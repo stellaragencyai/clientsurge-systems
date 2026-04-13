@@ -1,0 +1,32 @@
+{
+  "name": "Events",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "event_type": {
+      "type": "string",
+      "title": "Event Type",
+      "enum": [
+        "lead_created",
+        "sms_sent",
+        "sms_received",
+        "email_sent",
+        "email_opened",
+        "email_clicked",
+        "status_changed",
+        "follow_up_scheduled"
+      ]
+    },
+    "data": {
+      "type": "object",
+      "title": "Event Data"
+    }
+  },
+  "required": [
+    "lead_id",
+    "event_type"
+  ]
+}

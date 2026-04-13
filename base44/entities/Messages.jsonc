@@ -1,0 +1,46 @@
+{
+  "name": "Messages",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "direction": {
+      "type": "string",
+      "title": "Direction",
+      "enum": [
+        "inbound",
+        "outbound"
+      ]
+    },
+    "channel": {
+      "type": "string",
+      "title": "Channel",
+      "enum": [
+        "sms",
+        "email"
+      ]
+    },
+    "message_text": {
+      "type": "string",
+      "title": "Message Text"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "sent",
+        "delivered",
+        "failed",
+        "received"
+      ]
+    }
+  },
+  "required": [
+    "lead_id",
+    "direction",
+    "channel",
+    "message_text"
+  ]
+}

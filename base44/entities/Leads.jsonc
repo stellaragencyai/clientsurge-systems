@@ -1,0 +1,51 @@
+{
+  "name": "Leads",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string",
+      "title": "Full Name"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Phone Number"
+    },
+    "business_type": {
+      "type": "string",
+      "title": "Business Type"
+    },
+    "problem": {
+      "type": "string",
+      "title": "Biggest Problem"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "New",
+        "Contacted",
+        "Replied",
+        "Qualified",
+        "Booked",
+        "Closed"
+      ],
+      "default": "New"
+    }
+  },
+  "required": [
+    "full_name",
+    "business_name",
+    "email",
+    "phone",
+    "business_type",
+    "problem"
+  ]
+}

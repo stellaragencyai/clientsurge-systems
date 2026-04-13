@@ -1,0 +1,38 @@
+{
+  "name": "Emails",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "email_address": {
+      "type": "string",
+      "title": "Email Address"
+    },
+    "subject": {
+      "type": "string",
+      "title": "Subject"
+    },
+    "body": {
+      "type": "string",
+      "title": "Body"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "sent",
+        "delivered",
+        "opened",
+        "failed"
+      ]
+    }
+  },
+  "required": [
+    "lead_id",
+    "email_address",
+    "subject",
+    "body"
+  ]
+}

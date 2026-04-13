@@ -11,6 +11,7 @@ import MedSpa from './pages/MedSpa';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import AdminSettings from './pages/AdminSettings';
+import CaptureLeads from './pages/CaptureLeads';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -43,6 +44,7 @@ const AuthenticatedApp = () => {
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/admin-settings" element={<AdminSettings />} />
+      <Route path="/leads/capture" element={<CaptureLeads />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
