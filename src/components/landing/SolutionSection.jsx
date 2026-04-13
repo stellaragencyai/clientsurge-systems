@@ -54,16 +54,33 @@ export default function SolutionSection() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {services.map((s, i) => (
-            <div key={i} className="p-6 rounded-2xl bg-background border border-border hover:shadow-md hover:border-primary/20 transition-all">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
-                <s.icon className="w-5 h-5 text-primary" />
+          {services.map((s, i) => {
+            let containerClass = "p-6 rounded-2xl transition-all";
+            
+            // Option A: Frosted Obsidian (indices 0-1)
+            if (i < 2) {
+              containerClass += " bg-opacity-55 backdrop-blur-xl border border-primary/25 shadow-lg hover:shadow-xl hover:border-primary/40 bg-slate-950/55";
+            }
+            // Option B: Liquid Gold Depth (indices 2-3)
+            else if (i < 4) {
+              containerClass += " bg-amber-50/45 backdrop-blur-2xl border border-primary/25 shadow-md hover:shadow-lg hover:border-primary/35 hover:bg-amber-50/55";
+            }
+            // Option C: Aurora Crystal (indices 4-5)
+            else {
+              containerClass += " bg-white/18 backdrop-blur-3xl border border-white/25 shadow-md hover:shadow-lg hover:border-primary/40 hover:bg-white/22";
+            }
+            
+            return (
+              <div key={i} className={containerClass}>
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+                  <s.icon className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="text-base font-semibold text-foreground mb-1">{s.title}</h3>
+                <p className="text-xs font-semibold text-primary mb-3">{s.outcome}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
               </div>
-              <h3 className="text-base font-semibold text-foreground mb-1">{s.title}</h3>
-              <p className="text-xs font-semibold text-primary mb-3">{s.outcome}</p>
-              <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
