@@ -2,30 +2,183 @@
   "name": "Lead",
   "type": "object",
   "properties": {
-    "business_type": {
+    "business_name": {
       "type": "string",
-      "title": "Business Type"
+      "title": "Business Name"
     },
-    "monthly_leads": {
+    "phone": {
       "type": "string",
-      "title": "Monthly Leads"
+      "title": "Phone Number"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "website": {
+      "type": "string",
+      "title": "Website URL"
+    },
+    "address": {
+      "type": "string",
+      "title": "Full Address"
+    },
+    "city": {
+      "type": "string",
+      "title": "City"
+    },
+    "state": {
+      "type": "string",
+      "title": "State"
+    },
+    "niche": {
+      "type": "string",
+      "title": "Business Niche"
+    },
+    "social_links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "platform": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "facebook",
+              "linkedin",
+              "twitter",
+              "tiktok"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "followers": {
+            "type": "number"
+          }
+        }
+      },
+      "title": "Social Media Links"
+    },
+    "has_website": {
+      "type": "boolean",
+      "title": "Has Website",
+      "default": false
+    },
+    "has_social": {
+      "type": "boolean",
+      "title": "Has Social Presence",
+      "default": false
+    },
+    "social_activity": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "unknown"
+      ],
+      "title": "Social Activity Level",
+      "default": "unknown"
+    },
+    "website_quality": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ],
+      "title": "Website Quality",
+      "default": "unknown"
+    },
+    "lead_score": {
+      "type": "number",
+      "title": "Lead Score (0-100)",
+      "default": 0
+    },
+    "lead_quality_label": {
+      "type": "string",
+      "enum": [
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "title": "Lead Quality Label"
     },
     "status": {
       "type": "string",
-      "title": "Status",
       "enum": [
-        "new",
-        "contacted",
-        "demo_booked",
-        "closed",
-        "not_qualified"
+        "New",
+        "Qualified",
+        "Contacted",
+        "Responded",
+        "Booked",
+        "Closed",
+        "Rejected"
       ],
-      "default": "new"
+      "title": "Pipeline Status",
+      "default": "New"
     },
-    "notes": {
+    "source": {
       "type": "string",
-      "title": "Notes"
+      "title": "Discovery Source",
+      "default": "agent"
+    },
+    "outreach_insight": {
+      "type": "string",
+      "title": "Outreach Intelligence / Insight Summary"
+    },
+    "estimated_responsiveness": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "unknown"
+      ],
+      "title": "Estimated Responsiveness",
+      "default": "unknown"
+    },
+    "missing_systems": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Missing Follow-Up Systems",
+      "default": []
+    },
+    "competitor_notes": {
+      "type": "string",
+      "title": "Internal Notes / Observations"
+    },
+    "phone_hash": {
+      "type": "string",
+      "title": "Phone Hash (for deduplication)"
+    },
+    "domain": {
+      "type": "string",
+      "title": "Website Domain (for deduplication)"
+    },
+    "last_enriched_at": {
+      "type": "string",
+      "title": "Last Enrichment Date"
+    },
+    "contacted_at": {
+      "type": "string",
+      "title": "Date First Contacted"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Tags"
     }
   },
-  "required": []
+  "required": [
+    "business_name",
+    "phone",
+    "city",
+    "state",
+    "niche"
+  ]
 }

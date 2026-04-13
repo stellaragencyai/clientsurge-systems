@@ -1,0 +1,67 @@
+{
+  "name": "LeadAnalytics",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "title": "Date"
+    },
+    "total_leads": {
+      "type": "number",
+      "title": "Total Leads",
+      "default": 0
+    },
+    "new_leads": {
+      "type": "number",
+      "title": "New Leads Today",
+      "default": 0
+    },
+    "high_quality_count": {
+      "type": "number",
+      "title": "High Quality Count",
+      "default": 0
+    },
+    "medium_quality_count": {
+      "type": "number",
+      "title": "Medium Quality Count",
+      "default": 0
+    },
+    "low_quality_count": {
+      "type": "number",
+      "title": "Low Quality Count",
+      "default": 0
+    },
+    "avg_lead_score": {
+      "type": "number",
+      "title": "Average Lead Score",
+      "default": 0
+    },
+    "stage_new": {
+      "type": "number",
+      "default": 0
+    },
+    "stage_qualified": {
+      "type": "number",
+      "default": 0
+    },
+    "stage_contacted": {
+      "type": "number",
+      "default": 0
+    },
+    "stage_responded": {
+      "type": "number",
+      "default": 0
+    },
+    "stage_booked": {
+      "type": "number",
+      "default": 0
+    },
+    "stage_closed": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "date"
+  ]
+}

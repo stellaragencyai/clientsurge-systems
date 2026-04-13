@@ -1,0 +1,81 @@
+{
+  "name": "LeadDiscoveryJob",
+  "type": "object",
+  "properties": {
+    "niche": {
+      "type": "string",
+      "title": "Target Niche"
+    },
+    "location_city": {
+      "type": "string",
+      "title": "Target City"
+    },
+    "location_state": {
+      "type": "string",
+      "title": "Target State"
+    },
+    "location_radius_miles": {
+      "type": "number",
+      "title": "Search Radius (miles)",
+      "default": 25
+    },
+    "min_rating": {
+      "type": "number",
+      "title": "Minimum Rating",
+      "default": 0
+    },
+    "require_website": {
+      "type": "boolean",
+      "title": "Website Required",
+      "default": false
+    },
+    "min_followers": {
+      "type": "number",
+      "title": "Minimum Social Followers",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "running",
+        "completed",
+        "failed"
+      ],
+      "title": "Job Status",
+      "default": "pending"
+    },
+    "leads_discovered": {
+      "type": "number",
+      "title": "Leads Discovered",
+      "default": 0
+    },
+    "leads_new": {
+      "type": "number",
+      "title": "New Leads",
+      "default": 0
+    },
+    "leads_updated": {
+      "type": "number",
+      "title": "Updated Leads",
+      "default": 0
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message"
+    },
+    "started_at": {
+      "type": "string",
+      "title": "Job Started"
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Job Completed"
+    }
+  },
+  "required": [
+    "niche",
+    "location_city",
+    "location_state"
+  ]
+}
