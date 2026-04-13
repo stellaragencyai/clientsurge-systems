@@ -19,12 +19,12 @@ const faqs = [
     a: "Absolutely. We can integrate with your existing database and start reactivating old leads immediately.",
   },
   {
-    q: 'How fast can it go live?',
-    a: 'Most med spas are fully live within 5–7 business days. We handle everything. One onboarding call and you're done.',
+    q: "How fast can it go live?",
+    a: "Most med spas are fully live within 5–7 business days. We handle everything. One onboarding call and you're done.",
   },
   {
-    q: 'What if we use a custom calendar system?',
-    a: 'We integrate with most calendar platforms—Acuity, Calendly, Google Calendar, etc. If it's different, we can usually make it work.',
+    q: "What if we use a custom calendar system?",
+    a: "We integrate with most calendar platforms—Acuity, Calendly, Google Calendar, etc. If it's different, we can usually make it work.",
   },
   {
     q: 'How much does this cost?',

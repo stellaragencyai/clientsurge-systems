@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const demoMessages = [
   { from: 'system', text: 'New inquiry: Sarah M. — Interested in Botox consultation', time: '2:14 PM' },
@@ -20,7 +20,7 @@ export default function DemoSection() {
   };
 
   // Auto-play logic
-  React.useEffect(() => {
+  useEffect(() => {
     if (!autoPlay || displayedMessages >= demoMessages.length) return;
     const timer = setTimeout(() => {
       setDisplayedMessages(displayedMessages + 1);
