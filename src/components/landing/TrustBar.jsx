@@ -32,7 +32,7 @@ export default function TrustBar() {
   const [tooltip, setTooltip] = useState(null);
 
   return (
-    <section className="py-6 border-y border-border bg-muted/40 relative">
+    <section className="py-8 bg-gradient-to-b from-background via-card to-background relative">
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
           {items.map((item, i) => (

@@ -30,7 +30,7 @@ const problems = [
 
 export default function ProblemSection() {
   return (
-    <section className="py-24 md:py-32 px-6">
+    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-background via-card to-background">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Real Problem</p>
@@ -46,7 +46,7 @@ export default function ProblemSection() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {problems.map((p, i) => (
-            <div key={i} className="p-6 rounded-2xl border border-border bg-card hover:border-primary/40 transition-colors">
+            <div key={i} className="p-6 rounded-2xl border border-border bg-white hover:border-primary/40 transition-colors">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
                 <p.icon className="w-5 h-5 text-primary" />
               </div>

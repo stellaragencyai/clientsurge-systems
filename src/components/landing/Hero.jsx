@@ -26,7 +26,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="pt-32 pb-20 md:pt-48 md:pb-32 px-6">
+    <section className="pt-32 pb-20 md:pt-48 md:pb-32 px-6 bg-gradient-to-b from-card via-background to-card">
       <div className="max-w-4xl mx-auto text-center">
 
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-widest uppercase mb-10">
