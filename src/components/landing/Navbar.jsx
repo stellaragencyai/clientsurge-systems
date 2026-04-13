@@ -49,9 +49,26 @@ export default function Navbar() {
     }`}>
       <div className="w-full px-8 h-16 flex items-center justify-between">
         {/* Logo — pinned left */}
-        <a href="#" className="font-display text-xl font-semibold tracking-tight text-foreground shrink-0">
+        <button 
+          onClick={(e) => {
+            e.preventDefault();
+            const start = window.scrollY;
+            const distance = -start;
+            const duration = 900;
+            let startTime = null;
+            const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            const step = (timestamp) => {
+              if (!startTime) startTime = timestamp;
+              const progress = Math.min((timestamp - startTime) / duration, 1);
+              window.scrollTo(0, start + distance * ease(progress));
+              if (progress < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+          }}
+          className="font-display text-xl font-semibold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:text-primary transition-colors"
+        >
           Apex<span className="text-primary">Flow</span>
-        </a>
+        </button>
 
         {/* Center nav links */}
         <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
