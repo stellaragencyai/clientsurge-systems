@@ -85,6 +85,12 @@ Deno.serve(async (req) => {
       console.log('Webhook dispatch failed (non-blocking):', err.message);
     }
 
+    try {
+      await base44.functions.invoke('scheduleFollowUpEmails', { lead_id: lead.id });
+    } catch (err) {
+      console.log('Follow-up email scheduling failed (non-blocking):', err.message);
+    }
+
     return Response.json({
       success: true,
       lead_id: lead.id,

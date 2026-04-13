@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Search, Filter, LogOut, Plus, Edit, Trash2, Eye } from "lucide-react";
+import EmailHistoryPanel from "../components/dashboard/EmailHistoryPanel";
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -10,9 +11,12 @@ export default function Dashboard() {
   const [leads, setLeads] = useState([]);
   const [clients, setClients] = useState([]);
   const [demoRequests, setDemoRequests] = useState([]);
+  const [emails, setEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedLead, setSelectedLead] = useState(null);
+  const [leadEmails, setLeadEmails] = useState([]);
 
   useEffect(() => {
     loadData();
@@ -21,18 +25,33 @@ export default function Dashboard() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [leadsData, clientsData, demosData] = await Promise.all([
+      const [leadsData, clientsData, demosData, emailsData] = await Promise.all([
         base44.entities.Lead.list("-created_date", 100),
         base44.entities.Client.list("-created_date", 100),
         base44.entities.DemoRequest.list("-created_date", 100),
+        base44.entities.CommunicationEvent.filter({ channel: 'email' }, '-created_date', 100),
       ]);
       setLeads(leadsData);
       setClients(clientsData);
       setDemoRequests(demosData);
+      setEmails(emailsData);
     } catch (err) {
       console.error("Error loading data:", err);
     }
     setLoading(false);
+  };
+
+  const loadLeadEmails = async (leadId) => {
+    try {
+      const emailsData = await base44.entities.CommunicationEvent.filter(
+        { lead_id: leadId, channel: 'email' },
+        '-created_date',
+        50
+      );
+      setLeadEmails(emailsData);
+    } catch (err) {
+      console.error("Error loading lead emails:", err);
+    }
   };
 
   const handleLogout = () => {
@@ -94,6 +113,7 @@ export default function Dashboard() {
             { id: "leads", label: "Leads", count: leads.length },
             { id: "clients", label: "Clients", count: clients.length },
             { id: "demos", label: "Demo Requests", count: demoRequests.length },
+            { id: "emails", label: "Emails", count: emails.length },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -147,7 +167,11 @@ export default function Dashboard() {
                 {filteredLeads.map((lead) => (
                   <div
                     key={lead.id}
-                    className="p-4 bg-white rounded-lg border border-border hover:border-primary/30 transition-colors"
+                    className="p-4 bg-white rounded-lg border border-border hover:border-primary/30 transition-colors cursor-pointer"
+                    onClick={() => {
+                      setSelectedLead(lead.id === selectedLead ? null : lead.id);
+                      if (lead.id !== selectedLead) loadLeadEmails(lead.id);
+                    }}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -163,12 +187,18 @@ export default function Dashboard() {
                             </span>
                           )}
                         </div>
+                        {selectedLead === lead.id && (
+                          <div className="mt-4 pt-4 border-t border-border">
+                            <p className="text-xs font-semibold text-foreground mb-3">Email History</p>
+                            <EmailHistoryPanel emails={leadEmails} />
+                          </div>
+                        )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <button className="p-2 hover:bg-muted rounded-lg transition-colors">
+                        <button className="p-2 hover:bg-muted rounded-lg transition-colors" onClick={(e) => e.stopPropagation()}>
                           <Edit className="w-4 h-4 text-foreground" />
                         </button>
-                        <button className="p-2 hover:bg-muted rounded-lg transition-colors">
+                        <button className="p-2 hover:bg-muted rounded-lg transition-colors" onClick={(e) => e.stopPropagation()}>
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </button>
                       </div>
@@ -236,6 +266,41 @@ export default function Dashboard() {
                         <div className="mt-2">
                           <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-medium">
                             {demo.status}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Emails Tab */}
+        {activeTab === "emails" && (
+          <div className="space-y-4">
+            {loading ? (
+              <p className="text-muted-foreground text-center py-8">Loading...</p>
+            ) : emails.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">No emails sent</p>
+            ) : (
+              <div className="space-y-3">
+                {emails.map((email) => (
+                  <div
+                    key={email.id}
+                    className="p-4 bg-white rounded-lg border border-border hover:border-primary/30 transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground">{email.subject}</h3>
+                        <p className="text-sm text-muted-foreground mt-1">{email.message_body}</p>
+                        <div className="mt-2 flex items-center gap-2 text-xs">
+                          <span className="px-2 py-1 rounded-full bg-primary/10 text-primary font-medium">
+                            {email.status}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {new Date(email.created_date).toLocaleDateString()}
                           </span>
                         </div>
                       </div>
