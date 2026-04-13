@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Sparkles, Heart, Building2, Home, MapPin, Wrench, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import IndustryModal from "./IndustryModal";
 
 const industries = [
   {
@@ -60,7 +61,7 @@ const industries = [
 ];
 
 export default function Industries() {
-  const [active, setActive] = useState(null);
+  const [selectedIndustry, setSelectedIndustry] = useState(null);
 
   return (
     <section id="industries" className="py-24 md:py-32 px-6 bg-gradient-to-b from-card via-background to-card">
@@ -75,50 +76,48 @@ export default function Industries() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {industries.map((ind, i) => {
-            const isOpen = active === i;
+            const Icon = ind.icon;
             return (
-              <div
+              <button
                 key={i}
-                onClick={() => setActive(isOpen ? null : i)}
-                className={`p-6 rounded-2xl border cursor-pointer transition-all ${
-                  isOpen
-                    ? "border-primary/50 shadow-md bg-card"
-                    : "border-border bg-card hover:border-primary/30 hover:shadow-sm"
-                }`}
+                onClick={() => setSelectedIndustry(ind)}
+                className="group relative p-6 rounded-2xl border border-border bg-gradient-to-br from-white/50 to-white/30 hover:border-primary/50 transition-all duration-300 hover:shadow-lg overflow-hidden text-left"
               >
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
-                  <ind.icon className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="text-base font-semibold text-foreground mb-1">{ind.name}</h3>
-                <p className="text-xs font-medium text-primary/80 mb-3 italic">{ind.problem}</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">{ind.desc}</p>
-
-                {/* Expanded CTA */}
-                {isOpen && (
-                  <div className="mt-5 pt-5 border-t border-border space-y-3" onClick={(e) => e.stopPropagation()}>
-                    <p className="text-xs font-semibold text-primary flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
-                      {ind.result}
-                    </p>
-                    <a href={ind.href}>
-                      <Button size="sm" className="rounded-full w-full text-xs font-semibold gap-1.5 h-9">
-                        {ind.cta}
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </Button>
-                    </a>
+                {/* Background gradient on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                
+                <div className="relative z-10">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center mb-5 transition-colors">
+                    <Icon className="w-6 h-6 text-primary" />
                   </div>
-                )}
-              </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                    {ind.name}
+                  </h3>
+                  <p className="text-sm font-medium text-primary/70 mb-3 italic">{ind.problem}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{ind.desc}</p>
+                  
+                  {/* Arrow hint */}
+                  <div className="mt-4 flex items-center gap-2 text-primary font-semibold text-sm group-hover:gap-3 transition-all">
+                    <span>Explore</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </div>
+              </button>
             );
           })}
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-8">
-          Click your industry to see results and book a tailored demo.
+        <p className="text-center text-xs text-muted-foreground mt-10">
+          Click any industry to see how ApexFlow works for your business.
         </p>
       </div>
+
+      {/* Modal */}
+      {selectedIndustry && (
+        <IndustryModal industry={selectedIndustry} onClose={() => setSelectedIndustry(null)} />
+      )}
     </section>
   );
 }
