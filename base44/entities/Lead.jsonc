@@ -1,0 +1,31 @@
+{
+  "name": "Lead",
+  "type": "object",
+  "properties": {
+    "business_type": {
+      "type": "string",
+      "title": "Business Type"
+    },
+    "monthly_leads": {
+      "type": "string",
+      "title": "Monthly Leads"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "new",
+        "contacted",
+        "demo_booked",
+        "closed",
+        "not_qualified"
+      ],
+      "default": "new"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": []
+}

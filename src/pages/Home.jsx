@@ -6,6 +6,7 @@ import SolutionSection from "../components/landing/SolutionSection";
 import HowItWorks from "../components/landing/HowItWorks";
 import Benefits from "../components/landing/Benefits";
 import ConversationMockup from "../components/landing/ConversationMockup";
+import Testimonials from "../components/landing/Testimonials";
 import Industries from "../components/landing/Industries";
 import CoreOffer from "../components/landing/CoreOffer";
 import WhyUs from "../components/landing/WhyUs";
@@ -22,6 +23,7 @@ export default function Home() {
       <ProblemSection />
       <SolutionSection />
       <HowItWorks />
+      <Testimonials />
       <ConversationMockup />
       <Benefits />
       <Industries />

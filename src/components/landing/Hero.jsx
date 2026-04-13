@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 import StatCounter from "./StatCounter";
 import ConversationModal from "./ConversationModal";
 
@@ -18,10 +19,18 @@ export default function Hero() {
   const [step, setStep] = useState("cta"); // "cta" | "form" | "done"
   const [bizType, setBizType] = useState("");
   const [leads, setLeads] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!bizType || !leads) return;
+    setSaving(true);
+    await base44.entities.Lead.create({
+      business_type: bizType,
+      monthly_leads: leads,
+      status: "new",
+    });
+    setSaving(false);
     setStep("done");
   };
 
