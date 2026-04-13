@@ -36,7 +36,7 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 bg-gradient-to-b from-background to-card overflow-hidden">
+    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 bg-white overflow-hidden transition-all duration-700">
       {/* Gold ambient glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full pointer-events-none" style={{background: 'radial-gradient(ellipse, rgba(161,120,35,0.18) 0%, transparent 70%)'}} />
 

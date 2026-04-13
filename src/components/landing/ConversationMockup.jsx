@@ -30,7 +30,7 @@ export default function ConversationMockup() {
   ];
 
   return (
-    <section className="py-20 md:py-28 px-6 bg-gradient-to-b from-background to-card">
+    <section className="py-20 md:py-28 px-6 bg-white transition-all duration-700">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-sm font-medium text-primary tracking-wide uppercase mb-4">
