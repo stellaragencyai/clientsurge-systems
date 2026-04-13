@@ -55,7 +55,7 @@ export default function SolutionSection() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {services.map((s, i) => (
-            <div key={i} className="p-6 rounded-2xl bg-background border border-border hover:shadow-md hover:border-primary/20 transition-all">
+            <div key={i} className="p-6 rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 hover:bg-white/20 hover:border-white/40 transition-all shadow-lg">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
                 <s.icon className="w-5 h-5 text-primary" />
               </div>
