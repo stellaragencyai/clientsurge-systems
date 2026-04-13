@@ -38,10 +38,6 @@ export default function Hero() {
     <section className="pt-32 pb-20 md:pt-48 md:pb-32 px-6 bg-gradient-to-b from-background to-card">
       <div className="max-w-4xl mx-auto text-center">
 
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-widest uppercase mb-10">
-          Done-For-You AI Automation
-        </div>
-
         <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.08] text-foreground">
           Turn More Leads Into
           <br />
