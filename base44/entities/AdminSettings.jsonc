@@ -1,0 +1,81 @@
+{
+  "name": "AdminSettings",
+  "type": "object",
+  "properties": {
+    "twilio_enabled": {
+      "type": "boolean",
+      "title": "Twilio Enabled",
+      "default": false
+    },
+    "twilio_from_number": {
+      "type": "string",
+      "title": "Twilio From Number"
+    },
+    "twilio_account_sid_present": {
+      "type": "boolean",
+      "title": "Twilio Account SID Present",
+      "default": false
+    },
+    "twilio_auth_token_present": {
+      "type": "boolean",
+      "title": "Twilio Auth Token Present",
+      "default": false
+    },
+    "resend_enabled": {
+      "type": "boolean",
+      "title": "Resend Email Enabled",
+      "default": false
+    },
+    "resend_from_email": {
+      "type": "string",
+      "title": "Resend From Email"
+    },
+    "gmail_enabled": {
+      "type": "boolean",
+      "title": "Gmail Enabled",
+      "default": false
+    },
+    "gmail_from_email": {
+      "type": "string",
+      "title": "Gmail From Email"
+    },
+    "lead_notification_email": {
+      "type": "string",
+      "title": "Admin Notification Email"
+    },
+    "booking_link_default": {
+      "type": "string",
+      "title": "Default Booking Link"
+    },
+    "webhook_enabled": {
+      "type": "boolean",
+      "title": "Webhooks Enabled",
+      "default": false
+    },
+    "webhook_url": {
+      "type": "string",
+      "title": "Webhook URL"
+    },
+    "sms_template": {
+      "type": "string",
+      "title": "SMS Template"
+    },
+    "email_confirmation_template": {
+      "type": "string",
+      "title": "Email Confirmation Template"
+    },
+    "admin_notification_template": {
+      "type": "string",
+      "title": "Admin Notification Template"
+    },
+    "last_webhook_test_result": {
+      "type": "string",
+      "title": "Last Webhook Test Result"
+    },
+    "last_webhook_test_at": {
+      "type": "string",
+      "title": "Last Webhook Test At"
+    }
+  },
+  "required": []
+}

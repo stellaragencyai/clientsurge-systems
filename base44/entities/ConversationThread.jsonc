@@ -1,0 +1,42 @@
+{
+  "name": "ConversationThread",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "primary_channel": {
+      "type": "string",
+      "title": "Primary Channel",
+      "enum": [
+        "sms",
+        "email",
+        "webhook"
+      ]
+    },
+    "last_message_at": {
+      "type": "string",
+      "title": "Last Message At"
+    },
+    "thread_status": {
+      "type": "string",
+      "title": "Thread Status",
+      "enum": [
+        "open",
+        "active",
+        "closed"
+      ],
+      "default": "open"
+    },
+    "message_count": {
+      "type": "integer",
+      "title": "Message Count",
+      "default": 0
+    }
+  },
+  "required": [
+    "lead_id",
+    "primary_channel"
+  ]
+}

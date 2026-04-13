@@ -1,0 +1,97 @@
+{
+  "name": "CommunicationEvent",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "channel": {
+      "type": "string",
+      "title": "Channel",
+      "enum": [
+        "sms",
+        "email",
+        "webhook",
+        "internal"
+      ]
+    },
+    "direction": {
+      "type": "string",
+      "title": "Direction",
+      "enum": [
+        "outbound",
+        "inbound",
+        "system"
+      ]
+    },
+    "event_type": {
+      "type": "string",
+      "title": "Event Type",
+      "enum": [
+        "lead_created",
+        "sms_sent",
+        "sms_failed",
+        "sms_received",
+        "sms_delivered",
+        "email_sent",
+        "email_failed",
+        "webhook_sent",
+        "workflow_triggered",
+        "status_update"
+      ]
+    },
+    "provider": {
+      "type": "string",
+      "title": "Provider",
+      "enum": [
+        "twilio",
+        "resend",
+        "gmail",
+        "zapier",
+        "n8n",
+        "internal"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "pending",
+        "sent",
+        "delivered",
+        "failed",
+        "received",
+        "processed"
+      ]
+    },
+    "subject": {
+      "type": "string",
+      "title": "Subject"
+    },
+    "message_body": {
+      "type": "string",
+      "title": "Message Body"
+    },
+    "provider_message_id": {
+      "type": "string",
+      "title": "Provider Message ID"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Metadata"
+    }
+  },
+  "required": [
+    "lead_id",
+    "channel",
+    "direction",
+    "event_type",
+    "provider",
+    "status"
+  ]
+}

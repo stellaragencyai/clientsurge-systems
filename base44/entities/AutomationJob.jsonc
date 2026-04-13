@@ -1,0 +1,61 @@
+{
+  "name": "AutomationJob",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "job_type": {
+      "type": "string",
+      "title": "Job Type",
+      "enum": [
+        "instant_sms",
+        "confirmation_email",
+        "admin_notification",
+        "nurture_sequence",
+        "webhook_dispatch"
+      ]
+    },
+    "trigger_event": {
+      "type": "string",
+      "title": "Trigger Event"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "queued",
+        "processing",
+        "completed",
+        "failed"
+      ]
+    },
+    "attempts": {
+      "type": "integer",
+      "title": "Attempts",
+      "default": 0
+    },
+    "last_error": {
+      "type": "string",
+      "title": "Last Error"
+    },
+    "scheduled_for": {
+      "type": "string",
+      "title": "Scheduled For"
+    },
+    "processed_at": {
+      "type": "string",
+      "title": "Processed At"
+    },
+    "result_metadata": {
+      "type": "string",
+      "title": "Result Metadata"
+    }
+  },
+  "required": [
+    "lead_id",
+    "job_type",
+    "status"
+  ]
+}

@@ -10,6 +10,7 @@ import Home from './pages/Home';
 import MedSpa from './pages/MedSpa';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
+import AdminSettings from './pages/AdminSettings';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -41,6 +42,7 @@ const AuthenticatedApp = () => {
       <Route path="/med-spa" element={<MedSpa />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/admin-settings" element={<AdminSettings />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
