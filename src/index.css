@@ -7,7 +7,7 @@
 @layer base {
   :root {
     --font-inter: 'Inter', sans-serif;
-    --font-display: 'Inter', sans-serif;
+    --font-display: 'Playfair Display', serif;
 
     --background: 40 20% 98%;
     --foreground: 220 20% 10%;
