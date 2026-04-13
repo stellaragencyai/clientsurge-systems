@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -66,7 +67,13 @@ export default function Navbar() {
         </div>
 
         {/* CTA — pinned right */}
-        <div className="hidden md:block shrink-0">
+        <div className="hidden md:flex items-center gap-3 shrink-0">
+          <button
+            onClick={() => base44.auth.redirectToLogin()}
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Login
+          </button>
           <a href="#book-demo">
             <Button className="rounded-full px-6 text-sm font-medium">
               Book a Demo
@@ -94,6 +101,12 @@ export default function Navbar() {
               {l.label}
             </a>
           ))}
+          <button
+            onClick={() => base44.auth.redirectToLogin()}
+            className="block w-full text-left text-sm text-muted-foreground hover:text-foreground mb-3"
+          >
+            Login
+          </button>
           <a href="#book-demo" onClick={(e) => scrollTo(e, "#book-demo")}>
             <Button className="rounded-full w-full text-sm font-medium">
               Book a Demo
