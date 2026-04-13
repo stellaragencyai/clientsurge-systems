@@ -14,7 +14,7 @@ const includes = [
 
 export default function CoreOffer() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-card/60 via-background/40 to-card/30">
+    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-background via-card to-background">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Package</p>

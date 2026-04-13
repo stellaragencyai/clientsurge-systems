@@ -27,7 +27,7 @@ const reasons = [
 
 export default function WhyUs() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-card/40 via-background to-background/80">
+    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Why ApexFlow</p>

@@ -41,9 +41,8 @@ const services = [
 
 export default function SolutionSection() {
   return (
-    <section id="services" className="py-24 md:py-32 px-6 bg-gradient-to-b from-foreground/10 via-background to-card relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-foreground/5 via-transparent to-transparent pointer-events-none" />
-      <div className="max-w-6xl mx-auto relative z-10">
+    <section id="services" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
+      <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">What We Build</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">

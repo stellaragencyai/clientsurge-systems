@@ -38,7 +38,7 @@ export default function TrustBar() {
   const [tooltip, setTooltip] = useState(null);
 
   return (
-    <section className="py-10 bg-gradient-to-b from-card via-background/50 to-background">
+    <section className="py-10 bg-gradient-to-b from-card to-background">
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-wrap items-stretch justify-center divide-y md:divide-y-0 md:divide-x divide-border">
           {items.map((item, i) => {
