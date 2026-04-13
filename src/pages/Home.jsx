@@ -14,8 +14,6 @@ import FAQ from "../components/landing/FAQ";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
 import FadeIn from "../components/landing/FadeIn";
-import BeforeAfter from "../components/landing/BeforeAfter";
-import RevenueCalculator from "../components/landing/RevenueCalculator";
 import StickyCTA from "../components/landing/StickyCTA";
 import SocialProofToasts from "../components/landing/SocialProofToasts";
 
@@ -26,7 +24,6 @@ export default function Home() {
       <Hero />
       <FadeIn><TrustBar /></FadeIn>
       <FadeIn><ProblemSection /></FadeIn>
-      <FadeIn><BeforeAfter /></FadeIn>
       <FadeIn><SolutionSection /></FadeIn>
       <FadeIn><HowItWorks /></FadeIn>
       <FadeIn><Testimonials /></FadeIn>
@@ -36,7 +33,6 @@ export default function Home() {
       <FadeIn><CoreOffer /></FadeIn>
       <FadeIn><WhyUs /></FadeIn>
       <FadeIn><FAQ /></FadeIn>
-      <FadeIn><RevenueCalculator /></FadeIn>
       <FinalCTA />
       <Footer />
       <StickyCTA />
