@@ -75,37 +75,49 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-border">
-        <div className="max-w-6xl mx-auto px-6 py-4">
+      {/* Bottom bar — improved with pinned left/right, separators, gradient */}
+      <div className="border-t border-border bg-gradient-to-r from-background via-background/95 to-background">
+        <div className="max-w-6xl mx-auto px-6 py-5">
 
-          {/* Bottom legal row */}
-          <div className="border-t border-border pt-3 flex flex-col sm:flex-row items-center justify-between gap-3">
-            {/* Branding — bottom left, small */}
-            <a href="#" className="font-display text-sm font-semibold tracking-tight text-foreground/60">
+          {/* Bottom legal row — logo pinned left, copyright pinned right */}
+          <div className="flex items-center justify-between gap-4">
+            {/* Logo pinned far left */}
+            <a href="#" className="font-display text-sm font-semibold tracking-tight text-foreground/60 hover:text-primary transition-colors flex-shrink-0">
               Apex<span className="text-primary">Flow</span>™
             </a>
 
-            {/* Legal links — center */}
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              {legal.map((l) => (
-                <a key={l.label} href={l.href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                  {l.label}
-                </a>
+            {/* Legal links — center with separators */}
+            <div className="hidden md:flex items-center gap-4 flex-1 px-6 justify-center">
+              {legal.map((l, idx) => (
+                <div key={l.label} className="flex items-center gap-4">
+                  <a href={l.href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                    {l.label}
+                  </a>
+                  {idx < legal.length - 1 && <span className="w-px h-3 bg-border/60" />}
+                </div>
               ))}
             </div>
 
-            {/* Copyright + scroll top — right */}
-            <div className="flex items-center gap-3">
-              <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} ApexFlow. All rights reserved.</p>
+            {/* Copyright + scroll top — pinned far right */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <p className="text-xs text-muted-foreground whitespace-nowrap">© {new Date().getFullYear()} ApexFlow. All rights reserved.</p>
               <button
                 onClick={scrollTop}
-                className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary transition-all"
+                className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary transition-all hover:bg-primary/5"
                 aria-label="Back to top"
               >
                 <ArrowUp className="w-3 h-3" />
               </button>
             </div>
+          </div>
+
+          {/* Mobile legal links */}
+          <div className="md:hidden flex flex-wrap items-center justify-center gap-2 mt-4 pt-4 border-t border-border">
+            {legal.map((l) => (
+              <a key={l.label} href={l.href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                {l.label}
+              </a>
+            ))}
           </div>
 
         </div>
