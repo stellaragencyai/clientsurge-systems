@@ -22,7 +22,20 @@ export default function Navbar() {
   const scrollTo = (e, href) => {
     e.preventDefault();
     const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!el) return;
+    const start = window.scrollY;
+    const target = el.getBoundingClientRect().top + window.scrollY - 64;
+    const distance = target - start;
+    const duration = 900;
+    let startTime = null;
+    const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const step = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      window.scrollTo(0, start + distance * ease(progress));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
     setOpen(false);
   };
 
