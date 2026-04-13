@@ -1,24 +1,47 @@
-import { Clock, CalendarCheck, ShieldCheck, Users, TrendingUp, DollarSign } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Clock, CalendarCheck, ShieldCheck, Users, TrendingUp, DollarSign } from "lucide-react";
 
 const benefits = [
-  { icon: Clock, title: "Faster Response Times", desc: "Respond to every lead in under 60 seconds — day or night." },
-  { icon: CalendarCheck, title: "More Booked Appointments", desc: "Automated booking flows remove friction and increase show rates." },
-  { icon: ShieldCheck, title: "Fewer Missed Leads", desc: "No lead goes unanswered. Every inquiry gets a response." },
-  { icon: Users, title: "Less Manual Work", desc: "Free your team from repetitive follow-up so they can focus on patients and clients." },
-  { icon: TrendingUp, title: "Higher Conversion Rates", desc: "Consistent follow-up turns more inquiries into paying customers." },
-  { icon: DollarSign, title: "More Revenue From Existing Demand", desc: "Stop leaving money on the table. Convert the leads you're already generating." },
+  {
+    icon: Clock,
+    title: "Respond Before Your Competitor Does",
+    desc: "First to respond wins the booking. Our systems reply in under 60 seconds — day, night, weekends.",
+  },
+  {
+    icon: CalendarCheck,
+    title: "A Fuller Calendar, Without More Effort",
+    desc: "Automated booking flows mean more appointments confirmed and fewer no-shows draining your day.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Zero Leads Slipping Through",
+    desc: "Every inquiry gets a response. Every follow-up gets sent. Nothing depends on someone remembering.",
+  },
+  {
+    icon: Users,
+    title: "Your Team Focuses on What Matters",
+    desc: "When follow-up is automated, your staff focuses on clients in front of them — not chasing cold leads.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Higher Conversions From the Same Traffic",
+    desc: "You're already paying for leads. We help you convert more of them — without spending a dollar more on ads.",
+  },
+  {
+    icon: DollarSign,
+    title: "Revenue You Were Already Leaving on the Table",
+    desc: "Missed calls, slow replies, forgotten leads. Our systems recover that revenue and turn it into bookings.",
+  },
 ];
 
 export default function Benefits() {
   return (
-    <section className="py-20 md:py-28 px-6 bg-card border-y border-border">
+    <section className="py-24 md:py-32 px-6 bg-card border-y border-border">
       <div className="max-w-6xl mx-auto">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <p className="text-sm font-medium text-primary tracking-wide uppercase mb-4">
-            Real Results
-          </p>
+        <div className="max-w-2xl mx-auto text-center mb-16">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Outcomes</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            What This Means For Your Business
+            What Changes When You Automate
           </h2>
         </div>
 
@@ -34,6 +57,15 @@ export default function Benefits() {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="text-center mt-14">
+          <a href="#book-demo">
+            <Button className="rounded-full px-8 h-12 text-base font-semibold gap-2">
+              Book a Demo
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </a>
         </div>
       </div>
     </section>

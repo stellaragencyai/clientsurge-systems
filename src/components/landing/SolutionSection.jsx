@@ -4,68 +4,64 @@ const services = [
   {
     icon: Zap,
     title: "Instant Lead Response",
-    what: "Automatically respond to every new lead within seconds via SMS or chat.",
-    why: "Speed-to-lead is the #1 factor in conversion. Responding first wins the booking.",
+    outcome: "Stop losing leads to faster competitors.",
+    desc: "Every new inquiry — form, call, or message — gets an immediate, personalized response. No delays. No missed opportunities.",
   },
   {
     icon: MessageSquare,
     title: "Automated Follow-Up",
-    what: "Multi-step follow-up sequences that nurture leads until they book.",
-    why: "80% of sales happen after the 5th contact. Automation ensures no lead is forgotten.",
+    outcome: "Convert more of the leads you're already getting.",
+    desc: "Smart multi-step sequences keep following up until a lead books or opts out. Your pipeline works even when your team doesn't.",
   },
   {
     icon: PhoneOff,
     title: "Missed Call Text-Back",
-    what: "When you can't answer, an instant text is sent to keep the conversation alive.",
-    why: "Recover revenue from calls you'd otherwise lose to voicemail.",
+    outcome: "Recover revenue from every unanswered call.",
+    desc: "When you miss a call, a text fires instantly to keep the conversation alive. Customers stay engaged instead of moving on.",
   },
   {
     icon: CalendarCheck,
     title: "Booking Flow Automation",
-    what: "Guide leads directly to your scheduling page with zero friction.",
-    why: "Reduce the steps between interest and appointment. More bookings, less drop-off.",
+    outcome: "Remove friction between interest and appointment.",
+    desc: "Leads are guided directly to your calendar with zero manual back-and-forth. More bookings, fewer drop-offs.",
   },
   {
     icon: RotateCcw,
     title: "Lead Reactivation",
-    what: "Re-engage old leads in your database with targeted campaigns.",
-    why: "Turn past inquiries into new revenue without spending more on ads.",
+    outcome: "Generate revenue from leads you've already paid for.",
+    desc: "We re-engage dormant contacts in your database with targeted campaigns. Turn past inquiries into new bookings.",
   },
   {
     icon: Database,
-    title: "CRM Automation",
-    what: "Keep your pipeline organized with automatic tagging, status updates, and task creation.",
-    why: "Your team sees what matters. Nothing slips through the cracks.",
+    title: "CRM Pipeline Automation",
+    outcome: "Always know exactly where every lead stands.",
+    desc: "Automatic tagging, status updates, and task creation keep your pipeline clean. Nothing falls through the cracks.",
   },
 ];
 
 export default function SolutionSection() {
   return (
-    <section id="services" className="py-20 md:py-28 px-6 bg-card border-y border-border">
+    <section id="services" className="py-24 md:py-32 px-6 bg-card border-y border-border">
       <div className="max-w-6xl mx-auto">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <p className="text-sm font-medium text-primary tracking-wide uppercase mb-4">
-            What We Build For You
-          </p>
+        <div className="max-w-2xl mx-auto text-center mb-16">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">What We Build</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            Our Automation Systems Fix That
+            Systems That Convert Leads Into Revenue
           </h2>
+          <p className="mt-5 text-muted-foreground text-lg leading-relaxed">
+            Each system is built around a specific outcome — not a feature. No fluff. Just results.
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {services.map((s, i) => (
-            <div
-              key={i}
-              className="p-6 rounded-2xl bg-background border border-border hover:shadow-lg hover:border-primary/20 transition-all"
-            >
+            <div key={i} className="p-6 rounded-2xl bg-background border border-border hover:shadow-md hover:border-primary/20 transition-all">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
                 <s.icon className="w-5 h-5 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-3">{s.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-3">{s.what}</p>
-              <p className="text-sm text-foreground/80 font-medium leading-relaxed">
-                → {s.why}
-              </p>
+              <h3 className="text-base font-semibold text-foreground mb-1">{s.title}</h3>
+              <p className="text-xs font-semibold text-primary mb-3">{s.outcome}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
             </div>
           ))}
         </div>
