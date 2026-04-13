@@ -2,62 +2,55 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
 export default function MedSpaHero() {
+  const scrollTo = (href) => {
+    const el = document.querySelector(href);
+    if (!el) return;
+    const start = window.scrollY;
+    const target = el.getBoundingClientRect().top + window.scrollY - 64;
+    const distance = target - start;
+    const duration = 900;
+    let startTime = null;
+    const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    const step = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      window.scrollTo(0, start + distance * ease(progress));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
   return (
-    <section className="pt-32 pb-20 md:pt-52 md:pb-36 px-6">
-      <div className="max-w-4xl mx-auto text-center">
-
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#C9A96E]/30 bg-[#C9A96E]/8 text-[#A8874A] text-xs font-semibold tracking-widest uppercase mb-10">
-          For Med Spas & Aesthetic Clinics
-        </div>
-
-        <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.1] text-[#1C1C1C]">
-          Turn More Med Spa Leads Into
+    <section className="pt-32 pb-20 md:pt-48 md:pb-32 px-6 bg-white">
+      <div className="max-w-3xl mx-auto text-center">
+        <h1 className="text-5xl md:text-6xl font-semibold tracking-tight text-foreground leading-[1.1] mb-6">
+          Turn More Med Spa Leads Into Booked Appointments
           <br />
-          <span className="text-[#A8874A]">Booked Appointments.</span>
-          <br />
-          Automatically.
+          <span className="text-primary">Automatically</span>
         </h1>
 
-        <p className="mt-7 text-lg md:text-xl text-[#6B6B6B] max-w-2xl mx-auto leading-relaxed">
-          Your system responds to every inquiry in under 60 seconds, follows up
-          automatically, and books consultations — without your front desk
-          lifting a finger.
+        <p className="text-lg text-muted-foreground leading-relaxed mb-8 max-w-2xl mx-auto">
+          Instant responses. Automated follow-up. More bookings. No extra front desk work.
         </p>
 
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="#medspa-cta">
-            <Button
-              size="lg"
-              className="rounded-full px-9 h-13 text-base font-semibold gap-2 bg-[#A8874A] hover:bg-[#8f7040] text-white shadow-md hover:shadow-lg transition-all"
-            >
-              Book a Free Demo
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+          <a href="https://calendly.com" target="_blank" rel="noopener noreferrer">
+            <Button size="lg" className="rounded-lg px-8 h-12 text-base font-semibold gap-2">
+              Book a Demo
               <ArrowRight className="w-4 h-4" />
             </Button>
           </a>
-          <a href="#medspa-flow">
-            <Button
-              variant="outline"
-              size="lg"
-              className="rounded-full px-9 h-13 text-base font-medium border-[#D6C5A8] text-[#6B6B6B] hover:text-[#1C1C1C] hover:border-[#A8874A]"
-            >
-              See How It Works
-            </Button>
-          </a>
+          <button
+            onClick={() => scrollTo("#how-it-works")}
+            className="px-8 h-12 rounded-lg border border-border text-foreground font-semibold hover:bg-secondary transition-colors"
+          >
+            See How It Works
+          </button>
         </div>
 
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-[#9B9B9B]">
-          {[
-            "Live in under 7 days",
-            "No extra front desk work",
-            "Month-to-month, no contracts",
-          ].map((t, i) => (
-            <span key={i} className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#C9A96E]" />
-              {t}
-            </span>
-          ))}
-        </div>
-
+        <p className="text-sm text-muted-foreground">
+          No long-term contracts. Live in under 7 days.
+        </p>
       </div>
     </section>
   );

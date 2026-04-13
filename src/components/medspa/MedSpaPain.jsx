@@ -1,49 +1,27 @@
 export default function MedSpaPain() {
   return (
-    <section className="py-20 md:py-28 px-6 bg-[#1C1C1C]">
+    <section className="py-20 md:py-28 px-6 bg-white">
       <div className="max-w-3xl mx-auto text-center">
-        <p className="text-xs font-semibold text-[#C9A96E] tracking-widest uppercase mb-6">
-          The Cost of Delay
-        </p>
-        <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold text-white leading-snug mb-8">
-          Every Delayed Response
-          <br />
-          <span className="text-[#C9A96E]">Costs You a Client</span>
-        </h2>
-
-        <div className="space-y-5 text-left max-w-xl mx-auto">
-          {[
-            {
-              stat: "78%",
-              text: "of clients book with the first business to respond — not the best one.",
-            },
-            {
-              stat: "10×",
-              text: "higher conversion rate when you reply within 5 minutes vs. 60 minutes.",
-            },
-            {
-              stat: "$0",
-              text: "of recovered revenue from leads that went cold — because no one followed up.",
-            },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="flex items-start gap-5 p-5 rounded-2xl bg-white/5 border border-white/10"
-            >
-              <span className="flex-shrink-0 font-display text-3xl font-semibold text-[#C9A96E] leading-none">
-                {item.stat}
-              </span>
-              <p className="text-[#D6D6D6] text-sm leading-relaxed mt-1">
-                {item.text}
-              </p>
-            </div>
-          ))}
+        <div className="inline-block px-4 py-2 bg-destructive/10 rounded-lg mb-6">
+          <p className="text-sm font-semibold text-destructive">The Real Cost</p>
         </div>
 
-        <p className="mt-10 text-[#9B9B9B] text-base leading-relaxed">
-          Your competitors are getting faster. If your response isn't immediate,
-          the lead goes elsewhere — and they may never come back.
+        <h2 className="text-4xl md:text-5xl font-semibold text-foreground mb-6">
+          Every Delayed Response Costs You Clients
+        </h2>
+
+        <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
+          Your competitors respond faster. Leads go to them. Revenue stays on the table. This happens automatically with your current system.
         </p>
+
+        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-8">
+          <p className="text-3xl font-semibold text-foreground mb-2">
+            Missed Lead Response = Lost Booking
+          </p>
+          <p className="text-muted-foreground">
+            The first business to respond typically wins the appointment. Speed is everything.
+          </p>
+        </div>
       </div>
     </section>
   );
