@@ -71,33 +71,34 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Main footer grid */}
+      {/* Nav columns — centered, same row */}
       <div className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
-
-          {/* Brand column — spans 2 */}
-          <div className="lg:col-span-2 space-y-5">
-            <a href="#" className="font-display text-2xl font-semibold tracking-tight text-background">
-              Apex<span className="text-primary">Flow</span>
-            </a>
-            <p className="text-sm text-background/55 leading-relaxed max-w-xs">
-              ApexFlow builds done-for-you automation systems that help appointment-based businesses respond faster, follow up smarter, and book more clients — without adding headcount.
-            </p>
-
-            {/* Contact */}
-            <div className="space-y-2">
-              <a href="mailto:hello@apexflow.io" className="flex items-center gap-2 text-xs text-background/50 hover:text-background transition-colors">
-                <Mail className="w-3.5 h-3.5" />
-                hello@apexflow.io
-              </a>
-              <a href="tel:+18005550000" className="flex items-center gap-2 text-xs text-background/50 hover:text-background transition-colors">
-                <Phone className="w-3.5 h-3.5" />
-                +1 (800) 555-0000
-              </a>
+        <div className="flex flex-col md:flex-row justify-center gap-16 lg:gap-24">
+          {navColumns.map((col) => (
+            <div key={col.title} className="flex flex-col items-center text-center">
+              <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-4">{col.title}</p>
+              <ul className="space-y-2.5">
+                {col.links.map((link) => (
+                  <li key={link.label}>
+                    <a href={link.href} className="text-sm text-background/60 hover:text-background transition-colors">
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
+          ))}
+        </div>
+      </div>
 
-            {/* Social icons */}
-            <div className="flex items-center gap-3 pt-1">
+      {/* Bottom bar */}
+      <div className="border-t border-background/10">
+        <div className="max-w-6xl mx-auto px-6 py-6">
+
+          {/* Follow us row — centered */}
+          <div className="flex flex-col items-center gap-3 mb-6">
+            <p className="text-xs font-semibold text-background/40 uppercase tracking-widest">Follow Us</p>
+            <div className="flex items-center gap-3">
               {socials.map((s) => (
                 <a
                   key={s.label}
@@ -113,47 +114,35 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Nav columns */}
-          {navColumns.map((col) => (
-            <div key={col.title}>
-              <p className="text-xs font-semibold text-background/40 uppercase tracking-widest mb-4">{col.title}</p>
-              <ul className="space-y-2.5">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="text-sm text-background/60 hover:text-background transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </div>
+          {/* Bottom legal row */}
+          <div className="border-t border-background/10 pt-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            {/* Branding — bottom left, small */}
+            <a href="#" className="font-display text-sm font-semibold tracking-tight text-background/50">
+              Apex<span className="text-primary">Flow</span>™
+            </a>
 
-      {/* Bottom bar */}
-      <div className="border-t border-background/10">
-        <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-background/35">
-            © {new Date().getFullYear()} ApexFlow™. All rights reserved. ApexFlow is a registered trademark.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {legal.map((l) => (
-              <a key={l.label} href={l.href} className="text-xs text-background/35 hover:text-background/60 transition-colors">
-                {l.label}
-              </a>
-            ))}
+            {/* Legal links — center */}
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              {legal.map((l) => (
+                <a key={l.label} href={l.href} className="text-xs text-background/35 hover:text-background/60 transition-colors">
+                  {l.label}
+                </a>
+              ))}
+            </div>
+
+            {/* Copyright + scroll top — right */}
+            <div className="flex items-center gap-4">
+              <p className="text-xs text-background/35">© {new Date().getFullYear()} ApexFlow. All rights reserved.</p>
+              <button
+                onClick={scrollTop}
+                className="w-7 h-7 rounded-full border border-background/15 flex items-center justify-center text-background/40 hover:text-background hover:border-background/40 transition-all"
+                aria-label="Back to top"
+              >
+                <ArrowUp className="w-3 h-3" />
+              </button>
+            </div>
           </div>
-          <button
-            onClick={scrollTop}
-            className="w-8 h-8 rounded-full border border-background/15 flex items-center justify-center text-background/40 hover:text-background hover:border-background/40 transition-all"
-            aria-label="Back to top"
-          >
-            <ArrowUp className="w-3.5 h-3.5" />
-          </button>
+
         </div>
       </div>
 
