@@ -13,23 +13,24 @@ import WhyUs from "../components/landing/WhyUs";
 import FAQ from "../components/landing/FAQ";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
+import FadeIn from "../components/landing/FadeIn";
 
 export default function Home() {
   return (
     <div className="min-h-screen">
       <Navbar />
       <Hero />
-      <TrustBar />
-      <ProblemSection />
-      <SolutionSection />
-      <HowItWorks />
-      <Testimonials />
-      <ConversationMockup />
-      <Benefits />
-      <Industries />
-      <CoreOffer />
-      <WhyUs />
-      <FAQ />
+      <FadeIn><TrustBar /></FadeIn>
+      <FadeIn><ProblemSection /></FadeIn>
+      <FadeIn><SolutionSection /></FadeIn>
+      <FadeIn><HowItWorks /></FadeIn>
+      <FadeIn><Testimonials /></FadeIn>
+      <FadeIn><ConversationMockup /></FadeIn>
+      <FadeIn><Benefits /></FadeIn>
+      <FadeIn><Industries /></FadeIn>
+      <FadeIn><CoreOffer /></FadeIn>
+      <FadeIn><WhyUs /></FadeIn>
+      <FadeIn><FAQ /></FadeIn>
       <FinalCTA />
       <Footer />
     </div>

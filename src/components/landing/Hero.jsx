@@ -35,13 +35,16 @@ export default function Hero() {
   };
 
   return (
-    <section className="pt-32 pb-20 md:pt-48 md:pb-32 px-6 bg-gradient-to-b from-background to-card">
-      <div className="max-w-4xl mx-auto text-center">
+    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 bg-gradient-to-b from-background to-card overflow-hidden">
+      {/* Gold ambient glow */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full pointer-events-none" style={{background: 'radial-gradient(ellipse, rgba(161,120,35,0.18) 0%, transparent 70%)'}} />
+
+      <div className="max-w-4xl mx-auto text-center relative z-10">
 
         <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.08] text-foreground">
           Turn More Leads Into
           <br />
-          <span className="text-primary">Booked Appointments.</span>
+          <span className="text-primary" style={{textShadow: '0 0 40px rgba(161,120,35,0.45)'}}>Booked Appointments.</span>
         </h1>
 
         <p className="mt-7 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
