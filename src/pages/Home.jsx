@@ -14,9 +14,6 @@ import FAQ from "../components/landing/FAQ";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
 import FadeIn from "../components/landing/FadeIn";
-import BeforeAfter from "../components/landing/BeforeAfter";
-import AutomationDemo from "../components/landing/AutomationDemo";
-import LeadCaptureForm from "../components/landing/LeadCaptureForm";
 
 import SocialProofToasts from "../components/landing/SocialProofToasts";
 import StickyCTA from "../components/landing/StickyCTA";
@@ -29,9 +26,6 @@ export default function Home() {
       <FadeIn><TrustBar /></FadeIn>
       <FadeIn><ProblemSection /></FadeIn>
       <FadeIn><SolutionSection /></FadeIn>
-      <FadeIn><BeforeAfter /></FadeIn>
-      <AutomationDemo />
-      <FadeIn><LeadCaptureForm /></FadeIn>
       <FadeIn><HowItWorks /></FadeIn>
       <FadeIn><Testimonials /></FadeIn>
       <FadeIn><ConversationMockup /></FadeIn>
