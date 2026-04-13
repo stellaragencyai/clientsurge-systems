@@ -1,0 +1,132 @@
+{
+  "name": "Client",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string",
+      "title": "Full Name"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Phone Number"
+    },
+    "website": {
+      "type": "string",
+      "title": "Website URL"
+    },
+    "social_media": {
+      "type": "string",
+      "title": "Instagram / Social Media Links"
+    },
+    "services": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Services Offered"
+    },
+    "lead_sources": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Lead Sources"
+    },
+    "current_process": {
+      "type": "string",
+      "title": "Current Lead Handling Process"
+    },
+    "response_speed": {
+      "type": "string",
+      "title": "Response Speed",
+      "enum": [
+        "Immediately",
+        "Within 1 hour",
+        "Same day",
+        "Longer"
+      ]
+    },
+    "booking_link": {
+      "type": "string",
+      "title": "Booking Link"
+    },
+    "calendar_system": {
+      "type": "string",
+      "title": "Calendar System Used"
+    },
+    "requires_consultation": {
+      "type": "string",
+      "title": "Requires Consultation First",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "brand_voice": {
+      "type": "string",
+      "title": "Brand Voice",
+      "enum": [
+        "Professional",
+        "Friendly",
+        "Luxury",
+        "Casual"
+      ]
+    },
+    "customer_questions": {
+      "type": "string",
+      "title": "Most Common Customer Questions"
+    },
+    "business_hours": {
+      "type": "string",
+      "title": "Business Hours"
+    },
+    "has_old_leads": {
+      "type": "string",
+      "title": "Has Old Leads",
+      "enum": [
+        "Yes",
+        "No"
+      ]
+    },
+    "access_info": {
+      "type": "string",
+      "title": "Access / Login Information"
+    },
+    "goals": {
+      "type": "string",
+      "title": "Success Goals"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "Onboarding",
+        "In Setup",
+        "Active",
+        "Completed"
+      ],
+      "default": "Onboarding"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Tags"
+    }
+  },
+  "required": [
+    "full_name",
+    "business_name",
+    "email",
+    "phone"
+  ]
+}
