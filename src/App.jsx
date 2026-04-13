@@ -13,6 +13,7 @@ import Dashboard from './pages/Dashboard';
 import AdminSettings from './pages/AdminSettings';
 import CaptureLeads from './pages/CaptureLeads';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminLeads from './pages/AdminLeads';
 import AdminLeadDetail from './pages/AdminLeadDetail';
 
 const AuthenticatedApp = () => {
@@ -48,8 +49,8 @@ const AuthenticatedApp = () => {
       <Route path="/admin-settings" element={<AdminSettings />} />
       <Route path="/leads/capture" element={<CaptureLeads />} />
       <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/admin/leads" element={<AdminDashboard />} />
-      <Route path="/admin/leads/:id" element={<AdminLeadDetail />} />
+      <Route path="/admin/leads" element={<AdminLeads />} />
+      <Route path="/admin/leads/:leadId" element={<AdminLeadDetail />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
