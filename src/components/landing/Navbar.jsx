@@ -60,7 +60,7 @@ export default function Navbar() {
               key={l.href}
               href={l.href}
               onClick={(e) => scrollTo(e, l.href)}
-              className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className="text-base font-display font-semibold text-foreground hover:text-primary transition-colors"
             >
               {l.label}
             </a>

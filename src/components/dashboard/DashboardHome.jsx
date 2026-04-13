@@ -70,13 +70,13 @@ export default function DashboardHome() {
   ];
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-semibold text-foreground mb-2">
-          Welcome Back
+    <div className="space-y-6">
+      <div className="mb-6">
+        <h2 className="text-3xl font-display font-semibold text-foreground mb-1">
+          Pipeline Overview
         </h2>
-        <p className="text-muted-foreground">
-          Here's your lead pipeline at a glance.
+        <p className="text-sm text-muted-foreground">
+          Lead distribution across stages
         </p>
       </div>
 
@@ -85,19 +85,19 @@ export default function DashboardHome() {
           <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {cards.map((card, i) => {
             const Icon = card.icon;
             return (
               <div
                 key={i}
-                className="bg-white rounded-xl border border-border p-6 hover:shadow-md transition-shadow"
+                className="bg-white rounded-lg border border-border p-4 hover:border-primary/30 transition-all"
               >
-                <div className={`w-12 h-12 rounded-lg ${card.color} flex items-center justify-center mb-4`}>
-                  <Icon className="w-6 h-6" />
+                <div className={`w-10 h-10 rounded-md ${card.color} flex items-center justify-center mb-3`}>
+                  <Icon className="w-5 h-5" />
                 </div>
-                <p className="text-sm text-muted-foreground mb-1">{card.title}</p>
-                <p className="text-3xl font-bold text-foreground">{card.value}</p>
+                <p className="text-xs text-muted-foreground mb-1 font-medium">{card.title}</p>
+                <p className="text-2xl font-bold text-foreground">{card.value}</p>
               </div>
             );
           })}

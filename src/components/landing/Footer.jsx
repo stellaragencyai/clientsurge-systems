@@ -53,14 +53,14 @@ export default function Footer() {
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <footer className="bg-foreground text-background">
+    <footer className="bg-white text-foreground border-t border-border">
 
       {/* Top CTA strip */}
-      <div className="border-b border-background/10">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="border-b border-border">
+        <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-background/90">Ready to stop losing leads?</p>
-            <p className="text-xs text-background/50 mt-0.5">Book a free demo — live in 5–7 days, no contracts.</p>
+            <p className="text-sm font-semibold text-foreground">Ready to stop losing leads?</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Book a free demo — live in 5–7 days, no contracts.</p>
           </div>
           <a
             href="#book-demo"
@@ -72,15 +72,15 @@ export default function Footer() {
       </div>
 
       {/* Nav columns — spread full width */}
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-0">
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-0">
           {navColumns.map((col) => (
             <div key={col.title} className="flex flex-col items-center text-center">
-              <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-6">{col.title}</p>
-              <ul className="space-y-3.5">
+              <p className="text-base font-display font-semibold text-primary uppercase tracking-widest mb-4">{col.title}</p>
+              <ul className="space-y-2">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className="text-sm font-medium text-background/85 hover:text-background transition-colors">
+                    <a href={link.href} className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
                       {link.label}
                     </a>
                   </li>
@@ -92,12 +92,12 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-background/10">
-        <div className="max-w-6xl mx-auto px-6 py-6">
+      <div className="border-t border-border">
+        <div className="max-w-6xl mx-auto px-6 py-4">
 
           {/* Follow us row — centered */}
-          <div className="flex flex-col items-center gap-3 mb-6">
-            <p className="text-xs font-semibold text-background/40 uppercase tracking-widest">Follow Us</p>
+          <div className="flex flex-col items-center gap-2 mb-4">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Follow Us</p>
             <div className="flex items-center gap-3">
               {socials.map((s) => (
                 <a
@@ -106,7 +106,7 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="w-8 h-8 rounded-full border border-background/15 flex items-center justify-center text-background/50 hover:text-background hover:border-background/40 transition-all"
+                  className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary transition-all"
                 >
                   <s.icon className="w-3.5 h-3.5" />
                 </a>
@@ -115,27 +115,27 @@ export default function Footer() {
           </div>
 
           {/* Bottom legal row */}
-          <div className="border-t border-background/10 pt-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="border-t border-border pt-3 flex flex-col sm:flex-row items-center justify-between gap-3">
             {/* Branding — bottom left, small */}
-            <a href="#" className="font-display text-sm font-semibold tracking-tight text-background/50">
+            <a href="#" className="font-display text-sm font-semibold tracking-tight text-foreground/60">
               Apex<span className="text-primary">Flow</span>™
             </a>
 
             {/* Legal links — center */}
-            <div className="flex flex-wrap items-center justify-center gap-4">
+            <div className="flex flex-wrap items-center justify-center gap-3">
               {legal.map((l) => (
-                <a key={l.label} href={l.href} className="text-xs text-background/35 hover:text-background/60 transition-colors">
+                <a key={l.label} href={l.href} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                   {l.label}
                 </a>
               ))}
             </div>
 
             {/* Copyright + scroll top — right */}
-            <div className="flex items-center gap-4">
-              <p className="text-xs text-background/35">© {new Date().getFullYear()} ApexFlow. All rights reserved.</p>
+            <div className="flex items-center gap-3">
+              <p className="text-xs text-muted-foreground">© {new Date().getFullYear()} ApexFlow. All rights reserved.</p>
               <button
                 onClick={scrollTop}
-                className="w-7 h-7 rounded-full border border-background/15 flex items-center justify-center text-background/40 hover:text-background hover:border-background/40 transition-all"
+                className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary transition-all"
                 aria-label="Back to top"
               >
                 <ArrowUp className="w-3 h-3" />

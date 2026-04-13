@@ -65,7 +65,26 @@ export default function Hero() {
                 <ArrowRight className="w-4 h-4" />
               </Button>
             </a>
-            <a href="#how-it-works">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                const target = document.getElementById("how-it-works");
+                if (!target) return;
+                const start = window.scrollY;
+                const end = target.getBoundingClientRect().top + window.scrollY - 64;
+                const distance = end - start;
+                const duration = 1200;
+                let startTime = null;
+                const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+                const step = (timestamp) => {
+                  if (!startTime) startTime = timestamp;
+                  const progress = Math.min((timestamp - startTime) / duration, 1);
+                  window.scrollTo(0, start + distance * easeInOutCubic(progress));
+                  if (progress < 1) requestAnimationFrame(step);
+                };
+                requestAnimationFrame(step);
+              }}
+            >
               <Button
                 size="lg"
                 variant="outline"
@@ -73,7 +92,7 @@ export default function Hero() {
               >
                 See How It Works
               </Button>
-            </a>
+            </button>
           </div>
         )}
 
