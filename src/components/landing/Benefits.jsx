@@ -41,7 +41,7 @@ export default function Benefits() {
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Outcomes</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            What Changes When You Automate
+            What Changes When You <span className="text-primary">Automate</span>
           </h2>
         </div>
 

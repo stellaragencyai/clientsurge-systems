@@ -46,7 +46,7 @@ export default function SolutionSection() {
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">What We Build</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            Systems That Convert Leads Into Revenue
+            Systems That <span className="text-primary">Convert</span> Leads Into Revenue
           </h2>
           <p className="mt-5 text-muted-foreground text-lg leading-relaxed">
             Each system is built around a specific outcome — not a feature. No fluff. Just results.

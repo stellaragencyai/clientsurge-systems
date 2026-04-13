@@ -68,7 +68,7 @@ export default function Industries() {
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Who We Work With</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            Built for Businesses That Run on Bookings
+            <span className="text-primary">Built for Businesses</span> <span className="text-primary">That Run on Bookings</span>
           </h2>
           <p className="mt-5 text-muted-foreground text-lg">
             Pick your industry below — we'll show you exactly how it works for you.
