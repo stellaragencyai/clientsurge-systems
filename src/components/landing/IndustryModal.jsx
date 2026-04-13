@@ -15,9 +15,9 @@ export default function IndustryModal({ industry, onClose }) {
   const imageUrl = industryImages[industry.name] || industryImages["Med Spas & Aesthetic Clinics"];
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-lg z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
       <div
-        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-300"
+        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-500"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}

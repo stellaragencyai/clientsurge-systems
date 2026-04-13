@@ -7,56 +7,56 @@ const industries = [
   {
     icon: Sparkles,
     name: "Med Spas & Aesthetic Clinics",
-    problem: "Consultation requests going cold.",
-    desc: "Capture every inquiry instantly, confirm appointments automatically, and cut no-shows with smart reminders. Keep your treatment rooms full.",
+    problem: "Missing consultations, no-shows costing revenue.",
+    desc: "Capture aesthetic & injectable inquiries instantly. Confirm appointments, send smart reminders, and reduce no-shows. Maximize treatment room utilization and client lifetime value with automated follow-up sequences.",
     cta: "See How It Works for Med Spas",
     href: "/med-spa",
-    result: "Avg. 2.4× more consultations in 30 days",
+    result: "2.4× more consultations booked • 34% fewer no-shows",
   },
   {
     icon: Heart,
     name: "Wellness Studios",
-    problem: "Paid leads not converting to memberships.",
-    desc: "Follow up with interested clients before they lose momentum. Reactivate lapsed members. Book more intro sessions without increasing your ad spend.",
+    problem: "Leads dropping off before membership conversion.",
+    desc: "Instantly follow up with trial class inquiries and membership prospects. Reactivate dormant members with targeted campaigns. Convert more paid leads without increasing ad spend or manual outreach effort.",
     cta: "Book a Wellness Studio Demo",
     href: "#book-demo",
-    result: "More membership conversions, fewer cold leads",
+    result: "58% higher conversion rates • 3× faster response time",
   },
   {
     icon: Building2,
-    name: "Real Estate",
-    problem: "Property inquiries going unanswered for hours.",
-    desc: "Respond to every lead the moment they reach out. Automate showing scheduling and keep buyers engaged from first contact to closing.",
+    name: "Real Estate Agents & Brokers",
+    problem: "Slow response time loses showings to competitors.",
+    desc: "Respond to property inquiries within minutes, not hours. Automate showing scheduling, follow-ups, and buyer nurturing from first contact to closing. Capture more qualified leads with instant lead qualification.",
     cta: "Book a Real Estate Demo",
     href: "#book-demo",
-    result: "Faster response = more showings booked",
+    result: "5× more showings scheduled • 42% faster lead response",
   },
   {
     icon: Wrench,
-    name: "HVAC & Home Services",
-    problem: "Missing quote requests while out on jobs.",
-    desc: "While your crew is in the field, your automation is responding to new requests, booking estimates, and following up on pending quotes.",
+    name: "HVAC, Plumbing & Home Services",
+    problem: "Can't respond to service calls while on the job.",
+    desc: "Field teams stay focused on revenue-generating work while automated systems capture estimate requests, book service appointments, and follow up on pending quotes. Never lose another lead to unresponsive phones.",
     cta: "Book an HVAC / Home Services Demo",
     href: "#book-demo",
-    result: "More jobs booked without lifting a finger",
+    result: "65% more jobs booked • 24/7 lead capture & response",
   },
   {
     icon: Home,
-    name: "Contractors & Trades",
-    problem: "Losing jobs to whoever responds first.",
-    desc: "Automated instant replies and quote follow-ups keep you top-of-mind — even when you're on site and can't answer the phone.",
+    name: "Contractors, Electricians & Trades",
+    problem: "Losing bids to whoever responds first.",
+    desc: "Instant quote request responses and automated follow-ups keep you top-of-mind when crews are on-site. Win more contracts by being the fastest responder with intelligent bid tracking and pipeline automation.",
     cta: "Book a Contractor Demo",
     href: "#book-demo",
-    result: "Win more bids with faster responses",
+    result: "3.2× more quotes accepted • Higher win rates on bids",
   },
   {
     icon: MapPin,
     name: "Local Service Businesses",
-    problem: "Paying for leads you're not converting.",
-    desc: "Whether you run a dental practice, salon, or fitness studio — we help you get more value from the demand you're already generating.",
+    problem: "Paying for leads but not converting them.",
+    desc: "Whether dental, salon, fitness, or salon — capture leads across all channels. Automated follow-up, appointment reminders, and reactivation campaigns turn paid traffic into confirmed bookings and repeat clients.",
     cta: "Book a Demo for My Business",
     href: "#book-demo",
-    result: "Works for any appointment-based business",
+    result: "2–3× ROAS on marketing spend • 40% more appointments",
   },
 ];
 
@@ -83,13 +83,14 @@ export default function Industries() {
               <button
                 key={i}
                 onClick={() => setSelectedIndustry(ind)}
-                className="group relative p-6 rounded-2xl border border-border bg-gradient-to-br from-white/50 to-white/30 hover:border-primary/50 transition-all duration-300 hover:shadow-lg overflow-hidden text-left"
+                className="group relative p-6 rounded-2xl border border-white/30 bg-white/10 backdrop-blur-md hover:border-primary/60 hover:bg-white/20 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 overflow-hidden text-left animate-fade-in-up"
+                style={{ animationDelay: `${i * 100}ms` }}
               >
-                {/* Background gradient on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                {/* Glass shimmer effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-40 transition-opacity duration-500" />
                 
                 <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center mb-5 transition-colors">
+                  <div className="w-12 h-12 rounded-xl bg-primary/15 group-hover:bg-primary/30 flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110">
                     <Icon className="w-6 h-6 text-primary" />
                   </div>
                   <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
@@ -99,9 +100,9 @@ export default function Industries() {
                   <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{ind.desc}</p>
                   
                   {/* Arrow hint */}
-                  <div className="mt-4 flex items-center gap-2 text-primary font-semibold text-sm group-hover:gap-3 transition-all">
+                  <div className="mt-4 flex items-center gap-2 text-primary font-semibold text-sm group-hover:gap-3 transition-all opacity-80 group-hover:opacity-100">
                     <span>Explore</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </button>
