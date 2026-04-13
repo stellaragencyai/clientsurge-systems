@@ -19,6 +19,13 @@ export default function Navbar() {
     { label: "FAQ", href: "#faq" },
   ];
 
+  const scrollTo = (e, href) => {
+    e.preventDefault();
+    const el = document.querySelector(href);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    setOpen(false);
+  };
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       scrolled
@@ -37,6 +44,7 @@ export default function Navbar() {
             <a
               key={l.href}
               href={l.href}
+              onClick={(e) => scrollTo(e, l.href)}
               className="text-base font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {l.label}
@@ -68,12 +76,12 @@ export default function Navbar() {
               key={l.href}
               href={l.href}
               className="block text-sm text-muted-foreground hover:text-foreground"
-              onClick={() => setOpen(false)}
+              onClick={(e) => scrollTo(e, l.href)}
             >
               {l.label}
             </a>
           ))}
-          <a href="#book-demo" onClick={() => setOpen(false)}>
+          <a href="#book-demo" onClick={(e) => scrollTo(e, "#book-demo")}>
             <Button className="rounded-full w-full text-sm font-medium">
               Book a Demo
             </Button>
