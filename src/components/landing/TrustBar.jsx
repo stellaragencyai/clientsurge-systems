@@ -56,7 +56,7 @@ export default function TrustBar() {
                   </div>
 
                   {/* Stat */}
-                  <span className="text-base font-bold text-foreground group-hover:text-primary transition-colors leading-tight">
+                  <span className="font-display text-xl font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
                     {item.stat}
                   </span>
 
