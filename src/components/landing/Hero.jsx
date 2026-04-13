@@ -56,12 +56,6 @@ export default function Hero() {
               Book a Free Demo
               <ArrowRight className="w-4 h-4" />
             </Button>
-            <button
-              onClick={() => setShowModal(true)}
-              className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
-            >
-              See a real example →
-            </button>
           </div>
         )}
 

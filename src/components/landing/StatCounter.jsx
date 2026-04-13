@@ -40,26 +40,26 @@ export default function StatCounter() {
   const v1 = useCountUp(1800, 1800, started);
 
   return (
-    <div ref={ref} className="mt-14 flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+    <div ref={ref} className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-y-8 sm:gap-y-0 sm:gap-x-20">
       <div className="text-center">
-        <p className="font-display text-3xl font-semibold text-foreground tabular-nums">
+        <p className="font-display text-4xl font-semibold text-foreground tabular-nums">
           {v0.toLocaleString()}+
         </p>
-        <p className="text-xs text-muted-foreground mt-1 tracking-wide uppercase">Leads Captured</p>
+        <p className="text-xs text-muted-foreground mt-2 tracking-wide uppercase">Leads Captured</p>
       </div>
-      <div className="w-px h-8 bg-border hidden sm:block" />
+      <div className="w-px h-12 bg-border hidden sm:block" />
       <div className="text-center">
-        <p className="font-display text-3xl font-semibold text-foreground tabular-nums">
+        <p className="font-display text-4xl font-semibold text-foreground tabular-nums">
           {v1.toLocaleString()}+
         </p>
-        <p className="text-xs text-muted-foreground mt-1 tracking-wide uppercase">Appointments Booked</p>
+        <p className="text-xs text-muted-foreground mt-2 tracking-wide uppercase">Appointments Booked</p>
       </div>
-      <div className="w-px h-8 bg-border hidden sm:block" />
+      <div className="w-px h-12 bg-border hidden sm:block" />
       <div className="text-center">
-        <p className="font-display text-3xl font-semibold text-foreground tabular-nums">
+        <p className="font-display text-4xl font-semibold text-foreground tabular-nums">
           {started ? "$3.2M+" : "$0"}
         </p>
-        <p className="text-xs text-muted-foreground mt-1 tracking-wide uppercase">Revenue Recovered</p>
+        <p className="text-xs text-muted-foreground mt-2 tracking-wide uppercase">Revenue Recovered</p>
       </div>
     </div>
   );
