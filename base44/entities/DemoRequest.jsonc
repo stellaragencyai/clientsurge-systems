@@ -1,0 +1,38 @@
+{
+  "name": "DemoRequest",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "scheduled_date": {
+      "type": "string",
+      "title": "Scheduled Date"
+    },
+    "scheduled_time": {
+      "type": "string",
+      "title": "Scheduled Time"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "requested",
+        "scheduled",
+        "completed",
+        "cancelled",
+        "no_show"
+      ],
+      "default": "requested"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "lead_id",
+    "status"
+  ]
+}

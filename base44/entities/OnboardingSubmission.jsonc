@@ -1,0 +1,32 @@
+{
+  "name": "OnboardingSubmission",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "submission_data": {
+      "type": "object",
+      "title": "Form Data"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "submitted",
+        "reviewed",
+        "in_setup",
+        "completed"
+      ],
+      "default": "submitted"
+    },
+    "assigned_to": {
+      "type": "string",
+      "title": "Assigned To (Admin)"
+    }
+  },
+  "required": [
+    "client_id"
+  ]
+}

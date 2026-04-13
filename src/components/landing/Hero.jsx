@@ -42,33 +42,43 @@ export default function Hero() {
       <div className="max-w-4xl mx-auto text-center relative z-10">
 
         <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.08] text-foreground">
-          Turn More Leads Into
+          Stop Losing Leads.
           <br />
-          <span className="text-primary" style={{textShadow: '0 0 40px rgba(161,120,35,0.45)'}}>Booked Appointments.</span>
+          <span className="text-primary" style={{textShadow: '0 0 40px rgba(161,120,35,0.45)'}}>Automate Follow-Up.</span>
+          <br />
+          Book More Customers.
         </h1>
 
         <p className="mt-7 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          We build systems that respond to every lead in under 60 seconds,
-          follow up automatically, and fill your calendar —
-          without adding work for your team.
+          Done-for-you AI systems that capture leads, respond instantly, automate follow-up, recover missed calls, and increase booked customers.
         </p>
 
         {/* Step: default CTA */}
         {step === "cta" && (
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button
-              size="lg"
-              className="rounded-full px-8 h-13 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-shadow"
-              onClick={() => setStep("form")}
-            >
-              Book a Free Demo
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+            <a href="#demo-booking">
+              <Button
+                size="lg"
+                className="rounded-full px-8 h-13 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-shadow"
+              >
+                Book a Demo
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </a>
+            <a href="#how-it-works">
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-full px-8 h-13 text-base font-semibold gap-2"
+              >
+                See How It Works
+              </Button>
+            </a>
           </div>
         )}
 
         {/* Step: micro-qualifying form */}
-        {step === "form" && (
+        {step === "form" && !showModal && (
           <form
             onSubmit={handleSubmit}
             className="mt-10 max-w-md mx-auto bg-card border border-border rounded-2xl p-6 shadow-lg text-left"
