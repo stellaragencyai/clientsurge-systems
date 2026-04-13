@@ -19,14 +19,14 @@ export default function CoreOffer() {
         <div className="text-center mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Package</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            A Complete System, Implemented for You
+            A <span className="text-primary">Complete</span> System, Implemented for You
           </h2>
           <p className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
             This isn't software you have to figure out. We build, install, and manage the entire system — so your only job is showing up for the appointments it generates.
           </p>
         </div>
 
-        <div className="bg-background rounded-3xl border border-border p-8 md:p-12">
+        <div className="bg-white/40 backdrop-blur-md rounded-3xl border border-white/30 p-8 md:p-12 shadow-lg hover:bg-white/50 hover:border-white/40 transition-all">
           <div className="grid md:grid-cols-2 gap-4 mb-10">
             {includes.map((item, i) => (
               <div key={i} className="flex items-start gap-3">
@@ -43,7 +43,7 @@ export default function CoreOffer() {
               Fully tailored to your business. Designed to generate revenue from day one.
             </p>
             <a href="#book-demo">
-              <Button size="lg" className="rounded-full px-8 h-12 text-base font-semibold gap-2">
+              <Button size="lg" className="rounded-full px-8 h-12 text-base font-semibold gap-2 hover:shadow-xl hover:scale-105 transition-all">
                 Book a Demo
                 <ArrowRight className="w-4 h-4" />
               </Button>
