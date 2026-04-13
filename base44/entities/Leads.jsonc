@@ -38,6 +38,10 @@
         "Closed"
       ],
       "default": "New"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Internal Notes"
     }
   },
   "required": [
