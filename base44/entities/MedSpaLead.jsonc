@@ -1,0 +1,65 @@
+{
+  "name": "MedSpaLead",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Full Name"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Med Spa Business Name"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Phone Number"
+    },
+    "service_interest": {
+      "type": "string",
+      "enum": [
+        "injectables",
+        "laser",
+        "skin_treatments",
+        "body_treatments",
+        "other"
+      ],
+      "title": "Primary Service Focus"
+    },
+    "problem": {
+      "type": "string",
+      "title": "Biggest Follow-Up Challenge"
+    },
+    "source": {
+      "type": "string",
+      "default": "med_spa_page",
+      "title": "Lead Source"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "contacted",
+        "qualified",
+        "booked"
+      ],
+      "default": "new",
+      "title": "Status"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Internal Notes"
+    }
+  },
+  "required": [
+    "name",
+    "business_name",
+    "email",
+    "phone",
+    "service_interest",
+    "problem"
+  ]
+}
