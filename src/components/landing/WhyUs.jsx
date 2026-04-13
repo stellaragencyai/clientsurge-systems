@@ -38,7 +38,7 @@ export default function WhyUs() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {reasons.map((r, i) => (
-            <div key={i} className="p-6 rounded-2xl border border-border bg-card hover:border-primary/30 transition-colors">
+            <div key={i} className="p-6 rounded-2xl border-2 border-black bg-card hover:border-primary/30 transition-colors">
               <div className="w-8 h-0.5 bg-primary mb-5 rounded-full" />
               <h3 className="text-base font-semibold text-foreground mb-2">{r.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">{r.desc}</p>

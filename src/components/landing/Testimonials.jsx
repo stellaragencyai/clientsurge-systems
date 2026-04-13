@@ -32,7 +32,7 @@ export default function Testimonials() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {testimonials.map((t, i) => (
-            <div key={i} className="flex flex-col p-7 rounded-2xl border border-border bg-card hover:border-primary/30 transition-colors">
+            <div key={i} className="flex flex-col p-7 rounded-2xl border-2 border-black bg-card hover:border-primary/30 transition-colors">
               <div className="text-3xl text-primary/30 font-display leading-none mb-4">"</div>
               <p className="text-sm text-foreground leading-relaxed flex-1 mb-6">{t.quote}</p>
               <div className="pt-5 border-t border-border">

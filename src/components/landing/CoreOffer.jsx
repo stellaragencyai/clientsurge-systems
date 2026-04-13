@@ -26,7 +26,7 @@ export default function CoreOffer() {
           </p>
         </div>
 
-        <div className="bg-white/40 backdrop-blur-md rounded-3xl border border-white/30 p-8 md:p-12 shadow-lg hover:bg-white/50 hover:border-white/40 transition-all">
+        <div className="bg-white/40 backdrop-blur-md rounded-3xl border-2 border-black p-8 md:p-12 shadow-lg hover:bg-white/50 hover:border-white/40 transition-all">
           <div className="grid md:grid-cols-2 gap-4 mb-10">
             {includes.map((item, i) => (
               <div key={i} className="flex items-start gap-3">

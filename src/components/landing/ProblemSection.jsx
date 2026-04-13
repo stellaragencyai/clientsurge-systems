@@ -46,7 +46,7 @@ export default function ProblemSection() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {problems.map((p, i) => (
-            <div key={i} className="p-6 rounded-2xl border border-background/10 bg-background/5 hover:border-primary/40 transition-colors">
+            <div key={i} className="p-6 rounded-2xl border-2 border-black bg-background/5 hover:border-primary/40 transition-colors">
               <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center mb-4">
                 <p.icon className="w-5 h-5 text-primary" />
               </div>

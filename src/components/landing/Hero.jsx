@@ -100,7 +100,7 @@ export default function Hero() {
         {step === "form" && !showModal && (
           <form
             onSubmit={handleSubmit}
-            className="mt-10 max-w-md mx-auto bg-card border border-border rounded-2xl p-6 shadow-lg text-left"
+            className="mt-10 max-w-md mx-auto bg-card border-2 border-black rounded-2xl p-6 shadow-lg text-left"
           >
             <p className="text-sm font-semibold text-foreground mb-4">
               Tell us a bit about your business — we'll tailor the demo.
