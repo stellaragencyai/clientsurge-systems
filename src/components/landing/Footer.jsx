@@ -71,16 +71,16 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Nav columns — centered, same row */}
+      {/* Nav columns — spread full width */}
       <div className="max-w-6xl mx-auto px-6 py-16">
-        <div className="flex flex-col md:flex-row justify-center gap-16 lg:gap-24">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-0">
           {navColumns.map((col) => (
             <div key={col.title} className="flex flex-col items-center text-center">
-              <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-4">{col.title}</p>
-              <ul className="space-y-2.5">
+              <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-6">{col.title}</p>
+              <ul className="space-y-3.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className="text-sm text-background/60 hover:text-background transition-colors">
+                    <a href={link.href} className="text-sm font-medium text-background/85 hover:text-background transition-colors">
                       {link.label}
                     </a>
                   </li>
