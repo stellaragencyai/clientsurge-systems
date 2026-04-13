@@ -92,3 +92,22 @@
 html {
   scroll-behavior: smooth;
 }
+
+/* Sophisticated Container Effects */
+.glass-card {
+  @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl;
+}
+
+.glass-card:hover {
+  @apply bg-white/15 border-white/30 shadow-lg;
+}
+
+.overlay-card {
+  @apply bg-gradient-to-br from-foreground/5 to-foreground/10 border border-border rounded-2xl;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.overlay-card:hover {
+  @apply border-primary/30 shadow-md;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
