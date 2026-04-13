@@ -30,8 +30,9 @@ const problems = [
 
 export default function ProblemSection() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-foreground">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-background/30 to-foreground relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-foreground/20 to-foreground pointer-events-none" />
+      <div className="max-w-6xl mx-auto relative z-10">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Real Problem</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-background leading-tight">

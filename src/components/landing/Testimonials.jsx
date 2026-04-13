@@ -21,7 +21,7 @@ const testimonials = [
 
 export default function Testimonials() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
+    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-background via-background to-card/50">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Client Results</p>
