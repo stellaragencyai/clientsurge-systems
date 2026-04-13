@@ -15,8 +15,6 @@ import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
 import FadeIn from "../components/landing/FadeIn";
 
-import SocialProofToasts from "../components/landing/SocialProofToasts";
-
 export default function Home() {
   return (
     <div className="min-h-screen">
@@ -35,7 +33,6 @@ export default function Home() {
       <FadeIn><FAQ /></FadeIn>
       <FinalCTA />
       <Footer />
-      <SocialProofToasts />
     </div>
   );
 }
