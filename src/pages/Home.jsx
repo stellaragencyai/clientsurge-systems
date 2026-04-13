@@ -14,7 +14,7 @@ import FAQ from "../components/landing/FAQ";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
 import FadeIn from "../components/landing/FadeIn";
-import StickyCTA from "../components/landing/StickyCTA";
+
 import SocialProofToasts from "../components/landing/SocialProofToasts";
 
 export default function Home() {
@@ -35,7 +35,6 @@ export default function Home() {
       <FadeIn><FAQ /></FadeIn>
       <FinalCTA />
       <Footer />
-      <StickyCTA />
       <SocialProofToasts />
     </div>
   );
