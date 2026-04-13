@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import { base44 } from "@/api/base44Client";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -69,7 +70,7 @@ export default function Navbar() {
         {/* CTA — pinned right */}
         <div className="hidden md:flex items-center gap-3 shrink-0">
           <button
-            onClick={() => base44.auth.redirectToLogin()}
+            onClick={() => navigate("/admin")}
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Login
@@ -102,7 +103,7 @@ export default function Navbar() {
             </a>
           ))}
           <button
-            onClick={() => base44.auth.redirectToLogin()}
+            onClick={() => navigate("/admin")}
             className="block w-full text-left text-sm text-muted-foreground hover:text-foreground mb-3"
           >
             Login
