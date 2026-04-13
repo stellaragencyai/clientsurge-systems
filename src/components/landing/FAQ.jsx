@@ -42,7 +42,7 @@ const faqs = [
 
 export default function FAQ() {
   return (
-    <section id="faq" className="py-24 md:py-32 px-6 bg-background transition-all duration-700">
+    <section id="faq" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Questions</p>

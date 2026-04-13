@@ -48,7 +48,7 @@ const ProblemCard = ({ problem }) => {
 
 export default function ProblemSection() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-white transition-all duration-700">
+    <section className="py-24 md:py-32 px-6 bg-foreground">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Real Problem</p>

@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 
 export default function FinalCTA() {
   return (
-    <section id="book-demo" className="py-24 md:py-32 px-6 bg-white transition-all duration-700">
+    <section id="book-demo" className="py-24 md:py-32 px-6 bg-gradient-to-b from-card/80 via-background to-background">
       <div className="max-w-3xl mx-auto text-center">
         <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">Ready to Start?</p>
         <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
