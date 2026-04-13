@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Zap, MessageSquare, PhoneOff, CalendarCheck, RotateCcw, Database } from "lucide-react";
 
 const services = [
@@ -39,6 +40,25 @@ const services = [
   },
 ];
 
+const ServiceCard = ({ service }) => {
+  const [hovered, setHovered] = useState(false);
+  const Icon = service.icon;
+  return (
+    <div 
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`p-6 rounded-2xl bg-white/15 backdrop-blur-md hover:bg-white/20 transition-all shadow-lg ${hovered ? "border border-slate-600" : "border border-transparent"}`}
+    >
+      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+        <Icon className="w-5 h-5 text-primary" />
+      </div>
+      <h3 className="text-base font-semibold text-foreground mb-1">{service.title}</h3>
+      <p className="text-xs font-semibold text-primary mb-3">{service.outcome}</p>
+      <p className="text-sm text-muted-foreground leading-relaxed">{service.desc}</p>
+    </div>
+  );
+};
+
 export default function SolutionSection() {
   return (
     <section id="services" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
@@ -55,14 +75,7 @@ export default function SolutionSection() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {services.map((s, i) => (
-            <div key={i} className="p-6 rounded-2xl bg-white/15 backdrop-blur-md border-2 border-black hover:bg-white/20 hover:border-white/40 transition-all shadow-lg">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
-                <s.icon className="w-5 h-5 text-primary" />
-              </div>
-              <h3 className="text-base font-semibold text-foreground mb-1">{s.title}</h3>
-              <p className="text-xs font-semibold text-primary mb-3">{s.outcome}</p>
-              <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-            </div>
+            <ServiceCard key={i} service={s} />
           ))}
         </div>
       </div>

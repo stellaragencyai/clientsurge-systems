@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const testimonials = [
   {
     quote: "Within 3 weeks we went from booking maybe 2 consultations a week from online leads to over 10. The system just runs — I don't touch it.",
@@ -19,6 +21,25 @@ const testimonials = [
   },
 ];
 
+const TestimonialCard = ({ testimonial }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div 
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`flex flex-col p-7 rounded-2xl bg-card transition-all ${hovered ? "border border-slate-600" : "border border-transparent"}`}
+    >
+      <div className="text-3xl text-primary/30 font-display leading-none mb-4">"</div>
+      <p className="text-sm text-foreground leading-relaxed flex-1 mb-6">{testimonial.quote}</p>
+      <div className="pt-5 border-t border-border">
+        <p className="text-xs font-semibold text-primary mb-0.5">{testimonial.result}</p>
+        <p className="text-sm font-semibold text-foreground">{testimonial.name}</p>
+        <p className="text-xs text-muted-foreground">{testimonial.business}</p>
+      </div>
+    </div>
+  );
+};
+
 export default function Testimonials() {
   return (
     <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
@@ -32,15 +53,7 @@ export default function Testimonials() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {testimonials.map((t, i) => (
-            <div key={i} className="flex flex-col p-7 rounded-2xl border-2 border-black bg-card hover:border-primary/30 transition-colors">
-              <div className="text-3xl text-primary/30 font-display leading-none mb-4">"</div>
-              <p className="text-sm text-foreground leading-relaxed flex-1 mb-6">{t.quote}</p>
-              <div className="pt-5 border-t border-border">
-                <p className="text-xs font-semibold text-primary mb-0.5">{t.result}</p>
-                <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                <p className="text-xs text-muted-foreground">{t.business}</p>
-              </div>
-            </div>
+            <TestimonialCard key={i} testimonial={t} />
           ))}
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check, ArrowRight } from "lucide-react";
 
@@ -11,6 +12,19 @@ const includes = [
   "CRM pipeline automation — tagging, tasks, status updates",
   "Ongoing support and optimization included",
 ];
+
+const CoreOfferContainer = ({ children }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div 
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`bg-white/40 backdrop-blur-md rounded-3xl p-8 md:p-12 shadow-lg hover:bg-white/50 transition-all ${hovered ? "border border-slate-600" : "border border-transparent"}`}
+    >
+      {children}
+    </div>
+  );
+};
 
 export default function CoreOffer() {
   return (
@@ -26,7 +40,7 @@ export default function CoreOffer() {
           </p>
         </div>
 
-        <div className="bg-white/40 backdrop-blur-md rounded-3xl border-2 border-black p-8 md:p-12 shadow-lg hover:bg-white/50 hover:border-white/40 transition-all">
+        <CoreOfferContainer>
           <div className="grid md:grid-cols-2 gap-4 mb-10">
             {includes.map((item, i) => (
               <div key={i} className="flex items-start gap-3">
@@ -49,7 +63,7 @@ export default function CoreOffer() {
               </Button>
             </a>
           </div>
-        </div>
+        </CoreOfferContainer>
       </div>
     </section>
   );

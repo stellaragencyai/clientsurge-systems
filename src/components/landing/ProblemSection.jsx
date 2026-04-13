@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Clock, PhoneMissed, Users, AlertTriangle, Archive } from "lucide-react";
 
 const problems = [
@@ -28,6 +29,23 @@ const problems = [
   },
 ];
 
+const ProblemCard = ({ problem }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div 
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`p-6 rounded-2xl bg-background/5 transition-all ${hovered ? "border border-slate-600" : "border border-transparent"}`}
+    >
+      <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center mb-4">
+        <problem.icon className="w-5 h-5 text-primary" />
+      </div>
+      <h3 className="text-base font-semibold text-background mb-2">{problem.title}</h3>
+      <p className="text-sm text-background/60 leading-relaxed">{problem.desc}</p>
+    </div>
+  );
+};
+
 export default function ProblemSection() {
   return (
     <section className="py-24 md:py-32 px-6 bg-foreground">
@@ -46,13 +64,7 @@ export default function ProblemSection() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {problems.map((p, i) => (
-            <div key={i} className="p-6 rounded-2xl border-2 border-black bg-background/5 hover:border-primary/40 transition-colors">
-              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center mb-4">
-                <p.icon className="w-5 h-5 text-primary" />
-              </div>
-              <h3 className="text-base font-semibold text-background mb-2">{p.title}</h3>
-              <p className="text-sm text-background/60 leading-relaxed">{p.desc}</p>
-            </div>
+            <ProblemCard key={i} problem={p} />
           ))}
         </div>
       </div>

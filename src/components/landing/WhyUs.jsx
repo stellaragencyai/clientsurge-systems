@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const reasons = [
   {
     title: "We Focus on Revenue, Not Features",
@@ -25,6 +27,21 @@ const reasons = [
   },
 ];
 
+const WhyUsCard = ({ reason }) => {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <div 
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`p-6 rounded-2xl bg-card transition-all ${hovered ? "border border-slate-600" : "border border-transparent"}`}
+    >
+      <div className="w-8 h-0.5 bg-primary mb-5 rounded-full" />
+      <h3 className="text-base font-semibold text-foreground mb-2">{reason.title}</h3>
+      <p className="text-sm text-muted-foreground leading-relaxed">{reason.desc}</p>
+    </div>
+  );
+};
+
 export default function WhyUs() {
   return (
     <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
@@ -38,11 +55,7 @@ export default function WhyUs() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {reasons.map((r, i) => (
-            <div key={i} className="p-6 rounded-2xl border-2 border-black bg-card hover:border-primary/30 transition-colors">
-              <div className="w-8 h-0.5 bg-primary mb-5 rounded-full" />
-              <h3 className="text-base font-semibold text-foreground mb-2">{r.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{r.desc}</p>
-            </div>
+            <WhyUsCard key={i} reason={r} />
           ))}
         </div>
       </div>
