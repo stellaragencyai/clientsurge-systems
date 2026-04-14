@@ -1,4 +1,6 @@
-import { Sparkles, Heart, Building2, Home, MapPin, Wrench, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { Sparkles, Heart, Building2, Home, MapPin, Wrench, ArrowRight, X, CheckCircle2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const industries = [
   {
@@ -8,7 +10,15 @@ const industries = [
     desc: "Capture aesthetic & injectable inquiries instantly. Confirm appointments and reduce no-shows with automated follow-up sequences.",
     result: "2.4× more consultations booked • 34% fewer no-shows",
     href: "/med-spa",
-    image: "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=900&q=85",
+    bullets: [
+      "Instant SMS/email response to every new inquiry",
+      "Automated consultation reminders 24h & 1h before",
+      "Missed call text-back so no lead goes unanswered",
+      "Reactivate old leads who never booked",
+      "Booking link sent automatically after first contact",
+    ],
+    detail: "Med spas lose an average of $12,000/month in missed consultations. Our system responds to every lead within 90 seconds — even at 2am — and handles the entire booking flow so your front desk can focus on in-clinic guests.",
   },
   {
     icon: Heart,
@@ -17,7 +27,15 @@ const industries = [
     desc: "Instantly follow up with trial class inquiries. Reactivate dormant members and convert more paid leads without extra ad spend.",
     result: "58% higher conversion rates • 3× faster response time",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=900&q=85",
+    bullets: [
+      "Auto-respond to trial class & membership inquiries",
+      "Smart nurture sequences for non-converters",
+      "Win-back campaigns for cancelled members",
+      "Follow-up after every trial class attendance",
+      "Pipeline dashboard to track every prospect",
+    ],
+    detail: "Most studios spend heavily on ads but lose leads in the follow-up gap. We bridge that gap with personalized, automated touchpoints that feel human — turning trial visitors into long-term paying members.",
   },
   {
     icon: Building2,
@@ -26,7 +44,15 @@ const industries = [
     desc: "Respond to property inquiries within minutes. Automate showing scheduling, follow-ups, and buyer nurturing from first contact to closing.",
     result: "5× more showings scheduled • 42% faster lead response",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=85",
+    bullets: [
+      "Instant lead response under 90 seconds, 24/7",
+      "Auto-qualify buyers with smart SMS sequences",
+      "Showing scheduling sent with calendar link",
+      "Long-term nurture for leads not ready yet",
+      "Automated post-showing follow-up & feedback",
+    ],
+    detail: "87% of buyers choose the agent who responds first. Our system keeps you ahead of every competitor by responding instantly, qualifying the lead, and scheduling the showing — all before you pick up your phone.",
   },
   {
     icon: Wrench,
@@ -35,7 +61,15 @@ const industries = [
     desc: "Field teams stay focused while automated systems capture estimate requests, book appointments, and follow up on pending quotes.",
     result: "65% more jobs booked • 24/7 lead capture & response",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=900&q=85",
+    bullets: [
+      "Never miss a service call — auto-response 24/7",
+      "Estimate follow-ups sent automatically",
+      "Appointment reminders reduce no-shows",
+      "Upsell existing customers on maintenance plans",
+      "Review requests sent after every completed job",
+    ],
+    detail: "When you're under a sink or on a roof, you can't answer every call. Our system captures every lead, schedules estimates, and follows up on pending quotes — so you close more jobs without lifting a finger.",
   },
   {
     icon: Home,
@@ -44,7 +78,15 @@ const industries = [
     desc: "Instant quote request responses keep you top-of-mind when crews are on-site. Win more contracts with intelligent bid tracking.",
     result: "3.2× more quotes accepted • Higher win rates on bids",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=85",
+    bullets: [
+      "Instant acknowledgement on every quote request",
+      "Automated follow-up on submitted bids",
+      "Reminder sequences for undecided prospects",
+      "Re-engage past clients for repeat projects",
+      "Job completion follow-ups to generate referrals",
+    ],
+    detail: "In contracting, speed wins bids. We make sure you're the first to respond every single time — and then keep following up until the prospect decides. Most contractors see a 3× increase in accepted quotes within 60 days.",
   },
   {
     icon: MapPin,
@@ -53,11 +95,21 @@ const industries = [
     desc: "Capture leads across all channels. Automated follow-up, appointment reminders, and reactivation campaigns turn paid traffic into bookings.",
     result: "2–3× ROAS on marketing spend • 40% more appointments",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&q=85",
+    bullets: [
+      "Capture leads from Google, Facebook, Instagram & web",
+      "Instant multi-channel follow-up (SMS + email)",
+      "Appointment booking without manual scheduling",
+      "Reactivate cold leads from your existing database",
+      "ROI tracking to see exactly what's working",
+    ],
+    detail: "If you're running ads and not following up within 5 minutes, you're wasting your budget. Our system connects to every lead source and turns clicks into confirmed appointments — automatically, around the clock.",
   },
 ];
 
 export default function Industries() {
+  const [selected, setSelected] = useState(null);
+
   return (
     <section id="industries" className="bg-gradient-to-b from-card via-background to-card">
       {/* Header */}
@@ -70,7 +122,7 @@ export default function Industries() {
           <span className="text-primary">Bookings</span>
         </h2>
         <p className="mt-5 text-muted-foreground text-lg">
-          Pick your industry — we'll show you exactly how it works for you.
+          Click your industry — we'll show you exactly how it works for you.
         </p>
       </div>
 
@@ -79,22 +131,21 @@ export default function Industries() {
         {industries.map((ind, i) => {
           const Icon = ind.icon;
           return (
-            <a
+            <button
               key={i}
-              href={ind.href}
-              className="group relative flex flex-col overflow-hidden"
+              onClick={() => setSelected(ind)}
+              className="group relative flex flex-col overflow-hidden cursor-pointer text-left focus:outline-none"
               style={{ minHeight: "480px" }}
             >
               {/* Image — 70% */}
-              <div className="relative overflow-hidden" style={{ height: "70%" }}>
+              <div className="relative overflow-hidden" style={{ flex: "0 0 70%" }}>
                 <img
                   src={ind.image}
                   alt={ind.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  style={{ minHeight: "320px" }}
                 />
-                {/* Dark gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/50" />
-                {/* Icon badge */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/25 to-black/55" />
                 <div className="absolute top-5 left-5 w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
                   <Icon className="w-5 h-5 text-white" />
                 </div>
@@ -115,16 +166,109 @@ export default function Industries() {
                 </div>
               </div>
 
-              {/* Border between cards */}
               {i % 3 !== 2 && (
                 <div className="absolute top-0 right-0 w-px h-full bg-border/40 hidden md:block" />
               )}
-            </a>
+            </button>
           );
         })}
       </div>
 
       <div className="pb-24" />
+
+      {/* Expanded overlay */}
+      <AnimatePresence>
+        {selected && (
+          <>
+            {/* Blurred backdrop */}
+            <motion.div
+              className="fixed inset-0 z-40"
+              style={{ backdropFilter: "blur(12px)", backgroundColor: "rgba(0,0,0,0.55)" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              onClick={() => setSelected(null)}
+            />
+
+            {/* Expanding card */}
+            <motion.div
+              className="fixed z-50 overflow-hidden rounded-2xl shadow-2xl"
+              initial={{ width: "31vw", height: "480px", top: "50%", left: "50%", x: "-50%", y: "-50%", opacity: 0.4, scale: 0.5 }}
+              animate={{ width: "min(860px, 92vw)", height: "auto", top: "50%", left: "50%", x: "-50%", y: "-50%", opacity: 1, scale: 1 }}
+              exit={{ width: "31vw", height: "480px", opacity: 0, scale: 0.5 }}
+              transition={{ type: "spring", stiffness: 220, damping: 28 }}
+            >
+              {/* Close */}
+              <button
+                onClick={() => setSelected(null)}
+                className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-md transition-all"
+              >
+                <X className="w-4 h-4 text-foreground" />
+              </button>
+
+              {/* Image top */}
+              <div className="relative w-full overflow-hidden" style={{ height: "260px" }}>
+                <img
+                  src={selected.image}
+                  alt={selected.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                {/* Title over image */}
+                <div className="absolute bottom-0 left-0 right-0 px-8 pb-6">
+                  <div className="flex items-center gap-3 mb-1">
+                    {(() => { const Icon = selected.icon; return <Icon className="w-5 h-5 text-white/80" />; })()}
+                    <p className="text-xs font-semibold text-white/60 uppercase tracking-widest">Industry Focus</p>
+                  </div>
+                  <h2 className="font-display text-2xl md:text-3xl font-semibold text-white leading-tight">
+                    {selected.name}
+                  </h2>
+                  <p className="text-sm font-semibold text-primary mt-1">{selected.result}</p>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="bg-white px-8 py-7">
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* Left — detail */}
+                  <div>
+                    <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-3">The Challenge & Our Solution</p>
+                    <p className="text-sm font-semibold text-foreground mb-3">{selected.problem}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{selected.detail}</p>
+                  </div>
+                  {/* Right — bullets */}
+                  <div>
+                    <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-3">What You Get</p>
+                    <ul className="space-y-2.5">
+                      {selected.bullets.map((b, i) => (
+                        <li key={i} className="flex items-start gap-2.5">
+                          <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-sm text-foreground">{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <div className="mt-7 flex flex-col sm:flex-row gap-3 items-center">
+                  <a
+                    href={selected.href}
+                    className="flex-1 w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-full h-12 px-8 font-semibold text-sm hover:bg-primary/90 transition-colors"
+                  >
+                    {selected.href === "/med-spa" ? "See the Med Spa Page" : "Book a Free Demo"}
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                  <p className="text-xs text-muted-foreground text-center sm:text-left">
+                    Free 30-min call • No commitment • Live in 5–7 days
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
