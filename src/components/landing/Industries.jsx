@@ -111,8 +111,6 @@ const industries = [
 export default function Industries() {
   const [selected, setSelected] = useState(null);
   const [showLeadModal, setShowLeadModal] = useState(false);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [hoveredIndex, setHoveredIndex] = useState(null);
 
   return (
     <section id="industries" className="bg-gradient-to-b from-card via-background to-card">
@@ -134,30 +132,12 @@ export default function Industries() {
       <div className="grid grid-cols-1 md:grid-cols-3">
         {industries.map((ind, i) => {
           const Icon = ind.icon;
-          const handleMouseMove = (e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = (e.clientY - rect.top - rect.height / 2) / 20;
-            const y = -(e.clientX - rect.left - rect.width / 2) / 20;
-            setTilt({ x, y });
-            setHoveredIndex(i);
-          };
-          const handleMouseLeave = () => {
-            setTilt({ x: 0, y: 0 });
-            setHoveredIndex(null);
-          };
           return (
             <button
               key={i}
               onClick={() => setSelected(ind)}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-              className="group relative flex flex-col overflow-hidden cursor-pointer text-left focus:outline-none"
-              style={{ 
-                minHeight: "480px",
-                transform: hoveredIndex === i ? `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` : "perspective(1000px) rotateX(0) rotateY(0)",
-                transition: hoveredIndex === i ? "none" : "transform 0.3s ease-out",
-                transformStyle: "preserve-3d"
-              }}
+              className="group relative flex flex-col overflow-hidden cursor-pointer text-left focus:outline-none border-2 border-transparent transition-colors duration-300 hover:border-[#a0714f]"
+              style={{ minHeight: "480px" }}
             >
               {/* Image — 70% */}
               <div className="relative overflow-hidden" style={{ flex: "0 0 70%" }}>
