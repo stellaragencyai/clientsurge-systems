@@ -32,6 +32,7 @@ export default function MedSpaHero() {
             src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1920&q=90"
             alt="Luxury med spa treatment"
             className="w-full h-full object-cover object-top"
+            loading="eager"
           />
           <div className="absolute inset-0 bg-black/20" />
         </div>
