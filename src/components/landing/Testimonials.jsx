@@ -1,23 +1,32 @@
 const testimonials = [
   {
-    quote: "Within 3 weeks we went from booking maybe 2 consultations a week from online leads to over 10. The system just runs — I don't touch it.",
     name: "Jessica M.",
-    business: "Owner, Luminary Aesthetics — Miami, FL",
-    result: "5× consultation bookings",
+    businessType: "Med Spa",
+    location: "Miami, FL",
+    before: "Booking 2 consults/week from online leads",
+    after: "10+ consults/week",
+    result: "5× booking increase",
+    quote: "The system just runs — I don't touch it.",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80",
   },
   {
-    quote: "We were spending $4k/month on ads and converting almost none of it. Now our close rate from ads is completely different. It paid for itself in the first week.",
     name: "Carlos R.",
-    business: "Owner, Elite HVAC & Cooling — Phoenix, AZ",
+    businessType: "HVAC Contractor",
+    location: "Phoenix, AZ",
+    before: "$4k/month ad spend with low conversion",
+    after: "Close rate doubled",
     result: "ROI in under 7 days",
+    quote: "It paid for itself in the first week.",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80",
   },
   {
-    quote: "I used to personally follow up with every lead. Now that's just… handled. My team is focused on clients and I'm focused on growth.",
     name: "Amanda T.",
-    business: "Director, Revive Wellness Studio — Austin, TX",
-    result: "Fully automated follow-up",
+    businessType: "Wellness Studio",
+    location: "Austin, TX",
+    before: "Manual follow-up draining team time",
+    after: "Fully automated follow-up",
+    result: "Team freed for growth",
+    quote: "My team is focused on clients and I'm focused on growth.",
     avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&q=80",
   },
 ];
@@ -27,71 +36,110 @@ export default function Testimonials() {
     <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Client Results</p>
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Proven Results</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            What Clients Say After 30 Days
+            Real Results From Businesses Using Our System
           </h2>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-           {testimonials.map((t, i) => (
-             <div
-               key={i}
-               className="group relative flex flex-col p-8 rounded-2xl backdrop-blur-md transition-all duration-500 hover:-translate-y-2 cursor-default"
-               style={{
-                 background: "rgba(255, 255, 255, 0.75)",
-                 border: "1.5px solid rgba(255, 255, 255, 0.6)",
-                 boxShadow: "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
-                 transition: "all 0.4s ease",
-               }}
-               onMouseEnter={e => {
-                 e.currentTarget.style.background = "rgba(255, 255, 255, 0.95)";
-                 e.currentTarget.style.border = "1.5px solid rgba(200, 150, 92, 0.4)";
-                 e.currentTarget.style.boxShadow = "0 24px 60px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8), 0 0 40px rgba(200, 150, 92, 0.15)";
-                 e.currentTarget.style.transform = "translateY(-8px)";
-               }}
-               onMouseLeave={e => {
-                 e.currentTarget.style.background = "rgba(255, 255, 255, 0.75)";
-                 e.currentTarget.style.border = "1.5px solid rgba(255, 255, 255, 0.6)";
-                 e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)";
-                 e.currentTarget.style.transform = "translateY(0)";
-               }}
-             >
-              {/* Quote mark */}
-              <div className="text-5xl font-display text-foreground/10 leading-none mb-3 select-none">"</div>
+          {testimonials.map((t, i) => (
+            <div
+              key={i}
+              className="group relative flex flex-col p-8 rounded-2xl backdrop-blur-md transition-all duration-500 hover:-translate-y-2 cursor-default"
+              style={{
+                background: "rgba(255, 255, 255, 0.75)",
+                border: "1.5px solid rgba(255, 255, 255, 0.6)",
+                boxShadow: "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
+                transition: "all 0.4s ease",
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.95)";
+                e.currentTarget.style.border = "1.5px solid rgba(200, 150, 92, 0.4)";
+                e.currentTarget.style.boxShadow = "0 24px 60px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8), 0 0 40px rgba(200, 150, 92, 0.15)";
+                e.currentTarget.style.transform = "translateY(-8px)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.75)";
+                e.currentTarget.style.border = "1.5px solid rgba(255, 255, 255, 0.6)";
+                e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              {/* Business Type Badge */}
+              <div className="mb-4">
+                <span className="inline-block text-xs font-bold text-foreground/60 bg-foreground/5 px-3 py-1 rounded-full">
+                  {t.businessType} — {t.location}
+                </span>
+              </div>
 
-              {/* Quote text */}
-              <p className="text-sm text-foreground/80 leading-relaxed flex-1 mb-8 italic">
-                {t.quote}
-              </p>
-
-              {/* Divider */}
-              <div className="border-t border-black/8 pt-5 flex items-center gap-4">
-                {/* Avatar */}
-                <div className="relative flex-shrink-0">
-                  <img
-                    src={t.avatar}
-                    alt={t.name}
-                    className="w-12 h-12 rounded-full object-cover ring-2 ring-white shadow-md"
-                  />
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-primary border-2 border-white" />
+              {/* Before/After */}
+              <div className="mb-6 space-y-3 pb-6 border-b border-black/8">
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Before</p>
+                  <p className="text-sm text-foreground/70">{t.before}</p>
                 </div>
-
-                {/* Name + biz */}
-                <div className="min-w-0">
-                  <p className="text-sm font-bold text-foreground truncate">{t.name}</p>
-                  <p className="text-xs text-muted-foreground leading-snug">{t.business}</p>
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">After</p>
+                  <p className="text-sm font-semibold text-foreground">{t.after}</p>
                 </div>
               </div>
 
-              {/* Result badge */}
-              <div className="mt-4">
-                <span className="inline-block text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
-                  ✓ {t.result}
+              {/* Result Highlight */}
+              <div className="mb-6">
+                <span className="inline-block text-sm font-bold text-white bg-gradient-to-r from-amber-600 to-amber-500 px-4 py-2 rounded-full">
+                  {t.result}
                 </span>
+              </div>
+
+              {/* Quote */}
+              <p className="text-sm text-foreground/75 leading-relaxed flex-1 mb-6 italic">
+                "{t.quote}"
+              </p>
+
+              {/* Author */}
+              <div className="flex items-center gap-3">
+                <img
+                  src={t.avatar}
+                  alt={t.name}
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-md"
+                />
+                <div>
+                  <p className="text-sm font-bold text-foreground">{t.name}</p>
+                </div>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* CTA Section */}
+        <div className="text-center mt-16 pt-12 border-t border-border">
+          <p className="text-lg font-semibold text-foreground mb-6">
+            Want results like this for your business?
+          </p>
+          <button onClick={() => {
+            const start = window.scrollY;
+            const end = document.body.scrollHeight - window.innerHeight;
+            const distance = end - start;
+            const duration = 1200;
+            let startTime = null;
+            const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            const step = (timestamp) => {
+              if (!startTime) startTime = timestamp;
+              const progress = Math.min((timestamp - startTime) / duration, 1);
+              window.scrollTo(0, start + distance * easeInOutCubic(progress));
+              if (progress < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+          }} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.5s ease, transform 0.3s ease",border:"none",cursor:"pointer"}} onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+          }} onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
+          }}>
+            <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 32px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
+              Book a Demo
+            </span>
+          </button>
         </div>
       </div>
     </section>
