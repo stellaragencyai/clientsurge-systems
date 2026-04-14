@@ -36,49 +36,42 @@ const navColumns = [
   },
 ];
 
-const colBgs = [
-  "bg-white",
-  "bg-secondary/60",
-  "bg-white",
-  "bg-secondary/60",
-];
-
 export default function Footer() {
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <footer className="text-foreground border-t border-border">
+    <footer className="bg-foreground text-background">
 
-      {/* Nav columns — alternating background per column */}
-      <div className="grid grid-cols-2 md:grid-cols-4">
-        {navColumns.map((col, idx) => (
-          <div key={col.title} className={`${colBgs[idx]} px-8 py-10 flex flex-col items-center text-center border-r last:border-r-0 border-border`}>
-            <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-5">{col.title}</p>
-            <ul className="space-y-3">
-              {col.links.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+      {/* Nav columns */}
+      <div className="max-w-6xl mx-auto px-6 pt-12 pb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+          {navColumns.map((col) => (
+            <div key={col.title} className="flex flex-col items-center text-center">
+              <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-5">{col.title}</p>
+              <ul className="space-y-3">
+                {col.links.map((link) => (
+                  <li key={link.label}>
+                    <a href={link.href} className="text-xs font-medium text-background/50 hover:text-background transition-colors">
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
 
-      {/* Bottom bar */}
-      <div className="bg-foreground/5 border-t border-border">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-          <a href="#" className="font-display text-sm font-semibold tracking-tight text-foreground/60 hover:text-primary transition-colors flex-shrink-0">
+        {/* Bottom row inside footer */}
+        <div className="mt-10 pt-6 border-t border-background/10 flex items-center justify-between gap-4">
+          <a href="#" className="font-display text-sm font-semibold text-background/40 hover:text-primary transition-colors">
             Apex<span className="text-primary">Flow</span>™
           </a>
-          <p className="text-xs text-muted-foreground whitespace-nowrap">
+          <p className="text-xs text-background/40">
             © {new Date().getFullYear()} ApexFlow. All rights reserved.
           </p>
           <button
             onClick={scrollTop}
-            className="w-7 h-7 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary transition-all hover:bg-primary/5 flex-shrink-0"
+            className="w-7 h-7 rounded-full border border-background/20 flex items-center justify-center text-background/40 hover:text-background hover:border-background/50 transition-all"
             aria-label="Back to top"
           >
             <ArrowUp className="w-3 h-3" />
