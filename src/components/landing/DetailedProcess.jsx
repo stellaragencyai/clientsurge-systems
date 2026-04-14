@@ -14,10 +14,6 @@ const steps = [
       "Zero manual entry — your CRM is updated in real time",
     ],
     image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=600&q=80",
-    color: "from-amber-50 to-yellow-50",
-    border: "border-amber-100",
-    iconBg: "bg-amber-100",
-    iconColor: "text-amber-700",
   },
   {
     step: "Step 2",
@@ -30,11 +26,7 @@ const steps = [
       "SMS + email sent simultaneously for maximum reach",
       "Proven message templates optimized for your niche",
     ],
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80",
-    color: "from-blue-50 to-cyan-50",
-    border: "border-blue-100",
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-700",
+    image: "https://images.unsplash.com/photo-1611746872915-64382b5c76da?w=600&q=80",
   },
   {
     step: "Step 3",
@@ -48,10 +40,6 @@ const steps = [
       "Stops automatically once they reply or book",
     ],
     image: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=80",
-    color: "from-violet-50 to-purple-50",
-    border: "border-violet-100",
-    iconBg: "bg-violet-100",
-    iconColor: "text-violet-700",
   },
   {
     step: "Step 4",
@@ -65,10 +53,6 @@ const steps = [
       "Smart rescheduling if they need to change",
     ],
     image: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&q=80",
-    color: "from-emerald-50 to-green-50",
-    border: "border-emerald-100",
-    iconBg: "bg-emerald-100",
-    iconColor: "text-emerald-700",
   },
   {
     step: "Step 5",
@@ -81,11 +65,7 @@ const steps = [
       "Re-engagement sequence for repeat bookings",
       "Pipeline analytics show you exactly what's working",
     ],
-    image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=600&q=80",
-    color: "from-rose-50 to-pink-50",
-    border: "border-rose-100",
-    iconBg: "bg-rose-100",
-    iconColor: "text-rose-700",
+    image: "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=600&q=80",
   },
 ];
 
@@ -110,14 +90,14 @@ function StepCard({ step, index }) {
       style={{ transitionDelay: `${index * 80}ms` }}
     >
       <div
-        className={`group relative flex flex-col md:flex-row rounded-2xl overflow-hidden border ${step.border} bg-gradient-to-br ${step.color} transition-all duration-500`}
+        className="group relative flex flex-col md:flex-row rounded-2xl overflow-hidden border border-border bg-white transition-all duration-500"
         style={{
           boxShadow: "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)",
           transformStyle: "preserve-3d",
         }}
         onMouseEnter={e => {
-          e.currentTarget.style.boxShadow = "0 20px 60px rgba(0,0,0,0.12), 0 6px 18px rgba(0,0,0,0.07)";
-          e.currentTarget.style.transform = "translateY(-4px) rotateX(1.5deg)";
+          e.currentTarget.style.boxShadow = "0 24px 64px rgba(0,0,0,0.13), 0 8px 20px rgba(0,0,0,0.08)";
+          e.currentTarget.style.transform = "translateY(-5px) rotateX(1.5deg)";
         }}
         onMouseLeave={e => {
           e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)";
@@ -129,33 +109,35 @@ function StepCard({ step, index }) {
           {/* Step badge */}
           <div className="flex items-center gap-3 mb-5">
             <span className="text-xs font-bold text-foreground/40 uppercase tracking-widest">{step.step}</span>
-            <span className="text-xs font-semibold text-muted-foreground bg-white/70 px-3 py-1 rounded-full border border-black/5">
+            <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
               {step.timeframe}
             </span>
           </div>
 
           {/* Icon + Title */}
           <div className="flex items-center gap-4 mb-4">
-            <div className={`w-12 h-12 rounded-xl ${step.iconBg} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-              <Icon className={`w-6 h-6 ${step.iconColor}`} />
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+              <Icon className="w-6 h-6 text-primary" />
             </div>
             <h3 className="font-display text-2xl font-semibold text-foreground">{step.title}</h3>
           </div>
 
-          <p className="text-sm text-muted-foreground leading-relaxed mb-6">{step.desc}</p>
+          <p style={{ fontFamily: "'Georgia', serif" }} className="text-sm text-muted-foreground leading-relaxed mb-6">
+            {step.desc}
+          </p>
 
           <ul className="space-y-2.5">
             {step.bullets.map((b, i) => (
               <li key={i} className="flex items-start gap-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-foreground/30 mt-1.5 flex-shrink-0" />
-                <span className="text-sm text-foreground/70">{b}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-primary/50 mt-1.5 flex-shrink-0" />
+                <span style={{ fontFamily: "'Georgia', serif" }} className="text-sm text-foreground/70">{b}</span>
               </li>
             ))}
           </ul>
         </div>
 
         {/* Right — image */}
-        <div className="md:w-64 lg:w-80 h-48 md:h-auto overflow-hidden flex-shrink-0">
+        <div className="md:w-64 lg:w-80 h-52 md:h-auto overflow-hidden flex-shrink-0">
           <img
             src={step.image}
             alt={step.title}
@@ -167,14 +149,13 @@ function StepCard({ step, index }) {
   );
 }
 
-// Thin arrow connector between steps
 function StepArrow() {
   return (
-    <div className="flex justify-center items-center py-1">
+    <div className="flex justify-center items-center py-5">
       <div className="flex flex-col items-center">
-        <div className="w-px h-6 bg-foreground/20" />
-        <svg width="12" height="8" viewBox="0 0 12 8" fill="none" className="text-foreground/30">
-          <path d="M6 8L0.803848 0.5L11.1962 0.5L6 8Z" fill="currentColor" />
+        <div className="w-px h-10 bg-foreground/25" />
+        <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
+          <path d="M11 14L0.607696 0.5L21.3923 0.5L11 14Z" fill="rgba(0,0,0,0.25)" />
         </svg>
       </div>
     </div>
