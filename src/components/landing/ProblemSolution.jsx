@@ -1,10 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Clock, PhoneMissed, Users, AlertTriangle, Archive, ArrowRight, Zap, MessageCircle, Phone, CheckSquare2, RefreshCw, Hourglass } from "lucide-react";
-
-let scrollY = 0;
-if (typeof window !== "undefined") {
-  scrollY = window.scrollY;
-}
+import { Clock, PhoneMissed, Users, AlertTriangle, Archive, Zap, MessageCircle, Phone, CheckSquare2, RefreshCw, Hourglass } from "lucide-react";
 
 const pairs = [
   {
@@ -13,7 +8,7 @@ const pairs = [
     problemDesc: "The average business takes 47 hours to reply. By then, they've already booked your competitor.",
     solutionIcon: Zap,
     solution: "Instant Lead Response",
-    solutionDesc: "Capture leads before competitors respond.",
+    solutionDesc: "Respond in under 60 seconds — automatically, 24/7.",
   },
   {
     problemIcon: Phone,
@@ -21,7 +16,7 @@ const pairs = [
     problemDesc: "Every unanswered call is a customer you paid to attract — walking straight to someone else.",
     solutionIcon: MessageCircle,
     solution: "Missed Call Text-Back",
-    solutionDesc: "Recover revenue from every missed call.",
+    solutionDesc: "Text them back instantly. Recover the lead before they dial your competitor.",
   },
   {
     problemIcon: Users,
@@ -29,7 +24,7 @@ const pairs = [
     problemDesc: "Front desks handle walk-ins, phones, and messages at once. Follow-up is an afterthought.",
     solutionIcon: CheckSquare2,
     solution: "Automated Follow-Up",
-    solutionDesc: "Turn more inquiries into booked appointments.",
+    solutionDesc: "Smart sequences handle the repetition. Your team focuses on closing deals.",
   },
   {
     problemIcon: AlertTriangle,
@@ -37,7 +32,7 @@ const pairs = [
     problemDesc: "A warm lead left without contact for 24 hours is a cold lead. Without automation, that's most of your pipeline.",
     solutionIcon: Zap,
     solution: "Booking Flow Automation",
-    solutionDesc: "Guide leads directly to scheduling without friction.",
+    solutionDesc: "Guide leads directly to your calendar. No phone tag. No friction.",
   },
   {
     problemIcon: Archive,
@@ -45,7 +40,7 @@ const pairs = [
     problemDesc: "You already paid to get them. Without a reactivation system, that investment is rotting in a spreadsheet.",
     solutionIcon: RefreshCw,
     solution: "Lead Reactivation",
-    solutionDesc: "Turn old leads into new revenue.",
+    solutionDesc: "Turn cold leads back into revenue with proven re-engagement campaigns.",
   },
 ];
 
@@ -77,44 +72,21 @@ function CardWithFadeIn({ children, delay = 0 }) {
 }
 
 export default function ProblemSolution() {
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const sectionRef = useRef(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const progress = Math.max(0, Math.min(1, (viewportHeight - rect.top) / (viewportHeight + rect.height)));
-      setScrollProgress(progress);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   return (
-    <section ref={sectionRef} id="services" className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card to-background">
+    <section id="services" className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card to-background">
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
-        <div className="max-w-2xl mx-auto text-center mb-20">
+        <div className="max-w-3xl mx-auto text-center mb-20">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Problem & The Fix</p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
+          <h2 className="font-display text-4xl md:text-5xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight mb-6">
             You Don't Have a Lead Problem.
             <br />
             <span className="text-primary">You Have a Follow-Up Problem.</span>
           </h2>
-          <p className="mt-5 text-muted-foreground text-lg leading-relaxed">
+          <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
             Every delayed response is lost revenue. Here's where it breaks — and exactly how we fix it.
           </p>
-        </div>
-
-        {/* Column labels */}
-        <div className="hidden md:grid grid-cols-[1fr_50px_1fr] gap-6 mb-8 px-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-destructive/60 text-center">The Problem</p>
-          <div />
-          <p className="text-xs font-bold uppercase tracking-widest text-primary text-center">The Solution</p>
         </div>
 
         {/* Paired rows */}
@@ -122,34 +94,30 @@ export default function ProblemSolution() {
           {pairs.map((pair, i) => {
             const ProblemIcon = pair.problemIcon;
             const SolutionIcon = pair.solutionIcon;
-            const colorProgress = Math.max(0, Math.min(1, scrollProgress - i * 0.08));
-            const parallaxOffsetProblem = scrollProgress * -15;
-            const parallaxOffsetSolution = scrollProgress * 15;
 
             return (
-              <div key={i} className="grid md:grid-cols-[1fr_50px_1fr] gap-6 items-center">
+              <div key={i} className="grid md:grid-cols-2 gap-6 items-stretch">
 
                 {/* Problem */}
-                <CardWithFadeIn delay={i * 50}>
+                <CardWithFadeIn delay={i * 40}>
                   <div 
-                    className="flex items-start gap-5 p-7 rounded-2xl border hover:border-black/40 hover:shadow-lg hover:scale-105 transition-all duration-300 group cursor-default min-h-40 bg-red-50/60"
+                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-red-400 hover:shadow-lg bg-red-50/40 min-h-36"
                     style={{
-                      transform: `translateY(${parallaxOffsetProblem}px)`,
-                      borderColor: `rgba(239,68,68,${0.2})`,
+                      borderColor: `rgba(239,68,68,0.2)`,
                     }}
                   >
                     <div 
-                      className="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 bg-red-200/50"
+                      className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 bg-red-200/50"
                     >
                       <ProblemIcon 
-                        className="w-7 h-7"
+                        className="w-6 h-6"
                         style={{
-                          color: `rgba(239,68,68,0.7)`,
+                          color: `rgba(239,68,68,0.8)`,
                         }}
                         strokeWidth={1.5} 
                       />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <h3 className="text-base font-bold text-foreground mb-2">{pair.problem}</h3>
                       <p className="text-sm text-foreground/70 leading-relaxed">{pair.problemDesc}</p>
                     </div>
@@ -157,30 +125,27 @@ export default function ProblemSolution() {
                 </CardWithFadeIn>
 
                 {/* Solution */}
-                <CardWithFadeIn delay={i * 50 + 100}>
+                <CardWithFadeIn delay={i * 40 + 80}>
                   <div 
-                    className="flex items-start gap-5 p-7 rounded-2xl border hover:border-black/40 hover:shadow-lg hover:scale-105 transition-all duration-300 group cursor-default min-h-40 bg-amber-50/60"
+                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-amber-500 hover:shadow-lg bg-amber-50/40 min-h-36"
                     style={{
-                      transform: `translateY(${parallaxOffsetSolution}px)`,
-                      borderColor: `rgba(161,120,35,${0.2})`,
+                      borderColor: `rgba(161,120,35,0.2)`,
                     }}
                   >
                     <div 
-                      className="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 bg-amber-200/50"
+                      className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 bg-amber-200/50"
                     >
                       <SolutionIcon 
-                        className="w-7 h-7"
+                        className="w-6 h-6"
                         style={{
-                          color: `rgba(161,120,35,0.7)`,
+                          color: `rgba(161,120,35,0.8)`,
                         }}
                         strokeWidth={1.5} 
                       />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <h3 className="text-base font-bold text-foreground mb-2">{pair.solution}</h3>
-                      <p 
-                        className="text-sm font-medium leading-relaxed transition-colors duration-300 text-foreground/80"
-                      >
+                      <p className="text-sm text-foreground/70 leading-relaxed">
                         {pair.solutionDesc}
                       </p>
                     </div>
@@ -191,13 +156,6 @@ export default function ProblemSolution() {
             );
           })}
         </div>
-
-        <style>{`
-          @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-          }
-        `}</style>
 
       </div>
     </section>
