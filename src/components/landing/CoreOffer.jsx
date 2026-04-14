@@ -3,11 +3,11 @@ import { ArrowRight, Zap, MessageSquare, PhoneCall, CalendarCheck, RotateCcw, La
 import LeadCaptureModal from "../forms/LeadCaptureModal";
 
 const includes = [
-  { icon: Zap, step: "01", title: "Instant Lead Capture", desc: "Every inquiry captured and logged automatically — from any channel, 24/7." },
-  { icon: MessageSquare, step: "02", title: "SMS & Chat Response", desc: "Personalized instant replies sent within seconds of every new lead." },
-  { icon: ArrowRight, step: "03", title: "Follow-Up Sequences", desc: "Multi-step, timed sequences written and scheduled — no manual work." },
-  { icon: PhoneCall, step: "04", title: "Missed Call Text-Back", desc: "Every missed call triggers an immediate text so no lead disappears." },
-  { icon: RotateCcw, step: "05", title: "Lead Reactivation", desc: "Old leads re-engaged with proven campaigns. Dormant = money left on the table." },
+  { icon: Zap, step: "01", title: "Instantly respond to every lead", desc: "Before your competitors do — personalized replies within seconds." },
+  { icon: MessageSquare, step: "02", title: "Turn inquiries into booked appointments", desc: "Guided booking flow that converts more leads into confirmed bookings." },
+  { icon: PhoneCall, step: "03", title: "Recover bookings from missed calls", desc: "Every missed call gets an immediate text-back — zero leads disappear." },
+  { icon: ArrowRight, step: "04", title: "Automate follow-up so nothing slips through", desc: "Multi-step sequences keep leads warm and moving toward booking." },
+  { icon: RotateCcw, step: "05", title: "Reactivate old leads into new revenue", desc: "Turn dormant contacts into fresh opportunities with proven campaigns." },
   { icon: CalendarCheck, step: "06", title: "Booking Flow", desc: "Leads guided directly to your calendar. No phone tag, no friction." },
   { icon: LayoutDashboard, step: "07", title: "CRM Pipeline Automation", desc: "Auto-tagging, status updates, and task creation — your pipeline runs itself." },
   { icon: HeadphonesIcon, step: "08", title: "Ongoing Support", desc: "Continuous optimization and priority support from our team post-launch." },
@@ -23,10 +23,10 @@ export default function CoreOffer() {
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Package</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
-            A <span className="text-primary">Complete</span> System,<br /><span style={{color: "rgba(161,120,35,1)", textShadow: "0 0 20px rgba(161,120,35,0.5)"}}>Automated</span> for You
+            A Done-For-You System That Turns Leads Into Booked Clients
           </h2>
           <p className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-            This isn't software you figure out. We build, install, and manage the entire system — your only job is showing up for the appointments it generates.
+            We build, install, and run the system — so you get more bookings without doing the work.
           </p>
         </div>
 
@@ -35,11 +35,14 @@ export default function CoreOffer() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-8 py-5">
             <div className="flex items-center gap-3">
               <TrendingUp className="w-6 h-6 text-amber-300 flex-shrink-0" />
-              <p className="text-sm font-semibold text-amber-100">Most clients recover their investment within the first 30 days.</p>
+              <p className="text-sm font-semibold text-amber-100">Most clients recover their investment within the first 30 days — often sooner.</p>
             </div>
             <span className="text-xs font-bold text-amber-300/70 uppercase tracking-widest whitespace-nowrap">Revenue-first, always</span>
           </div>
         </div>
+
+        {/* Feature grid intro */}
+        <p className="text-sm font-semibold text-foreground mb-6">Here's exactly what's included in your system:</p>
 
         {/* Feature grid cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
@@ -69,7 +72,7 @@ export default function CoreOffer() {
         {/* Setup timeline bar */}
         <div className="mb-8 p-5 bg-primary/5 border border-primary/15 rounded-2xl grid sm:grid-cols-3 gap-4 text-center">
           {[
-            { label: "Setup Timeline", value: "Live in 5–7 days" },
+            { label: "Setup Timeline", value: "Live in 5–7 days — no complex setup on your end" },
             { label: "What You Do", value: "One onboarding call" },
             { label: "Everything Else", value: "Automated Entirely", highlight: true },
           ].map((item, i) => (
@@ -90,8 +93,8 @@ export default function CoreOffer() {
 
         {/* CTA */}
         <div className="pt-6 border-t border-border text-center">
-          <p className="text-muted-foreground text-sm mb-6">
-            Fully tailored to your business. Designed to generate revenue from day one.
+          <p className="text-foreground text-sm font-semibold mb-6">
+            If you're getting leads but not converting them, this is the fix.
           </p>
           <button onClick={(e) => {
             e.preventDefault();
@@ -114,7 +117,7 @@ export default function CoreOffer() {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
           }}>
             <span style={{display:"flex",alignItems:"center",gap:"8px",height:"52px",padding:"0 36px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
-              Book a Demo
+              Book a 10-Min Demo
               <ArrowRight className="w-4 h-4" />
             </span>
           </button>
