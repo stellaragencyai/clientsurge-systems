@@ -208,7 +208,7 @@ export default function ConversationMockup() {
         </div>
 
         {/* Phone container */}
-        <div className="mx-auto" style={{ perspective: "1200px", maxWidth: "450px" }}>
+        <div className="mx-auto" style={{ perspective: "1200px", maxWidth: "563px" }}>
           {/* 3D tilt wrapper */}
           <div style={{ transform: "rotateY(-2deg) rotateX(1deg)" }}>
           {/* Phone shell */}
@@ -241,7 +241,7 @@ export default function ConversationMockup() {
             <div
               ref={scrollRef}
               className="bg-white px-4 py-4 space-y-3 overflow-y-auto"
-              style={{ minHeight: "399px", maxHeight: "441px" }}
+              style={{ minHeight: "499px", maxHeight: "551px" }}
             >
               {STEPS.map((step) => {
                 if (!isVisible(step.id)) return null;
