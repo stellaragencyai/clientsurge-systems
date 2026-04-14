@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -42,19 +41,17 @@ const faqs = [
 ];
 
 export default function FAQ() {
-  const [openIndex, setOpenIndex] = useState(null);
-
   return (
     <section id="faq" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
-          <p className="text-xs font-semibold text-foreground/70 tracking-widest uppercase mb-4">Questions</p>
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Questions</p>
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
             Frequently Asked Questions
           </h2>
         </div>
 
-        <Accordion type="single" collapsible className="space-y-3" onValueChange={(v) => setOpenIndex(v ? parseInt(v.split('-')[1]) : null)}>
+        <Accordion type="single" collapsible className="space-y-3">
           {faqs.map((faq, i) => (
             <AccordionItem
               key={i}
@@ -64,34 +61,8 @@ export default function FAQ() {
               <AccordionTrigger className="text-left text-sm font-semibold hover:no-underline py-5">
                 {faq.q}
               </AccordionTrigger>
-              <AccordionContent className="overflow-visible pb-6 min-h-32">
-                {openIndex === i && (
-                  <div className="animate-in fade-in duration-300">
-                    <style>{`
-                      @keyframes handwrite {
-                        0% { 
-                          background-size: 0% 100%;
-                        }
-                        100% { 
-                          background-size: 100% 100%;
-                        }
-                      }
-                      .handwrite-text {
-                        background: linear-gradient(90deg, #9a5c2e 0%, #9a5c2e 0%, transparent 0%);
-                        background-size: 0% 100%;
-                        animation: handwrite 1.8s ease-out forwards;
-                        color: #9a5c2e;
-                        font-family: 'Segoe Print', 'Comic Sans MS', cursive;
-                        font-weight: 500;
-                        letter-spacing: 0.5px;
-                        line-height: 1.8;
-                      }
-                    `}</style>
-                    <p className="handwrite-text text-sm leading-relaxed">
-                      {faq.a}
-                    </p>
-                  </div>
-                )}
+              <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-5">
+                {faq.a}
               </AccordionContent>
             </AccordionItem>
           ))}
