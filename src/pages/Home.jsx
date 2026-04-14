@@ -6,6 +6,7 @@ import SolutionSection from "../components/landing/SolutionSection";
 import HowItWorks from "../components/landing/HowItWorks";
 import Benefits from "../components/landing/Benefits";
 import ConversationMockup from "../components/landing/ConversationMockup";
+import DetailedProcess from "../components/landing/DetailedProcess";
 import Testimonials from "../components/landing/Testimonials";
 import Industries from "../components/landing/Industries";
 import CoreOffer from "../components/landing/CoreOffer";
@@ -27,6 +28,7 @@ export default function Home() {
       <FadeIn><HowItWorks /></FadeIn>
       <FadeIn><Testimonials /></FadeIn>
       <FadeIn><ConversationMockup /></FadeIn>
+      <FadeIn><DetailedProcess /></FadeIn>
       <FadeIn><Benefits /></FadeIn>
       <FadeIn><Industries /></FadeIn>
       <FadeIn><CoreOffer /></FadeIn>
