@@ -93,9 +93,6 @@ function StepCard({ step, index }) {
         className="group relative flex flex-col md:flex-row rounded-2xl overflow-hidden border border-border bg-white transition-all duration-300 h-full"
         style={{
           boxShadow: "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)",
-          transformStyle: "preserve-3d",
-          transform: "scale(1.15)",
-          transformOrigin: "center",
         }}
         onMouseEnter={e => {
           e.currentTarget.style.borderColor = "#000000";
