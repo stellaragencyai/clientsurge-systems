@@ -38,9 +38,9 @@ export default function Success() {
           <h2 className="text-sm font-semibold text-primary uppercase tracking-widest mb-6">What Happens Next</h2>
           <div className="space-y-4">
             {[
-              { step: '1', title: 'Confirmation', desc: 'You'll receive a calendar invite and meeting link' },
-              { step: '2', title: 'Demo Call', desc: 'We show you the exact system for your business type' },
-              { step: '3', title: 'Next Steps', desc: 'Discuss options and timing for your implementation' },
+              { step: '1', title: 'Confirmation', desc: "You'll receive a calendar invite and meeting link" },
+              { step: '2', title: 'Demo Call', desc: "We show you the exact system for your business type" },
+              { step: '3', title: 'Next Steps', desc: "Discuss options and timing for your implementation" },
             ].map((item, i) => (
               <div key={i} className="flex gap-4 text-left">
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center">
