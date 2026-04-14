@@ -122,7 +122,8 @@ export default function Pricing() {
         }
         .pricing-card:hover {
           border-color: #c8965c !important;
-          box-shadow: 0 8px 36px rgba(120,70,20,0.18), 0 2px 8px rgba(0,0,0,0.07) !important;
+          border-width: 3px !important;
+          box-shadow: 0 8px 40px rgba(160,90,20,0.25), 0 2px 10px rgba(0,0,0,0.08) !important;
         }
         .pricing-badge-float {
           position: absolute;
@@ -182,7 +183,7 @@ function PricingCard({ plan }) {
             }
           : {
               background: "#fff",
-              border: "1px solid hsl(var(--border))",
+              border: "2px solid hsl(var(--border))",
               boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
             }
       }

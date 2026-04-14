@@ -1,30 +1,15 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Check, ArrowRight } from "lucide-react";
+import { Check, ArrowRight, Zap, MessageSquare, PhoneCall, CalendarCheck, RotateCcw, LayoutDashboard } from "lucide-react";
 
 const includes = [
-  "Full lead capture system — built and integrated for you",
-  "Instant response automation via SMS and chat",
-  "Multi-step follow-up sequences, written and scheduled",
-  "Missed call text-back system",
-  "Lead reactivation campaigns for your existing database",
-  "Booking flow connected to your calendar",
-  "CRM pipeline automation — tagging, tasks, status updates",
-  "Ongoing support and optimization included",
+  { icon: Zap, text: "Full lead capture system — built and integrated for you" },
+  { icon: MessageSquare, text: "Instant response automation via SMS and chat" },
+  { icon: ArrowRight, text: "Multi-step follow-up sequences, written and scheduled" },
+  { icon: PhoneCall, text: "Missed call text-back system" },
+  { icon: RotateCcw, text: "Lead reactivation campaigns for your existing database" },
+  { icon: CalendarCheck, text: "Booking flow connected to your calendar" },
+  { icon: LayoutDashboard, text: "CRM pipeline automation — tagging, tasks, status updates" },
+  { icon: Check, text: "Ongoing support and optimization included" },
 ];
-
-const CoreOfferContainer = ({ children }) => {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <div 
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className={`bg-white/40 backdrop-blur-md rounded-3xl p-8 md:p-12 shadow-lg hover:bg-white/50 transition-all ${hovered ? "border border-slate-600" : "border border-transparent"}`}
-    >
-      {children}
-    </div>
-  );
-};
 
 export default function CoreOffer() {
   return (
@@ -40,30 +25,52 @@ export default function CoreOffer() {
           </p>
         </div>
 
-        <CoreOfferContainer>
+        <div className="bg-white rounded-3xl p-8 md:p-12 shadow-lg border-2 border-foreground">
+          {/* Icon grid of included items */}
           <div className="grid md:grid-cols-2 gap-4 mb-10">
-            {includes.map((item, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
-                  <Check className="w-3 h-3 text-primary" />
+            {includes.map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div key={i} className="flex items-start gap-3 p-3 rounded-xl hover:bg-primary/4 transition-colors">
+                  <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center mt-0.5">
+                    <Icon className="w-3.5 h-3.5 text-primary" />
+                  </div>
+                  <span className="text-sm text-foreground leading-relaxed">{item.text}</span>
                 </div>
-                <span className="text-sm text-foreground leading-relaxed">{item}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          <div className="pt-8 border-t border-border text-center">
+          {/* Setup timeline bar */}
+          <div className="mb-8 p-4 bg-primary/5 border border-primary/15 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+            <div>
+              <p className="text-xs font-bold text-primary uppercase tracking-widest mb-0.5">Setup Timeline</p>
+              <p className="text-sm font-semibold text-foreground">Live in 5–7 business days</p>
+            </div>
+            <div className="h-px sm:h-8 w-full sm:w-px bg-border" />
+            <div>
+              <p className="text-xs font-bold text-primary uppercase tracking-widest mb-0.5">What You Do</p>
+              <p className="text-sm font-semibold text-foreground">Show up to one onboarding call</p>
+            </div>
+            <div className="h-px sm:h-8 w-full sm:w-px bg-border" />
+            <div>
+              <p className="text-xs font-bold text-primary uppercase tracking-widest mb-0.5">Everything Else</p>
+              <p className="text-sm font-semibold text-foreground">We handle it entirely</p>
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-border text-center">
             <p className="text-muted-foreground text-sm mb-6">
               Fully tailored to your business. Designed to generate revenue from day one.
             </p>
-            <a href="#book-demo">
-              <Button size="lg" className="rounded-full px-8 h-12 text-base font-semibold gap-2 hover:shadow-xl hover:scale-105 transition-all">
+            <a href="#book-demo" style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}>
+              <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 32px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
                 Book a Demo
                 <ArrowRight className="w-4 h-4" />
-              </Button>
+              </span>
             </a>
           </div>
-        </CoreOfferContainer>
+        </div>
       </div>
     </section>
   );
