@@ -87,12 +87,6 @@ export default function Navbar() {
         {/* CTA — pinned right */}
         <div className="hidden md:flex items-center gap-3 shrink-0">
           <button
-            onClick={() => base44.auth.redirectToLogin("/admin")}
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Login
-          </button>
-          <button
             onClick={() => {
               window.location.href = '/start';
             }}
@@ -124,12 +118,6 @@ export default function Navbar() {
               {l.label}
             </a>
           ))}
-          <button
-            onClick={() => base44.auth.redirectToLogin("/admin")}
-            className="block w-full text-left text-sm text-muted-foreground hover:text-foreground mb-3"
-          >
-            Login
-          </button>
           <button onClick={() => {
             window.location.href = '/start';
           }} style={{display:"block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 14px rgba(120,70,20,0.35)",border:"none",cursor:"pointer",width:"100%"}}>
