@@ -18,6 +18,16 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAppState = async () => {
+    // Development bypass: if in preview mode, skip auth
+    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname.includes('preview');
+    if (isDevelopment) {
+      setIsLoadingPublicSettings(false);
+      setIsLoadingAuth(false);
+      setIsAuthenticated(false);
+      setAuthError(null);
+      return;
+    }
+
     try {
       setIsLoadingPublicSettings(true);
       setAuthError(null);
