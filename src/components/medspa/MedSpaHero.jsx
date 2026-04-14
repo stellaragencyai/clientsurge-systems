@@ -33,7 +33,7 @@ export default function MedSpaHero() {
             alt="Luxury med spa treatment"
             className="w-full h-full object-cover object-top"
           />
-          <div className="absolute inset-0" style={{background:"linear-gradient(to bottom, rgba(230,215,195,0.55) 0%, rgba(220,200,175,0.4) 40%, rgba(210,190,160,0.65) 100%)"}} />
+          <div className="absolute inset-0 bg-black/20" />
         </div>
 
         {/* Content */}
