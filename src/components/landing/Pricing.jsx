@@ -59,13 +59,32 @@ const plans = [
   },
 ];
 
+function scrollToDemo(e) {
+  e.preventDefault();
+  const el = document.getElementById("book-demo");
+  if (!el) return;
+  const start = window.scrollY;
+  const target = el.getBoundingClientRect().top + window.scrollY - 80;
+  const distance = target - start;
+  const duration = 1100;
+  let startTime = null;
+  const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const step = (ts) => {
+    if (!startTime) startTime = ts;
+    const progress = Math.min((ts - startTime) / duration, 1);
+    window.scrollTo(0, start + distance * ease(progress));
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 export default function Pricing() {
   return (
-    <section id="pricing" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
-      <div className="max-w-6xl mx-auto">
+    <section id="pricing" className="py-28 md:py-36 px-6 bg-gradient-to-b from-background to-card overflow-visible">
+      <div className="max-w-7xl mx-auto">
 
         {/* Header */}
-        <div className="max-w-2xl mx-auto text-center mb-16">
+        <div className="max-w-2xl mx-auto text-center mb-20">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Pricing & Packages</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
             Choose the Right Automation System for Your Business
@@ -76,101 +95,143 @@ export default function Pricing() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start" style={{ perspective: "1400px" }}>
           {plans.map((plan, i) => (
-            <div
-              key={i}
-              className="relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
-              style={
-                plan.highlight
-                  ? {
-                      background: "#fff",
-                      border: "2px solid hsl(var(--primary))",
-                      boxShadow: "0 20px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06)",
-                    }
-                  : {
-                      background: "#fff",
-                      border: "1px solid hsl(var(--border))",
-                      boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-                    }
-              }
-            >
-              {/* Badge */}
-              {plan.badge && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                  <span className="inline-block bg-primary text-primary-foreground text-xs font-bold px-4 py-1.5 rounded-full tracking-wide shadow">
-                    {plan.badge}
-                  </span>
-                </div>
-              )}
-
-              {/* Top accent bar for highlighted card */}
-              {plan.highlight && (
-                <div className="h-1 w-full bg-primary" />
-              )}
-
-              <div className="flex flex-col flex-1 p-8">
-                {/* Plan name & subtitle */}
-                <div className="mb-6">
-                  <h3 className="font-display text-xl font-semibold text-foreground mb-2">{plan.name}</h3>
-                  <p className="text-xs text-muted-foreground leading-snug">{plan.subtitle}</p>
-                </div>
-
-                {/* Pricing */}
-                <div className="mb-6 pb-6 border-b border-border">
-                  <div className="flex items-end gap-2 mb-1">
-                    <span className="text-4xl font-bold text-foreground">{plan.monthly}</span>
-                    <span className="text-sm text-muted-foreground mb-1.5">/month</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">{plan.setup}</p>
-                </div>
-
-                {/* Description */}
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6">{plan.desc}</p>
-
-                {/* Features */}
-                <ul className="space-y-3 flex-1 mb-8">
-                  {plan.features.map((f, j) => (
-                    <li key={j} className="flex items-start gap-3">
-                      <CheckCircle2 className={`w-4 h-4 flex-shrink-0 mt-0.5 ${plan.highlight ? "text-primary" : "text-foreground/40"}`} />
-                      <span className="text-sm text-foreground/75">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* CTA */}
-                <a href="#book-demo">
-                  <Button
-                    className={`w-full h-12 rounded-full font-semibold gap-2 ${
-                      plan.highlight
-                        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                        : "bg-foreground/5 text-foreground hover:bg-foreground/10 border border-border"
-                    }`}
-                    variant={plan.highlight ? "default" : "outline"}
-                  >
-                    Book a Demo
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </a>
-              </div>
-            </div>
+            <PricingCard key={i} plan={plan} />
           ))}
         </div>
 
         {/* Bottom trust note */}
-        <div className="mt-14 text-center max-w-xl mx-auto">
+        <div className="mt-16 text-center max-w-xl mx-auto">
           <p className="text-sm text-muted-foreground leading-relaxed mb-6">
             Not sure which option is right for your business? Book a quick demo and we'll recommend the best fit based on your lead flow, follow-up process, and goals.
           </p>
-          <a href="#book-demo">
+          <button onClick={scrollToDemo}>
             <Button className="rounded-full px-8 h-12 font-semibold gap-2">
               Book Your Demo
               <ArrowRight className="w-4 h-4" />
             </Button>
-          </a>
+          </button>
         </div>
 
       </div>
+
+      <style>{`
+        .pricing-card {
+          transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+          transform-style: preserve-3d;
+          will-change: transform;
+        }
+        .pricing-card:hover {
+          transform: translateY(-12px) rotateX(3deg) rotateY(-1deg) scale(1.02);
+        }
+        .pricing-card-highlight:hover {
+          transform: translateY(-14px) rotateX(3deg) rotateY(-1deg) scale(1.025);
+        }
+        .pricing-card::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          opacity: 0;
+          transition: opacity 0.4s ease;
+          background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 60%);
+          pointer-events: none;
+          z-index: 1;
+        }
+        .pricing-card:hover::before {
+          opacity: 1;
+        }
+        .pricing-badge-float {
+          position: absolute;
+          top: -14px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 20;
+          white-space: nowrap;
+        }
+      `}</style>
     </section>
+  );
+}
+
+function PricingCard({ plan }) {
+  return (
+    <div
+      className={`pricing-card ${plan.highlight ? "pricing-card-highlight" : ""} relative flex flex-col rounded-2xl overflow-visible`}
+      style={
+        plan.highlight
+          ? {
+              background: "#fff",
+              border: "2px solid hsl(var(--primary))",
+              boxShadow: "0 8px 40px rgba(0,0,0,0.10), 0 2px 10px rgba(0,0,0,0.06)",
+              paddingTop: "14px",
+            }
+          : {
+              background: "#fff",
+              border: "1px solid hsl(var(--border))",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            }
+      }
+    >
+      {/* Badge — floats above card */}
+      {plan.badge && (
+        <div className="pricing-badge-float">
+          <span className="inline-block bg-primary text-primary-foreground text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-lg">
+            {plan.badge}
+          </span>
+        </div>
+      )}
+
+      {/* Top accent bar */}
+      {plan.highlight && (
+        <div className="h-1 w-full bg-primary rounded-t-2xl" />
+      )}
+
+      <div className="flex flex-col flex-1 p-10">
+        {/* Plan name & subtitle */}
+        <div className="mb-7">
+          <h3 className="font-display text-2xl font-semibold text-foreground mb-2">{plan.name}</h3>
+          <p className="text-xs text-muted-foreground leading-snug">{plan.subtitle}</p>
+        </div>
+
+        {/* Pricing */}
+        <div className="mb-7 pb-7 border-b border-border">
+          <div className="flex items-end gap-2 mb-1">
+            <span className="text-5xl font-bold text-foreground">{plan.monthly}</span>
+            <span className="text-sm text-muted-foreground mb-2">/month</span>
+          </div>
+          <p className="text-xs text-muted-foreground">{plan.setup}</p>
+        </div>
+
+        {/* Description */}
+        <p className="text-sm text-muted-foreground leading-relaxed mb-7">{plan.desc}</p>
+
+        {/* Features */}
+        <ul className="space-y-3.5 flex-1 mb-9">
+          {plan.features.map((f, j) => (
+            <li key={j} className="flex items-start gap-3">
+              <CheckCircle2 className={`w-4 h-4 flex-shrink-0 mt-0.5 ${plan.highlight ? "text-primary" : "text-foreground/35"}`} />
+              <span className="text-sm text-foreground/75">{f}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* CTA */}
+        <button onClick={scrollToDemo} className="w-full">
+          <Button
+            className={`w-full h-13 py-3 rounded-full font-semibold gap-2 text-sm ${
+              plan.highlight
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "bg-transparent text-foreground hover:bg-foreground/5 border border-border"
+            }`}
+            variant={plan.highlight ? "default" : "outline"}
+          >
+            Book a Demo
+            <ArrowRight className="w-4 h-4" />
+          </Button>
+        </button>
+      </div>
+    </div>
   );
 }
