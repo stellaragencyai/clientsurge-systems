@@ -8,7 +8,7 @@ const STEPS = [
     id: "sys1",
     type: "system",
     text: "New lead received: Sarah M. — Interested in Botox consultation",
-    delay: 400,
+    delay: 800,
   },
   {
     id: "bot1",
@@ -16,33 +16,29 @@ const STEPS = [
     label: "Instant Auto-Response",
     text: "Hi Sarah! Thanks for reaching out about our Botox services. Would you prefer a morning or afternoon consultation?",
     time: "2:14 PM",
-    delay: 700,
+    delay: 1400,
   },
-  // Sarah reads
   {
     id: "read1",
     type: "read",
-    delay: 1200,
+    delay: 2400,
   },
-  // Sarah typing
   {
     id: "typing1",
     type: "typing",
-    delay: 1000,
+    delay: 2000,
   },
-  // Sarah replies
   {
     id: "sarah1",
     type: "lead",
     text: "Afternoon works best for me!",
     time: "2:16 PM",
-    delay: 1400,
+    delay: 2800,
   },
-  // AI typing
   {
     id: "aityping1",
     type: "aityping",
-    delay: 900,
+    delay: 1800,
   },
   {
     id: "bot2",
@@ -50,25 +46,24 @@ const STEPS = [
     label: "Smart Booking Flow",
     text: "Perfect! I have Thursday at 3:00 PM available. Here's your booking link: [Book Now] 🗓️",
     time: "2:16 PM",
-    delay: 1200,
+    delay: 2400,
   },
   {
     id: "sys2",
     type: "system",
     text: "✓ Appointment booked: Thursday, 3:00 PM — Botox Consultation",
-    delay: 900,
+    delay: 1800,
   },
-  // --- Round 2 (follow-up, ~30s later simulated visually) ---
   {
     id: "gap",
     type: "timegap",
     text: "30 minutes later...",
-    delay: 1500,
+    delay: 3000,
   },
   {
     id: "aityping2",
     type: "aityping",
-    delay: 800,
+    delay: 1600,
   },
   {
     id: "bot3",
@@ -76,30 +71,30 @@ const STEPS = [
     label: "Automated Follow-Up",
     text: "Hi Sarah! Just confirming your Botox consultation Thursday at 3 PM. Reply YES to confirm or call us to reschedule. See you soon! 💫",
     time: "2:46 PM",
-    delay: 1300,
+    delay: 2600,
   },
   {
     id: "read2",
     type: "read",
-    delay: 1100,
+    delay: 2200,
   },
   {
     id: "typing2",
     type: "typing",
-    delay: 1000,
+    delay: 2000,
   },
   {
     id: "sarah2",
     type: "lead",
     text: "YES, confirmed! See you then 😊",
     time: "2:47 PM",
-    delay: 1300,
+    delay: 2600,
   },
   {
     id: "sys3",
     type: "system",
     text: "✓ Appointment confirmed by client",
-    delay: 800,
+    delay: 1600,
   },
 ];
 
@@ -213,18 +208,23 @@ export default function ConversationMockup() {
         </div>
 
         {/* Phone container */}
-        <div className="max-w-sm mx-auto">
+        <div className="max-w-sm mx-auto" style={{ perspective: "1200px" }}>
+          {/* 3D tilt wrapper */}
+          <div style={{ transform: "rotateY(-2deg) rotateX(1deg)" }}>
           {/* Phone shell */}
-          <div className="bg-white rounded-[2.5rem] shadow-2xl border border-gray-200 overflow-hidden" style={{ boxShadow: "0 30px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)" }}>
-            {/* Status bar */}
-            <div className="bg-white px-6 pt-4 pb-1 flex items-center justify-between">
-              <span className="text-xs font-semibold text-foreground">2:14 PM</span>
-              <div className="w-24 h-6 bg-black rounded-full mx-auto absolute left-1/2 -translate-x-1/2" style={{ top: "16px", width: "80px", height: "22px" }} />
-              <div className="flex items-center gap-1">
-                <div className="flex gap-0.5 items-end">
-                  {[3,4,5,6].map(h => <div key={h} className="w-0.5 bg-foreground rounded-sm" style={{ height: `${h}px` }} />)}
+          <div className="bg-white rounded-[2.8rem] overflow-hidden relative" style={{ boxShadow: "0 50px 100px -20px rgba(0,0,0,0.25), 0 30px 60px -30px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -1px 0 rgba(0,0,0,0.05)", border: "3px solid #1a1a1a", outline: "1px solid rgba(0,0,0,0.12)", outlineOffset: "2px" }}>
+            {/* Notch / Dynamic Island */}
+            <div className="bg-white relative">
+              <div className="mx-auto mt-2 w-[90px] h-[24px] bg-black rounded-full" />
+              <div className="px-6 pt-2 pb-1 flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-foreground">2:14 PM</span>
+                <div className="flex items-center gap-1.5">
+                  <div className="flex gap-[2px] items-end">
+                    {[3,5,7,9].map(h => <div key={h} className="w-[3px] bg-foreground/80 rounded-sm" style={{ height: `${h}px` }} />)}
+                  </div>
+                  <svg className="w-4 h-4 text-foreground/80" viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.24 4.24 0 00-6 0zm-4-4l2 2a7.07 7.07 0 0110 0l2-2C15.68 9.68 8.32 9.68 5 13z"/></svg>
+                  <svg className="w-5 h-5 text-foreground/80" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="6" width="18" height="12" rx="2" fill="none" stroke="currentColor" strokeWidth="1.5"/><rect x="20.5" y="10" width="1.5" height="4" rx="0.5" fill="currentColor"/><rect x="4" y="8" width="10" height="8" rx="1" fill="currentColor" opacity="0.5"/></svg>
                 </div>
-                <span className="text-xs font-semibold">●●●</span>
               </div>
             </div>
 
@@ -338,11 +338,12 @@ export default function ConversationMockup() {
             </div>
 
             {/* Home indicator */}
-            <div className="bg-white pb-3 flex justify-center">
-              <div className="w-24 h-1 bg-gray-300 rounded-full" />
+            <div className="bg-white pb-4 pt-1 flex justify-center">
+              <div className="w-28 h-[5px] bg-black/20 rounded-full" />
             </div>
           </div>
 
+          </div>
           {/* Replay button */}
           <div className="text-center mt-6">
             <button

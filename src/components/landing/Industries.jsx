@@ -68,8 +68,8 @@ export default function Industries() {
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Who We Work With</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            <span className="text-primary">Built for Businesses</span> <span className="text-primary">That Run on Bookings</span>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight">
+            <span className="text-foreground">Built for </span><span className="text-primary">Businesses</span><span className="text-foreground"> That Run on </span><span className="text-primary">Bookings</span>
           </h2>
           <p className="mt-5 text-muted-foreground text-lg">
             Pick your industry below — we'll show you exactly how it works for you.
@@ -83,11 +83,13 @@ export default function Industries() {
               <button
                 key={i}
                 onClick={() => setSelectedIndustry(ind)}
-                className="group relative p-6 rounded-2xl border border-white/30 bg-white/10 backdrop-blur-md hover:border-primary/60 hover:bg-white/20 transition-all duration-500 hover:shadow-2xl hover:-translate-y-1 overflow-hidden text-left animate-fade-in-up"
-                style={{ animationDelay: `${i * 100}ms` }}
+                className="group relative p-6 rounded-2xl bg-white/80 backdrop-blur-xl border border-white/60 hover:border-primary/30 hover:bg-white/95 transition-all duration-500 hover:-translate-y-1.5 overflow-hidden text-left animate-fade-in-up"
+                style={{ animationDelay: `${i * 100}ms`, boxShadow: "0 4px 30px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9)", transition: "all 0.4s ease" }}
+                onMouseEnter={e => e.currentTarget.style.boxShadow = "0 20px 60px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)"}
+                onMouseLeave={e => e.currentTarget.style.boxShadow = "0 4px 30px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9)"}
               >
                 {/* Glass shimmer effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-40 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-white/10 opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
                 
                 <div className="relative z-10">
                   <div className="w-12 h-12 rounded-xl bg-primary/15 group-hover:bg-primary/30 flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110">
