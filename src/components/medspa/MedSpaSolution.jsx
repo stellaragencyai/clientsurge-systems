@@ -1,63 +1,76 @@
-import { MessageSquare, Zap, Phone, Calendar, RotateCw } from "lucide-react";
+import { Zap, MessageSquare, PhoneOff, CalendarCheck, RotateCcw } from "lucide-react";
+
+const solutions = [
+  {
+    icon: Zap,
+    title: "Instant Lead Response",
+    desc: "Every new inquiry gets contacted immediately — not when someone gets around to it. Within seconds, your lead receives a personalized response no matter the time of day.",
+    image: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=80",
+  },
+  {
+    icon: MessageSquare,
+    title: "Automated Follow-Up",
+    desc: "If a lead doesn't respond right away, the system continues the conversation automatically. Smart sequences run in the background until they book or opt out.",
+    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80",
+  },
+  {
+    icon: PhoneOff,
+    title: "Missed Call Text-Back",
+    desc: "When a call goes unanswered, an immediate text fires to keep the conversation alive. That lead stays warm instead of disappearing.",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80",
+  },
+  {
+    icon: CalendarCheck,
+    title: "Booking Push",
+    desc: "Interested leads are guided toward their next step. A booking link or consultation flow is sent at exactly the right moment — no manual work required.",
+    image: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&q=80",
+  },
+  {
+    icon: RotateCcw,
+    title: "Old Lead Reactivation",
+    desc: "Past inquiries that never booked can be re-engaged with targeted messages. Many of them are still interested. They just haven't heard from you.",
+    image: "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=600&q=80",
+  },
+];
 
 export default function MedSpaSolution() {
-  const solutions = [
-    {
-      icon: Zap,
-      title: "Instant Response",
-      desc: "Every lead gets a response within seconds. Automatically.",
-    },
-    {
-      icon: MessageSquare,
-      title: "Automated Follow-Up",
-      desc: "Smart messages sent at the right time to nurture leads toward booking.",
-    },
-    {
-      icon: Phone,
-      title: "Missed Call Text-Back",
-      desc: "Calls missed? Automatic SMS reaches out and gets them back on track.",
-    },
-    {
-      icon: Calendar,
-      title: "Booking Link Sent Automatically",
-      desc: "Lead is ready? They get a direct link to book their consultation.",
-    },
-    {
-      icon: RotateCw,
-      title: "Reactivate Old Leads",
-      desc: "Turn past inquiries into new bookings with smart re-engagement.",
-    },
-  ];
-
   return (
-    <section className="py-20 md:py-28 px-6 bg-secondary/30">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-14">
-          <h2 className="text-4xl md:text-5xl font-semibold text-foreground mb-4">
-            We Fix Your Follow-Up System
+    <section className="py-24 md:py-32 px-6 bg-[#FAFAF8]">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-16">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Solution</p>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground mb-5">
+            We Fix the Follow-Up System for You
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Here's exactly what we automate for you.
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            Five specific automations. Each one designed to recover a booking you would have otherwise lost.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="space-y-6">
           {solutions.map((item, i) => {
             const Icon = item.icon;
+            const isEven = i % 2 === 0;
             return (
-              <div key={i} className="bg-white p-6 rounded-lg border border-border">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center h-12 w-12 rounded-lg bg-primary/10">
-                      <Icon className="w-6 h-6 text-primary" />
+              <div key={i} className={`group flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"} gap-0 bg-white rounded-2xl border border-border overflow-hidden hover:shadow-md hover:border-primary/20 transition-all duration-300`}>
+                {/* Image */}
+                <div className="md:w-64 lg:w-72 h-48 md:h-auto flex-shrink-0 overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                {/* Content */}
+                <div className="flex-1 p-8 flex flex-col justify-center">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/15 transition-colors">
+                      <Icon className="w-5 h-5 text-primary" />
                     </div>
+                    <span className="text-xs font-bold text-foreground/40 uppercase tracking-widest">Step {i + 1}</span>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
-                      {item.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm">{item.desc}</p>
-                  </div>
+                  <h3 className="text-xl font-semibold text-foreground mb-3">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             );

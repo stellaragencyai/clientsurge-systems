@@ -1,55 +1,55 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const faqs = [
   {
-    q: "Will this replace my staff?",
-    a: "No. It handles the repetitive follow-up work so your team can focus on clients in the chair. It gives your staff time back.",
+    q: "Will this replace my front desk?",
+    a: "No. It supports your team by handling the fast response and repetitive follow-up they don't have time for. Your staff focuses on the clients in the room. The system handles the leads coming in.",
   },
   {
-    q: "How fast can it be set up?",
-    a: "Most med spas are live within 5–7 business days. We do the work. You just show up for one setup call.",
+    q: "How quickly can this be set up?",
+    a: "Most systems are live within 5–7 business days once onboarding is complete. We do the build. You just need to show up for a short setup call.",
   },
   {
     q: "Does this work with my current leads?",
-    a: "Yes. We integrate with what you have—phone system, booking calendar, current databases. No massive overhaul needed.",
+    a: "Yes. It can work with new leads coming in from any channel, and it can also help re-engage older inquiries you already have. No massive overhaul required.",
   },
   {
-    q: "How does this actually increase bookings?",
-    a: "Instant response + automatic follow-up = leads who would have gone cold now get converted. You're not getting more leads. You're converting more of the ones you have.",
+    q: "What kinds of med spas is this best for?",
+    a: "It works best for med spas that are already getting inquiries and want to convert more of them into booked appointments. If you have lead flow but inconsistent follow-up, this is built for you.",
   },
   {
-    q: "What happens after I book a call?",
-    a: "We'll spend 30 minutes learning your med spa—your services, lead sources, challenges. Then we show you exactly what we'd automate and what you can expect.",
+    q: "What happens after I book a demo?",
+    a: "We'll review your current lead flow, identify where bookings are being lost, and walk you through exactly how the system would work for your specific med spa. No obligation.",
+  },
+  {
+    q: "Will the responses sound robotic?",
+    a: "No. The messaging is crafted to feel clean, professional, and natural — consistent with the tone of your brand. It should feel like a well-trained team member, not an autoresponder.",
   },
 ];
 
 export default function MedSpaFAQ() {
   return (
-    <section className="py-20 md:py-28 px-6 bg-white">
+    <section className="py-24 md:py-32 px-6 bg-white">
       <div className="max-w-3xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-semibold text-foreground mb-4 text-center">
-          Frequently Asked Questions
-        </h2>
-        <p className="text-lg text-muted-foreground text-center mb-12">
-          Everything you need to know.
-        </p>
+        <div className="text-center mb-14">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">FAQ</p>
+          <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-base text-muted-foreground">Straight answers. No fluff.</p>
+        </div>
 
         <Accordion type="single" collapsible className="space-y-3">
           {faqs.map((faq, i) => (
             <AccordionItem
               key={i}
               value={`faq-${i}`}
-              className="border border-border rounded-lg px-6 data-[state=open]:border-primary data-[state=open]:bg-primary/5 transition-colors"
+              className="border border-border rounded-xl px-6 bg-[#FAFAF8] data-[state=open]:border-primary/40 data-[state=open]:bg-primary/3 transition-colors"
             >
-              <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-4">
+              <AccordionTrigger className="text-left text-sm font-semibold hover:no-underline py-5 text-foreground">
                 {faq.q}
               </AccordionTrigger>
-              <AccordionContent className="text-base text-muted-foreground pb-4">
+              <AccordionContent className="text-sm text-muted-foreground pb-5 leading-relaxed">
                 {faq.a}
               </AccordionContent>
             </AccordionItem>
