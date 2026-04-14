@@ -53,7 +53,10 @@ export default function MedSpaDemoModal({ onClose }) {
 
       if (result.data.success) {
         setSuccess(true);
-        setTimeout(() => onClose(), 3000);
+        setTimeout(() => {
+          onClose();
+          window.location.href = '/';
+        }, 4000);
       }
     } catch (error) {
       alert('Error scheduling demo: ' + error.message);
@@ -88,15 +91,25 @@ export default function MedSpaDemoModal({ onClose }) {
         {/* Success State */}
         {success && (
           <div className="px-8 py-12 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-              <CheckCircle2 className="w-8 h-8 text-green-600" />
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6 animate-bounce">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-2">Demo Confirmed!</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Check your email for confirmation details.
+            <h3 className="text-2xl font-semibold text-foreground mb-3">Thank You!</h3>
+            <p className="text-base text-muted-foreground mb-2">
+              We've received your intake form and demo request.
             </p>
+            <p className="text-sm text-muted-foreground mb-6">
+              Keep an eye on your inbox for a confirmation email with all the details about your scheduled demo.
+            </p>
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 w-full mb-6">
+              <p className="text-xs text-muted-foreground">
+                ✓ Confirmation email sent<br/>
+                ✓ SMS reminder scheduled<br/>
+                ✓ Demo added to calendar
+              </p>
+            </div>
             <p className="text-xs text-muted-foreground">
-              Closing in 3 seconds...
+              Redirecting to home in 4 seconds...
             </p>
           </div>
         )}
