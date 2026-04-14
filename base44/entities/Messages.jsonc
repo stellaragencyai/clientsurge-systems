@@ -35,6 +35,21 @@
         "failed",
         "received"
       ]
+    },
+    "ai_generated": {
+      "type": "boolean",
+      "title": "AI Generated",
+      "default": false
+    },
+    "delivery_status": {
+      "type": "string",
+      "title": "Delivery Status",
+      "enum": [
+        "pending",
+        "sent",
+        "delivered",
+        "failed"
+      ]
     }
   },
   "required": [

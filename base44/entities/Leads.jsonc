@@ -34,14 +34,56 @@
         "Contacted",
         "Replied",
         "Qualified",
+        "Booking Prompt Sent",
         "Booked",
         "Closed"
       ],
       "default": "New"
     },
-    "notes": {
+    "lead_score": {
+      "type": "number",
+      "title": "Lead Score (0-100)",
+      "default": 0
+    },
+    "last_contacted_at": {
       "type": "string",
-      "title": "Internal Notes"
+      "title": "Last Contacted At"
+    },
+    "next_follow_up_at": {
+      "type": "string",
+      "title": "Next Follow-Up At"
+    },
+    "booking_link_sent_at": {
+      "type": "string",
+      "title": "Booking Link Sent At"
+    },
+    "booked_at": {
+      "type": "string",
+      "title": "Booked At"
+    },
+    "ai_intent": {
+      "type": "string",
+      "title": "AI Intent",
+      "enum": [
+        "question",
+        "pricing_interest",
+        "availability_interest",
+        "booking_ready",
+        "unsure",
+        "not_interested",
+        "stop",
+        "other"
+      ],
+      "default": "other"
+    },
+    "ai_last_classification": {
+      "type": "string",
+      "title": "Last AI Classification"
+    },
+    "ai_confidence": {
+      "type": "number",
+      "title": "Last Classification Confidence",
+      "default": 0
     }
   },
   "required": [
