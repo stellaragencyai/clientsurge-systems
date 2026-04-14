@@ -106,8 +106,8 @@ export default function ProblemSolution() {
 
                 {/* Problem */}
                 <CardWithFadeIn delay={i * 50}>
-                  <div className="flex items-start gap-5 p-7 rounded-3xl bg-white border-2 border-destructive/25 hover:border-destructive/40 hover:shadow-lg transition-all duration-300 group cursor-default">
-                    <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-destructive/15 flex items-center justify-center group-hover:bg-destructive/25 transition-colors duration-300">
+                  <div className="flex items-start gap-5 p-7 rounded-3xl bg-white border border-black/20 hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40">
+                    <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-destructive/15 flex items-center justify-center group-hover:bg-destructive/25 transition-colors duration-300 flex-shrink">
                       <ProblemIcon className="w-7 h-7 text-destructive/70" strokeWidth={1.5} />
                     </div>
                     <div className="flex-1">
@@ -119,18 +119,16 @@ export default function ProblemSolution() {
 
                 {/* Arrow */}
                 <div className="hidden md:flex items-center justify-center">
-                  <div className="w-10 h-10 rounded-full bg-primary/30 border-2 border-primary flex items-center justify-center animate-pulse">
-                    <ArrowRight className="w-5 h-5 text-primary" strokeWidth={2.5} />
-                  </div>
+                  <ArrowRight className="w-8 h-8 text-black/70 hover:text-black transition-colors" strokeWidth={2} />
                 </div>
                 <div className="md:hidden flex justify-center">
-                  <ArrowRight className="w-5 h-5 text-primary rotate-90" strokeWidth={2.5} />
+                  <ArrowRight className="w-8 h-8 text-black/70 rotate-90" strokeWidth={2} />
                 </div>
 
                 {/* Solution */}
                 <CardWithFadeIn delay={i * 50 + 100}>
-                  <div className="flex items-start gap-5 p-7 rounded-3xl bg-gradient-to-br from-primary/12 to-primary/5 border-2 border-primary/35 hover:border-primary/60 hover:shadow-lg transition-all duration-300 group cursor-default">
-                    <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-primary/25 flex items-center justify-center group-hover:bg-primary/35 transition-colors duration-300">
+                  <div className="flex items-start gap-5 p-7 rounded-3xl bg-gradient-to-br from-primary/12 to-primary/5 border border-black/20 hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40">
+                    <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-primary/25 flex items-center justify-center group-hover:bg-primary/35 transition-colors duration-300 flex-shrink">
                       <SolutionIcon className="w-7 h-7 text-primary" strokeWidth={1.5} />
                     </div>
                     <div className="flex-1">

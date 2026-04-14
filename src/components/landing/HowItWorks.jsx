@@ -87,48 +87,63 @@ export default function HowItWorks() {
         <div className="relative mb-16">
           {/* Desktop: Horizontal flow with aligned icons */}
           <div className="hidden lg:block">
-            {/* Icons row — all perfectly aligned with animated progress line */}
-            <div className="flex items-center justify-between mb-6 relative">
+            {/* Icons row — all perfectly aligned directly above titles */}
+            <div className="flex items-start justify-between mb-4 relative px-4">
               {steps.map((step, i) => {
                 const Icon = step.icon;
-                // Each connector spans between steps
-                const connectorFill = Math.max(0, Math.min(1, (lineProgress * steps.length) - i));
                 return (
-                  <div key={i} className="flex-1 flex items-center">
-                    <div className="flex flex-col items-center flex-1">
-                      <div
-                        className="w-14 h-14 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center transition-all duration-300"
-                        style={{
-                          animation: inView ? `float 3s ease-in-out ${i * 0.2}s infinite` : "none",
-                          opacity: inView ? 1 : 0,
-                          transform: inView ? "scale(1)" : "scale(0.8)",
-                          transition: `opacity 0.4s ease ${i * 0.15}s, transform 0.4s ease ${i * 0.15}s`,
-                        }}
-                      >
-                        <Icon className="w-7 h-7 text-primary" />
-                      </div>
+                  <div key={i} className="flex flex-col items-center flex-1">
+                    <div
+                      className="w-16 h-16 rounded-2xl bg-black/8 border border-black/25 flex items-center justify-center transition-all duration-300 mb-6"
+                      style={{
+                        animation: inView ? `float 3s ease-in-out ${i * 0.2}s infinite` : "none",
+                        opacity: inView ? 1 : 0,
+                        transform: inView ? "scale(1)" : "scale(0.8)",
+                        transition: `opacity 0.4s ease ${i * 0.15}s, transform 0.4s ease ${i * 0.15}s`,
+                      }}
+                    >
+                      <Icon className="w-8 h-8 text-black/70" strokeWidth={1.5} />
                     </div>
-                    {i < steps.length - 1 && (
-                      <div className="w-12 flex-shrink-0 relative h-0.5 mx-1">
-                        {/* Track */}
-                        <div className="absolute inset-0 border-t-2 border-dashed border-primary/20" />
-                        {/* Animated fill */}
-                        <div
-                          className="absolute inset-y-0 left-0 bg-primary/60 rounded-full"
-                          style={{ height: "2px", width: `${connectorFill * 100}%`, transition: "width 0.1s linear" }}
-                        />
-                      </div>
-                    )}
                   </div>
                 );
               })}
             </div>
-            {/* Text row */}
-            <div className="flex justify-between gap-2">
+            
+            {/* Connecting arrows row */}
+            <div className="flex items-center justify-between px-4 mb-8 relative" style={{height: "60px"}}>
               {steps.map((step, i) => (
-                <div key={i} className="flex-1 flex flex-col items-center px-1">
-                  <p className="text-xs font-semibold text-primary uppercase mb-1">{step.subtitle}</p>
-                  <h3 className="text-sm font-semibold text-foreground text-center mb-1">{step.title}</h3>
+                <div key={i} className="flex-1 flex items-center relative">
+                  {i < steps.length - 1 && (
+                    <div className="absolute left-1/2 top-1/2 -translate-y-1/2 w-full h-0.5 flex items-center justify-end pr-8">
+                      {/* Track line */}
+                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 2" preserveAspectRatio="none">
+                        <line x1="0" y1="1" x2="100" y2="1" stroke="rgb(0,0,0)" strokeWidth="1.5" opacity="0.3" />
+                      </svg>
+                      {/* Animated fill */}
+                      <svg 
+                        className="absolute inset-0 w-full h-full" 
+                        viewBox="0 0 100 2" 
+                        preserveAspectRatio="none"
+                        style={{clipPath: `inset(0 ${100 - connectorFill * 100}% 0 0)`}}
+                      >
+                        <line x1="0" y1="1" x2="100" y2="1" stroke="rgb(0,0,0)" strokeWidth="1.5" />
+                      </svg>
+                      {/* Arrow head */}
+                      <div className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center">
+                        <ArrowRight className="w-6 h-6 text-black/70" strokeWidth={2.5} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Text row */}
+            <div className="flex justify-between gap-2 px-4">
+              {steps.map((step, i) => (
+                <div key={i} className="flex-1 flex flex-col items-center">
+                  <p className="text-xs font-semibold text-black/50 uppercase mb-2">{step.subtitle}</p>
+                  <h3 className="text-sm font-bold text-foreground text-center mb-2">{step.title}</h3>
                   <p className="text-xs text-muted-foreground text-center leading-relaxed">{step.desc}</p>
                 </div>
               ))}
