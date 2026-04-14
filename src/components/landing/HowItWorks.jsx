@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect, useRef } from "react";
 import { ArrowRight, MessageSquare, Zap, Send, CalendarCheck, CheckCircle2 } from "lucide-react";
 
 const steps = [
@@ -37,11 +36,25 @@ const steps = [
 
 export default function HowItWorks() {
   const [inView, setInView] = useState(false);
+  const [lineProgress, setLineProgress] = useState(0);
+  const lineRef = useRef(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) setInView(true);
-    }, { threshold: 0.1 });
+      if (entry.isIntersecting) {
+        setInView(true);
+        // Animate line fill
+        let start = null;
+        const duration = 1400;
+        const animate = (ts) => {
+          if (!start) start = ts;
+          const progress = Math.min((ts - start) / duration, 1);
+          setLineProgress(progress);
+          if (progress < 1) requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
+      }
+    }, { threshold: 0.3 });
     const section = document.getElementById("how-it-works");
     if (section) observer.observe(section);
     return () => observer.disconnect();
@@ -74,24 +87,37 @@ export default function HowItWorks() {
         <div className="relative mb-16">
           {/* Desktop: Horizontal flow with aligned icons */}
           <div className="hidden lg:block">
-            {/* Icons row — all perfectly aligned */}
-            <div className="flex items-center justify-between mb-6">
+            {/* Icons row — all perfectly aligned with animated progress line */}
+            <div className="flex items-center justify-between mb-6 relative">
               {steps.map((step, i) => {
                 const Icon = step.icon;
+                // Each connector spans between steps
+                const connectorFill = Math.max(0, Math.min(1, (lineProgress * steps.length) - i));
                 return (
                   <div key={i} className="flex-1 flex items-center">
                     <div className="flex flex-col items-center flex-1">
                       <div
-                        className="w-14 h-14 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center hover:bg-primary/25 transition-all duration-300"
+                        className="w-14 h-14 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center transition-all duration-300"
                         style={{
                           animation: inView ? `float 3s ease-in-out ${i * 0.2}s infinite` : "none",
+                          opacity: inView ? 1 : 0,
+                          transform: inView ? "scale(1)" : "scale(0.8)",
+                          transition: `opacity 0.4s ease ${i * 0.15}s, transform 0.4s ease ${i * 0.15}s`,
                         }}
                       >
                         <Icon className="w-7 h-7 text-primary" />
                       </div>
                     </div>
                     {i < steps.length - 1 && (
-                      <div className="w-12 flex-shrink-0 border-t-2 border-dashed border-primary/20 mx-1" />
+                      <div className="w-12 flex-shrink-0 relative h-0.5 mx-1">
+                        {/* Track */}
+                        <div className="absolute inset-0 border-t-2 border-dashed border-primary/20" />
+                        {/* Animated fill */}
+                        <div
+                          className="absolute inset-y-0 left-0 bg-primary/60 rounded-full"
+                          style={{ height: "2px", width: `${connectorFill * 100}%`, transition: "width 0.1s linear" }}
+                        />
+                      </div>
                     )}
                   </div>
                 );

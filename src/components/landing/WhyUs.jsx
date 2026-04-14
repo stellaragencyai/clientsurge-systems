@@ -61,6 +61,27 @@ export default function WhyUs() {
           </p>
         </div>
 
+        {/* Platform vs Partner contrast */}
+        <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-14 max-w-2xl mx-auto">
+          <div className="flex-1 p-5 rounded-2xl bg-destructive/5 border border-destructive/15">
+            <p className="text-xs font-bold uppercase tracking-widest text-destructive/70 mb-3">A Platform Gives You</p>
+            {["A login and a dashboard", "Hours of setup videos", "Ongoing technical work", "You figure out what works"].map((t, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm text-foreground/60 mb-1.5">
+                <span className="text-destructive/50 text-base leading-none">✕</span> {t}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center justify-center text-xl font-bold text-primary/40 px-2 hidden sm:flex">→</div>
+          <div className="flex-1 p-5 rounded-2xl bg-primary/5 border border-primary/20">
+            <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">ApexFlow Gives You</p>
+            {["A fully built system", "One onboarding call", "We handle everything", "Live in 5–7 days"].map((t, i) => (
+              <div key={i} className="flex items-center gap-2 text-sm text-foreground/80 mb-1.5">
+                <span className="text-primary text-base leading-none">✓</span> {t}
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Implementation timeline strip */}
         <div className="flex items-center justify-center gap-2 mb-14 flex-wrap">
           {["Day 1: Kickoff call", "Days 2–4: Build & integrate", "Day 5–7: Test & launch", "Day 30+: Optimize"].map((step, i) => (

@@ -1,9 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import StatCounter from "./StatCounter";
 import ConversationModal from "./ConversationModal";
+
+const TICKER_EVENTS = [
+  "🟢 New lead captured — Austin, TX",
+  "📅 Appointment booked — Miami, FL",
+  "💬 Follow-up sent automatically — Denver, CO",
+  "📞 Missed call recovered — Phoenix, AZ",
+  "🟢 New lead captured — Nashville, TN",
+  "📅 Consultation booked — Los Angeles, CA",
+  "💬 Lead re-engaged — Chicago, IL",
+  "📞 Missed call recovered — Atlanta, GA",
+];
+
+function LiveTicker() {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((i) => (i + 1) % TICKER_EVENTS.length);
+        setVisible(true);
+      }, 400);
+    }, 2800);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="inline-flex items-center gap-3 px-5 py-2.5 bg-card border border-border rounded-full shadow-sm overflow-hidden">
+      <span className="relative flex h-2 w-2 flex-shrink-0">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+      </span>
+      <span
+        className="text-xs font-medium text-foreground/80 transition-all duration-400"
+        style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(6px)" }}
+      >
+        {TICKER_EVENTS[index]}
+      </span>
+    </div>
+  );
+}
 
 const businessTypes = [
   "Med Spa / Aesthetic Clinic",
@@ -187,6 +229,11 @@ export default function Hero() {
 
         {/* Animated stat counters */}
         <StatCounter />
+
+        {/* Live-feeling activity ticker */}
+        <div className="mt-10 flex items-center justify-center">
+          <LiveTicker />
+        </div>
 
       </div>
 
