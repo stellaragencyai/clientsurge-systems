@@ -16,10 +16,10 @@ export default function MedSpaPain() {
               Every delayed response<br />can cost you a client.
             </h2>
             <p className="text-base text-muted-foreground leading-relaxed mb-6">
-              Med spa leads are not loyal. They are looking for a solution. The first business that responds with confidence gets the booking.
+              Med spa leads are not loyal. They want a solution. The first business to respond gets the booking.
             </p>
             <p className="text-base text-muted-foreground leading-relaxed mb-6">
-              Delayed follow-up doesn't just lose a lead. It hands revenue directly to whoever responded faster. If you're running ads and not following up within minutes, you're wasting your budget.
+              Every delayed follow-up hands revenue to whoever responded faster. If you're running ads and not following up within minutes, you're losing money.
             </p>
             <div className="p-5 bg-destructive/5 border border-destructive/15 rounded-xl">
               <p className="text-base font-semibold text-foreground">

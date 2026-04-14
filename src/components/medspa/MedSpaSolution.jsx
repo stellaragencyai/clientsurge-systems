@@ -4,31 +4,31 @@ const solutions = [
   {
     icon: Zap,
     title: "Instant Lead Response",
-    desc: "Every new inquiry gets contacted immediately — not when someone gets around to it. Within seconds, your lead receives a personalized response no matter the time of day.",
+    desc: "Every inquiry gets a personalized reply within seconds. No waiting, no manual work — 24/7.",
     image: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=80",
   },
   {
     icon: MessageSquare,
     title: "Automated Follow-Up",
-    desc: "If a lead doesn't respond right away, the system continues the conversation automatically. Smart sequences run in the background until they book or opt out.",
+    desc: "If they don't respond, the system follows up automatically — multiple times, across multiple days.",
     image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80",
   },
   {
     icon: PhoneOff,
     title: "Missed Call Text-Back",
-    desc: "When a call goes unanswered, an immediate text fires to keep the conversation alive. That lead stays warm instead of disappearing.",
+    desc: "Missed call? An instant text goes out immediately. The lead stays warm instead of disappearing.",
     image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80",
   },
   {
     icon: CalendarCheck,
     title: "Booking Push",
-    desc: "Interested leads are guided toward their next step. A booking link or consultation flow is sent at exactly the right moment — no manual work required.",
+    desc: "Ready leads get a booking link at exactly the right moment. No back-and-forth required.",
     image: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=600&q=80",
   },
   {
     icon: RotateCcw,
     title: "Old Lead Reactivation",
-    desc: "Past inquiries that never booked can be re-engaged with targeted messages. Many of them are still interested. They just haven't heard from you.",
+    desc: "Past inquiries that never converted get re-engaged. Many are still interested — they just haven't heard from you.",
     image: "https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=600&q=80",
   },
 ];

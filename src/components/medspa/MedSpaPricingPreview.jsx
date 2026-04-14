@@ -20,11 +20,11 @@ export default function MedSpaPricingPreview() {
             Done-for-You Automation Systems for Med Spas
           </h2>
           <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            We build and install systems that help med spas respond faster, follow up better, and convert more leads into booked consultations.
+            Faster response. Better follow-up. More booked consultations. We build and install the system — you focus on your clients.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-border p-8 md:p-12 shadow-sm">
+        <div className="bg-white rounded-2xl border-2 border-primary/30 p-8 md:p-12 shadow-md" style={{boxShadow:"0 8px 40px rgba(120,70,20,0.10), 0 2px 8px rgba(0,0,0,0.06)"}}>
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
               <p className="text-sm font-semibold text-foreground mb-6">Every system includes:</p>
