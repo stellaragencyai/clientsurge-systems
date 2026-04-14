@@ -208,7 +208,7 @@ export default function Hero() {
             <p className="text-sm text-muted-foreground mb-5">
               Book your slot below. Your demo will be tailored to <span className="text-foreground font-medium">{bizType}</span>.
             </p>
-            <Button onClick={() => navigate("/start")} className="rounded-full px-8 h-11 text-sm font-semibold gap-2">
+            <Button onClick={() => setShowLeadModal(true)} className="rounded-full px-8 h-11 text-sm font-semibold gap-2">
               Choose a Time
               <ArrowRight className="w-4 h-4" />
             </Button>
