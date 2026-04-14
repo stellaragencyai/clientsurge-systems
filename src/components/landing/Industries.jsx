@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Sparkles, Heart, Building2, Home, MapPin, Wrench, ArrowRight, X, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import LeadCaptureModal from "../forms/LeadCaptureModal";
 
 const industries = [
   {
@@ -109,6 +110,7 @@ const industries = [
 
 export default function Industries() {
   const [selected, setSelected] = useState(null);
+  const [showLeadModal, setShowLeadModal] = useState(false);
 
   return (
     <section id="industries" className="bg-gradient-to-b from-card via-background to-card">
@@ -191,76 +193,89 @@ export default function Industries() {
               onClick={() => setSelected(null)}
             />
 
-            {/* Expanding card */}
+            {/* Expanding card — 50% bigger */}
             <motion.div
-              className="fixed z-50 overflow-hidden rounded-2xl shadow-2xl"
+              className="fixed z-50 overflow-hidden rounded-2xl shadow-2xl bg-white"
               initial={{ width: "31vw", height: "480px", top: "50%", left: "50%", x: "-50%", y: "-50%", opacity: 0.4, scale: 0.5 }}
-              animate={{ width: "min(860px, 92vw)", height: "auto", top: "50%", left: "50%", x: "-50%", y: "-50%", opacity: 1, scale: 1 }}
+              animate={{ width: "min(1100px, 95vw)", height: "auto", top: "50%", left: "50%", x: "-50%", y: "-50%", opacity: 1, scale: 1 }}
               exit={{ width: "31vw", height: "480px", opacity: 0, scale: 0.5 }}
               transition={{ type: "spring", stiffness: 220, damping: 28 }}
             >
               {/* Close */}
               <button
                 onClick={() => setSelected(null)}
-                className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-md transition-all"
+                className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full bg-white/95 hover:bg-white flex items-center justify-center shadow-lg transition-all border border-border"
               >
-                <X className="w-4 h-4 text-foreground" />
+                <X className="w-5 h-5 text-foreground" />
               </button>
 
-              {/* Image top */}
-              <div className="relative w-full overflow-hidden" style={{ height: "260px" }}>
-                <img
-                  src={selected.image}
-                  alt={selected.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                {/* Title over image */}
-                <div className="absolute bottom-0 left-0 right-0 px-8 pb-6">
-                  <div className="flex items-center gap-3 mb-1">
-                    {(() => { const Icon = selected.icon; return <Icon className="w-5 h-5 text-white/80" />; })()}
-                    <p className="text-xs font-semibold text-white/60 uppercase tracking-widest">Industry Focus</p>
-                  </div>
-                  <h2 className="font-display text-2xl md:text-3xl font-semibold text-white leading-tight">
-                    {selected.name}
-                  </h2>
-                  <p className="text-sm font-semibold text-primary mt-1">{selected.result}</p>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="bg-white px-8 py-7">
-                <div className="grid md:grid-cols-2 gap-8">
-                  {/* Left — detail */}
-                  <div>
-                    <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-3">The Challenge & Our Solution</p>
-                    <p className="text-sm font-semibold text-foreground mb-3">{selected.problem}</p>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{selected.detail}</p>
-                  </div>
-                  {/* Right — bullets */}
-                  <div>
-                    <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-3">What You Get</p>
-                    <ul className="space-y-2.5">
-                      {selected.bullets.map((b, i) => (
-                        <li key={i} className="flex items-start gap-2.5">
-                          <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                          <span className="text-sm text-foreground">{b}</span>
-                        </li>
-                      ))}
-                    </ul>
+              {/* Main Grid: Image Left (55%), Content Right (45%) */}
+              <div className="grid lg:grid-cols-[55%_45%] gap-0">
+                {/* Image Section — Large and prominent */}
+                <div className="relative overflow-hidden order-1 lg:order-none" style={{ minHeight: "500px" }}>
+                  <img
+                    src={selected.image}
+                    alt={selected.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  {/* Icon badge in corner */}
+                  <div className="absolute top-6 left-6 w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
+                    {(() => { const Icon = selected.icon; return <Icon className="w-6 h-6 text-white" />; })()}
                   </div>
                 </div>
 
-                {/* CTA */}
-                <div className="mt-7 flex flex-col sm:flex-row gap-3 items-center">
-                  <a
-                    href={selected.href}
-                    className="flex-1 w-full sm:w-auto flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-full h-12 px-8 font-semibold text-sm hover:bg-primary/90 transition-colors"
+                {/* Content Section */}
+                <div className="p-8 lg:p-10 flex flex-col justify-between overflow-y-auto max-h-[90vh] lg:max-h-[600px]">
+                  {/* Header */}
+                  <div>
+                    <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-2">Industry Solution</p>
+                    <h2 className="font-display text-2xl lg:text-3xl font-semibold text-foreground mb-2 leading-tight">
+                      {selected.name}
+                    </h2>
+                    <p className="text-sm font-bold text-primary mb-6">{selected.result}</p>
+
+                    {/* Challenge & Solution */}
+                    <div className="mb-6">
+                      <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-2">The Challenge</p>
+                      <p className="text-sm font-semibold text-foreground mb-4">{selected.problem}</p>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{selected.detail}</p>
+                    </div>
+
+                    {/* Bullets */}
+                    <div>
+                      <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-3">What You Get</p>
+                      <ul className="space-y-2">
+                        {selected.bullets.map((b, i) => (
+                          <li key={i} className="flex items-start gap-2.5">
+                            <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                            <span className="text-xs text-foreground">{b}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* CTA Button — Golden Brown */}
+                  <button
+                    onClick={() => {
+                      setSelected(null);
+                      setShowLeadModal(true);
+                    }}
+                    style={{display:"block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.3s ease, transform 0.2s ease",border:"none",cursor:"pointer",width:"100%",marginTop:"24px"}}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
+                    }}
                   >
-                    {selected.href === "/med-spa" ? "See the Med Spa Page" : "Book a Free Demo"}
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                  <p className="text-xs text-muted-foreground text-center sm:text-left">
+                    <span style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",height:"48px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
+                      Book a Free Demo
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </button>
+                  <p className="text-xs text-muted-foreground text-center mt-3">
                     Free 30-min call • No commitment • Live in 5–7 days
                   </p>
                 </div>
@@ -269,6 +284,16 @@ export default function Industries() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Lead Capture Modal */}
+      <LeadCaptureModal 
+        isOpen={showLeadModal}
+        onClose={() => setShowLeadModal(false)}
+        onSuccess={() => {
+          setShowLeadModal(false);
+          window.location.href = '/book';
+        }}
+      />
     </section>
   );
 }
