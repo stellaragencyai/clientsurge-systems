@@ -38,6 +38,26 @@ const faqs = [
     q: "What happens on the demo call?",
     a: "We spend 30 minutes understanding your business, your lead volume, and where you're losing bookings. Then we show you exactly what we'd build and what you can expect.",
   },
+  {
+    q: "Will this actually work for my specific business?",
+    a: "If you generate leads but lose conversions due to slow follow-up, the answer is almost always yes. We've worked across 15+ industries. On your demo call, we'll identify the exact gaps and show you the specific solution. If we don't think we can help, we'll tell you upfront.",
+  },
+  {
+    q: "How much time will I need to spend managing this?",
+    a: "Almost none. The system runs on autopilot. You check in weekly to review results, and we handle all updates and optimization. No learning curve, no training required for your team.",
+  },
+  {
+    q: "What if the system doesn't increase my bookings?",
+    a: "That's covered by our 30-day guarantee. If you're not seeing results by day 30, we refund your setup cost—no questions asked. But most clients see measurable improvements within the first two weeks.",
+  },
+  {
+    q: "Can you integrate this with my current booking system?",
+    a: "Yes. Whether you use Calendly, Acuity, Mindbody, or a custom system, we connect to it. If something unique, we build a custom integration.",
+  },
+  {
+    q: "How do I know if this is the right investment for my business?",
+    a: "That's what the demo is for. We'll show you the specific system we'd build, what it costs, and the projected ROI based on your current lead volume and conversion rate. You'll have concrete numbers before deciding.",
+  },
 ];
 
 export default function FAQ() {

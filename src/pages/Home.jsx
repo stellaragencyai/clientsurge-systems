@@ -11,6 +11,7 @@ import Industries from "../components/landing/Industries";
 import CoreOffer from "../components/landing/CoreOffer";
 import WhyUs from "../components/landing/WhyUs";
 import FAQ from "../components/landing/FAQ";
+import GuaranteeBanner from "../components/landing/GuaranteeBanner";
 import Pricing from "../components/landing/Pricing";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
@@ -34,6 +35,8 @@ export default function Home() {
       <FadeIn><FAQ /></FadeIn>
       <FadeIn><Testimonials /></FadeIn>
       <FadeIn><Pricing /></FadeIn>
+      <GuaranteeBanner />
+      <FadeIn><FAQ /></FadeIn>
       <FinalCTA />
       <Footer />
       <SamChatWidget />
