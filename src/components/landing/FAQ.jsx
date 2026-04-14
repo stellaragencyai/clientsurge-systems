@@ -86,7 +86,7 @@ export default function FAQ() {
                         letter-spacing: 0.5px;
                         line-height: 1.8;
                       }
-                    `}
+                    `}</style>
                     <p className="handwrite-text text-sm leading-relaxed">
                       {faq.a}
                     </p>
