@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Clock, PhoneMissed, Users, AlertTriangle, Archive, ArrowRight, Zap, MessageCircle, Phone, CheckSquare2, RefreshCw, Hourglass } from "lucide-react";
 
+let scrollY = 0;
+if (typeof window !== "undefined") {
+  scrollY = window.scrollY;
+}
+
 const pairs = [
   {
     problemIcon: Hourglass,
@@ -72,8 +77,24 @@ function CardWithFadeIn({ children, delay = 0 }) {
 }
 
 export default function ProblemSolution() {
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const progress = Math.max(0, Math.min(1, (viewportHeight - rect.top) / (viewportHeight + rect.height)));
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <section id="services" className="py-24 md:py-32 px-6 bg-gradient-to-b from-card to-background">
+    <section ref={sectionRef} id="services" className="py-24 md:py-32 px-6 bg-gradient-to-b from-card to-background">
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
@@ -101,14 +122,37 @@ export default function ProblemSolution() {
           {pairs.map((pair, i) => {
             const ProblemIcon = pair.problemIcon;
             const SolutionIcon = pair.solutionIcon;
+            const colorProgress = Math.max(0, Math.min(1, scrollProgress - i * 0.08));
+            const parallaxOffsetProblem = scrollProgress * -15;
+            const parallaxOffsetSolution = scrollProgress * 15;
+
             return (
               <div key={i} className="grid md:grid-cols-[1fr_50px_1fr] gap-6 items-center">
 
                 {/* Problem */}
                 <CardWithFadeIn delay={i * 50}>
-                  <div className="flex items-start gap-5 p-7 rounded-3xl bg-white border border-black/20 hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40">
-                    <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-destructive/15 flex items-center justify-center group-hover:bg-destructive/25 transition-colors duration-300 flex-shrink">
-                      <ProblemIcon className="w-7 h-7 text-destructive/70" strokeWidth={1.5} />
+                  <div 
+                    className="flex items-start gap-5 p-7 rounded-3xl border hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40"
+                    style={{
+                      background: `linear-gradient(to right, rgba(239,68,68,${0.08 * (1 - colorProgress)}) 0%, rgba(255,255,255,${1 - colorProgress * 0.3}) 100%)`,
+                      transform: `translateY(${parallaxOffsetProblem}px)`,
+                      borderColor: `rgba(0,0,0,${0.2 - colorProgress * 0.15})`,
+                    }}
+                  >
+                    <div 
+                      className="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink"
+                      style={{
+                        background: `rgba(239,68,68,${0.15 - colorProgress * 0.1})`,
+                      }}
+                    >
+                      <ProblemIcon 
+                        className="w-7 h-7 transition-all duration-300"
+                        style={{
+                          color: `rgba(239,68,68,${0.7 - colorProgress * 0.3})`,
+                          animation: `pulse 2s ease-in-out ${i * 0.1}s infinite`,
+                        }}
+                        strokeWidth={1.5} 
+                      />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-base font-bold text-foreground mb-2">{pair.problem}</h3>
@@ -117,23 +161,39 @@ export default function ProblemSolution() {
                   </div>
                 </CardWithFadeIn>
 
-                {/* Arrow */}
-                <div className="hidden md:flex items-center justify-center">
-                  <ArrowRight className="w-8 h-8 text-black/70 hover:text-black transition-colors" strokeWidth={2} />
-                </div>
-                <div className="md:hidden flex justify-center">
-                  <ArrowRight className="w-8 h-8 text-black/70 rotate-90" strokeWidth={2} />
-                </div>
-
                 {/* Solution */}
                 <CardWithFadeIn delay={i * 50 + 100}>
-                  <div className="flex items-start gap-5 p-7 rounded-3xl bg-gradient-to-br from-primary/12 to-primary/5 border border-black/20 hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40">
-                    <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-primary/25 flex items-center justify-center group-hover:bg-primary/35 transition-colors duration-300 flex-shrink">
-                      <SolutionIcon className="w-7 h-7 text-primary" strokeWidth={1.5} />
+                  <div 
+                    className="flex items-start gap-5 p-7 rounded-3xl border hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40"
+                    style={{
+                      background: `linear-gradient(to left, rgba(161,120,35,${0.12 * colorProgress}) 0%, rgba(245,217,168,${0.05 * colorProgress}) 50%, rgba(255,255,255,${1 - colorProgress * 0.2}) 100%)`,
+                      transform: `translateY(${parallaxOffsetSolution}px)`,
+                      borderColor: `rgba(0,0,0,${0.2 - colorProgress * 0.15})`,
+                    }}
+                  >
+                    <div 
+                      className="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink"
+                      style={{
+                        background: `rgba(161,120,35,${0.15 + colorProgress * 0.1})`,
+                      }}
+                    >
+                      <SolutionIcon 
+                        className="w-7 h-7 transition-all duration-300"
+                        style={{
+                          color: `rgba(161,120,35,${0.6 + colorProgress * 0.4})`,
+                          filter: `drop-shadow(0 0 ${4 * colorProgress}px rgba(161,120,35,0.4))`,
+                        }}
+                        strokeWidth={1.5} 
+                      />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-base font-bold text-foreground mb-2">{pair.solution}</h3>
-                      <p className="text-sm text-primary/75 font-medium leading-relaxed">{pair.solutionDesc}</p>
+                      <p 
+                        className="text-sm font-medium leading-relaxed transition-colors duration-300"
+                        style={{color: `rgba(161,120,35,${0.5 + colorProgress * 0.5})`}}
+                      >
+                        {pair.solutionDesc}
+                      </p>
                     </div>
                   </div>
                 </CardWithFadeIn>
@@ -142,6 +202,13 @@ export default function ProblemSolution() {
             );
           })}
         </div>
+
+        <style>{`
+          @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+          }
+        `}</style>
 
       </div>
     </section>
