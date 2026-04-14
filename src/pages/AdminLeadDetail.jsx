@@ -7,6 +7,7 @@ import StatusControl from "../components/dashboard/StatusControl";
 import MessagingPanel from "../components/dashboard/MessagingPanel";
 import EmailHistoryPanel from "../components/dashboard/EmailHistoryPanel";
 import NotesSection from "../components/dashboard/NotesSection";
+import LeadTimeline from "../components/dashboard/LeadTimeline";
 
 export default function AdminLeadDetail() {
   const { leadId } = useParams();
@@ -137,6 +138,9 @@ export default function AdminLeadDetail() {
         currentStatus={lead.status}
         onStatusChange={handleStatusChange}
       />
+
+      {/* Timeline with AI Classification */}
+      <LeadTimeline leadId={leadId} lead={lead} />
 
       {/* Panels Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

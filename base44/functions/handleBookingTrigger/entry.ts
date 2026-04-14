@@ -53,14 +53,12 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Send email if email exists
+    // Send booking email
     if (lead.email) {
       try {
-        await base44.functions.invoke('sendEmail', {
-          email: lead.email,
-          subject: 'Your next step',
-          body: bookingMessage,
-          leadId: lead.id,
+        await base44.functions.invoke('sendBookingEmail', {
+          lead,
+          bookingLink,
         });
       } catch (e) {
         console.error('Error sending booking email:', e.message);
