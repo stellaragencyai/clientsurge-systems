@@ -1,5 +1,6 @@
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const plans = [
   {
@@ -170,37 +171,32 @@ export default function Pricing() {
 }
 
 function PricingCard({ plan }) {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
     <div
-      className={`pricing-card ${plan.highlight ? "pricing-card-highlight" : ""} relative flex flex-col rounded-2xl overflow-visible`}
+      className="pricing-card relative flex flex-col rounded-2xl overflow-visible transition-all duration-300"
       style={
-        plan.highlight
-          ? {
-              background: "#fff",
-              border: "2px solid hsl(var(--primary))",
-              boxShadow: "0 8px 40px rgba(0,0,0,0.10), 0 2px 10px rgba(0,0,0,0.06)",
-              paddingTop: "14px",
-            }
-          : {
-              background: "#fff",
-              border: "2px solid hsl(var(--border))",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-            }
+        {
+          background: "#fff",
+          border: isHovered ? "3px solid #c8965c" : "2px solid hsl(var(--border))",
+          boxShadow: isHovered ? "0 8px 40px rgba(160,90,20,0.25), 0 2px 10px rgba(0,0,0,0.08)" : "0 4px 20px rgba(0,0,0,0.05)",
+          paddingTop: isHovered ? "0px" : "0px",
+        }
       }
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Badge — floats above card */}
-      {plan.badge && (
-        <div className="pricing-badge-float">
-          <span className="inline-block bg-primary text-primary-foreground text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-lg">
-            {plan.badge}
+      {/* Badge — hover only */}
+      {plan.badge && isHovered && (
+        <div className="pricing-badge-float animate-in fade-in zoom-in duration-300">
+          <span className="inline-block bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl">
+            ⭐ {plan.badge}
           </span>
         </div>
       )}
 
-      {/* Top accent bar */}
-      {plan.highlight && (
-        <div className="h-1 w-full bg-primary rounded-t-2xl" />
-      )}
+
 
       <div className="flex flex-col flex-1 p-10">
         {/* Plan name & subtitle */}

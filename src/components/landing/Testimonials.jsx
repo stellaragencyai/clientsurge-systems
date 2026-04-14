@@ -34,23 +34,29 @@ export default function Testimonials() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((t, i) => (
-            <div
-              key={i}
-              className="group relative flex flex-col p-8 rounded-2xl bg-white border border-border transition-all duration-500 hover:-translate-y-2 cursor-default"
-              style={{
-                boxShadow: "0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
-                transition: "all 0.4s ease",
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.boxShadow = "0 24px 60px rgba(0,0,0,0.13), 0 6px 20px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)";
-                e.currentTarget.style.transform = "translateY(-8px) rotateX(2deg)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)";
-                e.currentTarget.style.transform = "translateY(0) rotateX(0deg)";
-              }}
-            >
+           {testimonials.map((t, i) => (
+             <div
+               key={i}
+               className="group relative flex flex-col p-8 rounded-2xl backdrop-blur-md transition-all duration-500 hover:-translate-y-2 cursor-default"
+               style={{
+                 background: "rgba(255, 255, 255, 0.75)",
+                 border: "1.5px solid rgba(255, 255, 255, 0.6)",
+                 boxShadow: "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
+                 transition: "all 0.4s ease",
+               }}
+               onMouseEnter={e => {
+                 e.currentTarget.style.background = "rgba(255, 255, 255, 0.95)";
+                 e.currentTarget.style.border = "1.5px solid rgba(200, 150, 92, 0.4)";
+                 e.currentTarget.style.boxShadow = "0 24px 60px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8), 0 0 40px rgba(200, 150, 92, 0.15)";
+                 e.currentTarget.style.transform = "translateY(-8px)";
+               }}
+               onMouseLeave={e => {
+                 e.currentTarget.style.background = "rgba(255, 255, 255, 0.75)";
+                 e.currentTarget.style.border = "1.5px solid rgba(255, 255, 255, 0.6)";
+                 e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)";
+                 e.currentTarget.style.transform = "translateY(0)";
+               }}
+             >
               {/* Quote mark */}
               <div className="text-5xl font-display text-foreground/10 leading-none mb-3 select-none">"</div>
 
