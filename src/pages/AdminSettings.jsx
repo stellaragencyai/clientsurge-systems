@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, AlertCircle, Zap, Mail, Link2, Settings } from "lucide-react";
+import { CheckCircle2, AlertCircle, Zap, Mail, Link2, Settings, ArrowLeft } from "lucide-react";
 
 export default function AdminSettings() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("twilio");
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -86,6 +88,13 @@ export default function AdminSettings() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-12">
+          <button
+            onClick={() => navigate("/admin")}
+            className="flex items-center gap-2 text-primary hover:text-primary/80 mb-4 font-medium transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
+          </button>
           <div className="flex items-center gap-3 mb-4">
             <Settings className="w-8 h-8 text-primary" />
             <h1 className="font-display text-3xl font-semibold text-foreground">
