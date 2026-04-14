@@ -16,6 +16,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminLeads from './pages/AdminLeads';
 import AdminLeadDetail from './pages/AdminLeadDetail';
 import LeadIntelligence from './pages/LeadIntelligence';
+import Sam from './pages/Sam';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -53,6 +54,7 @@ const AuthenticatedApp = () => {
       <Route path="/admin/leads" element={<AdminLeads />} />
       <Route path="/admin/leads/:leadId" element={<AdminLeadDetail />} />
       <Route path="/lead-intelligence" element={<LeadIntelligence />} />
+      <Route path="/sam" element={<Sam />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

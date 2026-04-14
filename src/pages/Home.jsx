@@ -13,6 +13,7 @@ import WhyUs from "../components/landing/WhyUs";
 import FAQ from "../components/landing/FAQ";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
+import SamChatWidget from "../components/sam/SamChatWidget";
 import FadeIn from "../components/landing/FadeIn";
 
 export default function Home() {
@@ -33,6 +34,7 @@ export default function Home() {
       <FadeIn><FAQ /></FadeIn>
       <FinalCTA />
       <Footer />
+      <SamChatWidget />
     </div>
   );
 }
