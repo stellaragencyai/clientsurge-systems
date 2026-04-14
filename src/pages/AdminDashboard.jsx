@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { toast } from "sonner";
 import { LogOut, Menu, X, Settings } from "lucide-react";
 import DashboardHome from "../components/dashboard/DashboardHome";
 
@@ -33,7 +34,11 @@ export default function AdminDashboard() {
   }
 
   const handleLogout = () => {
-    base44.auth.logout();
+    toast.success("You have successfully logged out");
+    setTimeout(() => {
+      navigate("/");
+      base44.auth.logout();
+    }, 1000);
   };
 
   return (
