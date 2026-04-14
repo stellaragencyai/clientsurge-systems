@@ -208,9 +208,9 @@ export default function DetailedProcess() {
         </div>
 
         {/* Steps with arrows */}
-        <div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-1 gap-8">
           {steps.map((step, i) => (
-            <div key={i}>
+            <div key={i} className="flex flex-col">
               <StepCard step={step} index={i} />
               {i < steps.length - 1 && <StepConnector index={i} />}
             </div>
