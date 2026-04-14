@@ -95,7 +95,7 @@ export default function Pricing() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-start" style={{ perspective: "1400px" }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch" style={{ perspective: "1400px" }}>
           {plans.map((plan, i) => (
             <PricingCard key={i} plan={plan} />
           ))}
@@ -106,11 +106,11 @@ export default function Pricing() {
           <p className="text-sm text-muted-foreground leading-relaxed mb-6">
             Not sure which option is right for your business? Book a quick demo and we'll recommend the best fit based on your lead flow, follow-up process, and goals.
           </p>
-          <button onClick={scrollToDemo}>
-            <Button className="rounded-full px-8 h-12 font-semibold gap-2">
+          <button onClick={scrollToDemo} className="shiny-brown-btn">
+            <span className="shiny-brown-inner flex items-center justify-center gap-2 h-12 px-8 rounded-full font-semibold text-sm">
               Book Your Demo
               <ArrowRight className="w-4 h-4" />
-            </Button>
+            </span>
           </button>
         </div>
 
@@ -149,6 +149,37 @@ export default function Pricing() {
           transform: translateX(-50%);
           z-index: 20;
           white-space: nowrap;
+        }
+
+        /* Brown shiny button */
+        .shiny-brown-btn {
+          display: inline-block;
+          border-radius: 9999px;
+          padding: 2px;
+          background: linear-gradient(135deg, #a0714f 0%, #c8965c 30%, #f5d9a8 50%, #c8965c 70%, #7a4f2e 100%);
+          box-shadow: 0 4px 18px rgba(120, 70, 20, 0.35), 0 1px 4px rgba(0,0,0,0.15);
+          transition: box-shadow 0.3s ease, transform 0.3s ease;
+          cursor: pointer;
+          border: none;
+          background-size: 200% 200%;
+          animation: shineMove 3s ease infinite;
+        }
+        .shiny-brown-btn:hover {
+          box-shadow: 0 8px 32px rgba(120, 70, 20, 0.5), 0 2px 8px rgba(0,0,0,0.2);
+          transform: translateY(-2px);
+        }
+        .shiny-brown-inner {
+          background: linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 40%, #7a4825 100%);
+          border-radius: 9999px;
+          color: #f5e6d0;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        @keyframes shineMove {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
       `}</style>
     </section>
@@ -218,18 +249,11 @@ function PricingCard({ plan }) {
         </ul>
 
         {/* CTA */}
-        <button onClick={scrollToDemo} className="w-full">
-          <Button
-            className={`w-full h-13 py-3 rounded-full font-semibold gap-2 text-sm ${
-              plan.highlight
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : "bg-transparent text-foreground hover:bg-foreground/5 border border-border"
-            }`}
-            variant={plan.highlight ? "default" : "outline"}
-          >
+        <button onClick={scrollToDemo} className="w-full shiny-brown-btn">
+          <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
             Book a Demo
             <ArrowRight className="w-4 h-4" />
-          </Button>
+          </span>
         </button>
       </div>
     </div>
