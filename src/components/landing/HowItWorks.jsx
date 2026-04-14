@@ -102,7 +102,7 @@ export default function HowItWorks() {
                         transition: `opacity 0.4s ease ${i * 0.15}s, transform 0.4s ease ${i * 0.15}s`,
                       }}
                     >
-                      <Icon className="w-6 h-6 text-black/70" strokeWidth={1.5} />
+                      <Icon className="w-6 h-6" strokeWidth={1.5} style={{color: "#9a5c2e"}} />
                     </div>
                   </div>
                 );
@@ -110,7 +110,7 @@ export default function HowItWorks() {
             </div>
             
             {/* Connecting arrows row */}
-            <div className="flex items-center justify-between px-4 mb-2 relative" style={{height: "60px"}}></div>
+            <div className="flex items-center justify-between px-4 mb-2 relative" style={{height: "20px"}}></div>
 
             {/* Text row */}
             <div className="flex justify-between gap-2 px-4">
