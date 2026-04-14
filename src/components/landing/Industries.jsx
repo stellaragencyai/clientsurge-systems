@@ -1,126 +1,130 @@
-import { useState } from "react";
 import { Sparkles, Heart, Building2, Home, MapPin, Wrench, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import IndustryModal from "./IndustryModal";
 
 const industries = [
   {
     icon: Sparkles,
     name: "Med Spas & Aesthetic Clinics",
     problem: "Missing consultations, no-shows costing revenue.",
-    desc: "Capture aesthetic & injectable inquiries instantly. Confirm appointments, send smart reminders, and reduce no-shows. Maximize treatment room utilization and client lifetime value with automated follow-up sequences.",
-    cta: "See How It Works for Med Spas",
-    href: "/med-spa",
+    desc: "Capture aesthetic & injectable inquiries instantly. Confirm appointments and reduce no-shows with automated follow-up sequences.",
     result: "2.4× more consultations booked • 34% fewer no-shows",
+    href: "/med-spa",
+    image: "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=800&q=80",
   },
   {
     icon: Heart,
     name: "Wellness Studios",
     problem: "Leads dropping off before membership conversion.",
-    desc: "Instantly follow up with trial class inquiries and membership prospects. Reactivate dormant members with targeted campaigns. Convert more paid leads without increasing ad spend or manual outreach effort.",
-    cta: "Book a Wellness Studio Demo",
-    href: "#book-demo",
+    desc: "Instantly follow up with trial class inquiries. Reactivate dormant members and convert more paid leads without extra ad spend.",
     result: "58% higher conversion rates • 3× faster response time",
+    href: "#book-demo",
+    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
   },
   {
     icon: Building2,
     name: "Real Estate Agents & Brokers",
     problem: "Slow response time loses showings to competitors.",
-    desc: "Respond to property inquiries within minutes, not hours. Automate showing scheduling, follow-ups, and buyer nurturing from first contact to closing. Capture more qualified leads with instant lead qualification.",
-    cta: "Book a Real Estate Demo",
-    href: "#book-demo",
+    desc: "Respond to property inquiries within minutes. Automate showing scheduling, follow-ups, and buyer nurturing from first contact to closing.",
     result: "5× more showings scheduled • 42% faster lead response",
+    href: "#book-demo",
+    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80",
   },
   {
     icon: Wrench,
     name: "HVAC, Plumbing & Home Services",
     problem: "Can't respond to service calls while on the job.",
-    desc: "Field teams stay focused on revenue-generating work while automated systems capture estimate requests, book service appointments, and follow up on pending quotes. Never lose another lead to unresponsive phones.",
-    cta: "Book an HVAC / Home Services Demo",
-    href: "#book-demo",
+    desc: "Field teams stay focused while automated systems capture estimate requests, book appointments, and follow up on pending quotes.",
     result: "65% more jobs booked • 24/7 lead capture & response",
+    href: "#book-demo",
+    image: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
   },
   {
     icon: Home,
     name: "Contractors, Electricians & Trades",
     problem: "Losing bids to whoever responds first.",
-    desc: "Instant quote request responses and automated follow-ups keep you top-of-mind when crews are on-site. Win more contracts by being the fastest responder with intelligent bid tracking and pipeline automation.",
-    cta: "Book a Contractor Demo",
-    href: "#book-demo",
+    desc: "Instant quote request responses keep you top-of-mind when crews are on-site. Win more contracts with intelligent bid tracking.",
     result: "3.2× more quotes accepted • Higher win rates on bids",
+    href: "#book-demo",
+    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80",
   },
   {
     icon: MapPin,
     name: "Local Service Businesses",
     problem: "Paying for leads but not converting them.",
-    desc: "Whether dental, salon, fitness, or salon — capture leads across all channels. Automated follow-up, appointment reminders, and reactivation campaigns turn paid traffic into confirmed bookings and repeat clients.",
-    cta: "Book a Demo for My Business",
-    href: "#book-demo",
+    desc: "Capture leads across all channels. Automated follow-up, appointment reminders, and reactivation campaigns turn paid traffic into bookings.",
     result: "2–3× ROAS on marketing spend • 40% more appointments",
+    href: "#book-demo",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80",
   },
 ];
 
 export default function Industries() {
-  const [selectedIndustry, setSelectedIndustry] = useState(null);
-
   return (
-    <section id="industries" className="py-24 md:py-32 px-6 bg-gradient-to-b from-card via-background to-card">
-      <div className="max-w-6xl mx-auto">
-        <div className="max-w-2xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Who We Work With</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight">
-            <span className="text-foreground">Built for </span><span className="text-primary">Businesses</span><span className="text-foreground"> That Run on </span><span className="text-primary">Bookings</span>
-          </h2>
-          <p className="mt-5 text-muted-foreground text-lg">
-            Pick your industry below — we'll show you exactly how it works for you.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {industries.map((ind, i) => {
-            const Icon = ind.icon;
-            return (
-              <button
-                key={i}
-                onClick={() => setSelectedIndustry(ind)}
-                className="group relative p-6 rounded-2xl bg-white/80 backdrop-blur-xl border border-white/60 hover:border-primary/30 hover:bg-white/95 transition-all duration-500 hover:-translate-y-1.5 overflow-hidden text-left animate-fade-in-up"
-                style={{ animationDelay: `${i * 100}ms`, boxShadow: "0 4px 30px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9)", transition: "all 0.4s ease" }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = "0 20px 60px rgba(0,0,0,0.10), 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)"}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = "0 4px 30px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.9)"}
-              >
-                {/* Glass shimmer effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-white/40 via-transparent to-white/10 opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
-                
-                <div className="relative z-10">
-                  <div className="w-12 h-12 rounded-xl bg-primary/15 group-hover:bg-primary/30 flex items-center justify-center mb-5 transition-all duration-300 group-hover:scale-110">
-                    <Icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                    {ind.name}
-                  </h3>
-                  <p className="text-sm font-medium text-primary/70 mb-3 italic">{ind.problem}</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{ind.desc}</p>
-                  
-                  {/* Arrow hint */}
-                  <div className="mt-4 flex items-center gap-2 text-primary font-semibold text-sm group-hover:gap-3 transition-all opacity-80 group-hover:opacity-100">
-                    <span>Explore</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        <p className="text-center text-xs text-muted-foreground mt-10">
-          Click any industry to see how ApexFlow works for your business.
+    <section id="industries" className="bg-gradient-to-b from-card via-background to-card">
+      {/* Header */}
+      <div className="max-w-2xl mx-auto text-center pt-24 pb-14 px-6">
+        <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Who We Work With</p>
+        <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight">
+          <span className="text-foreground">Built for </span>
+          <span className="text-primary">Businesses</span>
+          <span className="text-foreground"> That Run on </span>
+          <span className="text-primary">Bookings</span>
+        </h2>
+        <p className="mt-5 text-muted-foreground text-lg">
+          Pick your industry — we'll show you exactly how it works for you.
         </p>
       </div>
 
-      {/* Modal */}
-      {selectedIndustry && (
-        <IndustryModal industry={selectedIndustry} onClose={() => setSelectedIndustry(null)} />
-      )}
+      {/* Full-bleed 3-column grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3">
+        {industries.map((ind, i) => {
+          const Icon = ind.icon;
+          return (
+            <a
+              key={i}
+              href={ind.href}
+              className="group relative flex flex-col overflow-hidden"
+              style={{ minHeight: "480px" }}
+            >
+              {/* Image — 70% */}
+              <div className="relative overflow-hidden" style={{ height: "70%" }}>
+                <img
+                  src={ind.image}
+                  alt={ind.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                {/* Dark gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/50" />
+                {/* Icon badge */}
+                <div className="absolute top-5 left-5 w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                  <Icon className="w-5 h-5 text-white" />
+                </div>
+              </div>
+
+              {/* Content — 30% */}
+              <div className="relative flex-1 bg-white px-6 py-5 flex flex-col justify-between border-t border-border group-hover:bg-primary/5 transition-colors duration-300">
+                <div>
+                  <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors leading-snug">
+                    {ind.name}
+                  </h3>
+                  <p className="text-xs font-medium text-primary/80 italic mb-2">{ind.problem}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{ind.desc}</p>
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="text-[10px] font-semibold text-primary/70">{ind.result}</p>
+                  <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                </div>
+              </div>
+
+              {/* Border between cards */}
+              {i % 3 !== 2 && (
+                <div className="absolute top-0 right-0 w-px h-full bg-border/40 hidden md:block" />
+              )}
+            </a>
+          );
+        })}
+      </div>
+
+      <div className="pb-24" />
     </section>
   );
 }

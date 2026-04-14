@@ -192,7 +192,7 @@ export default function ConversationMockup() {
     .find((s) => s.type === "bot" && isVisible(s.id));
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-28 px-6 bg-gradient-to-b from-background to-card">
+    <section ref={sectionRef} className="py-20 md:py-28 pb-40 md:pb-56 px-6 bg-gradient-to-b from-background to-card">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
