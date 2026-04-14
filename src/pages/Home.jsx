@@ -1,8 +1,7 @@
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
 import TrustBar from "../components/landing/TrustBar";
-import ProblemSection from "../components/landing/ProblemSection";
-import SolutionSection from "../components/landing/SolutionSection";
+import ProblemSolution from "../components/landing/ProblemSolution";
 import HowItWorks from "../components/landing/HowItWorks";
 import Benefits from "../components/landing/Benefits";
 import ConversationMockup from "../components/landing/ConversationMockup";
@@ -24,8 +23,7 @@ export default function Home() {
       <Navbar />
       <Hero />
       <FadeIn><TrustBar /></FadeIn>
-      <FadeIn><ProblemSection /></FadeIn>
-      <FadeIn><SolutionSection /></FadeIn>
+      <FadeIn><ProblemSolution /></FadeIn>
       <FadeIn><HowItWorks /></FadeIn>
       <FadeIn><ConversationMockup /></FadeIn>
       <FadeIn><DetailedProcess /></FadeIn>
