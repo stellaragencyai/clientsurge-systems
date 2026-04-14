@@ -61,60 +61,60 @@ export default function Footer() {
         </div>
       </section>
 
-      <footer className="bg-foreground text-background">
+      <footer className="bg-card border-t border-border">
 
-        {/* Nav columns */}
-        <div className="max-w-6xl mx-auto px-6 pt-12 pb-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
-          {navColumns.map((col) => (
-            <div key={col.title} className="flex flex-col items-center text-center">
-              <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-5">{col.title}</p>
-              <ul className="space-y-3">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <a href={link.href} className="text-xs font-medium text-background/50 hover:text-background transition-colors">
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* Bottom row inside footer */}
-        <div className="mt-10 pt-8 border-t border-background/10">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-6">
-            <div>
-              <a href="#" className="font-display text-sm font-semibold text-background hover:text-primary transition-colors block mb-1">
+        {/* Footer content */}
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          
+          {/* Top section: Brand + Navigation */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
+            {/* Brand column */}
+            <div className="md:col-span-1">
+              <a href="#" className="font-display text-lg font-semibold text-foreground hover:text-primary transition-colors block mb-2">
                 Apex<span className="text-primary">Flow</span>
               </a>
-              <p className="text-xs text-background/60">
-                Automation Systems Built to Increase Bookings
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Automation systems built to increase bookings.
               </p>
+              <button
+                onClick={scrollTop}
+                className="mt-4 w-8 h-8 rounded-full border border-border bg-background hover:border-primary hover:bg-primary/5 flex items-center justify-center text-foreground transition-all"
+                aria-label="Back to top"
+              >
+                <ArrowUp className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={scrollTop}
-              className="w-7 h-7 rounded-full border border-background/20 flex items-center justify-center text-background/40 hover:text-background hover:border-background/50 transition-all"
-              aria-label="Back to top"
-            >
-              <ArrowUp className="w-3 h-3" />
-            </button>
+
+            {/* Navigation columns */}
+            {navColumns.map((col) => (
+              <div key={col.title} className="md:col-span-1">
+                <p className="text-xs font-semibold text-foreground uppercase tracking-widest mb-4">{col.title}</p>
+                <ul className="space-y-2.5">
+                  {col.links.map((link) => (
+                    <li key={link.label}>
+                      <a href={link.href} className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
-          
-          {/* Trust signals */}
-          <div className="text-center py-4 border-t border-background/10">
-            <p className="text-xs text-background/50 space-y-1">
-              <span className="block">Built for service businesses • Designed for real results • No complex setup required</span>
+
+          {/* Divider */}
+          <div className="border-t border-border mb-8" />
+
+          {/* Bottom section: Trust signals + Copyright */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <p className="text-xs text-muted-foreground text-center md:text-left">
+              Built for service businesses • Designed for real results • No complex setup required
+            </p>
+            <p className="text-xs text-muted-foreground">
+              © {new Date().getFullYear()} ApexFlow. All rights reserved.
             </p>
           </div>
-          
-          {/* Copyright */}
-          <p className="text-xs text-background/40 text-center mt-4">
-            © {new Date().getFullYear()} ApexFlow. All rights reserved.
-          </p>
         </div>
-      </div>
 
     </footer>
     </>
