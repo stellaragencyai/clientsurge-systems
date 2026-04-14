@@ -1,5 +1,7 @@
 import Navbar from "../components/landing/Navbar";
 import MedSpaHero from "../components/medspa/MedSpaHero";
+import MedSpaPositioning from "../components/medspa/MedSpaPositioning";
+import MedSpaWhyItWorks from "../components/medspa/MedSpaWhyItWorks";
 import MedSpaProblem from "../components/medspa/MedSpaProblem";
 import MedSpaPain from "../components/medspa/MedSpaPain";
 import MedSpaSolution from "../components/medspa/MedSpaSolution";
@@ -18,11 +20,13 @@ export default function MedSpa() {
     <div className="min-h-screen bg-white">
       <Navbar />
       <MedSpaHero />
+      <MedSpaPositioning />
       <MedSpaProblem />
       <MedSpaPain />
       <MedSpaSolution />
       <MedSpaFlow />
       <MedSpaDemo />
+      <MedSpaWhyItWorks />
       <MedSpaBenefits />
       <MedSpaSpecific />
       <MedSpaReactivation />

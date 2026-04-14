@@ -18,8 +18,11 @@ export default function MedSpaFinalCTA() {
         <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight mb-6">
           If your med spa is already getting leads, you should be converting more of them.
         </h2>
-        <p className="text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto mb-10">
-          Book a quick demo and we'll show you how the system can fit your business — at no cost and no commitment.
+        <p className="text-base font-semibold text-foreground/70 mb-4">
+          Most med spas lose leads simply because they don't respond fast enough. This system fixes that immediately.
+        </p>
+        <p className="text-base text-muted-foreground max-w-xl mx-auto mb-10">
+          Book a quick demo and we'll show you exactly where bookings are being lost — and how to fix it.
         </p>
 
         <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 6px 24px rgba(120,70,20,0.4)"}}>

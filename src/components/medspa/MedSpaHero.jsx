@@ -29,12 +29,12 @@ export default function MedSpaHero() {
         </div>
 
         <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.1] text-foreground mb-6">
-          Turn More Med Spa Leads Into<br />
-          <span className="text-primary">Booked Appointments</span> Automatically
+          Stop Losing Med Spa Leads —<br />
+          <span className="text-primary">Book More Appointments</span> Automatically
         </h1>
 
-        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-10">
-          We install done-for-you automation systems that respond instantly to new inquiries, follow up automatically, recover missed opportunities, and help med spas book more consultations — without adding extra front desk work.
+        <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed mb-10">
+          We install systems that instantly respond to inquiries, follow up automatically, and turn more leads into paying clients.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
