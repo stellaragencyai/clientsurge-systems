@@ -45,25 +45,25 @@ const pairs = [
 
 export default function ProblemSolution() {
   return (
-    <section id="services" className="py-24 md:py-32 px-6 bg-foreground">
+    <section id="services" className="py-24 md:py-32 px-6 bg-background">
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Problem & The Fix</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-background leading-tight">
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
             You Don't Have a Lead Problem.
             <br />
             <span className="text-primary">You Have a Follow-Up Problem.</span>
           </h2>
-          <p className="mt-5 text-background/60 text-lg leading-relaxed">
+          <p className="mt-5 text-muted-foreground text-lg leading-relaxed">
             Every delayed response is lost revenue. Here's where it breaks — and exactly how we fix it.
           </p>
         </div>
 
         {/* Column labels */}
         <div className="hidden md:grid grid-cols-[1fr_40px_1fr] gap-4 mb-6 px-2">
-          <p className="text-xs font-bold uppercase tracking-widest text-background/40 text-center">The Problem</p>
+          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground text-center">The Problem</p>
           <div />
           <p className="text-xs font-bold uppercase tracking-widest text-primary/70 text-center">The Fix</p>
         </div>
@@ -77,13 +77,13 @@ export default function ProblemSolution() {
               <div key={i} className="grid md:grid-cols-[1fr_40px_1fr] gap-3 md:gap-4 items-center">
 
                 {/* Problem */}
-                <div className="flex items-start gap-4 p-5 rounded-2xl bg-white/5 border border-white/8 hover:border-white/15 transition-all">
+                <div className="flex items-start gap-4 p-5 rounded-2xl bg-white border border-border hover:border-destructive/20 hover:shadow-sm transition-all">
                   <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-destructive/20 flex items-center justify-center">
                     <ProblemIcon className="w-5 h-5 text-destructive/80" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-background mb-1">{pair.problem}</h3>
-                    <p className="text-xs text-background/50 leading-relaxed">{pair.problemDesc}</p>
+                    <h3 className="text-sm font-semibold text-foreground mb-1">{pair.problem}</h3>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{pair.problemDesc}</p>
                   </div>
                 </div>
 
@@ -98,12 +98,12 @@ export default function ProblemSolution() {
                 </div>
 
                 {/* Solution */}
-                <div className="flex items-start gap-4 p-5 rounded-2xl bg-primary/10 border border-primary/25 hover:border-primary/40 transition-all">
+                <div className="flex items-start gap-4 p-5 rounded-2xl bg-primary/8 border border-primary/20 hover:border-primary/40 hover:shadow-sm transition-all">
                   <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
                     <SolutionIcon className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-background mb-1">{pair.solution}</h3>
+                    <h3 className="text-sm font-semibold text-foreground mb-1">{pair.solution}</h3>
                     <p className="text-xs text-primary/80 font-medium leading-relaxed">{pair.solutionDesc}</p>
                   </div>
                 </div>
