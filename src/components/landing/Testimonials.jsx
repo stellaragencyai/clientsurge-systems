@@ -49,19 +49,19 @@ export default function Testimonials() {
               className="group relative flex flex-col p-8 rounded-2xl backdrop-blur-md transition-all duration-500 hover:-translate-y-2 cursor-default"
               style={{
                 background: "rgba(255, 255, 255, 0.75)",
-                border: "1.5px solid rgba(255, 255, 255, 0.6)",
+                border: "2px solid #000000",
                 boxShadow: "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
                 transition: "all 0.4s ease",
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.background = "rgba(255, 255, 255, 0.95)";
-                e.currentTarget.style.border = "1.5px solid rgba(200, 150, 92, 0.4)";
+                e.currentTarget.style.border = "2px solid #000000";
                 e.currentTarget.style.boxShadow = "0 24px 60px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8), 0 0 40px rgba(200, 150, 92, 0.15)";
                 e.currentTarget.style.transform = "translateY(-8px)";
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.background = "rgba(255, 255, 255, 0.75)";
-                e.currentTarget.style.border = "1.5px solid rgba(255, 255, 255, 0.6)";
+                e.currentTarget.style.border = "2px solid #000000";
                 e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)";
                 e.currentTarget.style.transform = "translateY(0)";
               }}
@@ -87,26 +87,27 @@ export default function Testimonials() {
 
               {/* Result Highlight */}
               <div className="mb-6">
-                <span className="inline-block text-sm font-bold text-white bg-gradient-to-r from-amber-600 to-amber-500 px-4 py-2 rounded-full">
+                <span className="inline-block text-sm font-bold text-white bg-gradient-to-r from-amber-800 to-amber-700 px-4 py-2 rounded-full" style={{background: "linear-gradient(135deg, #9a5c2e 0%, #7a4825 100%)"}}>
                   {t.result}
                 </span>
               </div>
 
               {/* Quote */}
-              <p className="text-sm text-foreground/75 leading-relaxed flex-1 mb-6 italic">
+              <p className="text-sm text-foreground/75 leading-relaxed flex-1 mb-6">
                 "{t.quote}"
               </p>
 
               {/* Author */}
-              <div className="flex items-center gap-3">
-                <img
-                  src={t.avatar}
-                  alt={t.name}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-md"
-                />
-                <div>
-                  <p className="text-sm font-bold text-foreground">{t.name}</p>
-                </div>
+              <div className="flex items-center gap-4">
+               <img
+                 src={t.avatar}
+                 alt={t.name}
+                 className="w-16 h-16 rounded-full object-cover ring-2 ring-white shadow-md"
+               />
+               <div>
+                 <p className="text-sm font-bold text-foreground">{t.name}</p>
+                 <p className="text-xs text-muted-foreground">{t.location}</p>
+               </div>
               </div>
             </div>
           ))}

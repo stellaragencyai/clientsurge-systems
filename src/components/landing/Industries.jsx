@@ -61,7 +61,7 @@ const industries = [
     desc: "Field teams stay focused while automated systems capture estimate requests, book appointments, and follow up on pending quotes.",
     result: "65% more jobs booked • 24/7 lead capture & response",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1504801990592-bef489c9b9a8?w=900&q=85",
     bullets: [
       "Never miss a service call — auto-response 24/7",
       "Estimate follow-ups sent automatically",
@@ -157,13 +157,13 @@ export default function Industries() {
                   <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors leading-snug">
                     {ind.name}
                   </h3>
-                  <p className="text-xs font-medium text-primary/80 italic mb-2">{ind.problem}</p>
+                  <p className="text-xs font-medium text-primary/80 mb-2">{ind.problem}</p>
                   <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{ind.desc}</p>
                 </div>
                 <div className="mt-3 flex items-center justify-between">
-                  <p className="text-[10px] font-semibold text-primary/70">{ind.result}</p>
-                  <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform flex-shrink-0" />
-                </div>
+                   <p className="text-[10px] font-semibold text-primary/70 opacity-0 group-hover:opacity-100 transition-opacity">{ind.result}</p>
+                   <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                 </div>
               </div>
 
               {i % 3 !== 2 && (
