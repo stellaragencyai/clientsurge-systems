@@ -95,7 +95,7 @@ export default function Pricing() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch" style={{ perspective: "1400px" }}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
           {plans.map((plan, i) => (
             <PricingCard key={i} plan={plan} />
           ))}
@@ -118,29 +118,11 @@ export default function Pricing() {
 
       <style>{`
         .pricing-card {
-          transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-          transform-style: preserve-3d;
-          will-change: transform;
+          transition: border-color 0.25s ease, box-shadow 0.25s ease;
         }
         .pricing-card:hover {
-          transform: translateY(-12px) rotateX(3deg) rotateY(-1deg) scale(1.02);
-        }
-        .pricing-card-highlight:hover {
-          transform: translateY(-14px) rotateX(3deg) rotateY(-1deg) scale(1.025);
-        }
-        .pricing-card::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          opacity: 0;
-          transition: opacity 0.4s ease;
-          background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 60%);
-          pointer-events: none;
-          z-index: 1;
-        }
-        .pricing-card:hover::before {
-          opacity: 1;
+          border-color: #c8965c !important;
+          box-shadow: 0 8px 36px rgba(120,70,20,0.18), 0 2px 8px rgba(0,0,0,0.07) !important;
         }
         .pricing-badge-float {
           position: absolute;

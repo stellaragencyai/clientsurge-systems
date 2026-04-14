@@ -1,9 +1,8 @@
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Clock, CalendarCheck, ShieldCheck, Users, TrendingUp, DollarSign } from "lucide-react";
+import { ArrowRight, Timer, CalendarCheck, ShieldCheck, UsersRound, TrendingUp, BadgeDollarSign } from "lucide-react";
 
 const benefits = [
   {
-    icon: Clock,
+    icon: Timer,
     title: "Respond Before Your Competitor Does",
     desc: "First to respond wins the booking. Our systems reply in under 60 seconds — day, night, weekends.",
   },
@@ -18,7 +17,7 @@ const benefits = [
     desc: "Every inquiry gets a response. Every follow-up gets sent. Nothing depends on someone remembering.",
   },
   {
-    icon: Users,
+    icon: UsersRound,
     title: "Your Team Focuses on What Matters",
     desc: "When follow-up is automated, your staff focuses on clients in front of them — not chasing cold leads.",
   },
@@ -28,7 +27,7 @@ const benefits = [
     desc: "You're already paying for leads. We help you convert more of them — without spending a dollar more on ads.",
   },
   {
-    icon: DollarSign,
+    icon: BadgeDollarSign,
     title: "Revenue You Were Already Leaving on the Table",
     desc: "Missed calls, slow replies, forgotten leads. Our systems recover that revenue and turn it into bookings.",
   },
@@ -45,11 +44,11 @@ export default function Benefits() {
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {benefits.map((b, i) => (
-            <div key={i} className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <b.icon className="w-5 h-5 text-primary" />
+            <div key={i} className="flex gap-4 p-6 bg-white rounded-2xl border border-border hover:border-primary/30 hover:shadow-md transition-all duration-200">
+              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center">
+                <b.icon className="w-5 h-5 text-primary" strokeWidth={1.75} />
               </div>
               <div>
                 <h3 className="text-base font-semibold text-foreground mb-1">{b.title}</h3>

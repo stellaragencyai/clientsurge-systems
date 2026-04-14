@@ -72,37 +72,40 @@ export default function HowItWorks() {
 
         {/* Horizontal flow */}
         <div className="relative mb-16">
-          {/* Desktop: Horizontal flow with animated line */}
+          {/* Desktop: Horizontal flow with aligned icons */}
           <div className="hidden lg:block">
-            <div className="flex items-end justify-between gap-2 mb-8">
+            {/* Icons row — all perfectly aligned */}
+            <div className="flex items-center justify-between mb-6">
               {steps.map((step, i) => {
                 const Icon = step.icon;
                 return (
-                  <div key={i} className="flex flex-col items-center flex-1">
-                    {/* Icon container with float animation */}
-                    <div
-                      className="relative mb-6"
-                      style={{
-                        animation: inView ? `float 3s ease-in-out ${i * 0.2}s infinite` : "none",
-                      }}
-                    >
-                      <div className="w-14 h-14 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center hover:bg-primary/25 transition-all duration-300">
+                  <div key={i} className="flex-1 flex items-center">
+                    <div className="flex flex-col items-center flex-1">
+                      <div
+                        className="w-14 h-14 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center hover:bg-primary/25 transition-all duration-300"
+                        style={{
+                          animation: inView ? `float 3s ease-in-out ${i * 0.2}s infinite` : "none",
+                        }}
+                      >
                         <Icon className="w-7 h-7 text-primary" />
                       </div>
                     </div>
-
-                    {/* Arrow connector (except last) */}
                     {i < steps.length - 1 && (
-                      <div className="absolute top-7 left-[calc(50%+28px)] w-12 h-0.5 border-t-2 border-dashed border-primary/20" />
+                      <div className="w-12 flex-shrink-0 border-t-2 border-dashed border-primary/20 mx-1" />
                     )}
-
-                    {/* Step label */}
-                    <p className="text-xs font-semibold text-primary uppercase mb-2">{step.subtitle}</p>
-                    <h3 className="text-sm font-semibold text-foreground text-center mb-2">{step.title}</h3>
-                    <p className="text-xs text-muted-foreground text-center leading-relaxed">{step.desc}</p>
                   </div>
                 );
               })}
+            </div>
+            {/* Text row */}
+            <div className="flex justify-between gap-2">
+              {steps.map((step, i) => (
+                <div key={i} className="flex-1 flex flex-col items-center px-1">
+                  <p className="text-xs font-semibold text-primary uppercase mb-1">{step.subtitle}</p>
+                  <h3 className="text-sm font-semibold text-foreground text-center mb-1">{step.title}</h3>
+                  <p className="text-xs text-muted-foreground text-center leading-relaxed">{step.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
 

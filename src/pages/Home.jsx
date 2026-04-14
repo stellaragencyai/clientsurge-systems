@@ -27,7 +27,6 @@ export default function Home() {
       <FadeIn><ProblemSection /></FadeIn>
       <FadeIn><SolutionSection /></FadeIn>
       <FadeIn><HowItWorks /></FadeIn>
-      <FadeIn><Testimonials /></FadeIn>
       <FadeIn><ConversationMockup /></FadeIn>
       <FadeIn><DetailedProcess /></FadeIn>
       <FadeIn><Benefits /></FadeIn>
@@ -35,6 +34,7 @@ export default function Home() {
       <FadeIn><CoreOffer /></FadeIn>
       <FadeIn><WhyUs /></FadeIn>
       <FadeIn><FAQ /></FadeIn>
+      <FadeIn><Testimonials /></FadeIn>
       <FadeIn><Pricing /></FadeIn>
       <FinalCTA />
       <Footer />
