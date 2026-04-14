@@ -17,6 +17,7 @@ import AdminLeads from './pages/AdminLeads';
 import AdminLeadDetail from './pages/AdminLeadDetail';
 import LeadIntelligence from './pages/LeadIntelligence';
 import Sam from './pages/Sam';
+import MedSpaDashboard from './pages/MedSpaDashboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -55,6 +56,7 @@ const AuthenticatedApp = () => {
       <Route path="/admin/leads/:leadId" element={<AdminLeadDetail />} />
       <Route path="/lead-intelligence" element={<LeadIntelligence />} />
       <Route path="/sam" element={<Sam />} />
+      <Route path="/medspa-dashboard" element={<MedSpaDashboard />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
