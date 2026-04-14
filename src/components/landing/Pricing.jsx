@@ -107,7 +107,11 @@ export default function Pricing() {
           <p className="text-sm text-muted-foreground leading-relaxed mb-6">
             Not sure which option is right for your business? Book a quick demo and we'll recommend the best fit based on your lead flow, follow-up process, and goals.
           </p>
-          <button onClick={scrollToDemo} className="shiny-brown-btn">
+          <button onClick={scrollToDemo} className="shiny-brown-btn" onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+          }} onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
+          }}>
             <span className="shiny-brown-inner flex items-center justify-center gap-2 h-12 px-8 rounded-full font-semibold text-sm">
               Book Your Demo
               <ArrowRight className="w-4 h-4" />
@@ -228,7 +232,11 @@ function PricingCard({ plan }) {
         </ul>
 
         {/* CTA */}
-        <button onClick={scrollToDemo} className="w-full shiny-brown-btn">
+        <button onClick={scrollToDemo} className="w-full shiny-brown-btn" onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+          }} onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
+          }}>
           <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
             Book a Demo
             <ArrowRight className="w-4 h-4" />

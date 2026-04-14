@@ -23,7 +23,7 @@ export default function CoreOffer() {
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Package</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
-            A <span className="text-primary">Complete</span> System,<br />Implemented for You
+            A <span className="text-primary">Complete</span> System,<br /><span style={{color: "rgba(161,120,35,1)", textShadow: "0 0 20px rgba(161,120,35,0.5)"}}>Automated</span> for You
           </h2>
           <p className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
             This isn't software you figure out. We build, install, and manage the entire system — your only job is showing up for the appointments it generates.
@@ -71,11 +71,19 @@ export default function CoreOffer() {
           {[
             { label: "Setup Timeline", value: "Live in 5–7 days" },
             { label: "What You Do", value: "One onboarding call" },
-            { label: "Everything Else", value: "We handle it entirely" },
+            { label: "Everything Else", value: "Automated Entirely", highlight: true },
           ].map((item, i) => (
             <div key={i} className={`${i < 2 ? "sm:border-r sm:border-border" : ""} px-4`}>
               <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">{item.label}</p>
-              <p className="text-sm font-semibold text-foreground">{item.value}</p>
+              <p className="text-sm font-semibold text-foreground">
+                {item.highlight ? (
+                  <>
+                    <span style={{color: "rgba(161,120,35,1)", textShadow: "0 0 15px rgba(161,120,35,0.5)"}}>Automated</span> Entirely
+                  </>
+                ) : (
+                  item.value
+                )}
+              </p>
             </div>
           ))}
         </div>
@@ -100,7 +108,11 @@ export default function CoreOffer() {
               if (progress < 1) requestAnimationFrame(step);
             };
             requestAnimationFrame(step);
-          }} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",border:"none",cursor:"pointer"}}>
+          }} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",border:"none",cursor:"pointer",transition:"box-shadow 0.5s ease"}} onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+          }} onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
+          }}>
             <span style={{display:"flex",alignItems:"center",gap:"8px",height:"52px",padding:"0 36px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
               Book a Demo
               <ArrowRight className="w-4 h-4" />

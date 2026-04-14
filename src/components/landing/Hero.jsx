@@ -84,7 +84,13 @@ export default function Hero() {
           <Button
             size="lg"
             onClick={() => setShowLeadModal(true)}
-            className="rounded-full px-8 h-12 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-shadow"
+            className="rounded-full px-8 h-12 text-base font-semibold gap-2 shadow-md transition-all duration-500"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 20px rgba(120,70,20,0.4)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+            }}
           >
             Book a Demo
             <ArrowRight className="w-4 h-4" />

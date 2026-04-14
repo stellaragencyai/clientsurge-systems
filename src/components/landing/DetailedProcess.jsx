@@ -152,7 +152,7 @@ function StepCard({ step, index }) {
 
 export default function DetailedProcess() {
   return (
-    <section className="py-16 md:py-24 px-4 md:px-6 bg-gradient-to-b from-amber-50/20 via-background to-card">
+    <section className="py-16 md:py-24 px-4 md:px-6 bg-gradient-to-b from-background via-background to-card">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-14">

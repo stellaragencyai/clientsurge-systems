@@ -120,7 +120,7 @@ export default function Benefits() {
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-foreground/70 tracking-widest uppercase mb-4">The Outcomes</p>
           <h2 className="font-display text-4xl md:text-5xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            What Changes When You <span className="text-primary"><AnimatedText text="Automate" /></span>
+            What Changes When You <span style={{color: "rgba(161,120,35,1)", textShadow: "0 0 30px rgba(161,120,35,0.6), 0 0 60px rgba(161,120,35,0.35)"}}><AnimatedText text="Automate" /></span>
           </h2>
         </div>
 
@@ -131,7 +131,11 @@ export default function Benefits() {
         </div>
 
         <div className="text-center mt-14">
-          <a href="#book-demo" style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.3s ease, transform 0.3s ease"}}>
+          <a href="#book-demo" style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.5s ease, transform 0.3s ease", cursor:"pointer"}} onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+          }} onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
+          }}>
             <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 32px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
               Book a Demo
               <ArrowRight className="w-4 h-4" />
