@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { MessageSquare, Zap, Send, CalendarCheck, CheckCircle2 } from "lucide-react";
 
 const steps = [
@@ -149,15 +149,66 @@ function StepCard({ step, index }) {
   );
 }
 
-function StepArrow() {
+function StepConnector({ index }) {
+  const ref = useRef(null);
+  const [drawn, setDrawn] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setDrawn(true); },
+      { threshold: 0.5 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="flex justify-center items-center py-5">
-      <div className="flex flex-col items-center">
-        <div className="w-px h-10 bg-foreground/25" />
-        <svg width="22" height="14" viewBox="0 0 22 14" fill="none">
-          <path d="M11 14L0.607696 0.5L21.3923 0.5L11 14Z" fill="rgba(0,0,0,0.25)" />
-        </svg>
-      </div>
+    <div ref={ref} className="flex justify-center items-center py-2" style={{ position: "relative", height: "80px" }}>
+      <svg width="60" height="80" viewBox="0 0 60 80" fill="none" style={{ overflow: "visible" }}>
+        {/* Dashed static track */}
+        <path
+          d="M30 0 C30 0 30 30 10 40 C-10 50 30 60 30 80"
+          stroke="rgba(161,120,35,0.15)"
+          strokeWidth="2"
+          strokeDasharray="4 4"
+          fill="none"
+        />
+        {/* Animated draw-on path */}
+        <path
+          d="M30 0 C30 0 30 30 10 40 C-10 50 30 60 30 80"
+          stroke="hsl(var(--primary))"
+          strokeWidth="2.5"
+          fill="none"
+          strokeLinecap="round"
+          style={{
+            strokeDasharray: 160,
+            strokeDashoffset: drawn ? 0 : 160,
+            transition: `stroke-dashoffset ${0.8 + index * 0.1}s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.15}s`,
+          }}
+        />
+        {/* Animated dot at end */}
+        <circle
+          cx="30" cy="80" r="4"
+          fill="hsl(var(--primary))"
+          style={{
+            opacity: drawn ? 1 : 0,
+            transition: `opacity 0.3s ease ${0.8 + index * 0.1}s`,
+          }}
+        />
+        {/* Arrow head */}
+        <path
+          d="M24 74 L30 82 L36 74"
+          stroke="hsl(var(--primary))"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+          style={{
+            opacity: drawn ? 1 : 0,
+            transition: `opacity 0.3s ease ${0.9 + index * 0.1}s`,
+          }}
+        />
+      </svg>
     </div>
   );
 }
@@ -182,7 +233,7 @@ export default function DetailedProcess() {
           {steps.map((step, i) => (
             <div key={i}>
               <StepCard step={step} index={i} />
-              {i < steps.length - 1 && <StepArrow />}
+              {i < steps.length - 1 && <StepConnector index={i} />}
             </div>
           ))}
         </div>

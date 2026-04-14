@@ -36,13 +36,26 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 bg-gradient-to-b from-background to-card overflow-hidden">
+    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 overflow-hidden">
+      {/* Cinematic video background */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ zIndex: 0 }}
+      >
+        <source src="https://videos.pexels.com/video-files/3194277/3194277-uhd_2560_1440_25fps.mp4" type="video/mp4" />
+      </video>
+      {/* Dark overlay with warm tint */}
+      <div className="absolute inset-0" style={{ zIndex: 1, background: "linear-gradient(135deg, rgba(10,8,5,0.82) 0%, rgba(30,18,5,0.78) 50%, rgba(10,8,5,0.85) 100%)" }} />
       {/* Gold ambient glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full pointer-events-none" style={{background: 'radial-gradient(ellipse, rgba(161,120,35,0.18) 0%, transparent 70%)'}} />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] rounded-full pointer-events-none" style={{ zIndex: 2, background: 'radial-gradient(ellipse, rgba(161,120,35,0.22) 0%, transparent 70%)' }} />
 
-      <div className="max-w-4xl mx-auto text-center relative z-10">
+      <div className="max-w-4xl mx-auto text-center relative" style={{ zIndex: 3 }}>
 
-        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.08] text-foreground">
+        <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.08] text-white">
           Stop Losing Leads.
           <br />
           <span className="text-primary" style={{textShadow: '0 0 40px rgba(161,120,35,0.45)'}}>Automate Follow-Up.</span>
@@ -50,7 +63,7 @@ export default function Hero() {
           Book More Customers.
         </h1>
 
-        <p className="mt-7 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+        <p className="mt-7 text-lg md:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
           Done-for-you AI systems that capture leads, respond instantly, automate follow-up, recover missed calls, and increase booked customers.
         </p>
 
@@ -176,7 +189,7 @@ export default function Hero() {
           </div>
         )}
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-white/60">
           {["No long-term contracts", "Live in under 7 days", "Fully done-for-you"].map((t, i) => (
             <span key={i} className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-primary" />

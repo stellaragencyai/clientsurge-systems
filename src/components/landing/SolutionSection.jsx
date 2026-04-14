@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Zap, MessageSquare, PhoneOff, CalendarCheck, RotateCcw, Database } from "lucide-react";
 
 const services = [
@@ -41,20 +41,72 @@ const services = [
 ];
 
 const ServiceCard = ({ service }) => {
+  const cardRef = useRef(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [sheen, setSheen] = useState({ x: 50, y: 50 });
   const [hovered, setHovered] = useState(false);
   const Icon = service.icon;
+
+  const handleMouseMove = useCallback((e) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) / (rect.width / 2);
+    const dy = (e.clientY - cy) / (rect.height / 2);
+    setTilt({ x: dy * -12, y: dx * 12 });
+    setSheen({
+      x: ((e.clientX - rect.left) / rect.width) * 100,
+      y: ((e.clientY - rect.top) / rect.height) * 100,
+    });
+  }, []);
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+    setSheen({ x: 50, y: 50 });
+    setHovered(false);
+  };
+
   return (
-    <div 
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className={`p-6 rounded-2xl bg-white/15 backdrop-blur-md hover:bg-white/20 transition-all shadow-lg ${hovered ? "border border-slate-600" : "border border-transparent"}`}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: hovered ? `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.03)` : "perspective(800px) rotateX(0) rotateY(0) scale(1)",
+        transition: hovered ? "transform 0.1s ease-out" : "transform 0.5s ease-out",
+        background: "rgba(255,255,255,0.08)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: hovered ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.1)",
+        boxShadow: hovered ? "0 24px 48px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.1)" : "0 4px 16px rgba(0,0,0,0.06)",
+        borderRadius: "1rem",
+        padding: "1.5rem",
+        position: "relative",
+        overflow: "hidden",
+        transformStyle: "preserve-3d",
+      }}
     >
-      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+      {/* Glass sheen highlight */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "inherit",
+          opacity: hovered ? 1 : 0,
+          transition: "opacity 0.3s ease",
+          background: `radial-gradient(circle at ${sheen.x}% ${sheen.y}%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 60%)`,
+          pointerEvents: "none",
+        }}
+      />
+      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5" style={{ transform: "translateZ(20px)" }}>
         <Icon className="w-5 h-5 text-primary" />
       </div>
-      <h3 className="text-base font-semibold text-foreground mb-1">{service.title}</h3>
-      <p className="text-xs font-semibold text-primary mb-3">{service.outcome}</p>
-      <p className="text-sm text-muted-foreground leading-relaxed">{service.desc}</p>
+      <h3 className="text-base font-semibold text-foreground mb-1" style={{ transform: "translateZ(16px)" }}>{service.title}</h3>
+      <p className="text-xs font-semibold text-primary mb-3" style={{ transform: "translateZ(14px)" }}>{service.outcome}</p>
+      <p className="text-sm text-muted-foreground leading-relaxed" style={{ transform: "translateZ(10px)" }}>{service.desc}</p>
     </div>
   );
 };
