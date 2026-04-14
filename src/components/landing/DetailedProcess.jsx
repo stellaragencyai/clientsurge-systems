@@ -208,7 +208,7 @@ export default function DetailedProcess() {
         </div>
 
         {/* Steps */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-1 gap-8">
+        <div className="space-y-8">
           {steps.map((step, i) => (
             <StepCard key={i} step={step} index={i} />
           ))}
