@@ -192,7 +192,7 @@ export default function ConversationMockup() {
     .find((s) => s.type === "bot" && isVisible(s.id));
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-28 pb-40 md:pb-56 px-6 bg-gradient-to-b from-background to-card">
+    <section ref={sectionRef} className="py-20 md:py-28 pb-40 md:pb-56 px-6 bg-gradient-to-b from-background via-card to-amber-50/20">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -208,7 +208,7 @@ export default function ConversationMockup() {
         </div>
 
         {/* Phone container */}
-        <div className="max-w-sm mx-auto" style={{ perspective: "1200px" }}>
+        <div className="mx-auto" style={{ perspective: "1200px", maxWidth: "450px" }}>
           {/* 3D tilt wrapper */}
           <div style={{ transform: "rotateY(-2deg) rotateX(1deg)" }}>
           {/* Phone shell */}

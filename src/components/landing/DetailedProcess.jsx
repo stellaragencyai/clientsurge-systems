@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { MessageSquare, Zap, Send, CalendarCheck, CheckCircle2 } from "lucide-react";
+import { MessageSquare, Zap, Send, CalendarCheck, CheckCircle2, ChevronDown } from "lucide-react";
 
 const steps = [
   {
@@ -94,21 +94,23 @@ function StepCard({ step, index }) {
         style={{
           boxShadow: "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)",
           transformStyle: "preserve-3d",
+          transform: "scale(1.15)",
+          transformOrigin: "center",
         }}
         onMouseEnter={e => {
           e.currentTarget.style.boxShadow = "0 24px 64px rgba(0,0,0,0.13), 0 8px 20px rgba(0,0,0,0.08)";
-          e.currentTarget.style.transform = "translateY(-5px) rotateX(1.5deg)";
+          e.currentTarget.style.transform = "scale(1.15) translateY(-5px) rotateX(1.5deg)";
         }}
         onMouseLeave={e => {
           e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)";
-          e.currentTarget.style.transform = "translateY(0) rotateX(0deg)";
+          e.currentTarget.style.transform = "scale(1.15) translateY(0) rotateX(0deg)";
         }}
       >
         {/* Left — content */}
-        <div className="flex-1 p-8 md:p-10">
+        <div className="flex-1 p-9 md:p-12">
           {/* Step badge */}
           <div className="flex items-center gap-3 mb-5">
-            <span className="text-xs font-bold text-foreground/40 uppercase tracking-widest">{step.step}</span>
+            <span className="text-sm font-bold text-black uppercase tracking-widest text-lg">{step.step}</span>
             <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
               {step.timeframe}
             </span>
@@ -137,7 +139,7 @@ function StepCard({ step, index }) {
         </div>
 
         {/* Right — image */}
-        <div className="md:w-64 lg:w-80 h-52 md:h-auto overflow-hidden flex-shrink-0">
+        <div className="md:w-80 lg:w-96 h-60 md:h-auto overflow-hidden flex-shrink-0">
           <img
             src={step.image}
             alt={step.title}
@@ -163,49 +165,26 @@ function StepConnector({ index }) {
   }, []);
 
   return (
-    <div ref={ref} className="flex justify-center items-center py-2" style={{ position: "relative", height: "80px" }}>
-      <svg width="60" height="80" viewBox="0 0 60 80" fill="none" style={{ overflow: "visible" }}>
-        {/* Dashed static track */}
-        <path
-          d="M30 0 C30 0 30 30 10 40 C-10 50 30 60 30 80"
-          stroke="rgba(161,120,35,0.15)"
-          strokeWidth="2"
-          strokeDasharray="4 4"
-          fill="none"
-        />
-        {/* Animated draw-on path */}
-        <path
-          d="M30 0 C30 0 30 30 10 40 C-10 50 30 60 30 80"
-          stroke="hsl(var(--primary))"
-          strokeWidth="2.5"
-          fill="none"
-          strokeLinecap="round"
-          style={{
-            strokeDasharray: 160,
-            strokeDashoffset: drawn ? 0 : 160,
-            transition: `stroke-dashoffset ${0.8 + index * 0.1}s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.15}s`,
-          }}
-        />
-        {/* Animated dot at end */}
-        <circle
-          cx="30" cy="80" r="4"
-          fill="hsl(var(--primary))"
+    <div ref={ref} className="flex justify-center items-center py-6" style={{ position: "relative", height: "140px" }}>
+      <svg width="100" height="140" viewBox="0 0 100 140" fill="none" style={{ overflow: "visible" }}>
+        {/* Large black arrow pointing down */}
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+            <polygon points="0 0, 10 5, 0 10" fill="#000000" />
+          </marker>
+        </defs>
+        {/* Arrow line */}
+        <line
+          x1="50"
+          y1="0"
+          x2="50"
+          y2="110"
+          stroke="#000000"
+          strokeWidth="4"
+          markerEnd="url(#arrowhead)"
           style={{
             opacity: drawn ? 1 : 0,
-            transition: `opacity 0.3s ease ${0.8 + index * 0.1}s`,
-          }}
-        />
-        {/* Arrow head */}
-        <path
-          d="M24 74 L30 82 L36 74"
-          stroke="hsl(var(--primary))"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-          style={{
-            opacity: drawn ? 1 : 0,
-            transition: `opacity 0.3s ease ${0.9 + index * 0.1}s`,
+            transition: `opacity 0.4s ease ${0.2 + index * 0.1}s`,
           }}
         />
       </svg>
@@ -215,13 +194,13 @@ function StepConnector({ index }) {
 
 export default function DetailedProcess() {
   return (
-    <section className="py-20 md:py-28 px-6 bg-gradient-to-b from-card to-background">
+    <section className="py-20 md:py-28 px-6 bg-gradient-to-b from-amber-50/20 via-background to-card">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Under The Hood</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            Our Detailed Automation Process
+            Our Detailed <span className="relative inline-block" style={{color: "rgba(161,120,35,1)", textShadow: "0 0 30px rgba(161,120,35,0.6), 0 0 60px rgba(161,120,35,0.35)"}}>Automation</span> Process
           </h2>
           <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
             A step-by-step look at exactly how every lead is handled — from first touch to confirmed booking.
