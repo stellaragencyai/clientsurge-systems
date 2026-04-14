@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { MessageSquare, Zap, Send, CalendarCheck, CheckCircle2, ChevronDown } from "lucide-react";
+import { MessageSquare, Zap, Send, CalendarCheck, CheckCircle2, ChevronDown, ArrowRight } from "lucide-react";
 
 const steps = [
   {
@@ -153,19 +153,41 @@ function StepCard({ step, index }) {
 export default function DetailedProcess() {
   return (
     <section className="py-16 md:py-24 px-4 md:px-6 bg-gradient-to-b from-background via-background to-card">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-14">
-          <p className="text-xs font-semibold text-foreground/70 tracking-widest uppercase mb-4">Under The Hood</p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            Our Detailed <span className="relative inline-block" style={{color: "rgba(161,120,35,1)", textShadow: "0 0 30px rgba(161,120,35,0.6), 0 0 60px rgba(161,120,35,0.35)"}}>Automation</span> Process
+        <div className="text-center mb-16">
+          <h2 className="font-display text-4xl md:text-5xl lg:text-5xl font-semibold tracking-tight" style={{color: "rgba(161,120,35,1)", textShadow: "0 0 50px rgba(161,120,35,0.8), 0 0 100px rgba(161,120,35,0.4)"}}>
+            How You Turn Leads Into Booked Appointments
           </h2>
-          <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
-            A step-by-step look at exactly how every lead is handled — from first touch to confirmed booking.
+          <p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
+            From first contact to confirmed booking. Five clear steps. All automated.
           </p>
         </div>
 
-        {/* Steps */}
+        {/* Summarized flow */}
+        <div className="mb-20 flex flex-col md:flex-row items-center justify-between gap-4 px-4">
+          {steps.map((step, i) => {
+            const Icon = step.icon;
+            return (
+              <div key={i} className="flex items-center gap-4 w-full md:w-auto">
+                <div className="flex flex-col items-center">
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3 transition-all" style={{background: "rgba(161,120,35,0.15)", border: "2px solid rgba(161,120,35,0.3)", boxShadow: "0 0 30px rgba(161,120,35,0.25)"}}>
+                    <Icon className="w-7 h-7" style={{color: "rgba(161,120,35,1)"}} />
+                  </div>
+                  <p className="text-xs font-bold uppercase tracking-widest" style={{color: "rgba(161,120,35,1)"}}>{step.step}</p>
+                  <p className="text-xs font-semibold text-foreground mt-1 text-center">{step.title}</p>
+                </div>
+                {i < steps.length - 1 && <ArrowRight className="w-5 h-5 text-muted-foreground hidden md:block" style={{color: "rgba(161,120,35,0.6)"}} />}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Detailed steps */}
+        <h3 className="font-display text-3xl md:text-4xl font-semibold text-center mb-12" style={{color: "rgba(161,120,35,1)", textShadow: "0 0 40px rgba(161,120,35,0.7), 0 0 80px rgba(161,120,35,0.35)"}}>
+          Our Detailed Process
+        </h3>
+
         <div className="grid grid-cols-1 gap-8">
           {steps.map((step, i) => (
             <StepCard key={i} step={step} index={i} />
