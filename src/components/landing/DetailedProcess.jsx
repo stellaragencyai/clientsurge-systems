@@ -87,7 +87,7 @@ function StepCard({ step, index }) {
     <div
       ref={ref}
       className={`transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-      style={{ transitionDelay: `${index * 80}ms`, minHeight: "420px" }}
+      style={{ transitionDelay: `${index * 80}ms`, height: "420px" }}
     >
       <div
         className="group relative flex flex-col md:flex-row rounded-2xl overflow-hidden border border-border bg-white transition-all duration-300 h-full"
@@ -207,13 +207,10 @@ export default function DetailedProcess() {
           </p>
         </div>
 
-        {/* Steps with arrows */}
+        {/* Steps */}
         <div className="grid md:grid-cols-2 lg:grid-cols-1 gap-8">
           {steps.map((step, i) => (
-            <div key={i} className="flex flex-col">
-              <StepCard step={step} index={i} />
-              {i < steps.length - 1 && <StepConnector index={i} />}
-            </div>
+            <StepCard key={i} step={step} index={i} />
           ))}
         </div>
       </div>
