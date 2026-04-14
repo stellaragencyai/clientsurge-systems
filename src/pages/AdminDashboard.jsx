@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/lib/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { LogOut, Menu, X } from "lucide-react";
+import { LogOut, Menu, X, Settings } from "lucide-react";
 import DashboardHome from "../components/dashboard/DashboardHome";
 
 export default function AdminDashboard() {
@@ -71,6 +71,16 @@ export default function AdminDashboard() {
               className="w-full text-left px-4 py-3 rounded-lg text-foreground font-medium hover:bg-muted transition-colors"
             >
               Leads
+            </button>
+            <button
+              onClick={() => {
+                navigate("/admin-settings");
+                setSidebarOpen(false);
+              }}
+              className="w-full text-left px-4 py-3 rounded-lg text-foreground font-medium hover:bg-muted transition-colors flex items-center gap-2"
+            >
+              <Settings className="w-4 h-4" />
+              Settings
             </button>
           </nav>
 
