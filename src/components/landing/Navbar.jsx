@@ -89,7 +89,7 @@ export default function Navbar() {
         {/* CTA — pinned right */}
         <div className="hidden md:flex items-center gap-3 shrink-0">
           <button
-            onClick={() => base44.auth.redirectToLogin()}
+            onClick={() => navigate("/admin")}
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Login
@@ -125,7 +125,7 @@ export default function Navbar() {
             </a>
           ))}
           <button
-            onClick={() => base44.auth.redirectToLogin()}
+            onClick={() => navigate("/admin")}
             className="block w-full text-left text-sm text-muted-foreground hover:text-foreground mb-3"
           >
             Login
