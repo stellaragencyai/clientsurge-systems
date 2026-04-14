@@ -1,5 +1,6 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { ArrowRight, Zap, MessageSquare, PhoneCall, CalendarCheck, RotateCcw, LayoutDashboard, HeadphonesIcon, TrendingUp } from "lucide-react";
+import LeadCaptureModal from "../forms/LeadCaptureModal";
 
 const includes = [
   { icon: Zap, step: "01", title: "Instant Lead Capture", desc: "Every inquiry captured and logged automatically — from any channel, 24/7." },
@@ -13,7 +14,7 @@ const includes = [
 ];
 
 export default function CoreOffer() {
-  const navigate = useNavigate();
+  const [showLeadModal, setShowLeadModal] = useState(false);
   return (
     <section className="py-24 md:py-32 px-6 bg-white">
       <div className="max-w-5xl mx-auto">
@@ -84,13 +85,21 @@ export default function CoreOffer() {
           <p className="text-muted-foreground text-sm mb-6">
             Fully tailored to your business. Designed to generate revenue from day one.
           </p>
-          <button onClick={() => navigate("/start")} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",border:"none",cursor:"pointer"}}>
+          <button onClick={() => setShowLeadModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",border:"none",cursor:"pointer"}}>
             <span style={{display:"flex",alignItems:"center",gap:"8px",height:"52px",padding:"0 36px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
               Book a Demo
               <ArrowRight className="w-4 h-4" />
             </span>
           </button>
         </div>
+        <LeadCaptureModal 
+          isOpen={showLeadModal} 
+          onClose={() => setShowLeadModal(false)}
+          onSuccess={() => {
+            setShowLeadModal(false);
+            window.location.href = '/book';
+          }}
+        />
       </div>
     </section>
   );

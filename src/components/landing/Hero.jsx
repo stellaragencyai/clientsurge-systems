@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import StatCounter from "./StatCounter";
 import ConversationModal from "./ConversationModal";
+import LeadCaptureModal from "../forms/LeadCaptureModal";
 
 const TICKER_EVENTS = [
   "🟢 New lead captured — Austin, TX",
@@ -58,7 +58,7 @@ const businessTypes = [
 ];
 
 export default function Hero() {
-  const navigate = useNavigate();
+  const [showLeadModal, setShowLeadModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [step, setStep] = useState("cta"); // "cta" | "form" | "done"
   const [bizType, setBizType] = useState("");
@@ -103,7 +103,7 @@ export default function Hero() {
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Button
               size="lg"
-              onClick={() => navigate("/start")}
+              onClick={() => setShowLeadModal(true)}
               className="rounded-full px-8 h-13 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-shadow"
             >
               Book a Demo
@@ -235,6 +235,15 @@ export default function Hero() {
       </div>
 
       {showModal && <ConversationModal onClose={() => setShowModal(false)} />}
+      <LeadCaptureModal 
+        isOpen={showLeadModal} 
+        onClose={() => setShowLeadModal(false)}
+        onSuccess={() => {
+          setShowLeadModal(false);
+          // Redirect after success
+          window.location.href = '/book';
+        }}
+      />
     </section>
   );
 }
