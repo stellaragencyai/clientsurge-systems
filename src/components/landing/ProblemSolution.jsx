@@ -132,24 +132,19 @@ export default function ProblemSolution() {
                 {/* Problem */}
                 <CardWithFadeIn delay={i * 50}>
                   <div 
-                    className="flex items-start gap-5 p-7 rounded-3xl border hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40"
+                    className="flex items-start gap-5 p-7 rounded-2xl border hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40 bg-red-50/60"
                     style={{
-                      background: `linear-gradient(to right, rgba(239,68,68,${0.08 * (1 - colorProgress)}) 0%, rgba(255,255,255,${1 - colorProgress * 0.3}) 100%)`,
                       transform: `translateY(${parallaxOffsetProblem}px)`,
-                      borderColor: `rgba(0,0,0,${0.2 - colorProgress * 0.15})`,
+                      borderColor: `rgba(239,68,68,${0.2})`,
                     }}
                   >
                     <div 
-                      className="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink"
-                      style={{
-                        background: `rgba(239,68,68,${0.15 - colorProgress * 0.1})`,
-                      }}
+                      className="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 bg-red-200/50"
                     >
                       <ProblemIcon 
-                        className="w-7 h-7 transition-all duration-300"
+                        className="w-7 h-7"
                         style={{
-                          color: `rgba(239,68,68,${0.7 - colorProgress * 0.3})`,
-                          animation: `pulse 2s ease-in-out ${i * 0.1}s infinite`,
+                          color: `rgba(239,68,68,0.7)`,
                         }}
                         strokeWidth={1.5} 
                       />
@@ -164,24 +159,19 @@ export default function ProblemSolution() {
                 {/* Solution */}
                 <CardWithFadeIn delay={i * 50 + 100}>
                   <div 
-                    className="flex items-start gap-5 p-7 rounded-3xl border hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40"
+                    className="flex items-start gap-5 p-7 rounded-2xl border hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40 bg-amber-50/60"
                     style={{
-                      background: `linear-gradient(to left, rgba(161,120,35,${0.12 * colorProgress}) 0%, rgba(245,217,168,${0.05 * colorProgress}) 50%, rgba(255,255,255,${1 - colorProgress * 0.2}) 100%)`,
                       transform: `translateY(${parallaxOffsetSolution}px)`,
-                      borderColor: `rgba(0,0,0,${0.2 - colorProgress * 0.15})`,
+                      borderColor: `rgba(161,120,35,${0.2})`,
                     }}
                   >
                     <div 
-                      className="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink"
-                      style={{
-                        background: `rgba(161,120,35,${0.15 + colorProgress * 0.1})`,
-                      }}
+                      className="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 bg-amber-200/50"
                     >
                       <SolutionIcon 
-                        className="w-7 h-7 transition-all duration-300"
+                        className="w-7 h-7"
                         style={{
-                          color: `rgba(161,120,35,${0.6 + colorProgress * 0.4})`,
-                          filter: `drop-shadow(0 0 ${4 * colorProgress}px rgba(161,120,35,0.4))`,
+                          color: `rgba(161,120,35,0.7)`,
                         }}
                         strokeWidth={1.5} 
                       />
