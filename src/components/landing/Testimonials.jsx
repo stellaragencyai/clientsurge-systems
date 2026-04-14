@@ -5,9 +5,6 @@ const testimonials = [
     business: "Owner, Luminary Aesthetics — Miami, FL",
     result: "5× consultation bookings",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80",
-    color: "from-rose-50 to-orange-50",
-    border: "border-rose-100",
-    accent: "bg-rose-500",
   },
   {
     quote: "We were spending $4k/month on ads and converting almost none of it. Now our close rate from ads is completely different. It paid for itself in the first week.",
@@ -15,9 +12,6 @@ const testimonials = [
     business: "Owner, Elite HVAC & Cooling — Phoenix, AZ",
     result: "ROI in under 7 days",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80",
-    color: "from-blue-50 to-cyan-50",
-    border: "border-blue-100",
-    accent: "bg-blue-500",
   },
   {
     quote: "I used to personally follow up with every lead. Now that's just… handled. My team is focused on clients and I'm focused on growth.",
@@ -25,9 +19,6 @@ const testimonials = [
     business: "Director, Revive Wellness Studio — Austin, TX",
     result: "Fully automated follow-up",
     avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&q=80",
-    color: "from-emerald-50 to-teal-50",
-    border: "border-emerald-100",
-    accent: "bg-emerald-500",
   },
 ];
 
@@ -46,7 +37,7 @@ export default function Testimonials() {
           {testimonials.map((t, i) => (
             <div
               key={i}
-              className={`group relative flex flex-col p-8 rounded-2xl bg-gradient-to-br ${t.color} border ${t.border} transition-all duration-500 hover:-translate-y-2 cursor-default`}
+              className="group relative flex flex-col p-8 rounded-2xl bg-white border border-border transition-all duration-500 hover:-translate-y-2 cursor-default"
               style={{
                 boxShadow: "0 4px 24px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04)",
                 transition: "all 0.4s ease",
@@ -77,7 +68,7 @@ export default function Testimonials() {
                     alt={t.name}
                     className="w-12 h-12 rounded-full object-cover ring-2 ring-white shadow-md"
                   />
-                  <span className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full ${t.accent} border-2 border-white`} />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-primary border-2 border-white" />
                 </div>
 
                 {/* Name + biz */}
