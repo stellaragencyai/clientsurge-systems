@@ -241,7 +241,7 @@ export default function ConversationMockup() {
             <div
               ref={scrollRef}
               className="bg-white px-4 py-4 space-y-3 overflow-y-auto"
-              style={{ minHeight: "380px", maxHeight: "420px" }}
+              style={{ minHeight: "399px", maxHeight: "441px" }}
             >
               {STEPS.map((step) => {
                 if (!isVisible(step.id)) return null;
