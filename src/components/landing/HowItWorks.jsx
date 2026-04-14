@@ -74,7 +74,7 @@ export default function HowItWorks() {
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <div className="max-w-2xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Process</p>
+          <p className="text-xs font-semibold text-foreground/70 tracking-widest uppercase mb-4">The Process</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
             How It Works
           </h2>
@@ -94,7 +94,7 @@ export default function HowItWorks() {
                 return (
                   <div key={i} className="flex flex-col items-center flex-1">
                     <div
-                      className="w-16 h-16 rounded-2xl bg-black/8 border border-black/25 flex items-center justify-center transition-all duration-300 mb-0"
+                      className="w-14 h-14 rounded-2xl bg-black/8 border border-black/25 flex items-center justify-center transition-all duration-300 mb-0"
                       style={{
                         animation: inView ? `float 3s ease-in-out ${i * 0.2}s infinite` : "none",
                         opacity: inView ? 1 : 0,
@@ -102,7 +102,7 @@ export default function HowItWorks() {
                         transition: `opacity 0.4s ease ${i * 0.15}s, transform 0.4s ease ${i * 0.15}s`,
                       }}
                     >
-                      <Icon className="w-8 h-8 text-black/70" strokeWidth={1.5} />
+                      <Icon className="w-6 h-6 text-black/70" strokeWidth={1.5} />
                     </div>
                   </div>
                 );

@@ -42,7 +42,7 @@ export default function CoreOffer() {
         </div>
 
         {/* Feature grid cards */}
-        <div className="grid md:grid-cols-2 gap-4 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
           {includes.map((item, i) => {
             const Icon = item.icon;
             return (
@@ -53,13 +53,13 @@ export default function CoreOffer() {
                 {/* Step number */}
                 <span className="text-xs font-bold text-primary/40 group-hover:text-primary/70 transition-colors mt-0.5 w-6 flex-shrink-0">{item.step}</span>
                 {/* Icon */}
-                <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors duration-300">
-                  <Icon className="w-4 h-4 text-primary" />
+                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors duration-300">
+                  <Icon className="w-5 h-5 text-primary" />
                 </div>
                 {/* Text */}
                 <div>
-                  <h3 className="text-sm font-semibold text-foreground mb-1">{item.title}</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+                <h3 className="text-sm font-semibold text-foreground mb-1">{item.title}</h3>
+                <p className="text-xs text-foreground/70 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             );

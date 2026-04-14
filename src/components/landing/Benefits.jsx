@@ -90,8 +90,8 @@ function BenefitCard({ benefit, index, isVisible }) {
         transitionDelay: `${index * 150}ms`,
       }}
     >
-      <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center">
-        <benefit.icon className="w-5 h-5 text-primary" strokeWidth={1.75} />
+      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center">
+        <benefit.icon className="w-4 h-4 text-primary" strokeWidth={1.75} />
       </div>
       <div>
         <h3 className="text-base font-semibold text-foreground mb-1">{benefit.title}</h3>
@@ -118,13 +118,13 @@ export default function Benefits() {
     <section ref={sectionRef} className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card to-background">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Outcomes</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
+          <p className="text-xs font-semibold text-foreground/70 tracking-widest uppercase mb-4">The Outcomes</p>
+          <h2 className="font-display text-4xl md:text-5xl lg:text-5xl font-semibold tracking-tight text-foreground">
             What Changes When You <span className="text-primary"><AnimatedText text="Automate" /></span>
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {benefits.map((b, i) => (
             <BenefitCard key={i} benefit={b} index={i} isVisible={sectionVisible} />
           ))}

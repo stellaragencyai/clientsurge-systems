@@ -100,7 +100,7 @@ export default function ProblemSolution() {
         {/* Header */}
         <div className="max-w-2xl mx-auto text-center mb-20">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Problem & The Fix</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
+          <h2 className="font-display text-4xl md:text-5xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
             You Don't Have a Lead Problem.
             <br />
             <span className="text-primary">You Have a Follow-Up Problem.</span>
@@ -132,7 +132,7 @@ export default function ProblemSolution() {
                 {/* Problem */}
                 <CardWithFadeIn delay={i * 50}>
                   <div 
-                    className="flex items-start gap-5 p-7 rounded-2xl border hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40 bg-red-50/60"
+                    className="flex items-start gap-5 p-7 rounded-2xl border hover:border-black/40 hover:shadow-lg hover:scale-105 transition-all duration-300 group cursor-default min-h-40 bg-red-50/60"
                     style={{
                       transform: `translateY(${parallaxOffsetProblem}px)`,
                       borderColor: `rgba(239,68,68,${0.2})`,
@@ -151,7 +151,7 @@ export default function ProblemSolution() {
                     </div>
                     <div className="flex-1">
                       <h3 className="text-base font-bold text-foreground mb-2">{pair.problem}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{pair.problemDesc}</p>
+                      <p className="text-sm text-foreground/70 leading-relaxed">{pair.problemDesc}</p>
                     </div>
                   </div>
                 </CardWithFadeIn>
@@ -159,7 +159,7 @@ export default function ProblemSolution() {
                 {/* Solution */}
                 <CardWithFadeIn delay={i * 50 + 100}>
                   <div 
-                    className="flex items-start gap-5 p-7 rounded-2xl border hover:border-black/40 hover:shadow-lg transition-all duration-300 group cursor-default min-h-40 bg-amber-50/60"
+                    className="flex items-start gap-5 p-7 rounded-2xl border hover:border-black/40 hover:shadow-lg hover:scale-105 transition-all duration-300 group cursor-default min-h-40 bg-amber-50/60"
                     style={{
                       transform: `translateY(${parallaxOffsetSolution}px)`,
                       borderColor: `rgba(161,120,35,${0.2})`,
@@ -179,8 +179,7 @@ export default function ProblemSolution() {
                     <div className="flex-1">
                       <h3 className="text-base font-bold text-foreground mb-2">{pair.solution}</h3>
                       <p 
-                        className="text-sm font-medium leading-relaxed transition-colors duration-300"
-                        style={{color: `rgba(161,120,35,${0.5 + colorProgress * 0.5})`}}
+                        className="text-sm font-medium leading-relaxed transition-colors duration-300 text-foreground/80"
                       >
                         {pair.solutionDesc}
                       </p>

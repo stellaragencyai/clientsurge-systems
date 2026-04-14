@@ -104,7 +104,7 @@ function StepCard({ step, index }) {
         }}
       >
         {/* Left — content */}
-        <div className="flex-1 p-10 md:p-12">
+        <div className="flex-1 p-8 md:p-10">
           {/* Step badge */}
           <div className="flex items-center gap-3 mb-6">
             <span className="text-xs font-bold text-black/80 uppercase tracking-widest">{step.step}</span>
@@ -115,8 +115,8 @@ function StepCard({ step, index }) {
 
           {/* Icon + Title */}
           <div className="flex items-center gap-4 mb-5">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-6 h-6 text-primary" />
+            <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Icon className="w-5 h-5 text-primary" />
             </div>
             <h3 className="font-display text-2xl font-semibold text-black">{step.title}</h3>
           </div>
@@ -156,8 +156,8 @@ export default function DetailedProcess() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-14">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Under The Hood</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
+          <p className="text-xs font-semibold text-foreground/70 tracking-widest uppercase mb-4">Under The Hood</p>
+          <h2 className="font-display text-4xl md:text-5xl lg:text-5xl font-semibold tracking-tight text-foreground">
             Our Detailed <span className="relative inline-block" style={{color: "rgba(161,120,35,1)", textShadow: "0 0 30px rgba(161,120,35,0.6), 0 0 60px rgba(161,120,35,0.35)"}}>Automation</span> Process
           </h2>
           <p className="mt-4 text-muted-foreground text-lg max-w-xl mx-auto">
@@ -166,7 +166,7 @@ export default function DetailedProcess() {
         </div>
 
         {/* Steps */}
-        <div className="space-y-8">
+        <div className="grid grid-cols-1 gap-8">
           {steps.map((step, i) => (
             <StepCard key={i} step={step} index={i} />
           ))}
