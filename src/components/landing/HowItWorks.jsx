@@ -4,33 +4,33 @@ import { ArrowRight, MessageSquare, Zap, Send, CalendarCheck, CheckCircle2 } fro
 const steps = [
   {
     icon: MessageSquare,
-    title: "Lead Comes In",
+    title: "A new lead reaches out",
     subtitle: "Step 1",
-    desc: "A prospect fills out a form, calls your number, or sends a message from any channel.",
+    desc: "A new lead reaches out",
   },
   {
     icon: Zap,
-    title: "Instant Response",
+    title: "They get an instant response",
     subtitle: "Step 2",
-    desc: "Within seconds, they receive a personalized message — automatically.",
+    desc: "They get an instant response",
   },
   {
     icon: Send,
-    title: "Follow-Up Sequence",
+    title: "Follow-up continues automatically",
     subtitle: "Step 3",
-    desc: "A smart sequence nurtures the lead over time with the right message at the right moment.",
+    desc: "Follow-up continues automatically",
   },
   {
     icon: CalendarCheck,
-    title: "Books Appointment",
+    title: "They're guided to book",
     subtitle: "Step 4",
-    desc: "They're guided directly to your calendar. No phone tag. Just a confirmed booking.",
+    desc: "They're guided to book",
   },
   {
     icon: CheckCircle2,
-    title: "Customer Arrives",
+    title: "You get a confirmed client",
     subtitle: "Step 5",
-    desc: "They show up ready. You get paid. The whole process repeats — without you managing it.",
+    desc: "You get a confirmed client",
   },
 ];
 
@@ -76,10 +76,10 @@ export default function HowItWorks() {
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-foreground/70 tracking-widest uppercase mb-4">The Process</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            How It Works
+            How You Turn Leads Into Booked Appointments Automatically
           </h2>
           <p className="mt-5 text-muted-foreground text-lg">
-            From first contact to confirmed appointment — handled automatically in 5 clear steps.
+            From first inquiry to booked appointment — without manual follow-up or missed opportunities.
           </p>
         </div>
 
@@ -146,8 +146,16 @@ export default function HowItWorks() {
           </div>
         </div>
 
+        {/* Emotional Payoff */}
+        <div className="text-center mb-10">
+          <p className="text-lg font-semibold text-foreground">
+            No missed calls. No delayed replies. No lost opportunities.
+          </p>
+        </div>
+
         {/* CTA */}
         <div className="text-center">
+          <p className="text-foreground mb-6">Want to see this set up for your business?</p>
           <button onClick={(e) => {
             e.preventDefault();
             const start = window.scrollY;
@@ -169,7 +177,7 @@ export default function HowItWorks() {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
           }}>
             <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 32px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
-              See It In Action
+              See It Work For Your Business
               <ArrowRight className="w-4 h-4" />
             </span>
           </button>
