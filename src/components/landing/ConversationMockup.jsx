@@ -1,37 +1,205 @@
+import { useEffect, useRef, useState } from "react";
+
+// All steps in the animation sequence
+// delay = ms after previous step completes before this one shows
+const STEPS = [
+  // --- Round 1 ---
+  {
+    id: "sys1",
+    type: "system",
+    text: "New lead received: Sarah M. — Interested in Botox consultation",
+    delay: 400,
+  },
+  {
+    id: "bot1",
+    type: "bot",
+    label: "Instant Auto-Response",
+    text: "Hi Sarah! Thanks for reaching out about our Botox services. Would you prefer a morning or afternoon consultation?",
+    time: "2:14 PM",
+    delay: 700,
+  },
+  // Sarah reads
+  {
+    id: "read1",
+    type: "read",
+    delay: 1200,
+  },
+  // Sarah typing
+  {
+    id: "typing1",
+    type: "typing",
+    delay: 1000,
+  },
+  // Sarah replies
+  {
+    id: "sarah1",
+    type: "lead",
+    text: "Afternoon works best for me!",
+    time: "2:16 PM",
+    delay: 1400,
+  },
+  // AI typing
+  {
+    id: "aityping1",
+    type: "aityping",
+    delay: 900,
+  },
+  {
+    id: "bot2",
+    type: "bot",
+    label: "Smart Booking Flow",
+    text: "Perfect! I have Thursday at 3:00 PM available. Here's your booking link: [Book Now] 🗓️",
+    time: "2:16 PM",
+    delay: 1200,
+  },
+  {
+    id: "sys2",
+    type: "system",
+    text: "✓ Appointment booked: Thursday, 3:00 PM — Botox Consultation",
+    delay: 900,
+  },
+  // --- Round 2 (follow-up, ~30s later simulated visually) ---
+  {
+    id: "gap",
+    type: "timegap",
+    text: "30 minutes later...",
+    delay: 1500,
+  },
+  {
+    id: "aityping2",
+    type: "aityping",
+    delay: 800,
+  },
+  {
+    id: "bot3",
+    type: "bot",
+    label: "Automated Follow-Up",
+    text: "Hi Sarah! Just confirming your Botox consultation Thursday at 3 PM. Reply YES to confirm or call us to reschedule. See you soon! 💫",
+    time: "2:46 PM",
+    delay: 1300,
+  },
+  {
+    id: "read2",
+    type: "read",
+    delay: 1100,
+  },
+  {
+    id: "typing2",
+    type: "typing",
+    delay: 1000,
+  },
+  {
+    id: "sarah2",
+    type: "lead",
+    text: "YES, confirmed! See you then 😊",
+    time: "2:47 PM",
+    delay: 1300,
+  },
+  {
+    id: "sys3",
+    type: "system",
+    text: "✓ Appointment confirmed by client",
+    delay: 800,
+  },
+];
+
+function TypingDots({ color = "gray" }) {
+  return (
+    <div className={`flex items-center gap-1 px-4 py-3 rounded-2xl rounded-bl-sm w-16 ${color === "green" ? "bg-[#dcf8c6]" : "bg-[#e5e5ea]"}`}>
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce"
+          style={{ animationDelay: `${i * 0.18}s`, animationDuration: "0.8s" }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function ConversationMockup() {
-  const messages = [
-    {
-      from: "system",
-      text: "New lead received: Sarah M. — Interested in Botox consultation",
-      time: "2:14 PM",
-    },
-    {
-      from: "bot",
-      text: "Hi Sarah! Thanks for your interest in our Botox services. I'd love to help you get scheduled. Would you prefer morning or afternoon for your consultation?",
-      time: "2:14 PM",
-      label: "Instant Auto-Response",
-    },
-    {
-      from: "lead",
-      text: "Afternoon works best!",
-      time: "2:16 PM",
-    },
-    {
-      from: "bot",
-      text: "Great! I have a few openings this week. Here's a link to book your preferred time: [Book Now] — Looking forward to seeing you!",
-      time: "2:16 PM",
-      label: "Smart Booking Flow",
-    },
-    {
-      from: "system",
-      text: "✓ Appointment booked: Thursday, 3:00 PM — Botox Consultation",
-      time: "2:18 PM",
-    },
-  ];
+  const sectionRef = useRef(null);
+  const scrollRef = useRef(null);
+  const timeoutsRef = useRef([]);
+  const [visibleSteps, setVisibleSteps] = useState([]);
+  const [showTyping, setShowTyping] = useState(false); // sarah typing
+  const [showAiTyping, setShowAiTyping] = useState(false);
+  const [readReceipt, setReadReceipt] = useState(false);
+  const [animating, setAnimating] = useState(false);
+
+  const clearAllTimeouts = () => {
+    timeoutsRef.current.forEach(clearTimeout);
+    timeoutsRef.current = [];
+  };
+
+  const startAnimation = () => {
+    clearAllTimeouts();
+    setVisibleSteps([]);
+    setShowTyping(false);
+    setShowAiTyping(false);
+    setReadReceipt(false);
+    setAnimating(true);
+
+    let elapsed = 0;
+
+    STEPS.forEach((step) => {
+      elapsed += step.delay;
+      const t = setTimeout(() => {
+        if (step.type === "typing") {
+          setShowTyping(true);
+          const hide = setTimeout(() => setShowTyping(false), 1300);
+          timeoutsRef.current.push(hide);
+        } else if (step.type === "aityping") {
+          setShowAiTyping(true);
+          const hide = setTimeout(() => setShowAiTyping(false), 1100);
+          timeoutsRef.current.push(hide);
+        } else if (step.type === "read") {
+          setReadReceipt(true);
+          const hide = setTimeout(() => setReadReceipt(false), 2200);
+          timeoutsRef.current.push(hide);
+        } else {
+          setVisibleSteps((prev) => [...prev, step.id]);
+        }
+        // scroll chat to bottom
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
+      }, elapsed);
+      timeoutsRef.current.push(t);
+    });
+
+    const total = elapsed + 1000;
+    const done = setTimeout(() => setAnimating(false), total);
+    timeoutsRef.current.push(done);
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          startAnimation();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => {
+      observer.disconnect();
+      clearAllTimeouts();
+    };
+  }, []);
+
+  const isVisible = (id) => visibleSteps.includes(id);
+
+  // Find the last visible bot message for read receipt positioning
+  const lastBotVisible = [...STEPS]
+    .reverse()
+    .find((s) => s.type === "bot" && isVisible(s.id));
 
   return (
-    <section className="py-20 md:py-28 px-6 bg-gradient-to-b from-background to-card">
+    <section ref={sectionRef} className="py-20 md:py-28 px-6 bg-gradient-to-b from-background to-card">
       <div className="max-w-4xl mx-auto">
+        {/* Header */}
         <div className="text-center mb-12">
           <p className="text-sm font-medium text-primary tracking-wide uppercase mb-4">
             See It In Action
@@ -40,49 +208,153 @@ export default function ConversationMockup() {
             From Lead to Booked — In Minutes
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
-            Here's what automated follow-up looks like in practice.
+            Watch the automation play out in real time.
           </p>
         </div>
 
-        <div className="max-w-lg mx-auto bg-background rounded-2xl border border-border overflow-hidden shadow-sm">
-          <div className="px-5 py-3 border-b border-border bg-muted/50 flex items-center gap-3">
-            <div className="w-2.5 h-2.5 rounded-full bg-green-500" />
-            <span className="text-xs font-medium text-muted-foreground">Live Automation Preview</span>
+        {/* Phone container */}
+        <div className="max-w-sm mx-auto">
+          {/* Phone shell */}
+          <div className="bg-white rounded-[2.5rem] shadow-2xl border border-gray-200 overflow-hidden" style={{ boxShadow: "0 30px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)" }}>
+            {/* Status bar */}
+            <div className="bg-white px-6 pt-4 pb-1 flex items-center justify-between">
+              <span className="text-xs font-semibold text-foreground">2:14 PM</span>
+              <div className="w-24 h-6 bg-black rounded-full mx-auto absolute left-1/2 -translate-x-1/2" style={{ top: "16px", width: "80px", height: "22px" }} />
+              <div className="flex items-center gap-1">
+                <div className="flex gap-0.5 items-end">
+                  {[3,4,5,6].map(h => <div key={h} className="w-0.5 bg-foreground rounded-sm" style={{ height: `${h}px` }} />)}
+                </div>
+                <span className="text-xs font-semibold">●●●</span>
+              </div>
+            </div>
+
+            {/* iMessage header */}
+            <div className="bg-white px-4 py-3 flex flex-col items-center border-b border-gray-100">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center mb-1.5 shadow-sm">
+                <span className="text-white font-bold text-base">S</span>
+              </div>
+              <p className="text-sm font-semibold text-foreground">Sarah M.</p>
+              <p className="text-[10px] text-muted-foreground">iMessage</p>
+            </div>
+
+            {/* Messages area */}
+            <div
+              ref={scrollRef}
+              className="bg-white px-4 py-4 space-y-3 overflow-y-auto"
+              style={{ minHeight: "380px", maxHeight: "420px" }}
+            >
+              {STEPS.map((step) => {
+                if (!isVisible(step.id)) return null;
+
+                if (step.type === "system") {
+                  return (
+                    <div key={step.id} className="text-center animate-fade-in">
+                      <span className="inline-block text-[10px] text-muted-foreground bg-gray-100 px-3 py-1 rounded-full">
+                        {step.text}
+                      </span>
+                    </div>
+                  );
+                }
+
+                if (step.type === "timegap") {
+                  return (
+                    <div key={step.id} className="text-center animate-fade-in py-1">
+                      <span className="inline-block text-[10px] text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
+                        {step.text}
+                      </span>
+                    </div>
+                  );
+                }
+
+                if (step.type === "bot") {
+                  return (
+                    <div key={step.id} className="flex flex-col items-start animate-fade-in">
+                      {step.label && (
+                        <span className="text-[9px] text-primary font-semibold mb-1 ml-1 uppercase tracking-wide">
+                          {step.label}
+                        </span>
+                      )}
+                      <div className="max-w-[82%] px-3.5 py-2.5 rounded-2xl rounded-tl-sm text-sm leading-relaxed bg-[#e5e5ea] text-black">
+                        {step.text}
+                      </div>
+                      {step.time && (
+                        <span className="text-[9px] text-muted-foreground mt-1 ml-1">{step.time}</span>
+                      )}
+                    </div>
+                  );
+                }
+
+                if (step.type === "lead") {
+                  return (
+                    <div key={step.id} className="flex flex-col items-end animate-fade-in">
+                      <div className="max-w-[82%] px-3.5 py-2.5 rounded-2xl rounded-tr-sm text-sm leading-relaxed bg-[#34c759] text-white">
+                        {step.text}
+                      </div>
+                      {step.time && (
+                        <span className="text-[9px] text-muted-foreground mt-1 mr-1">{step.time}</span>
+                      )}
+                    </div>
+                  );
+                }
+
+                return null;
+              })}
+
+              {/* Sarah typing indicator */}
+              {showTyping && (
+                <div className="flex items-end gap-2 animate-fade-in">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-400 to-rose-500 flex items-center justify-center flex-shrink-0">
+                    <span className="text-white font-bold text-[9px]">S</span>
+                  </div>
+                  <TypingDots color="gray" />
+                </div>
+              )}
+
+              {/* Read receipt */}
+              {readReceipt && (
+                <div className="flex justify-end animate-fade-in">
+                  <span className="text-[9px] text-muted-foreground">Read</span>
+                </div>
+              )}
+
+              {/* AI typing indicator */}
+              {showAiTyping && (
+                <div className="flex flex-col items-start animate-fade-in">
+                  <TypingDots color="gray" />
+                </div>
+              )}
+            </div>
+
+            {/* iMessage input bar */}
+            <div className="bg-white px-3 py-3 border-t border-gray-100 flex items-center gap-2">
+              <div className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-xs text-muted-foreground">
+                iMessage
+              </div>
+              <div className="w-7 h-7 rounded-full bg-[#34c759] flex items-center justify-center">
+                <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M22 2L11 13" /><path d="M22 2L15 22l-4-9-9-4 20-7z" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Home indicator */}
+            <div className="bg-white pb-3 flex justify-center">
+              <div className="w-24 h-1 bg-gray-300 rounded-full" />
+            </div>
           </div>
 
-          <div className="p-5 space-y-4">
-            {messages.map((msg, i) => {
-              if (msg.from === "system") {
-                return (
-                  <div key={i} className="text-center">
-                    <span className="inline-block text-xs text-muted-foreground bg-muted px-3 py-1 rounded-full">
-                      {msg.text}
-                    </span>
-                  </div>
-                );
-              }
-
-              const isBot = msg.from === "bot";
-              return (
-                <div key={i} className={`flex flex-col ${isBot ? "items-start" : "items-end"}`}>
-                  {msg.label && (
-                    <span className="text-[10px] text-primary font-medium mb-1 px-1">
-                      {msg.label}
-                    </span>
-                  )}
-                  <div
-                    className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                      isBot
-                        ? "bg-primary/10 text-foreground rounded-bl-md"
-                        : "bg-foreground text-background rounded-br-md"
-                    }`}
-                  >
-                    {msg.text}
-                  </div>
-                  <span className="text-[10px] text-muted-foreground mt-1 px-1">{msg.time}</span>
-                </div>
-              );
-            })}
+          {/* Replay button */}
+          <div className="text-center mt-6">
+            <button
+              onClick={startAnimation}
+              disabled={animating}
+              className="text-xs font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-40 flex items-center gap-1.5 mx-auto"
+            >
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M1 4v6h6" /><path d="M3.51 15a9 9 0 1 0 .49-4" />
+              </svg>
+              {animating ? "Playing..." : "Replay animation"}
+            </button>
           </div>
         </div>
       </div>
