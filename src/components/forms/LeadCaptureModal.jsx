@@ -139,7 +139,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
       )}
 
       {/* Modal */}
-      <div className={`relative bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-500 transition-opacity ${showSuccess ? 'opacity-50' : 'opacity-100'}`}>
+      <div className={`relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[95vh] overflow-y-auto animate-in fade-in zoom-in duration-500 transition-opacity ${showSuccess ? 'opacity-50' : 'opacity-100'}`}>
         {/* Left accent bar */}
         <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-amber-400 via-amber-500 to-amber-600 rounded-l-3xl" />
 
@@ -151,18 +151,16 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
           <X className="w-5 h-5 text-muted-foreground" />
         </button>
 
-        <div className="p-8 md:p-12" style={{ opacity: showSuccess ? 0.5 : 1, pointerEvents: showSuccess ? 'none' : 'auto' }}>
+        <div className="p-5 md:p-6" style={{ opacity: showSuccess ? 0.5 : 1, pointerEvents: showSuccess ? 'none' : 'auto' }}>
            {/* Header with Logo */}
-          <div className="flex items-start justify-between mb-8">
+          <div className="flex items-start gap-3 mb-6">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0">
+              <span className="font-display font-bold text-white text-base">A</span>
+            </div>
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center">
-                  <span className="font-display font-bold text-white text-lg">A</span>
-                </div>
-                <span className="font-display text-xl font-semibold text-foreground">ApexFlow</span>
-              </div>
-              <h2 className="font-display text-3xl md:text-4xl font-semibold text-foreground">
-                Let's Set Up Your Demo
+              <span className="font-display text-lg font-semibold text-foreground block">ApexFlow</span>
+              <h2 className="font-display text-2xl font-semibold text-foreground mt-1">
+                Demo Setup
               </h2>
             </div>
           </div>
@@ -172,96 +170,98 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
             
             {/* Step 1: Contact Info */}
              {step === 1 && (
-               <div className="space-y-5 animate-in fade-in duration-300">
-                 <div className="flex items-center gap-3">
-                   <div className="flex-shrink-0">
-                     <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-widest mb-2">Full Name</label>
+               <div className="space-y-4 animate-in fade-in duration-300">
+                 {/* Full Name */}
+                 <div>
+                   <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-1.5">Full Name</label>
+                   <div className="flex gap-2.5">
+                     <User className="w-4 h-4 text-amber-600 flex-shrink-0 mt-2.5" />
+                     <input
+                       type="text"
+                       name="full_name"
+                       value={formData.full_name}
+                       onChange={handleInputChange}
+                       onBlur={handleBlur}
+                       disabled={loading}
+                       placeholder="John Doe"
+                       className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.full_name && touched.full_name ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                     />
+                   </div>
+                   {errors.full_name && touched.full_name && <p className="text-xs text-red-500 mt-0.5 ml-6.5">{errors.full_name}</p>}
+                 </div>
+
+                 {/* Business & Phone in 2 columns */}
+                 <div className="grid grid-cols-2 gap-3">
+                   <div>
+                     <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-1.5">Business</label>
+                     <div className="flex gap-2">
+                       <Building2 className="w-4 h-4 text-amber-600 flex-shrink-0 mt-2.5" />
+                       <input
+                         type="text"
+                         name="business_name"
+                         value={formData.business_name}
+                         onChange={handleInputChange}
+                         onBlur={handleBlur}
+                         disabled={loading}
+                         placeholder="Med Spa"
+                         className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.business_name && touched.business_name ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                       />
+                     </div>
+                     {errors.business_name && touched.business_name && <p className="text-xs text-red-500 mt-0.5">{errors.business_name}</p>}
+                   </div>
+                   <div>
+                     <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-1.5">Phone</label>
+                     <div className="flex gap-2">
+                       <Phone className="w-4 h-4 text-amber-600 flex-shrink-0 mt-2.5" />
+                       <input
+                         type="tel"
+                         name="phone"
+                         value={formData.phone}
+                         onChange={handleInputChange}
+                         onBlur={handleBlur}
+                         disabled={loading}
+                         placeholder="(555) 1234"
+                         className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.phone && touched.phone ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                       />
+                     </div>
+                     {errors.phone && touched.phone && <p className="text-xs text-red-500 mt-0.5">{errors.phone}</p>}
                    </div>
                  </div>
-                 <div className="flex gap-3">
-                   <User className="w-5 h-5 text-amber-600 flex-shrink-0 mt-3" />
-                   <input
-                     type="text"
-                     name="full_name"
-                     value={formData.full_name}
-                     onChange={handleInputChange}
-                     onBlur={handleBlur}
-                     disabled={loading}
-                     placeholder="John Doe"
-                     className={`flex-1 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.full_name && touched.full_name ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
-                   />
-                 </div>
-                 {errors.full_name && touched.full_name && <p className="text-xs text-red-500 ml-8">{errors.full_name}</p>}
 
-                 <div className="flex items-center gap-3 pt-2">
-                   <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-widest">Business Name</label>
+                 {/* Email */}
+                 <div>
+                   <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-1.5">Email</label>
+                   <div className="flex gap-2.5">
+                     <Mail className="w-4 h-4 text-amber-600 flex-shrink-0 mt-2.5" />
+                     <input
+                       type="email"
+                       name="email"
+                       value={formData.email}
+                       onChange={handleInputChange}
+                       onBlur={handleBlur}
+                       disabled={loading}
+                       placeholder="john@example.com"
+                       className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.email && touched.email ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                     />
+                   </div>
+                   {errors.email && touched.email && <p className="text-xs text-red-500 mt-0.5 ml-6">{errors.email}</p>}
                  </div>
-                 <div className="flex gap-3">
-                   <Building2 className="w-5 h-5 text-amber-600 flex-shrink-0 mt-3" />
-                   <input
-                     type="text"
-                     name="business_name"
-                     value={formData.business_name}
-                     onChange={handleInputChange}
-                     onBlur={handleBlur}
-                     disabled={loading}
-                     placeholder="Your Med Spa"
-                     className={`flex-1 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.business_name && touched.business_name ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
-                   />
-                 </div>
-                 {errors.business_name && touched.business_name && <p className="text-xs text-red-500 ml-8">{errors.business_name}</p>}
-
-                 <div className="flex items-center gap-3 pt-2">
-                   <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-widest">Email</label>
-                 </div>
-                 <div className="flex gap-3">
-                   <Mail className="w-5 h-5 text-amber-600 flex-shrink-0 mt-3" />
-                   <input
-                     type="email"
-                     name="email"
-                     value={formData.email}
-                     onChange={handleInputChange}
-                     onBlur={handleBlur}
-                     disabled={loading}
-                     placeholder="john@example.com"
-                     className={`flex-1 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.email && touched.email ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
-                   />
-                 </div>
-                 {errors.email && touched.email && <p className="text-xs text-red-500 ml-8">{errors.email}</p>}
-
-                 <div className="flex items-center gap-3 pt-2">
-                   <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-widest">Phone</label>
-                 </div>
-                 <div className="flex gap-3">
-                   <Phone className="w-5 h-5 text-amber-600 flex-shrink-0 mt-3" />
-                   <input
-                     type="tel"
-                     name="phone"
-                     value={formData.phone}
-                     onChange={handleInputChange}
-                     onBlur={handleBlur}
-                     disabled={loading}
-                     placeholder="(555) 123-4567"
-                     className={`flex-1 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.phone && touched.phone ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
-                   />
-                 </div>
-                 {errors.phone && touched.phone && <p className="text-xs text-red-500 ml-8">{errors.phone}</p>}
                </div>
              )}
 
             {/* Step 2: Business Info */}
              {step === 2 && (
-               <div className="space-y-5 animate-in fade-in duration-300">
+               <div className="space-y-4 animate-in fade-in duration-300">
                  <div>
-                   <label className="block text-sm font-semibold text-foreground mb-2">Business Type</label>
+                   <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-1.5">Business Type</label>
                    <select
                      name="business_type"
                      value={formData.business_type}
                      onChange={handleInputChange}
                      disabled={loading}
-                     className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                     className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                    >
-                     <option value="">Select business type</option>
+                     <option value="">Select type</option>
                      <option value="med_spa">Med Spa</option>
                      <option value="salon">Salon</option>
                      <option value="clinic">Clinic</option>
@@ -271,19 +271,19 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                    </select>
                  </div>
                  <div>
-                   <label className="block text-sm font-semibold text-foreground mb-2">Monthly Leads</label>
+                   <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-1.5">Monthly Leads</label>
                    <select
                      name="monthly_leads"
                      value={formData.monthly_leads}
                      onChange={handleInputChange}
                      disabled={loading}
-                     className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                     className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                    >
                      <option value="">Select range</option>
-                     <option value="1-10">1-10 leads/month</option>
-                     <option value="11-25">11-25 leads/month</option>
-                     <option value="26-50">26-50 leads/month</option>
-                     <option value="50+">50+ leads/month</option>
+                     <option value="1-10">1-10/month</option>
+                     <option value="11-25">11-25/month</option>
+                     <option value="26-50">26-50/month</option>
+                     <option value="50+">50+/month</option>
                    </select>
                  </div>
                </div>
@@ -291,12 +291,12 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
 
             {/* Step 3: Business Challenges */}
              {step === 3 && (
-               <div className="space-y-5 animate-in fade-in duration-300">
+               <div className="space-y-4 animate-in fade-in duration-300">
                  <div>
-                   <label className="block text-sm font-semibold text-foreground mb-4">What's Your Biggest Issue?</label>
-                   <div className="space-y-3">
+                   <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-2.5">Biggest Issue</label>
+                   <div className="space-y-2">
                      {['slow_response', 'missed_calls', 'no_follow_up', 'low_bookings'].map(option => (
-                       <label key={option} className="flex items-center p-4 border border-border rounded-lg hover:border-amber-500/50 hover:bg-amber-50/30 cursor-pointer transition-all" style={{opacity: loading ? 0.5 : 1, pointerEvents: loading ? 'none' : 'auto'}}>
+                       <label key={option} className="flex items-center p-2.5 border border-border rounded-lg hover:border-amber-500/50 hover:bg-amber-50/30 cursor-pointer transition-all text-sm" style={{opacity: loading ? 0.5 : 1, pointerEvents: loading ? 'none' : 'auto'}}>
                          <input
                            type="radio"
                            name="biggest_issue"
@@ -306,7 +306,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                            disabled={loading}
                            className="w-4 h-4 accent-amber-600"
                          />
-                         <span className="ml-3 text-sm font-medium text-foreground capitalize">
+                         <span className="ml-2 text-xs font-medium text-foreground capitalize">
                            {option.replace(/_/g, ' ')}
                          </span>
                        </label>
@@ -315,10 +315,10 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                  </div>
 
                  <div>
-                   <label className="block text-sm font-semibold text-foreground mb-4">Where Do Your Leads Come From?</label>
-                   <div className="space-y-3">
+                   <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-2.5">Lead Sources</label>
+                   <div className="space-y-2">
                      {['Instagram', 'Website', 'Ads', 'Calls'].map(source => (
-                       <label key={source} className="flex items-center p-4 border border-border rounded-lg hover:border-amber-500/50 hover:bg-amber-50/30 cursor-pointer transition-all" style={{opacity: loading ? 0.5 : 1, pointerEvents: loading ? 'none' : 'auto'}}>
+                       <label key={source} className="flex items-center p-2.5 border border-border rounded-lg hover:border-amber-500/50 hover:bg-amber-50/30 cursor-pointer transition-all text-sm" style={{opacity: loading ? 0.5 : 1, pointerEvents: loading ? 'none' : 'auto'}}>
                          <input
                            type="checkbox"
                            value={source.toLowerCase()}
@@ -327,7 +327,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                            disabled={loading}
                            className="w-4 h-4 rounded accent-amber-600"
                          />
-                         <span className="ml-3 text-sm font-medium text-foreground">{source}</span>
+                         <span className="ml-2 text-xs font-medium text-foreground">{source}</span>
                        </label>
                      ))}
                    </div>
@@ -336,17 +336,17 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
              )}
 
             {/* Error message */}
-            {errors.submit && <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 text-center">{errors.submit}</div>}
+            {errors.submit && <div className="p-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 text-center mt-2">{errors.submit}</div>}
 
             {/* Navigation */}
-            <div className="flex items-center justify-between gap-4 mt-10 pt-6 border-t border-border">
+            <div className="flex items-center justify-between gap-3 mt-6 pt-5 border-t border-border">
               <button
                 type="button"
                 onClick={() => setStep(step - 1)}
                 disabled={step === 1 || loading}
-                className="flex items-center gap-2 px-6 py-3 text-sm font-medium text-foreground hover:text-amber-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-1 px-4 py-2 text-xs font-medium text-foreground hover:text-amber-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-3.5 h-3.5" />
                 Back
               </button>
 
@@ -355,21 +355,21 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                   type="button"
                   onClick={() => setStep(step + 1)}
                   disabled={step === 1 ? !canProceedStep1 : !canProceedStep2 || loading}
-                  className="ml-auto flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground"
+                  className="ml-auto flex items-center gap-1.5 px-6 py-2 rounded-full font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground"
                   style={{background: 'linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)'}}
                 >
                   Next
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               ) : (
                 <button
                   type="submit"
                   disabled={!canSubmit || loading}
-                  className="ml-auto flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground"
+                  className="ml-auto flex items-center gap-1.5 px-6 py-2 rounded-full font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground"
                   style={{background: 'linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)'}}
                 >
-                  {loading ? 'Submitting...' : 'Schedule Demo'}
-                  {!loading && <ArrowRight className="w-4 h-4" />}
+                  {loading ? 'Submit' : 'Schedule'}
+                  {!loading && <ArrowRight className="w-3.5 h-3.5" />}
                 </button>
               )}
             </div>
@@ -378,14 +378,14 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
             </div>
 
             {/* Progress indicator at bottom */}
-            <div className="flex items-center justify-between px-8 md:px-12 py-4 border-t border-border bg-gray-50">
+            <div className="flex items-center justify-between px-5 md:px-6 py-3 border-t border-border bg-gray-50">
               <p className="text-xs font-medium text-foreground/60">Step {step} of 3</p>
-              <div className="flex gap-2">
+              <div className="flex gap-1.5">
                 {[1, 2, 3].map(dot => (
                   <div
                     key={dot}
-                    className={`h-2 rounded-full transition-all ${
-                      dot <= step ? 'w-8 bg-amber-600' : 'w-2 bg-border'
+                    className={`h-1.5 rounded-full transition-all ${
+                      dot <= step ? 'w-6 bg-amber-600' : 'w-1.5 bg-border'
                     }`}
                   />
                 ))}
