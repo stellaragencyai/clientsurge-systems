@@ -111,31 +111,34 @@ export default function HowItWorks() {
             
             {/* Connecting arrows row */}
             <div className="flex items-center justify-between px-4 mb-8 relative" style={{height: "60px"}}>
-              {steps.map((step, i) => (
-                <div key={i} className="flex-1 flex items-center relative">
-                  {i < steps.length - 1 && (
-                    <div className="absolute left-1/2 top-1/2 -translate-y-1/2 w-full h-0.5 flex items-center justify-end pr-8">
-                      {/* Track line */}
-                      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 2" preserveAspectRatio="none">
-                        <line x1="0" y1="1" x2="100" y2="1" stroke="rgb(0,0,0)" strokeWidth="1.5" opacity="0.3" />
-                      </svg>
-                      {/* Animated fill */}
-                      <svg 
-                        className="absolute inset-0 w-full h-full" 
-                        viewBox="0 0 100 2" 
-                        preserveAspectRatio="none"
-                        style={{clipPath: `inset(0 ${100 - connectorFill * 100}% 0 0)`}}
-                      >
-                        <line x1="0" y1="1" x2="100" y2="1" stroke="rgb(0,0,0)" strokeWidth="1.5" />
-                      </svg>
-                      {/* Arrow head */}
-                      <div className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center">
-                        <ArrowRight className="w-6 h-6 text-black/70" strokeWidth={2.5} />
+              {steps.map((step, i) => {
+                const connectorFill = Math.max(0, Math.min(1, (lineProgress * steps.length) - i));
+                return (
+                  <div key={i} className="flex-1 flex items-center relative">
+                    {i < steps.length - 1 && (
+                      <div className="absolute left-1/2 top-1/2 -translate-y-1/2 w-full h-0.5 flex items-center justify-end pr-8">
+                        {/* Track line */}
+                        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 2" preserveAspectRatio="none">
+                          <line x1="0" y1="1" x2="100" y2="1" stroke="rgb(0,0,0)" strokeWidth="1.5" opacity="0.3" />
+                        </svg>
+                        {/* Animated fill */}
+                        <svg 
+                          className="absolute inset-0 w-full h-full" 
+                          viewBox="0 0 100 2" 
+                          preserveAspectRatio="none"
+                          style={{clipPath: `inset(0 ${100 - connectorFill * 100}% 0 0)`}}
+                        >
+                          <line x1="0" y1="1" x2="100" y2="1" stroke="rgb(0,0,0)" strokeWidth="1.5" />
+                        </svg>
+                        {/* Arrow head */}
+                        <div className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center">
+                          <ArrowRight className="w-6 h-6 text-black/70" strokeWidth={2.5} />
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {/* Text row */}
