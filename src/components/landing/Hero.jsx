@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -57,6 +58,7 @@ const businessTypes = [
 ];
 
 export default function Hero() {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [step, setStep] = useState("cta"); // "cta" | "form" | "done"
   const [bizType, setBizType] = useState("");
@@ -99,15 +101,14 @@ export default function Hero() {
         {/* Step: default CTA */}
         {step === "cta" && (
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="#demo-booking">
-              <Button
-                size="lg"
-                className="rounded-full px-8 h-13 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-shadow"
-              >
-                Book a Demo
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </a>
+            <Button
+              size="lg"
+              onClick={() => navigate("/start")}
+              className="rounded-full px-8 h-13 text-base font-semibold gap-2 shadow-md hover:shadow-lg transition-shadow"
+            >
+              Book a Demo
+              <ArrowRight className="w-4 h-4" />
+            </Button>
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -192,12 +193,10 @@ export default function Hero() {
               <Button type="button" variant="outline" className="rounded-full flex-1 text-sm" onClick={() => setStep("cta")}>
                 Back
               </Button>
-              <a href="#book-demo" className="flex-1">
-                <Button type="submit" className="rounded-full w-full text-sm font-semibold gap-2" onClick={handleSubmit}>
-                  Book My Demo
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </a>
+              <Button type="submit" className="rounded-full flex-1 text-sm font-semibold gap-2" onClick={handleSubmit} disabled={saving}>
+                {saving ? 'Saving...' : 'Book My Demo'}
+                <ArrowRight className="w-4 h-4" />
+              </Button>
             </div>
           </form>
         )}
@@ -209,12 +208,10 @@ export default function Hero() {
             <p className="text-sm text-muted-foreground mb-5">
               Book your slot below. Your demo will be tailored to <span className="text-foreground font-medium">{bizType}</span>.
             </p>
-            <a href="#book-demo">
-              <Button className="rounded-full px-8 h-11 text-sm font-semibold gap-2">
-                Choose a Time
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </a>
+            <Button onClick={() => navigate("/start")} className="rounded-full px-8 h-11 text-sm font-semibold gap-2">
+              Choose a Time
+              <ArrowRight className="w-4 h-4" />
+            </Button>
           </div>
         )}
 
