@@ -87,10 +87,10 @@ function StepCard({ step, index }) {
     <div
       ref={ref}
       className={`transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-      style={{ transitionDelay: `${index * 80}ms` }}
+      style={{ transitionDelay: `${index * 80}ms`, minHeight: "420px" }}
     >
       <div
-        className="group relative flex flex-col md:flex-row rounded-2xl overflow-hidden border border-border bg-white transition-all duration-500"
+        className="group relative flex flex-col md:flex-row rounded-2xl overflow-hidden border border-border bg-white transition-all duration-300 h-full"
         style={{
           boxShadow: "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)",
           transformStyle: "preserve-3d",
@@ -98,41 +98,41 @@ function StepCard({ step, index }) {
           transformOrigin: "center",
         }}
         onMouseEnter={e => {
-          e.currentTarget.style.boxShadow = "0 24px 64px rgba(0,0,0,0.13), 0 8px 20px rgba(0,0,0,0.08)";
-          e.currentTarget.style.transform = "scale(1.15) translateY(-5px) rotateX(1.5deg)";
+          e.currentTarget.style.borderColor = "#000000";
+          e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)";
         }}
         onMouseLeave={e => {
+          e.currentTarget.style.borderColor = "hsl(var(--border))";
           e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)";
-          e.currentTarget.style.transform = "scale(1.15) translateY(0) rotateX(0deg)";
         }}
       >
         {/* Left — content */}
-        <div className="flex-1 p-9 md:p-12">
+        <div className="flex-1 p-10 md:p-12">
           {/* Step badge */}
-          <div className="flex items-center gap-3 mb-5">
-            <span className="text-sm font-bold text-black uppercase tracking-widest text-lg">{step.step}</span>
+          <div className="flex items-center gap-3 mb-6">
+            <span className="text-xs font-bold text-black/80 uppercase tracking-widest">{step.step}</span>
             <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
               {step.timeframe}
             </span>
           </div>
 
           {/* Icon + Title */}
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+          <div className="flex items-center gap-4 mb-5">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
               <Icon className="w-6 h-6 text-primary" />
             </div>
-            <h3 className="font-display text-2xl font-semibold text-foreground">{step.title}</h3>
+            <h3 className="font-display text-2xl font-semibold text-black">{step.title}</h3>
           </div>
 
-          <p style={{ fontFamily: "'Georgia', serif" }} className="text-sm text-muted-foreground leading-relaxed mb-6">
+          <p className="text-sm text-black/70 leading-relaxed mb-6 font-medium">
             {step.desc}
           </p>
 
-          <ul className="space-y-2.5">
+          <ul className="space-y-3">
             {step.bullets.map((b, i) => (
               <li key={i} className="flex items-start gap-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary/50 mt-1.5 flex-shrink-0" />
-                <span style={{ fontFamily: "'Georgia', serif" }} className="text-sm text-foreground/70">{b}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-primary/60 mt-1.5 flex-shrink-0" />
+                <span className="text-sm text-black/60 font-medium">{b}</span>
               </li>
             ))}
           </ul>
@@ -165,26 +165,26 @@ function StepConnector({ index }) {
   }, []);
 
   return (
-    <div ref={ref} className="flex justify-center items-center py-6" style={{ position: "relative", height: "140px" }}>
-      <svg width="100" height="140" viewBox="0 0 100 140" fill="none" style={{ overflow: "visible" }}>
-        {/* Large black arrow pointing down */}
+    <div ref={ref} className="flex justify-center items-center py-4" style={{ position: "relative", height: "60px" }}>
+      <svg width="30" height="60" viewBox="0 0 30 60" fill="none" style={{ overflow: "visible" }}>
+        {/* Small black arrow pointing down */}
         <defs>
-          <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
-            <polygon points="0 0, 10 5, 0 10" fill="#000000" />
+          <marker id="arrowhead-small" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+            <polygon points="0 0, 6 3, 0 6" fill="#000000" />
           </marker>
         </defs>
         {/* Arrow line */}
         <line
-          x1="50"
+          x1="15"
           y1="0"
-          x2="50"
-          y2="110"
+          x2="15"
+          y2="48"
           stroke="#000000"
-          strokeWidth="4"
-          markerEnd="url(#arrowhead)"
+          strokeWidth="2"
+          markerEnd="url(#arrowhead-small)"
           style={{
             opacity: drawn ? 1 : 0,
-            transition: `opacity 0.4s ease ${0.2 + index * 0.1}s`,
+            transition: `opacity 0.3s ease ${0.2 + index * 0.1}s`,
           }}
         />
       </svg>

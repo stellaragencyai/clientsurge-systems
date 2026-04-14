@@ -1,4 +1,5 @@
 import { ArrowRight, Timer, CalendarCheck, ShieldCheck, UsersRound, TrendingUp, BadgeDollarSign } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
 const benefits = [
   {
@@ -33,28 +34,99 @@ const benefits = [
   },
 ];
 
-export default function Benefits() {
+function AnimatedText({ text }) {
+  const [displayedText, setDisplayedText] = useState("");
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setIsVisible(true); },
+      { threshold: 0.3 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index <= text.length) {
+        setDisplayedText(text.slice(0, index));
+        index++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 40);
+    return () => clearInterval(interval);
+  }, [isVisible, text]);
+
+  return <span ref={ref} className="inline">{displayedText}</span>;
+}
+
+function BenefitCard({ benefit, index, isVisible }) {
+  const ref = useRef(null);
+  const [showBorder, setShowBorder] = useState(false);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    const delay = index * 150;
+    const timeout = setTimeout(() => {
+      setShowBorder(true);
+    }, delay);
+    return () => clearTimeout(timeout);
+  }, [isVisible, index]);
+
   return (
-    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-card to-background">
+    <div
+      ref={ref}
+      className={`flex gap-4 p-6 bg-white rounded-2xl transition-all duration-500 ${
+        showBorder ? "opacity-100 translate-y-0 border-black" : "opacity-0 translate-y-4 border-border"
+      }`}
+      style={{
+        borderWidth: "1px",
+        borderStyle: "solid",
+        transitionDelay: `${index * 150}ms`,
+      }}
+    >
+      <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center">
+        <benefit.icon className="w-5 h-5 text-primary" strokeWidth={1.75} />
+      </div>
+      <div>
+        <h3 className="text-base font-semibold text-foreground mb-1">{benefit.title}</h3>
+        <p className="text-sm text-muted-foreground leading-relaxed">{benefit.desc}</p>
+      </div>
+    </div>
+  );
+}
+
+export default function Benefits() {
+  const sectionRef = useRef(null);
+  const [sectionVisible, setSectionVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setSectionVisible(true); },
+      { threshold: 0.3 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={sectionRef} className="py-24 md:py-32 px-6 bg-gradient-to-b from-card to-background">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Outcomes</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            What Changes When You <span className="text-primary">Automate</span>
+            What Changes When You <span className="text-primary"><AnimatedText text="Automate" /></span>
           </h2>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {benefits.map((b, i) => (
-            <div key={i} className="flex gap-4 p-6 bg-white rounded-2xl border border-border hover:border-primary/30 hover:shadow-md transition-all duration-200">
-              <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center">
-                <b.icon className="w-5 h-5 text-primary" strokeWidth={1.75} />
-              </div>
-              <div>
-                <h3 className="text-base font-semibold text-foreground mb-1">{b.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{b.desc}</p>
-              </div>
-            </div>
+            <BenefitCard key={i} benefit={b} index={i} isVisible={sectionVisible} />
           ))}
         </div>
 
