@@ -4,33 +4,33 @@ import { Wrench, Rocket, Fingerprint, EyeOff, Hammer, BadgeDollarSign } from "lu
 const reasons = [
   {
     icon: BadgeDollarSign,
-    title: "We Focus on Revenue, Not Features",
-    desc: "We don't sell software. We build systems designed to fill your calendar and increase what you earn. Every component has one job: drive bookings.",
+    title: "Every part of the system is built to increase bookings",
+    desc: "No feature bloat. No distractions. Every element exists to convert more leads into booked appointments.",
   },
   {
     icon: Rocket,
-    title: "Implemented in Days, Not Months",
-    desc: "Most clients are live within 5–7 business days. We handle every detail of the setup — you don't need to be technical or carve out weeks of your schedule.",
+    title: "Set up in days, not months",
+    desc: "Live within 5–7 business days. We handle the entire build — you don't need to be technical.",
   },
   {
     icon: Fingerprint,
-    title: "Custom-Built for Your Business",
-    desc: "There's no template. We map your lead sources, your workflow, and your goals — then build a system that fits how your business actually operates.",
+    title: "Custom-built for how your business actually works",
+    desc: "We map your lead sources, workflow, and goals — then build exactly what you need. No templates.",
   },
   {
     icon: EyeOff,
-    title: "Zero Disruption to Your Team",
-    desc: "Our systems work in the background. Your staff doesn't need to learn new tools or change how they work. It just runs.",
+    title: "No disruption to your team",
+    desc: "Works silently in the background. Your staff doesn't learn anything new. It just runs.",
   },
   {
     icon: Hammer,
-    title: "We Only Build What Works",
-    desc: "No bloated platforms. No feature overload. Clean, reliable automation that does exactly what it's supposed to — and nothing more.",
+    title: "No unnecessary features — only what drives results",
+    desc: "Clean, focused automation that does exactly what it's supposed to do — and nothing more.",
   },
   {
     icon: Wrench,
-    title: "You Keep Every Dollar It Generates",
-    desc: "Our systems are built to return far more than they cost. If the ROI isn't clear, we'll tell you that before you sign anything.",
+    title: "Built to generate more revenue than it costs",
+    desc: "We design systems with clear ROI. If the results aren't there, we'll tell you upfront.",
   },
 ];
 
@@ -51,13 +51,16 @@ export default function WhyUs() {
   return (
     <section className="py-24 md:py-32 px-6 bg-foreground">
       <div className="max-w-6xl mx-auto">
-        <div className="max-w-2xl mx-auto text-center mb-6">
+        <div className="max-w-3xl mx-auto text-center mb-6">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Why ApexFlow</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-background">
-            We're Not a Platform.<br />We're Your Implementation Partner.
+          <p className="text-base font-semibold text-background/70 mb-4">
+            If your leads are slipping through the cracks, this is why — and how we fix it.
+          </p>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-background mb-5">
+            You Don't Need Another Platform — You Need Something That Actually Works
           </h2>
-          <p className="mt-5 text-base text-background/60 max-w-xl mx-auto leading-relaxed">
-            Platforms give you tools and leave you to figure it out. We show up, build the system end-to-end, and make sure it works — so you never have to touch it.
+          <p className="mt-4 text-lg text-background/70 max-w-2xl mx-auto leading-relaxed font-semibold">
+            We don't give you tools to figure out. We build and run the system so it actually produces results.
           </p>
         </div>
 
@@ -65,7 +68,7 @@ export default function WhyUs() {
         <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-14 max-w-2xl mx-auto">
           <div className="flex-1 p-5 rounded-2xl bg-destructive/10 border border-destructive/20">
             <p className="text-xs font-bold uppercase tracking-widest text-destructive/80 mb-3">A Platform Gives You</p>
-            {["A login and a dashboard", "Hours of setup videos", "Ongoing technical work", "You figure out what works"].map((t, i) => (
+            {["You're left to figure it out", "Requires constant setup", "Takes time to learn", "Doesn't guarantee results"].map((t, i) => (
               <div key={i} className="flex items-center gap-2 text-sm text-background/60 mb-1.5">
                 <span className="text-destructive/60 text-base leading-none">✕</span> {t}
               </div>
@@ -73,8 +76,8 @@ export default function WhyUs() {
           </div>
           <div className="flex items-center justify-center text-xl font-bold text-primary/40 px-2 hidden sm:flex">→</div>
           <div className="flex-1 p-5 rounded-2xl bg-primary/10 border border-primary/25">
-            <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">ApexFlow Gives You</p>
-            {["A fully built system", "One onboarding call", "We handle everything", "Live in 5–7 days"].map((t, i) => (
+            <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Our System Gives You</p>
+            {["Fully built for you", "Runs automatically", "Designed to increase bookings", "Live in days"].map((t, i) => (
               <div key={i} className="flex items-center gap-2 text-sm text-background/80 mb-1.5">
                 <span className="text-primary text-base leading-none">✓</span> {t}
               </div>
@@ -83,21 +86,39 @@ export default function WhyUs() {
         </div>
 
         {/* Implementation timeline strip */}
-        <div className="flex items-center justify-center gap-2 mb-14 flex-wrap">
-          {["Day 1: Kickoff call", "Days 2–4: Build & integrate", "Day 5–7: Test & launch", "Day 30+: Optimize"].map((step, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <span className="px-4 py-1.5 bg-primary/15 border border-primary/30 rounded-full text-xs font-semibold text-primary">
-                {step}
-              </span>
-              {i < 3 && <span className="text-primary/30 text-xs">→</span>}
-            </div>
-          ))}
+        <div className="text-center mb-14">
+          <p className="text-sm font-semibold text-background/70 mb-3">
+            Live in 5–7 days — without disrupting your business
+          </p>
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            {["Day 1: Kickoff call", "Days 2–4: Build & integrate", "Day 5–7: Test & launch", "Day 30+: Optimize"].map((step, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span className="px-4 py-1.5 bg-primary/15 border border-primary/30 rounded-full text-xs font-semibold text-primary">
+                  {step}
+                </span>
+                {i < 3 && <span className="text-primary/30 text-xs">→</span>}
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
           {reasons.map((r, i) => (
             <WhyUsCard key={i} reason={r} />
           ))}
+        </div>
+
+        {/* Risk reduction & CTA */}
+        <div className="text-center max-w-2xl mx-auto border-t border-background/10 pt-10">
+          <p className="text-sm text-background/60 mb-2">
+            No complicated setup. No ongoing management required.
+          </p>
+          <p className="text-sm font-semibold text-background mb-6">
+            You don't need to learn anything. It just works.
+          </p>
+          <p className="text-base font-semibold text-background/80">
+            Want us to set this up for your business?
+          </p>
         </div>
 
       </div>
