@@ -208,7 +208,8 @@ export default function ConversationMockup() {
         </div>
 
         {/* Phone container */}
-        <div className="mx-auto" style={{ perspective: "1200px", maxWidth: "563px" }}>
+        <div className="flex justify-center" style={{ perspective: "1200px" }}>
+        <div style={{ maxWidth: "563px", width: "100%" }}>
           {/* 3D tilt wrapper */}
           <div style={{ transform: "rotateY(-2deg) rotateX(1deg)" }}>
           {/* Phone shell */}
@@ -343,7 +344,8 @@ export default function ConversationMockup() {
             </div>
           </div>
 
-          </div>
+        </div>
+        </div>
           {/* Replay button */}
           <div className="text-center mt-6">
             <button
