@@ -88,13 +88,13 @@ export default function HowItWorks() {
           {/* Desktop: Horizontal flow with aligned icons */}
           <div className="hidden lg:block">
             {/* Icons row — all perfectly aligned directly above titles */}
-            <div className="flex items-start justify-between mb-4 relative px-4">
+            <div className="flex items-start justify-between mb-0 relative px-4">
               {steps.map((step, i) => {
                 const Icon = step.icon;
                 return (
                   <div key={i} className="flex flex-col items-center flex-1">
                     <div
-                      className="w-16 h-16 rounded-2xl bg-black/8 border border-black/25 flex items-center justify-center transition-all duration-300 mb-6"
+                      className="w-16 h-16 rounded-2xl bg-black/8 border border-black/25 flex items-center justify-center transition-all duration-300 mb-2"
                       style={{
                         animation: inView ? `float 3s ease-in-out ${i * 0.2}s infinite` : "none",
                         opacity: inView ? 1 : 0,
@@ -110,7 +110,7 @@ export default function HowItWorks() {
             </div>
             
             {/* Connecting arrows row */}
-            <div className="flex items-center justify-between px-4 mb-8 relative" style={{height: "60px"}}></div>
+            <div className="flex items-center justify-between px-4 mb-4 relative" style={{height: "60px"}}></div>
 
             {/* Text row */}
             <div className="flex justify-between gap-2 px-4">
