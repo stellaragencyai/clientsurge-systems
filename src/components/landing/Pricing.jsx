@@ -5,7 +5,7 @@ import { useState } from "react";
 const plans = [
   {
     name: "Starter System",
-    subtitle: "Best for smaller or lower-volume businesses getting started with automation",
+    subtitle: "For businesses just getting started with automation (limited functionality).",
     desc: "A simple automation system to respond faster and capture more opportunities without complexity.",
     setup: "$997 setup",
     monthly: "$397",
@@ -88,9 +88,12 @@ export default function Pricing() {
         <div className="max-w-2xl mx-auto text-center mb-20">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Pricing & Packages</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
-            Choose the Right Automation System for Your Business
+            Choose the System That Turns Your Leads Into Booked Clients
           </h2>
-          <p className="mt-5 text-muted-foreground text-lg leading-relaxed">
+          <p className="mt-5 text-foreground font-semibold text-base mb-3">
+            Most businesses recover the cost with just a few additional bookings.
+          </p>
+          <p className="text-muted-foreground text-lg leading-relaxed">
             We install done-for-you systems that respond to leads instantly, automate follow-up, and help turn more inquiries into booked appointments.
           </p>
         </div>
@@ -102,10 +105,10 @@ export default function Pricing() {
           ))}
         </div>
 
-        {/* Bottom trust note */}
+        {/* Bottom CTA */}
         <div className="mt-16 text-center max-w-xl mx-auto">
-          <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-            Not sure which option is right for your business? Book a quick demo and we'll recommend the best fit based on your lead flow, follow-up process, and goals.
+          <p className="text-foreground font-semibold text-base mb-4">
+            Not sure which system fits your business? We'll recommend the best option based on your lead flow.
           </p>
           <button onClick={scrollToDemo} className="shiny-brown-btn" onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
@@ -113,7 +116,7 @@ export default function Pricing() {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
           }}>
             <span className="shiny-brown-inner flex items-center justify-center gap-2 h-12 px-8 rounded-full font-semibold text-sm">
-              Book Your Demo
+              Book a 10-Min Demo
               <ArrowRight className="w-4 h-4" />
             </span>
           </button>
@@ -206,6 +209,7 @@ function PricingCard({ plan }) {
         {/* Plan name & subtitle */}
         <div className="mb-7">
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">{plan.name}</h3>
+          {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Best choice for most businesses.</p>}
           <p className="text-xs text-muted-foreground leading-snug">{plan.subtitle}</p>
         </div>
 
