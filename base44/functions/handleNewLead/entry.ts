@@ -3,130 +3,58 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { lead_id } = await req.json();
+    const { event } = await req.json();
 
-    if (!lead_id) {
-      return Response.json({ error: 'lead_id required' }, { status: 400 });
+    if (event.type !== 'create' || event.entity_name !== 'Leads') {
+      return Response.json({ success: true });
     }
 
-    // Fetch the lead
-    const lead = await base44.entities.Leads.get(lead_id);
-    if (!lead) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+    const lead = event.data;
+
+    if (!lead || !lead.id) {
+      return Response.json({ error: 'Lead data missing' }, { status: 400 });
     }
 
-    // 1. Generate AI messages
-    const aiMessages = await generateMessages(base44, lead);
+    // Generate message
+    const firstName = lead.full_name ? lead.full_name.split(' ')[0] : 'there';
+    const message = `Hey ${firstName}, thanks for reaching out — what service were you interested in?`;
 
-    // 2. Send SMS (if Twilio is configured)
-    const smsResult = await sendSmsIfConfigured(base44, lead, aiMessages.sms);
+    // Send SMS if phone exists
+    if (lead.phone) {
+      await base44.functions.invoke('sendSMS', {
+        phone: lead.phone,
+        message,
+        leadId: lead.id,
+      });
+    }
 
-    // 3. Send Email (if Resend is configured)
-    const emailResult = await sendEmailIfConfigured(base44, lead, aiMessages.email);
+    // Send confirmation email if email exists
+    if (lead.email) {
+      const emailBody = `<p>Hi ${firstName},</p><p>${message}</p><p>Looking forward to helping you!</p>`;
+      await base44.functions.invoke('sendEmail', {
+        email: lead.email,
+        subject: 'Thanks for Reaching Out!',
+        body: emailBody,
+        leadId: lead.id,
+      });
+    }
 
-    // 4. Log events
-    await logEvent(base44, lead_id, 'lead_created', {
-      sms_sent: !!smsResult,
-      email_sent: !!emailResult,
+    // Update lead status
+    await base44.entities.Leads.update(lead.id, {
+      status: 'Contacted',
+      last_contacted_at: new Date().toISOString(),
     });
 
-    return Response.json({
-      success: true,
-      lead_id,
-      sms_sent: !!smsResult,
-      email_sent: !!emailResult,
+    // Log automation event
+    await base44.entities.Events.create({
+      lead_id: lead.id,
+      event_type: 'lead_created',
+      data: { automated: true, sms_sent: !!lead.phone, email_sent: !!lead.email },
     });
+
+    return Response.json({ success: true, leadId: lead.id });
   } catch (error) {
-    console.error('Error in handleNewLead:', error);
+    console.error('handleNewLead error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
-
-async function generateMessages(base44, lead) {
-  try {
-    const response = await base44.integrations.Core.InvokeLLM({
-      prompt: `Generate a short, friendly SMS and email for a new business inquiry.
-
-Lead Info:
-- Name: ${lead.full_name}
-- Business: ${lead.business_name}
-- Problem: ${lead.problem}
-
-Create TWO messages:
-
-1. SMS (max 160 characters): A short friendly greeting that asks what they need and invites them to book a call.
-
-2. EMAIL: A short email (2-3 sentences) welcoming them and asking what they need.
-
-Format your response as JSON with keys: "sms" and "email"`,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          sms: { type: 'string' },
-          email: { type: 'string' },
-        },
-      },
-    });
-
-    return response.data;
-  } catch (error) {
-    console.error('AI message generation failed:', error);
-    return {
-      sms: `Hi ${lead.full_name}! We got your inquiry. When would be a good time to chat?`,
-      email: `Hi ${lead.full_name},\n\nThanks for reaching out! We'd love to help. Let's schedule a quick call to discuss what you need.`,
-    };
-  }
-}
-
-async function sendSmsIfConfigured(base44, lead, message) {
-  try {
-    // This will be properly implemented in STEP 5 with Twilio
-    console.log('SMS sending prepared for:', lead.phone);
-    
-    // For now, log it as a message
-    await base44.entities.Messages.create({
-      lead_id: lead.id,
-      direction: 'outbound',
-      channel: 'sms',
-      message_text: message,
-      status: 'sent',
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error('SMS send failed:', error);
-    return null;
-  }
-}
-
-async function sendEmailIfConfigured(base44, lead, emailBody) {
-  try {
-    // This will be properly implemented in STEP 6 with Resend
-    console.log('Email sending prepared for:', lead.email);
-
-    await base44.entities.Emails.create({
-      lead_id: lead.id,
-      email_address: lead.email,
-      subject: `Let's discuss ${lead.business_name}`,
-      body: emailBody,
-      status: 'sent',
-    });
-
-    return { success: true };
-  } catch (error) {
-    console.error('Email send failed:', error);
-    return null;
-  }
-}
-
-async function logEvent(base44, lead_id, event_type, data) {
-  try {
-    await base44.entities.Events.create({
-      lead_id,
-      event_type,
-      data,
-    });
-  } catch (error) {
-    console.error('Event logging failed:', error);
-  }
-}
