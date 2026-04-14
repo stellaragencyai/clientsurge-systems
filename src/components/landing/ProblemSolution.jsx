@@ -94,7 +94,7 @@ export default function ProblemSolution() {
   }, []);
 
   return (
-    <section ref={sectionRef} id="services" className="py-24 md:py-32 px-6 bg-gradient-to-b from-card to-background">
+    <section ref={sectionRef} id="services" className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card to-background">
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
@@ -118,7 +118,7 @@ export default function ProblemSolution() {
         </div>
 
         {/* Paired rows */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {pairs.map((pair, i) => {
             const ProblemIcon = pair.problemIcon;
             const SolutionIcon = pair.solutionIcon;

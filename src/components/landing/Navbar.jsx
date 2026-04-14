@@ -43,10 +43,10 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+    <nav className={`sticky top-0 left-0 right-0 z-50 transition-all duration-500 ${
       scrolled
-        ? "bg-white/30 backdrop-blur-2xl border-b border-white/20 shadow-sm"
-        : "bg-white/10 backdrop-blur-md border-b border-white/10"
+        ? "bg-white/40 backdrop-blur-2xl border-b border-white/30 shadow-lg"
+        : "bg-white/15 backdrop-blur-md border-b border-white/20"
     }`}>
       <div className="w-full px-8 h-16 flex items-center justify-between">
         {/* Logo — pinned left */}

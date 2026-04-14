@@ -348,10 +348,17 @@ export default function ConversationMockup() {
         </div>
           {/* Replay button */}
           <div className="text-center mt-6">
+            <style>{`
+              @keyframes pulse-scale {
+                0%, 100% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.08); opacity: 0.8; }
+              }
+              .replay-pulse { animation: pulse-scale 1.2s ease-in-out 3; }
+            `}</style>
             <button
               onClick={startAnimation}
               disabled={animating}
-              className="text-xs font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-40 flex items-center gap-1.5 mx-auto"
+              className="text-xs font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-40 flex items-center gap-1.5 mx-auto replay-pulse"
             >
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M1 4v6h6" /><path d="M3.51 15a9 9 0 1 0 .49-4" />

@@ -148,50 +148,11 @@ function StepCard({ step, index }) {
   );
 }
 
-function StepConnector({ index }) {
-  const ref = useRef(null);
-  const [drawn, setDrawn] = useState(false);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setDrawn(true); },
-      { threshold: 0.5 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div ref={ref} className="flex justify-center items-center py-4" style={{ position: "relative", height: "60px" }}>
-      <svg width="30" height="60" viewBox="0 0 30 60" fill="none" style={{ overflow: "visible" }}>
-        {/* Small black arrow pointing down */}
-        <defs>
-          <marker id="arrowhead-small" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-            <polygon points="0 0, 6 3, 0 6" fill="#000000" />
-          </marker>
-        </defs>
-        {/* Arrow line */}
-        <line
-          x1="15"
-          y1="0"
-          x2="15"
-          y2="48"
-          stroke="#000000"
-          strokeWidth="2"
-          markerEnd="url(#arrowhead-small)"
-          style={{
-            opacity: drawn ? 1 : 0,
-            transition: `opacity 0.3s ease ${0.2 + index * 0.1}s`,
-          }}
-        />
-      </svg>
-    </div>
-  );
-}
 
 export default function DetailedProcess() {
   return (
-    <section className="py-20 md:py-28 px-6 bg-gradient-to-b from-amber-50/20 via-background to-card">
+    <section className="py-16 md:py-24 px-4 md:px-6 bg-gradient-to-b from-amber-50/20 via-background to-card">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-14">

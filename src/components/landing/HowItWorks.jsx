@@ -63,7 +63,7 @@ export default function HowItWorks() {
   return (
     <section 
       id="how-it-works" 
-      className="py-24 md:py-32 px-6 bg-gradient-to-br from-background via-card to-background relative overflow-hidden"
+      className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-br from-background via-card to-background relative overflow-hidden"
     >
       {/* Animated gradient glow */}
       <div 

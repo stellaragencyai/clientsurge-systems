@@ -16,7 +16,7 @@ const includes = [
 export default function CoreOffer() {
   const [showLeadModal, setShowLeadModal] = useState(false);
   return (
-    <section className="py-24 md:py-32 px-6 bg-white">
+    <section className="py-20 md:py-28 px-4 md:px-6 bg-white">
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
