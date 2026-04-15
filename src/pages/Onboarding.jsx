@@ -473,8 +473,8 @@ export default function Onboarding() {
           </div>
         </form>
       </div>
+      <OnboardingChatWidget />
     </div>
-    <OnboardingChatWidget />
   );
 }
 
