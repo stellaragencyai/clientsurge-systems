@@ -6,14 +6,14 @@ import StatCounter from "./StatCounter";
 import LeadCaptureModal from "../forms/LeadCaptureModal";
 
 const TICKER_EVENTS = [
-  "🟢 New lead captured — Austin, TX",
+  "📅 Consultation booked — Scottsdale, AZ",
   "📅 Appointment booked — Scottsdale, AZ",
-  "💬 Follow-up sent automatically — Denver, CO",
+  "💬 Follow-up sent automatically — Phoenix, AZ",
   "📞 Missed call recovered — Phoenix, AZ",
-  "🟢 New lead captured — Nashville, TN",
-  "📅 Consultation booked — Los Angeles, CA",
-  "💬 Lead re-engaged — Chicago, IL",
-  "📞 Missed call recovered — Atlanta, GA",
+  "🟢 New lead captured — Scottsdale, AZ",
+  "📅 Demo scheduled — Tempe, AZ",
+  "💬 Lead re-engaged — Chandler, AZ",
+  "📞 Booking confirmed — Scottsdale, AZ",
 ];
 
 function LiveTicker() {
@@ -61,7 +61,7 @@ export default function Hero() {
 
   const handleLearnMore = (e) => {
     e.preventDefault();
-    const target = document.getElementById("how-it-works");
+    const target = document.getElementById("how-it-works-section");
     if (!target) return;
     const start = window.scrollY;
     const end = target.getBoundingClientRect().top + window.scrollY - 64;

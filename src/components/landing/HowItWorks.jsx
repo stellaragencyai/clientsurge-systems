@@ -55,14 +55,14 @@ export default function HowItWorks() {
         requestAnimationFrame(animate);
       }
     }, { threshold: 0.3 });
-    const section = document.getElementById("how-it-works");
+    const section = document.getElementById("how-it-works-section");
     if (section) observer.observe(section);
     return () => observer.disconnect();
   }, []);
 
   return (
     <section 
-      id="how-it-works" 
+      id="how-it-works-section" 
       className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-br from-background via-card to-background relative overflow-hidden"
     >
       {/* Animated gradient glow */}
