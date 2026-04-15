@@ -62,7 +62,7 @@ const industries = [
     desc: "Field teams stay focused while automated systems capture estimate requests, book appointments, and follow up on pending quotes.",
     result: "65% more jobs booked • 24/7 lead capture & response",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=900&q=85",
     bullets: [
       "Never miss a service call — auto-response 24/7",
       "Estimate follow-ups sent automatically",

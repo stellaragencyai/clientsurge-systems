@@ -30,14 +30,11 @@ export default function CoreOffer() {
           </p>
         </div>
 
-        {/* ROI Callout Banner */}
-        <div className="mb-10 rounded-2xl overflow-hidden" style={{background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 50%,#7a4825 100%)",boxShadow:"0 8px 32px rgba(120,70,20,0.25)"}}>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-8 py-5">
-            <div className="flex items-center gap-3">
-              <TrendingUp className="w-6 h-6 text-amber-300 flex-shrink-0" />
-              <p className="text-sm font-semibold text-amber-100">Most clients recover their investment within the first 30 days — often sooner.</p>
-            </div>
-            <span className="text-xs font-bold text-amber-300/70 uppercase tracking-widest whitespace-nowrap">Revenue-first, always</span>
+        {/* ROI Callout — lightweight pill */}
+        <div className="mb-10 flex justify-center">
+          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-primary/25 bg-primary/6">
+            <TrendingUp className="w-4 h-4 text-primary flex-shrink-0" />
+            <p className="text-sm font-semibold text-foreground">Most clients recover their investment within the first 30 days — often sooner.</p>
           </div>
         </div>
 
@@ -55,13 +52,8 @@ export default function CoreOffer() {
             return (
               <div
                 key={i}
-                className="group flex items-start gap-4 p-5 rounded-2xl border transition-all duration-300 cursor-default hover:shadow-md"
-                style={{
-                  background: i % 2 === 0 ? "white" : "hsl(var(--card))",
-                  borderColor: i % 2 === 0 ? "hsl(var(--border))" : "rgba(161,120,35,0.15)",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(161,120,35,0.5)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = i % 2 === 0 ? "hsl(var(--border))" : "rgba(161,120,35,0.15)"; }}
+                className="group flex items-start gap-4 p-5 rounded-2xl border bg-white transition-all duration-300 cursor-default hover:shadow-md hover:border-primary/40"
+                style={{ borderColor: "hsl(var(--border))" }}
               >
                 {/* Step number */}
                 <span className="text-xs font-bold text-primary/40 group-hover:text-primary/70 transition-colors mt-0.5 w-6 flex-shrink-0">{item.step}</span>
@@ -80,25 +72,24 @@ export default function CoreOffer() {
         </div>
 
         {/* Setup timeline bar */}
-        <div className="mb-8 p-5 bg-primary/5 border border-primary/15 rounded-2xl grid sm:grid-cols-3 gap-4 text-center">
-          {[
-            { label: "Setup Timeline", value: "Live in 5–7 days — no complex setup on your end" },
-            { label: "What You Do", value: "One onboarding call" },
-            { label: "Everything Else", value: "Automated Entirely", highlight: true },
-          ].map((item, i) => (
-            <div key={i} className={`${i < 2 ? "sm:border-r sm:border-border" : ""} px-4`}>
-              <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">{item.label}</p>
-              <p className="text-sm font-semibold text-foreground">
-                {item.highlight ? (
-                  <>
-                    <span style={{color: "rgba(161,120,35,1)", textShadow: "0 0 15px rgba(161,120,35,0.5)"}}>Automated</span> Entirely
-                  </>
-                ) : (
-                  item.value
-                )}
-              </p>
-            </div>
-          ))}
+        <div className="mb-8 rounded-2xl border border-primary/15 overflow-hidden">
+          {/* Two equal cols */}
+          <div className="grid sm:grid-cols-2 bg-primary/5">
+            {[
+              { label: "Setup Timeline", value: "Live in 5–7 days — no complex setup on your end" },
+              { label: "What You Do", value: "One onboarding call" },
+            ].map((item, i) => (
+              <div key={i} className={`px-6 py-4 text-center ${i === 0 ? "sm:border-r border-primary/15" : ""}`}>
+                <p className="text-xs font-bold text-primary uppercase tracking-widest mb-1">{item.label}</p>
+                <p className="text-sm font-semibold text-foreground">{item.value}</p>
+              </div>
+            ))}
+          </div>
+          {/* Highlighted payoff row */}
+          <div className="px-6 py-5 text-center border-t border-primary/15" style={{background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)"}}>
+            <p className="text-xs font-bold text-amber-300/70 uppercase tracking-widest mb-1">Everything Else</p>
+            <p className="text-lg font-bold text-amber-100">Automated Entirely</p>
+          </div>
         </div>
 
         {/* CTA */}
