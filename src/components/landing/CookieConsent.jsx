@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
@@ -16,45 +17,64 @@ export default function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md border-t px-6 py-4" style={{ background: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.1)' }}>
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
-        <p className="text-sm" style={{ color: '#f5e6d0' }}>
-          We use cookies to enhance your experience. By using this site, you agree to our{' '}
-          <a href="/privacy-policy" className="transition-colors underline" style={{ color: '#c8965c' }}>
+    <div className="fixed bottom-6 right-6 z-50 max-w-sm">
+      <div 
+        className="rounded-2xl shadow-lg border backdrop-blur-md p-5 space-y-4"
+        style={{
+          background: 'rgba(255,255,255,0.95)',
+          borderColor: 'rgba(0,0,0,0.1)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.12)'
+        }}
+      >
+        {/* Header with close */}
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="font-semibold text-sm text-foreground">Cookie Preferences</h3>
+          <button
+            onClick={() => setVisible(false)}
+            className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Message */}
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          We use cookies to enhance your experience and analyze site traffic. By continuing to use this site, you agree to our{' '}
+          <a 
+            href="/privacy-policy" 
+            className="font-medium text-primary hover:text-primary/80 transition-colors"
+          >
             privacy policy
           </a>
           .
         </p>
-        <button
-          onClick={handleAccept}
-          style={{
-            display: 'inline-block',
-            borderRadius: '9999px',
-            padding: '2px',
-            background: 'linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)',
-            border: 'none',
-            cursor: 'pointer',
-            flexShrink: 0,
-          }}
-        >
-          <span
+
+        {/* Actions */}
+        <div className="flex gap-3 pt-2">
+          <button
+            onClick={() => setVisible(false)}
+            className="flex-1 px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground border border-border rounded-lg transition-colors"
+          >
+            Decline
+          </button>
+          <button
+            onClick={handleAccept}
+            className="flex-1 px-4 py-2 text-xs font-medium text-white rounded-lg transition-all"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '40px',
-              padding: '0 24px',
-              borderRadius: '9999px',
-              background: 'linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)',
-              color: '#f5e6d0',
-              fontWeight: '700',
-              fontSize: '0.875rem',
-              textShadow: '0 1px 2px rgba(0,0,0,0.3)',
+              background: 'linear-gradient(135deg,#9a5c2e 0%,#c8965c 50%,#7a4825 100%)',
+              boxShadow: '0 4px 12px rgba(154,92,46,0.25)'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(154,92,46,0.35)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(154,92,46,0.25)';
             }}
           >
-            Got it
-          </span>
-        </button>
+            Accept
+          </button>
+        </div>
       </div>
     </div>
   );
