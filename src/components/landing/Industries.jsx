@@ -160,7 +160,7 @@ export default function Industries() {
         })}
       </div>
 
-      <div className="pb-16" />
+      <div className="pb-0" />
 
       {/* Expanded overlay */}
       <AnimatePresence>

@@ -101,7 +101,7 @@ export default function ProblemSolution() {
                 {/* Problem */}
                 <CardWithFadeIn delay={i * 40}>
                   <div 
-                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-red-600 hover:shadow-lg"
+                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-red-600 hover:shadow-lg relative overflow-hidden"
                     style={{
                       backgroundColor: `rgba(239,68,68,0.05)`,
                       borderColor: `#000000`,
@@ -109,18 +109,31 @@ export default function ProblemSolution() {
                     }}
                   >
                     <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: "linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)",
+                        animation: "shimmer 3s infinite",
+                      }}
+                    />
+                    <style>{`
+                      @keyframes shimmer {
+                        0% { transform: translateX(-100%); }
+                        100% { transform: translateX(100%); }
+                      }
+                    `}</style>
+                    <div 
                       className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300"
                       style={{ backgroundColor: `rgba(239,68,68,0.1)` }}
                     >
                       <ProblemIcon 
-                        className="w-6 h-6"
+                        className="w-6 h-6 relative z-10"
                         style={{
                           color: `rgba(239,68,68,0.9)`,
                         }}
                         strokeWidth={1.5} 
                       />
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 relative z-10">
                       <h3 className="text-base font-bold text-foreground mb-2">{pair.problem}</h3>
                       <p className="text-sm text-foreground/70 leading-relaxed">{pair.problemDesc}</p>
                     </div>
@@ -130,7 +143,7 @@ export default function ProblemSolution() {
                 {/* Solution */}
                 <CardWithFadeIn delay={i * 40 + 80}>
                   <div 
-                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-amber-600 hover:shadow-lg min-h-36"
+                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-amber-600 hover:shadow-lg min-h-36 relative overflow-hidden"
                     style={{
                       backgroundColor: `rgba(200,150,92,0.08)`,
                       borderColor: `#000000`,
@@ -138,18 +151,31 @@ export default function ProblemSolution() {
                     }}
                   >
                     <div 
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: "linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)",
+                        animation: "shimmer 3s infinite",
+                      }}
+                    />
+                    <style>{`
+                      @keyframes shimmer {
+                        0% { transform: translateX(-100%); }
+                        100% { transform: translateX(100%); }
+                      }
+                    `}</style>
+                    <div 
                       className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300"
                       style={{ backgroundColor: `rgba(154,92,46,0.15)` }}
                     >
                       <SolutionIcon 
-                        className="w-6 h-6"
+                        className="w-6 h-6 relative z-10"
                         style={{
                           color: `#9a5c2e`,
                         }}
                         strokeWidth={1.5} 
                       />
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 relative z-10">
                       <h3 className="text-base font-bold text-foreground mb-2">{pair.solution}</h3>
                       <p className="text-sm text-foreground/70 leading-relaxed">
                         {pair.solutionDesc}
