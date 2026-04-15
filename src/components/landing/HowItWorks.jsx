@@ -4,33 +4,33 @@ import { ArrowRight, MessageSquare, Zap, Send, CalendarCheck, CheckCircle2 } fro
 const steps = [
   {
     icon: MessageSquare,
-    title: "A new lead reaches out",
+    title: "A prospect contacts you via form, phone, DM, or ad — the system captures them instantly.",
     subtitle: "Step 1",
-    desc: "A new lead reaches out",
+    desc: "Every lead is logged, tagged, and ready to engage.",
   },
   {
     icon: Zap,
-    title: "They get an instant response",
+    title: "Within 60 seconds they receive a personalized SMS and email — before your competitor sees the notification.",
     subtitle: "Step 2",
-    desc: "They get an instant response",
+    desc: "Speed wins. You're always first.",
   },
   {
     icon: Send,
-    title: "Follow-up continues automatically",
+    title: "A multi-day sequence keeps you top-of-mind without any manual work.",
     subtitle: "Step 3",
-    desc: "Follow-up continues automatically",
+    desc: "Consistent follow-up that builds interest.",
   },
   {
     icon: CalendarCheck,
-    title: "They're guided to book",
+    title: "A booking link is sent at exactly the right moment — confirmed appointment, no phone tag.",
     subtitle: "Step 4",
-    desc: "They're guided to book",
+    desc: "Frictionless booking experience.",
   },
   {
     icon: CheckCircle2,
-    title: "You get a confirmed client",
+    title: "Post-visit the system auto-requests a review and re-enters them into a referral sequence.",
     subtitle: "Step 5",
-    desc: "You get a confirmed client",
+    desc: "Turn customers into repeat business and referrals.",
   },
 ];
 
@@ -156,22 +156,7 @@ export default function HowItWorks() {
         {/* CTA */}
         <div className="text-center">
           <p className="text-foreground mb-6">Want to see this set up for your business?</p>
-          <button onClick={(e) => {
-            e.preventDefault();
-            const start = window.scrollY;
-            const end = document.body.scrollHeight - window.innerHeight;
-            const distance = end - start;
-            const duration = 1200;
-            let startTime = null;
-            const easeInOutCubic = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-            const step = (timestamp) => {
-              if (!startTime) startTime = timestamp;
-              const progress = Math.min((timestamp - startTime) / duration, 1);
-              window.scrollTo(0, start + distance * easeInOutCubic(progress));
-              if (progress < 1) requestAnimationFrame(step);
-            };
-            requestAnimationFrame(step);
-          }} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.5s ease, transform 0.3s ease",border:"none",cursor:"pointer"}} onMouseEnter={(e) => {
+          <button onClick={() => window.location.href = '/book-demo'} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.5s ease, transform 0.3s ease",border:"none",cursor:"pointer"}} onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
           }} onMouseLeave={(e) => {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";

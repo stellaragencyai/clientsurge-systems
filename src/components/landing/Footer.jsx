@@ -22,7 +22,6 @@ const navColumns = [
     title: "Learn More",
     links: [
       { label: "How It Works", href: "#how-it-works" },
-      { label: "Why ApexFlow", href: "#services" },
       { label: "Book a Demo", href: "#book-demo" },
     ],
   },
@@ -44,17 +43,14 @@ export default function Footer() {
       {/* Final CTA Section */}
       <section className="bg-gradient-to-br from-primary/3 to-primary/5 border-t border-primary/20 py-16 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-block px-4 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
-            <p className="text-xs font-bold text-primary uppercase tracking-widest">⏰ Time-Limited Offer</p>
-          </div>
           <h3 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-3">
-            Get Your System Live in 5 Days
+            Ready to Stop Losing Leads?
           </h3>
           <p className="text-muted-foreground text-base mb-8 max-w-xl mx-auto">
-            Limited spots available this month. Average ROI: 14–30 days. No risk demo call — book now.
+            Book a free 30-min demo. No commitment. Live in 5–7 days.
           </p>
           <button
-            onClick={() => window.location.href = '/start'}
+            onClick={() => window.location.href = '/book-demo'}
             style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.3s ease, transform 0.3s ease",border:"none",cursor:"pointer"}} onMouseEnter={(e) => {
               e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
             }} onMouseLeave={(e) => {
@@ -115,7 +111,7 @@ export default function Footer() {
           {/* Bottom section: Trust signals + Copyright */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="text-xs text-muted-foreground text-center md:text-left">
-              Built for service businesses • Designed for real results • No complex setup required
+              ClientSurge Systems · Phoenix, Arizona · <a href="mailto:system@clientsurgesystems.com" className="hover:text-primary transition-colors">system@clientsurgesystems.com</a>
             </p>
             <p className="text-xs text-muted-foreground">
               © {new Date().getFullYear()} ClientSurge Systems. All rights reserved.

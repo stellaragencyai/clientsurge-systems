@@ -1,13 +1,13 @@
 import { Star, CheckCircle2 } from "lucide-react";
 
 const testimonials = [
-  { name: "Sarah M.", clinic: "Glow Med Spa", text: "We're booking 3x more appointments since launch. Best investment we've made.", rating: 5 },
-  { name: "James P.", clinic: "Elite Aesthetics", text: "Our front desk loves this. No more missed leads.", rating: 5 },
-  { name: "Diana L.", clinic: "Zen Wellness", text: "Recovered $8k in old leads within the first month.", rating: 5 },
+  { name: "Med Spa Owner", clinic: "Phoenix, AZ", text: "We went from missing leads to booking consultations same-day.", rating: 5 },
+  { name: "Aesthetic Clinic", clinic: "Scottsdale, AZ", text: "Our front desk was overwhelmed. Now follow-up is fully automated.", rating: 5 },
+  { name: "Wellness Studio", clinic: "Gilbert, AZ", text: "Paid for itself in the first month.", rating: 5 },
 ];
 
 const metrics = [
-  { label: "Med Spas Using System", value: "250+" },
+  { label: "Built for Med Spas & Clinics", value: "Proven" },
   { label: "Avg Booking Increase", value: "2–3x" },
   { label: "ROI Timeline", value: "14–30 days" },
 ];

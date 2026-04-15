@@ -1,4 +1,4 @@
-import Navbar from "../components/landing/Navbar";
+import { useEffect } from 'react';
 import MedSpaHero from "../components/medspa/MedSpaHero";
 import MedSpaPositioning from "../components/medspa/MedSpaPositioning";
 import MedSpaTransition from "../components/medspa/MedSpaTransition";
@@ -19,9 +19,16 @@ import MedSpaFinalCTA from "../components/medspa/MedSpaFinalCTA";
 import Footer from "../components/landing/Footer";
 
 export default function MedSpa() {
+  useEffect(() => {
+    const navbar = document.querySelector('nav');
+    if (navbar) navbar.style.display = 'none';
+    return () => {
+      if (navbar) navbar.style.display = 'block';
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
       <MedSpaHero />
       <MedSpaPositioning />
       <MedSpaProblem />

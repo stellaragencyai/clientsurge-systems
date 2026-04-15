@@ -4,6 +4,8 @@ const stats = [
   { value: "1 in 3", label: "Never call back twice" },
 ];
 
+const sources = "Sources: Lead Response Management Study · Harvard Business Review · Salesforce State of Sales Report";
+
 export default function MedSpaPain() {
   return (
     <section className="py-24 md:py-32 px-6 bg-white overflow-hidden">
@@ -37,7 +39,7 @@ export default function MedSpaPain() {
                 className="w-full h-52 object-cover object-top"
               />
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-4 mb-4">
               {stats.map((s, i) => (
                 <div key={i} className="bg-[#FAFAF8] border border-border rounded-xl p-4 text-center">
                   <p className="text-2xl font-bold text-primary mb-1">{s.value}</p>
@@ -45,6 +47,7 @@ export default function MedSpaPain() {
                 </div>
               ))}
             </div>
+            <p className="text-[10px] text-muted-foreground text-center">{sources}</p>
           </div>
         </div>
       </div>

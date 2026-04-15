@@ -219,7 +219,8 @@ function PricingCard({ plan }) {
             <span className="text-5xl font-bold text-foreground">{plan.monthly}</span>
             <span className="text-sm text-muted-foreground mb-2">/month</span>
           </div>
-          <p className="text-xs text-muted-foreground">{plan.setup}</p>
+          <p className="text-xs text-muted-foreground mb-3">{plan.setup}</p>
+          <p className="text-xs text-muted-foreground text-left">Starting from $497/mo · No setup fees · No long-term contracts · Cancel anytime</p>
         </div>
 
         {/* Description */}

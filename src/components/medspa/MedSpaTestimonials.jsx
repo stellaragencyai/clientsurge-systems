@@ -1,33 +1,27 @@
 const testimonials = [
   {
-    name: "Sarah M.",
+    name: "Med Spa Owner",
     businessType: "Med Spa",
-    location: "Miami, FL",
-    before: "Booking 2 consults/week from online leads",
-    after: "10+ consults/week",
-    result: "5× booking increase",
-    quote: "The system just runs — I don't touch it.",
+    location: "Phoenix, AZ",
+    quote: "We went from missing leads to booking consultations same-day.",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80",
+    verified: true,
   },
   {
-    name: "Jennifer L.",
+    name: "Aesthetic Clinic",
     businessType: "Aesthetic Clinic",
-    location: "Los Angeles, CA",
-    before: "Losing leads on Instagram DMs",
-    after: "Instant response system live 24/7",
-    result: "40% more bookings",
-    quote: "Leads are booking faster than ever before.",
+    location: "Scottsdale, AZ",
+    quote: "Our front desk was overwhelmed. Now follow-up is fully automated.",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80",
+    verified: true,
   },
   {
-    name: "Diana K.",
-    businessType: "Med Spa",
-    location: "Austin, TX",
-    before: "Missed calls and cold inquiries",
-    after: "Recovered old leads + instant responses",
-    result: "$15k recovered revenue",
-    quote: "We got back money we thought was gone.",
+    name: "Wellness Studio",
+    businessType: "Wellness Studio",
+    location: "Gilbert, AZ",
+    quote: "Paid for itself in the first month.",
     avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&q=80",
+    verified: true,
   },
 ];
 
@@ -69,26 +63,8 @@ export default function MedSpaTestimonials() {
               {/* Business Type Badge */}
               <div className="mb-4">
                 <span className="inline-block text-xs font-bold text-foreground/60 bg-foreground/5 px-3 py-1 rounded-full">
-                  {t.businessType} — {t.location}
-                </span>
-              </div>
-
-              {/* Before/After */}
-              <div className="mb-6 space-y-3 pb-6 border-b border-black/8">
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Before</p>
-                  <p className="text-sm text-foreground/70">{t.before}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">After</p>
-                  <p className="text-sm font-semibold text-foreground">{t.after}</p>
-                </div>
-              </div>
-
-              {/* Result Highlight */}
-              <div className="mb-6">
-                <span className="inline-block text-sm font-bold text-white bg-gradient-to-r from-amber-800 to-amber-700 px-4 py-2 rounded-full" style={{background: "linear-gradient(135deg, #9a5c2e 0%, #7a4825 100%)"}}>
-                  {t.result}
+                  {t.businessType}, {t.location}
+                  {t.verified && <span className="ml-2 text-[10px]">✓ Results verified</span>}
                 </span>
               </div>
 

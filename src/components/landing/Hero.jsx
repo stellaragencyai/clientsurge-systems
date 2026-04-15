@@ -7,7 +7,7 @@ import LeadCaptureModal from "../forms/LeadCaptureModal";
 
 const TICKER_EVENTS = [
   "🟢 New lead captured — Austin, TX",
-  "📅 Appointment booked — Miami, FL",
+  "📅 Appointment booked — Scottsdale, AZ",
   "💬 Follow-up sent automatically — Denver, CO",
   "📞 Missed call recovered — Phoenix, AZ",
   "🟢 New lead captured — Nashville, TN",
@@ -90,7 +90,7 @@ export default function Hero() {
           onClick: () => setShowLeadModal(true),
         }}
         secondaryCTA={{
-          label: "Learn More",
+          label: "See How It Works ↓",
           onClick: handleLearnMore,
         }}
         trustBadges={["No long-term contracts", "Live in under 7 days", "Fully done-for-you"]}
