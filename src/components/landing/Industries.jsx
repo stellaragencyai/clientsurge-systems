@@ -96,7 +96,7 @@ const industries = [
     desc: "Capture leads across all channels. Automated follow-up, appointment reminders, and reactivation campaigns turn paid traffic into bookings.",
     result: "2–3× ROAS on marketing spend • 40% more appointments",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=900&q=85",
     bullets: [
       "Capture leads from Google, Facebook, Instagram & web",
       "Instant multi-channel follow-up (SMS + email)",

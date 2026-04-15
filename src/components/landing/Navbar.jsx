@@ -19,6 +19,7 @@ export default function Navbar() {
     { label: "How It Works", href: "#how-it-works" },
     { label: "Services", href: "#services" },
     { label: "Industries", href: "#industries" },
+    { label: "Med Spa", href: "/med-spa", external: true },
     { label: "FAQ", href: "#faq" },
   ];
 
@@ -75,6 +76,15 @@ export default function Navbar() {
         {/* Center nav links */}
         <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           {links.map((l) => (
+            l.external ? (
+              <a
+                key={l.href}
+                href={l.href}
+                className="text-base font-medium text-foreground hover:text-primary transition-colors"
+              >
+                {l.label}
+              </a>
+            ) : (
             <a
               key={l.href}
               href={l.href}
@@ -83,6 +93,7 @@ export default function Navbar() {
             >
               {l.label}
             </a>
+            )
           ))}
         </div>
 
