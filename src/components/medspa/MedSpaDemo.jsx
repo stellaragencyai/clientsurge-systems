@@ -145,11 +145,12 @@ export default function MedSpaDemo() {
                   <div className="w-24 h-1 bg-black/20 rounded-full" />
                 </div>
               </div>
-              <div className="text-center mt-4">
-                <button onClick={start} disabled={animating} className="text-xs text-primary font-medium hover:text-primary/70 transition-colors disabled:opacity-40 flex items-center gap-1.5 mx-auto">
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 4v6h6" /><path d="M3.51 15a9 9 0 1 0 .49-4" /></svg>
-                  {animating ? "Playing..." : "Replay"}
+              <div className="text-center mt-6">
+                <button onClick={start} disabled={animating} className="px-5 py-2.5 text-xs text-white font-semibold bg-primary hover:bg-primary/90 rounded-lg transition-all disabled:opacity-50 flex items-center gap-2 mx-auto hover:shadow-lg hover:scale-105">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 4v6h6" /><path d="M3.51 15a9 9 0 1 0 .49-4" /></svg>
+                  {animating ? "Playing..." : "Replay Demo"}
                 </button>
+                <p className="text-xs text-muted-foreground mt-3">{visible.length} / {MESSAGES.length} messages</p>
               </div>
             </div>
           </div>

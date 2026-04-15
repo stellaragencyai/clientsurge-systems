@@ -28,9 +28,15 @@ export default function MedSpaWhyItWorks() {
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           {points.map((p, i) => (
-            <div key={i} className="p-7 bg-[#FAFAF8] rounded-2xl border border-border hover:border-primary/25 hover:shadow-sm transition-all">
-              <span className="text-4xl font-bold text-primary/15 font-display block mb-4">{p.number}</span>
-              <h3 className="text-base font-semibold text-foreground mb-2">{p.title}</h3>
+            <div key={i} className="p-7 bg-gradient-to-br from-[#FAFAF8] to-white rounded-2xl border border-border hover:border-primary/40 hover:shadow-lg transition-all group">
+              <div className="flex items-start justify-between mb-4">
+                <span className="text-5xl font-bold text-primary/20 font-display">{p.number}</span>
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <span className="text-primary text-sm font-bold">·</span>
+                </div>
+              </div>
+              <h3 className="text-base font-semibold text-foreground mb-3">{p.title}</h3>
+              <div className="w-1 h-0.5 bg-gradient-to-r from-primary to-transparent mb-3" />
               <p className="text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
             </div>
           ))}

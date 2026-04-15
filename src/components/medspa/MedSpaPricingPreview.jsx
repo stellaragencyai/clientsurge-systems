@@ -24,7 +24,7 @@ export default function MedSpaPricingPreview() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border-2 border-primary/30 p-8 md:p-12 shadow-md" style={{boxShadow:"0 8px 40px rgba(120,70,20,0.10), 0 2px 8px rgba(0,0,0,0.06)"}}>
+        <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg" style={{background:"linear-gradient(135deg, #ffffff 0%, #fefdfb 100%)", boxShadow:"0 20px 60px -20px rgba(120,70,20,0.15), 0 0 1px rgba(120,70,20,0.2)", border:"2px solid transparent", backgroundImage:"linear-gradient(135deg, #ffffff 0%, #fefdfb 100%), linear-gradient(135deg, rgba(160,113,79,0.3) 0%, rgba(200,150,92,0.1) 100%)", backgroundOrigin:"border-box", backgroundClip:"padding-box, border-box"}}>
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
               <div className="flex items-center gap-2 mb-6">

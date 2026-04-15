@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Wrench, Lightbulb, DollarSign } from "lucide-react";
 
 const faqCategories = [
-  { icon: "🔧", category: "Setup & Integration", color: "from-blue-500/10 to-blue-600/5" },
-  { icon: "💬", category: "How It Works", color: "from-green-500/10 to-green-600/5" },
-  { icon: "💰", category: "Pricing & ROI", color: "from-amber-500/10 to-amber-600/5" },
+  { icon: Wrench, category: "Setup & Integration" },
+  { icon: Lightbulb, category: "How It Works" },
+  { icon: DollarSign, category: "Pricing & ROI" },
 ];
 
 const faqs = [
@@ -35,19 +36,23 @@ export default function MedSpaFAQ() {
 
         {/* Category filters */}
         <div className="flex flex-wrap gap-3 justify-center mb-10">
-          {faqCategories.map((cat) => (
-            <button
-              key={cat.category}
-              onClick={() => setActiveCategory(cat.category)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                activeCategory === cat.category
-                  ? "bg-primary text-white"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              {cat.icon} {cat.category}
-            </button>
-          ))}
+          {faqCategories.map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <button
+                key={cat.category}
+                onClick={() => setActiveCategory(cat.category)}
+                className={`flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium transition-all transform hover:scale-105 ${
+                  activeCategory === cat.category
+                    ? "bg-primary text-white shadow-lg shadow-primary/30"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80 border border-transparent hover:border-primary/20"
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {cat.category}
+              </button>
+            );
+          })}
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">

@@ -61,12 +61,12 @@ export default function MedSpaBenefits() {
             {benefits.map((b, i) => {
               const Icon = b.icon;
               return (
-                <div key={i} className="flex gap-4 p-5 bg-[#FAFAF8] rounded-xl border border-border hover:border-primary/25 hover:shadow-sm transition-all duration-200">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-primary" />
+                <div key={i} className="flex gap-4 p-6 bg-gradient-to-r from-[#FAFAF8] to-white rounded-xl border border-border hover:border-primary/40 hover:shadow-lg transition-all duration-200 group">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 group-hover:scale-110 transition-all">
+                    <Icon className="w-6 h-6 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-foreground mb-1">{b.title}</h3>
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-foreground mb-2">{b.title}</h3>
                     <p className="text-xs text-muted-foreground leading-relaxed">{b.desc}</p>
                   </div>
                 </div>

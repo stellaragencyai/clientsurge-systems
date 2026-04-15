@@ -34,13 +34,13 @@ export default function MedSpaProblem() {
 
           <div className="space-y-3">
             {problems.map((p, i) => (
-              <div key={i} className="flex gap-4 p-5 bg-gradient-to-br from-destructive/5 to-destructive/2 rounded-xl border border-destructive/20 hover:border-destructive/40 hover:shadow-md hover:from-destructive/8 transition-all">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-destructive/20 flex items-center justify-center">
-                  <X className="w-4 h-4 text-destructive" />
+              <div key={i} className="flex gap-4 p-6 bg-gradient-to-br from-destructive/5 to-destructive/2 rounded-xl border border-destructive/20 hover:border-destructive/40 hover:shadow-md hover:from-destructive/8 transition-all">
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-destructive/20 flex items-center justify-center flex-shrink-0">
+                  <X className="w-5 h-5 text-destructive" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <p className="text-sm font-semibold text-foreground leading-tight">{p.title}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{p.desc}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{p.desc}</p>
                 </div>
               </div>
             ))}

@@ -35,7 +35,7 @@ const solutions = [
 
 export default function MedSpaSolution() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-[#FAFAF8]">
+    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-white via-primary/2 to-white">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Solution</p>
@@ -52,22 +52,24 @@ export default function MedSpaSolution() {
             const Icon = item.icon;
             const isEven = i % 2 === 0;
             return (
-              <div key={i} className={`group flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"} gap-0 bg-white rounded-2xl border border-border overflow-hidden hover:shadow-md hover:border-primary/20 transition-all duration-300`}>
+              <div key={i} className={`group flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"} gap-0 bg-white rounded-2xl border border-border overflow-hidden hover:shadow-xl hover:border-primary/40 transition-all duration-300`}>
                 {/* Image */}
                 <div className="md:w-64 lg:w-72 h-48 md:h-auto flex-shrink-0 overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                 </div>
                 {/* Content */}
                 <div className="flex-1 p-8 flex flex-col justify-center">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/15 transition-colors">
+                    <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary/20 text-primary font-bold text-sm flex-shrink-0 group-hover:bg-primary/30 transition-colors">
+                      {i + 1}
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
                       <Icon className="w-5 h-5 text-primary" />
                     </div>
-                    <span className="text-xs font-bold text-foreground/40 uppercase tracking-widest">Step {i + 1}</span>
                   </div>
                   <h3 className="text-xl font-semibold text-foreground mb-3">{item.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>

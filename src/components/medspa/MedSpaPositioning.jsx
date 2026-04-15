@@ -72,7 +72,7 @@ export default function MedSpaPositioning() {
 
           {/* Loss indicator */}
           <div className="flex justify-center mt-8 relative z-20">
-            <div className="px-6 py-3 rounded-full bg-destructive/10 border border-destructive/30 backdrop-blur">
+            <div className="px-6 py-3 rounded-full bg-destructive/10 border border-destructive/30 backdrop-blur animate-pulse">
               <p className="text-sm font-bold text-destructive">❌ But many are lost to poor follow-up</p>
             </div>
           </div>

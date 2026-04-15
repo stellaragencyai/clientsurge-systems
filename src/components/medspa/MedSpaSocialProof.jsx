@@ -29,15 +29,17 @@ export default function MedSpaSocialProof() {
         {/* Testimonials */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {testimonials.map((t, i) => (
-            <div key={i} className="bg-white rounded-xl border border-border p-6 shadow-sm hover:shadow-md transition-shadow">
-              <div className="flex gap-1 mb-3">
+            <div key={i} className="bg-gradient-to-br from-white to-primary/3 rounded-xl border border-primary/15 p-6 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 group">
+              <div className="flex gap-1 mb-4">
                 {[...Array(t.rating)].map((_, j) => (
-                  <Star key={j} className="w-4 h-4 fill-primary text-primary" />
+                  <Star key={j} className="w-4 h-4 fill-primary text-primary animate-bounce" style={{animationDelay: `${j * 0.1}s`}} />
                 ))}
               </div>
-              <p className="text-sm text-foreground/80 mb-4 italic">"{t.text}"</p>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+              <p className="text-sm text-foreground/80 mb-5 italic leading-relaxed">"{t.text}"</p>
+              <div className="flex items-center gap-3 pt-4 border-t border-primary/10">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <span className="text-white text-xs font-bold">{t.name.charAt(0)}</span>
+                </div>
                 <div>
                   <p className="text-xs font-semibold text-foreground">{t.name}</p>
                   <p className="text-xs text-muted-foreground">{t.clinic}</p>
