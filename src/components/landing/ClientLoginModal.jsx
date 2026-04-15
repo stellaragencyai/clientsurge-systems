@@ -31,8 +31,8 @@ export default function ClientLoginModal({ onClose }) {
 
         {/* Modal */}
         <motion.div
-          className="relative w-full max-w-md overflow-hidden rounded-3xl shadow-2xl"
-          style={{ background: "#0f0e0c" }}
+          className="relative w-full max-w-md overflow-hidden rounded-3xl shadow-2xl z-50"
+          style={{ background: "#0f0e0c", margin: "0 auto" }}
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
