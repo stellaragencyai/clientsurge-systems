@@ -42,11 +42,17 @@ export default function Footer() {
   return (
     <>
       {/* Final CTA Section */}
-      <section className="bg-card border-t border-border py-14 px-6">
+      <section className="bg-gradient-to-br from-primary/3 to-primary/5 border-t border-primary/20 py-16 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <h3 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-6">
-            Ready to stop losing leads?
+          <div className="inline-block px-4 py-1 rounded-full bg-primary/10 border border-primary/20 mb-6">
+            <p className="text-xs font-bold text-primary uppercase tracking-widest">⏰ Time-Limited Offer</p>
+          </div>
+          <h3 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-3">
+            Get Your System Live in 5 Days
           </h3>
+          <p className="text-muted-foreground text-base mb-8 max-w-xl mx-auto">
+            Limited spots available this month. Average ROI: 14–30 days. No risk demo call — book now.
+          </p>
           <button
             onClick={() => window.location.href = '/start'}
             style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.3s ease, transform 0.3s ease",border:"none",cursor:"pointer"}} onMouseEnter={(e) => {
@@ -54,8 +60,8 @@ export default function Footer() {
             }} onMouseLeave={(e) => {
               e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
             }}>
-            <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 32px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
-              Book a 10-Min Demo
+            <span style={{display:"flex",alignItems:"center",gap:"8px",height:"52px",padding:"0 36px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
+              Book Your Free Demo
             </span>
           </button>
         </div>
@@ -70,9 +76,10 @@ export default function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
             {/* Brand column */}
             <div className="md:col-span-1">
-              <a href="#" className="font-display text-lg font-semibold text-foreground hover:text-primary transition-colors block mb-2">
-                Apex<span className="text-primary">Flow</span>
-              </a>
+              <div className="font-display font-semibold text-foreground flex flex-col leading-tight mb-2">
+                <span className="text-sm">ClientSurge</span>
+                <span className="text-xs text-primary">Systems</span>
+              </div>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Automation systems built to increase bookings.
               </p>
@@ -111,7 +118,7 @@ export default function Footer() {
               Built for service businesses • Designed for real results • No complex setup required
             </p>
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} ApexFlow. All rights reserved.
+              © {new Date().getFullYear()} ClientSurge Systems. All rights reserved.
             </p>
           </div>
         </div>

@@ -27,6 +27,9 @@ export default function MedSpaPricingPreview() {
         <div className="bg-white rounded-2xl border-2 border-primary/30 p-8 md:p-12 shadow-md" style={{boxShadow:"0 8px 40px rgba(120,70,20,0.10), 0 2px 8px rgba(0,0,0,0.06)"}}>
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
+              <div className="flex items-center gap-2 mb-6">
+               <div className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">⚡ LIMITED OFFER</div>
+              </div>
               <p className="text-sm font-semibold text-foreground mb-6">Every system includes:</p>
               <ul className="space-y-3">
                 {includes.map((item, i) => (

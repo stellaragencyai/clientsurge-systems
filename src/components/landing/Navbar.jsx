@@ -69,11 +69,16 @@ export default function Navbar() {
             };
             requestAnimationFrame(step);
           }}
-          className="font-display font-semibold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:text-primary transition-colors flex flex-col leading-tight"
+          className="font-display font-semibold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:text-primary transition-colors flex items-center gap-2 leading-tight"
           style={{ fontSize: "0.875rem" }}
         >
-          <span className="font-semibold">ClientSurge</span>
-          <span className="text-primary text-xs">Systems</span>
+          <div className="flex flex-col">
+            <span className="font-semibold">ClientSurge</span>
+            <span className="text-primary text-xs">Systems</span>
+          </div>
+          <div className="flex items-center justify-center w-4 h-4 rounded-full bg-primary/10">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+          </div>
         </button>
 
         {/* Center nav links */}
