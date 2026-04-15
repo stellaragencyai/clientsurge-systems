@@ -2,15 +2,6 @@ import { ArrowUp } from "lucide-react";
 
 const navColumns = [
   {
-    title: "What We Help You Do",
-    links: [
-      { label: "Capture leads instantly", href: "#how-it-works" },
-      { label: "Convert more inquiries", href: "#services" },
-      { label: "Recover missed calls", href: "#services" },
-      { label: "Automate follow-up", href: "#services" },
-    ],
-  },
-  {
     title: "Industries",
     links: [
       { label: "Med Spas & Clinics", href: "/med-spa" },
@@ -68,30 +59,11 @@ export default function Footer() {
         {/* Footer content */}
         <div className="max-w-7xl mx-auto px-6 py-16">
           
-          {/* Top section: Brand + Navigation */}
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-12">
-            {/* Brand column */}
-            <div className="md:col-span-1">
-              <div className="font-display font-semibold text-foreground flex flex-col leading-tight mb-2">
-                <span className="text-sm">ClientSurge</span>
-                <span className="text-xs text-primary">Systems</span>
-              </div>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                Automation systems built to increase bookings.
-              </p>
-              <button
-                onClick={scrollTop}
-                className="mt-4 w-8 h-8 rounded-full border border-border bg-background hover:border-primary hover:bg-primary/5 flex items-center justify-center text-foreground transition-all"
-                aria-label="Back to top"
-              >
-                <ArrowUp className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Navigation columns */}
+          {/* Navigation columns — centered */}
+          <div className="flex flex-col md:flex-row justify-center gap-16 md:gap-24 mb-12 text-center">
             {navColumns.map((col) => (
-              <div key={col.title} className="md:col-span-1">
-                <p className="text-xs font-semibold text-foreground uppercase tracking-widest mb-4">{col.title}</p>
+              <div key={col.title}>
+                <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "#9a5c2e" }}>{col.title}</p>
                 <ul className="space-y-2.5">
                   {col.links.map((link) => (
                     <li key={link.label}>
@@ -108,7 +80,7 @@ export default function Footer() {
           {/* Divider */}
           <div className="border-t border-border mb-8" />
 
-          {/* Bottom section: Trust signals + Copyright */}
+          {/* Bottom section */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="text-xs text-muted-foreground text-center md:text-left">
               ClientSurge Systems · Phoenix, Arizona · <a href="mailto:system@clientsurgesystems.com" className="hover:text-primary transition-colors">system@clientsurgesystems.com</a>
@@ -116,6 +88,13 @@ export default function Footer() {
             <p className="text-xs text-muted-foreground">
               © {new Date().getFullYear()} ClientSurge Systems. All rights reserved.
             </p>
+            <button
+              onClick={scrollTop}
+              className="w-8 h-8 rounded-full border border-border bg-background hover:border-primary hover:bg-primary/5 flex items-center justify-center text-foreground transition-all"
+              aria-label="Back to top"
+            >
+              <ArrowUp className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
