@@ -15,25 +15,26 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Lead data missing' }, { status: 400 });
     }
 
-    // Generate message
+    // Generate message (exact spec)
     const firstName = lead.full_name ? lead.full_name.split(' ')[0] : 'there';
-    const message = `Hey ${firstName}, thanks for reaching out — what service were you interested in?`;
+    const smsMessage = `Hey ${firstName}, thanks for reaching out — what can we help you with?`;
+    const emailSubject = 'We got your request';
+    const emailBody = `Hey ${firstName}, we received your request and will follow up shortly.`;
 
     // Send SMS if phone exists
     if (lead.phone) {
       await base44.functions.invoke('sendSMS', {
         phone: lead.phone,
-        message,
+        message: smsMessage,
         leadId: lead.id,
       });
     }
 
     // Send confirmation email if email exists
     if (lead.email) {
-      const emailBody = `<p>Hi ${firstName},</p><p>${message}</p><p>Looking forward to helping you!</p>`;
       await base44.functions.invoke('sendEmail', {
         email: lead.email,
-        subject: 'Thanks for Reaching Out!',
+        subject: emailSubject,
         body: emailBody,
         leadId: lead.id,
       });
