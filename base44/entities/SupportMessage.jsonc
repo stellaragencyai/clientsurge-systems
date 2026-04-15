@@ -1,0 +1,42 @@
+{
+  "name": "SupportMessage",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "title": "Project ID"
+    },
+    "sender_email": {
+      "type": "string",
+      "title": "Sender Email"
+    },
+    "sender_name": {
+      "type": "string",
+      "title": "Sender Name"
+    },
+    "role": {
+      "type": "string",
+      "title": "Role",
+      "enum": [
+        "client",
+        "admin"
+      ],
+      "default": "client"
+    },
+    "message": {
+      "type": "string",
+      "title": "Message"
+    },
+    "read": {
+      "type": "boolean",
+      "title": "Read",
+      "default": false
+    }
+  },
+  "required": [
+    "project_id",
+    "sender_email",
+    "message",
+    "role"
+  ]
+}

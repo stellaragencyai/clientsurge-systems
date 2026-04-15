@@ -19,6 +19,7 @@ import LeadIntelligence from './pages/LeadIntelligence';
 import Sam from './pages/Sam';
 import MedSpaDashboard from './pages/MedSpaDashboard';
 import Start from './pages/Start';
+import ClientPortal from './pages/ClientPortal';
 import Book from './pages/Book';
 import Success from './pages/Success';
 
@@ -63,6 +64,7 @@ const AuthenticatedApp = () => {
       <Route path="/lead-intelligence" element={<LeadIntelligence />} />
       <Route path="/sam" element={<Sam />} />
       <Route path="/medspa-dashboard" element={<MedSpaDashboard />} />
+      <Route path="/client-portal" element={<ClientPortal />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

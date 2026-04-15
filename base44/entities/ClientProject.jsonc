@@ -1,0 +1,136 @@
+{
+  "name": "ClientProject",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (links to Client entity)"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "client_name": {
+      "type": "string",
+      "title": "Client Name"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "plan": {
+      "type": "string",
+      "title": "Current Plan",
+      "enum": [
+        "Starter System",
+        "Growth System",
+        "Pro System"
+      ],
+      "default": "Starter System"
+    },
+    "plan_change_request": {
+      "type": "string",
+      "title": "Plan Change Request",
+      "enum": [
+        "None",
+        "Starter System",
+        "Growth System",
+        "Pro System"
+      ],
+      "default": "None"
+    },
+    "step_onboarding": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "complete"
+      ],
+      "default": "pending",
+      "title": "Step 1: Onboarding Form"
+    },
+    "step_payment": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "complete"
+      ],
+      "default": "pending",
+      "title": "Step 2: Payment Confirmed"
+    },
+    "step_system_setup": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "complete"
+      ],
+      "default": "pending",
+      "title": "Step 3: System Setup"
+    },
+    "step_sms": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "complete"
+      ],
+      "default": "pending",
+      "title": "Step 4: SMS Connected"
+    },
+    "step_email": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "complete"
+      ],
+      "default": "pending",
+      "title": "Step 5: Email Connected"
+    },
+    "step_booking": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "complete"
+      ],
+      "default": "pending",
+      "title": "Step 6: Booking Flow Live"
+    },
+    "step_followup": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "complete"
+      ],
+      "default": "pending",
+      "title": "Step 7: Follow-Up Active"
+    },
+    "step_live": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "complete"
+      ],
+      "default": "pending",
+      "title": "Step 8: Full System Running"
+    },
+    "admin_notes": {
+      "type": "string",
+      "title": "Admin Notes (internal)"
+    },
+    "go_live_date": {
+      "type": "string",
+      "title": "Go-Live Date"
+    }
+  },
+  "required": [
+    "client_email",
+    "client_name",
+    "business_name"
+  ]
+}
