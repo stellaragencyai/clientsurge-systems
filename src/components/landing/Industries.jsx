@@ -45,7 +45,7 @@ const industries = [
     desc: "Respond to property inquiries within minutes. Automate showing scheduling, follow-ups, and buyer nurturing from first contact to closing.",
     result: "5× more showings scheduled • 42% faster lead response",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=900&q=85",
     bullets: [
       "Instant lead response under 90 seconds, 24/7",
       "Auto-qualify buyers with smart SMS sequences",
