@@ -36,11 +36,11 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-6 py-16">
           
           {/* Navigation columns — centered */}
-          <div className="flex flex-col md:flex-row justify-center gap-16 md:gap-24 mb-12 text-center">
+          <div className="flex flex-col md:flex-row justify-center gap-20 md:gap-36 mb-12 text-center">
             {navColumns.map((col) => (
               <div key={col.title}>
-                <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "#9a5c2e" }}>{col.title}</p>
-                <ul className="space-y-2.5">
+                <p className="text-xs font-semibold uppercase tracking-widest mb-6" style={{ color: "#9a5c2e" }}>{col.title}</p>
+                <ul className="space-y-3.5">
                   {col.links.map((link) => (
                     <li key={link.label}>
                       <a href={link.href} className="text-xs text-muted-foreground hover:text-primary transition-colors">

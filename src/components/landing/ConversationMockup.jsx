@@ -209,7 +209,7 @@ export default function ConversationMockup() {
 
         {/* Phone container */}
         <div className="flex justify-center" style={{ perspective: "1200px" }}>
-        <div style={{ maxWidth: "563px", width: "100%" }}>
+        <div style={{ maxWidth: "535px", width: "100%", paddingX: "5%" }}>
           {/* 3D tilt wrapper */}
           <div style={{ transform: "rotateY(-2deg) rotateX(1deg)" }}>
           {/* Phone shell */}

@@ -39,10 +39,10 @@ function FeatureCard({ item, onSelect, isSelected }) {
       className="relative cursor-pointer group"
       onClick={() => onSelect(item.step)}
     >
-      {/* Step label above card - centered */}
-      <div className="text-center mb-3">
+      {/* Step label above card - centered and positioned above */}
+      <div className="text-center mb-1 -mt-6">
         <span
-          className="text-xs font-bold uppercase tracking-widest"
+          className="text-lg font-black uppercase tracking-widest"
           style={{ color: "#9a5c2e" }}
         >
           Step {stepNum}
