@@ -43,7 +43,7 @@ export default function Footer() {
                 <ul className="space-y-3.5">
                   {col.links.map((link) => (
                     <li key={link.label}>
-                      <a href={link.href} className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                      <a href={link.href} className="text-xs text-foreground/85 hover:text-primary focus:ring-2 focus:ring-primary focus:outline-none rounded px-2 py-1 inline-block transition-colors">
                         {link.label}
                       </a>
                     </li>
@@ -58,15 +58,15 @@ export default function Footer() {
 
           {/* Bottom section */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-xs text-muted-foreground text-center md:text-left">
-              ClientSurge Systems · Phoenix, Arizona · <a href="mailto:system@clientsurgesystems.com" className="hover:text-primary transition-colors">system@clientsurgesystems.com</a>
+            <p className="text-xs text-foreground/75 text-center md:text-left">
+              ClientSurge Systems · Phoenix, Arizona · <a href="mailto:system@clientsurgesystems.com" className="hover:text-primary focus:ring-2 focus:ring-primary focus:outline-none rounded px-1 transition-colors">system@clientsurgesystems.com</a>
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-foreground/75">
               © {new Date().getFullYear()} ClientSurge Systems. All rights reserved.
             </p>
             <button
               onClick={scrollTop}
-              className="w-8 h-8 rounded-full border border-border bg-background hover:border-primary hover:bg-primary/5 flex items-center justify-center text-foreground transition-all"
+              className="w-10 h-10 rounded-full border border-border bg-background hover:border-primary hover:bg-primary/5 flex items-center justify-center text-foreground focus:ring-2 focus:ring-primary focus:outline-none transition-all"
               aria-label="Back to top"
             >
               <ArrowUp className="w-4 h-4" />

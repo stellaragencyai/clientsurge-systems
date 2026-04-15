@@ -17,6 +17,9 @@ export default function DemoBookingModal({ onClose }) {
   });
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -26,18 +29,40 @@ export default function DemoBookingModal({ onClose }) {
     setScheduling((s) => ({ ...s, [e.target.name]: e.target.value }));
   };
 
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePhone = (phone) => /^[\d\s\-()]+$/.test(phone) && phone.replace(/\D/g, '').length >= 10;
+
   const handleStep1Submit = (e) => {
     e.preventDefault();
-    if (form.full_name && form.business_name && form.email && form.phone) {
+    setSubmitAttempted(true);
+    const newErrors = {};
+    
+    if (!form.full_name.trim()) newErrors.full_name = "Name is required";
+    if (!form.business_name.trim()) newErrors.business_name = "Business name is required";
+    if (!form.email.trim()) newErrors.email = "Email is required";
+    else if (!validateEmail(form.email)) newErrors.email = "Please enter a valid email";
+    if (!form.phone.trim()) newErrors.phone = "Phone is required";
+    else if (!validatePhone(form.phone)) newErrors.phone = "Please enter a valid phone number";
+    
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length === 0) {
       setStep(2);
     }
   };
 
   const handleStep2Submit = async (e) => {
     e.preventDefault();
-    if (!scheduling.date || !scheduling.time) return;
+    
+    const now = Date.now();
+    if (now - lastSubmitTime < 3000) return;
+    
+    if (!scheduling.date || !scheduling.time) {
+      setErrors({ scheduling: "Please select both date and time" });
+      return;
+    }
 
     setSaving(true);
+    setLastSubmitTime(now);
     try {
       const result = await base44.functions.invoke('scheduleDemoBooking', {
         full_name: form.full_name,
@@ -53,28 +78,33 @@ export default function DemoBookingModal({ onClose }) {
         setSuccess(true);
         setTimeout(() => {
           onClose();
-          window.location.href = '/';
-        }, 4000);
+          window.location.href = '/book?success=true';
+        }, 3000);
       }
     } catch (error) {
-      alert('Error scheduling demo: ' + error.message);
+      setErrors({ submit: "Something went wrong. Please try again or contact support." });
     } finally {
       setSaving(false);
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Escape') onClose();
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onKeyDown={handleKeyDown} tabIndex={0}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden z-50 animate-in fade-in zoom-in duration-300">
         {/* Header */}
         <div className="px-8 pt-8 pb-5 border-b border-border">
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-muted hover:bg-border transition-colors"
+            className="absolute top-5 right-5 w-10 h-10 flex items-center justify-center rounded-full bg-muted hover:bg-border focus:ring-2 focus:ring-primary focus:outline-none transition-colors"
+            aria-label="Close dialog"
           >
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
@@ -115,55 +145,61 @@ export default function DemoBookingModal({ onClose }) {
         {/* Step 1: Info Collection */}
         {!success && step === 1 && (
           <form onSubmit={handleStep1Submit} className="px-8 py-6 space-y-4">
+            {errors.submit && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 flex items-start gap-2">
+                <span className="text-lg">⚠️</span>
+                <span>{errors.submit}</span>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 sm:col-span-1">
-                <label className="block text-xs font-semibold text-foreground mb-1.5">Full Name *</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Full Name <span className="text-red-600">*</span></label>
                 <input
                   name="full_name"
                   value={form.full_name}
                   onChange={handleChange}
-                  required
                   placeholder="Jane Smith"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.full_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
+                {errors.full_name && <p className="text-red-600 text-xs mt-1">❌ {errors.full_name}</p>}
               </div>
               <div className="col-span-2 sm:col-span-1">
-                <label className="block text-xs font-semibold text-foreground mb-1.5">Business Name *</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Business Name <span className="text-red-600">*</span></label>
                 <input
                   name="business_name"
                   value={form.business_name}
                   onChange={handleChange}
-                  required
                   placeholder="My Business"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.business_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
+                {errors.business_name && <p className="text-red-600 text-xs mt-1">❌ {errors.business_name}</p>}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 sm:col-span-1">
-                <label className="block text-xs font-semibold text-foreground mb-1.5">Email *</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Email <span className="text-red-600">*</span></label>
                 <input
                   name="email"
                   type="email"
                   value={form.email}
                   onChange={handleChange}
-                  required
                   placeholder="jane@business.com"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.email ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
+                {errors.email && <p className="text-red-600 text-xs mt-1">❌ {errors.email}</p>}
               </div>
               <div className="col-span-2 sm:col-span-1">
-                <label className="block text-xs font-semibold text-foreground mb-1.5">Phone *</label>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Phone <span className="text-red-600">*</span></label>
                 <input
                   name="phone"
                   type="tel"
                   value={form.phone}
                   onChange={handleChange}
-                  required
                   placeholder="(555) 000-0000"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.phone ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
+                {errors.phone && <p className="text-red-600 text-xs mt-1">❌ {errors.phone}</p>}
               </div>
             </div>
 
@@ -186,7 +222,9 @@ export default function DemoBookingModal({ onClose }) {
             <button
               type="submit"
               style={{background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}
-              className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90"
+              className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 focus:ring-2 focus:ring-primary focus:outline-none"
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)"}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"}
             >
               Next: Choose Time <ArrowRight className="w-4 h-4" />
             </button>
@@ -198,26 +236,30 @@ export default function DemoBookingModal({ onClose }) {
         {/* Step 2: Scheduling */}
         {!success && step === 2 && (
           <form onSubmit={handleStep2Submit} className="px-8 py-6 space-y-4">
+            {errors.scheduling && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 flex items-start gap-2">
+                <span className="text-lg">⚠️</span>
+                <span>{errors.scheduling}</span>
+              </div>
+            )}
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1.5">Select Date *</label>
+              <label className="block text-xs font-semibold text-foreground mb-1.5">Select Date <span className="text-red-600">*</span></label>
               <input
                 name="date"
                 type="date"
                 value={scheduling.date}
                 onChange={handleSchedulingChange}
-                required
-                className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1.5">Select Time *</label>
+              <label className="block text-xs font-semibold text-foreground mb-1.5">Select Time <span className="text-red-600">*</span></label>
               <select
                 name="time"
                 value={scheduling.time}
                 onChange={handleSchedulingChange}
-                required
-                className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
               >
                 <option value="">Choose a time…</option>
                 <option value="09:00">9:00 AM</option>
@@ -244,16 +286,18 @@ export default function DemoBookingModal({ onClose }) {
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setStep(1)}
-                className="flex-1 h-12 rounded-full border border-input text-foreground font-semibold hover:bg-muted transition"
+                onClick={() => { setStep(1); setErrors({}); }}
+                className="flex-1 h-12 rounded-full border border-input text-foreground font-semibold hover:bg-muted focus:ring-2 focus:ring-primary focus:outline-none transition"
               >
                 Back
               </button>
               <button
                 type="submit"
-                disabled={saving}
+                disabled={saving || (Date.now() - lastSubmitTime < 3000 && lastSubmitTime > 0)}
                 style={{background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}
-                className="flex-1 h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-60"
+                className="flex-1 h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-60 focus:ring-2 focus:ring-primary focus:outline-none"
+                onMouseEnter={(e) => !saving && (e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)")}
+                onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"}
               >
                 {saving ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling…</>

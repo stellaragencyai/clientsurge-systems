@@ -128,6 +128,12 @@ export default function ConversationMockup() {
   };
 
   const startAnimation = () => {
+    const now = Date.now();
+    const lastRun = sessionStorage.getItem('lastConvAnimRun');
+    // Rate limit: don't restart animation more than once per 2 seconds
+    if (lastRun && now - parseInt(lastRun) < 2000) return;
+    
+    sessionStorage.setItem('lastConvAnimRun', now.toString());
     clearAllTimeouts();
     setVisibleSteps([]);
     setShowTyping(false);
@@ -358,7 +364,7 @@ export default function ConversationMockup() {
             <button
               onClick={startAnimation}
               disabled={animating}
-              className="text-xs font-medium text-primary hover:text-primary/80 transition-colors disabled:opacity-40 flex items-center gap-1.5 mx-auto replay-pulse"
+              className="text-xs font-medium text-primary hover:text-primary/80 focus:ring-2 focus:ring-primary focus:outline-none rounded px-3 py-2 transition-colors disabled:opacity-40 flex items-center gap-1.5 mx-auto replay-pulse"
             >
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M1 4v6h6" /><path d="M3.51 15a9 9 0 1 0 .49-4" />

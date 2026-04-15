@@ -99,7 +99,7 @@ export default function Pricing() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {plans.map((plan, i) => (
             <PricingCard key={i} plan={plan} />
           ))}
@@ -110,15 +110,15 @@ export default function Pricing() {
           <p className="text-foreground font-semibold text-base mb-4">
             Not sure which system fits your business? We'll recommend the best option based on your lead flow.
           </p>
-          <button onClick={scrollToDemo} className="shiny-brown-btn" onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+          <button onClick={scrollToDemo} className="shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none" onMouseEnter={(e) => {
+           e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
           }} onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
+           e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
           }}>
-            <span className="shiny-brown-inner flex items-center justify-center gap-2 h-12 px-8 rounded-full font-semibold text-sm">
-              Book a 10-Min Demo
-              <ArrowRight className="w-4 h-4" />
-            </span>
+           <span className="shiny-brown-inner flex items-center justify-center gap-2 h-12 px-8 rounded-full font-semibold text-sm">
+             Book a 10-Min Demo
+             <ArrowRight className="w-4 h-4" />
+           </span>
           </button>
         </div>
 
@@ -237,7 +237,7 @@ function PricingCard({ plan }) {
         </ul>
 
         {/* CTA */}
-        <button onClick={scrollToDemo} className="w-full shiny-brown-btn" onMouseEnter={(e) => {
+        <button onClick={scrollToDemo} className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none" onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
           }} onMouseLeave={(e) => {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";

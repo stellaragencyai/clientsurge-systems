@@ -142,7 +142,8 @@ export default function Industries() {
               {/* Full image */}
               <img
                 src={ind.image}
-                alt={ind.name}
+                alt={`${ind.name} - ${ind.problem}`}
+                loading="lazy"
                 className="w-full h-full object-cover absolute inset-0 transition-transform duration-700 group-hover:scale-105"
                 style={{ minHeight: "560px" }}
               />
@@ -189,10 +190,11 @@ export default function Industries() {
               {/* Close */}
               <button
                 onClick={() => setSelected(null)}
-                className="absolute top-6 right-6 z-20 w-11 h-11 rounded-full flex items-center justify-center transition-all"
+                className="absolute top-6 right-6 z-20 w-12 h-12 rounded-full flex items-center justify-center transition-all focus:ring-2 focus:ring-white focus:outline-none hover:bg-white/20"
                 style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)" }}
+                aria-label="Close industry details"
               >
-                <X className="w-5 h-5 text-white" />
+                <X className="w-6 h-6 text-white" />
               </button>
 
               {/* Main layout: top image, bottom content */}
@@ -202,7 +204,8 @@ export default function Industries() {
                 <div className="relative overflow-hidden" style={{ minHeight: "500px" }}>
                   <img
                     src={selected.image}
-                    alt={selected.name}
+                    alt={`${selected.name} - Industry solution for lead conversion`}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                     style={{ minHeight: "700px" }}
                   />
@@ -263,11 +266,12 @@ export default function Industries() {
                   {/* CTA */}
                   <div>
                     <button
-                      onClick={() => { setSelected(null); setShowLeadModal(true); }}
-                      style={{ display: "block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 24px rgba(120,70,20,0.45)", border: "none", cursor: "pointer", width: "100%", marginBottom: "12px" }}
-                      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 48px rgba(161,120,35,0.65), 0 4px 18px rgba(120,70,20,0.4)"; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(120,70,20,0.45)"; }}
-                    >
+                       onClick={() => { setSelected(null); setShowLeadModal(true); }}
+                       style={{ display: "block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 24px rgba(120,70,20,0.45)", border: "none", cursor: "pointer", width: "100%", marginBottom: "12px" }}
+                       onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 48px rgba(161,120,35,0.65), 0 4px 18px rgba(120,70,20,0.4)"; }}
+                       onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(120,70,20,0.45)"; }}
+                       className="focus:ring-2 focus:ring-white focus:outline-none"
+                     >
                       <span className="font-inter" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", height: "56px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1.05rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
                         Book a Free Demo
                         <ArrowRight className="w-5 h-5" />

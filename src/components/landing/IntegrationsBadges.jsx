@@ -20,12 +20,16 @@ export default function IntegrationsBadges() {
           {integrations.map((int, i) => (
             <div
               key={i}
-              className="inline-flex items-center px-4 py-2 bg-white border border-border rounded-full shadow-sm hover:shadow-md transition-shadow"
+              className="inline-flex items-center px-4 py-2 bg-white border border-border rounded-full shadow-sm hover:shadow-md focus-within:ring-2 focus-within:ring-primary transition-all"
               title={int.name}
+              role="img"
+              aria-label={`${int.name} integration`}
+              tabIndex={0}
             >
               <img 
                 src={int.logo} 
-                alt={int.name}
+                alt={`${int.name} logo`}
+                loading="lazy"
                 style={{ height: `${int.height}px`, maxWidth: '120px', objectFit: 'contain' }}
                 className="grayscale hover:grayscale-0 transition-all"
               />

@@ -109,13 +109,16 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-3 shrink-0">
           <button
             onClick={() => setShowLoginModal(true)}
-            className="text-sm font-semibold text-foreground hover:text-primary transition-colors"
+            className="text-sm font-semibold text-foreground hover:text-primary focus:ring-2 focus:ring-primary focus:outline-none rounded px-3 py-2 transition-colors"
           >
             Login
           </button>
           <button
             onClick={() => setShowDemoModal(true)}
             style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 14px rgba(120,70,20,0.35)",transition:"box-shadow 0.3s ease, transform 0.3s ease",border:"none",cursor:"pointer"}}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)"}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 14px rgba(120,70,20,0.35)"}
+            className="focus:ring-2 focus:ring-primary focus:outline-none rounded"
           >
             <span style={{display:"flex",alignItems:"center",gap:"6px",height:"36px",padding:"0 20px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"600",fontSize:"0.875rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
               Book a Demo
@@ -137,8 +140,8 @@ export default function Navbar() {
             <a
               key={l.href}
               href={l.href}
-              className="block text-sm text-muted-foreground hover:text-foreground"
-              onClick={(e) => scrollTo(e, l.href)}
+              className="block text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded px-2 py-1"
+              onClick={(e) => { scrollTo(e, l.href); setOpen(false); }}
             >
               {l.label}
             </a>

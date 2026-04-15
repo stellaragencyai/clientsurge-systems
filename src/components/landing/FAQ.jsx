@@ -76,12 +76,12 @@ export default function FAQ() {
             <AccordionItem
               key={i}
               value={`faq-${i}`}
-              className="border border-slate-600/0 hover:border-slate-600 rounded-xl px-6 data-[state=open]:border-amber-500/40 transition-colors bg-background overflow-hidden"
+              className="border border-slate-600/0 hover:border-slate-600 rounded-xl px-6 data-[state=open]:border-amber-500/40 transition-colors bg-background overflow-hidden focus-within:ring-2 focus-within:ring-primary"
             >
-              <AccordionTrigger className="text-left text-sm font-semibold hover:no-underline py-5">
+              <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
                 {faq.q}
               </AccordionTrigger>
-              <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-5">
+              <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5">
                 {faq.a}
               </AccordionContent>
             </AccordionItem>
