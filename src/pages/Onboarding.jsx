@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { CheckCircle2, AlertCircle } from "lucide-react";
+import OnboardingChatWidget from "../components/onboarding/OnboardingChatWidget";
 
 const SERVICES = ["Botox / Injectables", "Fillers", "Laser Treatments", "Facials / Skincare", "Body Contouring", "Weight Loss"];
 const LEAD_SOURCES = ["Website Forms", "Instagram DMs", "Phone Calls", "Paid Ads"];
@@ -473,6 +474,7 @@ export default function Onboarding() {
         </form>
       </div>
     </div>
+    <OnboardingChatWidget />
   );
 }
 
