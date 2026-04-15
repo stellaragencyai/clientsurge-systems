@@ -73,8 +73,15 @@ function CardWithFadeIn({ children, delay = 0 }) {
 
 export default function ProblemSolution() {
   return (
-    <section id="services" className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card to-background">
-      <div className="max-w-6xl mx-auto">
+    <section id="services" className="py-20 md:py-28 px-4 md:px-6 relative overflow-hidden">
+      {/* Luxury gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white via-amber-50/40 to-white pointer-events-none" />
+      
+      {/* Subtle accent blurs */}
+      <div className="absolute top-20 right-1/4 w-96 h-96 bg-amber-200/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-32 left-1/3 w-80 h-80 bg-amber-100/15 rounded-full blur-3xl pointer-events-none" />
+      
+      <div className="max-w-6xl mx-auto relative z-10">
 
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-20">
@@ -101,17 +108,37 @@ export default function ProblemSolution() {
                 {/* Problem */}
                 <CardWithFadeIn delay={i * 40}>
                   <div 
-                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-red-600 hover:shadow-lg relative overflow-hidden"
+                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-500 hover:scale-105 relative overflow-hidden backdrop-blur-sm group"
                     style={{
-                      backgroundColor: `rgba(239,68,68,0.05)`,
-                      borderColor: `#000000`,
-                      borderWidth: `2px`,
+                      backgroundColor: `rgba(255,255,255,0.75)`,
+                      borderColor: `rgba(239,68,68,0.3)`,
+                      borderWidth: `1.5px`,
+                      boxShadow: `
+                        0 8px 32px rgba(239,68,68,0.1),
+                        0 1px 0 rgba(255,255,255,0.8) inset,
+                        0 0 1px rgba(239,68,68,0.2)
+                      `,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = `
+                        0 20px 60px rgba(239,68,68,0.15),
+                        0 1px 0 rgba(255,255,255,0.8) inset,
+                        0 0 40px rgba(239,68,68,0.12)
+                      `;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = `
+                        0 8px 32px rgba(239,68,68,0.1),
+                        0 1px 0 rgba(255,255,255,0.8) inset,
+                        0 0 1px rgba(239,68,68,0.2)
+                      `;
                     }}
                   >
+                    {/* Shimmer effect */}
                     <div 
-                      className="absolute inset-0 pointer-events-none"
+                      className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                       style={{
-                        background: "linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)",
+                        background: "linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)",
                         animation: "shimmer 3s infinite",
                       }}
                     />
@@ -143,17 +170,37 @@ export default function ProblemSolution() {
                 {/* Solution */}
                 <CardWithFadeIn delay={i * 40 + 80}>
                   <div 
-                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-amber-600 hover:shadow-lg min-h-36 relative overflow-hidden"
+                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-500 hover:scale-105 relative overflow-hidden backdrop-blur-sm group min-h-36"
                     style={{
-                      backgroundColor: `rgba(200,150,92,0.08)`,
-                      borderColor: `#000000`,
-                      borderWidth: `2px`,
+                      backgroundColor: `rgba(255,255,255,0.8)`,
+                      borderColor: `rgba(154,92,46,0.3)`,
+                      borderWidth: `1.5px`,
+                      boxShadow: `
+                        0 8px 32px rgba(154,92,46,0.12),
+                        0 1px 0 rgba(255,255,255,0.9) inset,
+                        0 0 1px rgba(154,92,46,0.15)
+                      `,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.boxShadow = `
+                        0 20px 60px rgba(154,92,46,0.18),
+                        0 1px 0 rgba(255,255,255,0.9) inset,
+                        0 0 40px rgba(154,92,46,0.15)
+                      `;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.boxShadow = `
+                        0 8px 32px rgba(154,92,46,0.12),
+                        0 1px 0 rgba(255,255,255,0.9) inset,
+                        0 0 1px rgba(154,92,46,0.15)
+                      `;
                     }}
                   >
+                    {/* Shimmer effect */}
                     <div 
-                      className="absolute inset-0 pointer-events-none"
+                      className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                       style={{
-                        background: "linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)",
+                        background: "linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)",
                         animation: "shimmer 3s infinite",
                       }}
                     />
