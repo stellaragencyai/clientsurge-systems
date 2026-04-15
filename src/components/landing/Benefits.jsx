@@ -131,7 +131,7 @@ export default function Benefits() {
         </div>
 
         <div className="text-center mt-14">
-          <a href="#book-demo" style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.5s ease, transform 0.3s ease", cursor:"pointer"}} onMouseEnter={(e) => {
+          <button onClick={() => window.location.href = '/book'} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.5s ease, transform 0.3s ease", cursor:"pointer",border:"none"}} onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
           }} onMouseLeave={(e) => {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
@@ -140,7 +140,7 @@ export default function Benefits() {
               Book a Demo
               <ArrowRight className="w-4 h-4" />
             </span>
-          </a>
+          </button>
         </div>
       </div>
     </section>

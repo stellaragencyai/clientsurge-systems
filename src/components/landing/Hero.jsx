@@ -3,7 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import HeroSection from "./HeroSection";
 import StatCounter from "./StatCounter";
-import LeadCaptureModal from "../forms/LeadCaptureModal";
+import DemoBookingModal from "../forms/DemoBookingModal";
 
 const TICKER_EVENTS = [
   "📅 Consultation booked — Scottsdale, AZ",
@@ -57,7 +57,7 @@ const businessTypes = [
 ];
 
 export default function Hero() {
-  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [showDemoModal, setShowDemoModal] = useState(false);
 
   const handleLearnMore = (e) => {
     e.preventDefault();
@@ -87,7 +87,7 @@ export default function Hero() {
         backgroundGradient="linear-gradient(to bottom, hsl(40, 8%, 88%), hsl(0, 0%, 100%))"
         primaryCTA={{
           label: "Book a Demo",
-          onClick: () => setShowLeadModal(true),
+          onClick: () => setShowDemoModal(true),
         }}
         secondaryCTA={{
           label: "See How It Works ↓",
@@ -101,14 +101,7 @@ export default function Hero() {
         </div>
       </HeroSection>
 
-      <LeadCaptureModal 
-        isOpen={showLeadModal} 
-        onClose={() => setShowLeadModal(false)}
-        onSuccess={() => {
-          setShowLeadModal(false);
-          window.location.href = '/book';
-        }}
-      />
+      {showDemoModal && <DemoBookingModal onClose={() => setShowDemoModal(false)} />}
     </>
   );
 }
