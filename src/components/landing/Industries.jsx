@@ -136,38 +136,25 @@ export default function Industries() {
             <button
               key={i}
               onClick={() => setSelected(ind)}
-              className="group relative flex flex-col overflow-hidden cursor-pointer text-left focus:outline-none outline-4 outline outline-transparent transition-all duration-300 hover:outline-[#a0714f]"
+              className="group relative overflow-hidden cursor-pointer text-left focus:outline-none"
               style={{ minHeight: "560px" }}
             >
-              {/* Image — 70% */}
-              <div className="relative overflow-hidden" style={{ flex: "0 0 70%" }}>
-                <img
-                  src={ind.image}
-                  alt={ind.name}
-                  className="w-full h-full object-cover"
-                  style={{ minHeight: "320px" }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/25 to-black/55" />
+              {/* Full image */}
+              <img
+                src={ind.image}
+                alt={ind.name}
+                className="w-full h-full object-cover absolute inset-0 transition-transform duration-700 group-hover:scale-105"
+                style={{ minHeight: "560px" }}
+              />
+              {/* Gradient overlay — stronger at bottom for title legibility */}
+              <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.75) 100%)" }} />
 
+              {/* Title at bottom */}
+              <div className="absolute bottom-0 left-0 right-0 px-6 py-5">
+                <h3 className="text-base font-bold text-white leading-snug drop-shadow-lg">
+                  {ind.name}
+                </h3>
               </div>
-
-              {/* Content — 30% */}
-              <div className="relative flex-1 bg-white px-6 py-5 flex flex-col justify-between border-t border-border">
-                <div>
-                  <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors leading-snug">
-                    {ind.name}
-                  </h3>
-                  <p className="text-xs font-medium text-primary/80 mb-2">{ind.problem}</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{ind.desc}</p>
-                </div>
-                <div className="mt-3 flex items-center justify-end">
-                   <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform flex-shrink-0" />
-                 </div>
-              </div>
-
-              {i % 3 !== 2 && (
-                <div className="absolute top-0 right-0 w-px h-full bg-border/40 hidden md:block" />
-              )}
             </button>
           );
         })}
