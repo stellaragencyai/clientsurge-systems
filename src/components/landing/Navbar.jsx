@@ -99,13 +99,19 @@ export default function Navbar() {
 
         {/* CTA — pinned right */}
         <div className="hidden md:flex items-center gap-3 shrink-0">
+          <a
+            href="/client-portal"
+            className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+          >
+            Client Login
+          </a>
           <button
             onClick={() => {
               window.location.href = '/admin';
             }}
-            className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
+            className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors text-xs"
           >
-            Login
+            Admin
           </button>
           <button
             onClick={() => setShowLeadModal(true)}

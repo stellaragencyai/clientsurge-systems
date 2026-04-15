@@ -72,9 +72,26 @@ export default function Onboarding() {
     setError(null);
 
     try {
+      // 1. Create the Client record
       await base44.entities.Client.create({
         ...formData,
         status: "Onboarding",
+      });
+
+      // 2. Auto-create the ClientProject so the portal is ready immediately
+      await base44.entities.ClientProject.create({
+        client_email: formData.email,
+        client_name: formData.full_name,
+        business_name: formData.business_name,
+        plan: "Starter System",
+        step_onboarding: "complete",
+      });
+
+      // 3. Send portal welcome email
+      await base44.functions.invoke("sendPortalWelcomeEmail", {
+        client_name: formData.full_name,
+        client_email: formData.email,
+        business_name: formData.business_name,
       });
 
       setSubmitted(true);
