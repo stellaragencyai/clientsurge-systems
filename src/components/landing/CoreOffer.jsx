@@ -46,25 +46,30 @@ export default function CoreOffer() {
         </div>
 
         {/* Feature grid cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
           {includes.map((item, i) => {
             const Icon = item.icon;
             return (
               <div
                 key={i}
-                className="group flex items-start gap-4 p-5 rounded-2xl border bg-white transition-all duration-300 cursor-default hover:shadow-md hover:border-primary/40"
+                className="group flex items-start gap-5 p-7 rounded-2xl border bg-white transition-all duration-300 cursor-default hover:shadow-md hover:border-primary/40 min-h-[120px]"
                 style={{ borderColor: "hsl(var(--border))" }}
               >
                 {/* Step number */}
-                <span className="text-xs font-bold text-primary/40 group-hover:text-primary/70 transition-colors mt-0.5 w-6 flex-shrink-0">{item.step}</span>
+                <span
+                  className="text-3xl font-black flex-shrink-0 leading-none mt-1 transition-colors duration-300"
+                  style={{ color: "#9a5c2e", fontFamily: "var(--font-display)", minWidth: "2.5rem" }}
+                >
+                  {item.step}
+                </span>
                 {/* Icon */}
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors duration-300">
+                <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors duration-300">
                   <Icon className="w-5 h-5 text-primary" />
                 </div>
                 {/* Text */}
-                <div>
-                <h3 className="text-sm font-semibold text-foreground mb-1">{item.title}</h3>
-                <p className="text-xs text-foreground/70 leading-relaxed">{item.desc}</p>
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-foreground mb-1.5">{item.title}</h3>
+                  <p className="text-xs text-foreground/70 leading-relaxed">{item.desc}</p>
                 </div>
               </div>
             );
