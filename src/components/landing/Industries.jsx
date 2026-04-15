@@ -190,91 +190,106 @@ export default function Industries() {
               onClick={() => setSelected(null)}
             />
 
-            {/* Expanding card — 50% bigger */}
+            {/* Expanded modal — doubled size */}
             <motion.div
-              className="fixed z-50 overflow-hidden rounded-2xl shadow-2xl bg-white"
+              className="fixed z-50 overflow-hidden rounded-3xl shadow-2xl"
+              style={{ background: "#0f0e0c" }}
               initial={{ width: "31vw", height: "480px", top: "50%", left: "50%", x: "-50%", y: "-50%", opacity: 0.4, scale: 0.5 }}
-              animate={{ width: "min(1100px, 95vw)", height: "auto", top: "50%", left: "50%", x: "-50%", y: "-50%", opacity: 1, scale: 1 }}
+              animate={{ width: "min(1400px, 96vw)", height: "auto", top: "50%", left: "50%", x: "-50%", y: "-50%", opacity: 1, scale: 1 }}
               exit={{ width: "31vw", height: "480px", opacity: 0, scale: 0.5 }}
-              transition={{ type: "spring", stiffness: 220, damping: 28 }}
+              transition={{ type: "spring", stiffness: 200, damping: 28 }}
             >
               {/* Close */}
               <button
                 onClick={() => setSelected(null)}
-                className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full bg-white/95 hover:bg-white flex items-center justify-center shadow-lg transition-all border border-border"
+                className="absolute top-6 right-6 z-20 w-11 h-11 rounded-full flex items-center justify-center transition-all"
+                style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)" }}
               >
-                <X className="w-5 h-5 text-foreground" />
+                <X className="w-5 h-5 text-white" />
               </button>
 
-              {/* Main Grid: Image Left (55%), Content Right (45%) */}
-              <div className="grid lg:grid-cols-[55%_45%] gap-0">
-                {/* Image Section — Large and prominent */}
-                <div className="relative overflow-hidden order-1 lg:order-none" style={{ minHeight: "500px" }}>
+              {/* Main layout: top image, bottom content */}
+              <div className="flex flex-col lg:grid lg:grid-cols-[58%_42%]" style={{ minHeight: "700px" }}>
+
+                {/* LEFT — Full image panel */}
+                <div className="relative overflow-hidden" style={{ minHeight: "500px" }}>
                   <img
                     src={selected.image}
                     alt={selected.name}
                     className="w-full h-full object-cover"
+                    style={{ minHeight: "700px" }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  {/* Icon badge in corner */}
-                  <div className="absolute top-6 left-6 w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center">
-                    {(() => { const Icon = selected.icon; return <Icon className="w-6 h-6 text-white" />; })()}
+                  {/* Dark gradient overlay */}
+                  <div className="absolute inset-0" style={{ background: "linear-gradient(160deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.35) 60%, rgba(15,14,12,0.92) 100%)" }} />
+
+                  {/* Icon + industry tag */}
+                  <div className="absolute top-8 left-8 flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.25)" }}>
+                      {(() => { const Icon = selected.icon; return <Icon className="w-6 h-6 text-white" />; })()}
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-widest text-white/70" style={{ fontFamily: "'DM Mono', 'Courier New', monospace", letterSpacing: "0.2em" }}>Industry Solution</span>
+                  </div>
+
+                  {/* Result stat overlaid at bottom of image */}
+                  <div className="absolute bottom-8 left-8 right-8">
+                    <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl" style={{ background: "rgba(161,120,35,0.2)", backdropFilter: "blur(16px)", border: "1px solid rgba(161,120,35,0.4)" }}>
+                      <CheckCircle2 className="w-5 h-5 flex-shrink-0" style={{ color: "#c8965c" }} />
+                      <span className="text-sm font-bold text-white" style={{ fontFamily: "'DM Mono', 'Courier New', monospace" }}>{selected.result}</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Content Section */}
-                <div className="p-8 lg:p-10 flex flex-col justify-between overflow-y-auto max-h-[90vh] lg:max-h-[600px]">
+                {/* RIGHT — Content panel */}
+                <div className="flex flex-col justify-between overflow-y-auto" style={{ padding: "48px 44px", maxHeight: "90vh", background: "#0f0e0c" }}>
+                  
                   {/* Header */}
                   <div>
-                    <p className="text-xs font-semibold text-primary uppercase tracking-widest mb-2">Industry Solution</p>
-                    <h2 className="font-display text-2xl lg:text-3xl font-semibold text-foreground mb-2 leading-tight">
+                    <h2 style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: "2.25rem", fontWeight: "700", color: "#f5e6d0", lineHeight: "1.15", marginBottom: "8px", letterSpacing: "-0.01em" }}>
                       {selected.name}
                     </h2>
-                    <p className="text-sm font-bold text-primary mb-6">{selected.result}</p>
+                    <p style={{ fontFamily: "'DM Mono', 'Courier New', monospace", fontSize: "0.75rem", color: "#c8965c", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "28px" }}>
+                      {selected.problem}
+                    </p>
 
-                    {/* Challenge & Solution */}
-                    <div className="mb-6">
-                      <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-2">The Challenge</p>
-                      <p className="text-sm font-semibold text-foreground mb-4">{selected.problem}</p>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{selected.detail}</p>
-                    </div>
+                    {/* Divider */}
+                    <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", marginBottom: "28px" }} />
 
-                    {/* Bullets */}
-                    <div>
-                      <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-3">What You Get</p>
-                      <ul className="space-y-2">
-                        {selected.bullets.map((b, i) => (
-                          <li key={i} className="flex items-start gap-2.5">
-                            <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                            <span className="text-xs text-foreground">{b}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    {/* Detail paragraph */}
+                    <p style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: "1rem", color: "rgba(245,230,208,0.72)", lineHeight: "1.85", marginBottom: "32px" }}>
+                      {selected.detail}
+                    </p>
+
+                    {/* What You Get */}
+                    <p style={{ fontFamily: "'DM Mono', 'Courier New', monospace", fontSize: "0.7rem", color: "rgba(200,150,92,0.7)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "16px" }}>
+                      What's Included
+                    </p>
+                    <ul style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "36px" }}>
+                      {selected.bullets.map((b, idx) => (
+                        <li key={idx} style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#c8965c", flexShrink: 0, marginTop: "8px" }} />
+                          <span style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: "0.95rem", color: "rgba(245,230,208,0.8)", lineHeight: "1.6" }}>{b}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
 
-                  {/* CTA Button — Golden Brown */}
-                  <button
-                    onClick={() => {
-                      setSelected(null);
-                      setShowLeadModal(true);
-                    }}
-                    style={{display:"block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.3s ease, transform 0.2s ease",border:"none",cursor:"pointer",width:"100%",marginTop:"24px"}}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
-                    }}
-                  >
-                    <span style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",height:"48px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
-                      Book a Free Demo
-                      <ArrowRight className="w-4 h-4" />
-                    </span>
-                  </button>
-                  <p className="text-xs text-muted-foreground text-center mt-3">
-                    Free 30-min call • No commitment • Live in 5–7 days
-                  </p>
+                  {/* CTA */}
+                  <div>
+                    <button
+                      onClick={() => { setSelected(null); setShowLeadModal(true); }}
+                      style={{ display: "block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 24px rgba(120,70,20,0.45)", border: "none", cursor: "pointer", width: "100%", marginBottom: "12px" }}
+                      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 48px rgba(161,120,35,0.65), 0 4px 18px rgba(120,70,20,0.4)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(120,70,20,0.45)"; }}
+                    >
+                      <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", height: "56px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1.05rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)", fontFamily: "'Georgia', 'Times New Roman', serif" }}>
+                        Book a Free Demo
+                        <ArrowRight className="w-5 h-5" />
+                      </span>
+                    </button>
+                    <p style={{ fontFamily: "'DM Mono', 'Courier New', monospace", fontSize: "0.7rem", color: "rgba(245,230,208,0.35)", textAlign: "center", letterSpacing: "0.08em" }}>
+                      Free 30-min call • No commitment • Live in 5–7 days
+                    </p>
+                  </div>
                 </div>
               </div>
             </motion.div>
