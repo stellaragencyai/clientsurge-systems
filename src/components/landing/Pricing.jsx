@@ -197,7 +197,7 @@ function PricingCard({ plan }) {
       {/* Badge — hover only */}
       {plan.badge && isHovered && (
         <div className="pricing-badge-float animate-in fade-in zoom-in duration-300">
-          <span className="inline-block bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl">
+          <span className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl" style={{background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)"}}>
             ⭐ {plan.badge}
           </span>
         </div>

@@ -5,23 +5,23 @@ const navColumns = [
     title: "Industries",
     links: [
       { label: "Med Spas & Clinics", href: "/med-spa" },
-      { label: "Real Estate", href: "#industries" },
-      { label: "HVAC & Home Services", href: "#industries" },
+      { label: "Real Estate", href: "/#industries" },
+      { label: "HVAC & Home Services", href: "/#industries" },
     ],
   },
   {
     title: "Learn More",
     links: [
-      { label: "How It Works", href: "/how-it-works" },
-      { label: "Book a Demo", href: "/book-demo" },
+      { label: "How It Works", href: "/#how-it-works-section" },
+      { label: "Book a Demo", href: "/book" },
     ],
   },
   {
     title: "Legal & Policies",
     links: [
-      { label: "Privacy Policy", href: "#" },
-      { label: "Terms of Service", href: "#" },
-      { label: "Cookie Policy", href: "#" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms of Service", href: "/terms-of-service" },
+      { label: "Cookie Policy", href: "/cookie-policy" },
     ],
   },
 ];

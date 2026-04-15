@@ -32,33 +32,46 @@ function FeatureCard({ item, onSelect, isSelected }) {
   };
 
   const cardAspects = aspects[item.step] || [];
+  const stepNum = parseInt(item.step);
 
   return (
     <div
-      className="relative min-h-[120px] cursor-pointer group"
+      className="relative cursor-pointer group"
       onClick={() => onSelect(item.step)}
     >
+      {/* Step label above card - centered */}
+      <div className="text-center mb-3">
+        <span
+          className="text-xs font-bold uppercase tracking-widest"
+          style={{ color: "#9a5c2e" }}
+        >
+          Step {stepNum}
+        </span>
+      </div>
+
       <div
-        className="flex items-start gap-5 p-7 rounded-2xl border transition-all duration-500 min-h-[120px] relative overflow-hidden"
+        className="flex flex-col p-8 rounded-2xl border transition-all duration-500 min-h-[160px] relative overflow-hidden"
         style={{
           borderColor: "#000000",
           backgroundColor: "white",
           boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-          transform: "translateY(0) rotateX(0deg)",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.boxShadow = "0 16px 40px rgba(154,92,46,0.15), 0 4px 12px rgba(0,0,0,0.08)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
         }}
       >
-        <span
-          className="text-3xl font-black flex-shrink-0 leading-none mt-1 transition-colors duration-300"
-          style={{ color: "#9a5c2e", fontFamily: "var(--font-display)", minWidth: "2.5rem" }}
-        >
-          {item.step}
-        </span>
-        <div className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300" style={{ backgroundColor: "rgba(154,92,46,0.1)" }}>
-          <Icon className="w-5 h-5" style={{ color: "#9a5c2e" }} />
+        {/* Icon in upper left */}
+        <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300" style={{ backgroundColor: "rgba(154,92,46,0.1)" }}>
+          <Icon className="w-6 h-6" style={{ color: "#9a5c2e" }} />
         </div>
+
+        {/* Content */}
         <div className="flex-1 relative z-10">
-          <h3 className="text-sm font-semibold text-foreground mb-1.5">{item.title}</h3>
-          <p className="text-xs text-foreground/70 leading-relaxed mb-3">{item.desc}</p>
+          <h3 className="text-sm font-semibold text-foreground mb-2">{item.title}</h3>
+          <p className="text-xs text-foreground/70 leading-relaxed mb-4">{item.desc}</p>
           <span
             className="inline-block text-xs font-bold px-3 py-1 rounded-full"
             style={{
