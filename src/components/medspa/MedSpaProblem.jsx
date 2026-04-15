@@ -26,8 +26,8 @@ export default function MedSpaProblem() {
         <div className="grid md:grid-cols-2 gap-12 items-stretch">
           <div className="rounded-2xl overflow-hidden shadow-lg">
             <img
-              src="https://images.unsplash.com/photo-1633613286991-611bcb6c4ee1?w=800&q=85"
-              alt="Med spa treatment room"
+              src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=85"
+              alt="Professional at work desk"
               className="w-full h-72 md:h-full object-cover"
             />
           </div>
