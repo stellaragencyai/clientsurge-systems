@@ -108,7 +108,7 @@ export default function Navbar() {
         {/* CTA — pinned right */}
         <div className="hidden md:flex items-center gap-3 shrink-0">
           <button
-            onClick={() => window.location.href = '/client-portal'}
+            onClick={() => setShowLoginModal(true)}
             className="text-sm font-semibold text-foreground hover:text-primary transition-colors"
           >
             Login
