@@ -2,16 +2,16 @@ import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
 import TrustBar from "../components/landing/TrustBar";
 import ProblemSolution from "../components/landing/ProblemSolution.jsx";
+import Industries from "../components/landing/Industries";
+import WhyUs from "../components/landing/WhyUs";
+import Testimonials from "../components/landing/Testimonials";
 import HowItWorks from "../components/landing/HowItWorks";
 import Benefits from "../components/landing/Benefits";
 import ConversationMockup from "../components/landing/ConversationMockup";
 import DetailedProcess from "../components/landing/DetailedProcess";
-import Testimonials from "../components/landing/Testimonials";
-import Industries from "../components/landing/Industries";
 import CoreOffer from "../components/landing/CoreOffer";
-import WhyUs from "../components/landing/WhyUs";
+import Guarantee from "../components/landing/Guarantee";
 import FAQ from "../components/landing/FAQ";
-
 import Pricing from "../components/landing/Pricing";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
@@ -25,15 +25,16 @@ export default function Home() {
       <Hero />
       <FadeIn><TrustBar /></FadeIn>
       <FadeIn><ProblemSolution /></FadeIn>
+      <FadeIn><Industries /></FadeIn>
+      <FadeIn><WhyUs /></FadeIn>
+      <FadeIn><Testimonials /></FadeIn>
       <FadeIn><HowItWorks /></FadeIn>
       <FadeIn><ConversationMockup /></FadeIn>
       <FadeIn><DetailedProcess /></FadeIn>
       <FadeIn><Benefits /></FadeIn>
-      <FadeIn><Industries /></FadeIn>
       <FadeIn><CoreOffer /></FadeIn>
-      <FadeIn><WhyUs /></FadeIn>
+      <FadeIn><Guarantee /></FadeIn>
       <FadeIn><FAQ /></FadeIn>
-      <FadeIn><Testimonials /></FadeIn>
       <FadeIn><Pricing /></FadeIn>
       <FinalCTA />
       <Footer />
