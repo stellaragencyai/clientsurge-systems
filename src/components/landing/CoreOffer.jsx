@@ -16,7 +16,7 @@ const includes = [
 export default function CoreOffer() {
   const [showLeadModal, setShowLeadModal] = useState(false);
   return (
-    <section className="py-20 md:py-28 px-4 md:px-6 bg-white">
+    <section className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card via-white to-background">
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
@@ -42,7 +42,11 @@ export default function CoreOffer() {
         </div>
 
         {/* Feature grid intro */}
-        <p className="text-sm font-semibold text-foreground mb-6">Here's exactly what's included in your system:</p>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-xs font-bold text-primary uppercase tracking-widest px-3 py-1.5 bg-primary/8 border border-primary/20 rounded-full">What's Included</span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
 
         {/* Feature grid cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
@@ -51,7 +55,13 @@ export default function CoreOffer() {
             return (
               <div
                 key={i}
-                className="group flex items-start gap-4 p-5 rounded-2xl border border-border bg-card hover:border-primary/40 hover:shadow-md transition-all duration-300 cursor-default"
+                className="group flex items-start gap-4 p-5 rounded-2xl border transition-all duration-300 cursor-default hover:shadow-md"
+                style={{
+                  background: i % 2 === 0 ? "white" : "hsl(var(--card))",
+                  borderColor: i % 2 === 0 ? "hsl(var(--border))" : "rgba(161,120,35,0.15)",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(161,120,35,0.5)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = i % 2 === 0 ? "hsl(var(--border))" : "rgba(161,120,35,0.15)"; }}
               >
                 {/* Step number */}
                 <span className="text-xs font-bold text-primary/40 group-hover:text-primary/70 transition-colors mt-0.5 w-6 flex-shrink-0">{item.step}</span>

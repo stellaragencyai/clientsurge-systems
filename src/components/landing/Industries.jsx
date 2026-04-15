@@ -136,7 +136,7 @@ export default function Industries() {
             <button
               key={i}
               onClick={() => setSelected(ind)}
-              className="group relative flex flex-col overflow-hidden cursor-pointer text-left focus:outline-none border-2 border-transparent transition-colors duration-300 hover:border-[#a0714f]"
+              className="group relative flex flex-col overflow-hidden cursor-pointer text-left focus:outline-none border-4 border-transparent transition-colors duration-300 hover:border-[#a0714f]"
               style={{ minHeight: "480px" }}
             >
               {/* Image — 70% */}
@@ -160,8 +160,7 @@ export default function Industries() {
                   <p className="text-xs font-medium text-primary/80 mb-2">{ind.problem}</p>
                   <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{ind.desc}</p>
                 </div>
-                <div className="mt-3 flex items-center justify-between">
-                   <p className="text-[10px] font-semibold text-primary/70 opacity-0 group-hover:opacity-100 transition-opacity">{ind.result}</p>
+                <div className="mt-3 flex items-center justify-end">
                    <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform flex-shrink-0" />
                  </div>
               </div>
