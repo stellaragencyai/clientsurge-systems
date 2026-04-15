@@ -87,7 +87,10 @@ export default function Onboarding() {
         step_onboarding: "complete",
       });
 
-      // 3. Send portal welcome email
+      // 3. Invite the client to the platform (sends activation email with login link)
+      await base44.users.inviteUser(formData.email, "user");
+
+      // 4. Send portal welcome email
       await base44.functions.invoke("sendPortalWelcomeEmail", {
         client_name: formData.full_name,
         client_email: formData.email,

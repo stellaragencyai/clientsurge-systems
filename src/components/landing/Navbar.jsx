@@ -3,11 +3,13 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import LeadCaptureModal from "../forms/LeadCaptureModal";
+import ClientLoginModal from "./ClientLoginModal";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showLeadModal, setShowLeadModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -99,19 +101,11 @@ export default function Navbar() {
 
         {/* CTA — pinned right */}
         <div className="hidden md:flex items-center gap-3 shrink-0">
-          <a
-            href="/client-portal"
+          <button
+            onClick={() => setShowLoginModal(true)}
             className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-colors"
           >
             Client Login
-          </a>
-          <button
-            onClick={() => {
-              window.location.href = '/admin';
-            }}
-            className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors text-xs"
-          >
-            Admin
           </button>
           <button
             onClick={() => setShowLeadModal(true)}
@@ -143,10 +137,8 @@ export default function Navbar() {
               {l.label}
             </a>
           ))}
-          <button onClick={() => {
-            window.location.href = '/admin';
-          }} className="block text-sm text-muted-foreground hover:text-foreground py-2">
-            Login
+          <button onClick={() => { setOpen(false); setShowLoginModal(true); }} className="block text-sm text-muted-foreground hover:text-foreground py-2">
+            Client Login
           </button>
           <button onClick={() => { setOpen(false); setShowLeadModal(true); }} style={{display:"block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 14px rgba(120,70,20,0.35)",border:"none",cursor:"pointer",width:"100%"}}>
             <span style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",height:"40px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"600",fontSize:"0.875rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
@@ -163,6 +155,7 @@ export default function Navbar() {
           window.location.href = '/book';
         }}
       />
+      {showLoginModal && <ClientLoginModal onClose={() => setShowLoginModal(false)} />}
     </nav>
   );
 }
