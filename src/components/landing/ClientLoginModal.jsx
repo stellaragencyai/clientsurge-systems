@@ -14,15 +14,14 @@ export default function ClientLoginModal({ onClose }) {
   return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-transparent"
-        style={{ pointerEvents: 'auto' }}
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
       >
         {/* Backdrop */}
         <motion.div
-          className="absolute inset-0"
+          className="absolute inset-0 z-0"
           style={{ background: "rgba(10,8,5,0.72)", backdropFilter: "blur(12px)" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -31,8 +30,8 @@ export default function ClientLoginModal({ onClose }) {
 
         {/* Modal */}
         <motion.div
-          className="relative w-full max-w-md overflow-hidden rounded-3xl shadow-2xl z-50"
-          style={{ background: "#0f0e0c", margin: "0 auto" }}
+          className="relative w-full max-w-md overflow-visible rounded-3xl shadow-2xl z-10"
+          style={{ background: "#0f0e0c" }}
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
