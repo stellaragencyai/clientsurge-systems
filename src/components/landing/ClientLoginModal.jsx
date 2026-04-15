@@ -30,8 +30,8 @@ export default function ClientLoginModal({ onClose }) {
 
         {/* Modal */}
         <motion.div
-          className="relative w-full max-w-md overflow-visible rounded-3xl shadow-2xl z-10"
-          style={{ background: "#0f0e0c" }}
+          className="relative w-full max-w-md rounded-3xl shadow-2xl z-10"
+          style={{ background: "#0f0e0c", maxHeight: "90vh", overflowY: "auto" }}
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -39,14 +39,14 @@ export default function ClientLoginModal({ onClose }) {
         >
           {/* Top gradient bar */}
           <div
-            className="h-1.5 w-full"
+            className="h-1.5 w-full sticky top-0"
             style={{ background: "linear-gradient(90deg,#6b3f1f,#c8965c,#f5d9a8,#c8965c,#7a4825)" }}
           />
 
           {/* Close */}
           <button
             onClick={onClose}
-            className="absolute top-5 right-5 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+            className="fixed top-5 right-5 w-8 h-8 rounded-full flex items-center justify-center transition-colors z-20"
             style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}
           >
             <X className="w-4 h-4 text-white/70" />
