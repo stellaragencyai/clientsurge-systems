@@ -214,14 +214,14 @@ export default function Industries() {
                     <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: "rgba(255,255,255,0.15)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.25)" }}>
                       {(() => { const Icon = selected.icon; return <Icon className="w-6 h-6 text-white" />; })()}
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-white/70" style={{ fontFamily: "'DM Mono', 'Courier New', monospace", letterSpacing: "0.2em" }}>Industry Solution</span>
+                    <span className="font-inter text-xs font-bold uppercase tracking-widest text-white/70">Industry Solution</span>
                   </div>
 
                   {/* Result stat overlaid at bottom of image */}
                   <div className="absolute bottom-8 left-8 right-8">
                     <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl" style={{ background: "rgba(161,120,35,0.2)", backdropFilter: "blur(16px)", border: "1px solid rgba(161,120,35,0.4)" }}>
                       <CheckCircle2 className="w-5 h-5 flex-shrink-0" style={{ color: "#c8965c" }} />
-                      <span className="text-sm font-bold text-white" style={{ fontFamily: "'DM Mono', 'Courier New', monospace" }}>{selected.result}</span>
+                      <span className="font-inter text-sm font-bold text-white">{selected.result}</span>
                     </div>
                   </div>
                 </div>
@@ -231,10 +231,10 @@ export default function Industries() {
                   
                   {/* Header */}
                   <div>
-                    <h2 style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: "2.25rem", fontWeight: "700", color: "#f5e6d0", lineHeight: "1.15", marginBottom: "8px", letterSpacing: "-0.01em" }}>
+                    <h2 className="font-display" style={{ fontSize: "2.25rem", fontWeight: "700", color: "#f5e6d0", lineHeight: "1.15", marginBottom: "8px", letterSpacing: "-0.01em" }}>
                       {selected.name}
                     </h2>
-                    <p style={{ fontFamily: "'DM Mono', 'Courier New', monospace", fontSize: "0.75rem", color: "#c8965c", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "28px" }}>
+                    <p className="font-inter" style={{ fontSize: "0.75rem", color: "#c8965c", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "28px" }}>
                       {selected.problem}
                     </p>
 
@@ -242,19 +242,19 @@ export default function Industries() {
                     <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", marginBottom: "28px" }} />
 
                     {/* Detail paragraph */}
-                    <p style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: "1rem", color: "rgba(245,230,208,0.72)", lineHeight: "1.85", marginBottom: "32px" }}>
+                    <p className="font-inter" style={{ fontSize: "1rem", color: "rgba(245,230,208,0.72)", lineHeight: "1.85", marginBottom: "32px" }}>
                       {selected.detail}
                     </p>
 
                     {/* What You Get */}
-                    <p style={{ fontFamily: "'DM Mono', 'Courier New', monospace", fontSize: "0.7rem", color: "rgba(200,150,92,0.7)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "16px" }}>
+                    <p className="font-inter" style={{ fontSize: "0.7rem", color: "rgba(200,150,92,0.7)", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "16px" }}>
                       What's Included
                     </p>
                     <ul style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "36px" }}>
                       {selected.bullets.map((b, idx) => (
                         <li key={idx} style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
                           <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#c8965c", flexShrink: 0, marginTop: "8px" }} />
-                          <span style={{ fontFamily: "'Georgia', 'Times New Roman', serif", fontSize: "0.95rem", color: "rgba(245,230,208,0.8)", lineHeight: "1.6" }}>{b}</span>
+                          <span className="font-inter" style={{ fontSize: "0.95rem", color: "rgba(245,230,208,0.8)", lineHeight: "1.6" }}>{b}</span>
                         </li>
                       ))}
                     </ul>
@@ -268,12 +268,12 @@ export default function Industries() {
                       onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 48px rgba(161,120,35,0.65), 0 4px 18px rgba(120,70,20,0.4)"; }}
                       onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(120,70,20,0.45)"; }}
                     >
-                      <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", height: "56px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1.05rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)", fontFamily: "'Georgia', 'Times New Roman', serif" }}>
+                      <span className="font-inter" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", height: "56px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1.05rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
                         Book a Free Demo
                         <ArrowRight className="w-5 h-5" />
                       </span>
                     </button>
-                    <p style={{ fontFamily: "'DM Mono', 'Courier New', monospace", fontSize: "0.7rem", color: "rgba(245,230,208,0.35)", textAlign: "center", letterSpacing: "0.08em" }}>
+                    <p className="font-inter" style={{ fontSize: "0.7rem", color: "rgba(245,230,208,0.35)", textAlign: "center", letterSpacing: "0.08em" }}>
                       Free 30-min call • No commitment • Live in 5–7 days
                     </p>
                   </div>
