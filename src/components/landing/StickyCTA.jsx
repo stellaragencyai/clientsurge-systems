@@ -24,13 +24,13 @@ export default function StickyCTA() {
         visible ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
       }`}
       style={{
-        background: '#1a1a1a',
-        backdropFilter: 'blur(12px)',
-        borderTop: '1px solid rgba(255,255,255,0.1)',
+        background: 'rgba(255,255,255,0.15)',
+        backdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(255,255,255,0.2)',
       }}
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-6">
-        <p className="text-white font-semibold text-sm md:text-base">
+        <p className="text-foreground font-semibold text-sm md:text-base">
           Ready to stop losing leads?
         </p>
         <button
