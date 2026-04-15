@@ -17,91 +17,54 @@ const doneForYou = [
   { icon: HeadphonesIcon, step: "08", title: "Ongoing Support", desc: "Continuous optimization and priority support from our team post-launch.", tag: "Priority access" },
 ];
 
-function FeatureCard({ item }) {
+function FeatureCard({ item, onSelect, isSelected }) {
   const Icon = item.icon;
-  const [isHovered, setIsHovered] = useState(false);
 
   const aspects = {
-    "01": ["Responds instantly to all inquiries", "Personalized by lead details", "Available 24/7/365"],
-    "02": ["Guides prospects directly to booking", "Eliminates phone tag friction", "Auto-confirms appointments"],
-    "03": ["SMS + email touchpoints", "Timed for optimal engagement", "Stops when they convert"],
-    "04": ["Smart booking flow", "Direct calendar integration", "Automated confirmations"],
-    "05": ["Reactivates dormant leads", "Proven re-engagement sequences", "$4k+ revenue recovery/month"],
-    "06": ["Zero manual scheduling", "Frictionless booking experience", "Sync with all calendars"],
-    "07": ["Auto-tagging & status updates", "Self-running pipeline", "Full visibility dashboard"],
-    "08": ["Priority support access", "Continuous optimization", "Post-launch monitoring"],
+    "01": ["Responds instantly to all inquiries", "Personalized by lead details"],
+    "02": ["Guides prospects directly to booking", "Eliminates phone tag friction"],
+    "03": ["SMS + email touchpoints", "Timed for optimal engagement"],
+    "04": ["Smart booking flow", "Direct calendar integration"],
+    "05": ["Reactivates dormant leads", "Proven re-engagement sequences"],
+    "06": ["Zero manual scheduling", "Frictionless experience"],
+    "07": ["Auto-tagging & status updates", "Full visibility dashboard"],
+    "08": ["Priority support access", "Continuous optimization"],
   };
 
   const cardAspects = aspects[item.step] || [];
 
   return (
     <div
-      className="relative min-h-[120px]"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      style={{ perspective: "1200px" }}
+      className="relative min-h-[120px] cursor-pointer group"
+      onClick={() => onSelect(item.step)}
     >
       <div
-        className="flex items-start gap-5 p-7 rounded-2xl border transition-all duration-500 cursor-default min-h-[120px] relative overflow-hidden"
+        className="flex items-start gap-5 p-7 rounded-2xl border transition-all duration-500 min-h-[120px] relative overflow-hidden"
         style={{
-          borderColor: isHovered ? "#9a5c2e" : "hsl(var(--border))",
-          backgroundColor: isHovered ? "rgba(154, 92, 46, 0.08)" : "white",
-          boxShadow: isHovered 
-            ? "0 20px 40px rgba(154,92,46,0.15), 0 0 60px rgba(154,92,46,0.1)"
-            : "0 2px 8px rgba(0,0,0,0.04)",
-          transform: isHovered ? "translateY(-8px) rotateX(2deg)" : "translateY(0) rotateX(0deg)",
+          borderColor: "#000000",
+          backgroundColor: "white",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+          transform: "translateY(0) rotateX(0deg)",
         }}
       >
-        {/* Animated gradient glow on hover */}
-        {isHovered && (
-          <div
-            className="absolute inset-0 opacity-0 animate-pulse pointer-events-none"
-            style={{
-              background: "radial-gradient(circle at center, rgba(154,92,46,0.15) 0%, transparent 70%)",
-              animation: "fadeInOut 2s ease-in-out infinite",
-            }}
-          />
-        )}
-
-        {/* Golden arrow on hover */}
-        {isHovered && (
-          <div
-            className="absolute -right-1 top-1/2 -translate-y-1/2 text-4xl font-black"
-            style={{
-              color: "#c8965c",
-              opacity: 0,
-              animation: "slideInArrow 0.5s ease-out forwards",
-              textShadow: "0 0 20px rgba(200, 150, 92, 0.6)",
-            }}
-          >
-            →
-          </div>
-        )}
-
         <span
           className="text-3xl font-black flex-shrink-0 leading-none mt-1 transition-colors duration-300"
-          style={{ color: isHovered ? "#c8965c" : "#9a5c2e", fontFamily: "var(--font-display)", minWidth: "2.5rem" }}
+          style={{ color: "#9a5c2e", fontFamily: "var(--font-display)", minWidth: "2.5rem" }}
         >
           {item.step}
         </span>
-        <div
-          className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300"
-          style={{
-            backgroundColor: isHovered ? "rgba(200,150,92,0.2)" : "rgba(154,92,46,0.1)",
-            boxShadow: isHovered ? "0 0 16px rgba(200,150,92,0.3)" : "none",
-          }}
-        >
-          <Icon className="w-5 h-5" style={{ color: isHovered ? "#c8965c" : "#9a5c2e" }} />
+        <div className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300" style={{ backgroundColor: "rgba(154,92,46,0.1)" }}>
+          <Icon className="w-5 h-5" style={{ color: "#9a5c2e" }} />
         </div>
         <div className="flex-1 relative z-10">
-          <h3 className="text-sm font-semibold text-foreground mb-1.5 transition-colors duration-300">{item.title}</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-1.5">{item.title}</h3>
           <p className="text-xs text-foreground/70 leading-relaxed mb-3">{item.desc}</p>
           <span
-            className="inline-block text-xs font-bold px-3 py-1 rounded-full transition-all duration-300"
+            className="inline-block text-xs font-bold px-3 py-1 rounded-full"
             style={{
-              background: isHovered ? "rgba(200,150,92,0.2)" : "rgba(154,92,46,0.1)",
-              color: isHovered ? "#c8965c" : "#9a5c2e",
-              border: isHovered ? "1px solid rgba(200,150,92,0.4)" : "1px solid rgba(154,92,46,0.2)",
+              background: "rgba(154,92,46,0.1)",
+              color: "#9a5c2e",
+              border: "1px solid rgba(154,92,46,0.2)",
             }}
           >
             {item.tag}
@@ -109,57 +72,15 @@ function FeatureCard({ item }) {
         </div>
       </div>
 
-      {/* Hover details panel */}
-      {isHovered && (
-        <div
-          className="absolute -right-2 top-full mt-2 bg-white rounded-xl shadow-lg z-20 min-w-max"
-          style={{
-            borderLeft: "4px solid #c8965c",
-            padding: "12px 16px",
-            animation: "slideUp 0.4s ease-out forwards",
-            boxShadow: "0 12px 32px rgba(154,92,46,0.2)",
-          }}
-        >
-          <p className="text-xs font-bold text-primary mb-2 uppercase tracking-widest">Key Points:</p>
-          <ul className="space-y-1.5">
-            {cardAspects.map((aspect, idx) => (
-              <li key={idx} className="flex items-start gap-2 text-xs text-foreground/80">
-                <span
-                  className="text-primary font-bold mt-0.5 flex-shrink-0"
-                  style={{ color: "#c8965c" }}
-                >
-                  •
-                </span>
-                <span>{aspect}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
       <style>{`
-        @keyframes fadeInOut {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 0.6; }
-        }
-        @keyframes slideInArrow {
+        @keyframes expandCard {
           from {
-            opacity: 0;
-            transform: translateX(20px);
+            transform: scale(1);
+            opacity: 1;
           }
           to {
+            transform: scale(1.1);
             opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
           }
         }
       `}</style>
@@ -169,6 +90,7 @@ function FeatureCard({ item }) {
 
 export default function CoreOffer() {
   const [showLeadModal, setShowLeadModal] = useState(false);
+  const [selectedStep, setSelectedStep] = useState(null);
 
   return (
     <section className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card via-white to-background">
@@ -193,6 +115,160 @@ export default function CoreOffer() {
           </div>
         </div>
 
+        {/* Backdrop blur when card is selected */}
+        {selectedStep && (
+          <div
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 transition-opacity duration-300"
+            onClick={() => setSelectedStep(null)}
+          />
+        )}
+
+        {/* Selected card modal */}
+        {selectedStep && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setSelectedStep(null)}>
+            <div
+              className="bg-white rounded-3xl p-12 max-w-2xl w-full shadow-2xl relative"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                animation: "expandAndCenter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+                border: "2px solid #000000",
+              }}
+            >
+              {/* Close button */}
+              <button
+                onClick={() => setSelectedStep(null)}
+                className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Content */}
+              <div className="flex items-start gap-6">
+                {(() => {
+                  const itemData = [...coreAutomation, ...doneForYou].find(i => i.step === selectedStep);
+                  const Icon = itemData?.icon;
+                  const aspects = {
+                    "01": ["Responds instantly to all inquiries", "Personalized by lead details"],
+                    "02": ["Guides prospects directly to booking", "Eliminates phone tag friction"],
+                    "03": ["SMS + email touchpoints", "Timed for optimal engagement"],
+                    "04": ["Smart booking flow", "Direct calendar integration"],
+                    "05": ["Reactivates dormant leads", "Proven re-engagement sequences"],
+                    "06": ["Zero manual scheduling", "Frictionless experience"],
+                    "07": ["Auto-tagging & status updates", "Full visibility dashboard"],
+                    "08": ["Priority support access", "Continuous optimization"],
+                  };
+                  const cardAspects = aspects[selectedStep] || [];
+
+                  return (
+                    <>
+                      <div className="flex-shrink-0">
+                        <div
+                          className="w-16 h-16 rounded-2xl flex items-center justify-center"
+                          style={{
+                            backgroundColor: "rgba(200,150,92,0.15)",
+                            border: "2px solid #c8965c",
+                            boxShadow: "0 0 24px rgba(200,150,92,0.2)",
+                          }}
+                        >
+                          {Icon && <Icon className="w-8 h-8" style={{ color: "#c8965c" }} />}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-4">
+                          <span className="text-4xl font-black" style={{ color: "#c8965c", fontFamily: "var(--font-display)" }}>
+                            {itemData?.step}
+                          </span>
+                        </div>
+                        <h2 className="text-2xl font-bold text-foreground mb-3">{itemData?.title}</h2>
+                        <p className="text-foreground/70 mb-6 leading-relaxed">{itemData?.desc}</p>
+
+                        {/* Golden arrow animation */}
+                        <div className="mb-6 relative h-8">
+                          <svg
+                            className="absolute left-0 top-0"
+                            width="40"
+                            height="32"
+                            viewBox="0 0 40 32"
+                            style={{
+                              animation: "arrowSlide 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+                              opacity: 0,
+                            }}
+                          >
+                            <defs>
+                              <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style={{ stopColor: "#c8965c", stopOpacity: 0 }} />
+                                <stop offset="100%" style={{ stopColor: "#c8965c", stopOpacity: 1 }} />
+                              </linearGradient>
+                            </defs>
+                            <line x1="0" y1="16" x2="35" y2="16" stroke="url(#arrowGradient)" strokeWidth="3" strokeLinecap="round" />
+                            <polygon points="40,16 30,10 30,22" fill="#c8965c" />
+                          </svg>
+                        </div>
+
+                        {/* Key points */}
+                        <div className="space-y-3">
+                          {cardAspects.map((aspect, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-start gap-3 p-3 rounded-lg"
+                              style={{
+                                backgroundColor: "rgba(200,150,92,0.08)",
+                                animation: `slideInPoint 0.5s ease-out ${0.3 + idx * 0.15}s forwards`,
+                                opacity: 0,
+                                border: "1px solid rgba(200,150,92,0.2)",
+                              }}
+                            >
+                              <span className="text-lg font-black mt-0.5 flex-shrink-0" style={{ color: "#c8965c" }}>
+                                →
+                              </span>
+                              <span className="text-sm font-semibold text-foreground">{aspect}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+
+              <style>{`
+                @keyframes expandAndCenter {
+                  from {
+                    transform: scale(0.8) translateY(20px);
+                    opacity: 0;
+                  }
+                  to {
+                    transform: scale(1) translateY(0);
+                    opacity: 1;
+                  }
+                }
+                @keyframes arrowSlide {
+                  from {
+                    opacity: 0;
+                    transform: translateX(-20px);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: translateX(0);
+                  }
+                }
+                @keyframes slideInPoint {
+                  from {
+                    opacity: 0;
+                    transform: translateX(-12px);
+                  }
+                  to {
+                    opacity: 1;
+                    transform: translateX(0);
+                  }
+                }
+              `}</style>
+            </div>
+          </div>
+        )}
+
         {/* TIER 1 — Core Automation */}
         <div className="flex items-center gap-3 mb-6">
           <div className="flex-1 h-px bg-border" />
@@ -204,7 +280,7 @@ export default function CoreOffer() {
           {/* Connector line — desktop only */}
           <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary/20 via-primary/10 to-transparent pointer-events-none" />
           {coreAutomation.map((item, i) => (
-            <FeatureCard key={i} item={item} />
+            <FeatureCard key={i} item={item} onSelect={setSelectedStep} isSelected={selectedStep === item.step} />
           ))}
         </div>
 
@@ -217,7 +293,7 @@ export default function CoreOffer() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
           {doneForYou.map((item, i) => (
-            <FeatureCard key={i} item={item} />
+            <FeatureCard key={i} item={item} onSelect={setSelectedStep} isSelected={selectedStep === item.step} />
           ))}
         </div>
 
