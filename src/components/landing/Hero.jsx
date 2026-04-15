@@ -81,20 +81,15 @@ export default function Hero() {
 
         {/* CTA */}
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button
-            size="lg"
+          <button
             onClick={() => setShowLeadModal(true)}
-            className="rounded-full px-8 h-12 text-base font-semibold gap-2 shadow-md transition-all duration-500"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 20px rgba(120,70,20,0.4)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
-            }}
+            style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 14px rgba(120,70,20,0.35)",transition:"box-shadow 0.3s ease, transform 0.3s ease",border:"none",cursor:"pointer"}}
           >
-            Book a Demo
-            <ArrowRight className="w-4 h-4" />
-          </Button>
+            <span style={{display:"flex",alignItems:"center",gap:"6px",height:"48px",padding:"0 32px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"600",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
+              Book a Demo
+              <ArrowRight className="w-4 h-4" />
+            </span>
+          </button>
           <button
             onClick={(e) => {
               e.preventDefault();
