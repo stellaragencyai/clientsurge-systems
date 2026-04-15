@@ -15,6 +15,7 @@ const includes = [
 export default function MedSpaPricingPreview() {
   const [showModal, setShowModal] = useState(false);
   return (
+    <>
     <section className="py-24 md:py-32 px-6 bg-[#FAFAF8]">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
@@ -80,6 +81,7 @@ export default function MedSpaPricingPreview() {
         </div>
       </div>
     </section>
-    {showModal && <MedSpaDemoModal onClose={() => setShowModal(false)} />}
+      {showModal && <MedSpaDemoModal onClose={() => setShowModal(false)} />}
+    </>
   );
 }
