@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, Zap, MessageSquare, PhoneCall, CalendarCheck, RotateCcw, LayoutDashboard, HeadphonesIcon, TrendingUp, CheckCircle2 } from "lucide-react";
 import LeadCaptureModal from "../forms/LeadCaptureModal";
+import { useRef } from 'react';
 
 const coreAutomation = [
   { icon: Zap, step: "01", title: "Instantly respond to every lead", desc: "Before your competitors do — personalized replies within seconds.", tag: "Avg. 2× more bookings" },
@@ -18,30 +19,150 @@ const doneForYou = [
 
 function FeatureCard({ item }) {
   const Icon = item.icon;
+  const [isHovered, setIsHovered] = useState(false);
+
+  const aspects = {
+    "01": ["Responds instantly to all inquiries", "Personalized by lead details", "Available 24/7/365"],
+    "02": ["Guides prospects directly to booking", "Eliminates phone tag friction", "Auto-confirms appointments"],
+    "03": ["SMS + email touchpoints", "Timed for optimal engagement", "Stops when they convert"],
+    "04": ["Smart booking flow", "Direct calendar integration", "Automated confirmations"],
+    "05": ["Reactivates dormant leads", "Proven re-engagement sequences", "$4k+ revenue recovery/month"],
+    "06": ["Zero manual scheduling", "Frictionless booking experience", "Sync with all calendars"],
+    "07": ["Auto-tagging & status updates", "Self-running pipeline", "Full visibility dashboard"],
+    "08": ["Priority support access", "Continuous optimization", "Post-launch monitoring"],
+  };
+
+  const cardAspects = aspects[item.step] || [];
+
   return (
     <div
-      className="group flex items-start gap-5 p-7 rounded-2xl border bg-white transition-all duration-300 cursor-default hover:shadow-md hover:border-primary/40 min-h-[120px]"
-      style={{ borderColor: "hsl(var(--border))" }}
+      className="relative min-h-[120px]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{ perspective: "1200px" }}
     >
-      <span
-        className="text-3xl font-black flex-shrink-0 leading-none mt-1"
-        style={{ color: "#9a5c2e", fontFamily: "var(--font-display)", minWidth: "2.5rem" }}
+      <div
+        className="flex items-start gap-5 p-7 rounded-2xl border transition-all duration-500 cursor-default min-h-[120px] relative overflow-hidden"
+        style={{
+          borderColor: isHovered ? "#9a5c2e" : "hsl(var(--border))",
+          backgroundColor: isHovered ? "rgba(154, 92, 46, 0.08)" : "white",
+          boxShadow: isHovered 
+            ? "0 20px 40px rgba(154,92,46,0.15), 0 0 60px rgba(154,92,46,0.1)"
+            : "0 2px 8px rgba(0,0,0,0.04)",
+          transform: isHovered ? "translateY(-8px) rotateX(2deg)" : "translateY(0) rotateX(0deg)",
+        }}
       >
-        {item.step}
-      </span>
-      <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors duration-300">
-        <Icon className="w-5 h-5 text-primary" />
-      </div>
-      <div className="flex-1">
-        <h3 className="text-sm font-semibold text-foreground mb-1.5">{item.title}</h3>
-        <p className="text-xs text-foreground/70 leading-relaxed mb-3">{item.desc}</p>
+        {/* Animated gradient glow on hover */}
+        {isHovered && (
+          <div
+            className="absolute inset-0 opacity-0 animate-pulse pointer-events-none"
+            style={{
+              background: "radial-gradient(circle at center, rgba(154,92,46,0.15) 0%, transparent 70%)",
+              animation: "fadeInOut 2s ease-in-out infinite",
+            }}
+          />
+        )}
+
+        {/* Golden arrow on hover */}
+        {isHovered && (
+          <div
+            className="absolute -right-1 top-1/2 -translate-y-1/2 text-4xl font-black"
+            style={{
+              color: "#c8965c",
+              opacity: 0,
+              animation: "slideInArrow 0.5s ease-out forwards",
+              textShadow: "0 0 20px rgba(200, 150, 92, 0.6)",
+            }}
+          >
+            →
+          </div>
+        )}
+
         <span
-          className="inline-block text-xs font-bold px-3 py-1 rounded-full"
-          style={{ background: "rgba(154,92,46,0.1)", color: "#9a5c2e", border: "1px solid rgba(154,92,46,0.2)" }}
+          className="text-3xl font-black flex-shrink-0 leading-none mt-1 transition-colors duration-300"
+          style={{ color: isHovered ? "#c8965c" : "#9a5c2e", fontFamily: "var(--font-display)", minWidth: "2.5rem" }}
         >
-          {item.tag}
+          {item.step}
         </span>
+        <div
+          className="flex-shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-all duration-300"
+          style={{
+            backgroundColor: isHovered ? "rgba(200,150,92,0.2)" : "rgba(154,92,46,0.1)",
+            boxShadow: isHovered ? "0 0 16px rgba(200,150,92,0.3)" : "none",
+          }}
+        >
+          <Icon className="w-5 h-5" style={{ color: isHovered ? "#c8965c" : "#9a5c2e" }} />
+        </div>
+        <div className="flex-1 relative z-10">
+          <h3 className="text-sm font-semibold text-foreground mb-1.5 transition-colors duration-300">{item.title}</h3>
+          <p className="text-xs text-foreground/70 leading-relaxed mb-3">{item.desc}</p>
+          <span
+            className="inline-block text-xs font-bold px-3 py-1 rounded-full transition-all duration-300"
+            style={{
+              background: isHovered ? "rgba(200,150,92,0.2)" : "rgba(154,92,46,0.1)",
+              color: isHovered ? "#c8965c" : "#9a5c2e",
+              border: isHovered ? "1px solid rgba(200,150,92,0.4)" : "1px solid rgba(154,92,46,0.2)",
+            }}
+          >
+            {item.tag}
+          </span>
+        </div>
       </div>
+
+      {/* Hover details panel */}
+      {isHovered && (
+        <div
+          className="absolute -right-2 top-full mt-2 bg-white rounded-xl shadow-lg z-20 min-w-max"
+          style={{
+            borderLeft: "4px solid #c8965c",
+            padding: "12px 16px",
+            animation: "slideUp 0.4s ease-out forwards",
+            boxShadow: "0 12px 32px rgba(154,92,46,0.2)",
+          }}
+        >
+          <p className="text-xs font-bold text-primary mb-2 uppercase tracking-widest">Key Points:</p>
+          <ul className="space-y-1.5">
+            {cardAspects.map((aspect, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-xs text-foreground/80">
+                <span
+                  className="text-primary font-bold mt-0.5 flex-shrink-0"
+                  style={{ color: "#c8965c" }}
+                >
+                  •
+                </span>
+                <span>{aspect}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes fadeInOut {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.6; }
+        }
+        @keyframes slideInArrow {
+          from {
+            opacity: 0;
+            transform: translateX(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
