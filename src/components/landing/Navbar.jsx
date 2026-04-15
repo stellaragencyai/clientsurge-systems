@@ -72,7 +72,7 @@ export default function Navbar() {
           className="font-display text-2xl font-semibold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:text-primary transition-colors"
           style={{ fontSize: "1.75rem" }}
         >
-          Apex<span className="text-primary">Flow</span>
+          ClientSurge<span className="text-primary">Systems</span>
         </button>
 
         {/* Center nav links */}

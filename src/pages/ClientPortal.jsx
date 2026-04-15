@@ -83,7 +83,7 @@ export default function ClientPortal() {
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-border px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="font-display text-xl font-semibold text-foreground">
-            Apex<span className="text-primary">Flow</span>
+            ClientSurge<span className="text-primary">Systems</span>
           </span>
           <span className="text-muted-foreground/40 text-lg">·</span>
           <span className="text-sm font-medium text-muted-foreground">Client Portal</span>
