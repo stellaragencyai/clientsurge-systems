@@ -17,7 +17,7 @@ export default function MedSpaPricingPreview() {
         <div className="text-center mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Offer</p>
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-5">
-            Done-for-You Automation Systems for Med Spas
+            Done-for-You <span className="text-primary">Automation</span> Systems for Med Spas
           </h2>
           <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
             Faster response. Better follow-up. More booked consultations. We build and install the system — you focus on your clients.
