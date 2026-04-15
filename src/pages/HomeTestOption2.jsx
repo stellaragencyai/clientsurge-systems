@@ -31,27 +31,28 @@ export default function HomeTestOption2() {
 
       {/* OPTION 2: Modern/Tech with Colored Gradient Tint */}
       <section 
-        className="relative min-h-screen py-24 md:py-32 px-6 w-full"
+        className="relative w-full py-24 md:py-32 px-6"
         style={{
           backgroundImage: 'url("https://images.unsplash.com/photo-1552664730-d307ca884978?w=1920&q=90")',
           backgroundSize: 'cover',
-          backgroundPosition: 'center top',
+          backgroundPosition: 'center center',
           backgroundAttachment: 'fixed',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          minHeight: '90vh'
         }}
       >
-        {/* Primary color tinted gradient overlay (15-20% opacity) */}
+        {/* Primary color tinted gradient overlay */}
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to bottom, rgba(42, 80, 38, 0.18), rgba(42, 80, 38, 0.10), rgba(42, 80, 38, 0.04), transparent)',
+            background: 'linear-gradient(to bottom, rgba(42, 80, 38, 0.12), rgba(42, 80, 38, 0.06), transparent)',
           }}
         />
         
         {/* Fade out to white at bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/50" />
         
-        <div className="relative z-10 max-w-5xl mx-auto">
+        <div className="relative z-10 max-w-5xl mx-auto w-full">
           <Industries />
         </div>
       </section>

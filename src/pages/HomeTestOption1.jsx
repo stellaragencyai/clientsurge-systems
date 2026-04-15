@@ -31,22 +31,23 @@ export default function HomeTestOption1() {
 
       {/* OPTION 1: Luxury/Premium with Soft Dark Gradient */}
       <section 
-        className="relative min-h-screen py-24 md:py-32 px-6 w-full"
+        className="relative w-full py-24 md:py-32 px-6"
         style={{
           backgroundImage: 'url("https://images.unsplash.com/photo-1552693673-1bf958298935?w=1920&q=90")',
           backgroundSize: 'cover',
-          backgroundPosition: 'center top',
+          backgroundPosition: 'center center',
           backgroundAttachment: 'fixed',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          minHeight: '90vh'
         }}
       >
-        {/* Soft dark gradient overlay (15-25% opacity) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/18 via-black/12 to-transparent" />
+        {/* Soft dark gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/15 to-black/5" />
         
         {/* Fade-out to white at bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/50" />
         
-        <div className="relative z-10 max-w-5xl mx-auto">
+        <div className="relative z-10 max-w-5xl mx-auto w-full">
           <Industries />
         </div>
       </section>

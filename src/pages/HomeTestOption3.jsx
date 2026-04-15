@@ -31,27 +31,28 @@ export default function HomeTestOption3() {
 
       {/* OPTION 3: Action/Dynamic with Multi-layer Smart Fade */}
       <section 
-        className="relative min-h-screen py-24 md:py-32 px-6 w-full"
+        className="relative w-full py-24 md:py-32 px-6"
         style={{
           backgroundImage: 'url("https://images.unsplash.com/photo-1552664730-d307ca884978?w=1920&q=90")',
           backgroundSize: 'cover',
-          backgroundPosition: 'center top',
+          backgroundPosition: 'center center',
           backgroundAttachment: 'fixed',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          minHeight: '90vh'
         }}
       >
         {/* Dark at top, lighter in middle, fades to white */}
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.10) 45%, rgba(0, 0, 0, 0.02) 75%, transparent 100%)',
+            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.08) 50%, transparent 100%)',
           }}
         />
         
         {/* Smooth fade to white at bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/45" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/50" />
         
-        <div className="relative z-10 max-w-5xl mx-auto">
+        <div className="relative z-10 max-w-5xl mx-auto w-full">
           <Industries />
         </div>
       </section>
