@@ -1,6 +1,7 @@
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import DemoBookingModal from "../forms/DemoBookingModal";
 
 const plans = [
   {
@@ -80,9 +81,11 @@ function scrollToDemo(e) {
 }
 
 export default function Pricing() {
-  return (
-    <section id="pricing" className="py-28 md:py-36 px-6 bg-gradient-to-b from-background to-card overflow-visible">
-      <div className="max-w-7xl mx-auto">
+   const [showDemoModal, setShowDemoModal] = useState(false);
+
+   return (
+     <section id="pricing" className="py-28 md:py-36 px-6 bg-gradient-to-b from-background to-card overflow-visible">
+       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
         <div className="max-w-2xl mx-auto text-center mb-20">
@@ -101,7 +104,7 @@ export default function Pricing() {
         {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {plans.map((plan, i) => (
-            <PricingCard key={i} plan={plan} />
+            <PricingCard key={i} plan={plan} onOpenModal={() => setShowDemoModal(true)} />
           ))}
         </div>
 
@@ -110,7 +113,7 @@ export default function Pricing() {
           <p className="text-foreground font-semibold text-base mb-4">
             Not sure which system fits your business? We'll recommend the best option based on your lead flow.
           </p>
-          <button onClick={scrollToDemo} className="shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none" onMouseEnter={(e) => {
+          <button onClick={() => setShowDemoModal(true)} className="shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none" onMouseEnter={(e) => {
            e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
           }} onMouseLeave={(e) => {
            e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
@@ -121,6 +124,8 @@ export default function Pricing() {
            </span>
           </button>
         </div>
+
+        {showDemoModal && <DemoBookingModal onClose={() => setShowDemoModal(false)} />}
 
       </div>
 
@@ -177,8 +182,8 @@ export default function Pricing() {
   );
 }
 
-function PricingCard({ plan }) {
-  const [isHovered, setIsHovered] = useState(false);
+function PricingCard({ plan, onOpenModal }) {
+   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <div
@@ -237,7 +242,7 @@ function PricingCard({ plan }) {
         </ul>
 
         {/* CTA */}
-        <button onClick={scrollToDemo} className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none" onMouseEnter={(e) => {
+        <button onClick={onOpenModal} className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none" onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
           }} onMouseLeave={(e) => {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
