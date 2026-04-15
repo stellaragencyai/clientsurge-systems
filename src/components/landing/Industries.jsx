@@ -144,17 +144,15 @@ export default function Industries() {
                 <img
                   src={ind.image}
                   alt={ind.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="w-full h-full object-cover"
                   style={{ minHeight: "320px" }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/25 to-black/55" />
-                <div className="absolute top-5 left-5 w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-white" />
-                </div>
+
               </div>
 
               {/* Content — 30% */}
-              <div className="relative flex-1 bg-white px-6 py-5 flex flex-col justify-between border-t border-border group-hover:bg-primary/5 transition-colors duration-300">
+              <div className="relative flex-1 bg-white px-6 py-5 flex flex-col justify-between border-t border-border">
                 <div>
                   <h3 className="text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors leading-snug">
                     {ind.name}
