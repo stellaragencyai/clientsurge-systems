@@ -69,10 +69,11 @@ export default function Navbar() {
             };
             requestAnimationFrame(step);
           }}
-          className="font-display text-2xl font-semibold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:text-primary transition-colors"
-          style={{ fontSize: "1.75rem" }}
+          className="font-display font-semibold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:text-primary transition-colors flex flex-col leading-tight"
+          style={{ fontSize: "0.875rem" }}
         >
-          ClientSurge<span className="text-primary">Systems</span>
+          <span className="font-semibold">ClientSurge</span>
+          <span className="text-primary text-xs">Systems</span>
         </button>
 
         {/* Center nav links */}

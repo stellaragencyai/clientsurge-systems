@@ -82,9 +82,10 @@ export default function ClientPortal() {
       {/* Top bar */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-border px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <span className="font-display text-xl font-semibold text-foreground">
-            ClientSurge<span className="text-primary">Systems</span>
-          </span>
+          <div className="font-display font-semibold text-foreground flex flex-col leading-tight">
+            <span className="text-sm">ClientSurge</span>
+            <span className="text-xs text-primary">Systems</span>
+          </div>
           <span className="text-muted-foreground/40 text-lg">·</span>
           <span className="text-sm font-medium text-muted-foreground">Client Portal</span>
         </div>
