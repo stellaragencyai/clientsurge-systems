@@ -35,7 +35,6 @@ export default function Home() {
       <FadeIn><FAQ /></FadeIn>
       <FadeIn><Testimonials /></FadeIn>
       <FadeIn><Pricing /></FadeIn>
-      <FadeIn><FAQ /></FadeIn>
       <FinalCTA />
       <Footer />
       <SamChatWidget />
