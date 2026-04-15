@@ -31,26 +31,27 @@ export default function HomeTestOption3() {
 
       {/* OPTION 3: Action/Dynamic with Multi-layer Smart Fade */}
       <section 
-        className="relative py-24 md:py-32 px-6"
+        className="relative min-h-screen py-24 md:py-32 px-6 w-full"
         style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1552664730-d307ca884978?w=1920&q=80)',
+          backgroundImage: 'url("https://images.unsplash.com/photo-1552664730-d307ca884978?w=1920&q=90")',
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed'
+          backgroundPosition: 'center top',
+          backgroundAttachment: 'fixed',
+          backgroundRepeat: 'no-repeat'
         }}
       >
-        {/* Dark at top near header, lighter in middle, fades to white */}
+        {/* Dark at top, lighter in middle, fades to white */}
         <div 
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.12) 40%, rgba(0, 0, 0, 0.05) 70%, transparent 100%)',
+            background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.30) 0%, rgba(0, 0, 0, 0.10) 45%, rgba(0, 0, 0, 0.02) 75%, transparent 100%)',
           }}
         />
         
         {/* Smooth fade to white at bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent via-60% to-white/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/45" />
         
-        <div className="relative z-10">
+        <div className="relative z-10 max-w-5xl mx-auto">
           <Industries />
         </div>
       </section>
