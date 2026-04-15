@@ -13,6 +13,7 @@ import MedSpaSpecific from "../components/medspa/MedSpaSpecific";
 import MedSpaReactivation from "../components/medspa/MedSpaReactivation";
 import MedSpaPricingPreview from "../components/medspa/MedSpaPricingPreview";
 import MedSpaSocialProof from "../components/medspa/MedSpaSocialProof";
+import MedSpaTestimonials from "../components/medspa/MedSpaTestimonials";
 import MedSpaFAQ from "../components/medspa/MedSpaFAQ";
 import MedSpaFinalCTA from "../components/medspa/MedSpaFinalCTA";
 import Footer from "../components/landing/Footer";
@@ -35,6 +36,7 @@ export default function MedSpa() {
       <MedSpaSpecific />
       <MedSpaReactivation />
       <MedSpaPricingPreview />
+      <MedSpaTestimonials />
       <MedSpaFAQ />
       <MedSpaFinalCTA />
       <Footer />

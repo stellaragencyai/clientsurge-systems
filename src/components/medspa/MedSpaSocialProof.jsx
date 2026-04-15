@@ -14,7 +14,7 @@ const metrics = [
 
 export default function MedSpaSocialProof() {
   return (
-    <section className="py-16 md:py-20 px-6 bg-gradient-to-b from-white to-primary/2">
+    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-white to-primary/2">
       <div className="max-w-5xl mx-auto">
         {/* Metrics */}
         <div className="grid grid-cols-3 gap-6 md:gap-12 mb-16">

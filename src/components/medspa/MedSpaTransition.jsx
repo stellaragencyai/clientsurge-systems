@@ -18,7 +18,7 @@ export default function MedSpaTransition() {
   };
 
   return (
-    <section className="py-12 md:py-16 px-6 bg-white border-b border-border">
+    <section className="py-24 md:py-32 px-6 bg-white border-b border-border">
       <div className="max-w-3xl mx-auto text-center">
         <h3 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-6">
           And this is exactly what our system fixes.

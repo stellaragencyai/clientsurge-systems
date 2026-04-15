@@ -11,7 +11,7 @@ export default function MedSpaPositioning() {
   ];
 
   return (
-    <section className="py-16 md:py-20 px-6 bg-gradient-to-b from-primary/5 to-white border-y border-primary/10">
+    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-primary/5 to-white border-y border-primary/10">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
           <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-2">
