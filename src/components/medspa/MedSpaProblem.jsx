@@ -18,7 +18,7 @@ export default function MedSpaProblem() {
         <div className="max-w-3xl mx-auto text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">The Real Problem</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground mb-4">
-            <span className="text-primary">Here's what's really happening.</span>
+            <span className="text-black">Here's what's really happening.</span>
           </h2>
         </div>
 
@@ -26,8 +26,8 @@ export default function MedSpaProblem() {
         <div className="grid md:grid-cols-2 gap-12 items-stretch">
           <div className="rounded-2xl overflow-hidden shadow-lg">
             <img
-              src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=85"
-              alt="Frustrated person at desk"
+              src="https://images.unsplash.com/photo-1633613286991-611bcb6c4ee1?w=800&q=85"
+              alt="Med spa treatment room"
               className="w-full h-72 md:h-full object-cover"
             />
           </div>

@@ -22,13 +22,10 @@ export default function MedSpaPositioning() {
           </p>
         </div>
 
-        {/* Enhanced channels flow */}
-        <div className="relative">
-          {/* Connecting line */}
-          <div className="hidden md:block absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent -translate-y-1/2" />
-
+        {/* Enhanced channels funnel flow */}
+        <div className="relative mb-16">
           {/* Channels grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8 relative z-10">
             {channels.map((c, i) => {
               const Icon = c.icon;
               return (
@@ -40,18 +37,52 @@ export default function MedSpaPositioning() {
                     <Icon className="w-6 h-6 text-primary" />
                   </div>
                   <p className="text-xs font-semibold text-foreground text-center leading-tight">{c.name}</p>
-                  <div className="hidden group-hover:block absolute -right-3 top-1/2 -translate-y-1/2 z-10">
-                    <ArrowRight className="w-5 h-5 text-primary/40" />
-                  </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Unified lead point */}
-          <div className="flex justify-center mb-8">
-            <div className="px-6 py-2 rounded-full bg-primary/10 border border-primary/25">
-              <p className="text-xs font-semibold text-primary uppercase tracking-wide">All lead to the same place</p>
+          {/* SVG Funnel visualization with arrows */}
+          <svg className="absolute inset-0 w-full h-96 pointer-events-none" style={{ top: '60px' }}>
+            {/* Arrow from Instagram (0) to center */}
+            <path d="M 80 60 Q 50% 150, 50% 280" stroke="#000" strokeWidth="2" fill="none" strokeDasharray="5,5" />
+            <polygon points="50%,290 calc(50% - 6),275 calc(50% + 6),275" fill="#000" />
+
+            {/* Arrow from Website (1) to center */}
+            <path d="M 210 60 Q 48% 150, 50% 280" stroke="#000" strokeWidth="2" fill="none" strokeDasharray="5,5" />
+            <polygon points="50%,290 calc(50% - 6),275 calc(50% + 6),275" fill="#000" />
+
+            {/* Arrow from Phone (2) to center */}
+            <path d="M 340 60 Q 52% 150, 50% 280" stroke="#000" strokeWidth="2" fill="none" strokeDasharray="5,5" />
+            <polygon points="50%,290 calc(50% - 6),275 calc(50% + 6),275" fill="#000" />
+
+            {/* Arrow from Ads (3) to center */}
+            <path d="M 470 60 Q 52% 150, 50% 280" stroke="#000" strokeWidth="2" fill="none" strokeDasharray="5,5" />
+            <polygon points="50%,290 calc(50% - 6),275 calc(50% + 6),275" fill="#000" />
+
+            {/* Arrow from Facebook (4) to center */}
+            <path d="M 600 60 Q 52% 150, 50% 280" stroke="#000" strokeWidth="2" fill="none" strokeDasharray="5,5" />
+            <polygon points="50%,290 calc(50% - 6),275 calc(50% + 6),275" fill="#000" />
+
+            {/* Arrow from Referrals (5) to center */}
+            <path d="M 730 60 Q 52% 150, 50% 280" stroke="#000" strokeWidth="2" fill="none" strokeDasharray="5,5" />
+            <polygon points="50%,290 calc(50% - 6),275 calc(50% + 6),275" fill="#000" />
+          </svg>
+
+          {/* Central convergence point - the med spa */}
+          <div className="flex justify-center relative z-20 mt-12">
+            <div className="text-center">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center mb-3 shadow-lg">
+                <span className="text-white font-bold text-sm text-center px-2">Your Med Spa</span>
+              </div>
+              <p className="text-xs font-semibold text-foreground">All leads funnel here</p>
+            </div>
+          </div>
+
+          {/* Loss indicator */}
+          <div className="flex justify-center mt-8 relative z-20">
+            <div className="px-4 py-2 rounded-full bg-destructive/10 border border-destructive/30">
+              <p className="text-xs font-semibold text-destructive">❌ But many are lost to poor follow-up</p>
             </div>
           </div>
         </div>
