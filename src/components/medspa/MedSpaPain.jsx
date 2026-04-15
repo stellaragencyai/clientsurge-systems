@@ -1,7 +1,7 @@
 const stats = [
-  { value: "78%", label: "of clients choose the first business that responds" },
-  { value: "5 min", label: "response window before conversion rates drop sharply" },
-  { value: "1 in 3", label: "missed calls never call back a second time" },
+  { value: "78%", label: "Book with whoever responds first" },
+  { value: "5 min", label: "Critical response window" },
+  { value: "1 in 3", label: "Never call back twice" },
 ];
 
 export default function MedSpaPain() {
@@ -11,19 +11,19 @@ export default function MedSpaPain() {
         <div className="grid md:grid-cols-2 gap-14 items-center">
           {/* Left content */}
           <div>
-            <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Cost of Slow Response</p>
+            <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Financial Reality</p>
             <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-6 leading-snug">
-              Every delayed response<br />can cost you a client.
+              You're already paying for leads. You're just not closing them.
             </h2>
-            <p className="text-base text-muted-foreground leading-relaxed mb-6">
-              Med spa leads are not loyal. They want a solution. The first business to respond gets the booking.
+            <p className="text-base text-muted-foreground leading-relaxed mb-4">
+              <span className="font-semibold text-foreground">First response wins.</span> Med spa leads book with whoever answers first.
             </p>
             <p className="text-base text-muted-foreground leading-relaxed mb-6">
-              Every delayed follow-up hands revenue to whoever responded faster. If you're running ads and not following up within minutes, you're losing money.
+              You're running ads. Someone calls. Your team is busy. They book someone else instead.
             </p>
-            <div className="p-5 bg-destructive/5 border border-destructive/15 rounded-xl">
+            <div className="p-5 bg-primary/5 border border-primary/15 rounded-xl">
               <p className="text-base font-semibold text-foreground">
-                You're already paying for attention. The problem is what happens after you get it.
+                <span className="text-primary">Every missed moment is lost revenue.</span>
               </p>
             </div>
           </div>

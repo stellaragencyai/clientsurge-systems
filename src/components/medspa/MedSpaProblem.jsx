@@ -1,11 +1,11 @@
 import { X } from "lucide-react";
 
 const problems = [
-  { title: "Leads not answered fast enough", desc: "By the time someone follows up, the lead has already booked elsewhere." },
-  { title: "Missed calls become lost appointments", desc: "Every unanswered phone call is a potential consultation you will never get back." },
-  { title: "Front desk teams get overwhelmed", desc: "Your staff is focused on clients in the room — not chasing new inquiries." },
-  { title: "Follow-ups are inconsistent or forgotten", desc: "Manual outreach is unreliable. Some leads get follow-up. Most don't." },
-  { title: "Old leads go cold and are never re-engaged", desc: "Your database is full of past inquiries that could still become bookings." },
+  { title: "If you're slow, someone else closes them", desc: "Leads shop around. First response wins." },
+  { title: "Every missed call is a lost booking", desc: "They don't call back twice." },
+  { title: "Your team is busy — your leads are not waiting", desc: "Front desk is with clients. Leads are booking elsewhere." },
+  { title: "No system means no follow-up", desc: "Manual workflows fail. Leads slip through." },
+  { title: "Old leads are losing value daily", desc: "Every day they wait, conversion probability drops." },
 ];
 
 const channels = ["Instagram", "Website", "Phone Calls", "Google Ads", "Referrals", "Facebook"];
@@ -15,23 +15,11 @@ export default function MedSpaProblem() {
     <section className="py-24 md:py-32 px-6 bg-[#FAFAF8]">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Real Problem</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground mb-5">
-            Most Med Spas Don't Have a Lead Problem. They Have a <span className="text-primary">Follow-Up Problem.</span>
+        <div className="max-w-3xl mx-auto text-center mb-12">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">The Real Problem</p>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground mb-4">
+            <span className="text-primary">Here's what's really happening.</span>
           </h2>
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            You're already getting inquiries through multiple channels. The problem is what happens next — or what <em>doesn't</em> happen.
-          </p>
-        </div>
-
-        {/* Channels */}
-        <div className="flex flex-wrap justify-center gap-3 mb-14">
-          {channels.map((c, i) => (
-            <span key={i} className="px-4 py-2 bg-white border border-border rounded-full text-sm font-medium text-foreground/70">
-              {c}
-            </span>
-          ))}
         </div>
 
         {/* Two-column: image + problem list */}
@@ -56,9 +44,14 @@ export default function MedSpaProblem() {
                 </div>
               </div>
             ))}
-            <p className="text-sm font-semibold text-foreground/60 pt-2 pl-1 italic">
-              That is where bookings and revenue are quietly lost.
-            </p>
+            <div className="mt-6 pt-6 border-t border-border">
+             <p className="text-sm font-semibold text-foreground mb-2">
+               <span className="text-primary">One missed inquiry</span> can mean a lost high-value client.
+             </p>
+             <p className="text-xs text-muted-foreground">
+               This is happening every day you don't fix it.
+             </p>
+            </div>
           </div>
         </div>
       </div>

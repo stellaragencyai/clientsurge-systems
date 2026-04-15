@@ -1,6 +1,7 @@
 import Navbar from "../components/landing/Navbar";
 import MedSpaHero from "../components/medspa/MedSpaHero";
 import MedSpaPositioning from "../components/medspa/MedSpaPositioning";
+import MedSpaTransition from "../components/medspa/MedSpaTransition";
 import MedSpaWhyItWorks from "../components/medspa/MedSpaWhyItWorks";
 import MedSpaProblem from "../components/medspa/MedSpaProblem";
 import MedSpaPain from "../components/medspa/MedSpaPain";
@@ -24,6 +25,7 @@ export default function MedSpa() {
       <MedSpaPositioning />
       <MedSpaProblem />
       <MedSpaPain />
+      <MedSpaTransition />
       <MedSpaSolution />
       <MedSpaFlow />
       <MedSpaDemo />
