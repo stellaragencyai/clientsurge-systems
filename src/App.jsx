@@ -7,6 +7,9 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 // Add page imports here
 import Home from './pages/Home';
+import HomeTestOption1 from './pages/HomeTestOption1';
+import HomeTestOption2 from './pages/HomeTestOption2';
+import HomeTestOption3 from './pages/HomeTestOption3';
 import MedSpa from './pages/MedSpa';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
@@ -50,6 +53,9 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/test-option-1" element={<HomeTestOption1 />} />
+      <Route path="/test-option-2" element={<HomeTestOption2 />} />
+      <Route path="/test-option-3" element={<HomeTestOption3 />} />
       <Route path="/med-spa" element={<MedSpa />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />
