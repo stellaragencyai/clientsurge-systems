@@ -12,10 +12,10 @@ const channels = ["Instagram", "Website", "Phone Calls", "Google Ads", "Referral
 
 export default function MedSpaProblem() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-[#FAFAF8]">
+    <section className="py-24 md:py-32 px-6 bg-white">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-12">
+        <div className="max-w-3xl mx-auto text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">The Real Problem</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground mb-4">
             <span className="text-primary">Here's what's really happening.</span>
@@ -23,24 +23,24 @@ export default function MedSpaProblem() {
         </div>
 
         {/* Two-column: image + problem list */}
-        <div className="grid md:grid-cols-2 gap-10 items-center">
+        <div className="grid md:grid-cols-2 gap-12 items-stretch">
           <div className="rounded-2xl overflow-hidden shadow-lg">
             <img
-              src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=85"
-              alt="Med spa reception"
+              src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=85"
+              alt="Frustrated person at desk"
               className="w-full h-72 md:h-full object-cover"
             />
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {problems.map((p, i) => (
-              <div key={i} className="flex gap-4 p-5 bg-white rounded-xl border border-border hover:border-destructive/30 hover:shadow-sm transition-all">
-                <div className="flex-shrink-0 w-7 h-7 rounded-full bg-destructive/10 flex items-center justify-center">
-                  <X className="w-3.5 h-3.5 text-destructive" />
+              <div key={i} className="flex gap-4 p-5 bg-gradient-to-br from-destructive/5 to-destructive/2 rounded-xl border border-destructive/20 hover:border-destructive/40 hover:shadow-md hover:from-destructive/8 transition-all">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-destructive/20 flex items-center justify-center">
+                  <X className="w-4 h-4 text-destructive" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-foreground mb-0.5">{p.title}</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{p.desc}</p>
+                  <p className="text-sm font-semibold text-foreground leading-tight">{p.title}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{p.desc}</p>
                 </div>
               </div>
             ))}
