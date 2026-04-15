@@ -115,7 +115,7 @@ export default function Benefits() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card to-background">
+    <section ref={sectionRef} className="py-20 md:py-32 px-4 md:px-6 bg-gradient-to-b from-card to-background border-t-2 border-border">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-foreground/70 tracking-widest uppercase mb-4">The Outcomes</p>

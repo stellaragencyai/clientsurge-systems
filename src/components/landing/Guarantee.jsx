@@ -39,19 +39,19 @@ export default function Guarantee() {
         </div>
 
         {/* Guarantee Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {guarantees.map((g, i) => {
             const Icon = g.icon;
             return (
               <div
                 key={i}
-                className="p-8 rounded-2xl border border-border bg-white transition-all duration-300 hover:shadow-md hover:border-primary/40"
+                className="p-6 rounded-2xl border border-border bg-white transition-all duration-300 hover:shadow-md hover:border-primary/40"
               >
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-5 flex-shrink-0">
-                  <Icon className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 flex-shrink-0">
+                  <Icon className="w-4 h-4 text-primary" />
                 </div>
-                <h3 className="font-semibold text-foreground mb-2">{g.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{g.desc}</p>
+                <h3 className="font-semibold text-foreground mb-2 text-sm">{g.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{g.desc}</p>
               </div>
             );
           })}

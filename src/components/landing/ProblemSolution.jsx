@@ -101,18 +101,21 @@ export default function ProblemSolution() {
                 {/* Problem */}
                 <CardWithFadeIn delay={i * 40}>
                   <div 
-                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-red-400 hover:shadow-lg bg-red-50/40 min-h-36"
+                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-red-600 hover:shadow-lg"
                     style={{
-                      borderColor: `rgba(239,68,68,0.2)`,
+                      backgroundColor: `rgba(239,68,68,0.05)`,
+                      borderColor: `#000000`,
+                      borderWidth: `2px`,
                     }}
                   >
                     <div 
-                      className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 bg-red-200/50"
+                      className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300"
+                      style={{ backgroundColor: `rgba(239,68,68,0.1)` }}
                     >
                       <ProblemIcon 
                         className="w-6 h-6"
                         style={{
-                          color: `rgba(239,68,68,0.8)`,
+                          color: `rgba(239,68,68,0.9)`,
                         }}
                         strokeWidth={1.5} 
                       />
@@ -127,18 +130,21 @@ export default function ProblemSolution() {
                 {/* Solution */}
                 <CardWithFadeIn delay={i * 40 + 80}>
                   <div 
-                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-amber-500 hover:shadow-lg bg-amber-50/40 min-h-36"
+                    className="flex items-start gap-4 p-7 rounded-2xl border transition-all duration-300 hover:border-amber-600 hover:shadow-lg min-h-36"
                     style={{
-                      borderColor: `rgba(161,120,35,0.2)`,
+                      backgroundColor: `rgba(200,150,92,0.08)`,
+                      borderColor: `#000000`,
+                      borderWidth: `2px`,
                     }}
                   >
                     <div 
-                      className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300 bg-amber-200/50"
+                      className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-transform duration-300"
+                      style={{ backgroundColor: `rgba(154,92,46,0.15)` }}
                     >
                       <SolutionIcon 
                         className="w-6 h-6"
                         style={{
-                          color: `rgba(161,120,35,0.8)`,
+                          color: `#9a5c2e`,
                         }}
                         strokeWidth={1.5} 
                       />

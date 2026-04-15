@@ -16,7 +16,7 @@ export default function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-md border-t border-white/10 px-6 py-4">
+    <div className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-md border-t border-white/10 px-6 py-4" style={{ background: 'rgba(255,255,255,0.08)' }}>
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
         <p className="text-sm text-white/90">
           We use cookies to enhance your experience. By using this site, you agree to our{' '}
