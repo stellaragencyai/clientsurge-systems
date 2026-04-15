@@ -2,28 +2,36 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 const faqs = [
   {
-    q: "Will this replace my front desk?",
-    a: "No. It supports your team by handling the fast response and repetitive follow-up they don't have time for. Your staff focuses on the clients in the room. The system handles the leads coming in.",
+    q: "Will my clients know they're talking to automation?",
+    a: "No — and that's by design. Every message is written in your brand's voice: professional, warm, and personal. Clients experience it the same way they would a well-trained front desk team member. The only difference is it responds in seconds, even at 11pm.",
+  },
+  {
+    q: "Does it work with my booking software (Vagaro, Mindbody, Acuity, Jane)?",
+    a: "Yes. We integrate with all major med spa booking platforms. Your booking link gets sent automatically at exactly the right moment — so leads go directly into your calendar without any manual scheduling.",
+  },
+  {
+    q: "We already have a front desk. Why do we need this?",
+    a: "Your front desk is great — for clients already in the room. The problem is what happens to the leads who text, DM, or call while your team is busy. This system handles that gap 24/7, so your staff can focus on the experience you're paid to deliver, not chasing inquiries.",
   },
   {
     q: "How quickly can this be set up?",
-    a: "Most systems are live within 5–7 business days once onboarding is complete. We do the build. You just need to show up for a short setup call.",
+    a: "Most med spa systems are fully live within 5–7 business days. We do the entire build — messaging, sequences, integrations, testing. You attend one short onboarding call. That's it.",
   },
   {
-    q: "Does this work with my current leads?",
-    a: "Yes. It can work with new leads coming in from any channel, and it can also help re-engage older inquiries you already have. No massive overhaul required.",
+    q: "We mostly get leads from Instagram DMs. Does this work for that?",
+    a: "Yes. We capture and respond to leads from Instagram, your website, Google ads, phone calls, and more. Wherever your inquiries come from, the system picks them up and responds immediately.",
   },
   {
-    q: "What kinds of med spas is this best for?",
-    a: "It works best for med spas that are already getting inquiries and want to convert more of them into booked appointments. If you have lead flow but inconsistent follow-up, this is built for you.",
+    q: "What if a lead asks a specific question about a treatment like Botox or filler pricing?",
+    a: "The system is built around your specific services, FAQs, and pricing ranges. It handles common questions naturally and knows when to route a conversation to your team for anything more complex — so nothing gets mishandled.",
+  },
+  {
+    q: "How much does it cost — and is it worth it?",
+    a: "Plans start at $397/month with a one-time setup fee. A single recovered consultation typically covers the monthly cost. Most med spas see ROI within the first 2–3 weeks. Book the demo and we'll show you the exact math for your lead volume.",
   },
   {
     q: "What happens after I book a demo?",
-    a: "We'll review your current lead flow, identify where bookings are being lost, and walk you through exactly how the system would work for your specific med spa. No obligation.",
-  },
-  {
-    q: "Will the responses sound robotic?",
-    a: "No. The messaging is crafted to feel clean, professional, and natural — consistent with the tone of your brand. It should feel like a well-trained team member, not an autoresponder.",
+    a: "We review your current lead flow, show you exactly where bookings are being lost, and walk you through how the system would work for your specific med spa. It's 30 minutes, zero obligation, and most people leave with clarity they didn't have before.",
   },
 ];
 
@@ -36,7 +44,7 @@ export default function MedSpaFAQ() {
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
             Frequently Asked Questions
           </h2>
-          <p className="text-base text-muted-foreground">Straight answers. No fluff.</p>
+          <p className="text-base text-muted-foreground">Real questions med spa owners ask us. Honest answers.</p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">
