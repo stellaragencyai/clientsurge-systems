@@ -36,7 +36,7 @@ export default function MedSpaPositioning() {
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                     <Icon className="w-6 h-6 text-primary" />
                   </div>
-                  <p className="text-xs font-semibold text-foreground text-center leading-tight">{c.name}</p>
+                  <p className="text-xs font-semibold text-foreground text-center leading-tight">Built for {c.name}</p>
                   
                   {/* Connecting lines from each source */}
                   <div className="absolute -bottom-16 left-1/2 w-0.5 h-16 bg-gradient-to-b from-black/30 to-black/5 -translate-x-1/2" />

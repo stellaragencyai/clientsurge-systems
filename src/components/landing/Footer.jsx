@@ -21,8 +21,8 @@ const navColumns = [
   {
     title: "Learn More",
     links: [
-      { label: "How It Works", href: "#how-it-works" },
-      { label: "Book a Demo", href: "#book-demo" },
+      { label: "How It Works", href: "/how-it-works" },
+      { label: "Book a Demo", href: "/book-demo" },
     ],
   },
   {

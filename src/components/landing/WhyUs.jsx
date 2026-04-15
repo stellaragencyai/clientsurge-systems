@@ -52,7 +52,7 @@ export default function WhyUs() {
     <section className="py-24 md:py-32 px-6 bg-foreground">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-3xl mx-auto text-center mb-6">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Why ApexFlow</p>
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Why ClientSurge Systems</p>
           <p className="text-base font-semibold text-background/70 mb-4">
             If your leads are slipping through the cracks, this is why — and how we fix it.
           </p>

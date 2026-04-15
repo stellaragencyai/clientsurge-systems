@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 
 const MESSAGES = [
   { id: 1, from: "lead", text: "Hi! I saw your ad — I'm interested in Botox and lip filler. Do you have availability this week?", time: "2:12 PM", delay: 800 },
-  { id: 2, from: "bot", label: "Instant Auto-Response (60 sec)", text: "Hi Ashley! Thanks for reaching out 😊 We have openings this week — grab a time here: [booking link]. Dr. Kim will do a quick consultation to make sure you get exactly what you're looking for!", time: "2:12 PM", delay: 1600 },
+  { id: 2, from: "bot", label: "Instant Auto-Response (under 60 sec)", text: "Hi Ashley! Thanks for reaching out 😊 We have openings this week — grab a time here: [booking link]. Our provider will do a quick consultation to get you exactly what you're looking for!", time: "2:12 PM", delay: 1600 },
   { id: 3, type: "system", text: "✓ Appointment booked - Thursday 3:00 PM", delay: 1400 },
-  { id: 4, from: "bot", label: "Day 2 Follow-up", text: "Hey Ashley — just checking in! Did you get a chance to look at the booking link? We'd love to get you in this week 🙏", time: "2:25 PM", delay: 2400 },
+  { id: 4, from: "bot", label: "Day 2 Follow-up", text: "Hey Ashley — just checking in! Did you get a chance to look at the link? We'd love to get you in this week 🙏", time: "2:25 PM", delay: 2400 },
 ];
 
 export default function MedSpaDemo() {
@@ -149,7 +149,6 @@ export default function MedSpaDemo() {
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 4v6h6" /><path d="M3.51 15a9 9 0 1 0 .49-4" /></svg>
                   {animating ? "Playing..." : "Replay Demo"}
                 </button>
-                {animating && <p className="text-xs text-muted-foreground mt-3">{visible.length} / {MESSAGES.length} messages</p>}
               </div>
             </div>
           </div>

@@ -65,9 +65,8 @@ export default function TrustBar() {
                 <span className="font-display text-xl font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
                   {item.stat}
                 </span>
-                <span className="text-[11px] text-muted-foreground flex items-center gap-1 leading-tight">
-                  {item.label}
-                  <span className="w-3.5 h-3.5 rounded-full border border-muted-foreground/30 text-[9px] flex items-center justify-center text-muted-foreground/60">?</span>
+                <span className="text-[11px] text-muted-foreground leading-tight">
+                   {item.label}
                 </span>
                 {tooltip === i && (
                   <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-64 bg-foreground text-background text-xs rounded-xl px-4 py-3 shadow-xl z-20 text-left leading-relaxed">
