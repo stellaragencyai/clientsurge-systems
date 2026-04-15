@@ -62,7 +62,7 @@ const industries = [
     desc: "Field teams stay focused while automated systems capture estimate requests, book appointments, and follow up on pending quotes.",
     result: "65% more jobs booked • 24/7 lead capture & response",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1504801990592-bef489c9b9a8?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=900&q=85",
     bullets: [
       "Never miss a service call — auto-response 24/7",
       "Estimate follow-ups sent automatically",
@@ -136,8 +136,8 @@ export default function Industries() {
             <button
               key={i}
               onClick={() => setSelected(ind)}
-              className="group relative flex flex-col overflow-hidden cursor-pointer text-left focus:outline-none border-4 border-transparent transition-colors duration-300 hover:border-[#a0714f]"
-              style={{ minHeight: "480px" }}
+              className="group relative flex flex-col overflow-hidden cursor-pointer text-left focus:outline-none outline-4 outline outline-transparent transition-all duration-300 hover:outline-[#a0714f]"
+              style={{ minHeight: "560px" }}
             >
               {/* Image — 70% */}
               <div className="relative overflow-hidden" style={{ flex: "0 0 70%" }}>
@@ -173,7 +173,7 @@ export default function Industries() {
         })}
       </div>
 
-      <div className="pb-24" />
+      <div className="pb-16" />
 
       {/* Expanded overlay */}
       <AnimatePresence>
