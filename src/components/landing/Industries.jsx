@@ -45,7 +45,7 @@ const industries = [
     desc: "Respond to property inquiries within minutes. Automate showing scheduling, follow-ups, and buyer nurturing from first contact to closing.",
     result: "5× more showings scheduled • 42% faster lead response",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=900&q=85",
     bullets: [
       "Instant lead response under 90 seconds, 24/7",
       "Auto-qualify buyers with smart SMS sequences",
@@ -96,7 +96,7 @@ const industries = [
     desc: "Capture leads across all channels. Automated follow-up, appointment reminders, and reactivation campaigns turn paid traffic into bookings.",
     result: "2–3× ROAS on marketing spend • 40% more appointments",
     href: "#book-demo",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=900&q=85",
     bullets: [
       "Capture leads from Google, Facebook, Instagram & web",
       "Instant multi-channel follow-up (SMS + email)",
