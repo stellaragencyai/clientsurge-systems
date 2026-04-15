@@ -37,86 +37,86 @@ const reasons = [
 const WhyUsCard = ({ reason }) => {
   const Icon = reason.icon;
   return (
-    <div className="group p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-primary/50 hover:bg-white/8 hover:shadow-lg transition-all duration-300 cursor-default">
-      <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-5 group-hover:bg-primary/30 transition-colors duration-300">
-        <Icon className="w-5 h-5 text-primary" strokeWidth={1.75} />
+    <div className="group p-8 md:p-10 rounded-2xl bg-white border-2 border-black hover:shadow-lg transition-all duration-300 cursor-default" style={{boxShadow: "0 4px 16px rgba(0,0,0,0.06)"}}>
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-all duration-300" style={{backgroundColor: "rgba(154,92,46,0.12)", border: "2px solid rgba(154,92,46,0.3)"}}>
+        <Icon className="w-6 h-6" style={{color: "#9a5c2e"}} strokeWidth={1.75} />
       </div>
-      <h3 className="text-base font-semibold text-background mb-2">{reason.title}</h3>
-      <p className="text-sm text-background/55 leading-relaxed">{reason.desc}</p>
+      <h3 className="text-lg md:text-xl font-semibold text-foreground mb-3">{reason.title}</h3>
+      <p className="text-base text-foreground/70 leading-relaxed">{reason.desc}</p>
     </div>
   );
 };
 
 export default function WhyUs() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-foreground">
+    <section className="py-28 md:py-40 px-6 bg-gradient-to-b from-white to-background">
       <div className="max-w-6xl mx-auto">
-        <div className="max-w-3xl mx-auto text-center mb-6">
+        <div className="max-w-3xl mx-auto text-center mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Why ClientSurge Systems</p>
-          <p className="text-base font-semibold text-background/70 mb-4">
+          <p className="text-base font-semibold text-foreground/70 mb-5">
             If your leads are slipping through the cracks, this is why — and how we fix it.
           </p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-background mb-5">
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-foreground mb-6">
             You Don't Need Another Platform — You Need Something That Actually Works
           </h2>
-          <p className="mt-4 text-lg text-background/70 max-w-2xl mx-auto leading-relaxed font-semibold">
+          <p className="mt-6 text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto leading-relaxed font-semibold">
             We don't give you tools to figure out. We build and run the system so it actually produces results.
           </p>
         </div>
 
         {/* Platform vs Partner contrast */}
-        <div className="flex flex-col sm:flex-row items-stretch justify-center gap-4 mb-14 max-w-2xl mx-auto">
-          <div className="flex-1 p-5 rounded-2xl bg-destructive/10 border border-destructive/20">
-            <p className="text-xs font-bold uppercase tracking-widest text-destructive/80 mb-3">A Platform Gives You</p>
+        <div className="flex flex-col sm:flex-row items-stretch justify-center gap-6 mb-16 max-w-3xl mx-auto">
+          <div className="flex-1 p-8 rounded-2xl bg-destructive/8 border-2 border-destructive/30">
+            <p className="text-xs font-bold uppercase tracking-widest text-destructive/80 mb-4">A Platform Gives You</p>
             {["You're left to figure it out", "Requires constant setup", "Takes time to learn", "Doesn't guarantee results"].map((t, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm text-background/60 mb-1.5">
-                <span className="text-destructive/60 text-base leading-none">✕</span> {t}
+              <div key={i} className="flex items-center gap-3 text-base text-foreground/70 mb-2.5">
+                <span className="text-destructive/70 text-lg leading-none">✕</span> {t}
               </div>
             ))}
           </div>
-          <div className="flex items-center justify-center text-xl font-bold text-primary/40 px-2 hidden sm:flex">→</div>
-          <div className="flex-1 p-5 rounded-2xl bg-primary/10 border border-primary/25">
-            <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">Our System Gives You</p>
+          <div className="flex items-center justify-center text-2xl font-bold px-4 hidden sm:flex" style={{color: "rgba(154,92,46,0.5)"}}>→</div>
+          <div className="flex-1 p-8 rounded-2xl border-2" style={{backgroundColor: "rgba(154,92,46,0.08)", borderColor: "rgba(154,92,46,0.3)"}}>
+            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{color: "#9a5c2e"}}>Our System Gives You</p>
             {["Fully built for you", "Runs automatically", "Designed to increase bookings", "Live in days"].map((t, i) => (
-              <div key={i} className="flex items-center gap-2 text-sm text-background/80 mb-1.5">
-                <span className="text-primary text-base leading-none">✓</span> {t}
+              <div key={i} className="flex items-center gap-3 text-base text-foreground/80 mb-2.5">
+                <span className="text-lg leading-none" style={{color: "#9a5c2e"}}>✓</span> {t}
               </div>
             ))}
           </div>
         </div>
 
         {/* Implementation timeline strip */}
-        <div className="text-center mb-14">
-          <p className="text-sm font-semibold text-background/70 mb-3">
+        <div className="text-center mb-16">
+          <p className="text-lg font-semibold text-foreground/80 mb-6">
             Live in 5–7 days — without disrupting your business
           </p>
-          <div className="flex items-center justify-center gap-2 flex-wrap">
+          <div className="flex items-center justify-center gap-3 flex-wrap">
             {["Day 1: Kickoff call", "Days 2–4: Build & integrate", "Day 5–7: Test & launch", "Day 30+: Optimize"].map((step, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <span className="px-4 py-1.5 bg-primary/15 border border-primary/30 rounded-full text-xs font-semibold text-primary">
+              <div key={i} className="flex items-center gap-3">
+                <span className="px-6 py-2.5 border-2 border-black rounded-full text-sm font-semibold text-foreground" style={{backgroundColor: "rgba(154,92,46,0.1)", borderColor: "#000000"}}>
                   {step}
                 </span>
-                {i < 3 && <span className="text-primary/30 text-xs">→</span>}
+                {i < 3 && <span className="text-foreground/40 text-base">→</span>}
               </div>
             ))}
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-14">
           {reasons.map((r, i) => (
             <WhyUsCard key={i} reason={r} />
           ))}
         </div>
 
         {/* Risk reduction & CTA */}
-        <div className="text-center max-w-2xl mx-auto border-t border-background/10 pt-10">
-          <p className="text-sm text-background/60 mb-2">
+        <div className="text-center max-w-2xl mx-auto border-t border-border pt-12">
+          <p className="text-base text-foreground/70 mb-3">
             No complicated setup. No ongoing management required.
           </p>
-          <p className="text-sm font-semibold text-background mb-6">
+          <p className="text-lg font-semibold text-foreground mb-8">
             You don't need to learn anything. It just works.
           </p>
-          <p className="text-base font-semibold text-background/80">
+          <p className="text-lg font-semibold text-foreground">
             Want us to set this up for your business?
           </p>
         </div>
