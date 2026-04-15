@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
-import MedSpaDemoModal from "./MedSpaDemoModal";
 
 const includes = [
   "Instant lead response system",
@@ -13,9 +11,7 @@ const includes = [
 ];
 
 export default function MedSpaPricingPreview() {
-  const [showModal, setShowModal] = useState(false);
   return (
-    <>
     <section className="py-24 md:py-32 px-6 bg-[#FAFAF8]">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
@@ -48,12 +44,12 @@ export default function MedSpaPricingPreview() {
               <p className="text-sm text-muted-foreground leading-relaxed mb-8">
                 Plans are tailored based on your lead volume and growth stage. No two systems are the same.
               </p>
-              <button onClick={() => setShowModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",border:"none",cursor:"pointer"}}>
-                 <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 28px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"0.9rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
+              <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}>
+                <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 28px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"0.9rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
                   Book a Demo
                   <ArrowRight className="w-4 h-4" />
                 </span>
-              </button>
+              </a>
               <p className="text-xs text-muted-foreground mt-4">Free 30-min call · No commitment · Live in 5–7 days</p>
             </div>
           </div>
@@ -72,16 +68,14 @@ export default function MedSpaPricingPreview() {
           <p className="text-sm text-muted-foreground mb-6">
             Book a quick 10-minute demo and we'll recommend the best setup for your business.
           </p>
-          <button onClick={() => setShowModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",border:"none",cursor:"pointer"}}>
-             <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 28px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"0.9rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
+          <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}>
+            <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 28px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"0.9rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
               Book Your Demo
               <ArrowRight className="w-4 h-4" />
             </span>
-          </button>
+          </a>
         </div>
       </div>
     </section>
-      {showModal && <MedSpaDemoModal onClose={() => setShowModal(false)} />}
-    </>
   );
 }
