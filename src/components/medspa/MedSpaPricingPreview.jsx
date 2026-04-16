@@ -15,7 +15,7 @@ const includes = [
 export default function MedSpaPricingPreview() {
   const [showModal, setShowModal] = useState(false);
   return (
-    <section className="py-24 md:py-32 px-6 bg-[#FAFAF8]">
+    <section className="py-24 md:py-32 px-6 bg-muted">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Offer</p>

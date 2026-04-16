@@ -12,7 +12,7 @@ const channels = ["Instagram", "Website", "Phone Calls", "Google Ads", "Referral
 
 export default function MedSpaProblem() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-white">
+    <section className="py-24 md:py-32 px-6 bg-background">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-14">

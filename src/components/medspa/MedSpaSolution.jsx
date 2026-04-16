@@ -35,7 +35,7 @@ const solutions = [
 
 export default function MedSpaSolution() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-white via-primary/2 to-white">
+    <section className="py-24 md:py-32 px-6 bg-muted">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Solution</p>

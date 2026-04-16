@@ -33,7 +33,7 @@ const steps = [
 
 export default function MedSpaFlow() {
   return (
-    <section id="how-it-works-medspa" className="py-24 md:py-32 px-6 bg-white">
+    <section id="how-it-works-medspa" className="py-24 md:py-32 px-6 bg-background">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Process</p>
@@ -49,7 +49,7 @@ export default function MedSpaFlow() {
           {steps.map((step, i) => {
             const Icon = step.icon;
             return (
-              <div key={i} className="group flex flex-col rounded-2xl overflow-hidden border border-border bg-[#FAFAF8] hover:shadow-md hover:border-primary/20 transition-all duration-300">
+              <div key={i} className="group flex flex-col rounded-2xl overflow-hidden border border-border bg-muted hover:shadow-md hover:border-primary/20 transition-all duration-300">
                 {/* Image */}
                 <div className="h-40 overflow-hidden">
                   <img

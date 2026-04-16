@@ -19,7 +19,7 @@ const points = [
 
 export default function MedSpaSpecific() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-[#FAFAF8]">
+    <section className="py-24 md:py-32 px-6 bg-muted">
       <div className="max-w-5xl mx-auto">
         <div className="grid md:grid-cols-2 gap-14 items-center">
           {/* Left: image stack */}

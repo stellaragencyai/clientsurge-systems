@@ -5,7 +5,7 @@ import MedSpaDemoModal from "./MedSpaDemoModal";
 export default function MedSpaFinalCTA() {
   const [showModal, setShowModal] = useState(false);
   return (
-    <section className="py-24 md:py-32 px-6 bg-[#FAFAF8] relative overflow-hidden">
+    <section className="py-24 md:py-32 px-6 bg-muted relative overflow-hidden">
       {/* Background image */}
       <div className="absolute inset-0">
         <img
@@ -13,7 +13,7 @@ export default function MedSpaFinalCTA() {
           alt="Med spa ambiance"
           className="w-full h-full object-cover opacity-20"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FAFAF8] via-primary/5 to-[#FAFAF8]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-muted via-primary/5 to-muted" />
       </div>
 
       <div className="relative z-10 max-w-3xl mx-auto text-center">

@@ -8,7 +8,7 @@ const sources = "Sources: Lead Response Management Study · Harvard Business Rev
 
 export default function MedSpaPain() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-white overflow-hidden">
+    <section className="py-24 md:py-32 px-6 bg-muted overflow-hidden">
       <div className="max-w-5xl mx-auto">
         <div className="grid md:grid-cols-2 gap-14 items-center">
           {/* Left content */}
@@ -42,7 +42,7 @@ export default function MedSpaPain() {
             </div>
             <div className="grid grid-cols-3 gap-4 mb-4">
               {stats.map((s, i) => (
-                <div key={i} className="bg-[#FAFAF8] border border-border rounded-xl p-4 text-center">
+                <div key={i} className="bg-muted border border-border rounded-xl p-4 text-center">
                   <p className="text-2xl font-bold text-primary mb-1">{s.value}</p>
                   <p className="text-xs text-muted-foreground leading-snug">{s.label}</p>
                 </div>

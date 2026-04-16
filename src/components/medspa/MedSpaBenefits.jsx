@@ -35,7 +35,7 @@ const benefits = [
 
 export default function MedSpaBenefits() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-white">
+    <section className="py-24 md:py-32 px-6 bg-muted">
       <div className="max-w-5xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-start">
           {/* Left: image */}
