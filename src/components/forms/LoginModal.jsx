@@ -1,22 +1,20 @@
 import { useState } from "react";
 import { X, ArrowRight, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import SignupModal from "./SignupModal";
 
 export default function LoginModal({ onClose }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showSignup, setShowSignup] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
-      // Base44's login is handled via redirectToLogin
-      // For custom email/password modal, we'd call a backend function
-      // For now, redirect to the login page
       base44.auth.redirectToLogin();
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -24,6 +22,15 @@ export default function LoginModal({ onClose }) {
       setLoading(false);
     }
   };
+
+  if (showSignup) {
+    return (
+      <SignupModal
+        onClose={onClose}
+        onSwitchToLogin={() => setShowSignup(false)}
+      />
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -83,7 +90,7 @@ export default function LoginModal({ onClose }) {
           <button
             type="submit"
             disabled={loading}
-            style={{background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}
+            style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", borderRadius: "9999px", boxShadow: "0 4px 18px rgba(120,70,20,0.35)" }}
             className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-60"
           >
             {loading ? (
@@ -94,7 +101,14 @@ export default function LoginModal({ onClose }) {
           </button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Don't have an account? <a href="/onboarding" className="text-primary font-semibold hover:underline">Start onboarding</a>
+            Don't have an account?{" "}
+            <button
+              type="button"
+              onClick={() => setShowSignup(true)}
+              className="text-primary font-semibold hover:underline focus:outline-none"
+            >
+              Start onboarding
+            </button>
           </p>
         </form>
       </div>
