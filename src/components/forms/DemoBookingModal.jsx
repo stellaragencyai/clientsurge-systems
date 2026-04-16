@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { X, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -92,8 +93,8 @@ export default function DemoBookingModal({ onClose }) {
     if (e.key === 'Escape') onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto" onKeyDown={handleKeyDown} tabIndex={0}>
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] overflow-y-auto" onKeyDown={handleKeyDown} tabIndex={0}>
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={onClose} />
 
@@ -314,6 +315,7 @@ export default function DemoBookingModal({ onClose }) {
         )}
       </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { X, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -75,8 +76,8 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] overflow-y-auto">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
@@ -181,7 +182,8 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
         )}
       </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
