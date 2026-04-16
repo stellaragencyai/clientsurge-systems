@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useState } from "react";
 import DemoBookingModal from "../forms/DemoBookingModal";
 
 const testimonials = [
