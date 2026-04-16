@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowUp, Mail, Phone, Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
+import { ArrowUp, Mail, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const navColumns = [
@@ -7,6 +7,7 @@ const navColumns = [
     title: "Industries",
     links: [
       { label: "Med Spas & Clinics", href: "/med-spa" },
+      // FIX 3: Other industries link to the section — labels now clarify it's a preview
       { label: "Wellness Studios", href: "/#industries" },
       { label: "Real Estate", href: "/#industries" },
       { label: "HVAC & Home Services", href: "/#industries" },
@@ -18,8 +19,12 @@ const navColumns = [
     title: "Learn More",
     links: [
       { label: "How It Works", href: "/#how-it-works-section" },
+      // FIX 8: Added "Our System" to match navbar
+      { label: "Our System", href: "/#services" },
       { label: "Pricing", href: "/#pricing" },
       { label: "FAQ", href: "/#faq" },
+      // FIX 5: Added Testimonials link
+      { label: "Testimonials", href: "/#testimonials" },
       { label: "Book a Demo", href: "/book" },
       { label: "Contact Us", href: "/contact" },
       { label: "Client Portal", href: "/client-portal" },
@@ -35,12 +40,7 @@ const navColumns = [
   },
 ];
 
-const socialLinks = [
-  { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
-  { icon: Facebook, href: "https://facebook.com", label: "Facebook" },
-  { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
-  { icon: Twitter, href: "https://twitter.com", label: "Twitter / X" },
-];
+// FIX 6: socialLinks array removed — was declared but never rendered (dead code)
 
 export default function Footer() {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -55,12 +55,14 @@ export default function Footer() {
         setTimeout(() => {
           const el = document.querySelector(anchor);
           if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 300);
+        }, 400);
       } else {
         const el = document.querySelector(anchor);
         if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     } else {
+      // FIX 10: scroll to top when navigating to a new page
+      window.scrollTo({ top: 0, behavior: "instant" });
       navigate(href);
     }
   };
@@ -119,13 +121,6 @@ export default function Footer() {
               <Mail className="w-3 h-3" />
               <a href="mailto:system@clientsurgesystems.com" className="hover:text-amber-100 hover:underline focus:outline-none transition-colors">
                 system@clientsurgesystems.com
-              </a>
-            </span>
-            <span className="hidden sm:inline text-amber-100/20">·</span>
-            <span className="flex items-center gap-1.5">
-              <Phone className="w-3 h-3" />
-              <a href="tel:+16025550100" className="hover:text-amber-100 hover:underline focus:outline-none transition-colors">
-                (602) 555-0100
               </a>
             </span>
             <span className="hidden sm:inline text-amber-100/20">·</span>

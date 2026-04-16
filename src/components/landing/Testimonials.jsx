@@ -33,7 +33,7 @@ const testimonials = [
 
 export default function Testimonials() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
+    <section id="testimonials" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Proven Results</p>
@@ -138,7 +138,7 @@ export default function Testimonials() {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
           }}>
             <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 32px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
-              Book a Demo →
+              Book a Demo
             </span>
           </button>
         </div>
