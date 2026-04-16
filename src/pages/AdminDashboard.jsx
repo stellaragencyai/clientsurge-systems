@@ -73,7 +73,7 @@ export default function AdminDashboard() {
           {/* Logo */}
           <div className="p-6 border-b border-border">
             <h1 className="font-display text-xl font-semibold text-foreground">
-              Apex<span className="text-primary">Flow</span> Admin
+              ClientSurge <span className="text-primary">Admin</span>
             </h1>
           </div>
 
