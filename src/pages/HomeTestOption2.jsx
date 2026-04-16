@@ -4,7 +4,6 @@ import TrustBar from "../components/landing/TrustBar";
 import ProblemSolution from "../components/landing/ProblemSolution.jsx";
 import HowItWorks from "../components/landing/HowItWorks";
 import Benefits from "../components/landing/Benefits";
-import ConversationMockup from "../components/landing/ConversationMockup";
 import DetailedProcess from "../components/landing/DetailedProcess";
 import Testimonials from "../components/landing/Testimonials";
 import Industries from "../components/landing/Industries";
@@ -25,7 +24,6 @@ export default function HomeTestOption2() {
       <FadeIn><TrustBar /></FadeIn>
       <FadeIn><ProblemSolution /></FadeIn>
       <FadeIn><HowItWorks /></FadeIn>
-      <FadeIn><ConversationMockup /></FadeIn>
       <FadeIn><DetailedProcess /></FadeIn>
       <FadeIn><Benefits /></FadeIn>
 
