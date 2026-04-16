@@ -35,6 +35,7 @@ export default function MedSpaReactivation() {
             <img
               src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=800&q=85"
               alt="Med spa client returning"
+              loading="lazy"
               className="w-full h-96 object-cover object-top"
             />
           </div>

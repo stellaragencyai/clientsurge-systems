@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import MedSpaNavBar from "../components/medspa/MedSpaNavBar";
 import MedSpaHero from "../components/medspa/MedSpaHero";
 import MedSpaPositioning from "../components/medspa/MedSpaPositioning";
 import MedSpaTransition from "../components/medspa/MedSpaTransition";
@@ -29,6 +30,7 @@ export default function MedSpa() {
 
   return (
     <div className="min-h-screen bg-white">
+      <MedSpaNavBar />
       <MedSpaHero />
       <MedSpaPositioning />
       <MedSpaProblem />

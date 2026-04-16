@@ -18,6 +18,7 @@ export default function MedSpaDemoModal({ onClose }) {
   });
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -49,17 +50,17 @@ export default function MedSpaDemoModal({ onClose }) {
         biggest_issue: form.biggest_issue,
         scheduled_date: scheduling.date,
         scheduled_time: scheduling.time,
+        industry: "Med Spa",
       });
 
       if (result.data.success) {
         setSuccess(true);
         setTimeout(() => {
           onClose();
-          window.location.href = '/';
-        }, 4000);
+        }, 3000);
       }
     } catch (error) {
-      alert('Error scheduling demo: ' + error.message);
+      setSubmitError('Something went wrong. Please try again or contact us directly.');
     } finally {
       setSaving(false);
     }
@@ -109,7 +110,7 @@ export default function MedSpaDemoModal({ onClose }) {
               </p>
             </div>
             <p className="text-xs text-muted-foreground">
-              Redirecting to home in 4 seconds...
+              This window will close in a moment...
             </p>
           </div>
         )}
@@ -217,6 +218,7 @@ export default function MedSpaDemoModal({ onClose }) {
                 name="date"
                 type="date"
                 value={scheduling.date}
+                min={new Date().toISOString().split('T')[0]}
                 onChange={handleSchedulingChange}
                 required
                 className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
@@ -250,7 +252,7 @@ export default function MedSpaDemoModal({ onClose }) {
 
             <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
               <p className="text-xs text-muted-foreground">
-                <strong>📅 Demo Confirmed:</strong> {scheduling.date && new Date(scheduling.date).toLocaleDateString()} at {scheduling.time || 'TBD'}
+                <strong>📅 Demo Confirmed:</strong> {scheduling.date && scheduling.date.split('-').slice(1).concat(scheduling.date.split('-')[0]).join('/')} at {scheduling.time || 'TBD'}
               </p>
             </div>
 
@@ -276,6 +278,7 @@ export default function MedSpaDemoModal({ onClose }) {
               </button>
             </div>
 
+            {submitError && <p className="text-center text-xs text-destructive">{submitError}</p>}
             <p className="text-center text-xs text-muted-foreground">We'll send confirmation email & SMS</p>
           </form>
         )}

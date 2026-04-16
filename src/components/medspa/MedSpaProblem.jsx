@@ -28,6 +28,7 @@ export default function MedSpaProblem() {
             <img
               src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=85"
               alt="Med spa facial treatment"
+              loading="lazy"
               className="w-full h-72 md:h-full object-cover"
             />
           </div>

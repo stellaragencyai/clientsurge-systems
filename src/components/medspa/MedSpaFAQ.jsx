@@ -32,7 +32,7 @@ const faqs = [
   },
   {
     q: "How much does it cost — and is it worth it?",
-    a: "Plans start at $397/month with a one-time setup fee. A single recovered consultation typically covers the monthly cost. Most med spas see ROI within the first 2–3 weeks. Book the demo and we'll show you the exact math for your lead volume.",
+    a: "Plans start at $497/month with a one-time setup fee. A single recovered consultation typically covers the monthly cost. Most med spas see ROI within the first 2–3 weeks. Book the demo and we'll show you the exact math for your lead volume.",
   },
   {
     q: "What happens after I book a demo?",

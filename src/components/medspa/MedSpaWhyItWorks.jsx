@@ -31,9 +31,7 @@ export default function MedSpaWhyItWorks() {
             <div key={i} className="p-7 bg-gradient-to-br from-[#FAFAF8] to-white rounded-2xl border border-border hover:border-primary/40 hover:shadow-lg transition-all group">
               <div className="flex items-start justify-between mb-4">
                 <span className="text-5xl font-bold text-primary/20 font-display">{p.number}</span>
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <span className="text-primary text-sm font-bold">·</span>
-                </div>
+                <div className="w-2 h-2 rounded-full bg-primary/30 mt-2" />
               </div>
               <h3 className="text-base font-semibold text-foreground mb-3">{p.title}</h3>
               <div className="w-1 h-0.5 bg-gradient-to-r from-primary to-transparent mb-3" />

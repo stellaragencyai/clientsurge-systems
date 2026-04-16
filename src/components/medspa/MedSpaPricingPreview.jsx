@@ -31,7 +31,7 @@ export default function MedSpaPricingPreview() {
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
 
-              <p className="text-sm font-semibold text-foreground mb-4">Starting from $497/mo · No setup fees · No long-term contracts · Cancel anytime</p>
+              <p className="text-sm font-semibold text-foreground mb-4">Starting from $497/mo · One-time setup fee · No long-term contracts · Cancel anytime</p>
               <p className="text-sm font-semibold text-foreground mb-6">Every system includes:</p>
               <ul className="space-y-3">
                 {includes.map((item, i) => (

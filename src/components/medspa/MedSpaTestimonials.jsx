@@ -78,6 +78,7 @@ export default function MedSpaTestimonials() {
                 <img
                   src={t.avatar}
                   alt={t.name}
+                  loading="lazy"
                   className="w-16 h-16 rounded-full object-cover ring-2 ring-white shadow-md"
                 />
                 <div>
