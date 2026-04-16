@@ -6,7 +6,7 @@ import DemoBookingModal from "../forms/DemoBookingModal";
 const plans = [
   {
     name: "Starter System",
-    subtitle: "For businesses just getting started with automation (limited functionality).",
+    subtitle: "For businesses just getting started with automation.",
     desc: "A simple automation system to respond faster and capture more opportunities without complexity.",
     setup: "$997 setup",
     monthly: "$397",
@@ -172,7 +172,7 @@ function PricingCard({ plan, onOpenModal }) {
       className="pricing-card relative flex flex-col rounded-2xl overflow-visible transition-all duration-300"
       style={
         {
-          background: "#fff",
+          background: "hsl(var(--card))",
           border: isHovered ? "3px solid #c8965c" : "2px solid hsl(var(--border))",
           boxShadow: isHovered ? "0 8px 40px rgba(160,90,20,0.25), 0 2px 10px rgba(0,0,0,0.08)" : "0 4px 20px rgba(0,0,0,0.05)",
           paddingTop: isHovered ? "0px" : "0px",
@@ -181,9 +181,9 @@ function PricingCard({ plan, onOpenModal }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Badge — hover only */}
-      {plan.badge && isHovered && (
-        <div className="pricing-badge-float animate-in fade-in zoom-in duration-300">
+      {/* Badge — always visible */}
+      {plan.badge && (
+        <div className="pricing-badge-float">
           <span className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl" style={{background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)"}}>
             ⭐ {plan.badge}
           </span>

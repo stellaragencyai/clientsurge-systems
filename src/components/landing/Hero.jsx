@@ -47,15 +47,6 @@ function LiveTicker() {
   );
 }
 
-const businessTypes = [
-  "Med Spa / Aesthetic Clinic",
-  "Real Estate Agency",
-  "Home Services",
-  "Dental / Medical Practice",
-  "Salon / Wellness Studio",
-  "Other Service Business",
-];
-
 export default function Hero() {
   const [showDemoModal, setShowDemoModal] = useState(false);
 

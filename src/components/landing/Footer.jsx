@@ -72,6 +72,19 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto px-6 pt-14 pb-10">
 
+        {/* Brand tagline */}
+        <div className="text-center mb-10">
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+              <span className="text-white font-black text-sm">CS</span>
+            </div>
+            <span className="font-black text-sm text-amber-100">ClientSurge <span className="text-primary">Systems</span></span>
+          </div>
+          <p className="text-xs text-amber-100/45 max-w-sm mx-auto leading-relaxed">
+            Done-for-you AI automation that turns leads into booked clients — for local service businesses across the US.
+          </p>
+        </div>
+
         {/* Navigation columns — centered, Learn More in middle */}
         <div className="flex flex-col sm:flex-row justify-center gap-16 md:gap-28 mb-12 text-center">
           {navColumns.map((col) => (

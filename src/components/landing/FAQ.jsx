@@ -32,7 +32,7 @@ const faqs = [
   },
   {
     q: "How much does it cost?",
-    a: "It depends on the scope. We discuss everything transparently on your demo call. Our pricing is designed to make the ROI obvious before you commit.",
+    a: "Plans start at $397/month with a one-time setup fee. We have three tiers — Starter, Growth, and Pro — depending on your lead volume and goals. See our Pricing section for full details, and we'll confirm the best fit on your demo call.",
   },
   {
     q: "What happens on the demo call?",
@@ -69,6 +69,9 @@ export default function FAQ() {
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
             Frequently Asked Questions
           </h2>
+          <p className="mt-4 text-muted-foreground text-base">
+            Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message →</a>
+          </p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">
@@ -76,7 +79,7 @@ export default function FAQ() {
             <AccordionItem
               key={i}
               value={`faq-${i}`}
-              className="border border-slate-600/0 hover:border-slate-600 rounded-xl px-6 data-[state=open]:border-amber-500/40 transition-colors bg-background overflow-hidden focus-within:ring-2 focus-within:ring-primary"
+              className="border border-border hover:border-primary/40 rounded-xl px-6 data-[state=open]:border-primary/40 transition-colors bg-background overflow-hidden focus-within:ring-2 focus-within:ring-primary"
             >
               <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
                 {faq.q}

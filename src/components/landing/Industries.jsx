@@ -148,13 +148,18 @@ export default function Industries() {
                 style={{ minHeight: "448px" }}
               />
               {/* Gradient overlay — stronger at bottom for title legibility */}
-              <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.75) 100%)" }} />
+              <div className="absolute inset-0 transition-opacity duration-300" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.75) 100%)" }} />
+              {/* Hover overlay */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: "rgba(154,92,46,0.18)" }} />
 
               {/* Title at bottom */}
               <div className="absolute bottom-0 left-0 right-0 px-6 py-5">
                 <h3 className="text-base font-bold text-white leading-snug drop-shadow-lg">
                   {ind.name}
                 </h3>
+                <p className="text-xs text-white/70 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
+                  Click to learn more →
+                </p>
               </div>
             </button>
           );
@@ -278,7 +283,7 @@ export default function Industries() {
                       </span>
                     </button>
                     <p className="font-inter" style={{ fontSize: "0.7rem", color: "rgba(245,230,208,0.35)", textAlign: "center", letterSpacing: "0.08em" }}>
-                      Free 30-min call • No commitment • Live in 5–7 days
+                     Free 15-min call • No commitment • Live in 5–7 days
                     </p>
                   </div>
                 </div>

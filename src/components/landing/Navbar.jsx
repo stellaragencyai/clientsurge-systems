@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
-import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
 import LoginModal from "../forms/LoginModal";
@@ -19,9 +17,9 @@ export default function Navbar() {
 
   const links = [
     { label: "How It Works", href: "#how-it-works-section" },
-    { label: "Services", href: "#services" },
+    { label: "Our System", href: "#services" },
     { label: "Industries", href: "#industries" },
-    { label: "Med Spa", href: "/med-spa", external: true },
+    { label: "Pricing", href: "#pricing" },
     { label: "FAQ", href: "#faq" },
   ];
 
