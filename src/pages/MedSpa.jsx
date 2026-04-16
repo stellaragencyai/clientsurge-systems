@@ -23,8 +23,18 @@ export default function MedSpa() {
   useEffect(() => {
     const navbar = document.querySelector('nav');
     if (navbar) navbar.style.display = 'none';
+
+    const prevTitle = document.title;
+    document.title = "Med Spa Automation | ClientSurge Systems — Book More Consultations on Autopilot";
+    let metaDesc = document.querySelector('meta[name="description"]');
+    const prevDesc = metaDesc?.getAttribute('content') || '';
+    if (!metaDesc) { metaDesc = document.createElement('meta'); metaDesc.setAttribute('name', 'description'); document.head.appendChild(metaDesc); }
+    metaDesc.setAttribute('content', 'Done-for-you AI automation for med spas and aesthetic clinics. Respond to leads in under 60 seconds, automate follow-up, and book more consultations — live in 5–7 days.');
+
     return () => {
       if (navbar) navbar.style.display = 'block';
+      document.title = prevTitle;
+      if (metaDesc) metaDesc.setAttribute('content', prevDesc);
     };
   }, []);
 

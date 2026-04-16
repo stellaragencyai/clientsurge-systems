@@ -169,7 +169,8 @@ function PricingCard({ plan, onOpenModal }) {
 
   return (
     <div
-      className="pricing-card relative flex flex-col rounded-2xl overflow-visible transition-all duration-300"
+      className="pricing-card relative flex flex-col rounded-2xl transition-all duration-300"
+      style={{overflow: "visible"}}
       style={
         {
           background: "hsl(var(--card))",
@@ -183,7 +184,7 @@ function PricingCard({ plan, onOpenModal }) {
     >
       {/* Badge — always visible */}
       {plan.badge && (
-        <div className="pricing-badge-float">
+        <div className="pricing-badge-float" style={{zIndex: 30}}>
           <span className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl" style={{background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)"}}>
             ⭐ {plan.badge}
           </span>
