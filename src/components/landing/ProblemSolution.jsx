@@ -112,7 +112,7 @@ export default function ProblemSolution() {
                     style={{
                       backgroundColor: `rgba(255,255,255,0.75)`,
                       borderColor: `#000000`,
-                      borderWidth: `2px`,
+                      borderWidth: `1px`,
                       boxShadow: `
                         0 8px 32px rgba(167,42,42,0.08),
                         0 1px 0 rgba(255,255,255,0.8) inset,
@@ -174,7 +174,7 @@ export default function ProblemSolution() {
                     style={{
                       backgroundColor: `rgba(255,255,255,0.8)`,
                       borderColor: `#000000`,
-                      borderWidth: `2px`,
+                      borderWidth: `1px`,
                       boxShadow: `
                         0 8px 32px rgba(154,92,46,0.08),
                         0 1px 0 rgba(255,255,255,0.9) inset,

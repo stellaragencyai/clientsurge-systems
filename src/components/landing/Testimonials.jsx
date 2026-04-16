@@ -49,19 +49,19 @@ export default function Testimonials() {
               className="group relative flex flex-col p-8 rounded-2xl backdrop-blur-md transition-all duration-500 hover:-translate-y-2 cursor-default"
               style={{
                 background: "rgba(255, 255, 255, 0.75)",
-                border: "2px solid #000000",
+                border: "1px solid #000000",
                 boxShadow: "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)",
                 transition: "all 0.4s ease",
               }}
               onMouseEnter={e => {
                 e.currentTarget.style.background = "rgba(255, 255, 255, 0.95)";
-                e.currentTarget.style.border = "2px solid #000000";
+                e.currentTarget.style.border = "1px solid #000000";
                 e.currentTarget.style.boxShadow = "0 24px 60px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8), 0 0 40px rgba(200, 150, 92, 0.15)";
                 e.currentTarget.style.transform = "translateY(-8px)";
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.background = "rgba(255, 255, 255, 0.75)";
-                e.currentTarget.style.border = "2px solid #000000";
+                e.currentTarget.style.border = "1px solid #000000";
                 e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)";
                 e.currentTarget.style.transform = "translateY(0)";
               }}
