@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ArrowUp, Mail, Phone, Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import DemoBookingModal from "../forms/DemoBookingModal";
 
 const navColumns = [
   {
@@ -43,7 +42,6 @@ const socialLinks = [
 ];
 
 export default function Footer() {
-  const [showDemoModal, setShowDemoModal] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
 
@@ -71,87 +69,29 @@ export default function Footer() {
   return (
     <footer style={{ background: "hsl(40, 10%, 14%)" }} className="border-t border-white/10">
 
-      {/* Mini CTA Banner */}
-      <div className="border-b border-white/10 py-8 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-bold text-amber-100">Ready to stop losing leads?</p>
-            <p className="text-xs text-amber-100/50 mt-0.5">Join local businesses automating their growth with ClientSurge.</p>
-          </div>
-          <button
-            onClick={() => setShowDemoModal(true)}
-            style={{ borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.4)", border: "none", cursor: "pointer", flexShrink: 0 }}
-          >
-            <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "38px", padding: "0 24px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.85rem" }}>
-              Book a Free Demo
-            </span>
-          </button>
-        </div>
-      </div>
-
       <div className="max-w-7xl mx-auto px-6 pt-14 pb-10">
 
-        {/* Top: Logo + tagline + social */}
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-8 mb-12">
-          {/* Logo + tagline */}
-          <div className="flex flex-col gap-3 max-w-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-black text-sm">CS</span>
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="font-black text-sm text-amber-100">ClientSurge</span>
-                <span className="text-primary text-xs font-bold">Systems</span>
-              </div>
+        {/* Navigation columns — centered, Learn More in middle */}
+        <div className="flex flex-col sm:flex-row justify-center gap-16 md:gap-28 mb-12 text-center">
+          {navColumns.map((col) => (
+            <div key={col.title}>
+              <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: "#c8965c" }}>{col.title}</p>
+              <ul className="space-y-3">
+                {col.links.map((link) => (
+                  <li key={link.label}>
+                    <a
+                      href={link.href}
+                      aria-label={`Navigate to ${link.label}`}
+                      onClick={(e) => handleNavClick(e, link.href)}
+                      className="text-xs text-amber-100/60 hover:text-amber-100 hover:underline focus:ring-2 focus:ring-primary focus:outline-none rounded px-1 py-0.5 inline-block transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="text-xs text-amber-100/50 leading-relaxed">
-              Done-for-you AI automation that captures leads, responds instantly, and books more customers — for local service businesses.
-            </p>
-            {/* Social icons */}
-            <div className="flex items-center gap-2 mt-1">
-              {socialLinks.map((s) => {
-                const Icon = s.icon;
-                return (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={s.label}
-                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                    style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(200,150,92,0.2)"; e.currentTarget.style.borderColor = "rgba(200,150,92,0.5)"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; }}
-                  >
-                    <Icon className="w-3.5 h-3.5 text-amber-100/60" />
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Navigation columns */}
-          <div className="flex flex-col sm:flex-row gap-10 md:gap-16">
-            {navColumns.map((col) => (
-              <div key={col.title}>
-                <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: "#c8965c" }}>{col.title}</p>
-                <ul className="space-y-3">
-                  {col.links.map((link) => (
-                    <li key={link.label}>
-                      <a
-                        href={link.href}
-                        aria-label={`Navigate to ${link.label}`}
-                        onClick={(e) => handleNavClick(e, link.href)}
-                        className="text-xs text-amber-100/60 hover:text-amber-100 hover:underline focus:ring-2 focus:ring-primary focus:outline-none rounded px-1 py-0.5 inline-block transition-colors"
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
 
         {/* Divider */}
@@ -206,7 +146,6 @@ export default function Footer() {
         </div>
       </div>
 
-      {showDemoModal && <DemoBookingModal onClose={() => setShowDemoModal(false)} />}
     </footer>
   );
 }
