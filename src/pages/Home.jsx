@@ -8,7 +8,6 @@ import WhyUs from "../components/landing/WhyUs";
 import IntegrationsBadges from "../components/landing/IntegrationsBadges";
 import HowItWorks from "../components/landing/HowItWorks";
 import Benefits from "../components/landing/Benefits";
-import ConversationMockup from "../components/landing/ConversationMockup.jsx";
 import Testimonials from "../components/landing/Testimonials";
 import DetailedProcess from "../components/landing/DetailedProcess";
 import FounderSection from "../components/landing/FounderSection";
@@ -43,7 +42,7 @@ export default function Home() {
       <FadeIn><WhyUs /></FadeIn>
       <FadeIn><IntegrationsBadges /></FadeIn>
       <FadeIn><HowItWorks id="how-it-works-section" /></FadeIn>
-      <FadeIn><ConversationMockup /></FadeIn>
+      
       <FadeIn><DetailedProcess /></FadeIn>
       <FadeIn><Benefits /></FadeIn>
       <FadeIn><FounderSection /></FadeIn>
