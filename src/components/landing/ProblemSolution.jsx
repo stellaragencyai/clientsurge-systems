@@ -121,17 +121,15 @@ export default function ProblemSolution() {
             const SolutionIcon = pair.solutionIcon;
 
             return (
-              <div key={i} className="grid md:grid-cols-2 gap-0 md:gap-0 items-stretch relative">
+              <div key={i} className="grid md:grid-cols-[1fr_auto_1fr] gap-0 items-center">
 
                 {/* Problem card */}
                 <CardWithFadeIn delay={i * 40}>
                   <div
-                    className="flex items-start gap-4 p-7 rounded-2xl md:rounded-r-none relative overflow-hidden group h-full"
+                    className="flex items-start gap-4 p-7 rounded-2xl relative overflow-hidden group h-full"
                     style={{
                       backgroundColor: "rgba(167,42,42,0.04)",
                       border: "1px solid rgba(167,42,42,0.18)",
-                      borderRight: "none",
-                      // FIX 5: lift instead of scale — no layout clipping
                       transition: "box-shadow 0.3s ease, transform 0.3s ease",
                     }}
                     onMouseEnter={(e) => {
@@ -167,20 +165,21 @@ export default function ProblemSolution() {
                   </div>
                 </CardWithFadeIn>
 
-                {/* Visual Enhancement: connector arrow (desktop only) */}
-                <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full items-center justify-center shadow-md"
-                  style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)", border: "2px solid white" }}>
-                  <ArrowRight className="w-3.5 h-3.5 text-amber-100" />
+                {/* Arrow connector between the two cards */}
+                <div className="hidden md:flex flex-col items-center justify-center px-3">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center shadow-md flex-shrink-0"
+                    style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)", border: "2px solid white" }}>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-100" />
+                  </div>
                 </div>
 
                 {/* Solution card */}
                 <CardWithFadeIn delay={i * 40 + 80}>
                   <div
-                    className="flex items-start gap-4 p-7 rounded-2xl md:rounded-l-none relative overflow-hidden group h-full"
+                    className="flex items-start gap-4 p-7 rounded-2xl relative overflow-hidden group h-full"
                     style={{
                       backgroundColor: "rgba(154,92,46,0.05)",
                       border: "1px solid rgba(154,92,46,0.22)",
-                      borderLeft: "none",
                       transition: "box-shadow 0.3s ease, transform 0.3s ease",
                     }}
                     onMouseEnter={(e) => {
