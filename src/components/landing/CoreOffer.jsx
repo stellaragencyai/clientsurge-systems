@@ -27,55 +27,54 @@ function FeatureCard({ item, onSelect, isSelected }) {
       onClick={() => onSelect(item.step)}
     >
       <div
-        className="flex flex-col rounded-2xl border transition-all duration-400 min-h-[160px] relative overflow-hidden"
+        className="flex flex-col rounded-2xl overflow-hidden transition-all duration-300"
         style={{
-          borderColor: "rgba(0,0,0,0.08)",
-          backgroundColor: "white",
-          boxShadow: "0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)",
+          border: "1px solid rgba(154,92,46,0.2)",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = "0 12px 36px rgba(154,92,46,0.12), 0 2px 8px rgba(0,0,0,0.06)";
-          e.currentTarget.style.borderColor = "rgba(154,92,46,0.25)";
+          e.currentTarget.style.boxShadow = "0 12px 36px rgba(154,92,46,0.2), 0 2px 8px rgba(0,0,0,0.08)";
+          e.currentTarget.style.borderColor = "rgba(154,92,46,0.45)";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
-          e.currentTarget.style.borderColor = "rgba(0,0,0,0.08)";
+          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
+          e.currentTarget.style.borderColor = "rgba(154,92,46,0.2)";
         }}
       >
-        {/* Warm top accent line */}
-        <div className="h-[2px] w-full rounded-t-2xl" style={{ background: "linear-gradient(90deg, #c8965c 0%, rgba(200,150,92,0.2) 100%)" }} />
-
-        <div className="p-6">
-          {/* Step + Icon row */}
-          <div className="flex items-center justify-between mb-4">
+        {/* TOP — light warm section (like the 3-step top) */}
+        <div className="px-6 pt-5 pb-4" style={{ background: "rgba(154,92,46,0.05)" }}>
+          <div className="flex items-center justify-between">
             <span
               className="text-[10px] font-bold uppercase tracking-[0.18em]"
-              style={{ color: "rgba(154,92,46,0.55)" }}
+              style={{ color: "rgba(154,92,46,0.6)" }}
             >
               Step {stepNum < 10 ? `0${stepNum}` : stepNum}
             </span>
             <div
               className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-              style={{ backgroundColor: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.12)" }}
+              style={{ backgroundColor: "rgba(154,92,46,0.1)", border: "1px solid rgba(154,92,46,0.2)" }}
             >
               <Icon className="w-4 h-4" style={{ color: "#9a5c2e" }} />
             </div>
           </div>
+        </div>
 
-          {/* Title */}
-          <h3 className="text-sm font-semibold text-foreground mb-1.5 leading-snug">{item.title}</h3>
+        {/* Divider */}
+        <div style={{ height: "1px", background: "rgba(154,92,46,0.15)" }} />
 
-          {/* Desc */}
-          <p className="text-xs text-foreground/55 leading-relaxed mb-4">{item.desc}</p>
-
-          {/* Tag */}
+        {/* BOTTOM — dark gradient section (like "Everything Else Automated Entirely") */}
+        <div
+          className="px-6 py-5 flex flex-col gap-2"
+          style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}
+        >
+          <h3 className="text-sm font-semibold leading-snug" style={{ color: "#f5e6d0" }}>{item.title}</h3>
+          <p className="text-xs leading-relaxed" style={{ color: "rgba(245,230,208,0.65)" }}>{item.desc}</p>
           <span
-            className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-full tracking-wide uppercase"
+            className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wide uppercase w-fit mt-1"
             style={{
-              background: "rgba(154,92,46,0.06)",
-              color: "#9a5c2e",
-              border: "1px solid rgba(154,92,46,0.15)",
-              letterSpacing: "0.05em",
+              background: "rgba(245,230,208,0.12)",
+              color: "#f5d9a8",
+              border: "1px solid rgba(245,230,208,0.2)",
             }}
           >
             {item.tag}
