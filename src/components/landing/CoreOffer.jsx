@@ -19,19 +19,6 @@ const doneForYou = [
 
 function FeatureCard({ item, onSelect, isSelected }) {
   const Icon = item.icon;
-
-  const aspects = {
-    "01": ["Responds instantly to all inquiries", "Personalized by lead details"],
-    "02": ["Guides prospects directly to booking", "Eliminates phone tag friction"],
-    "03": ["SMS + email touchpoints", "Timed for optimal engagement"],
-    "04": ["Smart booking flow", "Direct calendar integration"],
-    "05": ["Reactivates dormant leads", "Proven re-engagement sequences"],
-    "06": ["Zero manual scheduling", "Frictionless experience"],
-    "07": ["Auto-tagging & status updates", "Full visibility dashboard"],
-    "08": ["Priority support access", "Continuous optimization"],
-  };
-
-  const cardAspects = aspects[item.step] || [];
   const stepNum = parseInt(item.step);
 
   return (
@@ -39,64 +26,62 @@ function FeatureCard({ item, onSelect, isSelected }) {
       className="relative cursor-pointer group"
       onClick={() => onSelect(item.step)}
     >
-      {/* Step label above card - centered and positioned above */}
-      <div className="text-center mb-1 -mt-6">
-        <span
-          className="text-lg font-black uppercase tracking-widest"
-          style={{ color: "#9a5c2e" }}
-        >
-          Step {stepNum}
-        </span>
-      </div>
-
       <div
-        className="flex flex-col p-8 rounded-2xl border transition-all duration-500 min-h-[160px] relative overflow-hidden"
+        className="flex flex-col rounded-2xl border transition-all duration-400 min-h-[160px] relative overflow-hidden"
         style={{
-          borderColor: "#000000",
+          borderColor: "rgba(0,0,0,0.08)",
           backgroundColor: "white",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)",
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = "0 16px 40px rgba(154,92,46,0.15), 0 4px 12px rgba(0,0,0,0.08)";
+          e.currentTarget.style.boxShadow = "0 12px 36px rgba(154,92,46,0.12), 0 2px 8px rgba(0,0,0,0.06)";
+          e.currentTarget.style.borderColor = "rgba(154,92,46,0.25)";
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
+          e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.03)";
+          e.currentTarget.style.borderColor = "rgba(0,0,0,0.08)";
         }}
       >
-        {/* Icon in upper left */}
-        <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all duration-300" style={{ backgroundColor: "rgba(154,92,46,0.1)" }}>
-          <Icon className="w-6 h-6" style={{ color: "#9a5c2e" }} />
-        </div>
+        {/* Warm top accent line */}
+        <div className="h-[2px] w-full rounded-t-2xl" style={{ background: "linear-gradient(90deg, #c8965c 0%, rgba(200,150,92,0.2) 100%)" }} />
 
-        {/* Content */}
-        <div className="flex-1 relative z-10">
-          <h3 className="text-sm font-semibold text-foreground mb-2">{item.title}</h3>
-          <p className="text-xs text-foreground/70 leading-relaxed mb-4">{item.desc}</p>
+        <div className="p-6">
+          {/* Step + Icon row */}
+          <div className="flex items-center justify-between mb-4">
+            <span
+              className="text-[10px] font-bold uppercase tracking-[0.18em]"
+              style={{ color: "rgba(154,92,46,0.55)" }}
+            >
+              Step {stepNum < 10 ? `0${stepNum}` : stepNum}
+            </span>
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+              style={{ backgroundColor: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.12)" }}
+            >
+              <Icon className="w-4 h-4" style={{ color: "#9a5c2e" }} />
+            </div>
+          </div>
+
+          {/* Title */}
+          <h3 className="text-sm font-semibold text-foreground mb-1.5 leading-snug">{item.title}</h3>
+
+          {/* Desc */}
+          <p className="text-xs text-foreground/55 leading-relaxed mb-4">{item.desc}</p>
+
+          {/* Tag */}
           <span
-            className="inline-block text-xs font-bold px-3 py-1 rounded-full"
+            className="inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-full tracking-wide uppercase"
             style={{
-              background: "rgba(154,92,46,0.1)",
+              background: "rgba(154,92,46,0.06)",
               color: "#9a5c2e",
-              border: "1px solid rgba(154,92,46,0.2)",
+              border: "1px solid rgba(154,92,46,0.15)",
+              letterSpacing: "0.05em",
             }}
           >
             {item.tag}
           </span>
         </div>
       </div>
-
-      <style>{`
-        @keyframes expandCard {
-          from {
-            transform: scale(1);
-            opacity: 1;
-          }
-          to {
-            transform: scale(1.1);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   );
 }
