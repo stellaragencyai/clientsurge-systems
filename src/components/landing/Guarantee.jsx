@@ -45,8 +45,9 @@ export default function Guarantee() {
             return (
               <div
                 key={i}
-                className="p-6 rounded-2xl border border-border bg-white transition-all duration-300 hover:shadow-md hover:border-primary/40"
+                className="relative p-6 rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/40 overflow-hidden"
               >
+                <div className="absolute left-0 top-4 bottom-4 w-1 rounded-full" style={{ background: "linear-gradient(to bottom, rgba(154,92,46,0.7), rgba(154,92,46,0.15))" }} />
                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4 flex-shrink-0">
                   <Icon className="w-4 h-4 text-primary" />
                 </div>

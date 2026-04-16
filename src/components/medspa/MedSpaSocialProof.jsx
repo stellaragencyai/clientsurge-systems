@@ -32,7 +32,7 @@ export default function MedSpaSocialProof() {
             <div key={i} className="bg-gradient-to-br from-white to-primary/3 rounded-xl border border-primary/15 p-6 shadow-sm hover:shadow-xl hover:border-primary/30 transition-all duration-300 group">
               <div className="flex gap-1 mb-4">
                 {[...Array(t.rating)].map((_, j) => (
-                  <Star key={j} className="w-4 h-4 fill-primary text-primary animate-bounce" style={{animationDelay: `${j * 0.1}s`}} />
+                  <Star key={j} className="w-4 h-4 fill-primary text-primary" />
                 ))}
               </div>
               <p className="text-sm text-foreground/80 mb-5 italic leading-relaxed">"{t.text}"</p>
