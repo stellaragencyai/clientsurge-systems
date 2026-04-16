@@ -21,6 +21,9 @@ import SamChatWidget from "../components/sam/SamChatWidget";
 import StickyCTA from "../components/landing/StickyCTA";
 import CookieConsent from "../components/landing/CookieConsent";
 import FadeIn from "../components/landing/FadeIn";
+import LeadValueCalculator from "../components/landing/LeadValueCalculator";
+import LiveAutomationFeed from "../components/landing/LiveAutomationFeed";
+import AIResponseDemo from "../components/landing/AIResponseDemo";
 
 export default function Home() {
   useEffect(() => {
@@ -44,6 +47,9 @@ export default function Home() {
       <FadeIn><Benefits /></FadeIn>
       <FadeIn><FounderSection /></FadeIn>
       <FadeIn><CoreOffer /></FadeIn>
+      <FadeIn><AIResponseDemo /></FadeIn>
+      <FadeIn><LiveAutomationFeed /></FadeIn>
+      <FadeIn><LeadValueCalculator /></FadeIn>
       <FadeIn><Guarantee /></FadeIn>
       <FadeIn><FAQ /></FadeIn>
       <FadeIn><Pricing /></FadeIn>

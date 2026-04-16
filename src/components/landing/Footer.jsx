@@ -70,7 +70,7 @@ export default function Footer() {
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <footer style={{ background: "hsl(40, 12%, 22%)" }} className="border-t border-primary/20">
+    <footer style={{ background: "hsl(40, 8%, 88%)" }} className="border-t border-primary/20">
 
       <div className="max-w-7xl mx-auto px-6 pt-14 pb-10">
 
@@ -80,9 +80,9 @@ export default function Footer() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
               <span className="text-white font-black text-sm">CS</span>
             </div>
-            <span className="font-black text-sm text-amber-100">ClientSurge <span className="text-primary">Systems</span></span>
+            <span className="font-black text-sm text-foreground">ClientSurge <span className="text-primary">Systems</span></span>
           </div>
-          <p className="text-xs text-amber-100/45 max-w-sm mx-auto leading-relaxed">
+          <p className="text-xs text-foreground/50 max-w-sm mx-auto leading-relaxed">
             Done-for-you AI automation that turns leads into booked clients — for local service businesses across the US.
           </p>
         </div>
@@ -91,7 +91,7 @@ export default function Footer() {
         <div className="flex flex-col sm:flex-row justify-center gap-16 md:gap-28 mb-12 text-center">
           {navColumns.map((col) => (
             <div key={col.title}>
-              <p className="text-xs font-bold uppercase tracking-widest mb-5" style={{ color: "#c8965c" }}>{col.title}</p>
+              <p className="text-xs font-bold uppercase tracking-widest mb-5 text-primary">{col.title}</p>
               <ul className="space-y-3">
                 {col.links.map((link) => (
                   <li key={link.label}>
@@ -99,7 +99,7 @@ export default function Footer() {
                       href={link.href}
                       aria-label={`Navigate to ${link.label}`}
                       onClick={(e) => handleNavClick(e, link.href)}
-                      className="text-xs text-amber-100/60 hover:text-amber-100 hover:underline focus:ring-2 focus:ring-primary focus:outline-none rounded px-1 py-0.5 inline-block transition-colors"
+                      className="text-xs text-foreground/55 hover:text-foreground hover:underline focus:ring-2 focus:ring-primary focus:outline-none rounded px-1 py-0.5 inline-block transition-colors"
                     >
                       {link.label}
                     </a>
@@ -116,19 +116,19 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Contact info */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 text-xs text-amber-100/50">
+          <div className="flex flex-col sm:flex-row items-center gap-4 text-xs text-foreground/50">
             <span className="flex items-center gap-1.5">
               <Mail className="w-3 h-3" />
-              <a href="mailto:system@clientsurgesystems.com" className="hover:text-amber-100 hover:underline focus:outline-none transition-colors">
+              <a href="mailto:system@clientsurgesystems.com" className="hover:text-foreground hover:underline focus:outline-none transition-colors">
                 system@clientsurgesystems.com
               </a>
             </span>
-            <span className="hidden sm:inline text-amber-100/20">·</span>
+            <span className="hidden sm:inline text-foreground/20">·</span>
             <span>Phoenix, Arizona</span>
           </div>
 
           {/* Copyright */}
-          <p className="text-xs text-amber-100/35">
+          <p className="text-xs text-foreground/40">
             © {new Date().getFullYear()} ClientSurge Systems. All rights reserved.
           </p>
 
@@ -139,15 +139,15 @@ export default function Footer() {
               onMouseEnter={() => setShowTooltip(true)}
               onMouseLeave={() => setShowTooltip(false)}
               className="w-9 h-9 rounded-full flex items-center justify-center transition-all focus:ring-2 focus:ring-primary focus:outline-none"
-              style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}
-              onMouseEnterCapture={(e) => { e.currentTarget.style.borderColor = "rgba(200,150,92,0.5)"; e.currentTarget.style.background = "rgba(200,150,92,0.15)"; }}
-              onMouseLeaveCapture={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+              style={{ background: "rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.12)" }}
+              onMouseEnterCapture={(e) => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.5)"; e.currentTarget.style.background = "rgba(154,92,46,0.1)"; }}
+              onMouseLeaveCapture={(e) => { e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"; e.currentTarget.style.background = "rgba(0,0,0,0.06)"; }}
               aria-label="Back to top"
             >
-              <ArrowUp className="w-4 h-4 text-amber-100/70" />
+              <ArrowUp className="w-4 h-4 text-foreground/60" />
             </button>
             {showTooltip && (
-              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-foreground text-background font-semibold px-2 py-1 rounded-md pointer-events-none">
+              <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs bg-foreground/90 text-background font-semibold px-2 py-1 rounded-md pointer-events-none">
                 Back to top
               </div>
             )}
