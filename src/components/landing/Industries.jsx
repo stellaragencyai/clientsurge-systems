@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Sparkles, Heart, Building2, Home, MapPin, Wrench, ArrowRight, X, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import LeadCaptureModal from "../forms/LeadCaptureModal";
+import DemoBookingModal from "../forms/DemoBookingModal";
 
 const industries = [
   {
@@ -110,7 +110,7 @@ const industries = [
 
 export default function Industries() {
   const [selected, setSelected] = useState(null);
-  const [showLeadModal, setShowLeadModal] = useState(false);
+  const [demoIndustry, setDemoIndustry] = useState(null);
 
   return (
     <section id="industries" className="bg-gradient-to-b from-card via-background to-card">
@@ -266,7 +266,7 @@ export default function Industries() {
                   {/* CTA */}
                   <div>
                     <button
-                       onClick={() => { setSelected(null); setShowLeadModal(true); }}
+                      onClick={() => { const name = selected.name; setSelected(null); setDemoIndustry(name); }}
                        style={{ display: "block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 24px rgba(120,70,20,0.45)", border: "none", cursor: "pointer", width: "100%", marginBottom: "12px" }}
                        onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 48px rgba(161,120,35,0.65), 0 4px 18px rgba(120,70,20,0.4)"; }}
                        onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(120,70,20,0.45)"; }}
@@ -288,15 +288,12 @@ export default function Industries() {
         )}
       </AnimatePresence>
 
-      {/* Lead Capture Modal */}
-      <LeadCaptureModal 
-        isOpen={showLeadModal}
-        onClose={() => setShowLeadModal(false)}
-        onSuccess={() => {
-          setShowLeadModal(false);
-          window.location.href = '/book';
-        }}
-      />
+      {demoIndustry && (
+        <DemoBookingModal
+          onClose={() => setDemoIndustry(null)}
+          prefillIndustry={demoIndustry}
+        />
+      )}
     </section>
   );
 }

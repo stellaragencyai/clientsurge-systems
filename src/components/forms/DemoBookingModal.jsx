@@ -3,13 +3,14 @@ import { createPortal } from "react-dom";
 import { X, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
-export default function DemoBookingModal({ onClose }) {
+export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     full_name: "",
     business_name: "",
     email: "",
     phone: "",
+    industry: prefillIndustry,
     biggest_issue: "",
   });
   const [scheduling, setScheduling] = useState({
@@ -70,6 +71,7 @@ export default function DemoBookingModal({ onClose }) {
         business_name: form.business_name,
         email: form.email,
         phone: form.phone,
+        industry: form.industry,
         biggest_issue: form.biggest_issue,
         scheduled_date: scheduling.date,
         scheduled_time: scheduling.time,
@@ -79,7 +81,6 @@ export default function DemoBookingModal({ onClose }) {
         setSuccess(true);
         setTimeout(() => {
           onClose();
-          window.location.href = '/book?success=true';
         }, 3000);
       }
     } catch (error) {
@@ -205,6 +206,18 @@ export default function DemoBookingModal({ onClose }) {
                 {errors.phone && <p className="text-red-600 text-xs mt-1">❌ {errors.phone}</p>}
               </div>
             </div>
+
+            {prefillIndustry && (
+              <div>
+                <label className="block text-xs font-semibold text-foreground mb-1.5">Selected Industry</label>
+                <input
+                  name="industry"
+                  value={form.industry}
+                  readOnly
+                  className="w-full h-11 rounded-xl border border-primary/30 bg-primary/5 px-4 text-sm font-semibold text-primary focus:outline-none cursor-default"
+                />
+              </div>
+            )}
 
             <div>
               <label className="block text-xs font-semibold text-foreground mb-1.5">Biggest challenge right now?</label>

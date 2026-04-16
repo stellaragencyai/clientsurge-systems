@@ -61,24 +61,6 @@ const plans = [
   },
 ];
 
-function scrollToDemo(e) {
-  e.preventDefault();
-  const el = document.getElementById("book-demo");
-  if (!el) return;
-  const start = window.scrollY;
-  const target = el.getBoundingClientRect().top + window.scrollY - 80;
-  const distance = target - start;
-  const duration = 1100;
-  let startTime = null;
-  const ease = (t) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  const step = (ts) => {
-    if (!startTime) startTime = ts;
-    const progress = Math.min((ts - startTime) / duration, 1);
-    window.scrollTo(0, start + distance * ease(progress));
-    if (progress < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-}
 
 export default function Pricing() {
    const [showDemoModal, setShowDemoModal] = useState(false);
@@ -225,7 +207,7 @@ function PricingCard({ plan, onOpenModal }) {
             <span className="text-sm text-muted-foreground mb-2">/month</span>
           </div>
           <p className="text-xs text-muted-foreground mb-3">{plan.setup}</p>
-          <p className="text-xs text-muted-foreground text-left">Starting from $497/mo · No setup fees · No long-term contracts · Cancel anytime</p>
+          <p className="text-xs text-muted-foreground text-left">One-time setup fee + monthly · No long-term contracts · Cancel anytime</p>
         </div>
 
         {/* Description */}
