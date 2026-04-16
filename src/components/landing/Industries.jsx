@@ -137,7 +137,7 @@ export default function Industries() {
               key={i}
               onClick={() => setSelected(ind)}
               className="group relative overflow-hidden cursor-pointer text-left focus:outline-none"
-              style={{ minHeight: "560px" }}
+              style={{ minHeight: "448px" }}
             >
               {/* Full image */}
               <img
@@ -145,7 +145,7 @@ export default function Industries() {
                 alt={`${ind.name} - ${ind.problem}`}
                 loading="lazy"
                 className="w-full h-full object-cover absolute inset-0 transition-transform duration-700 group-hover:scale-105"
-                style={{ minHeight: "560px" }}
+                style={{ minHeight: "448px" }}
               />
               {/* Gradient overlay — stronger at bottom for title legibility */}
               <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.75) 100%)" }} />
