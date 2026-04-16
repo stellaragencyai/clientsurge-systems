@@ -83,7 +83,7 @@ function BenefitCard({ benefit, index, isVisible }) {
     <div
       ref={ref}
       className={`flex gap-4 p-6 bg-white rounded-2xl transition-all duration-500 ${
-        showBorder ? "opacity-100 translate-y-0 border-black" : "opacity-0 translate-y-4 border-border"
+        showBorder ? "opacity-100 translate-y-0 border-primary/30" : "opacity-0 translate-y-4 border-border"
       }`}
       style={{
         borderWidth: "1px",
@@ -117,7 +117,7 @@ export default function Benefits() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-20 md:py-32 px-4 md:px-6 bg-gradient-to-b from-card to-background border-t-2 border-border">
+    <section ref={sectionRef} className="py-20 md:py-32 px-4 md:px-6 bg-gradient-to-b from-card to-background">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-foreground/70 tracking-widest uppercase mb-4">The Outcomes</p>

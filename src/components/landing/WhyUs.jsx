@@ -86,7 +86,7 @@ export default function WhyUs() {
   const [sectionRef, sectionVisible] = useInView(0.1);
 
   return (
-    <section className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-white to-background overflow-hidden">
+    <section className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-background to-background overflow-hidden">
       <div className="max-w-6xl mx-auto">
 
         {/* ── Header ── */}
