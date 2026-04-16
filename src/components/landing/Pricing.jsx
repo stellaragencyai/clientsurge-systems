@@ -230,7 +230,7 @@ function PricingCard({ plan, onOpenModal }) {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
           }}>
           <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
-            Book a Demo
+            Book a Free 15-Min Demo
             <ArrowRight className="w-4 h-4" />
           </span>
         </button>

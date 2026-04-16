@@ -136,12 +136,10 @@ export default function Footer() {
           <div className="relative">
             <button
               onClick={scrollTop}
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
+              onMouseEnter={(e) => { setShowTooltip(true); e.currentTarget.style.borderColor = "rgba(154,92,46,0.5)"; e.currentTarget.style.background = "rgba(154,92,46,0.1)"; }}
+              onMouseLeave={(e) => { setShowTooltip(false); e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"; e.currentTarget.style.background = "rgba(0,0,0,0.06)"; }}
               className="w-9 h-9 rounded-full flex items-center justify-center transition-all focus:ring-2 focus:ring-primary focus:outline-none"
               style={{ background: "rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.12)" }}
-              onMouseEnterCapture={(e) => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.5)"; e.currentTarget.style.background = "rgba(154,92,46,0.1)"; }}
-              onMouseLeaveCapture={(e) => { e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"; e.currentTarget.style.background = "rgba(0,0,0,0.06)"; }}
               aria-label="Back to top"
             >
               <ArrowUp className="w-4 h-4 text-foreground/60" />
