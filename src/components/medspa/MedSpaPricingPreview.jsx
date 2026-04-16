@@ -55,7 +55,7 @@ export default function MedSpaPricingPreview() {
                   <ArrowRight className="w-4 h-4" />
                 </span>
               </button>
-              <p className="text-xs text-muted-foreground mt-4">Free 30-min call · No commitment · Live in 5–7 days</p>
+              <p className="text-xs text-muted-foreground mt-4">Free 15-min call · No commitment · Live in 5–7 days</p>
             </div>
           </div>
         </div>

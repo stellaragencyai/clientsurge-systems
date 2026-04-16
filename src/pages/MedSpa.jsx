@@ -29,7 +29,7 @@ export default function MedSpa() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <MedSpaNavBar />
       <MedSpaHero />
       <MedSpaPositioning />

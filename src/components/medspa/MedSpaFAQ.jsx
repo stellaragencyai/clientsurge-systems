@@ -49,6 +49,9 @@ export default function MedSpaFAQ() {
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
             Frequently Asked Questions
           </h2>
+          <p className="mt-4 text-muted-foreground text-base">
+            Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message →</a>
+          </p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">
@@ -56,9 +59,9 @@ export default function MedSpaFAQ() {
             <AccordionItem
               key={i}
               value={`faq-${i}`}
-              className="border border-slate-600/0 hover:border-slate-600 rounded-xl px-6 data-[state=open]:border-amber-500/40 transition-colors bg-background overflow-hidden"
+              className="border border-border hover:border-primary/40 rounded-xl px-6 data-[state=open]:border-primary/40 transition-colors bg-background overflow-hidden focus-within:ring-2 focus-within:ring-primary"
             >
-              <AccordionTrigger className="text-left text-sm font-semibold hover:no-underline py-5">
+              <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
                 {faq.q}
               </AccordionTrigger>
               <AccordionContent className="text-sm text-muted-foreground leading-relaxed pb-5">

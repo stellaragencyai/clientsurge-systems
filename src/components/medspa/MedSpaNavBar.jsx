@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import MedSpaDemoModal from "./MedSpaDemoModal";
@@ -6,10 +6,21 @@ import MedSpaDemoModal from "./MedSpaDemoModal";
 export default function MedSpaNavBar() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <>
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-border/50 px-6 h-14 flex items-center justify-between shadow-sm">
+      <nav className={`sticky top-0 z-50 transition-all duration-500 px-6 h-16 flex items-center justify-between ${
+        scrolled
+          ? "bg-white/40 backdrop-blur-2xl border-b border-white/30 shadow-lg"
+          : "bg-white/15 backdrop-blur-md border-b border-white/20"
+      }`}>
         {/* Back to main site */}
         <button
           onClick={() => navigate("/")}
@@ -22,7 +33,7 @@ export default function MedSpaNavBar() {
 
         {/* Logo */}
         <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
             <span className="text-white font-black text-xs">CS</span>
           </div>
           <span className="font-black text-sm text-foreground hidden sm:inline">
