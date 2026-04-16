@@ -1,5 +1,6 @@
 import { ArrowRight, Timer, CalendarCheck, ShieldCheck, UsersRound, TrendingUp, BadgeDollarSign } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import DemoBookingModal from "../forms/DemoBookingModal";
 
 const benefits = [
   {
@@ -104,6 +105,7 @@ function BenefitCard({ benefit, index, isVisible }) {
 export default function Benefits() {
   const sectionRef = useRef(null);
   const [sectionVisible, setSectionVisible] = useState(false);
+  const [showDemoModal, setShowDemoModal] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -131,7 +133,7 @@ export default function Benefits() {
         </div>
 
         <div className="text-center mt-14">
-          <button onClick={() => window.location.href = '/book'} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.5s ease, transform 0.3s ease", cursor:"pointer",border:"none"}} onMouseEnter={(e) => {
+          <button onClick={() => setShowDemoModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.5s ease, transform 0.3s ease", cursor:"pointer",border:"none"}} onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
           }} onMouseLeave={(e) => {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
@@ -142,6 +144,7 @@ export default function Benefits() {
             </span>
           </button>
         </div>
+        {showDemoModal && <DemoBookingModal onClose={() => setShowDemoModal(false)} />}
       </div>
     </section>
   );

@@ -18,7 +18,7 @@ export default function Navbar() {
   }, []);
 
   const links = [
-    { label: "How It Works", href: "#how-it-works" },
+    { label: "How It Works", href: "#how-it-works-section" },
     { label: "Services", href: "#services" },
     { label: "Industries", href: "#industries" },
     { label: "Med Spa", href: "/med-spa", external: true },
@@ -137,6 +137,16 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden bg-background border-b border-border px-6 pb-6 pt-2 space-y-4">
           {links.map((l) => (
+            l.external ? (
+              <a
+                key={l.href}
+                href={l.href}
+                className="block text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded px-2 py-1"
+                onClick={() => setOpen(false)}
+              >
+                {l.label}
+              </a>
+            ) : (
             <a
               key={l.href}
               href={l.href}
@@ -145,6 +155,7 @@ export default function Navbar() {
             >
               {l.label}
             </a>
+            )
           ))}
           <button onClick={() => { setOpen(false); setShowDemoModal(true); }} style={{display:"block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 14px rgba(120,70,20,0.35)",border:"none",cursor:"pointer",width:"100%"}}>
             <span style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",height:"40px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"600",fontSize:"0.875rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>

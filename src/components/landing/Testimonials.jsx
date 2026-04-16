@@ -119,8 +119,10 @@ export default function Testimonials() {
             Want results like this for your business?
           </p>
           <button onClick={() => {
+            const target = document.getElementById('book-demo');
+            if (!target) return;
             const start = window.scrollY;
-            const end = document.body.scrollHeight - window.innerHeight;
+            const end = target.getBoundingClientRect().top + window.scrollY - 80;
             const distance = end - start;
             const duration = 1200;
             let startTime = null;

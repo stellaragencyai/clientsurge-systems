@@ -25,6 +25,7 @@ import Start from './pages/Start';
 import ClientPortal from './pages/ClientPortal';
 import Book from './pages/Book';
 import Success from './pages/Success';
+import LegalPage from './pages/LegalPage';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -71,6 +72,7 @@ const AuthenticatedApp = () => {
       <Route path="/sam" element={<Sam />} />
       <Route path="/medspa-dashboard" element={<MedSpaDashboard />} />
       <Route path="/client-portal" element={<ClientPortal />} />
+      <Route path="/legal/:type" element={<LegalPage />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
