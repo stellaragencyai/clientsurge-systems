@@ -76,12 +76,14 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
+      {/* Centering wrapper */}
+      <div className="flex min-h-full items-center justify-center p-4">
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden z-10 animate-in fade-in zoom-in duration-300">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl z-10 animate-in fade-in zoom-in duration-300">
         {/* Header */}
         <div className="px-8 pt-8 pb-5 border-b border-border">
           <button
@@ -177,6 +179,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             </p>
           </form>
         )}
+      </div>
       </div>
     </div>
   );

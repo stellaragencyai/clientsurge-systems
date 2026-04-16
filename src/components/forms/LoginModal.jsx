@@ -33,10 +33,12 @@ export default function LoginModal({ onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
+      {/* Centering wrapper */}
+      <div className="flex min-h-full items-center justify-center p-4">
       {/* Modal */}
       <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden z-10">
         {/* Header */}
@@ -111,6 +113,7 @@ export default function LoginModal({ onClose }) {
             </button>
           </p>
         </form>
+      </div>
       </div>
     </div>
   );

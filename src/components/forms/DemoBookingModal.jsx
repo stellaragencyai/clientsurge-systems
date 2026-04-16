@@ -93,10 +93,12 @@ export default function DemoBookingModal({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onKeyDown={handleKeyDown} tabIndex={0}>
+    <div className="fixed inset-0 z-50 overflow-y-auto" onKeyDown={handleKeyDown} tabIndex={0}>
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={onClose} />
 
+      {/* Centering wrapper */}
+      <div className="flex min-h-full items-center justify-center p-4">
       {/* Modal */}
       <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden z-50 animate-in fade-in zoom-in duration-300">
         {/* Header */}
@@ -310,6 +312,7 @@ export default function DemoBookingModal({ onClose }) {
             <p className="text-center text-xs text-muted-foreground">We'll send confirmation email & SMS</p>
           </form>
         )}
+      </div>
       </div>
     </div>
   );
