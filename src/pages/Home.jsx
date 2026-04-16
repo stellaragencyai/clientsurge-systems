@@ -5,7 +5,6 @@ import TrustBar from "../components/landing/TrustBar";
 import ProblemSolution from "../components/landing/ProblemSolution.jsx";
 import Industries from "../components/landing/Industries";
 import WhyUs from "../components/landing/WhyUs";
-import Testimonials from "../components/landing/Testimonials";
 import IntegrationsBadges from "../components/landing/IntegrationsBadges";
 import HowItWorks from "../components/landing/HowItWorks";
 import Benefits from "../components/landing/Benefits";
@@ -38,7 +37,6 @@ export default function Home() {
       <FadeIn><ProblemSolution /></FadeIn>
       <FadeIn><Industries /></FadeIn>
       <FadeIn><WhyUs /></FadeIn>
-      <FadeIn><Testimonials /></FadeIn>
       <FadeIn><IntegrationsBadges /></FadeIn>
       <FadeIn><HowItWorks id="how-it-works-section" /></FadeIn>
       <FadeIn><ConversationMockup /></FadeIn>

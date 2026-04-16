@@ -37,7 +37,7 @@ const reasons = [
 const WhyUsCard = ({ reason }) => {
   const Icon = reason.icon;
   return (
-    <div className="group p-8 md:p-10 rounded-2xl bg-white border-2 border-black hover:shadow-lg transition-all duration-300 cursor-default" style={{boxShadow: "0 4px 16px rgba(0,0,0,0.06)"}}>
+    <div className="group p-8 md:p-10 rounded-2xl bg-white hover:shadow-lg transition-all duration-300 cursor-default" style={{boxShadow: "0 4px 16px rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.07)"}}>
       <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-all duration-300" style={{backgroundColor: "rgba(154,92,46,0.12)", border: "2px solid rgba(154,92,46,0.3)"}}>
         <Icon className="w-6 h-6" style={{color: "#9a5c2e"}} strokeWidth={1.75} />
       </div>
@@ -93,7 +93,7 @@ export default function WhyUs() {
           <div className="flex items-center justify-center gap-3 flex-wrap">
             {["Day 1: Kickoff call", "Days 2–4: Build & integrate", "Day 5–7: Test & launch", "Day 30+: Optimize"].map((step, i) => (
               <div key={i} className="flex items-center gap-3">
-                <span className="px-6 py-2.5 border-2 border-black rounded-full text-sm font-semibold text-foreground" style={{backgroundColor: "rgba(154,92,46,0.1)", borderColor: "#000000"}}>
+                <span className="px-6 py-2.5 rounded-full text-sm font-semibold text-foreground" style={{backgroundColor: "rgba(154,92,46,0.1)", border: "1px solid rgba(154,92,46,0.25)"}}>
                   {step}
                 </span>
                 {i < 3 && <span className="text-foreground/40 text-base">→</span>}
@@ -108,18 +108,7 @@ export default function WhyUs() {
           ))}
         </div>
 
-        {/* Risk reduction & CTA */}
-        <div className="text-center max-w-2xl mx-auto border-t border-border pt-12">
-          <p className="text-base text-foreground/70 mb-3">
-            No complicated setup. No ongoing management required.
-          </p>
-          <p className="text-lg font-semibold text-foreground mb-8">
-            You don't need to learn anything. It just works.
-          </p>
-          <p className="text-lg font-semibold text-foreground">
-            Want us to set this up for your business?
-          </p>
-        </div>
+
 
       </div>
     </section>
