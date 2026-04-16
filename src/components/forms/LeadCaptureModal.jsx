@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { ArrowRight, ChevronLeft, X, CheckCircle2, User, Building2, Mail, Phone } from 'lucide-react';
+import { ArrowRight, ChevronLeft, X, CheckCircle2, User, Building2, Mail, Phone, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
@@ -154,11 +154,11 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
         <div className="p-5 md:p-6" style={{ opacity: showSuccess ? 0.5 : 1, pointerEvents: showSuccess ? 'none' : 'auto' }}>
            {/* Header with Logo */}
           <div className="flex items-start gap-3 mb-6">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center flex-shrink-0">
-              <span className="font-display font-bold text-white text-base">A</span>
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-600 to-amber-800 flex items-center justify-center flex-shrink-0">
+              <span className="font-display font-bold text-white text-sm">CS</span>
             </div>
             <div>
-              <span className="font-display text-lg font-semibold text-foreground block">ApexFlow</span>
+              <span className="font-display text-lg font-semibold text-foreground block">ClientSurge Systems</span>
               <h2 className="font-display text-2xl font-semibold text-foreground mt-1">
                 Demo Setup
               </h2>
@@ -368,8 +368,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                   className="ml-auto flex items-center gap-1.5 px-6 py-2 rounded-full font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground"
                   style={{background: 'linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)'}}
                 >
-                  {loading ? 'Submit' : 'Schedule'}
-                  {!loading && <ArrowRight className="w-3.5 h-3.5" />}
+                  {loading ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Submitting…</> : <>Schedule <ArrowRight className="w-3.5 h-3.5" /></>}
                 </button>
               )}
             </div>

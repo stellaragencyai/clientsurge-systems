@@ -111,9 +111,6 @@ export default function HowItWorks() {
               })}
             </div>
             
-            {/* Connecting arrows row */}
-            <div className="flex items-center justify-between px-4 mb-2 relative" style={{height: "20px"}}></div>
-
             {/* Text row */}
             <div className="flex justify-between gap-2 px-4">
               {steps.map((step, i) => (

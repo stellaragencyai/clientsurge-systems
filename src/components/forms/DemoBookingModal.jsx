@@ -141,7 +141,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
               </p>
             </div>
             <p className="text-xs text-muted-foreground">
-              Redirecting to home in 4 seconds...
+              This window will close in a moment...
             </p>
           </div>
         )}
@@ -264,6 +264,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                 name="date"
                 type="date"
                 value={scheduling.date}
+                min={new Date().toISOString().split('T')[0]}
                 onChange={handleSchedulingChange}
                 className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
               />
@@ -295,7 +296,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
 
             <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
               <p className="text-xs text-muted-foreground">
-                <strong>📅 Demo Confirmed:</strong> {scheduling.date && new Date(scheduling.date).toLocaleDateString()} at {scheduling.time || 'TBD'}
+                <strong>📅 Demo Confirmed:</strong> {scheduling.date && scheduling.date.split('-').slice(1).concat(scheduling.date.split('-')[0]).join('/')} at {scheduling.time || 'TBD'}
               </p>
             </div>
 

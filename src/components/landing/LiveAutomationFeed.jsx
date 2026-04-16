@@ -115,7 +115,7 @@ export default function LiveAutomationFeed() {
               <div key={label} className="flex-1 rounded-2xl p-5 bg-white flex flex-col justify-between" style={{ border: "1px solid rgba(154,92,46,0.12)", boxShadow: "0 4px 16px rgba(0,0,0,0.05)" }}>
                 <p className="text-xs font-bold uppercase tracking-widest text-foreground/45 mb-2">{label}</p>
                 <p className="font-display text-3xl font-bold transition-all duration-500" style={{ color }}>{value.toLocaleString()}</p>
-                <p className="text-[10px] text-foreground/35 mt-1">This month across all clients</p>
+                <p className="text-[10px] text-foreground/35 mt-1">Simulated demo data</p>
               </div>
             ))}
 

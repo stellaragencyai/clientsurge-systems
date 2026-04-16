@@ -120,12 +120,10 @@ export default function HeroSection({
             )}
 
             {secondaryCTA && (
-              <button onClick={secondaryCTA.onClick}>
-                <Button size="lg" variant="outline" className="rounded-full px-8 h-[52px] text-base font-semibold gap-2">
-                  {secondaryCTA.label}
-                  {secondaryCTA.icon && <secondaryCTA.icon className="w-4 h-4" />}
-                </Button>
-              </button>
+              <Button size="lg" variant="outline" onClick={secondaryCTA.onClick} className="rounded-full px-8 h-[52px] text-base font-semibold gap-2">
+                {secondaryCTA.label}
+                {secondaryCTA.icon && <secondaryCTA.icon className="w-4 h-4" />}
+              </Button>
             )}
           </div>
 

@@ -171,7 +171,7 @@ Keep it under 160 characters ideally, natural and warm — not robotic. No place
                   <Bot className="w-4 h-4 text-amber-100" />
                 </div>
                 <div className="rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm shadow-sm" style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.08), rgba(154,92,46,0.04))", border: "1px solid rgba(154,92,46,0.25)" }}>
-                  <p className="text-sm text-foreground/85 leading-relaxed">{displayedResponse}<span className="animate-pulse">|</span></p>
+                  <p className="text-sm text-foreground/85 leading-relaxed">{displayedResponse}{displayedResponse.length < aiResponse.length && <span className="animate-pulse">|</span>}</p>
                   <p className="text-[10px] mt-1.5 font-semibold" style={{ color: "rgba(154,92,46,0.6)" }}>⚡ ClientSurge AI — responded in &lt;60s</p>
                 </div>
               </div>

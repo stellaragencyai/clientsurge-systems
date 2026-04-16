@@ -6,8 +6,13 @@ export default function FounderSection() {
           <div className="grid md:grid-cols-2 gap-12 p-12 md:p-16 items-center">
             {/* Left: Photo Placeholder */}
             <div className="flex items-center justify-center">
-              <div className="w-64 h-64 rounded-2xl bg-gradient-to-br from-amber-600/30 to-amber-800/20 border border-amber-500/30 flex items-center justify-center">
-                <span className="text-amber-600/50 text-sm font-semibold">[PHOTO]</span>
+              <div className="w-64 h-64 rounded-2xl overflow-hidden bg-gradient-to-br from-amber-600/30 to-amber-800/20 border border-amber-500/30 flex items-center justify-center">
+                <img
+                  src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=85"
+                  alt="Neo — Founder of ClientSurge Systems"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
               </div>
             </div>
 

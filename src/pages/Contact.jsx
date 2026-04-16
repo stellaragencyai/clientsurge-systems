@@ -86,8 +86,8 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">Phone</p>
-                    <a href="tel:+16025550100" className="text-sm text-foreground hover:text-primary transition-colors">
-                      (602) 555-0100
+                    <a href="mailto:system@clientsurgesystems.com" className="text-sm text-foreground hover:text-primary transition-colors">
+                      system@clientsurgesystems.com
                     </a>
                   </div>
                 </div>

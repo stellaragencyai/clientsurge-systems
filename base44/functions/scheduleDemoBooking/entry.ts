@@ -3,7 +3,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { full_name, business_name, email, phone, scheduled_date, scheduled_time, monthly_leads, biggest_issue } = await req.json();
+    const { full_name, business_name, email, phone, scheduled_date, scheduled_time, monthly_leads, biggest_issue, industry } = await req.json();
 
     // Validate required fields
     if (!full_name || !email || !phone || !scheduled_date || !scheduled_time) {
@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
       business_name,
       email,
       phone,
-      business_type: "Med Spa",
+      business_type: industry || "General",
       problem: biggest_issue || monthly_leads || "Scheduling demo",
       status: "Booked",
       booking_link_sent_at: new Date().toISOString(),
@@ -61,12 +61,13 @@ Deno.serve(async (req) => {
       scheduled_time,
       monthly_leads,
       biggest_issue,
+      industry,
     });
 
     // 5. Create calendar event
     await base44.functions.invoke('createDemoCalendarEvent', {
       title: `Demo: ${business_name} - ${full_name}`,
-      description: `Med Spa Demo Booking\n\nBusiness: ${business_name}\nContact: ${full_name}\nEmail: ${email}\nPhone: ${phone}\nMonthly Leads: ${monthly_leads}\nChallenge: ${biggest_issue}`,
+      description: `Demo Booking\n\nBusiness: ${business_name}\nIndustry: ${industry || 'General'}\nContact: ${full_name}\nEmail: ${email}\nPhone: ${phone}\nMonthly Leads: ${monthly_leads}\nChallenge: ${biggest_issue}`,
       start_time: bookingDateTime,
       duration_minutes: 15,
     });
