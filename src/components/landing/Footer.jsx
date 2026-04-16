@@ -21,6 +21,7 @@ const navColumns = [
       { label: "Pricing", href: "/#pricing" },
       { label: "FAQ", href: "/#faq" },
       { label: "Book a Demo", href: "/book" },
+      { label: "Contact Us", href: "/contact" },
       { label: "Client Portal", href: "/client-portal" },
     ],
   },
@@ -67,7 +68,7 @@ export default function Footer() {
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <footer style={{ background: "hsl(40, 10%, 14%)" }} className="border-t border-white/10">
+    <footer style={{ background: "hsl(40, 12%, 22%)" }} className="border-t border-primary/20">
 
       <div className="max-w-7xl mx-auto px-6 pt-14 pb-10">
 
