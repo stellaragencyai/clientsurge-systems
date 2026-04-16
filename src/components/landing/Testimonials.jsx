@@ -1,3 +1,6 @@
+import { useState } from "react";
+import DemoBookingModal from "../forms/DemoBookingModal";
+
 const testimonials = [
   {
     name: "Jessica M.",
@@ -32,6 +35,7 @@ const testimonials = [
 ];
 
 export default function Testimonials() {
+  const [showDemoModal, setShowDemoModal] = useState(false);
   return (
     <section id="testimonials" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
       <div className="max-w-6xl mx-auto">
@@ -125,14 +129,7 @@ export default function Testimonials() {
           <p className="text-lg font-semibold text-foreground mb-6">
             Want results like this for your business?
           </p>
-          <button onClick={() => {
-            const target = document.getElementById('book-demo');
-            if (target) {
-              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-              window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            }
-          }} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.5s ease, transform 0.3s ease",border:"none",cursor:"pointer"}} onMouseEnter={(e) => {
+          <button onClick={() => setShowDemoModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.5s ease, transform 0.3s ease",border:"none",cursor:"pointer"}} onMouseEnter={(e) => {
             e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
           }} onMouseLeave={(e) => {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
@@ -141,6 +138,7 @@ export default function Testimonials() {
               Book a Demo
             </span>
           </button>
+          {showDemoModal && <DemoBookingModal onClose={() => setShowDemoModal(false)} />}
         </div>
       </div>
     </section>
