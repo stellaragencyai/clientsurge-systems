@@ -160,24 +160,10 @@ export default function Industries() {
                 }}
               />
 
-              {/* Icon badge — always visible top-left */}
-              <div
-                className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full"
-                style={{
-                  background: "rgba(15,14,12,0.55)",
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)",
-                  border: "1px solid rgba(200,150,92,0.3)",
-                }}
-              >
-                <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#c8965c" }} />
-                <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">{ind.name.split(" ")[0]}</span>
-              </div>
-
               {/* Title at bottom — scrolls up with the drawer */}
               <div
-                className="absolute bottom-0 left-0 right-0 transition-transform duration-400 ease-out group-hover:-translate-y-[100px]"
-                style={{ padding: "0 24px 16px" }}
+                className="absolute bottom-0 left-0 right-0 transition-transform duration-800 ease-out group-hover:-translate-y-[100px]"
+                style={{ padding: "0 24px 16px", transitionDuration: "800ms" }}
               >
                 <h3 className="text-base font-bold text-white leading-snug drop-shadow-lg">
                   {ind.name}
@@ -186,7 +172,8 @@ export default function Industries() {
 
               {/* Glass drawer — slides up from below, title is part of it */}
               <div
-                className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out"
+                className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform ease-out"
+                style={{ transitionDuration: "800ms" }}
                 style={{
                   background: "rgba(15,14,12,0.72)",
                   backdropFilter: "blur(16px)",
