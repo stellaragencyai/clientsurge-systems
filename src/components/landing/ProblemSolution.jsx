@@ -129,11 +129,11 @@ export default function ProblemSolution() {
                   <div
                     className="flex items-start gap-4 p-7 rounded-2xl relative overflow-hidden group h-full"
                     style={{
-                      background: "linear-gradient(135deg, rgba(255,230,230,0.18) 0%, rgba(220,60,60,0.07) 100%)",
-                      backdropFilter: "blur(20px)",
-                      WebkitBackdropFilter: "blur(20px)",
-                      border: "1px solid rgba(220,80,80,0.25)",
-                      boxShadow: "0 4px 24px rgba(167,42,42,0.08), inset 0 1px 0 rgba(255,200,200,0.25), 0 0 40px rgba(180,40,40,0.06)",
+                      background: "linear-gradient(135deg, rgba(255,220,220,0.08) 0%, rgba(220,60,60,0.04) 100%)",
+                      backdropFilter: "blur(8px)",
+                      WebkitBackdropFilter: "blur(8px)",
+                      border: "1px solid rgba(220,80,80,0.20)",
+                      boxShadow: "0 4px 24px rgba(167,42,42,0.06), inset 0 1px 0 rgba(255,200,200,0.15), 0 0 40px rgba(180,40,40,0.04)",
                       transition: "box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease",
                     }}
                     onMouseEnter={(e) => {
@@ -184,11 +184,11 @@ export default function ProblemSolution() {
                   <div
                     className="flex items-start gap-4 p-7 rounded-2xl relative overflow-hidden group h-full"
                     style={{
-                      background: "linear-gradient(135deg, rgba(255,248,225,0.18) 0%, rgba(154,92,46,0.10) 100%)",
-                      backdropFilter: "blur(20px)",
-                      WebkitBackdropFilter: "blur(20px)",
-                      border: "1px solid rgba(200,150,92,0.30)",
-                      boxShadow: "0 4px 24px rgba(154,92,46,0.09), inset 0 1px 0 rgba(255,220,150,0.2), 0 0 40px rgba(154,92,46,0.07)",
+                      background: "linear-gradient(135deg, rgba(255,245,215,0.08) 0%, rgba(154,92,46,0.05) 100%)",
+                      backdropFilter: "blur(8px)",
+                      WebkitBackdropFilter: "blur(8px)",
+                      border: "1px solid rgba(200,150,92,0.22)",
+                      boxShadow: "0 4px 24px rgba(154,92,46,0.06), inset 0 1px 0 rgba(255,220,150,0.12), 0 0 40px rgba(154,92,46,0.05)",
                       transition: "box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease",
                     }}
                     onMouseEnter={(e) => {
