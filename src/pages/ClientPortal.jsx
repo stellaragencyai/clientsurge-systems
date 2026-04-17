@@ -30,7 +30,15 @@ export default function ClientPortal() {
       // Find project by client email
       const projects = await base44.entities.ClientProject.filter({ client_email: me.email });
       if (projects.length === 0) {
-        setNotFound(true);
+        // Auto-create a project for this user so the portal is always accessible
+        const newProject = await base44.entities.ClientProject.create({
+          client_email: me.email,
+          client_name: me.full_name || me.email,
+          business_name: me.full_name ? `${me.full_name}'s Business` : me.email,
+          plan: "Starter System",
+          step_onboarding: "pending",
+        });
+        setProject(newProject);
       } else {
         setProject(projects[0]);
       }
