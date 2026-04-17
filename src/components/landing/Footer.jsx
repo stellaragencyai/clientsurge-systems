@@ -124,6 +124,13 @@ export default function Footer() {
               </a>
             </span>
             <span className="hidden sm:inline text-foreground/20">·</span>
+            <span className="flex items-center gap-1.5">
+              <Phone className="w-3 h-3" />
+              <a href="tel:+16025874608" className="hover:text-foreground hover:underline focus:outline-none transition-colors">
+                (602) 587-4608
+              </a>
+            </span>
+            <span className="hidden sm:inline text-foreground/20">·</span>
             <span>Phoenix, Arizona</span>
           </div>
 

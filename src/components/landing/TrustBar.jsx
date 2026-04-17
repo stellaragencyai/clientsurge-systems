@@ -22,8 +22,8 @@ const items = [
   },
   {
     icon: Building2,
-    stat: "Med Spas · HVAC · RE",
-    label: "Industries served",
+    stat: "15+ Industries",
+    label: "Served nationwide",
     story: "We've built systems for appointment-based businesses across aesthetics, home services, real estate, and more.",
   },
   {

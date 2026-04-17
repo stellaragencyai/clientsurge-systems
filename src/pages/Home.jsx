@@ -24,6 +24,7 @@ import FadeIn from "../components/landing/FadeIn";
 import LeadValueCalculator from "../components/landing/LeadValueCalculator";
 import LiveAutomationFeed from "../components/landing/LiveAutomationFeed";
 import AIResponseDemo from "../components/landing/AIResponseDemo";
+import SectionDivider from "../components/landing/SectionDivider";
 
 export default function Home() {
   useEffect(() => {
@@ -45,12 +46,15 @@ export default function Home() {
       
       <FadeIn><DetailedProcess /></FadeIn>
       <FadeIn><Benefits /></FadeIn>
+      <SectionDivider stat="Done-for-you." label="We build it. You get the bookings." />
       <FadeIn><FounderSection /></FadeIn>
       <FadeIn><CoreOffer /></FadeIn>
+      <SectionDivider stat="Real results." label="From real businesses like yours." />
       <FadeIn><Testimonials /></FadeIn>
       <FadeIn><AIResponseDemo /></FadeIn>
       <FadeIn><LiveAutomationFeed /></FadeIn>
       <FadeIn><LeadValueCalculator /></FadeIn>
+      <SectionDivider stat="Zero risk." label="30-day money-back guarantee." />
       <FadeIn><Guarantee /></FadeIn>
       <FadeIn><FAQ /></FadeIn>
       <FadeIn><Pricing /></FadeIn>
