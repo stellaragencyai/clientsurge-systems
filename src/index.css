@@ -85,7 +85,13 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-inter;
+    @apply text-foreground font-inter;
+    background-color: hsl(var(--background));
+    background-image: url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/4c711bf35_generated_image.png');
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 }
 
