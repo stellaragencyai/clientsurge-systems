@@ -34,6 +34,14 @@ Deno.serve(async (req) => {
       parseInt(minute)
     ).toISOString();
 
+    // 1b. Save DemoRequest for slot blocking
+    await base44.asServiceRole.entities.DemoRequest.create({
+      lead_id: lead.id,
+      scheduled_date,
+      scheduled_time,
+      status: 'scheduled',
+    });
+
     // 2. Send confirmation email to lead
     await base44.functions.invoke('sendDemoConfirmationEmail', {
       email,
