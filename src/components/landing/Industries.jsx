@@ -139,27 +139,52 @@ export default function Industries() {
               className="group relative overflow-hidden cursor-pointer text-left focus:outline-none"
               style={{ minHeight: "358px" }}
             >
-              {/* Full image */}
+              {/* Full image — no zoom */}
               <img
                 src={ind.image}
                 alt={`${ind.name} - ${ind.problem}`}
                 loading="lazy"
-                className="w-full h-full object-cover absolute inset-0 transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover absolute inset-0"
                 style={{ minHeight: "358px" }}
               />
-              {/* Gradient overlay — stronger at bottom for title legibility */}
-              <div className="absolute inset-0 transition-opacity duration-300" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.75) 100%)" }} />
-              {/* Hover overlay */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: "rgba(154,92,46,0.18)" }} />
 
-              {/* Title at bottom — static */}
-              <div className="absolute bottom-0 left-0 right-0 px-6 py-4 transition-all duration-300 group-hover:translate-y-[-110px]">
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 transition-opacity duration-300" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.72) 100%)" }} />
+
+              {/* Animated gold shimmer border on hover */}
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none"
+                style={{
+                  boxShadow: "inset 0 0 0 2px rgba(200,150,92,0.7)",
+                  background: "linear-gradient(135deg, rgba(200,150,92,0.08) 0%, transparent 50%, rgba(200,150,92,0.06) 100%)",
+                }}
+              />
+
+              {/* Icon badge — always visible top-left */}
+              <div
+                className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 rounded-full"
+                style={{
+                  background: "rgba(15,14,12,0.55)",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                  border: "1px solid rgba(200,150,92,0.3)",
+                }}
+              >
+                <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "#c8965c" }} />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-white/80">{ind.name.split(" ")[0]}</span>
+              </div>
+
+              {/* Title at bottom — scrolls up with the drawer */}
+              <div
+                className="absolute bottom-0 left-0 right-0 transition-transform duration-400 ease-out group-hover:-translate-y-[100px]"
+                style={{ padding: "0 24px 16px" }}
+              >
                 <h3 className="text-base font-bold text-white leading-snug drop-shadow-lg">
                   {ind.name}
                 </h3>
               </div>
 
-              {/* Glass drawer — slides up on hover */}
+              {/* Glass drawer — slides up from below, title is part of it */}
               <div
                 className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out"
                 style={{
@@ -167,11 +192,10 @@ export default function Industries() {
                   backdropFilter: "blur(16px)",
                   WebkitBackdropFilter: "blur(16px)",
                   borderTop: "1px solid rgba(200,150,92,0.35)",
-                  padding: "20px 24px",
+                  padding: "16px 24px 20px",
                 }}
               >
-                <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#c8965c" }}>{ind.name}</p>
-                <p className="text-xs text-white/70 leading-relaxed mb-3">{ind.problem}</p>
+                <p className="text-xs text-white/60 leading-relaxed mb-3">{ind.problem}</p>
                 <p className="text-xs font-semibold flex items-center gap-1" style={{ color: "#f5d9a8" }}>
                   Click to see the full solution →
                 </p>
