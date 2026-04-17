@@ -96,8 +96,9 @@ export default function ProblemSolution() {
 
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-amber-50/30 to-background pointer-events-none" />
-      <div className="absolute top-20 right-1/4 w-96 h-96 bg-amber-200/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-32 left-1/3 w-80 h-80 bg-amber-100/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-20 right-1/4 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-32 left-1/3 w-80 h-80 bg-amber-100/25 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-red-100/15 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative z-10">
 
@@ -128,26 +129,31 @@ export default function ProblemSolution() {
                   <div
                     className="flex items-start gap-4 p-7 rounded-2xl relative overflow-hidden group h-full"
                     style={{
-                      backgroundColor: "rgba(167,42,42,0.04)",
-                      border: "1px solid rgba(167,42,42,0.18)",
-                      transition: "box-shadow 0.3s ease, transform 0.3s ease",
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,240,240,0.35) 100%)",
+                      backdropFilter: "blur(16px)",
+                      WebkitBackdropFilter: "blur(16px)",
+                      border: "1px solid rgba(220,80,80,0.18)",
+                      boxShadow: "0 4px 24px rgba(167,42,42,0.06), inset 0 1px 0 rgba(255,255,255,0.7)",
+                      transition: "box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = "0 16px 48px rgba(167,42,42,0.12)";
-                      e.currentTarget.style.transform = "translateY(-3px)";
+                      e.currentTarget.style.boxShadow = "0 20px 52px rgba(167,42,42,0.14), inset 0 1px 0 rgba(255,255,255,0.8)";
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.borderColor = "rgba(220,80,80,0.35)";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = "none";
+                      e.currentTarget.style.boxShadow = "0 4px 24px rgba(167,42,42,0.06), inset 0 1px 0 rgba(255,255,255,0.7)";
                       e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.borderColor = "rgba(220,80,80,0.18)";
                     }}
                   >
-                    {/* FIX 3 + Visual Enhancement: left accent bar — red for problem */}
-                    <div className="absolute left-0 top-4 bottom-4 w-1 rounded-full" style={{ background: "linear-gradient(to bottom, rgba(167,42,42,0.6), rgba(167,42,42,0.15))" }} />
+                    {/* Left accent bar */}
+                    <div className="absolute left-0 top-4 bottom-4 w-1 rounded-full" style={{ background: "linear-gradient(to bottom, rgba(167,42,42,0.7), rgba(167,42,42,0.1))" }} />
 
-                    {/* Shimmer */}
+                    {/* Glass shimmer on hover */}
                     <div
-                      className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{ background: "linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)", animation: "shimmer 3s infinite" }}
+                      className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-2xl"
+                      style={{ background: "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%)", animation: "shimmer 2.5s infinite" }}
                     />
 
                     <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: "rgba(167,42,42,0.10)" }}>
@@ -178,26 +184,31 @@ export default function ProblemSolution() {
                   <div
                     className="flex items-start gap-4 p-7 rounded-2xl relative overflow-hidden group h-full"
                     style={{
-                      backgroundColor: "rgba(154,92,46,0.05)",
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,248,235,0.4) 100%)",
+                      backdropFilter: "blur(16px)",
+                      WebkitBackdropFilter: "blur(16px)",
                       border: "1px solid rgba(154,92,46,0.22)",
-                      transition: "box-shadow 0.3s ease, transform 0.3s ease",
+                      boxShadow: "0 4px 24px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.7)",
+                      transition: "box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = "0 16px 48px rgba(154,92,46,0.15)";
-                      e.currentTarget.style.transform = "translateY(-3px)";
+                      e.currentTarget.style.boxShadow = "0 20px 52px rgba(154,92,46,0.16), inset 0 1px 0 rgba(255,255,255,0.8)";
+                      e.currentTarget.style.transform = "translateY(-4px)";
+                      e.currentTarget.style.borderColor = "rgba(154,92,46,0.4)";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = "none";
+                      e.currentTarget.style.boxShadow = "0 4px 24px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.7)";
                       e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.borderColor = "rgba(154,92,46,0.22)";
                     }}
                   >
-                    {/* Visual Enhancement: right accent bar — gold for solution */}
-                    <div className="absolute right-0 top-4 bottom-4 w-1 rounded-full" style={{ background: "linear-gradient(to bottom, rgba(154,92,46,0.7), rgba(154,92,46,0.15))" }} />
+                    {/* Right accent bar */}
+                    <div className="absolute right-0 top-4 bottom-4 w-1 rounded-full" style={{ background: "linear-gradient(to bottom, rgba(154,92,46,0.75), rgba(154,92,46,0.1))" }} />
 
-                    {/* Shimmer */}
+                    {/* Glass shimmer on hover */}
                     <div
-                      className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                      style={{ background: "linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)", animation: "shimmer 3s infinite" }}
+                      className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-2xl"
+                      style={{ background: "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.35) 50%, transparent 70%)", animation: "shimmer 2.5s infinite" }}
                     />
 
                     <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center" style={{ backgroundColor: "rgba(154,92,46,0.12)" }}>
