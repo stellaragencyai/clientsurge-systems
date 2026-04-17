@@ -75,7 +75,7 @@ export default function Hero() {
         title="Stop Losing Leads."
         titleHighlight="Automate Follow-Up. Book More Customers."
         subtitle="Done-for-you AI systems that capture leads, respond instantly, automate follow-up, recover missed calls, and increase booked customers."
-        backgroundGradient="linear-gradient(to bottom, hsl(40, 8%, 88%), hsl(0, 0%, 100%))"
+        backgroundGradient="transparent"
         primaryCTA={{
           label: "Book a Demo",
           onClick: () => setShowDemoModal(true),

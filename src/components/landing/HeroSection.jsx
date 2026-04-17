@@ -24,12 +24,12 @@ export default function HeroSection({
     <section
       className="relative overflow-hidden"
       style={{
-        background: backgroundType === "image" ? "transparent" : backgroundGradient,
-        minHeight: backgroundType === "image" ? "100vh" : "auto",
-        paddingTop: backgroundType === "image" ? "0" : "80px",
-        paddingBottom: backgroundType === "image" ? "0" : "128px",
-        display: backgroundType === "image" ? "flex" : "block",
-        alignItems: backgroundType === "image" ? "center" : "auto",
+        background: "transparent",
+        minHeight: "100vh",
+        paddingTop: "0",
+        paddingBottom: "0",
+        display: "flex",
+        alignItems: "center",
       }}
     >
       {/* Background image if applicable */}
