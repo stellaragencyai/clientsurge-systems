@@ -47,7 +47,7 @@ export default function HeroSection({
 
       {/* Content */}
       <div className="relative z-10 flex items-center justify-center w-full h-full" style={{padding: "40px 24px"}}>
-        <div className="max-w-4xl mx-auto text-center pt-40 pb-32 md:pt-52 md:pb-40 px-6">
+        <div className="max-w-4xl mx-auto text-center pt-24 pb-32 md:pt-28 md:pb-40 px-6">
           {/* Badge */}
           {badge && (
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/25 backdrop-blur-sm rounded-full px-4 py-1.5 mb-8">
