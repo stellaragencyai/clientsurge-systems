@@ -170,15 +170,20 @@ function PricingCard({ plan, onOpenModal }) {
   return (
     <div
       className="pricing-card relative flex flex-col rounded-2xl transition-all duration-300"
-      style={{overflow: "visible"}}
-      style={
-        {
-          background: "hsl(var(--card))",
-          border: isHovered ? "3px solid #c8965c" : "2px solid hsl(var(--border))",
-          boxShadow: isHovered ? "0 8px 40px rgba(160,90,20,0.25), 0 2px 10px rgba(0,0,0,0.08)" : "0 4px 20px rgba(0,0,0,0.05)",
-          paddingTop: isHovered ? "0px" : "0px",
-        }
-      }
+      style={{
+        overflow: "visible",
+        background: isHovered
+          ? "linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,248,235,0.7) 100%)"
+          : "linear-gradient(135deg, rgba(255,255,255,0.65) 0%, rgba(255,248,235,0.45) 100%)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: isHovered ? "2px solid rgba(200,150,92,0.55)" : "1.5px solid rgba(154,92,46,0.2)",
+        boxShadow: isHovered
+          ? "0 20px 52px rgba(160,90,20,0.2), inset 0 1px 0 rgba(255,255,255,0.85)"
+          : "0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.7)",
+        transform: isHovered ? "translateY(-6px)" : "translateY(0)",
+        transition: "all 0.35s ease",
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >

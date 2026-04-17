@@ -128,7 +128,17 @@ export default function HowItWorks() {
             {steps.map((step, i) => {
               const Icon = step.icon;
               return (
-                <div key={i} className="flex gap-4">
+                <div
+                  key={i}
+                  className="flex gap-4 p-4 rounded-2xl"
+                  style={{
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,248,235,0.38) 100%)",
+                    backdropFilter: "blur(14px)",
+                    WebkitBackdropFilter: "blur(14px)",
+                    border: "1px solid rgba(154,92,46,0.18)",
+                    boxShadow: "0 4px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
+                  }}
+                >
                   <div className="flex-shrink-0">
                     <div className="w-12 h-12 rounded-2xl bg-primary/15 border border-primary/30 flex items-center justify-center">
                       <Icon className="w-6 h-6 text-primary" />

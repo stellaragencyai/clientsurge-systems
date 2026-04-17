@@ -82,13 +82,27 @@ function BenefitCard({ benefit, index, isVisible }) {
   return (
     <div
       ref={ref}
-      className={`flex gap-4 p-6 bg-white rounded-2xl transition-all duration-500 ${
-        showBorder ? "opacity-100 translate-y-0 border-primary/30" : "opacity-0 translate-y-4 border-border"
+      className={`flex gap-4 p-6 rounded-2xl transition-all duration-500 group ${
+        showBorder ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       }`}
       style={{
-        borderWidth: "1px",
-        borderStyle: "solid",
+        background: "linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,248,235,0.4) 100%)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
+        border: showBorder ? "1px solid rgba(154,92,46,0.22)" : "1px solid rgba(154,92,46,0.08)",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
         transitionDelay: `${index * 150}ms`,
+        transition: `opacity 0.5s ease ${index * 150}ms, transform 0.5s ease ${index * 150}ms, box-shadow 0.3s ease, border-color 0.3s ease`,
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.boxShadow = "0 16px 40px rgba(154,92,46,0.14), inset 0 1px 0 rgba(255,255,255,0.8)";
+        e.currentTarget.style.transform = "translateY(-4px)";
+        e.currentTarget.style.borderColor = "rgba(154,92,46,0.38)";
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7)";
+        e.currentTarget.style.transform = showBorder ? "translateY(0)" : "translateY(16px)";
+        e.currentTarget.style.borderColor = "rgba(154,92,46,0.22)";
       }}
     >
       <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center">
