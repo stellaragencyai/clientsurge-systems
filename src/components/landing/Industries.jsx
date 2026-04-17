@@ -152,13 +152,28 @@ export default function Industries() {
               {/* Hover overlay */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: "rgba(154,92,46,0.18)" }} />
 
-              {/* Title at bottom */}
-              <div className="absolute bottom-0 left-0 right-0 px-6 py-5">
+              {/* Title at bottom — static */}
+              <div className="absolute bottom-0 left-0 right-0 px-6 py-4 transition-all duration-300 group-hover:translate-y-[-110px]">
                 <h3 className="text-base font-bold text-white leading-snug drop-shadow-lg">
                   {ind.name}
                 </h3>
-                <p className="text-xs text-white/70 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
-                  Click to learn more →
+              </div>
+
+              {/* Glass drawer — slides up on hover */}
+              <div
+                className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out"
+                style={{
+                  background: "rgba(15,14,12,0.72)",
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                  borderTop: "1px solid rgba(200,150,92,0.35)",
+                  padding: "20px 24px",
+                }}
+              >
+                <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#c8965c" }}>{ind.name}</p>
+                <p className="text-xs text-white/70 leading-relaxed mb-3">{ind.problem}</p>
+                <p className="text-xs font-semibold flex items-center gap-1" style={{ color: "#f5d9a8" }}>
+                  Click to see the full solution →
                 </p>
               </div>
             </button>

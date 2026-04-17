@@ -174,19 +174,41 @@ function PricingCard({ plan, onOpenModal }) {
         overflow: "visible",
         background: isHovered
           ? "linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,248,235,0.7) 100%)"
-          : "linear-gradient(135deg, rgba(255,255,255,0.65) 0%, rgba(255,248,235,0.45) 100%)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        border: isHovered ? "2px solid rgba(200,150,92,0.55)" : "1.5px solid rgba(154,92,46,0.2)",
-        boxShadow: isHovered
-          ? "0 20px 52px rgba(160,90,20,0.2), inset 0 1px 0 rgba(255,255,255,0.85)"
-          : "0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.7)",
-        transform: isHovered ? "translateY(-6px)" : "translateY(0)",
+          : plan.highlight
+            ? "linear-gradient(135deg, rgba(255,252,240,0.72) 0%, rgba(255,243,210,0.55) 100%)"
+            : "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(255,248,235,0.28) 100%)",
+        backdropFilter: plan.highlight ? "blur(24px)" : "blur(16px)",
+        WebkitBackdropFilter: plan.highlight ? "blur(24px)" : "blur(16px)",
+        border: plan.highlight
+          ? isHovered ? "2px solid rgba(200,150,92,0.75)" : "2px solid rgba(200,150,92,0.45)"
+          : isHovered ? "2px solid rgba(200,150,92,0.55)" : "1.5px solid rgba(154,92,46,0.15)",
+        boxShadow: plan.highlight
+          ? isHovered
+            ? "0 24px 64px rgba(160,90,20,0.32), 0 0 80px rgba(200,150,92,0.22), inset 0 1px 0 rgba(255,255,255,0.9)"
+            : "0 8px 40px rgba(160,90,20,0.18), 0 0 60px rgba(200,150,92,0.14), inset 0 1px 0 rgba(255,255,255,0.8)"
+          : isHovered
+            ? "0 20px 52px rgba(160,90,20,0.2), inset 0 1px 0 rgba(255,255,255,0.85)"
+            : "0 4px 24px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.6)",
+        transform: isHovered ? "translateY(-6px)" : plan.highlight ? "translateY(-3px)" : "translateY(0)",
         transition: "all 0.35s ease",
+        zIndex: plan.highlight ? 2 : 1,
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Ambient glow ring for highlight card */}
+      {plan.highlight && (
+        <div
+          className="absolute inset-0 rounded-2xl pointer-events-none"
+          style={{
+            boxShadow: isHovered
+              ? "0 0 0 1px rgba(200,150,92,0.5), 0 0 80px rgba(200,150,92,0.25)"
+              : "0 0 0 1px rgba(200,150,92,0.3), 0 0 50px rgba(200,150,92,0.14)",
+            transition: "box-shadow 0.35s ease",
+            borderRadius: "inherit",
+          }}
+        />
+      )}
       {/* Badge — always visible */}
       {plan.badge && (
         <div className="pricing-badge-float" style={{zIndex: 30}}>
@@ -198,7 +220,7 @@ function PricingCard({ plan, onOpenModal }) {
 
 
 
-      <div className="flex flex-col flex-1 p-10">
+      <div className="flex flex-col flex-1 p-10 relative z-10">
         {/* Plan name & subtitle */}
         <div className="mb-7">
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">{plan.name}</h3>

@@ -129,22 +129,22 @@ export default function ProblemSolution() {
                   <div
                     className="flex items-start gap-4 p-7 rounded-2xl relative overflow-hidden group h-full"
                     style={{
-                      background: "linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,240,240,0.35) 100%)",
-                      backdropFilter: "blur(16px)",
-                      WebkitBackdropFilter: "blur(16px)",
-                      border: "1px solid rgba(220,80,80,0.18)",
-                      boxShadow: "0 4px 24px rgba(167,42,42,0.06), inset 0 1px 0 rgba(255,255,255,0.7)",
+                      background: "linear-gradient(135deg, rgba(255,230,230,0.18) 0%, rgba(220,60,60,0.07) 100%)",
+                      backdropFilter: "blur(20px)",
+                      WebkitBackdropFilter: "blur(20px)",
+                      border: "1px solid rgba(220,80,80,0.25)",
+                      boxShadow: "0 4px 24px rgba(167,42,42,0.08), inset 0 1px 0 rgba(255,200,200,0.25), 0 0 40px rgba(180,40,40,0.06)",
                       transition: "box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = "0 20px 52px rgba(167,42,42,0.14), inset 0 1px 0 rgba(255,255,255,0.8)";
+                      e.currentTarget.style.boxShadow = "0 20px 52px rgba(167,42,42,0.18), inset 0 1px 0 rgba(255,200,200,0.35), 0 0 60px rgba(180,40,40,0.12)";
                       e.currentTarget.style.transform = "translateY(-4px)";
-                      e.currentTarget.style.borderColor = "rgba(220,80,80,0.35)";
+                      e.currentTarget.style.borderColor = "rgba(220,80,80,0.45)";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = "0 4px 24px rgba(167,42,42,0.06), inset 0 1px 0 rgba(255,255,255,0.7)";
+                      e.currentTarget.style.boxShadow = "0 4px 24px rgba(167,42,42,0.08), inset 0 1px 0 rgba(255,200,200,0.25), 0 0 40px rgba(180,40,40,0.06)";
                       e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.borderColor = "rgba(220,80,80,0.18)";
+                      e.currentTarget.style.borderColor = "rgba(220,80,80,0.25)";
                     }}
                   >
                     {/* Left accent bar */}
@@ -184,22 +184,22 @@ export default function ProblemSolution() {
                   <div
                     className="flex items-start gap-4 p-7 rounded-2xl relative overflow-hidden group h-full"
                     style={{
-                      background: "linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,248,235,0.4) 100%)",
-                      backdropFilter: "blur(16px)",
-                      WebkitBackdropFilter: "blur(16px)",
-                      border: "1px solid rgba(154,92,46,0.22)",
-                      boxShadow: "0 4px 24px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.7)",
+                      background: "linear-gradient(135deg, rgba(255,248,225,0.18) 0%, rgba(154,92,46,0.10) 100%)",
+                      backdropFilter: "blur(20px)",
+                      WebkitBackdropFilter: "blur(20px)",
+                      border: "1px solid rgba(200,150,92,0.30)",
+                      boxShadow: "0 4px 24px rgba(154,92,46,0.09), inset 0 1px 0 rgba(255,220,150,0.2), 0 0 40px rgba(154,92,46,0.07)",
                       transition: "box-shadow 0.35s ease, transform 0.35s ease, border-color 0.35s ease",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = "0 20px 52px rgba(154,92,46,0.16), inset 0 1px 0 rgba(255,255,255,0.8)";
+                      e.currentTarget.style.boxShadow = "0 20px 52px rgba(154,92,46,0.20), inset 0 1px 0 rgba(255,220,150,0.35), 0 0 60px rgba(154,92,46,0.13)";
                       e.currentTarget.style.transform = "translateY(-4px)";
-                      e.currentTarget.style.borderColor = "rgba(154,92,46,0.4)";
+                      e.currentTarget.style.borderColor = "rgba(200,150,92,0.55)";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = "0 4px 24px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.7)";
+                      e.currentTarget.style.boxShadow = "0 4px 24px rgba(154,92,46,0.09), inset 0 1px 0 rgba(255,220,150,0.2), 0 0 40px rgba(154,92,46,0.07)";
                       e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.borderColor = "rgba(154,92,46,0.22)";
+                      e.currentTarget.style.borderColor = "rgba(200,150,92,0.30)";
                     }}
                   >
                     {/* Right accent bar */}
