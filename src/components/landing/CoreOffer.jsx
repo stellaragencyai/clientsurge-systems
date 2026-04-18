@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, Zap, MessageSquare, PhoneCall, CalendarCheck, RotateCcw, LayoutDashboard, HeadphonesIcon, TrendingUp, CheckCircle2, Send, X } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
+import SystemFlowDiagram from "./SystemFlowDiagram";
 
 const coreAutomation = [
   { icon: Zap, step: "01", title: "Instantly respond to every lead", desc: "Before your competitors do — personalized replies within seconds.", tag: "Avg. 2× more bookings" },
@@ -254,6 +255,9 @@ export default function CoreOffer() {
             <span className="text-xs font-bold" style={{ color: "#f5d9a8" }}>8 systems included</span>
           </div>
         </div>
+
+        {/* Animated Flow Diagram */}
+        <SystemFlowDiagram />
 
         {/* TIER 1 — Core Automation */}
         <div className="flex items-center gap-3 mb-6">
