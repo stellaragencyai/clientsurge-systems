@@ -14,6 +14,14 @@ export default function Navbar() {
     const isDark = !darkMode;
     setDarkMode(isDark);
     document.documentElement.classList.toggle("dark", isDark);
+    // Swap background wallpaper
+    if (isDark) {
+      document.body.style.backgroundImage = "none";
+      document.body.style.backgroundColor = "hsl(220, 20%, 5%)";
+    } else {
+      document.body.style.backgroundImage = "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/4c711bf35_generated_image.png')";
+      document.body.style.backgroundColor = "";
+    }
   };
 
   useEffect(() => {

@@ -45,38 +45,38 @@
   }
 
   .dark {
-    --background: 220 20% 6%;
-    --foreground: 40 20% 95%;
-    --card: 220 20% 8%;
-    --card-foreground: 40 20% 95%;
-    --popover: 220 20% 8%;
-    --popover-foreground: 40 20% 95%;
-    --primary: 42 80% 45%;
-    --primary-foreground: 220 20% 6%;
+    --background: 220 20% 5%;
+    --foreground: 42 30% 88%;
+    --card: 220 20% 7%;
+    --card-foreground: 42 30% 88%;
+    --popover: 220 20% 7%;
+    --popover-foreground: 42 30% 88%;
+    --primary: 42 75% 52%;
+    --primary-foreground: 220 20% 5%;
     --secondary: 220 15% 12%;
-    --secondary-foreground: 40 20% 95%;
-    --muted: 220 15% 14%;
-    --muted-foreground: 40 10% 55%;
-    --accent: 42 80% 45%;
-    --accent-foreground: 220 20% 6%;
+    --secondary-foreground: 42 30% 88%;
+    --muted: 220 15% 10%;
+    --muted-foreground: 42 15% 55%;
+    --accent: 42 75% 52%;
+    --accent-foreground: 220 20% 5%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 16%;
-    --input: 220 15% 16%;
-    --ring: 42 80% 45%;
-    --chart-1: 220 70% 50%;
+    --border: 220 15% 14%;
+    --input: 220 15% 14%;
+    --ring: 42 75% 52%;
+    --chart-1: 42 75% 52%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 220 20% 5%;
+    --sidebar-foreground: 42 30% 88%;
+    --sidebar-primary: 42 75% 52%;
+    --sidebar-primary-foreground: 220 20% 5%;
+    --sidebar-accent: 220 15% 12%;
+    --sidebar-accent-foreground: 42 30% 88%;
+    --sidebar-border: 220 15% 14%;
+    --sidebar-ring: 42 75% 52%;
   }
 }
 
@@ -159,4 +159,148 @@ html {
 
 .animate-fade-out {
   animation: fadeOut 0.4s ease-out forwards;
+}
+
+/* ============================================
+   DARK MODE OVERRIDES
+   Handles components with hardcoded inline styles
+   Only active when .dark is on <html>
+   ============================================ */
+
+/* Body / background */
+.dark body {
+  background-image: none !important;
+  background-color: hsl(220, 20%, 5%) !important;
+}
+
+/* Navbar */
+.dark nav {
+  background: rgba(10, 12, 20, 0.85) !important;
+  border-bottom-color: rgba(200, 150, 92, 0.15) !important;
+}
+
+/* Hero section — force dark bg so text is visible */
+.dark section {
+  background: transparent;
+}
+
+/* Cards with white/cream hardcoded backgrounds */
+.dark [style*="rgba(255,255,255"] {
+  background: rgba(20, 22, 30, 0.85) !important;
+}
+
+/* Problem/Solution section background blobs */
+.dark .absolute.inset-0.bg-gradient-to-b {
+  background: linear-gradient(to bottom, transparent, rgba(42, 30, 10, 0.15), transparent) !important;
+}
+
+/* WhyUs comparison cards — override hardcoded inline styles */
+.dark [style*="rgba(255,255,255,0.55)"] {
+  background: rgba(18, 20, 28, 0.9) !important;
+  border-color: rgba(200, 150, 92, 0.2) !important;
+}
+.dark [style*="rgba(255,235,235"] {
+  background: rgba(30, 15, 15, 0.8) !important;
+}
+.dark [style*="rgba(255,248,235"] {
+  background: rgba(20, 15, 8, 0.8) !important;
+}
+
+/* HowItWorks mobile cards */
+.dark [style*="rgba(255,255,255,0.6)"] {
+  background: rgba(18, 20, 28, 0.9) !important;
+}
+
+/* WhyUs reason cards */
+.dark [style*="rgba(255,255,255,0.6) 0%, rgba(255,248,235"] {
+  background: rgba(18, 20, 28, 0.9) !important;
+}
+
+/* Timeline strips */
+.dark [style*="rgba(154,92,46,0.04)"] {
+  background: rgba(30, 22, 10, 0.6) !important;
+}
+
+/* Arrow connector circles */
+.dark [style*="border: 2px solid white"] {
+  border-color: rgba(200, 150, 92, 0.4) !important;
+}
+
+/* Stats bar */
+.dark [style*="rgba(154,92,46,0.06)"] {
+  background: rgba(25, 18, 5, 0.7) !important;
+  border-color: rgba(200, 150, 92, 0.25) !important;
+}
+
+/* TrustBar */
+.dark .border-y {
+  border-color: rgba(200, 150, 92, 0.15) !important;
+}
+
+/* Footer */
+.dark footer {
+  background: hsl(220, 20%, 4%) !important;
+  border-top-color: rgba(200, 150, 92, 0.15) !important;
+}
+
+/* White text on gold gradient CTAs — keep them as-is (they look great in dark) */
+
+/* Modals */
+.dark [class*="bg-white rounded-3xl"] {
+  background: hsl(220, 20%, 8%) !important;
+}
+.dark .bg-white {
+  background-color: hsl(220, 20%, 8%) !important;
+}
+.dark [class*="bg-card"] {
+  background: hsl(var(--card)) !important;
+}
+
+/* Input fields in forms */
+.dark input, .dark select, .dark textarea {
+  background: hsl(220, 20%, 10%) !important;
+  border-color: rgba(200, 150, 92, 0.2) !important;
+  color: hsl(42, 30%, 88%) !important;
+}
+.dark input::placeholder, .dark textarea::placeholder {
+  color: rgba(200, 170, 120, 0.4) !important;
+}
+
+/* Borders */
+.dark .border-border {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Sticky navbar scrolled state */
+.dark [class*="bg-white/40"] {
+  background: rgba(10, 12, 20, 0.92) !important;
+}
+.dark [class*="bg-white/15"] {
+  background: rgba(10, 12, 20, 0.6) !important;
+}
+
+/* Mobile nav dropdown */
+.dark .bg-background {
+  background-color: hsl(var(--background)) !important;
+}
+
+/* Client portal & dashboard pages */
+.dark .bg-white\/80 {
+  background: rgba(10, 12, 20, 0.85) !important;
+}
+
+/* Overlay cards */
+.dark .overlay-card {
+  background: rgba(25, 20, 10, 0.6) !important;
+  border-color: rgba(200, 150, 92, 0.18) !important;
+}
+
+/* SectionDivider & other gradient strips */
+.dark [style*="background: linear-gradient(135deg,#6b3f1f"] {
+  opacity: 0.9;
+}
+
+/* Ensure text on dark stays legible */
+.dark p, .dark h1, .dark h2, .dark h3, .dark h4, .dark span:not([style*="color"]) {
+  color: inherit;
 }
