@@ -19,7 +19,7 @@ export default function Navbar() {
       document.body.style.backgroundImage = "none";
       document.body.style.backgroundColor = "hsl(220, 20%, 5%)";
     } else {
-      document.body.style.backgroundImage = "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/4c711bf35_generated_image.png')";
+      document.body.style.backgroundImage = "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png')";
       document.body.style.backgroundColor = "";
     }
   };
