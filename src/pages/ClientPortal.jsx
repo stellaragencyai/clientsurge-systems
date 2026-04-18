@@ -53,6 +53,17 @@ export default function ClientPortal() {
     if (projects.length > 0) setProject(projects[0]);
   };
 
+  // Real-time subscription at page level
+  useEffect(() => {
+    if (!project?.id) return;
+    const unsubscribe = base44.entities.ClientProject.subscribe((event) => {
+      if (event.id === project.id && event.type !== "delete") {
+        setProject(event.data);
+      }
+    });
+    return unsubscribe;
+  }, [project?.id]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
