@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Moon, Sun } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
 import LoginModal from "../forms/LoginModal";
 
@@ -8,6 +8,13 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  const toggleDark = () => {
+    const isDark = !darkMode;
+    setDarkMode(isDark);
+    document.documentElement.classList.toggle("dark", isDark);
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -113,6 +120,13 @@ export default function Navbar() {
 
         {/* CTA — pinned right */}
         <div className="hidden md:flex items-center gap-3 shrink-0">
+          <button
+            onClick={toggleDark}
+            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            className="w-9 h-9 rounded-full flex items-center justify-center border border-border bg-background/50 hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            {darkMode ? <Sun className="w-4 h-4 text-primary" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
+          </button>
           <button
             onClick={() => setShowLoginModal(true)}
             className="text-sm font-semibold text-foreground hover:text-primary focus:ring-2 focus:ring-primary focus:outline-none rounded px-3 py-2 transition-colors"
