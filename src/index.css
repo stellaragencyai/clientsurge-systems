@@ -87,16 +87,35 @@
   body {
     @apply text-foreground font-inter;
     background-color: hsl(var(--background));
-    background-image: url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png');
-    background-size: cover;
-    background-attachment: fixed;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-color: hsl(var(--background));
+    position: relative;
   }
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.18;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dark body::before {
+  display: none;
 }
 
 /* Sophisticated Container Effects */
