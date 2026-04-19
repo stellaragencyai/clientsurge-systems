@@ -173,10 +173,10 @@ function PricingCard({ plan, onOpenModal }) {
       style={{
         overflow: "visible",
         background: isHovered
-          ? "linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(255,248,235,0.7) 100%)"
+          ? "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%)"
           : plan.highlight
-            ? "linear-gradient(135deg, rgba(255,252,240,0.72) 0%, rgba(255,243,210,0.55) 100%)"
-            : "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(255,248,235,0.28) 100%)",
+            ? "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.75) 100%)"
+            : "linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.45) 100%)",
         backdropFilter: plan.highlight ? "blur(24px)" : "blur(16px)",
         WebkitBackdropFilter: plan.highlight ? "blur(24px)" : "blur(16px)",
         border: plan.highlight
