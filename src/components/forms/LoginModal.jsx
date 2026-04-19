@@ -16,7 +16,7 @@ export default function LoginModal({ onClose }) {
     setError("");
     setLoading(true);
     try {
-      base44.auth.redirectToLogin();
+      base44.auth.redirectToLogin("/admin");
     } catch (err) {
       setError("An error occurred. Please try again.");
     } finally {
