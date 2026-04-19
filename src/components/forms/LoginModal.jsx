@@ -118,7 +118,7 @@ export default function LoginModal({ onClose }) {
         <div className="px-8 pb-6 text-center">
           <button
             type="button"
-            onClick={() => window.open("https://base44.com/forgot-password", "_blank")}
+            onClick={() => window.open("https://app.base44.com", "_blank")}
             className="text-xs text-muted-foreground hover:text-primary hover:underline transition-colors"
           >
             Forgot your password?
