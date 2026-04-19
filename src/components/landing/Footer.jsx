@@ -70,7 +70,7 @@ export default function Footer() {
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <footer style={{ background: "hsl(40, 8%, 88%)" }} className="border-t border-primary/20">
+    <footer style={{ background: "hsl(40, 30%, 96%)" }} className="border-t border-primary/20">
 
       <div className="max-w-7xl mx-auto px-6 pt-14 pb-10">
 
