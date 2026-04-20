@@ -10,7 +10,7 @@ const testimonials = [
     after: "10+ consults/week",
     result: "5× booking increase",
     quote: "The system just runs — I don't touch it.",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=65&auto=format",
   },
   {
     name: "Carlos R.",
@@ -20,7 +20,7 @@ const testimonials = [
     after: "Close rate doubled",
     result: "ROI in under 7 days",
     quote: "It paid for itself in the first week.",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=65&auto=format",
   },
   {
     name: "Amanda T.",
@@ -30,7 +30,7 @@ const testimonials = [
     after: "Fully automated follow-up",
     result: "Team freed for growth",
     quote: "My team is focused on clients and I'm focused on growth.",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&q=65&auto=format",
   },
 ];
 
@@ -113,6 +113,7 @@ export default function Testimonials() {
                <img
                  src={t.avatar}
                  alt={t.name}
+                 loading="lazy"
                  className="w-16 h-16 rounded-full object-cover ring-2 ring-white shadow-md"
                />
                <div>
