@@ -86,6 +86,10 @@
       "type": "string",
       "title": "AI Generated Messages (JSON)"
     },
+    "notes": {
+      "type": "string",
+      "title": "Internal Notes / Activity Log"
+    },
     "step_twilio": {
       "type": "boolean",
       "title": "Step 1: Twilio Configured",
