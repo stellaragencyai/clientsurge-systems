@@ -10,7 +10,7 @@ export default function MedSpaFinalCTA() {
       {/* Background image */}
       <div className="absolute inset-0">
         <img
-          src="https://images.unsplash.com/photo-1552693673-1bf958298935?w=1600&q=80"
+          src="https://images.unsplash.com/photo-1552693673-1bf958298935?w=1000&q=60&auto=format"
           alt="Med spa ambiance"
           className="w-full h-full object-cover opacity-20"
         />

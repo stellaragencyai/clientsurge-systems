@@ -33,7 +33,7 @@ export default function MedSpaHero() {
         subtitle="If your med spa is getting inquiries but not turning them into bookings, this system fixes that instantly."
         description="Designed to capture leads before competitors respond."
         backgroundType="image"
-        backgroundImage="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1920&q=90"
+        backgroundImage="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1280&q=75&auto=format"
         primaryCTA={{
           label: "Book a 10-Min Demo",
           onClick: () => setShowModal(true),

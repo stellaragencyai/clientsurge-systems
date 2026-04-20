@@ -26,7 +26,7 @@ export default function MedSpaSpecific() {
           <div className="relative">
             <div className="rounded-2xl overflow-hidden shadow-lg">
               <img
-                src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=85"
+                src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=70&auto=format"
                 alt="Luxury med spa interior"
                 loading="lazy"
                 className="w-full h-80 object-cover"
@@ -34,7 +34,7 @@ export default function MedSpaSpecific() {
             </div>
             <div className="absolute -bottom-6 -right-4 w-40 h-40 rounded-2xl overflow-hidden shadow-xl border-4 border-white hidden md:block">
               <img
-                src="https://images.unsplash.com/photo-1552693673-1bf958298935?w=400&q=85"
+                src="https://images.unsplash.com/photo-1552693673-1bf958298935?w=300&q=70&auto=format"
                 alt="Med spa treatment"
                 loading="lazy"
                 className="w-full h-full object-cover"
