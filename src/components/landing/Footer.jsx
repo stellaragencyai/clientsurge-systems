@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowUp, Mail } from "lucide-react";
+import { ArrowUp, Mail, Phone } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const navColumns = [
@@ -59,7 +59,7 @@ export default function Footer() {
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <footer style={{ background: "hsl(40, 8%, 88%)" }} className="border-t border-primary/20">
+    <footer className="bg-background border-t border-primary/20">
       <div className="max-w-7xl mx-auto px-6 pt-14 pb-10">
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-2 mb-3">
@@ -106,6 +106,13 @@ export default function Footer() {
               </a>
             </span>
             <span className="hidden sm:inline text-foreground/20">&middot;</span>
+            <span className="flex items-center gap-1.5">
+              <Phone className="w-3 h-3" />
+              <a href="tel:+16025874608" className="hover:text-foreground hover:underline focus:outline-none transition-colors">
+                (602) 587-4608
+              </a>
+            </span>
+            <span className="hidden sm:inline text-foreground/20">&middot;</span>
             <span>Phoenix, Arizona</span>
           </div>
 
@@ -135,3 +142,4 @@ export default function Footer() {
     </footer>
   );
 }
+

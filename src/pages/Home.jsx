@@ -19,7 +19,7 @@ export default function Home() {
   useEffect(() => {
     document.title = "ClientSurge Systems | AI Automation for Med Spas & Local Businesses";
     const metaDesc = document.querySelector('meta[name="description"]');
-    if (metaDesc) metaDesc.setAttribute('content', 'Done-for-you AI automation that captures leads, responds instantly, and books more appointments — for med spas and local service businesses in Phoenix, AZ.');
+    if (metaDesc) metaDesc.setAttribute('content', 'Done-for-you AI automation that captures leads, responds instantly, and books more appointments for med spas and local service businesses in Phoenix, AZ.');
   }, []);
 
   return (

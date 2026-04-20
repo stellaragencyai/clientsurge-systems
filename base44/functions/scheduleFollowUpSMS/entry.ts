@@ -3,46 +3,46 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { event } = await req.json();
 
-    // Trigger: 15 minutes after lead creation
-    if (event.type !== 'create' || event.entity_name !== 'Leads') {
-      return Response.json({ success: true });
-    }
+    // Find leads that are in "Contacted" status and were created 10–20 min ago
+    const now = new Date();
+    const tenMinAgo = new Date(now.getTime() - 10 * 60 * 1000).toISOString();
+    const twentyMinAgo = new Date(now.getTime() - 20 * 60 * 1000).toISOString();
 
-    const lead = event.data;
-
-    if (!lead || !lead.id || !lead.phone) {
-      return Response.json({ success: true });
-    }
-
-    // Only send if status is still "Contacted" (no reply yet)
-    if (lead.status !== 'Contacted') {
-      return Response.json({ success: true });
-    }
-
-    // Check if follow-up already sent
-    const existingFollowUp = await base44.entities.Messages.filter({
-      lead_id: lead.id,
-      channel: 'sms',
-      message_text: 'Just checking — still interested?',
+    const leads = await base44.asServiceRole.entities.Leads.filter({
+      status: 'Contacted',
     });
 
-    if (existingFollowUp.length > 0) {
-      return Response.json({ success: true, skipped: true });
-    }
-
-    // Send follow-up SMS
-    const firstName = lead.full_name ? lead.full_name.split(' ')[0] : 'there';
-    const followUpMessage = 'Just checking — still interested?';
-
-    await base44.functions.invoke('sendSMS', {
-      phone: lead.phone,
-      message: followUpMessage,
-      leadId: lead.id,
+    // Filter to leads created in the 10–20 minute window
+    const eligibleLeads = leads.filter(lead => {
+      if (!lead.phone || !lead.created_date) return false;
+      const created = new Date(lead.created_date).toISOString();
+      return created >= twentyMinAgo && created <= tenMinAgo;
     });
 
-    return Response.json({ success: true, followUpSent: true });
+    let sent = 0;
+
+    for (const lead of eligibleLeads) {
+      // Check if follow-up already sent
+      const existing = await base44.asServiceRole.entities.Messages.filter({
+        lead_id: lead.id,
+        channel: 'sms',
+        message_text: 'Just checking — still interested?',
+      });
+
+      if (existing.length > 0) continue;
+
+      // Send follow-up SMS
+      await base44.functions.invoke('sendSMS', {
+        phone: lead.phone,
+        message: 'Just checking — still interested?',
+        leadId: lead.id,
+      });
+
+      sent++;
+    }
+
+    return Response.json({ success: true, sent, eligible: eligibleLeads.length });
   } catch (error) {
     console.error('scheduleFollowUpSMS error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });

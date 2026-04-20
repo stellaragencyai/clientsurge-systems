@@ -174,6 +174,14 @@ Deno.serve(async (req) => {
       },
     });
 
+    await base44.asServiceRole.entities.DemoRequest.create({
+      lead_id: lead.id,
+      scheduled_date: payload.scheduled_date,
+      scheduled_time: payload.scheduled_time,
+      status: 'scheduled',
+      notes: payload.biggest_issue || undefined,
+    });
+
     const warnings: string[] = [];
 
     const sideEffects = [

@@ -30,7 +30,15 @@ export default function ClientPortal() {
       // Find project by client email
       const projects = await base44.entities.ClientProject.filter({ client_email: me.email });
       if (projects.length === 0) {
-        setNotFound(true);
+        // Auto-create a project for this user so the portal is always accessible
+        const newProject = await base44.entities.ClientProject.create({
+          client_email: me.email,
+          client_name: me.full_name || me.email,
+          business_name: me.full_name ? `${me.full_name}'s Business` : me.email,
+          plan: "Starter System",
+          step_onboarding: "pending",
+        });
+        setProject(newProject);
       } else {
         setProject(projects[0]);
       }
@@ -44,6 +52,17 @@ export default function ClientPortal() {
     const projects = await base44.entities.ClientProject.filter({ client_email: user.email });
     if (projects.length > 0) setProject(projects[0]);
   };
+
+  // Real-time subscription at page level
+  useEffect(() => {
+    if (!project?.id) return;
+    const unsubscribe = base44.entities.ClientProject.subscribe((event) => {
+      if (event.id === project.id && event.type !== "delete") {
+        setProject(event.data);
+      }
+    });
+    return unsubscribe;
+  }, [project?.id]);
 
   if (loading) {
     return (

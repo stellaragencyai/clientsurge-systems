@@ -137,28 +137,54 @@ export default function Industries() {
               key={i}
               onClick={() => setSelected(ind)}
               className="group relative overflow-hidden cursor-pointer text-left focus:outline-none"
-              style={{ minHeight: "448px" }}
+              style={{ minHeight: "358px" }}
             >
-              {/* Full image */}
+              {/* Full image — no zoom */}
               <img
                 src={ind.image}
                 alt={`${ind.name} - ${ind.problem}`}
                 loading="lazy"
-                className="w-full h-full object-cover absolute inset-0 transition-transform duration-700 group-hover:scale-105"
-                style={{ minHeight: "448px" }}
+                className="w-full h-full object-cover absolute inset-0"
+                style={{ minHeight: "358px" }}
               />
-              {/* Gradient overlay — stronger at bottom for title legibility */}
-              <div className="absolute inset-0 transition-opacity duration-300" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.75) 100%)" }} />
-              {/* Hover overlay */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: "rgba(154,92,46,0.18)" }} />
 
-              {/* Title at bottom */}
-              <div className="absolute bottom-0 left-0 right-0 px-6 py-5">
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 transition-opacity duration-300" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.72) 100%)" }} />
+
+              {/* Animated gold shimmer border on hover */}
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none"
+                style={{
+                  boxShadow: "inset 0 0 0 2px rgba(200,150,92,0.7)",
+                  background: "linear-gradient(135deg, rgba(200,150,92,0.08) 0%, transparent 50%, rgba(200,150,92,0.06) 100%)",
+                }}
+              />
+
+              {/* Title at bottom — scrolls up with the drawer */}
+              <div
+                className="absolute bottom-0 left-0 right-0 transition-transform duration-800 ease-out group-hover:-translate-y-[100px]"
+                style={{ padding: "0 24px 16px", transitionDuration: "800ms" }}
+              >
                 <h3 className="text-base font-bold text-white leading-snug drop-shadow-lg">
                   {ind.name}
                 </h3>
-                <p className="text-xs text-white/70 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
-                  Click to learn more →
+              </div>
+
+              {/* Glass drawer — slides up from below, title is part of it */}
+              <div
+                className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform ease-out"
+                style={{ transitionDuration: "800ms" }}
+                style={{
+                  background: "rgba(15,14,12,0.72)",
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                  borderTop: "1px solid rgba(200,150,92,0.35)",
+                  padding: "16px 24px 20px",
+                }}
+              >
+                <p className="text-xs text-white/60 leading-relaxed mb-3">{ind.problem}</p>
+                <p className="text-xs font-semibold flex items-center gap-1" style={{ color: "#f5d9a8" }}>
+                  Click to see the full solution →
                 </p>
               </div>
             </button>

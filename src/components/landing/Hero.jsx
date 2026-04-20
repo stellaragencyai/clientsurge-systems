@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import HeroSection from "./HeroSection";
-import StatCounter from "./StatCounter";
 import DemoBookingModal from "../forms/DemoBookingModal";
 
 const TICKER_EVENTS = [
@@ -85,7 +84,6 @@ export default function Hero() {
         }}
         trustBadges={["Live in 5-7 days", "Month-to-month", "Fully done-for-you"]}
       >
-        <StatCounter />
         <div className="mt-10 flex items-center justify-center">
           <LiveTicker />
         </div>

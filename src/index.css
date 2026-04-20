@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;1,9..40,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,77 +6,77 @@
 
 @layer base {
   :root {
-    --font-inter: 'DM Sans', sans-serif;
-    --font-display: 'Cormorant Garamond', serif;
+    --font-inter: 'Inter', sans-serif;
+    --font-display: 'Playfair Display', serif;
 
-    --background: 40 8% 88%;
-    --foreground: 220 20% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 10%;
+    --background: 0 0% 100%;
+    --foreground: 30 25% 15%;
+    --card: 40 30% 98%;
+    --card-foreground: 30 25% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 10%;
-    --primary: 42 80% 38%;
+    --popover-foreground: 30 25% 15%;
+    --primary: 33 72% 40%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 40 15% 95%;
-    --secondary-foreground: 220 20% 10%;
-    --muted: 40 10% 94%;
-    --muted-foreground: 220 10% 45%;
-    --accent: 42 80% 38%;
+    --secondary: 40 40% 94%;
+    --secondary-foreground: 30 25% 15%;
+    --muted: 40 30% 96%;
+    --muted-foreground: 30 15% 45%;
+    --accent: 33 72% 40%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 40 10% 88%;
-    --input: 40 10% 88%;
-    --ring: 42 80% 38%;
-    --chart-1: 42 80% 38%;
+    --border: 40 25% 88%;
+    --input: 40 25% 88%;
+    --ring: 33 72% 40%;
+    --chart-1: 33 72% 40%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 30 25% 15%;
+    --sidebar-primary: 33 72% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 40% 94%;
+    --sidebar-accent-foreground: 30 25% 15%;
+    --sidebar-border: 40 25% 88%;
+    --sidebar-ring: 33 72% 40%;
   }
 
   .dark {
-    --background: 220 20% 6%;
-    --foreground: 40 20% 95%;
-    --card: 220 20% 8%;
-    --card-foreground: 40 20% 95%;
-    --popover: 220 20% 8%;
-    --popover-foreground: 40 20% 95%;
-    --primary: 42 80% 45%;
-    --primary-foreground: 220 20% 6%;
-    --secondary: 220 15% 12%;
-    --secondary-foreground: 40 20% 95%;
-    --muted: 220 15% 14%;
-    --muted-foreground: 40 10% 55%;
-    --accent: 42 80% 45%;
-    --accent-foreground: 220 20% 6%;
+    --background: 28 20% 8%;
+    --foreground: 40 40% 92%;
+    --card: 28 18% 11%;
+    --card-foreground: 40 40% 92%;
+    --popover: 28 18% 11%;
+    --popover-foreground: 40 40% 92%;
+    --primary: 33 75% 52%;
+    --primary-foreground: 28 20% 8%;
+    --secondary: 28 15% 16%;
+    --secondary-foreground: 40 40% 92%;
+    --muted: 28 15% 13%;
+    --muted-foreground: 38 20% 55%;
+    --accent: 33 75% 52%;
+    --accent-foreground: 28 20% 8%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 16%;
-    --input: 220 15% 16%;
-    --ring: 42 80% 45%;
-    --chart-1: 220 70% 50%;
+    --border: 28 15% 18%;
+    --input: 28 15% 18%;
+    --ring: 33 75% 52%;
+    --chart-1: 33 75% 52%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 28 20% 8%;
+    --sidebar-foreground: 40 40% 92%;
+    --sidebar-primary: 33 75% 52%;
+    --sidebar-primary-foreground: 28 20% 8%;
+    --sidebar-accent: 28 15% 16%;
+    --sidebar-accent-foreground: 40 40% 92%;
+    --sidebar-border: 28 15% 18%;
+    --sidebar-ring: 33 75% 52%;
   }
 }
 
@@ -86,11 +86,34 @@
   }
   body {
     @apply bg-background text-foreground font-inter;
+    position: relative;
   }
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+.dark body::before {
+  display: none;
 }
 
 /* Sophisticated Container Effects */
@@ -153,4 +176,148 @@ html {
 
 .animate-fade-out {
   animation: fadeOut 0.4s ease-out forwards;
+}
+
+/* ============================================
+   DARK MODE OVERRIDES
+   Handles components with hardcoded inline styles
+   Only active when .dark is on <html>
+   ============================================ */
+
+/* Body / background */
+.dark body {
+  background-image: none !important;
+  background-color: hsl(28, 20%, 8%) !important;
+}
+
+/* Navbar */
+.dark nav {
+  background: rgba(10, 12, 20, 0.85) !important;
+  border-bottom-color: rgba(200, 150, 92, 0.15) !important;
+}
+
+/* Hero section — force dark bg so text is visible */
+.dark section {
+  background: transparent;
+}
+
+/* Cards with white/cream hardcoded backgrounds */
+.dark [style*="rgba(255,255,255"] {
+  background: rgba(20, 22, 30, 0.85) !important;
+}
+
+/* Problem/Solution section background blobs */
+.dark .absolute.inset-0.bg-gradient-to-b {
+  background: linear-gradient(to bottom, transparent, rgba(42, 30, 10, 0.15), transparent) !important;
+}
+
+/* WhyUs comparison cards — override hardcoded inline styles */
+.dark [style*="rgba(255,255,255,0.55)"] {
+  background: rgba(18, 20, 28, 0.9) !important;
+  border-color: rgba(200, 150, 92, 0.2) !important;
+}
+.dark [style*="rgba(255,235,235"] {
+  background: rgba(30, 15, 15, 0.8) !important;
+}
+.dark [style*="rgba(255,248,235"] {
+  background: rgba(20, 15, 8, 0.8) !important;
+}
+
+/* HowItWorks mobile cards */
+.dark [style*="rgba(255,255,255,0.6)"] {
+  background: rgba(18, 20, 28, 0.9) !important;
+}
+
+/* WhyUs reason cards */
+.dark [style*="rgba(255,255,255,0.6) 0%, rgba(255,248,235"] {
+  background: rgba(18, 20, 28, 0.9) !important;
+}
+
+/* Timeline strips */
+.dark [style*="rgba(154,92,46,0.04)"] {
+  background: rgba(30, 22, 10, 0.6) !important;
+}
+
+/* Arrow connector circles */
+.dark [style*="border: 2px solid white"] {
+  border-color: rgba(200, 150, 92, 0.4) !important;
+}
+
+/* Stats bar */
+.dark [style*="rgba(154,92,46,0.06)"] {
+  background: rgba(25, 18, 5, 0.7) !important;
+  border-color: rgba(200, 150, 92, 0.25) !important;
+}
+
+/* TrustBar */
+.dark .border-y {
+  border-color: rgba(200, 150, 92, 0.15) !important;
+}
+
+/* Footer */
+.dark footer {
+  background: hsl(28, 20%, 6%) !important;
+  border-top-color: rgba(200, 150, 92, 0.15) !important;
+}
+
+/* White text on gold gradient CTAs — keep them as-is (they look great in dark) */
+
+/* Modals */
+.dark [class*="bg-white rounded-3xl"] {
+  background: hsl(220, 20%, 8%) !important;
+}
+.dark .bg-white {
+  background-color: hsl(220, 20%, 8%) !important;
+}
+.dark [class*="bg-card"] {
+  background: hsl(var(--card)) !important;
+}
+
+/* Input fields in forms */
+.dark input, .dark select, .dark textarea {
+  background: hsl(220, 20%, 10%) !important;
+  border-color: rgba(200, 150, 92, 0.2) !important;
+  color: hsl(42, 30%, 88%) !important;
+}
+.dark input::placeholder, .dark textarea::placeholder {
+  color: rgba(200, 170, 120, 0.4) !important;
+}
+
+/* Borders */
+.dark .border-border {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Sticky navbar scrolled state */
+.dark [class*="bg-white/40"] {
+  background: rgba(10, 12, 20, 0.92) !important;
+}
+.dark [class*="bg-white/15"] {
+  background: rgba(10, 12, 20, 0.6) !important;
+}
+
+/* Mobile nav dropdown */
+.dark .bg-background {
+  background-color: hsl(var(--background)) !important;
+}
+
+/* Client portal & dashboard pages */
+.dark .bg-white\/80 {
+  background: rgba(10, 12, 20, 0.85) !important;
+}
+
+/* Overlay cards */
+.dark .overlay-card {
+  background: rgba(25, 20, 10, 0.6) !important;
+  border-color: rgba(200, 150, 92, 0.18) !important;
+}
+
+/* SectionDivider & other gradient strips */
+.dark [style*="background: linear-gradient(135deg,#6b3f1f"] {
+  opacity: 0.9;
+}
+
+/* Ensure text on dark stays legible */
+.dark p, .dark h1, .dark h2, .dark h3, .dark h4, .dark span:not([style*="color"]) {
+  color: inherit;
 }

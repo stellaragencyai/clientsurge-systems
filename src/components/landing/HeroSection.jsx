@@ -24,12 +24,12 @@ export default function HeroSection({
     <section
       className="relative overflow-hidden"
       style={{
-        background: backgroundType === "image" ? "transparent" : backgroundGradient,
-        minHeight: backgroundType === "image" ? "100vh" : "auto",
-        paddingTop: backgroundType === "image" ? "0" : "80px",
-        paddingBottom: backgroundType === "image" ? "0" : "128px",
-        display: backgroundType === "image" ? "flex" : "block",
-        alignItems: backgroundType === "image" ? "center" : "auto",
+        background: "transparent",
+        minHeight: "100vh",
+        paddingTop: "0",
+        paddingBottom: "0",
+        display: "flex",
+        alignItems: "center",
       }}
     >
       {/* Background image if applicable */}
@@ -46,8 +46,8 @@ export default function HeroSection({
       )}
 
       {/* Content */}
-      <div className={`relative z-10 ${backgroundType === "image" ? "flex items-center justify-center w-full h-full" : ""}`} style={{padding: backgroundType === "image" ? "40px 24px" : "0"}}>
-        <div className={`${backgroundType === "image" ? "max-w-5xl" : "max-w-4xl"} mx-auto text-center ${backgroundType === "image" ? "pt-40 pb-32 md:pt-52 md:pb-40 px-6" : "px-4 md:px-6"}`}>
+      <div className="relative z-10 flex items-center justify-center w-full h-full" style={{padding: "40px 24px"}}>
+        <div className="max-w-4xl mx-auto text-center pt-24 pb-32 md:pt-28 md:pb-40 px-6">
           {/* Badge */}
           {badge && (
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/25 backdrop-blur-sm rounded-full px-4 py-1.5 mb-8">

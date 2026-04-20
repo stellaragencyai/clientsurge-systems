@@ -103,7 +103,7 @@ export default function WhyUs() {
         {/* ── Platform vs Our System ── */}
         <div className="grid md:grid-cols-[1fr_auto_1fr] gap-0 items-stretch max-w-4xl mx-auto mb-14">
           {/* Left — Platform */}
-          <div className="rounded-2xl p-7 flex flex-col gap-4" style={{ background: "rgba(180,40,40,0.04)", border: "1.5px solid rgba(180,40,40,0.18)" }}>
+          <div className="rounded-2xl p-7 flex flex-col gap-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,235,235,0.35) 100%)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", border: "1.5px solid rgba(180,40,40,0.2)", boxShadow: "0 4px 20px rgba(167,42,42,0.06), inset 0 1px 0 rgba(255,255,255,0.7)" }}>
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2 h-2 rounded-full bg-red-400" />
               <p className="text-xs font-black uppercase tracking-widest text-red-500/80">Any Other Platform</p>
@@ -126,7 +126,7 @@ export default function WhyUs() {
           </div>
 
           {/* Right — Our System */}
-          <div className="rounded-2xl p-7 flex flex-col gap-4" style={{ background: "rgba(154,92,46,0.06)", border: "1.5px solid rgba(154,92,46,0.28)" }}>
+          <div className="rounded-2xl p-7 flex flex-col gap-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,248,235,0.4) 100%)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", border: "1.5px solid rgba(154,92,46,0.28)", boxShadow: "0 4px 20px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.7)" }}>
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2 h-2 rounded-full" style={{ background: "#9a5c2e" }} />
               <p className="text-xs font-black uppercase tracking-widest" style={{ color: "#9a5c2e" }}>ClientSurge Systems</p>
@@ -154,16 +154,19 @@ export default function WhyUs() {
             return (
               <div
                 key={i}
-                className="group flex flex-col gap-3 p-5 rounded-2xl bg-white transition-all duration-300 hover:-translate-y-1"
+                className="group flex flex-col gap-3 p-5 rounded-2xl transition-all duration-300"
                 style={{
-                  boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-                  border: "1px solid rgba(154,92,46,0.12)",
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,248,235,0.38) 100%)",
+                  backdropFilter: "blur(14px)",
+                  WebkitBackdropFilter: "blur(14px)",
+                  boxShadow: "0 3px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
+                  border: "1px solid rgba(154,92,46,0.15)",
                   opacity: sectionVisible ? 1 : 0,
                   transform: sectionVisible ? "translateY(0)" : "translateY(20px)",
                   transition: `opacity 0.5s ease ${i * 80}ms, transform 0.5s ease ${i * 80}ms, box-shadow 0.3s ease, border-color 0.3s ease`,
                 }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.4)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(154,92,46,0.15)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.12)"; e.currentTarget.style.boxShadow = "0 2px 12px rgba(0,0,0,0.06)"; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.4)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(154,92,46,0.14), inset 0 1px 0 rgba(255,255,255,0.8)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.15)"; e.currentTarget.style.boxShadow = "0 3px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7)"; e.currentTarget.style.transform = "translateY(0)"; }}
               >
                 <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110" style={{ backgroundColor: "rgba(154,92,46,0.1)", border: "1.5px solid rgba(154,92,46,0.25)" }}>
                   <Icon className="w-4 h-4" style={{ color: "#9a5c2e" }} strokeWidth={1.75} />

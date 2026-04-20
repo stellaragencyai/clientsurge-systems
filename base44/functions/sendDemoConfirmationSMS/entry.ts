@@ -2,7 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   try {
-    const base44 = createClientFromRequest(req);
+    createClientFromRequest(req);
     const { phone, full_name, scheduled_date, scheduled_time } = await req.json();
 
     if (!phone || !scheduled_date || !scheduled_time) {
@@ -17,12 +17,12 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Twilio credentials not configured' }, { status: 500 });
     }
 
-    const message = `Hi ${full_name}! Your ApexFlow demo is confirmed for ${scheduled_date} at ${scheduled_time}. We'll send you the meeting link 24 hours before. Reply STOP to unsubscribe.`;
+    const message = `Hi ${full_name || 'there'}! Your ClientSurge Systems demo is confirmed for ${scheduled_date} at ${scheduled_time}. We'll send you the meeting link shortly. Reply STOP to unsubscribe.`;
 
     const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${btoa(`${accountSid}:${authToken}`)}`,
+        Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
@@ -33,6 +33,7 @@ Deno.serve(async (req) => {
     });
 
     const data = await response.json();
+
     if (response.status !== 201) {
       throw new Error(data.message || 'Failed to send SMS');
     }

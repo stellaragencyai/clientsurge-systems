@@ -22,6 +22,8 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   const [errors, setErrors] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
+  const [bookedSlots, setBookedSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -36,8 +38,22 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   };
 
-  const handleSchedulingChange = (e) => {
-    setScheduling((s) => ({ ...s, [e.target.name]: e.target.value }));
+  const handleSchedulingChange = async (e) => {
+    const { name, value } = e.target;
+    setScheduling((s) => ({ ...s, [name]: value }));
+    if (name === 'date' && value) {
+      setLoadingSlots(true);
+      setBookedSlots([]);
+      setScheduling((s) => ({ ...s, date: value, time: '' }));
+      try {
+        const res = await base44.functions.invoke('getBookedDemoSlots', { date: value });
+        setBookedSlots(res.data.booked_times || []);
+      } catch {
+        setBookedSlots([]);
+      } finally {
+        setLoadingSlots(false);
+      }
+    }
   };
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -292,26 +308,39 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-foreground mb-1.5">Select Time <span className="text-red-600">*</span></label>
+              <label className="block text-xs font-semibold text-foreground mb-1.5">
+                Select Time <span className="text-red-600">*</span>
+                {loadingSlots && <span className="ml-2 text-xs text-muted-foreground font-normal">Loading availability…</span>}
+              </label>
               <select
                 name="time"
                 value={scheduling.time}
                 onChange={handleSchedulingChange}
-                className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                disabled={!scheduling.date || loadingSlots}
+                className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition disabled:opacity-50 disabled:cursor-not-allowed ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
               >
-                <option value="">Choose a time…</option>
-                <option value="09:00">9:00 AM</option>
-                <option value="09:30">9:30 AM</option>
-                <option value="10:00">10:00 AM</option>
-                <option value="10:30">10:30 AM</option>
-                <option value="11:00">11:00 AM</option>
-                <option value="11:30">11:30 AM</option>
-                <option value="14:00">2:00 PM</option>
-                <option value="14:30">2:30 PM</option>
-                <option value="15:00">3:00 PM</option>
-                <option value="15:30">3:30 PM</option>
-                <option value="16:00">4:00 PM</option>
-                <option value="16:30">4:30 PM</option>
+                <option value="">{!scheduling.date ? 'Select a date first…' : 'Choose a time…'}</option>
+                {[
+                  { value: "09:00", label: "9:00 AM" },
+                  { value: "09:30", label: "9:30 AM" },
+                  { value: "10:00", label: "10:00 AM" },
+                  { value: "10:30", label: "10:30 AM" },
+                  { value: "11:00", label: "11:00 AM" },
+                  { value: "11:30", label: "11:30 AM" },
+                  { value: "14:00", label: "2:00 PM" },
+                  { value: "14:30", label: "2:30 PM" },
+                  { value: "15:00", label: "3:00 PM" },
+                  { value: "15:30", label: "3:30 PM" },
+                  { value: "16:00", label: "4:00 PM" },
+                  { value: "16:30", label: "4:30 PM" },
+                ].map(({ value, label }) => {
+                  const isBooked = bookedSlots.includes(value);
+                  return (
+                    <option key={value} value={value} disabled={isBooked}>
+                      {label}{isBooked ? ' — Booked' : ''}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 

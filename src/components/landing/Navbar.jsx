@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Moon, Sun } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
 import LoginModal from "../forms/LoginModal";
 
@@ -8,6 +8,21 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [showDemoModal, setShowDemoModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  const toggleDark = () => {
+    const isDark = !darkMode;
+    setDarkMode(isDark);
+    document.documentElement.classList.toggle("dark", isDark);
+    // Swap background wallpaper
+    if (isDark) {
+      document.body.style.backgroundImage = "none";
+      document.body.style.backgroundColor = "hsl(220, 20%, 5%)";
+    } else {
+      document.body.style.backgroundImage = "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png')";
+      document.body.style.backgroundColor = "";
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -114,6 +129,13 @@ export default function Navbar() {
         {/* CTA — pinned right */}
         <div className="hidden md:flex items-center gap-3 shrink-0">
           <button
+            onClick={toggleDark}
+            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            className="w-9 h-9 rounded-full flex items-center justify-center border border-border bg-background/50 hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            {darkMode ? <Sun className="w-4 h-4 text-primary" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
+          </button>
+          <button
             onClick={() => setShowLoginModal(true)}
             className="text-sm font-semibold text-foreground hover:text-primary focus:ring-2 focus:ring-primary focus:outline-none rounded px-3 py-2 transition-colors"
           >
@@ -163,6 +185,12 @@ export default function Navbar() {
             </a>
             )
           ))}
+          <button
+            onClick={() => { setOpen(false); setShowLoginModal(true); }}
+            className="w-full text-sm font-semibold text-foreground hover:text-primary border border-border rounded-full py-2 transition-colors"
+          >
+            Login
+          </button>
           <button onClick={() => { setOpen(false); setShowDemoModal(true); }} style={{display:"block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 14px rgba(120,70,20,0.35)",border:"none",cursor:"pointer",width:"100%"}}>
             <span style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"6px",height:"40px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"600",fontSize:"0.875rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
               Book a Demo

@@ -16,7 +16,7 @@ export default function LoginModal({ onClose }) {
     setError("");
     setLoading(true);
     try {
-      base44.auth.redirectToLogin();
+      base44.auth.redirectToLogin("/admin");
     } catch (err) {
       setError("An error occurred. Please try again.");
     } finally {
@@ -103,16 +103,26 @@ export default function LoginModal({ onClose }) {
             )}
           </button>
 
-          <p className="text-center text-xs text-muted-foreground">
-            Don't have an account?{" "}
-            <button
-              type="button"
-              onClick={() => setShowSignup(true)}
-              className="text-primary font-semibold hover:underline focus:outline-none"
+          <div className="flex flex-col items-center gap-2">
+            <a
+              href="https://base44.com/forgot-password"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-primary hover:underline transition-colors"
             >
-              Start onboarding
-            </button>
-          </p>
+              Forgot your password?
+            </a>
+            <p className="text-center text-xs text-muted-foreground">
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() => setShowSignup(true)}
+                className="text-primary font-semibold hover:underline focus:outline-none"
+              >
+                Start onboarding
+              </button>
+            </p>
+          </div>
         </form>
       </div>
       </div>
