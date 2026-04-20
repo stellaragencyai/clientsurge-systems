@@ -103,27 +103,27 @@ export default function LoginModal({ onClose }) {
             )}
           </button>
 
-          <p className="text-center text-xs text-muted-foreground">
-            Don't have an account?{" "}
-            <button
-              type="button"
-              onClick={() => setShowSignup(true)}
-              className="text-primary font-semibold hover:underline focus:outline-none"
+          <div className="flex flex-col items-center gap-2">
+            <a
+              href="https://base44.com/forgot-password"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-primary hover:underline transition-colors"
             >
-              Start onboarding
-            </button>
-          </p>
+              Forgot your password?
+            </a>
+            <p className="text-center text-xs text-muted-foreground">
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() => setShowSignup(true)}
+                className="text-primary font-semibold hover:underline focus:outline-none"
+              >
+                Start onboarding
+              </button>
+            </p>
+          </div>
         </form>
-
-        <div className="px-8 pb-6 text-center">
-          <button
-            type="button"
-            onClick={() => window.open("https://base44.com/forgot-password", "_blank")}
-            className="text-xs text-muted-foreground hover:text-primary hover:underline transition-colors"
-          >
-            Forgot your password?
-          </button>
-        </div>
       </div>
       </div>
     </div>,
