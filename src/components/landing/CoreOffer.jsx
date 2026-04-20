@@ -237,11 +237,19 @@ export default function CoreOffer() {
         {/* Header */}
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Package</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
-            The Complete System. Installed For You. Running in 7 Days.
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-foreground">
+            How the{" "}
+            <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.35)" }}>8-System</span>
+            {" "}Flow Works
           </h2>
-          <p className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-            We build, install, and run the system — so you get more bookings without doing the work.
+          {/* Gold accent divider */}
+          <div className="flex items-center justify-center gap-3 mt-5 mb-5">
+            <div style={{ height: "1px", width: "48px", background: "linear-gradient(to right, transparent, rgba(154,92,46,0.5))" }} />
+            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#9a5c2e" }} />
+            <div style={{ height: "1px", width: "48px", background: "linear-gradient(to left, transparent, rgba(154,92,46,0.5))" }} />
+          </div>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
+            Every system works together — capturing leads, responding instantly, following up automatically, and booking appointments without you lifting a finger.
           </p>
         </div>
 
@@ -313,17 +321,19 @@ export default function CoreOffer() {
             ))}
           </div>
           <div className="px-6 py-5 text-center border-t border-primary/15" style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}>
-            <p className="text-xs font-bold text-amber-300/70 uppercase tracking-widest mb-1">Everything Else</p>
-            <p className="text-lg font-bold text-amber-100">Automated Entirely</p>
+            <p className="text-xs font-bold text-amber-300/70 uppercase tracking-widest mb-1">The Complete System</p>
+            <p className="text-lg font-bold text-amber-100">Installed For You. Running in 7 Days.</p>
           </div>
         </div>
 
         {/* CTA */}
         <div className="pt-6 border-t border-border text-center">
-          <p className="text-foreground text-sm font-semibold mb-2">
-            If you're getting leads but not converting them, this is the fix.
+          <p className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-1">
+            The Complete System.{" "}
+            <span style={{ color: "#9a5c2e" }}>Installed For You.</span>{" "}
+            Running in 7 Days.
           </p>
-          <p className="text-xs text-muted-foreground mb-6">Click any card above to explore what each system does.</p>
+          <p className="text-xs text-muted-foreground mb-6 mt-2">Click any card above to explore what each system does.</p>
           <button
             onClick={() => setShowDemoModal(true)}
             style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.35)", border: "none", cursor: "pointer", transition: "box-shadow 0.5s ease" }}
@@ -331,7 +341,7 @@ export default function CoreOffer() {
             onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"; }}
           >
             <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "52px", padding: "0 36px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
-              Book a Free 15-Min Demo
+              Start Today
               <ArrowRight className="w-4 h-4" />
             </span>
           </button>
