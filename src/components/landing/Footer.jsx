@@ -7,12 +7,9 @@ const navColumns = [
     title: "Industries",
     links: [
       { label: "Med Spas & Clinics", href: "/med-spa" },
-      // FIX 3: Other industries link to the section — labels now clarify it's a preview
+      { label: "Dental", href: "/#industries" },
+      { label: "Tanning Salons", href: "/#industries" },
       { label: "Wellness Studios", href: "/#industries" },
-      { label: "Real Estate", href: "/#industries" },
-      { label: "HVAC & Home Services", href: "/#industries" },
-      { label: "Contractors & Trades", href: "/#industries" },
-      { label: "Local Service Businesses", href: "/#industries" },
     ],
   },
   {
@@ -130,6 +127,7 @@ export default function Footer() {
                 (602) 587-4608
               </a>
             </span>
+            <span className="hidden sm:inline text-foreground/20">·</span>
             <span className="hidden sm:inline text-foreground/20">·</span>
             <span>Phoenix, Arizona</span>
           </div>

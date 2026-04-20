@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowRight } from "lucide-react";
-import { base44 } from "@/api/base44Client";
 import HeroSection from "./HeroSection";
-import StatCounter from "./StatCounter";
 import DemoBookingModal from "../forms/DemoBookingModal";
 
 const TICKER_EVENTS = [
@@ -86,7 +84,6 @@ export default function Hero() {
         }}
         trustBadges={["No long-term contracts", "Live in under 7 days", "Fully done-for-you"]}
       >
-        <StatCounter />
         <div className="mt-10 flex items-center justify-center">
           <LiveTicker />
         </div>

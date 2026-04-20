@@ -8,7 +8,6 @@ import WhyUs from "../components/landing/WhyUs";
 import IntegrationsBadges from "../components/landing/IntegrationsBadges";
 import HowItWorks from "../components/landing/HowItWorks";
 import Benefits from "../components/landing/Benefits";
-import Testimonials from "../components/landing/Testimonials";
 import DetailedProcess from "../components/landing/DetailedProcess";
 import FounderSection from "../components/landing/FounderSection";
 import CoreOffer from "../components/landing/CoreOffer";
@@ -49,8 +48,6 @@ export default function Home() {
       <SectionDivider stat="Done-for-you." label="We build it. You get the bookings." />
       <FadeIn><FounderSection /></FadeIn>
       <FadeIn><CoreOffer /></FadeIn>
-      <SectionDivider stat="Real results." label="From real businesses like yours." />
-      <FadeIn><Testimonials /></FadeIn>
       <FadeIn><AIResponseDemo /></FadeIn>
       <FadeIn><LiveAutomationFeed /></FadeIn>
       <FadeIn><LeadValueCalculator /></FadeIn>

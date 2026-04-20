@@ -30,7 +30,7 @@ export default function FounderSection() {
               >
                 <img
                   src="https://images.unsplash.com/photo-1556157382-97eda2d62296?w=600&q=90"
-                  alt="Neo — Founder of ClientSurge Systems"
+                  alt="Nolan — Founder of ClientSurge Systems"
                   className="w-full h-full object-cover object-top"
                   loading="lazy"
                 />
@@ -40,7 +40,7 @@ export default function FounderSection() {
             {/* Right: Message */}
             <div className="flex flex-col justify-center p-10 md:p-12">
               <h3 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-5 leading-tight">
-                I'm Neo — Founder of ClientSurge Systems
+                I'm Nolan — Founder of ClientSurge Systems
               </h3>
               <p className="text-base text-muted-foreground leading-relaxed mb-8">
                 I built this after watching local businesses spend thousands attracting leads and lose half of them to slow follow-up. Every system is custom, done-for-you, and designed to pay for itself within 30 days.
@@ -50,7 +50,7 @@ export default function FounderSection() {
                 style={{ borderTop: "1px solid rgba(154,92,46,0.2)" }}
               >
                 <p className="text-sm font-semibold" style={{ color: "#9a5c2e" }}>
-                  — Neo, Founder · ClientSurge Systems · Phoenix, AZ
+                  — Nolan, Founder · ClientSurge Systems · Phoenix, AZ
                 </p>
               </div>
             </div>

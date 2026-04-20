@@ -66,7 +66,7 @@ export default function SamChatWidget() {
           className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-foreground text-background px-5 py-3 rounded-full shadow-xl hover:bg-foreground/90 transition-all font-semibold text-sm mb-14 sm:mb-0"
         >
           <MessageSquare className="w-4 h-4" />
-          Chat with Sam
+          Chat with us
         </button>
       )}
 
