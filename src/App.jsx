@@ -27,6 +27,7 @@ import Book from './pages/Book';
 import Success from './pages/Success';
 import LegalPage from './pages/LegalPage';
 import Contact from './pages/Contact';
+import AdminOnboarding from './pages/AdminOnboarding';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -75,6 +76,7 @@ const AuthenticatedApp = () => {
       <Route path="/client-portal" element={<ClientPortal />} />
       <Route path="/legal/:type" element={<LegalPage />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/admin/onboarding" element={<AdminOnboarding />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

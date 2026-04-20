@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'leads', label: 'Leads', icon: Users },
   { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
+  { id: 'onboarding', label: 'Client Onboarding', icon: ClipboardList },
   { id: 'automations', label: '9 Automations', icon: Zap },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   { id: 'templates', label: 'Templates', icon: MessageSquare },
@@ -57,6 +58,9 @@ export default function AdminDashboard() {
         return <ClientProjectsPanel />;
       case 'automations':
         return <AutomationsPanel />;
+      case 'onboarding':
+        navigate('/admin/onboarding');
+        return null;
       case 'settings':
         return <AdminSettingsPanel />;
       case 'overview':
