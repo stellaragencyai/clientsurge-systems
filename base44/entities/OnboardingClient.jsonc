@@ -82,6 +82,10 @@
       ],
       "default": "Onboarding"
     },
+    "generated_messages": {
+      "type": "string",
+      "title": "AI Generated Messages (JSON)"
+    },
     "step_twilio": {
       "type": "boolean",
       "title": "Step 1: Twilio Configured",
