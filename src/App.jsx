@@ -29,8 +29,16 @@ import LegalPage from './pages/LegalPage';
 import Contact from './pages/Contact';
 import AdminOnboarding from './pages/AdminOnboarding';
 
+// Public routes that do NOT require authentication
+const PUBLIC_PATHS = ["/", "/med-spa", "/start", "/book", "/success", "/legal", "/contact", "/test-option-1", "/test-option-2", "/test-option-3"];
+
+const isPublicPath = (pathname) => {
+  return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + "/"));
+};
+
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const pathname = window.location.pathname;
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -46,9 +54,11 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
+      // Only redirect to login for protected routes — public pages load freely
+      if (!isPublicPath(pathname)) {
+        navigateToLogin();
+        return null;
+      }
     }
   }
 
