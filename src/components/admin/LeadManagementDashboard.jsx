@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Search, Filter, Trash2, Edit2, BarChart3 } from 'lucide-react';
+import { Search, Trash2, Edit2 } from 'lucide-react';
+
+const intakeTypeLabels = {
+  lead_capture: 'Lead Capture',
+  contact_inquiry: 'Contact Inquiry',
+  demo_booking: 'Demo Booking',
+};
+
+const sourceLabels = {
+  website: 'Website',
+};
 
 export default function LeadManagementDashboard() {
   const [leads, setLeads] = useState([]);
@@ -72,6 +82,9 @@ export default function LeadManagementDashboard() {
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
 
+  const formatIntakeType = (value) => intakeTypeLabels[value] || value || 'Unknown';
+  const formatSource = (value) => sourceLabels[value] || value || 'Unknown';
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -134,6 +147,7 @@ export default function LeadManagementDashboard() {
                 <th className="px-6 py-3 text-left font-semibold text-foreground">Name</th>
                 <th className="px-6 py-3 text-left font-semibold text-foreground">Contact</th>
                 <th className="px-6 py-3 text-left font-semibold text-foreground">Status</th>
+                <th className="px-6 py-3 text-left font-semibold text-foreground">Intake</th>
                 <th className="px-6 py-3 text-left font-semibold text-foreground">Score</th>
                 <th className="px-6 py-3 text-left font-semibold text-foreground">Created</th>
                 <th className="px-6 py-3 text-center font-semibold text-foreground">Actions</th>
@@ -141,9 +155,9 @@ export default function LeadManagementDashboard() {
             </thead>
             <tbody className="divide-y divide-border">
               {loading ? (
-                <tr><td colSpan="6" className="px-6 py-8 text-center text-muted-foreground">Loading...</td></tr>
+                <tr><td colSpan="7" className="px-6 py-8 text-center text-muted-foreground">Loading...</td></tr>
               ) : filtered.length === 0 ? (
-                <tr><td colSpan="6" className="px-6 py-8 text-center text-muted-foreground">No leads found</td></tr>
+                <tr><td colSpan="7" className="px-6 py-8 text-center text-muted-foreground">No leads found</td></tr>
               ) : (
                 filtered.map((lead) => (
                   <tr key={lead.id} className="hover:bg-muted/50 transition-colors">
@@ -153,6 +167,12 @@ export default function LeadManagementDashboard() {
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(lead.status)}`}>
                         {lead.status}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      <div className="space-y-1">
+                        <p className="text-foreground">{formatIntakeType(lead.intake_type)}</p>
+                        <p className="text-xs text-muted-foreground">{formatSource(lead.source)}</p>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getScoreColor(lead.lead_score)}`}>

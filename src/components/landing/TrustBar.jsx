@@ -6,31 +6,31 @@ const items = [
     icon: Zap,
     stat: "Under 60 sec",
     label: "Lead response time",
-    story: "Our systems fire an automated, personalized reply the moment a lead submits a form or calls — day, night, or weekend.",
+    story: "Your leads get an immediate response the moment they call or submit a form, even after hours.",
   },
   {
     icon: TrendingUp,
-    stat: "3× avg. bookings",
-    label: "Increase for clients",
-    story: "A med spa in Miami went from 14% to 61% lead-to-consultation conversion within 30 days of going live.",
+    stat: "More booked consults",
+    label: "From the leads you already generate",
+    story: "The system focuses on the biggest leak first: slow follow-up that lets ready-to-buy prospects go cold.",
   },
   {
     icon: CalendarCheck,
-    stat: "5–7 days",
+    stat: "5-7 days",
     label: "Average setup time",
-    story: "We handle every step of the build. You attend one onboarding call. Your system is live in less than a week.",
+    story: "We handle the build and setup. You join one onboarding call and review the finished system before launch.",
   },
   {
     icon: Building2,
-    stat: "Med Spas · HVAC · RE",
-    label: "Industries served",
-    story: "We've built systems for appointment-based businesses across aesthetics, home services, real estate, and more.",
+    stat: "Med spas + local services",
+    label: "Built for appointment-driven teams",
+    story: "This works best for businesses where missed follow-up means missed appointments and lost revenue.",
   },
   {
     icon: ShieldCheck,
     stat: "Month-to-month",
     label: "No lock-in contracts",
-    story: "We earn your business every month. If the system isn't performing, you can leave. Simple as that.",
+    story: "The offer is simple: no long-term contract and no need to hire additional front-desk or follow-up staff first.",
   },
 ];
 
@@ -48,7 +48,6 @@ export default function TrustBar() {
   return (
     <section ref={ref} className="py-12 bg-gradient-to-b from-card to-background border-y border-border/50">
       <div className="max-w-6xl mx-auto px-6">
-        {/* Desktop */}
         <div className="hidden md:flex items-stretch justify-center divide-x divide-border">
           {items.map((item, i) => {
             const Icon = item.icon;
@@ -65,9 +64,7 @@ export default function TrustBar() {
                 <span className="font-display text-xl font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
                   {item.stat}
                 </span>
-                <span className="text-[11px] text-muted-foreground leading-tight">
-                   {item.label}
-                </span>
+                <span className="text-[11px] text-muted-foreground leading-tight">{item.label}</span>
                 {tooltip === i && (
                   <div className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-64 bg-foreground text-background text-xs rounded-xl px-4 py-3 shadow-xl z-20 text-left leading-relaxed">
                     {item.story}
@@ -79,26 +76,21 @@ export default function TrustBar() {
           })}
         </div>
 
-        {/* Mobile: auto-scrolling ticker */}
-        <div className="md:hidden overflow-hidden relative">
-          <div className="flex gap-6 animate-trust-ticker" style={{ width: "max-content" }}>
-            {[...items, ...items].map((item, i) => {
-              const Icon = item.icon;
-              return (
-                <div key={i} className="flex flex-col items-center gap-1.5 px-5 py-3 bg-card border border-border rounded-2xl flex-shrink-0 w-36 text-center">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-primary" />
-                  </div>
-                  <span className="font-display text-base font-semibold text-foreground leading-tight">{item.stat}</span>
-                  <span className="text-[10px] text-muted-foreground leading-tight">{item.label}</span>
+        <div className="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {items.map((item, i) => {
+            const Icon = item.icon;
+            return (
+              <div key={i} className="flex items-start gap-3 px-4 py-4 bg-card border border-border rounded-2xl">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-4 h-4 text-primary" />
                 </div>
-              );
-            })}
-          </div>
-          <style>{`
-            @keyframes trust-ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-            .animate-trust-ticker { animation: trust-ticker 18s linear infinite; }
-          `}</style>
+                <div className="min-w-0">
+                  <p className="font-display text-base font-semibold text-foreground leading-tight">{item.stat}</p>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed mt-1">{item.label}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

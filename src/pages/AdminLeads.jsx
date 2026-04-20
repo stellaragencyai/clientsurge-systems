@@ -38,7 +38,7 @@ export default function AdminLeads() {
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-border">
             <h1 className="font-display text-xl font-semibold text-foreground">
-              ApexFlow Admin
+              ClientSurge Admin
             </h1>
           </div>
 

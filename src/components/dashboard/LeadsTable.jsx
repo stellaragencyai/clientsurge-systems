@@ -1,7 +1,17 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Search, Filter } from "lucide-react";
+import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
+const intakeTypeLabels = {
+  lead_capture: "Lead Capture",
+  contact_inquiry: "Contact Inquiry",
+  demo_booking: "Demo Booking",
+};
+
+const sourceLabels = {
+  website: "Website",
+};
 
 export default function LeadsTable() {
   const navigate = useNavigate();
@@ -71,6 +81,9 @@ export default function LeadsTable() {
     });
   };
 
+  const formatIntakeType = (value) => intakeTypeLabels[value] || value || "Unknown";
+  const formatSource = (value) => sourceLabels[value] || value || "Unknown";
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4">
@@ -130,6 +143,9 @@ export default function LeadsTable() {
                     Phone
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-foreground">
+                    Intake
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-foreground">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-foreground">
@@ -155,6 +171,12 @@ export default function LeadsTable() {
                     </td>
                     <td className="px-6 py-4 text-sm text-muted-foreground">
                       {lead.phone}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      <div className="space-y-1">
+                        <p className="text-foreground">{formatIntakeType(lead.intake_type)}</p>
+                        <p className="text-xs text-muted-foreground">{formatSource(lead.source)}</p>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(lead.status)}`}>

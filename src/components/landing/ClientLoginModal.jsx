@@ -13,12 +13,15 @@ export default function ClientLoginModal({ onClose }) {
 
   return (
     <AnimatePresence>
-      <motion.div
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-      >
+        <motion.div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="client-login-modal-title"
+        >
         {/* Backdrop */}
         <motion.div
           className="absolute inset-0 z-0"
@@ -48,6 +51,8 @@ export default function ClientLoginModal({ onClose }) {
             onClick={onClose}
             className="fixed top-5 right-5 w-8 h-8 rounded-full flex items-center justify-center transition-colors z-20"
             style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}
+            type="button"
+            aria-label="Close dialog"
           >
             <X className="w-4 h-4 text-white/70" />
           </button>
@@ -64,6 +69,7 @@ export default function ClientLoginModal({ onClose }) {
 
             {/* Heading */}
             <h2
+              id="client-login-modal-title"
               className="font-display mb-2"
               style={{ fontSize: "1.75rem", fontWeight: "700", color: "#f5e6d0", lineHeight: "1.2" }}
             >
@@ -77,7 +83,7 @@ export default function ClientLoginModal({ onClose }) {
             <div className="space-y-3 mb-10">
               {[
                 { icon: Sparkles, text: "Real-time build progress tracker" },
-                { icon: Mail, text: "Direct messaging with the ApexFlow team" },
+                { icon: Mail, text: "Direct messaging with the ClientSurge Systems team" },
                 { icon: Lock, text: "Secure access — invite-only portal" },
               ].map((item, i) => {
                 const Icon = item.icon;
@@ -134,7 +140,7 @@ export default function ClientLoginModal({ onClose }) {
 
             <p style={{ fontSize: "0.72rem", color: "rgba(245,230,208,0.3)", textAlign: "center", lineHeight: "1.5" }}>
               Access is invite-only. If you haven't received an invitation,{" "}
-              <a href="mailto:hello@apexflow.com" style={{ color: "rgba(200,150,92,0.7)", textDecoration: "underline" }}>
+              <a href="mailto:system@clientsurgesystems.com" style={{ color: "rgba(200,150,92,0.7)", textDecoration: "underline" }}>
                 contact us
               </a>
               .

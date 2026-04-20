@@ -26,6 +26,14 @@
       "type": "string",
       "title": "Biggest Problem"
     },
+    "source": {
+      "type": "string",
+      "title": "Lead Source"
+    },
+    "intake_type": {
+      "type": "string",
+      "title": "Intake Type"
+    },
     "status": {
       "type": "string",
       "title": "Status",

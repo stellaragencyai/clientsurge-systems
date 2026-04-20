@@ -37,10 +37,13 @@ export default function LeadCaptureForm() {
     setLoading(true);
 
     try {
-      await base44.entities.Leads.create({
+      const result = await base44.functions.invoke("submitLeadCapture", {
         ...formData,
-        status: "New",
       });
+
+      if (!result.data?.success) {
+        throw new Error("Lead submission failed");
+      }
 
       setSuccess(true);
       setFormData({

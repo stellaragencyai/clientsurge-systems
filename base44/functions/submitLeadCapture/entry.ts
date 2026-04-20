@@ -1,0 +1,150 @@
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+
+const MAX_FIELD_LENGTH = 500;
+const DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+const LEAD_SOURCE = 'website';
+const INTAKE_TYPE = 'lead_capture';
+
+function sanitizeString(value: unknown) {
+  if (typeof value !== 'string') return '';
+  return value.replace(/[<>]/g, '').trim().slice(0, MAX_FIELD_LENGTH);
+}
+
+function normalizeLeadInput(payload: Record<string, unknown>) {
+  return {
+    full_name: sanitizeString(payload.full_name),
+    business_name: sanitizeString(payload.business_name),
+    email: sanitizeString(payload.email).toLowerCase(),
+    phone: sanitizeString(payload.phone),
+    business_type: sanitizeString(payload.business_type),
+    problem: sanitizeString(payload.problem),
+  };
+}
+
+function buildLeadPayload(lead: ReturnType<typeof normalizeLeadInput>, status: string) {
+  return {
+    ...lead,
+    source: LEAD_SOURCE,
+    intake_type: INTAKE_TYPE,
+    status,
+  };
+}
+
+async function logLeadCreated(
+  base44: ReturnType<typeof createClientFromRequest>,
+  leadId: string,
+  action: 'created' | 'updated',
+  lead: ReturnType<typeof normalizeLeadInput>
+) {
+  await base44.asServiceRole.entities.CommunicationEvent.create({
+    lead_id: leadId,
+    channel: 'internal',
+    direction: 'system',
+    event_type: 'lead_created',
+    provider: 'internal',
+    status: 'processed',
+    subject: action === 'created' ? 'Lead capture submitted' : 'Lead capture updated',
+    message_body: `Lead capture ${action} for ${lead.full_name} from ${lead.business_name}`,
+    metadata_json: JSON.stringify({
+      source: LEAD_SOURCE,
+      intake_type: INTAKE_TYPE,
+      action,
+      email: lead.email,
+      business_type: lead.business_type,
+    }),
+  });
+}
+
+function validateLeadInput(lead: ReturnType<typeof normalizeLeadInput>) {
+  const errors: string[] = [];
+
+  if (!lead.full_name) errors.push('Full name is required');
+  if (!lead.business_name) errors.push('Business name is required');
+  if (!lead.email) {
+    errors.push('Email is required');
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(lead.email)) {
+    errors.push('Email must be valid');
+  }
+
+  if (!lead.phone) {
+    errors.push('Phone is required');
+  } else if (lead.phone.replace(/\D/g, '').length < 10) {
+    errors.push('Phone must be valid');
+  }
+
+  if (!lead.business_type) errors.push('Business type is required');
+  if (!lead.problem) errors.push('Problem is required');
+
+  return errors;
+}
+
+function isRecentDuplicate(existingLead: Record<string, unknown>, incomingLead: ReturnType<typeof normalizeLeadInput>) {
+  const createdDate = typeof existingLead.created_date === 'string' ? new Date(existingLead.created_date).getTime() : 0;
+  const isWithinWindow = createdDate > 0 && Date.now() - createdDate < DUPLICATE_WINDOW_MS;
+  const sameBusiness =
+    typeof existingLead.business_name === 'string' &&
+    existingLead.business_name.trim().toLowerCase() === incomingLead.business_name.toLowerCase();
+
+  return isWithinWindow && sameBusiness;
+}
+
+Deno.serve(async (req) => {
+  try {
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
+    const base44 = createClientFromRequest(req);
+    const payload = await req.json();
+    const lead = normalizeLeadInput(payload);
+    const errors = validateLeadInput(lead);
+
+    if (errors.length > 0) {
+      return Response.json({ error: errors[0], errors }, { status: 400 });
+    }
+
+    let duplicateLead = null;
+
+    if (lead.email) {
+      const emailMatches = await base44.asServiceRole.entities.Leads.filter({ email: lead.email }, '-created_date', 10);
+      duplicateLead = emailMatches.find((item: Record<string, unknown>) => isRecentDuplicate(item, lead)) || null;
+    }
+
+    if (!duplicateLead && lead.phone) {
+      const phoneMatches = await base44.asServiceRole.entities.Leads.filter({ phone: lead.phone }, '-created_date', 10);
+      duplicateLead = phoneMatches.find((item: Record<string, unknown>) => isRecentDuplicate(item, lead)) || null;
+    }
+
+    if (duplicateLead) {
+      const nextStatus =
+        duplicateLead.status === 'Closed'
+          ? 'New'
+          : typeof duplicateLead.status === 'string' && duplicateLead.status.length > 0
+            ? duplicateLead.status
+            : 'New';
+
+      await base44.asServiceRole.entities.Leads.update(duplicateLead.id, buildLeadPayload(lead, nextStatus));
+      await logLeadCreated(base44, duplicateLead.id, 'updated', lead);
+
+      return Response.json({
+        success: true,
+        lead_id: duplicateLead.id,
+        action: 'updated',
+      });
+    }
+
+    const createdLead = await base44.asServiceRole.entities.Leads.create({
+      ...buildLeadPayload(lead, 'New'),
+    });
+    await logLeadCreated(base44, createdLead.id, 'created', lead);
+
+    return Response.json({
+      success: true,
+      lead_id: createdLead.id,
+      action: 'created',
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to submit lead';
+    return Response.json({ error: message }, { status: 500 });
+  }
+});

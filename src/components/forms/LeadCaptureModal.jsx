@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { ArrowRight, ChevronLeft, X, CheckCircle2, User, Building2, Mail, Phone, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -19,6 +19,17 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
     biggest_issue: '',
     lead_source: [],
   });
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -61,18 +72,41 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
     }));
   };
 
+  const buildProblemSummary = () => {
+    const details = [];
+
+    if (formData.biggest_issue) {
+      details.push(`Primary challenge: ${formData.biggest_issue.replace(/_/g, " ")}`);
+    }
+
+    if (formData.monthly_leads) {
+      details.push(`Monthly leads: ${formData.monthly_leads}`);
+    }
+
+    if (formData.lead_source.length > 0) {
+      details.push(`Lead sources: ${formData.lead_source.join(", ")}`);
+    }
+
+    return details.join(" | ") || "Requested a demo from the website";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await base44.entities.Leads.create({
+      const result = await base44.functions.invoke('submitLeadCapture', {
         full_name: formData.full_name,
         business_name: formData.business_name,
         email: formData.email,
         phone: formData.phone,
         business_type: formData.business_type,
-        status: 'New',
+        problem: buildProblemSummary(),
       });
+
+      if (!result.data?.success) {
+        throw new Error('Lead submission failed');
+      }
+
       // Trigger confetti celebration
       confetti({
         particleCount: 100,
@@ -113,7 +147,12 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="lead-capture-modal-title"
+    >
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300"
@@ -147,6 +186,8 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
         <button
           onClick={handleClose}
           className="absolute top-6 right-6 p-2 hover:bg-muted rounded-full transition-colors z-10"
+          type="button"
+          aria-label="Close dialog"
         >
           <X className="w-5 h-5 text-muted-foreground" />
         </button>
@@ -159,7 +200,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
             </div>
             <div>
               <span className="font-display text-lg font-semibold text-foreground block">ClientSurge Systems</span>
-              <h2 className="font-display text-2xl font-semibold text-foreground mt-1">
+              <h2 id="lead-capture-modal-title" className="font-display text-2xl font-semibold text-foreground mt-1">
                 Demo Setup
               </h2>
             </div>

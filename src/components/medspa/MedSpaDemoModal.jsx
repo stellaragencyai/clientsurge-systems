@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -19,6 +19,15 @@ export default function MedSpaDemoModal({ onClose }) {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -67,7 +76,12 @@ export default function MedSpaDemoModal({ onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="medspa-demo-modal-title"
+    >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
@@ -78,6 +92,8 @@ export default function MedSpaDemoModal({ onClose }) {
           <button
             onClick={onClose}
             className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-muted hover:bg-border transition-colors"
+            type="button"
+            aria-label="Close dialog"
           >
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
@@ -85,7 +101,7 @@ export default function MedSpaDemoModal({ onClose }) {
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             <span className="text-xs font-semibold text-primary uppercase tracking-wide">Free 15-Min Demo</span>
           </div>
-          <h2 className="font-display text-2xl font-semibold text-foreground">Tell us about your med spa</h2>
+          <h2 id="medspa-demo-modal-title" className="font-display text-2xl font-semibold text-foreground">Tell us about your med spa</h2>
           <p className="text-sm text-muted-foreground mt-1">We'll tailor the demo to your exact situation.</p>
         </div>
 
@@ -117,7 +133,7 @@ export default function MedSpaDemoModal({ onClose }) {
 
         {/* Step 1: Info Collection */}
         {!success && step === 1 && (
-          <form onSubmit={handleStep1Submit} className="px-8 py-6 space-y-4">
+          <form onSubmit={handleStep1Submit} className="px-8 py-6 space-y-4" noValidate>
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 sm:col-span-1">
                 <label className="block text-xs font-semibold text-foreground mb-1.5">Full Name *</label>
@@ -126,6 +142,7 @@ export default function MedSpaDemoModal({ onClose }) {
                   value={form.full_name}
                   onChange={handleChange}
                   required
+                  autoComplete="name"
                   placeholder="Jane Smith"
                   className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
                 />
@@ -137,6 +154,7 @@ export default function MedSpaDemoModal({ onClose }) {
                   value={form.business_name}
                   onChange={handleChange}
                   required
+                  autoComplete="organization"
                   placeholder="Glow Med Spa"
                   className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
                 />
@@ -152,6 +170,7 @@ export default function MedSpaDemoModal({ onClose }) {
                   value={form.email}
                   onChange={handleChange}
                   required
+                  autoComplete="email"
                   placeholder="jane@glowspa.com"
                   className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
                 />
@@ -164,6 +183,8 @@ export default function MedSpaDemoModal({ onClose }) {
                   value={form.phone}
                   onChange={handleChange}
                   required
+                  autoComplete="tel"
+                  inputMode="tel"
                   placeholder="(555) 000-0000"
                   className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
                 />

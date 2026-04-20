@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Loader2, CheckCircle2, Mail, Phone, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^[\d\s()+.-]+$/;
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -16,29 +20,90 @@ export default function Contact() {
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
 
+  useEffect(() => {
+    const previousTitle = document.title;
+    const metaDesc = document.querySelector('meta[name="description"]');
+    const previousDescription = metaDesc?.getAttribute('content') || '';
+    const canonical = document.querySelector('link[rel="canonical"]');
+    const previousCanonical = canonical?.getAttribute('href') || '';
+
+    document.title = 'Contact ClientSurge Systems';
+
+    if (metaDesc) {
+      metaDesc.setAttribute(
+        'content',
+        'Contact ClientSurge Systems to ask questions, request a walkthrough, or discuss lead capture automation for your business.'
+      );
+    }
+
+    if (canonical) {
+      canonical.setAttribute('href', 'https://clientsurgesystems.com/contact');
+    }
+
+    return () => {
+      document.title = previousTitle;
+      if (metaDesc) {
+        metaDesc.setAttribute('content', previousDescription);
+      }
+      if (canonical) {
+        canonical.setAttribute('href', previousCanonical || 'https://clientsurgesystems.com/');
+      }
+    };
+  }, []);
+
   const validate = () => {
-    const e = {};
-    if (!form.full_name.trim()) e.full_name = "Required";
-    if (!form.email.trim()) e.email = "Required";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Enter a valid email";
-    if (!form.message.trim()) e.message = "Required";
-    return e;
+    const nextErrors = {};
+
+    if (!form.full_name.trim()) {
+      nextErrors.full_name = 'Required';
+    }
+
+    if (!form.email.trim()) {
+      nextErrors.email = 'Required';
+    } else if (!EMAIL_REGEX.test(form.email)) {
+      nextErrors.email = 'Enter a valid email';
+    }
+
+    if (form.phone.trim()) {
+      const digits = form.phone.replace(/\D/g, '');
+      if (!PHONE_REGEX.test(form.phone) || digits.length < 10) {
+        nextErrors.phone = 'Enter a valid phone number';
+      }
+    }
+
+    if (!form.message.trim()) {
+      nextErrors.message = 'Required';
+    }
+
+    return nextErrors;
   };
 
   const handleChange = (e) => {
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-    setErrors((err) => ({ ...err, [e.target.name]: undefined }));
+    const { name, value } = e.target;
+    setForm((current) => ({ ...current, [name]: value }));
+    setErrors((current) => ({ ...current, [name]: undefined, submit: undefined }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    const nextErrors = validate();
+
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
+
     setLoading(true);
+
     try {
-      await base44.functions.invoke("sendContactEmail", form);
+      const result = await base44.functions.invoke("submitContactInquiry", form);
+
+      if (!result.data?.success) {
+        throw new Error(result.data?.error || "Contact submission failed");
+      }
+
       setSuccess(true);
-    } catch (err) {
+    } catch (error) {
       setErrors({ submit: "Something went wrong. Please try again or email us directly." });
     } finally {
       setLoading(false);
@@ -49,22 +114,18 @@ export default function Contact() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Hero */}
       <section className="py-20 px-6 text-center" style={{ background: "linear-gradient(to bottom, hsl(40,8%,88%), hsl(0,0%,100%))" }}>
         <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Get In Touch</p>
         <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
-          Let's Talk About Your Business
+          Let&apos;s Talk About Your Business
         </h1>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-          Have a question or want to learn more? Send us a message and we'll get back to you within one business day.
+          Have a question or want to learn more? Send us a message and we&apos;ll get back to you within one business day.
         </p>
       </section>
 
-      {/* Content */}
       <section className="py-16 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
-
-          {/* Info */}
           <div className="flex flex-col gap-8">
             <div>
               <h2 className="font-display text-2xl font-semibold text-foreground mb-6">Contact Information</h2>
@@ -85,10 +146,8 @@ export default function Contact() {
                     <Phone className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">Phone</p>
-                    <a href="mailto:system@clientsurgesystems.com" className="text-sm text-foreground hover:text-primary transition-colors">
-                      system@clientsurgesystems.com
-                    </a>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">Demo Calls</p>
+                    <p className="text-sm text-foreground">Available by appointment during your free walkthrough.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -106,88 +165,104 @@ export default function Contact() {
             <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5">
               <p className="text-sm font-semibold text-foreground mb-2">Prefer a live walkthrough?</p>
               <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-                Skip the form and book a free 15-min demo. We'll show you exactly how the system works for your business.
+                Skip the form and book a free 15-minute demo. We&apos;ll show you exactly how the system works for your business.
               </p>
-              <a
-                href="/book"
+              <Link
+                to="/book"
                 style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.3)", border: "none", cursor: "pointer", textDecoration: "none" }}
               >
                 <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 20px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.8rem" }}>
                   Book a Free Demo <ArrowRight className="w-3.5 h-3.5" />
                 </span>
-              </a>
+              </Link>
             </div>
           </div>
 
-          {/* Form */}
           <div className="bg-card rounded-2xl border border-border p-8 shadow-sm">
             {success ? (
-              <div className="flex flex-col items-center text-center py-8">
+              <div className="flex flex-col items-center text-center py-8" aria-live="polite">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-5">
                   <CheckCircle2 className="w-8 h-8 text-green-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">Message Sent!</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Thanks for reaching out. We'll get back to you within one business day.
+                  Thanks for reaching out. We&apos;ll get back to you within one business day.
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <h3 className="font-display text-xl font-semibold text-foreground mb-2">Send a Message</h3>
 
                 {errors.submit && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700" role="alert">
                     {errors.submit}
                   </div>
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1.5">Full Name <span className="text-red-500">*</span></label>
+                    <label htmlFor="contact-full-name" className="block text-xs font-semibold text-foreground mb-1.5">Full Name <span className="text-red-500">*</span></label>
                     <input
+                      id="contact-full-name"
                       name="full_name"
                       value={form.full_name}
                       onChange={handleChange}
+                      autoComplete="name"
+                      required
+                      aria-invalid={Boolean(errors.full_name)}
+                      aria-describedby={errors.full_name ? "contact-full-name-error" : undefined}
                       placeholder="Jane Smith"
                       className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition bg-background ${errors.full_name ? "border-red-400" : "border-input"}`}
                     />
-                    {errors.full_name && <p className="text-red-500 text-xs mt-1">{errors.full_name}</p>}
+                    {errors.full_name && <p id="contact-full-name-error" className="text-red-500 text-xs mt-1">{errors.full_name}</p>}
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1.5">Email <span className="text-red-500">*</span></label>
+                    <label htmlFor="contact-email" className="block text-xs font-semibold text-foreground mb-1.5">Email <span className="text-red-500">*</span></label>
                     <input
+                      id="contact-email"
                       name="email"
                       type="email"
                       value={form.email}
                       onChange={handleChange}
+                      autoComplete="email"
+                      required
+                      aria-invalid={Boolean(errors.email)}
+                      aria-describedby={errors.email ? "contact-email-error" : undefined}
                       placeholder="jane@business.com"
                       className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition bg-background ${errors.email ? "border-red-400" : "border-input"}`}
                     />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                    {errors.email && <p id="contact-email-error" className="text-red-500 text-xs mt-1">{errors.email}</p>}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1.5">Phone</label>
+                    <label htmlFor="contact-phone" className="block text-xs font-semibold text-foreground mb-1.5">Phone</label>
                     <input
+                      id="contact-phone"
                       name="phone"
                       type="tel"
                       value={form.phone}
                       onChange={handleChange}
+                      autoComplete="tel"
+                      inputMode="tel"
+                      aria-invalid={Boolean(errors.phone)}
+                      aria-describedby={errors.phone ? "contact-phone-error" : undefined}
                       placeholder="(555) 000-0000"
-                      className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
+                      className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition bg-background ${errors.phone ? "border-red-400" : "border-input"}`}
                     />
+                    {errors.phone && <p id="contact-phone-error" className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1.5">Business Type</label>
+                    <label htmlFor="contact-business-type" className="block text-xs font-semibold text-foreground mb-1.5">Business Type</label>
                     <select
+                      id="contact-business-type"
                       name="business_type"
                       value={form.business_type}
                       onChange={handleChange}
                       className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                     >
-                      <option value="">Select one…</option>
+                      <option value="">Select one...</option>
                       <option>Med Spa / Aesthetic Clinic</option>
                       <option>Wellness Studio</option>
                       <option>Real Estate</option>
@@ -200,16 +275,20 @@ export default function Contact() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-foreground mb-1.5">Message <span className="text-red-500">*</span></label>
+                  <label htmlFor="contact-message" className="block text-xs font-semibold text-foreground mb-1.5">Message <span className="text-red-500">*</span></label>
                   <textarea
+                    id="contact-message"
                     name="message"
                     value={form.message}
                     onChange={handleChange}
-                    placeholder="Tell us about your business and what you're looking for…"
+                    required
+                    aria-invalid={Boolean(errors.message)}
+                    aria-describedby={errors.message ? "contact-message-error" : undefined}
+                    placeholder="Tell us about your business and what you're looking for..."
                     rows={5}
                     className={`w-full rounded-xl border px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition bg-background resize-none ${errors.message ? "border-red-400" : "border-input"}`}
                   />
-                  {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
+                  {errors.message && <p id="contact-message-error" className="text-red-500 text-xs mt-1">{errors.message}</p>}
                 </div>
 
                 <button
@@ -218,7 +297,7 @@ export default function Contact() {
                   style={{ borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.35)", border: "none", cursor: "pointer", width: "100%" }}
                 >
                   <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "48px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem", opacity: loading ? 0.7 : 1 }}>
-                    {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</> : <>Send Message <ArrowRight className="w-4 h-4" /></>}
+                    {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</> : <>Send Message <ArrowRight className="w-4 h-4" /></>}
                   </span>
                 </button>
               </form>

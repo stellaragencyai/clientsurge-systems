@@ -43,22 +43,42 @@ export default function LeadCaptureForm() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const buildProblemSummary = () => {
+    const details = [];
+
+    if (formData.biggest_problem) {
+      details.push(`Primary challenge: ${formData.biggest_problem}`);
+    }
+
+    if (formData.monthly_leads) {
+      details.push(`Monthly leads: ${formData.monthly_leads}`);
+    }
+
+    if (formData.contact_method) {
+      details.push(`Preferred contact: ${formData.contact_method}`);
+    }
+
+    return details.join(" | ") || "Requested a demo from the website";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      await base44.entities.Lead.create({
-        name: formData.full_name,
+      const result = await base44.functions.invoke('submitLeadCapture', {
+        full_name: formData.full_name,
         business_name: formData.business_name,
         email: formData.email,
         phone: formData.phone,
-        niche: formData.niche,
-        monthly_leads: formData.monthly_leads,
-        status: "new",
-        notes: `Problem: ${formData.biggest_problem}\nPreferred contact: ${formData.contact_method}`,
+        business_type: formData.niche || "Other",
+        problem: buildProblemSummary(),
       });
+
+      if (!result.data?.success) {
+        throw new Error("Lead submission failed");
+      }
 
       setSubmitted(true);
     } catch (err) {

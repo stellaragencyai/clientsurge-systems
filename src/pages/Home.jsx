@@ -3,16 +3,9 @@ import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
 import TrustBar from "../components/landing/TrustBar";
 import ProblemSolution from "../components/landing/ProblemSolution.jsx";
-import Industries from "../components/landing/Industries";
-import WhyUs from "../components/landing/WhyUs";
-import IntegrationsBadges from "../components/landing/IntegrationsBadges";
 import HowItWorks from "../components/landing/HowItWorks";
-import Benefits from "../components/landing/Benefits";
 import Testimonials from "../components/landing/Testimonials";
-import DetailedProcess from "../components/landing/DetailedProcess";
-import FounderSection from "../components/landing/FounderSection";
 import CoreOffer from "../components/landing/CoreOffer";
-import Guarantee from "../components/landing/Guarantee";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
 import FinalCTA from "../components/landing/FinalCTA";
@@ -21,9 +14,6 @@ import SamChatWidget from "../components/sam/SamChatWidget";
 import StickyCTA from "../components/landing/StickyCTA";
 import CookieConsent from "../components/landing/CookieConsent";
 import FadeIn from "../components/landing/FadeIn";
-import LeadValueCalculator from "../components/landing/LeadValueCalculator";
-import LiveAutomationFeed from "../components/landing/LiveAutomationFeed";
-import AIResponseDemo from "../components/landing/AIResponseDemo";
 
 export default function Home() {
   useEffect(() => {
@@ -38,22 +28,11 @@ export default function Home() {
       <Hero />
       <FadeIn><TrustBar /></FadeIn>
       <FadeIn><ProblemSolution /></FadeIn>
-      <FadeIn><Industries /></FadeIn>
-      <FadeIn><WhyUs /></FadeIn>
-      <FadeIn><IntegrationsBadges /></FadeIn>
       <FadeIn><HowItWorks id="how-it-works-section" /></FadeIn>
-      
-      <FadeIn><DetailedProcess /></FadeIn>
-      <FadeIn><Benefits /></FadeIn>
-      <FadeIn><FounderSection /></FadeIn>
       <FadeIn><CoreOffer /></FadeIn>
       <FadeIn><Testimonials /></FadeIn>
-      <FadeIn><AIResponseDemo /></FadeIn>
-      <FadeIn><LiveAutomationFeed /></FadeIn>
-      <FadeIn><LeadValueCalculator /></FadeIn>
-      <FadeIn><Guarantee /></FadeIn>
-      <FadeIn><FAQ /></FadeIn>
       <FadeIn><Pricing /></FadeIn>
+      <FadeIn><FAQ /></FadeIn>
       <FinalCTA />
       <Footer />
       <SamChatWidget />

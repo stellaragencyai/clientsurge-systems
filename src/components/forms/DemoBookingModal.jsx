@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { X, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -22,6 +22,15 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   const [errors, setErrors] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -95,7 +104,14 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] overflow-y-auto" onKeyDown={handleKeyDown} tabIndex={0}>
+    <div
+      className="fixed inset-0 z-[9999] overflow-y-auto"
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="demo-booking-modal-title"
+    >
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40" onClick={onClose} />
 
@@ -116,7 +132,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             <span className="text-xs font-semibold text-primary uppercase tracking-wide">Free 15-Min Demo</span>
           </div>
-          <h2 className="font-display text-2xl font-semibold text-foreground">Tell us about your business</h2>
+          <h2 id="demo-booking-modal-title" className="font-display text-2xl font-semibold text-foreground">Tell us about your business</h2>
           <p className="text-sm text-muted-foreground mt-1">We'll tailor the demo to your exact situation.</p>
         </div>
 
@@ -148,7 +164,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
 
         {/* Step 1: Info Collection */}
         {!success && step === 1 && (
-          <form onSubmit={handleStep1Submit} className="px-8 py-6 space-y-4">
+          <form onSubmit={handleStep1Submit} className="px-8 py-6 space-y-4" noValidate>
             {errors.submit && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 flex items-start gap-2">
                 <span className="text-lg">⚠️</span>
@@ -162,6 +178,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   name="full_name"
                   value={form.full_name}
                   onChange={handleChange}
+                  autoComplete="name"
                   placeholder="Jane Smith"
                   className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.full_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
@@ -173,6 +190,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   name="business_name"
                   value={form.business_name}
                   onChange={handleChange}
+                  autoComplete="organization"
                   placeholder="My Business"
                   className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.business_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
@@ -188,6 +206,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   type="email"
                   value={form.email}
                   onChange={handleChange}
+                  autoComplete="email"
                   placeholder="jane@business.com"
                   className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.email ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
@@ -200,6 +219,8 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   type="tel"
                   value={form.phone}
                   onChange={handleChange}
+                  autoComplete="tel"
+                  inputMode="tel"
                   placeholder="(555) 000-0000"
                   className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.phone ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
@@ -251,7 +272,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
 
         {/* Step 2: Scheduling */}
         {!success && step === 2 && (
-          <form onSubmit={handleStep2Submit} className="px-8 py-6 space-y-4">
+          <form onSubmit={handleStep2Submit} className="px-8 py-6 space-y-4" noValidate>
             {errors.scheduling && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 flex items-start gap-2">
                 <span className="text-lg">⚠️</span>

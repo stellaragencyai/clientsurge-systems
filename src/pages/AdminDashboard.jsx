@@ -10,6 +10,12 @@ import CommunicationTemplates from '../components/admin/CommunicationTemplates';
 import IntegrationHealth from '../components/admin/IntegrationHealth';
 import ClientProjectsPanel from '../components/admin/ClientProjectsPanel';
 
+const intakeTypeLabels = {
+  lead_capture: 'Lead Capture',
+  contact_inquiry: 'Contact Inquiry',
+  demo_booking: 'Demo Booking',
+};
+
 const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'leads', label: 'Leads', icon: Users },
@@ -223,6 +229,9 @@ function OverviewDashboard() {
                 <div>
                   <p className="font-medium text-foreground text-sm">{lead.full_name}</p>
                   <p className="text-xs text-muted-foreground">{lead.email}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {intakeTypeLabels[lead.intake_type] || lead.intake_type || 'Legacy intake'}
+                  </p>
                 </div>
                 <span className={`px-2.5 py-1 rounded text-xs font-semibold ${
                   lead.status === 'Booked' ? 'bg-green-100 text-green-800' :
@@ -243,10 +252,10 @@ function OverviewDashboard() {
         <div className="bg-white rounded-xl border border-border p-6">
           <h3 className="font-semibold text-foreground mb-3">Quick Actions</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>✓ View all leads in the Leads section</li>
-            <li>✓ Check analytics and conversion rates</li>
-            <li>✓ Customize message templates</li>
-            <li>✓ Monitor integration health</li>
+            <li>&#10003; View all leads in the Leads section</li>
+            <li>&#10003; Check analytics and conversion rates</li>
+            <li>&#10003; Customize message templates</li>
+            <li>&#10003; Monitor integration health</li>
           </ul>
         </div>
         <div className="bg-white rounded-xl border border-border p-6">
@@ -270,3 +279,4 @@ function OverviewDashboard() {
     </div>
   );
 }
+

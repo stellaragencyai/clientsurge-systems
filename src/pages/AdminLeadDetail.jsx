@@ -9,6 +9,16 @@ import EmailHistoryPanel from "../components/dashboard/EmailHistoryPanel";
 import NotesSection from "../components/dashboard/NotesSection";
 import LeadTimeline from "../components/dashboard/LeadTimeline";
 
+const intakeTypeLabels = {
+  lead_capture: "Lead Capture",
+  contact_inquiry: "Contact Inquiry",
+  demo_booking: "Demo Booking",
+};
+
+const sourceLabels = {
+  website: "Website",
+};
+
 export default function AdminLeadDetail() {
   const { leadId } = useParams();
   const navigate = useNavigate();
@@ -48,6 +58,9 @@ export default function AdminLeadDetail() {
       minute: "2-digit",
     });
   };
+
+  const formatIntakeType = (value) => intakeTypeLabels[value] || value || "Unknown";
+  const formatSource = (value) => sourceLabels[value] || value || "Unknown";
 
   if (loading) {
     return (
@@ -107,6 +120,18 @@ export default function AdminLeadDetail() {
                 Business Type
               </p>
               <p className="text-sm text-foreground">{lead.business_type}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase font-semibold">
+                Intake Type
+              </p>
+              <p className="text-sm text-foreground">{formatIntakeType(lead.intake_type)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase font-semibold">
+                Source
+              </p>
+              <p className="text-sm text-foreground">{formatSource(lead.source)}</p>
             </div>
           </div>
         </div>

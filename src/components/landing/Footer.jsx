@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowUp, Mail, Phone } from "lucide-react";
+import { ArrowUp, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const navColumns = [
@@ -7,23 +7,15 @@ const navColumns = [
     title: "Industries",
     links: [
       { label: "Med Spas & Clinics", href: "/med-spa" },
-      // FIX 3: Other industries link to the section — labels now clarify it's a preview
-      { label: "Wellness Studios", href: "/#industries" },
-      { label: "Real Estate", href: "/#industries" },
-      { label: "HVAC & Home Services", href: "/#industries" },
-      { label: "Contractors & Trades", href: "/#industries" },
-      { label: "Local Service Businesses", href: "/#industries" },
     ],
   },
   {
     title: "Learn More",
     links: [
       { label: "How It Works", href: "/#how-it-works-section" },
-      // FIX 8: Added "Our System" to match navbar
       { label: "Our System", href: "/#services" },
       { label: "Pricing", href: "/#pricing" },
       { label: "FAQ", href: "/#faq" },
-      // FIX 5: Added Testimonials link
       { label: "Testimonials", href: "/#testimonials" },
       { label: "Book a Demo", href: "/book" },
       { label: "Contact Us", href: "/contact" },
@@ -39,8 +31,6 @@ const navColumns = [
     ],
   },
 ];
-
-// FIX 6: socialLinks array removed — was declared but never rendered (dead code)
 
 export default function Footer() {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -61,8 +51,7 @@ export default function Footer() {
         if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
       }
     } else {
-      // FIX 10: scroll to top when navigating to a new page
-      window.scrollTo({ top: 0, behavior: "instant" });
+      window.scrollTo({ top: 0, behavior: "auto" });
       navigate(href);
     }
   };
@@ -71,10 +60,7 @@ export default function Footer() {
 
   return (
     <footer style={{ background: "hsl(40, 8%, 88%)" }} className="border-t border-primary/20">
-
       <div className="max-w-7xl mx-auto px-6 pt-14 pb-10">
-
-        {/* Brand tagline */}
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
@@ -83,11 +69,10 @@ export default function Footer() {
             <span className="font-black text-sm text-foreground">ClientSurge <span className="text-primary">Systems</span></span>
           </div>
           <p className="text-xs text-foreground/50 max-w-sm mx-auto leading-relaxed">
-            Done-for-you AI automation that turns leads into booked clients — for local service businesses across the US.
+            Done-for-you AI automation that turns leads into booked clients for local service businesses across the US.
           </p>
         </div>
 
-        {/* Navigation columns — centered, Learn More in middle */}
         <div className="flex flex-col sm:flex-row justify-center gap-16 md:gap-28 mb-12 text-center">
           {navColumns.map((col) => (
             <div key={col.title}>
@@ -110,12 +95,9 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Divider */}
         <div className="border-t border-white/10 mb-7" />
 
-        {/* Bottom bar */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Contact info */}
           <div className="flex flex-col sm:flex-row items-center gap-4 text-xs text-foreground/50">
             <span className="flex items-center gap-1.5">
               <Mail className="w-3 h-3" />
@@ -123,16 +105,14 @@ export default function Footer() {
                 system@clientsurgesystems.com
               </a>
             </span>
-            <span className="hidden sm:inline text-foreground/20">·</span>
+            <span className="hidden sm:inline text-foreground/20">&middot;</span>
             <span>Phoenix, Arizona</span>
           </div>
 
-          {/* Copyright */}
           <p className="text-xs text-foreground/40">
-            © {new Date().getFullYear()} ClientSurge Systems. All rights reserved.
+            &copy; {new Date().getFullYear()} ClientSurge Systems. All rights reserved.
           </p>
 
-          {/* Back to top with tooltip */}
           <div className="relative">
             <button
               onClick={scrollTop}
@@ -152,7 +132,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
     </footer>
   );
 }

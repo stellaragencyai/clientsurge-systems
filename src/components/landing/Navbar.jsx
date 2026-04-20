@@ -26,7 +26,7 @@ export default function Navbar() {
   const links = [
     { label: "How It Works", href: "#how-it-works-section" },
     { label: "Our System", href: "#services" },
-    { label: "Industries", href: "#industries" },
+    { label: "Med Spas", href: "/med-spa", external: true },
     { label: "Pricing", href: "#pricing" },
     { label: "FAQ", href: "#faq" },
   ];
