@@ -231,7 +231,7 @@ export default function CoreOffer() {
   const [totalValue] = useState(8);
 
   return (
-    <section className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card via-white to-background">
+    <section id="services" className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card via-white to-background">
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
