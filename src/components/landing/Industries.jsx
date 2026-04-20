@@ -173,8 +173,8 @@ export default function Industries() {
               {/* Glass drawer — slides up from below, title is part of it */}
               <div
                 className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform ease-out"
-                style={{ transitionDuration: "800ms" }}
                 style={{
+                  transitionDuration: "800ms",
                   background: "rgba(15,14,12,0.72)",
                   backdropFilter: "blur(16px)",
                   WebkitBackdropFilter: "blur(16px)",
