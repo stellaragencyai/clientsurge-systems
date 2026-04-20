@@ -14,6 +14,14 @@ export default function AdminOnboarding() {
   const [showAdd, setShowAdd] = useState(false);
   const [filter, setFilter] = useState("all");
 
+  const loadClients = async () => {
+    const data = await base44.entities.OnboardingClient.list("-created_date", 100);
+    setClients(data);
+    setLoading(false);
+  };
+
+  useEffect(() => { loadClients(); }, []);
+
   // Admin-only guard
   if (user && user.role !== "admin") {
     return (
@@ -25,14 +33,6 @@ export default function AdminOnboarding() {
       </div>
     );
   }
-
-  const loadClients = async () => {
-    const data = await base44.entities.OnboardingClient.list("-created_date", 100);
-    setClients(data);
-    setLoading(false);
-  };
-
-  useEffect(() => { loadClients(); }, []);
 
   const liveCount = clients.filter(c => c.status === "Live").length;
   const inSetupCount = clients.filter(c => c.status === "In Setup").length;
