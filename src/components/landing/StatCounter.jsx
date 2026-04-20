@@ -18,9 +18,9 @@ function useCountUp(target, duration = 1800, start = false) {
 }
 
 const stats = [
-  { value: 4200, suffix: "+", label: "Leads Captured" },
-  { value: 1800, suffix: "+", label: "Appointments Booked" },
-  { value: 3.2, suffix: "M+", label: "Revenue Recovered", prefix: "$", isDecimal: true },
+  { value: 1200, suffix: "+", label: "Leads Captured" },
+  { value: 340, suffix: "+", label: "Appointments Booked" },
+  { value: 127000, suffix: "+", label: "Revenue Recovered", prefix: "$" },
 ];
 
 export default function StatCounter() {
@@ -36,8 +36,9 @@ export default function StatCounter() {
     return () => observer.disconnect();
   }, []);
 
-  const v0 = useCountUp(4200, 1800, started);
-  const v1 = useCountUp(1800, 1800, started);
+  const v0 = useCountUp(1200, 1500, started);
+  const v1 = useCountUp(340, 1500, started);
+  const v2 = useCountUp(127000, 1500, started);
 
   return (
     <div ref={ref} className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-y-8 sm:gap-y-0 sm:gap-x-20">
@@ -57,7 +58,7 @@ export default function StatCounter() {
       <div className="w-px h-12 bg-border hidden sm:block" />
       <div className="text-center">
         <p className="font-display text-4xl font-semibold text-foreground tabular-nums">
-          {started ? "$3.2M+" : "$0"}
+          ${v2.toLocaleString()}+
         </p>
         <p className="text-xs text-muted-foreground mt-2 tracking-wide uppercase">Revenue Recovered</p>
       </div>

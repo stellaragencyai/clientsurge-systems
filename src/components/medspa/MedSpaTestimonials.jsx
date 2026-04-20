@@ -5,7 +5,7 @@ const testimonials = [
   {
     name: "Jessica M.",
     businessType: "Med Spa",
-    location: "Miami, FL",
+    location: "Phoenix, AZ",
     before: "Missing 60% of after-hours inquiries",
     after: "10+ consultations booked/week",
     result: "5× booking increase",

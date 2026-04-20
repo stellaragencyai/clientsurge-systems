@@ -29,6 +29,10 @@ export default function MedSpaFinalCTA() {
           Book a quick demo and we'll show you exactly where bookings are being lost — and how to fix it.
         </p>
 
+        <p className="text-sm text-muted-foreground mb-8">
+          Starting from $497/mo · No setup fee · No long-term contracts · Cancel anytime
+        </p>
+
         {!showForm ? (
           <>
             <button

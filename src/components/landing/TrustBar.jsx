@@ -12,7 +12,7 @@ const items = [
     icon: TrendingUp,
     stat: "3× avg. bookings",
     label: "Increase for clients",
-    story: "A med spa in Miami went from 14% to 61% lead-to-consultation conversion within 30 days of going live.",
+    story: "A med spa in Scottsdale went from 14% to 61% lead-to-consultation conversion within 30 days of going live.",
   },
   {
     icon: CalendarCheck,
@@ -22,9 +22,9 @@ const items = [
   },
   {
     icon: Building2,
-    stat: "15+ Industries",
-    label: "Served nationwide",
-    story: "We've built systems for appointment-based businesses across aesthetics, home services, real estate, and more.",
+    stat: "6 Industries",
+    label: "Phoenix-Based",
+    story: "We've built systems for appointment-based businesses in the Phoenix metro — med spas, dental, chiropractic, home services, legal, and real estate.",
   },
   {
     icon: ShieldCheck,
