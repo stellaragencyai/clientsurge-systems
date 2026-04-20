@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight } from "lucide-react";
-import DemoBookingInline from "../forms/DemoBookingInline";
+import DemoBookingInline from "@/components/forms/DemoBookingInline";
 
 export default function FinalCTA() {
   const [showForm, setShowForm] = useState(false);
