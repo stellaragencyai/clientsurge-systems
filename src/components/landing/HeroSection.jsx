@@ -40,6 +40,8 @@ export default function HeroSection({
             alt="Hero background"
             className="w-full h-full object-cover object-top"
             loading="eager"
+            fetchPriority="high"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-black/35" />
         </div>

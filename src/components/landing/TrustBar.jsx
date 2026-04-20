@@ -10,9 +10,9 @@ const items = [
   },
   {
     icon: TrendingUp,
-    stat: "More booked consults",
-    label: "From the leads you already generate",
-    story: "The system focuses on the biggest leak first: slow follow-up that lets ready-to-buy prospects go cold.",
+    stat: "3x avg. bookings",
+    label: "Increase for clients",
+    story: "A med spa in Scottsdale went from 14% to 61% lead-to-consultation conversion within 30 days of going live.",
   },
   {
     icon: CalendarCheck,
@@ -22,9 +22,9 @@ const items = [
   },
   {
     icon: Building2,
-    stat: "Med spas + local services",
-    label: "Built for appointment-driven teams",
-    story: "This works best for businesses where missed follow-up means missed appointments and lost revenue.",
+    stat: "6 Industries",
+    label: "Phoenix-based",
+    story: "We've built systems for appointment-based businesses in the Phoenix metro - med spas, dental, chiropractic, home services, legal, and real estate.",
   },
   {
     icon: ShieldCheck,

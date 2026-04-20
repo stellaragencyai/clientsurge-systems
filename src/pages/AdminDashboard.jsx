@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
@@ -9,6 +9,7 @@ import AnalyticsDashboard from '../components/admin/AnalyticsDashboard';
 import CommunicationTemplates from '../components/admin/CommunicationTemplates';
 import IntegrationHealth from '../components/admin/IntegrationHealth';
 import ClientProjectsPanel from '../components/admin/ClientProjectsPanel';
+import AutomationsPanel from '../components/admin/AutomationsPanel';
 
 const intakeTypeLabels = {
   lead_capture: 'Lead Capture',
@@ -20,6 +21,8 @@ const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'leads', label: 'Leads', icon: Users },
   { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
+  { id: 'onboarding', label: 'Client Onboarding', icon: ClipboardList },
+  { id: 'automations', label: '9 Automations', icon: Zap },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   { id: 'templates', label: 'Templates', icon: MessageSquare },
   { id: 'health', label: 'Integration Health', icon: Activity },
@@ -59,6 +62,11 @@ export default function AdminDashboard() {
         return <IntegrationHealth />;
       case 'client-projects':
         return <ClientProjectsPanel />;
+      case 'automations':
+        return <AutomationsPanel />;
+      case 'onboarding':
+        navigate('/admin/onboarding');
+        return null;
       case 'settings':
         return <AdminSettingsPanel />;
       case 'overview':

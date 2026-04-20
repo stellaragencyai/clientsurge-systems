@@ -1,0 +1,145 @@
+{
+  "name": "OnboardingClient",
+  "type": "object",
+  "properties": {
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "owner_name": {
+      "type": "string",
+      "title": "Owner Name"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Phone"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email"
+    },
+    "website": {
+      "type": "string",
+      "title": "Website"
+    },
+    "instagram": {
+      "type": "string",
+      "title": "Instagram Handle"
+    },
+    "industry": {
+      "type": "string",
+      "title": "Industry"
+    },
+    "services": {
+      "type": "string",
+      "title": "Services Offered"
+    },
+    "tone_of_voice": {
+      "type": "string",
+      "title": "Tone of Voice",
+      "enum": [
+        "Professional",
+        "Friendly",
+        "Luxury",
+        "Casual"
+      ]
+    },
+    "booking_platform": {
+      "type": "string",
+      "title": "Booking Platform"
+    },
+    "booking_link": {
+      "type": "string",
+      "title": "Booking Link"
+    },
+    "lead_sources": {
+      "type": "string",
+      "title": "Lead Sources (comma separated)"
+    },
+    "twilio_number": {
+      "type": "string",
+      "title": "Twilio Number"
+    },
+    "monthly_rate": {
+      "type": "number",
+      "title": "Monthly Rate ($)"
+    },
+    "setup_fee": {
+      "type": "number",
+      "title": "Setup Fee ($)"
+    },
+    "start_date": {
+      "type": "string",
+      "title": "Start Date"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "Onboarding",
+        "In Setup",
+        "Live"
+      ],
+      "default": "Onboarding"
+    },
+    "generated_messages": {
+      "type": "string",
+      "title": "AI Generated Messages (JSON)"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Internal Notes / Activity Log"
+    },
+    "step_twilio": {
+      "type": "boolean",
+      "title": "Step 1: Twilio Configured",
+      "default": false
+    },
+    "step_lead_sources": {
+      "type": "boolean",
+      "title": "Step 2: Lead Sources Connected",
+      "default": false
+    },
+    "step_instant_response": {
+      "type": "boolean",
+      "title": "Step 3: Instant Response Built",
+      "default": false
+    },
+    "step_followup_sequence": {
+      "type": "boolean",
+      "title": "Step 4: Follow-Up Sequence Built",
+      "default": false
+    },
+    "step_missed_call": {
+      "type": "boolean",
+      "title": "Step 5: Missed Call Text-Back Active",
+      "default": false
+    },
+    "step_messages_customized": {
+      "type": "boolean",
+      "title": "Step 6: Messages Customized",
+      "default": false
+    },
+    "step_tested": {
+      "type": "boolean",
+      "title": "Step 7: End-to-End Tested",
+      "default": false
+    },
+    "step_dashboard": {
+      "type": "boolean",
+      "title": "Step 8: Dashboard Delivered",
+      "default": false
+    },
+    "step_live": {
+      "type": "boolean",
+      "title": "Step 9: Went Live",
+      "default": false
+    }
+  },
+  "required": [
+    "business_name",
+    "owner_name",
+    "email",
+    "phone"
+  ]
+}

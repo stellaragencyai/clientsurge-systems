@@ -5,12 +5,12 @@ const testimonials = [
   {
     name: "Jessica M.",
     businessType: "Med Spa",
-    location: "Miami, FL",
+    location: "Phoenix, AZ",
     before: "Missing 60% of after-hours inquiries",
     after: "10+ consultations booked/week",
     result: "5× booking increase",
     quote: "We went from missing leads to booking consultations same-day. The system just runs.",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=65&auto=format",
   },
   {
     name: "Sarah K.",
@@ -20,7 +20,7 @@ const testimonials = [
     after: "Fully automated follow-up",
     result: "Zero leads dropped",
     quote: "Our front desk was overwhelmed. Now follow-up is fully automated and nothing slips through.",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=65&auto=format",
   },
   {
     name: "Amanda T.",
@@ -30,7 +30,7 @@ const testimonials = [
     after: "ROI recovered in first month",
     result: "Paid for itself in 30 days",
     quote: "Paid for itself in the first month. Recovered revenue we thought was gone.",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=120&q=80",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=65&auto=format",
   },
 ];
 

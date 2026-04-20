@@ -29,7 +29,7 @@ export default function FounderSection() {
                 style={{ border: "2px solid rgba(154,92,46,0.2)", boxShadow: "0 8px 32px rgba(120,70,20,0.12)" }}
               >
                 <img
-                  src="https://images.unsplash.com/photo-1556157382-97eda2d62296?w=600&q=90"
+                  src="https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&q=70&auto=format"
                   alt="Nolan — Founder of ClientSurge Systems"
                   className="w-full h-full object-cover object-top"
                   loading="lazy"
