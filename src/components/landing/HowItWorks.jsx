@@ -32,6 +32,11 @@ export default function HowItWorks() {
   const [inView, setInView] = useState(false);
 
   useEffect(() => {
+    if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return undefined;
+    }
+
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         setInView(true);

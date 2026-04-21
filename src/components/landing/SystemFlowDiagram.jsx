@@ -19,6 +19,11 @@ export default function SystemFlowDiagram() {
   const [activeConnector, setActiveConnector] = useState(0);
 
   useEffect(() => {
+    if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return undefined;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) setInView(true); },
       { threshold: 0.2 }

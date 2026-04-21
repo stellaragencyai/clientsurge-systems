@@ -3,16 +3,10 @@ import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
 import TrustBar from "../components/landing/TrustBar";
 import Industries from "../components/landing/Industries";
-import ToolsStrip from "../components/landing/ToolsStrip";
 import ProblemSolution from "../components/landing/ProblemSolution.jsx";
 import HowItWorks from "../components/landing/HowItWorks";
-import AutomationDemo from "../components/landing/AutomationDemo";
-import AIResponseDemo from "../components/landing/AIResponseDemo";
-import AIAuditSection from "../components/landing/AIAuditSection";
-import AIRoutingForm from "../components/landing/AIRoutingForm";
 import Testimonials from "../components/landing/Testimonials";
 import CoreOffer from "../components/landing/CoreOffer";
-import AutomationWalkthrough from "../components/landing/AutomationWalkthrough";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
 import FinalCTA from "../components/landing/FinalCTA";
@@ -57,17 +51,13 @@ export default function Home() {
         <Navbar />
         <Hero />
         <Industries />
-        <TrustBar />
-        <ToolsStrip />
+        <section aria-label="Proof and trust">
+          <TrustBar />
+          <Testimonials />
+        </section>
         <ProblemSolution />
-        <HowItWorks id="how-it-works-section" />
-        <AutomationDemo />
-        <AIResponseDemo />
-        <AIAuditSection />
-        <AIRoutingForm />
-        <AutomationWalkthrough />
         <CoreOffer />
-        <Testimonials />
+        <HowItWorks id="how-it-works-section" />
         <Pricing />
         <FAQ />
         <FinalCTA />

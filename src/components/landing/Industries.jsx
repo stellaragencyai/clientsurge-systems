@@ -70,6 +70,11 @@ export default function Industries() {
   const [sectionVisible, setSectionVisible] = useState(false);
 
   useEffect(() => {
+    if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
+      setSectionVisible(true);
+      return undefined;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

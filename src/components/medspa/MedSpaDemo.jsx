@@ -44,6 +44,13 @@ export default function MedSpaDemo() {
   };
 
   useEffect(() => {
+    if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
+      start();
+      return () => {
+        clearAll();
+      };
+    }
+
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) start();
       else { clearAll(); setVisible([]); setShowTyping(false); setAnimating(false); }
