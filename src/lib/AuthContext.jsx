@@ -19,7 +19,11 @@ export const AuthProvider = ({ children }) => {
 
   const checkAppState = async () => {
     // Development bypass: if in preview mode, skip auth
-    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname.includes('preview');
+    const hostname = window.location.hostname;
+    const isDevelopment = hostname === 'localhost' || 
+      hostname.includes('preview') || 
+      hostname.includes('base44') ||
+      hostname.includes('app.base44.com');
     if (isDevelopment) {
       setIsLoadingPublicSettings(false);
       setIsLoadingAuth(false);
@@ -44,7 +48,13 @@ export const AuthProvider = ({ children }) => {
       });
       
       try {
-        const publicSettings = await appClient.get(`/prod/public-settings/by-id/${appParams.appId}`);
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('timeout')), 5000)
+        );
+        const publicSettings = await Promise.race([
+          appClient.get(`/prod/public-settings/by-id/${appParams.appId}`),
+          timeoutPromise
+        ]);
         setAppPublicSettings(publicSettings);
         
         // If we got the app public settings successfully, check if user is authenticated
