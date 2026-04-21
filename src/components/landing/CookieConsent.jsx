@@ -1,26 +1,42 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
+function safeGetCookieConsent() {
+  try {
+    return window.localStorage.getItem('cookie-consent');
+  } catch {
+    return null;
+  }
+}
+
+function safeSetCookieConsent(value) {
+  try {
+    window.localStorage.setItem('cookie-consent', value);
+  } catch {
+    // Ignore storage failures in embedded preview environments.
+  }
+}
+
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem('cookie-consent');
+    const consent = safeGetCookieConsent();
     if (!consent) setVisible(true);
   }, []);
 
   const handleAccept = () => {
-    localStorage.setItem('cookie-consent', 'accepted');
+    safeSetCookieConsent('accepted');
     setVisible(false);
   };
 
   const handleDecline = () => {
-    localStorage.setItem('cookie-consent', 'declined');
+    safeSetCookieConsent('declined');
     setVisible(false);
   };
 
   const handleDismiss = () => {
-    localStorage.setItem('cookie-consent', 'dismissed');
+    safeSetCookieConsent('dismissed');
     setVisible(false);
   };
 

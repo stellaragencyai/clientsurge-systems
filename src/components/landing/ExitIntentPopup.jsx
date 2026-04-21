@@ -8,6 +8,38 @@ const TARGET_PATHS = new Set(["/", "/med-spa", "/industries", "/contact", "/book
 const STORAGE_KEY = "clientsurge-exit-intent-dismissed";
 const SESSION_KEY = "clientsurge-exit-intent-session";
 
+function safeGetSessionItem(key) {
+  try {
+    return window.sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSetSessionItem(key, value) {
+  try {
+    window.sessionStorage.setItem(key, value);
+  } catch {
+    // Ignore storage failures in embedded preview environments.
+  }
+}
+
+function safeGetLocalItem(key) {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSetLocalItem(key, value) {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage failures in embedded preview environments.
+  }
+}
+
 export default function ExitIntentPopup({ pathname }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,13 +56,13 @@ export default function ExitIntentPopup({ pathname }) {
   useEffect(() => {
     if (!isActivePath) return;
     if (typeof window === "undefined") return;
-    if (window.sessionStorage.getItem(SESSION_KEY) === "true") return;
-    if (window.localStorage.getItem(STORAGE_KEY) === "dismissed") return;
+    if (safeGetSessionItem(SESSION_KEY) === "true") return;
+    if (safeGetLocalItem(STORAGE_KEY) === "dismissed") return;
 
     let timeoutId = window.setTimeout(() => {
       if (window.innerWidth < 768 && window.scrollY > 600) {
         setOpen(true);
-        window.sessionStorage.setItem(SESSION_KEY, "true");
+        safeSetSessionItem(SESSION_KEY, "true");
       }
     }, 18000);
 
@@ -38,7 +70,7 @@ export default function ExitIntentPopup({ pathname }) {
       if (window.innerWidth < 768) return;
       if (event.clientY > 12) return;
       setOpen(true);
-      window.sessionStorage.setItem(SESSION_KEY, "true");
+      safeSetSessionItem(SESSION_KEY, "true");
       trackCTA("exit_intent_opened", pathname || "unknown");
     };
 
@@ -48,7 +80,7 @@ export default function ExitIntentPopup({ pathname }) {
       if (scrollable <= 0) return;
       if (window.scrollY / scrollable < 0.55) return;
       setOpen(true);
-      window.sessionStorage.setItem(SESSION_KEY, "true");
+      safeSetSessionItem(SESSION_KEY, "true");
       trackCTA("exit_intent_opened", pathname || "unknown");
     };
 
@@ -66,7 +98,7 @@ export default function ExitIntentPopup({ pathname }) {
     setOpen(false);
     setError("");
     if (persist && typeof window !== "undefined") {
-      window.localStorage.setItem(STORAGE_KEY, "dismissed");
+      safeSetLocalItem(STORAGE_KEY, "dismissed");
     }
   };
 

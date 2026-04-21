@@ -21,6 +21,22 @@ const industryLinks = [
   { label: "Contractors & Trades", href: "/industries#contractors", live: false },
 ];
 
+function safeGetThemePreference() {
+  try {
+    return window.localStorage.getItem("theme-preference");
+  } catch {
+    return null;
+  }
+}
+
+function safeSetThemePreference(value) {
+  try {
+    window.localStorage.setItem("theme-preference", value);
+  } catch {
+    // Ignore storage failures in embedded preview environments.
+  }
+}
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -35,7 +51,7 @@ export default function Navbar() {
     const isDark = !darkMode;
     setDarkMode(isDark);
     document.documentElement.classList.toggle("dark", isDark);
-    window.localStorage.setItem("theme-preference", isDark ? "dark" : "light");
+    safeSetThemePreference(isDark ? "dark" : "light");
     if (isDark) {
       document.body.style.backgroundImage = "none";
       document.body.style.backgroundColor = "hsl(220, 20%, 5%)";
@@ -74,7 +90,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const storedTheme = window.localStorage.getItem("theme-preference");
+    const storedTheme = safeGetThemePreference();
     const shouldUseDark = storedTheme === "dark";
     setDarkMode(shouldUseDark);
     document.documentElement.classList.toggle("dark", shouldUseDark);
