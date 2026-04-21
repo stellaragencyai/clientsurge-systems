@@ -3,12 +3,8 @@ import { ArrowRight, CheckCircle2, ChevronDown } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import DemoBookingModal from "@/components/forms/DemoBookingModal";
 
-const SMS_MESSAGES = [
-  { from: "lead", text: "Hi! I saw your ad for the laser facial. How much is it?", time: "2:14 PM", delay: 800 },
-  { from: "system", text: "Hi Sarah! Thanks for reaching out to Glow Med Spa 💛 Our laser facial starts at $249. I'd love to get you booked — are mornings or afternoons better for you?", time: "2:14 PM", tag: "Replied in 8 sec", delay: 1800, typingDuration: 1400 },
-  { from: "lead", text: "Afternoons work! Maybe Thursday?", time: "2:16 PM", delay: 1200 },
-  { from: "system", text: "Perfect! I've reserved Thursday at 3 PM for you. Here's your booking link to confirm: glowspa.com/book ✅", time: "2:16 PM", tag: "Booked!", delay: 1600, typingDuration: 1200 },
-];
+// Each step in the sequence engine (not just final messages)
+// Handled procedurally in runSequence below
 
 function TypingDots() {
   return (
@@ -34,59 +30,88 @@ function TypingDots() {
 }
 
 function SMSMockup() {
-  const [visibleCount, setVisibleCount] = useState(0);
-  const [typingFor, setTypingFor] = useState(null); // index of message currently being "typed"
+  // messages: array of { from: "lead"|"system", text, time, tag? }
+  const [messages, setMessages] = useState([]);
+  // readStatus: index of system message that shows "Read"
+  const [readIndex, setReadIndex] = useState(null);
+  // typingFrom: "system"|"lead"|null — who is currently showing typing dots
+  const [typingFrom, setTypingFrom] = useState(null);
   const [floatingReply, setFloatingReply] = useState(false);
   const [floatingBooked, setFloatingBooked] = useState(false);
-  const messagesEndRef = useRef(null); // kept for structure but scroll handled by container
   const containerRef = useRef(null);
 
-  // Scroll chat container internally (not the page)
+  // Auto-scroll chat area only (never the page)
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
-  }, [visibleCount, typingFor]);
+  }, [messages, typingFrom, readIndex]);
 
-  // Sequence engine — plays through messages then loops
+  function sleep(ms) {
+    return new Promise((res) => setTimeout(res, ms));
+  }
+
+  function addMessage(msg) {
+    setMessages((prev) => [...prev, msg]);
+  }
+
   useEffect(() => {
     let cancelled = false;
 
     async function runSequence() {
-      // Reset
-      setVisibleCount(0);
-      setTypingFor(null);
+      // Reset everything
+      setMessages([]);
+      setReadIndex(null);
+      setTypingFrom(null);
       setFloatingReply(false);
       setFloatingBooked(false);
 
-      for (let i = 0; i < SMS_MESSAGES.length; i++) {
-        const msg = SMS_MESSAGES[i];
+      // ── Step 1: Sarah sends first message ──
+      await sleep(1600); // half speed (was 800)
+      if (cancelled) return;
+      addMessage({ from: "lead", text: "Hi! I saw your ad for the laser facial. How much is it?", time: "2:14 PM" });
 
-        // Pause before message appears (simulates human typing delay)
-        await sleep(msg.delay);
-        if (cancelled) return;
+      // ── Step 2: AI types then replies ──
+      await sleep(3600); // half speed (was 1800)
+      if (cancelled) return;
+      setTypingFrom("system");
+      await sleep(2800); // half speed (was 1400)
+      if (cancelled) return;
+      setTypingFrom(null);
+      const aiMsg1Index = 1; // 0-based index of this message after push
+      addMessage({ from: "system", text: "Hi Sarah! Thanks for reaching out to Glow Med Spa 💛 Our laser facial starts at $249. I'd love to get you booked — are mornings or afternoons better for you?", time: "2:14 PM", tag: "Replied in 8 sec" });
+      setFloatingReply(true);
 
-        if (msg.from === "system" && msg.typingDuration) {
-          // Show typing indicator for AI response
-          setTypingFor(i);
-          await sleep(msg.typingDuration);
-          if (cancelled) return;
-          setTypingFor(null);
-        }
+      // ── Step 3: Show "Read" under AI message after 10s ──
+      await sleep(10000);
+      if (cancelled) return;
+      setReadIndex(aiMsg1Index);
 
-        setVisibleCount(i + 1);
+      // ── Step 4: Sarah typing dots ──
+      await sleep(2000);
+      if (cancelled) return;
+      setTypingFrom("lead");
+      await sleep(2400); // half speed (was 1200)
+      if (cancelled) return;
+      setTypingFrom(null);
 
-        // Trigger floating pills at the right moments
-        if (msg.tag === "Replied in 8 sec") {
-          setFloatingReply(true);
-        }
-        if (msg.tag === "Booked!") {
-          setFloatingBooked(true);
-        }
-      }
+      // ── Step 5: Sarah sends reply ──
+      addMessage({ from: "lead", text: "Afternoons work! Maybe Thursday?", time: "2:16 PM" });
 
-      // Hold fully complete state for 3s, then restart
-      await sleep(3000);
+      // ── Step 6: Wait 5 seconds before AI answers ──
+      await sleep(5000);
+      if (cancelled) return;
+
+      // ── Step 7: AI types then sends booking confirmation ──
+      setTypingFrom("system");
+      await sleep(2400); // half speed (was 1200)
+      if (cancelled) return;
+      setTypingFrom(null);
+      addMessage({ from: "system", text: "Perfect! I've reserved Thursday at 3 PM for you. Here's your booking link to confirm: glowspa.com/book ✅", time: "2:16 PM", tag: "Booked!" });
+      setFloatingBooked(true);
+
+      // ── Hold then loop ──
+      await sleep(6000);
       if (cancelled) return;
       runSequence();
     }
@@ -95,13 +120,9 @@ function SMSMockup() {
     return () => { cancelled = true; };
   }, []);
 
-  function sleep(ms) {
-    return new Promise((res) => setTimeout(res, ms));
-  }
-
   return (
     <div className="relative w-full max-w-sm mx-auto lg:mx-0 lg:ml-auto" aria-hidden="true">
-      {/* Phone frame */}
+      {/* Phone frame — fixed height so it never resizes during animation */}
       <div
         className="relative rounded-3xl overflow-hidden shadow-2xl"
         style={{
@@ -110,8 +131,8 @@ function SMSMockup() {
           boxShadow: "0 32px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06)",
         }}
       >
-        {/* Status bar */}
-        <div className="flex items-center justify-between px-5 pt-4 pb-2">
+        {/* Status bar — extra top padding (+10%) */}
+        <div className="flex items-center justify-between px-5 pt-6 pb-2">
           <span className="text-[10px] font-semibold text-white/60">2:14 PM</span>
           <div className="w-12 h-1.5 rounded-full bg-white/20" />
           <span className="text-[10px] font-semibold text-white/60">100%</span>
@@ -137,82 +158,80 @@ function SMSMockup() {
           </div>
         </div>
 
-        {/* Messages scroll area */}
+        {/* Messages scroll area — fixed height so phone never changes size */}
         <div
           ref={containerRef}
-          className="px-3 py-4 space-y-3 overflow-hidden"
-          style={{ minHeight: "325px", maxHeight: "375px", overflowY: "auto" }}
+          className="px-3 py-4 space-y-3"
+          style={{ height: "380px", overflowY: "auto", scrollbarWidth: "none" }}
         >
-          {SMS_MESSAGES.map((msg, i) => {
-            const isVisible = i < visibleCount;
-            const isTyping = typingFor === i;
+          {messages.map((msg, i) => (
+            <div
+              key={i}
+              className={`flex flex-col ${msg.from === "lead" ? "items-start" : "items-end"}`}
+              style={{ animation: "fadeSlideIn 0.35s ease forwards" }}
+            >
+              {/* Tag pill */}
+              {msg.tag && (
+                <span
+                  className="text-[9px] font-bold uppercase tracking-wider mb-1 px-2 py-0.5 rounded-full"
+                  style={{
+                    background: msg.tag === "Booked!" ? "rgba(34,197,94,0.2)" : "rgba(200,150,92,0.25)",
+                    color: msg.tag === "Booked!" ? "#4ade80" : "#f5d9a8",
+                    border: msg.tag === "Booked!" ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(200,150,92,0.3)",
+                  }}
+                >
+                  {msg.tag}
+                </span>
+              )}
 
-            if (!isVisible && !isTyping) return null;
-
-            return (
+              {/* Bubble */}
               <div
-                key={i}
-                className={`flex flex-col ${msg.from === "lead" ? "items-start" : "items-end"}`}
+                className="max-w-[82%] rounded-2xl px-3 py-2"
                 style={{
-                  opacity: isVisible ? 1 : 0,
-                  transform: isVisible ? "translateY(0)" : "translateY(8px)",
-                  transition: "opacity 0.35s ease, transform 0.35s ease",
+                  background: msg.from === "lead"
+                    ? "rgba(255,255,255,0.1)"
+                    : "linear-gradient(135deg, #7a4825, #c8965c)",
+                  borderBottomLeftRadius: msg.from === "lead" ? "4px" : undefined,
+                  borderBottomRightRadius: msg.from === "system" ? "4px" : undefined,
                 }}
               >
-                {/* Tag pill */}
-                {isVisible && msg.tag && (
-                  <span
-                    className="text-[9px] font-bold uppercase tracking-wider mb-1 px-2 py-0.5 rounded-full"
-                    style={{
-                      background: msg.tag === "Booked!" ? "rgba(34,197,94,0.2)" : "rgba(200,150,92,0.25)",
-                      color: msg.tag === "Booked!" ? "#4ade80" : "#f5d9a8",
-                      border: msg.tag === "Booked!" ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(200,150,92,0.3)",
-                      animation: "fadeSlideIn 0.4s ease forwards",
-                    }}
-                  >
-                    {msg.tag}
+                <p className="text-[11px] leading-relaxed text-white">{msg.text}</p>
+              </div>
+
+              {/* Timestamp + Read status */}
+              <div className="flex items-center gap-1.5 mt-0.5 px-1">
+                <span className="text-[9px] text-white/35">{msg.time}</span>
+                {msg.from === "system" && readIndex !== null && i <= readIndex && (
+                  <span className="text-[9px] text-blue-400 font-semibold" style={{ animation: "fadeSlideIn 0.4s ease forwards" }}>
+                    Read
                   </span>
                 )}
-
-                {/* Typing indicator OR bubble */}
-                {isTyping ? (
-                  <div
-                    className="rounded-2xl"
-                    style={{
-                      background: "linear-gradient(135deg, #7a4825, #c8965c)",
-                      borderBottomRightRadius: "4px",
-                    }}
-                  >
-                    <TypingDots />
-                  </div>
-                ) : isVisible ? (
-                  <div
-                    className="max-w-[82%] rounded-2xl px-3 py-2"
-                    style={{
-                      background: msg.from === "lead"
-                        ? "rgba(255,255,255,0.1)"
-                        : "linear-gradient(135deg, #7a4825, #c8965c)",
-                      borderBottomLeftRadius: msg.from === "lead" ? "4px" : undefined,
-                      borderBottomRightRadius: msg.from === "system" ? "4px" : undefined,
-                      animation: "fadeSlideIn 0.35s ease forwards",
-                    }}
-                  >
-                    <p className="text-[11px] leading-relaxed text-white">{msg.text}</p>
-                  </div>
-                ) : null}
-
-                {isVisible && (
-                  <span className="text-[9px] text-white/35 mt-0.5 px-1">{msg.time}</span>
-                )}
               </div>
-            );
-          })}
-          <div ref={messagesEndRef} />
+            </div>
+          ))}
+
+          {/* Live typing indicator */}
+          {typingFrom && (
+            <div className={`flex flex-col ${typingFrom === "lead" ? "items-start" : "items-end"}`}>
+              <div
+                className="rounded-2xl"
+                style={{
+                  background: typingFrom === "lead"
+                    ? "rgba(255,255,255,0.1)"
+                    : "linear-gradient(135deg, #7a4825, #c8965c)",
+                  borderBottomLeftRadius: typingFrom === "lead" ? "4px" : undefined,
+                  borderBottomRightRadius: typingFrom === "system" ? "4px" : undefined,
+                }}
+              >
+                <TypingDots />
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Bottom bar */}
+        {/* Bottom bar — extra bottom padding (+10%) */}
         <div
-          className="flex items-center gap-2 px-3 py-3 border-t"
+          className="flex items-center gap-2 px-3 pt-3 pb-5 border-t"
           style={{ borderColor: "rgba(255,255,255,0.08)" }}
         >
           <div
