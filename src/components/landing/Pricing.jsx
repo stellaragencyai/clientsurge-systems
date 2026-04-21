@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 const plans = [
