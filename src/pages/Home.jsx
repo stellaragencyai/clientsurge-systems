@@ -4,6 +4,7 @@ import Hero from "../components/landing/Hero";
 import TrustBar from "../components/landing/TrustBar";
 import Industries from "../components/landing/Industries";
 import ProblemSolution from "../components/landing/ProblemSolution.jsx";
+import HowItWorks from "../components/landing/HowItWorks";
 import Testimonials from "../components/landing/Testimonials";
 import CoreOffer from "../components/landing/CoreOffer";
 import FAQ from "../components/landing/FAQ";
@@ -61,7 +62,7 @@ export default function Home() {
           <Testimonials />
         </section>
         <ProblemSolution />
-        <CoreOffer />
+        <HowItWorks id="how-it-works-section" />
         <Pricing />
         <FAQ />
         <FinalCTA />
