@@ -81,8 +81,15 @@ export default function FAQ() {
           <AccordionItem
             key={i}
             value={`faq-${i}`}
-            className="border border-border hover:border-primary/40 rounded-xl px-6 data-[state=open]:border-primary/40 transition-colors bg-background overflow-hidden focus-within:ring-2 focus-within:ring-primary">
-            
+            className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary transition-all duration-300"
+            style={{
+              background: "linear-gradient(135deg, rgba(255,252,247,0.7) 0%, rgba(252,240,220,0.5) 100%)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              border: "1.5px solid rgba(200,150,92,0.2)",
+              boxShadow: "0 2px 14px rgba(154,92,46,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
+            }}
+          >
               <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
                 {faq.q}
               </AccordionTrigger>

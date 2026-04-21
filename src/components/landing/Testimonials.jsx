@@ -51,7 +51,22 @@ export default function Testimonials() {
           {testimonials.map((testimonial) => (
             <article
               key={testimonial.name}
-              className="flex flex-col rounded-2xl border border-border bg-card/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_14px_36px_rgba(0,0,0,0.08)]"
+              className="flex flex-col rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1"
+              style={{
+                background: "linear-gradient(135deg, rgba(255,252,247,0.72) 0%, rgba(252,240,220,0.55) 100%)",
+                backdropFilter: "blur(18px)",
+                WebkitBackdropFilter: "blur(18px)",
+                border: "1.5px solid rgba(200,150,92,0.22)",
+                boxShadow: "0 4px 24px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.75)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.border = "1.5px solid rgba(200,150,92,0.5)";
+                e.currentTarget.style.boxShadow = "0 18px 48px rgba(154,92,46,0.16), 0 0 0 1px rgba(200,150,92,0.18), inset 0 1px 0 rgba(255,255,255,0.9)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.border = "1.5px solid rgba(200,150,92,0.22)";
+                e.currentTarget.style.boxShadow = "0 4px 24px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.75)";
+              }}
             >
               <div className="mb-4 flex items-center justify-between gap-3">
                 <span className="inline-flex text-xs font-semibold text-primary/90 bg-primary/10 px-3 py-1 rounded-full">
