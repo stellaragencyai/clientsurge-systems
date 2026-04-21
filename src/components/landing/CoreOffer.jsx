@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { ArrowRight, Zap, MessageSquare, PhoneCall, CalendarCheck, RotateCcw, LayoutDashboard, HeadphonesIcon, TrendingUp, CheckCircle2, Send, X } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
-import SystemFlowDiagram from "./SystemFlowDiagram";
-import EnhancedSystemSteps from "./EnhancedSystemSteps";
 
 const coreAutomation = [
   { icon: Zap, step: "01", title: "Instantly respond to every lead", desc: "Before your competitors do - personalized replies within seconds.", tag: "Avg. 2x more bookings" },
@@ -228,6 +226,9 @@ function StepModal({ stepId, onClose, onBookDemo }) {
 }
 
 export default function CoreOffer() {
+  const [selectedStep, setSelectedStep] = useState(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+
   return (
     <section id="services" className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card via-white to-background">
       <div className="max-w-5xl mx-auto">
@@ -262,9 +263,21 @@ export default function CoreOffer() {
           </div>
         </div>
 
-        {/* Animated Flow Diagram */}
-        <SystemFlowDiagram />
-        <EnhancedSystemSteps />
+        {/* 8-Step Clickable Cards */}
+        <div className="mb-10">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-5 text-center">Core Automation — Steps 1–5</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {coreAutomation.map((item) => (
+              <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
+            ))}
+          </div>
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-5 text-center">Done-For-You — Steps 6–8</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {doneForYou.map((item) => (
+              <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
+            ))}
+          </div>
+        </div>
 
         {/* 3-step timeline */}
         <div className="mb-8 rounded-2xl border border-primary/15 overflow-hidden">
@@ -315,9 +328,15 @@ export default function CoreOffer() {
         </div>
 
       </div>
+
+      {selectedStep && (
+        <StepModal
+          stepId={selectedStep}
+          onClose={() => setSelectedStep(null)}
+          onBookDemo={() => setShowBookingModal(true)}
+        />
+      )}
+      {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
     </section>
   );
 }
-
-
-
