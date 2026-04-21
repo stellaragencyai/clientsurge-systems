@@ -91,18 +91,18 @@ export default function Industries() {
     <section
       id="industries"
       ref={sectionRef}
-      className="py-24 md:py-32 px-6 bg-[#0d0d0d]"
+      className="py-24 md:py-32 px-6 bg-gradient-to-b from-card via-background to-card"
     >
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-16">
-        <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3" style={{ color: "#c8965c" }}>
+        <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">
           Choose Your Industry
         </p>
-        <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+        <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
           Built for Businesses That Win on{" "}
-          <span style={{ color: "#c8965c" }}>Fast Response</span>
+          <span className="text-primary">Fast Response</span>
         </h2>
-        <p className="mt-4 text-white/50 text-lg max-w-2xl">
+        <p className="mt-4 text-muted-foreground text-lg max-w-2xl leading-relaxed">
           Start with the live med spa page, or explore the six industry tracks the system is designed around.
         </p>
       </div>
@@ -128,7 +128,7 @@ export default function Industries() {
                   src={industry.image}
                   alt={industry.name}
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
+                  className="absolute inset-0 h-full w-full object-cover"
                 />
                 {/* Subtle top vignette */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
@@ -144,14 +144,7 @@ export default function Industries() {
                     card.addEventListener("mouseleave", () => { el.style.opacity = "0"; });
                   }}
                 />
-                {/* Status badge */}
-                <div
-                  className="absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest"
-                  style={{ background: "rgba(0,0,0,0.65)", color: "#c8965c", border: "1px solid rgba(200,150,92,0.4)" }}
-                >
-                  <Icon className="w-3 h-3" />
-                  {industry.result}
-                </div>
+
               </div>
 
               {/* Info strip — dark, below photo */}
