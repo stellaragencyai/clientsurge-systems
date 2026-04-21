@@ -6,7 +6,7 @@ import DemoBookingModal from "../forms/DemoBookingModal";
 import { trackCTA } from "@/lib/analytics";
 
 const sectionLinks = [
-  { label: "How It Works", href: "#how-it-works-section" },
+  { label: "How It Works", href: "#problem-solution" },
   { label: "Our System", href: "#services" },
   { label: "Pricing", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
@@ -22,7 +22,7 @@ const industryLinks = [
 ];
 
 const SAFE_SECTION_HASHES = new Set([
-  "#how-it-works-section",
+  "#problem-solution",
   "#services",
   "#pricing",
   "#faq",

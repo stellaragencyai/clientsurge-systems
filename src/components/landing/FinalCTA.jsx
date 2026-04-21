@@ -66,11 +66,11 @@ export default function FinalCTA() {
               </span>
             </button>
             <a
-              href="#automation-demo"
-              onClick={() => trackCTA("see_live_demo_3_minutes", "final_cta")}
+              href="#services"
+              onClick={() => trackCTA("review_8_system_flow", "final_cta")}
               className="inline-flex items-center justify-center h-14 px-6 rounded-full border border-primary/25 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
             >
-              See a live demo in 3 minutes
+              Review the 8-step system
             </a>
           </div>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-muted-foreground">

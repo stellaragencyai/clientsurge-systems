@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, Zap, MessageSquare, PhoneCall, CalendarCheck, RotateCcw, LayoutDashboard, HeadphonesIcon, TrendingUp, CheckCircle2, Send, X } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
+import AutomationPipelineSection from "./AutomationPipelineSection";
 
 const coreAutomation = [
   { icon: Zap, step: "01", title: "Instantly respond to every lead", desc: "Before your competitors do - personalized replies within seconds.", tag: "Avg. 2x more bookings" },
@@ -25,6 +26,57 @@ const aspects = {
   "06": ["Zero manual scheduling", "Frictionless booking experience", "Direct calendar integration"],
   "07": ["Auto-tagging & status updates", "Full visibility dashboard", "Task creation on autopilot"],
   "08": ["Priority support access", "Continuous post-launch optimization", "Monthly performance reviews"],
+};
+
+const blueprints = {
+  "01": {
+    trigger: "A new lead submits a form, ad inquiry, or direct message.",
+    system: "The system sends a personalized first response in seconds based on lead source and context.",
+    visibleToLead: "They hear from you immediately instead of waiting for a callback.",
+    businessOutcome: "You win more conversations before competitors even respond.",
+  },
+  "02": {
+    trigger: "A prospect asks questions or shows interest but has not booked yet.",
+    system: "The automation answers, qualifies, and routes the conversation toward a booking decision.",
+    visibleToLead: "The interaction feels guided, helpful, and responsive.",
+    businessOutcome: "More warm inquiries turn into booked appointments.",
+  },
+  "03": {
+    trigger: "A call comes in and your team misses it while busy or after hours.",
+    system: "A text-back fires automatically and keeps the lead engaged while your team catches up.",
+    visibleToLead: "They still get an immediate response instead of feeling ignored.",
+    businessOutcome: "Missed calls stop turning into lost revenue.",
+  },
+  "04": {
+    trigger: "A lead goes quiet after the first touchpoint or does not book right away.",
+    system: "Timed SMS and email follow-up keeps the lead warm with the right spacing and next step.",
+    visibleToLead: "They experience steady follow-up without feeling chased.",
+    businessOutcome: "More leads come back and convert instead of dying silently.",
+  },
+  "05": {
+    trigger: "Your CRM already contains older leads that never converted.",
+    system: "Reactivation campaigns reopen dormant conversations with proven messaging.",
+    visibleToLead: "They receive a relevant reconnect message rather than being forgotten forever.",
+    businessOutcome: "Old contacts become fresh opportunities and recovered revenue.",
+  },
+  "06": {
+    trigger: "A lead is qualified and ready to move into scheduling.",
+    system: "The automation pushes them into a cleaner booking path with less back-and-forth.",
+    visibleToLead: "Scheduling feels easy, direct, and frictionless.",
+    businessOutcome: "More ready prospects actually complete the booking step.",
+  },
+  "07": {
+    trigger: "A lead replies, changes stage, or requires internal follow-through.",
+    system: "Statuses, tags, and pipeline actions update automatically behind the scenes.",
+    visibleToLead: "They experience a coordinated business that seems on top of everything.",
+    businessOutcome: "Your team gets cleaner visibility and fewer workflow gaps.",
+  },
+  "08": {
+    trigger: "The system is live and handling real lead flow.",
+    system: "We review results, tune messaging, and improve performance over time.",
+    visibleToLead: "They keep experiencing a polished follow-up flow instead of a stale setup.",
+    businessOutcome: "The automation gets stronger instead of degrading after launch.",
+  },
 };
 
 function FeatureCard({ item, onSelect }) {
@@ -112,6 +164,7 @@ function StepModal({ stepId, onClose, onBookDemo }) {
   if (!itemData) return null;
   const Icon = itemData.icon;
   const cardAspects = aspects[stepId] || [];
+  const blueprint = blueprints[stepId];
 
   return (
     <>
@@ -164,6 +217,23 @@ function StepModal({ stepId, onClose, onBookDemo }) {
           {/* Body */}
           <div className="px-10 py-8">
             <p className="text-foreground/70 mb-7 leading-relaxed">{itemData.desc}</p>
+
+            <div className="grid gap-3 mb-8 md:grid-cols-2">
+              {[
+                { label: "Trigger", value: blueprint?.trigger },
+                { label: "System Action", value: blueprint?.system },
+                { label: "Lead Experiences", value: blueprint?.visibleToLead },
+                { label: "Business Outcome", value: blueprint?.businessOutcome },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-2xl border border-[rgba(154,92,46,0.15)] bg-[rgba(154,92,46,0.05)] px-4 py-4"
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-primary mb-2">{item.label}</p>
+                  <p className="text-sm leading-6 text-foreground/80">{item.value}</p>
+                </div>
+              ))}
+            </div>
 
             {/* Key points */}
             <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-4">What This Includes</p>
@@ -250,6 +320,9 @@ export default function CoreOffer() {
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
             Every system works together - capturing leads, responding instantly, following up automatically, and booking appointments without you lifting a finger.
           </p>
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+            Click any system card to open its automation blueprint
+          </div>
         </div>
 
         {/* ROI Callout + Step count pill */}
@@ -279,8 +352,10 @@ export default function CoreOffer() {
           </div>
         </div>
 
+        <AutomationPipelineSection />
+
         {/* 3-step timeline */}
-        <div className="mb-8 rounded-2xl border border-primary/15 overflow-hidden">
+        <div className="mb-8 mt-12 rounded-2xl border border-primary/15 overflow-hidden">
           <div className="grid grid-cols-3 bg-primary/5">
             {[
               { num: "1", label: "Onboarding Call", sub: "One 15-min call with our team" },
