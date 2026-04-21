@@ -27,9 +27,15 @@ const steps = [
 ];
 
 function StepModal({ activeStep, onClose, onBook }) {
-  const step = useMemo(() => steps.find(([stepId]) => stepId === activeStep), [activeStep]);
+  const step = useMemo(() => steps.find((s) => s[0] === activeStep), [activeStep]);
   if (!step) return null;
-  const [stepId, lane, Icon, title, desc, tag, diagram] = step;
+  const stepNum = step[0];
+  const lane = step[1];
+  const StepIcon = step[2];
+  const title = step[3];
+  const desc = step[4];
+  const tag = step[5];
+  const diagram = step[6];
 
   return (
     <>
@@ -42,13 +48,13 @@ function StepModal({ activeStep, onClose, onBook }) {
           <div className="grid gap-6 px-7 pb-7 pt-8 md:grid-cols-[1.15fr_0.9fr] md:px-10 md:pb-10">
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#c8965c]/25 bg-white/80 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8a684a] shadow-sm">
-                Step {stepId}
+                Step {stepNum}
                 <span className="h-1.5 w-1.5 rounded-full bg-[#c8965c]" />
                 {lane}
               </div>
               <div className="mb-5 flex items-start gap-4">
                 <div className="flex h-16 w-16 items-center justify-center rounded-[1.4rem] border border-[#c8965c]/25 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(248,235,214,0.95))]">
-                  <Icon className="h-7 w-7 text-[#8a5a32]" />
+                  <StepIcon className="h-7 w-7 text-[#8a5a32]" />
                 </div>
                 <div>
                   <h3 className="font-display text-3xl font-semibold leading-tight text-slate-900 md:text-[2.15rem]">{title}</h3>
@@ -93,72 +99,81 @@ export default function EnhancedSystemSteps() {
   return (
     <>
       <div className="space-y-6">
-        {steps.map(([id, lane, Icon, title, desc, tag, diagram], index) => (
-          <article key={id} className="group relative overflow-hidden rounded-[2rem] border border-[#b98b61]/25 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,248,239,0.82))] shadow-[0_24px_60px_rgba(15,23,42,0.08)] ring-1 ring-black/5 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 hover:border-[#9a6c45]/55 hover:shadow-[0_36px_90px_rgba(15,23,42,0.12)]" style={{ animation: `stepCardIn 560ms ease ${index * 90}ms both` }}>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-[linear-gradient(180deg,#f0cf9b_0%,#b77b47_55%,#7a4f2e_100%)]" />
-            <div className="pointer-events-none absolute inset-x-10 top-0 h-24 rounded-full bg-[#f7dfb8]/45 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.28),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(201,156,110,0.14),transparent_36%)] opacity-90" />
+        {steps.map((step, index) => {
+          const stepNum = step[0];
+          const lane = step[1];
+          const StepIcon = step[2];
+          const title = step[3];
+          const desc = step[4];
+          const tag = step[5];
+          const diagram = step[6];
+          return (
+            <article key={stepNum} className="group relative overflow-hidden rounded-[2rem] border border-[#b98b61]/25 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,248,239,0.82))] shadow-[0_24px_60px_rgba(15,23,42,0.08)] ring-1 ring-black/5 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 hover:border-[#9a6c45]/55 hover:shadow-[0_36px_90px_rgba(15,23,42,0.12)]" style={{ animation: `stepCardIn 560ms ease ${index * 90}ms both` }}>
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-[linear-gradient(180deg,#f0cf9b_0%,#b77b47_55%,#7a4f2e_100%)]" />
+              <div className="pointer-events-none absolute inset-x-10 top-0 h-24 rounded-full bg-[#f7dfb8]/45 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.28),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(201,156,110,0.14),transparent_36%)] opacity-90" />
 
-            <div className="relative grid gap-6 px-7 py-7 md:grid-cols-[1.1fr_1.2fr_0.9fr] md:px-9 md:py-9">
-              <div className="flex flex-col justify-between gap-5">
-                <div>
-                  <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#c8965c]/25 bg-white/75 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8a684a] shadow-sm backdrop-blur">
-                    Step {id}
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#c8965c]" />
-                    {lane}
-                  </div>
-                  <div className="mb-4 flex items-start gap-4">
-                    <div className="mt-1 flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[#c8965c]/25 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(248,235,214,0.95))]">
-                      <Icon className="h-6 w-6 text-[#8a5a32]" />
+              <div className="relative grid gap-6 px-7 py-7 md:grid-cols-[1.1fr_1.2fr_0.9fr] md:px-9 md:py-9">
+                <div className="flex flex-col justify-between gap-5">
+                  <div>
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#c8965c]/25 bg-white/75 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8a684a] shadow-sm backdrop-blur">
+                      Step {stepNum}
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#c8965c]" />
+                      {lane}
                     </div>
-                    <div>
-                      <h3 className="font-display text-2xl font-semibold leading-tight text-slate-900 md:text-[1.95rem]">{title}</h3>
-                      <p className="mt-3 max-w-xl text-[15px] leading-7 text-slate-600">{desc}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="inline-flex items-center gap-2 self-start rounded-full bg-[linear-gradient(135deg,#6b3f1f,#9a5c2e)] px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-amber-100 shadow-[0_10px_26px_rgba(122,72,37,0.22)]">
-                  <TrendingUp className="h-3.5 w-3.5" />
-                  {tag}
-                </div>
-              </div>
-
-              <div className="rounded-[1.75rem] border border-white/70 bg-white/55 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur">
-                <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8a684a]">What This Step Does</p>
-                <div className="space-y-3">
-                  {diagram.map((item, pointIndex) => (
-                    <div key={item} className="flex items-start gap-3 rounded-2xl border border-[#e6d6c0] bg-[linear-gradient(180deg,rgba(255,255,255,0.85),rgba(255,250,243,0.92))] px-4 py-3 shadow-sm" style={{ animation: `slidePointIn 380ms ease ${(index * 90) + (pointIndex * 70)}ms both` }}>
-                      <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#f5e0c2] text-[#8a5a32]">
-                        <CheckCircle2 className="h-3.5 w-3.5" />
+                    <div className="mb-4 flex items-start gap-4">
+                      <div className="mt-1 flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[#c8965c]/25 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(248,235,214,0.95))]">
+                        <StepIcon className="h-6 w-6 text-[#8a5a32]" />
                       </div>
-                      <p className="text-sm font-medium leading-6 text-slate-700">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-[1.75rem] border border-[#d6c2ab] bg-[linear-gradient(180deg,rgba(109,67,33,0.98),rgba(139,91,52,0.98))] p-5 text-amber-50 shadow-[0_24px_50px_rgba(107,63,31,0.22)]">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-200/80">Mini Flow Diagram</p>
-                  <button type="button" onClick={() => setActiveStep(id)} className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-100 transition-colors hover:bg-white/15">
-                    Expand
-                  </button>
-                </div>
-                <div className="space-y-3">
-                  {diagram.map((item, itemIndex) => (
-                    <div key={item} className="relative">
-                      <div className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 backdrop-blur">
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-200/70">{itemIndex === 0 ? "Input" : itemIndex === 1 ? "Automation" : "Outcome"}</p>
-                        <p className="mt-1 text-sm leading-6 text-amber-50">{item}</p>
+                      <div>
+                        <h3 className="font-display text-2xl font-semibold leading-tight text-slate-900 md:text-[1.95rem]">{title}</h3>
+                        <p className="mt-3 max-w-xl text-[15px] leading-7 text-slate-600">{desc}</p>
                       </div>
-                      {itemIndex < 2 && <div className="ml-5 mt-2 flex items-center gap-2 text-amber-200/70"><div className="h-6 w-px bg-gradient-to-b from-amber-200/50 to-transparent" /><ArrowRight className="h-3.5 w-3.5 rotate-90" /></div>}
                     </div>
-                  ))}
+                  </div>
+                  <div className="inline-flex items-center gap-2 self-start rounded-full bg-[linear-gradient(135deg,#6b3f1f,#9a5c2e)] px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-amber-100 shadow-[0_10px_26px_rgba(122,72,37,0.22)]">
+                    <TrendingUp className="h-3.5 w-3.5" />
+                    {tag}
+                  </div>
+                </div>
+
+                <div className="rounded-[1.75rem] border border-white/70 bg-white/55 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur">
+                  <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8a684a]">What This Step Does</p>
+                  <div className="space-y-3">
+                    {diagram.map((item, pointIndex) => (
+                      <div key={item} className="flex items-start gap-3 rounded-2xl border border-[#e6d6c0] bg-[linear-gradient(180deg,rgba(255,255,255,0.85),rgba(255,250,243,0.92))] px-4 py-3 shadow-sm" style={{ animation: `slidePointIn 380ms ease ${(index * 90) + (pointIndex * 70)}ms both` }}>
+                        <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#f5e0c2] text-[#8a5a32]">
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                        </div>
+                        <p className="text-sm font-medium leading-6 text-slate-700">{item}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-[1.75rem] border border-[#d6c2ab] bg-[linear-gradient(180deg,rgba(109,67,33,0.98),rgba(139,91,52,0.98))] p-5 text-amber-50 shadow-[0_24px_50px_rgba(107,63,31,0.22)]">
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-200/80">Mini Flow Diagram</p>
+                    <button type="button" onClick={() => setActiveStep(stepNum)} className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-100 transition-colors hover:bg-white/15">
+                      Expand
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {diagram.map((item, itemIndex) => (
+                      <div key={item} className="relative">
+                        <div className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 backdrop-blur">
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-200/70">{itemIndex === 0 ? "Input" : itemIndex === 1 ? "Automation" : "Outcome"}</p>
+                          <p className="mt-1 text-sm leading-6 text-amber-50">{item}</p>
+                        </div>
+                        {itemIndex < 2 && <div className="ml-5 mt-2 flex items-center gap-2 text-amber-200/70"><div className="h-6 w-px bg-gradient-to-b from-amber-200/50 to-transparent" /><ArrowRight className="h-3.5 w-3.5 rotate-90" /></div>}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
 
       {activeStep && <StepModal activeStep={activeStep} onClose={() => setActiveStep(null)} onBook={() => { setActiveStep(null); setShowDemoModal(true); }} />}
