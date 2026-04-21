@@ -27,7 +27,7 @@ const steps = [
 ];
 
 function StepModal({ activeStep, onClose, onBook }) {
-  const step = useMemo(() => steps.find(([id]) => id === activeStep), [activeStep]);
+  const step = useMemo(() => steps.find(([stepId]) => stepId === activeStep), [activeStep]);
   if (!step) return null;
   const [id, lane, Icon, title, desc, tag, diagram] = step;
 
