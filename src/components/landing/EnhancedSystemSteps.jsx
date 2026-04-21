@@ -27,9 +27,9 @@ const steps = [
 ];
 
 function StepModal({ activeStep, onClose, onBook }) {
-  const step = useMemo(() => steps.find(([id]) => id === activeStep), [activeStep]);
+  const step = useMemo(() => steps.find(([stepId]) => stepId === activeStep), [activeStep]);
   if (!step) return null;
-  const [id, lane, Icon, title, desc, tag, diagram] = step;
+  const [stepId, lane, Icon, title, desc, tag, diagram] = step;
 
   return (
     <>
@@ -42,7 +42,7 @@ function StepModal({ activeStep, onClose, onBook }) {
           <div className="grid gap-6 px-7 pb-7 pt-8 md:grid-cols-[1.15fr_0.9fr] md:px-10 md:pb-10">
             <div>
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#c8965c]/25 bg-white/80 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8a684a] shadow-sm">
-                Step {id}
+                Step {stepId}
                 <span className="h-1.5 w-1.5 rounded-full bg-[#c8965c]" />
                 {lane}
               </div>
