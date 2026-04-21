@@ -29,6 +29,7 @@ const steps = [
 function StepModal({ activeStep, onClose, onBook }) {
   const step = useMemo(() => steps.find((s) => s[0] === activeStep), [activeStep]);
   if (!step) return null;
+
   const stepNum = step[0];
   const lane = step[1];
   const StepIcon = step[2];
@@ -41,7 +42,10 @@ function StepModal({ activeStep, onClose, onBook }) {
     <>
       <div className="fixed inset-0 z-40 bg-black/35 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
-        <div className="relative w-full max-w-4xl overflow-hidden rounded-[2rem] border border-[#d3b08b]/55 bg-[linear-gradient(180deg,rgba(255,252,247,0.98),rgba(255,247,236,0.96))] shadow-[0_40px_100px_rgba(15,23,42,0.2)]" onClick={(event) => event.stopPropagation()}>
+        <div
+          className="relative w-full max-w-4xl overflow-hidden rounded-[2rem] border border-[#d3b08b]/55 bg-[linear-gradient(180deg,rgba(255,252,247,0.98),rgba(255,247,236,0.96))] shadow-[0_40px_100px_rgba(15,23,42,0.2)]"
+          onClick={(e) => e.stopPropagation()}
+        >
           <button onClick={onClose} className="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-black/5 bg-white/90 text-slate-600 shadow-sm transition-colors hover:bg-white" aria-label="Close">
             <X className="h-4 w-4" />
           </button>
@@ -73,14 +77,24 @@ function StepModal({ activeStep, onClose, onBook }) {
                 {diagram.map((item, index) => (
                   <div key={item} className="relative">
                     <div className="rounded-2xl border border-white/12 bg-white/8 px-4 py-4 backdrop-blur">
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-200/70">{index === 0 ? "Input" : index === 1 ? "Automation" : "Outcome"}</p>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-200/70">
+                        {index === 0 ? "Input" : index === 1 ? "Automation" : "Outcome"}
+                      </p>
                       <p className="mt-2 text-sm leading-6 text-amber-50">{item}</p>
                     </div>
-                    {index < 2 && <div className="ml-6 mt-2 flex items-center gap-2 text-amber-200/70"><div className="h-8 w-px bg-gradient-to-b from-amber-200/50 to-transparent" /><ArrowRight className="h-4 w-4 rotate-90" /></div>}
+                    {index < 2 && (
+                      <div className="ml-6 mt-2 flex items-center gap-2 text-amber-200/70">
+                        <div className="h-8 w-px bg-gradient-to-b from-amber-200/50 to-transparent" />
+                        <ArrowRight className="h-4 w-4 rotate-90" />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
-              <button onClick={onBook} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#f0d4a5_0%,#e4b875_50%,#c8965c_100%)] px-5 py-3 text-sm font-semibold text-[#5d371d] shadow-[0_14px_30px_rgba(240,212,165,0.18)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(240,212,165,0.24)]">
+              <button
+                onClick={onBook}
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#f0d4a5_0%,#e4b875_50%,#c8965c_100%)] px-5 py-3 text-sm font-semibold text-[#5d371d] shadow-[0_14px_30px_rgba(240,212,165,0.18)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(240,212,165,0.24)]"
+              >
                 Book Your Free Demo
                 <ArrowRight className="h-4 w-4" />
               </button>
@@ -107,8 +121,13 @@ export default function EnhancedSystemSteps() {
           const desc = step[4];
           const tag = step[5];
           const diagram = step[6];
+
           return (
-            <article key={stepNum} className="group relative overflow-hidden rounded-[2rem] border border-[#b98b61]/25 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,248,239,0.82))] shadow-[0_24px_60px_rgba(15,23,42,0.08)] ring-1 ring-black/5 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 hover:border-[#9a6c45]/55 hover:shadow-[0_36px_90px_rgba(15,23,42,0.12)]" style={{ animation: `stepCardIn 560ms ease ${index * 90}ms both` }}>
+            <article
+              key={stepNum}
+              className="group relative overflow-hidden rounded-[2rem] border border-[#b98b61]/25 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,248,239,0.82))] shadow-[0_24px_60px_rgba(15,23,42,0.08)] ring-1 ring-black/5 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 hover:border-[#9a6c45]/55 hover:shadow-[0_36px_90px_rgba(15,23,42,0.12)]"
+              style={{ animation: `stepCardIn 560ms ease ${index * 90}ms both` }}
+            >
               <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-[linear-gradient(180deg,#f0cf9b_0%,#b77b47_55%,#7a4f2e_100%)]" />
               <div className="pointer-events-none absolute inset-x-10 top-0 h-24 rounded-full bg-[#f7dfb8]/45 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.28),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(201,156,110,0.14),transparent_36%)] opacity-90" />
@@ -141,7 +160,11 @@ export default function EnhancedSystemSteps() {
                   <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8a684a]">What This Step Does</p>
                   <div className="space-y-3">
                     {diagram.map((item, pointIndex) => (
-                      <div key={item} className="flex items-start gap-3 rounded-2xl border border-[#e6d6c0] bg-[linear-gradient(180deg,rgba(255,255,255,0.85),rgba(255,250,243,0.92))] px-4 py-3 shadow-sm" style={{ animation: `slidePointIn 380ms ease ${(index * 90) + (pointIndex * 70)}ms both` }}>
+                      <div
+                        key={item}
+                        className="flex items-start gap-3 rounded-2xl border border-[#e6d6c0] bg-[linear-gradient(180deg,rgba(255,255,255,0.85),rgba(255,250,243,0.92))] px-4 py-3 shadow-sm"
+                        style={{ animation: `slidePointIn 380ms ease ${index * 90 + pointIndex * 70}ms both` }}
+                      >
                         <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#f5e0c2] text-[#8a5a32]">
                           <CheckCircle2 className="h-3.5 w-3.5" />
                         </div>
@@ -154,7 +177,11 @@ export default function EnhancedSystemSteps() {
                 <div className="rounded-[1.75rem] border border-[#d6c2ab] bg-[linear-gradient(180deg,rgba(109,67,33,0.98),rgba(139,91,52,0.98))] p-5 text-amber-50 shadow-[0_24px_50px_rgba(107,63,31,0.22)]">
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-200/80">Mini Flow Diagram</p>
-                    <button type="button" onClick={() => setActiveStep(stepNum)} className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-100 transition-colors hover:bg-white/15">
+                    <button
+                      type="button"
+                      onClick={() => setActiveStep(stepNum)}
+                      className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-100 transition-colors hover:bg-white/15"
+                    >
                       Expand
                     </button>
                   </div>
@@ -162,10 +189,17 @@ export default function EnhancedSystemSteps() {
                     {diagram.map((item, itemIndex) => (
                       <div key={item} className="relative">
                         <div className="rounded-2xl border border-white/12 bg-white/8 px-4 py-3 backdrop-blur">
-                          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-200/70">{itemIndex === 0 ? "Input" : itemIndex === 1 ? "Automation" : "Outcome"}</p>
+                          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-200/70">
+                            {itemIndex === 0 ? "Input" : itemIndex === 1 ? "Automation" : "Outcome"}
+                          </p>
                           <p className="mt-1 text-sm leading-6 text-amber-50">{item}</p>
                         </div>
-                        {itemIndex < 2 && <div className="ml-5 mt-2 flex items-center gap-2 text-amber-200/70"><div className="h-6 w-px bg-gradient-to-b from-amber-200/50 to-transparent" /><ArrowRight className="h-3.5 w-3.5 rotate-90" /></div>}
+                        {itemIndex < 2 && (
+                          <div className="ml-5 mt-2 flex items-center gap-2 text-amber-200/70">
+                            <div className="h-6 w-px bg-gradient-to-b from-amber-200/50 to-transparent" />
+                            <ArrowRight className="h-3.5 w-3.5 rotate-90" />
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -176,7 +210,13 @@ export default function EnhancedSystemSteps() {
         })}
       </div>
 
-      {activeStep && <StepModal activeStep={activeStep} onClose={() => setActiveStep(null)} onBook={() => { setActiveStep(null); setShowDemoModal(true); }} />}
+      {activeStep && (
+        <StepModal
+          activeStep={activeStep}
+          onClose={() => setActiveStep(null)}
+          onBook={() => { setActiveStep(null); setShowDemoModal(true); }}
+        />
+      )}
       {showDemoModal && <DemoBookingModal onClose={() => setShowDemoModal(false)} />}
 
       <style>{`
