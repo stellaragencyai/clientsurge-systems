@@ -1,21 +1,106 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowRight, CheckCircle2, ChevronDown } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import DemoBookingModal from "@/components/forms/DemoBookingModal";
 
 const SMS_MESSAGES = [
-  { from: "lead", text: "Hi! I saw your ad for the laser facial. How much is it?", time: "2:14 PM" },
-  { from: "system", text: "Hi Sarah! Thanks for reaching out to Glow Med Spa 💛 Our laser facial starts at $249. I'd love to get you booked — are mornings or afternoons better for you?", time: "2:14 PM", tag: "Replied in 8 sec" },
-  { from: "lead", text: "Afternoons work! Maybe Thursday?", time: "2:16 PM" },
-  { from: "system", text: "Perfect! I've reserved Thursday at 3 PM for you. Here's your booking link to confirm: glowspa.com/book ✅", time: "2:16 PM", tag: "Booked!" },
+  { from: "lead", text: "Hi! I saw your ad for the laser facial. How much is it?", time: "2:14 PM", delay: 800 },
+  { from: "system", text: "Hi Sarah! Thanks for reaching out to Glow Med Spa 💛 Our laser facial starts at $249. I'd love to get you booked — are mornings or afternoons better for you?", time: "2:14 PM", tag: "Replied in 8 sec", delay: 1800, typingDuration: 1400 },
+  { from: "lead", text: "Afternoons work! Maybe Thursday?", time: "2:16 PM", delay: 1200 },
+  { from: "system", text: "Perfect! I've reserved Thursday at 3 PM for you. Here's your booking link to confirm: glowspa.com/book ✅", time: "2:16 PM", tag: "Booked!", delay: 1600, typingDuration: 1200 },
 ];
 
-function SMSMockup() {
+function TypingDots() {
   return (
-    <div
-      className="relative w-full max-w-xs mx-auto lg:mx-0 lg:ml-auto"
-      aria-hidden="true"
-    >
+    <div className="flex items-center gap-1 px-3 py-2">
+      {[0, 1, 2].map((i) => (
+        <div
+          key={i}
+          className="w-1.5 h-1.5 rounded-full bg-white/60"
+          style={{
+            animation: `typingBounce 1.2s ease-in-out infinite`,
+            animationDelay: `${i * 0.2}s`,
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes typingBounce {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+          30% { transform: translateY(-4px); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function SMSMockup() {
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [typingFor, setTypingFor] = useState(null); // index of message currently being "typed"
+  const [floatingReply, setFloatingReply] = useState(false);
+  const [floatingBooked, setFloatingBooked] = useState(false);
+  const messagesEndRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // Scroll to bottom of chat whenever messages appear
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [visibleCount, typingFor]);
+
+  // Sequence engine — plays through messages then loops
+  useEffect(() => {
+    let cancelled = false;
+
+    async function runSequence() {
+      // Reset
+      setVisibleCount(0);
+      setTypingFor(null);
+      setFloatingReply(false);
+      setFloatingBooked(false);
+
+      for (let i = 0; i < SMS_MESSAGES.length; i++) {
+        const msg = SMS_MESSAGES[i];
+
+        // Pause before message appears (simulates human typing delay)
+        await sleep(msg.delay);
+        if (cancelled) return;
+
+        if (msg.from === "system" && msg.typingDuration) {
+          // Show typing indicator for AI response
+          setTypingFor(i);
+          await sleep(msg.typingDuration);
+          if (cancelled) return;
+          setTypingFor(null);
+        }
+
+        setVisibleCount(i + 1);
+
+        // Trigger floating pills at the right moments
+        if (msg.tag === "Replied in 8 sec") {
+          setFloatingReply(true);
+        }
+        if (msg.tag === "Booked!") {
+          setFloatingBooked(true);
+        }
+      }
+
+      // Hold fully complete state for 3s, then restart
+      await sleep(3000);
+      if (cancelled) return;
+      runSequence();
+    }
+
+    runSequence();
+    return () => { cancelled = true; };
+  }, []);
+
+  function sleep(ms) {
+    return new Promise((res) => setTimeout(res, ms));
+  }
+
+  return (
+    <div className="relative w-full max-w-xs mx-auto lg:mx-0 lg:ml-auto" aria-hidden="true">
       {/* Phone frame */}
       <div
         className="relative rounded-3xl overflow-hidden shadow-2xl"
@@ -27,10 +112,8 @@ function SMSMockup() {
       >
         {/* Status bar */}
         <div className="flex items-center justify-between px-5 pt-4 pb-2">
-          <span className="text-[10px] font-semibold text-white/60">2:16 PM</span>
-          <div className="flex gap-1.5">
-            <div className="w-12 h-1.5 rounded-full bg-white/20" />
-          </div>
+          <span className="text-[10px] font-semibold text-white/60">2:14 PM</span>
+          <div className="w-12 h-1.5 rounded-full bg-white/20" />
           <span className="text-[10px] font-semibold text-white/60">100%</span>
         </div>
 
@@ -47,44 +130,84 @@ function SMSMockup() {
           </div>
           <div>
             <p className="text-xs font-semibold text-white">Glow Med Spa</p>
-            <p className="text-[10px] text-green-400">● AI System Active</p>
+            <p className="text-[10px] text-green-400 flex items-center gap-1">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              AI System Active
+            </p>
           </div>
         </div>
 
-        {/* Messages */}
-        <div className="px-3 py-4 space-y-3">
-          {SMS_MESSAGES.map((msg, i) => (
-            <div
-              key={i}
-              className={`flex flex-col ${msg.from === "lead" ? "items-start" : "items-end"}`}
-            >
-              {msg.tag && (
-                <span
-                  className="text-[9px] font-bold uppercase tracking-wider mb-1 px-2 py-0.5 rounded-full"
-                  style={{
-                    background: msg.tag === "Booked!" ? "rgba(34,197,94,0.2)" : "rgba(200,150,92,0.25)",
-                    color: msg.tag === "Booked!" ? "#4ade80" : "#f5d9a8",
-                    border: msg.tag === "Booked!" ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(200,150,92,0.3)",
-                  }}
-                >
-                  {msg.tag}
-                </span>
-              )}
+        {/* Messages scroll area */}
+        <div
+          ref={containerRef}
+          className="px-3 py-4 space-y-3 overflow-hidden"
+          style={{ minHeight: "260px", maxHeight: "300px", overflowY: "auto" }}
+        >
+          {SMS_MESSAGES.map((msg, i) => {
+            const isVisible = i < visibleCount;
+            const isTyping = typingFor === i;
+
+            if (!isVisible && !isTyping) return null;
+
+            return (
               <div
-                className="max-w-[80%] rounded-2xl px-3 py-2"
+                key={i}
+                className={`flex flex-col ${msg.from === "lead" ? "items-start" : "items-end"}`}
                 style={{
-                  background: msg.from === "lead"
-                    ? "rgba(255,255,255,0.1)"
-                    : "linear-gradient(135deg, #7a4825, #c8965c)",
-                  borderBottomLeftRadius: msg.from === "lead" ? "4px" : undefined,
-                  borderBottomRightRadius: msg.from === "system" ? "4px" : undefined,
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? "translateY(0)" : "translateY(8px)",
+                  transition: "opacity 0.35s ease, transform 0.35s ease",
                 }}
               >
-                <p className="text-[11px] leading-relaxed text-white">{msg.text}</p>
+                {/* Tag pill */}
+                {isVisible && msg.tag && (
+                  <span
+                    className="text-[9px] font-bold uppercase tracking-wider mb-1 px-2 py-0.5 rounded-full"
+                    style={{
+                      background: msg.tag === "Booked!" ? "rgba(34,197,94,0.2)" : "rgba(200,150,92,0.25)",
+                      color: msg.tag === "Booked!" ? "#4ade80" : "#f5d9a8",
+                      border: msg.tag === "Booked!" ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(200,150,92,0.3)",
+                      animation: "fadeSlideIn 0.4s ease forwards",
+                    }}
+                  >
+                    {msg.tag}
+                  </span>
+                )}
+
+                {/* Typing indicator OR bubble */}
+                {isTyping ? (
+                  <div
+                    className="rounded-2xl"
+                    style={{
+                      background: "linear-gradient(135deg, #7a4825, #c8965c)",
+                      borderBottomRightRadius: "4px",
+                    }}
+                  >
+                    <TypingDots />
+                  </div>
+                ) : isVisible ? (
+                  <div
+                    className="max-w-[82%] rounded-2xl px-3 py-2"
+                    style={{
+                      background: msg.from === "lead"
+                        ? "rgba(255,255,255,0.1)"
+                        : "linear-gradient(135deg, #7a4825, #c8965c)",
+                      borderBottomLeftRadius: msg.from === "lead" ? "4px" : undefined,
+                      borderBottomRightRadius: msg.from === "system" ? "4px" : undefined,
+                      animation: "fadeSlideIn 0.35s ease forwards",
+                    }}
+                  >
+                    <p className="text-[11px] leading-relaxed text-white">{msg.text}</p>
+                  </div>
+                ) : null}
+
+                {isVisible && (
+                  <span className="text-[9px] text-white/35 mt-0.5 px-1">{msg.time}</span>
+                )}
               </div>
-              <span className="text-[9px] text-white/35 mt-0.5 px-1">{msg.time}</span>
-            </div>
-          ))}
+            );
+          })}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Bottom bar */}
@@ -107,31 +230,44 @@ function SMSMockup() {
         </div>
       </div>
 
-      {/* Floating stat pill */}
+      {/* Floating "Replied in 8 sec" pill */}
       <div
         className="absolute -left-6 top-1/3 flex items-center gap-2 rounded-full px-3 py-2 shadow-xl"
         style={{
           background: "rgba(255,255,255,0.96)",
           border: "1px solid rgba(200,150,92,0.3)",
           boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          opacity: floatingReply ? 1 : 0,
+          transform: floatingReply ? "translateX(0) scale(1)" : "translateX(-12px) scale(0.9)",
+          transition: "opacity 0.4s ease, transform 0.4s ease",
         }}
       >
         <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
         <span className="text-[10px] font-bold text-foreground">Replied in 8 sec</span>
       </div>
 
-      {/* Floating booked pill */}
+      {/* Floating "Appointment Booked" pill */}
       <div
         className="absolute -right-4 bottom-20 flex items-center gap-2 rounded-full px-3 py-2 shadow-xl"
         style={{
           background: "rgba(255,255,255,0.96)",
           border: "1px solid rgba(34,197,94,0.3)",
           boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+          opacity: floatingBooked ? 1 : 0,
+          transform: floatingBooked ? "translateX(0) scale(1)" : "translateX(12px) scale(0.9)",
+          transition: "opacity 0.4s ease, transform 0.4s ease",
         }}
       >
         <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
         <span className="text-[10px] font-bold text-foreground">Appointment Booked</span>
       </div>
+
+      <style>{`
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
