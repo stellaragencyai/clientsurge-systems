@@ -7,70 +7,73 @@ const stages = [
     icon: Zap,
     eyebrow: "Trigger",
     title: "Lead comes in",
-    copy: "A call, form, ad lead, or direct inquiry enters the system and gets captured immediately.",
+    copy: "A call, form, ad lead, or direct inquiry enters the system and gets captured immediately — nothing slips through the cracks.",
   },
   {
     id: "instant-response",
     icon: MessageSquare,
     eyebrow: "Speed",
     title: "Instant response",
-    copy: "The system replies right away so you show up first while intent is still high.",
+    copy: "The system replies within seconds so you show up first while the lead's intent is still at its peak.",
   },
   {
     id: "missed-call",
     icon: PhoneCall,
     eyebrow: "Coverage",
     title: "Missed-call recovery",
-    copy: "If nobody answers, a text-back keeps the conversation alive instead of losing the lead.",
+    copy: "If nobody answers, a text-back fires immediately to keep the conversation alive before they call a competitor.",
   },
   {
     id: "follow-up",
     icon: Send,
     eyebrow: "Nurture",
     title: "Follow-up runs",
-    copy: "Automated sequences keep warm leads moving until they reply, book, or clearly go cold.",
+    copy: "Automated sequences keep warm leads moving over 14 days until they reply, book, or clearly go cold.",
   },
   {
     id: "booking",
     icon: CalendarCheck,
     eyebrow: "Conversion",
     title: "Booking handoff",
-    copy: "Ready leads move into a cleaner booking path with less friction and fewer drop-offs.",
+    copy: "Ready leads move into a frictionless booking path — fewer drop-offs, more confirmed appointments.",
   },
   {
     id: "crm",
     icon: LayoutDashboard,
     eyebrow: "Visibility",
     title: "Pipeline updates",
-    copy: "Statuses, tags, and handoffs stay organized automatically inside your workflow.",
+    copy: "Statuses, tags, and handoffs stay organized automatically so your team always knows where every lead stands.",
   },
   {
     id: "reactivation",
     icon: RotateCcw,
     eyebrow: "Recovery",
     title: "Old leads return",
-    copy: "Dormant opportunities can be reactivated with the right campaign instead of sitting untouched.",
+    copy: "Dormant contacts get reactivated with proven campaigns — turning forgotten leads into fresh revenue.",
   },
   {
     id: "optimization",
     icon: HeadphonesIcon,
     eyebrow: "Support",
     title: "System improves",
-    copy: "Performance gets reviewed and tuned so the automation keeps getting stronger over time.",
+    copy: "Performance is reviewed and tuned after launch so the automation keeps getting stronger and converting more over time.",
   },
 ];
+
+// How long each stage is highlighted (ms)
+const STAGE_DURATION = 3200;
 
 export default function AutomationPipelineSection() {
   const sectionRef = useRef(null);
   const [inView, setInView] = useState(false);
   const [activeStage, setActiveStage] = useState(0);
+  const [descVisible, setDescVisible] = useState(true);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
       setInView(true);
       return undefined;
     }
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -78,150 +81,258 @@ export default function AutomationPipelineSection() {
           observer.disconnect();
         }
       },
-      { threshold: 0.16 }
+      { threshold: 0.12 }
     );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
     if (!inView) return undefined;
-
     const interval = window.setInterval(() => {
-      setActiveStage((current) => (current + 1) % stages.length);
-    }, 1500);
-
+      // Fade out desc, advance stage, fade back in
+      setDescVisible(false);
+      const t = window.setTimeout(() => {
+        setActiveStage((curr) => (curr + 1) % stages.length);
+        setDescVisible(true);
+      }, 380);
+      return () => window.clearTimeout(t);
+    }, STAGE_DURATION);
     return () => window.clearInterval(interval);
   }, [inView]);
+
+  const active = stages[activeStage];
+  const ActiveIcon = active.icon;
 
   return (
     <section
       ref={sectionRef}
       aria-label="Automation pipeline diagram"
-      className="relative mt-12 overflow-hidden rounded-[2rem] border border-primary/20 bg-[linear-gradient(180deg,rgba(255,252,247,0.96),rgba(250,244,236,0.94))] px-5 py-10 md:px-8 md:py-12 shadow-[0_24px_70px_rgba(15,23,42,0.08)]"
+      className="relative mt-16"
     >
-      <div className="pointer-events-none absolute inset-x-12 top-0 h-24 rounded-full bg-[#f5d9a8]/35 blur-3xl" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.32),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(201,156,110,0.12),transparent_36%)] opacity-90" />
+      {/* Subtle background glow strip */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
-      <div className="relative text-center mb-8">
-        <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Animated Pipeline View</p>
+      {/* Header */}
+      <div className="text-center mb-14">
+        <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">Live Pipeline View</p>
         <h3 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
-          See How the Full System Works Together
+          See the Full System in Motion
         </h3>
-        <p className="mt-4 text-muted-foreground text-base md:text-lg max-w-3xl mx-auto">
-          The blueprint cards show each automation individually. This view shows the whole revenue engine moving from first lead to booked appointment and ongoing optimization.
+        <p className="mt-4 text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
+          Every step fires automatically. Watch the engine move from first lead to booked appointment.
         </p>
       </div>
 
-      <div className="relative hidden lg:block">
-        <div className="absolute left-[6%] right-[6%] top-[2.65rem] h-[2px] rounded-full bg-[rgba(154,92,46,0.12)] overflow-hidden">
-          <div
-            className="h-full rounded-full bg-[linear-gradient(90deg,#7a4825,#c8965c,#f5d9a8,#c8965c,#7a4825)]"
-            style={{
-              width: inView ? "100%" : "0%",
-              transition: "width 2200ms ease",
-              boxShadow: "0 0 16px rgba(200,150,92,0.45)",
-            }}
-          />
-          <div
-            className="absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 rounded-full"
-            style={{
-              left: `calc(${((activeStage + 0.5) / stages.length) * 100}% - 7px)`,
-              background: "radial-gradient(circle, #fff5e3 0%, #f0c98a 55%, rgba(200,150,92,0.18) 100%)",
-              boxShadow: "0 0 20px rgba(240,201,138,0.75)",
-              transition: "left 850ms ease",
-            }}
-          />
-        </div>
+      {/* ── Desktop pipeline (lg+) ── */}
+      <div className="hidden lg:block">
 
-        <div className="grid grid-cols-4 gap-5 xl:grid-cols-8">
-          {stages.map((stage, index) => {
-            const Icon = stage.icon;
-            const isActive = activeStage === index;
+        {/* Node row */}
+        <div className="relative">
 
-            return (
-              <article
-                key={stage.id}
-                className="relative rounded-[1.5rem] border px-4 pb-5 pt-4 text-center transition-all duration-500"
-                style={{
-                  opacity: inView ? 1 : 0,
-                  transform: inView ? "translateY(0)" : "translateY(18px)",
-                  transitionDelay: `${index * 90}ms`,
-                  borderColor: isActive ? "rgba(154,92,46,0.44)" : "rgba(154,92,46,0.16)",
-                  background: isActive
-                    ? "linear-gradient(180deg,rgba(255,255,255,0.9),rgba(252,245,234,0.96))"
-                    : "linear-gradient(180deg,rgba(255,255,255,0.72),rgba(255,250,243,0.82))",
-                  boxShadow: isActive
-                    ? "0 18px 36px rgba(154,92,46,0.14), inset 0 1px 0 rgba(255,255,255,0.78)"
-                    : "0 8px 24px rgba(15,23,42,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
-                }}
-              >
-                <div className="mb-3 flex justify-center">
+          {/* Connector line behind nodes */}
+          <div className="absolute left-0 right-0 top-[2.1rem] h-px">
+            {/* Base track */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+            {/* Animated fill */}
+            <div
+              className="absolute inset-y-0 left-0 rounded-full"
+              style={{
+                width: inView ? "100%" : "0%",
+                transition: "width 2800ms ease",
+                background: "linear-gradient(90deg, #7a4825, #c8965c, #f5d9a8, #c8965c, #7a4825)",
+                boxShadow: "0 0 10px rgba(200,150,92,0.3)",
+              }}
+            />
+            {/* Travelling dot */}
+            <div
+              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
+              style={{
+                left: `calc(${((activeStage + 0.5) / stages.length) * 100}% - 6px)`,
+                background: "radial-gradient(circle, #fff5e0 10%, #e8a550 60%, rgba(200,150,92,0.1) 100%)",
+                boxShadow: "0 0 14px 4px rgba(232,165,80,0.55)",
+                transition: `left ${STAGE_DURATION * 0.85}ms cubic-bezier(0.4, 0, 0.2, 1)`,
+              }}
+            />
+          </div>
+
+          {/* Stage nodes */}
+          <div className="grid grid-cols-8">
+            {stages.map((stage, index) => {
+              const Icon = stage.icon;
+              const isActive = activeStage === index;
+              return (
+                <button
+                  key={stage.id}
+                  onClick={() => { setDescVisible(false); setTimeout(() => { setActiveStage(index); setDescVisible(true); }, 200); }}
+                  className="flex flex-col items-center gap-3 focus:outline-none group"
+                  style={{
+                    opacity: inView ? 1 : 0,
+                    transform: inView ? "translateY(0)" : "translateY(16px)",
+                    transition: `opacity 600ms ease ${index * 80}ms, transform 600ms ease ${index * 80}ms`,
+                  }}
+                >
+                  {/* Circle node */}
                   <div
-                    className="flex h-12 w-12 items-center justify-center rounded-[1rem] border transition-all duration-500"
+                    className="relative z-10 w-[4.25rem] h-[4.25rem] rounded-full flex items-center justify-center transition-all duration-500"
                     style={{
-                      borderColor: isActive ? "rgba(154,92,46,0.3)" : "rgba(154,92,46,0.18)",
                       background: isActive
-                        ? "linear-gradient(135deg,#9a5c2e 0%,#c8965c 100%)"
-                        : "linear-gradient(135deg,rgba(255,255,255,0.9),rgba(248,235,214,0.96))",
-                      boxShadow: isActive ? "0 0 18px rgba(200,150,92,0.35)" : "none",
+                        ? "linear-gradient(135deg, #7a4825 0%, #c8965c 100%)"
+                        : "rgba(255,255,255,0.85)",
+                      border: isActive
+                        ? "2px solid rgba(200,150,92,0.6)"
+                        : "1.5px solid rgba(154,92,46,0.2)",
+                      boxShadow: isActive
+                        ? "0 0 0 6px rgba(200,150,92,0.12), 0 12px 28px rgba(154,92,46,0.22)"
+                        : "0 4px 14px rgba(0,0,0,0.06)",
+                      transform: isActive ? "scale(1.12)" : "scale(1)",
                     }}
                   >
-                    <Icon className={`h-5 w-5 ${isActive ? "text-white" : "text-[#8a5a32]"}`} />
+                    <Icon
+                      className="w-6 h-6 transition-colors duration-500"
+                      style={{ color: isActive ? "#fff5e0" : "#9a5c2e" }}
+                    />
+                    {/* Pulse ring on active */}
+                    {isActive && (
+                      <span
+                        className="absolute inset-0 rounded-full animate-ping"
+                        style={{ background: "rgba(200,150,92,0.18)", animationDuration: "1.8s" }}
+                      />
+                    )}
                   </div>
+
+                  {/* Label below node */}
+                  <span
+                    className="text-xs font-semibold text-center leading-tight transition-colors duration-300 px-1"
+                    style={{ color: isActive ? "#7a4825" : "rgba(90,60,30,0.55)" }}
+                  >
+                    {stage.title}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Expanding description panel */}
+        <div
+          className="mt-10 overflow-hidden"
+          style={{
+            maxHeight: descVisible ? "280px" : "0px",
+            opacity: descVisible ? 1 : 0,
+            transition: "max-height 460ms cubic-bezier(0.4,0,0.2,1), opacity 380ms ease",
+          }}
+        >
+          <div
+            className="rounded-2xl px-10 py-8 flex gap-8 items-start"
+            style={{
+              background: "linear-gradient(135deg, rgba(255,252,247,0.98) 0%, rgba(252,244,232,0.96) 100%)",
+              border: "1.5px solid rgba(200,150,92,0.28)",
+              boxShadow: "0 12px 48px rgba(154,92,46,0.1), inset 0 1px 0 rgba(255,255,255,0.9)",
+            }}
+          >
+            {/* Icon */}
+            <div
+              className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center"
+              style={{
+                background: "linear-gradient(135deg, #7a4825 0%, #c8965c 100%)",
+                boxShadow: "0 8px 24px rgba(154,92,46,0.28)",
+              }}
+            >
+              <ActiveIcon className="w-7 h-7 text-white" />
+            </div>
+
+            {/* Text */}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">{active.eyebrow}</p>
+                {/* Progress dots */}
+                <div className="flex gap-1.5 ml-auto">
+                  {stages.map((_, i) => (
+                    <div
+                      key={i}
+                      className="rounded-full transition-all duration-500"
+                      style={{
+                        width: i === activeStage ? "20px" : "6px",
+                        height: "6px",
+                        background: i === activeStage
+                          ? "linear-gradient(90deg, #7a4825, #c8965c)"
+                          : "rgba(154,92,46,0.2)",
+                      }}
+                    />
+                  ))}
                 </div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#8a684a]">{stage.eyebrow}</p>
-                <h4 className="mt-2 text-sm font-semibold leading-snug text-slate-900">{stage.title}</h4>
-                <p className="mt-2 text-xs leading-5 text-slate-600">{stage.copy}</p>
-              </article>
-            );
-          })}
+              </div>
+              <h4 className="font-display text-2xl font-bold text-foreground mb-3">{active.title}</h4>
+              <p className="text-base text-muted-foreground leading-relaxed max-w-2xl">{active.copy}</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="relative space-y-4 lg:hidden">
+      {/* ── Mobile pipeline (< lg) ── */}
+      <div className="lg:hidden space-y-0">
         {stages.map((stage, index) => {
           const Icon = stage.icon;
           const isActive = activeStage === index;
-
           return (
-            <div
-              key={stage.id}
-              className="flex items-start gap-4 rounded-[1.5rem] border px-4 py-4 transition-all duration-500"
-              style={{
-                opacity: inView ? 1 : 0,
-                transform: inView ? "translateX(0)" : "translateX(-12px)",
-                transitionDelay: `${index * 80}ms`,
-                borderColor: isActive ? "rgba(154,92,46,0.4)" : "rgba(154,92,46,0.16)",
-                background: isActive
-                  ? "linear-gradient(180deg,rgba(255,255,255,0.92),rgba(252,245,234,0.96))"
-                  : "linear-gradient(180deg,rgba(255,255,255,0.76),rgba(255,250,243,0.84))",
-              }}
-            >
-              <div
-                className="mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[1rem] border"
-                style={{
-                  borderColor: isActive ? "rgba(154,92,46,0.3)" : "rgba(154,92,46,0.18)",
-                  background: isActive
-                    ? "linear-gradient(135deg,#9a5c2e 0%,#c8965c 100%)"
-                    : "linear-gradient(135deg,rgba(255,255,255,0.9),rgba(248,235,214,0.96))",
-                }}
-              >
-                <Icon className={`h-5 w-5 ${isActive ? "text-white" : "text-[#8a5a32]"}`} />
+            <div key={stage.id} className="relative pl-10">
+              {/* Vertical connector */}
+              {index < stages.length - 1 && (
+                <div
+                  className="absolute left-[1.175rem] top-[3.5rem] w-px"
+                  style={{
+                    height: isActive ? "calc(100% + 1px)" : "calc(100% + 1px)",
+                    background: isActive
+                      ? "linear-gradient(to bottom, #c8965c, rgba(200,150,92,0.2))"
+                      : "rgba(154,92,46,0.14)",
+                    transition: "background 600ms ease",
+                  }}
+                />
+              )}
+
+              {/* Node */}
+              <div className="absolute left-0 top-4">
+                <div
+                  className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-500"
+                  style={{
+                    background: isActive
+                      ? "linear-gradient(135deg, #7a4825 0%, #c8965c 100%)"
+                      : "rgba(255,255,255,0.9)",
+                    border: isActive ? "2px solid rgba(200,150,92,0.5)" : "1.5px solid rgba(154,92,46,0.2)",
+                    boxShadow: isActive ? "0 0 0 4px rgba(200,150,92,0.12)" : "none",
+                  }}
+                >
+                  <Icon className="w-4 h-4" style={{ color: isActive ? "#fff5e0" : "#9a5c2e" }} />
+                </div>
               </div>
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#8a684a]">{stage.eyebrow}</p>
-                <h4 className="mt-1 text-sm font-semibold text-slate-900">{stage.title}</h4>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{stage.copy}</p>
+
+              {/* Content */}
+              <div
+                className="mb-2 pt-3 pb-4 pr-2 transition-all duration-400"
+                style={{ opacity: inView ? 1 : 0, transform: inView ? "translateX(0)" : "translateX(-8px)", transitionDelay: `${index * 60}ms` }}
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-widest mb-1" style={{ color: "#9a6840" }}>{stage.eyebrow}</p>
+                <h4 className="text-sm font-bold text-foreground mb-0">{stage.title}</h4>
+
+                {/* Expanding copy on mobile */}
+                <div
+                  className="overflow-hidden"
+                  style={{
+                    maxHeight: isActive ? "80px" : "0px",
+                    opacity: isActive ? 1 : 0,
+                    transition: "max-height 440ms ease, opacity 360ms ease",
+                  }}
+                >
+                  <p className="text-sm text-muted-foreground leading-relaxed mt-2">{stage.copy}</p>
+                </div>
               </div>
             </div>
           );
         })}
       </div>
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
     </section>
   );
 }
