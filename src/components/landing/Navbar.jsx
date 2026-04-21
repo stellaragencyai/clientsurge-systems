@@ -37,6 +37,14 @@ function safeSetThemePreference(value) {
   }
 }
 
+function safeApplyTheme(isDark) {
+  try {
+    document.documentElement.classList.toggle("dark", isDark);
+  } catch {
+    // Ignore DOM theme failures in preview environments.
+  }
+}
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -50,15 +58,8 @@ export default function Navbar() {
   const toggleDark = () => {
     const isDark = !darkMode;
     setDarkMode(isDark);
-    document.documentElement.classList.toggle("dark", isDark);
+    safeApplyTheme(isDark);
     safeSetThemePreference(isDark ? "dark" : "light");
-    if (isDark) {
-      document.body.style.backgroundImage = "none";
-      document.body.style.backgroundColor = "hsl(220, 20%, 5%)";
-    } else {
-      document.body.style.backgroundImage = "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png')";
-      document.body.style.backgroundColor = "";
-    }
   };
 
   const smoothScrollToHash = (href) => {
@@ -93,15 +94,7 @@ export default function Navbar() {
     const storedTheme = safeGetThemePreference();
     const shouldUseDark = storedTheme === "dark";
     setDarkMode(shouldUseDark);
-    document.documentElement.classList.toggle("dark", shouldUseDark);
-    if (shouldUseDark) {
-      document.body.style.backgroundImage = "none";
-      document.body.style.backgroundColor = "hsl(220, 20%, 5%)";
-    } else {
-      document.body.style.backgroundImage =
-        "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png')";
-      document.body.style.backgroundColor = "";
-    }
+    safeApplyTheme(shouldUseDark);
   }, []);
 
   useEffect(() => {

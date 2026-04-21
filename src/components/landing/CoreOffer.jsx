@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowRight, Zap, MessageSquare, PhoneCall, CalendarCheck, RotateCcw, LayoutDashboard, HeadphonesIcon, TrendingUp, CheckCircle2, Send, X } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
 import SystemFlowDiagram from "./SystemFlowDiagram";
+import EnhancedSystemSteps from "./EnhancedSystemSteps";
 
 const coreAutomation = [
   { icon: Zap, step: "01", title: "Instantly respond to every lead", desc: "Before your competitors do - personalized replies within seconds.", tag: "Avg. 2x more bookings" },
@@ -227,10 +228,6 @@ function StepModal({ stepId, onClose, onBookDemo }) {
 }
 
 export default function CoreOffer() {
-  const [showDemoModal, setShowDemoModal] = useState(false);
-  const [selectedStep, setSelectedStep] = useState(null);
-  const [totalValue] = useState(8);
-
   return (
     <section id="services" className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card via-white to-background">
       <div className="max-w-5xl mx-auto">
@@ -267,34 +264,7 @@ export default function CoreOffer() {
 
         {/* Animated Flow Diagram */}
         <SystemFlowDiagram />
-
-        {/* TIER 1 - Core Automation */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 h-px bg-border" />
-          <span className="text-xs font-bold text-primary uppercase tracking-widest px-3 py-1.5 bg-primary/8 border border-primary/20 rounded-full">Core Automation</span>
-          <div className="flex-1 h-px bg-border" />
-        </div>
-
-        <div className="relative grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
-          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary/20 via-primary/10 to-transparent pointer-events-none" />
-          {coreAutomation.map((item, i) => (
-            <FeatureCard key={i} item={item} onSelect={setSelectedStep} />
-          ))}
-        </div>
-
-        {/* TIER 2 - Done-For-You Support */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 h-px bg-border" />
-          <span className="text-xs font-bold text-primary uppercase tracking-widest px-3 py-1.5 bg-primary/8 border border-primary/20 rounded-full">Done-For-You Support</span>
-          <div className="flex-1 h-px bg-border" />
-        </div>
-
-        {/* FIX: 3-col grid so all 3 cards are equal width */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
-          {doneForYou.map((item, i) => (
-            <FeatureCard key={i} item={item} onSelect={setSelectedStep} />
-          ))}
-        </div>
+        <EnhancedSystemSteps />
 
         {/* 3-step timeline */}
         <div className="mb-8 rounded-2xl border border-primary/15 overflow-hidden">
@@ -344,16 +314,6 @@ export default function CoreOffer() {
           </a>
         </div>
 
-        {/* Step Modal */}
-        {selectedStep && (
-          <StepModal
-            stepId={selectedStep}
-            onClose={() => setSelectedStep(null)}
-            onBookDemo={() => setShowDemoModal(true)}
-          />
-        )}
-
-        {showDemoModal && <DemoBookingModal onClose={() => setShowDemoModal(false)} />}
       </div>
     </section>
   );

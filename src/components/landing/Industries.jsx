@@ -136,7 +136,7 @@ export default function Industries() {
           return (
             <article
               key={industry.name}
-              className="group relative overflow-hidden rounded-[2rem] border border-slate-400/95 bg-white/78 shadow-[0_18px_48px_rgba(15,23,42,0.08)] ring-1 ring-slate-900/8 backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:border-slate-500 hover:shadow-[0_30px_80px_rgba(15,23,42,0.14)]"
+              className="group relative overflow-hidden rounded-[2rem] border border-slate-500/95 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(255,251,246,0.76))] shadow-[0_22px_56px_rgba(15,23,42,0.08)] ring-1 ring-slate-900/10 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-2 hover:border-[#8f6848] hover:shadow-[0_34px_86px_rgba(15,23,42,0.14)]"
               style={{
                 opacity: sectionVisible ? 1 : 0,
                 transform: sectionVisible ? "translateY(0)" : "translateY(28px)",
@@ -144,36 +144,41 @@ export default function Industries() {
               }}
             >
               <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                <div className="absolute inset-y-0 -left-1/3 w-1/2 rotate-12 bg-gradient-to-r from-transparent via-white/30 to-transparent blur-xl transition-transform duration-700 group-hover:translate-x-[180%]" />
+                <div className="absolute inset-y-0 -left-1/3 w-1/2 rotate-12 bg-gradient-to-r from-transparent via-white/35 to-transparent blur-xl transition-transform duration-700 group-hover:translate-x-[180%]" />
               </div>
-              <div className="pointer-events-none absolute inset-x-10 top-0 h-24 rounded-full bg-white/40 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
-              <div className="relative h-84 overflow-hidden md:h-[24rem]">
+              <div className="pointer-events-none absolute inset-x-8 top-0 h-24 rounded-full bg-[#f6dfb6]/40 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.3),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(201,156,110,0.16),transparent_40%)] opacity-90" />
+              <div className="relative h-[20.5rem] overflow-hidden md:h-[20.5rem]">
                 <img
                   src={industry.image}
                   alt={industry.name}
                   loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                  className="h-full w-full object-cover saturate-[0.96] transition-transform duration-700 group-hover:scale-[1.05]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-white/10" />
-                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-primary/20 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
-                <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/18 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-md">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#101828]/78 via-[#101828]/20 to-white/12" />
+                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#c49563]/26 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
+                <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/20 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-md">
                   <Icon className="w-3.5 h-3.5" />
                   {industry.result}
                 </div>
                 <div className="absolute bottom-6 left-6 right-6">
-                  <h3 className="font-display text-[1.95rem] font-semibold leading-tight text-white md:text-[2.15rem]">
+                  <h3 className="font-serif text-[1.85rem] font-semibold leading-tight text-white drop-shadow-[0_6px_24px_rgba(15,23,42,0.35)] md:text-[2rem]">
                     {industry.name}
                   </h3>
                 </div>
               </div>
 
-              <div className="relative p-8 md:p-10">
-                <div className="mb-5 h-px w-full bg-gradient-to-r from-primary/20 via-primary/45 to-transparent" />
-                <p className="mb-3 text-base font-semibold leading-relaxed text-foreground">{industry.problem}</p>
-                <p className="mb-6 text-[15px] leading-7 text-muted-foreground">{industry.desc}</p>
+              <div className="relative p-7 md:p-8">
+                <div className="mb-5 h-px w-full bg-gradient-to-r from-[#9a6c45]/25 via-[#c8965c]/55 to-transparent" />
+                <div className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/55 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8a684a]">Ideal Use Case</p>
+                  <div className="h-2.5 w-2.5 rounded-full bg-[#c8965c] shadow-[0_0_14px_rgba(200,150,92,0.65)]" />
+                </div>
+                <p className="mb-3 font-serif text-[1.08rem] font-semibold leading-relaxed text-slate-900">{industry.problem}</p>
+                <p className="mb-6 text-[15px] leading-7 text-slate-600">{industry.desc}</p>
                 <Link
                   to={industry.href}
-                  className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 hover:text-primary/80"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#b98b61]/30 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(252,245,234,0.9))] px-4 py-2.5 text-sm font-semibold text-[#8a5a32] shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#a0714f] hover:bg-white"
                 >
                   {industry.cta}
                   <ArrowRight className="w-4 h-4" />

@@ -7,6 +7,7 @@ import { trackCTA } from "@/lib/analytics";
 const TARGET_PATHS = new Set(["/", "/med-spa", "/industries", "/contact", "/book"]);
 const STORAGE_KEY = "clientsurge-exit-intent-dismissed";
 const SESSION_KEY = "clientsurge-exit-intent-session";
+const MANUAL_HASH = "#free-audit-popup";
 
 function safeGetSessionItem(key) {
   try {
@@ -53,6 +54,13 @@ export default function ExitIntentPopup({ pathname }) {
 
   const isActivePath = useMemo(() => TARGET_PATHS.has(pathname), [pathname]);
 
+  const openPopup = (source = "manual") => {
+    setSubmitted(false);
+    setError("");
+    setOpen(true);
+    trackCTA("exit_intent_opened", source);
+  };
+
   useEffect(() => {
     if (!isActivePath) return;
     if (typeof window === "undefined") return;
@@ -61,7 +69,7 @@ export default function ExitIntentPopup({ pathname }) {
 
     let timeoutId = window.setTimeout(() => {
       if (window.innerWidth < 768 && window.scrollY > 600) {
-        setOpen(true);
+        openPopup(pathname || "unknown");
         safeSetSessionItem(SESSION_KEY, "true");
       }
     }, 18000);
@@ -69,9 +77,8 @@ export default function ExitIntentPopup({ pathname }) {
     const handleMouseLeave = (event) => {
       if (window.innerWidth < 768) return;
       if (event.clientY > 12) return;
-      setOpen(true);
+      openPopup(pathname || "unknown");
       safeSetSessionItem(SESSION_KEY, "true");
-      trackCTA("exit_intent_opened", pathname || "unknown");
     };
 
     const handleScroll = () => {
@@ -79,9 +86,8 @@ export default function ExitIntentPopup({ pathname }) {
       const scrollable = document.documentElement.scrollHeight - window.innerHeight;
       if (scrollable <= 0) return;
       if (window.scrollY / scrollable < 0.55) return;
-      setOpen(true);
+      openPopup(pathname || "unknown");
       safeSetSessionItem(SESSION_KEY, "true");
-      trackCTA("exit_intent_opened", pathname || "unknown");
     };
 
     document.addEventListener("mouseout", handleMouseLeave);
@@ -94,9 +100,52 @@ export default function ExitIntentPopup({ pathname }) {
     };
   }, [isActivePath, pathname]);
 
+  useEffect(() => {
+    if (!isActivePath) return;
+    if (typeof window === "undefined") return;
+
+    const handleManualOpen = () => {
+      openPopup("manual_trigger");
+    };
+
+    const handleHashOpen = () => {
+      if (window.location.hash === MANUAL_HASH) {
+        openPopup("manual_hash");
+      }
+    };
+
+    window.addEventListener("clientsurge:open-audit-popup", handleManualOpen);
+    handleHashOpen();
+
+    window.clientsurgePreview = {
+      ...(window.clientsurgePreview || {}),
+      openAuditPopup: () => {
+        if (window.location.hash !== MANUAL_HASH) {
+          window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}${MANUAL_HASH}`);
+        }
+        handleManualOpen();
+      },
+    };
+
+    window.addEventListener("hashchange", handleHashOpen);
+
+    return () => {
+      window.removeEventListener("clientsurge:open-audit-popup", handleManualOpen);
+      window.removeEventListener("hashchange", handleHashOpen);
+      if (window.clientsurgePreview?.openAuditPopup) {
+        const nextHelpers = { ...(window.clientsurgePreview || {}) };
+        delete nextHelpers.openAuditPopup;
+        window.clientsurgePreview = nextHelpers;
+      }
+    };
+  }, [isActivePath]);
+
   const handleClose = (persist = false) => {
     setOpen(false);
     setError("");
+    if (typeof window !== "undefined" && window.location.hash === MANUAL_HASH) {
+      window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}`);
+    }
     if (persist && typeof window !== "undefined") {
       safeSetLocalItem(STORAGE_KEY, "dismissed");
     }
@@ -135,23 +184,33 @@ export default function ExitIntentPopup({ pathname }) {
 
   return createPortal(
     <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/45 backdrop-blur-sm" onClick={() => handleClose(true)} />
-      <div className="relative z-10 w-full max-w-md overflow-hidden rounded-[2rem] border border-white/40 bg-white/88 shadow-[0_30px_80px_rgba(15,23,42,0.22)] backdrop-blur-xl">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(245,217,168,0.28),transparent_35%),rgba(15,23,42,0.22)] backdrop-blur-[6px]" onClick={() => handleClose(true)} />
+      <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/70 bg-[linear-gradient(180deg,rgba(255,252,246,0.98),rgba(255,248,238,0.95))] shadow-[0_30px_90px_rgba(15,23,42,0.18)] ring-1 ring-black/5 backdrop-blur-2xl">
+        <div className="pointer-events-none absolute inset-x-10 top-0 h-28 rounded-full bg-primary/18 blur-3xl" />
         <button
           type="button"
           onClick={() => handleClose(true)}
-          className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full border border-black/5 bg-white/80 text-muted-foreground transition-colors hover:bg-muted"
+          className="absolute right-5 top-5 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-black/5 bg-white/92 text-slate-600 shadow-sm transition-colors hover:bg-white"
           aria-label="Close popup"
         >
           <X className="h-4 w-4" />
         </button>
 
-        <div className="bg-gradient-to-r from-primary/15 via-primary/5 to-transparent px-7 pb-5 pt-7">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Before You Go</p>
-          <h3 className="font-display text-3xl font-semibold text-foreground">Want a free lead leak audit instead?</h3>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+        <div className="relative px-7 pb-5 pt-7 md:px-8">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/75 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary shadow-sm">
+            Before You Go
+          </div>
+          <h3 className="max-w-md font-display text-3xl font-semibold leading-tight text-slate-900 md:text-[2.25rem]">Want a free lead leak audit instead?</h3>
+          <p className="mt-3 max-w-md text-[15px] leading-7 text-slate-600">
             Leave your details and we&apos;ll review where your follow-up and booking flow is likely leaking revenue.
           </p>
+          <div className="mt-5 grid grid-cols-3 gap-2">
+            {["Lead speed", "Booking friction", "Follow-up leaks"].map((item) => (
+              <div key={item} className="rounded-2xl border border-white/70 bg-white/78 px-3 py-2 text-center text-[11px] font-semibold text-slate-700 shadow-sm backdrop-blur">
+                {item}
+              </div>
+            ))}
+          </div>
         </div>
 
         {submitted ? (
@@ -163,35 +222,35 @@ export default function ExitIntentPopup({ pathname }) {
             <p className="mt-2 text-sm text-muted-foreground">We&apos;ll follow up by email with next steps.</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 px-7 pb-7">
-            {error && <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
+          <form onSubmit={handleSubmit} className="space-y-4 px-7 pb-7 md:px-8">
+            {error && <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-foreground/60">Full name</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Full name</label>
               <input
                 value={form.full_name}
                 onChange={(event) => setForm((prev) => ({ ...prev, full_name: event.target.value }))}
                 required
-                className="h-12 w-full rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="h-12 w-full rounded-2xl border border-amber-200/80 bg-white/92 px-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="Jane Smith"
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-foreground/60">Email</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Email</label>
               <input
                 type="email"
                 value={form.email}
                 onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
                 required
-                className="h-12 w-full rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="h-12 w-full rounded-2xl border border-amber-200/80 bg-white/92 px-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="jane@business.com"
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-foreground/60">Industry</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600">Industry</label>
               <select
                 value={form.business_type}
                 onChange={(event) => setForm((prev) => ({ ...prev, business_type: event.target.value }))}
-                className="h-12 w-full rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="h-12 w-full rounded-2xl border border-amber-200/80 bg-white/92 px-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
                 <option>Med Spas & Aesthetic Clinics</option>
                 <option>Dental & Orthodontics</option>
@@ -206,12 +265,12 @@ export default function ExitIntentPopup({ pathname }) {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#8b5b34_0%,#b77b47_55%,#7a4f2e_100%)] px-5 py-3 text-sm font-semibold text-amber-50 shadow-[0_14px_34px_rgba(154,92,46,0.24)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(154,92,46,0.3)] disabled:opacity-60"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
               Get My Free Audit
             </button>
-            <p className="text-center text-xs text-muted-foreground">No spam. No pressure. Just a thoughtful follow-up.</p>
+            <p className="text-center text-xs text-slate-500">No spam. No pressure. Just a thoughtful follow-up.</p>
           </form>
         )}
       </div>
