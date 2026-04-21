@@ -1,3 +1,5 @@
+import { useDemoBooking } from "./DemoBookingContext";
+
 const testimonials = [
   {
     name: "Jessica M.",
@@ -32,6 +34,7 @@ const testimonials = [
 ];
 
 export default function Testimonials() {
+  const demoBooking = useDemoBooking();
   return (
     <section id="testimonials" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
       <div className="max-w-6xl mx-auto">
@@ -96,12 +99,22 @@ export default function Testimonials() {
           <p className="text-lg font-semibold text-foreground mb-4">
             Want results like this for your business?
           </p>
-          <a
-            href="/book"
-            className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
-          >
-            Book your free demo below
-          </a>
+          {demoBooking ? (
+            <button
+              type="button"
+              onClick={demoBooking.openDemoBooking}
+              className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+            >
+              Book Your Free Demo
+            </button>
+          ) : (
+            <a
+              href="/book"
+              className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+            >
+              Book Your Free Demo
+            </a>
+          )}
         </div>
       </div>
     </section>

@@ -97,7 +97,7 @@ export default function AddClientModal({ onClose, onSaved }) {
           {/* Booking */}
           <p className="text-xs font-bold text-primary uppercase tracking-widest pt-1">Booking & Leads</p>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Booking Platform" k="booking_platform" placeholder="e.g. Calendly, Acuity" />
+            <Field label="Booking Platform" k="booking_platform" placeholder="e.g. scheduler, Acuity" />
             <Field label="Booking Link" k="booking_link" placeholder="https://" />
             <Field label="Lead Sources" k="lead_sources" placeholder="Google, Facebook, Instagram" />
             <Field label="Twilio Number" k="twilio_number" placeholder="+1..." />

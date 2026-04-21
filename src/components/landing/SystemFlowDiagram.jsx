@@ -16,6 +16,7 @@ export default function SystemFlowDiagram() {
   const ref = useRef(null);
   const [inView, setInView] = useState(false);
   const [activeNode, setActiveNode] = useState(null);
+  const [activeConnector, setActiveConnector] = useState(0);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -33,6 +34,16 @@ export default function SystemFlowDiagram() {
     NODES.forEach((_, i) => {
       setTimeout(() => setLit(prev => [...prev, i]), i * 180);
     });
+  }, [inView]);
+
+  useEffect(() => {
+    if (!inView) return;
+
+    const interval = window.setInterval(() => {
+      setActiveConnector((current) => (current + 1) % (NODES.length - 1));
+    }, 1300);
+
+    return () => window.clearInterval(interval);
   }, [inView]);
 
   return (
@@ -79,6 +90,18 @@ export default function SystemFlowDiagram() {
                         />
                       )}
                     </svg>
+                    {isLit && (
+                      <div
+                        className="absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full"
+                        style={{
+                          background: "radial-gradient(circle, #f5d9a8 0%, #c8965c 55%, rgba(200,150,92,0.15) 100%)",
+                          boxShadow: "0 0 14px rgba(200,150,92,0.55)",
+                          left: activeConnector === i ? "calc(100% - 10px)" : "0%",
+                          opacity: activeConnector === i ? 1 : 0.35,
+                          transition: "left 850ms ease, opacity 250ms ease",
+                        }}
+                      />
+                    )}
                   </div>
                 )}
 

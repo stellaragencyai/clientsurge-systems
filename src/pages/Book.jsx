@@ -11,7 +11,7 @@ export default function Book() {
 
   useEffect(() => {
     const cleanupMetadata = setPageMetadata({
-      title: 'Book Your Demo | ClientSurge Systems',
+      title: 'Book Your Free Demo | ClientSurge Systems',
       description:
         'Book a free ClientSurge Systems demo to review your follow-up process, lead leaks, and the fastest automation wins for your business.',
       canonicalPath: '/book',

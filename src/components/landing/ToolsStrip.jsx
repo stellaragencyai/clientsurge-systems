@@ -1,6 +1,6 @@
 const tools = [
   "Twilio",
-  "Calendly",
+  "Google Calendar",
   "Google",
   "Resend",
   "Base44",

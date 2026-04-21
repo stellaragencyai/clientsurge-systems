@@ -2,7 +2,6 @@ export default function IntegrationsBadges() {
   const integrations = [
     { name: 'GHL', logo: 'https://images.g2crowd.com/upload/enterprises/images/ca/79/000014079/original/gohighlevel-logo.png', height: 24 },
     { name: 'Twilio', logo: 'https://www.twilio.com/en/company/assets/logos/twilio_logo_blue.svg', height: 24 },
-    { name: 'Calendly', logo: 'https://assets.calendly.com/assets/logo-full-body-dark.png', height: 24 },
     { name: 'Google', logo: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png', height: 20 },
     { name: 'Facebook', logo: 'https://www.facebook.com/rsrc.php/v3/y2/r/8WDI3EvcuIT.png', height: 24 },
     { name: 'Instagram', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png', height: 24 },

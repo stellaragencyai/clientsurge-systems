@@ -11,12 +11,12 @@ const reasons = [
   {
     icon: Rocket,
     title: "Live in Days",
-    desc: "Running within 5–7 business days. We handle the entire build.",
+    desc: "Running within 5-7 business days. We handle the entire build.",
   },
   {
     icon: Fingerprint,
     title: "Custom to You",
-    desc: "Mapped to your lead sources, workflow, and goals — no templates.",
+    desc: "Mapped to your lead sources, workflow, and goals - no templates.",
   },
   {
     icon: EyeOff,
@@ -44,15 +44,15 @@ const platformItems = [
 
 const systemItems = [
   "Fully built and managed for you",
-  "Live within 5–7 days",
+  "Live within 5-7 days",
   "Runs 24/7 automatically",
   "Designed to increase bookings",
 ];
 
 const stats = [
   { value: "< 60s", label: "Lead Response Time" },
-  { value: "5–7", label: "Days to Go Live" },
-  { value: "2–5×", label: "More Bookings" },
+  { value: "5-7", label: "Days to Go Live" },
+  { value: "2-5x", label: "More Bookings" },
   { value: "30 Day", label: "Money-Back Guarantee" },
 ];
 
@@ -96,13 +96,13 @@ export default function WhyUs() {
             Stop Paying for Tools. Start Getting Results.
           </h2>
           <p className="text-lg text-foreground/65 max-w-2xl mx-auto leading-relaxed">
-            We don't hand you software to figure out. We build, install, and run the system — so you get more bookings without lifting a finger.
+            We don't hand you software to figure out. We build, install, and run the system - so you get more bookings without lifting a finger.
           </p>
         </div>
 
         {/* ── Platform vs Our System ── */}
         <div className="grid md:grid-cols-[1fr_auto_1fr] gap-0 items-stretch max-w-4xl mx-auto mb-14">
-          {/* Left — Platform */}
+          {/* Left - Platform */}
           <div className="rounded-2xl p-7 flex flex-col gap-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,235,235,0.35) 100%)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", border: "1.5px solid rgba(180,40,40,0.2)", boxShadow: "0 4px 20px rgba(167,42,42,0.06), inset 0 1px 0 rgba(255,255,255,0.7)" }}>
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2 h-2 rounded-full bg-red-400" />
@@ -125,7 +125,7 @@ export default function WhyUs() {
             </div>
           </div>
 
-          {/* Right — Our System */}
+          {/* Right - Our System */}
           <div className="rounded-2xl p-7 flex flex-col gap-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,248,235,0.4) 100%)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", border: "1.5px solid rgba(154,92,46,0.28)", boxShadow: "0 4px 20px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.7)" }}>
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2 h-2 rounded-full" style={{ background: "#9a5c2e" }} />
@@ -183,7 +183,7 @@ export default function WhyUs() {
         {/* ── Timeline Strip ── */}
         <div className="rounded-2xl overflow-hidden mb-12" style={{ border: "1px solid rgba(154,92,46,0.18)" }}>
           <div className="grid grid-cols-2 md:grid-cols-4">
-            {["Day 1: Kickoff Call", "Days 2–4: Build & Integrate", "Days 5–7: Test & Launch", "Day 30+: Ongoing Optimization"].map((step, i) => (
+            {["Day 1: Kickoff Call", "Days 2-4: Build & Integrate", "Days 5-7: Test & Launch", "Day 30+: Ongoing Optimization"].map((step, i) => (
               <div key={i} className={`px-5 py-5 text-center relative ${i < 3 ? "border-r border-primary/10" : ""}`} style={{ background: "rgba(154,92,46,0.04)" }}>
                 {i < 3 && (
                   <div className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-6 h-6 rounded-full bg-white border border-primary/20 items-center justify-center">
@@ -211,7 +211,7 @@ export default function WhyUs() {
             onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"; }}
           >
             <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 32px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
-              Book a Free 15-Min Demo
+              Book Your Free Demo
               <ArrowRight className="w-4 h-4" />
             </span>
           </button>

@@ -1,4 +1,5 @@
 import { ArrowRight, CalendarCheck2, MessageSquareText, PhoneCall, Workflow } from "lucide-react";
+import { useDemoBooking } from "./DemoBookingContext";
 
 const walkthroughSteps = [
   {
@@ -24,6 +25,7 @@ const walkthroughSteps = [
 ];
 
 export default function AutomationWalkthrough() {
+  const demoBooking = useDemoBooking();
   return (
     <section id="automation-walkthrough" className="py-20 md:py-28 px-6 bg-gradient-to-b from-card to-background">
       <div className="max-w-5xl mx-auto">
@@ -74,10 +76,21 @@ export default function AutomationWalkthrough() {
               Ask a question
               <ArrowRight className="w-4 h-4" />
             </a>
-            <a href="/book" className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary/80 transition-colors">
-              Book your free demo
-              <ArrowRight className="w-4 h-4" />
-            </a>
+            {demoBooking ? (
+              <button
+                type="button"
+                onClick={demoBooking.openDemoBooking}
+                className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary/80 transition-colors"
+              >
+                Book Your Free Demo
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <a href="/book" className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary/80 transition-colors">
+                Book Your Free Demo
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            )}
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { ArrowRight, Loader2, Sparkles, Target, TriangleAlert } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useDemoBooking } from "./DemoBookingContext";
 
 const industries = [
   "Med Spas & Aesthetic Clinics",
@@ -13,6 +14,7 @@ const industries = [
 ];
 
 export default function AIAuditSection() {
+  const demoBooking = useDemoBooking();
   const [form, setForm] = useState({
     website: "",
     industry: industries[0],
@@ -124,7 +126,7 @@ Return a concise audit as JSON with:
                   onChange={(e) => setForm((prev) => ({ ...prev, bookingMethod: e.target.value }))}
                   className="w-full h-12 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 >
-                  {["Online form + manual follow-up", "Calendly or scheduler link", "Phone-first booking", "No clear booking process"].map((item) => <option key={item}>{item}</option>)}
+                  {["Online form + manual follow-up", "Booking page or scheduler link", "Phone-first booking", "No clear booking process"].map((item) => <option key={item}>{item}</option>)}
                 </select>
               </div>
             </div>
@@ -157,10 +159,21 @@ Return a concise audit as JSON with:
                   <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-2">Audit score</p>
                   <p className="font-display text-5xl font-semibold text-foreground">{result.audit_score}<span className="text-lg text-muted-foreground">/100</span></p>
                 </div>
-                <Link to="/book" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
-                  Book a review call
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+                {demoBooking ? (
+                  <button
+                    type="button"
+                    onClick={demoBooking.openDemoBooking}
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Book Your Free Demo
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <Link to="/book" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
+                    Book Your Free Demo
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
               </div>
 
               <div className="space-y-4">
@@ -172,7 +185,7 @@ Return a concise audit as JSON with:
                   <p className="text-xs font-semibold uppercase tracking-wide text-foreground/55 mb-2">Top fixes</p>
                   <ul className="space-y-2">
                     {result.top_fixes?.map((fix) => (
-                      <li key={fix} className="text-sm text-foreground/80">• {fix}</li>
+                      <li key={fix} className="ml-5 list-disc text-sm text-foreground/80">{fix}</li>
                     ))}
                   </ul>
                 </div>

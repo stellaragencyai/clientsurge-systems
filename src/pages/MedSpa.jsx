@@ -15,10 +15,13 @@ import MedSpaReactivation from "../components/medspa/MedSpaReactivation";
 import MedSpaPricingPreview from "../components/medspa/MedSpaPricingPreview";
 import MedSpaROIBlock from "../components/medspa/MedSpaROIBlock";
 import MedSpaFAQ from "../components/medspa/MedSpaFAQ";
+import { MEDSPA_FAQ_ITEMS } from "../components/medspa/MedSpaFAQ";
 import MedSpaFinalCTA from "../components/medspa/MedSpaFinalCTA";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
-import { setPageMetadata } from "@/lib/seo";
+import ExitIntentPopup from "../components/landing/ExitIntentPopup";
+import { setJsonLd, setPageMetadata } from "@/lib/seo";
+import { getFAQSchema } from "../components/SEO/SchemaMarkup";
 
 export default function MedSpa() {
   useEffect(() => {
@@ -34,9 +37,11 @@ export default function MedSpa() {
       ogDescription:
         'See how ClientSurge helps med spas automate lead response, follow-up, and consultation booking.',
     });
+    const cleanupFaq = setJsonLd("medspa-faq", getFAQSchema(MEDSPA_FAQ_ITEMS));
 
     return () => {
       if (navbar) navbar.style.display = 'block';
+      cleanupFaq();
       cleanupMetadata();
     };
   }, []);
@@ -62,6 +67,7 @@ export default function MedSpa() {
       <MedSpaFinalCTA />
       <Footer />
       <MobileCallBar />
+      <ExitIntentPopup pathname="/med-spa" />
     </div>
   );
 }

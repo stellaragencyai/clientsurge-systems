@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 import { Loader2, Send, Sparkles, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
+import { trackCTA } from "@/lib/analytics";
 
 const quickPrompts = [
   "Which industries are the best fit?",
@@ -16,6 +17,22 @@ export default function SamChatWidget() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  const [captureLoading, setCaptureLoading] = useState(false);
+  const [captureError, setCaptureError] = useState("");
+  const [leadProfile, setLeadProfile] = useState(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const saved = window.localStorage.getItem("clientsurge-chat-profile");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [leadForm, setLeadForm] = useState(() => ({
+    full_name: leadProfile?.full_name || "",
+    email: leadProfile?.email || "",
+    industry: leadProfile?.industry || "Med Spas & Aesthetic Clinics",
+  }));
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -79,6 +96,37 @@ export default function SamChatWidget() {
 
   const visibleMessages = messages.filter((m) => m.role === "user" || m.role === "assistant");
 
+  const handleCapture = async (event) => {
+    event.preventDefault();
+    setCaptureLoading(true);
+    setCaptureError("");
+
+    try {
+      const result = await base44.functions.invoke("submitContactInquiry", {
+        full_name: leadForm.full_name,
+        email: leadForm.email,
+        phone: "",
+        business_type: leadForm.industry,
+        message: `AI concierge chat request. Industry: ${leadForm.industry}.`,
+        website_url: "",
+      });
+
+      if (!result.data?.success) {
+        throw new Error(result.data?.error || "Unable to start chat");
+      }
+
+      const profile = { ...leadForm, captured_at: new Date().toISOString() };
+      setLeadProfile(profile);
+      window.localStorage.setItem("clientsurge-chat-profile", JSON.stringify(profile));
+      trackCTA("ai_concierge_start", "chat_widget", { industry: leadForm.industry });
+      await ensureConversation();
+    } catch (error) {
+      setCaptureError("We couldn't start the concierge right now. Please try again.");
+    } finally {
+      setCaptureLoading(false);
+    }
+  };
+
   return (
     <>
       {/* Floating button */}
@@ -111,7 +159,53 @@ export default function SamChatWidget() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-secondary/20 min-h-[300px] max-h-[380px]">
-            {visibleMessages.length === 0 && (
+            {!leadProfile ? (
+              <form onSubmit={handleCapture} className="rounded-2xl border border-border bg-white p-4 shadow-sm">
+                <p className="text-sm font-semibold text-foreground">Start with your email so we can follow up usefully.</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                  Every concierge conversation becomes a qualified lead instead of disappearing anonymously.
+                </p>
+                <div className="mt-4 space-y-3">
+                  <input
+                    value={leadForm.full_name}
+                    onChange={(e) => setLeadForm((prev) => ({ ...prev, full_name: e.target.value }))}
+                    required
+                    placeholder="Your name"
+                    className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                  <input
+                    type="email"
+                    value={leadForm.email}
+                    onChange={(e) => setLeadForm((prev) => ({ ...prev, email: e.target.value }))}
+                    required
+                    placeholder="you@business.com"
+                    className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                  <select
+                    value={leadForm.industry}
+                    onChange={(e) => setLeadForm((prev) => ({ ...prev, industry: e.target.value }))}
+                    className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  >
+                    <option>Med Spas & Aesthetic Clinics</option>
+                    <option>Dental & Orthodontics</option>
+                    <option>Chiropractic & Physical Therapy</option>
+                    <option>HVAC, Plumbing & Home Services</option>
+                    <option>Roofing & Restoration</option>
+                    <option>Contractors & Trades</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                {captureError && <p className="mt-3 text-xs text-red-600">{captureError}</p>}
+                <button
+                  type="submit"
+                  disabled={captureLoading}
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+                >
+                  {captureLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                  Start AI Concierge
+                </button>
+              </form>
+            ) : visibleMessages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center py-8">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
                   <span className="text-xl font-bold text-primary">AI</span>
@@ -123,7 +217,10 @@ export default function SamChatWidget() {
                     <button
                       key={prompt}
                       type="button"
-                      onClick={() => void sendMessage(prompt)}
+                      onClick={() => {
+                        trackCTA("ai_concierge_prompt", "chat_widget", { prompt });
+                        void sendMessage(prompt);
+                      }}
                       className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
                     >
                       {prompt}
@@ -131,7 +228,7 @@ export default function SamChatWidget() {
                   ))}
                 </div>
               </div>
-            )}
+            ) : null}
             {visibleMessages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] px-3 py-2 rounded-xl text-sm ${
@@ -163,10 +260,11 @@ export default function SamChatWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
+              disabled={!leadProfile}
               placeholder="Ask about pricing, industries, demos, or integrations..."
               className="flex-1 text-sm border border-input rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring"
             />
-            <Button size="icon" onClick={() => void handleSend()} disabled={!input.trim() || sending} className="rounded-lg h-9 w-9">
+            <Button size="icon" onClick={() => void handleSend()} disabled={!leadProfile || !input.trim() || sending} className="rounded-lg h-9 w-9">
               <Send className="w-4 h-4" />
             </Button>
           </div>

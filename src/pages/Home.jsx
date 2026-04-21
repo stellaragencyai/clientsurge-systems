@@ -17,10 +17,11 @@ import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
+import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import SamChatWidget from "../components/sam/SamChatWidget";
 import CookieConsent from "../components/landing/CookieConsent";
 import MobileCallBar from "../components/landing/MobileCallBar";
-import FadeIn from "../components/landing/FadeIn";
+import ExitIntentPopup from "../components/landing/ExitIntentPopup";
 import { FAQ_ITEMS } from "../components/landing/FAQ";
 import { getFAQSchema, getLocalBusinessSchema, getOrganizationSchema, getServiceSchema } from "../components/SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
@@ -51,28 +52,31 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen pb-16">
-      <Navbar />
-      <Hero />
-      <FadeIn><Industries /></FadeIn>
-      <FadeIn><TrustBar /></FadeIn>
-      <FadeIn><ToolsStrip /></FadeIn>
-      <FadeIn><ProblemSolution /></FadeIn>
-      <FadeIn><HowItWorks id="how-it-works-section" /></FadeIn>
-      <FadeIn><AutomationDemo /></FadeIn>
-      <FadeIn><AIResponseDemo /></FadeIn>
-      <FadeIn><AIAuditSection /></FadeIn>
-      <FadeIn><AIRoutingForm /></FadeIn>
-      <FadeIn><AutomationWalkthrough /></FadeIn>
-      <FadeIn><CoreOffer /></FadeIn>
-      <FadeIn><Testimonials /></FadeIn>
-      <FadeIn><Pricing /></FadeIn>
-      <FadeIn><FAQ /></FadeIn>
-      <FinalCTA />
-      <Footer />
-      <SamChatWidget />
-      <CookieConsent />
-      <MobileCallBar />
-    </div>
+    <DemoBookingProvider>
+      <div className="min-h-screen pb-16">
+        <Navbar />
+        <Hero />
+        <Industries />
+        <TrustBar />
+        <ToolsStrip />
+        <ProblemSolution />
+        <HowItWorks id="how-it-works-section" />
+        <AutomationDemo />
+        <AIResponseDemo />
+        <AIAuditSection />
+        <AIRoutingForm />
+        <AutomationWalkthrough />
+        <CoreOffer />
+        <Testimonials />
+        <Pricing />
+        <FAQ />
+        <FinalCTA />
+        <Footer />
+        <SamChatWidget />
+        <CookieConsent />
+        <MobileCallBar />
+        <ExitIntentPopup pathname="/" />
+      </div>
+    </DemoBookingProvider>
   );
 }

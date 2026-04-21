@@ -5,22 +5,22 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const faqs = [
+export const MEDSPA_FAQ_ITEMS = [
   {
     q: "Will my clients know they're talking to automation?",
-    a: "No — and that's by design. Every message is written in your brand's voice: professional, warm, and personal. Clients experience it the same way they would a well-trained front desk team member. The only difference is it responds in seconds, even at 11pm.",
+    a: "No - and that's by design. Every message is written in your brand's voice: professional, warm, and personal. Clients experience it the same way they would a well-trained front desk team member. The only difference is it responds in seconds, even at 11pm.",
   },
   {
     q: "Does it work with my booking software (Vagaro, Mindbody, Acuity, Jane)?",
-    a: "Yes. We integrate with all major med spa booking platforms. Your booking link gets sent automatically at exactly the right moment — so leads go directly into your calendar without any manual scheduling.",
+    a: "Yes. We integrate with all major med spa booking platforms. Your booking link gets sent automatically at exactly the right moment - so leads go directly into your calendar without any manual scheduling.",
   },
   {
     q: "We already have a front desk. Why do we need this?",
-    a: "Your front desk is great — for clients already in the room. The problem is what happens to the leads who text, DM, or call while your team is busy. This system handles that gap 24/7, so your staff can focus on the experience you're paid to deliver, not chasing inquiries.",
+    a: "Your front desk is great - for clients already in the room. The problem is what happens to the leads who text, DM, or call while your team is busy. This system handles that gap 24/7, so your staff can focus on the experience you're paid to deliver, not chasing inquiries.",
   },
   {
     q: "How quickly can this be set up?",
-    a: "Most med spa systems are fully live within 5–7 business days. We do the entire build — messaging, sequences, integrations, testing. You attend one short onboarding call. That's it.",
+    a: "Most med spa systems are fully live within 5-7 business days. We do the entire build - messaging, sequences, integrations, testing. You attend one short onboarding call. That's it.",
   },
   {
     q: "We mostly get leads from Instagram DMs. Does this work for that?",
@@ -28,11 +28,11 @@ const faqs = [
   },
   {
     q: "What if a lead asks a specific question about a treatment like Botox or filler pricing?",
-    a: "The system is built around your specific services, FAQs, and pricing ranges. It handles common questions naturally and knows when to route a conversation to your team for anything more complex — so nothing gets mishandled.",
+    a: "The system is built around your specific services, FAQs, and pricing ranges. It handles common questions naturally and knows when to route a conversation to your team for anything more complex - so nothing gets mishandled.",
   },
   {
-    q: "How much does it cost — and is it worth it?",
-    a: "Plans start at $497/month with a one-time setup fee. A single recovered consultation typically covers the monthly cost. Most med spas see ROI within the first 2–3 weeks. Book the demo and we'll show you the exact math for your lead volume.",
+    q: "How much does it cost - and is it worth it?",
+    a: "Plans start at $497/month with a one-time setup fee. A single recovered consultation typically covers the monthly cost. Most med spas see ROI within the first 2-3 weeks. Book the demo and we'll show you the exact math for your lead volume.",
   },
   {
     q: "What happens after I book a demo?",
@@ -50,12 +50,12 @@ export default function MedSpaFAQ() {
             Frequently Asked Questions
           </h2>
           <p className="mt-4 text-muted-foreground text-base">
-            Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message →</a>
+            Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message -></a>
           </p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">
-          {faqs.map((faq, i) => (
+          {MEDSPA_FAQ_ITEMS.map((faq, i) => (
             <AccordionItem
               key={i}
               value={`faq-${i}`}

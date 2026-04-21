@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, CheckCircle2, Clock3 } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
+import DemoBookingModal from "../components/forms/DemoBookingModal";
 import { setPageMetadata } from "@/lib/seo";
 
 const industries = [
@@ -17,41 +18,43 @@ const industries = [
   {
     id: "dental",
     title: "Dental & Orthodontics",
-    status: "Coming soon",
+    status: "Industry track",
     description:
       "Best for practices that need faster response to new patient inquiries, missed-call text-back, and more booked consults.",
   },
   {
     id: "chiropractic",
     title: "Chiropractic & Physical Therapy",
-    status: "Coming soon",
+    status: "Industry track",
     description:
       "Built for practices that need more evaluations booked, cleaner follow-up, and less admin drag after the first inquiry.",
   },
   {
     id: "hvac",
     title: "HVAC, Plumbing & Home Services",
-    status: "Coming soon",
+    status: "Industry track",
     description:
       "Ideal for service businesses losing jobs to missed calls, slow follow-up, and manual lead management.",
   },
   {
     id: "roofing",
     title: "Roofing & Restoration",
-    status: "Coming soon",
+    status: "Industry track",
     description:
       "Designed for teams that need faster estimate response, better urgency handling, and more booked inspections.",
   },
   {
     id: "contractors",
     title: "Contractors & Trades",
-    status: "Coming soon",
+    status: "Industry track",
     description:
       "Great for teams that need to respond quickly, follow up on quote requests, and convert more web leads into booked jobs.",
   },
 ];
 
 export default function Industries() {
+  const [showBookingModal, setShowBookingModal] = useState(false);
+
   useEffect(() => {
     return setPageMetadata({
       title: "Industries We Serve | ClientSurge Systems",
@@ -111,13 +114,14 @@ export default function Industries() {
                     <ArrowRight className="w-4 h-4" />
                   </a>
                 ) : (
-                  <a
-                    href="/book"
+                  <button
+                    type="button"
+                    onClick={() => setShowBookingModal(true)}
                     className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
                   >
-                    Book a general demo
+                    Book Your Free Demo
                     <ArrowRight className="w-4 h-4" />
-                  </a>
+                  </button>
                 )}
               </article>
             );
@@ -127,6 +131,7 @@ export default function Industries() {
 
       <Footer />
       <MobileCallBar />
+      {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
     </div>
   );
 }

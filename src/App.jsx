@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavig
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import AutoCTAAnalytics from './components/analytics/AutoCTAAnalytics';
 // Add page imports here
 import Home from './pages/Home';
 import HomeTestOption1 from './pages/HomeTestOption1';
@@ -171,6 +172,7 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
+          <AutoCTAAnalytics />
           <RouteIndexingGuard />
           <AuthenticatedApp />
         </Router>

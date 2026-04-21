@@ -5,6 +5,7 @@ import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
+import DemoBookingModal from "../components/forms/DemoBookingModal";
 import { setPageMetadata } from "@/lib/seo";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -22,6 +23,7 @@ export default function Contact() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     return setPageMetadata({
@@ -150,14 +152,15 @@ export default function Contact() {
               <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
                 Skip the form and book a free 15-minute demo. We&apos;ll show you exactly how the system works for your business.
               </p>
-              <Link
-                to="/book"
+              <button
+                type="button"
+                onClick={() => setShowBookingModal(true)}
                 style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.3)", border: "none", cursor: "pointer", textDecoration: "none" }}
               >
                 <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 20px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.8rem" }}>
                   Book Your Free Demo <ArrowRight className="w-3.5 h-3.5" />
                 </span>
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -172,12 +175,13 @@ export default function Contact() {
                   Thanks for reaching out. We&apos;ll get back to you within one business day.
                 </p>
                 <div className="mt-6 flex flex-col sm:flex-row gap-3">
-                  <Link
-                    to="/book"
+                  <button
+                    type="button"
+                    onClick={() => setShowBookingModal(true)}
                     className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
                   >
                     Prefer to book a demo instead?
-                  </Link>
+                  </button>
                   <a
                     href="mailto:system@clientsurgesystems.com"
                     className="inline-flex items-center justify-center rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
@@ -318,6 +322,7 @@ export default function Contact() {
 
       <Footer />
       <MobileCallBar />
+      {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
     </div>
   );
 }

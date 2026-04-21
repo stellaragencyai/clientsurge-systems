@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { useDemoBooking } from "./DemoBookingContext";
 
 const plans = [
   {
@@ -63,6 +64,7 @@ const plans = [
 ];
 
 export default function Pricing() {
+  const demoBooking = useDemoBooking();
   return (
     <section id="pricing" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card overflow-visible">
       <div className="max-w-7xl mx-auto">
@@ -81,7 +83,7 @@ export default function Pricing() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {plans.map((plan, i) => (
-            <PricingCard key={i} plan={plan} />
+            <PricingCard key={i} plan={plan} demoBooking={demoBooking} />
           ))}
         </div>
 
@@ -117,13 +119,24 @@ export default function Pricing() {
           <p className="text-foreground font-semibold text-base mb-4">
             Not sure which system fits your business? We will recommend the best option based on your lead flow.
           </p>
-          <a
-            href="/book"
-            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
-          >
-            Use the final booking section below
-            <ArrowRight className="w-4 h-4" />
-          </a>
+          {demoBooking ? (
+            <button
+              type="button"
+              onClick={demoBooking.openDemoBooking}
+              className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+            >
+              Book Your Free Demo
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <a
+              href="/book"
+              className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+            >
+              Book Your Free Demo
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          )}
         </div>
 
       </div>
@@ -178,7 +191,7 @@ export default function Pricing() {
   );
 }
 
-function PricingCard({ plan }) {
+function PricingCard({ plan, demoBooking }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -264,8 +277,15 @@ function PricingCard({ plan }) {
           ))}
         </ul>
 
-        <a
-          href="/book"
+        <button
+          type="button"
+          onClick={() => {
+            if (demoBooking) {
+              demoBooking.openDemoBooking();
+              return;
+            }
+            window.location.href = "/book";
+          }}
           className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none"
           onMouseEnter={(event) => {
             event.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
@@ -278,7 +298,7 @@ function PricingCard({ plan }) {
             Book Your Free Demo
             <ArrowRight className="w-4 h-4" />
           </span>
-        </a>
+        </button>
       </div>
     </div>
   );

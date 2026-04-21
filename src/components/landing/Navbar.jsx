@@ -187,31 +187,21 @@ export default function Navbar() {
             {industriesOpen && (
               <div className="absolute top-full left-1/2 mt-3 w-60 -translate-x-1/2 rounded-2xl border border-border bg-background/95 backdrop-blur shadow-lg p-3">
                 <div className="space-y-1">
-                  {industryLinks.map((item) =>
-                    item.live ? (
-                      <a
-                        key={item.label}
-                        href={item.href}
-                        onClick={() => trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown")}
-                        className="block rounded-xl px-3 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                      >
-                        {item.label}
-                      </a>
-                    ) : (
-                      <a
-                        key={item.label}
-                        href={item.href}
-                        onClick={() => {
-                          trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
-                          setIndustriesOpen(false);
-                        }}
-                        className="flex items-center justify-between rounded-xl px-3 py-2 text-sm text-muted-foreground hover:bg-muted transition-colors"
-                      >
-                        <span>{item.label}</span>
-                        <span className="text-[10px] font-semibold uppercase tracking-wide">Coming soon</span>
-                      </a>
-                    )
-                  )}
+                  {industryLinks.map((item) => (
+                    <a
+                      key={item.label}
+                      href={item.href}
+                      onClick={() => {
+                        trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
+                        setIndustriesOpen(false);
+                      }}
+                      className={`block rounded-xl px-3 py-2 text-sm transition-colors ${
+                        item.live ? "font-medium text-foreground hover:bg-muted" : "text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {item.label}
+                    </a>
+                  ))}
                 </div>
               </div>
             )}
@@ -279,34 +269,19 @@ export default function Navbar() {
           <div className="pt-2 border-t border-border">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-primary mb-2">Industries</p>
             <div className="space-y-1">
-              {industryLinks.map((item) =>
-                item.live ? (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    onClick={() => {
-                      trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
-                      setOpen(false);
-                    }}
-                    className="block text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded px-2 py-1"
-                  >
-                    {item.label}
-                  </a>
-                ) : (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    className="flex items-center justify-between rounded px-2 py-1 text-sm text-muted-foreground/80 hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none"
-                    onClick={() => {
-                      trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
-                      setOpen(false);
-                    }}
-                  >
-                    <span>{item.label}</span>
-                    <span className="text-[10px] font-semibold uppercase tracking-wide">Soon</span>
-                  </a>
-                )
-              )}
+              {industryLinks.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="block rounded px-2 py-1 text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none"
+                  onClick={() => {
+                    trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
+                    setOpen(false);
+                  }}
+                >
+                  {item.label}
+                </a>
+              ))}
             </div>
           </div>
 

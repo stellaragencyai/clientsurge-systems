@@ -49,7 +49,7 @@ export default function StickyCTA() {
             fontSize: "0.9rem",
             textShadow: "0 1px 2px rgba(0,0,0,0.3)",
           }}>
-            Book a Free Demo
+            Book Your Free Demo
             <ArrowRight className="w-4 h-4" />
           </span>
         </button>

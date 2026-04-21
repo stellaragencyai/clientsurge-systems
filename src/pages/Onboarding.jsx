@@ -324,16 +324,16 @@ export default function Onboarding() {
                 Booking System
               </h2>
               <InputField
-                label="Booking Link (Calendly, Acuity, etc.)"
+                label="Booking Link (scheduler, Acuity, etc.)"
                 value={formData.booking_link}
                 onChange={(e) => updateField("booking_link", e.target.value)}
-                placeholder="https://calendly.com/..."
+                placeholder="https://your-booking-page.com/..."
               />
               <InputField
                 label="Calendar System Used"
                 value={formData.calendar_system}
                 onChange={(e) => updateField("calendar_system", e.target.value)}
-                placeholder="Calendly, Acuity Scheduling, etc."
+                placeholder="Google Calendar, Acuity Scheduling, etc."
               />
               <SelectField
                 label="Do you require a consultation first?"

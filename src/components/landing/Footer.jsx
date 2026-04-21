@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowUp, Mail, Phone } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useDemoBooking } from "./DemoBookingContext";
 
 const navColumns = [
   {
@@ -37,6 +38,7 @@ const navColumns = [
 
 export default function Footer() {
   const [showTooltip, setShowTooltip] = useState(false);
+  const demoBooking = useDemoBooking();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -99,7 +101,14 @@ export default function Footer() {
         <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-foreground/55 mb-10">
           <a
             href="/book"
-            onClick={(e) => handleNavClick(e, "/book")}
+            onClick={(e) => {
+              if (demoBooking && location.pathname === "/") {
+                e.preventDefault();
+                demoBooking.openDemoBooking();
+                return;
+              }
+              handleNavClick(e, "/book");
+            }}
             className="hover:text-foreground hover:underline focus:ring-2 focus:ring-primary focus:outline-none rounded px-1 py-0.5 transition-colors"
           >
             Book Your Free Demo

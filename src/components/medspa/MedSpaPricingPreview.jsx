@@ -23,7 +23,7 @@ export default function MedSpaPricingPreview() {
             Done-for-You <span className="text-primary">Automation</span> Systems for Med Spas
           </h2>
           <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Faster response. Better follow-up. More booked consultations. We build and install the system â€” you focus on your clients.
+            Faster response. Better follow-up. More booked consultations. We build and install the system - you focus on your clients.
           </p>
         </div>
 
@@ -31,7 +31,7 @@ export default function MedSpaPricingPreview() {
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
 
-              <p className="text-sm font-semibold text-foreground mb-4">Starting from $497/mo Â· One-time setup fee Â· No long-term contracts Â· Cancel anytime</p>
+              <p className="text-sm font-semibold text-foreground mb-4">Starting from $497/mo · One-time setup fee · No long-term contracts · Cancel anytime</p>
               <p className="text-sm font-semibold text-foreground mb-6">Every system includes:</p>
               <ul className="space-y-3">
                 {includes.map((item, i) => (
@@ -51,11 +51,11 @@ export default function MedSpaPricingPreview() {
               </p>
               <button onClick={() => setShowModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",border:"none",cursor:"pointer"}}>
                 <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 28px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"0.9rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
-                  Book a Demo
+                  Book Your Free Demo
                   <ArrowRight className="w-4 h-4" />
                 </span>
               </button>
-              <p className="text-xs text-muted-foreground mt-4">Free 15-min call Â· No commitment Â· Live in 5â€“7 days</p>
+              <p className="text-xs text-muted-foreground mt-4">Free 15-min call · No commitment · Live in 5-7 days</p>
             </div>
           </div>
         </div>
@@ -75,7 +75,7 @@ export default function MedSpaPricingPreview() {
           </p>
           <button onClick={() => setShowModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",border:"none",cursor:"pointer"}}>
             <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 28px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"0.9rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
-              Book Your Demo
+              Book Your Free Demo
               <ArrowRight className="w-4 h-4" />
             </span>
           </button>

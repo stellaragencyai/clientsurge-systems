@@ -6,7 +6,7 @@ const benefits = [
   {
     icon: Timer,
     title: "Respond Before Your Competitor Does",
-    desc: "First to respond wins the booking. Our systems reply in under 60 seconds — day, night, weekends.",
+    desc: "First to respond wins the booking. Our systems reply in under 60 seconds - day, night, weekends.",
   },
   {
     icon: CalendarCheck,
@@ -21,12 +21,12 @@ const benefits = [
   {
     icon: UsersRound,
     title: "Your Team Focuses on What Matters",
-    desc: "When follow-up is automated, your staff focuses on clients in front of them — not chasing cold leads.",
+    desc: "When follow-up is automated, your staff focuses on clients in front of them - not chasing cold leads.",
   },
   {
     icon: TrendingUp,
     title: "Higher Conversions From the Same Traffic",
-    desc: "You're already paying for leads. We help you convert more of them — without spending a dollar more on ads.",
+    desc: "You're already paying for leads. We help you convert more of them - without spending a dollar more on ads.",
   },
   {
     icon: BadgeDollarSign,
@@ -153,7 +153,7 @@ export default function Benefits() {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
           }}>
             <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 32px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
-              Book a Demo
+              Book Your Free Demo
               <ArrowRight className="w-4 h-4" />
             </span>
           </button>

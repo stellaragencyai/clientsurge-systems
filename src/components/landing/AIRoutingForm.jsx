@@ -2,6 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useDemoBooking } from "./DemoBookingContext";
 
 const industries = [
   "Med Spas & Aesthetic Clinics",
@@ -20,6 +21,7 @@ const routeMap = {
 };
 
 export default function AIRoutingForm() {
+  const demoBooking = useDemoBooking();
   const [form, setForm] = useState({
     industry: industries[0],
     urgency: "Need help this month",
@@ -65,6 +67,7 @@ Return JSON with:
   };
 
   const cta = recommendation ? routeMap[recommendation.route] || routeMap.book : routeMap.book;
+  const shouldOpenModal = cta.href === "/book" && Boolean(demoBooking);
 
   return (
     <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-card to-background">
@@ -116,13 +119,24 @@ Return JSON with:
                   <p className="text-xs font-semibold uppercase tracking-wide text-foreground/55 mb-2">Why this route</p>
                   <p className="text-sm text-muted-foreground">{recommendation.reason}</p>
                 </div>
-                <Link
-                  to={cta.href}
-                  className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
-                >
-                  {cta.label}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+                {shouldOpenModal ? (
+                  <button
+                    type="button"
+                    onClick={demoBooking.openDemoBooking}
+                    className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
+                  >
+                    {cta.label}
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <Link
+                    to={cta.href}
+                    className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
+                  >
+                    {cta.label}
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
               </div>
             )}
           </div>
