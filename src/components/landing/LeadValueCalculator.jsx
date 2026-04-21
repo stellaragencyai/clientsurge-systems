@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowRight, TrendingUp, DollarSign } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
 
 export default function LeadValueCalculator() {

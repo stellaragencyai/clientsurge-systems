@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ArrowRight, Zap, MessageSquare, PhoneCall, CalendarCheck, RotateCcw, LayoutDashboard, HeadphonesIcon, TrendingUp, CheckCircle2, Send, X } from "lucide-react";
-import DemoBookingModal from "../forms/DemoBookingModal";
 import SystemFlowDiagram from "./SystemFlowDiagram";
 import EnhancedSystemSteps from "./EnhancedSystemSteps";
 
