@@ -148,32 +148,22 @@ export default function Industries() {
               </div>
               <div className="pointer-events-none absolute inset-x-8 top-0 h-24 rounded-full bg-[#f6dfb6]/40 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.3),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(201,156,110,0.16),transparent_40%)] opacity-90" />
-              <div className="relative h-[20.5rem] overflow-hidden md:h-[20.5rem]">
+              <div className="relative h-[16.5rem] overflow-hidden md:h-[16.5rem]">
                 <img
                   src={industry.image}
                   alt={industry.name}
                   loading="lazy"
                   className="h-full w-full object-cover saturate-[0.96] transition-transform duration-700 group-hover:scale-[1.05]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#101828]/78 via-[#101828]/20 to-white/12" />
-                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#c49563]/26 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
-                <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/20 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-md">
+                <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/40 bg-black/30 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-md">
                   <Icon className="w-3.5 h-3.5" />
                   {industry.result}
-                </div>
-                <div className="absolute bottom-6 left-6 right-6">
-                  <h3 className="font-serif text-[1.85rem] font-semibold leading-tight text-white drop-shadow-[0_6px_24px_rgba(15,23,42,0.35)] md:text-[2rem]">
-                    {industry.name}
-                  </h3>
                 </div>
               </div>
 
               <div className="relative p-7 md:p-8">
-                <div className="mb-5 h-px w-full bg-gradient-to-r from-[#9a6c45]/25 via-[#c8965c]/55 to-transparent" />
-                <div className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/55 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8a684a]">Ideal Use Case</p>
-                  <div className="h-2.5 w-2.5 rounded-full bg-[#c8965c] shadow-[0_0_14px_rgba(200,150,92,0.65)]" />
-                </div>
+                <h3 className="font-serif text-[1.25rem] font-semibold leading-tight text-slate-900 mb-4">{industry.name}</h3>
+                <div className="mb-4 h-px w-full bg-gradient-to-r from-[#9a6c45]/25 via-[#c8965c]/55 to-transparent" />
                 <p className="mb-3 font-serif text-[1.08rem] font-semibold leading-relaxed text-slate-900">{industry.problem}</p>
                 <p className="mb-6 text-[15px] leading-7 text-slate-600">{industry.desc}</p>
                 <Link
