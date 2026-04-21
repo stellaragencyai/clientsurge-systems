@@ -20,7 +20,7 @@ const industries = [
     desc: "Faster response, reminder flows, and cleaner follow-up for dental practices.",
     result: "Launching next",
     href: "/industries#dental",
-    image: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=900&q=85",
     cta: "See industry roadmap",
   },
   {
@@ -30,7 +30,7 @@ const industries = [
     desc: "Automated response and reactivation for practices that live on booked visits.",
     result: "Launching next",
     href: "/industries#chiropractic",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=900&q=85",
     cta: "See industry roadmap",
   },
   {
@@ -50,7 +50,7 @@ const industries = [
     desc: "Fast callback, estimate follow-up, and missed-call recovery for urgent jobs.",
     result: "Launching next",
     href: "/industries#roofing",
-    image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1618832817092-3338b483a528?w=900&q=85",
     cta: "See industry roadmap",
   },
   {
