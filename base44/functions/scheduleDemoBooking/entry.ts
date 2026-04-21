@@ -2,6 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const MAX_FIELD_LENGTH = 500;
 const DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const LEAD_SOURCE = 'website';
 const INTAKE_TYPE = 'demo_booking';
 
@@ -21,6 +22,7 @@ function normalizePayload(payload: Record<string, unknown>) {
     monthly_leads: sanitizeString(payload.monthly_leads),
     biggest_issue: sanitizeString(payload.biggest_issue),
     industry: sanitizeString(payload.industry, 'General') || 'General',
+    website_url: sanitizeString(payload.website_url),
   };
 }
 
@@ -51,6 +53,24 @@ function validatePayload(payload: ReturnType<typeof normalizePayload>) {
   }
 
   return errors;
+}
+
+async function isRateLimited(
+  base44: ReturnType<typeof createClientFromRequest>,
+  payload: ReturnType<typeof normalizePayload>
+) {
+  const emailMatches = await base44.asServiceRole.entities.Leads.filter({ email: payload.email }, '-created_date', 5);
+  const now = Date.now();
+
+  return emailMatches.some((existingLead: Record<string, unknown>) => {
+    const createdDate =
+      typeof existingLead.created_date === 'string' ? new Date(existingLead.created_date).getTime() : 0;
+    const sameBusiness =
+      typeof existingLead.business_name === 'string' &&
+      existingLead.business_name.trim().toLowerCase() === payload.business_name.toLowerCase();
+
+    return createdDate > 0 && now - createdDate < RATE_LIMIT_WINDOW_MS && sameBusiness;
+  });
 }
 
 function parseBookingDateTime(date: string, time: string) {
@@ -92,6 +112,38 @@ function buildLeadPayload(payload: ReturnType<typeof normalizePayload>) {
   };
 }
 
+async function ensureDemoRequest(
+  base44: ReturnType<typeof createClientFromRequest>,
+  leadId: string,
+  payload: ReturnType<typeof normalizePayload>
+) {
+  const existingRequests = await base44.asServiceRole.entities.DemoRequest.filter(
+    {
+      lead_id: leadId,
+      scheduled_date: payload.scheduled_date,
+      scheduled_time: payload.scheduled_time,
+    },
+    '-created_date',
+    10
+  );
+
+  const existingScheduledRequest = existingRequests.find(
+    (request: Record<string, unknown>) => request.status === 'scheduled'
+  );
+
+  if (existingScheduledRequest) {
+    return existingScheduledRequest;
+  }
+
+  return base44.asServiceRole.entities.DemoRequest.create({
+    lead_id: leadId,
+    scheduled_date: payload.scheduled_date,
+    scheduled_time: payload.scheduled_time,
+    status: 'scheduled',
+    notes: payload.biggest_issue || undefined,
+  });
+}
+
 async function logCommunicationEvent(
   base44: ReturnType<typeof createClientFromRequest>,
   payload: {
@@ -130,10 +182,19 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const rawPayload = await req.json();
     const payload = normalizePayload(rawPayload);
+
+    if (payload.website_url) {
+      return Response.json({ success: true, ignored: true });
+    }
+
     const errors = validatePayload(payload);
 
     if (errors.length > 0) {
       return Response.json({ error: errors[0], errors }, { status: 400 });
+    }
+
+    if (await isRateLimited(base44, payload)) {
+      return Response.json({ error: 'Please wait a moment before submitting again.' }, { status: 429 });
     }
 
     const bookingDateTime = parseBookingDateTime(payload.scheduled_date, payload.scheduled_time);
@@ -174,13 +235,7 @@ Deno.serve(async (req) => {
       },
     });
 
-    await base44.asServiceRole.entities.DemoRequest.create({
-      lead_id: lead.id,
-      scheduled_date: payload.scheduled_date,
-      scheduled_time: payload.scheduled_time,
-      status: 'scheduled',
-      notes: payload.biggest_issue || undefined,
-    });
+    await ensureDemoRequest(base44, lead.id, payload);
 
     const warnings: string[] = [];
 
@@ -195,6 +250,23 @@ Deno.serve(async (req) => {
         message: `Demo confirmation email for ${payload.scheduled_date} ${payload.scheduled_time}`,
         run: () =>
           base44.functions.invoke('sendDemoConfirmationEmail', {
+            email: payload.email,
+            full_name: payload.full_name,
+            business_name: payload.business_name,
+            scheduled_date: payload.scheduled_date,
+            scheduled_time: payload.scheduled_time,
+          }),
+      },
+      {
+        name: 'prep_email',
+        channel: 'email' as const,
+        eventTypeSuccess: 'email_sent' as const,
+        eventTypeFailure: 'email_failed' as const,
+        provider: 'internal' as const,
+        subject: `Demo prep email for ${payload.full_name}`,
+        message: `Demo prep email for ${payload.scheduled_date} ${payload.scheduled_time}`,
+        run: () =>
+          base44.functions.invoke('sendDemoPrepEmail', {
             email: payload.email,
             full_name: payload.full_name,
             business_name: payload.business_name,
@@ -249,6 +321,7 @@ Deno.serve(async (req) => {
         message: `Calendar event scheduled for ${payload.scheduled_date} ${payload.scheduled_time}`,
         run: () =>
           base44.functions.invoke('createDemoCalendarEvent', {
+            lead_id: lead.id,
             title: `Demo: ${payload.business_name} - ${payload.full_name}`,
             description: `Demo Booking\n\nBusiness: ${payload.business_name}\nIndustry: ${payload.industry}\nContact: ${payload.full_name}\nEmail: ${payload.email}\nPhone: ${payload.phone}\nMonthly Leads: ${payload.monthly_leads}\nChallenge: ${payload.biggest_issue}`,
             start_time: bookingDateTime,

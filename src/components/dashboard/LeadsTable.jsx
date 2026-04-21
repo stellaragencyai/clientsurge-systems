@@ -18,8 +18,11 @@ export default function LeadsTable() {
   const [leads, setLeads] = useState([]);
   const [filteredLeads, setFilteredLeads] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [intakeFilter, setIntakeFilter] = useState("all");
+  const [sourceFilter, setSourceFilter] = useState("all");
 
   useEffect(() => {
     loadLeads();
@@ -27,14 +30,16 @@ export default function LeadsTable() {
 
   useEffect(() => {
     filterLeads();
-  }, [leads, searchTerm, statusFilter]);
+  }, [leads, searchTerm, statusFilter, intakeFilter, sourceFilter]);
 
   const loadLeads = async () => {
     try {
+      setError("");
       const data = await base44.entities.Leads.list("-created_date", 500);
       setLeads(data);
     } catch (err) {
       console.error("Error loading leads:", err);
+      setError("Unable to load leads right now.");
     } finally {
       setLoading(false);
     }
@@ -56,6 +61,14 @@ export default function LeadsTable() {
     // Status filter
     if (statusFilter !== "all") {
       filtered = filtered.filter((lead) => lead.status === statusFilter);
+    }
+
+    if (intakeFilter !== "all") {
+      filtered = filtered.filter((lead) => (lead.intake_type || "legacy") === intakeFilter);
+    }
+
+    if (sourceFilter !== "all") {
+      filtered = filtered.filter((lead) => (lead.source || "unknown") === sourceFilter);
     }
 
     setFilteredLeads(filtered);
@@ -113,12 +126,38 @@ export default function LeadsTable() {
           <option value="Booked">Booked</option>
           <option value="Closed">Closed</option>
         </select>
+
+        <select
+          value={intakeFilter}
+          onChange={(e) => setIntakeFilter(e.target.value)}
+          className="px-4 py-2.5 rounded-lg border border-border bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+        >
+          <option value="all">All Intake Types</option>
+          <option value="lead_capture">Lead Capture</option>
+          <option value="contact_inquiry">Contact Inquiry</option>
+          <option value="demo_booking">Demo Booking</option>
+          <option value="legacy">Legacy / Unlabeled</option>
+        </select>
+
+        <select
+          value={sourceFilter}
+          onChange={(e) => setSourceFilter(e.target.value)}
+          className="px-4 py-2.5 rounded-lg border border-border bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+        >
+          <option value="all">All Sources</option>
+          <option value="website">Website</option>
+          <option value="unknown">Unknown / Legacy</option>
+        </select>
       </div>
 
       {/* Table */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
           <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <p className="text-red-600">{error}</p>
         </div>
       ) : filteredLeads.length === 0 ? (
         <div className="text-center py-12">

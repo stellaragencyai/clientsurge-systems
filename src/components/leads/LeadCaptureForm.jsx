@@ -14,15 +14,16 @@ export default function LeadCaptureForm() {
     phone: "",
     business_type: "",
     problem: "",
+    website_url: "",
   });
 
   const businessTypes = [
-    "Medical Spa",
-    "Salon",
-    "Dental Practice",
-    "Real Estate",
-    "HVAC",
-    "Contractor",
+    "Med Spas & Aesthetic Clinics",
+    "Dental & Orthodontics",
+    "Chiropractic & Physical Therapy",
+    "HVAC, Plumbing & Home Services",
+    "Roofing & Restoration",
+    "Contractors & Trades",
     "Other",
   ];
 
@@ -78,6 +79,16 @@ export default function LeadCaptureForm() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto space-y-4">
+      <input
+        type="text"
+        name="website_url"
+        value={formData.website_url}
+        onChange={handleChange}
+        tabIndex={-1}
+        autoComplete="off"
+        className="hidden"
+        aria-hidden="true"
+      />
       {error && (
         <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
           <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
@@ -196,7 +207,7 @@ export default function LeadCaptureForm() {
       </Button>
 
       <p className="text-xs text-muted-foreground text-center">
-        We'll respond within the next few hours.
+        No spam. No pressure. We&apos;ll respond within the next few hours.
       </p>
     </form>
   );

@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Users, AlertTriangle, Archive, Zap, MessageCircle, CheckSquare2, RefreshCw, Hourglass, Phone, ArrowRight } from "lucide-react";
-import DemoBookingModal from "../forms/DemoBookingModal";
 
 const pairs = [
   {
@@ -9,12 +8,12 @@ const pairs = [
     problemDesc: "The average business takes 47 hours to reply. By then, they've already booked your competitor.",
     solutionIcon: Zap,
     solution: "Instant Lead Response",
-    solutionDesc: "Respond in under 60 seconds — automatically, 24/7.",
+    solutionDesc: "Respond in under 60 seconds  -  automatically, 24/7.",
   },
   {
     problemIcon: Phone,
     problem: "Missed Calls Are Missed Revenue",
-    problemDesc: "Every unanswered call is a customer you paid to attract — walking straight to someone else.",
+    problemDesc: "Every unanswered call is a customer you paid to attract  -  walking straight to someone else.",
     solutionIcon: MessageCircle,
     solution: "Missed Call Text-Back",
     solutionDesc: "Text them back instantly. Recover the lead before they dial your competitor.",
@@ -45,7 +44,7 @@ const pairs = [
   },
 ];
 
-// FIX 2: Single shimmer keyframe at module level — not duplicated per card
+// FIX 2: Single shimmer keyframe at module level  -  not duplicated per card
 const sectionStyles = `
   @keyframes shimmer {
     0% { transform: translateX(-100%); }
@@ -62,7 +61,7 @@ function CardWithFadeIn({ children, delay = 0 }) {
       ([entry]) => {
         if (entry.isIntersecting) {
           setVisible(true);
-          // FIX 5 (functionality): disconnect after first trigger — no wasted observers
+          // FIX 5 (functionality): disconnect after first trigger  -  no wasted observers
           observer.disconnect();
         }
       },
@@ -87,11 +86,9 @@ function CardWithFadeIn({ children, delay = 0 }) {
 }
 
 export default function ProblemSolution() {
-  const [showDemoModal, setShowDemoModal] = useState(false);
-
   return (
     <section id="services" className="py-20 md:py-28 px-4 md:px-6 relative overflow-hidden">
-      {/* Single style block — no duplicates */}
+      {/* Single style block  -  no duplicates */}
       <style>{sectionStyles}</style>
 
       {/* Background */}
@@ -111,7 +108,7 @@ export default function ProblemSolution() {
             <span className="text-primary">You Have a Follow-Up Problem.</span>
           </h2>
           <p className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-            Every delayed response is lost revenue. Here's where it breaks — and exactly how we fix it.
+            Every delayed response is lost revenue. Here's where it breaks  -  and exactly how we fix it.
           </p>
         </div>
 
@@ -231,28 +228,24 @@ export default function ProblemSolution() {
           })}
         </div>
 
-        {/* FIX: CTA at the bottom */}
+        {/* Next Step */}
         <div className="mt-16 text-center">
           <p className="text-foreground font-semibold text-base mb-6">
             Ready to fix all 5 of these in your business?
           </p>
-          <button
-            onClick={() => setShowDemoModal(true)}
-            style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.35)", border: "none", cursor: "pointer", transition: "box-shadow 0.4s ease" }}
-            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"; }}
+          <a
+            href="#how-it-works-section"
+            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
           >
-            <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "50px", padding: "0 36px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
-              See How We Fix It — Free 15-Min Demo
-              <ArrowRight className="w-4 h-4" />
-            </span>
-          </button>
-          <p className="mt-4 text-xs text-muted-foreground">No commitment · Live in 5–7 days · Fully done-for-you</p>
+            See the 4-step system below
+            <ArrowRight className="w-4 h-4" />
+          </a>
+          <p className="mt-4 text-xs text-muted-foreground">No commitment � Live in 5-7 days � Fully done-for-you</p>
         </div>
 
       </div>
-
-      {showDemoModal && <DemoBookingModal onClose={() => setShowDemoModal(false)} />}
     </section>
   );
 }
+
+

@@ -18,6 +18,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
     monthly_leads: '',
     biggest_issue: '',
     lead_source: [],
+    website_url: '',
   });
 
   useEffect(() => {
@@ -101,6 +102,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
         phone: formData.phone,
         business_type: formData.business_type,
         problem: buildProblemSummary(),
+        website_url: formData.website_url,
       });
 
       if (!result.data?.success) {
@@ -136,6 +138,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
       monthly_leads: '',
       biggest_issue: '',
       lead_source: [],
+      website_url: '',
     });
     onClose();
   };
@@ -207,7 +210,17 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+           <form onSubmit={handleSubmit} className="space-y-6">
+            <input
+              type="text"
+              name="website_url"
+              value={formData.website_url}
+              onChange={handleInputChange}
+              tabIndex={-1}
+              autoComplete="off"
+              className="hidden"
+              aria-hidden="true"
+            />
             
             {/* Step 1: Contact Info */}
              {step === 1 && (
@@ -303,11 +316,12 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                      className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                    >
                      <option value="">Select type</option>
-                     <option value="med_spa">Med Spa</option>
-                     <option value="salon">Salon</option>
-                     <option value="clinic">Clinic</option>
-                     <option value="dental">Dental</option>
-                     <option value="fitness">Fitness</option>
+                     <option value="med_spa">Med Spas & Aesthetic Clinics</option>
+                     <option value="dental">Dental & Orthodontics</option>
+                     <option value="chiropractic">Chiropractic & Physical Therapy</option>
+                     <option value="home_services">HVAC, Plumbing & Home Services</option>
+                     <option value="roofing">Roofing & Restoration</option>
+                     <option value="contractor">Contractors & Trades</option>
                      <option value="other">Other</option>
                    </select>
                  </div>
@@ -413,6 +427,9 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                 </button>
               )}
             </div>
+            <p className="mt-4 text-center text-xs text-muted-foreground">
+              No spam. No pressure. Just a tailored follow-up about your lead system.
+            </p>
             </form>
 
             </div>
@@ -435,3 +452,5 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
             </div>
             );
             }
+
+

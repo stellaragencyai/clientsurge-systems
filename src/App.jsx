@@ -1,7 +1,8 @@
+import { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -28,13 +29,75 @@ import Success from './pages/Success';
 import LegalPage from './pages/LegalPage';
 import Contact from './pages/Contact';
 import AdminOnboarding from './pages/AdminOnboarding';
+import Industries from './pages/Industries';
 
 // Public routes that do NOT require authentication
-const PUBLIC_PATHS = ["/", "/med-spa", "/start", "/book", "/success", "/legal", "/contact", "/test-option-1", "/test-option-2", "/test-option-3"];
+const PUBLIC_PATHS = [
+  "/",
+  "/med-spa",
+  "/start",
+  "/book",
+  "/book-demo",
+  "/industries",
+  "/pricing",
+  "/faq",
+  "/our-system",
+  "/testimonials",
+  "/privacy-policy",
+  "/terms",
+  "/login",
+  "/success",
+  "/legal",
+  "/contact",
+  "/test-option-1",
+  "/test-option-2",
+  "/test-option-3",
+];
+const NOINDEX_PREFIXES = ['/admin', '/dashboard', '/client-portal', '/lead-intelligence', '/medspa-dashboard', '/sam', '/test-option-1', '/test-option-2', '/test-option-3', '/success'];
 
 const isPublicPath = (pathname) => {
   return PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith(p + "/"));
 };
+
+function SectionRedirect({ hash }) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate("/", { replace: true });
+
+    const timer = window.setTimeout(() => {
+      const el = document.querySelector(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      window.history.replaceState({}, "", `/${hash}`);
+    }, 450);
+
+    return () => window.clearTimeout(timer);
+  }, [hash, navigate]);
+
+  return null;
+}
+
+function RouteIndexingGuard() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const robotsMeta = document.head.querySelector('meta[name="robots"]');
+    if (!robotsMeta) return;
+
+    const previous = robotsMeta.getAttribute('content') || 'index,follow';
+    const shouldNoindex = NOINDEX_PREFIXES.some((prefix) => location.pathname === prefix || location.pathname.startsWith(`${prefix}/`));
+
+    robotsMeta.setAttribute('content', shouldNoindex ? 'noindex,nofollow' : 'index,follow');
+
+    return () => {
+      robotsMeta.setAttribute('content', previous);
+    };
+  }, [location.pathname]);
+
+  return null;
+}
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -72,6 +135,15 @@ const AuthenticatedApp = () => {
       <Route path="/med-spa" element={<MedSpa />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />
+      <Route path="/book-demo" element={<Navigate to="/book" replace />} />
+      <Route path="/industries" element={<Industries />} />
+      <Route path="/pricing" element={<SectionRedirect hash="#pricing" />} />
+      <Route path="/faq" element={<SectionRedirect hash="#faq" />} />
+      <Route path="/our-system" element={<SectionRedirect hash="#services" />} />
+      <Route path="/testimonials" element={<SectionRedirect hash="#testimonials" />} />
+      <Route path="/privacy-policy" element={<Navigate to="/legal/privacy" replace />} />
+      <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
+      <Route path="/login" element={<Navigate to="/client-portal" replace />} />
       <Route path="/success" element={<Success />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/dashboard" element={<Dashboard />} />
@@ -99,6 +171,7 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
+          <RouteIndexingGuard />
           <AuthenticatedApp />
         </Router>
         <Toaster />

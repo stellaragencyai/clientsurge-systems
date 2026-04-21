@@ -4,8 +4,7 @@ import { Loader2 } from 'lucide-react';
 import AIClassificationBadge from './AIClassificationBadge';
 
 export default function LeadTimeline({ leadId, lead }) {
-  const [messages, setMessages] = useState([]);
-  const [emails, setEmails] = useState([]);
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,10 +13,8 @@ export default function LeadTimeline({ leadId, lead }) {
 
   const loadTimeline = async () => {
     try {
-      const msgs = await base44.entities.Messages.filter({ lead_id: leadId });
-      const emls = await base44.entities.Emails.filter({ lead_id: leadId });
-      setMessages(msgs || []);
-      setEmails(emls || []);
+      const eventData = await base44.entities.CommunicationEvent.filter({ lead_id: leadId }, '-created_date', 100);
+      setEvents(eventData || []);
     } catch (err) {
       console.error('Error loading timeline:', err);
     } finally {
@@ -42,18 +39,11 @@ export default function LeadTimeline({ leadId, lead }) {
     });
   };
 
-  const allEvents = [
-    ...messages.map((m) => ({
-      type: 'message',
-      timestamp: m.created_date,
-      data: m,
-    })),
-    ...emails.map((e) => ({
-      type: 'email',
-      timestamp: e.created_date,
-      data: e,
-    })),
-  ].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const allEvents = events.map((event) => ({
+    type: event.channel || 'internal',
+    timestamp: event.created_date,
+    data: event,
+  }));
 
   return (
     <div className="bg-white rounded-lg border border-border p-6">
@@ -96,47 +86,77 @@ export default function LeadTimeline({ leadId, lead }) {
         )}
       </div>
 
-      {/* Message & Email Timeline */}
+      {/* Event Timeline */}
       {allEvents.length === 0 ? (
-        <p className="text-muted-foreground text-sm">No messages or emails yet</p>
+        <p className="text-muted-foreground text-sm">No lead activity yet</p>
       ) : (
         <div className="space-y-4">
           {allEvents.map((event, idx) => {
-            const isMessage = event.type === 'message';
             const item = event.data;
+            const isSms = item.channel === 'sms';
+            const isEmail = item.channel === 'email';
+            const isFailure = item.status === 'failed';
+            const badgeLabel =
+              item.channel === 'internal'
+                ? 'System'
+                : isSms
+                  ? item.direction === 'inbound'
+                    ? 'Inbound SMS'
+                    : 'Outbound SMS'
+                  : isEmail
+                    ? 'Email'
+                    : item.channel || 'Activity';
 
             return (
               <div key={idx} className="flex gap-4">
                 <div className="flex-shrink-0">
                   <div
                     className={`w-2 h-2 rounded-full mt-2 ${
-                      isMessage
-                        ? item.direction === 'inbound'
-                          ? 'bg-green-500'
-                          : 'bg-blue-500'
-                        : 'bg-amber-500'
+                      isFailure
+                        ? 'bg-red-500'
+                        : isSms
+                          ? item.direction === 'inbound'
+                            ? 'bg-green-500'
+                            : 'bg-blue-500'
+                          : isEmail
+                            ? 'bg-amber-500'
+                            : 'bg-slate-500'
                     }`}
                   />
                 </div>
                 <div className="flex-1 text-sm">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-semibold">
-                      {isMessage
-                        ? item.direction === 'inbound'
-                          ? 'Inbound SMS'
-                          : 'Outbound SMS'
-                        : 'Email'}
-                    </span>
-                    {isMessage && item.ai_generated && (
+                    <span className="font-semibold">{badgeLabel}</span>
+                    {item.ai_generated && (
                       <span className="text-xs bg-purple-100 text-purple-800 px-2 py-0.5 rounded">
                         AI Generated
                       </span>
                     )}
+                    <span
+                      className={`text-xs px-2 py-0.5 rounded font-medium ${
+                        item.status === 'failed'
+                          ? 'bg-red-100 text-red-700'
+                          : item.status === 'processed' || item.status === 'sent' || item.status === 'delivered'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-slate-100 text-slate-700'
+                      }`}
+                    >
+                      {item.status}
+                    </span>
                   </div>
-                  <p className="text-muted-foreground mb-1">{formatDate(event.timestamp)}</p>
+                  <p className="text-muted-foreground mb-1">
+                    {formatDate(event.timestamp)}
+                    {item.provider ? ` • ${item.provider}` : ''}
+                  </p>
+                  {item.subject && (
+                    <p className="font-medium text-foreground mb-2">{item.subject}</p>
+                  )}
                   <div className="bg-gray-50 rounded p-3 text-foreground">
-                    {isMessage ? item.message_text : `${item.subject}\n\n${item.body}`}
+                    {item.message_body || item.error_message || 'No additional details recorded.'}
                   </div>
+                  {item.status === 'failed' && (
+                    <p className="text-xs text-red-600 mt-2 font-medium">Manual follow-up may be needed.</p>
+                  )}
                 </div>
               </div>
             );
@@ -146,3 +166,4 @@ export default function LeadTimeline({ leadId, lead }) {
     </div>
   );
 }
+

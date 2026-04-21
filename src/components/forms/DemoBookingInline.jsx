@@ -18,20 +18,26 @@ const TIME_SLOTS = [
 ];
 
 const INDUSTRIES = [
-  "Med Spa", "Dental", "Chiropractic", "HVAC", "Roofing",
-  "Plumbing", "Legal", "Real Estate", "Insurance", "Other",
+  "Med Spas & Aesthetic Clinics",
+  "Dental & Orthodontics",
+  "Chiropractic & Physical Therapy",
+  "HVAC, Plumbing & Home Services",
+  "Roofing & Restoration",
+  "Contractors & Trades",
+  "Other",
 ];
 
 export default function DemoBookingInline({ prefillIndustry = "" }) {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     first_name: "", last_name: "", business_name: "", email: "",
-    phone: "", website: "", industry: prefillIndustry, biggest_issue: "",
+    phone: "", website: "", industry: prefillIndustry, biggest_issue: "", website_url: "",
   });
   const [scheduling, setScheduling] = useState({ date: "", time: "" });
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
+  const [submitWarnings, setSubmitWarnings] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
@@ -73,6 +79,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
       return;
     }
     setSaving(true);
+    setSubmitWarnings([]);
     try {
       const res = await base44.functions.invoke("scheduleDemoBooking", {
         full_name: `${form.first_name} ${form.last_name}`,
@@ -84,10 +91,14 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         website: form.website,
         industry: form.industry,
         biggest_issue: form.biggest_issue,
+        website_url: form.website_url,
         scheduled_date: scheduling.date,
         scheduled_time: scheduling.time,
       });
-      if (res.data.success) setSuccess(true);
+      if (res.data.success) {
+        setSubmitWarnings(res.data.warnings || []);
+        setSuccess(true);
+      }
     } catch {
       setErrors({ submit: "Something went wrong. Please try again." });
     } finally { setSaving(false); }
@@ -104,6 +115,11 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         </div>
         <h3 className="text-xl font-semibold text-white mb-2">You're all set.</h3>
         <p className="text-sm text-white/50">Nolan will confirm your demo within 24 hours.</p>
+        {submitWarnings.length > 0 && (
+          <p className="mt-3 text-xs text-amber-300 max-w-sm">
+            Your booking was saved, but one or more follow-up actions still need review.
+          </p>
+        )}
       </div>
     );
   }
@@ -111,6 +127,16 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
   if (step === 1) {
     return (
       <form onSubmit={handleStep1} className="space-y-3">
+        <input
+          type="text"
+          name="website_url"
+          value={form.website_url}
+          onChange={set}
+          tabIndex={-1}
+          autoComplete="off"
+          className="hidden"
+          aria-hidden="true"
+        />
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-semibold text-white/60 mb-1">First Name *</label>
@@ -128,7 +154,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         <div>
           <label className="block text-xs font-semibold text-white/60 mb-1">Industry</label>
           <select name="industry" value={form.industry} onChange={set} className={`${inputCls("industry")} cursor-pointer`}>
-            <option value="">Select…</option>
+            <option value="">Select...</option>
             {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
           </select>
         </div>
@@ -149,7 +175,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         <div>
           <label className="block text-xs font-semibold text-white/60 mb-1">Biggest challenge right now?</label>
           <select name="biggest_issue" value={form.biggest_issue} onChange={set} className={`${inputCls("biggest_issue")} cursor-pointer`}>
-            <option value="">Select one…</option>
+            <option value="">Select one...</option>
             <option value="Slow response time">Slow response time</option>
             <option value="Missed calls not being followed up">Missed calls not followed up</option>
             <option value="No follow-up system">No follow-up system</option>
@@ -166,6 +192,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         >
           Next: Choose Time <ArrowRight className="w-4 h-4" />
         </button>
+        <p className="text-center text-xs text-white/60">No spam. No pressure. Just a tailored walkthrough of your business.</p>
       </form>
     );
   }
@@ -186,7 +213,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
       </div>
       <div>
         <label className="block text-xs font-semibold text-white/60 mb-1">
-          Select Time * {loadingSlots && <span className="font-normal text-white/30 ml-1">Loading…</span>}
+          Select Time * {loadingSlots && <span className="font-normal text-white/30 ml-1">Loading...</span>}
         </label>
         <select
           value={scheduling.time}
@@ -194,10 +221,10 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           disabled={!scheduling.date || loadingSlots}
           className={`${inputCls("scheduling")} disabled:opacity-40 cursor-pointer`}
         >
-          <option value="">{!scheduling.date ? "Select a date first…" : "Choose a time…"}</option>
+          <option value="">{!scheduling.date ? "Select a date first..." : "Choose a time..."}</option>
           {TIME_SLOTS.map(({ value, label }) => {
             const booked = bookedSlots.includes(value);
-            return <option key={value} value={value} disabled={booked}>{label}{booked ? " — Booked" : ""}</option>;
+            return <option key={value} value={value} disabled={booked}>{label}{booked ? " - Booked" : ""}</option>;
           })}
         </select>
       </div>
@@ -211,9 +238,12 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           className="flex-1 h-11 flex items-center justify-center gap-2 rounded-full text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-50"
           style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}
         >
-          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling…</> : <>Schedule Demo <ArrowRight className="w-4 h-4" /></>}
+          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</> : <>Schedule Demo <ArrowRight className="w-4 h-4" /></>}
         </button>
       </div>
+      <p className="text-center text-xs text-white/60">No spam. No pressure. Just a tailored walkthrough of your business.</p>
     </form>
   );
 }
+
+

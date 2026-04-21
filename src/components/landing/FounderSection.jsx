@@ -2,7 +2,6 @@ export default function FounderSection() {
   return (
     <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-card to-background">
       <div className="max-w-4xl mx-auto">
-        {/* Label */}
         <div className="text-center mb-12">
           <p className="text-xs font-bold text-primary uppercase tracking-widest mb-3">Built by someone who actually gets it</p>
           <h2 className="font-display text-3xl md:text-4xl font-semibold text-foreground leading-tight">
@@ -19,7 +18,6 @@ export default function FounderSection() {
           }}
         >
           <div className="grid md:grid-cols-2 gap-0 items-stretch">
-            {/* Left: Photo */}
             <div
               className="relative flex items-center justify-center p-10 md:p-12"
               style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.06) 0%, rgba(200,150,92,0.04) 100%)" }}
@@ -30,27 +28,23 @@ export default function FounderSection() {
               >
                 <img
                   src="https://images.unsplash.com/photo-1556157382-97eda2d62296?w=400&q=70&auto=format"
-                  alt="Nolan — Founder of ClientSurge Systems"
+                  alt="Nolan, founder of ClientSurge Systems"
                   className="w-full h-full object-cover object-top"
                   loading="lazy"
                 />
               </div>
             </div>
 
-            {/* Right: Message */}
             <div className="flex flex-col justify-center p-10 md:p-12">
               <h3 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-5 leading-tight">
-                I'm Nolan — Founder of ClientSurge Systems
+                I am Nolan, founder of ClientSurge Systems
               </h3>
               <p className="text-base text-muted-foreground leading-relaxed mb-8">
                 I built this after watching local businesses spend thousands attracting leads and lose half of them to slow follow-up. Every system is custom, done-for-you, and designed to pay for itself within 30 days.
               </p>
-              <div
-                className="pt-6"
-                style={{ borderTop: "1px solid rgba(154,92,46,0.2)" }}
-              >
+              <div className="pt-6" style={{ borderTop: "1px solid rgba(154,92,46,0.2)" }}>
                 <p className="text-sm font-semibold" style={{ color: "#9a5c2e" }}>
-                  — Nolan, Founder · ClientSurge Systems · Phoenix, AZ
+                  Nolan, Founder | ClientSurge Systems | Phoenix, AZ
                 </p>
               </div>
             </div>

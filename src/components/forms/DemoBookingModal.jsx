@@ -12,6 +12,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
     phone: "",
     industry: prefillIndustry,
     biggest_issue: "",
+    website_url: "",
   });
   const [scheduling, setScheduling] = useState({
     date: "",
@@ -20,6 +21,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
+  const [submitWarnings, setSubmitWarnings] = useState([]);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
   const [bookedSlots, setBookedSlots] = useState([]);
@@ -90,6 +92,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
 
     setSaving(true);
     setLastSubmitTime(now);
+    setSubmitWarnings([]);
     try {
       const result = await base44.functions.invoke('scheduleDemoBooking', {
         full_name: form.full_name,
@@ -98,11 +101,13 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
         phone: form.phone,
         industry: form.industry,
         biggest_issue: form.biggest_issue,
+        website_url: form.website_url,
         scheduled_date: scheduling.date,
         scheduled_time: scheduling.time,
       });
 
       if (result.data.success) {
+        setSubmitWarnings(result.data.warnings || []);
         setSuccess(true);
         setTimeout(() => {
           onClose();
@@ -146,7 +151,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
           </button>
           <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            <span className="text-xs font-semibold text-primary uppercase tracking-wide">Free 15-Min Demo</span>
+            <span className="text-xs font-semibold text-primary uppercase tracking-wide">Free 15-Minute Demo</span>
           </div>
           <h2 id="demo-booking-modal-title" className="font-display text-2xl font-semibold text-foreground">Tell us about your business</h2>
           <p className="text-sm text-muted-foreground mt-1">We'll tailor the demo to your exact situation.</p>
@@ -165,6 +170,13 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
             <p className="text-sm text-muted-foreground mb-6">
               Keep an eye on your inbox for a confirmation email with all the details about your scheduled demo.
             </p>
+            {submitWarnings.length > 0 && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 w-full mb-4">
+                <p className="text-xs text-amber-800">
+                  Your booking was saved, but one or more follow-up actions still need review on our side.
+                </p>
+              </div>
+            )}
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 w-full mb-6">
               <p className="text-xs text-muted-foreground">
                 ✓ Confirmation email sent<br/>
@@ -181,9 +193,19 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
         {/* Step 1: Info Collection */}
         {!success && step === 1 && (
           <form onSubmit={handleStep1Submit} className="px-8 py-6 space-y-4" noValidate>
+            <input
+              type="text"
+              name="website_url"
+              value={form.website_url}
+              onChange={handleChange}
+              tabIndex={-1}
+              autoComplete="off"
+              className="hidden"
+              aria-hidden="true"
+            />
             {errors.submit && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 flex items-start gap-2">
-                <span className="text-lg">⚠️</span>
+                <span className="text-lg">Warning:</span>
                 <span>{errors.submit}</span>
               </div>
             )}
@@ -198,7 +220,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   placeholder="Jane Smith"
                   className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.full_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
-                {errors.full_name && <p className="text-red-600 text-xs mt-1">❌ {errors.full_name}</p>}
+                {errors.full_name && <p className="text-red-600 text-xs mt-1">Error: {errors.full_name}</p>}
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <label className="block text-xs font-semibold text-foreground mb-1.5">Business Name <span className="text-red-600">*</span></label>
@@ -210,7 +232,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   placeholder="My Business"
                   className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.business_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
-                {errors.business_name && <p className="text-red-600 text-xs mt-1">❌ {errors.business_name}</p>}
+                {errors.business_name && <p className="text-red-600 text-xs mt-1">Error: {errors.business_name}</p>}
               </div>
             </div>
 
@@ -226,7 +248,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   placeholder="jane@business.com"
                   className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.email ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
-                {errors.email && <p className="text-red-600 text-xs mt-1">❌ {errors.email}</p>}
+                {errors.email && <p className="text-red-600 text-xs mt-1">Error: {errors.email}</p>}
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <label className="block text-xs font-semibold text-foreground mb-1.5">Phone <span className="text-red-600">*</span></label>
@@ -240,7 +262,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   placeholder="(555) 000-0000"
                   className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.phone ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
-                {errors.phone && <p className="text-red-600 text-xs mt-1">❌ {errors.phone}</p>}
+                {errors.phone && <p className="text-red-600 text-xs mt-1">Error: {errors.phone}</p>}
               </div>
             </div>
 
@@ -264,7 +286,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                 onChange={handleChange}
                 className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
               >
-                <option value="">Select one…</option>
+                <option value="">Select one...</option>
                 <option value="Slow response time">Slow response time</option>
                 <option value="Missed calls not being followed up">Missed calls not being followed up</option>
                 <option value="No follow-up system">No follow-up system</option>
@@ -282,7 +304,8 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
               Next: Choose Time <ArrowRight className="w-4 h-4" />
             </button>
 
-            <p className="text-center text-xs text-muted-foreground">No commitment. Free 15-min call. Live in 5–7 days.</p>
+            <p className="text-center text-xs text-muted-foreground">No commitment. Free 15-minute call. Live in 5-7 days.</p>
+            <p className="text-center text-xs text-muted-foreground/80">No spam. No pressure. Just a tailored walkthrough of your business.</p>
           </form>
         )}
 
@@ -291,7 +314,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
           <form onSubmit={handleStep2Submit} className="px-8 py-6 space-y-4" noValidate>
             {errors.scheduling && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700 flex items-start gap-2">
-                <span className="text-lg">⚠️</span>
+                <span className="text-lg">Warning:</span>
                 <span>{errors.scheduling}</span>
               </div>
             )}
@@ -310,7 +333,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
             <div>
               <label className="block text-xs font-semibold text-foreground mb-1.5">
                 Select Time <span className="text-red-600">*</span>
-                {loadingSlots && <span className="ml-2 text-xs text-muted-foreground font-normal">Loading availability…</span>}
+                {loadingSlots && <span className="ml-2 text-xs text-muted-foreground font-normal">Loading availability...</span>}
               </label>
               <select
                 name="time"
@@ -319,7 +342,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                 disabled={!scheduling.date || loadingSlots}
                 className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition disabled:opacity-50 disabled:cursor-not-allowed ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
               >
-                <option value="">{!scheduling.date ? 'Select a date first…' : 'Choose a time…'}</option>
+                <option value="">{!scheduling.date ? 'Select a date first...' : 'Choose a time...'}</option>
                 {[
                   { value: "09:00", label: "9:00 AM" },
                   { value: "09:30", label: "9:30 AM" },
@@ -337,7 +360,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   const isBooked = bookedSlots.includes(value);
                   return (
                     <option key={value} value={value} disabled={isBooked}>
-                      {label}{isBooked ? ' — Booked' : ''}
+                      {label}{isBooked ? ' - Booked' : ''}
                     </option>
                   );
                 })}
@@ -346,7 +369,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
 
             <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
               <p className="text-xs text-muted-foreground">
-                <strong>📅 Demo Confirmed:</strong> {scheduling.date && scheduling.date.split('-').slice(1).concat(scheduling.date.split('-')[0]).join('/')} at {scheduling.time || 'TBD'}
+                <strong>Demo confirmed:</strong> {scheduling.date && scheduling.date.split('-').slice(1).concat(scheduling.date.split('-')[0]).join('/')} at {scheduling.time || 'TBD'}
               </p>
             </div>
 
@@ -367,7 +390,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                 onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"}
               >
                 {saving ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling…</>
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</>
                 ) : (
                   <>Schedule Demo <ArrowRight className="w-4 h-4" /></>
                 )}
@@ -375,6 +398,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
             </div>
 
             <p className="text-center text-xs text-muted-foreground">We'll send confirmation email & SMS</p>
+            <p className="text-center text-xs text-muted-foreground/80">No spam. No pressure. Just a tailored walkthrough of your business.</p>
           </form>
         )}
       </div>
@@ -383,3 +407,4 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
     document.body
   );
 }
+

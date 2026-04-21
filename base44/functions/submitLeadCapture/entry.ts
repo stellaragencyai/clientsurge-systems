@@ -2,6 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const MAX_FIELD_LENGTH = 500;
 const DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const LEAD_SOURCE = 'website';
 const INTAKE_TYPE = 'lead_capture';
 
@@ -18,6 +19,7 @@ function normalizeLeadInput(payload: Record<string, unknown>) {
     phone: sanitizeString(payload.phone),
     business_type: sanitizeString(payload.business_type),
     problem: sanitizeString(payload.problem),
+    website_url: sanitizeString(payload.website_url),
   };
 }
 
@@ -78,6 +80,26 @@ function validateLeadInput(lead: ReturnType<typeof normalizeLeadInput>) {
   return errors;
 }
 
+async function isRateLimited(
+  base44: ReturnType<typeof createClientFromRequest>,
+  lead: ReturnType<typeof normalizeLeadInput>
+) {
+  if (!lead.email) return false;
+
+  const emailMatches = await base44.asServiceRole.entities.Leads.filter({ email: lead.email }, '-created_date', 5);
+  const now = Date.now();
+
+  return emailMatches.some((existingLead: Record<string, unknown>) => {
+    const createdDate =
+      typeof existingLead.created_date === 'string' ? new Date(existingLead.created_date).getTime() : 0;
+    const sameBusiness =
+      typeof existingLead.business_name === 'string' &&
+      existingLead.business_name.trim().toLowerCase() === lead.business_name.toLowerCase();
+
+    return createdDate > 0 && now - createdDate < RATE_LIMIT_WINDOW_MS && sameBusiness;
+  });
+}
+
 function isRecentDuplicate(existingLead: Record<string, unknown>, incomingLead: ReturnType<typeof normalizeLeadInput>) {
   const createdDate = typeof existingLead.created_date === 'string' ? new Date(existingLead.created_date).getTime() : 0;
   const isWithinWindow = createdDate > 0 && Date.now() - createdDate < DUPLICATE_WINDOW_MS;
@@ -97,10 +119,19 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const payload = await req.json();
     const lead = normalizeLeadInput(payload);
+
+    if (lead.website_url) {
+      return Response.json({ success: true, ignored: true });
+    }
+
     const errors = validateLeadInput(lead);
 
     if (errors.length > 0) {
       return Response.json({ error: errors[0], errors }, { status: 400 });
+    }
+
+    if (await isRateLimited(base44, lead)) {
+      return Response.json({ error: 'Please wait a moment before submitting again.' }, { status: 429 });
     }
 
     let duplicateLead = null;

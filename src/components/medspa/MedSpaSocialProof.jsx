@@ -3,13 +3,13 @@ import { Star, CheckCircle2 } from "lucide-react";
 const testimonials = [
   { name: "Med Spa Owner", clinic: "Phoenix, AZ", text: "We went from missing leads to booking consultations same-day.", rating: 5 },
   { name: "Aesthetic Clinic", clinic: "Scottsdale, AZ", text: "Our front desk was overwhelmed. Now follow-up is fully automated.", rating: 5 },
-  { name: "Wellness Studio", clinic: "Gilbert, AZ", text: "Paid for itself in the first month.", rating: 5 },
+  { name: "Aesthetic Clinic", clinic: "Gilbert, AZ", text: "Paid for itself in the first month.", rating: 5 },
 ];
 
 const metrics = [
-  { label: "Built for Med Spas & Clinics", value: "Proven" },
-  { label: "Avg Booking Increase", value: "2–3x" },
-  { label: "ROI Timeline", value: "14–30 days" },
+  { label: "Built for Med Spas & Aesthetic Clinics", value: "Proven" },
+  { label: "Avg Booking Increase", value: "2-3x" },
+  { label: "ROI Timeline", value: "14-30 days" },
 ];
 
 export default function MedSpaSocialProof() {

@@ -3,6 +3,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 const MAX_FIELD_LENGTH = 500;
 const MAX_MESSAGE_LENGTH = 1500;
 const DUPLICATE_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const CONTACT_PREFIX = 'Contact form inquiry: ';
 const LEAD_SOURCE = 'website';
 const INTAKE_TYPE = 'contact_inquiry';
@@ -20,6 +21,7 @@ function normalizeContactInput(payload: Record<string, unknown>) {
     business_name: sanitizeString(payload.business_name),
     business_type: sanitizeString(payload.business_type) || 'General Inquiry',
     message: sanitizeString(payload.message, MAX_MESSAGE_LENGTH),
+    website_url: sanitizeString(payload.website_url),
   };
 }
 
@@ -41,6 +43,23 @@ function validateContactInput(contact: ReturnType<typeof normalizeContactInput>)
   if (!contact.message) errors.push('Message is required');
 
   return errors;
+}
+
+async function isRateLimited(
+  base44: ReturnType<typeof createClientFromRequest>,
+  contact: ReturnType<typeof normalizeContactInput>
+) {
+  const emailMatches = await base44.asServiceRole.entities.Leads.filter({ email: contact.email }, '-created_date', 5);
+  const now = Date.now();
+
+  return emailMatches.some((existingLead: Record<string, unknown>) => {
+    const createdDate =
+      typeof existingLead.created_date === 'string' ? new Date(existingLead.created_date).getTime() : 0;
+    const sameContactPattern =
+      typeof existingLead.problem === 'string' && existingLead.problem.startsWith(CONTACT_PREFIX);
+
+    return createdDate > 0 && now - createdDate < RATE_LIMIT_WINDOW_MS && sameContactPattern;
+  });
 }
 
 function buildLeadPayload(contact: ReturnType<typeof normalizeContactInput>, status = 'New') {
@@ -150,10 +169,19 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const payload = await req.json();
     const contact = normalizeContactInput(payload);
+
+    if (contact.website_url) {
+      return Response.json({ success: true, ignored: true });
+    }
+
     const errors = validateContactInput(contact);
 
     if (errors.length > 0) {
       return Response.json({ error: errors[0], errors }, { status: 400 });
+    }
+
+    if (await isRateLimited(base44, contact)) {
+      return Response.json({ error: 'Please wait a moment before submitting again.' }, { status: 429 });
     }
 
     let existingInquiry = null;

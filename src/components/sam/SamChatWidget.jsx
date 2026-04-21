@@ -1,8 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
-import { base44 } from '@/api/base44Client';
-import { Button } from '@/components/ui/button';
-import { MessageSquare, X, Send, Loader2, Minimize2 } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
+import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import { Loader2, Send, Sparkles, X } from "lucide-react";
+import { base44 } from "@/api/base44Client";
+import { Button } from "@/components/ui/button";
+
+const quickPrompts = [
+  "Which industries are the best fit?",
+  "What happens after I book a demo?",
+  "How does your lead follow-up automation work?",
+];
 
 export default function SamChatWidget() {
   const [open, setOpen] = useState(false);
@@ -14,9 +20,9 @@ export default function SamChatWidget() {
 
   useEffect(() => {
     if (open && !conversation) {
-      initConversation();
+      void initConversation();
     }
-  }, [open]);
+  }, [open, conversation]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -28,34 +34,50 @@ export default function SamChatWidget() {
       setMessages(data.messages || []);
     });
     return () => unsub();
-  }, [conversation?.id]);
+  }, [conversation]);
 
   const initConversation = async () => {
     const conv = await base44.agents.createConversation({
-      agent_name: 'sam',
-      metadata: { name: 'Sam Chat' },
+      agent_name: "sam",
+      metadata: { name: "AI Concierge Chat" },
     });
     setConversation(conv);
     setMessages(conv.messages || []);
+    return conv;
   };
 
-  const handleSend = async () => {
-    if (!input.trim() || sending || !conversation) return;
-    const text = input.trim();
-    setInput('');
+  const ensureConversation = async () => {
+    if (conversation) return conversation;
+    return initConversation();
+  };
+
+  const sendMessage = async (text) => {
+    if (!text.trim() || sending) return;
     setSending(true);
-    await base44.agents.addMessage(conversation, { role: 'user', content: text });
-    setSending(false);
-  };
-
-  const handleKey = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+    try {
+      const activeConversation = await ensureConversation();
+      if (!activeConversation) return;
+      await base44.agents.addMessage(activeConversation, { role: "user", content: text.trim() });
+    } finally {
+      setSending(false);
     }
   };
 
-  const visibleMessages = messages.filter(m => m.role === 'user' || m.role === 'assistant');
+  const handleSend = async () => {
+    const text = input.trim();
+    if (!text) return;
+    setInput("");
+    await sendMessage(text);
+  };
+
+  const handleKey = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      void handleSend();
+    }
+  };
+
+  const visibleMessages = messages.filter((m) => m.role === "user" || m.role === "assistant");
 
   return (
     <>
@@ -65,8 +87,8 @@ export default function SamChatWidget() {
           onClick={() => setOpen(true)}
           className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-foreground text-background px-5 py-3 rounded-full shadow-xl hover:bg-foreground/90 transition-all font-semibold text-sm mb-14 sm:mb-0"
         >
-          <MessageSquare className="w-4 h-4" />
-          Chat with us
+          <Sparkles className="w-4 h-4" />
+          AI Concierge
         </button>
       )}
 
@@ -76,10 +98,10 @@ export default function SamChatWidget() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-foreground text-background">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-sm font-bold text-white">S</div>
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-sm font-bold text-white">AI</div>
               <div>
-                <p className="text-sm font-semibold">Sam</p>
-                <p className="text-xs opacity-60">Lead Pipeline Manager</p>
+                <p className="text-sm font-semibold">ClientSurge AI Concierge</p>
+                <p className="text-xs opacity-60">Pricing, industries, booking, and automation help</p>
               </div>
             </div>
             <button onClick={() => setOpen(false)} className="opacity-60 hover:opacity-100 transition-opacity">
@@ -92,10 +114,22 @@ export default function SamChatWidget() {
             {visibleMessages.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-center py-8">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                  <span className="text-xl font-bold text-primary">S</span>
+                  <span className="text-xl font-bold text-primary">AI</span>
                 </div>
-                <p className="text-sm font-semibold text-foreground">Hi, I'm Sam</p>
-                <p className="text-xs text-muted-foreground mt-1">I manage your lead pipeline. Ask me anything.</p>
+                <p className="text-sm font-semibold text-foreground">Ask the AI concierge anything</p>
+                <p className="text-xs text-muted-foreground mt-1">Use it to find the right page, understand the offer, or decide whether to book now.</p>
+                <div className="mt-4 flex flex-wrap justify-center gap-2">
+                  {quickPrompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      onClick={() => void sendMessage(prompt)}
+                      className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             {visibleMessages.map((msg, i) => (
@@ -129,10 +163,10 @@ export default function SamChatWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
-              placeholder="Ask Sam..."
+              placeholder="Ask about pricing, industries, demos, or integrations..."
               className="flex-1 text-sm border border-input rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring"
             />
-            <Button size="icon" onClick={handleSend} disabled={!input.trim() || sending} className="rounded-lg h-9 w-9">
+            <Button size="icon" onClick={() => void handleSend()} disabled={!input.trim() || sending} className="rounded-lg h-9 w-9">
               <Send className="w-4 h-4" />
             </Button>
           </div>

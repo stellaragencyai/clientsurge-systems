@@ -1,24 +1,24 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { Zap, ArrowRight, Sparkles, User, Bot, Send, Target, TrendingUp, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import DemoBookingModal from "../forms/DemoBookingModal";
 
 const INDUSTRIES = [
-  "Med Spa / Aesthetic Clinic",
-  "HVAC / Plumbing",
-  "Wellness Studio",
-  "Real Estate",
-  "Contractor / Trades",
-  "Local Service Business",
+  "Med Spas & Aesthetic Clinics",
+  "Dental & Orthodontics",
+  "Chiropractic & Physical Therapy",
+  "HVAC, Plumbing & Home Services",
+  "Roofing & Restoration",
+  "Contractors & Trades",
 ];
 
 const SAMPLE_LEADS = {
-  "Med Spa / Aesthetic Clinic": "Hi, I saw your ad for lip filler. How much does it cost and do you have anything available this week?",
-  "HVAC / Plumbing": "My AC stopped working and it's 107 degrees. Do you have same-day service? How much does a repair usually run?",
-  "Wellness Studio": "Interested in joining your studio. Do you offer trial classes? What are your membership options?",
-  "Real Estate": "I saw the listing on Zillow for the house on Oak Street. Is it still available? Can I schedule a showing this weekend?",
-  "Contractor / Trades": "Looking to get a quote on a kitchen remodel. When can someone come out to take a look?",
-  "Local Service Business": "I need your services ASAP. What's your availability this week and what are your rates?",
+  "Med Spas & Aesthetic Clinics": "Hi, I saw your ad for lip filler. How much does it cost and do you have anything available this week?",
+  "Dental & Orthodontics": "I am looking into Invisalign. Do you offer consultations this week, and what does pricing usually look like?",
+  "Chiropractic & Physical Therapy": "My back has been flaring up again. Do you have any evaluation openings this week, and do you take new patients?",
+  "HVAC, Plumbing & Home Services": "My AC stopped working and it's 107 degrees. Do you have same-day service? How much does a repair usually run?",
+  "Roofing & Restoration": "We had storm damage and need someone to inspect the roof. How quickly can you come out and what is the process?",
+  "Contractors & Trades": "Looking to get a quote on a kitchen remodel. When can someone come out to take a look?",
 };
 
 function TypingDots() {
@@ -76,7 +76,7 @@ function IntentScorePanel({ score }) {
 }
 
 export default function AIResponseDemo() {
-  const [industry, setIndustry] = useState("Med Spa / Aesthetic Clinic");
+  const [industry, setIndustry] = useState("Med Spas & Aesthetic Clinics");
   const [customLead, setCustomLead] = useState("");
   const [messages, setMessages] = useState([]); // {role: 'lead'|'ai', text: string}
   const [phase, setPhase] = useState("idle"); // idle | typing | done
@@ -113,7 +113,7 @@ Write a friendly, professional, conversion-focused SMS/text response (max 3 sent
 2. Provides a short helpful answer or builds trust
 3. Ends with a clear, soft call-to-action to book or continue the conversation
 
-Keep it under 160 characters ideally, natural and warm — not robotic. No placeholders like [Name] or [Business]. Just write the actual message.`,
+Keep it short, natural, warm, and non-robotic. No placeholders like [Name] or [Business]. Just write the actual message.`,
         }),
         base44.integrations.Core.InvokeLLM({
           prompt: `Analyze this lead message for a "${industry}" business: "${leadMessage}"
@@ -228,10 +228,10 @@ Return a JSON object with:
             <span className="text-xs font-bold text-primary uppercase tracking-wide">AI Response Engine</span>
           </div>
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
-            See Our AI Respond to a Real Lead — Right Now
+            See Our AI Respond to a Real Lead Right Now
           </h2>
           <p className="text-muted-foreground text-base max-w-xl mx-auto">
-            Pick your industry, customize the lead message, then watch what your business would send in under 60 seconds — and keep the conversation going.
+            Pick your industry, customize the lead message, then watch what your business would send in under 60 seconds and keep the conversation going.
           </p>
         </div>
 
@@ -250,10 +250,10 @@ Return a JSON object with:
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-bold uppercase tracking-widest text-foreground/50 mb-2">Lead Message (or use sample ↓)</label>
+                <label className="block text-xs font-bold uppercase tracking-widest text-foreground/50 mb-2">Lead Message (or use sample below)</label>
                 <input
                   type="text"
-                  placeholder="Type a custom lead message…"
+                  placeholder="Type a custom lead message..."
                   value={customLead}
                   onChange={e => { setCustomLead(e.target.value); if (phase !== "idle") handleReset(); }}
                   className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -281,7 +281,7 @@ Return a JSON object with:
                     <Zap className="w-4 h-4 text-amber-100" />
                   </div>
                   <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-border/50 shadow-sm">
-                    <p className="text-sm text-foreground/40 italic">AI response will appear here…</p>
+                    <p className="text-sm text-foreground/40 italic">AI response will appear here...</p>
                   </div>
                 </div>
               </>
@@ -324,7 +324,7 @@ Return a JSON object with:
                 ) : (
                   <div className="rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm shadow-sm" style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.08), rgba(154,92,46,0.04))", border: "1px solid rgba(154,92,46,0.25)" }}>
                     <p className="text-sm text-foreground/85 leading-relaxed">{msg.text}</p>
-                    <p className="text-[10px] mt-1.5 font-semibold" style={{ color: "rgba(154,92,46,0.6)" }}>⚡ ClientSurge AI — responded in &lt;60s</p>
+                    <p className="text-[10px] mt-1.5 font-semibold" style={{ color: "rgba(154,92,46,0.6)" }}>ClientSurge AI responded in under 60 seconds</p>
                   </div>
                 )}
               </div>
@@ -361,7 +361,7 @@ Return a JSON object with:
                 </div>
                 <input
                   type="text"
-                  placeholder="Continue the conversation — type a follow-up message…"
+                  placeholder="Continue the conversation. Type a follow-up message..."
                   value={followUpInput}
                   onChange={e => setFollowUpInput(e.target.value)}
                   onKeyDown={e => { if (e.key === "Enter" && !isTyping) handleFollowUp(); }}
@@ -377,7 +377,7 @@ Return a JSON object with:
                   <Send className="w-4 h-4 text-amber-100" />
                 </button>
               </div>
-              <p className="text-[10px] text-foreground/30 mt-2 pl-10">Press Enter or click send — the AI will respond just like in a real conversation</p>
+              <p className="text-[10px] text-foreground/30 mt-2 pl-10">Press Enter or click send. The AI will respond just like in a real conversation.</p>
             </div>
           )}
 
@@ -398,7 +398,7 @@ Return a JSON object with:
               onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 14px rgba(120,70,20,0.35)"; }}
             >
               <Sparkles className="w-4 h-4" />
-              {phase === "typing" ? "Generating…" : phase === "done" ? "Start Over" : "Generate AI Response"}
+              {phase === "typing" ? "Generating..." : phase === "done" ? "Start Over" : "Generate AI Response"}
             </button>
             {phase === "done" && (
               <button
@@ -406,12 +406,12 @@ Return a JSON object with:
                 className="text-sm font-semibold flex items-center gap-1.5 hover:underline focus:outline-none"
                 style={{ color: "#9a5c2e" }}
               >
-                Get this for my business
+                Book Your Free Demo
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
             {phase === "idle" && (
-              <p className="text-xs text-foreground/40">This is the same AI that responds to your leads 24/7 — fully automated.</p>
+              <p className="text-xs text-foreground/40">This is the same AI that responds to your leads 24/7, fully automated.</p>
             )}
           </div>
         </div>
@@ -426,3 +426,4 @@ Return a JSON object with:
     </section>
   );
 }
+

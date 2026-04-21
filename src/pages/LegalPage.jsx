@@ -1,6 +1,8 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
+import { setPageMetadata } from "@/lib/seo";
+import { useEffect } from "react";
 
 const content = {
   privacy: {
@@ -44,6 +46,18 @@ export default function LegalPage() {
   const { type } = useParams();
   const page = content[type];
 
+  useEffect(() => {
+    if (!page) return undefined;
+
+    return setPageMetadata({
+      title: `${page.title} | ClientSurge Systems`,
+      description: `${page.title} for ClientSurge Systems.`,
+      canonicalPath: `/legal/${type}`,
+      ogTitle: `${page.title} | ClientSurge Systems`,
+      ogDescription: `${page.title} for ClientSurge Systems.`,
+    });
+  }, [page, type]);
+
   if (!page) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -51,6 +65,30 @@ export default function LegalPage() {
       </div>
     );
   }
+
+  const policyLinks = [
+    { label: "Privacy Policy", to: "/legal/privacy" },
+    { label: "Terms of Service", to: "/legal/terms" },
+    { label: "Cookie Policy", to: "/legal/cookies" },
+    { label: "Contact Us", to: "/contact" },
+  ];
+
+  const renderSectionText = (text) => {
+    if (!text.includes("system@clientsurgesystems.com")) {
+      return text;
+    }
+
+    const [before, after] = text.split("system@clientsurgesystems.com");
+    return (
+      <>
+        {before}
+        <a href="mailto:system@clientsurgesystems.com" className="text-primary font-medium hover:underline">
+          system@clientsurgesystems.com
+        </a>
+        {after}
+      </>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -60,11 +98,27 @@ export default function LegalPage() {
         <h1 className="font-display text-4xl font-semibold text-foreground mb-2">{page.title}</h1>
         <p className="text-sm text-muted-foreground mb-12">Last updated: {page.updated}</p>
 
+        <div className="flex flex-wrap gap-3 mb-10">
+          {policyLinks.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`inline-flex items-center rounded-full border px-4 py-2 text-sm transition-colors ${
+                item.to === `/legal/${type}`
+                  ? "border-primary bg-primary/10 text-primary font-semibold"
+                  : "border-border bg-background text-foreground hover:bg-muted"
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+
         <div className="space-y-10">
           {page.body.map((section, i) => (
-            <div key={i}>
+            <div key={i} id={section.heading.toLowerCase().replace(/[^a-z0-9]+/g, "-")}>
               <h2 className="text-lg font-semibold text-foreground mb-3">{section.heading}</h2>
-              <p className="text-muted-foreground leading-relaxed">{section.text}</p>
+              <p className="text-muted-foreground leading-relaxed">{renderSectionText(section.text)}</p>
             </div>
           ))}
         </div>

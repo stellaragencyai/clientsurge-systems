@@ -1,5 +1,14 @@
 import { useState, useRef } from "react";
-import { PhoneMissed, Clock, TrendingDown, CalendarX, Zap, CalendarCheck, TrendingUp, PhoneCall } from "lucide-react";
+import {
+  PhoneMissed,
+  Clock,
+  TrendingDown,
+  CalendarX,
+  Zap,
+  CalendarCheck,
+  TrendingUp,
+  PhoneCall,
+} from "lucide-react";
 
 const beforeItems = [
   { icon: Clock, text: "47-hour average response time" },
@@ -26,10 +35,18 @@ export default function BeforeAfter() {
     return Math.round((x / rect.width) * 100);
   };
 
-  const onMouseDown = () => { dragging.current = true; };
-  const onMouseMove = (e) => { if (dragging.current) setSliderPos(getPos(e.clientX)); };
-  const onMouseUp = () => { dragging.current = false; };
-  const onTouchMove = (e) => { setSliderPos(getPos(e.touches[0].clientX)); };
+  const onMouseDown = () => {
+    dragging.current = true;
+  };
+  const onMouseMove = (e) => {
+    if (dragging.current) setSliderPos(getPos(e.clientX));
+  };
+  const onMouseUp = () => {
+    dragging.current = false;
+  };
+  const onTouchMove = (e) => {
+    setSliderPos(getPos(e.touches[0].clientX));
+  };
 
   return (
     <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
@@ -39,10 +56,11 @@ export default function BeforeAfter() {
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
             Drag to See <span className="text-primary">Your Transformation</span>
           </h2>
-          <p className="mt-4 text-muted-foreground text-lg">Slide to compare life before and after ApexFlow.</p>
+          <p className="mt-4 text-muted-foreground text-lg">
+            Slide to compare life before and after ClientSurge Systems automation.
+          </p>
         </div>
 
-        {/* Split container */}
         <div
           ref={containerRef}
           className="relative rounded-3xl overflow-hidden border border-border select-none cursor-col-resize shadow-2xl"
@@ -53,10 +71,9 @@ export default function BeforeAfter() {
           onTouchMove={onTouchMove}
           onTouchEnd={onMouseUp}
         >
-          {/* BEFORE panel — full width, clipped */}
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-800 flex flex-col justify-center px-10 py-12">
             <p className="text-xs font-bold text-red-400 uppercase tracking-widest mb-6 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse inline-block" /> Without ApexFlow
+              <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse inline-block" /> Without ClientSurge Systems
             </p>
             <div className="space-y-5">
               {beforeItems.map((item, i) => (
@@ -71,16 +88,15 @@ export default function BeforeAfter() {
             <div className="mt-8 text-xs text-slate-500 italic">Revenue leaking every day you wait.</div>
           </div>
 
-          {/* AFTER panel — clipped by slider */}
           <div
             className="absolute inset-0 flex flex-col justify-center px-10 py-12"
             style={{
               clipPath: `inset(0 0 0 ${sliderPos}%)`,
-              background: 'linear-gradient(135deg, hsl(40,20%,97%) 0%, hsl(42,30%,94%) 100%)',
+              background: "linear-gradient(135deg, hsl(40,20%,97%) 0%, hsl(42,30%,94%) 100%)",
             }}
           >
             <p className="text-xs font-bold text-primary uppercase tracking-widest mb-6 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse inline-block" /> With ApexFlow
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse inline-block" /> With ClientSurge Systems
             </p>
             <div className="space-y-5">
               {afterItems.map((item, i) => (
@@ -92,13 +108,14 @@ export default function BeforeAfter() {
                 </div>
               ))}
             </div>
-            <div className="mt-8 text-xs text-primary/60 italic font-medium">Results clients see in the first 30 days.</div>
+            <div className="mt-8 text-xs text-primary/60 italic font-medium">
+              Results clients see in the first 30 days.
+            </div>
           </div>
 
-          {/* Slider handle */}
           <div
             className="absolute top-0 bottom-0 flex items-center justify-center z-20"
-            style={{ left: `${sliderPos}%`, transform: 'translateX(-50%)' }}
+            style={{ left: `${sliderPos}%`, transform: "translateX(-50%)" }}
             onMouseDown={onMouseDown}
             onTouchStart={onMouseDown}
           >
@@ -112,7 +129,7 @@ export default function BeforeAfter() {
           </div>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-4">← Drag the handle to compare →</p>
+        <p className="text-center text-xs text-muted-foreground mt-4">Drag the handle to compare both sides.</p>
       </div>
     </section>
   );

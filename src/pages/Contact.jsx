@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
+import MobileCallBar from "../components/landing/MobileCallBar";
+import { setPageMetadata } from "@/lib/seo";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
@@ -15,40 +17,21 @@ export default function Contact() {
     phone: "",
     business_type: "",
     message: "",
+    website_url: "",
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    const previousTitle = document.title;
-    const metaDesc = document.querySelector('meta[name="description"]');
-    const previousDescription = metaDesc?.getAttribute('content') || '';
-    const canonical = document.querySelector('link[rel="canonical"]');
-    const previousCanonical = canonical?.getAttribute('href') || '';
-
-    document.title = 'Contact ClientSurge Systems';
-
-    if (metaDesc) {
-      metaDesc.setAttribute(
-        'content',
-        'Contact ClientSurge Systems to ask questions, request a walkthrough, or discuss lead capture automation for your business.'
-      );
-    }
-
-    if (canonical) {
-      canonical.setAttribute('href', 'https://clientsurgesystems.com/contact');
-    }
-
-    return () => {
-      document.title = previousTitle;
-      if (metaDesc) {
-        metaDesc.setAttribute('content', previousDescription);
-      }
-      if (canonical) {
-        canonical.setAttribute('href', previousCanonical || 'https://clientsurgesystems.com/');
-      }
-    };
+    return setPageMetadata({
+      title: "Contact ClientSurge Systems | Questions and Demo Requests",
+      description:
+        "Contact ClientSurge Systems to ask questions, request a walkthrough, or discuss lead capture automation for your business.",
+      canonicalPath: "/contact",
+      ogTitle: "Contact ClientSurge Systems",
+      ogDescription: "Reach out to discuss your lead flow, booking process, or automation questions.",
+    });
   }, []);
 
   const validate = () => {
@@ -172,7 +155,7 @@ export default function Contact() {
                 style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.3)", border: "none", cursor: "pointer", textDecoration: "none" }}
               >
                 <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 20px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.8rem" }}>
-                  Book a Free Demo <ArrowRight className="w-3.5 h-3.5" />
+                  Book Your Free Demo <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </Link>
             </div>
@@ -188,6 +171,20 @@ export default function Contact() {
                 <p className="text-sm text-muted-foreground leading-relaxed">
                   Thanks for reaching out. We&apos;ll get back to you within one business day.
                 </p>
+                <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                  <Link
+                    to="/book"
+                    className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
+                  >
+                    Prefer to book a demo instead?
+                  </Link>
+                  <a
+                    href="mailto:system@clientsurgesystems.com"
+                    className="inline-flex items-center justify-center rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+                  >
+                    Email us directly
+                  </a>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4" noValidate>
@@ -200,6 +197,16 @@ export default function Contact() {
                 )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    name="website_url"
+                    value={form.website_url}
+                    onChange={handleChange}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    className="hidden"
+                    aria-hidden="true"
+                  />
                   <div>
                     <label htmlFor="contact-full-name" className="block text-xs font-semibold text-foreground mb-1.5">Full Name <span className="text-red-500">*</span></label>
                     <input
@@ -263,12 +270,12 @@ export default function Contact() {
                       className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                     >
                       <option value="">Select one...</option>
-                      <option>Med Spa / Aesthetic Clinic</option>
-                      <option>Wellness Studio</option>
-                      <option>Real Estate</option>
-                      <option>HVAC / Home Services</option>
-                      <option>Contractor / Trades</option>
-                      <option>Local Service Business</option>
+                      <option>Med Spas & Aesthetic Clinics</option>
+                      <option>Dental & Orthodontics</option>
+                      <option>Chiropractic & Physical Therapy</option>
+                      <option>HVAC, Plumbing & Home Services</option>
+                      <option>Roofing & Restoration</option>
+                      <option>Contractors & Trades</option>
                       <option>Other</option>
                     </select>
                   </div>
@@ -300,6 +307,9 @@ export default function Contact() {
                     {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</> : <>Send Message <ArrowRight className="w-4 h-4" /></>}
                   </span>
                 </button>
+                <p className="text-center text-xs text-muted-foreground">
+                  No spam. No pressure. Just a thoughtful reply from our team.
+                </p>
               </form>
             )}
           </div>
@@ -307,6 +317,7 @@ export default function Contact() {
       </section>
 
       <Footer />
+      <MobileCallBar />
     </div>
   );
 }

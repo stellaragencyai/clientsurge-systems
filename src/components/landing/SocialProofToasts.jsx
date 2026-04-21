@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { CalendarCheck } from "lucide-react";
 
 const proofItems = [
-  { name: "Mike R.", location: "Houston, TX", action: "just booked a demo", ago: "2 min ago", industry: "HVAC Co." },
-  { name: "Sarah M.", location: "Miami, FL", action: "signed up today", ago: "11 min ago", industry: "Med Spa" },
-  { name: "David L.", location: "Austin, TX", action: "just booked a demo", ago: "18 min ago", industry: "Real Estate" },
-  { name: "Jessica T.", location: "Atlanta, GA", action: "signed up today", ago: "34 min ago", industry: "Wellness Studio" },
-  { name: "Carlos B.", location: "Phoenix, AZ", action: "just booked a demo", ago: "47 min ago", industry: "Home Services" },
-  { name: "Amy W.", location: "Nashville, TN", action: "signed up today", ago: "1 hr ago", industry: "Dental Practice" },
+  { name: "Mike R.", location: "Houston, TX", action: "just booked a demo", ago: "2 min ago", industry: "HVAC & Home Services" },
+  { name: "Sarah M.", location: "Miami, FL", action: "signed up today", ago: "11 min ago", industry: "Med Spas & Aesthetic Clinics" },
+  { name: "David L.", location: "Austin, TX", action: "just booked a demo", ago: "18 min ago", industry: "Roofing & Restoration" },
+  { name: "Jessica T.", location: "Atlanta, GA", action: "signed up today", ago: "34 min ago", industry: "Chiropractic & Physical Therapy" },
+  { name: "Carlos B.", location: "Phoenix, AZ", action: "just booked a demo", ago: "47 min ago", industry: "Contractors & Trades" },
+  { name: "Amy W.", location: "Nashville, TN", action: "signed up today", ago: "1 hr ago", industry: "Dental & Orthodontics" },
 ];
 
 export default function SocialProofToasts() {
@@ -50,9 +50,9 @@ export default function SocialProofToasts() {
         </div>
         <div className="min-w-0">
           <p className="text-xs font-semibold text-foreground truncate">
-            {current.name} · {current.industry}
+            {current.name} - {current.industry}
           </p>
-          <p className="text-xs text-muted-foreground">{current.action} · {current.location}</p>
+          <p className="text-xs text-muted-foreground">{current.action} - {current.location}</p>
         </div>
         <p className="text-[10px] text-muted-foreground/60 flex-shrink-0">{current.ago}</p>
       </div>

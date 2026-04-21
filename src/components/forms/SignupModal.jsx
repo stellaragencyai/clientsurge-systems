@@ -148,13 +148,13 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
                 onChange={handleChange}
                 className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
               >
-                <option value="">Select your industry…</option>
-                <option>Med Spa / Aesthetic Clinic</option>
-                <option>Wellness Studio</option>
-                <option>Real Estate</option>
-                <option>HVAC / Plumbing / Home Services</option>
-                <option>Contractor / Electrician / Trades</option>
-                <option>Salon / Beauty</option>
+                <option value="">Select your industry...</option>
+                <option>Med Spas & Aesthetic Clinics</option>
+                <option>Dental & Orthodontics</option>
+                <option>Chiropractic & Physical Therapy</option>
+                <option>HVAC, Plumbing & Home Services</option>
+                <option>Roofing & Restoration</option>
+                <option>Contractors & Trades</option>
                 <option>Other Service Business</option>
               </select>
             </div>
@@ -166,7 +166,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
               className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-60 focus:ring-2 focus:ring-primary focus:outline-none"
             >
               {loading ? (
-                <><Loader2 className="w-4 h-4 animate-spin" /> Creating Account…</>
+                <><Loader2 className="w-4 h-4 animate-spin" /> Creating Account...</>
               ) : (
                 <>Create Account <ArrowRight className="w-4 h-4" /></>
               )}
@@ -205,3 +205,4 @@ function Field({ label, name, type = "text", value, onChange, placeholder, error
     </div>
   );
 }
+

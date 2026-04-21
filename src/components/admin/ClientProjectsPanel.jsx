@@ -51,8 +51,8 @@ export default function ClientProjectsPanel() {
     setSaving(prev => ({ ...prev, [`reply_${project.id}`]: true }));
     await base44.entities.SupportMessage.create({
       project_id: project.id,
-      sender_email: "admin@apexflow.com",
-      sender_name: "ApexFlow Team",
+      sender_email: "system@clientsurgesystems.com",
+      sender_name: "ClientSurge Systems",
       role: "admin",
       message: text,
       read: false,

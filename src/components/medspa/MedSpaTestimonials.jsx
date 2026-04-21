@@ -8,7 +8,7 @@ const testimonials = [
     location: "Phoenix, AZ",
     before: "Missing 60% of after-hours inquiries",
     after: "10+ consultations booked/week",
-    result: "5× booking increase",
+    result: "5x booking increase",
     quote: "We went from missing leads to booking consultations same-day. The system just runs.",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=65&auto=format",
   },
@@ -24,7 +24,7 @@ const testimonials = [
   },
   {
     name: "Amanda T.",
-    businessType: "Wellness Studio",
+    businessType: "Aesthetic Clinic",
     location: "Gilbert, AZ",
     before: "Spending on ads, not converting",
     after: "ROI recovered in first month",
@@ -74,14 +74,14 @@ export default function MedSpaTestimonials() {
               {/* Business Type Badge */}
               <div className="mb-4">
                 <span className="inline-block text-xs font-bold text-foreground/60 bg-foreground/5 px-3 py-1 rounded-full">
-                  {t.businessType} — {t.location}
+                  {t.businessType} - {t.location}
                 </span>
               </div>
 
               {/* Star Rating */}
               <div className="flex gap-0.5 mb-3">
                 {[...Array(5)].map((_, i) => (
-                  <span key={i} style={{ color: "#c8965c", fontSize: "14px" }}>★</span>
+                  <span key={i} style={{ color: "#c8965c", fontSize: "14px" }}>*</span>
                 ))}
               </div>
 
@@ -146,3 +146,5 @@ export default function MedSpaTestimonials() {
     </section>
   );
 }
+
+

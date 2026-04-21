@@ -14,6 +14,7 @@ export default function HeroSection({
   stats,
   backgroundType = "gradient", // "gradient" or "image"
   backgroundImage,
+  backgroundImageAlt,
   backgroundGradient,
   children, // for extra content like ticker or stats
   videoUrl,
@@ -37,7 +38,7 @@ export default function HeroSection({
         <div className="absolute inset-0 z-0">
           <img
             src={backgroundImage}
-            alt="Hero background"
+            alt={backgroundImageAlt || `${title}${titleHighlight ? ` ${titleHighlight}` : ""} hero background`}
             className="w-full h-full object-cover object-top"
             loading="eager"
             fetchPriority="high"
@@ -48,8 +49,8 @@ export default function HeroSection({
       )}
 
       {/* Content */}
-      <div className="relative z-10 flex items-center justify-center w-full h-full" style={{padding: "40px 24px"}}>
-        <div className="max-w-4xl mx-auto text-center pt-24 pb-32 md:pt-28 md:pb-40 px-6">
+      <div className="relative z-10 flex items-center justify-center w-full h-full" style={{padding: "28px 20px"}}>
+        <div className="max-w-4xl mx-auto text-center pt-20 pb-24 md:pt-28 md:pb-40 px-4 sm:px-6">
           {/* Badge */}
           {badge && (
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/25 backdrop-blur-sm rounded-full px-4 py-1.5 mb-8">
@@ -59,7 +60,7 @@ export default function HeroSection({
           )}
 
           {/* Heading */}
-          <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.1] mb-6" style={{color: backgroundType === "image" ? "white" : "inherit", textShadow: backgroundType === "image" ? "0 2px 12px rgba(0,0,0,0.5)" : "none"}}>
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.1] mb-5 md:mb-6" style={{color: backgroundType === "image" ? "white" : "inherit", textShadow: backgroundType === "image" ? "0 2px 12px rgba(0,0,0,0.5)" : "none"}}>
             {title}
             {titleHighlight && (
               <>
@@ -73,7 +74,7 @@ export default function HeroSection({
 
           {/* Subtitle (optional) */}
           {subtitle && (
-            <p className="text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-4" style={{color: backgroundType === "image" ? "white" : "inherit", textShadow: backgroundType === "image" ? "0 1px 6px rgba(0,0,0,0.4)" : "none"}}>
+            <p className="text-base md:text-xl max-w-2xl mx-auto leading-relaxed mb-4" style={{color: backgroundType === "image" ? "white" : "inherit", textShadow: backgroundType === "image" ? "0 1px 6px rgba(0,0,0,0.4)" : "none"}}>
               {subtitle}
             </p>
           )}
@@ -86,7 +87,7 @@ export default function HeroSection({
           )}
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 md:mb-10">
             {primaryCTA && (
               <button
                 onClick={primaryCTA.onClick}

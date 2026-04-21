@@ -14,6 +14,16 @@ export default function CookieConsent() {
     setVisible(false);
   };
 
+  const handleDecline = () => {
+    localStorage.setItem('cookie-consent', 'declined');
+    setVisible(false);
+  };
+
+  const handleDismiss = () => {
+    localStorage.setItem('cookie-consent', 'dismissed');
+    setVisible(false);
+  };
+
   if (!visible) return null;
 
   return (
@@ -30,7 +40,7 @@ export default function CookieConsent() {
         <div className="flex items-start justify-between gap-3">
           <h3 className="font-semibold text-sm text-foreground">Cookie Preferences</h3>
           <button
-            onClick={() => setVisible(false)}
+            onClick={handleDismiss}
             className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
             aria-label="Close"
           >
@@ -42,18 +52,25 @@ export default function CookieConsent() {
         <p className="text-xs text-muted-foreground leading-relaxed">
           We use cookies to enhance your experience and analyze site traffic. By continuing to use this site, you agree to our{' '}
           <a 
-            href="/privacy-policy" 
+            href="/legal/privacy" 
             className="font-medium text-primary hover:text-primary/80 transition-colors"
           >
             privacy policy
           </a>
           .
         </p>
+        <div className="rounded-xl bg-background/70 border border-border p-3">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-foreground mb-2">Cookie categories</p>
+          <div className="space-y-1 text-[11px] text-muted-foreground">
+            <p><span className="font-semibold text-foreground">Essential:</span> keeps forms and navigation working properly.</p>
+            <p><span className="font-semibold text-foreground">Analytics:</span> helps us understand which pages and CTAs are performing.</p>
+          </div>
+        </div>
 
         {/* Actions */}
         <div className="flex gap-3 pt-2">
           <button
-            onClick={() => setVisible(false)}
+            onClick={handleDecline}
             className="flex-1 px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground border border-border rounded-lg transition-colors"
           >
             Decline

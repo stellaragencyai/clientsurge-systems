@@ -4,21 +4,21 @@ import DemoBookingModal from "../forms/DemoBookingModal";
 import SystemFlowDiagram from "./SystemFlowDiagram";
 
 const coreAutomation = [
-  { icon: Zap, step: "01", title: "Instantly respond to every lead", desc: "Before your competitors do — personalized replies within seconds.", tag: "Avg. 2× more bookings" },
-  { icon: MessageSquare, step: "02", title: "Turn inquiries into booked appointments", desc: "Guided booking flow that converts more leads into confirmed bookings.", tag: "Saves 3–5 hrs/week" },
-  { icon: PhoneCall, step: "03", title: "Recover bookings from missed calls", desc: "Every missed call gets an immediate text-back — zero leads disappear.", tag: "0 leads lost" },
+  { icon: Zap, step: "01", title: "Instantly respond to every lead", desc: "Before your competitors do - personalized replies within seconds.", tag: "Avg. 2x more bookings" },
+  { icon: MessageSquare, step: "02", title: "Turn inquiries into booked appointments", desc: "Guided booking flow that converts more leads into confirmed bookings.", tag: "Saves 3-5 hrs/week" },
+  { icon: PhoneCall, step: "03", title: "Recover bookings from missed calls", desc: "Every missed call gets an immediate text-back - zero leads disappear.", tag: "0 leads lost" },
   { icon: Send, step: "04", title: "Automate follow-up so nothing slips through", desc: "Multi-step sequences keep leads warm and moving toward booking.", tag: "14-day nurture sequence" },
   { icon: RotateCcw, step: "05", title: "Reactivate old leads into new revenue", desc: "Turn dormant contacts into fresh opportunities with proven campaigns.", tag: "Avg. $4k recovered/mo" },
 ];
 
 const doneForYou = [
   { icon: CalendarCheck, step: "06", title: "Booking Flow", desc: "Leads guided directly to your calendar. No phone tag, no friction.", tag: "Zero manual scheduling" },
-  { icon: LayoutDashboard, step: "07", title: "CRM Pipeline Automation", desc: "Auto-tagging, status updates, and task creation — your pipeline runs itself.", tag: "Full visibility" },
+  { icon: LayoutDashboard, step: "07", title: "CRM Pipeline Automation", desc: "Auto-tagging, status updates, and task creation - your pipeline runs itself.", tag: "Full visibility" },
   { icon: HeadphonesIcon, step: "08", title: "Ongoing Support", desc: "Continuous optimization and priority support from our team post-launch.", tag: "Priority access" },
 ];
 
 const aspects = {
-  "01": ["Responds instantly to all inquiries", "Personalized by lead details", "Works 24/7 — even at 2am"],
+  "01": ["Responds instantly to all inquiries", "Personalized by lead details", "Works 24/7 - even at 2am"],
   "02": ["Guides prospects directly to booking", "Eliminates phone tag friction", "Confirmation sent automatically"],
   "03": ["SMS sent within 60 seconds of missed call", "Recovers leads before they dial a competitor", "Works while you're with other clients"],
   "04": ["Multi-step SMS & email sequences", "Smart timing based on lead behaviour", "14-day automated nurture window"],
@@ -65,7 +65,8 @@ function FeatureCard({ item, onSelect }) {
                   transform: hovered ? "translateX(0)" : "translateX(4px)",
                 }}
               >
-                tap to expand
+                <span className="sm:hidden">Tap to expand</span>
+                <span className="hidden sm:inline">Click to expand</span>
               </span>
               <div
                 className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300"
@@ -84,7 +85,7 @@ function FeatureCard({ item, onSelect }) {
         {/* Divider */}
         <div style={{ height: "1px", background: "rgba(154,92,46,0.15)" }} />
 
-        {/* BOTTOM — dark gradient */}
+        {/* BOTTOM - dark gradient */}
         <div
           className="px-6 py-5 flex flex-col gap-2"
           style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}
@@ -203,7 +204,7 @@ function StepModal({ stepId, onClose, onBookDemo }) {
               onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"; }}
             >
               <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "48px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }}>
-                Book a Free 15-Min Demo
+                Book Your Free Demo
                 <ArrowRight className="w-4 h-4" />
               </span>
             </button>
@@ -249,7 +250,7 @@ export default function CoreOffer() {
             <div style={{ height: "1px", width: "48px", background: "linear-gradient(to left, transparent, rgba(154,92,46,0.5))" }} />
           </div>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-            Every system works together — capturing leads, responding instantly, following up automatically, and booking appointments without you lifting a finger.
+            Every system works together - capturing leads, responding instantly, following up automatically, and booking appointments without you lifting a finger.
           </p>
         </div>
 
@@ -257,7 +258,7 @@ export default function CoreOffer() {
         <div className="mb-10 flex flex-col sm:flex-row items-center justify-center gap-3">
           <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-primary/25 bg-primary/6">
             <TrendingUp className="w-4 h-4 text-primary flex-shrink-0" />
-            <p className="text-sm font-semibold text-foreground">Most clients recover their investment within the first 30 days — often sooner.</p>
+            <p className="text-sm font-semibold text-foreground">Most clients recover their investment within the first 30 days - often sooner.</p>
           </div>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)", boxShadow: "0 2px 10px rgba(120,70,20,0.3)" }}>
             <span className="text-xs font-bold" style={{ color: "#f5d9a8" }}>8 systems included</span>
@@ -267,7 +268,7 @@ export default function CoreOffer() {
         {/* Animated Flow Diagram */}
         <SystemFlowDiagram />
 
-        {/* TIER 1 — Core Automation */}
+        {/* TIER 1 - Core Automation */}
         <div className="flex items-center gap-3 mb-6">
           <div className="flex-1 h-px bg-border" />
           <span className="text-xs font-bold text-primary uppercase tracking-widest px-3 py-1.5 bg-primary/8 border border-primary/20 rounded-full">Core Automation</span>
@@ -281,7 +282,7 @@ export default function CoreOffer() {
           ))}
         </div>
 
-        {/* TIER 2 — Done-For-You Support */}
+        {/* TIER 2 - Done-For-You Support */}
         <div className="flex items-center gap-3 mb-6">
           <div className="flex-1 h-px bg-border" />
           <span className="text-xs font-bold text-primary uppercase tracking-widest px-3 py-1.5 bg-primary/8 border border-primary/20 rounded-full">Done-For-You Support</span>
@@ -333,18 +334,14 @@ export default function CoreOffer() {
             <span style={{ color: "#9a5c2e" }}>Installed For You.</span>{" "}
             Running in 7 Days.
           </p>
-          <p className="text-xs text-muted-foreground mb-6 mt-2">Click any card above to explore what each system does.</p>
-          <button
-            onClick={() => setShowDemoModal(true)}
-            style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.35)", border: "none", cursor: "pointer", transition: "box-shadow 0.5s ease" }}
-            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"; }}
+          <p className="text-xs text-muted-foreground mb-3 mt-2">Click any card above to explore what each system does.</p>
+          <a
+            href="#pricing"
+            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
           >
-            <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "52px", padding: "0 36px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
-              Start Today
-              <ArrowRight className="w-4 h-4" />
-            </span>
-          </button>
+            See plans and pricing below
+            <ArrowRight className="w-4 h-4" />
+          </a>
         </div>
 
         {/* Step Modal */}
@@ -361,3 +358,6 @@ export default function CoreOffer() {
     </section>
   );
 }
+
+
+

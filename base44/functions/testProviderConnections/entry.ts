@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
       try {
         await base44.integrations.Core.SendEmail({
           to: user.email,
-          subject: 'Test Email from ApexFlow',
+          subject: 'Test Email from ClientSurge Systems',
           body: 'This is a test email to verify your email provider is configured.',
         });
 

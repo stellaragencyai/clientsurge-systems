@@ -1,25 +1,28 @@
 import { useState } from "react";
 import { ArrowUp, Mail, Phone } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const navColumns = [
   {
     title: "Industries",
     links: [
-      { label: "Med Spas & Clinics", href: "/med-spa" },
+      { label: "Med Spas & Aesthetic Clinics", href: "/med-spa" },
+      { label: "Dental & Orthodontics", href: "/industries#dental" },
+      { label: "Chiropractic & Physical Therapy", href: "/industries#chiropractic" },
+      { label: "HVAC, Plumbing & Home Services", href: "/industries#hvac" },
+      { label: "Roofing & Restoration", href: "/industries#roofing" },
+      { label: "Contractors & Trades", href: "/industries#contractors" },
+      { label: "All Industries", href: "/industries" },
     ],
   },
   {
-    title: "Learn More",
+    title: "Explore",
     links: [
       { label: "How It Works", href: "/#how-it-works-section" },
       { label: "Our System", href: "/#services" },
       { label: "Pricing", href: "/#pricing" },
       { label: "FAQ", href: "/#faq" },
-      { label: "Testimonials", href: "/#testimonials" },
-      { label: "Book a Demo", href: "/book" },
       { label: "Contact Us", href: "/contact" },
-      { label: "Client Portal", href: "/client-portal" },
     ],
   },
   {
@@ -35,21 +38,19 @@ const navColumns = [
 export default function Footer() {
   const [showTooltip, setShowTooltip] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleNavClick = (e, href) => {
     e.preventDefault();
     if (href.startsWith("/#")) {
       const anchor = href.slice(1);
-      if (window.location.pathname !== "/") {
-        navigate("/");
-        setTimeout(() => {
-          const el = document.querySelector(anchor);
-          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 400);
-      } else {
-        const el = document.querySelector(anchor);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (location.pathname !== "/") {
+        navigate(`/${anchor}`);
+        return;
       }
+      const el = document.querySelector(anchor);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.history.replaceState({}, "", `/${anchor}`);
     } else {
       window.scrollTo({ top: 0, behavior: "auto" });
       navigate(href);
@@ -73,7 +74,7 @@ export default function Footer() {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-center gap-16 md:gap-28 mb-12 text-center">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 md:gap-16 mb-10 text-center">
           {navColumns.map((col) => (
             <div key={col.title}>
               <p className="text-xs font-bold uppercase tracking-widest mb-5 text-primary">{col.title}</p>
@@ -93,6 +94,24 @@ export default function Footer() {
               </ul>
             </div>
           ))}
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-foreground/55 mb-10">
+          <a
+            href="/book"
+            onClick={(e) => handleNavClick(e, "/book")}
+            className="hover:text-foreground hover:underline focus:ring-2 focus:ring-primary focus:outline-none rounded px-1 py-0.5 transition-colors"
+          >
+            Book Your Free Demo
+          </a>
+          <span className="text-foreground/20">|</span>
+          <a
+            href="/client-portal"
+            onClick={(e) => handleNavClick(e, "/client-portal")}
+            className="hover:text-foreground hover:underline focus:ring-2 focus:ring-primary focus:outline-none rounded px-1 py-0.5 transition-colors"
+          >
+            Client Portal
+          </a>
         </div>
 
         <div className="border-t border-white/10 mb-7" />

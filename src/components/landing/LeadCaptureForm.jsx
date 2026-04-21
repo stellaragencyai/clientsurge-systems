@@ -4,12 +4,12 @@ import { base44 } from "@/api/base44Client";
 import { ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
 
 const NICHES = [
-  "Med Spa / Aesthetics",
-  "Dental Practice",
-  "Real Estate",
-  "Home Services",
-  "Salon / Wellness",
-  "Fitness / Gym",
+  "Med Spas & Aesthetic Clinics",
+  "Dental & Orthodontics",
+  "Chiropractic & Physical Therapy",
+  "HVAC, Plumbing & Home Services",
+  "Roofing & Restoration",
+  "Contractors & Trades",
   "Other",
 ];
 
@@ -37,6 +37,7 @@ export default function LeadCaptureForm() {
     monthly_leads: "",
     biggest_problem: "",
     contact_method: "",
+    website_url: "",
   });
 
   const updateField = (field, value) => {
@@ -74,6 +75,7 @@ export default function LeadCaptureForm() {
         phone: formData.phone,
         business_type: formData.niche || "Other",
         problem: buildProblemSummary(),
+        website_url: formData.website_url,
       });
 
       if (!result.data?.success) {
@@ -140,6 +142,15 @@ export default function LeadCaptureForm() {
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={formData.website_url}
+            onChange={(e) => updateField("website_url", e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            className="hidden"
+            aria-hidden="true"
+          />
           {/* Step 1: Personal */}
           {step === 1 && (
             <div className="space-y-5">
@@ -266,6 +277,9 @@ export default function LeadCaptureForm() {
               </button>
             )}
           </div>
+          <p className="mt-4 text-xs text-muted-foreground text-center">
+            No spam. No pressure. Just a tailored follow-up about your lead system.
+          </p>
         </form>
       </div>
     </section>

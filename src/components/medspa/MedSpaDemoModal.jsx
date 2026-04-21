@@ -11,6 +11,7 @@ export default function MedSpaDemoModal({ onClose }) {
     phone: "",
     monthly_leads: "",
     biggest_issue: "",
+    website_url: "",
   });
   const [scheduling, setScheduling] = useState({
     date: "",
@@ -19,6 +20,7 @@ export default function MedSpaDemoModal({ onClose }) {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
+  const [submitWarnings, setSubmitWarnings] = useState([]);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -49,6 +51,7 @@ export default function MedSpaDemoModal({ onClose }) {
     if (!scheduling.date || !scheduling.time) return;
 
     setSaving(true);
+    setSubmitWarnings([]);
     try {
       const result = await base44.functions.invoke('scheduleDemoBooking', {
         full_name: form.full_name,
@@ -57,12 +60,14 @@ export default function MedSpaDemoModal({ onClose }) {
         phone: form.phone,
         monthly_leads: form.monthly_leads,
         biggest_issue: form.biggest_issue,
+        website_url: form.website_url,
         scheduled_date: scheduling.date,
         scheduled_time: scheduling.time,
         industry: "Med Spa",
       });
 
       if (result.data.success) {
+        setSubmitWarnings(result.data.warnings || []);
         setSuccess(true);
         setTimeout(() => {
           onClose();
@@ -99,7 +104,7 @@ export default function MedSpaDemoModal({ onClose }) {
           </button>
           <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            <span className="text-xs font-semibold text-primary uppercase tracking-wide">Free 15-Min Demo</span>
+            <span className="text-xs font-semibold text-primary uppercase tracking-wide">Free 15-Minute Demo</span>
           </div>
           <h2 id="medspa-demo-modal-title" className="font-display text-2xl font-semibold text-foreground">Tell us about your med spa</h2>
           <p className="text-sm text-muted-foreground mt-1">We'll tailor the demo to your exact situation.</p>
@@ -118,6 +123,13 @@ export default function MedSpaDemoModal({ onClose }) {
             <p className="text-sm text-muted-foreground mb-6">
               Keep an eye on your inbox for a confirmation email with all the details about your scheduled demo.
             </p>
+            {submitWarnings.length > 0 && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 w-full mb-4">
+                <p className="text-xs text-amber-800">
+                  Your booking was saved, but one or more follow-up actions still need review on our side.
+                </p>
+              </div>
+            )}
             <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 w-full mb-6">
               <p className="text-xs text-muted-foreground">
                 ✓ Confirmation email sent<br/>
@@ -134,6 +146,16 @@ export default function MedSpaDemoModal({ onClose }) {
         {/* Step 1: Info Collection */}
         {!success && step === 1 && (
           <form onSubmit={handleStep1Submit} className="px-8 py-6 space-y-4" noValidate>
+            <input
+              type="text"
+              name="website_url"
+              value={form.website_url}
+              onChange={handleChange}
+              tabIndex={-1}
+              autoComplete="off"
+              className="hidden"
+              aria-hidden="true"
+            />
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 sm:col-span-1">
                 <label className="block text-xs font-semibold text-foreground mb-1.5">Full Name *</label>
@@ -197,7 +219,7 @@ export default function MedSpaDemoModal({ onClose }) {
                 name="monthly_leads"
                 value={form.monthly_leads}
                 onChange={handleChange}
-                placeholder="e.g. 30–50 per month"
+                placeholder="e.g. 30-50 per month"
                 className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
               />
             </div>
@@ -210,7 +232,7 @@ export default function MedSpaDemoModal({ onClose }) {
                 onChange={handleChange}
                 className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
               >
-                <option value="">Select one…</option>
+                <option value="">Select one...</option>
                 <option value="Slow response time">Slow response time</option>
                 <option value="Missed calls not being followed up">Missed calls not being followed up</option>
                 <option value="No follow-up system">No follow-up system</option>
@@ -226,7 +248,8 @@ export default function MedSpaDemoModal({ onClose }) {
               Next: Choose Time <ArrowRight className="w-4 h-4" />
             </button>
 
-            <p className="text-center text-xs text-muted-foreground">No commitment. Free 15-min call. Live in 5–7 days.</p>
+            <p className="text-center text-xs text-muted-foreground">No commitment. Free 15-minute call. Live in 5-7 days.</p>
+            <p className="text-center text-xs text-muted-foreground/80">No spam. No pressure. Just a tailored walkthrough of your med spa.</p>
           </form>
         )}
 
@@ -255,7 +278,7 @@ export default function MedSpaDemoModal({ onClose }) {
                 required
                 className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
               >
-                <option value="">Choose a time…</option>
+                <option value="">Choose a time...</option>
                 <option value="09:00">9:00 AM</option>
                 <option value="09:30">9:30 AM</option>
                 <option value="10:00">10:00 AM</option>
@@ -273,7 +296,7 @@ export default function MedSpaDemoModal({ onClose }) {
 
             <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
               <p className="text-xs text-muted-foreground">
-                <strong>📅 Demo Confirmed:</strong> {scheduling.date && scheduling.date.split('-').slice(1).concat(scheduling.date.split('-')[0]).join('/')} at {scheduling.time || 'TBD'}
+                <strong>Demo confirmed:</strong> {scheduling.date && scheduling.date.split('-').slice(1).concat(scheduling.date.split('-')[0]).join('/')} at {scheduling.time || 'TBD'}
               </p>
             </div>
 
@@ -292,7 +315,7 @@ export default function MedSpaDemoModal({ onClose }) {
                 className="flex-1 h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-60"
               >
                 {saving ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling…</>
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</>
                 ) : (
                   <>Schedule Demo <ArrowRight className="w-4 h-4" /></>
                 )}
@@ -301,9 +324,11 @@ export default function MedSpaDemoModal({ onClose }) {
 
             {submitError && <p className="text-center text-xs text-destructive">{submitError}</p>}
             <p className="text-center text-xs text-muted-foreground">We'll send confirmation email & SMS</p>
+            <p className="text-center text-xs text-muted-foreground/80">No spam. No pressure. Just a tailored walkthrough of your med spa.</p>
           </form>
         )}
       </div>
     </div>
   );
 }
+

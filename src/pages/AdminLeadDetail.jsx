@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Loader2 } from "lucide-react";
 import StatusControl from "../components/dashboard/StatusControl";
 import MessagingPanel from "../components/dashboard/MessagingPanel";
 import EmailHistoryPanel from "../components/dashboard/EmailHistoryPanel";
@@ -24,6 +24,7 @@ export default function AdminLeadDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [lead, setLead] = useState(null);
+  const [failedEvents, setFailedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -36,8 +37,12 @@ export default function AdminLeadDetail() {
 
   const loadLead = async () => {
     try {
-      const data = await base44.entities.Leads.get(leadId);
+      const [data, events] = await Promise.all([
+        base44.entities.Leads.get(leadId),
+        base44.entities.CommunicationEvent.filter({ lead_id: leadId, status: "failed" }, "-created_date", 20),
+      ]);
       setLead(data);
+      setFailedEvents(events || []);
     } catch (err) {
       console.error("Error loading lead:", err);
     } finally {
@@ -163,6 +168,37 @@ export default function AdminLeadDetail() {
         currentStatus={lead.status}
         onStatusChange={handleStatusChange}
       />
+
+      {failedEvents.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-700 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-amber-900">Manual follow-up may be needed</p>
+            <p className="text-sm text-amber-800 mt-1">
+              This lead has {failedEvents.length} failed notification or workflow event{failedEvents.length === 1 ? "" : "s"}.
+              Review the timeline below and follow up manually if needed.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {failedEvents.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {failedEvents.slice(0, 3).map((event) => (
+            <div key={event.id} className="rounded-lg border border-amber-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-800 mb-2">
+                {event.channel || "workflow"} failure
+              </p>
+              <p className="text-sm font-medium text-foreground mb-2">
+                {event.subject || event.event_type || "Follow-up event failed"}
+              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {event.error_message || "Review this lead and follow up manually if needed."}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Timeline with AI Classification */}
       <LeadTimeline leadId={leadId} lead={lead} />

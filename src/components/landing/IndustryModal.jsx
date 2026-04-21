@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 
 const industryImages = {
   "Med Spas & Aesthetic Clinics": "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=800&q=80",
-  "Wellness Studios": "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80",
-  "Real Estate": "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&q=80",
-  "HVAC & Home Services": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+  "Dental & Orthodontics": "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800&q=80",
+  "Chiropractic & Physical Therapy": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
+  "HVAC, Plumbing & Home Services": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
+  "Roofing & Restoration": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&q=80",
   "Contractors & Trades": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
-  "Local Service Businesses": "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80",
 };
 
 export default function IndustryModal({ industry, onClose }) {

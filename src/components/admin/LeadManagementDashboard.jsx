@@ -16,9 +16,12 @@ export default function LeadManagementDashboard() {
   const [leads, setLeads] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [scoreFilter, setScoreFilter] = useState('all');
+  const [intakeFilter, setIntakeFilter] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState('all');
 
   useEffect(() => {
     fetchLeads();
@@ -26,14 +29,16 @@ export default function LeadManagementDashboard() {
 
   useEffect(() => {
     applyFilters();
-  }, [leads, search, statusFilter, scoreFilter]);
+  }, [leads, search, statusFilter, scoreFilter, intakeFilter, sourceFilter]);
 
   const fetchLeads = async () => {
     try {
+      setError('');
       const data = await base44.entities.Leads.list('-created_date', 100);
       setLeads(data);
     } catch (err) {
       console.error('Failed to load leads:', err);
+      setError('Unable to load leads right now.');
     } finally {
       setLoading(false);
     }
@@ -60,6 +65,14 @@ export default function LeadManagementDashboard() {
       if (scoreFilter === 'high') result = result.filter(l => l.lead_score >= 75);
       if (scoreFilter === 'medium') result = result.filter(l => l.lead_score >= 50 && l.lead_score < 75);
       if (scoreFilter === 'low') result = result.filter(l => l.lead_score < 50);
+    }
+
+    if (intakeFilter !== 'all') {
+      result = result.filter((l) => (l.intake_type || 'legacy') === intakeFilter);
+    }
+
+    if (sourceFilter !== 'all') {
+      result = result.filter((l) => (l.source || 'unknown') === sourceFilter);
     }
 
     setFiltered(result);
@@ -103,7 +116,7 @@ export default function LeadManagementDashboard() {
 
       {/* Filters */}
       <div className="bg-white rounded-xl border border-border p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
             <input
@@ -135,6 +148,26 @@ export default function LeadManagementDashboard() {
             <option value="medium">Medium (50-74)</option>
             <option value="low">Low (&lt;50)</option>
           </select>
+          <select
+            value={intakeFilter}
+            onChange={(e) => setIntakeFilter(e.target.value)}
+            className="px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="all">All Intake Types</option>
+            <option value="lead_capture">Lead Capture</option>
+            <option value="contact_inquiry">Contact Inquiry</option>
+            <option value="demo_booking">Demo Booking</option>
+            <option value="legacy">Legacy / Unlabeled</option>
+          </select>
+          <select
+            value={sourceFilter}
+            onChange={(e) => setSourceFilter(e.target.value)}
+            className="px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="all">All Sources</option>
+            <option value="website">Website</option>
+            <option value="unknown">Unknown / Legacy</option>
+          </select>
         </div>
       </div>
 
@@ -156,6 +189,8 @@ export default function LeadManagementDashboard() {
             <tbody className="divide-y divide-border">
               {loading ? (
                 <tr><td colSpan="7" className="px-6 py-8 text-center text-muted-foreground">Loading...</td></tr>
+              ) : error ? (
+                <tr><td colSpan="7" className="px-6 py-8 text-center text-red-600">{error}</td></tr>
               ) : filtered.length === 0 ? (
                 <tr><td colSpan="7" className="px-6 py-8 text-center text-muted-foreground">No leads found</td></tr>
               ) : (

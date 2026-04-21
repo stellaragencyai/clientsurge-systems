@@ -13,8 +13,8 @@ export default function EmailHistoryPanel({ leadId }) {
 
   const loadEmails = async () => {
     try {
-      const data = await base44.entities.Emails.filter(
-        { lead_id: leadId },
+      const data = await base44.entities.CommunicationEvent.filter(
+        { lead_id: leadId, channel: "email" },
         "-created_date",
         50
       );
@@ -68,18 +68,18 @@ export default function EmailHistoryPanel({ leadId }) {
                   <div className="flex items-center gap-2 mb-1">
                     <Mail className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                     <h4 className="font-medium text-foreground truncate">
-                      {email.subject}
+                      {email.subject || "Email event"}
                     </h4>
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-2">
-                    {email.body}
+                    {email.message_body || email.error_message || "No message body recorded"}
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(email.status)}`}>
                       {email.status}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {formatDate(email.created_date)}
+                    {formatDate(email.created_date)}
                     </span>
                   </div>
                 </div>
@@ -95,7 +95,7 @@ export default function EmailHistoryPanel({ leadId }) {
               {selectedEmail?.id === email.id && (
                 <div className="mt-4 pt-4 border-t border-border">
                   <p className="text-sm text-foreground whitespace-pre-wrap">
-                    {email.body}
+                    {email.message_body || email.error_message || "No message body recorded"}
                   </p>
                 </div>
               )}

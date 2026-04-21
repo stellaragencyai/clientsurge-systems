@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
-import { ArrowRight, MessageSquare, Zap, Send, CalendarCheck } from "lucide-react";
-import DemoBookingModal from "../forms/DemoBookingModal";
+import { useEffect, useState } from "react";
+import { MessageSquare, Zap, Send, CalendarCheck } from "lucide-react";
 
 const steps = [
   {
@@ -31,7 +30,6 @@ const steps = [
 
 export default function HowItWorks() {
   const [inView, setInView] = useState(false);
-  const [showDemoModal, setShowDemoModal] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
@@ -137,18 +135,13 @@ export default function HowItWorks() {
         </div>
 
         <div className="text-center">
-          <p className="text-foreground mb-6">Want to see what this would look like for your business?</p>
-          <button onClick={() => setShowDemoModal(true)} style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.35)", transition: "box-shadow 0.5s ease, transform 0.3s ease", border: "none", cursor: "pointer" }} onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
-          }} onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
-          }}>
-            <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 32px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
-              Book Your Free Demo
-              <ArrowRight className="w-4 h-4" />
-            </span>
-          </button>
-          {showDemoModal && <DemoBookingModal onClose={() => setShowDemoModal(false)} />}
+          <p className="text-foreground mb-3">Want to see how this would fit your business?</p>
+          <a
+            href="#pricing"
+            className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+          >
+            See plans and pricing below
+          </a>
         </div>
       </div>
 

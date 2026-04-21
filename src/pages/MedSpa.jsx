@@ -13,26 +13,31 @@ import MedSpaBenefits from "../components/medspa/MedSpaBenefits";
 import MedSpaSpecific from "../components/medspa/MedSpaSpecific";
 import MedSpaReactivation from "../components/medspa/MedSpaReactivation";
 import MedSpaPricingPreview from "../components/medspa/MedSpaPricingPreview";
+import MedSpaROIBlock from "../components/medspa/MedSpaROIBlock";
 import MedSpaFAQ from "../components/medspa/MedSpaFAQ";
 import MedSpaFinalCTA from "../components/medspa/MedSpaFinalCTA";
 import Footer from "../components/landing/Footer";
+import MobileCallBar from "../components/landing/MobileCallBar";
+import { setPageMetadata } from "@/lib/seo";
 
 export default function MedSpa() {
   useEffect(() => {
     const navbar = document.querySelector('nav');
     if (navbar) navbar.style.display = 'none';
 
-    const prevTitle = document.title;
-    document.title = "Med Spa Automation | ClientSurge Systems — Book More Consultations on Autopilot";
-    let metaDesc = document.querySelector('meta[name="description"]');
-    const prevDesc = metaDesc?.getAttribute('content') || '';
-    if (!metaDesc) { metaDesc = document.createElement('meta'); metaDesc.setAttribute('name', 'description'); document.head.appendChild(metaDesc); }
-    metaDesc.setAttribute('content', 'Done-for-you AI automation for med spas and aesthetic clinics. Respond to leads in under 60 seconds, automate follow-up, and book more consultations — live in 5–7 days.');
+    const cleanupMetadata = setPageMetadata({
+      title: 'Med Spa Automation | ClientSurge Systems',
+      description:
+        'Done-for-you automation for med spas and aesthetic clinics. Respond to leads in under 60 seconds, automate follow-up, and book more consultations.',
+      canonicalPath: '/med-spa',
+      ogTitle: 'Med Spa Automation | ClientSurge Systems',
+      ogDescription:
+        'See how ClientSurge helps med spas automate lead response, follow-up, and consultation booking.',
+    });
 
     return () => {
       if (navbar) navbar.style.display = 'block';
-      document.title = prevTitle;
-      if (metaDesc) metaDesc.setAttribute('content', prevDesc);
+      cleanupMetadata();
     };
   }, []);
 
@@ -52,9 +57,11 @@ export default function MedSpa() {
       <MedSpaSpecific />
       <MedSpaReactivation />
       <MedSpaPricingPreview />
+      <MedSpaROIBlock />
       <MedSpaFAQ />
       <MedSpaFinalCTA />
       <Footer />
+      <MobileCallBar />
     </div>
   );
 }

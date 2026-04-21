@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
         to: adminSettings.lead_notification_email,
         subject: `New Lead: ${lead.business_name}`,
         body: emailBody,
-        from_name: 'ApexFlow System',
+        from_name: 'ClientSurge Systems',
       });
     } catch (err) {
       console.log('Admin notification failed:', err.message);

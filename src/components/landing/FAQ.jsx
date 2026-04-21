@@ -5,10 +5,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const faqs = [
+export const FAQ_ITEMS = [
   {
     q: "Who is this built for?",
-    a: "Service businesses that already generate leads but aren't converting them efficiently — med spas, aesthetic clinics, real estate agencies, home service companies, and similar appointment-based businesses.",
+    a: "Service businesses that already generate leads but are not converting them efficiently - med spas, aesthetic clinics, real estate agencies, home service companies, and similar appointment-based businesses.",
   },
   {
     q: "Do I need existing software or systems?",
@@ -16,11 +16,11 @@ const faqs = [
   },
   {
     q: "Will this replace my staff?",
-    a: "No. It handles the repetitive work — instant responses, follow-up sequences, reminders — so your team can focus on the clients in front of them.",
+    a: "No. It handles the repetitive work - instant responses, follow-up sequences, reminders - so your team can focus on the clients in front of them.",
   },
   {
     q: "How fast can I get set up?",
-    a: "Most clients are fully live within 5–7 business days. We do the work. You just need to show up for one onboarding call.",
+    a: "Most clients are fully live within 5-7 business days. We do the work. You just need to show up for one onboarding call.",
   },
   {
     q: "What results should I expect?",
@@ -28,35 +28,35 @@ const faqs = [
   },
   {
     q: "Is there a long-term contract?",
-    a: "No. Month-to-month only. We keep your business because the system works — not because you're locked in.",
+    a: "No. Month-to-month only. We keep your business because the system works - not because you are locked in.",
   },
   {
     q: "How much does it cost?",
-    a: "Plans start at $397/month with a one-time setup fee. We have three tiers — Starter, Growth, and Pro — depending on your lead volume and goals. See our Pricing section for full details, and we'll confirm the best fit on your demo call.",
+    a: "Plans start at $397/month with a one-time setup fee. We have three tiers - Starter, Growth, and Pro - depending on your lead volume and goals. See our Pricing section for full details, and we will confirm the best fit on your demo call.",
   },
   {
     q: "What happens on the demo call?",
-    a: "We spend 30 minutes understanding your business, your lead volume, and where you're losing bookings. Then we show you exactly what we'd build and what you can expect.",
+    a: "We spend 30 minutes understanding your business, your lead volume, and where you are losing bookings. Then we show you exactly what we would build and what you can expect.",
   },
   {
     q: "Will this actually work for my specific business?",
-    a: "If you generate leads but lose conversions due to slow follow-up, the answer is almost always yes. We've worked across 15+ industries. On your demo call, we'll identify the exact gaps and show you the specific solution. If we don't think we can help, we'll tell you upfront.",
+    a: "If you generate leads but lose conversions due to slow follow-up, the answer is almost always yes. We have worked across many appointment-based industries. On your demo call, we will identify the exact gaps and show you the specific solution. If we do not think we can help, we will tell you upfront.",
   },
   {
     q: "How much time will I need to spend managing this?",
-    a: "Almost none. The system runs on autopilot. You check in weekly to review results, and we handle all updates and optimization. No learning curve, no training required for your team.",
+    a: "Almost none. The system runs on autopilot. You check in weekly to review results, and we handle all updates and optimization. No learning curve and no training required for your team.",
   },
   {
-    q: "What if the system doesn't increase my bookings?",
-    a: "That's covered by our 30-day guarantee. If you're not seeing results by day 30, we refund your setup cost—no questions asked. But most clients see measurable improvements within the first two weeks.",
+    q: "What if the system does not increase my bookings?",
+    a: "We set clear success goals during onboarding and review performance with you after launch. If we do not think we can create a meaningful improvement for your business, we will tell you before you move forward.",
   },
   {
     q: "Can you integrate this with my current booking system?",
-    a: "Yes. Whether you use Calendly, Acuity, Mindbody, or a custom system, we connect to it. If something unique, we build a custom integration.",
+    a: "Usually, yes. We review your current booking and follow-up tools during the demo, confirm what can be connected cleanly, and recommend the simplest setup path for your business.",
   },
   {
     q: "How do I know if this is the right investment for my business?",
-    a: "That's what the demo is for. We'll show you the specific system we'd build, what it costs, and the projected ROI based on your current lead volume and conversion rate. You'll have concrete numbers before deciding.",
+    a: "That is what the demo is for. We will show you the specific system we would build, what it costs, and the projected ROI based on your current lead volume and conversion rate. You will have concrete numbers before deciding.",
   },
 ];
 
@@ -70,12 +70,12 @@ export default function FAQ() {
             Frequently Asked Questions
           </h2>
           <p className="mt-4 text-muted-foreground text-base">
-            Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message →</a>
+            Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message</a>
           </p>
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">
-          {faqs.map((faq, i) => (
+          {FAQ_ITEMS.map((faq, i) => (
             <AccordionItem
               key={i}
               value={`faq-${i}`}

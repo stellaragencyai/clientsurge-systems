@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
     const adminSettings = settings.length > 0 ? settings[0] : null;
 
     const templateContent = adminSettings?.email_confirmation_template || 
-      `Hi {{full_name}},\n\nThanks for reaching out. We received your inquiry and will be in touch shortly.\n\nYou can also book a demo here: {{booking_link}}\n\nBest regards,\nThe ApexFlow Team`;
+      `Hi {{full_name}},\n\nThanks for reaching out. We received your inquiry and will be in touch shortly.\n\nYou can also book a demo here: {{booking_link}}\n\nBest regards,\nThe ClientSurge Systems Team`;
 
     const emailBody = templateContent
       .replace('{{full_name}}', lead.name)
@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
         to: lead.email,
         subject: 'We received your inquiry',
         body: emailBody,
-        from_name: 'ApexFlow',
+        from_name: 'ClientSurge Systems',
       });
     } catch (err) {
       console.log('Email send failed:', err.message);

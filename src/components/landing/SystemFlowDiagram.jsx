@@ -142,11 +142,12 @@ export default function SystemFlowDiagram() {
         {/* Progress bar beneath */}
         <div className="mt-8 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.07)" }}>
           <div
-            className="h-full rounded-full transition-all duration-[2.5s] ease-out"
+            className="h-full rounded-full transition-all ease-out"
             style={{
               width: inView ? "100%" : "0%",
               background: "linear-gradient(90deg, #7a4825, #c8965c, #f5d9a8, #c8965c)",
               boxShadow: "0 0 10px rgba(200,150,92,0.5)",
+              transitionDuration: "2500ms",
             }}
           />
         </div>
