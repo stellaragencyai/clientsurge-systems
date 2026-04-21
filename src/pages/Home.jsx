@@ -3,8 +3,10 @@ import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero";
 import TrustBar from "../components/landing/TrustBar";
 import Industries from "../components/landing/Industries";
-import LeadValueCalculator from "../components/landing/LeadValueCalculator";
+import ProblemSolution from "../components/landing/ProblemSolution.jsx";
+import HowItWorks from "../components/landing/HowItWorks";
 import Testimonials from "../components/landing/Testimonials";
+import CoreOffer from "../components/landing/CoreOffer";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
 import FinalCTA from "../components/landing/FinalCTA";
@@ -54,12 +56,13 @@ export default function Home() {
       <div className="min-h-screen pb-16">
         <Navbar />
         <Hero />
-        <LeadValueCalculator />
         <Industries />
         <section aria-label="Proof and trust">
           <TrustBar />
           <Testimonials />
         </section>
+        <ProblemSolution />
+        <HowItWorks id="how-it-works-section" />
         <Pricing />
         <FAQ />
         <FinalCTA />

@@ -43,11 +43,11 @@ export default function Book() {
           </h1>
           <p className="text-muted-foreground text-lg">Free 15 minutes. No commitment. Same guided booking flow as the rest of the site.</p>
           <a
-            href="/#services"
-            onClick={() => trackCTA('review_8_system_flow', 'book_page_header')}
+            href="/#automation-demo"
+            onClick={() => trackCTA('see_live_demo_3_minutes', 'book_page_header')}
             className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
           >
-            Review the 8-system flow
+            See a live demo in 3 minutes
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>

@@ -9,10 +9,10 @@ export default function Hero() {
 
   const handleLearnMore = (e) => {
     e.preventDefault();
-    trackCTA("see_the_8_system_flow", "hero");
-    const target = document.getElementById("services");
+    trackCTA("see_the_4_step_system", "hero");
+    const target = document.getElementById("how-it-works-section");
     if (!target) {
-      window.location.href = "/#services";
+      window.location.href = "/#how-it-works-section";
       return;
     }
     const start = window.scrollY;
@@ -86,7 +86,7 @@ export default function Hero() {
             },
           }}
           secondaryCTA={{
-            label: "See The 8-System Flow",
+            label: "See The 4-Step System",
             onClick: handleLearnMore,
           }}
           trustBadges={["Live in 5-7 days", "Month-to-month", "Fully done-for-you"]}

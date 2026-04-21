@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Wrench, Rocket, Fingerprint, EyeOff, Hammer, BadgeDollarSign, ArrowRight, CheckCircle2, X } from "lucide-react";
+import { Wrench, Rocket, Fingerprint, EyeOff, Hammer, BadgeDollarSign, ArrowRight, CheckCircle2, X, TrendingUp } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
 
 const reasons = [

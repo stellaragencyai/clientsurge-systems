@@ -19,8 +19,8 @@ const navColumns = [
   {
     title: "Explore",
     links: [
-      { label: "How It Works", href: "/#services" },
-      { label: "Results", href: "/#testimonials" },
+      { label: "How It Works", href: "/#how-it-works-section" },
+      { label: "Our System", href: "/#services" },
       { label: "Pricing", href: "/#pricing" },
       { label: "FAQ", href: "/#faq" },
       { label: "Contact Us", href: "/contact" },
