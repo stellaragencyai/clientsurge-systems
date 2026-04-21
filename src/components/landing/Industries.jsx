@@ -91,10 +91,10 @@ export default function Industries() {
     <section
       id="industries"
       ref={sectionRef}
-      className="py-24 md:py-32 px-6 bg-gradient-to-b from-card via-background to-card"
+      className="py-24 md:py-32 px-0 bg-gradient-to-b from-card via-background to-card"
     >
       {/* Header */}
-      <div className="max-w-6xl mx-auto mb-16">
+      <div className="max-w-6xl mx-auto mb-16 px-6">
         <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">
           Choose Your Industry
         </p>
@@ -108,7 +108,7 @@ export default function Industries() {
       </div>
 
       {/* Cards grid */}
-      <div className="max-w-[1400px] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3">
+      <div className="max-w-[1800px] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3">
         {industries.map((industry, index) => {
           const Icon = industry.icon;
           return (
@@ -123,7 +123,7 @@ export default function Industries() {
               }}
             >
               {/* Photo — tall, fills top ~78% */}
-              <div className="relative overflow-hidden" style={{ paddingBottom: "72%" }}>
+              <div className="relative overflow-hidden" style={{ paddingBottom: "100%" }}>
                 <img
                   src={industry.image}
                   alt={industry.name}
