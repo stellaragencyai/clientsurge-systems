@@ -74,7 +74,6 @@ export default function Industries() {
       setSectionVisible(true);
       return undefined;
     }
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -82,13 +81,9 @@ export default function Industries() {
           observer.disconnect();
         }
       },
-      { threshold: 0.18 }
+      { threshold: 0.1 }
     );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
+    if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
@@ -98,12 +93,14 @@ export default function Industries() {
       ref={sectionRef}
       className="relative overflow-hidden py-24 md:py-32 px-6 bg-gradient-to-b from-card via-background to-card"
     >
+      {/* Background glows */}
       <div className="pointer-events-none absolute inset-x-0 top-12 flex justify-center">
         <div className="h-44 w-[34rem] rounded-full bg-primary/10 blur-3xl" />
       </div>
       <div className="pointer-events-none absolute left-[-8rem] top-1/3 h-52 w-52 rounded-full bg-white/35 blur-3xl" />
       <div className="pointer-events-none absolute right-[-6rem] bottom-12 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
 
+      {/* Header */}
       <div className="relative mx-auto mb-14 max-w-4xl rounded-[2rem] border border-white/40 bg-white/65 px-8 py-10 text-center shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl">
         <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase mb-4">Choose Your Industry</p>
         <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
@@ -114,6 +111,7 @@ export default function Industries() {
         </p>
       </div>
 
+      {/* Pills */}
       <div className="relative mx-auto mb-12 flex max-w-[108rem] flex-wrap items-center justify-center gap-3 rounded-[2rem] border border-white/30 bg-white/45 px-5 py-5 shadow-[0_18px_48px_rgba(15,23,42,0.06)] backdrop-blur-lg">
         {industries.map((industry, index) => (
           <span
@@ -130,54 +128,81 @@ export default function Industries() {
         ))}
       </div>
 
-      <div className="relative mx-auto grid max-w-[112rem] grid-cols-1 gap-9 md:grid-cols-2 lg:grid-cols-3">
+      {/* Cards grid */}
+      <div className="relative mx-auto grid max-w-[112rem] grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {industries.map((industry, index) => {
           const Icon = industry.icon;
           return (
-            <article
+            <Link
+              to={industry.href}
               key={industry.name}
-              className="group relative overflow-hidden rounded-[2rem] border border-slate-500/95 bg-[linear-gradient(180deg,rgba(255,255,255,0.84),rgba(255,251,246,0.76))] shadow-[0_22px_56px_rgba(15,23,42,0.08)] ring-1 ring-slate-900/10 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-2 hover:border-[#8f6848] hover:shadow-[0_34px_86px_rgba(15,23,42,0.14)]"
+              className="industry-card group relative block overflow-hidden rounded-2xl shadow-[0_8px_40px_rgba(15,23,42,0.14)] ring-1 ring-black/10"
               style={{
+                aspectRatio: "4 / 3",
                 opacity: sectionVisible ? 1 : 0,
                 transform: sectionVisible ? "translateY(0)" : "translateY(28px)",
-                transition: `opacity 560ms ease ${index * 120}ms, transform 560ms ease ${index * 120}ms, box-shadow 500ms ease, border-color 500ms ease`,
+                transition: `opacity 560ms ease ${index * 120}ms, transform 560ms ease ${index * 120}ms`,
               }}
             >
-              <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
-                <div className="absolute inset-y-0 -left-1/3 w-1/2 rotate-12 bg-gradient-to-r from-transparent via-white/35 to-transparent blur-xl transition-transform duration-700 group-hover:translate-x-[180%]" />
-              </div>
-              <div className="pointer-events-none absolute inset-x-8 top-0 h-24 rounded-full bg-[#f6dfb6]/40 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.3),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(201,156,110,0.16),transparent_40%)] opacity-90" />
-              <div className="relative h-[16.5rem] overflow-hidden md:h-[16.5rem]">
-                <img
-                  src={industry.image}
-                  alt={industry.name}
-                  loading="lazy"
-                  className="h-full w-full object-cover saturate-[0.96] transition-transform duration-700 group-hover:scale-[1.05]"
-                />
-                <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/40 bg-black/30 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-md">
-                  <Icon className="w-3.5 h-3.5" />
-                  {industry.result}
-                </div>
+              {/* Full-card photo */}
+              <img
+                src={industry.image}
+                alt={industry.name}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.07]"
+              />
+
+              {/* Permanent dark gradient at bottom so title is always legible */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
+
+              {/* Status pill */}
+              <div className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-black/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white backdrop-blur-md">
+                <Icon className="w-3 h-3" />
+                {industry.result}
               </div>
 
-              <div className="relative p-7 md:p-8">
-                <h3 className="font-serif text-[1.25rem] font-semibold leading-tight text-slate-900 mb-4">{industry.name}</h3>
-                <div className="mb-4 h-px w-full bg-gradient-to-r from-[#9a6c45]/25 via-[#c8965c]/55 to-transparent" />
-                <p className="mb-3 font-serif text-[1.08rem] font-semibold leading-relaxed text-slate-900">{industry.problem}</p>
-                <p className="mb-6 text-[15px] leading-7 text-slate-600">{industry.desc}</p>
-                <Link
-                  to={industry.href}
-                  className="inline-flex items-center gap-2 rounded-full border border-[#b98b61]/30 bg-[linear-gradient(180deg,rgba(255,255,255,0.82),rgba(252,245,234,0.9))] px-4 py-2.5 text-sm font-semibold text-[#8a5a32] shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#a0714f] hover:bg-white"
-                >
-                  {industry.cta}
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
+              {/* Default state: title only at bottom */}
+              <div className="industry-title absolute inset-x-0 bottom-0 px-6 pb-5 transition-all duration-400 ease-out group-hover:translate-y-2 group-hover:opacity-0">
+                <h3 className="font-display text-xl font-bold leading-tight text-white">
+                  {industry.name}
+                </h3>
               </div>
-            </article>
+
+              {/* Hover overlay: rich brown panel slides up */}
+              <div className="industry-hover-panel absolute inset-x-0 bottom-0 flex flex-col justify-end px-6 pb-6 pt-10 translate-y-full opacity-0 transition-all duration-450 ease-out group-hover:translate-y-0 group-hover:opacity-100"
+                style={{ background: "linear-gradient(to top, rgba(90,50,18,0.97) 0%, rgba(107,63,31,0.92) 55%, transparent 100%)" }}
+              >
+                {/* Gold accent line */}
+                <div className="mb-3 h-[2px] w-8 rounded-full bg-[#c8965c]" />
+                <h3 className="font-display text-lg font-bold leading-tight text-white mb-2">
+                  {industry.name}
+                </h3>
+                <p className="mb-1.5 text-sm font-semibold leading-snug text-white/90">{industry.problem}</p>
+                <p className="mb-4 text-xs leading-relaxed text-white/65">{industry.desc}</p>
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wide text-[#f5d9a8]">
+                  {industry.cta}
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+                </span>
+              </div>
+            </Link>
           );
         })}
       </div>
+
+      <style>{`
+        .industry-card {
+          transition-property: opacity, transform, box-shadow;
+        }
+        .industry-card:hover {
+          box-shadow: 0 24px 64px rgba(107,63,31,0.35), 0 4px 16px rgba(0,0,0,0.12);
+        }
+        .industry-hover-panel {
+          transition: transform 420ms cubic-bezier(0.4, 0, 0.2, 1), opacity 380ms ease;
+        }
+        .industry-title {
+          transition: opacity 250ms ease, transform 300ms ease;
+        }
+      `}</style>
     </section>
   );
 }
