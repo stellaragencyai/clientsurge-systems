@@ -1,4 +1,5 @@
 import { useState } from "react";
+import StardustOverlay from "./StardustOverlay";
 import { ArrowRight } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import DemoBookingModal from "@/components/forms/DemoBookingModal";
@@ -8,8 +9,9 @@ export default function FinalCTA() {
 
   return (
     <>
-      <section id="book-demo" className="nebula-cta py-24 md:py-32 px-6">
-        <div className="max-w-3xl mx-auto text-center">
+      <section id="book-demo" className="nebula-cta py-24 md:py-32 px-6 relative overflow-hidden">
+        <StardustOverlay seed={13} opacity={0.6} />
+        <div className="max-w-3xl mx-auto text-center relative z-10">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">Ready to Start?</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
             You're Already Getting Leads.
@@ -21,7 +23,7 @@ export default function FinalCTA() {
           </p>
         </div>
 
-        <div className="max-w-3xl mx-auto text-center mt-10">
+        <div className="max-w-3xl mx-auto text-center mt-10 relative z-10">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               type="button"

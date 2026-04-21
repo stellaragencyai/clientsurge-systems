@@ -1,4 +1,5 @@
 import { useDemoBooking } from "./DemoBookingContext";
+import StardustOverlay from "./StardustOverlay";
 
 const testimonials = [
   {
@@ -36,8 +37,9 @@ const testimonials = [
 export default function Testimonials() {
   const demoBooking = useDemoBooking();
   return (
-    <section id="testimonials" className="nebula-testimonials py-24 md:py-32 px-6">
-      <div className="max-w-6xl mx-auto">
+    <section id="testimonials" className="nebula-testimonials py-24 md:py-32 px-6 relative overflow-hidden">
+      <StardustOverlay seed={21} opacity={0.4} />
+      <div className="max-w-6xl mx-auto relative z-10">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Proven Results</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">

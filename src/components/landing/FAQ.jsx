@@ -1,3 +1,4 @@
+import StardustOverlay from "./StardustOverlay";
 import {
   Accordion,
   AccordionContent,
@@ -62,8 +63,9 @@ export const FAQ_ITEMS = [
 
 export default function FAQ() {
   return (
-    <section id="faq" className="nebula-faq px-6 py-24 md:py-32">
-      <div className="max-w-3xl mx-auto">
+    <section id="faq" className="nebula-faq px-6 py-24 md:py-32 relative overflow-hidden">
+      <StardustOverlay seed={7} opacity={0.5} />
+      <div className="max-w-3xl mx-auto relative z-10">
         <div className="text-center mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Questions</p>
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
