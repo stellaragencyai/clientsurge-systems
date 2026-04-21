@@ -21,6 +21,16 @@ const industryLinks = [
   { label: "Contractors & Trades", href: "/industries#contractors", live: false },
 ];
 
+const SAFE_SECTION_HASHES = new Set([
+  "#how-it-works-section",
+  "#services",
+  "#pricing",
+  "#faq",
+  "#testimonials",
+  "#industries",
+  "#book-demo",
+]);
+
 function safeGetThemePreference() {
   try {
     return window.localStorage.getItem("theme-preference");
@@ -45,6 +55,23 @@ function safeApplyTheme(isDark) {
   }
 }
 
+function getSafeHashTarget(hash) {
+  if (!hash || !SAFE_SECTION_HASHES.has(hash)) {
+    return null;
+  }
+
+  const elementId = hash.startsWith("#") ? hash.slice(1) : hash;
+  if (!elementId) {
+    return null;
+  }
+
+  try {
+    return document.getElementById(elementId);
+  } catch {
+    return null;
+  }
+}
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -63,7 +90,7 @@ export default function Navbar() {
   };
 
   const smoothScrollToHash = (href) => {
-    const el = document.querySelector(href);
+    const el = getSafeHashTarget(href);
     if (!el) return false;
 
     const start = window.scrollY;
@@ -98,7 +125,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (!location.hash) return;
+    if (!location.hash || !SAFE_SECTION_HASHES.has(location.hash)) return;
     const timer = window.setTimeout(() => {
       smoothScrollToHash(location.hash);
     }, 250);
