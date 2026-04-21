@@ -38,13 +38,13 @@ function SMSMockup() {
   const [typingFor, setTypingFor] = useState(null); // index of message currently being "typed"
   const [floatingReply, setFloatingReply] = useState(false);
   const [floatingBooked, setFloatingBooked] = useState(false);
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef(null); // kept for structure but scroll handled by container
   const containerRef = useRef(null);
 
-  // Scroll to bottom of chat whenever messages appear
+  // Scroll chat container internally (not the page)
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   }, [visibleCount, typingFor]);
 
@@ -100,7 +100,7 @@ function SMSMockup() {
   }
 
   return (
-    <div className="relative w-full max-w-xs mx-auto lg:mx-0 lg:ml-auto" aria-hidden="true">
+    <div className="relative w-full max-w-sm mx-auto lg:mx-0 lg:ml-auto" aria-hidden="true">
       {/* Phone frame */}
       <div
         className="relative rounded-3xl overflow-hidden shadow-2xl"
@@ -141,7 +141,7 @@ function SMSMockup() {
         <div
           ref={containerRef}
           className="px-3 py-4 space-y-3 overflow-hidden"
-          style={{ minHeight: "260px", maxHeight: "300px", overflowY: "auto" }}
+          style={{ minHeight: "325px", maxHeight: "375px", overflowY: "auto" }}
         >
           {SMS_MESSAGES.map((msg, i) => {
             const isVisible = i < visibleCount;
