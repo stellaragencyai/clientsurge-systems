@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -20,6 +20,19 @@ export default function HeroSection({
   videoUrl,
 }) {
   const [showModal, setShowModal] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const sectionRef = useRef(null);
+
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Parallax offsets per layer
+  const p1 = scrollY * -0.12;
+  const p2 = scrollY * -0.06;
+  const p3 = scrollY * -0.02;
 
   return (
     <section
@@ -49,7 +62,7 @@ export default function HeroSection({
       )}
 
       {/* Content */}
-      <div className="relative z-10 flex items-center justify-center w-full h-full" style={{padding: "28px 20px"}}>
+      <div ref={sectionRef} className="relative z-10 flex items-center justify-center w-full h-full" style={{padding: "28px 20px"}}>
         <div className="max-w-4xl mx-auto text-center pt-20 pb-24 md:pt-28 md:pb-40 px-4 sm:px-6">
           {/* Badge */}
           {badge && (
@@ -59,13 +72,23 @@ export default function HeroSection({
             </div>
           )}
 
-          {/* Heading */}
+          {/* Heading — parallax depth layers */}
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.1] mb-5 md:mb-6" style={{color: backgroundType === "image" ? "white" : "inherit", textShadow: backgroundType === "image" ? "0 2px 12px rgba(0,0,0,0.5)" : "none"}}>
-            {title}
+            {title ? (
+              <span
+                className="inline-block will-change-transform"
+                style={{ transform: `translateY(${p1}px)`, transition: "transform 0.1s linear" }}
+              >
+                {title}
+              </span>
+            ) : null}
             {titleHighlight && (
               <>
                 <br />
-                <span className={backgroundType === "image" ? "text-primary" : "text-primary"}>
+                <span
+                  className="text-primary inline-block will-change-transform"
+                  style={{ transform: `translateY(${p2}px)`, transition: "transform 0.1s linear" }}
+                >
                   {titleHighlight}
                 </span>
               </>
@@ -74,7 +97,15 @@ export default function HeroSection({
 
           {/* Subtitle (optional) */}
           {subtitle && (
-            <p className="text-base md:text-xl max-w-2xl mx-auto leading-relaxed mb-4" style={{color: backgroundType === "image" ? "white" : "inherit", textShadow: backgroundType === "image" ? "0 1px 6px rgba(0,0,0,0.4)" : "none"}}>
+            <p
+              className="text-base md:text-xl max-w-2xl mx-auto leading-relaxed mb-4 will-change-transform"
+              style={{
+                color: backgroundType === "image" ? "white" : "inherit",
+                textShadow: backgroundType === "image" ? "0 1px 6px rgba(0,0,0,0.4)" : "none",
+                transform: `translateY(${p3}px)`,
+                transition: "transform 0.1s linear",
+              }}
+            >
               {subtitle}
             </p>
           )}
