@@ -50,7 +50,7 @@ export default function MedSpaFAQ() {
             Frequently Asked Questions
           </h2>
           <p className="mt-4 text-muted-foreground text-base">
-            Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message -></a>
+            Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message →</a>
           </p>
         </div>
 

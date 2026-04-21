@@ -114,11 +114,11 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Handle authentication errors
-  if (authError) {
-    if (!publicRoute && authError.type === 'user_not_registered') {
+  // Handle authentication errors (never block public routes)
+  if (authError && !publicRoute) {
+    if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
-    } else if (!publicRoute && authError.type === 'auth_required') {
+    } else if (authError.type === 'auth_required') {
       navigateToLogin();
       return null;
     }
