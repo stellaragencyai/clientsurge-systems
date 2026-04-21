@@ -62,7 +62,7 @@ function CardWithFadeIn({ children, delay = 0 }) {
 
 export default function ProblemSolution() {
   return (
-    <section id="problem-solution" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
+    <section id="problem-solution" className="nebula-problem py-24 md:py-32 px-6">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">

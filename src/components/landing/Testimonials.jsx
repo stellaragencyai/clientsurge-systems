@@ -36,7 +36,7 @@ const testimonials = [
 export default function Testimonials() {
   const demoBooking = useDemoBooking();
   return (
-    <section id="testimonials" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
+    <section id="testimonials" className="nebula-testimonials py-24 md:py-32 px-6">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Proven Results</p>
@@ -120,4 +120,3 @@ export default function Testimonials() {
     </section>
   );
 }
-

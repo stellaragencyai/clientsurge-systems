@@ -62,7 +62,7 @@ export const FAQ_ITEMS = [
 
 export default function FAQ() {
   return (
-    <section id="faq" className="bg-[hsl(var(--background))] px-6 py-24 md:py-32 from-background to-card">
+    <section id="faq" className="nebula-faq px-6 py-24 md:py-32">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Questions</p>
