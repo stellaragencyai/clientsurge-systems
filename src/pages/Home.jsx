@@ -54,8 +54,8 @@ export default function Home() {
     <div className="min-h-screen pb-16">
       <Navbar />
       <Hero />
-      <FadeIn><TrustBar /></FadeIn>
       <FadeIn><Industries /></FadeIn>
+      <FadeIn><TrustBar /></FadeIn>
       <FadeIn><ToolsStrip /></FadeIn>
       <FadeIn><ProblemSolution /></FadeIn>
       <FadeIn><HowItWorks id="how-it-works-section" /></FadeIn>

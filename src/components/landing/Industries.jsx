@@ -68,13 +68,24 @@ export default function Industries() {
   return (
     <section id="industries" className="py-24 md:py-32 px-6 bg-gradient-to-b from-card via-background to-card">
       <div className="max-w-3xl mx-auto text-center mb-14">
-        <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Industries We Support</p>
+        <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Choose Your Industry</p>
         <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
           Built for Businesses That Win on <span className="text-primary">Fast Response and Better Booking</span>
         </h2>
         <p className="mt-5 text-muted-foreground text-lg">
-          The med spa page is live now, and the rest of our industry playbooks are expanding through the new industries hub.
+          Start with the live med spa page, or explore the six industry tracks the system is designed around.
         </p>
+      </div>
+
+      <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-3 mb-10">
+        {industries.map((industry) => (
+          <span
+            key={`${industry.name}-pill`}
+            className="inline-flex items-center rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground/80 shadow-sm"
+          >
+            {industry.name}
+          </span>
+        ))}
       </div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">

@@ -23,8 +23,8 @@ const items = [
   {
     icon: Building2,
     stat: "6 industries",
-    label: "Phoenix-based operator",
-    story: "We build for appointment-based businesses in the Phoenix metro, including med spas, dental, chiropractic, home services, legal, and real estate.",
+    label: "Core industry tracks",
+    story: "The current homepage supports med spas, dental, chiropractic, HVAC and home services, roofing, and contractors and trades.",
   },
   {
     icon: ShieldCheck,
