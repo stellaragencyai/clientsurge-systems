@@ -66,59 +66,70 @@ const industries = [
 
 export default function Industries() {
   return (
-    <section id="industries" className="py-24 md:py-32 px-6 bg-gradient-to-b from-card via-background to-card">
-      <div className="max-w-3xl mx-auto text-center mb-14">
-        <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Choose Your Industry</p>
+    <section id="industries" className="relative overflow-hidden py-24 md:py-32 px-6 bg-gradient-to-b from-card via-background to-card">
+      <div className="pointer-events-none absolute inset-x-0 top-12 flex justify-center">
+        <div className="h-44 w-[34rem] rounded-full bg-primary/10 blur-3xl" />
+      </div>
+      <div className="pointer-events-none absolute left-[-8rem] top-1/3 h-52 w-52 rounded-full bg-white/35 blur-3xl" />
+      <div className="pointer-events-none absolute right-[-6rem] bottom-12 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+
+      <div className="relative mx-auto mb-14 max-w-4xl rounded-[2rem] border border-white/40 bg-white/65 px-8 py-10 text-center shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-xl">
+        <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase mb-4">Choose Your Industry</p>
         <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
           Built for Businesses That Win on <span className="text-primary">Fast Response and Better Booking</span>
         </h2>
-        <p className="mt-5 text-muted-foreground text-lg">
+        <p className="mt-5 text-muted-foreground text-lg md:text-xl">
           Start with the live med spa page, or explore the six industry tracks the system is designed around.
         </p>
       </div>
 
-      <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-center gap-3 mb-10">
+      <div className="relative mx-auto mb-12 flex max-w-[108rem] flex-wrap items-center justify-center gap-3 rounded-[2rem] border border-white/30 bg-white/45 px-5 py-5 shadow-[0_18px_48px_rgba(15,23,42,0.06)] backdrop-blur-lg">
         {industries.map((industry) => (
           <span
             key={`${industry.name}-pill`}
-            className="inline-flex items-center rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground/80 shadow-sm"
+            className="inline-flex items-center rounded-full border border-white/60 bg-white/75 px-5 py-2.5 text-xs font-semibold text-foreground/80 shadow-sm"
           >
             {industry.name}
           </span>
         ))}
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="relative mx-auto grid max-w-[108rem] grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         {industries.map((industry) => {
           const Icon = industry.icon;
           return (
             <article
               key={industry.name}
-              className="group overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-transform duration-300 hover:-translate-y-1"
+              className="group relative overflow-hidden rounded-[2rem] border border-white/40 bg-white/70 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur-xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_80px_rgba(15,23,42,0.14)]"
             >
-              <div className="relative h-60 overflow-hidden">
+              <div className="pointer-events-none absolute inset-x-10 top-0 h-24 rounded-full bg-white/40 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
+              <div className="relative h-72 overflow-hidden md:h-80">
                 <img
                   src={industry.image}
                   alt={industry.name}
                   loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                <div className="absolute top-5 left-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/35 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-white/10" />
+                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-primary/20 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
+                <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/18 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur-md">
                   <Icon className="w-3.5 h-3.5" />
                   {industry.result}
                 </div>
-                <div className="absolute bottom-5 left-5 right-5">
-                  <h3 className="font-display text-2xl font-semibold text-white leading-tight">{industry.name}</h3>
+                <div className="absolute bottom-6 left-6 right-6">
+                  <h3 className="font-display text-[1.95rem] font-semibold leading-tight text-white md:text-[2.15rem]">
+                    {industry.name}
+                  </h3>
                 </div>
               </div>
 
-              <div className="p-6">
-                <p className="text-sm font-semibold text-foreground mb-2">{industry.problem}</p>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-5">{industry.desc}</p>
+              <div className="relative p-7 md:p-8">
+                <div className="mb-5 h-px w-full bg-gradient-to-r from-primary/20 via-primary/45 to-transparent" />
+                <p className="mb-3 text-base font-semibold leading-relaxed text-foreground">{industry.problem}</p>
+                <p className="mb-6 text-[15px] leading-7 text-muted-foreground">{industry.desc}</p>
                 <Link
                   to={industry.href}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-4 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10 hover:text-primary/80"
                 >
                   {industry.cta}
                   <ArrowRight className="w-4 h-4" />

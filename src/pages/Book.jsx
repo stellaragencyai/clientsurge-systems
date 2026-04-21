@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ArrowRight, CalendarCheck2, ClipboardList, MessagesSquare } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { setPageMetadata } from '@/lib/seo';
 import { trackCTA } from '@/lib/analytics';
 import MobileCallBar from '@/components/landing/MobileCallBar';
-import { bookingConfig } from '@/lib/booking';
+import DemoBookingModal from '@/components/forms/DemoBookingModal';
 
 export default function Book() {
-  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const cleanupMetadata = setPageMetadata({
@@ -20,37 +20,28 @@ export default function Book() {
         'Schedule a walkthrough to see how ClientSurge can improve your lead response and booking flow.',
     });
 
-    let script = document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]');
-    let scriptAdded = false;
+    return cleanupMetadata;
+  }, []);
 
-    if (!script) {
-      script = document.createElement('script');
-      script.src = 'https://assets.calendly.com/assets/external/widget.js';
-      script.async = true;
-      script.onload = () => setScriptLoaded(true);
-      document.body.appendChild(script);
-      scriptAdded = true;
-    } else {
-      setScriptLoaded(true);
+  const handleClose = () => {
+    const cameFromThisSite = document.referrer.startsWith(window.location.origin);
+
+    if (cameFromThisSite && window.history.length > 1) {
+      navigate(-1);
+      return;
     }
 
-    return () => {
-      cleanupMetadata();
-      if (scriptAdded && script?.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
-  }, []);
+    navigate('/', { replace: true });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-background flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-3xl">
-        {/* Header */}
         <div className="text-center mb-12">
           <h1 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-4">
             Book Your Free Demo
           </h1>
-          <p className="text-muted-foreground text-lg">30 minutes. No commitment.</p>
+          <p className="text-muted-foreground text-lg">Free 15 minutes. No commitment. Same guided booking flow as the rest of the site.</p>
           <a
             href="/#automation-demo"
             onClick={() => trackCTA('see_live_demo_3_minutes', 'book_page_header')}
@@ -59,41 +50,6 @@ export default function Book() {
             See a live demo in 3 minutes
             <ArrowRight className="w-4 h-4" />
           </a>
-        </div>
-
-        {/* Calendly Widget */}
-        <div className="bg-white rounded-2xl border border-border shadow-lg overflow-hidden">
-          <div className="calendly-inline-widget" data-url={bookingConfig.embedUrl} style={{minWidth:'320px',height:'700px'}} />
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-border bg-card/60 p-4 text-sm text-muted-foreground">
-          <p className="font-medium text-foreground mb-2">If the scheduler does not load, use one of these options:</p>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <a
-              href={bookingConfig.directUrl}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => trackCTA('open_external_scheduler', 'book_page_fallback')}
-              className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-background px-4 py-2 font-semibold text-primary hover:bg-primary/5 transition-colors"
-            >
-              Open scheduler in a new tab
-            </a>
-            <Link
-              to="/contact"
-              onClick={() => trackCTA('contact_us_instead', 'book_page_fallback')}
-              className="inline-flex items-center justify-center rounded-full border border-border bg-background px-4 py-2 font-semibold text-foreground hover:bg-muted transition-colors"
-            >
-              Contact us instead
-            </Link>
-          </div>
-          {!scriptLoaded && (
-            <p className="mt-3 text-xs text-amber-700">
-              The booking widget is still loading. The fallback links above are available right away.
-            </p>
-          )}
-          <p className="mt-3 text-xs text-muted-foreground">
-            {bookingConfig.fallbackMessage}
-          </p>
         </div>
 
         <div className="mt-10 rounded-2xl border border-border bg-card/80 p-6 md:p-8">
@@ -141,8 +97,26 @@ export default function Book() {
           <p className="mt-6 text-center text-xs text-muted-foreground">
             No spam. No pressure. Just a tailored walkthrough of your current lead and booking process.
           </p>
+
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => trackCTA('book_your_free_demo', 'book_page')}
+              className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              Booking modal is open above
+            </button>
+            <Link
+              to="/contact"
+              onClick={() => trackCTA('contact_us_instead', 'book_page')}
+              className="inline-flex items-center justify-center rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+            >
+              Contact us instead
+            </Link>
+          </div>
         </div>
       </div>
+      <DemoBookingModal onClose={handleClose} />
       <MobileCallBar />
     </div>
   );

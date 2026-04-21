@@ -1,7 +1,7 @@
 export const bookingConfig = {
-  provider: "Calendly",
-  embedUrl: "https://calendly.com/clientsurgesystems/30min",
-  directUrl: "https://calendly.com/clientsurgesystems/30min",
+  provider: "InternalDemoModal",
+  embedUrl: "",
+  directUrl: "/book",
   fallbackMessage:
-    "If the embedded scheduler is blocked or slow, use the direct booking link or contact us and we will schedule you manually.",
+    "Use the in-site demo booking flow or contact us directly if you need help scheduling.",
 };

@@ -1,9 +1,10 @@
+import { useState } from "react";
 import HeroSection from "./HeroSection";
 import { trackCTA } from "@/lib/analytics";
-import { useNavigate } from "react-router-dom";
+import DemoBookingModal from "@/components/forms/DemoBookingModal";
 
 export default function Hero() {
-  const navigate = useNavigate();
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   const handleLearnMore = (e) => {
     e.preventDefault();
@@ -40,7 +41,7 @@ export default function Hero() {
           label: "Book Your Free Demo",
           onClick: () => {
             trackCTA("book_your_free_demo", "hero");
-            navigate("/book");
+            setShowBookingModal(true);
           },
         }}
         secondaryCTA={{
@@ -65,7 +66,7 @@ export default function Hero() {
           ))}
         </div>
       </HeroSection>
-
+      {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
     </>
   );
 }

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, Menu, Moon, Sun, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import LoginModal from "../forms/LoginModal";
+import PortalLoginModal from "../forms/PortalLoginModal";
+import DemoBookingModal from "../forms/DemoBookingModal";
 import { trackCTA } from "@/lib/analytics";
 
 const sectionLinks = [
@@ -24,6 +25,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
   const navigate = useNavigate();
@@ -239,7 +241,7 @@ export default function Navbar() {
           <button
             onClick={() => {
               trackCTA("book_your_free_demo", "navbar");
-              navigate("/book");
+              setShowBookingModal(true);
             }}
             style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.35)", transition: "box-shadow 0.3s ease, transform 0.3s ease", border: "none", cursor: "pointer" }}
             onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)")}
@@ -330,7 +332,7 @@ export default function Navbar() {
             onClick={() => {
               trackCTA("book_your_free_demo", "mobile_nav");
               setOpen(false);
-              navigate("/book");
+              setShowBookingModal(true);
             }}
             style={{ display: "block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.35)", border: "none", cursor: "pointer", width: "100%" }}
           >
@@ -341,7 +343,8 @@ export default function Navbar() {
         </div>
       )}
 
-      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
+      {showLoginModal && <PortalLoginModal onClose={() => setShowLoginModal(false)} />}
+      {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
     </nav>
   );
 }
