@@ -372,8 +372,8 @@ export default function Hero() {
               </h1>
 
               {/* Subheadline */}
-              <p className="text-base md:text-lg text-foreground/70 leading-relaxed mb-8 max-w-lg">
-                We install done-for-you AI systems that capture, respond, and follow up with every lead instantly — for med spas and local service teams.
+              <p className="text-base md:text-lg text-foreground/75 leading-relaxed mb-8 max-w-lg font-medium">
+                We install done-for-you AI systems that capture, respond, and follow up with every lead instantly for med spas.
               </p>
 
               {/* CTAs */}
