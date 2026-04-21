@@ -147,40 +147,16 @@ export default function Industries() {
 
               </div>
 
-              {/* Info strip — dark, below photo */}
-              <div
-                className="relative px-6 py-5 transition-colors duration-300"
-                style={{ background: "#111111", borderTop: "3px solid #c8965c" }}
-              >
-                <h3 className="font-display text-base font-bold text-white mb-1 leading-tight">
+              {/* Info strip */}
+              <div className="relative px-6 py-5 bg-card border-t-2 border-primary/40">
+                <h3 className="font-display text-base font-bold text-foreground mb-1 leading-tight">
                   {industry.name}
                 </h3>
-                <p className="text-xs text-white/45 leading-snug mb-3">{industry.problem}</p>
-
-                {/* Hover-revealed desc + CTA */}
-                <div
-                  className="overflow-hidden transition-all duration-400 ease-out"
-                  style={{ maxHeight: 0, opacity: 0 }}
-                  ref={(el) => {
-                    if (!el) return;
-                    const card = el.closest(".industry-card");
-                    if (!card) return;
-                    card.addEventListener("mouseenter", () => {
-                      el.style.maxHeight = "120px";
-                      el.style.opacity = "1";
-                    });
-                    card.addEventListener("mouseleave", () => {
-                      el.style.maxHeight = "0";
-                      el.style.opacity = "0";
-                    });
-                  }}
-                >
-                  <p className="text-xs text-white/60 leading-relaxed mb-3">{industry.desc}</p>
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider" style={{ color: "#c8965c" }}>
-                    {industry.cta}
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </span>
-                </div>
+                <p className="text-xs text-muted-foreground leading-snug mb-3">{industry.problem}</p>
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                  {industry.cta}
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </span>
               </div>
 
               {/* Bottom border accent line that grows on hover */}
