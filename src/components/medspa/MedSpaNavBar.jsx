@@ -31,15 +31,18 @@ export default function MedSpaNavBar() {
           <span className="sm:hidden">Back</span>
         </button>
 
-        {/* Logo */}
-        <div className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+        {/* Logo — clickable back to home */}
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center gap-2 absolute left-1/2 -translate-x-1/2 hover:opacity-80 transition-opacity cursor-pointer"
+        >
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
             <span className="text-white font-black text-xs">CS</span>
           </div>
           <span className="font-black text-sm text-foreground hidden sm:inline">
             ClientSurge <span className="text-primary">Systems</span>
           </span>
-        </div>
+        </button>
 
         {/* CTA */}
         <button
