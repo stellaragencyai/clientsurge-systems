@@ -198,7 +198,7 @@ export default function Hero() {
         }}
       />
 
-      {/* ── Pulsing warm amber glow halo behind bezel ── */}
+      {/* ── Pulsing warm amber glow halo behind bezel + floating effect ── */}
       <div
         aria-hidden="true"
         style={{
@@ -214,7 +214,7 @@ export default function Hero() {
           boxShadow: "0 0 60px 16px rgba(200,150,92,0.16), 0 0 130px 50px rgba(154,92,46,0.09)",
           transform: "translateY(-48%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)",
           transformOrigin: "center center",
-          animation: "haloglow 4s ease-in-out infinite",
+          animation: "haloglow 4s ease-in-out infinite, floatTablet 6s ease-in-out infinite",
           zIndex: 1,
           pointerEvents: "none",
         }}
@@ -322,7 +322,7 @@ export default function Hero() {
           zIndex: 2,
         }}
       >
-        {/* Idea 3: Glass-shine highlight streak across top of bezel */}
+        {/* Idea 3: Glass-shine highlight streak across top of bezel with shimmer */}
         <div style={{
           position: "absolute",
           top: "6px",
@@ -333,6 +333,7 @@ export default function Hero() {
           background: "linear-gradient(to right, transparent, rgba(255,255,255,0.28) 30%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.28) 70%, transparent)",
           pointerEvents: "none",
           zIndex: 15,
+          animation: "glassShine 3s ease-in-out infinite",
         }} />
 
         {/* Idea 6: Frosted edge — left side of bezel fades into bg via mask */}
@@ -432,24 +433,7 @@ export default function Hero() {
       >
         <div style={{ maxWidth: "540px" }}>
 
-          {/* Badge */}
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              borderRadius: "9999px",
-              padding: "6px 16px",
-              marginBottom: "28px",
-              background: "rgba(154,92,46,0.08)",
-              border: "1px solid rgba(154,92,46,0.2)",
-            }}
-          >
-            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#9a5c2e", display: "inline-block" }} />
-            <span style={{ fontSize: "11px", fontWeight: "700", color: "#9a5c2e", letterSpacing: "0.16em", textTransform: "uppercase" }}>
-              Done-For-You AI Automation
-            </span>
-          </div>
+
 
           {/* Headline */}
           <h1
@@ -464,14 +448,7 @@ export default function Hero() {
             }}
           >
             Turn Every Lead Into a{" "}
-            <span
-              style={{
-                background: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 50%, #9a5c2e 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
+            <span style={{ color: "#1a1209" }}>
               Booked Appointment
             </span>
             {" "}— Automatically
@@ -582,6 +559,8 @@ export default function Hero() {
       <style>{`
         @keyframes hpulse    { 0%,100%{opacity:1} 50%{opacity:0.3} }
         @keyframes haloglow  { 0%,100%{opacity:0.7} 50%{opacity:1} }
+        @keyframes floatTablet { 0%,100%{transform: translateY(-48%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)} 50%{transform: translateY(-52%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)} }
+        @keyframes glassShine { 0%,100%{opacity:0.4} 50%{opacity:0.8} }
 
         @media (max-width: 1024px) {
           /* On tablet/mobile, hide the background tablet and go stacked */

@@ -95,8 +95,8 @@ function FeatureCard({ item, onSelect }) {
         className="flex flex-col rounded-2xl overflow-hidden transition-all duration-300"
         style={{
           border: hovered ? "1px solid rgba(154,92,46,0.55)" : "1px solid rgba(154,92,46,0.2)",
-          boxShadow: hovered ? "0 12px 36px rgba(154,92,46,0.2), 0 2px 8px rgba(0,0,0,0.08)" : "0 2px 8px rgba(0,0,0,0.06)",
-          transform: hovered ? "translateY(-2px)" : "translateY(0)",
+          boxShadow: hovered ? "0 12px 36px rgba(154,92,46,0.2), 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 3px rgba(255,255,255,0.4)" : "0 2px 8px rgba(0,0,0,0.06)",
+          transform: hovered ? "translateY(-2px) scale(1.01)" : "translateY(0)",
           transition: "all 0.25s ease",
         }}
       >
@@ -307,9 +307,7 @@ export default function CoreOffer() {
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Package</p>
           <h2 className="font-titles text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-foreground">
-            How the{" "}
-            <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.35)" }}>8-System</span>
-            {" "}Flow Works
+           <span style={{ color: "#1a1209" }}>How the 8-System Flow Works</span>
           </h2>
           {/* Gold accent divider */}
           <div className="flex items-center justify-center gap-3 mt-5 mb-5">
