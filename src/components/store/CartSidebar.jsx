@@ -138,12 +138,13 @@ export default function CartSidebar() {
            const hasBundle = items.length >= 3;
            let setupPercent = 0, monthlyPercent = 0;
            
+           // Balanced tier: Aggressive acquisition + healthy margins
            if (items.length >= 5) {
-             setupPercent = 100; monthlyPercent = 50;
+             setupPercent = 50; monthlyPercent = 40;  // Peak value, sustainable
            } else if (items.length === 4) {
-             setupPercent = 50; monthlyPercent = 30;
+             setupPercent = 40; monthlyPercent = 28;  // Smoother progression
            } else if (items.length >= 3) {
-             setupPercent = 25; monthlyPercent = 20;
+             setupPercent = 25; monthlyPercent = 20;  // Entry incentive
            }
            
            const bundleDiscountSetup = hasBundle ? Math.round(totalSetup * (setupPercent / 100)) : 0;
