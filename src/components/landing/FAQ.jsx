@@ -1,3 +1,4 @@
+import { useState } from "react";
 import StardustOverlay from "./StardustOverlay";
 import {
   Accordion,
@@ -9,59 +10,100 @@ import {
 export const FAQ_ITEMS = [
 {
   q: "Who is this built for?",
-  a: "Service businesses that already generate leads but are not converting them efficiently - med spas, aesthetic clinics, real estate agencies, home service companies, and similar appointment-based businesses."
+  a: "Service businesses that already generate leads but are not converting them efficiently - med spas, aesthetic clinics, real estate agencies, home service companies, and similar appointment-based businesses.",
+  category: "setup"
 },
 {
   q: "Do I need existing software or systems?",
-  a: "No. We work with what you have or build from the ground up. Either way, we handle the entire setup."
+  a: "No. We work with what you have or build from the ground up. Either way, we handle the entire setup.",
+  category: "setup"
 },
 {
   q: "Will this replace my staff?",
-  a: "No. It handles the repetitive work - instant responses, follow-up sequences, reminders - so your team can focus on the clients in front of them."
+  a: "No. It handles the repetitive work - instant responses, follow-up sequences, reminders - so your team can focus on the clients in front of them.",
+  category: "setup"
 },
 {
   q: "How fast can I get set up?",
-  a: "Most clients are fully live within 5-7 business days. We do the work. You just need to show up for one onboarding call."
+  a: "Most clients are fully live within 5-7 business days. We do the work. You just need to show up for one onboarding call.",
+  category: "setup"
 },
 {
   q: "What results should I expect?",
-  a: "Faster lead response, more booked appointments, and recovered revenue from leads that would otherwise go cold. Many clients see clear results in the first 30 days."
+  a: "Faster lead response, more booked appointments, and recovered revenue from leads that would otherwise go cold. Many clients see clear results in the first 30 days.",
+  category: "pricing"
 },
 {
   q: "Is there a long-term contract?",
-  a: "No. Month-to-month only. We keep your business because the system works - not because you are locked in."
+  a: "No. Month-to-month only. We keep your business because the system works - not because you are locked in.",
+  category: "pricing"
 },
 {
   q: "How much does it cost?",
-  a: "Plans start at $397/month with a one-time setup fee. We have three tiers - Starter, Growth, and Pro - depending on your lead volume and goals. See our Pricing section for full details, and we will confirm the best fit on your demo call."
+  a: "Plans start at $397/month with a one-time setup fee. We have three tiers - Starter, Growth, and Pro - depending on your lead volume and goals. See our Pricing section for full details, and we will confirm the best fit on your demo call.",
+  category: "pricing"
 },
 {
   q: "What happens on the demo call?",
-  a: "We spend 30 minutes understanding your business, your lead volume, and where you are losing bookings. Then we show you exactly what we would build and what you can expect."
+  a: "We spend 30 minutes understanding your business, your lead volume, and where you are losing bookings. Then we show you exactly what we would build and what you can expect.",
+  category: "integration"
 },
 {
   q: "Will this actually work for my specific business?",
-  a: "If you generate leads but lose conversions due to slow follow-up, the answer is almost always yes. We have worked across many appointment-based industries. On your demo call, we will identify the exact gaps and show you the specific solution. If we do not think we can help, we will tell you upfront."
+  a: "If you generate leads but lose conversions due to slow follow-up, the answer is almost always yes. We have worked across many appointment-based industries. On your demo call, we will identify the exact gaps and show you the specific solution. If we do not think we can help, we will tell you upfront.",
+  category: "integration"
 },
 {
   q: "How much time will I need to spend managing this?",
-  a: "Almost none. The system runs on autopilot. You check in weekly to review results, and we handle all updates and optimization. No learning curve and no training required for your team."
+  a: "Almost none. The system runs on autopilot. You check in weekly to review results, and we handle all updates and optimization. No learning curve and no training required for your team.",
+  category: "support"
 },
 {
   q: "What if the system does not increase my bookings?",
-  a: "We set clear success goals during onboarding and review performance with you after launch. If we do not think we can create a meaningful improvement for your business, we will tell you before you move forward."
+  a: "We set clear success goals during onboarding and review performance with you after launch. If we do not think we can create a meaningful improvement for your business, we will tell you before you move forward.",
+  category: "support"
 },
 {
   q: "Can you integrate this with my current booking system?",
-  a: "Usually, yes. We review your current booking and follow-up tools during the demo, confirm what can be connected cleanly, and recommend the simplest setup path for your business."
+  a: "Usually, yes. We review your current booking and follow-up tools during the demo, confirm what can be connected cleanly, and recommend the simplest setup path for your business.",
+  category: "integration"
 },
 {
   q: "How do I know if this is the right investment for my business?",
-  a: "That is what the demo is for. We will show you the specific system we would build, what it costs, and the projected ROI based on your current lead volume and conversion rate. You will have concrete numbers before deciding."
+  a: "That is what the demo is for. We will show you the specific system we would build, what it costs, and the projected ROI based on your current lead volume and conversion rate. You will have concrete numbers before deciding.",
+  category: "support"
 }];
 
 
 export default function FAQ() {
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [expandedIndex, setExpandedIndex] = useState(0);
+  const [helpfulVotes, setHelpfulVotes] = useState({});
+
+  const categories = ["all", "setup", "pricing", "integration", "support"];
+
+  const filtered = FAQ_ITEMS.filter((item, idx) => {
+    const matchesSearch = item.q.toLowerCase().includes(search.toLowerCase()) || 
+                         item.a.toLowerCase().includes(search.toLowerCase());
+    const matchesCategory = category === "all" || item.category === category;
+    return matchesSearch && matchesCategory;
+  });
+
+  const handleVote = (idx, helpful) => {
+    setHelpfulVotes(prev => ({
+      ...prev,
+      [idx]: helpful ? "yes" : "no"
+    }));
+    setTimeout(() => {
+      setHelpfulVotes(prev => {
+        const newVotes = { ...prev };
+        delete newVotes[idx];
+        return newVotes;
+      });
+    }, 2000);
+  };
+
   return (
     <section id="faq" className="nebula-faq px-6 py-24 md:py-32 relative overflow-hidden">
       <StardustOverlay seed={7} opacity={0.5} />
@@ -77,30 +119,92 @@ export default function FAQ() {
           <div className="mt-8 border-t border-border/40" />
         </div>
 
-        <Accordion type="single" collapsible className="space-y-3">
-          {FAQ_ITEMS.map((faq, i) =>
-          <AccordionItem
-            key={i}
-            value={`faq-${i}`}
-            className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary transition-all duration-300"
-            style={{
-              background: "linear-gradient(135deg, rgba(255,252,247,0.7) 0%, rgba(252,240,220,0.5) 100%)",
-              backdropFilter: "blur(14px)",
-              WebkitBackdropFilter: "blur(14px)",
-              border: "1.5px solid rgba(200,150,92,0.2)",
-              boxShadow: "0 2px 14px rgba(154,92,46,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
-            }}
-          >
-              <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
-                {faq.q}
-              </AccordionTrigger>
-              <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5">
-                {faq.a}
-              </AccordionContent>
-            </AccordionItem>
-          )}
-        </Accordion>
+        {/* Search bar */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search FAQs..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full px-4 py-2.5 rounded-lg border border-border bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+          />
+        </div>
+
+        {/* Category filters */}
+        <div className="mb-6 flex flex-wrap gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-all ${
+                category === cat
+                  ? "bg-primary text-white"
+                  : "bg-primary/10 text-primary hover:bg-primary/20"
+              }`}
+            >
+              {cat === "all" ? "All" : cat}
+            </button>
+          ))}
+        </div>
+
+        {filtered.length > 0 ? (
+          <Accordion type="single" collapsible value={`faq-${expandedIndex}`} onValueChange={(val) => setExpandedIndex(parseInt(val.split("-")[1]))} className="space-y-3">
+            {filtered.map((faq, idx) => {
+              const originalIdx = FAQ_ITEMS.indexOf(faq);
+              return (
+              <AccordionItem
+                key={idx}
+                value={`faq-${idx}`}
+                className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary transition-all duration-300"
+                style={{
+                  background: "linear-gradient(135deg, rgba(255,252,247,0.7) 0%, rgba(252,240,220,0.5) 100%)",
+                  backdropFilter: "blur(14px)",
+                  WebkitBackdropFilter: "blur(14px)",
+                  border: "1.5px solid rgba(200,150,92,0.2)",
+                  boxShadow: "0 2px 14px rgba(154,92,46,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
+                }}
+              >
+                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
+                    {faq.q}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5">
+                    <div>
+                      <p>{faq.a}</p>
+                      <div className="mt-4 flex items-center gap-3 text-xs font-semibold text-muted-foreground border-t border-border pt-3">
+                        <span>Was this helpful?</span>
+                        <button
+                          onClick={() => handleVote(originalIdx, true)}
+                          className={`px-3 py-1 rounded-full transition-all ${
+                            helpfulVotes[originalIdx] === "yes"
+                              ? "bg-green-100 text-green-700"
+                              : "hover:bg-primary/10"
+                          }`}
+                        >
+                          👍 Yes
+                        </button>
+                        <button
+                          onClick={() => handleVote(originalIdx, false)}
+                          className={`px-3 py-1 rounded-full transition-all ${
+                            helpfulVotes[originalIdx] === "no"
+                              ? "bg-red-100 text-red-700"
+                              : "hover:bg-primary/10"
+                          }`}
+                        >
+                          👎 No
+                        </button>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              );
+            })}
+          </Accordion>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            <p className="font-semibold mb-2">No results found</p>
+            <p className="text-sm">Try adjusting your search or filter</p>
+          </div>
+        )}
       </div>
     </section>);
-
 }
