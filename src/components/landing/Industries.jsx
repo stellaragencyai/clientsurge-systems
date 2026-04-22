@@ -50,7 +50,7 @@ const industries = [
     desc: "Fast callback, estimate follow-up, and missed-call recovery for urgent jobs.",
     result: "Launching next",
     href: "/industries#roofing",
-    image: "https://images.unsplash.com/photo-1618832817092-3338b483a528?w=900&q=85",
+    image: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/3fcc65c06_Screenshot2026-04-21185605.png",
     cta: "See industry roadmap",
   },
   {
