@@ -42,11 +42,14 @@ function useScrollGradient() {
 }
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
+import LiveLeadPulse from "../components/landing/LiveLeadPulse";
 import TrustBar from "../components/landing/TrustBar";
 import Industries from "../components/landing/Industries";
 import ProblemSolution from "../components/landing/ProblemSolution.jsx";
+import MissedLeadRecovery from "../components/landing/MissedLeadRecovery";
 import Testimonials from "../components/landing/Testimonials";
 import CoreOffer from "../components/landing/CoreOffer";
+import PerformancePod from "../components/landing/PerformancePod";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
 import FinalCTA from "../components/landing/FinalCTA";
@@ -98,9 +101,11 @@ export default function Home() {
       <div className="min-h-screen pb-16">
         <Navbar />
         <Hero />
+        <LiveLeadPulse />
         <Industries />
         <section aria-label="Proof and trust">
           <TrustBar />
+          <MissedLeadRecovery />
           <Testimonials />
         </section>
         <ProblemSolution />
@@ -108,6 +113,7 @@ export default function Home() {
         <Pricing />
         <FAQ />
         <FinalCTA />
+        <PerformancePod />
         <Footer />
       </div>
     </DemoBookingProvider>

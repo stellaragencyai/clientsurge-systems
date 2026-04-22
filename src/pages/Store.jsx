@@ -4,6 +4,7 @@ import { CartProvider, useCart } from "@/lib/cartContext";
 import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
 import CartSidebar from "@/components/store/CartSidebar";
+import InteractiveStackBuilder from "@/components/store/InteractiveStackBuilder";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
@@ -126,6 +127,8 @@ function StoreInner() {
             <p style={{ fontSize: "16px", fontWeight: "600" }}>No services match your search</p>
           </div>
         )}
+
+        <InteractiveStackBuilder />
       </div>
 
       <CartSidebar />

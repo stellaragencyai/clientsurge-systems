@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Building2, Heart, Home, MapPin, Sparkles, Wrench } from "lucide-react";
 import { Link } from "react-router-dom";
+import IndustryBlueprintModal from "./IndustryBlueprintModal";
 
 const industries = [
   {
@@ -68,6 +69,7 @@ const industries = [
 export default function Industries() {
   const sectionRef = useRef(null);
   const [sectionVisible, setSectionVisible] = useState(false);
+  const [selectedBlueprint, setSelectedBlueprint] = useState(null);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
@@ -111,11 +113,12 @@ export default function Industries() {
       <div className="max-w-[1800px] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3">
         {industries.map((industry, index) => {
           const Icon = industry.icon;
+          const isBlueprinted = ["med-spa", "hvac", "dental"].includes(industry.href.split("#")[1] || industry.href);
           return (
-            <Link
-              to={industry.href}
+            <div
               key={industry.name}
-              className="industry-card group relative block overflow-hidden"
+              className="industry-card group relative block overflow-hidden cursor-pointer"
+              onClick={() => isBlueprinted && setSelectedBlueprint(isBlueprinted)}
               style={{
                 opacity: sectionVisible ? 1 : 0,
                 transform: sectionVisible ? "translateY(0)" : "translateY(32px)",
@@ -164,10 +167,17 @@ export default function Industries() {
                 className="h-[2px] w-0 transition-all duration-500 ease-out group-hover:w-full"
                 style={{ background: "linear-gradient(to right, #c8965c, #f5d9a8, #c8965c)" }}
               />
-            </Link>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
+              </div>
+              );
+              })}
+              </div>
+
+              {selectedBlueprint && (
+              <IndustryBlueprintModal
+              industry={selectedBlueprint}
+              onClose={() => setSelectedBlueprint(null)}
+              />
+              )}
+              </section>
+              );
+              }
