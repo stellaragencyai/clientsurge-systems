@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
 import DemoBookingModal from "../forms/DemoBookingModal";
 import { trackCTA } from "@/lib/analytics";
+import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 
 const sectionLinks = [
   { label: "How It Works", href: "#problem-solution" },
@@ -82,6 +83,9 @@ export default function Navbar() {
   const [industriesOpen, setIndustriesOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Track page views
+  usePageViewTracking();
 
   const toggleDark = () => {
     const isDark = !darkMode;

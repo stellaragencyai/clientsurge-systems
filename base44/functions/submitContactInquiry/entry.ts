@@ -323,6 +323,18 @@ Deno.serve(async (req) => {
       },
     });
 
+    // Track contact form completion
+    try {
+      await base44.asServiceRole.functions.invoke('trackContactFormCompletion', {
+        lead_id: leadId,
+        contact_info: {
+          business_type: contact.business_type,
+        },
+      });
+    } catch {
+      // Silently fail tracking if it errors - don't block form submission
+    }
+
     return Response.json({
       success: true,
       lead_id: leadId,
