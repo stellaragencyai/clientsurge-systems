@@ -101,9 +101,9 @@ function FeatureCard({ item, onSelect }) {
         }}
       >
         {/* TOP */}
-        <div className="px-6 pt-5 pb-4" style={{ background: "rgba(154,92,46,0.05)" }}>
+        <div className="px-6 pt-7 pb-5" style={{ background: "rgba(154,92,46,0.05)" }}>
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "rgba(154,92,46,0.6)" }}>
+            <span className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: "rgba(80,40,10,0.9)" }}>
               Step {stepNum < 10 ? `0${stepNum}` : stepNum}
             </span>
             <div className="flex items-center gap-2">
@@ -138,7 +138,7 @@ function FeatureCard({ item, onSelect }) {
 
         {/* BOTTOM - dark gradient */}
         <div
-          className="px-6 py-5 flex flex-col gap-2"
+          className="px-6 py-8 flex flex-col gap-2"
           style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}
         >
           <h3 className="text-sm font-semibold leading-snug" style={{ color: "#f5e6d0" }}>{item.title}</h3>
@@ -337,51 +337,94 @@ export default function CoreOffer() {
           </div>
         </div>
 
-        {/* 8-Step Clickable Cards */}
+        {/* 8-Step Clickable Cards — with left rail timeline */}
         <div className="mb-10">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-5 text-center">Core Automation — Steps 1–5</p>
-          <div className="flex flex-col">
-            {coreAutomation.map((item, idx) => (
-              <div key={item.step}>
-                <FeatureCard item={item} onSelect={setSelectedStep} />
-                {/* Arrow between cards */}
-                <div className="flex flex-col items-center py-1" aria-hidden="true">
-                  <div style={{ width: "2px", height: "10px", background: "rgba(0,0,0,0.18)" }} />
-                  <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
-                    <path d="M11 16 L0 0 L22 0 Z" fill="rgba(0,0,0,0.82)" />
-                  </svg>
+
+          {/* Left-rail wrapper */}
+          <div className="relative pl-10">
+            {/* Vertical track line */}
+            <div
+              className="absolute left-[18px] top-0 bottom-0 w-[3px] rounded-full"
+              style={{ background: "linear-gradient(to bottom, #1a1a1a 0%, rgba(0,0,0,0.15) 100%)" }}
+              aria-hidden="true"
+            />
+
+            <div className="flex flex-col">
+              {coreAutomation.map((item, idx) => (
+                <div key={item.step} className="relative">
+                  {/* Step node on the rail */}
+                  <div
+                    className="absolute -left-10 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center z-10 text-[10px] font-black"
+                    style={{
+                      background: "#111",
+                      color: "#f5e6d0",
+                      border: "2px solid rgba(154,92,46,0.5)",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
+                    }}
+                    aria-hidden="true"
+                  >
+                    {item.step}
+                  </div>
+                  <FeatureCard item={item} onSelect={setSelectedStep} />
+                  {/* Arrow between cards */}
+                  <div className="flex flex-col items-center py-1" aria-hidden="true">
+                    <div style={{ width: "4px", height: "25px", background: "rgba(0,0,0,0.75)", borderRadius: "2px" }} />
+                    <svg width="36" height="28" viewBox="0 0 36 28" fill="none">
+                      <path d="M18 28 L0 0 L36 0 Z" fill="rgba(0,0,0,0.88)" />
+                    </svg>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Transition label between groups */}
-          <div className="flex items-center gap-3 my-4">
+          <div className="flex items-center gap-3 my-6">
             <div className="flex-1 h-px bg-border" />
             <p className="text-xs font-semibold text-primary tracking-widest uppercase whitespace-nowrap">Done-For-You — Steps 6–8</p>
             <div className="flex-1 h-px bg-border" />
           </div>
 
-          <div className="flex flex-col">
-            {doneForYou.map((item, idx) => (
-              <div key={item.step}>
-                <FeatureCard item={item} onSelect={setSelectedStep} />
-                {/* Arrow between cards — not after the last one */}
-                {idx < doneForYou.length - 1 && (
-                  <div className="flex flex-col items-center py-1" aria-hidden="true">
-                    <div style={{ width: "2px", height: "10px", background: "rgba(0,0,0,0.18)" }} />
-                    <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
-                      <path d="M11 16 L0 0 L22 0 Z" fill="rgba(0,0,0,0.82)" />
-                    </svg>
+          {/* Left-rail wrapper for done-for-you */}
+          <div className="relative pl-10">
+            <div
+              className="absolute left-[18px] top-0 bottom-0 w-[3px] rounded-full"
+              style={{ background: "linear-gradient(to bottom, #1a1a1a 0%, rgba(0,0,0,0.15) 100%)" }}
+              aria-hidden="true"
+            />
+            <div className="flex flex-col">
+              {doneForYou.map((item, idx) => (
+                <div key={item.step} className="relative">
+                  <div
+                    className="absolute -left-10 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center z-10 text-[10px] font-black"
+                    style={{
+                      background: "#111",
+                      color: "#f5e6d0",
+                      border: "2px solid rgba(154,92,46,0.5)",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.35)",
+                    }}
+                    aria-hidden="true"
+                  >
+                    {item.step}
                   </div>
-                )}
-              </div>
-            ))}
+                  <FeatureCard item={item} onSelect={setSelectedStep} />
+                  {idx < doneForYou.length - 1 && (
+                    <div className="flex flex-col items-center py-1" aria-hidden="true">
+                      <div style={{ width: "4px", height: "25px", background: "rgba(0,0,0,0.75)", borderRadius: "2px" }} />
+                      <svg width="36" height="28" viewBox="0 0 36 28" fill="none">
+                        <path d="M18 28 L0 0 L36 0 Z" fill="rgba(0,0,0,0.88)" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* ── Section divider after Step 08 ── */}
-        <div className="mt-16 mb-16 flex flex-col items-center gap-4">
+        <div className="mt-20 mb-20 flex flex-col items-center gap-4">
           <div className="flex items-center gap-3 w-full">
             <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(154,92,46,0.4))" }} />
             <div
@@ -397,7 +440,9 @@ export default function CoreOffer() {
           </p>
         </div>
 
-        <AutomationPipelineSection />
+        <div className="pt-8">
+          <AutomationPipelineSection />
+        </div>
 
         {/* 3-step timeline */}
         <div className="mb-8 mt-12 rounded-2xl border border-primary/15 overflow-hidden">
