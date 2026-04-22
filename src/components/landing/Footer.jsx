@@ -64,7 +64,7 @@ export default function Footer() {
   return (
     <footer className="bg-background border-t border-primary/20">
       <div className="max-w-7xl mx-auto px-6 pt-14 pb-10">
-        <div className="text-center mb-10">
+        <div className="text-center mb-8 pb-8 border-b border-border/40">
           <div className="flex items-center justify-center gap-2 mb-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
               <span className="text-white font-black text-sm">CS</span>
@@ -76,7 +76,7 @@ export default function Footer() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 md:gap-16 mb-10 text-center">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-10 md:gap-16 mb-10 text-left">
           {navColumns.map((col) => (
             <div key={col.title}>
               <p className="text-xs font-bold uppercase tracking-widest mb-5 text-primary">{col.title}</p>
@@ -123,7 +123,7 @@ export default function Footer() {
           </a>
         </div>
 
-        <div className="border-t border-white/10 mb-7" />
+        <div className="border-t border-border mb-7" />
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col sm:flex-row items-center gap-4 text-xs text-foreground/50">
@@ -170,4 +170,3 @@ export default function Footer() {
     </footer>
   );
 }
-

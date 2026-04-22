@@ -201,7 +201,7 @@ export default function Navbar() {
               key={link.href}
               href={`/${link.href}`}
               onClick={(e) => handleSectionNavigation(e, link.href)}
-              className="text-base font-medium text-foreground hover:text-primary transition-colors"
+              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
             >
               {link.label}
             </a>
@@ -214,7 +214,7 @@ export default function Navbar() {
           >
             <button
               onClick={() => setIndustriesOpen((prev) => !prev)}
-              className="inline-flex items-center gap-1 text-base font-medium text-foreground hover:text-primary transition-colors"
+              className="inline-flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary transition-colors"
             >
               Industries
               <ChevronDown className={`w-4 h-4 transition-transform ${industriesOpen ? "rotate-180" : ""}`} />
@@ -250,17 +250,16 @@ export default function Navbar() {
             title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
             aria-label={darkMode ? "Switch to light theme" : "Switch to dark theme"}
             aria-pressed={darkMode}
-            className="h-9 rounded-full inline-flex items-center justify-center gap-2 border border-border bg-background/50 hover:bg-muted px-3 transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-9 h-9 rounded-full inline-flex items-center justify-center border border-border bg-background/50 hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
           >
             {darkMode ? <Sun className="w-4 h-4 text-primary" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
-            <span className="text-xs font-semibold text-foreground">Theme</span>
           </button>
           <button
             onClick={() => {
               trackCTA("login", "navbar");
               setShowLoginModal(true);
             }}
-            className="text-sm font-semibold text-foreground hover:text-primary focus:ring-2 focus:ring-primary focus:outline-none rounded px-3 py-2 transition-colors"
+            className="text-sm font-semibold text-foreground hover:text-primary border border-border hover:border-primary/40 bg-background/50 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-4 py-1.5 transition-colors"
           >
             Login
           </button>

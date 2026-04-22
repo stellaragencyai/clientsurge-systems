@@ -14,7 +14,7 @@ export default function FinalCTA() {
 
         {/* Glass panel */}
         <div
-          className="relative z-10 max-w-3xl mx-auto rounded-3xl px-8 py-14 text-center"
+          className="relative z-10 max-w-3xl mx-auto rounded-3xl px-10 py-12 text-center"
           style={{
             background: "linear-gradient(135deg, rgba(255,252,247,0.68) 0%, rgba(252,240,220,0.52) 100%)",
             backdropFilter: "blur(22px)",
@@ -81,7 +81,7 @@ export default function FinalCTA() {
             <a
               href="#services"
               onClick={() => trackCTA("review_8_system_flow", "final_cta")}
-              className="inline-flex items-center justify-center h-14 px-6 rounded-full border border-primary/25 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
+              className="inline-flex items-center justify-center h-14 px-6 rounded-full border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200"
             >
               Review the 8-step system
             </a>

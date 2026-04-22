@@ -66,7 +66,7 @@ export default function ProblemSolution() {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
-            The Problem & Solution
+            Where Leads Are Lost
           </p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
             Every Problem Has a System Behind It
@@ -81,15 +81,15 @@ export default function ProblemSolution() {
             <CardWithFadeIn key={i} delay={i * 80}>
               <div className="grid md:grid-cols-2 gap-0 rounded-2xl overflow-hidden border border-border shadow-sm">
                 {/* Problem side */}
-                <div className="flex items-start gap-4 px-6 py-5 bg-destructive/5 border-b md:border-b-0 md:border-r border-border">
-                  <div className="w-9 h-9 rounded-xl bg-destructive/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="flex items-center gap-4 px-6 py-5 bg-destructive/5 border-b md:border-b-0 md:border-r border-border">
+                  <div className="w-9 h-9 rounded-xl bg-destructive/15 flex items-center justify-center flex-shrink-0">
                     <X className="w-4 h-4 text-destructive" />
                   </div>
                   <p className="text-sm font-semibold text-foreground leading-snug">{item.problem}</p>
                 </div>
                 {/* Solution side */}
-                <div className="flex items-start gap-4 px-6 py-5 bg-primary/5">
-                  <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="flex items-center gap-4 px-6 py-5 bg-primary/5">
+                  <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
                     <CheckCircle2 className="w-4 h-4 text-primary" />
                   </div>
                   <p className="text-sm font-semibold text-foreground leading-snug">{item.solution}</p>

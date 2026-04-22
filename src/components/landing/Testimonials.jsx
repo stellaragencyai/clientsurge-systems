@@ -92,7 +92,7 @@ export default function Testimonials() {
                 </span>
               </div>
 
-              <p className="text-sm text-foreground/75 leading-relaxed flex-1 mb-6">
+              <p className="text-sm text-foreground/75 leading-relaxed flex-1 min-h-[72px] mb-6">
                 "{testimonial.quote}"
               </p>
 
@@ -101,11 +101,11 @@ export default function Testimonials() {
                   src={testimonial.avatar}
                   alt={`${testimonial.name}, ${testimonial.businessType} client testimonial`}
                   loading="lazy"
-                  className="w-14 h-14 rounded-full object-cover ring-2 ring-white shadow-md"
+                  className="w-14 h-14 rounded-full object-cover ring-2 ring-primary/20 shadow-md"
                 />
                 <div>
                   <p className="text-sm font-bold text-foreground">{testimonial.name}</p>
-                  <p className="text-xs text-muted-foreground">{testimonial.businessType} client</p>
+                  <p className="text-xs text-muted-foreground">{testimonial.location}</p>
                 </div>
               </div>
             </article>

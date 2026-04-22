@@ -58,15 +58,15 @@ export default function TrustBar() {
   }, []);
 
   return (
-    <section ref={ref} className="py-12 bg-gradient-to-b from-card to-background border-y border-border/50">
+    <section ref={ref} className="py-16 bg-gradient-to-b from-card to-background border-y border-border/50">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           {items.map((item, index) => {
             const Icon = item.icon;
             return (
               <article
                 key={item.label}
-                className="rounded-2xl border border-border bg-card/80 px-5 py-5 text-left shadow-sm"
+                className="rounded-2xl border border-border bg-card/80 px-5 py-5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
                 style={{
                   opacity: inView ? 1 : 0,
                   transform: inView ? "translateY(0)" : "translateY(16px)",
@@ -78,7 +78,7 @@ export default function TrustBar() {
                 </div>
                 <p className="font-display text-xl font-semibold text-foreground leading-tight">{item.stat}</p>
                 <p className="text-[11px] uppercase tracking-wide text-primary/80 mt-1 mb-3">{item.label}</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.story}</p>
+                <p className="text-sm text-foreground/65 leading-relaxed">{item.story}</p>
               </article>
             );
           })}

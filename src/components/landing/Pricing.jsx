@@ -115,15 +115,15 @@ export default function Pricing() {
           </div>
         </div>
 
-        <div className="mt-14 text-center max-w-xl mx-auto">
-          <p className="text-foreground font-semibold text-base mb-4">
+        <div className="mt-14 text-center max-w-xl mx-auto border-t border-border pt-10">
+          <p className="text-foreground font-semibold text-base mb-5">
             Not sure which system fits your business? We will recommend the best option based on your lead flow.
           </p>
           {demoBooking ? (
             <button
               type="button"
               onClick={demoBooking.openDemoBooking}
-              className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full border-2 border-primary/40 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/60 transition-all duration-200"
             >
               Book Your Free Demo
               <ArrowRight className="w-4 h-4" />
@@ -131,7 +131,7 @@ export default function Pricing() {
           ) : (
             <a
               href="/book"
-              className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full border-2 border-primary/40 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/60 transition-all duration-200"
             >
               Book Your Free Demo
               <ArrowRight className="w-4 h-4" />
@@ -247,12 +247,11 @@ function PricingCard({ plan, demoBooking }) {
         </div>
       )}
 
-      <div className="flex flex-col flex-1 p-10 relative z-10">
+      <div className="flex flex-col flex-1 p-6 md:p-8 lg:p-10 relative z-10">
         <div className="mb-7">
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">{plan.name}</h3>
           {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Best choice for most businesses.</p>}
-          <p className="text-xs font-semibold text-foreground/70 mb-2">{plan.fit}</p>
-          <p className="text-xs text-muted-foreground leading-snug">{plan.subtitle}</p>
+          <p className="text-xs font-semibold text-foreground/70 leading-snug">{plan.fit}</p>
         </div>
 
         <div className="mb-7 pb-7 border-b border-border">
@@ -271,7 +270,7 @@ function PricingCard({ plan, demoBooking }) {
         <ul className="space-y-3.5 flex-1 mb-9">
           {plan.features.map((feature, index) => (
             <li key={index} className="flex items-start gap-3">
-              <CheckCircle2 className={`w-4 h-4 flex-shrink-0 mt-0.5 ${plan.highlight ? "text-primary" : "text-foreground/35"}`} />
+              <CheckCircle2 className={`w-4 h-4 flex-shrink-0 mt-0.5 ${plan.highlight ? "text-primary" : "text-foreground/60"}`} />
               <span className="text-sm text-foreground/75">{feature}</span>
             </li>
           ))}

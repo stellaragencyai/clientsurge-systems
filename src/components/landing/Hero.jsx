@@ -121,7 +121,7 @@ function SMSMockup() {
   }, []);
 
   return (
-    <div className="relative w-full max-w-sm mx-auto lg:mx-0 lg:ml-auto" aria-hidden="true">
+    <div className="relative w-full max-w-sm mx-auto lg:mx-0 lg:ml-auto" aria-hidden="true" style={{ isolation: "isolate" }}>
       {/* Phone frame — fixed height so it never resizes during animation */}
       <div
         className="relative rounded-3xl overflow-hidden shadow-2xl"
@@ -293,7 +293,6 @@ function SMSMockup() {
 
 export default function Hero() {
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
 
   const handleLearnMore = (e) => {
     e.preventDefault();
@@ -321,7 +320,7 @@ export default function Hero() {
         className="relative overflow-hidden"
         style={{
           background: "linear-gradient(135deg, hsl(38,18%,94%) 0%, hsl(40,10%,97%) 50%, hsl(0,0%,100%) 100%)",
-          minHeight: "100vh",
+          minHeight: "90vh",
           display: "flex",
           alignItems: "center",
         }}
@@ -340,7 +339,7 @@ export default function Hero() {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white/60 to-transparent" />
 
         {/* Main content */}
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-28 md:py-36">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-20 md:py-28">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
             {/* LEFT: Copy */}
@@ -349,12 +348,12 @@ export default function Hero() {
               <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/25 backdrop-blur-sm rounded-full px-4 py-1.5 mb-7">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary" />
                 <span className="text-xs font-semibold text-primary tracking-wide uppercase">
-                  Built for Med Spas &amp; Service Businesses
+                  Built for Med Spas & Service Businesses
                 </span>
               </div>
 
               {/* Headline */}
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.25rem] xl:text-6xl font-bold tracking-tight leading-[1.08] mb-5 text-foreground">
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.25rem] xl:text-6xl font-bold tracking-tight leading-[1.1] mb-5 text-foreground">
                 Turn Missed Leads Into{" "}
                 <span
                   className="inline-block"
@@ -366,9 +365,8 @@ export default function Hero() {
                   }}
                 >
                   Booked Clients
-                </span>{" "}
-                Automatically
-                <span className="block text-foreground mt-1">— Without Hiring Staff</span>
+                </span>
+                <span className="block text-foreground">Automatically — Without Hiring Staff</span>
               </h1>
 
               {/* Subheadline */}
@@ -437,7 +435,7 @@ export default function Hero() {
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2.5">
                     <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                    <span className="text-sm font-medium text-foreground/80">{item}</span>
+                    <span className="text-sm font-medium text-foreground/90">{item}</span>
                   </div>
                 ))}
               </div>
