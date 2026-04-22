@@ -116,7 +116,7 @@ export default function Industries() {
           return (
             <div
               key={industry.name}
-              className="group relative block overflow-hidden cursor-pointer h-64"
+              className="group relative block overflow-hidden cursor-pointer h-80"
               onClick={() => {
                 const blueprintKey = industry.href.includes("med-spa") ? "med-spa" : industry.href.split("#")[1];
                 if (["med-spa", "hvac", "dental"].includes(blueprintKey)) {
@@ -137,9 +137,6 @@ export default function Industries() {
                 className="absolute inset-0 h-full w-full object-cover"
               />
               
-              {/* Dark overlay */}
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all duration-300" />
-              
               {/* Gold border on hover */}
               <div
                 className="absolute inset-0 border-2 pointer-events-none transition-opacity duration-400"
@@ -152,18 +149,6 @@ export default function Industries() {
                   card.addEventListener("mouseleave", () => { el.style.opacity = "0"; });
                 }}
               />
-
-              {/* Industry name bottom left */}
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h3 
-                  className="font-display text-xl font-bold leading-tight transition-all duration-300"
-                  style={{ color: "#000" }}
-                  onMouseEnter={(e) => { e.target.style.color = "#c8965c"; }}
-                  onMouseLeave={(e) => { e.target.style.color = "#000"; }}
-                >
-                  {industry.name}
-                </h3>
-              </div>
 
               {/* Bottom border accent line */}
               <div
