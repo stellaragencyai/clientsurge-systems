@@ -191,7 +191,7 @@ export default function Footer() {
         {/* System Requirements Footer */}
         <div className="mt-8 pt-6 border-t border-border/30 text-center">
           <p className="text-[9px] text-foreground/30 font-medium tracking-wide uppercase">
-            ClientSurge Systems © 2026 | Automating lead follow-up for service businesses
+            ClientSurge Systems © 2026 | Automating lead follow-up for service businesses | Phoenix, AZ
           </p>
         </div>
       </div>

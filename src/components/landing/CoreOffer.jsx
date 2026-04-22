@@ -307,7 +307,9 @@ export default function CoreOffer() {
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Package</p>
           <h2 className="font-titles text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-foreground">
-           <span style={{ color: "#1a1209" }}>How the 8-System Flow Works</span>
+           How the{" "}
+           <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.35)" }}>8-System</span>
+           {" "}Flow Works
           </h2>
           {/* Gold accent divider */}
           <div className="flex items-center justify-center gap-3 mt-5 mb-5">

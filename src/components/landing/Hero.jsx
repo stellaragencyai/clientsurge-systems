@@ -433,7 +433,24 @@ export default function Hero() {
       >
         <div style={{ maxWidth: "540px" }}>
 
-
+          {/* Badge */}
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              borderRadius: "9999px",
+              padding: "6px 16px",
+              marginBottom: "28px",
+              background: "rgba(154,92,46,0.08)",
+              border: "1px solid rgba(154,92,46,0.2)",
+            }}
+          >
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#9a5c2e", display: "inline-block" }} />
+            <span style={{ fontSize: "11px", fontWeight: "700", color: "#9a5c2e", letterSpacing: "0.16em", textTransform: "uppercase" }}>
+              Done-For-You AI Automation
+            </span>
+          </div>
 
           {/* Headline */}
           <h1
@@ -448,7 +465,14 @@ export default function Hero() {
             }}
           >
             Turn Every Lead Into a{" "}
-            <span style={{ color: "#1a1209" }}>
+            <span
+              style={{
+                background: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 50%, #9a5c2e 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
               Booked Appointment
             </span>
             {" "}— Automatically
