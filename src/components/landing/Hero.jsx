@@ -1,99 +1,109 @@
 import { useState, useEffect, useRef } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
+import {
+  KeywordDriftCanvas,
+  RadialSpotlight,
+  GrainOverlay,
+  WatermarkTypography,
+  GhostStatCards,
+} from "./HeroBackground";
 
-// Animated chat messages for the phone mockup
+// ── Animated iPhone chat mockup ──────────────────────────────────────────────
 const chatMessages = [
-  { role: "lead", text: "Hi! I saw your ad, how much are your facials?", delay: 0 },
-  { role: "ai", text: "Hi Sarah! 👋 Our signature facial starts at $150. We'd love to get you booked — what days work best for you?", delay: 1200 },
-  { role: "lead", text: "This week sometime, maybe Thursday?", delay: 2800 },
-  { role: "ai", text: "Perfect! We have Thursday at 2pm or 4pm open. Want me to hold a spot? 📅", delay: 4000 },
-  { role: "lead", text: "2pm works!", delay: 5400 },
-  { role: "ai", text: "✅ Booked! Confirmation sent to your email. See you Thursday at 2pm!", delay: 6600 },
+  { role: "lead",  text: "Hi! I saw your ad — how much are your facials?",                        delay: 0    },
+  { role: "ai",    text: "Hey Sarah! 👋 Our signature facial starts at $150. What days work for you?", delay: 1400 },
+  { role: "lead",  text: "Thursday maybe?",                                                          delay: 3000 },
+  { role: "ai",    text: "We have Thu at 2pm or 4pm — want me to hold a spot? 📅",                  delay: 4400 },
+  { role: "lead",  text: "2pm works!",                                                               delay: 5800 },
+  { role: "ai",    text: "✅ Booked! Confirmation sent. See you Thursday at 2pm!",                   delay: 7000 },
 ];
 
-function PhoneMockup() {
+function IPhoneMockup() {
   const [visibleCount, setVisibleCount] = useState(0);
+  const timersRef = useRef([]);
 
-  useEffect(() => {
+  const startAnimation = () => {
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current = [];
+    setVisibleCount(0);
     chatMessages.forEach((msg, i) => {
-      const timer = setTimeout(() => {
-        setVisibleCount(i + 1);
-      }, msg.delay + 800);
-      return () => clearTimeout(timer);
+      const t = setTimeout(() => setVisibleCount(i + 1), msg.delay + 600);
+      timersRef.current.push(t);
     });
-  }, []);
+  };
 
-  // Loop the animation
   useEffect(() => {
-    const loop = setInterval(() => {
-      setVisibleCount(0);
-      chatMessages.forEach((msg, i) => {
-        setTimeout(() => setVisibleCount(i + 1), msg.delay + 800);
-      });
-    }, 10000);
-    return () => clearInterval(loop);
+    startAnimation();
+    const loop = setInterval(startAnimation, 11000);
+    return () => {
+      clearInterval(loop);
+      timersRef.current.forEach(clearTimeout);
+    };
   }, []);
 
   return (
     <div
       style={{
-        width: "260px",
-        height: "520px",
-        borderRadius: "36px",
-        background: "linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)",
-        border: "2px solid rgba(200,150,92,0.3)",
-        boxShadow: "0 32px 80px rgba(0,0,0,0.25), 0 8px 24px rgba(200,150,92,0.12), inset 0 1px 0 rgba(255,255,255,0.08)",
+        width: "270px",
+        height: "540px",
+        borderRadius: "44px",
+        background: "linear-gradient(160deg, #fafafa 0%, #f0f0f0 100%)",
+        border: "10px solid #e8e8e8",
+        boxShadow:
+          "0 0 0 1px rgba(0,0,0,0.08), 0 40px 100px rgba(0,0,0,0.45), 0 16px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.9)",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
         position: "relative",
       }}
     >
-      {/* Phone notch */}
-      <div style={{ display: "flex", justifyContent: "center", paddingTop: "14px", paddingBottom: "8px" }}>
-        <div style={{ width: "80px", height: "6px", borderRadius: "3px", background: "rgba(255,255,255,0.15)" }} />
+      {/* Status bar */}
+      <div style={{ background: "#fff", padding: "10px 18px 6px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <span style={{ fontSize: "11px", fontWeight: "700", color: "#111" }}>9:41</span>
+        <div style={{ width: "90px", height: "22px", borderRadius: "11px", background: "#111", margin: "0 auto", position: "absolute", left: "50%", transform: "translateX(-50%)", top: "6px" }} />
+        <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+          <div style={{ width: "14px", height: "8px", border: "1.5px solid #111", borderRadius: "2px", position: "relative" }}>
+            <div style={{ position: "absolute", inset: "1px 1px 1px", background: "#111", borderRadius: "1px", width: "70%" }} />
+          </div>
+        </div>
       </div>
 
       {/* Chat header */}
-      <div style={{ padding: "8px 14px 10px", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg,#9a5c2e,#c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <span style={{ fontSize: "11px", fontWeight: "800", color: "#f5e6d0" }}>AI</span>
-          </div>
-          <div>
-            <p style={{ fontSize: "11px", fontWeight: "700", color: "rgba(245,230,208,0.9)", margin: 0 }}>AI Assistant</p>
-            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22c55e" }} />
-              <span style={{ fontSize: "9px", color: "rgba(245,230,208,0.45)" }}>Responding instantly</span>
-            </div>
+      <div style={{ background: "#fff", padding: "8px 14px 10px", borderBottom: "1px solid #f0f0f0", display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{ width: "34px", height: "34px", borderRadius: "50%", background: "linear-gradient(135deg, #9a5c2e, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <span style={{ fontSize: "12px", fontWeight: "800", color: "#fff" }}>AI</span>
+        </div>
+        <div>
+          <p style={{ fontSize: "13px", fontWeight: "700", color: "#111", margin: 0, lineHeight: 1.2 }}>ClientSurge AI</p>
+          <div style={{ display: "flex", alignItems: "center", gap: "4px", marginTop: "2px" }}>
+            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e" }} />
+            <span style={{ fontSize: "10px", color: "#888" }}>Responding instantly</span>
           </div>
         </div>
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, padding: "12px 10px", overflowY: "hidden", display: "flex", flexDirection: "column", gap: "8px" }}>
+      <div style={{ flex: 1, background: "#f7f7f7", padding: "12px 10px", display: "flex", flexDirection: "column", gap: "7px", overflowY: "hidden" }}>
         {chatMessages.slice(0, visibleCount).map((msg, i) => (
           <div
             key={i}
             style={{
               display: "flex",
               justifyContent: msg.role === "ai" ? "flex-start" : "flex-end",
-              animation: "msgIn 0.3s ease-out forwards",
+              animation: "msgPop 0.28s cubic-bezier(0.34,1.56,0.64,1) forwards",
             }}
           >
             <div
               style={{
-                maxWidth: "82%",
-                padding: "7px 10px",
-                borderRadius: msg.role === "ai" ? "4px 12px 12px 12px" : "12px 4px 12px 12px",
-                background: msg.role === "ai"
-                  ? "linear-gradient(135deg, rgba(154,92,46,0.85), rgba(200,150,92,0.75))"
-                  : "rgba(255,255,255,0.12)",
-                fontSize: "10px",
-                lineHeight: "1.45",
-                color: msg.role === "ai" ? "#f5e6d0" : "rgba(245,230,208,0.85)",
-                border: msg.role === "ai" ? "none" : "1px solid rgba(255,255,255,0.1)",
+                maxWidth: "78%",
+                padding: "8px 11px",
+                borderRadius: msg.role === "ai" ? "4px 16px 16px 16px" : "16px 4px 16px 16px",
+                background: msg.role === "ai" ? "linear-gradient(135deg, #22c55e, #16a34a)" : "#111",
+                fontSize: "11px",
+                lineHeight: "1.5",
+                color: "#fff",
+                boxShadow: msg.role === "ai" ? "0 2px 8px rgba(34,197,94,0.3)" : "0 2px 8px rgba(0,0,0,0.2)",
               }}
             >
               {msg.text}
@@ -102,23 +112,25 @@ function PhoneMockup() {
         ))}
       </div>
 
-      {/* "Replied in X seconds" badge */}
-      <div style={{ padding: "8px 12px 14px", textAlign: "center" }}>
-        <span style={{ fontSize: "9px", fontWeight: "700", color: "rgba(200,150,92,0.6)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          ⚡ Replied in 4 seconds
-        </span>
+      {/* Bottom bar */}
+      <div style={{ background: "#fff", padding: "8px 12px 10px", borderTop: "1px solid #f0f0f0", display: "flex", alignItems: "center", gap: "8px" }}>
+        <div style={{ flex: 1, background: "#f3f3f3", borderRadius: "20px", padding: "7px 12px", fontSize: "11px", color: "#bbb" }}>Message...</div>
+        <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #9a5c2e, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <ArrowRight style={{ width: "12px", height: "12px", color: "#fff" }} />
+        </div>
       </div>
 
       <style>{`
-        @keyframes msgIn {
-          from { opacity: 0; transform: translateY(6px); }
-          to { opacity: 1; transform: translateY(0); }
+        @keyframes msgPop {
+          from { opacity: 0; transform: scale(0.85) translateY(6px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
         }
       `}</style>
     </div>
   );
 }
 
+// ── Main Hero ─────────────────────────────────────────────────────────────────
 export default function Hero() {
   const demoBooking = useDemoBooking();
 
@@ -126,125 +138,200 @@ export default function Hero() {
     <section
       className="relative overflow-hidden"
       style={{
-        background: "linear-gradient(160deg, hsl(40,35%,97%) 0%, hsl(38,30%,95%) 50%, hsl(36,25%,93%) 100%)",
-        minHeight: "92vh",
+        background: "linear-gradient(135deg, #0a0c14 0%, #0f1220 40%, #0c0e18 100%)",
+        minHeight: "100vh",
         display: "flex",
         alignItems: "center",
       }}
     >
-      {/* Soft background blobs */}
-      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div style={{ position: "absolute", top: "-10%", right: "-5%", width: "600px", height: "600px", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(200,150,92,0.08) 0%, transparent 70%)" }} />
-        <div style={{ position: "absolute", bottom: "0", left: "-10%", width: "500px", height: "400px", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(154,92,46,0.06) 0%, transparent 65%)" }} />
-      </div>
+      {/* Background layers */}
+      <KeywordDriftCanvas />
+      <RadialSpotlight />
+      <GrainOverlay />
+      <WatermarkTypography />
+      <GhostStatCards />
 
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-6 py-24 md:py-32">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+      {/* Content */}
+      <div className="relative w-full max-w-6xl mx-auto px-6 py-28 md:py-36" style={{ zIndex: 5 }}>
+        <div className="grid md:grid-cols-2 gap-16 items-center">
 
-          {/* LEFT: Text content */}
+          {/* LEFT: copy */}
           <div>
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/25 rounded-full px-4 py-1.5 mb-7">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-              <span className="text-xs font-bold text-primary tracking-widest uppercase">Done-For-You Automation</span>
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-8"
+              style={{
+                background: "rgba(200,150,92,0.1)",
+                border: "1px solid rgba(200,150,92,0.25)",
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#c8965c", display: "inline-block" }} />
+              <span style={{ fontSize: "11px", fontWeight: "700", color: "#c8965c", letterSpacing: "0.18em", textTransform: "uppercase" }}>
+                Done-For-You AI Automation
+              </span>
             </div>
 
-            {/* Heading */}
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] text-foreground mb-6">
+            {/* Headline */}
+            <h1
+              className="font-display font-bold tracking-tight leading-[1.08] mb-6"
+              style={{ fontSize: "clamp(2.4rem, 5vw, 3.6rem)", color: "#f5e6d0" }}
+            >
               Turn Every Lead Into a{" "}
-              <span style={{ color: "#9a5c2e" }}>Booked Appointment</span>
+              <span
+                style={{
+                  background: "linear-gradient(135deg, #c8965c 0%, #f5d9a8 50%, #c8965c 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Booked Appointment
+              </span>
               {" "}— Automatically
             </h1>
 
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8 max-w-lg">
-              We build AI-powered follow-up systems for service businesses that respond instantly, nurture leads, and fill your calendar — without you lifting a finger.
+            <p style={{ fontSize: "1.1rem", color: "rgba(245,230,208,0.65)", lineHeight: 1.7, marginBottom: "2rem", maxWidth: "480px" }}>
+              We build AI-powered follow-up systems that respond in seconds, nurture leads for 14 days, and fill your calendar — without you lifting a finger.
             </p>
 
-            {/* Trust points */}
-            <div className="flex flex-col gap-2.5 mb-9">
+            {/* Checklist */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "2.5rem" }}>
               {[
-                "Instant response to every new lead",
-                "Automated follow-up for 14 days",
-                "Live in 5–7 business days",
-              ].map((point) => (
-                <div key={point} className="flex items-center gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span className="text-sm font-medium text-foreground/80">{point}</span>
+                "Instant SMS response to every new lead",
+                "14-day automated follow-up sequence",
+                "Missed call text-back — 0 leads lost",
+                "Live in 5–7 business days, fully built for you",
+              ].map((pt) => (
+                <div key={pt} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <CheckCircle2 style={{ width: "16px", height: "16px", color: "#22c55e", flexShrink: 0 }} />
+                  <span style={{ fontSize: "14px", fontWeight: "500", color: "rgba(245,230,208,0.8)" }}>{pt}</span>
                 </div>
               ))}
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-start gap-3">
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center" }}>
               <button
                 onClick={demoBooking?.openDemoBooking}
                 style={{
                   borderRadius: "9999px",
                   padding: "2px",
                   background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                  boxShadow: "0 4px 20px rgba(120,70,20,0.35)",
+                  boxShadow: "0 4px 24px rgba(120,70,20,0.5)",
                   border: "none",
                   cursor: "pointer",
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 36px rgba(120,70,20,0.5)"}
-                onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 20px rgba(120,70,20,0.35)"}
+                onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.7)"}
+                onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 24px rgba(120,70,20,0.5)"}
               >
-                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "52px", padding: "0 32px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1rem" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "54px", padding: "0 36px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1rem" }}>
                   Book Your Free Demo
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight style={{ width: "16px", height: "16px" }} />
                 </span>
               </button>
               <a
                 href="#services"
-                className="inline-flex items-center gap-2 h-[52px] px-6 rounded-full border-2 border-primary/25 text-sm font-semibold text-primary hover:border-primary/50 hover:bg-primary/5 transition-all"
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", height: "54px", padding: "0 24px", borderRadius: "9999px", border: "1.5px solid rgba(200,150,92,0.3)", color: "rgba(245,230,208,0.7)", fontSize: "14px", fontWeight: "600", textDecoration: "none", transition: "all 0.2s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(200,150,92,0.6)"; e.currentTarget.style.color = "#f5e6d0"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(200,150,92,0.3)"; e.currentTarget.style.color = "rgba(245,230,208,0.7)"; }}
               >
                 See how it works
               </a>
             </div>
 
-            {/* Social proof micro-line */}
-            <p className="mt-6 text-xs text-muted-foreground">
-              No contracts · Setup in 5–7 days · Most clients see ROI in 30 days
+            <p style={{ marginTop: "20px", fontSize: "11px", color: "rgba(245,230,208,0.3)", letterSpacing: "0.04em" }}>
+              No contracts · Most clients see ROI within 30 days
             </p>
           </div>
 
-          {/* RIGHT: Phone mockup */}
-          <div className="flex justify-center md:justify-end">
+          {/* RIGHT: 3D tilted iPhone */}
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
             <div style={{ position: "relative" }}>
-              {/* Glow behind phone */}
-              <div style={{ position: "absolute", inset: "-30px", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(200,150,92,0.15) 0%, transparent 70%)", filter: "blur(12px)", zIndex: 0 }} />
 
-              {/* Floating stat badge - top left */}
+              {/* Glow behind phone */}
+              <div style={{
+                position: "absolute",
+                inset: "-60px",
+                borderRadius: "50%",
+                background: "radial-gradient(ellipse at center, rgba(200,150,92,0.18) 0%, rgba(34,197,94,0.06) 50%, transparent 75%)",
+                filter: "blur(20px)",
+                zIndex: 0,
+              }} />
+
+              {/* 3D tilted phone */}
               <div
                 style={{
-                  position: "absolute", top: "30px", left: "-70px", zIndex: 10,
-                  background: "white", borderRadius: "14px", padding: "10px 14px",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.1)", border: "1px solid rgba(200,150,92,0.2)",
+                  position: "relative",
+                  zIndex: 1,
+                  transform: "perspective(1400px) rotateY(-22deg) rotateX(6deg) rotateZ(1.5deg)",
+                  transformStyle: "preserve-3d",
+                  transition: "transform 0.6s ease",
+                  filter: "drop-shadow(0 60px 80px rgba(0,0,0,0.6)) drop-shadow(0 20px 40px rgba(0,0,0,0.4))",
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = "perspective(1400px) rotateY(-14deg) rotateX(4deg) rotateZ(0.5deg)"}
+                onMouseLeave={(e) => e.currentTarget.style.transform = "perspective(1400px) rotateY(-22deg) rotateX(6deg) rotateZ(1.5deg)"}
+              >
+                <IPhoneMockup />
+              </div>
+
+              {/* Floating stat — top left */}
+              <div
+                style={{
+                  position: "absolute", top: "20px", left: "-90px", zIndex: 10,
+                  background: "rgba(15,18,32,0.9)", backdropFilter: "blur(12px)",
+                  borderRadius: "14px", padding: "10px 14px",
+                  border: "1px solid rgba(200,150,92,0.2)",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
                   animation: "floatA 4s ease-in-out infinite",
                 }}
               >
-                <p style={{ fontSize: "9px", fontWeight: "700", color: "#9a5c2e", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>New Lead</p>
-                <p style={{ fontSize: "13px", fontWeight: "800", color: "#1a1a1a", margin: "2px 0 0" }}>Sarah M.</p>
-                <p style={{ fontSize: "9px", color: "#888", margin: 0 }}>Instagram Ad · 2s ago</p>
+                <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "3px" }}>
+                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e" }} />
+                  <span style={{ fontSize: "9px", fontWeight: "700", color: "rgba(200,150,92,0.7)", textTransform: "uppercase", letterSpacing: "0.1em" }}>New Lead</span>
+                </div>
+                <p style={{ fontSize: "13px", fontWeight: "800", color: "#f5e6d0", margin: "0 0 2px" }}>Sarah M.</p>
+                <p style={{ fontSize: "9px", color: "rgba(245,230,208,0.4)", margin: 0 }}>Instagram Ad · 2s ago</p>
               </div>
 
-              {/* Floating stat badge - bottom right */}
+              {/* Floating stat — bottom right */}
               <div
                 style={{
-                  position: "absolute", bottom: "50px", right: "-80px", zIndex: 10,
-                  background: "white", borderRadius: "14px", padding: "10px 14px",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.1)", border: "1px solid rgba(200,150,92,0.2)",
+                  position: "absolute", bottom: "60px", right: "-95px", zIndex: 10,
+                  background: "rgba(15,18,32,0.9)", backdropFilter: "blur(12px)",
+                  borderRadius: "14px", padding: "10px 14px",
+                  border: "1px solid rgba(34,197,94,0.2)",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
                   animation: "floatB 5s ease-in-out infinite",
                 }}
               >
-                <p style={{ fontSize: "9px", fontWeight: "700", color: "#22c55e", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>✓ Booked</p>
-                <p style={{ fontSize: "13px", fontWeight: "800", color: "#1a1a1a", margin: "2px 0 0" }}>Thu 2:00 PM</p>
-                <p style={{ fontSize: "9px", color: "#888", margin: 0 }}>Glow Med Spa</p>
+                <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "3px" }}>
+                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e" }} />
+                  <span style={{ fontSize: "9px", fontWeight: "700", color: "#22c55e", textTransform: "uppercase", letterSpacing: "0.1em" }}>✓ Booked</span>
+                </div>
+                <p style={{ fontSize: "13px", fontWeight: "800", color: "#f5e6d0", margin: "0 0 2px" }}>Thu 2:00 PM</p>
+                <p style={{ fontSize: "9px", color: "rgba(245,230,208,0.4)", margin: 0 }}>Glow Med Spa</p>
               </div>
 
-              <div style={{ position: "relative", zIndex: 1 }}>
-                <PhoneMockup />
+              {/* Floating stat — top right */}
+              <div
+                style={{
+                  position: "absolute", top: "160px", right: "-85px", zIndex: 10,
+                  background: "rgba(15,18,32,0.9)", backdropFilter: "blur(12px)",
+                  borderRadius: "14px", padding: "10px 14px",
+                  border: "1px solid rgba(167,139,250,0.2)",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+                  animation: "floatC 4.5s ease-in-out infinite",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "3px" }}>
+                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#a78bfa" }} />
+                  <span style={{ fontSize: "9px", fontWeight: "700", color: "rgba(167,139,250,0.8)", textTransform: "uppercase", letterSpacing: "0.1em" }}>AI Replied</span>
+                </div>
+                <p style={{ fontSize: "13px", fontWeight: "800", color: "#f5e6d0", margin: "0 0 2px" }}>4 seconds</p>
+                <p style={{ fontSize: "9px", color: "rgba(245,230,208,0.4)", margin: 0 }}>Before any competitor</p>
               </div>
+
             </div>
           </div>
 
@@ -252,14 +339,9 @@ export default function Hero() {
       </div>
 
       <style>{`
-        @keyframes floatA {
-          0%,100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
-        }
-        @keyframes floatB {
-          0%,100% { transform: translateY(0px); }
-          50% { transform: translateY(-6px); }
-        }
+        @keyframes floatA { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes floatB { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        @keyframes floatC { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
       `}</style>
     </section>
   );
