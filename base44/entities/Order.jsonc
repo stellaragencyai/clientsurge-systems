@@ -1,0 +1,103 @@
+{
+  "name": "Order",
+  "type": "object",
+  "properties": {
+    "customer_email": {
+      "type": "string",
+      "title": "Customer Email"
+    },
+    "customer_name": {
+      "type": "string",
+      "title": "Customer Name"
+    },
+    "customer_phone": {
+      "type": "string",
+      "title": "Customer Phone"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "items": {
+      "type": "array",
+      "title": "Ordered Services",
+      "items": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string"
+          },
+          "product_name": {
+            "type": "string"
+          },
+          "setup_price_id": {
+            "type": "string"
+          },
+          "monthly_price_id": {
+            "type": "string"
+          },
+          "setup_fee": {
+            "type": "number"
+          },
+          "monthly_fee": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "setting_up",
+              "live"
+            ]
+          }
+        }
+      }
+    },
+    "total_setup": {
+      "type": "number",
+      "title": "Total Setup Fee"
+    },
+    "total_monthly": {
+      "type": "number",
+      "title": "Total Monthly"
+    },
+    "stripe_session_id": {
+      "type": "string",
+      "title": "Stripe Session ID"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "title": "Stripe Customer ID"
+    },
+    "payment_status": {
+      "type": "string",
+      "title": "Payment Status",
+      "enum": [
+        "pending",
+        "paid",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "order_status": {
+      "type": "string",
+      "title": "Order Status",
+      "enum": [
+        "pending_payment",
+        "paid_setup_in_progress",
+        "partially_live",
+        "fully_live"
+      ],
+      "default": "pending_payment"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Admin Notes"
+    }
+  },
+  "required": [
+    "customer_email",
+    "customer_name",
+    "business_name"
+  ]
+}

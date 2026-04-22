@@ -8,6 +8,7 @@ import { trackCTA } from "@/lib/analytics";
 const sectionLinks = [
   { label: "How It Works", href: "#problem-solution" },
   { label: "Our System", href: "#services" },
+  { label: "AI Store", href: "/store", isPage: true },
   { label: "Pricing", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
 ];
@@ -197,14 +198,25 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           {sectionLinks.map((link) => (
-            <a
-              key={link.href}
-              href={`/${link.href}`}
-              onClick={(e) => handleSectionNavigation(e, link.href)}
-              className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-            >
-              {link.label}
-            </a>
+            link.isPage ? (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={() => { trackCTA("ai_store", "navbar"); }}
+                className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors border border-primary/25 px-3 py-1 rounded-full hover:bg-primary/5"
+              >
+                {link.label} ✦
+              </a>
+            ) : (
+              <a
+                key={link.href}
+                href={`/${link.href}`}
+                onClick={(e) => handleSectionNavigation(e, link.href)}
+                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+              >
+                {link.label}
+              </a>
+            )
           ))}
 
           <div

@@ -31,10 +31,14 @@ import LegalPage from './pages/LegalPage';
 import Contact from './pages/Contact';
 import AdminOnboarding from './pages/AdminOnboarding';
 import Industries from './pages/Industries';
+import Store from './pages/Store';
+import OrderSuccess from './pages/OrderSuccess';
 
 // Public routes that do NOT require authentication
 const PUBLIC_PATHS = [
   "/",
+  "/store",
+  "/order-success",
   "/med-spa",
   "/start",
   "/book",
@@ -157,6 +161,8 @@ const AuthenticatedApp = () => {
       <Route path="/legal/:type" element={<LegalPage />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/admin/onboarding" element={<AdminOnboarding />} />
+      <Route path="/store" element={<Store />} />
+      <Route path="/order-success" element={<OrderSuccess />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

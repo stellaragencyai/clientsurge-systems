@@ -44,17 +44,17 @@ export default function Hero() {
           maxWidth: "900px",
           height: "72vh",
           minHeight: "520px",
-          /* Dark tablet bezel */
-          background: "linear-gradient(145deg, #1c1f2e 0%, #131520 100%)",
+          /* White tablet bezel */
+          background: "linear-gradient(145deg, #f0ede8 0%, #e8e4de 100%)",
           borderRadius: "28px",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "1px solid rgba(0,0,0,0.08)",
           boxShadow: `
-            0 0 0 8px #111318,
-            0 0 0 10px rgba(255,255,255,0.05),
-            0 60px 120px rgba(0,0,0,0.45),
-            0 30px 60px rgba(0,0,0,0.3),
-            inset 0 1px 0 rgba(255,255,255,0.06),
-            0 0 80px rgba(200,150,92,0.08)
+            0 0 0 8px #d8d4ce,
+            0 0 0 10px rgba(0,0,0,0.06),
+            0 60px 120px rgba(0,0,0,0.22),
+            0 30px 60px rgba(0,0,0,0.14),
+            inset 0 1px 0 rgba(255,255,255,0.9),
+            0 0 80px rgba(200,150,92,0.1)
           `,
           padding: "16px",
           zIndex: 2,
@@ -63,7 +63,7 @@ export default function Hero() {
         }}
       >
         {/* Screen inner bezel ring */}
-        <div style={{ position: "absolute", inset: "12px", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.04)", pointerEvents: "none", zIndex: 10 }} />
+        <div style={{ position: "absolute", inset: "12px", borderRadius: "18px", border: "1px solid rgba(0,0,0,0.06)", pointerEvents: "none", zIndex: 10 }} />
         {/* Screen content */}
         <div style={{ width: "100%", height: "100%", borderRadius: "16px", overflow: "hidden", position: "relative" }}>
           <HeroDashboardScreen />
@@ -71,7 +71,7 @@ export default function Hero() {
           <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px)", pointerEvents: "none", zIndex: 5 }} />
         </div>
         {/* Camera dot */}
-        <div style={{ position: "absolute", top: "8px", left: "50%", transform: "translateX(-50%)", width: "6px", height: "6px", borderRadius: "50%", background: "#1c1f2e", border: "1px solid rgba(255,255,255,0.08)" }} />
+        <div style={{ position: "absolute", top: "8px", left: "50%", transform: "translateX(-50%)", width: "6px", height: "6px", borderRadius: "50%", background: "#c8c4be", border: "1px solid rgba(0,0,0,0.1)" }} />
       </div>
 
       {/* ── STEP 4: Left-to-right gradient overlay — text side stays clean ── */}
