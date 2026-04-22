@@ -87,7 +87,7 @@ export default function TrustBar() {
                 {/* Background image for 5-7 days only */}
                 {is5to7Days && (
                   <div
-                    className="absolute inset-0 rounded-2xl opacity-30 bg-cover bg-center"
+                    className="absolute inset-0 rounded-2xl opacity-65 bg-cover bg-center"
                     style={{
                       backgroundImage:
                         "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/1dea161a9_b163f1d0-a199-4721-abbc-0aa34fe8f78c.jpg')",
