@@ -114,29 +114,29 @@ export default function Hero() {
         <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "14px", opacity: 0.75 }}>
           {/* Header */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div style={{ width: "20px", height: "20px", borderRadius: "6px", background: "rgba(154,92,46,0.4)" }} />
-            <div style={{ height: "10px", width: "55%", borderRadius: "4px", background: "rgba(154,92,46,0.35)" }} />
+            <div style={{ width: "20px", height: "20px", borderRadius: "6px", background: "rgba(154,92,46,0.65)" }} />
+            <div style={{ height: "10px", width: "55%", borderRadius: "4px", background: "rgba(154,92,46,0.58)" }} />
           </div>
           {/* Stat row — legible numbers */}
           <div style={{ display: "flex", justifyContent: "space-around", gap: "8px" }}>
             {["247", "94%", "$4.2k"].map((val, i) => (
-              <div key={i} style={{ flex: 1, textAlign: "center", padding: "10px", borderRadius: "10px", background: "rgba(154,92,46,0.12)", border: "1px solid rgba(154,92,46,0.18)" }}>
-                <div style={{ height: "14px", background: `linear-gradient(to bottom, rgba(154,92,46,0.${40 + i*15}), rgba(154,92,46,0.${25 + i*10}))`, borderRadius: "2px", marginBottom: "3px" }} />
-                <div style={{ height: "8px", width: "70%", borderRadius: "3px", background: "rgba(154,92,46,0.25)", margin: "0 auto" }} />
+              <div key={i} style={{ flex: 1, textAlign: "center", padding: "10px", borderRadius: "10px", background: "rgba(154,92,46,0.18)", border: "1px solid rgba(154,92,46,0.28)" }}>
+                <div style={{ height: "14px", background: `linear-gradient(to bottom, rgba(154,92,46,0.${55 + i*15}), rgba(154,92,46,0.${45 + i*10}))`, borderRadius: "2px", marginBottom: "3px" }} />
+                <div style={{ height: "8px", width: "70%", borderRadius: "3px", background: "rgba(154,92,46,0.42)", margin: "0 auto" }} />
               </div>
             ))}
           </div>
           {/* Pipeline bar */}
           <div style={{ marginTop: "8px" }}>
-            <div style={{ height: "8px", width: "40%", borderRadius: "3px", background: "rgba(154,92,46,0.3)", marginBottom: "6px" }} />
-            <div style={{ height: "20px", borderRadius: "6px", background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.2)", position: "relative", overflow: "hidden" }}>
-              <div style={{ height: "100%", width: "72%", background: "rgba(34,197,94,0.35)", borderRadius: "6px" }} />
+            <div style={{ height: "8px", width: "40%", borderRadius: "3px", background: "rgba(154,92,46,0.48)", marginBottom: "6px" }} />
+            <div style={{ height: "20px", borderRadius: "6px", background: "rgba(34,197,94,0.25)", border: "1px solid rgba(34,197,94,0.35)", position: "relative", overflow: "hidden" }}>
+              <div style={{ height: "100%", width: "72%", background: "rgba(34,197,94,0.55)", borderRadius: "6px" }} />
             </div>
           </div>
           {/* Mini chart bars */}
           <div style={{ display: "flex", alignItems: "flex-end", gap: "6px", height: "50px", marginTop: "10px" }}>
             {[35, 52, 68, 44, 76].map((h, i) => (
-              <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "4px", background: `rgba(200,150,92,${0.15 + i*0.08})`, border: "1px solid rgba(200,150,92,0.15)" }} />
+              <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "4px", background: `rgba(200,150,92,${0.28 + i*0.12})`, border: "1px solid rgba(200,150,92,0.28)" }} />
             ))}
           </div>
         </div>
@@ -245,7 +245,7 @@ export default function Hero() {
           position: "absolute",
           top: "50%",
           right: "2%",
-          transform: "translateY(-48%) perspective(3000px) rotateY(-6deg) rotateX(3deg) rotateZ(1.5deg)",
+          transform: "translateY(-48%) perspective(2500px) rotateY(-12deg) rotateX(8deg) rotateZ(2.8deg)",
           transformOrigin: "center center",
           transformStyle: "preserve-3d",
           width: "60vw",
