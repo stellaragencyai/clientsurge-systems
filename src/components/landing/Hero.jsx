@@ -16,16 +16,58 @@ export default function Hero() {
         alignItems: "center",
       }}
     >
-      {/* ── IDEA 4: Full right-half warm atmosphere wash (IdentityIQ-style full-bleed color) ── */}
+      {/* ── Dark atmospheric wash — right side only (Fix 1) ── */}
       <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}>
-        {/* Wide amber atmosphere — floods the entire right half like IdentityIQ's navy wash */}
-        <div style={{ position: "absolute", top: "-10%", right: "-10%", width: "80vw", height: "120vh", background: "radial-gradient(ellipse at 65% 45%, rgba(200,150,92,0.16) 0%, rgba(154,92,46,0.09) 30%, rgba(245,217,168,0.05) 55%, transparent 72%)", filter: "blur(2px)" }} />
-        {/* Secondary warm bloom — lower right */}
-        <div style={{ position: "absolute", bottom: "-5%", right: "-5%", width: "55vw", height: "70vh", background: "radial-gradient(ellipse at 60% 60%, rgba(200,150,92,0.10) 0%, rgba(154,92,46,0.05) 40%, transparent 68%)", filter: "blur(6px)" }} />
+        {/* Main dark radial field centered-right — creates deep space effect */}
+        <div style={{ position: "absolute", top: "50%", right: "15%", width: "100vw", height: "100vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(13,15,30,0.75) 0%, rgba(13,15,30,0.4) 35%, rgba(13,15,30,0.15) 60%, transparent 85%)", transform: "translateY(-50%)", filter: "blur(3px)" }} />
+        {/* Warm accent layers — still present but now against dark backdrop */}
+        <div style={{ position: "absolute", top: "-10%", right: "-10%", width: "80vw", height: "120vh", background: "radial-gradient(ellipse at 65% 45%, rgba(200,150,92,0.08) 0%, rgba(154,92,46,0.04) 30%, transparent 55%)", filter: "blur(2px)" }} />
         {/* Green glow — pipeline booked stat */}
-        <div style={{ position: "absolute", top: "30%", right: "15%", width: "40vw", height: "50vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(34,197,94,0.07) 0%, transparent 65%)", filter: "blur(8px)" }} />
+        <div style={{ position: "absolute", top: "30%", right: "15%", width: "40vw", height: "50vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(34,197,94,0.05) 0%, transparent 65%)", filter: "blur(8px)" }} />
         {/* Purple glow — SMS section */}
-        <div style={{ position: "absolute", bottom: "15%", right: "10%", width: "30vw", height: "40vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(167,139,250,0.05) 0%, transparent 65%)", filter: "blur(10px)" }} />
+        <div style={{ position: "absolute", bottom: "15%", right: "10%", width: "30vw", height: "40vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(167,139,250,0.03) 0%, transparent 65%)", filter: "blur(10px)" }} />
+      </div>
+
+      {/* ── LEFT-side ghost panel bleeding off-screen (Fix 2) ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "-8%",
+          transform: "translateY(-50%)",
+          width: "42vw",
+          maxWidth: "620px",
+          height: "68vh",
+          minHeight: "420px",
+          background: "linear-gradient(145deg, rgba(26,18,9,0.12) 0%, rgba(200,150,92,0.06) 100%)",
+          borderRadius: "20px",
+          border: "none",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          opacity: 0.35,
+          zIndex: 0,
+          pointerEvents: "none",
+          overflow: "hidden",
+          maskImage: "radial-gradient(ellipse at right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, transparent 85%)",
+          WebkitMaskImage: "radial-gradient(ellipse at right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, transparent 85%)",
+        }}
+      >
+        {/* Left panel content — mini dashboard preview */}
+        <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "14px", opacity: 0.65 }}>
+          <div style={{ height: "12px", width: "70%", borderRadius: "6px", background: "rgba(154,92,46,0.3)" }} />
+          <div style={{ height: "10px", width: "90%", borderRadius: "6px", background: "rgba(154,92,46,0.2)" }} />
+          <div style={{ marginTop: "16px", height: "80px", borderRadius: "12px", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ height: "10px", width: "45%", borderRadius: "4px", background: "rgba(34,197,94,0.35)" }} />
+          </div>
+          <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
+            {[65, 48, 72, 55, 80].map((w, i) => (
+              <div key={i} style={{ flex: 1, height: "45px", borderRadius: "10px", background: `rgba(154,92,46,${0.08 + i * 0.03})`, border: "1px solid rgba(154,92,46,0.12)" }} />
+            ))}
+          </div>
+          <div style={{ height: "10px", width: "85%", borderRadius: "6px", background: "rgba(154,92,46,0.15)", marginTop: "8px" }} />
+          <div style={{ height: "8px", width: "65%", borderRadius: "6px", background: "rgba(154,92,46,0.1)" }} />
+        </div>
       </div>
 
       {/* ── IDEA 5: Dot-grid mesh texture overlay (IdentityIQ subtle depth texture) ── */}
