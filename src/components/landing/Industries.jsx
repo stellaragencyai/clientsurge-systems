@@ -21,7 +21,7 @@ const industries = [
     desc: "Faster response, reminder flows, and cleaner follow-up for dental practices.",
     result: "Launching next",
     href: "/industries#dental",
-    image: "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95",
     cta: "See industry roadmap",
   },
   {
@@ -31,7 +31,7 @@ const industries = [
     desc: "Automated response and reactivation for practices that live on booked visits.",
     result: "Launching next",
     href: "/industries#chiropractic",
-    image: "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=1200&q=95",
     cta: "See industry roadmap",
   },
   {
@@ -41,7 +41,7 @@ const industries = [
     desc: "24/7 lead capture, missed-call text-back, and appointment handoff for field teams.",
     result: "Launching next",
     href: "/industries#hvac",
-    image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=95",
     cta: "See industry roadmap",
   },
   {
@@ -61,7 +61,7 @@ const industries = [
     desc: "Faster response and better quote follow-up for service businesses.",
     result: "General-fit category",
     href: "/industries#contractors",
-    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=900&q=85",
+    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=95",
     cta: "See industry roadmap",
   },
 ];
@@ -110,13 +110,13 @@ export default function Industries() {
       </div>
 
       {/* Cards grid */}
-      <div className="max-w-[1800px] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3">
+      <div className="max-w-[1800px] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10">
         {industries.map((industry, index) => {
           const Icon = industry.icon;
           return (
             <div
               key={industry.name}
-              className="group relative block overflow-hidden cursor-pointer h-96"
+              className="group relative block overflow-hidden cursor-pointer h-[27.6rem]"
               onClick={() => {
                 const blueprintKey = industry.href.includes("med-spa") ? "med-spa" : industry.href.split("#")[1];
                 if (["med-spa", "hvac", "dental"].includes(blueprintKey)) {
