@@ -66,7 +66,7 @@ export default function FAQ() {
     <section id="faq" className="nebula-faq px-6 py-24 md:py-32 relative overflow-hidden">
       <StardustOverlay seed={7} opacity={0.5} />
       <div className="max-w-3xl mx-auto relative z-10">
-        <div className="text-center mb-12">
+        <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Questions</p>
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
             Frequently Asked Questions
@@ -74,6 +74,7 @@ export default function FAQ() {
           <p className="mt-4 text-muted-foreground text-base">
             Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message</a>
           </p>
+          <div className="mt-8 border-t border-border/40" />
         </div>
 
         <Accordion type="single" collapsible className="space-y-3">

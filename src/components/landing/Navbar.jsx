@@ -211,6 +211,7 @@ export default function Navbar() {
             className="relative"
             onMouseEnter={() => setIndustriesOpen(true)}
             onMouseLeave={() => setIndustriesOpen(false)}
+            onKeyDown={(e) => { if (e.key === "Escape") setIndustriesOpen(false); }}
           >
             <button
               onClick={() => setIndustriesOpen((prev) => !prev)}

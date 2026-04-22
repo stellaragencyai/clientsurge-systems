@@ -321,6 +321,7 @@ export default function CoreOffer() {
             Every system works together - capturing leads, responding instantly, following up automatically, and booking appointments without you lifting a finger.
           </p>
           <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+            <span aria-hidden="true">↗</span>
             Click any system card to open its automation blueprint
           </div>
         </div>
