@@ -116,7 +116,7 @@ export default function Industries() {
           return (
             <div
               key={industry.name}
-              className="group relative block overflow-hidden cursor-pointer h-80"
+              className="group relative block overflow-hidden cursor-pointer h-96"
               onClick={() => {
                 const blueprintKey = industry.href.includes("med-spa") ? "med-spa" : industry.href.split("#")[1];
                 if (["med-spa", "hvac", "dental"].includes(blueprintKey)) {
