@@ -44,17 +44,17 @@ export default function Hero() {
           maxWidth: "900px",
           height: "72vh",
           minHeight: "520px",
-          /* White tablet bezel */
-          background: "linear-gradient(145deg, #f0ede8 0%, #e8e4de 100%)",
+          /* Dark tablet bezel */
+          background: "linear-gradient(145deg, #1c1f2e 0%, #131520 100%)",
           borderRadius: "28px",
-          border: "1px solid rgba(0,0,0,0.08)",
+          border: "1px solid rgba(255,255,255,0.08)",
           boxShadow: `
-            0 0 0 8px #d8d4ce,
-            0 0 0 10px rgba(0,0,0,0.06),
-            0 60px 120px rgba(0,0,0,0.22),
-            0 30px 60px rgba(0,0,0,0.14),
-            inset 0 1px 0 rgba(255,255,255,0.9),
-            0 0 80px rgba(200,150,92,0.1)
+            0 0 0 8px #111318,
+            0 0 0 10px rgba(255,255,255,0.05),
+            0 60px 120px rgba(0,0,0,0.45),
+            0 30px 60px rgba(0,0,0,0.3),
+            inset 0 1px 0 rgba(255,255,255,0.06),
+            0 0 80px rgba(200,150,92,0.08)
           `,
           padding: "16px",
           zIndex: 2,
