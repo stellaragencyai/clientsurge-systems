@@ -1,6 +1,30 @@
 import { useState } from "react";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
+
+// Glowing Green Checkmark Component
+function GlowingCheck() {
+  return (
+    <svg
+      className="w-4 h-4 flex-shrink-0 mt-0.5"
+      viewBox="0 0 24 24"
+      fill="none"
+      style={{
+        filter: "drop-shadow(0 0 6px rgba(34,197,94,0.6))",
+        animation: "checkPulse 2s ease-in-out infinite",
+      }}
+    >
+      <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2" />
+      <path
+        d="M8 12l3 3 5-5"
+        stroke="#22c55e"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 const plans = [
   {
@@ -108,7 +132,7 @@ export default function Pricing() {
               "Short onboarding call plus implementation handoff",
             ].map((item) => (
               <div key={item} className="rounded-2xl border border-border bg-background px-4 py-4 flex items-start gap-3">
-                <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                <GlowingCheck />
                 <p className="text-sm text-foreground/80">{item}</p>
               </div>
             ))}
@@ -142,13 +166,48 @@ export default function Pricing() {
       </div>
 
       <style>{`
+        /* Card Gradient Shift on Hover */
         .pricing-card {
-          transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+          transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, background 0.35s ease;
+          position: relative;
+          background: linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.58) 100%);
+        }
+        .pricing-card.highlight-glow {
+          background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.84) 100%);
+        }
+        .pricing-card.highlight-hover {
+          background: linear-gradient(135deg, rgba(255,248,235,0.98) 0%, rgba(245,217,168,0.4) 100%);
         }
         .pricing-card:hover {
           border-color: #c8965c !important;
           box-shadow: 0 14px 36px rgba(160, 90, 20, 0.16), 0 2px 10px rgba(0, 0, 0, 0.06) !important;
         }
+        
+        /* Floating Accent Dots Behind Cards */
+        .pricing-card::before {
+          content: '';
+          position: absolute;
+          top: 10%;
+          right: -5%;
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(200,150,92,0.15) 0%, transparent 70%);
+          animation: drift 8s ease-in-out infinite;
+          pointer-events: none;
+          z-index: 0;
+        }
+        .pricing-card:nth-child(2)::before {
+          animation-delay: -2s;
+        }
+        .pricing-card:nth-child(3)::before {
+          animation-delay: -4s;
+          top: auto;
+          bottom: 5%;
+          right: auto;
+          left: -5%;
+        }
+        
         .pricing-badge-float {
           position: absolute;
           top: -14px;
@@ -157,17 +216,31 @@ export default function Pricing() {
           z-index: 20;
           white-space: nowrap;
         }
+        
         .shiny-brown-btn {
           display: inline-block;
           border-radius: 9999px;
           padding: 2px;
-          background: linear-gradient(135deg, #a0714f 0%, #c8965c 30%, #f5d9a8 50%, #c8965c 70%, #7a4f2e 100%);
+          background: linear-gradient(90deg, #a0714f 0%, #c8965c 30%, #f5d9a8 50%, #c8965c 70%, #7a4f2e 100%);
           box-shadow: 0 4px 18px rgba(120, 70, 20, 0.35), 0 1px 4px rgba(0, 0, 0, 0.15);
           transition: box-shadow 0.3s ease, transform 0.3s ease;
           cursor: pointer;
           border: none;
           background-size: 200% 200%;
-          animation: shineMove 3s ease infinite;
+          animation: shimmer 3.5s ease-in-out infinite;
+          position: relative;
+        }
+        .shiny-brown-btn::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+          border-radius: 9999px;
+          animation: shineWave 3s ease-in-out infinite;
+          pointer-events: none;
         }
         .shiny-brown-btn:hover {
           box-shadow: 0 8px 32px rgba(120, 70, 20, 0.5), 0 2px 8px rgba(0, 0, 0, 0.2);
@@ -180,11 +253,38 @@ export default function Pricing() {
           font-weight: 700;
           letter-spacing: 0.01em;
           text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+          position: relative;
+          z-index: 1;
         }
-        @keyframes shineMove {
-          0% { background-position: 0% 50%; }
+        
+        /* Animations */
+        @keyframes shimmer {
+          0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+        }
+        @keyframes shineWave {
+          0% { left: -100%; }
+          100% { left: 100%; }
+        }
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        @keyframes checkPulse {
+          0%, 100% { filter: drop-shadow(0 0 6px rgba(34,197,94,0.6)); }
+          50% { filter: drop-shadow(0 0 12px rgba(34,197,94,0.9)); }
+        }
+        @keyframes drift {
+          0%, 100% { transform: translateY(0px) translateX(0px); }
+          25% { transform: translateY(-20px) translateX(10px); }
+          50% { transform: translateY(-30px) translateX(-10px); }
+          75% { transform: translateY(-15px) translateX(15px); }
         }
       `}</style>
     </section>
@@ -196,7 +296,9 @@ function PricingCard({ plan, demoBooking }) {
 
   return (
     <div
-      className="pricing-card relative flex flex-col rounded-2xl transition-all duration-300"
+      className={`pricing-card relative flex flex-col rounded-2xl transition-all duration-300 ${
+        plan.highlight ? "highlight-glow" : ""
+      } ${isHovered && plan.highlight ? "highlight-hover" : ""}`}
       style={{
         overflow: "visible",
         background: isHovered
@@ -269,8 +371,14 @@ function PricingCard({ plan, demoBooking }) {
 
         <ul className="space-y-3.5 flex-1 mb-9">
           {plan.features.map((feature, index) => (
-            <li key={index} className="flex items-start gap-3">
-              <CheckCircle2 className={`w-4 h-4 flex-shrink-0 mt-0.5 ${plan.highlight ? "text-primary" : "text-foreground/60"}`} />
+            <li
+              key={index}
+              className="flex items-start gap-3"
+              style={{
+                animation: `slideIn 0.5s ease-out ${index * 0.05}s both`,
+              }}
+            >
+              <GlowingCheck />
               <span className="text-sm text-foreground/75">{feature}</span>
             </li>
           ))}
