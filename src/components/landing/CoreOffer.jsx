@@ -340,13 +340,13 @@ export default function CoreOffer() {
         {/* 8-Step Clickable Cards */}
         <div className="mb-10">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-5 text-center">Core Automation — Steps 1–5</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <div className="flex flex-col gap-4 mb-6">
             {coreAutomation.map((item) => (
               <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
             ))}
           </div>
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-5 text-center">Done-For-You — Steps 6–8</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="flex flex-col gap-4">
             {doneForYou.map((item) => (
               <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
             ))}
