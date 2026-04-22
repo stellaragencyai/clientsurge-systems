@@ -28,59 +28,145 @@ export default function Hero() {
         <div style={{ position: "absolute", top: "50%", right: "30%", width: "25vw", height: "30vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(99,102,241,0.05) 0%, transparent 65%)", filter: "blur(12px)" }} />
       </div>
 
-      {/* ── STEP 2+3: Giant tablet frame — absolute, bleeds off right + bottom ── */}
+      {/* ── IDEA 4+6: Frosted reflection pool behind tablet (integration) ── */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
-          /* Position so it bleeds off right edge and bottom — just like IdentityIQ */
+          top: "52%",
+          right: "2%",
+          width: "58vw",
+          maxWidth: "860px",
+          height: "20vh",
+          borderRadius: "50%",
+          background: "radial-gradient(ellipse at center, rgba(200,150,92,0.10) 0%, rgba(253,252,250,0.6) 50%, transparent 80%)",
+          filter: "blur(28px)",
+          transform: "translateY(30%) scaleY(0.35)",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── IDEA 2: Pulsing warm amber glow halo behind bezel ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
           top: "50%",
-          right: "-6%",
-          transform: "translateY(-46%) perspective(2200px) rotateY(-18deg) rotateX(8deg) rotateZ(1.5deg)",
+          right: "3%",
+          width: "58vw",
+          maxWidth: "870px",
+          height: "74vh",
+          minHeight: "530px",
+          borderRadius: "32px",
+          background: "transparent",
+          boxShadow: "0 0 80px 20px rgba(200,150,92,0.18), 0 0 160px 60px rgba(154,92,46,0.10)",
+          transform: "translateY(-46%) perspective(2200px) rotateY(-12deg) rotateX(5deg) rotateZ(1deg)",
+          transformOrigin: "right center",
+          animation: "haloglow 4s ease-in-out infinite",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── TABLET FRAME — moved more center, reduced tilt (Idea 1) ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: "50%",
+          /* Idea 1: pulled in from right edge so full tablet is visible */
+          right: "3%",
+          /* Idea 1: reduced tilt angle from -18deg to -12deg so screen faces more forward */
+          transform: "translateY(-46%) perspective(2200px) rotateY(-12deg) rotateX(5deg) rotateZ(1deg)",
           transformOrigin: "right center",
           transformStyle: "preserve-3d",
-          /* Tablet bezel size — massive, 60vw wide */
-          width: "60vw",
-          maxWidth: "900px",
-          height: "72vh",
-          minHeight: "520px",
-          /* Dark tablet bezel */
+          width: "58vw",
+          maxWidth: "860px",
+          height: "74vh",
+          minHeight: "530px",
+          /* Idea 6: slight opacity reduction so warm bg bleeds through edges */
+          opacity: 0.97,
           background: "linear-gradient(145deg, #1c1f2e 0%, #131520 100%)",
           borderRadius: "28px",
-          border: "1px solid rgba(255,255,255,0.08)",
+          border: "1px solid rgba(255,255,255,0.10)",
           boxShadow: `
             0 0 0 8px #111318,
             0 0 0 10px rgba(255,255,255,0.05),
             0 60px 120px rgba(0,0,0,0.45),
             0 30px 60px rgba(0,0,0,0.3),
             inset 0 1px 0 rgba(255,255,255,0.06),
-            0 0 80px rgba(200,150,92,0.08)
+            0 0 80px rgba(200,150,92,0.12)
           `,
           padding: "16px",
           zIndex: 2,
-          /* Step 5: filter glow around the bezel */
           filter: "drop-shadow(0 40px 80px rgba(0,0,0,0.35))",
         }}
       >
+        {/* Idea 3: Glass-shine highlight streak across top of bezel */}
+        <div style={{
+          position: "absolute",
+          top: "6px",
+          left: "12%",
+          right: "12%",
+          height: "2px",
+          borderRadius: "9999px",
+          background: "linear-gradient(to right, transparent, rgba(255,255,255,0.28) 30%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.28) 70%, transparent)",
+          pointerEvents: "none",
+          zIndex: 15,
+        }} />
+
+        {/* Idea 6: Frosted edge — left side of bezel fades into bg via mask */}
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "28px",
+          background: "linear-gradient(to right, rgba(248,244,238,0.18) 0%, transparent 18%)",
+          pointerEvents: "none",
+          zIndex: 11,
+        }} />
+
         {/* Screen inner bezel ring */}
-        <div style={{ position: "absolute", inset: "12px", borderRadius: "18px", border: "1px solid rgba(0,0,0,0.06)", pointerEvents: "none", zIndex: 10 }} />
+        <div style={{ position: "absolute", inset: "12px", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.07)", pointerEvents: "none", zIndex: 10 }} />
+
         {/* Screen content */}
         <div style={{ width: "100%", height: "100%", borderRadius: "16px", overflow: "hidden", position: "relative" }}>
           <HeroDashboardScreen />
-          {/* Step 8: subtle scanline texture overlay for depth */}
-          <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px)", pointerEvents: "none", zIndex: 5 }} />
+          {/* Scanline depth texture */}
+          <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.012) 2px, rgba(0,0,0,0.012) 4px)", pointerEvents: "none", zIndex: 5 }} />
         </div>
+
         {/* Camera dot */}
-        <div style={{ position: "absolute", top: "8px", left: "50%", transform: "translateX(-50%)", width: "6px", height: "6px", borderRadius: "50%", background: "#c8c4be", border: "1px solid rgba(0,0,0,0.1)" }} />
+        <div style={{ position: "absolute", top: "8px", left: "50%", transform: "translateX(-50%)", width: "6px", height: "6px", borderRadius: "50%", background: "#2a2d3e", border: "1px solid rgba(255,255,255,0.12)" }} />
       </div>
 
-      {/* ── STEP 4: Left-to-right gradient overlay — text side stays clean ── */}
+      {/* Idea 5: Frosted glass reflection below tablet — blends into page */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: "0",
+          right: "3%",
+          width: "58vw",
+          maxWidth: "860px",
+          height: "120px",
+          background: "linear-gradient(to top, rgba(253,252,250,1) 0%, rgba(248,244,238,0.6) 50%, transparent 100%)",
+          backdropFilter: "blur(6px)",
+          WebkitBackdropFilter: "blur(6px)",
+          zIndex: 3,
+          pointerEvents: "none",
+          borderRadius: "0 0 28px 28px",
+        }}
+      />
+
+      {/* ── Left-to-right gradient overlay — text side stays clean ── */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
           inset: 0,
-          background: "linear-gradient(to right, rgba(253,252,250,1) 0%, rgba(253,252,250,0.98) 30%, rgba(253,252,250,0.7) 52%, rgba(253,252,250,0.15) 68%, transparent 80%)",
+          /* Idea 4+6: fade ends earlier so tablet center is fully visible */
+          background: "linear-gradient(to right, rgba(253,252,250,1) 0%, rgba(253,252,250,0.98) 28%, rgba(253,252,250,0.55) 44%, rgba(253,252,250,0.08) 58%, transparent 70%)",
           zIndex: 3,
           pointerEvents: "none",
         }}
@@ -225,7 +311,7 @@ export default function Hero() {
         style={{
           position: "absolute",
           bottom: "22%",
-          right: "38%",
+          right: "44%",
           zIndex: 8,
           background: "rgba(255,255,255,0.92)",
           backdropFilter: "blur(16px)",
@@ -248,7 +334,7 @@ export default function Hero() {
         style={{
           position: "absolute",
           top: "18%",
-          right: "33%",
+          right: "38%",
           zIndex: 8,
           background: "rgba(255,255,255,0.92)",
           backdropFilter: "blur(16px)",
@@ -269,9 +355,10 @@ export default function Hero() {
       </div>
 
       <style>{`
-        @keyframes hfloatA { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
-        @keyframes hfloatB { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
-        @keyframes hpulse  { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        @keyframes hfloatA  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+        @keyframes hfloatB  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+        @keyframes hpulse   { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        @keyframes haloglow { 0%,100%{opacity:0.7} 50%{opacity:1} }
 
         @media (max-width: 1024px) {
           /* On tablet/mobile, hide the background tablet and go stacked */
