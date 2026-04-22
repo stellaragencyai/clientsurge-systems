@@ -41,7 +41,7 @@ function useScrollGradient() {
   }, []);
 }
 import Navbar from "../components/landing/Navbar";
-import Hero from "../components/landing/Hero";
+import Hero from "../components/landing/Hero.jsx";
 import TrustBar from "../components/landing/TrustBar";
 import Industries from "../components/landing/Industries";
 import ProblemSolution from "../components/landing/ProblemSolution.jsx";
@@ -95,7 +95,7 @@ export default function Home() {
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen pb-16">
+      <div className="min-h-screen pb-16" style={{ background: "hsl(38,18%,94%)" }}>
         <Navbar />
         <Hero />
         <Industries />
