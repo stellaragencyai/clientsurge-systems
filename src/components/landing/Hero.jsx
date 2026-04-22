@@ -121,18 +121,18 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── IDEA 4+6: Frosted reflection pool behind tablet (integration) ── */}
+      {/* ── Frosted reflection pool behind tablet ── */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
           top: "52%",
           right: "2%",
-          width: "58vw",
-          maxWidth: "860px",
+          width: "52vw",
+          maxWidth: "780px",
           height: "20vh",
           borderRadius: "50%",
-          background: "radial-gradient(ellipse at center, rgba(200,150,92,0.10) 0%, rgba(253,252,250,0.6) 50%, transparent 80%)",
+          background: "radial-gradient(ellipse at center, rgba(200,150,92,0.09) 0%, rgba(253,252,250,0.5) 50%, transparent 80%)",
           filter: "blur(28px)",
           transform: "translateY(30%) scaleY(0.35)",
           zIndex: 1,
@@ -140,60 +140,75 @@ export default function Hero() {
         }}
       />
 
-      {/* ── IDEA 2: Pulsing warm amber glow halo behind bezel ── */}
+      {/* ── Pulsing warm amber glow halo behind bezel ── */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
           top: "50%",
-          right: "3%",
-          width: "58vw",
-          maxWidth: "870px",
-          height: "74vh",
-          minHeight: "530px",
+          right: "2%",
+          width: "52vw",
+          maxWidth: "780px",
+          height: "72vh",
+          minHeight: "500px",
           borderRadius: "32px",
           background: "transparent",
-          boxShadow: "0 0 80px 20px rgba(200,150,92,0.18), 0 0 160px 60px rgba(154,92,46,0.10)",
-          transform: "translateY(-46%) perspective(2200px) rotateY(-12deg) rotateX(5deg) rotateZ(1deg)",
-          transformOrigin: "right center",
+          boxShadow: "0 0 60px 16px rgba(200,150,92,0.16), 0 0 130px 50px rgba(154,92,46,0.09)",
+          transform: "translateY(-48%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)",
+          transformOrigin: "center center",
           animation: "haloglow 4s ease-in-out infinite",
           zIndex: 1,
           pointerEvents: "none",
         }}
       />
 
-      {/* ── TABLET FRAME — moved more center, reduced tilt (Idea 1) ── */}
+      {/* ── CAST SHADOW — ground shadow beneath tablet ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: "88%",
+          right: "4%",
+          width: "52vw",
+          maxWidth: "780px",
+          height: "60px",
+          background: "radial-gradient(ellipse at center, rgba(0,0,0,0.18) 0%, transparent 70%)",
+          filter: "blur(18px)",
+          transform: "perspective(2200px) rotateX(80deg) scaleY(0.4)",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── TABLET FRAME — fully visible, no edge crop ── */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
           top: "50%",
-          /* Idea 1: pulled in from right edge so full tablet is visible */
-          right: "3%",
-          /* Idea 1: reduced tilt angle from -18deg to -12deg so screen faces more forward */
-          transform: "translateY(-46%) perspective(2200px) rotateY(-12deg) rotateX(5deg) rotateZ(1deg)",
-          transformOrigin: "right center",
+          right: "2%",
+          transform: "translateY(-48%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)",
+          transformOrigin: "center center",
           transformStyle: "preserve-3d",
-          width: "58vw",
-          maxWidth: "860px",
-          height: "74vh",
-          minHeight: "530px",
-          /* Idea 6: slight opacity reduction so warm bg bleeds through edges */
-          opacity: 0.97,
-          background: "linear-gradient(145deg, #1c1f2e 0%, #131520 100%)",
-          borderRadius: "28px",
-          border: "1px solid rgba(255,255,255,0.10)",
+          width: "52vw",
+          maxWidth: "780px",
+          height: "72vh",
+          minHeight: "500px",
+          opacity: 0.99,
+          background: "linear-gradient(160deg, #22253a 0%, #141620 60%, #0e1018 100%)",
+          borderRadius: "32px",
+          border: "1.5px solid rgba(255,255,255,0.12)",
           boxShadow: `
-            0 0 0 8px #111318,
-            0 0 0 10px rgba(255,255,255,0.05),
-            0 60px 120px rgba(0,0,0,0.45),
-            0 30px 60px rgba(0,0,0,0.3),
-            inset 0 1px 0 rgba(255,255,255,0.06),
-            0 0 80px rgba(200,150,92,0.12)
+            0 0 0 7px #0d0f18,
+            0 0 0 9px rgba(255,255,255,0.04),
+            0 0 0 10px rgba(200,150,92,0.08),
+            0 50px 100px rgba(0,0,0,0.55),
+            0 20px 50px rgba(0,0,0,0.35),
+            inset 0 1px 0 rgba(255,255,255,0.08),
+            inset 0 -1px 0 rgba(0,0,0,0.3)
           `,
-          padding: "16px",
+          padding: "14px",
           zIndex: 2,
-          filter: "drop-shadow(0 40px 80px rgba(0,0,0,0.35))",
         }}
       >
         {/* Idea 3: Glass-shine highlight streak across top of bezel */}
@@ -233,22 +248,22 @@ export default function Hero() {
         <div style={{ position: "absolute", top: "8px", left: "50%", transform: "translateX(-50%)", width: "6px", height: "6px", borderRadius: "50%", background: "#2a2d3e", border: "1px solid rgba(255,255,255,0.12)" }} />
       </div>
 
-      {/* Idea 5: Frosted glass reflection below tablet — blends into page */}
+      {/* Frosted glass fade below tablet — blends into page */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
           bottom: "0",
-          right: "3%",
-          width: "58vw",
-          maxWidth: "860px",
-          height: "120px",
-          background: "linear-gradient(to top, rgba(253,252,250,1) 0%, rgba(248,244,238,0.6) 50%, transparent 100%)",
+          right: "2%",
+          width: "52vw",
+          maxWidth: "780px",
+          height: "100px",
+          background: "linear-gradient(to top, rgba(253,252,250,1) 0%, rgba(248,244,238,0.5) 50%, transparent 100%)",
           backdropFilter: "blur(6px)",
           WebkitBackdropFilter: "blur(6px)",
           zIndex: 3,
           pointerEvents: "none",
-          borderRadius: "0 0 28px 28px",
+          borderRadius: "0 0 32px 32px",
         }}
       />
 
@@ -397,59 +412,52 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── STEP 8: Floating stat chips — hover OUTSIDE the tablet frame ─ */}
-      {/* Revenue chip */}
+      {/* ── Live indicator strip — anchored below the tablet like a product caption ── */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
-          bottom: "22%",
-          right: "44%",
+          bottom: "13%",
+          right: "3%",
+          width: "58vw",
+          maxWidth: "860px",
           zIndex: 8,
-          background: "rgba(255,255,255,0.92)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderRadius: "16px",
-          padding: "12px 16px",
-          border: "1px solid rgba(245,158,11,0.25)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.12), 0 0 20px rgba(245,158,11,0.12)",
-          animation: "hfloatA 4.5s ease-in-out infinite",
+          display: "flex",
+          justifyContent: "center",
+          pointerEvents: "none",
         }}
       >
-        <p style={{ fontSize: "9px", fontWeight: "700", color: "#f59e0b", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 3px" }}>💰 Revenue Recovered</p>
-        <p style={{ fontSize: "20px", fontWeight: "800", color: "#1a1209", margin: "0 0 2px", lineHeight: 1 }}>$4,200</p>
-        <p style={{ fontSize: "9px", color: "#aaa", margin: 0 }}>This week · reactivated leads</p>
-      </div>
-
-      {/* Response time chip */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          top: "18%",
-          right: "38%",
-          zIndex: 8,
-          background: "rgba(255,255,255,0.92)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          borderRadius: "16px",
-          padding: "12px 16px",
-          border: "1px solid rgba(34,197,94,0.25)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.1), 0 0 20px rgba(34,197,94,0.1)",
-          animation: "hfloatB 5.5s ease-in-out infinite",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "5px", marginBottom: "4px" }}>
-          <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px #22c55e", animation: "hpulse 2s infinite" }} />
-          <span style={{ fontSize: "9px", fontWeight: "700", color: "#22c55e", textTransform: "uppercase", letterSpacing: "0.08em" }}>AI Response</span>
+        <div style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "6px",
+          background: "rgba(255,255,255,0.82)",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          borderRadius: "9999px",
+          padding: "7px 18px",
+          border: "1px solid rgba(154,92,46,0.15)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          fontSize: "10px",
+          color: "rgba(26,18,9,0.55)",
+          fontWeight: "600",
+          whiteSpace: "nowrap",
+          gap: "14px",
+        }}>
+          <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px #22c55e", display: "inline-block", animation: "hpulse 2s infinite" }} />
+            Live system
+          </span>
+          <span style={{ color: "rgba(26,18,9,0.2)" }}>·</span>
+          <span>⚡ AI replies in 4 sec</span>
+          <span style={{ color: "rgba(26,18,9,0.2)" }}>·</span>
+          <span>💰 $4,200 recovered this week</span>
+          <span style={{ color: "rgba(26,18,9,0.2)" }}>·</span>
+          <span>👥 247 leads captured</span>
         </div>
-        <p style={{ fontSize: "22px", fontWeight: "800", color: "#1a1209", margin: "0 0 2px", lineHeight: 1 }}>⚡ 4 sec</p>
-        <p style={{ fontSize: "9px", color: "#aaa", margin: 0 }}>Average AI reply time</p>
       </div>
 
       <style>{`
-        @keyframes hfloatA   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
-        @keyframes hfloatB   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
         @keyframes hpulse    { 0%,100%{opacity:1} 50%{opacity:0.3} }
         @keyframes haloglow  { 0%,100%{opacity:0.7} 50%{opacity:1} }
 
