@@ -94,14 +94,17 @@ function FeatureCard({ item, onSelect }) {
       <div
         className="flex flex-col rounded-2xl overflow-hidden transition-all duration-300"
         style={{
-          border: hovered ? "1px solid rgba(154,92,46,0.55)" : "1px solid rgba(154,92,46,0.2)",
-          boxShadow: hovered ? "0 12px 36px rgba(154,92,46,0.2), 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 3px rgba(255,255,255,0.4)" : "0 2px 8px rgba(0,0,0,0.06)",
-          transform: hovered ? "translateY(-2px) scale(1.01)" : "translateY(0)",
-          transition: "all 0.25s ease",
+          background: hovered ? "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,240,235,0.9) 100%)" : "linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(252,247,242,0.75) 100%)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          border: hovered ? "1.5px solid rgba(154,92,46,0.6)" : "1.5px solid rgba(154,92,46,0.3)",
+          boxShadow: hovered ? "0 20px 50px rgba(154,92,46,0.25), 0 8px 16px rgba(0,0,0,0.1), inset 0 1px 2px rgba(255,255,255,0.6)" : "0 8px 24px rgba(154,92,46,0.12), 0 2px 8px rgba(0,0,0,0.05), inset 0 1px 2px rgba(255,255,255,0.5)",
+          transform: hovered ? "translateY(-4px) scale(1.02)" : "translateY(0)",
+          transition: "all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1)",
         }}
       >
         {/* TOP */}
-        <div className="px-6 pt-7 pb-5" style={{ background: "rgba(154,92,46,0.05)" }}>
+        <div className="px-6 pt-7 pb-5" style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.08) 0%, rgba(154,92,46,0.04) 100%)" }}>
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: "rgba(80,40,10,0.9)" }}>
               Step {stepNum < 10 ? `0${stepNum}` : stepNum}
@@ -134,12 +137,12 @@ function FeatureCard({ item, onSelect }) {
         </div>
 
         {/* Divider */}
-        <div style={{ height: "1px", background: "rgba(154,92,46,0.15)" }} />
+        <div style={{ height: "1px", background: "linear-gradient(to right, transparent, rgba(154,92,46,0.2), transparent)" }} />
 
-        {/* BOTTOM - dark gradient */}
+        {/* BOTTOM - dark gradient with improved contrast */}
         <div
-          className="px-6 py-8 flex flex-col gap-2"
-          style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}
+          className="px-6 py-8 flex flex-col gap-2 relative"
+          style={{ background: "linear-gradient(135deg,#5a3418 0%,#8a5229 40%,#6b4020 100%)" }}
         >
           <h3 className="text-sm font-semibold leading-snug" style={{ color: "#f5e6d0" }}>{item.title}</h3>
           <p className="text-xs leading-relaxed" style={{ color: "rgba(245,230,208,0.65)" }}>{item.desc}</p>
@@ -300,8 +303,10 @@ export default function CoreOffer() {
   const [showBookingModal, setShowBookingModal] = useState(false);
 
   return (
-    <section id="services" className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card via-white to-background">
-      <div className="max-w-5xl mx-auto">
+    <section id="services" className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-blue-50/30 via-slate-50 to-background relative overflow-hidden">
+      {/* Enhanced background with subtle radial gradient for contrast */}
+      <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 80% 100% at 50% 0%, rgba(154,92,46,0.08) 0%, transparent 70%)" }} />
+      <div className="max-w-5xl mx-auto relative z-10">
 
         {/* Header */}
         <div className="text-center mb-14">
