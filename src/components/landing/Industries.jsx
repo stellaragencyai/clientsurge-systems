@@ -116,52 +116,60 @@ export default function Industries() {
           return (
             <div
               key={industry.name}
-              className="group relative block overflow-hidden cursor-pointer h-64"
+              className="group relative block overflow-hidden cursor-pointer h-80"
+              onClick={() => {
+                const blueprintKey = industry.href.includes("med-spa") ? "med-spa" : industry.href.split("#")[1];
+                if (["med-spa", "hvac", "dental"].includes(blueprintKey)) {
+                  setSelectedBlueprint(blueprintKey);
+                }
+              }}
               style={{
                 opacity: sectionVisible ? 1 : 0,
                 transform: sectionVisible ? "translateY(0)" : "translateY(32px)",
                 transition: `opacity 600ms ease ${index * 100}ms, transform 600ms ease ${index * 100}ms`,
               }}
             >
-              {/* Full background image */}
-              <img
-                src={industry.image}
-                alt={industry.name}
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              
-              {/* Dark overlay */}
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all duration-300" />
-              
-              {/* Gold border on hover */}
-              <div
-                className="absolute inset-0 border-2 pointer-events-none transition-opacity duration-400"
-                style={{ borderColor: "#c8965c", opacity: 0 }}
-                ref={(el) => {
-                  if (!el) return;
-                  const card = el.closest(".group");
-                  if (!card) return;
-                  card.addEventListener("mouseenter", () => { el.style.opacity = "1"; });
-                  card.addEventListener("mouseleave", () => { el.style.opacity = "0"; });
-                }}
-              />
+              {/* Full background image — top 70% */}
+              <div className="relative h-64 overflow-hidden">
+                <img
+                  src={industry.image}
+                  alt={industry.name}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+                
+                {/* Dark overlay */}
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-all duration-300" />
+                
+                {/* Gold border on hover */}
+                <div
+                  className="absolute inset-0 border-2 pointer-events-none transition-opacity duration-400"
+                  style={{ borderColor: "#c8965c", opacity: 0 }}
+                  ref={(el) => {
+                    if (!el) return;
+                    const card = el.closest(".group");
+                    if (!card) return;
+                    card.addEventListener("mouseenter", () => { el.style.opacity = "1"; });
+                    card.addEventListener("mouseleave", () => { el.style.opacity = "0"; });
+                  }}
+                />
+              </div>
 
-              {/* Industry name bottom left */}
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h3 
-                  className="font-display text-xl font-bold leading-tight transition-all duration-300"
-                  style={{ color: "#000" }}
-                  onMouseEnter={(e) => { e.target.style.color = "#c8965c"; }}
-                  onMouseLeave={(e) => { e.target.style.color = "#000"; }}
-                >
+              {/* Info strip — bottom 30% */}
+              <div className="relative px-5 py-4 bg-card border-t border-primary/20">
+                <h3 className="font-display text-base font-bold text-foreground mb-1.5 leading-tight">
                   {industry.name}
                 </h3>
+                <p className="text-xs text-muted-foreground leading-snug mb-3">{industry.problem}</p>
+                <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-primary hover:text-primary/80 transition-colors">
+                  {industry.cta}
+                  <ArrowRight className="w-3 h-3" />
+                </span>
               </div>
 
               {/* Bottom border accent line */}
               <div
-                className="absolute bottom-0 left-0 h-[2px] w-0 transition-all duration-500 ease-out group-hover:w-full"
+                className="h-[2px] w-0 transition-all duration-500 ease-out group-hover:w-full"
                 style={{ background: "linear-gradient(to right, #c8965c, #f5d9a8, #c8965c)" }}
               />
             </div>
