@@ -105,7 +105,6 @@ export default function Home() {
         <Industries />
         <section aria-label="Proof and trust">
           <TrustBar />
-          <MissedLeadRecovery />
           <Testimonials />
         </section>
         <ProblemSolution />

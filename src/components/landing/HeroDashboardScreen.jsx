@@ -170,6 +170,15 @@ function TypingDots() {
 }
 
 export default function HeroDashboardScreen() {
+  const [aiRespondingDot, setAiRespondingDot] = useState(0);
+  const [dashboardFade, setDashboardFade] = useState(0);
+  
+  useEffect(() => {
+    const t1 = setInterval(() => setAiRespondingDot((v) => (v + 1) % 3), 300);
+    const t2 = setInterval(() => setDashboardFade((v) => (v + 1) % 2), 6000);
+    return () => { clearInterval(t1); clearInterval(t2); };
+  }, []);
+
   const initLeads   = useCounter(247,  2200, 400);
   const replied     = useCounter(94,   1800, 600);
   const booked      = useCounter(61,   2000, 800);
@@ -279,7 +288,7 @@ export default function HeroDashboardScreen() {
   const displayRevenue = liveRevenue || initRevenue;
 
   return (
-    <div style={{ width: "100%", height: "100%", background: bg, borderRadius: "12px", display: "flex", flexDirection: "column", fontFamily: "'Inter', sans-serif", overflow: "hidden", position: "relative" }}>
+    <div style={{ width: "100%", height: "100%", background: bg, borderRadius: "12px", display: "flex", flexDirection: "column", fontFamily: "'Inter', sans-serif", overflow: "hidden", position: "relative", opacity: dashboardFade === 0 ? 1 : 0.7, transition: "opacity 1s ease-in-out" }}>
 
       {/* Notification banner — absolutely positioned over content */}
       <NotificationBanner notif={NOTIFICATIONS[notifIdx]} visible={notifVisible} />
@@ -355,16 +364,34 @@ export default function HeroDashboardScreen() {
           {/* Live SMS — looping conversations */}
           <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: "11px", padding: "12px", display: "flex", flexDirection: "column", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
-              <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "linear-gradient(135deg,#9a5c2e,#c8965c)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <span style={{ fontSize: "8px", fontWeight: "800", color: "#fff" }}>AI</span>
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ fontSize: "10px", fontWeight: "700", color: textPrimary, display: "block", transition: "opacity 0.4s" }}>{conv.lead}</span>
-                <div style={{ display: "flex", alignItems: "center", gap: "3px", marginTop: "1px" }}>
-                  <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 5px #22c55e" }} />
-                  <span style={{ fontSize: "8px", color: textMuted }}>AI responding</span>
-                </div>
-              </div>
+             <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "linear-gradient(135deg,#9a5c2e,#c8965c)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, position: "relative" }}>
+               <span style={{ fontSize: "8px", fontWeight: "800", color: "#fff" }}>AI</span>
+               {/* Animated responding pulse dots */}
+               {[0, 1, 2].map((i) => (
+                 <div
+                   key={i}
+                   style={{
+                     position: "absolute",
+                     width: "3px",
+                     height: "3px",
+                     borderRadius: "50%",
+                     background: "#22c55e",
+                     boxShadow: "0 0 4px #22c55e",
+                     top: "-6px",
+                     left: `${4 + i * 3}px`,
+                     opacity: aiRespondingDot === i ? 1 : 0.3,
+                     transition: "opacity 0.2s ease",
+                   }}
+                 />
+               ))}
+             </div>
+             <div style={{ flex: 1, minWidth: 0 }}>
+               <span style={{ fontSize: "10px", fontWeight: "700", color: textPrimary, display: "block", transition: "opacity 0.4s" }}>{conv.lead}</span>
+               <div style={{ display: "flex", alignItems: "center", gap: "3px", marginTop: "1px" }}>
+                 <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 5px #22c55e" }} />
+                 <span style={{ fontSize: "8px", color: textMuted }}>AI responding</span>
+               </div>
+             </div>
               <div style={{ fontSize: "8px", fontWeight: "800", color: "#22c55e", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", padding: "2px 7px", borderRadius: "8px", flexShrink: 0 }}>⚡ 4s</div>
             </div>
             <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "5px", justifyContent: "flex-end", opacity: fadingOut ? 0 : 1, transition: "opacity 0.5s ease" }}>

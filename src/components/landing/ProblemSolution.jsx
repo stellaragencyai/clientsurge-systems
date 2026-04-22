@@ -98,7 +98,7 @@ export default function ProblemSolution() {
                   }}
                 >
                   {/* Problem side */}
-                  <div className="flex items-center gap-4 px-6 py-5 bg-destructive/5 border-b md:border-b-0 md:border-r border-border">
+                  <div className="flex items-center gap-4 px-6 py-5 bg-white border-b md:border-b-0 md:border-r border-border">
                     <div className="w-9 h-9 rounded-xl bg-destructive/15 flex items-center justify-center flex-shrink-0">
                       <X className="w-4 h-4 text-destructive" />
                     </div>
@@ -112,9 +112,9 @@ export default function ProblemSolution() {
                   {/* Solution side */}
                   <div 
                     data-solution-id={i}
-                    className="flex items-center gap-4 px-6 py-5 bg-primary/5 transition-all duration-500"
+                    className="flex items-center gap-4 px-6 py-5 bg-white transition-all duration-500"
                     style={{
-                      background: "rgba(34,197,94,0.05)",
+                      background: "rgba(255,255,255,1)",
                       boxShadow: "0 2px 14px rgba(154,92,46,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
                     }}
                   >
