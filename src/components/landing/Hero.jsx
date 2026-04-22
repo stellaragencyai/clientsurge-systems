@@ -16,16 +16,109 @@ export default function Hero() {
         alignItems: "center",
       }}
     >
-      {/* ── STEP 7: Ambient light rays glowing BEHIND the tablet ────── */}
+      {/* ── IDEA 4: Full right-half warm atmosphere wash (IdentityIQ-style full-bleed color) ── */}
       <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}>
-        {/* Main amber glow — right side, behind tablet */}
-        <div style={{ position: "absolute", top: "10%", right: "-5%", width: "70vw", height: "90vh", borderRadius: "50%", background: "radial-gradient(ellipse at 70% 40%, rgba(200,150,92,0.13) 0%, rgba(154,92,46,0.07) 35%, transparent 65%)", filter: "blur(4px)" }} />
+        {/* Wide amber atmosphere — floods the entire right half like IdentityIQ's navy wash */}
+        <div style={{ position: "absolute", top: "-10%", right: "-10%", width: "80vw", height: "120vh", background: "radial-gradient(ellipse at 65% 45%, rgba(200,150,92,0.16) 0%, rgba(154,92,46,0.09) 30%, rgba(245,217,168,0.05) 55%, transparent 72%)", filter: "blur(2px)" }} />
+        {/* Secondary warm bloom — lower right */}
+        <div style={{ position: "absolute", bottom: "-5%", right: "-5%", width: "55vw", height: "70vh", background: "radial-gradient(ellipse at 60% 60%, rgba(200,150,92,0.10) 0%, rgba(154,92,46,0.05) 40%, transparent 68%)", filter: "blur(6px)" }} />
         {/* Green glow — pipeline booked stat */}
         <div style={{ position: "absolute", top: "30%", right: "15%", width: "40vw", height: "50vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(34,197,94,0.07) 0%, transparent 65%)", filter: "blur(8px)" }} />
         {/* Purple glow — SMS section */}
-        <div style={{ position: "absolute", bottom: "15%", right: "10%", width: "30vw", height: "40vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(167,139,250,0.06) 0%, transparent 65%)", filter: "blur(10px)" }} />
-        {/* Indigo glow — pipeline */}
-        <div style={{ position: "absolute", top: "50%", right: "30%", width: "25vw", height: "30vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(99,102,241,0.05) 0%, transparent 65%)", filter: "blur(12px)" }} />
+        <div style={{ position: "absolute", bottom: "15%", right: "10%", width: "30vw", height: "40vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(167,139,250,0.05) 0%, transparent 65%)", filter: "blur(10px)" }} />
+      </div>
+
+      {/* ── IDEA 5: Dot-grid mesh texture overlay (IdentityIQ subtle depth texture) ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          zIndex: 1,
+          backgroundImage: "radial-gradient(circle, rgba(154,92,46,0.09) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          maskImage: "radial-gradient(ellipse 70% 100% at 75% 50%, rgba(0,0,0,0.5) 0%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(ellipse 70% 100% at 75% 50%, rgba(0,0,0,0.5) 0%, transparent 75%)",
+        }}
+      />
+
+      {/* ── IDEA 1: Ghost panel — bleeds off TOP RIGHT (far background depth layer) ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: "-8%",
+          right: "-2%",
+          width: "44vw",
+          maxWidth: "640px",
+          height: "55vh",
+          minHeight: "360px",
+          background: "linear-gradient(145deg, rgba(26,18,9,0.06) 0%, rgba(200,150,92,0.04) 100%)",
+          borderRadius: "22px",
+          border: "1px solid rgba(154,92,46,0.12)",
+          /* Idea 3: heavy blur = depth-of-field, feels like IdentityIQ's background screens */
+          filter: "blur(3px)",
+          transform: "perspective(2200px) rotateY(-14deg) rotateX(6deg) rotateZ(0.5deg)",
+          transformOrigin: "right top",
+          opacity: 0.55,
+          zIndex: 1,
+          pointerEvents: "none",
+          overflow: "hidden",
+        }}
+      >
+        {/* Ghost UI content — partially legible like IdentityIQ */}
+        <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "10px", opacity: 0.6 }}>
+          <div style={{ height: "10px", width: "55%", borderRadius: "6px", background: "rgba(154,92,46,0.25)" }} />
+          <div style={{ height: "8px", width: "80%", borderRadius: "6px", background: "rgba(154,92,46,0.15)" }} />
+          <div style={{ height: "8px", width: "65%", borderRadius: "6px", background: "rgba(154,92,46,0.12)" }} />
+          <div style={{ marginTop: "12px", height: "60px", borderRadius: "12px", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ height: "8px", width: "40%", borderRadius: "4px", background: "rgba(34,197,94,0.3)" }} />
+          </div>
+          <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+            {[70, 50, 85, 40, 60].map((w, i) => (
+              <div key={i} style={{ flex: 1, height: "40px", borderRadius: "8px", background: `rgba(154,92,46,${0.05 + i * 0.02})`, border: "1px solid rgba(154,92,46,0.1)" }} />
+            ))}
+          </div>
+          <div style={{ height: "8px", width: "90%", borderRadius: "6px", background: "rgba(154,92,46,0.10)" }} />
+          <div style={{ height: "8px", width: "70%", borderRadius: "6px", background: "rgba(154,92,46,0.08)" }} />
+        </div>
+      </div>
+
+      {/* ── IDEA 2: Ghost panel — bleeds off BOTTOM RIGHT (another depth layer) ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: "-12%",
+          right: "6%",
+          width: "38vw",
+          maxWidth: "560px",
+          height: "48vh",
+          minHeight: "300px",
+          background: "linear-gradient(145deg, rgba(26,18,9,0.05) 0%, rgba(200,150,92,0.03) 100%)",
+          borderRadius: "20px",
+          border: "1px solid rgba(154,92,46,0.10)",
+          /* Idea 3: even heavier blur for the deeper background panel */
+          filter: "blur(5px)",
+          transform: "perspective(2200px) rotateY(-10deg) rotateX(-4deg) rotateZ(-1deg)",
+          transformOrigin: "right bottom",
+          opacity: 0.45,
+          zIndex: 1,
+          pointerEvents: "none",
+          overflow: "hidden",
+        }}
+      >
+        {/* Ghost UI — lead list rows */}
+        <div style={{ padding: "18px", display: "flex", flexDirection: "column", gap: "8px", opacity: 0.7 }}>
+          {[90, 75, 60, 80, 55, 70].map((w, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 10px", borderRadius: "10px", background: "rgba(154,92,46,0.04)", border: "1px solid rgba(154,92,46,0.08)" }}>
+              <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: `rgba(154,92,46,${0.12 + i * 0.03})`, flexShrink: 0 }} />
+              <div style={{ height: "7px", width: `${w}%`, borderRadius: "4px", background: "rgba(26,18,9,0.12)" }} />
+              <div style={{ marginLeft: "auto", height: "7px", width: "15%", borderRadius: "4px", background: "rgba(34,197,94,0.2)", flexShrink: 0 }} />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── IDEA 4+6: Frosted reflection pool behind tablet (integration) ── */}
@@ -355,10 +448,10 @@ export default function Hero() {
       </div>
 
       <style>{`
-        @keyframes hfloatA  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
-        @keyframes hfloatB  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
-        @keyframes hpulse   { 0%,100%{opacity:1} 50%{opacity:0.3} }
-        @keyframes haloglow { 0%,100%{opacity:0.7} 50%{opacity:1} }
+        @keyframes hfloatA   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+        @keyframes hfloatB   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+        @keyframes hpulse    { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        @keyframes haloglow  { 0%,100%{opacity:0.7} 50%{opacity:1} }
 
         @media (max-width: 1024px) {
           /* On tablet/mobile, hide the background tablet and go stacked */
