@@ -67,41 +67,42 @@ export default function TrustBar() {
             return (
               <article
                 key={item.label}
-                className="relative rounded-2xl border border-border px-4 py-3 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
+                className="relative rounded-2xl border border-border px-4 py-3 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md overflow-hidden"
                 style={{
                   background: is5to7Days
-                    ? "rgba(255,255,255,0.5)"
+                    ? `url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/1dea161a9_b163f1d0-a199-4721-abbc-0aa34fe8f78c.jpg')`
                     : "rgba(255,255,255,0.7)",
-                  backdropFilter: is5to7Days ? "blur(12px)" : "none",
-                  WebkitBackdropFilter: is5to7Days ? "blur(12px)" : "none",
+                  backgroundSize: is5to7Days ? "cover" : "auto",
+                  backgroundPosition: is5to7Days ? "center" : "initial",
+                  backgroundColor: is5to7Days ? "rgba(255,255,255,0.92)" : "transparent",
+                  backgroundBlendMode: is5to7Days ? "overlay" : "normal",
+                  backdropFilter: !is5to7Days ? "blur(12px)" : "none",
+                  WebkitBackdropFilter: !is5to7Days ? "blur(12px)" : "none",
                   opacity: inView ? 1 : 0,
                   transform: inView ? "translateY(0)" : "translateY(16px)",
                   transition: `opacity 0.5s ease ${index * 0.08}s, transform 0.5s ease ${index * 0.08}s`,
                 }}
               >
-                {/* Floating icon cloud */}
-                <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-primary/15 border border-primary/25 flex items-center justify-center shadow-lg backdrop-blur-sm">
-                  <Icon className="w-[18px] h-[18px] text-primary" />
-                </div>
-
-                {/* Background image for 5-7 days only */}
-                {is5to7Days && (
-                  <div
-                    className="absolute inset-0 rounded-2xl opacity-65 bg-cover bg-center"
-                    style={{
-                      backgroundImage:
-                        "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/1dea161a9_b163f1d0-a199-4721-abbc-0aa34fe8f78c.jpg')",
-                      maskImage: "radial-gradient(circle at center, transparent 0%, black 100%)",
-                      WebkitMaskImage:
-                        "radial-gradient(circle at center, transparent 0%, black 100%)",
-                    }}
-                  />
+                {/* Floating icon cloud - hidden for 5-7 days */}
+                {!is5to7Days && (
+                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-primary/15 border border-primary/25 flex items-center justify-center shadow-lg backdrop-blur-sm">
+                    <Icon className="w-[18px] h-[18px] text-primary" />
+                  </div>
                 )}
 
                 <div className="relative z-10 pt-4">
-                  <p className="font-display text-lg font-semibold text-foreground leading-tight">{item.stat}</p>
-                  <p className="text-[10px] uppercase tracking-wide text-primary/80 mt-1.5 mb-2">{item.label}</p>
-                  <p className="text-xs text-foreground/65 leading-snug">{item.story}</p>
+                  {is5to7Days ? (
+                    <>
+                      <p className="font-display text-base font-bold text-black leading-tight">{item.stat}</p>
+                      <p className="text-[9px] text-black/70 leading-tight mt-2">{item.story}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-display text-lg font-semibold text-foreground leading-tight">{item.stat}</p>
+                      <p className="text-[10px] uppercase tracking-wide text-primary/80 mt-1.5 mb-2">{item.label}</p>
+                      <p className="text-xs text-foreground/65 leading-snug">{item.story}</p>
+                    </>
+                  )}
                 </div>
               </article>
             );
