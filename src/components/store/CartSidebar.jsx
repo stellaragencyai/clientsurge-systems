@@ -136,8 +136,18 @@ export default function CartSidebar() {
         {/* Footer totals + CTA */}
          {items.length > 0 && (() => {
            const hasBundle = items.length >= 3;
-           const bundleDiscountSetup = hasBundle ? Math.round(totalSetup * 0.15) : 0;
-           const bundleDiscountMonthly = hasBundle ? Math.round(totalMonthly * 0.1) : 0;
+           let setupPercent = 0, monthlyPercent = 0;
+           
+           if (items.length >= 5) {
+             setupPercent = 100; monthlyPercent = 50;
+           } else if (items.length === 4) {
+             setupPercent = 50; monthlyPercent = 30;
+           } else if (items.length >= 3) {
+             setupPercent = 25; monthlyPercent = 20;
+           }
+           
+           const bundleDiscountSetup = hasBundle ? Math.round(totalSetup * (setupPercent / 100)) : 0;
+           const bundleDiscountMonthly = hasBundle ? Math.round(totalMonthly * (monthlyPercent / 100)) : 0;
            const discountedSetup = totalSetup - bundleDiscountSetup;
            const discountedMonthly = totalMonthly - bundleDiscountMonthly;
 
@@ -157,7 +167,7 @@ export default function CartSidebar() {
                    🎁 Bundle Discount Applied!
                  </div>
                  <div style={{ fontSize: "12px", color: "rgba(26,18,9,0.6)" }}>
-                   Save ${bundleDiscountSetup} setup + ${bundleDiscountMonthly}/mo (15% & 10% off)
+                   Save ${bundleDiscountSetup} setup + ${bundleDiscountMonthly}/mo ({setupPercent}% & {monthlyPercent}% off)
                  </div>
                </div>
              )}
