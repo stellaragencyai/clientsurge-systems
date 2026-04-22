@@ -95,7 +95,7 @@ export default function Home() {
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen pb-16" style={{ background: "hsl(38,18%,94%)" }}>
+      <div className="min-h-screen pb-16">
         <Navbar />
         <Hero />
         <Industries />
