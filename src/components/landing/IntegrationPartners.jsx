@@ -71,7 +71,7 @@ export default function IntegrationPartners() {
         {/* Header */}
         <div className="text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">Integrations</p>
-          <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
+          <h2 className="font-titles text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
             We Easily Integrate With
           </h2>
           <p className="text-muted-foreground text-base max-w-xl mx-auto">

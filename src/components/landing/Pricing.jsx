@@ -94,7 +94,7 @@ export default function Pricing() {
       <div className="max-w-7xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Pricing & Packages</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground leading-tight">
+          <h2 className="font-titles text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
             Choose the System That Turns Your Leads Into Booked Clients
           </h2>
           <p className="mt-5 text-foreground font-semibold text-base mb-3">
@@ -114,7 +114,7 @@ export default function Pricing() {
         <div className="mt-12 max-w-5xl mx-auto rounded-3xl border border-border bg-card/80 p-6 md:p-8 shadow-sm">
           <div className="max-w-2xl mb-6">
             <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What&apos;s Included In Setup</p>
-            <h3 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
+            <h3 className="font-titles text-2xl md:text-3xl font-bold text-foreground">
               We handle the implementation work, not just the strategy
             </h3>
             <p className="mt-3 text-sm md:text-base text-muted-foreground">

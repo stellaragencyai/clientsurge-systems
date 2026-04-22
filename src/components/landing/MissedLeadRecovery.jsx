@@ -87,10 +87,10 @@ export default function MissedLeadRecovery() {
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
           <h2
-            className="font-display"
             style={{
+              fontFamily: "var(--font-titles)",
               fontSize: "28px",
-              fontWeight: "800",
+              fontWeight: "700",
               color: "#f5e6d0",
               marginBottom: "8px",
             }}

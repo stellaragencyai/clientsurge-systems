@@ -453,12 +453,12 @@ export default function Hero() {
 
           {/* Headline */}
           <h1
-            className="font-display"
             style={{
+              fontFamily: "var(--font-titles)",
               fontSize: "clamp(2.5rem, 4.5vw, 3.8rem)",
-              fontWeight: "800",
+              fontWeight: "700",
               lineHeight: 1.07,
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.01em",
               color: "#1a1209",
               marginBottom: "20px",
             }}

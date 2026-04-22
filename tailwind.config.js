@@ -7,6 +7,7 @@ module.exports = {
   		fontFamily: {
   			inter: ['var(--font-inter)'],
   			display: ['var(--font-display)'],
+  			titles: ['var(--font-titles)'],
   			sans: ['var(--font-inter)'],
   		},
   		borderRadius: {
