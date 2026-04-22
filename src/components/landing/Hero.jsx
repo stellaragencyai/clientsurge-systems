@@ -110,21 +110,35 @@ export default function Hero() {
           WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 85%)",
         }}
       >
-        {/* Ghost UI content — partially legible like IdentityIQ */}
-        <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "10px", opacity: 0.6 }}>
-          <div style={{ height: "10px", width: "55%", borderRadius: "6px", background: "rgba(154,92,46,0.25)" }} />
-          <div style={{ height: "8px", width: "80%", borderRadius: "6px", background: "rgba(154,92,46,0.15)" }} />
-          <div style={{ height: "8px", width: "65%", borderRadius: "6px", background: "rgba(154,92,46,0.12)" }} />
-          <div style={{ marginTop: "12px", height: "60px", borderRadius: "12px", background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ height: "8px", width: "40%", borderRadius: "4px", background: "rgba(34,197,94,0.3)" }} />
+        {/* Top panel readable UI (Fix 7) — dashboard preview with legible content */}
+        <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "14px", opacity: 0.75 }}>
+          {/* Header */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div style={{ width: "20px", height: "20px", borderRadius: "6px", background: "rgba(154,92,46,0.4)" }} />
+            <div style={{ height: "10px", width: "55%", borderRadius: "4px", background: "rgba(154,92,46,0.35)" }} />
           </div>
-          <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-            {[70, 50, 85, 40, 60].map((w, i) => (
-              <div key={i} style={{ flex: 1, height: "40px", borderRadius: "8px", background: `rgba(154,92,46,${0.05 + i * 0.02})`, border: "1px solid rgba(154,92,46,0.1)" }} />
+          {/* Stat row — legible numbers */}
+          <div style={{ display: "flex", justifyContent: "space-around", gap: "8px" }}>
+            {["247", "94%", "$4.2k"].map((val, i) => (
+              <div key={i} style={{ flex: 1, textAlign: "center", padding: "10px", borderRadius: "10px", background: "rgba(154,92,46,0.12)", border: "1px solid rgba(154,92,46,0.18)" }}>
+                <div style={{ height: "14px", background: `linear-gradient(to bottom, rgba(154,92,46,0.${40 + i*15}), rgba(154,92,46,0.${25 + i*10}))`, borderRadius: "2px", marginBottom: "3px" }} />
+                <div style={{ height: "8px", width: "70%", borderRadius: "3px", background: "rgba(154,92,46,0.25)", margin: "0 auto" }} />
+              </div>
             ))}
           </div>
-          <div style={{ height: "8px", width: "90%", borderRadius: "6px", background: "rgba(154,92,46,0.10)" }} />
-          <div style={{ height: "8px", width: "70%", borderRadius: "6px", background: "rgba(154,92,46,0.08)" }} />
+          {/* Pipeline bar */}
+          <div style={{ marginTop: "8px" }}>
+            <div style={{ height: "8px", width: "40%", borderRadius: "3px", background: "rgba(154,92,46,0.3)", marginBottom: "6px" }} />
+            <div style={{ height: "20px", borderRadius: "6px", background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.2)", position: "relative", overflow: "hidden" }}>
+              <div style={{ height: "100%", width: "72%", background: "rgba(34,197,94,0.35)", borderRadius: "6px" }} />
+            </div>
+          </div>
+          {/* Mini chart bars */}
+          <div style={{ display: "flex", alignItems: "flex-end", gap: "6px", height: "50px", marginTop: "10px" }}>
+            {[35, 52, 68, 44, 76].map((h, i) => (
+              <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "4px", background: `rgba(200,150,92,${0.15 + i*0.08})`, border: "1px solid rgba(200,150,92,0.15)" }} />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -224,7 +238,7 @@ export default function Hero() {
         }}
       />
 
-      {/* ── TABLET FRAME — fully visible, no edge crop ── */}
+      {/* ── TABLET FRAME — fully visible, scaled larger (Fix 6) ── */}
       <div
         aria-hidden="true"
         style={{
@@ -234,24 +248,24 @@ export default function Hero() {
           transform: "translateY(-48%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)",
           transformOrigin: "center center",
           transformStyle: "preserve-3d",
-          width: "52vw",
-          maxWidth: "780px",
-          height: "72vh",
-          minHeight: "500px",
+          width: "56vw",
+          maxWidth: "840px",
+          height: "80vh",
+          minHeight: "550px",
           opacity: 0.99,
           background: "linear-gradient(160deg, #22253a 0%, #141620 60%, #0e1018 100%)",
-          borderRadius: "32px",
+          borderRadius: "36px",
           border: "1.5px solid rgba(255,255,255,0.12)",
           boxShadow: `
-            0 0 0 7px #0d0f18,
-            0 0 0 9px rgba(255,255,255,0.04),
-            0 0 0 10px rgba(200,150,92,0.08),
-            0 50px 100px rgba(0,0,0,0.55),
-            0 20px 50px rgba(0,0,0,0.35),
+            0 0 0 8px #0d0f18,
+            0 0 0 10px rgba(255,255,255,0.04),
+            0 0 0 11px rgba(200,150,92,0.08),
+            0 60px 120px rgba(0,0,0,0.6),
+            0 25px 60px rgba(0,0,0,0.4),
             inset 0 1px 0 rgba(255,255,255,0.08),
             inset 0 -1px 0 rgba(0,0,0,0.3)
           `,
-          padding: "14px",
+          padding: "16px",
           zIndex: 2,
         }}
       >
@@ -311,13 +325,24 @@ export default function Hero() {
         }}
       />
 
+      {/* ── Top-to-bottom atmospheric light gradient (Fix 5) ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(to bottom, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.2) 100%)",
+          zIndex: 3,
+          pointerEvents: "none",
+        }}
+      />
+
       {/* ── Left-to-right gradient overlay — text side stays clean ── */}
       <div
         aria-hidden="true"
         style={{
           position: "absolute",
           inset: 0,
-          /* Idea 4+6: fade ends earlier so tablet center is fully visible */
           background: "linear-gradient(to right, rgba(253,252,250,1) 0%, rgba(253,252,250,0.98) 28%, rgba(253,252,250,0.55) 44%, rgba(253,252,250,0.08) 58%, transparent 70%)",
           zIndex: 3,
           pointerEvents: "none",
