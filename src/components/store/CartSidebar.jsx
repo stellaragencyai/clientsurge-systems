@@ -134,16 +134,48 @@ export default function CartSidebar() {
         </div>
 
         {/* Footer totals + CTA */}
-        {items.length > 0 && (
-          <div style={{ padding: "16px 24px", borderTop: "1px solid rgba(154,92,46,0.12)", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(10px)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-              <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>One-time setup total</span>
-              <span style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209" }}>${totalSetup}</span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
-              <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>Monthly total</span>
-              <span style={{ fontSize: "13px", fontWeight: "700", color: "#9a5c2e" }}>${totalMonthly}/mo</span>
-            </div>
+         {items.length > 0 && (() => {
+           const hasBundle = items.length >= 3;
+           const bundleDiscountSetup = hasBundle ? Math.round(totalSetup * 0.15) : 0;
+           const bundleDiscountMonthly = hasBundle ? Math.round(totalMonthly * 0.1) : 0;
+           const discountedSetup = totalSetup - bundleDiscountSetup;
+           const discountedMonthly = totalMonthly - bundleDiscountMonthly;
+
+           return (
+           <div style={{ padding: "16px 24px", borderTop: "1px solid rgba(154,92,46,0.12)", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(10px)" }}>
+             {/* Bundle discount visual */}
+             {hasBundle && (
+               <div style={{
+                 marginBottom: "12px",
+                 padding: "12px",
+                 borderRadius: "12px",
+                 background: "linear-gradient(135deg, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.08) 100%)",
+                 border: "1.5px solid rgba(34,197,94,0.3)",
+                 animation: "bundlePulse 2s ease-in-out infinite",
+               }}>
+                 <div style={{ fontSize: "11px", fontWeight: "700", color: "#22c55e", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                   🎁 Bundle Discount Applied!
+                 </div>
+                 <div style={{ fontSize: "12px", color: "rgba(26,18,9,0.6)" }}>
+                   Save ${bundleDiscountSetup} setup + ${bundleDiscountMonthly}/mo (15% & 10% off)
+                 </div>
+               </div>
+             )}
+
+             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
+               <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>One-time setup total</span>
+               <div style={{ textAlign: "right" }}>
+                 {hasBundle && <span style={{ fontSize: "11px", color: "rgba(26,18,9,0.3)", textDecoration: "line-through", marginRight: "6px" }}>${totalSetup}</span>}
+                 <span style={{ fontSize: "13px", fontWeight: "700", color: hasBundle ? "#22c55e" : "#1a1209" }}>${hasBundle ? discountedSetup : totalSetup}</span>
+               </div>
+             </div>
+             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+               <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>Monthly total</span>
+               <div style={{ textAlign: "right" }}>
+                 {hasBundle && <span style={{ fontSize: "11px", color: "rgba(26,18,9,0.3)", textDecoration: "line-through", marginRight: "6px" }}>${totalMonthly}</span>}
+                 <span style={{ fontSize: "13px", fontWeight: "700", color: hasBundle ? "#22c55e" : "#9a5c2e" }}>${hasBundle ? discountedMonthly : totalMonthly}/mo</span>
+               </div>
+             </div>
 
             {step === "cart" && (
               <button
@@ -173,12 +205,19 @@ export default function CartSidebar() {
               </div>
             )}
 
-            <p style={{ textAlign: "center", fontSize: "10px", color: "rgba(26,18,9,0.3)", marginTop: "10px" }}>
-              🔒 Secured by Stripe · Cancel anytime
-            </p>
-          </div>
-        )}
+             <p style={{ textAlign: "center", fontSize: "10px", color: "rgba(26,18,9,0.3)", marginTop: "10px" }}>
+               🔒 Secured by Stripe · Cancel anytime
+             </p>
+            </div>
+            );
+            })()}
       </div>
-    </>
-  );
-}
+      <style>{`
+        @keyframes bundlePulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4), inset 0 0 0 0 rgba(34,197,94,0.1); }
+          50% { box-shadow: 0 0 0 8px rgba(34,197,94,0), inset 0 0 0 1px rgba(34,197,94,0.3); }
+        }
+      `}</style>
+      </>
+      );
+      }
