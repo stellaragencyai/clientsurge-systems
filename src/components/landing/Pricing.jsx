@@ -94,8 +94,8 @@ export default function Pricing() {
       <div className="max-w-7xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Pricing & Packages</p>
-          <h2 className="font-titles text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
-            Choose the System That Turns Your Leads Into Booked Clients
+          <h2 className="font-inter text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
+           Choose the System That Turns Your Leads Into Booked Clients
           </h2>
           <p className="mt-5 text-foreground font-semibold text-base mb-3">
             Most businesses recover the cost with just a few additional bookings.

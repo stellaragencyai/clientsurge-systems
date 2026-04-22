@@ -110,8 +110,8 @@ export default function FAQ() {
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Questions</p>
-          <h2 className="font-titles text-3xl md:text-4xl font-bold tracking-tight text-foreground">
-            Frequently Asked Questions
+          <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+           Frequently Asked Questions
           </h2>
           <p className="mt-4 text-muted-foreground text-base">
             Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message</a>
