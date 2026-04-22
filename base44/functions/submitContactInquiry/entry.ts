@@ -160,6 +160,60 @@ async function sendAdminNotification(contact: ReturnType<typeof normalizeContact
   return { sent: true };
 }
 
+async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContactInput>) {
+  const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+
+  if (!RESEND_API_KEY) {
+    return { sent: false, reason: 'missing_resend_api_key' };
+  }
+
+  const businessTypeGreeting = `for ${contact.business_type}s`;
+  const emailBody = `
+    <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;">
+      <h2>Thanks for Reaching Out, ${contact.full_name.split(' ')[0]}!</h2>
+      <p style="color:#555;line-height:1.6;">We've received your message and we're excited to learn more about how we can help your business ${businessTypeGreeting}.</p>
+      
+      <div style="background:#f9f9f9;border-left:4px solid #9a5c2e;padding:16px;margin:24px 0;border-radius:4px;">
+        <p style="margin:0;color:#666;font-size:14px;"><strong>What happens next:</strong></p>
+        <ul style="margin:8px 0 0 0;padding-left:20px;color:#666;font-size:14px;">
+          <li>Our team will review your inquiry</li>
+          <li>We'll get back to you within one business day</li>
+          <li>If you'd prefer to chat sooner, <a href="https://clientsurgesystems.com/book" style="color:#9a5c2e;text-decoration:none;">book a free 15-minute demo</a></li>
+        </ul>
+      </div>
+
+      <p style="color:#666;line-height:1.6;">In the meantime, feel free to explore how our automation system works for ${contact.business_type.toLowerCase()}. We're here to help.</p>
+      
+      <p style="color:#999;font-size:12px;margin-top:32px;border-top:1px solid #eee;padding-top:16px;">
+        <strong>ClientSurge Systems</strong><br>
+        Phoenix, Arizona<br>
+        <a href="mailto:system@clientsurgesystems.com" style="color:#9a5c2e;text-decoration:none;">system@clientsurgesystems.com</a>
+      </p>
+    </div>
+  `;
+
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'ClientSurge Systems <onboarding@resend.dev>',
+      to: [contact.email],
+      subject: `Thank You for Your Message, ${contact.full_name.split(' ')[0]}!`,
+      html: emailBody,
+    }),
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    return { sent: false, reason: details || 'thank_you_email_failed' };
+  }
+
+  return { sent: true };
+}
+
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
@@ -232,6 +286,7 @@ Deno.serve(async (req) => {
     });
 
     const notification = await sendAdminNotification(contact);
+    const thankYouEmail = await sendUserThankYouEmail(contact);
 
     await logCommunicationEvent(base44, {
       lead_id: leadId,
@@ -250,12 +305,31 @@ Deno.serve(async (req) => {
       },
     });
 
+    await logCommunicationEvent(base44, {
+      lead_id: leadId,
+      channel: 'email',
+      direction: 'outbound',
+      event_type: thankYouEmail.sent ? 'email_sent' : 'email_failed',
+      provider: 'resend',
+      status: thankYouEmail.sent ? 'sent' : 'failed',
+      subject: `Thank You for Your Message, ${contact.full_name.split(' ')[0]}!`,
+      message_body: 'Automated thank you email',
+      error_message: thankYouEmail.sent ? undefined : thankYouEmail.reason,
+      metadata: {
+        target: 'user_thank_you',
+        source: LEAD_SOURCE,
+        intake_type: INTAKE_TYPE,
+        business_type: contact.business_type,
+      },
+    });
+
     return Response.json({
       success: true,
       lead_id: leadId,
       action,
       notification_sent: notification.sent,
       notification_warning: notification.sent ? null : notification.reason,
+      thank_you_sent: thankYouEmail.sent,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to submit contact inquiry';
