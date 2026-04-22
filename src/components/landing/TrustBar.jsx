@@ -60,25 +60,49 @@ export default function TrustBar() {
   return (
     <section ref={ref} className="py-16 bg-gradient-to-b from-card to-background border-y border-border/50">
       <div className="max-w-6xl mx-auto px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
           {items.map((item, index) => {
             const Icon = item.icon;
+            const is5to7Days = item.stat === "5-7 days";
             return (
               <article
                 key={item.label}
-                className="rounded-2xl border border-border bg-card/80 px-5 py-5 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
+                className="relative rounded-2xl border border-border px-4 py-3 text-left shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-md"
                 style={{
+                  background: is5to7Days
+                    ? "rgba(255,255,255,0.5)"
+                    : "rgba(255,255,255,0.7)",
+                  backdropFilter: is5to7Days ? "blur(12px)" : "none",
+                  WebkitBackdropFilter: is5to7Days ? "blur(12px)" : "none",
                   opacity: inView ? 1 : 0,
                   transform: inView ? "translateY(0)" : "translateY(16px)",
                   transition: `opacity 0.5s ease ${index * 0.08}s, transform 0.5s ease ${index * 0.08}s`,
                 }}
               >
-                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center mb-4">
+                {/* Floating icon cloud */}
+                <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-primary/15 border border-primary/25 flex items-center justify-center shadow-lg backdrop-blur-sm">
                   <Icon className="w-[18px] h-[18px] text-primary" />
                 </div>
-                <p className="font-display text-xl font-semibold text-foreground leading-tight">{item.stat}</p>
-                <p className="text-[11px] uppercase tracking-wide text-primary/80 mt-1 mb-3">{item.label}</p>
-                <p className="text-sm text-foreground/65 leading-relaxed">{item.story}</p>
+
+                {/* Background image for 5-7 days only */}
+                {is5to7Days && (
+                  <div
+                    className="absolute inset-0 rounded-2xl opacity-30 bg-cover bg-center"
+                    style={{
+                      backgroundImage:
+                        "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/1dea161a9_b163f1d0-a199-4721-abbc-0aa34fe8f78c.jpg')",
+                      maskImage: "radial-gradient(circle at center, transparent 0%, black 100%)",
+                      WebkitMaskImage:
+                        "radial-gradient(circle at center, transparent 0%, black 100%)",
+                    }}
+                  />
+                )}
+
+                <div className="relative z-10 pt-4">
+                  <p className="font-display text-lg font-semibold text-foreground leading-tight">{item.stat}</p>
+                  <p className="text-[10px] uppercase tracking-wide text-primary/80 mt-1.5 mb-2">{item.label}</p>
+                  <p className="text-xs text-foreground/65 leading-snug">{item.story}</p>
+                </div>
               </article>
             );
           })}
