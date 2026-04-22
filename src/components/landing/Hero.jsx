@@ -12,7 +12,7 @@ function TypingDots() {
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className="w-1.5 h-1.5 rounded-full bg-white/60"
+          className="w-1.5 h-1.5 rounded-full bg-white/80"
           style={{
             animation: `typingBounce 1.2s ease-in-out infinite`,
             animationDelay: `${i * 0.2}s`,
@@ -126,22 +126,22 @@ function SMSMockup() {
       <div
         className="relative rounded-3xl overflow-hidden shadow-2xl"
         style={{
-          background: "linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)",
-          border: "1.5px solid rgba(255,255,255,0.12)",
-          boxShadow: "0 32px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06)",
+          background: "linear-gradient(145deg, #f5f5f7 0%, #ffffff 100%)",
+          border: "1.5px solid rgba(0,0,0,0.1)",
+          boxShadow: "0 32px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)",
         }}
       >
         {/* Status bar — extra top padding (+10%) */}
         <div className="flex items-center justify-between px-5 pt-6 pb-2">
-          <span className="text-[10px] font-semibold text-white/60">2:14 PM</span>
-          <div className="w-12 h-1.5 rounded-full bg-white/20" />
-          <span className="text-[10px] font-semibold text-white/60">100%</span>
+          <span className="text-[10px] font-semibold text-gray-400">2:14 PM</span>
+          <div className="w-12 h-1.5 rounded-full bg-gray-200" />
+          <span className="text-[10px] font-semibold text-gray-400">100%</span>
         </div>
 
         {/* Chat header */}
         <div
           className="flex items-center gap-3 px-4 py-3 border-b"
-          style={{ borderColor: "rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.04)" }}
+          style={{ borderColor: "rgba(0,0,0,0.08)", background: "rgba(0,0,0,0.02)" }}
         >
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
@@ -150,9 +150,9 @@ function SMSMockup() {
             G
           </div>
           <div>
-            <p className="text-xs font-semibold text-white">Glow Med Spa</p>
-            <p className="text-[10px] text-green-400 flex items-center gap-1">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+            <p className="text-xs font-semibold text-gray-900">Glow Med Spa</p>
+            <p className="text-[10px] text-green-500 flex items-center gap-1">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
               AI System Active
             </p>
           </div>
@@ -189,20 +189,20 @@ function SMSMockup() {
                 className="max-w-[82%] rounded-2xl px-3 py-2"
                 style={{
                   background: msg.from === "lead"
-                    ? "rgba(255,255,255,0.1)"
-                    : "linear-gradient(135deg, #7a4825, #c8965c)",
+                    ? "#e9e9eb"
+                    : "linear-gradient(135deg, #34c759, #28a745)",
                   borderBottomLeftRadius: msg.from === "lead" ? "4px" : undefined,
                   borderBottomRightRadius: msg.from === "system" ? "4px" : undefined,
                 }}
               >
-                <p className="text-[11px] leading-relaxed text-white">{msg.text}</p>
+                <p className={`text-[11px] leading-relaxed ${msg.from === "lead" ? "text-gray-800" : "text-white"}`}>{msg.text}</p>
               </div>
 
               {/* Timestamp + Read status */}
               <div className="flex items-center gap-1.5 mt-0.5 px-1">
-                <span className="text-[9px] text-white/35">{msg.time}</span>
+                <span className="text-[9px] text-gray-400">{msg.time}</span>
                 {msg.from === "system" && readIndex !== null && i <= readIndex && (
-                  <span className="text-[9px] text-blue-400 font-semibold" style={{ animation: "fadeSlideIn 0.4s ease forwards" }}>
+                  <span className="text-[9px] text-blue-500 font-semibold" style={{ animation: "fadeSlideIn 0.4s ease forwards" }}>
                     Read
                   </span>
                 )}
@@ -217,8 +217,8 @@ function SMSMockup() {
                 className="rounded-2xl"
                 style={{
                   background: typingFrom === "lead"
-                    ? "rgba(255,255,255,0.1)"
-                    : "linear-gradient(135deg, #7a4825, #c8965c)",
+                    ? "#e9e9eb"
+                    : "linear-gradient(135deg, #34c759, #28a745)",
                   borderBottomLeftRadius: typingFrom === "lead" ? "4px" : undefined,
                   borderBottomRightRadius: typingFrom === "system" ? "4px" : undefined,
                 }}
@@ -232,17 +232,17 @@ function SMSMockup() {
         {/* Bottom bar — extra bottom padding (+10%) */}
         <div
           className="flex items-center gap-2 px-3 pt-3 pb-5 border-t"
-          style={{ borderColor: "rgba(255,255,255,0.08)" }}
+          style={{ borderColor: "rgba(0,0,0,0.08)" }}
         >
           <div
             className="flex-1 h-8 rounded-full px-3 flex items-center"
-            style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)" }}
+            style={{ background: "#f0f0f0", border: "1px solid rgba(0,0,0,0.08)" }}
           >
-            <span className="text-[10px] text-white/30">Message...</span>
+            <span className="text-[10px] text-gray-400">iMessage</span>
           </div>
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: "linear-gradient(135deg, #7a4825, #c8965c)" }}
+            style={{ background: "linear-gradient(135deg, #34c759, #28a745)" }}
           >
             <ArrowRight className="w-3.5 h-3.5 text-white" />
           </div>
