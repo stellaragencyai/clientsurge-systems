@@ -6,13 +6,13 @@ import DemoBookingModal from "@/components/forms/DemoBookingModal";
 // Each step in the sequence engine (not just final messages)
 // Handled procedurally in runSequence below
 
-function TypingDots() {
+function TypingDots({ fromLead = false }) {
   return (
     <div className="flex items-center gap-1 px-3 py-2">
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className="w-1.5 h-1.5 rounded-full bg-white/80"
+          className={`w-1.5 h-1.5 rounded-full ${fromLead ? "bg-gray-400" : "bg-white/80"}`}
           style={{
             animation: `typingBounce 1.2s ease-in-out infinite`,
             animationDelay: `${i * 0.2}s`,
@@ -32,8 +32,10 @@ function TypingDots() {
 function SMSMockup() {
   // messages: array of { from: "lead"|"system", text, time, tag? }
   const [messages, setMessages] = useState([]);
-  // readStatus: index of system message that shows "Read"
-  const [readIndex, setReadIndex] = useState(null);
+  // deliveryStatus per message index: "sent" | "delivered" | "read"
+  const [deliveryStatuses, setDeliveryStatuses] = useState({});
+  // tapback: index of lead message that gets a heart reaction
+  const [tapbackIndex, setTapbackIndex] = useState(null);
   // typingFrom: "system"|"lead"|null — who is currently showing typing dots
   const [typingFrom, setTypingFrom] = useState(null);
   const [floatingReply, setFloatingReply] = useState(false);
@@ -45,7 +47,7 @@ function SMSMockup() {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
-  }, [messages, typingFrom, readIndex]);
+  }, [messages, typingFrom, deliveryStatuses, tapbackIndex]);
 
   function sleep(ms) {
     return new Promise((res) => setTimeout(res, ms));
@@ -55,63 +57,88 @@ function SMSMockup() {
     setMessages((prev) => [...prev, msg]);
   }
 
+  function setDelivery(index, status) {
+    setDeliveryStatuses((prev) => ({ ...prev, [index]: status }));
+  }
+
   useEffect(() => {
     let cancelled = false;
 
     async function runSequence() {
       // Reset everything
       setMessages([]);
-      setReadIndex(null);
+      setDeliveryStatuses({});
+      setTapbackIndex(null);
       setTypingFrom(null);
       setFloatingReply(false);
       setFloatingBooked(false);
 
       // ── Step 1: Sarah sends first message ──
-      await sleep(1600); // half speed (was 800)
+      await sleep(1600);
       if (cancelled) return;
       addMessage({ from: "lead", text: "Hi! I saw your ad for the laser facial. How much is it?", time: "2:14 PM" });
 
       // ── Step 2: AI types then replies ──
-      await sleep(3600); // half speed (was 1800)
+      await sleep(3600);
       if (cancelled) return;
       setTypingFrom("system");
-      await sleep(2800); // half speed (was 1400)
+      await sleep(2800);
       if (cancelled) return;
       setTypingFrom(null);
-      const aiMsg1Index = 1; // 0-based index of this message after push
+      // aiMsg is index 1 (lead msg is index 0)
+      const aiMsg1Index = 1;
       addMessage({ from: "system", text: "Hi Sarah! Thanks for reaching out to Glow Med Spa 💛 Our laser facial starts at $249. I'd love to get you booked — are mornings or afternoons better for you?", time: "2:14 PM", tag: "Replied in 8 sec" });
       setFloatingReply(true);
-
-      // ── Step 3: Show "Read" under AI message after 10s ──
-      await sleep(10000);
+      // Sent → Delivered after 1.5s
+      setDelivery(aiMsg1Index, "sent");
+      await sleep(1500);
       if (cancelled) return;
-      setReadIndex(aiMsg1Index);
+      setDelivery(aiMsg1Index, "delivered");
+
+      // ── Step 3: Delivered → Read after ~8s (simulates Sarah opening it) ──
+      await sleep(8000);
+      if (cancelled) return;
+      setDelivery(aiMsg1Index, "read");
 
       // ── Step 4: Sarah typing dots ──
       await sleep(2000);
       if (cancelled) return;
       setTypingFrom("lead");
-      await sleep(2400); // half speed (was 1200)
+      await sleep(2400);
       if (cancelled) return;
       setTypingFrom(null);
 
       // ── Step 5: Sarah sends reply ──
+      const leadMsg2Index = 2;
       addMessage({ from: "lead", text: "Afternoons work! Maybe Thursday?", time: "2:16 PM" });
 
-      // ── Step 6: Wait 5 seconds before AI answers ──
-      await sleep(5000);
+      // ── Step 5b: AI sends a tapback ❤️ on Sarah's reply after 2s ──
+      await sleep(2000);
+      if (cancelled) return;
+      setTapbackIndex(leadMsg2Index);
+
+      // ── Step 6: Wait before AI answers ──
+      await sleep(3000);
       if (cancelled) return;
 
       // ── Step 7: AI types then sends booking confirmation ──
       setTypingFrom("system");
-      await sleep(2400); // half speed (was 1200)
+      await sleep(2400);
       if (cancelled) return;
       setTypingFrom(null);
+      const aiMsg2Index = 3;
       addMessage({ from: "system", text: "Perfect! I've reserved Thursday at 3 PM for you. Here's your booking link to confirm: glowspa.com/book ✅", time: "2:16 PM", tag: "Booked!" });
       setFloatingBooked(true);
+      setDelivery(aiMsg2Index, "sent");
+      await sleep(1200);
+      if (cancelled) return;
+      setDelivery(aiMsg2Index, "delivered");
+      await sleep(5000);
+      if (cancelled) return;
+      setDelivery(aiMsg2Index, "read");
 
       // ── Hold then loop ──
-      await sleep(6000);
+      await sleep(4000);
       if (cancelled) return;
       runSequence();
     }
@@ -164,51 +191,81 @@ function SMSMockup() {
           className="px-3 py-4 space-y-3"
           style={{ height: "380px", overflowY: "auto", scrollbarWidth: "none" }}
         >
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              className={`flex flex-col ${msg.from === "lead" ? "items-start" : "items-end"}`}
-              style={{ animation: "fadeSlideIn 0.35s ease forwards" }}
-            >
-              {/* Tag pill */}
-              {msg.tag && (
-                <span
-                  className="text-[9px] font-bold uppercase tracking-wider mb-1 px-2 py-0.5 rounded-full"
-                  style={{
-                    background: msg.tag === "Booked!" ? "rgba(34,197,94,0.2)" : "rgba(200,150,92,0.25)",
-                    color: msg.tag === "Booked!" ? "#4ade80" : "#f5d9a8",
-                    border: msg.tag === "Booked!" ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(200,150,92,0.3)",
-                  }}
-                >
-                  {msg.tag}
-                </span>
-              )}
-
-              {/* Bubble */}
+          {messages.map((msg, i) => {
+            const ds = deliveryStatuses[i];
+            return (
               <div
-                className="max-w-[82%] rounded-2xl px-3 py-2"
-                style={{
-                  background: msg.from === "lead"
-                    ? "#e9e9eb"
-                    : "linear-gradient(135deg, #34c759, #28a745)",
-                  borderBottomLeftRadius: msg.from === "lead" ? "4px" : undefined,
-                  borderBottomRightRadius: msg.from === "system" ? "4px" : undefined,
-                }}
+                key={i}
+                className={`flex flex-col ${msg.from === "lead" ? "items-start" : "items-end"}`}
+                style={{ animation: "fadeSlideIn 0.35s ease forwards" }}
               >
-                <p className={`text-[11px] leading-relaxed ${msg.from === "lead" ? "text-gray-800" : "text-white"}`}>{msg.text}</p>
-              </div>
-
-              {/* Timestamp + Read status */}
-              <div className="flex items-center gap-1.5 mt-0.5 px-1">
-                <span className="text-[9px] text-gray-400">{msg.time}</span>
-                {msg.from === "system" && readIndex !== null && i <= readIndex && (
-                  <span className="text-[9px] text-blue-500 font-semibold" style={{ animation: "fadeSlideIn 0.4s ease forwards" }}>
-                    Read
+                {/* Tag pill */}
+                {msg.tag && (
+                  <span
+                    className="text-[9px] font-bold uppercase tracking-wider mb-1 px-2 py-0.5 rounded-full"
+                    style={{
+                      background: msg.tag === "Booked!" ? "rgba(34,197,94,0.15)" : "rgba(154,92,46,0.12)",
+                      color: msg.tag === "Booked!" ? "#16a34a" : "#9a5c2e",
+                      border: msg.tag === "Booked!" ? "1px solid rgba(34,197,94,0.3)" : "1px solid rgba(154,92,46,0.25)",
+                    }}
+                  >
+                    {msg.tag}
                   </span>
                 )}
+
+                {/* Bubble + tapback wrapper */}
+                <div className="relative">
+                  <div
+                    className="max-w-[82%] rounded-2xl px-3 py-2"
+                    style={{
+                      background: msg.from === "lead"
+                        ? "#e9e9eb"
+                        : "linear-gradient(135deg, #34c759, #28a745)",
+                      borderBottomLeftRadius: msg.from === "lead" ? "4px" : undefined,
+                      borderBottomRightRadius: msg.from === "system" ? "4px" : undefined,
+                    }}
+                  >
+                    <p className={`text-[11px] leading-relaxed ${msg.from === "lead" ? "text-gray-800" : "text-white"}`}>{msg.text}</p>
+                  </div>
+
+                  {/* Tapback ❤️ reaction */}
+                  {tapbackIndex === i && (
+                    <div
+                      className="absolute -bottom-2 -right-1 w-5 h-5 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-[10px]"
+                      style={{ animation: "tapbackPop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards" }}
+                    >
+                      ❤️
+                    </div>
+                  )}
+                </div>
+
+                {/* Timestamp + delivery ticks */}
+                <div className="flex items-center gap-1 mt-1 px-1">
+                  <span className="text-[9px] text-gray-400">{msg.time}</span>
+                  {msg.from === "system" && ds && (
+                    <span
+                      className="flex items-center gap-0.5 text-[9px] font-semibold"
+                      style={{
+                        color: ds === "read" ? "#3b82f6" : "#9ca3af",
+                        animation: "fadeSlideIn 0.3s ease forwards",
+                      }}
+                    >
+                      {ds === "sent" && (
+                        <svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 4l3 3 7-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      )}
+                      {(ds === "delivered" || ds === "read") && (
+                        <svg width="16" height="8" viewBox="0 0 16 8" fill="none">
+                          <path d="M1 4l3 3 7-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M5 4l3 3 7-7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                      {ds === "read" && <span className="ml-0.5">Read</span>}
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {/* Live typing indicator */}
           {typingFrom && (
@@ -223,7 +280,7 @@ function SMSMockup() {
                   borderBottomRightRadius: typingFrom === "system" ? "4px" : undefined,
                 }}
               >
-                <TypingDots />
+                <TypingDots fromLead={typingFrom === "lead"} />
               </div>
             </div>
           )}
@@ -285,6 +342,10 @@ function SMSMockup() {
         @keyframes fadeSlideIn {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes tapbackPop {
+          from { opacity: 0; transform: scale(0.3); }
+          to { opacity: 1; transform: scale(1); }
         }
       `}</style>
     </div>
