@@ -85,7 +85,7 @@ export default function Hero() {
         }}
       />
 
-      {/* ── IDEA 1: Ghost panel — bleeds off TOP RIGHT (far background depth layer) ── */}
+      {/* ── Ghost panel TOP RIGHT — medium depth blur (Fix 3 + Fix 4) ── */}
       <div
         aria-hidden="true"
         style={{
@@ -98,15 +98,16 @@ export default function Hero() {
           minHeight: "360px",
           background: "linear-gradient(145deg, rgba(26,18,9,0.06) 0%, rgba(200,150,92,0.04) 100%)",
           borderRadius: "22px",
-          border: "1px solid rgba(154,92,46,0.12)",
-          /* Idea 3: heavy blur = depth-of-field, feels like IdentityIQ's background screens */
-          filter: "blur(3px)",
+          border: "none",
+          filter: "blur(12px)",
           transform: "perspective(2200px) rotateY(-14deg) rotateX(6deg) rotateZ(0.5deg)",
           transformOrigin: "right top",
           opacity: 0.55,
           zIndex: 1,
           pointerEvents: "none",
           overflow: "hidden",
+          maskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 85%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 85%)",
         }}
       >
         {/* Ghost UI content — partially legible like IdentityIQ */}
@@ -127,7 +128,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── IDEA 2: Ghost panel — bleeds off BOTTOM RIGHT (another depth layer) ── */}
+      {/* ── Ghost panel BOTTOM RIGHT — heavy depth blur (Fix 3 + Fix 4) ── */}
       <div
         aria-hidden="true"
         style={{
@@ -140,15 +141,16 @@ export default function Hero() {
           minHeight: "300px",
           background: "linear-gradient(145deg, rgba(26,18,9,0.05) 0%, rgba(200,150,92,0.03) 100%)",
           borderRadius: "20px",
-          border: "1px solid rgba(154,92,46,0.10)",
-          /* Idea 3: even heavier blur for the deeper background panel */
-          filter: "blur(5px)",
+          border: "none",
+          filter: "blur(20px)",
           transform: "perspective(2200px) rotateY(-10deg) rotateX(-4deg) rotateZ(-1deg)",
           transformOrigin: "right bottom",
           opacity: 0.45,
           zIndex: 1,
           pointerEvents: "none",
           overflow: "hidden",
+          maskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 55%, transparent 80%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 55%, transparent 80%)",
         }}
       >
         {/* Ghost UI — lead list rows */}
