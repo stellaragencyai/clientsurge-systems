@@ -49,6 +49,7 @@ import ProblemSolution from "../components/landing/ProblemSolution.jsx";
 import MissedLeadRecovery from "../components/landing/MissedLeadRecovery";
 import Testimonials from "../components/landing/Testimonials";
 import CoreOffer from "../components/landing/CoreOffer";
+import IntegrationPartners from "../components/landing/IntegrationPartners";
 import PerformancePod from "../components/landing/PerformancePod";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
@@ -109,6 +110,7 @@ export default function Home() {
         </section>
         <ProblemSolution />
         <CoreOffer />
+        <IntegrationPartners />
         <Pricing />
         <FAQ />
         <FinalCTA />
