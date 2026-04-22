@@ -10,7 +10,7 @@ const industries = [
     desc: "Instant response, consultation reminders, and tighter booking follow-up.",
     result: "Best current fit",
     href: "/med-spa",
-    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=900&q=85",
+    image: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/741357982_Gemini_Generated_Image_hdkpn1hdkpn1hdkp.png",
     cta: "Explore this industry",
   },
   {
