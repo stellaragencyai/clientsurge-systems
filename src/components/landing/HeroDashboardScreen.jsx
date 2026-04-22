@@ -59,6 +59,13 @@ const NOTIFICATIONS = [
   { from: "Luxe Aesthetics",  preview: "Just submitted the intake form — follow up?" },
 ];
 
+const PAYMENT_NOTIFICATIONS = [
+  { type: "venmo", from: "Zenith Wellness", amount: "+$280", sender: "Maya Chen", avatar: "🎯" },
+  { type: "cashapp", from: "Radiant Spas Inc", amount: "+$420", sender: "Jordan T.", avatar: "💚" },
+  { type: "venmo", from: "Luxe Aesthetics", amount: "+$150", sender: "Sarah M.", avatar: "✨" },
+  { type: "cashapp", from: "Peak Health", amount: "+$320", sender: "Alex K.", avatar: "💚" },
+];
+
 const LIVE_LEADS_POOL = [
   { name: "Sarah M.",   src: "Instagram", status: "Booked",    dot: "#22c55e" },
   { name: "Marcus D.",  src: "Google Ad", status: "Contacted", dot: "#c8965c" },
@@ -118,7 +125,7 @@ function StatusBar() {
   );
 }
 
-// Notification banner
+// Email Notification banner
 function NotificationBanner({ notif, visible }) {
   return (
     <div style={{
@@ -141,7 +148,6 @@ function NotificationBanner({ notif, visible }) {
       transition: "transform 0.4s cubic-bezier(0.34,1.2,0.64,1), opacity 0.3s ease",
       pointerEvents: "none",
     }}>
-      {/* Email icon */}
       <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "linear-gradient(135deg,#9a5c2e,#c8965c)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, position: "relative" }}>
         <span style={{ fontSize: "13px" }}>📧</span>
         <div style={{ position: "absolute", top: "-3px", right: "-3px", width: "8px", height: "8px", borderRadius: "50%", background: "#ef4444", border: "1.5px solid #fff" }} />
@@ -153,6 +159,50 @@ function NotificationBanner({ notif, visible }) {
         </div>
         <p style={{ fontSize: "11px", fontWeight: "700", color: "#1a1209", margin: "0 0 1px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{notif.from}</p>
         <p style={{ fontSize: "10px", color: "rgba(26,18,9,0.5)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>"{notif.preview}"</p>
+      </div>
+    </div>
+  );
+}
+
+// Payment Notification banner (Venmo, Cash App, Zelle)
+function PaymentNotificationBanner({ payment, visible }) {
+  const isVenmo = payment.type === "venmo";
+  const isCashApp = payment.type === "cashapp";
+  
+  const bgColor = isCashApp ? "#00D54B" : "#3D95CE";
+  const logo = isCashApp ? "💵" : "✓";
+  
+  return (
+    <div style={{
+      position: "absolute",
+      top: "24px",
+      left: "10px",
+      right: "10px",
+      zIndex: 30,
+      background: isCashApp ? "rgba(0,213,75,0.95)" : "rgba(61,149,206,0.95)",
+      backdropFilter: "blur(12px)",
+      borderRadius: "14px",
+      padding: "10px 12px",
+      boxShadow: "0 8px 32px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.1)",
+      border: `1px solid ${isCashApp ? "rgba(0,213,75,0.3)" : "rgba(61,149,206,0.3)"}`,
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "9px",
+      transform: visible ? "translateY(0)" : "translateY(-110%)",
+      opacity: visible ? 1 : 0,
+      transition: "transform 0.4s cubic-bezier(0.34,1.2,0.64,1), opacity 0.3s ease",
+      pointerEvents: "none",
+    }}>
+      <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "rgba(255,255,255,0.25)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: "14px", fontWeight: "800" }}>
+        {logo}
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2px" }}>
+          <span style={{ fontSize: "10px", fontWeight: "700", color: "#fff", textTransform: "uppercase", letterSpacing: "0.08em" }}>Payment Received</span>
+          <span style={{ fontSize: "9px", color: "rgba(255,255,255,0.7)" }}>now</span>
+        </div>
+        <p style={{ fontSize: "11px", fontWeight: "700", color: "#fff", margin: "0 0 1px" }}>{payment.sender}</p>
+        <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.85)", margin: 0 }}>{payment.from} • {payment.amount}</p>
       </div>
     </div>
   );
@@ -172,11 +222,13 @@ function TypingDots() {
 export default function HeroDashboardScreen() {
   const [aiRespondingDot, setAiRespondingDot] = useState(0);
   const [dashboardFade, setDashboardFade] = useState(0);
+  const [colorTone, setColorTone] = useState(0);
   
   useEffect(() => {
     const t1 = setInterval(() => setAiRespondingDot((v) => (v + 1) % 3), 300);
     const t2 = setInterval(() => setDashboardFade((v) => (v + 1) % 2), 6000);
-    return () => { clearInterval(t1); clearInterval(t2); };
+    const t3 = setInterval(() => setColorTone((v) => (v + 1) % 2), 6000);
+    return () => { clearInterval(t1); clearInterval(t2); clearInterval(t3); };
   }, []);
 
   const initLeads   = useCounter(247,  2200, 400);
@@ -241,22 +293,44 @@ export default function HeroDashboardScreen() {
     return () => { clearTimeout(init); timers.forEach(clearTimeout); };
   }, []);
 
-  // Notification banner cycling
+  // Email notification cycling
   const [notifIdx, setNotifIdx]     = useState(0);
   const [notifVisible, setNotifVisible] = useState(false);
+  
+  // Payment notification cycling
+  const [paymentIdx, setPaymentIdx] = useState(0);
+  const [paymentVisible, setPaymentVisible] = useState(false);
+  
   useEffect(() => {
-    const show = (idx) => {
+    const showEmail = (idx) => {
       setNotifIdx(idx);
       setNotifVisible(true);
       setTimeout(() => setNotifVisible(false), 3500);
     };
-    const t1 = setTimeout(() => show(0), 4000);
-    const t2 = setTimeout(() => show(1), 16000);
-    const t3 = setTimeout(() => show(2), 28000);
-    const loop = setInterval(() => {
-      show(Math.floor(Math.random() * NOTIFICATIONS.length));
-    }, 14000);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearInterval(loop); };
+    const showPayment = (idx) => {
+      setPaymentIdx(idx);
+      setPaymentVisible(true);
+      setTimeout(() => setPaymentVisible(false), 3500);
+    };
+    
+    const t1 = setTimeout(() => showEmail(0), 4000);
+    const t2 = setTimeout(() => showPayment(0), 10000);
+    const t3 = setTimeout(() => showEmail(1), 16000);
+    const t4 = setTimeout(() => showPayment(1), 22000);
+    const t5 = setTimeout(() => showEmail(2), 28000);
+    const t6 = setTimeout(() => showPayment(2), 34000);
+    
+    const loopEmail = setInterval(() => {
+      showEmail(Math.floor(Math.random() * NOTIFICATIONS.length));
+    }, 20000);
+    const loopPayment = setInterval(() => {
+      showPayment(Math.floor(Math.random() * PAYMENT_NOTIFICATIONS.length));
+    }, 20000);
+    
+    return () => { 
+      clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5); clearTimeout(t6);
+      clearInterval(loopEmail); clearInterval(loopPayment);
+    };
   }, []);
 
   // Live lead feed — new row pops in
@@ -287,11 +361,16 @@ export default function HeroDashboardScreen() {
   const displayLeads   = liveLeads   || initLeads;
   const displayRevenue = liveRevenue || initRevenue;
 
+  const bgColor = colorTone === 0 ? "#f8f5f0" : "#f5f3f0";
+  
   return (
-    <div style={{ width: "100%", height: "100%", background: bg, borderRadius: "12px", display: "flex", flexDirection: "column", fontFamily: "'Inter', sans-serif", overflow: "hidden", position: "relative", opacity: dashboardFade === 0 ? 1 : 0.7, transition: "opacity 1s ease-in-out" }}>
+    <div style={{ width: "100%", height: "100%", background: bgColor, borderRadius: "12px", display: "flex", flexDirection: "column", fontFamily: "'Inter', sans-serif", overflow: "hidden", position: "relative", opacity: dashboardFade === 0 ? 1 : 0.7, transition: "opacity 1s ease-in-out, background 3s ease-in-out" }}>
 
-      {/* Notification banner — absolutely positioned over content */}
+      {/* Email Notification banner — absolutely positioned over content */}
       <NotificationBanner notif={NOTIFICATIONS[notifIdx]} visible={notifVisible} />
+      
+      {/* Payment Notification banner */}
+      <PaymentNotificationBanner payment={PAYMENT_NOTIFICATIONS[paymentIdx]} visible={paymentVisible} />
 
       {/* ── iOS Status Bar ── */}
       <StatusBar />
@@ -304,8 +383,8 @@ export default function HeroDashboardScreen() {
       {/* Dashboard content */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px", padding: "0 14px 0", overflow: "hidden" }}>
 
-        {/* Header bar */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: cardBg, borderRadius: "10px", padding: "7px 12px", border: `1px solid ${cardBorder}` }}>
+        {/* Header bar — Glassmorphic */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderRadius: "10px", padding: "7px 12px", border: `1px solid rgba(255,255,255,0.3)`, boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <div style={{ width: "26px", height: "26px", borderRadius: "7px", background: "linear-gradient(135deg,#9a5c2e,#c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ fontSize: "9px", fontWeight: "800", color: "#fff" }}>CS</span>
@@ -313,6 +392,7 @@ export default function HeroDashboardScreen() {
             <span style={{ fontSize: "11px", fontWeight: "700", color: textPrimary }}>ClientSurge Dashboard</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+            <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#c8965c", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "7px", animation: "syncPulse 1.5s ease-in-out infinite" }}>⟳</div>
             <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 8px #22c55e", animation: "hPulse 2s infinite" }} />
             <span style={{ fontSize: "9px", color: textMuted, fontWeight: "600" }}>Live · Today</span>
           </div>
@@ -451,6 +531,7 @@ export default function HeroDashboardScreen() {
         @keyframes sIn        { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
         @keyframes rowPopin   { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
         @keyframes typingDot  { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-3px);opacity:1} }
+        @keyframes syncPulse  { 0%{opacity:0.4;transform:rotate(0deg)} 50%{opacity:1;transform:rotate(180deg)} 100%{opacity:0.4;transform:rotate(360deg)} }
       `}</style>
     </div>
   );

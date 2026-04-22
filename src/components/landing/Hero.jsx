@@ -220,6 +220,59 @@ export default function Hero() {
         }}
       />
 
+      {/* ── Glass desk reflection beneath tablet ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: "-18%",
+          right: "2%",
+          width: "60vw",
+          maxWidth: "900px",
+          height: "40vh",
+          background: "linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(220,220,220,0.15) 30%, transparent 70%)",
+          borderRadius: "50% 50% 0 0",
+          filter: "blur(20px)",
+          transform: "scaleY(0.4) perspective(2200px) rotateX(75deg)",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Pencil silhouette under tablet (left side) ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: "14%",
+          right: "32%",
+          width: "12vw",
+          maxWidth: "180px",
+          height: "2px",
+          background: "linear-gradient(to right, rgba(200,150,92,0.8) 0%, rgba(200,150,92,0.3) 100%)",
+          borderRadius: "1px",
+          transform: "perspective(2200px) rotateX(80deg) rotateZ(-15deg)",
+          zIndex: 0,
+          pointerEvents: "none",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+        }}
+      />
+
+      {/* ── Ultra-glass desk surface shine ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: "0",
+          right: "0",
+          width: "80vw",
+          height: "25vh",
+          background: "linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 40%, transparent 100%)",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
       {/* ── CAST SHADOW — ground shadow beneath tablet ── */}
       <div
         aria-hidden="true"
