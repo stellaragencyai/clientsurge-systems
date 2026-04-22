@@ -340,17 +340,61 @@ export default function CoreOffer() {
         {/* 8-Step Clickable Cards */}
         <div className="mb-10">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-5 text-center">Core Automation — Steps 1–5</p>
-          <div className="flex flex-col gap-4 mb-6">
-            {coreAutomation.map((item) => (
-              <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
+          <div className="flex flex-col">
+            {coreAutomation.map((item, idx) => (
+              <div key={item.step}>
+                <FeatureCard item={item} onSelect={setSelectedStep} />
+                {/* Arrow between cards */}
+                <div className="flex flex-col items-center py-1" aria-hidden="true">
+                  <div style={{ width: "2px", height: "10px", background: "rgba(0,0,0,0.18)" }} />
+                  <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
+                    <path d="M11 16 L0 0 L22 0 Z" fill="rgba(0,0,0,0.82)" />
+                  </svg>
+                </div>
+              </div>
             ))}
           </div>
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-5 text-center">Done-For-You — Steps 6–8</p>
-          <div className="flex flex-col gap-4">
-            {doneForYou.map((item) => (
-              <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
+
+          {/* Transition label between groups */}
+          <div className="flex items-center gap-3 my-4">
+            <div className="flex-1 h-px bg-border" />
+            <p className="text-xs font-semibold text-primary tracking-widest uppercase whitespace-nowrap">Done-For-You — Steps 6–8</p>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+
+          <div className="flex flex-col">
+            {doneForYou.map((item, idx) => (
+              <div key={item.step}>
+                <FeatureCard item={item} onSelect={setSelectedStep} />
+                {/* Arrow between cards — not after the last one */}
+                {idx < doneForYou.length - 1 && (
+                  <div className="flex flex-col items-center py-1" aria-hidden="true">
+                    <div style={{ width: "2px", height: "10px", background: "rgba(0,0,0,0.18)" }} />
+                    <svg width="22" height="16" viewBox="0 0 22 16" fill="none">
+                      <path d="M11 16 L0 0 L22 0 Z" fill="rgba(0,0,0,0.82)" />
+                    </svg>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
+        </div>
+
+        {/* ── Section divider after Step 08 ── */}
+        <div className="mt-16 mb-16 flex flex-col items-center gap-4">
+          <div className="flex items-center gap-3 w-full">
+            <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, rgba(154,92,46,0.4))" }} />
+            <div
+              className="flex items-center gap-2 px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest"
+              style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)", color: "#f5d9a8", boxShadow: "0 2px 12px rgba(120,70,20,0.25)" }}
+            >
+              <span>System Complete</span>
+            </div>
+            <div className="flex-1 h-px" style={{ background: "linear-gradient(to left, transparent, rgba(154,92,46,0.4))" }} />
+          </div>
+          <p className="text-xs text-muted-foreground text-center max-w-sm">
+            All 8 systems work together as one continuous engine — see how it performs in real time below.
+          </p>
         </div>
 
         <AutomationPipelineSection />
