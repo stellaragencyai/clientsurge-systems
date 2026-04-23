@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { saveLeadStatus, getLeadPipelineError } from "@/lib/leadPipelineApi";
+import LeadScoreBadge from "./LeadScoreBadge";
 
 const STATUSES = ["New", "Contacted", "Replied", "Qualified", "Booking Prompt Sent", "Booked", "Closed"];
 
@@ -172,6 +173,7 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
               <span className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-semibold border ${STATUS_COLORS[currentStatus] || "bg-gray-100 text-gray-700 border-gray-200"}`}>
                 {currentStatus}
               </span>
+              {lead.lead_score != null && <LeadScoreBadge score={lead.lead_score} />}
             </div>
             <p className="font-semibold text-foreground text-base">{lead.full_name}</p>
             <p className="text-xs text-muted-foreground">{lead.business_name} · {lead.phone || lead.email}</p>

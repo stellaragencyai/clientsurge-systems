@@ -6,12 +6,24 @@ export function getLeadPipelineError(error, fallback) {
 
 export async function fetchLeadPipelineSummary(filters = {}) {
   const response = await base44.functions.invoke("getLeadPipelineSummary", filters);
-  return response?.data || {
+  const data = response?.data || {
     summary: {},
     leads: [],
     pagination: {},
     filter_options: {},
   };
+
+  // Sort lead list and priority queue by lead_score descending (high-intent first)
+  if (Array.isArray(data.leads)) {
+    data.leads = [...data.leads].sort((a, b) => (b.lead_score ?? 0) - (a.lead_score ?? 0));
+  }
+  if (Array.isArray(data.summary?.priority_queue)) {
+    data.summary.priority_queue = [...data.summary.priority_queue].sort(
+      (a, b) => (b.lead_score ?? 0) - (a.lead_score ?? 0)
+    );
+  }
+
+  return data;
 }
 
 export async function previewLeadImport({ rows, import_source = "manual_import" }) {
@@ -32,6 +44,11 @@ export async function executeLeadImport({ rows, import_source = "manual_import" 
   });
 
   return response?.data?.result || null;
+}
+
+export async function triggerLeadScoring(lead_id = null) {
+  const response = await base44.functions.invoke("scoreLeads", lead_id ? { lead_id } : {});
+  return response?.data || {};
 }
 
 export async function saveLeadStatus({ lead_id, status, note = "" }) {

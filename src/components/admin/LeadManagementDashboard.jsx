@@ -15,14 +15,17 @@ import {
   Upload,
   Users,
   SlidersHorizontal,
+  Gauge,
 } from "lucide-react";
 import {
   executeLeadImport,
   fetchLeadPipelineSummary,
   getLeadPipelineError,
   previewLeadImport,
+  triggerLeadScoring,
 } from "@/lib/leadPipelineApi";
 import LeadCRMDrawer from "./LeadCRMDrawer";
+import LeadScoreBadge from "./LeadScoreBadge";
 
 const intakeTypeLabels = {
   lead_capture: "Lead Capture",
@@ -184,6 +187,7 @@ export default function LeadManagementDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [scoringLoading, setScoringLoading] = useState(false);
   const [error, setError] = useState("");
   const [importOpen, setImportOpen] = useState(false);
   const [drawerLead, setDrawerLead] = useState(null);
@@ -230,6 +234,18 @@ export default function LeadManagementDashboard() {
       ...current,
       [field]: value,
     }));
+  };
+
+  const handleRunScoring = async () => {
+    setScoringLoading(true);
+    try {
+      await triggerLeadScoring();
+      await loadSnapshot({ append: false, nextOffset: 0 });
+    } catch (err) {
+      setError(getLeadPipelineError(err, "Failed to run lead scoring."));
+    } finally {
+      setScoringLoading(false);
+    }
   };
 
   const handleLoadMore = () => {
@@ -332,6 +348,15 @@ export default function LeadManagementDashboard() {
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Refresh
+          </button>
+          <button
+            onClick={handleRunScoring}
+            disabled={scoringLoading || loading}
+            className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+            title="Recalculate lead scores now (runs automatically every hour)"
+          >
+            {scoringLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gauge className="h-4 w-4" />}
+            Score Leads
           </button>
           <button
             onClick={() => setImportOpen((current) => !current)}
@@ -750,6 +775,7 @@ export default function LeadManagementDashboard() {
                 <thead className="bg-muted/50">
                   <tr>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Lead</th>
+                    <th className="px-4 py-3 text-left font-semibold text-foreground">Score</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Why Now</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Next Action</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Recommended Offer</th>
@@ -760,13 +786,13 @@ export default function LeadManagementDashboard() {
                 <tbody className="divide-y divide-border bg-white">
                   {loading ? (
                     <tr>
-                      <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                      <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                         Loading lead pipeline...
                       </td>
                     </tr>
                   ) : leads.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                      <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                         No leads match the current filters.
                       </td>
                     </tr>
@@ -783,6 +809,9 @@ export default function LeadManagementDashboard() {
                               <span className="rounded-full bg-muted px-2 py-1 text-[11px] font-semibold text-muted-foreground">
                                 {stageGroupLabels[lead.stage_group] || lead.stage_group}
                               </span>
+                              {lead.lead_score != null && (
+                                <LeadScoreBadge score={lead.lead_score} />
+                              )}
                             </div>
                             <p className="mt-1 text-xs text-muted-foreground">{lead.business_name}</p>
                             <p className="mt-1 text-xs text-muted-foreground">
@@ -791,6 +820,15 @@ export default function LeadManagementDashboard() {
                             <p className="mt-2 text-[11px] text-muted-foreground">
                               {lead.source || "unknown"} • {intakeTypeLabels[lead.intake_type] || lead.intake_type || "Legacy"}
                             </p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex flex-col items-start gap-1">
+                            {lead.lead_score != null ? (
+                              <LeadScoreBadge score={lead.lead_score} size="lg" />
+                            ) : (
+                              <span className="text-xs text-muted-foreground">—</span>
+                            )}
                           </div>
                         </td>
                         <td className="px-4 py-4">
