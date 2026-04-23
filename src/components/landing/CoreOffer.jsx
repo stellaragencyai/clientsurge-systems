@@ -311,7 +311,7 @@ export default function CoreOffer() {
         {/* Header */}
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Package</p>
-          <h2 className="font-inter text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-foreground">
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-foreground">
            How the{" "}
            <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.35)" }}>8-System</span>
            {" "}Flow Works

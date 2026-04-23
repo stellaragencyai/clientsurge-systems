@@ -68,7 +68,7 @@ export default function ProblemSolution() {
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
             Where Leads Are Lost
           </p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
             Every Problem Has a System Behind It
           </h2>
           <p className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">

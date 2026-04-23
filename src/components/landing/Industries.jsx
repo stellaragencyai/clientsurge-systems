@@ -100,7 +100,7 @@ export default function Industries() {
         <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">
           Choose Your Industry
         </p>
-        <h2 className="font-titles text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
+        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
           Built for Businesses That Win on{" "}
           <span className="text-primary">Fast Response</span>
         </h2>
