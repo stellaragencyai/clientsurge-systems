@@ -1,6 +1,23 @@
 import { useEffect } from 'react';
+import Navbar from "../components/landing/Navbar";
+import Hero from "../components/landing/Hero.jsx";
+import LiveLeadPulse from "../components/landing/LiveLeadPulse";
+import TrustBar from "../components/landing/TrustBar";
+import Industries from "../components/landing/Industries";
+import ProblemSolution from "../components/landing/ProblemSolution.jsx";
+import Testimonials from "../components/landing/Testimonials";
+import CoreOffer from "../components/landing/CoreOffer";
+import IntegrationPartners from "../components/landing/IntegrationPartners";
+import FAQ from "../components/landing/FAQ";
+import Pricing from "../components/landing/Pricing";
+import FinalCTA from "../components/landing/FinalCTA";
+import Footer from "../components/landing/Footer";
+import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
+import { FAQ_ITEMS } from "../components/landing/FAQ";
+import { getFAQSchema, getLocalBusinessSchema, getOrganizationSchema, getServiceSchema } from "../components/SEO/SchemaMarkup";
+import { setJsonLd, setPageMetadata } from "@/lib/seo";
 
-// Scroll-driven background gradient (Idea 5)
+// Scroll-driven background gradient
 function useScrollGradient() {
   useEffect(() => {
     const stops = [
@@ -13,7 +30,6 @@ function useScrollGradient() {
     ];
 
     const lerp = (a, b, t) => {
-      // Parse hsl values and interpolate
       const parse = (s) => {
         const m = s.match(/hsl\(([^,]+),([^,]+),([^)]+)\)/);
         return m ? [parseFloat(m[1]), parseFloat(m[2]), parseFloat(m[3])] : [0,0,100];
@@ -40,24 +56,6 @@ function useScrollGradient() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 }
-import Navbar from "../components/landing/Navbar";
-import Hero from "../components/landing/Hero.jsx";
-import LiveLeadPulse from "../components/landing/LiveLeadPulse";
-import TrustBar from "../components/landing/TrustBar";
-import Industries from "../components/landing/Industries";
-import ProblemSolution from "../components/landing/ProblemSolution.jsx";
-import MissedLeadRecovery from "../components/landing/MissedLeadRecovery";
-import Testimonials from "../components/landing/Testimonials";
-import CoreOffer from "../components/landing/CoreOffer";
-import IntegrationPartners from "../components/landing/IntegrationPartners";
-import FAQ from "../components/landing/FAQ";
-import Pricing from "../components/landing/Pricing";
-import FinalCTA from "../components/landing/FinalCTA";
-import Footer from "../components/landing/Footer";
-import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
-import { FAQ_ITEMS } from "../components/landing/FAQ";
-import { getFAQSchema, getLocalBusinessSchema, getOrganizationSchema, getServiceSchema } from "../components/SEO/SchemaMarkup";
-import { setJsonLd, setPageMetadata } from "@/lib/seo";
 
 export default function Home() {
   useScrollGradient();
