@@ -33,6 +33,8 @@ import AdminOnboarding from './pages/AdminOnboarding';
 import Industries from './pages/Industries';
 import Store from './pages/Store';
 import OrderSuccess from './pages/OrderSuccess';
+import PreviewIdea1 from './pages/PreviewIdea1';
+import PreviewIdea2 from './pages/PreviewIdea2';
 
 // Public routes that do NOT require authentication
 const PUBLIC_PATHS = [
@@ -57,6 +59,8 @@ const PUBLIC_PATHS = [
   "/test-option-1",
   "/test-option-2",
   "/test-option-3",
+  "/preview-idea-1",
+  "/preview-idea-2",
 ];
 const NOINDEX_PREFIXES = ['/admin', '/dashboard', '/client-portal', '/lead-intelligence', '/medspa-dashboard', '/sam', '/test-option-1', '/test-option-2', '/test-option-3', '/success'];
 
@@ -163,6 +167,8 @@ const AuthenticatedApp = () => {
       <Route path="/admin/onboarding" element={<AdminOnboarding />} />
       <Route path="/store" element={<Store />} />
       <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/preview-idea-1" element={<PreviewIdea1 />} />
+      <Route path="/preview-idea-2" element={<PreviewIdea2 />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
