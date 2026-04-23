@@ -1,0 +1,105 @@
+{
+  "name": "DripCampaign",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "lead_name": {
+      "type": "string",
+      "title": "Lead Name"
+    },
+    "lead_email": {
+      "type": "string",
+      "title": "Lead Email"
+    },
+    "lead_phone": {
+      "type": "string",
+      "title": "Lead Phone"
+    },
+    "status": {
+      "type": "string",
+      "title": "Campaign Status",
+      "enum": [
+        "active",
+        "paused",
+        "completed",
+        "stopped"
+      ],
+      "default": "active"
+    },
+    "stop_reason": {
+      "type": "string",
+      "title": "Stop Reason",
+      "enum": [
+        "qualified",
+        "booked",
+        "closed",
+        "manual_pause",
+        "opted_out",
+        "completed_all_steps"
+      ]
+    },
+    "enrolled_at": {
+      "type": "string",
+      "title": "Enrolled At"
+    },
+    "day1_sent_at": {
+      "type": "string",
+      "title": "Day 1 Sent At"
+    },
+    "day3_sent_at": {
+      "type": "string",
+      "title": "Day 3 Sent At"
+    },
+    "day7_sent_at": {
+      "type": "string",
+      "title": "Day 7 Sent At"
+    },
+    "day1_status": {
+      "type": "string",
+      "title": "Day 1 Status",
+      "enum": [
+        "pending",
+        "sent",
+        "skipped",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "day3_status": {
+      "type": "string",
+      "title": "Day 3 Status",
+      "enum": [
+        "pending",
+        "sent",
+        "skipped",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "day7_status": {
+      "type": "string",
+      "title": "Day 7 Status",
+      "enum": [
+        "pending",
+        "sent",
+        "skipped",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "last_step_run_at": {
+      "type": "string",
+      "title": "Last Step Run At"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "lead_id"
+  ]
+}

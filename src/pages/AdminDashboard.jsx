@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList, Loader2 } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
@@ -13,6 +13,7 @@ import ClientProjectsPanel from '../components/admin/ClientProjectsPanel';
 import AutomationsPanel from '../components/admin/AutomationsPanel';
 import QaCustomerPanel from '../components/admin/QaCustomerPanel';
 import LeadRoutingPanel from '../components/admin/LeadRoutingPanel';
+import DripCampaignPanel from '../components/admin/DripCampaignPanel';
 
 const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -23,6 +24,7 @@ const NAV_ITEMS = [
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   { id: 'templates', label: 'Templates', icon: MessageSquare },
   { id: 'health', label: 'Integration Health', icon: Activity },
+  { id: 'drip', label: 'Drip Campaigns', icon: Send },
   { id: 'routing', label: 'Lead Routing', icon: Users },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
@@ -75,6 +77,8 @@ export default function AdminDashboard() {
       case 'onboarding':
         navigate('/admin/onboarding');
         return null;
+      case 'drip':
+        return <DripCampaignPanel />;
       case 'routing':
         return <LeadRoutingPanel />;
       case 'settings':
