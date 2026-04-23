@@ -40,28 +40,7 @@ export default function IntegrationPartners() {
   const [paused, setPaused] = useState(false);
 
   return (
-    // FIX 3: Tighter vertical padding — section was too tall with too much dead air
-    <section className="py-14 px-6 relative overflow-hidden">
-
-      {/* FIX 5a: Richer dual-nebula background behind logos */}
-      <div aria-hidden="true" style={{
-        position: "absolute", inset: 0, pointerEvents: "none",
-        background:
-          "radial-gradient(ellipse 75% 60% at 20% 60%, rgba(200,150,92,0.10) 0%, transparent 55%), " +
-          "radial-gradient(ellipse 60% 50% at 80% 40%, rgba(154,92,46,0.08) 0%, transparent 55%), " +
-          "radial-gradient(ellipse 100% 80% at 50% 50%, rgba(245,217,168,0.05) 0%, transparent 65%)",
-      }} />
-
-      {/* FIX 5b: Strengthened grid — more visible, still subtle */}
-      <div aria-hidden="true" style={{
-        position: "absolute", inset: 0, pointerEvents: "none",
-        backgroundImage:
-          "linear-gradient(rgba(154,92,46,0.09) 1px, transparent 1px), " +
-          "linear-gradient(90deg, rgba(154,92,46,0.09) 1px, transparent 1px)",
-        backgroundSize: "44px 44px",
-        maskImage: "radial-gradient(ellipse 90% 90% at 50% 50%, black 20%, transparent 100%)",
-        WebkitMaskImage: "radial-gradient(ellipse 90% 90% at 50% 50%, black 20%, transparent 100%)",
-      }} />
+    <section className="py-14 px-6 relative overflow-hidden" style={{ background: "#ffffff" }}>
 
       <div className="max-w-6xl mx-auto relative z-10">
 
@@ -106,11 +85,10 @@ export default function IntegrationPartners() {
         >
           {/* Left fade */}
           <div className="absolute left-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to right, hsl(var(--background)) 0%, transparent 100%)" }}
+            style={{ background: "linear-gradient(to right, #ffffff 0%, transparent 100%)" }}
           />
-          {/* Right fade */}
           <div className="absolute right-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to left, hsl(var(--background)) 0%, transparent 100%)" }}
+            style={{ background: "linear-gradient(to left, #ffffff 0%, transparent 100%)" }}
           />
 
           <div
@@ -120,7 +98,7 @@ export default function IntegrationPartners() {
               gap: "80px",
               // FIX 4: Slowed from 22s → 34s so logos are comfortably readable
               // FIX 7: Animation pauses on hover
-              animation: `integrationScroll 34s linear infinite`,
+              animation: `integrationScroll 18s linear infinite`,
               animationPlayState: paused ? "paused" : "running",
             }}
           >
@@ -140,9 +118,9 @@ export default function IntegrationPartners() {
                   alt={integration.name}
                   loading="lazy"
                   style={{
-                    height: "90px",
+                    height: "110px",
                     width: "auto",
-                    maxWidth: "200px",
+                    maxWidth: "240px",
                     objectFit: "contain",
                     transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease",
                     filter: "drop-shadow(0 0 0px rgba(200,150,92,0))",
