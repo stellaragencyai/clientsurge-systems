@@ -130,7 +130,7 @@ export default function AutomationPipelineSection() {
       {/* Header */}
       <div className="text-center mb-14">
         <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Live Pipeline View</p>
-        <h2 className="font-inter text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-foreground">
+        <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
           See the Full{" "}
           <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.35)" }}>System</span>
           {" "}in Motion
@@ -144,12 +144,12 @@ export default function AutomationPipelineSection() {
       <div className="hidden lg:block">
 
         {/* Node row */}
-        <div className="relative" style={{ paddingTop: `${NODE_SIZE / 2}px`, paddingBottom: "8px" }}>
+        <div className="relative" style={{ paddingTop: "20px", paddingBottom: "8px" }}>
 
-          {/* Connector line — centred on nodes */}
+          {/* Connector line — sits above the nodes, not through them */}
           <div
             className="absolute left-0 right-0"
-            style={{ top: `${NODE_SIZE / 2}px`, height: "2px" }}
+            style={{ top: "0px", height: "2px" }}
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
             <div
@@ -175,8 +175,8 @@ export default function AutomationPipelineSection() {
             />
           </div>
 
-          {/* Stage nodes */}
-          <div className="grid grid-cols-8">
+          {/* Stage nodes — 2× spacing via gap */}
+          <div className="grid grid-cols-8 gap-x-8">
             {stages.map((stage, index) => {
               const Icon = stage.icon;
               const isActive = activeStage === index;
@@ -239,13 +239,13 @@ export default function AutomationPipelineSection() {
           </div>
         </div>
 
-        {/* ── Always-visible detail panel — content fades in/out cinematically ── */}
+        {/* ── Always-visible detail panel — metallic silver ── */}
         <div
           className="mt-10 rounded-2xl px-10 py-8 flex gap-8 items-start"
           style={{
-            background: "linear-gradient(135deg, rgba(255,252,247,0.98) 0%, rgba(252,244,232,0.96) 100%)",
-            border: "1.5px solid rgba(200,150,92,0.28)",
-            boxShadow: "0 12px 48px rgba(154,92,46,0.1), inset 0 1px 0 rgba(255,255,255,0.9)",
+            background: "linear-gradient(135deg, rgba(245,246,248,0.98) 0%, rgba(228,231,236,0.97) 100%)",
+            border: "1.5px solid rgba(180,185,195,0.5)",
+            boxShadow: "0 12px 48px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -1px 0 rgba(0,0,0,0.04)",
             minHeight: "160px",
           }}
         >
