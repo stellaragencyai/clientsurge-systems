@@ -10,7 +10,6 @@ import CoreOffer from "../components/landing/CoreOffer";
 import IntegrationPartners from "../components/landing/IntegrationPartners";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
-import DemoVideoSection from "../components/landing/DemoVideoSection";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
@@ -44,9 +43,12 @@ function useScrollGradient() {
       return `hsl(${h1 + (h2 - h1) * t},${s1 + (s2 - s1) * t}%,${l1 + (l2 - l1) * t}%)`;
     };
 
-    const onScroll = () => {
+    let frameId = null;
+
+    const updateGradient = () => {
+      frameId = null;
       const progress = Math.min(
-        window.scrollY / (document.body.scrollHeight - window.innerHeight),
+        window.scrollY / Math.max(document.body.scrollHeight - window.innerHeight, 1),
         1
       );
       let i = 0;
@@ -60,9 +62,23 @@ function useScrollGradient() {
       document.documentElement.style.setProperty("--scroll-bg-to", lerp(seg.to, next.to, t));
     };
 
+    const onScroll = () => {
+      if (frameId !== null) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(updateGradient);
+    };
+
     window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    updateGradient();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
   }, []);
 }
 
@@ -118,7 +134,6 @@ export default function Home() {
         <CoreOffer />
         <IntegrationPartners />
         <Pricing />
-        <DemoVideoSection />
         <FAQ />
         <FinalCTA />
         <Footer />

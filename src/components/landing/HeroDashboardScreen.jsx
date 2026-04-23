@@ -1,398 +1,216 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const MOTION_MULTIPLIER = 1.4;
-
-function scaleMs(duration) {
-  return Math.round(duration * MOTION_MULTIPLIER);
-}
-
-function useCounter(target, duration = 1800, delay = 0) {
-  const [value, setValue] = useState(0);
+function useCounter(target, duration = 2000, delay = 0) {
+  const [val, setVal] = useState(0);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       const start = performance.now();
-
       const tick = (now) => {
         const progress = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        setValue(Math.round(eased * target));
-
+        const ease = 1 - Math.pow(1 - progress, 3);
+        setVal(Math.round(ease * target));
         if (progress < 1) {
           requestAnimationFrame(tick);
         }
       };
-
       requestAnimationFrame(tick);
     }, delay);
 
     return () => clearTimeout(timeoutId);
   }, [delay, duration, target]);
 
-  return value;
+  return val;
 }
 
-const DEMO_MODES = {
-  lead_response: {
-    label: "New Lead",
-    helper: "A new lead comes in and the first text goes out right away.",
-    headerTitle: "Lead inbox",
-    status: "Replying in 4s",
-    notification: {
-      type: "lead",
-      appName: "ClientSurge",
-      title: "New lead captured",
-      source: "Glow Med Spa",
-      detail: "Form lead received / intro text sent automatically",
-    },
-    stats: [
-      { label: "Lead", value: "Marcus D.", accent: "#6366f1" },
-      { label: "Source", value: "Website form", accent: "#c8965c" },
-      { label: "Next step", value: "First text", accent: "#22c55e" },
-    ],
-    queueItems: [
-      { title: "Marcus D.", meta: "Requested pricing", badge: "New" },
-      { title: "Phone captured", meta: "(602) 555-0148", badge: "Ready" },
-      { title: "Automation rule", meta: "Instant Lead Response", badge: "On" },
-    ],
+const PIPELINE = [
+  { label: "New", count: 24, color: "#6366f1", w: "95%" },
+  { label: "Contacted", count: 18, color: "#c8965c", w: "72%" },
+  { label: "Replied", count: 11, color: "#a78bfa", w: "44%" },
+  { label: "Booked", count: 7, color: "#22c55e", w: "28%" },
+  { label: "Closed", count: 4, color: "#f59e0b", w: "16%" },
+];
+
+const CONVERSATIONS = [
+  {
+    lead: "Marcus D.",
     messages: [
-      { role: "system", text: "Lead synced from website form" },
-      { role: "ai", text: "Hi Marcus. Thanks for reaching out to Glow Med Spa." },
-      { role: "ai", text: "Would you like a quick pricing breakdown or a booking link first?" },
-      { role: "lead", text: "Send me pricing first, please." },
-    ],
-    steps: [
-      "New lead arrives",
-      "Lead details land in the inbox",
-      "First SMS sends automatically",
+      { r: "ai", t: "Hi Marcus. Thanks for reaching out to Glow Med Spa." },
+      { r: "lead", t: "Can you send me pricing and your next availability?" },
+      { r: "ai", t: "Absolutely. I can send pricing first and then the booking link right after." },
     ],
   },
-  missed_call: {
-    label: "Missed Call",
-    helper: "A missed call turns into a text message instead of a lost lead.",
-    headerTitle: "Call recovery",
-    status: "Text-back in 60s",
-    notification: {
-      type: "lead",
-      appName: "ClientSurge",
-      title: "Missed call recovered",
-      source: "Peak Health Clinic",
-      detail: "No answer / text-back queued automatically",
-    },
-    stats: [
-      { label: "Caller", value: "Priya K.", accent: "#6366f1" },
-      { label: "Trigger", value: "Missed call", accent: "#c8965c" },
-      { label: "Next step", value: "Recovery text", accent: "#22c55e" },
-    ],
-    queueItems: [
-      { title: "Incoming call", meta: "11:42 AM / 23 sec", badge: "Missed" },
-      { title: "Caller ID", meta: "(480) 555-0102", badge: "Matched" },
-      { title: "Automation rule", meta: "Missed Call Text-Back", badge: "On" },
-    ],
+  {
+    lead: "Priya K.",
     messages: [
-      { role: "system", text: "Call ended without answer" },
-      { role: "ai", text: "Hi Priya. Sorry we missed your call." },
-      { role: "ai", text: "Want us to text you details or help you book?" },
-      { role: "lead", text: "Text me the details and the booking link." },
-    ],
-    steps: [
-      "Missed call is detected",
-      "Caller is matched to a record",
-      "Text-back sends automatically",
+      { r: "ai", t: "Hi Priya. Sorry we missed your call a moment ago." },
+      { r: "lead", t: "No problem. Can you text me the details and how to book?" },
+      { r: "ai", t: "Yes. I just sent the details and your booking link so you can choose a time." },
     ],
   },
-  booking: {
-    label: "Booking",
-    helper: "The system nudges the lead toward a booking link and confirmed next step.",
-    headerTitle: "Booking handoff",
-    status: "Booking in progress",
-    notification: {
-      type: "payment",
-      appName: "Venmo",
-      title: "Payment received",
-      source: "Luxe Aesthetics",
-      detail: "paid you $320 for setup deposit",
-    },
-    stats: [
-      { label: "Lead", value: "Jordan T.", accent: "#6366f1" },
-      { label: "Stage", value: "Ready to book", accent: "#c8965c" },
-      { label: "Next step", value: "Booking link", accent: "#22c55e" },
-    ],
-    queueItems: [
-      { title: "Jordan T.", meta: "Asked for next available slot", badge: "Hot" },
-      { title: "Booking link", meta: "Shared automatically", badge: "Sent" },
-      { title: "Follow-up", meta: "Reminder scheduled", badge: "Queued" },
-    ],
+  {
+    lead: "Jordan T.",
     messages: [
-      { role: "system", text: "Lead asked for the next available appointment" },
-      { role: "ai", text: "Perfect. Here is your booking link for the next open slot." },
-      { role: "ai", text: "Once you pick a time, we will send the confirmation for you." },
-      { role: "lead", text: "Done. I booked for Thursday afternoon." },
-    ],
-    steps: [
-      "Lead asks to move forward",
-      "Booking link is shared",
-      "Confirmation and reminders are queued",
+      { r: "ai", t: "Perfect. Here is the next available booking link for Thursday afternoon." },
+      { r: "lead", t: "Booked. Do I get a confirmation too?" },
+      { r: "ai", t: "Yes. Your confirmation is on the way and your reminder will go out automatically." },
     ],
   },
-};
+];
+
+const NOTIFICATIONS = [
+  { from: "Glow Med Spa", preview: "New form lead captured / first text sent automatically." },
+  { from: "Peak Health Clinic", preview: "Missed call detected / text-back sent automatically." },
+  { from: "Luxe Aesthetics", preview: "Lead asked for the booking link / follow-up queued." },
+];
+
+const PAYMENT_NOTIFICATIONS = [
+  { type: "venmo", from: "Luxe Aesthetics", amount: "$320", sender: "Setup deposit", action: "paid you" },
+  { type: "venmo", from: "Peak Health Clinic", amount: "$280", sender: "Implementation deposit", action: "paid you" },
+  { type: "venmo", from: "Glow Med Spa", amount: "$150", sender: "Launch retainer", action: "paid you" },
+];
+
+const LIVE_LEADS_POOL = [
+  { name: "Sarah M.", src: "Instagram", status: "Booked", dot: "#22c55e" },
+  { name: "Marcus D.", src: "Google Ad", status: "Contacted", dot: "#c8965c" },
+  { name: "Priya K.", src: "Missed Call", status: "Replied", dot: "#a78bfa" },
+  { name: "Jordan T.", src: "Referral", status: "New", dot: "#6366f1" },
+  { name: "Alyssa R.", src: "Instagram", status: "Booked", dot: "#22c55e" },
+  { name: "Devon L.", src: "TikTok", status: "New", dot: "#6366f1" },
+  { name: "Maya S.", src: "Google Ad", status: "Replied", dot: "#a78bfa" },
+  { name: "Carlos R.", src: "Referral", status: "Booked", dot: "#22c55e" },
+];
 
 function StatusBar() {
   const [time, setTime] = useState("");
 
   useEffect(() => {
-    const formatTime = () => {
-      const date = new Date();
-      let hours = date.getHours();
-      const minutes = date.getMinutes();
-      const ampm = hours >= 12 ? "PM" : "AM";
-      hours = hours % 12 || 12;
-      return `${hours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+    const fmt = () => {
+      const d = new Date();
+      let h = d.getHours();
+      const m = d.getMinutes();
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+      return `${h}:${m.toString().padStart(2, "0")} ${ampm}`;
     };
 
-    setTime(formatTime());
-    const intervalId = setInterval(() => setTime(formatTime()), 1000);
-    return () => clearInterval(intervalId);
+    setTime(fmt());
+    const id = setInterval(() => setTime(fmt()), 1000);
+    return () => clearInterval(id);
   }, []);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "4px 14px 2px",
-        height: "20px",
-      }}
-    >
-      <span
-        style={{
-          fontSize: "10px",
-          fontWeight: "700",
-          color: "rgba(26,18,9,0.75)",
-          letterSpacing: "0.02em",
-        }}
-      >
-        {time}
-      </span>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4px 14px 2px", height: "20px" }}>
+      <span style={{ fontSize: "10px", fontWeight: "700", color: "rgba(26,18,9,0.75)", letterSpacing: "0.02em" }}>{time}</span>
 
       <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
         <svg width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
-          {[0, 1, 2, 3].map((index) => (
+          {[0, 1, 2, 3].map((i) => (
             <rect
-              key={index}
-              x={index * 3.5}
-              y={10 - (index + 1) * 2.5}
+              key={i}
+              x={i * 3.5}
+              y={10 - (i + 1) * 2.5}
               width="2.5"
-              height={(index + 1) * 2.5}
+              height={(i + 1) * 2.5}
               rx="0.5"
-              fill="rgba(26,18,9,0.65)"
+              fill={i < 4 ? "rgba(26,18,9,0.65)" : "rgba(26,18,9,0.2)"}
             />
           ))}
         </svg>
         <svg width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
-          <path
-            d="M7 8.5 C7 8.5 7 8.5 7 8.5"
-            stroke="rgba(26,18,9,0.65)"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-          />
-          <path
-            d="M4.5 6.5 C5.2 5.8 5.9 5.5 7 5.5 C8.1 5.5 8.8 5.8 9.5 6.5"
-            stroke="rgba(26,18,9,0.65)"
-            strokeWidth="1.3"
-            fill="none"
-            strokeLinecap="round"
-          />
-          <path
-            d="M2.2 4.2 C3.5 2.9 5.1 2.2 7 2.2 C8.9 2.2 10.5 2.9 11.8 4.2"
-            stroke="rgba(26,18,9,0.65)"
-            strokeWidth="1.3"
-            fill="none"
-            strokeLinecap="round"
-          />
+          <path d="M7 8.5 C7 8.5 7 8.5 7 8.5" stroke="rgba(26,18,9,0.65)" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M4.5 6.5 C5.2 5.8 5.9 5.5 7 5.5 C8.1 5.5 8.8 5.8 9.5 6.5" stroke="rgba(26,18,9,0.65)" strokeWidth="1.3" fill="none" strokeLinecap="round" />
+          <path d="M2.2 4.2 C3.5 2.9 5.1 2.2 7 2.2 C8.9 2.2 10.5 2.9 11.8 4.2" stroke="rgba(26,18,9,0.65)" strokeWidth="1.3" fill="none" strokeLinecap="round" />
         </svg>
         <div style={{ display: "flex", alignItems: "center", gap: "1px" }}>
-          <div
-            style={{
-              width: "18px",
-              height: "9px",
-              borderRadius: "2px",
-              border: "1px solid rgba(26,18,9,0.5)",
-              padding: "1px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <div
-              style={{
-                width: "75%",
-                height: "100%",
-                borderRadius: "1px",
-                background: "#22c55e",
-              }}
-            />
+          <div style={{ width: "18px", height: "9px", borderRadius: "2px", border: "1px solid rgba(26,18,9,0.5)", padding: "1px", display: "flex", alignItems: "center" }}>
+            <div style={{ width: "75%", height: "100%", borderRadius: "1px", background: "#22c55e" }} />
           </div>
-          <div
-            style={{
-              width: "2px",
-              height: "4px",
-              borderRadius: "0 1px 1px 0",
-              background: "rgba(26,18,9,0.4)",
-            }}
-          />
+          <div style={{ width: "2px", height: "4px", borderRadius: "0 1px 1px 0", background: "rgba(26,18,9,0.4)" }} />
         </div>
       </div>
     </div>
   );
 }
 
-function VenmoLogo() {
+function NotificationBanner({ notif, visible }) {
   return (
-    <div
-      aria-hidden="true"
-      style={{
-        width: "28px",
-        height: "28px",
-        borderRadius: "8px",
-        background: "#008CFF",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3)",
-        flexShrink: 0,
-      }}
-    >
-      <span
-        style={{
-          color: "#fff",
-          fontSize: "19px",
-          fontWeight: "900",
-          fontStyle: "italic",
-          transform: "translateY(-1px) skewX(-11deg)",
-          lineHeight: 1,
-          fontFamily: "'Arial Black', 'Inter', sans-serif",
-        }}
-      >
-        v
-      </span>
+    <div style={{
+      position: "absolute",
+      top: "24px",
+      left: "10px",
+      right: "10px",
+      zIndex: 30,
+      background: "rgba(255,255,255,0.96)",
+      backdropFilter: "blur(12px)",
+      WebkitBackdropFilter: "blur(12px)",
+      borderRadius: "14px",
+      padding: "10px 12px",
+      boxShadow: "0 8px 32px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.08)",
+      border: "1px solid rgba(154,92,46,0.15)",
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "9px",
+      transform: visible ? "translateY(0)" : "translateY(-110%)",
+      opacity: visible ? 1 : 0,
+      transition: "transform 0.4s cubic-bezier(0.34,1.2,0.64,1), opacity 0.3s ease",
+      pointerEvents: "none",
+    }}>
+      <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "linear-gradient(135deg,#9a5c2e,#c8965c)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, position: "relative" }}>
+        <span style={{ fontSize: "13px", fontWeight: "800", color: "#fff" }}>CS</span>
+        <div style={{ position: "absolute", top: "-3px", right: "-3px", width: "8px", height: "8px", borderRadius: "50%", background: "#ef4444", border: "1.5px solid #fff" }} />
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2px" }}>
+          <span style={{ fontSize: "10px", fontWeight: "700", color: "#9a5c2e", textTransform: "uppercase", letterSpacing: "0.08em" }}>Lead activity</span>
+          <span style={{ fontSize: "9px", color: "rgba(26,18,9,0.35)" }}>now</span>
+        </div>
+        <p style={{ fontSize: "11px", fontWeight: "700", color: "#1a1209", margin: "0 0 1px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{notif.from}</p>
+        <p style={{ fontSize: "10px", color: "rgba(26,18,9,0.5)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{notif.preview}</p>
+      </div>
     </div>
   );
 }
 
-function NotificationBanner({ notification, visible }) {
-  if (!notification) {
-    return null;
-  }
-
-  const isPayment = notification.type === "payment";
-
+function VenmoMark() {
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: "24px",
-        left: "10px",
-        right: "10px",
-        zIndex: 30,
-        background: "rgba(255,255,255,0.92)",
-        color: "#1a1209",
-        backdropFilter: "blur(18px)",
-        WebkitBackdropFilter: "blur(18px)",
-        borderRadius: "16px",
-        padding: "10px 12px",
-        boxShadow: "0 18px 40px rgba(15,23,42,0.14), 0 2px 8px rgba(0,0,0,0.08)",
-        border: "1px solid rgba(255,255,255,0.55)",
-        display: "flex",
-        alignItems: "flex-start",
-        gap: "9px",
-        transform: visible ? "translateY(0)" : "translateY(-115%)",
-        opacity: visible ? 1 : 0,
-        transition: `transform ${scaleMs(350)}ms ease, opacity ${scaleMs(250)}ms ease`,
-        pointerEvents: "none",
-      }}
-    >
-      {isPayment ? (
-        <VenmoLogo />
-      ) : (
-        <div
-          style={{
-            width: "28px",
-            height: "28px",
-            borderRadius: "8px",
-            background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            fontSize: "13px",
-            fontWeight: "800",
-            color: "#fff",
-          }}
-        >
-          CS
-        </div>
-      )}
+    <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "#008CFF", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25)" }}>
+      <span style={{ color: "#fff", fontSize: "18px", fontWeight: "900", fontStyle: "italic", transform: "translateY(-1px) skewX(-10deg)", lineHeight: 1, fontFamily: "'Arial Black', 'Inter', sans-serif" }}>v</span>
+    </div>
+  );
+}
+
+function PaymentNotificationBanner({ payment, visible }) {
+  return (
+    <div style={{
+      position: "absolute",
+      top: "24px",
+      left: "10px",
+      right: "10px",
+      zIndex: 30,
+      background: "rgba(255,255,255,0.94)",
+      backdropFilter: "blur(16px)",
+      WebkitBackdropFilter: "blur(16px)",
+      borderRadius: "14px",
+      padding: "10px 12px",
+      boxShadow: "0 10px 34px rgba(15,23,42,0.16), 0 2px 8px rgba(0,0,0,0.08)",
+      border: "1px solid rgba(255,255,255,0.55)",
+      display: "flex",
+      alignItems: "flex-start",
+      gap: "9px",
+      transform: visible ? "translateY(0)" : "translateY(-110%)",
+      opacity: visible ? 1 : 0,
+      transition: "transform 0.4s cubic-bezier(0.34,1.2,0.64,1), opacity 0.3s ease",
+      pointerEvents: "none",
+    }}>
+      <VenmoMark />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "3px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
-            <span
-              style={{
-                fontSize: "10px",
-                fontWeight: "800",
-                color: "#111827",
-                letterSpacing: "0.01em",
-              }}
-            >
-              {notification.appName}
-            </span>
-            <span style={{ fontSize: "9px", color: "rgba(26,18,9,0.35)" }}>now</span>
-          </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2px" }}>
+          <span style={{ fontSize: "10px", fontWeight: "700", color: "#111827" }}>Venmo</span>
+          <span style={{ fontSize: "9px", color: "rgba(26,18,9,0.35)" }}>now</span>
         </div>
-        <p
-          style={{
-            fontSize: "11px",
-            fontWeight: "700",
-            margin: "0 0 1px",
-            color: "#111827",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {notification.title}
-        </p>
-        <p
-          style={{
-            fontSize: "10px",
-            margin: "0 0 1px",
-            color: "#111827",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {notification.source}
-        </p>
-        <p
-          style={{
-            fontSize: "10px",
-            margin: 0,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            color: "rgba(26,18,9,0.55)",
-          }}
-        >
-          {notification.detail}
-        </p>
+        <p style={{ fontSize: "11px", fontWeight: "700", color: "#111827", margin: "0 0 1px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{payment.sender}</p>
+        <p style={{ fontSize: "10px", color: "rgba(26,18,9,0.55)", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{payment.from} {payment.action} {payment.amount}</p>
       </div>
     </div>
   );
@@ -400,480 +218,239 @@ function NotificationBanner({ notification, visible }) {
 
 function TypingDots() {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "3px",
-        padding: "7px 10px",
-        background: "#f0ece6",
-        borderRadius: "3px 10px 10px 10px",
-        width: "fit-content",
-      }}
-    >
-      {[0, 1, 2].map((index) => (
-        <div
-          key={index}
-          style={{
-            width: "5px",
-            height: "5px",
-            borderRadius: "50%",
-            background: "rgba(26,18,9,0.35)",
-            animation: `typingDot ${scaleMs(1200)}ms ease-in-out ${Math.round(index * 280)}ms infinite`,
-          }}
-        />
+    <div style={{ display: "flex", alignItems: "center", gap: "3px", padding: "7px 10px", background: "#f0ece6", borderRadius: "3px 10px 10px 10px", width: "fit-content" }}>
+      {[0, 1, 2].map((i) => (
+        <div key={i} style={{ width: "5px", height: "5px", borderRadius: "50%", background: "rgba(26,18,9,0.35)", animation: `typingDot 1.2s ease-in-out ${i * 0.2}s infinite` }} />
       ))}
     </div>
   );
 }
 
 export default function HeroDashboardScreen() {
-  const [activeMode, setActiveMode] = useState("lead_response");
   const [aiRespondingDot, setAiRespondingDot] = useState(0);
-  const [notificationVisible, setNotificationVisible] = useState(false);
-  const [visibleMessages, setVisibleMessages] = useState(0);
+  const [dashboardFade, setDashboardFade] = useState(0);
+  const [colorTone, setColorTone] = useState(0);
+
+  useEffect(() => {
+    const t1 = setInterval(() => setAiRespondingDot((v) => (v + 1) % 3), 300);
+    const t2 = setInterval(() => setDashboardFade((v) => (v + 1) % 2), 6000);
+    const t3 = setInterval(() => setColorTone((v) => (v + 1) % 2), 6000);
+    return () => {
+      clearInterval(t1);
+      clearInterval(t2);
+      clearInterval(t3);
+    };
+  }, []);
+
+  const initLeads = useCounter(247, 2200, 400);
+  const replied = useCounter(94, 1800, 600);
+  const booked = useCounter(61, 2000, 800);
+  const initRevenue = useCounter(4200, 2400, 1000);
+
+  const [liveLeads, setLiveLeads] = useState(0);
+  const [liveRevenue, setLiveRevenue] = useState(0);
+  const [flashLead, setFlashLead] = useState(false);
+
+  useEffect(() => {
+    setLiveLeads(247);
+    setLiveRevenue(4200);
+    const id = setInterval(() => {
+      const addLead = Math.random() > 0.4;
+      if (addLead) {
+        setLiveLeads((v) => v + 1);
+        setFlashLead(true);
+        setTimeout(() => setFlashLead(false), 700);
+      }
+      if (Math.random() > 0.3) {
+        setLiveRevenue((v) => v + Math.floor(Math.random() * 120 + 40));
+      }
+    }, 9000);
+    return () => clearInterval(id);
+  }, []);
+
+  const [convIdx, setConvIdx] = useState(0);
+  const [smsVis, setSmsVis] = useState(0);
   const [showTyping, setShowTyping] = useState(false);
   const [fadingOut, setFadingOut] = useState(false);
-  const [liveLeads, setLiveLeads] = useState(247);
-  const [liveRevenue, setLiveRevenue] = useState(4200);
-  const [freshStep, setFreshStep] = useState(0);
-  const cycleRef = useRef(0);
-
-  const currentMode = useMemo(() => DEMO_MODES[activeMode], [activeMode]);
-  const initialLeads = useCounter(247, scaleMs(2200), scaleMs(400));
-  const initialRevenue = useCounter(4200, scaleMs(2400), scaleMs(1000));
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setAiRespondingDot((value) => (value + 1) % 3);
-    }, scaleMs(400));
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  useEffect(() => {
-    const rotateId = setInterval(() => {
-      setActiveMode((previous) => {
-        const keys = Object.keys(DEMO_MODES);
-        const nextIndex = (keys.indexOf(previous) + 1) % keys.length;
-        return keys[nextIndex];
+    const timers = [];
+    const runConv = (ci) => {
+      const msgs = CONVERSATIONS[ci].messages;
+      let delay = 0;
+      msgs.forEach((msg, i) => {
+        if (msg.r === "ai" && i > 0) {
+          timers.push(setTimeout(() => setShowTyping(true), delay));
+          delay += 1400;
+          timers.push(setTimeout(() => { setShowTyping(false); setSmsVis(i + 1); }, delay));
+        } else {
+          timers.push(setTimeout(() => setSmsVis(i + 1), delay));
+        }
+        delay += 1600;
       });
-    }, scaleMs(18000));
-
-    return () => clearInterval(rotateId);
-  }, []);
-
-  useEffect(() => {
-    setNotificationVisible(true);
-    const hideId = setTimeout(() => setNotificationVisible(false), scaleMs(3600));
-    return () => clearTimeout(hideId);
-  }, [activeMode]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const gainedLead = Math.random() > 0.55;
-
-      if (gainedLead) {
-        setLiveLeads((value) => value + 1);
-      }
-
-      if (Math.random() > 0.5) {
-        setLiveRevenue((value) => value + Math.floor(Math.random() * 90 + 30));
-      }
-    }, scaleMs(16000));
-
-    return () => clearInterval(intervalId);
-  }, []);
-
-  useEffect(() => {
-    setVisibleMessages(0);
-    setShowTyping(false);
-    setFadingOut(false);
-    setFreshStep(0);
-    cycleRef.current += 1;
-    const runId = cycleRef.current;
-    const timeouts = [];
-    const messages = currentMode.messages;
-
-    let delay = scaleMs(700);
-    messages.forEach((message, index) => {
-      if (message.role === "ai" && index > 0) {
-        timeouts.push(
-          setTimeout(() => {
-            if (cycleRef.current !== runId) {
-              return;
-            }
-            setShowTyping(true);
-          }, delay)
-        );
-        delay += scaleMs(1000);
-        timeouts.push(
-          setTimeout(() => {
-            if (cycleRef.current !== runId) {
-              return;
-            }
-            setShowTyping(false);
-            setVisibleMessages(index + 1);
-            setFreshStep(Math.min(index + 1, currentMode.steps.length - 1));
-          }, delay)
-        );
-      } else {
-        timeouts.push(
-          setTimeout(() => {
-            if (cycleRef.current !== runId) {
-              return;
-            }
-            setVisibleMessages(index + 1);
-            setFreshStep(Math.min(index, currentMode.steps.length - 1));
-          }, delay)
-        );
-      }
-
-      delay += scaleMs(1300);
-    });
-
-    timeouts.push(
-      setTimeout(() => {
-        if (cycleRef.current !== runId) {
-          return;
-        }
-        setFadingOut(true);
-      }, delay + scaleMs(2400))
-    );
-
-    timeouts.push(
-      setTimeout(() => {
-        if (cycleRef.current !== runId) {
-          return;
-        }
-        setVisibleMessages(0);
-        setShowTyping(false);
+      timers.push(setTimeout(() => setFadingOut(true), delay + 2000));
+      timers.push(setTimeout(() => {
         setFadingOut(false);
-        setFreshStep(0);
-      }, delay + scaleMs(3200))
-    );
+        setSmsVis(0);
+        setShowTyping(false);
+        const next = (ci + 1) % CONVERSATIONS.length;
+        setConvIdx(next);
+        runConv(next);
+      }, delay + 2700));
+    };
+    const init = setTimeout(() => runConv(0), 1200);
+    return () => {
+      clearTimeout(init);
+      timers.forEach(clearTimeout);
+    };
+  }, []);
+
+  const [notifIdx, setNotifIdx] = useState(0);
+  const [notifVisible, setNotifVisible] = useState(false);
+  const [paymentIdx, setPaymentIdx] = useState(0);
+  const [paymentVisible, setPaymentVisible] = useState(false);
+
+  useEffect(() => {
+    const showEmail = (idx) => {
+      setNotifIdx(idx);
+      setNotifVisible(true);
+      setTimeout(() => setNotifVisible(false), 3500);
+    };
+    const showPayment = (idx) => {
+      setPaymentIdx(idx);
+      setPaymentVisible(true);
+      setTimeout(() => setPaymentVisible(false), 3500);
+    };
+
+    const t1 = setTimeout(() => showEmail(0), 4000);
+    const t2 = setTimeout(() => showPayment(0), 10000);
+    const t3 = setTimeout(() => showEmail(1), 16000);
+    const t4 = setTimeout(() => showPayment(1), 22000);
+    const t5 = setTimeout(() => showEmail(2), 28000);
+    const t6 = setTimeout(() => showPayment(2), 34000);
+
+    const loopEmail = setInterval(() => {
+      showEmail(Math.floor(Math.random() * NOTIFICATIONS.length));
+    }, 20000);
+    const loopPayment = setInterval(() => {
+      showPayment(Math.floor(Math.random() * PAYMENT_NOTIFICATIONS.length));
+    }, 20000);
 
     return () => {
-      cycleRef.current += 1;
-      timeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
+      clearTimeout(t5);
+      clearTimeout(t6);
+      clearInterval(loopEmail);
+      clearInterval(loopPayment);
     };
-  }, [currentMode]);
+  }, []);
 
-  const displayLeads = liveLeads || initialLeads;
-  const displayRevenue = liveRevenue || initialRevenue;
+  const [feedLeads, setFeedLeads] = useState(LIVE_LEADS_POOL.slice(0, 5).map((l, i) => ({ ...l, id: i, age: `${(i + 1) * 6 + 1}m`, fresh: false })));
+  const poolIdx = useRef(5);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      const next = LIVE_LEADS_POOL[poolIdx.current % LIVE_LEADS_POOL.length];
+      poolIdx.current += 1;
+      setFeedLeads((prev) => {
+        const newRow = { ...next, id: Date.now(), age: "just now", fresh: true };
+        const updated = [newRow, ...prev.slice(0, 4)];
+        return updated.map((lead, index) => (
+          index === 0 ? lead : { ...lead, age: `${index * 6 + 1}m`, fresh: false }
+        ));
+      });
+    }, 10000);
+    return () => clearInterval(id);
+  }, []);
+
+  const bg = "#f8f5f0";
+  const cardBg = "#ffffff";
+  const cardBorder = "rgba(0,0,0,0.07)";
   const textPrimary = "#1a1209";
   const textMuted = "rgba(26,18,9,0.45)";
-  const cardBackground = "#ffffff";
-  const cardBorder = "rgba(0,0,0,0.07)";
-  const sectionBackground = "#f0ece6";
+  const sectionBg = "#f0ece6";
+  const conv = CONVERSATIONS[convIdx];
+
+  const displayLeads = liveLeads || initLeads;
+  const displayRevenue = liveRevenue || initRevenue;
+
+  const bgColor = colorTone === 0 ? bg : "#f5f3f0";
 
   return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        background: "#f8f5f0",
-        borderRadius: "12px",
-        display: "flex",
-        flexDirection: "column",
-        fontFamily: "'Inter', sans-serif",
-        overflow: "hidden",
-        position: "relative",
-        WebkitFontSmoothing: "antialiased",
-        MozOsxFontSmoothing: "grayscale",
-        textRendering: "optimizeLegibility",
-      }}
-    >
-      <NotificationBanner notification={currentMode.notification} visible={notificationVisible} />
+    <div style={{ width: "100%", height: "100%", background: bgColor, borderRadius: "12px", display: "flex", flexDirection: "column", fontFamily: "'Inter', sans-serif", overflow: "hidden", position: "relative", opacity: dashboardFade === 0 ? 1 : 0.7, transition: "opacity 1s ease-in-out, background 3s ease-in-out", WebkitFontSmoothing: "antialiased", MozOsxFontSmoothing: "grayscale", textRendering: "optimizeLegibility", imageRendering: "crisp-edges", willChange: "auto" }}>
+      <NotificationBanner notif={NOTIFICATIONS[notifIdx]} visible={notifVisible} />
+      <PaymentNotificationBanner payment={PAYMENT_NOTIFICATIONS[paymentIdx]} visible={paymentVisible} />
 
       <StatusBar />
 
       <div style={{ display: "flex", justifyContent: "center", marginBottom: "2px" }}>
-        <div
-          style={{
-            width: "80px",
-            height: "3px",
-            borderRadius: "9999px",
-            background: "rgba(26,18,9,0.12)",
-          }}
-        />
+        <div style={{ width: "80px", height: "3px", borderRadius: "9999px", background: "rgba(26,18,9,0.12)" }} />
       </div>
 
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-          padding: "0 14px 0",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            background: "rgba(255,255,255,0.82)",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
-            borderRadius: "10px",
-            padding: "7px 12px",
-            border: "1px solid rgba(255,255,255,0.35)",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-          }}
-        >
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px", padding: "0 14px 0", overflow: "hidden" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.7)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", borderRadius: "10px", padding: "7px 12px", border: "1px solid rgba(255,255,255,0.3)", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div
-              style={{
-                width: "26px",
-                height: "26px",
-                borderRadius: "7px",
-                background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
+            <div style={{ width: "26px", height: "26px", borderRadius: "7px", background: "linear-gradient(135deg,#9a5c2e,#c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ fontSize: "9px", fontWeight: "800", color: "#fff" }}>CS</span>
             </div>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: "700", color: textPrimary, display: "block" }}>
-                ClientSurge
-              </span>
-              <span style={{ fontSize: "8px", color: textMuted }}>{currentMode.helper}</span>
-            </div>
+            <span style={{ fontSize: "11px", fontWeight: "700", color: textPrimary }}>ClientSurge Dashboard</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-            <div
-              style={{
-                width: "6px",
-                height: "6px",
-                borderRadius: "50%",
-                background: "#22c55e",
-                boxShadow: "0 0 6px #22c55e",
-                animation: `hPulse ${scaleMs(2000)}ms infinite`,
-              }}
-            />
-            <span style={{ fontSize: "9px", color: textMuted, fontWeight: "600" }}>
-              {currentMode.status}
-            </span>
+            <div style={{ width: "12px", height: "12px", borderRadius: "50%", background: "#c8965c", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "7px", animation: "syncPulse 1.5s ease-in-out infinite" }}>⟳</div>
+            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 8px #22c55e", animation: "hPulse 2s infinite" }} />
+            <span style={{ fontSize: "9px", color: textMuted, fontWeight: "600" }}>Live · Today</span>
           </div>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            gap: "6px",
-            background: "rgba(255,255,255,0.75)",
-            borderRadius: "11px",
-            padding: "4px",
-            border: "1px solid rgba(0,0,0,0.05)",
-          }}
-        >
-          {Object.entries(DEMO_MODES).map(([key, mode]) => {
-            const isActive = key === activeMode;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setActiveMode(key)}
-                style={{
-                  flex: 1,
-                  border: "none",
-                  borderRadius: "8px",
-                  padding: "8px 6px",
-                  background: isActive ? "#1a1209" : "transparent",
-                  color: isActive ? "#fff" : textPrimary,
-                  cursor: "pointer",
-                  transition: `background ${scaleMs(220)}ms ease, color ${scaleMs(220)}ms ease, transform ${scaleMs(220)}ms ease`,
-                  boxShadow: isActive ? "0 6px 14px rgba(26,18,9,0.15)" : "none",
-                }}
-              >
-                <span style={{ display: "block", fontSize: "10px", fontWeight: "800" }}>{mode.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "7px" }}>
-          {currentMode.stats.map((stat) => (
-            <div
-              key={stat.label}
-              style={{
-                background: cardBackground,
-                border: `1.5px solid ${cardBorder}`,
-                borderRadius: "11px",
-                padding: "10px 8px",
-                position: "relative",
-                overflow: "hidden",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: "3px",
-                  background: stat.accent,
-                }}
-              />
-              <div style={{ fontSize: "8px", fontWeight: "700", color: textMuted, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                {stat.label}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: "7px" }}>
+          {[
+            { icon: "👥", label: "Total Leads", val: displayLeads, suffix: "", color: "#6366f1", flash: flashLead },
+            { icon: "⚡", label: "AI Replied", val: replied, suffix: "%", color: "#c8965c", flash: false },
+            { icon: "📅", label: "Booked", val: booked, suffix: "%", color: "#22c55e", flash: false },
+            { icon: "💰", label: "Revenue", val: `$${displayRevenue.toLocaleString()}`, raw: true, color: "#f59e0b", flash: false },
+          ].map((s, i) => (
+            <div key={i} style={{ background: cardBg, border: `1.5px solid ${s.flash ? s.color : cardBorder}`, borderRadius: "11px", padding: "10px 8px", position: "relative", overflow: "hidden", boxShadow: s.flash ? `0 0 12px ${s.color}40` : "0 1px 4px rgba(0,0,0,0.04)", transition: "border-color 0.4s, box-shadow 0.4s" }}>
+              <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "3px", background: s.color, borderRadius: "11px 11px 0 0" }} />
+              <div style={{ fontSize: "12px", marginBottom: "4px" }}>{s.icon}</div>
+              <div style={{ fontSize: "17px", fontWeight: "800", color: s.color, lineHeight: 1 }}>
+                {s.raw ? s.val : `${s.val}${s.suffix}`}
               </div>
-              <div
-                style={{
-                  fontSize: "14px",
-                  fontWeight: "800",
-                  color: stat.accent,
-                  lineHeight: 1.15,
-                  marginTop: "5px",
-                }}
-              >
-                {stat.value}
-              </div>
+              <div style={{ fontSize: "8px", color: textMuted, marginTop: "3px", textTransform: "uppercase", letterSpacing: "0.08em" }}>{s.label}</div>
             </div>
           ))}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "0.92fr 1.08fr", gap: "10px", flex: 1, minHeight: 0 }}>
-          <div
-            style={{
-              background: cardBackground,
-              border: `1px solid ${cardBorder}`,
-              borderRadius: "11px",
-              padding: "12px",
-              display: "flex",
-              flexDirection: "column",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-              minHeight: 0,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "10px",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "9px",
-                  fontWeight: "700",
-                  color: textMuted,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                }}
-              >
-                {currentMode.headerTitle}
-              </span>
-              <span
-                style={{
-                  fontSize: "8px",
-                  fontWeight: "700",
-                  color: "#22c55e",
-                  background: "rgba(34,197,94,0.1)",
-                  padding: "2px 7px",
-                  borderRadius: "8px",
-                  border: "1px solid rgba(34,197,94,0.2)",
-                }}
-              >
-                Running
-              </span>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", flex: 1, minHeight: 0 }}>
+          <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: "11px", padding: "12px", display: "flex", flexDirection: "column", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+              <span style={{ fontSize: "9px", fontWeight: "700", color: textMuted, textTransform: "uppercase", letterSpacing: "0.1em" }}>Pipeline</span>
+              <span style={{ fontSize: "8px", fontWeight: "700", color: "#22c55e", background: "rgba(34,197,94,0.1)", padding: "2px 7px", borderRadius: "8px", border: "1px solid rgba(34,197,94,0.2)" }}>Live</span>
             </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "7px", flex: 1 }}>
-              {currentMode.queueItems.map((item, index) => (
-                <div
-                  key={item.title}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "3px",
-                    padding: "8px 9px",
-                    borderRadius: "10px",
-                    background: sectionBackground,
-                    border: index === freshStep ? "1px solid rgba(34,197,94,0.35)" : "1px solid rgba(0,0,0,0.04)",
-                    boxShadow: index === freshStep ? "0 0 0 2px rgba(34,197,94,0.08)" : "none",
-                    transition: `border-color ${scaleMs(240)}ms ease, box-shadow ${scaleMs(240)}ms ease`,
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "6px" }}>
-                    <span style={{ fontSize: "10px", fontWeight: "700", color: textPrimary }}>{item.title}</span>
-                    <span
-                      style={{
-                        fontSize: "8px",
-                        fontWeight: "800",
-                        color: "#22c55e",
-                        background: "rgba(34,197,94,0.12)",
-                        border: "1px solid rgba(34,197,94,0.2)",
-                        padding: "2px 6px",
-                        borderRadius: "999px",
-                      }}
-                    >
-                      {item.badge}
-                    </span>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
+              {PIPELINE.map((p, i) => (
+                <div key={i}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
+                    <span style={{ fontSize: "9px", color: textMuted, fontWeight: "500" }}>{p.label}</span>
+                    <span style={{ fontSize: "9px", fontWeight: "700", color: p.color }}>{p.count}</span>
                   </div>
-                  <span style={{ fontSize: "8px", color: textMuted }}>{item.meta}</span>
+                  <div style={{ height: "4px", borderRadius: "2px", background: "rgba(0,0,0,0.06)", overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: p.w, background: p.color, borderRadius: "2px", transition: "width 1.4s cubic-bezier(0.34,1.2,0.64,1)" }} />
+                  </div>
                 </div>
               ))}
-
-              <div
-                style={{
-                  marginTop: "auto",
-                  padding: "8px 9px",
-                  borderRadius: "10px",
-                  background: "#f9f7f3",
-                  border: "1px dashed rgba(154,92,46,0.18)",
-                }}
-              >
-                <div style={{ fontSize: "8px", color: textMuted, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                  Today
-                </div>
-                <div style={{ fontSize: "12px", fontWeight: "800", color: textPrimary, marginTop: "2px" }}>
-                  {displayLeads}
-                </div>
-                <div style={{ fontSize: "8px", color: textMuted }}>
-                  active leads / ${displayRevenue.toLocaleString()} tracked
-                </div>
-              </div>
             </div>
           </div>
 
-          <div
-            style={{
-              background: cardBackground,
-              border: `1px solid ${cardBorder}`,
-              borderRadius: "11px",
-              padding: "12px",
-              display: "flex",
-              flexDirection: "column",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-              overflow: "hidden",
-              minHeight: 0,
-            }}
-          >
+          <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: "11px", padding: "12px", display: "flex", flexDirection: "column", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
-              <div
-                style={{
-                  width: "24px",
-                  height: "24px",
-                  borderRadius: "50%",
-                  background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  position: "relative",
-                }}
-              >
+              <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "linear-gradient(135deg,#9a5c2e,#c8965c)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, position: "relative" }}>
                 <span style={{ fontSize: "8px", fontWeight: "800", color: "#fff" }}>AI</span>
-                {[0, 1, 2].map((index) => (
+                {[0, 1, 2].map((i) => (
                   <div
-                    key={index}
+                    key={i}
                     style={{
                       position: "absolute",
                       width: "3px",
@@ -882,167 +459,82 @@ export default function HeroDashboardScreen() {
                       background: "#22c55e",
                       boxShadow: "0 0 4px #22c55e",
                       top: "-6px",
-                      left: `${4 + index * 3}px`,
-                      opacity: aiRespondingDot === index ? 1 : 0.28,
-                      transition: `opacity ${scaleMs(220)}ms ease`,
+                      left: `${4 + i * 3}px`,
+                      opacity: aiRespondingDot === i ? 1 : 0.3,
+                      transition: "opacity 0.2s ease",
                     }}
                   />
                 ))}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ fontSize: "10px", fontWeight: "700", color: textPrimary, display: "block" }}>
-                  Automation conversation
-                </span>
-                <span style={{ fontSize: "8px", color: textMuted }}>{currentMode.label} workflow</span>
+                <span style={{ fontSize: "10px", fontWeight: "700", color: textPrimary, display: "block", transition: "opacity 0.4s" }}>{conv.lead}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "3px", marginTop: "1px" }}>
+                  <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 5px #22c55e" }} />
+                  <span style={{ fontSize: "8px", color: textMuted }}>AI responding</span>
+                </div>
               </div>
-              <div
-                style={{
-                  fontSize: "8px",
-                  fontWeight: "800",
-                  color: "#22c55e",
-                  background: "rgba(34,197,94,0.1)",
-                  border: "1px solid rgba(34,197,94,0.2)",
-                  padding: "2px 7px",
-                  borderRadius: "8px",
-                  flexShrink: 0,
-                }}
-              >
-                Live
-              </div>
+              <div style={{ fontSize: "8px", fontWeight: "800", color: "#22c55e", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", padding: "2px 7px", borderRadius: "8px", flexShrink: 0 }}>⚡ 4s</div>
             </div>
-
-            <div
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                gap: "5px",
-                justifyContent: "flex-end",
-                opacity: fadingOut ? 0.45 : 1,
-                transition: `opacity ${scaleMs(420)}ms ease`,
-                minHeight: 0,
-              }}
-            >
-              {currentMode.messages.slice(0, visibleMessages).map((message, index) => {
-                const isAi = message.role === "ai";
-                const isSystem = message.role === "system";
-                return (
-                  <div
-                    key={`${activeMode}-${index}`}
-                    style={{
-                      display: "flex",
-                      justifyContent: isSystem ? "center" : isAi ? "flex-start" : "flex-end",
-                      animation: `sIn ${scaleMs(300)}ms ease-out`,
-                    }}
-                  >
-                    <div
-                      style={{
-                        maxWidth: isSystem ? "92%" : "82%",
-                        padding: isSystem ? "5px 8px" : "5px 8px",
-                        borderRadius: isSystem ? "999px" : isAi ? "3px 9px 9px 9px" : "9px 3px 9px 9px",
-                        background: isSystem
-                          ? "rgba(99,102,241,0.08)"
-                          : isAi
-                            ? "linear-gradient(135deg,#22c55e,#16a34a)"
-                            : "#e8e4de",
-                        fontSize: isSystem ? "8px" : "9px",
-                        lineHeight: 1.45,
-                        color: isSystem ? "#4f46e5" : isAi ? "#fff" : textPrimary,
-                        boxShadow: isAi ? "0 2px 8px rgba(34,197,94,0.18)" : "none",
-                        border: isSystem ? "1px solid rgba(99,102,241,0.12)" : "none",
-                        textAlign: isSystem ? "center" : "left",
-                      }}
-                    >
-                      {message.text}
-                    </div>
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "5px", justifyContent: "flex-end", opacity: fadingOut ? 0 : 1, transition: "opacity 0.5s ease" }}>
+              {conv.messages.slice(0, smsVis).map((m, i) => (
+                <div key={`${convIdx}-${i}`} style={{ display: "flex", justifyContent: m.r === "ai" ? "flex-start" : "flex-end", animation: "sIn 0.3s ease-out" }}>
+                  <div style={{ maxWidth: "82%", padding: "5px 8px", borderRadius: m.r === "ai" ? "3px 9px 9px 9px" : "9px 3px 9px 9px", background: m.r === "ai" ? "linear-gradient(135deg,#22c55e,#16a34a)" : "#e8e4de", fontSize: "9px", lineHeight: 1.45, color: m.r === "ai" ? "#fff" : textPrimary, boxShadow: m.r === "ai" ? "0 2px 8px rgba(34,197,94,0.25)" : "none" }}>
+                    {m.t}
                   </div>
-                );
-              })}
+                </div>
+              ))}
               {showTyping && <TypingDots />}
             </div>
           </div>
         </div>
 
-        <div
-          style={{
-            background: cardBackground,
-            border: `1px solid ${cardBorder}`,
-            borderRadius: "11px",
-            padding: "10px 12px",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: "7px",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "9px",
-                fontWeight: "700",
-                color: textMuted,
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-              }}
-            >
-              What happens automatically
-            </span>
-            <span style={{ fontSize: "8px", color: textMuted }}>1 / 2 / 3</span>
+        <div style={{ background: cardBg, border: `1px solid ${cardBorder}`, borderRadius: "11px", padding: "10px 12px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "7px" }}>
+            <span style={{ fontSize: "9px", fontWeight: "700", color: textMuted, textTransform: "uppercase", letterSpacing: "0.1em" }}>Recent Leads</span>
+            <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22c55e", animation: "hPulse 2s infinite", boxShadow: "0 0 5px #22c55e" }} />
+              <span style={{ fontSize: "8px", color: textMuted }}>Live feed</span>
+            </div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "6px" }}>
-            {currentMode.steps.map((step, index) => {
-              const isActive = index <= freshStep;
-              return (
-                <div
-                  key={step}
-                  style={{
-                    padding: "7px 8px",
-                    borderRadius: "9px",
-                    background: isActive ? "rgba(34,197,94,0.12)" : sectionBackground,
-                    border: isActive ? "1px solid rgba(34,197,94,0.2)" : "1px solid rgba(0,0,0,0.04)",
-                    transition: `background ${scaleMs(220)}ms ease, border-color ${scaleMs(220)}ms ease`,
-                  }}
-                >
-                  <div style={{ fontSize: "8px", color: isActive ? "#15803d" : textMuted, marginBottom: "3px", fontWeight: "800" }}>
-                    STEP {index + 1}
-                  </div>
-                  <div style={{ fontSize: "9px", color: textPrimary, lineHeight: 1.35, fontWeight: "600" }}>
-                    {step}
-                  </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            {feedLeads.map((lead) => (
+              <div
+                key={lead.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "7px",
+                  padding: "4px 6px",
+                  borderRadius: "7px",
+                  background: sectionBg,
+                  borderLeft: lead.fresh ? `2px solid ${lead.dot}` : "2px solid transparent",
+                  animation: lead.fresh ? "rowPopin 0.5s cubic-bezier(0.34,1.2,0.64,1)" : "none",
+                  transition: "border-left-color 2s ease",
+                }}
+              >
+                <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: `${lead.dot}18`, border: `1.5px solid ${lead.dot}60`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <span style={{ fontSize: "9px", fontWeight: "800", color: lead.dot }}>{lead.name[0]}</span>
                 </div>
-              );
-            })}
+                <span style={{ fontSize: "10px", fontWeight: "600", color: textPrimary, flex: 1 }}>{lead.name}</span>
+                <span style={{ fontSize: "8px", color: textMuted }}>{lead.src}</span>
+                <span style={{ fontSize: "8px", fontWeight: "700", color: lead.dot, background: `${lead.dot}15`, padding: "2px 6px", borderRadius: "7px", border: `1px solid ${lead.dot}30` }}>{lead.status}</span>
+                <span style={{ fontSize: "8px", color: textMuted, minWidth: "28px", textAlign: "right" }}>{lead.age}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "20px",
-          flexShrink: 0,
-        }}
-      >
-        <div
-          style={{
-            width: "32%",
-            height: "4px",
-            borderRadius: "9999px",
-            background: "rgba(26,18,9,0.18)",
-          }}
-        />
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "20px", flexShrink: 0 }}>
+        <div style={{ width: "32%", height: "4px", borderRadius: "9999px", background: "rgba(26,18,9,0.18)" }} />
       </div>
 
       <style>{`
-        @keyframes hPulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.35 } }
-        @keyframes sIn { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: translateY(0) } }
-        @keyframes typingDot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4 } 30% { transform: translateY(-3px); opacity: 1 } }
+        @keyframes hPulse     { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        @keyframes sIn        { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes rowPopin   { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes typingDot  { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-3px);opacity:1} }
+        @keyframes syncPulse  { 0%{opacity:0.4;transform:rotate(0deg)} 50%{opacity:1;transform:rotate(180deg)} 100%{opacity:0.4;transform:rotate(360deg)} }
       `}</style>
     </div>
   );

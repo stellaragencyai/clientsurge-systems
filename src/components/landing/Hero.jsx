@@ -16,20 +16,15 @@ export default function Hero() {
         alignItems: "center",
       }}
     >
-      {/* ── Dark atmospheric wash — right side only (Fix 1) ── */}
       <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}>
-        {/* Main dark radial field centered-right — creates deep space effect */}
         <div style={{ position: "absolute", top: "50%", right: "15%", width: "100vw", height: "100vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(13,15,30,0.75) 0%, rgba(13,15,30,0.4) 35%, rgba(13,15,30,0.15) 60%, transparent 85%)", transform: "translateY(-50%)", filter: "blur(3px)" }} />
-        {/* Warm accent layers — still present but now against dark backdrop */}
         <div style={{ position: "absolute", top: "-10%", right: "-10%", width: "80vw", height: "120vh", background: "radial-gradient(ellipse at 65% 45%, rgba(200,150,92,0.08) 0%, rgba(154,92,46,0.04) 30%, transparent 55%)", filter: "blur(2px)" }} />
-        {/* Green glow — pipeline booked stat */}
-        <div style={{ position: "absolute", top: "30%", right: "15%", width: "40vw", height: "50vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(34,197,94,0.03) 0%, transparent 65%)", filter: "blur(10px)" }} />
-        {/* Purple glow — SMS section */}
-        <div style={{ position: "absolute", bottom: "15%", right: "10%", width: "30vw", height: "40vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(167,139,250,0.015) 0%, transparent 65%)", filter: "blur(12px)" }} />
+        <div style={{ position: "absolute", top: "30%", right: "15%", width: "40vw", height: "50vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(34,197,94,0.05) 0%, transparent 65%)", filter: "blur(8px)" }} />
+        <div style={{ position: "absolute", bottom: "15%", right: "10%", width: "30vw", height: "40vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(167,139,250,0.03) 0%, transparent 65%)", filter: "blur(10px)" }} />
       </div>
 
-      {/* ── LEFT-side ghost panel bleeding off-screen (Fix 2) ── */}
       <div
+        aria-hidden="true"
         style={{
           position: "absolute",
           top: "50%",
@@ -44,7 +39,7 @@ export default function Hero() {
           border: "none",
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
-          opacity: 0.22,
+          opacity: 0.35,
           zIndex: 0,
           pointerEvents: "none",
           overflow: "hidden",
@@ -52,7 +47,6 @@ export default function Hero() {
           WebkitMaskImage: "radial-gradient(ellipse at right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, transparent 85%)",
         }}
       >
-        {/* Left panel content — mini dashboard preview */}
         <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "14px", opacity: 0.65 }}>
           <div style={{ height: "12px", width: "70%", borderRadius: "6px", background: "rgba(154,92,46,0.3)" }} />
           <div style={{ height: "10px", width: "90%", borderRadius: "6px", background: "rgba(154,92,46,0.2)" }} />
@@ -69,7 +63,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── IDEA 5: Dot-grid mesh texture overlay (IdentityIQ subtle depth texture) ── */}
       <div
         aria-hidden="true"
         style={{
@@ -84,7 +77,6 @@ export default function Hero() {
         }}
       />
 
-      {/* ── Ghost panel TOP RIGHT — medium depth blur (Fix 3 + Fix 4) ── */}
       <div
         aria-hidden="true"
         style={{
@@ -101,7 +93,7 @@ export default function Hero() {
           filter: "blur(12px)",
           transform: "perspective(2200px) rotateY(-14deg) rotateX(6deg) rotateZ(0.5deg)",
           transformOrigin: "right top",
-          opacity: 0.34,
+          opacity: 0.55,
           zIndex: 1,
           pointerEvents: "none",
           overflow: "hidden",
@@ -109,39 +101,33 @@ export default function Hero() {
           WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 85%)",
         }}
       >
-        {/* Top panel readable UI (Fix 7) — dashboard preview with legible content */}
         <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "14px", opacity: 0.75 }}>
-          {/* Header */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <div style={{ width: "20px", height: "20px", borderRadius: "6px", background: "rgba(154,92,46,0.65)" }} />
             <div style={{ height: "10px", width: "55%", borderRadius: "4px", background: "rgba(154,92,46,0.58)" }} />
           </div>
-          {/* Stat row — legible numbers */}
           <div style={{ display: "flex", justifyContent: "space-around", gap: "8px" }}>
             {["247", "94%", "$4.2k"].map((val, i) => (
               <div key={i} style={{ flex: 1, textAlign: "center", padding: "10px", borderRadius: "10px", background: "rgba(154,92,46,0.18)", border: "1px solid rgba(154,92,46,0.28)" }}>
-                <div style={{ height: "14px", background: `linear-gradient(to bottom, rgba(154,92,46,0.${55 + i*15}), rgba(154,92,46,0.${45 + i*10}))`, borderRadius: "2px", marginBottom: "3px" }} />
+                <div style={{ height: "14px", background: `linear-gradient(to bottom, rgba(154,92,46,0.${55 + i * 15}), rgba(154,92,46,0.${45 + i * 10}))`, borderRadius: "2px", marginBottom: "3px" }} />
                 <div style={{ height: "8px", width: "70%", borderRadius: "3px", background: "rgba(154,92,46,0.42)", margin: "0 auto" }} />
               </div>
             ))}
           </div>
-          {/* Pipeline bar */}
           <div style={{ marginTop: "8px" }}>
             <div style={{ height: "8px", width: "40%", borderRadius: "3px", background: "rgba(154,92,46,0.48)", marginBottom: "6px" }} />
             <div style={{ height: "20px", borderRadius: "6px", background: "rgba(34,197,94,0.25)", border: "1px solid rgba(34,197,94,0.35)", position: "relative", overflow: "hidden" }}>
               <div style={{ height: "100%", width: "72%", background: "rgba(34,197,94,0.55)", borderRadius: "6px" }} />
             </div>
           </div>
-          {/* Mini chart bars */}
           <div style={{ display: "flex", alignItems: "flex-end", gap: "6px", height: "50px", marginTop: "10px" }}>
             {[35, 52, 68, 44, 76].map((h, i) => (
-              <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "4px", background: `rgba(200,150,92,${0.28 + i*0.12})`, border: "1px solid rgba(200,150,92,0.28)" }} />
+              <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "4px", background: `rgba(200,150,92,${0.28 + i * 0.12})`, border: "1px solid rgba(200,150,92,0.28)" }} />
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── Ghost panel BOTTOM RIGHT — heavy depth blur (Fix 3 + Fix 4) ── */}
       <div
         aria-hidden="true"
         style={{
@@ -158,7 +144,7 @@ export default function Hero() {
           filter: "blur(20px)",
           transform: "perspective(2200px) rotateY(-10deg) rotateX(-4deg) rotateZ(-1deg)",
           transformOrigin: "right bottom",
-          opacity: 0.26,
+          opacity: 0.45,
           zIndex: 1,
           pointerEvents: "none",
           overflow: "hidden",
@@ -166,7 +152,6 @@ export default function Hero() {
           WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 55%, transparent 80%)",
         }}
       >
-        {/* Ghost UI — lead list rows */}
         <div style={{ padding: "18px", display: "flex", flexDirection: "column", gap: "8px", opacity: 0.7 }}>
           {[90, 75, 60, 80, 55, 70].map((w, i) => (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 10px", borderRadius: "10px", background: "rgba(154,92,46,0.04)", border: "1px solid rgba(154,92,46,0.08)" }}>
@@ -178,7 +163,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── Frosted reflection pool behind tablet ── */}
       <div
         aria-hidden="true"
         style={{
@@ -197,7 +181,6 @@ export default function Hero() {
         }}
       />
 
-      {/* ── Pulsing warm amber glow halo behind bezel + floating effect ── */}
       <div
         aria-hidden="true"
         style={{
@@ -210,17 +193,16 @@ export default function Hero() {
           minHeight: "580px",
           borderRadius: "32px",
           background: "transparent",
-          boxShadow: "0 0 44px 12px rgba(200,150,92,0.12), 0 0 96px 36px rgba(154,92,46,0.06)",
+          boxShadow: "0 0 60px 16px rgba(200,150,92,0.16), 0 0 130px 50px rgba(154,92,46,0.09)",
           transform: "translateY(-48%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)",
           transformOrigin: "center center",
-          animation: "haloglow 5.6s ease-in-out infinite, floatTablet 8.4s ease-in-out infinite",
+          animation: "haloglow 4s ease-in-out infinite, floatTablet 6s ease-in-out infinite",
           imageRendering: "crisp-edges",
           zIndex: 1,
           pointerEvents: "none",
         }}
       />
 
-      {/* ── Glass desk reflection beneath tablet ── */}
       <div
         aria-hidden="true"
         style={{
@@ -239,7 +221,6 @@ export default function Hero() {
         }}
       />
 
-      {/* ── Pencil silhouette under tablet (left side) ── */}
       <div
         aria-hidden="true"
         style={{
@@ -258,7 +239,6 @@ export default function Hero() {
         }}
       />
 
-      {/* ── Ultra-glass desk surface shine ── */}
       <div
         aria-hidden="true"
         style={{
@@ -273,7 +253,6 @@ export default function Hero() {
         }}
       />
 
-      {/* ── CAST SHADOW — ground shadow beneath tablet ── */}
       <div
         aria-hidden="true"
         style={{
@@ -291,7 +270,6 @@ export default function Hero() {
         }}
       />
 
-      {/* ── TABLET FRAME — fully visible, scaled larger (Fix 6) ── */}
       <div
         aria-hidden="true"
         style={{
@@ -322,7 +300,6 @@ export default function Hero() {
           zIndex: 2,
         }}
       >
-        {/* Idea 3: Glass-shine highlight streak across top of bezel with shimmer */}
         <div style={{
           position: "absolute",
           top: "6px",
@@ -333,10 +310,9 @@ export default function Hero() {
           background: "linear-gradient(to right, transparent, rgba(255,255,255,0.28) 30%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.28) 70%, transparent)",
           pointerEvents: "none",
           zIndex: 15,
-          animation: "glassShine 4.2s ease-in-out infinite",
+          animation: "glassShine 3s ease-in-out infinite",
         }} />
 
-        {/* Idea 6: Frosted edge — left side of bezel fades into bg via mask */}
         <div style={{
           position: "absolute",
           inset: 0,
@@ -346,19 +322,15 @@ export default function Hero() {
           zIndex: 11,
         }} />
 
-        {/* Screen inner bezel ring */}
         <div style={{ position: "absolute", inset: "12px", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.07)", pointerEvents: "none", zIndex: 10 }} />
 
-        {/* Screen content */}
         <div style={{ width: "100%", height: "100%", borderRadius: "16px", overflow: "hidden", position: "relative", transform: "translateZ(0)", willChange: "transform", WebkitFontSmoothing: "antialiased" }}>
           <HeroDashboardScreen />
         </div>
 
-        {/* Camera dot */}
         <div style={{ position: "absolute", top: "8px", left: "50%", transform: "translateX(-50%)", width: "6px", height: "6px", borderRadius: "50%", background: "#2a2d3e", border: "1px solid rgba(255,255,255,0.12)" }} />
       </div>
 
-      {/* Frosted glass fade below tablet — blends into page */}
       <div
         aria-hidden="true"
         style={{
@@ -377,7 +349,6 @@ export default function Hero() {
         }}
       />
 
-      {/* ── Top-to-bottom atmospheric light gradient (Fix 5) ── */}
       <div
         aria-hidden="true"
         style={{
@@ -389,7 +360,6 @@ export default function Hero() {
         }}
       />
 
-      {/* ── Left-to-right gradient overlay — text side stays clean ── */}
       <div
         aria-hidden="true"
         style={{
@@ -401,7 +371,6 @@ export default function Hero() {
         }}
       />
 
-      {/* ── STEP 5: Bottom fade — blends into next section ── */}
       <div
         aria-hidden="true"
         style={{
@@ -416,7 +385,6 @@ export default function Hero() {
         }}
       />
 
-      {/* ── STEP 9: Copy — left side, above gradients ─────────────────── */}
       <div
         style={{
           position: "relative",
@@ -430,8 +398,6 @@ export default function Hero() {
         }}
       >
         <div style={{ maxWidth: "540px" }}>
-
-          {/* Headline */}
           <h1
             style={{
               fontFamily: "var(--font-display)",
@@ -461,7 +427,6 @@ export default function Hero() {
             We build AI-powered systems that respond in seconds, nurture leads for 14 days, and fill your calendar — without you lifting a finger.
           </p>
 
-          {/* Checklist */}
           <div style={{ display: "flex", flexDirection: "column", gap: "11px", marginBottom: "36px" }}>
             {[
               "Instant SMS response to every new lead",
@@ -476,7 +441,6 @@ export default function Hero() {
             ))}
           </div>
 
-          {/* CTAs */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center" }}>
             <button
               onClick={demoBooking?.openDemoBooking}
@@ -514,8 +478,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Live indicator strip removed */}
-
       <style>{`
         @keyframes hpulse    { 0%,100%{opacity:1} 50%{opacity:0.3} }
         @keyframes haloglow  { 0%,100%{opacity:0.7} 50%{opacity:1} }
@@ -523,7 +485,6 @@ export default function Hero() {
         @keyframes glassShine { 0%,100%{opacity:0.4} 50%{opacity:0.8} }
 
         @media (max-width: 1024px) {
-          /* On tablet/mobile, hide the background tablet and go stacked */
         }
       `}</style>
     </section>
