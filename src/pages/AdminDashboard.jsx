@@ -35,24 +35,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  if (isLoadingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
-      </div>
-    );
-  }
 
-  if (!user || user.role !== 'admin') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Access Denied</h1>
-          <p className="text-muted-foreground">Admin access required</p>
-        </div>
-      </div>
-    );
-  }
 
   const handleLogout = () => {
     base44.auth.logout();
@@ -128,7 +111,7 @@ export default function AdminDashboard() {
           <div className="p-4 border-t border-border space-y-3">
             <div className="px-4 py-2">
               <p className="text-xs text-muted-foreground">Signed in as</p>
-              <p className="text-sm font-semibold text-foreground truncate">{user.full_name}</p>
+              <p className="text-sm font-semibold text-foreground truncate">{user?.full_name || 'Admin'}</p>
             </div>
             <button
               onClick={handleLogout}
