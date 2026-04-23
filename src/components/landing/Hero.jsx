@@ -23,14 +23,13 @@ export default function Hero() {
         {/* Warm accent layers — still present but now against dark backdrop */}
         <div style={{ position: "absolute", top: "-10%", right: "-10%", width: "80vw", height: "120vh", background: "radial-gradient(ellipse at 65% 45%, rgba(200,150,92,0.08) 0%, rgba(154,92,46,0.04) 30%, transparent 55%)", filter: "blur(2px)" }} />
         {/* Green glow — pipeline booked stat */}
-        <div style={{ position: "absolute", top: "30%", right: "15%", width: "40vw", height: "50vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(34,197,94,0.05) 0%, transparent 65%)", filter: "blur(8px)" }} />
+        <div style={{ position: "absolute", top: "30%", right: "15%", width: "40vw", height: "50vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(34,197,94,0.03) 0%, transparent 65%)", filter: "blur(10px)" }} />
         {/* Purple glow — SMS section */}
-        <div style={{ position: "absolute", bottom: "15%", right: "10%", width: "30vw", height: "40vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(167,139,250,0.03) 0%, transparent 65%)", filter: "blur(10px)" }} />
+        <div style={{ position: "absolute", bottom: "15%", right: "10%", width: "30vw", height: "40vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(167,139,250,0.015) 0%, transparent 65%)", filter: "blur(12px)" }} />
       </div>
 
       {/* ── LEFT-side ghost panel bleeding off-screen (Fix 2) ── */}
       <div
-        aria-hidden="true"
         style={{
           position: "absolute",
           top: "50%",
@@ -45,7 +44,7 @@ export default function Hero() {
           border: "none",
           backdropFilter: "blur(14px)",
           WebkitBackdropFilter: "blur(14px)",
-          opacity: 0.35,
+          opacity: 0.22,
           zIndex: 0,
           pointerEvents: "none",
           overflow: "hidden",
@@ -102,7 +101,7 @@ export default function Hero() {
           filter: "blur(12px)",
           transform: "perspective(2200px) rotateY(-14deg) rotateX(6deg) rotateZ(0.5deg)",
           transformOrigin: "right top",
-          opacity: 0.55,
+          opacity: 0.34,
           zIndex: 1,
           pointerEvents: "none",
           overflow: "hidden",
@@ -159,7 +158,7 @@ export default function Hero() {
           filter: "blur(20px)",
           transform: "perspective(2200px) rotateY(-10deg) rotateX(-4deg) rotateZ(-1deg)",
           transformOrigin: "right bottom",
-          opacity: 0.45,
+          opacity: 0.26,
           zIndex: 1,
           pointerEvents: "none",
           overflow: "hidden",
@@ -211,10 +210,10 @@ export default function Hero() {
           minHeight: "580px",
           borderRadius: "32px",
           background: "transparent",
-          boxShadow: "0 0 60px 16px rgba(200,150,92,0.16), 0 0 130px 50px rgba(154,92,46,0.09)",
+          boxShadow: "0 0 44px 12px rgba(200,150,92,0.12), 0 0 96px 36px rgba(154,92,46,0.06)",
           transform: "translateY(-48%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)",
           transformOrigin: "center center",
-          animation: "haloglow 4s ease-in-out infinite, floatTablet 6s ease-in-out infinite",
+          animation: "haloglow 5.6s ease-in-out infinite, floatTablet 8.4s ease-in-out infinite",
           imageRendering: "crisp-edges",
           zIndex: 1,
           pointerEvents: "none",
@@ -334,7 +333,7 @@ export default function Hero() {
           background: "linear-gradient(to right, transparent, rgba(255,255,255,0.28) 30%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.28) 70%, transparent)",
           pointerEvents: "none",
           zIndex: 15,
-          animation: "glassShine 3s ease-in-out infinite",
+          animation: "glassShine 4.2s ease-in-out infinite",
         }} />
 
         {/* Idea 6: Frosted edge — left side of bezel fades into bg via mask */}
