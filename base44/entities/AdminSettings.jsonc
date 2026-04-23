@@ -58,15 +58,31 @@
     },
     "sms_template": {
       "type": "string",
-      "title": "SMS Template"
+      "title": "Lead Response SMS Template"
     },
     "email_confirmation_template": {
       "type": "string",
-      "title": "Email Confirmation Template"
+      "title": "Lead Response Email Template"
+    },
+    "missed_call_sms_template": {
+      "type": "string",
+      "title": "Missed Call SMS Template"
+    },
+    "follow_up_day1_sms": {
+      "type": "string",
+      "title": "Follow-Up Day 1 SMS"
+    },
+    "follow_up_day3_sms": {
+      "type": "string",
+      "title": "Follow-Up Day 3 SMS"
+    },
+    "follow_up_day7_sms": {
+      "type": "string",
+      "title": "Follow-Up Day 7 SMS"
     },
     "admin_notification_template": {
       "type": "string",
-      "title": "Admin Notification Template"
+      "title": "Admin Notification Email Template"
     },
     "last_webhook_test_result": {
       "type": "string",
