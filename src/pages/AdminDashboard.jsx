@@ -12,6 +12,7 @@ import IntegrationHealth from '../components/admin/IntegrationHealth';
 import ClientProjectsPanel from '../components/admin/ClientProjectsPanel';
 import AutomationsPanel from '../components/admin/AutomationsPanel';
 import QaCustomerPanel from '../components/admin/QaCustomerPanel';
+import LeadRoutingPanel from '../components/admin/LeadRoutingPanel';
 
 const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -22,6 +23,7 @@ const NAV_ITEMS = [
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   { id: 'templates', label: 'Templates', icon: MessageSquare },
   { id: 'health', label: 'Integration Health', icon: Activity },
+  { id: 'routing', label: 'Lead Routing', icon: Users },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
@@ -73,6 +75,8 @@ export default function AdminDashboard() {
       case 'onboarding':
         navigate('/admin/onboarding');
         return null;
+      case 'routing':
+        return <LeadRoutingPanel />;
       case 'settings':
         return <AdminSettingsPanel />;
       case 'overview':
