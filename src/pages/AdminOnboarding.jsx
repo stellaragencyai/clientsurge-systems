@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
-import { Plus, Loader2, Users, CheckCircle2, Zap, ArrowLeft } from "lucide-react";
+import { Link2, Loader2, Users, ArrowLeft } from "lucide-react";
 import ClientOnboardingCard from "@/components/admin/onboarding/ClientOnboardingCard";
 import AddClientModal from "@/components/admin/onboarding/AddClientModal";
 
@@ -79,7 +79,7 @@ export default function AdminOnboarding() {
             style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", borderRadius: "9999px" }}
             className="flex items-center gap-2 px-5 h-10 text-sm font-bold text-amber-100 hover:opacity-90 transition-opacity"
           >
-            <Plus className="w-4 h-4" /> Add Client
+            <Link2 className="w-4 h-4" /> Attach Paid Order
           </button>
         </div>
       </div>
@@ -119,8 +119,8 @@ export default function AdminOnboarding() {
         {filtered.length === 0 ? (
           <div className="text-center py-16 text-muted-foreground">
             <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
-            <p className="font-semibold">No clients yet</p>
-            <p className="text-sm mt-1">Click "Add Client" to get started.</p>
+            <p className="font-semibold">No canonically linked onboarding records yet</p>
+            <p className="text-sm mt-1">Use "Attach Paid Order" to link a paid order into internal onboarding.</p>
           </div>
         ) : (
           <div className="space-y-4">

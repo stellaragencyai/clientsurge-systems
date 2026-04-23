@@ -60,6 +60,18 @@
       "type": "string",
       "title": "Twilio Number"
     },
+    "client_id": {
+      "type": "string",
+      "title": "Linked Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Linked Client Project ID"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Linked Order ID"
+    },
     "monthly_rate": {
       "type": "number",
       "title": "Monthly Rate ($)"

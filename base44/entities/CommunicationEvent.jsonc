@@ -6,6 +6,34 @@
       "type": "string",
       "title": "Lead ID"
     },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "onboarding_client_id": {
+      "type": "string",
+      "title": "Onboarding Client ID"
+    },
+    "service_key": {
+      "type": "string",
+      "title": "Service Key"
+    },
+    "context_type": {
+      "type": "string",
+      "title": "Context Type"
+    },
+    "context_id": {
+      "type": "string",
+      "title": "Context ID"
+    },
     "channel": {
       "type": "string",
       "title": "Channel",
@@ -37,6 +65,20 @@
         "email_sent",
         "email_failed",
         "webhook_sent",
+        "order_paid",
+        "install_initialized",
+        "service_configuration_updated",
+        "service_status_changed",
+        "service_transition_blocked",
+        "runtime_attempt_started",
+        "runtime_attempt_blocked",
+        "provider_send_attempted",
+        "provider_send_succeeded",
+        "provider_send_failed",
+        "booking_simulation_created",
+        "booking_created",
+        "lead_reactivation_batch_completed",
+        "review_request_trigger_simulated",
         "workflow_triggered",
         "status_update"
       ]
@@ -47,6 +89,7 @@
       "enum": [
         "twilio",
         "resend",
+        "stripe",
         "gmail",
         "zapier",
         "n8n",
@@ -61,6 +104,7 @@
         "sent",
         "delivered",
         "failed",
+        "opened",
         "received",
         "processed"
       ]
@@ -87,7 +131,6 @@
     }
   },
   "required": [
-    "lead_id",
     "channel",
     "direction",
     "event_type",

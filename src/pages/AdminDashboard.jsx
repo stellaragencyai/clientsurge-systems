@@ -3,6 +3,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
 import AnalyticsDashboard from '../components/admin/AnalyticsDashboard';
@@ -11,18 +12,12 @@ import IntegrationHealth from '../components/admin/IntegrationHealth';
 import ClientProjectsPanel from '../components/admin/ClientProjectsPanel';
 import AutomationsPanel from '../components/admin/AutomationsPanel';
 
-const intakeTypeLabels = {
-  lead_capture: 'Lead Capture',
-  contact_inquiry: 'Contact Inquiry',
-  demo_booking: 'Demo Booking',
-};
-
 const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'leads', label: 'Leads', icon: Users },
   { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
   { id: 'onboarding', label: 'Client Onboarding', icon: ClipboardList },
-  { id: 'automations', label: '9 Automations', icon: Zap },
+  { id: 'automations', label: 'Automation Status', icon: Zap },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   { id: 'templates', label: 'Templates', icon: MessageSquare },
   { id: 'health', label: 'Integration Health', icon: Activity },
@@ -170,8 +165,19 @@ export default function AdminDashboard() {
 }
 
 function OverviewDashboard() {
-  const [leads, setLeads] = useState([]);
+  const [snapshot, setSnapshot] = useState({
+    summary: {
+      total_leads: 0,
+      status_counts: {},
+      segment_counts: {},
+      recommended_offer_counts: {},
+      recent_lead_activity: [],
+      priority_queue: [],
+      last7Days: [],
+    },
+  });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchOverviewData();
@@ -179,23 +185,27 @@ function OverviewDashboard() {
 
   const fetchOverviewData = async () => {
     try {
-      const leadsData = await base44.entities.Leads.list('-created_date', 50);
-      setLeads(leadsData);
+      const response = await fetchLeadPipelineSummary({ limit: 10, offset: 0 });
+      setSnapshot(response);
+      setError("");
     } catch (err) {
       console.error('Failed to load data:', err);
+      setError(getLeadPipelineError(err, "Unable to load lead overview right now."));
     } finally {
       setLoading(false);
     }
   };
 
+  const totalLeads = snapshot.summary.total_leads || 0;
+  const recentLeads = snapshot.summary.recent_lead_activity || [];
+  const priorityQueue = snapshot.summary.priority_queue || [];
+  const newToday = snapshot.summary.last7Days?.[snapshot.summary.last7Days.length - 1]?.leads || 0;
+
   const stats = [
-    { label: 'Total Leads', value: leads.length, color: 'blue' },
-    { label: 'New Today', value: leads.filter(l => {
-      const today = new Date().toDateString();
-      return new Date(l.created_date).toDateString() === today;
-    }).length, color: 'green' },
-    { label: 'Qualified', value: leads.filter(l => l.status === 'Qualified').length, color: 'purple' },
-    { label: 'Booked', value: leads.filter(l => l.status === 'Booked').length, color: 'emerald' },
+    { label: 'Total Leads', value: totalLeads, color: 'blue' },
+    { label: 'New Today', value: newToday, color: 'green' },
+    { label: 'Follow-Up Due', value: snapshot.summary.segment_counts?.follow_up || 0, color: 'purple' },
+    { label: 'Awaiting Close', value: snapshot.summary.segment_counts?.awaiting_close || 0, color: 'emerald' },
   ];
 
   const colors = {
@@ -210,7 +220,7 @@ function OverviewDashboard() {
       {/* Header */}
       <div>
         <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>
-        <p className="text-sm text-muted-foreground mt-1">Here's your dashboard overview</p>
+        <p className="text-sm text-muted-foreground mt-1">Canonical lead activation overview across the current admin sales queue.</p>
       </div>
 
       {/* Stats Grid */}
@@ -223,22 +233,86 @@ function OverviewDashboard() {
         ))}
       </div>
 
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr,1fr]">
+        <div className="bg-white rounded-xl border border-border p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Priority Outreach Queue</h3>
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {loading ? (
+              <p className="text-sm text-muted-foreground">Loading...</p>
+            ) : error ? (
+              <p className="text-sm text-red-600">{error}</p>
+            ) : priorityQueue.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No priority leads yet</p>
+            ) : (
+              priorityQueue.slice(0, 6).map((lead, index) => (
+                <div key={lead.id} className="rounded-lg border border-border bg-muted/20 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        #{index + 1} {lead.full_name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{lead.business_name}</p>
+                    </div>
+                    <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground">
+                      {lead.activation_priority}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs font-medium text-foreground">{lead.next_action?.label || "Review lead"}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{lead.next_action?.detail || "Review lead context."}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Offer: {lead.recommended_offer?.package_name || lead.recommended_offer?.primary_service_name || 'No advisory offer'}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-border p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Offer Mix</h3>
+          <div className="space-y-3">
+            <OverviewLine
+              label="Starter"
+              value={snapshot.summary.recommended_offer_counts?.starter_system || 0}
+              helper="Response + booking fit"
+            />
+            <OverviewLine
+              label="Growth"
+              value={snapshot.summary.recommended_offer_counts?.growth_system || 0}
+              helper="Response + nurture fit"
+            />
+            <OverviewLine
+              label="Pro"
+              value={snapshot.summary.recommended_offer_counts?.pro_system || 0}
+              helper="Full-stack fit"
+            />
+            <OverviewLine
+              label="Single Service"
+              value={snapshot.summary.recommended_offer_counts?.single_service || 0}
+              helper="One clear first-service fit"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Recent Leads */}
       <div className="bg-white rounded-xl border border-border p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Recent Leads</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">Recent Lead Movement</h3>
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {loading ? (
             <p className="text-sm text-muted-foreground">Loading...</p>
-          ) : leads.length === 0 ? (
+          ) : error ? (
+            <p className="text-sm text-red-600">{error}</p>
+          ) : recentLeads.length === 0 ? (
             <p className="text-sm text-muted-foreground">No leads yet</p>
           ) : (
-            leads.slice(0, 5).map((lead) => (
+            recentLeads.slice(0, 5).map((lead) => (
               <div key={lead.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors border-b border-border last:border-0">
                 <div>
                   <p className="font-medium text-foreground text-sm">{lead.full_name}</p>
-                  <p className="text-xs text-muted-foreground">{lead.email}</p>
+                  <p className="text-xs text-muted-foreground">{lead.business_name}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {intakeTypeLabels[lead.intake_type] || lead.intake_type || 'Legacy intake'}
+                    {lead.recent_movement?.detail || (lead.last_activity_at ? new Date(lead.last_activity_at).toLocaleDateString() : 'Not tracked')}
                   </p>
                 </div>
                 <span className={`px-2.5 py-1 rounded text-xs font-semibold ${
@@ -255,35 +329,39 @@ function OverviewDashboard() {
         </div>
       </div>
 
-      {/* Quick Actions */}
+      {/* Activation Snapshot */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white rounded-xl border border-border p-6">
-          <h3 className="font-semibold text-foreground mb-3">Quick Actions</h3>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>&#10003; View all leads in the Leads section</li>
-            <li>&#10003; Check analytics and conversion rates</li>
-            <li>&#10003; Customize message templates</li>
-            <li>&#10003; Monitor integration health</li>
-          </ul>
+          <h3 className="font-semibold text-foreground mb-3">Actionability Snapshot</h3>
+          <div className="space-y-3 text-sm">
+            <OverviewLine label="Reactivation Ready" value={snapshot.summary.segment_counts?.reactivation || 0} helper="Dormant leads fit reactivation." />
+            <OverviewLine label="Nurture Ready" value={snapshot.summary.segment_counts?.nurture || 0} helper="Leads fit structured follow-up." />
+            <OverviewLine label="High-Value Outreach" value={snapshot.summary.segment_counts?.high_value_outreach || 0} helper="High-intent or high-score." />
+            <OverviewLine label="Demo Requested" value={snapshot.summary.segment_counts?.demo_requested || 0} helper="Demo-booking leads waiting on work." />
+          </div>
         </div>
         <div className="bg-white rounded-xl border border-border p-6">
-          <h3 className="font-semibold text-foreground mb-3">System Status</h3>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">API Status</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-600" />Operational</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Database</span>
-              <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-600" />Healthy</span>
-            </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Uptime</span>
-              <span className="font-semibold text-foreground">99.9%</span>
-            </div>
+          <h3 className="font-semibold text-foreground mb-3">Operator Guidance</h3>
+          <div className="space-y-2 text-sm text-muted-foreground">
+            <p>&#10003; Work the priority queue before broad list scanning.</p>
+            <p>&#10003; Follow-up and demo-close signals should be handled before nurture-only leads.</p>
+            <p>&#10003; Treat recommended offers as advisory, then confirm fit in the lead detail view.</p>
+            <p>&#10003; Keep status changes canonical so timestamps and segments stay accurate.</p>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function OverviewLine({ label, value, helper }) {
+  return (
+    <div className="flex items-start justify-between gap-3 rounded-lg border border-border bg-muted/20 p-3">
+      <div>
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground">{helper}</p>
+      </div>
+      <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground">{value}</span>
     </div>
   );
 }

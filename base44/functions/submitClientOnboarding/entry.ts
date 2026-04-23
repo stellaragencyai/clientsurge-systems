@@ -1,4 +1,8 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import {
+  ClientOnboardingAccessError,
+  submitClientOnboardingAccess,
+} from "../_shared/clientOnboardingAccess.js";
 
 Deno.serve(async (req) => {
   try {
@@ -9,30 +13,17 @@ Deno.serve(async (req) => {
     }
 
     const data = await req.json();
+    const result = await submitClientOnboardingAccess({
+      base44,
+      payload: data,
+    });
 
-    // Optional: Send webhook to n8n or external automation system
-    const webhookUrl = Deno.env.get('N8N_WEBHOOK_URL');
-    if (webhookUrl) {
-      try {
-        await fetch(webhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            event: 'client_onboarding_submitted',
-            timestamp: new Date().toISOString(),
-            data: data,
-          }),
-        });
-      } catch (webhookErr) {
-        console.log('Webhook send failed (non-blocking):', webhookErr.message);
-      }
+    return Response.json(result);
+  } catch (error) {
+    if (error instanceof ClientOnboardingAccessError) {
+      return Response.json({ error: error.message, code: error.code }, { status: error.status });
     }
 
-    return Response.json({ 
-      success: true, 
-      message: 'Onboarding submitted successfully' 
-    });
-  } catch (error) {
     console.error('Error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }

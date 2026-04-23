@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useMemo } from "react";
+import { buildPricingSummaryForProducts, normalizeSelectedProducts } from "./salesCatalog.js";
 
 const CartContext = createContext(null);
 
@@ -9,7 +10,7 @@ export function CartProvider({ children }) {
   const addItem = useCallback((product) => {
     setItems((prev) => {
       if (prev.find((i) => i.product_id === product.product_id)) return prev;
-      return [...prev, product];
+      return normalizeSelectedProducts([...prev, product]);
     });
     setCartOpen(true);
   }, []);
@@ -19,12 +20,29 @@ export function CartProvider({ children }) {
   }, []);
 
   const clearCart = useCallback(() => setItems([]), []);
+  const replaceItems = useCallback((nextItems) => {
+    setItems(normalizeSelectedProducts(nextItems));
+  }, []);
 
-  const totalSetup = items.reduce((sum, i) => sum + i.setup_fee, 0);
-  const totalMonthly = items.reduce((sum, i) => sum + i.monthly_fee, 0);
+  const pricingSummary = useMemo(() => buildPricingSummaryForProducts(items), [items]);
+  const totalSetup = pricingSummary.total_setup;
+  const totalMonthly = pricingSummary.total_monthly;
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, clearCart, cartOpen, setCartOpen, totalSetup, totalMonthly }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addItem,
+        removeItem,
+        clearCart,
+        replaceItems,
+        cartOpen,
+        setCartOpen,
+        pricingSummary,
+        totalSetup,
+        totalMonthly,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

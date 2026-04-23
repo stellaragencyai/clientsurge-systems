@@ -8,10 +8,19 @@ const STEPS = [
   { key: "step_system_setup", label: "System Setup", desc: "We're configuring your full automation system." },
   { key: "step_sms", label: "SMS Connected", desc: "Your dedicated SMS line is being activated and tested." },
   { key: "step_email", label: "Email Connected", desc: "Your email automation sequences are being connected." },
-  { key: "step_booking", label: "Booking Flow Live", desc: "Your booking calendar integration is going live." },
-  { key: "step_followup", label: "Follow-Up Sequences Active", desc: "Your follow-up sequences are loaded and running." },
-  { key: "step_live", label: "Full System Running", desc: "Everything is live and working for your business. 🎉" },
+  { key: "step_booking", label: "Booking Flow Setup", desc: "Your booking flow is being configured and verified." },
+  { key: "step_followup", label: "Follow-Up Setup", desc: "Your follow-up sequences are being loaded and checked." },
+  { key: "step_live", label: "System Live", desc: "Your paid setup order has been marked live after verification." },
 ];
+
+const STATUS_STYLES = {
+  Paid: "bg-slate-100 text-slate-700",
+  "Ready for Install": "bg-blue-50 text-blue-700",
+  Configuring: "bg-amber-50 text-amber-700",
+  Testing: "bg-purple-50 text-purple-700",
+  Live: "bg-green-50 text-green-700",
+  Error: "bg-red-50 text-red-700",
+};
 
 function StepRow({ step, index, isLast }) {
   const isComplete = step.status === "complete";
@@ -19,11 +28,10 @@ function StepRow({ step, index, isLast }) {
   const isPending = step.status === "pending";
 
   return (
-    <div className="flex items-start gap-4 relative">
-      {/* Connector line */}
+    <div className="relative flex items-start gap-4">
       {!isLast && (
         <div
-          className="absolute left-5 top-10 w-0.5 h-full -mb-2"
+          className="absolute left-5 top-10 h-full w-0.5 -mb-2"
           style={{
             background: isComplete
               ? "linear-gradient(to bottom, #c8965c, #9a5c2e)"
@@ -32,9 +40,8 @@ function StepRow({ step, index, isLast }) {
         />
       )}
 
-      {/* Icon circle */}
       <div
-        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center z-10 transition-all duration-500"
+        className="z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full transition-all duration-500"
         style={{
           background: isComplete
             ? "linear-gradient(135deg, #9a5c2e, #c8965c)"
@@ -49,17 +56,16 @@ function StepRow({ step, index, isLast }) {
           boxShadow: isComplete ? "0 0 16px rgba(200,150,92,0.4)" : "none",
         }}
       >
-        {isComplete && <CheckCircle2 className="w-5 h-5 text-white" />}
-        {isInProgress && <Loader2 className="w-5 h-5 animate-spin" style={{ color: "#9a5c2e" }} />}
-        {isPending && <Clock className="w-4 h-4 text-muted-foreground/40" />}
+        {isComplete && <CheckCircle2 className="h-5 w-5 text-white" />}
+        {isInProgress && <Loader2 className="h-5 w-5 animate-spin" style={{ color: "#9a5c2e" }} />}
+        {isPending && <Clock className="h-4 w-4 text-muted-foreground/40" />}
       </div>
 
-      {/* Content */}
       <div
         className="flex-1 pb-8 transition-all duration-500"
         style={{ opacity: isPending ? 0.4 : 1 }}
       >
-        <div className="flex items-center gap-2 flex-wrap mb-0.5">
+        <div className="mb-0.5 flex flex-wrap items-center gap-2">
           <span
             className="text-sm font-bold"
             style={{
@@ -70,31 +76,40 @@ function StepRow({ step, index, isLast }) {
           </span>
           {isComplete && (
             <span
-              className="text-xs font-bold px-2 py-0.5 rounded-full"
+              className="rounded-full px-2 py-0.5 text-xs font-bold"
               style={{ background: "rgba(154,92,46,0.12)", color: "#7a4825" }}
             >
-              ✓ Complete
+              Complete
             </span>
           )}
           {isInProgress && (
             <span
-              className="text-xs font-bold px-2 py-0.5 rounded-full animate-pulse"
+              className="animate-pulse rounded-full px-2 py-0.5 text-xs font-bold"
               style={{ background: "rgba(154,92,46,0.1)", color: "#9a5c2e" }}
             >
               In Progress
             </span>
           )}
         </div>
-        <p className="text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
+        <p className="text-xs leading-relaxed text-muted-foreground">{step.desc}</p>
       </div>
     </div>
   );
 }
 
-export default function BuildTracker({ project: initialProject }) {
+function OrderStatusBadge({ value }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[value] || "bg-slate-100 text-slate-700"}`}
+    >
+      {value}
+    </span>
+  );
+}
+
+export default function BuildTracker({ project: initialProject, order }) {
   const [project, setProject] = useState(initialProject);
 
-  // Real-time subscription — updates instantly when admin marks a step complete
   useEffect(() => {
     const unsubscribe = base44.entities.ClientProject.subscribe((event) => {
       if (event.id === initialProject.id && event.type !== "delete") {
@@ -104,11 +119,13 @@ export default function BuildTracker({ project: initialProject }) {
     return unsubscribe;
   }, [initialProject.id]);
 
-  const steps = STEPS.map((s) => ({ ...s, status: project[s.key] || "pending" }));
-  const completedCount = steps.filter((s) => s.status === "complete").length;
+  const steps = STEPS.map((step) => ({ ...step, status: project[step.key] || "pending" }));
+  const completedCount = steps.filter((step) => step.status === "complete").length;
   const progressPct = Math.round((completedCount / steps.length) * 100);
   const allDone = completedCount === steps.length;
-  const currentStep = steps.find((s) => s.status === "in_progress") || steps.find((s) => s.status === "pending");
+  const currentStep =
+    steps.find((step) => step.status === "in_progress") ||
+    steps.find((step) => step.status === "pending");
 
   return (
     <div
@@ -119,8 +136,39 @@ export default function BuildTracker({ project: initialProject }) {
         backdropFilter: "blur(12px)",
       }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-1">
+      {order && (
+        <div className="mb-6 rounded-2xl border border-border bg-muted/20 p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Canonical Setup Status</p>
+              <h3 className="mt-1 text-lg font-semibold text-foreground">Your paid setup order is the live source of truth</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                This status comes directly from your paid order and the real remote setup workflow our team is using.
+              </p>
+            </div>
+            <OrderStatusBadge value={order.pipeline_status} />
+          </div>
+
+          {order.services?.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {order.services.map((service) => (
+                <span
+                  key={service.service_key}
+                  className="inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-semibold text-foreground shadow-sm"
+                >
+                  {service.display_name}: {service.install_status}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <p className="mt-3 text-xs text-muted-foreground">
+            The build checklist below is still useful for high-level visibility, but the status above is the most accurate view of your remote setup progress.
+          </p>
+        </div>
+      )}
+
+      <div className="mb-1 flex items-center justify-between">
         <h2 className="font-display text-xl font-semibold text-foreground">System Build Progress</h2>
         <span className="text-sm font-bold" style={{ color: "#9a5c2e" }}>
           {completedCount}/{steps.length} complete
@@ -128,18 +176,17 @@ export default function BuildTracker({ project: initialProject }) {
       </div>
 
       {allDone ? (
-        <p className="text-sm font-semibold mb-5" style={{ color: "#7a4825" }}>
-          🎉 Your system is fully live and running!
+        <p className="mb-5 text-sm font-semibold" style={{ color: "#7a4825" }}>
+          Your paid setup order is marked live.
         </p>
       ) : currentStep ? (
-        <p className="text-xs text-muted-foreground mb-5">
+        <p className="mb-5 text-xs text-muted-foreground">
           {currentStep.status === "in_progress" ? "Currently working on: " : "Next up: "}
           <span className="font-semibold text-foreground">{currentStep.label}</span>
         </p>
       ) : null}
 
-      {/* Progress bar */}
-      <div className="h-3 bg-muted rounded-full mb-8 overflow-hidden">
+      <div className="mb-8 h-3 overflow-hidden rounded-full bg-muted">
         <div
           className="h-full rounded-full transition-all duration-700"
           style={{
@@ -150,22 +197,20 @@ export default function BuildTracker({ project: initialProject }) {
         />
       </div>
 
-      {/* Steps list */}
       <div>
-        {steps.map((step, i) => (
-          <StepRow key={step.key} step={step} index={i} isLast={i === steps.length - 1} />
+        {steps.map((step, index) => (
+          <StepRow key={step.key} step={step} index={index} isLast={index === steps.length - 1} />
         ))}
       </div>
 
-      {/* Go-live target */}
       {project.go_live_date && !allDone && (
         <div
-          className="mt-4 flex items-center gap-2 px-4 py-3 rounded-xl text-sm"
+          className="mt-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm"
           style={{ background: "rgba(154,92,46,0.07)", border: "1px solid rgba(154,92,46,0.15)" }}
         >
-          <Zap className="w-4 h-4 flex-shrink-0" style={{ color: "#9a5c2e" }} />
+          <Zap className="h-4 w-4 flex-shrink-0" style={{ color: "#9a5c2e" }} />
           <span className="text-foreground/70">
-            Target go-live: <span className="font-semibold" style={{ color: "#7a4825" }}>{project.go_live_date}</span>
+            Target live review: <span className="font-semibold" style={{ color: "#7a4825" }}>{project.go_live_date}</span>
           </span>
         </div>
       )}

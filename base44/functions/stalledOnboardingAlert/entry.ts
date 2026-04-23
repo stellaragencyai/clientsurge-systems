@@ -8,7 +8,7 @@ const STEP_LABELS = {
   step_missed_call: "Missed Call Text-Back Active",
   step_messages_customized: "Messages Customized",
   step_tested: "End-to-End Tested",
-  step_dashboard: "Dashboard Delivered",
+  step_dashboard: "Client Portal Delivered",
   step_live: "Went Live",
 };
 

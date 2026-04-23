@@ -10,8 +10,8 @@ const STEP_PROMPTS = {
   step_missed_call: (c) => `Draft a missed-call text-back SMS for ${c.business_name}. Tone: ${c.tone_of_voice}. It should acknowledge the missed call, introduce the business briefly, and send the booking link: ${c.booking_link || "[BOOKING LINK]"}. Under 160 characters.`,
   step_messages_customized: (c) => `Write a summary of all customized messages for ${c.business_name}: instant response, Day 1/3/7 follow-up, and missed call text-back. Tone: ${c.tone_of_voice}. Services: ${c.services}. Booking link: ${c.booking_link || "[BOOKING LINK]"}. Format clearly.`,
   step_tested: (c) => `Write an internal QA test checklist for ${c.business_name}'s automation system. Include: instant SMS response test, follow-up sequence trigger test, missed call text-back test, booking link validity, and CRM pipeline test.`,
-  step_dashboard: (c) => `Write a brief client-facing dashboard delivery note for ${c.owner_name} at ${c.business_name}. Explain what they can see in their portal: build progress, support chat, and their system status. Keep it warm and encouraging. Tone: ${c.tone_of_voice}.`,
-  step_live: (c) => `Write a "You're Live!" congratulations message for ${c.owner_name} at ${c.business_name}. Their system is now fully active. Mention their services (${c.services || "services"}), booking link (${c.booking_link || "their booking link"}), and that the team is monitoring everything. Tone: ${c.tone_of_voice}.`,
+  step_dashboard: (c) => `Write a brief client-facing client portal delivery note for ${c.owner_name} at ${c.business_name}. Explain what they can see in their portal: build progress, support chat, and paid-order setup status. Keep it warm and encouraging. Tone: ${c.tone_of_voice}.`,
+  step_live: (c) => `Write a "You're Live!" congratulations message for ${c.owner_name} at ${c.business_name}. Their paid setup order has been marked live. Mention their services (${c.services || "services"}), booking link (${c.booking_link || "their booking link"}), and that support remains available. Tone: ${c.tone_of_voice}.`,
 };
 
 const STEP_LABELS = {
@@ -22,7 +22,7 @@ const STEP_LABELS = {
   step_missed_call: "Missed Call Text-Back SMS",
   step_messages_customized: "All Messages Summary",
   step_tested: "QA Test Checklist",
-  step_dashboard: "Dashboard Delivery Note",
+  step_dashboard: "Client Portal Delivery Note",
   step_live: "Go-Live Congratulations",
 };
 

@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
 import { Mail, MessageSquare, Key, Save, AlertCircle, CheckCircle } from 'lucide-react';
+import {
+  fetchAdminSettings,
+  getAdminSettingsError,
+  saveAdminSettings,
+} from '@/lib/adminSettingsApi';
 
 export default function AdminSettingsPanel() {
   const [settings, setSettings] = useState({
@@ -22,12 +26,11 @@ export default function AdminSettingsPanel() {
 
   const fetchSettings = async () => {
     try {
-      const data = await base44.entities.AdminSettings.list();
-      if (data.length > 0) {
-        setSettings(data[0]);
-      }
+      const data = await fetchAdminSettings();
+      setSettings(data);
+      setError('');
     } catch (err) {
-      setError('Failed to load settings');
+      setError(getAdminSettingsError(err, 'Failed to load settings'));
     } finally {
       setLoading(false);
     }
@@ -41,15 +44,13 @@ export default function AdminSettingsPanel() {
   const handleSave = async () => {
     try {
       setLoading(true);
-      if (settings.id) {
-        await base44.entities.AdminSettings.update(settings.id, settings);
-      } else {
-        await base44.entities.AdminSettings.create(settings);
-      }
+      const savedSettings = await saveAdminSettings(settings);
+      setSettings(savedSettings);
+      setError('');
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
-      setError('Failed to save settings');
+      setError(getAdminSettingsError(err, 'Failed to save settings'));
     } finally {
       setLoading(false);
     }

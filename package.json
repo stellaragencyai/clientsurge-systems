@@ -8,6 +8,8 @@
     "build": "vite build",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
+    "test": "node --test",
+    "openclaw:validate-install": "node scripts/openclaw/run-install-validation.mjs",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview"
   },

@@ -53,6 +53,7 @@ import IntegrationPartners from "../components/landing/IntegrationPartners";
 import PerformancePod from "../components/landing/PerformancePod";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
+import DemoVideoSection from "../components/landing/DemoVideoSection";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
@@ -112,6 +113,7 @@ export default function Home() {
         <CoreOffer />
         <IntegrationPartners />
         <Pricing />
+        <DemoVideoSection />
         <FAQ />
         <FinalCTA />
         <PerformancePod />

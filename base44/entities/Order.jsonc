@@ -42,6 +42,30 @@
           "monthly_fee": {
             "type": "number"
           },
+          "compare_at_setup_fee": {
+            "type": "number",
+            "title": "Compare-At Setup Fee"
+          },
+          "compare_at_monthly_fee": {
+            "type": "number",
+            "title": "Compare-At Monthly Fee"
+          },
+          "setup_discount_fee": {
+            "type": "number",
+            "title": "Setup Discount Fee"
+          },
+          "monthly_discount_fee": {
+            "type": "number",
+            "title": "Monthly Discount Fee"
+          },
+          "source_package_key": {
+            "type": "string",
+            "title": "Source Package Key"
+          },
+          "source_package_name": {
+            "type": "string",
+            "title": "Source Package Name"
+          },
           "status": {
             "type": "string",
             "enum": [
@@ -49,6 +73,55 @@
               "setting_up",
               "live"
             ]
+          },
+          "service_key": {
+            "type": "string",
+            "title": "Canonical Service Key"
+          },
+          "tracking_enabled": {
+            "type": "boolean",
+            "title": "Tracked By Install Pipeline",
+            "default": false
+          },
+          "install_status": {
+            "type": "string",
+            "title": "Install Status",
+            "enum": [
+              "Paid",
+              "Ready for Install",
+              "Configuring",
+              "Testing",
+              "Live",
+              "Error"
+            ]
+          },
+          "install_started_at": {
+            "type": "string",
+            "title": "Install Started At"
+          },
+          "install_completed_at": {
+            "type": "string",
+            "title": "Install Completed At"
+          },
+          "install_error": {
+            "type": "string",
+            "title": "Install Error"
+          },
+          "service_access_status": {
+            "type": "string",
+            "title": "Service Access Status"
+          },
+          "previous_active_install_status": {
+            "type": "string",
+            "title": "Previous Active Install Status"
+          },
+          "access_disabled_at": {
+            "type": "string",
+            "title": "Access Disabled At"
+          },
+          "access_disable_reason": {
+            "type": "string",
+            "title": "Access Disable Reason"
           }
         }
       }
@@ -61,6 +134,84 @@
       "type": "number",
       "title": "Total Monthly"
     },
+    "pricing_summary": {
+      "type": "object",
+      "title": "Pricing Summary",
+      "properties": {
+        "pricing_version": {
+          "type": "string",
+          "title": "Pricing Version"
+        },
+        "package_key": {
+          "type": "string",
+          "title": "Package Key"
+        },
+        "package_name": {
+          "type": "string",
+          "title": "Package Name"
+        },
+        "package_service_keys": {
+          "type": "array",
+          "title": "Package Service Keys",
+          "items": {
+            "type": "string"
+          }
+        },
+        "add_on_service_keys": {
+          "type": "array",
+          "title": "Add-On Service Keys",
+          "items": {
+            "type": "string"
+          }
+        },
+        "selected_service_keys": {
+          "type": "array",
+          "title": "Selected Service Keys",
+          "items": {
+            "type": "string"
+          }
+        },
+        "selected_product_ids": {
+          "type": "array",
+          "title": "Selected Product IDs",
+          "items": {
+            "type": "string"
+          }
+        },
+        "total_setup_before_discount": {
+          "type": "number",
+          "title": "Total Setup Before Discount"
+        },
+        "total_monthly_before_discount": {
+          "type": "number",
+          "title": "Total Monthly Before Discount"
+        },
+        "total_setup": {
+          "type": "number",
+          "title": "Actual Setup Total"
+        },
+        "total_monthly": {
+          "type": "number",
+          "title": "Actual Monthly Total"
+        },
+        "setup_discount_total": {
+          "type": "number",
+          "title": "Setup Discount Total"
+        },
+        "monthly_discount_total": {
+          "type": "number",
+          "title": "Monthly Discount Total"
+        },
+        "compare_at_setup": {
+          "type": "number",
+          "title": "Package Compare-At Setup"
+        },
+        "compare_at_monthly": {
+          "type": "number",
+          "title": "Package Compare-At Monthly"
+        }
+      }
+    },
     "stripe_session_id": {
       "type": "string",
       "title": "Stripe Session ID"
@@ -68,6 +219,34 @@
     "stripe_customer_id": {
       "type": "string",
       "title": "Stripe Customer ID"
+    },
+    "subscription_id": {
+      "type": "string",
+      "title": "Linked Subscription ID"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "title": "Stripe Subscription ID"
+    },
+    "subscription_status": {
+      "type": "string",
+      "title": "Subscription Status"
+    },
+    "billing_status": {
+      "type": "string",
+      "title": "Billing Status"
+    },
+    "current_period_start": {
+      "type": "string",
+      "title": "Current Period Start"
+    },
+    "current_period_end": {
+      "type": "string",
+      "title": "Current Period End"
+    },
+    "plan_type": {
+      "type": "string",
+      "title": "Plan Type"
     },
     "payment_status": {
       "type": "string",
@@ -79,6 +258,18 @@
       ],
       "default": "pending"
     },
+    "pipeline_status": {
+      "type": "string",
+      "title": "Install Pipeline Status",
+      "enum": [
+        "Paid",
+        "Ready for Install",
+        "Configuring",
+        "Testing",
+        "Live",
+        "Error"
+      ]
+    },
     "order_status": {
       "type": "string",
       "title": "Order Status",
@@ -89,6 +280,229 @@
         "fully_live"
       ],
       "default": "pending_payment"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Linked Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Linked Client Project ID"
+    },
+    "onboarding_client_id": {
+      "type": "string",
+      "title": "Linked Onboarding Client ID"
+    },
+    "install_initialized_at": {
+      "type": "string",
+      "title": "Install Initialized At"
+    },
+    "last_install_event_at": {
+      "type": "string",
+      "title": "Last Install Event At"
+    },
+    "install_configuration": {
+      "type": "object",
+      "title": "Install Configuration",
+      "properties": {
+        "shared": {
+          "type": "object",
+          "properties": {
+            "twilio_business_phone": {
+              "type": "string",
+              "title": "Twilio Business Phone"
+            },
+            "business_hours": {
+              "type": "string",
+              "title": "Business Hours"
+            },
+            "after_hours_behavior": {
+              "type": "string",
+              "title": "After Hours Behavior",
+              "enum": [
+                "send_after_hours_sms",
+                "hold_until_open"
+              ]
+            },
+            "consent_behavior": {
+              "type": "string",
+              "title": "Consent Behavior",
+              "enum": [
+                "include_opt_out_language",
+                "explicit_consent_required"
+              ]
+            },
+            "opt_out_message": {
+              "type": "string",
+              "title": "Opt Out Message"
+            }
+          }
+        },
+        "services": {
+          "type": "object",
+          "properties": {
+            "instant_lead_response": {
+              "type": "object",
+              "properties": {
+                "sms_template": {
+                  "type": "string",
+                  "title": "Instant Lead Response SMS Template"
+                }
+              }
+            },
+            "missed_call_text_back": {
+              "type": "object",
+              "properties": {
+                "sms_template": {
+                  "type": "string",
+                  "title": "Missed Call Text-Back SMS Template"
+                }
+              }
+            },
+            "nurture_sequence_14d": {
+              "type": "object",
+              "properties": {
+                "sms_enabled": {
+                  "type": "boolean",
+                  "title": "Nurture Sequence SMS Enabled"
+                },
+                "email_enabled": {
+                  "type": "boolean",
+                  "title": "Nurture Sequence Email Enabled"
+                },
+                "steps": {
+                  "type": "array",
+                  "title": "Nurture Sequence Steps",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "day": {
+                        "type": "number",
+                        "title": "Day"
+                      },
+                      "channel": {
+                        "type": "string",
+                        "title": "Channel",
+                        "enum": [
+                          "sms",
+                          "email"
+                        ]
+                      },
+                      "message_template": {
+                        "type": "string",
+                        "title": "Message Template"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "ai_booking_agent": {
+              "type": "object",
+              "properties": {
+                "booking_link": {
+                  "type": "string",
+                  "title": "Booking Link"
+                },
+                "booking_mode": {
+                  "type": "string",
+                  "title": "Booking Mode",
+                  "enum": [
+                    "external_link",
+                    "internal_placeholder"
+                  ]
+                },
+                "confirmation_template": {
+                  "type": "string",
+                  "title": "Booking Confirmation Template"
+                },
+                "reminder_enabled": {
+                  "type": "boolean",
+                  "title": "Booking Reminder Enabled"
+                },
+                "reminder_template": {
+                  "type": "string",
+                  "title": "Booking Reminder Template"
+                },
+                "business_hours": {
+                  "type": "string",
+                  "title": "Booking Business Hours"
+                },
+                "intake_fields": {
+                  "type": "array",
+                  "title": "Booking Intake Fields",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "lead_reactivation": {
+              "type": "object",
+              "properties": {
+                "target_segment": {
+                  "type": "string",
+                  "title": "Target Segment"
+                },
+                "message_template": {
+                  "type": "string",
+                  "title": "Reactivation Message Template"
+                },
+                "max_batch_size": {
+                  "type": "number",
+                  "title": "Max Batch Size"
+                }
+              }
+            },
+            "review_request": {
+              "type": "object",
+              "properties": {
+                "review_link": {
+                  "type": "string",
+                  "title": "Review Link"
+                },
+                "trigger_event": {
+                  "type": "string",
+                  "title": "Trigger Event",
+                  "enum": [
+                    "appointment_completed",
+                    "order_completed",
+                    "manual_trigger"
+                  ]
+                },
+                "message_template": {
+                  "type": "string",
+                  "title": "Review Request Message Template"
+                },
+                "channel": {
+                  "type": "string",
+                  "title": "Review Request Channel",
+                  "enum": [
+                    "sms",
+                    "email"
+                  ]
+                },
+                "send_delay_minutes": {
+                  "type": "number",
+                  "title": "Send Delay Minutes"
+                },
+                "fallback_internal_feedback_enabled": {
+                  "type": "boolean",
+                  "title": "Fallback Internal Feedback Enabled"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "install_configuration_updated_at": {
+      "type": "string",
+      "title": "Install Configuration Updated At"
+    },
+    "pipeline_error": {
+      "type": "string",
+      "title": "Pipeline Error"
     },
     "notes": {
       "type": "string",

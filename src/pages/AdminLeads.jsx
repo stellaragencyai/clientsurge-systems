@@ -3,7 +3,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { LogOut, Menu, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import LeadsTable from "../components/dashboard/LeadsTable";
+import LeadManagementDashboard from "../components/admin/LeadManagementDashboard";
 
 export default function AdminLeads() {
   const { user } = useAuth();
@@ -97,7 +97,7 @@ export default function AdminLeads() {
         {/* Page Content */}
         <div className="flex-1 overflow-auto p-6">
           <div className="max-w-7xl mx-auto">
-            <LeadsTable />
+            <LeadManagementDashboard />
           </div>
         </div>
       </div>

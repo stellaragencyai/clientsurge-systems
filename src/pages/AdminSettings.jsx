@@ -2,8 +2,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import {
+  fetchAdminSettings,
+  getAdminSettingsError,
+  saveAdminSettings,
+} from "@/lib/adminSettingsApi";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, AlertCircle, Zap, Mail, Link2, Settings, ArrowLeft } from "lucide-react";
+import { Zap, Mail, Link2, Settings, ArrowLeft } from "lucide-react";
 
 export default function AdminSettings() {
   const { user } = useAuth();
@@ -21,8 +26,8 @@ export default function AdminSettings() {
 
   const loadSettings = async () => {
     try {
-      const data = await base44.entities.AdminSettings.list();
-      setSettings(data.length > 0 ? data[0] : {});
+      const data = await fetchAdminSettings();
+      setSettings(data);
     } catch (err) {
       console.error("Error loading settings:", err);
     }
@@ -52,14 +57,11 @@ export default function AdminSettings() {
   const handleSaveSettings = async () => {
     setSaving(true);
     try {
-      if (settings.id) {
-        await base44.entities.AdminSettings.update(settings.id, settings);
-      } else {
-        await base44.entities.AdminSettings.create(settings);
-      }
+      const nextSettings = await saveAdminSettings(settings);
+      setSettings(nextSettings);
       alert("Settings saved successfully");
     } catch (err) {
-      alert("Error saving settings: " + err.message);
+      alert("Error saving settings: " + getAdminSettingsError(err, "Unable to save settings."));
     }
     setSaving(false);
   };

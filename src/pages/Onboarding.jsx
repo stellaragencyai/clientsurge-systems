@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import OnboardingChatWidget from "../components/onboarding/OnboardingChatWidget";
@@ -72,34 +71,14 @@ export default function Onboarding() {
     setError(null);
 
     try {
-      // 1. Create the Client record
-      await base44.entities.Client.create({
+      await base44.functions.invoke("submitClientOnboarding", {
         ...formData,
-        status: "Onboarding",
-      });
-
-      // 2. Auto-create the ClientProject so the portal is ready immediately
-      await base44.entities.ClientProject.create({
-        client_email: formData.email,
-        client_name: formData.full_name,
-        business_name: formData.business_name,
-        plan: "Starter System",
-        step_onboarding: "complete",
-      });
-
-      // 3. Invite the client to the platform (sends activation email with login link)
-      await base44.users.inviteUser(formData.email, "user");
-
-      // 4. Send portal welcome email
-      await base44.functions.invoke("sendPortalWelcomeEmail", {
-        client_name: formData.full_name,
-        client_email: formData.email,
-        business_name: formData.business_name,
+        flow: "onboarding",
       });
 
       setSubmitted(true);
     } catch (err) {
-      setError(err.message || "Failed to submit onboarding");
+      setError(err?.data?.error || err.message || "Failed to submit onboarding");
       setLoading(false);
     }
   };
@@ -115,7 +94,7 @@ export default function Onboarding() {
             Onboarding Received
           </h1>
           <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-            Your onboarding has been received. We will begin setting up your system shortly.
+            Your onboarding has been attached to your account. If your login invite was not already active, check your email for next steps.
           </p>
           <div className="bg-primary/5 border border-primary/20 rounded-xl p-6">
             <p className="text-sm text-muted-foreground">

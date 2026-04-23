@@ -1,0 +1,69 @@
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { listInstallQueueOrders } from "../_shared/installPipeline.js";
+
+async function requireAdmin(base44: ReturnType<typeof createClientFromRequest>) {
+  const user = await base44.auth.me();
+  if (!user || user.role !== "admin") {
+    throw new Error("Admin access required");
+  }
+}
+
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    await requireAdmin(base44);
+
+    const payload = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+    const includeLive = Boolean(payload?.include_live);
+    const orders = await listInstallQueueOrders(base44, { includeLive });
+
+    return Response.json({
+      success: true,
+      orders: orders.map((order) => ({
+        id: order.id,
+        business_name: order.business_name,
+        customer_name: order.customer_name,
+        customer_email: order.customer_email,
+        customer_phone: order.customer_phone,
+        total_setup: order.total_setup,
+        total_monthly: order.total_monthly,
+        pricing_summary: order.pricing_summary || null,
+        payment_status: order.payment_status,
+        subscription_id: order.subscription_id || null,
+        stripe_subscription_id: order.stripe_subscription_id || null,
+        subscription_status: order.subscription_status || "",
+        billing_status: order.billing_status || "",
+        current_period_end: order.current_period_end || null,
+        plan_type: order.plan_type || "",
+        pipeline_status: order.pipeline_status,
+        pipeline_error: order.pipeline_error,
+        stripe_session_id: order.stripe_session_id,
+        client_id: order.client_id,
+        client_project_id: order.client_project_id,
+        onboarding_client_id: order.onboarding_client_id,
+        created_date: order.created_date,
+        last_install_event_at: order.last_install_event_at,
+        install_configuration: order.install_configuration,
+        configuration_summary: order.configuration_summary,
+        items: order.trackedItems.map((item) => ({
+          product_id: item.product_id,
+          product_name: item.product_name,
+          display_name: item.display_name,
+          service_key: item.service_key,
+          install_status: item.install_status,
+          install_started_at: item.install_started_at,
+          install_completed_at: item.install_completed_at,
+          install_error: item.install_error,
+          configuration_complete: item.configuration_complete,
+          missing_configuration_fields: item.missing_configuration_fields,
+          missing_configuration_labels: item.missing_configuration_labels,
+          allowed_next_statuses: item.allowed_next_statuses,
+        })),
+      })),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Failed to load install queue";
+    const status = message === "Admin access required" ? 403 : 500;
+    return Response.json({ error: message }, { status });
+  }
+});

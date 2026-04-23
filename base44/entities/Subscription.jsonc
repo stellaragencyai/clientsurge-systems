@@ -1,0 +1,79 @@
+{
+  "name": "Subscription",
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Canonical Order ID"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "title": "Stripe Customer ID"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "title": "Stripe Subscription ID"
+    },
+    "plan_type": {
+      "type": "string",
+      "title": "Plan Type"
+    },
+    "status": {
+      "type": "string",
+      "title": "Subscription Status",
+      "enum": [
+        "active",
+        "past_due",
+        "canceled"
+      ],
+      "default": "active"
+    },
+    "current_period_start": {
+      "type": "string",
+      "title": "Current Period Start"
+    },
+    "current_period_end": {
+      "type": "string",
+      "title": "Current Period End"
+    },
+    "services_included": {
+      "type": "array",
+      "title": "Services Included",
+      "items": {
+        "type": "string"
+      }
+    },
+    "change_request_type": {
+      "type": "string",
+      "title": "Change Request Type"
+    },
+    "requested_plan_type": {
+      "type": "string",
+      "title": "Requested Plan Type"
+    },
+    "change_request_status": {
+      "type": "string",
+      "title": "Change Request Status"
+    },
+    "cancel_requested_at": {
+      "type": "string",
+      "title": "Cancel Requested At"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Metadata JSON"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At"
+    },
+    "updated_at": {
+      "type": "string",
+      "title": "Updated At"
+    }
+  }
+}

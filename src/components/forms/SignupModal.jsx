@@ -39,38 +39,14 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
 
     setLoading(true);
     try {
-      // Create the Client record
-      await base44.entities.Client.create({
-        full_name: form.full_name,
-        business_name: form.business_name,
-        email: form.email,
-        phone: form.phone,
-        website: form.website,
-        status: "Onboarding",
-      });
-
-      // Auto-create ClientProject so the portal is ready
-      await base44.entities.ClientProject.create({
-        client_email: form.email,
-        client_name: form.full_name,
-        business_name: form.business_name,
-        plan: "Starter System",
-        step_onboarding: "pending",
-      });
-
-      // Invite the client (sends activation email)
-      await base44.users.inviteUser(form.email, "user");
-
-      // Send welcome email
-      await base44.functions.invoke("sendPortalWelcomeEmail", {
-        client_name: form.full_name,
-        client_email: form.email,
-        business_name: form.business_name,
+      await base44.functions.invoke("submitClientOnboarding", {
+        ...form,
+        flow: "signup",
       });
 
       setSuccess(true);
     } catch (err) {
-      setErrors({ submit: err.message || "Something went wrong. Please try again." });
+      setErrors({ submit: err?.data?.error || err.message || "Something went wrong. Please try again." });
     } finally {
       setLoading(false);
     }
@@ -108,9 +84,9 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-5">
               <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">Account Created!</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-2">Account Linked!</h3>
             <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              Check your email for an activation link. Once you activate your account you can log in to your client portal and track your system setup.
+              If this email was not already registered, check your inbox for an activation link. Once your account is active you can log in to your client portal and track your system setup.
             </p>
             <button
               onClick={onClose}

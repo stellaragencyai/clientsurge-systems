@@ -4,8 +4,14 @@ import { useCart } from "@/lib/cartContext";
 export default function ProductCard({ product }) {
   const { items, addItem, removeItem } = useCart();
   const inCart = items.some((i) => i.product_id === product.product_id);
+  const checkoutEnabled = product.checkout_enabled !== false;
 
   const toggle = () => {
+    if (!checkoutEnabled) {
+      window.location.href = "/book";
+      return;
+    }
+
     if (inCart) removeItem(product.product_id);
     else addItem(product);
   };
@@ -39,9 +45,26 @@ export default function ProductCard({ product }) {
       {/* Icon + category */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ fontSize: "28px", lineHeight: 1 }}>{product.icon}</div>
-        <span style={{ fontSize: "9px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(154,92,46,0.7)", background: "rgba(154,92,46,0.08)", padding: "3px 9px", borderRadius: "20px", border: "1px solid rgba(154,92,46,0.15)" }}>
-          {product.category}
-        </span>
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", justifyContent: "flex-end" }}>
+          <span style={{ fontSize: "9px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.12em", color: "rgba(154,92,46,0.7)", background: "rgba(154,92,46,0.08)", padding: "3px 9px", borderRadius: "20px", border: "1px solid rgba(154,92,46,0.15)" }}>
+            {product.category}
+          </span>
+          <span
+            style={{
+              fontSize: "9px",
+              fontWeight: "700",
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+              color: checkoutEnabled ? "#166534" : "#7c2d12",
+              background: checkoutEnabled ? "rgba(34,197,94,0.08)" : "rgba(249,115,22,0.1)",
+              padding: "3px 9px",
+              borderRadius: "20px",
+              border: checkoutEnabled ? "1px solid rgba(34,197,94,0.2)" : "1px solid rgba(249,115,22,0.18)",
+            }}
+          >
+            {product.availability_label || (checkoutEnabled ? "Self-Serve Checkout" : "Manual Review")}
+          </span>
+        </div>
       </div>
 
       {/* Name */}
@@ -51,6 +74,15 @@ export default function ProductCard({ product }) {
       </div>
 
       <p style={{ fontSize: "12.5px", color: "rgba(26,18,9,0.6)", lineHeight: 1.6, margin: 0 }}>{product.description}</p>
+
+      <div style={{ borderRadius: "12px", background: checkoutEnabled ? "rgba(34,197,94,0.07)" : "rgba(249,115,22,0.08)", border: checkoutEnabled ? "1px solid rgba(34,197,94,0.18)" : "1px solid rgba(249,115,22,0.18)", padding: "10px 12px" }}>
+        <p style={{ fontSize: "10px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.08em", color: checkoutEnabled ? "#166534" : "#9a3412", margin: "0 0 4px" }}>
+          Fulfillment
+        </p>
+        <p style={{ fontSize: "11px", color: "rgba(26,18,9,0.58)", margin: 0 }}>
+          {product.fulfillment_label || "Canonical install flow"}
+        </p>
+      </div>
 
       {/* Highlights */}
       <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
@@ -82,17 +114,29 @@ export default function ProductCard({ product }) {
         style={{
           borderRadius: "9999px",
           padding: "2px",
-          background: inCart
+          background: !checkoutEnabled
+            ? "linear-gradient(135deg,#f59e0b,#ea580c)"
+            : inCart
             ? "linear-gradient(135deg,#22c55e,#16a34a)"
             : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
           border: "none",
           cursor: "pointer",
-          boxShadow: inCart ? "0 4px 14px rgba(34,197,94,0.35)" : "0 4px 14px rgba(120,70,20,0.3)",
+          boxShadow: !checkoutEnabled
+            ? "0 4px 14px rgba(234,88,12,0.28)"
+            : inCart
+            ? "0 4px 14px rgba(34,197,94,0.35)"
+            : "0 4px 14px rgba(120,70,20,0.3)",
           transition: "all 0.2s",
         }}
       >
-        <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "42px", borderRadius: "9999px", background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#fff", fontWeight: "700", fontSize: "13px" }}>
-          {inCart ? <><Check style={{ width: "14px", height: "14px" }} /> Added to Cart</> : <><Plus style={{ width: "14px", height: "14px" }} /> Add to Cart</>}
+        <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "42px", borderRadius: "9999px", background: !checkoutEnabled ? "linear-gradient(135deg,#ea580c,#c2410c)" : inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#fff", fontWeight: "700", fontSize: "13px" }}>
+          {!checkoutEnabled ? (
+            <>Book Demo to Scope</>
+          ) : inCart ? (
+            <><Check style={{ width: "14px", height: "14px" }} /> Added to Cart</>
+          ) : (
+            <><Plus style={{ width: "14px", height: "14px" }} /> Add to Cart</>
+          )}
         </span>
       </button>
     </div>

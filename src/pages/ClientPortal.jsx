@@ -14,8 +14,11 @@ const TABS = [
 export default function ClientPortal() {
   const [user, setUser] = useState(null);
   const [project, setProject] = useState(null);
+  const [portalOrder, setPortalOrder] = useState(null);
+  const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [portalError, setPortalError] = useState("");
   const [activeTab, setActiveTab] = useState("progress");
 
   useEffect(() => {
@@ -27,20 +30,23 @@ export default function ClientPortal() {
       }
       const me = await base44.auth.me();
       setUser(me);
-      // Find project by client email
-      const projects = await base44.entities.ClientProject.filter({ client_email: me.email });
-      if (projects.length === 0) {
-        // Auto-create a project for this user so the portal is always accessible
-        const newProject = await base44.entities.ClientProject.create({
-          client_email: me.email,
-          client_name: me.full_name || me.email,
-          business_name: me.full_name ? `${me.full_name}'s Business` : me.email,
-          plan: "Starter System",
-          step_onboarding: "pending",
-        });
-        setProject(newProject);
-      } else {
-        setProject(projects[0]);
+      try {
+        const context = await base44.functions.invoke("getClientPortalContext", {});
+        setProject(context.project || null);
+        setPortalOrder(context.order || null);
+        setSubscription(context.subscription || null);
+        setNotFound(false);
+        setPortalError("");
+      } catch (error) {
+        setProject(null);
+        setPortalOrder(null);
+        setSubscription(null);
+        setNotFound(true);
+        setPortalError(
+          error?.data?.error ||
+          error?.message ||
+          "No portal project is linked to this account yet."
+        );
       }
       setLoading(false);
     };
@@ -49,8 +55,26 @@ export default function ClientPortal() {
 
   const refreshProject = async () => {
     if (!user) return;
-    const projects = await base44.entities.ClientProject.filter({ client_email: user.email });
-    if (projects.length > 0) setProject(projects[0]);
+    try {
+      const context = await base44.functions.invoke("getClientPortalContext", {});
+      if (context?.project) {
+        setProject(context.project);
+        setPortalOrder(context.order || null);
+        setSubscription(context.subscription || null);
+        setNotFound(false);
+        setPortalError("");
+      }
+    } catch (error) {
+      setProject(null);
+      setPortalOrder(null);
+      setSubscription(null);
+      setNotFound(true);
+      setPortalError(
+        error?.data?.error ||
+        error?.message ||
+        "No portal project is linked to this account yet."
+      );
+    }
   };
 
   // Real-time subscription at page level
@@ -63,6 +87,16 @@ export default function ClientPortal() {
     });
     return unsubscribe;
   }, [project?.id]);
+
+  useEffect(() => {
+    if (!portalOrder?.id) return;
+    const unsubscribe = base44.entities.Order.subscribe((event) => {
+      if (event.id === portalOrder.id && event.type !== "delete") {
+        refreshProject();
+      }
+    });
+    return unsubscribe;
+  }, [portalOrder?.id]);
 
   if (loading) {
     return (
@@ -81,8 +115,12 @@ export default function ClientPortal() {
           </div>
           <h1 className="font-display text-2xl font-semibold text-foreground mb-2">No Project Found</h1>
           <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-            We couldn't find a project linked to <span className="font-semibold text-foreground">{user?.email}</span>.
-            If you've recently signed up, your project may still be getting set up. Please contact us.
+            {portalError || (
+              <>
+                We couldn't find a project linked to <span className="font-semibold text-foreground">{user?.email}</span>.
+                If you've recently signed up, your project may still be getting set up. Please contact us.
+              </>
+            )}
           </p>
           <a
             href="/"
@@ -164,13 +202,13 @@ export default function ClientPortal() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
         {activeTab === "progress" && (
-          <BuildTracker project={project} />
+          <BuildTracker project={project} order={portalOrder} />
         )}
         {activeTab === "support" && (
           <SupportChat project={project} user={user} />
         )}
         {activeTab === "plan" && (
-          <PlanManager project={project} onUpdated={refreshProject} />
+          <PlanManager project={project} subscription={subscription} onUpdated={refreshProject} />
         )}
       </div>
     </div>

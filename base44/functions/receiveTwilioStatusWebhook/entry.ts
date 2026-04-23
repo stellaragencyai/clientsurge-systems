@@ -1,58 +1,45 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { handleTrustedTwilioStatusWebhook } from "../_shared/webhookHandlers.js";
+import {
+  buildWebhookAuthErrorResponse,
+  verifyTwilioWebhookRequest,
+} from "../_shared/webhookSecurity.js";
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
-
-    if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
-    }
-
-    // Parse Twilio status webhook
     const formData = await req.formData();
-    const messageId = formData.get('MessageSid');
-    const status = formData.get('MessageStatus');
 
-    if (!messageId || !status) {
-      return Response.json({ error: 'Missing MessageSid or MessageStatus' }, { status: 400 });
+    const verification = await verifyTwilioWebhookRequest({ req, formData });
+    if (!verification.ok) {
+      console.warn("Rejected untrusted Twilio webhook", {
+        code: verification.code,
+        reason: verification.reason,
+      });
+      return buildWebhookAuthErrorResponse({
+        provider: "twilio",
+        code: verification.code,
+      });
     }
 
-    // Find the communication event by provider_message_id
-    const events = await base44.asServiceRole.entities.CommunicationEvent.filter({
-      provider_message_id: messageId,
-    });
-
-    if (events.length === 0) {
-      return Response.json({ success: true, message: 'Event not found' });
+    const result = await handleTrustedTwilioStatusWebhook({ base44, formData });
+    if (result?.error) {
+      return Response.json({ error: result.error }, { status: result.status || 400 });
     }
 
-    const event = events[0];
-
-    // Map Twilio status to our status
-    const statusMap = {
-      queued: 'pending',
-      sending: 'pending',
-      sent: 'sent',
-      delivered: 'delivered',
-      failed: 'failed',
-      undelivered: 'failed',
-      received: 'received',
-    };
-
-    const mappedStatus = statusMap[status] || status;
-
-    // Update the communication event
-    await base44.entities.CommunicationEvent.update(event.id, {
-      status: mappedStatus,
+    console.info("Accepted trusted Twilio webhook", {
+      handled_as: result?.handled_as,
+      event_id: result?.event_id,
+      blocked: result?.blocked || false,
     });
 
-    return Response.json({
-      success: true,
-      event_id: event.id,
-      status: mappedStatus,
-    });
+    return Response.json(result);
   } catch (error) {
-    console.error('Error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error("Error:", error);
+    return Response.json({ error: error instanceof Error ? error.message : "Twilio status processing failed" }, { status: 500 });
   }
 });

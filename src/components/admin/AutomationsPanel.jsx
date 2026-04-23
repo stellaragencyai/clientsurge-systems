@@ -1,204 +1,208 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
-  Zap, MessageSquare, Mail, CalendarCheck, RotateCcw,
-  LayoutDashboard, HeadphonesIcon, Search, CheckCircle2,
-  XCircle, AlertCircle, Clock, RefreshCw, ChevronDown, ChevronUp
+  Zap,
+  MessageSquare,
+  Mail,
+  CalendarCheck,
+  RotateCcw,
+  LayoutDashboard,
+  HeadphonesIcon,
+  Search,
+  AlertCircle,
+  Clock,
+  RefreshCw,
+  ChevronDown,
+  ChevronUp,
+  Lock,
+  CheckCircle2,
+  Wrench,
+  TestTube2,
+  ShoppingBag,
+  CircleOff,
 } from "lucide-react";
+import {
+  CLIENT_PROJECT_PROGRESS_STEPS,
+  getClientProjectCompletedProgressCount,
+} from "@/lib/clientProjectMirrorControls";
 
-// The 9 core automations mapped to their system steps
-const NINE_AUTOMATIONS = [
-  {
-    id: "instant_response",
-    step: 1,
-    title: "Instant Lead Response",
-    desc: "Sends instant SMS + email within 60 seconds of a new lead being captured.",
-    icon: Zap,
-    automation_name: "Lead Capture & Instant Response",
-    type: "entity",
-    stepKey: "step_system_setup",
-  },
-  {
-    id: "booking_link",
-    step: 2,
-    title: "Booking Link (Qualified Leads)",
-    desc: "Automatically sends a booking link when a lead is marked Qualified.",
-    icon: CalendarCheck,
-    automation_name: "Send Booking Link (Qualified)",
-    type: "entity",
-    stepKey: "step_booking",
-  },
-  {
-    id: "followup_sms",
-    step: 3,
-    title: "Follow-Up SMS (15 Min)",
-    desc: "Sends a follow-up SMS 15 minutes after a lead is contacted if no reply.",
-    icon: MessageSquare,
-    automation_name: "Follow-Up SMS (15 Min)",
-    type: "scheduled",
-    stepKey: "step_followup",
-  },
-  {
-    id: "lead_discovery",
-    step: 4,
-    title: "Daily Lead Discovery",
-    desc: "Discovers and enriches new leads daily at 8AM from Google Maps.",
-    icon: Search,
-    automation_name: "Daily Lead Discovery & Enrichment",
-    type: "scheduled",
-    stepKey: null,
-  },
-  {
-    id: "missed_call",
-    step: 5,
-    title: "Missed Call Text-Back",
-    desc: "Immediately texts any lead that called but didn't get answered.",
-    icon: RotateCcw,
-    automation_name: null,
-    type: "planned",
-    stepKey: "step_sms",
-  },
-  {
-    id: "email_sequence",
-    step: 6,
-    title: "Email Follow-Up Sequence",
-    desc: "Multi-day email nurture sequence for leads who haven't booked yet.",
-    icon: Mail,
-    automation_name: null,
-    type: "planned",
-    stepKey: "step_email",
-  },
-  {
-    id: "reactivation",
-    step: 7,
-    title: "Old Lead Reactivation",
-    desc: "Re-engages dormant leads with a targeted re-activation campaign.",
-    icon: RefreshCw,
-    automation_name: null,
-    type: "planned",
-    stepKey: null,
-  },
-  {
-    id: "crm_pipeline",
-    step: 8,
-    title: "CRM Pipeline Automation",
-    desc: "Auto-tags and updates lead status through the pipeline based on activity.",
-    icon: LayoutDashboard,
-    automation_name: null,
-    type: "planned",
-    stepKey: "step_system_setup",
-  },
-  {
-    id: "support",
-    step: 9,
-    title: "Ongoing Support & Optimization",
-    desc: "Monthly performance reviews and continuous system optimization.",
-    icon: HeadphonesIcon,
-    automation_name: null,
-    type: "manual",
-    stepKey: "step_live",
-  },
-];
+const AUTOMATION_ICONS = {
+  instant_response: Zap,
+  booking_link: CalendarCheck,
+  followup_sms: MessageSquare,
+  lead_discovery: Search,
+  missed_call: RotateCcw,
+  email_sequence: Mail,
+  reactivation: RefreshCw,
+  crm_pipeline: LayoutDashboard,
+  support: HeadphonesIcon,
+};
 
-function StatusBadge({ automation, liveData }) {
-  if (automation.type === "planned") {
-    return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-        <Clock className="w-3 h-3" /> Planned
-      </span>
-    );
-  }
-  if (automation.type === "manual") {
-    return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-        <HeadphonesIcon className="w-3 h-3" /> Manual
-      </span>
-    );
-  }
-  if (!liveData) {
-    return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-50 text-gray-500 border border-gray-200">
-        <Clock className="w-3 h-3" /> Not Found
-      </span>
-    );
-  }
-  if (!liveData.is_active) {
-    return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-50 text-gray-500 border border-gray-200">
-        <XCircle className="w-3 h-3" /> Paused
-      </span>
-    );
-  }
-  if (liveData.last_run_status === "failed") {
-    return (
-      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-red-50 text-red-700 border border-red-200">
-        <AlertCircle className="w-3 h-3" /> Failed
-      </span>
-    );
-  }
+function MirrorStatusBadge({ value }) {
+  const tone =
+    value === "complete"
+      ? "bg-green-50 text-green-700"
+      : value === "in_progress"
+        ? "bg-amber-50 text-amber-700"
+        : "bg-slate-100 text-slate-600";
+
   return (
-    <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-green-50 text-green-700 border border-green-200">
-      <CheckCircle2 className="w-3 h-3" /> Active
+    <span className={`inline-flex rounded-full px-2 py-1 text-[11px] font-semibold ${tone}`}>
+      {value || "pending"}
     </span>
   );
 }
 
-// Per-client step tracker for a selected project
-function ClientStepUpdater({ project, onUpdate }) {
-  const STEPS = [
-    { key: "step_onboarding", label: "Onboarding Form" },
-    { key: "step_payment", label: "Payment Confirmed" },
-    { key: "step_system_setup", label: "System Setup" },
-    { key: "step_sms", label: "SMS Connected" },
-    { key: "step_email", label: "Email Connected" },
-    { key: "step_booking", label: "Booking Flow Live" },
-    { key: "step_followup", label: "Follow-Up Active" },
-    { key: "step_live", label: "Full System Running" },
-  ];
-  const [saving, setSaving] = useState(false);
-
-  const updateStep = async (key, value) => {
-    setSaving(true);
-    await base44.entities.ClientProject.update(project.id, { [key]: value });
-    onUpdate();
-    setSaving(false);
-  };
-
-  const completedCount = STEPS.filter(s => project[s.key] === "complete").length;
+function ClientProjectMirrorPanel({ project }) {
+  const completedCount = getClientProjectCompletedProgressCount(project);
 
   return (
-    <div className="mt-3 p-4 rounded-xl border border-border bg-muted/20">
-      <div className="flex items-center justify-between mb-3">
+    <div className="mt-3 space-y-4 rounded-xl border border-border bg-muted/20 p-4">
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <div className="flex items-start gap-3">
+          <Lock className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-700" />
+          <div>
+            <p className="text-xs font-semibold text-amber-900">
+              Client project progress is mirrored here
+            </p>
+            <p className="mt-1 text-xs text-amber-800">
+              These progress fields support the client portal and reflect the
+              canonical order/install workflow. Use the paid install workspace
+              for install truth instead of editing project steps here.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between">
         <p className="text-xs font-bold text-foreground">{project.business_name}</p>
-        <span className="text-xs text-muted-foreground">{completedCount}/8 complete</span>
+        <span className="text-xs text-muted-foreground">
+          {completedCount}/{CLIENT_PROJECT_PROGRESS_STEPS.length} complete
+        </span>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {STEPS.map((step) => {
-          const status = project[step.key] || "pending";
-          return (
-            <div key={step.key}>
-              <p className="text-[10px] text-muted-foreground mb-1">{step.label}</p>
-              <select
-                value={status}
-                onChange={e => updateStep(step.key, e.target.value)}
-                disabled={saving}
-                className="w-full text-xs border border-border rounded-lg px-2 py-1 bg-white focus:outline-none focus:ring-1 focus:ring-primary"
-              >
-                <option value="pending">Pending</option>
-                <option value="in_progress">In Progress</option>
-                <option value="complete">Complete</option>
-              </select>
+
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {CLIENT_PROJECT_PROGRESS_STEPS.map((step) => (
+          <div key={step.key} className="rounded-lg border border-border bg-white px-3 py-2">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-[10px] text-muted-foreground">{step.label}</p>
+              <Lock className="h-3 w-3 text-muted-foreground/70" />
             </div>
-          );
-        })}
+            <div className="mt-2">
+              <MirrorStatusBadge value={project[step.key] || "pending"} />
+            </div>
+            <p className="mt-2 text-[10px] leading-relaxed text-muted-foreground">
+              {step.desc}
+            </p>
+          </div>
+        ))}
       </div>
-      {saving && <p className="text-xs text-primary mt-2">Saving & updating client portal...</p>}
+    </div>
+  );
+}
+
+function StatusBadge({ state, stateLabel }) {
+  const styles = {
+    live: {
+      className: "bg-green-50 text-green-700 border-green-200",
+      Icon: CheckCircle2,
+    },
+    testing: {
+      className: "bg-blue-50 text-blue-700 border-blue-200",
+      Icon: TestTube2,
+    },
+    configuring: {
+      className: "bg-amber-50 text-amber-700 border-amber-200",
+      Icon: Wrench,
+    },
+    ready_for_install: {
+      className: "bg-orange-50 text-orange-700 border-orange-200",
+      Icon: ShoppingBag,
+    },
+    error: {
+      className: "bg-red-50 text-red-700 border-red-200",
+      Icon: AlertCircle,
+    },
+    not_purchased: {
+      className: "bg-slate-100 text-slate-600 border-slate-200",
+      Icon: Clock,
+    },
+    not_canonicalized: {
+      className: "bg-slate-100 text-slate-600 border-slate-200",
+      Icon: CircleOff,
+    },
+    paid: {
+      className: "bg-slate-100 text-slate-700 border-slate-200",
+      Icon: ShoppingBag,
+    },
+  };
+
+  const config = styles[state] || styles.not_canonicalized;
+  const Icon = config.Icon;
+
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold ${config.className}`}
+    >
+      <Icon className="h-3 w-3" /> {stateLabel}
+    </span>
+  );
+}
+
+function RuntimeSummary({ automation }) {
+  const runtime = automation.runtime || {
+    total_runs: 0,
+    successful_runs: 0,
+    failed_runs: 0,
+    last_signal: null,
+  };
+
+  if (!automation.supported) {
+    return (
+      <div className="border-t border-border pt-3 text-xs text-muted-foreground">
+        {automation.state_reason}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-0.5 border-t border-border pt-3 text-xs text-muted-foreground">
+      <div className="flex justify-between">
+        <span>Tracked orders</span>
+        <span className="font-semibold text-foreground">{automation.tracked_order_count}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Runtime attempts</span>
+        <span className="font-semibold text-foreground">{runtime.total_runs}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Successful sends</span>
+        <span className="font-semibold text-green-700">{runtime.successful_runs}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Failed or blocked</span>
+        <span className="font-semibold text-red-600">{runtime.failed_runs}</span>
+      </div>
+      <div className="pt-2">
+        <p className="font-semibold text-foreground">Derived from canonical state</p>
+        <p className="mt-1 leading-relaxed">
+          {automation.state_reason}
+          {runtime.last_signal
+            ? ` Latest signal: ${runtime.last_signal.event_type} (${runtime.last_signal.status || "processed"}).`
+            : " No runtime signal recorded yet."}
+        </p>
+      </div>
     </div>
   );
 }
 
 export default function AutomationsPanel() {
-  const [liveAutomations, setLiveAutomations] = useState([]);
+  const [automationSummary, setAutomationSummary] = useState({
+    canonical_services_tracked: 0,
+    live_services: 0,
+    errored_services: 0,
+  });
+  const [automations, setAutomations] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [expandedProject, setExpandedProject] = useState(null);
@@ -206,22 +210,31 @@ export default function AutomationsPanel() {
 
   const loadData = async () => {
     try {
-      const [projs] = await Promise.all([
-        base44.entities.ClientProject.list("-created_date", 50),
-      ]);
+      const projs = await base44.entities.ClientProject.list("-created_date", 50);
       setProjects(projs);
     } finally {
       setLoadingProjects(false);
     }
   };
 
-  // Fetch live automation status via backend
   const loadAutomations = async () => {
     try {
       const res = await base44.functions.invoke("getAutomationStatus", {});
-      setLiveAutomations(res.data?.automations || []);
+      setAutomations(res.data?.automations || []);
+      setAutomationSummary(
+        res.data?.summary || {
+          canonical_services_tracked: 0,
+          live_services: 0,
+          errored_services: 0,
+        }
+      );
     } catch {
-      // fallback: no live data
+      setAutomations([]);
+      setAutomationSummary({
+        canonical_services_tracked: 0,
+        live_services: 0,
+        errored_services: 0,
+      });
     } finally {
       setLoading(false);
     }
@@ -232,114 +245,124 @@ export default function AutomationsPanel() {
     loadAutomations();
   }, []);
 
-  const getLiveData = (automation) => {
-    if (!automation.automation_name) return null;
-    return liveAutomations.find(a => a.name === automation.automation_name) || null;
-  };
-
-  const activeCount = NINE_AUTOMATIONS.filter(a => {
-    const live = getLiveData(a);
-    return live?.is_active && live?.last_run_status !== "failed";
-  }).length;
-
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="font-display text-xl font-semibold text-foreground">9-System Automations</h2>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {activeCount} active · {NINE_AUTOMATIONS.length - activeCount} planned/manual
+          <h2 className="font-display text-xl font-semibold text-foreground">System Automations</h2>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            {automationSummary.canonical_services_tracked} canonical services tracked ·{" "}
+            {automationSummary.live_services} live · {automationSummary.errored_services} errored
           </p>
         </div>
         <button
-          onClick={() => { setLoading(true); loadAutomations(); }}
-          className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:opacity-70 transition-opacity"
+          onClick={() => {
+            setLoading(true);
+            loadAutomations();
+          }}
+          className="flex items-center gap-1.5 text-xs font-semibold text-primary transition-opacity hover:opacity-70"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+          <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
           Refresh
         </button>
       </div>
 
-      {/* 9 Automation Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {NINE_AUTOMATIONS.map((automation) => {
-          const Icon = automation.icon;
-          const live = getLiveData(automation);
-          const isActive = live?.is_active && live?.last_run_status !== "failed";
-          const isFailed = live?.last_run_status === "failed";
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <div className="flex items-start gap-3">
+          <Lock className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700" />
+          <div>
+            <p className="text-sm font-semibold text-amber-900">
+              Automation cards are now derived only from canonical backend state
+            </p>
+            <p className="mt-1 text-sm text-amber-800">
+              Status comes from paid orders, tracked service install states, and
+              CommunicationEvent signals. If a workflow is not yet on the canonical
+              order/install path, it is shown explicitly instead of being guessed.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {automations.map((automation) => {
+          const Icon = AUTOMATION_ICONS[automation.id] || LayoutDashboard;
 
           return (
             <div
               key={automation.id}
-              className="bg-white rounded-2xl border p-5 shadow-sm transition-all duration-200 hover:shadow-md"
+              className="rounded-2xl border bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md"
               style={{
-                borderColor: isActive
-                  ? "rgba(154,92,46,0.35)"
-                  : isFailed
-                  ? "rgba(220,38,38,0.3)"
-                  : "hsl(var(--border))",
+                borderColor:
+                  automation.state === "live"
+                    ? "rgba(34,197,94,0.35)"
+                    : automation.state === "error"
+                      ? "rgba(220,38,38,0.3)"
+                      : "hsl(var(--border))",
               }}
             >
-              <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="mb-3 flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl"
                     style={{
-                      background: isActive
-                        ? "linear-gradient(135deg,#9a5c2e,#c8965c)"
-                        : "rgba(0,0,0,0.05)",
+                      background:
+                        automation.state === "live"
+                          ? "linear-gradient(135deg,#16a34a,#22c55e)"
+                          : "rgba(0,0,0,0.05)",
                     }}
                   >
                     <Icon
-                      className="w-4 h-4"
-                      style={{ color: isActive ? "#fff" : "#9a5c2e" }}
+                      className="h-4 w-4"
+                      style={{
+                        color: automation.state === "live" ? "#fff" : "#9a5c2e",
+                      }}
                     />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Step {automation.step}</p>
-                    <p className="text-sm font-semibold text-foreground leading-tight">{automation.title}</p>
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      Step {automation.step}
+                    </p>
+                    <p className="text-sm font-semibold leading-tight text-foreground">
+                      {automation.title}
+                    </p>
                   </div>
                 </div>
-                <StatusBadge automation={automation} liveData={live} />
+                <StatusBadge state={automation.state} stateLabel={automation.state_label} />
               </div>
 
-              <p className="text-xs text-muted-foreground leading-relaxed mb-3">{automation.desc}</p>
+              <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
+                {automation.description}
+              </p>
 
-              {live && (
-                <div className="text-xs text-muted-foreground space-y-0.5 pt-3 border-t border-border">
-                  <div className="flex justify-between">
-                    <span>Total runs</span>
-                    <span className="font-semibold text-foreground">{live.total_runs}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Successful</span>
-                    <span className="font-semibold text-green-700">{live.successful_runs}</span>
-                  </div>
-                  {live.failed_runs > 0 && (
-                    <div className="flex justify-between">
-                      <span>Failed</span>
-                      <span className="font-semibold text-red-600">{live.failed_runs}</span>
+              {automation.supported && (
+                <div className="mb-3 grid grid-cols-2 gap-2 text-xs">
+                  {Object.entries(automation.tracked_install_counts || {}).map(([status, count]) => (
+                    <div key={status} className="rounded-lg border border-border bg-muted/20 px-3 py-2">
+                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                        {status}
+                      </p>
+                      <p className="mt-1 font-semibold text-foreground">{count}</p>
+                    </div>
+                  ))}
+                  {Object.keys(automation.tracked_install_counts || {}).length === 0 && (
+                    <div className="col-span-2 rounded-lg border border-border bg-muted/20 px-3 py-2 text-muted-foreground">
+                      No paid orders include this canonical service yet.
                     </div>
                   )}
                 </div>
               )}
 
-              {automation.type === "planned" && (
-                <p className="text-xs text-amber-600 font-semibold pt-2 border-t border-border mt-2">
-                  🔧 Coming soon — mark step complete in client projects when ready
-                </p>
-              )}
+              <RuntimeSummary automation={automation} />
             </div>
           );
         })}
       </div>
 
-      {/* Client Project Step Updater */}
-      <div className="bg-white rounded-2xl border border-border shadow-sm p-6">
-        <h3 className="font-semibold text-foreground mb-1">Update Client Build Progress</h3>
-        <p className="text-xs text-muted-foreground mb-4">
-          Mark steps complete here — the client's pizza tracker updates instantly in real-time.
+      <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+        <h3 className="mb-1 font-semibold text-foreground">Client Build Progress Mirrors</h3>
+        <p className="mb-4 text-xs text-muted-foreground">
+          These project progress fields support the client portal and are read-only here.
+          Canonical install changes for the first two services belong in the paid install workspace.
         </p>
 
         {loadingProjects ? (
@@ -348,31 +371,34 @@ export default function AutomationsPanel() {
           <p className="text-sm text-muted-foreground">No client projects yet.</p>
         ) : (
           <div className="space-y-2">
-            {projects.map(project => (
-              <div key={project.id} className="border border-border rounded-xl overflow-hidden">
+            {projects.map((project) => (
+              <div key={project.id} className="overflow-hidden rounded-xl border border-border">
                 <button
-                  onClick={() => setExpandedProject(expandedProject === project.id ? null : project.id)}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/20 transition-colors text-left"
+                  onClick={() =>
+                    setExpandedProject(expandedProject === project.id ? null : project.id)
+                  }
+                  className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-muted/20"
                 >
                   <div>
                     <p className="text-sm font-semibold text-foreground">{project.business_name}</p>
-                    <p className="text-xs text-muted-foreground">{project.client_email} · {project.plan}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {project.client_email} · {project.plan}
+                    </p>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="text-xs text-muted-foreground">
-                      {["step_onboarding","step_payment","step_system_setup","step_sms","step_email","step_booking","step_followup","step_live"].filter(k => project[k] === "complete").length}/8
+                      {getClientProjectCompletedProgressCount(project)}/
+                      {CLIENT_PROJECT_PROGRESS_STEPS.length}
                     </span>
-                    {expandedProject === project.id
-                      ? <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                      : <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    }
+                    {expandedProject === project.id ? (
+                      <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    )}
                   </div>
                 </button>
                 {expandedProject === project.id && (
-                  <ClientStepUpdater
-                    project={project}
-                    onUpdate={loadData}
-                  />
+                  <ClientProjectMirrorPanel project={project} />
                 )}
               </div>
             ))}

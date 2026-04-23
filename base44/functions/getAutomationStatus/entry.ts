@@ -1,55 +1,39 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { deriveAutomationStatuses } from "../_shared/automationStatus.js";
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    if (!user || user.role !== 'admin') {
-      return Response.json({ error: 'Forbidden' }, { status: 403 });
+
+    if (!user || user.role !== "admin") {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Fetch automations from the platform via service role
-    const automations = await base44.asServiceRole.entities.AutomationJob.list('-created_date', 100).catch(() => []);
+    const [orders, events] = await Promise.all([
+      base44.asServiceRole.entities.Order.list("-created_date", 100).catch(() => []),
+      base44.asServiceRole.entities.CommunicationEvent.list("-created_date", 500).catch(() => []),
+    ]);
 
-    // Return a static snapshot of the known automations with live run data
-    // We simulate this from AutomationJob records
+    const automations = deriveAutomationStatuses({
+      orders,
+      events,
+    });
+
     return Response.json({
-      automations: [
-        {
-          name: "Lead Capture & Instant Response",
-          is_active: true,
-          total_runs: 2,
-          successful_runs: 0,
-          failed_runs: 2,
-          last_run_status: "failed"
-        },
-        {
-          name: "Send Booking Link (Qualified)",
-          is_active: true,
-          total_runs: 0,
-          successful_runs: 0,
-          failed_runs: 0,
-          last_run_status: null
-        },
-        {
-          name: "Follow-Up SMS (15 Min)",
-          is_active: false,
-          total_runs: 5,
-          successful_runs: 0,
-          failed_runs: 5,
-          last_run_status: "failed"
-        },
-        {
-          name: "Daily Lead Discovery & Enrichment",
-          is_active: true,
-          total_runs: 6,
-          successful_runs: 6,
-          failed_runs: 0,
-          last_run_status: "success"
-        }
-      ]
+      automations,
+      summary: {
+        canonical_services_tracked: automations.filter((automation) => automation.supported).length,
+        live_services: automations.filter((automation) => automation.state === "live").length,
+        errored_services: automations.filter((automation) => automation.state === "error").length,
+      },
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json(
+      {
+        error: error instanceof Error ? error.message : "Failed to derive automation status",
+      },
+      { status: 500 }
+    );
   }
 });
