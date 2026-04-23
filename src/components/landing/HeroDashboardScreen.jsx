@@ -436,7 +436,11 @@ export default function HeroDashboardScreen() {
   const [fadingOut, setFadingOut] = useState(false);
   const [liveLeads, setLiveLeads] = useState(247);
   const [liveRevenue, setLiveRevenue] = useState(4200);
+  const [revenueFlash, setRevenueFlash] = useState(false);
   const [freshStep, setFreshStep] = useState(0);
+  const [ripple, setRipple] = useState(null);
+  const [glareVisible, setGlareVisible] = useState(false);
+  const touchStartX = useRef(null);
   const cycleRef = useRef(0);
 
   const currentMode = useMemo(() => DEMO_MODES[activeMode], [activeMode]);
@@ -471,19 +475,48 @@ export default function HeroDashboardScreen() {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      const gainedLead = Math.random() > 0.55;
-
-      if (gainedLead) {
-        setLiveLeads((value) => value + 1);
-      }
-
+      if (Math.random() > 0.55) setLiveLeads((v) => v + 1);
       if (Math.random() > 0.5) {
-        setLiveRevenue((value) => value + Math.floor(Math.random() * 90 + 30));
+        setLiveRevenue((v) => v + Math.floor(Math.random() * 90 + 30));
+        setRevenueFlash(true);
+        setTimeout(() => setRevenueFlash(false), 900);
       }
     }, scaleMs(16000));
-
     return () => clearInterval(intervalId);
   }, []);
+
+  // Enhancement 3: Periodic glare sweep
+  useEffect(() => {
+    const triggerGlare = () => {
+      setGlareVisible(true);
+      setTimeout(() => setGlareVisible(false), 1400);
+    };
+    triggerGlare();
+    const id = setInterval(triggerGlare, 8000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Enhancement 4: Swipe gesture to change tabs
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) < 40) return;
+    const keys = Object.keys(DEMO_MODES);
+    setActiveMode((prev) => {
+      const idx = keys.indexOf(prev);
+      return diff > 0 ? keys[(idx + 1) % keys.length] : keys[(idx - 1 + keys.length) % keys.length];
+    });
+    touchStartX.current = null;
+  };
+
+  // Enhancement 1: Tap ripple
+  const handleTabClick = (key, e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setRipple({ key, x: e.clientX - rect.left, y: e.clientY - rect.top });
+    setTimeout(() => setRipple(null), 500);
+    setActiveMode(key);
+  };
 
   useEffect(() => {
     setVisibleMessages(0);
@@ -569,6 +602,8 @@ export default function HeroDashboardScreen() {
 
   return (
     <div
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
       style={{
         width: "100%",
         height: "100%",
@@ -584,6 +619,27 @@ export default function HeroDashboardScreen() {
         textRendering: "optimizeLegibility",
       }}
     >
+      {/* Enhancement 3: Glass glare sweep */}
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        zIndex: 50,
+        pointerEvents: "none",
+        overflow: "hidden",
+        borderRadius: "12px",
+      }}>
+        <div style={{
+          position: "absolute",
+          top: "-20%",
+          left: glareVisible ? "120%" : "-60%",
+          width: "40%",
+          height: "140%",
+          background: "linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.18) 50%, transparent 80%)",
+          transform: "skewX(-12deg)",
+          transition: `left ${glareVisible ? 1400 : 0}ms cubic-bezier(0.4,0,0.2,1)`,
+          pointerEvents: "none",
+        }} />
+      </div>
       <NotificationBanner notification={currentMode.notification} visible={notificationVisible} />
 
       <StatusBar />
@@ -677,8 +733,9 @@ export default function HeroDashboardScreen() {
               <button
                 key={key}
                 type="button"
-                onClick={() => setActiveMode(key)}
-                style={{
+                onClick={(e) => handleTabClick(key, e)}
+                    style={{
+                      overflow: "hidden",
                   flex: 1,
                   border: "none",
                   borderRadius: "8px",
@@ -690,7 +747,19 @@ export default function HeroDashboardScreen() {
                   boxShadow: isActive ? "0 6px 14px rgba(26,18,9,0.15)" : "none",
                 }}
               >
-                <span style={{ display: "block", fontSize: "10px", fontWeight: "800" }}>{mode.label}</span>
+                {/* Enhancement 1: Tap ripple */}
+                {ripple?.key === key && (
+                  <span style={{
+                    position: "absolute",
+                    borderRadius: "50%",
+                    background: "rgba(255,255,255,0.35)",
+                    width: "80px", height: "80px",
+                    left: ripple.x - 40, top: ripple.y - 40,
+                    animation: "rippleOut 0.5s ease-out forwards",
+                    pointerEvents: "none",
+                  }} />
+                )}
+                <span style={{ display: "block", fontSize: "10px", fontWeight: "800", position: "relative", zIndex: 1 }}>{mode.label}</span>
               </button>
             );
           })}
@@ -836,7 +905,16 @@ export default function HeroDashboardScreen() {
                 <div style={{ fontSize: "12px", fontWeight: "800", color: textPrimary, marginTop: "2px" }}>
                   {displayLeads}
                 </div>
-                <div style={{ fontSize: "8px", color: textMuted }}>
+                {/* Enhancement 2: Revenue flash on tick */}
+                <div style={{
+                  fontSize: "8px",
+                  color: revenueFlash ? "#16a34a" : textMuted,
+                  fontWeight: revenueFlash ? "800" : "400",
+                  transition: "color 0.3s, font-weight 0.3s",
+                  background: revenueFlash ? "rgba(34,197,94,0.1)" : "transparent",
+                  borderRadius: "4px",
+                  padding: revenueFlash ? "1px 4px" : "0",
+                }}>
                   active leads / ${displayRevenue.toLocaleString()} tracked
                 </div>
               </div>
@@ -1043,6 +1121,7 @@ export default function HeroDashboardScreen() {
         @keyframes hPulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.35 } }
         @keyframes sIn { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: translateY(0) } }
         @keyframes typingDot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4 } 30% { transform: translateY(-3px); opacity: 1 } }
+        @keyframes rippleOut { from { transform: scale(0); opacity: 1; } to { transform: scale(3); opacity: 0; } }
       `}</style>
     </div>
   );
