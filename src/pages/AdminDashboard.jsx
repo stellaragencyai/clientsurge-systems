@@ -30,10 +30,18 @@ const NAV_ITEMS = [
 ];
 
 export default function AdminDashboard() {
-  const { user } = useAuth();
+  const { user, isLoadingAuth } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  if (isLoadingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (!user || user.role !== 'admin') {
     return (
@@ -287,4 +295,3 @@ function OverviewDashboard() {
     </div>
   );
 }
-
