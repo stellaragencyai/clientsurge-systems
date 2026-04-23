@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
-import LogoutSuccessModal from '../components/admin/LogoutSuccessModal';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
 import AnalyticsDashboard from '../components/admin/AnalyticsDashboard';
@@ -27,22 +26,33 @@ const NAV_ITEMS = [
 ];
 
 export default function AdminDashboard() {
-  const { user } = useAuth();
+  const { user, isLoadingAuth } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [showLogoutSuccess, setShowLogoutSuccess] = useState(false);
 
-  const handleLogout = async () => {
+  if (isLoadingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h1 className="text-2xl font-semibold text-foreground mb-4">Access Denied</h1>
+          <p className="text-muted-foreground">Admin access required</p>
+        </div>
+      </div>
+    );
+  }
+
+  const handleLogout = () => {
     setLoggingOut(true);
-    await new Promise((r) => setTimeout(r, 900));
-    setLoggingOut(false);
-    setShowLogoutSuccess(true);
-  };
-
-  const handleLogoutModalClose = () => {
-    setShowLogoutSuccess(false);
     base44.auth.logout('/');
   };
 
@@ -173,9 +183,6 @@ export default function AdminDashboard() {
           <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin" />
         </div>
       )}
-
-      {/* Logout success modal */}
-      {showLogoutSuccess && <LogoutSuccessModal onClose={handleLogoutModalClose} />}
     </div>
   );
 }
