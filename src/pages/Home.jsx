@@ -50,7 +50,6 @@ import MissedLeadRecovery from "../components/landing/MissedLeadRecovery";
 import Testimonials from "../components/landing/Testimonials";
 import CoreOffer from "../components/landing/CoreOffer";
 import IntegrationPartners from "../components/landing/IntegrationPartners";
-import PerformancePod from "../components/landing/PerformancePod";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
 import FinalCTA from "../components/landing/FinalCTA";
@@ -114,7 +113,6 @@ export default function Home() {
         <Pricing />
         <FAQ />
         <FinalCTA />
-        <PerformancePod />
         <Footer />
       </div>
     </DemoBookingProvider>

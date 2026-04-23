@@ -60,14 +60,15 @@ const stages = [
   },
 ];
 
-// How long each stage is highlighted (ms)
 const STAGE_DURATION = 3200;
 
 export default function AutomationPipelineSection() {
   const sectionRef = useRef(null);
   const [inView, setInView] = useState(false);
   const [activeStage, setActiveStage] = useState(0);
-  const [descVisible, setDescVisible] = useState(true);
+  // contentKey triggers fade: we increment it each time content changes
+  const [contentKey, setContentKey] = useState(0);
+  const [contentVisible, setContentVisible] = useState(true);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
@@ -87,22 +88,36 @@ export default function AutomationPipelineSection() {
     return () => observer.disconnect();
   }, []);
 
+  // Auto-advance
   useEffect(() => {
     if (!inView) return undefined;
     const interval = window.setInterval(() => {
-      // Fade out desc, advance stage, fade back in
-      setDescVisible(false);
-      const t = window.setTimeout(() => {
-        setActiveStage((curr) => (curr + 1) % stages.length);
-        setDescVisible(true);
-      }, 380);
-      return () => window.clearTimeout(t);
+      advanceTo((activeStage + 1) % stages.length);
     }, STAGE_DURATION);
     return () => window.clearInterval(interval);
-  }, [inView]);
+  }, [inView, activeStage]);
+
+  const advanceTo = (index) => {
+    setContentVisible(false);
+    const t = window.setTimeout(() => {
+      setActiveStage(index);
+      setContentKey((k) => k + 1);
+      setContentVisible(true);
+    }, 380);
+    return () => window.clearTimeout(t);
+  };
+
+  const handleNodeClick = (index) => {
+    if (index === activeStage) return;
+    advanceTo(index);
+  };
 
   const active = stages[activeStage];
   const ActiveIcon = active.icon;
+
+  // Node size: 1.5× the original ~4.25rem = ~6.375rem → use 96px
+  const NODE_SIZE = 96;
+  const ICON_SIZE = 36;
 
   return (
     <section
@@ -110,16 +125,17 @@ export default function AutomationPipelineSection() {
       aria-label="Automation pipeline diagram"
       className="relative mt-16"
     >
-      {/* Subtle background glow strip */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
       {/* Header */}
       <div className="text-center mb-14">
-        <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">Live Pipeline View</p>
-        <h3 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
-          See the Full System in Motion
-        </h3>
-        <p className="mt-4 text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
+        <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Live Pipeline View</p>
+        <h2 className="font-inter text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-foreground">
+          See the Full{" "}
+          <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.35)" }}>System</span>
+          {" "}in Motion
+        </h2>
+        <p className="mt-5 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
           Every step fires automatically. Watch the engine move from first lead to booked appointment.
         </p>
       </div>
@@ -128,13 +144,14 @@ export default function AutomationPipelineSection() {
       <div className="hidden lg:block">
 
         {/* Node row */}
-        <div className="relative">
+        <div className="relative" style={{ paddingTop: `${NODE_SIZE / 2}px`, paddingBottom: "8px" }}>
 
-          {/* Connector line behind nodes */}
-          <div className="absolute left-0 right-0 top-[2.1rem] h-px">
-            {/* Base track */}
+          {/* Connector line — centred on nodes */}
+          <div
+            className="absolute left-0 right-0"
+            style={{ top: `${NODE_SIZE / 2}px`, height: "2px" }}
+          >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-            {/* Animated fill */}
             <div
               className="absolute inset-y-0 left-0 rounded-full"
               style={{
@@ -146,11 +163,13 @@ export default function AutomationPipelineSection() {
             />
             {/* Travelling dot */}
             <div
-              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
+              className="absolute top-1/2 -translate-y-1/2 rounded-full"
               style={{
-                left: `calc(${((activeStage + 0.5) / stages.length) * 100}% - 6px)`,
+                width: "18px",
+                height: "18px",
+                left: `calc(${((activeStage + 0.5) / stages.length) * 100}% - 9px)`,
                 background: "radial-gradient(circle, #fff5e0 10%, #e8a550 60%, rgba(200,150,92,0.1) 100%)",
-                boxShadow: "0 0 14px 4px rgba(232,165,80,0.55)",
+                boxShadow: "0 0 18px 6px rgba(232,165,80,0.55)",
                 transition: `left ${STAGE_DURATION * 0.85}ms cubic-bezier(0.4, 0, 0.2, 1)`,
               }}
             />
@@ -164,35 +183,41 @@ export default function AutomationPipelineSection() {
               return (
                 <button
                   key={stage.id}
-                  onClick={() => { setDescVisible(false); setTimeout(() => { setActiveStage(index); setDescVisible(true); }, 200); }}
-                  className="flex flex-col items-center gap-3 focus:outline-none group"
+                  onClick={() => handleNodeClick(index)}
+                  className="flex flex-col items-center gap-4 focus:outline-none group"
                   style={{
                     opacity: inView ? 1 : 0,
                     transform: inView ? "translateY(0)" : "translateY(16px)",
                     transition: `opacity 600ms ease ${index * 80}ms, transform 600ms ease ${index * 80}ms`,
                   }}
                 >
-                  {/* Circle node */}
+                  {/* Circle node — 1.5× size */}
                   <div
-                    className="relative z-10 w-[4.25rem] h-[4.25rem] rounded-full flex items-center justify-center transition-all duration-500"
+                    className="relative z-10 flex items-center justify-center transition-all duration-500"
                     style={{
+                      width: `${NODE_SIZE}px`,
+                      height: `${NODE_SIZE}px`,
+                      borderRadius: "50%",
                       background: isActive
                         ? "linear-gradient(135deg, #7a4825 0%, #c8965c 100%)"
                         : "rgba(255,255,255,0.85)",
                       border: isActive
-                        ? "2px solid rgba(200,150,92,0.6)"
-                        : "1.5px solid rgba(154,92,46,0.2)",
+                        ? "3px solid rgba(200,150,92,0.6)"
+                        : "2px solid rgba(154,92,46,0.2)",
                       boxShadow: isActive
-                        ? "0 0 0 6px rgba(200,150,92,0.12), 0 12px 28px rgba(154,92,46,0.22)"
-                        : "0 4px 14px rgba(0,0,0,0.06)",
+                        ? "0 0 0 9px rgba(200,150,92,0.12), 0 16px 36px rgba(154,92,46,0.25)"
+                        : "0 6px 20px rgba(0,0,0,0.07)",
                       transform: isActive ? "scale(1.12)" : "scale(1)",
                     }}
                   >
                     <Icon
-                      className="w-6 h-6 transition-colors duration-500"
-                      style={{ color: isActive ? "#fff5e0" : "#9a5c2e" }}
+                      style={{
+                        width: `${ICON_SIZE}px`,
+                        height: `${ICON_SIZE}px`,
+                        color: isActive ? "#fff5e0" : "#9a5c2e",
+                        transition: "color 0.5s",
+                      }}
                     />
-                    {/* Pulse ring on active */}
                     {isActive && (
                       <span
                         className="absolute inset-0 rounded-full animate-ping"
@@ -201,7 +226,7 @@ export default function AutomationPipelineSection() {
                     )}
                   </div>
 
-                  {/* Label below node */}
+                  {/* Label */}
                   <span
                     className="text-xs font-semibold text-center leading-tight transition-colors duration-300 px-1"
                     style={{ color: isActive ? "#7a4825" : "rgba(90,60,30,0.55)" }}
@@ -214,26 +239,27 @@ export default function AutomationPipelineSection() {
           </div>
         </div>
 
-        {/* Expanding description panel */}
+        {/* ── Always-visible detail panel — content fades in/out cinematically ── */}
         <div
-          className="mt-10 overflow-hidden"
+          className="mt-10 rounded-2xl px-10 py-8 flex gap-8 items-start"
           style={{
-            maxHeight: descVisible ? "280px" : "0px",
-            opacity: descVisible ? 1 : 0,
-            transition: "max-height 460ms cubic-bezier(0.4,0,0.2,1), opacity 380ms ease",
+            background: "linear-gradient(135deg, rgba(255,252,247,0.98) 0%, rgba(252,244,232,0.96) 100%)",
+            border: "1.5px solid rgba(200,150,92,0.28)",
+            boxShadow: "0 12px 48px rgba(154,92,46,0.1), inset 0 1px 0 rgba(255,255,255,0.9)",
+            minHeight: "160px",
           }}
         >
+          {/* Icon — fades with content */}
           <div
-            className="rounded-2xl px-10 py-8 flex gap-8 items-start"
+            key={`icon-${contentKey}`}
             style={{
-              background: "linear-gradient(135deg, rgba(255,252,247,0.98) 0%, rgba(252,244,232,0.96) 100%)",
-              border: "1.5px solid rgba(200,150,92,0.28)",
-              boxShadow: "0 12px 48px rgba(154,92,46,0.1), inset 0 1px 0 rgba(255,255,255,0.9)",
+              opacity: contentVisible ? 1 : 0,
+              transition: "opacity 380ms ease",
+              flexShrink: 0,
             }}
           >
-            {/* Icon */}
             <div
-              className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center"
+              className="w-16 h-16 rounded-2xl flex items-center justify-center"
               style={{
                 background: "linear-gradient(135deg, #7a4825 0%, #c8965c 100%)",
                 boxShadow: "0 8px 24px rgba(154,92,46,0.28)",
@@ -241,31 +267,38 @@ export default function AutomationPipelineSection() {
             >
               <ActiveIcon className="w-7 h-7 text-white" />
             </div>
+          </div>
 
-            {/* Text */}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">{active.eyebrow}</p>
-                {/* Progress dots */}
-                <div className="flex gap-1.5 ml-auto">
-                  {stages.map((_, i) => (
-                    <div
-                      key={i}
-                      className="rounded-full transition-all duration-500"
-                      style={{
-                        width: i === activeStage ? "20px" : "6px",
-                        height: "6px",
-                        background: i === activeStage
-                          ? "linear-gradient(90deg, #7a4825, #c8965c)"
-                          : "rgba(154,92,46,0.2)",
-                      }}
-                    />
-                  ))}
-                </div>
+          {/* Text — fades with content */}
+          <div
+            key={`text-${contentKey}`}
+            className="flex-1"
+            style={{
+              opacity: contentVisible ? 1 : 0,
+              transition: "opacity 380ms ease",
+            }}
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-primary">{active.eyebrow}</p>
+              {/* Progress dots */}
+              <div className="flex gap-1.5 ml-auto">
+                {stages.map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-full transition-all duration-500"
+                    style={{
+                      width: i === activeStage ? "20px" : "6px",
+                      height: "6px",
+                      background: i === activeStage
+                        ? "linear-gradient(90deg, #7a4825, #c8965c)"
+                        : "rgba(154,92,46,0.2)",
+                    }}
+                  />
+                ))}
               </div>
-              <h4 className="font-display text-2xl font-bold text-foreground mb-3">{active.title}</h4>
-              <p className="text-base text-muted-foreground leading-relaxed max-w-2xl">{active.copy}</p>
             </div>
+            <h4 className="font-display text-2xl font-bold text-foreground mb-3">{active.title}</h4>
+            <p className="text-base text-muted-foreground leading-relaxed max-w-2xl">{active.copy}</p>
           </div>
         </div>
       </div>
@@ -277,12 +310,11 @@ export default function AutomationPipelineSection() {
           const isActive = activeStage === index;
           return (
             <div key={stage.id} className="relative pl-10">
-              {/* Vertical connector */}
               {index < stages.length - 1 && (
                 <div
                   className="absolute left-[1.175rem] top-[3.5rem] w-px"
                   style={{
-                    height: isActive ? "calc(100% + 1px)" : "calc(100% + 1px)",
+                    height: "calc(100% + 1px)",
                     background: isActive
                       ? "linear-gradient(to bottom, #c8965c, rgba(200,150,92,0.2))"
                       : "rgba(154,92,46,0.14)",
@@ -290,8 +322,6 @@ export default function AutomationPipelineSection() {
                   }}
                 />
               )}
-
-              {/* Node */}
               <div className="absolute left-0 top-4">
                 <div
                   className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-500"
@@ -306,16 +336,12 @@ export default function AutomationPipelineSection() {
                   <Icon className="w-4 h-4" style={{ color: isActive ? "#fff5e0" : "#9a5c2e" }} />
                 </div>
               </div>
-
-              {/* Content */}
               <div
-                className="mb-2 pt-3 pb-4 pr-2 transition-all duration-400"
-                style={{ opacity: inView ? 1 : 0, transform: inView ? "translateX(0)" : "translateX(-8px)", transitionDelay: `${index * 60}ms` }}
+                className="mb-2 pt-3 pb-4 pr-2"
+                style={{ opacity: inView ? 1 : 0, transform: inView ? "translateX(0)" : "translateX(-8px)", transition: `opacity 0.5s ease ${index * 60}ms, transform 0.5s ease ${index * 60}ms` }}
               >
                 <p className="text-[10px] font-semibold uppercase tracking-widest mb-1" style={{ color: "#9a6840" }}>{stage.eyebrow}</p>
                 <h4 className="text-sm font-bold text-foreground mb-0">{stage.title}</h4>
-
-                {/* Expanding copy on mobile */}
                 <div
                   className="overflow-hidden"
                   style={{
