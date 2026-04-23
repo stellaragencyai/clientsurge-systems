@@ -14,6 +14,7 @@ import {
   Target,
   Upload,
   Users,
+  SlidersHorizontal,
 } from "lucide-react";
 import {
   executeLeadImport,
@@ -21,6 +22,7 @@ import {
   getLeadPipelineError,
   previewLeadImport,
 } from "@/lib/leadPipelineApi";
+import LeadCRMDrawer from "./LeadCRMDrawer";
 
 const intakeTypeLabels = {
   lead_capture: "Lead Capture",
@@ -184,6 +186,7 @@ export default function LeadManagementDashboard() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const [importOpen, setImportOpen] = useState(false);
+  const [drawerLead, setDrawerLead] = useState(null);
   const [importSource, setImportSource] = useState("manual_import");
   const [importRaw, setImportRaw] = useState("");
   const [importPreview, setImportPreview] = useState(null);
@@ -828,13 +831,23 @@ export default function LeadManagementDashboard() {
                           </div>
                         </td>
                         <td className="px-4 py-4 text-right">
-                          <button
-                            onClick={() => navigate(`/admin/leads/${lead.id}`)}
-                            className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted"
-                          >
-                            Open
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </button>
+                         <div className="flex items-center justify-end gap-2">
+                           <button
+                             onClick={() => setDrawerLead(lead)}
+                             className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-xs font-semibold text-primary transition-colors hover:bg-primary/10"
+                             title="Quick CRM actions"
+                           >
+                             <SlidersHorizontal className="h-3.5 w-3.5" />
+                             CRM
+                           </button>
+                           <button
+                             onClick={() => navigate(`/admin/leads/${lead.id}`)}
+                             className="inline-flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted"
+                           >
+                             Open
+                             <ArrowRight className="h-3.5 w-3.5" />
+                           </button>
+                         </div>
                         </td>
                       </tr>
                     ))
@@ -857,6 +870,20 @@ export default function LeadManagementDashboard() {
             </div>
           ) : null}
       </div>
+
+      {drawerLead && (
+        <LeadCRMDrawer
+          lead={drawerLead}
+          onClose={() => setDrawerLead(null)}
+          onLeadUpdated={(updated) => {
+            setDrawerLead(updated);
+            setSnapshot((prev) => ({
+              ...prev,
+              leads: prev.leads.map((l) => l.id === updated.id ? { ...l, ...updated } : l),
+            }));
+          }}
+        />
+      )}
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           <div className="rounded-xl border border-border bg-white p-4">
