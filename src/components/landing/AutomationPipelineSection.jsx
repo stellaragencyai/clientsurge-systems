@@ -117,9 +117,9 @@ export default function AutomationPipelineSection() {
   const active = stages[activeStage];
   const ActiveIcon = active.icon;
 
-  // Node size: 1.3× previous 96px = ~125px
-  const NODE_SIZE = 125;
-  const ICON_SIZE = 47;
+  // Node size: 0.67× of 125px = ~84px
+  const NODE_SIZE = 84;
+  const ICON_SIZE = 31;
 
   return (
     <section

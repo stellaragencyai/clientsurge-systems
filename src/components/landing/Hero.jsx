@@ -435,7 +435,7 @@ export default function Hero() {
           {/* Headline */}
           <h1
             style={{
-              fontFamily: "var(--font-titles)",
+              fontFamily: "var(--font-display)",
               fontSize: "clamp(2.5rem, 4.5vw, 3.8rem)",
               fontWeight: "700",
               lineHeight: 1.07,
