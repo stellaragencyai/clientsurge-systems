@@ -109,6 +109,58 @@
       "type": "number",
       "title": "Last Classification Confidence",
       "default": 0
+    },
+    "website": {
+      "type": "string",
+      "title": "Business Website URL"
+    },
+    "industry_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Industry Tags (enriched)"
+    },
+    "company_size": {
+      "type": "string",
+      "title": "Company Size (enriched)",
+      "enum": [
+        "solo",
+        "small",
+        "medium",
+        "large",
+        "unknown"
+      ],
+      "default": "unknown"
+    },
+    "social_profiles": {
+      "type": "object",
+      "title": "Social Profiles (enriched)",
+      "properties": {
+        "instagram": {
+          "type": "string"
+        },
+        "facebook": {
+          "type": "string"
+        },
+        "linkedin": {
+          "type": "string"
+        },
+        "tiktok": {
+          "type": "string"
+        },
+        "twitter": {
+          "type": "string"
+        }
+      }
+    },
+    "enrichment_notes": {
+      "type": "string",
+      "title": "Enrichment Summary"
+    },
+    "enriched_at": {
+      "type": "string",
+      "title": "Last Enriched At"
     }
   },
   "required": [
