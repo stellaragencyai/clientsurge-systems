@@ -61,12 +61,13 @@ const stages = [
 ];
 
 const STAGE_DURATION = 3200;
+// Fade duration for content panel (ms) — slow enough to see
+const FADE_DURATION = 600;
 
 export default function AutomationPipelineSection() {
   const sectionRef = useRef(null);
   const [inView, setInView] = useState(false);
   const [activeStage, setActiveStage] = useState(0);
-  // contentKey triggers fade: we increment it each time content changes
   const [contentKey, setContentKey] = useState(0);
   const [contentVisible, setContentVisible] = useState(true);
 
@@ -98,12 +99,13 @@ export default function AutomationPipelineSection() {
   }, [inView, activeStage]);
 
   const advanceTo = (index) => {
+    // Fade out content AND switch active stage simultaneously
     setContentVisible(false);
+    setActiveStage(index);
     const t = window.setTimeout(() => {
-      setActiveStage(index);
       setContentKey((k) => k + 1);
       setContentVisible(true);
-    }, 380);
+    }, FADE_DURATION);
     return () => window.clearTimeout(t);
   };
 
@@ -115,9 +117,9 @@ export default function AutomationPipelineSection() {
   const active = stages[activeStage];
   const ActiveIcon = active.icon;
 
-  // Node size: 1.5× the original ~4.25rem = ~6.375rem → use 96px
-  const NODE_SIZE = 96;
-  const ICON_SIZE = 36;
+  // Node size: 1.3× previous 96px = ~125px
+  const NODE_SIZE = 125;
+  const ICON_SIZE = 47;
 
   return (
     <section
@@ -130,7 +132,7 @@ export default function AutomationPipelineSection() {
       {/* Header */}
       <div className="text-center mb-14">
         <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Live Pipeline View</p>
-        <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
+        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
           See the Full{" "}
           <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.35)" }}>System</span>
           {" "}in Motion
@@ -254,7 +256,7 @@ export default function AutomationPipelineSection() {
             key={`icon-${contentKey}`}
             style={{
               opacity: contentVisible ? 1 : 0,
-              transition: "opacity 380ms ease",
+              transition: `opacity ${FADE_DURATION}ms ease`,
               flexShrink: 0,
             }}
           >
@@ -275,7 +277,7 @@ export default function AutomationPipelineSection() {
             className="flex-1"
             style={{
               opacity: contentVisible ? 1 : 0,
-              transition: "opacity 380ms ease",
+              transition: `opacity ${FADE_DURATION}ms ease`,
             }}
           >
             <div className="flex items-center gap-3 mb-2">
