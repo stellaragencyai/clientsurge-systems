@@ -243,13 +243,14 @@ export default function AutomationPipelineSection() {
 
         {/* ── Always-visible detail panel — metallic silver ── */}
         <div
-          className="mt-10 rounded-2xl px-10 py-8 flex gap-8 items-start"
+          className="mt-10 rounded-2xl px-10 py-8 flex gap-8 items-start pipeline-panel-pulse"
           style={{
             background: "linear-gradient(135deg, rgba(245,246,248,0.98) 0%, rgba(228,231,236,0.97) 100%)",
             border: "1.5px solid rgba(180,185,195,0.5)",
             boxShadow: "0 12px 48px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -1px 0 rgba(0,0,0,0.04)",
             minHeight: "160px",
           }}
+          key={`panel-${contentKey}`}
         >
           {/* Icon — fades with content */}
           <div
@@ -361,6 +362,17 @@ export default function AutomationPipelineSection() {
       </div>
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+
+      <style>{`
+        @keyframes panelPulseFlash {
+          0%   { box-shadow: 0 12px 48px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.85), 0 0 0 0 rgba(200,150,92,0); border-color: rgba(180,185,195,0.5); }
+          18%  { box-shadow: 0 12px 48px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.85), 0 0 28px 6px rgba(200,150,92,0.55); border-color: rgba(200,150,92,0.75); }
+          100% { box-shadow: 0 12px 48px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.85), 0 0 0 0 rgba(200,150,92,0); border-color: rgba(180,185,195,0.5); }
+        }
+        .pipeline-panel-pulse {
+          animation: panelPulseFlash 700ms ease-out forwards;
+        }
+      `}</style>
     </section>
   );
 }
