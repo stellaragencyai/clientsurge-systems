@@ -215,6 +215,7 @@ export default function Hero() {
           transform: "translateY(-48%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)",
           transformOrigin: "center center",
           animation: "haloglow 4s ease-in-out infinite, floatTablet 6s ease-in-out infinite",
+          imageRendering: "crisp-edges",
           zIndex: 1,
           pointerEvents: "none",
         }}
@@ -298,7 +299,7 @@ export default function Hero() {
           position: "absolute",
           top: "50%",
           right: "2%",
-          transform: "translateY(-48%) perspective(2500px) rotateY(-12deg) rotateX(8deg) rotateZ(2.8deg)",
+          transform: "translateY(-48%) perspective(2500px) rotateY(-8deg) rotateX(5deg) rotateZ(1.5deg)",
           transformOrigin: "center center",
           transformStyle: "preserve-3d",
           width: "60vw",
@@ -350,10 +351,8 @@ export default function Hero() {
         <div style={{ position: "absolute", inset: "12px", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.07)", pointerEvents: "none", zIndex: 10 }} />
 
         {/* Screen content */}
-        <div style={{ width: "100%", height: "100%", borderRadius: "16px", overflow: "hidden", position: "relative" }}>
+        <div style={{ width: "100%", height: "100%", borderRadius: "16px", overflow: "hidden", position: "relative", transform: "translateZ(0)", willChange: "transform", WebkitFontSmoothing: "antialiased" }}>
           <HeroDashboardScreen />
-          {/* Scanline depth texture */}
-          <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.012) 2px, rgba(0,0,0,0.012) 4px)", pointerEvents: "none", zIndex: 5 }} />
         </div>
 
         {/* Camera dot */}
@@ -583,7 +582,7 @@ export default function Hero() {
       <style>{`
         @keyframes hpulse    { 0%,100%{opacity:1} 50%{opacity:0.3} }
         @keyframes haloglow  { 0%,100%{opacity:0.7} 50%{opacity:1} }
-        @keyframes floatTablet { 0%,100%{transform: translateY(-48%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)} 50%{transform: translateY(-52%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)} }
+        @keyframes floatTablet { 0%,100%{transform: translateY(-48%) perspective(2500px) rotateY(-8deg) rotateX(5deg) rotateZ(1.5deg)} 50%{transform: translateY(-52%) perspective(2500px) rotateY(-8deg) rotateX(5deg) rotateZ(1.5deg)} }
         @keyframes glassShine { 0%,100%{opacity:0.4} 50%{opacity:0.8} }
 
         @media (max-width: 1024px) {

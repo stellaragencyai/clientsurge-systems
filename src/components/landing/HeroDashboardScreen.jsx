@@ -364,7 +364,7 @@ export default function HeroDashboardScreen() {
   const bgColor = colorTone === 0 ? "#f8f5f0" : "#f5f3f0";
   
   return (
-    <div style={{ width: "100%", height: "100%", background: bgColor, borderRadius: "12px", display: "flex", flexDirection: "column", fontFamily: "'Inter', sans-serif", overflow: "hidden", position: "relative", opacity: dashboardFade === 0 ? 1 : 0.7, transition: "opacity 1s ease-in-out, background 3s ease-in-out" }}>
+    <div style={{ width: "100%", height: "100%", background: bgColor, borderRadius: "12px", display: "flex", flexDirection: "column", fontFamily: "'Inter', sans-serif", overflow: "hidden", position: "relative", opacity: dashboardFade === 0 ? 1 : 0.7, transition: "opacity 1s ease-in-out, background 3s ease-in-out", WebkitFontSmoothing: "antialiased", MozOsxFontSmoothing: "grayscale", textRendering: "optimizeLegibility", imageRendering: "crisp-edges", willChange: "auto" }}>
 
       {/* Email Notification banner — absolutely positioned over content */}
       <NotificationBanner notif={NOTIFICATIONS[notifIdx]} visible={notifVisible} />
