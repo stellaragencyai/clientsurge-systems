@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import LogoutSuccessModal from '../components/admin/LogoutSuccessModal';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
 import AnalyticsDashboard from '../components/admin/AnalyticsDashboard';
@@ -34,11 +35,19 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [showLogoutSuccess, setShowLogoutSuccess] = useState(false);
 
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    await new Promise((r) => setTimeout(r, 900));
+    setLoggingOut(false);
+    setShowLogoutSuccess(true);
+  };
 
-
-  const handleLogout = () => {
-    base44.auth.logout();
+  const handleLogoutModalClose = () => {
+    setShowLogoutSuccess(false);
+    base44.auth.logout('/');
   };
 
   const renderContent = () => {
@@ -115,10 +124,15 @@ export default function AdminDashboard() {
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors text-sm"
+              disabled={loggingOut}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors text-sm disabled:opacity-60"
             >
-              <LogOut className="w-4 h-4" />
-              Logout
+              {loggingOut ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <LogOut className="w-4 h-4" />
+              )}
+              {loggingOut ? 'Signing out...' : 'Logout'}
             </button>
           </div>
         </div>
@@ -156,6 +170,16 @@ export default function AdminDashboard() {
           className="fixed inset-0 bg-black/20 z-30 lg:hidden"
         />
       )}
+
+      {/* Logout spinner overlay */}
+      {loggingOut && (
+        <div className="fixed inset-0 z-[9998] bg-black/30 backdrop-blur-sm flex items-center justify-center">
+          <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+        </div>
+      )}
+
+      {/* Logout success modal */}
+      {showLogoutSuccess && <LogoutSuccessModal onClose={handleLogoutModalClose} />}
     </div>
   );
 }
