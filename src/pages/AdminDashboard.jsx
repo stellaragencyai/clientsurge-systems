@@ -11,6 +11,7 @@ import CommunicationTemplates from '../components/admin/CommunicationTemplates';
 import IntegrationHealth from '../components/admin/IntegrationHealth';
 import ClientProjectsPanel from '../components/admin/ClientProjectsPanel';
 import AutomationsPanel from '../components/admin/AutomationsPanel';
+import QaCustomerPanel from '../components/admin/QaCustomerPanel';
 
 const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -232,6 +233,8 @@ function OverviewDashboard() {
           </div>
         ))}
       </div>
+
+      <QaCustomerPanel />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr,1fr]">
         <div className="bg-white rounded-xl border border-border p-6">
