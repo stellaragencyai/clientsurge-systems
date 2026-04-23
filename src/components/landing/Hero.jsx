@@ -432,25 +432,6 @@ export default function Hero() {
       >
         <div style={{ maxWidth: "540px" }}>
 
-          {/* Badge */}
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              borderRadius: "9999px",
-              padding: "6px 16px",
-              marginBottom: "28px",
-              background: "rgba(154,92,46,0.08)",
-              border: "1px solid rgba(154,92,46,0.2)",
-            }}
-          >
-            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#9a5c2e", display: "inline-block" }} />
-            <span style={{ fontSize: "11px", fontWeight: "700", color: "#9a5c2e", letterSpacing: "0.16em", textTransform: "uppercase" }}>
-              Done-For-You AI Automation
-            </span>
-          </div>
-
           {/* Headline */}
           <h1
             style={{
@@ -534,50 +515,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── Live indicator strip — anchored below the tablet like a product caption ── */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          bottom: "13%",
-          right: "3%",
-          width: "60vw",
-          maxWidth: "900px",
-          zIndex: 8,
-          display: "flex",
-          justifyContent: "center",
-          pointerEvents: "none",
-        }}
-      >
-        <div style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "6px",
-          background: "rgba(255,255,255,0.82)",
-          backdropFilter: "blur(14px)",
-          WebkitBackdropFilter: "blur(14px)",
-          borderRadius: "9999px",
-          padding: "7px 18px",
-          border: "1px solid rgba(154,92,46,0.15)",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-          fontSize: "10px",
-          color: "rgba(26,18,9,0.55)",
-          fontWeight: "600",
-          whiteSpace: "nowrap",
-          gap: "14px",
-        }}>
-          <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px #22c55e", display: "inline-block", animation: "hpulse 2s infinite" }} />
-            Live system
-          </span>
-          <span style={{ color: "rgba(26,18,9,0.2)" }}>·</span>
-          <span>⚡ AI replies in 4 sec</span>
-          <span style={{ color: "rgba(26,18,9,0.2)" }}>·</span>
-          <span>💰 $4,200 recovered this week</span>
-          <span style={{ color: "rgba(26,18,9,0.2)" }}>·</span>
-          <span>👥 247 leads captured</span>
-        </div>
-      </div>
+      {/* Live indicator strip removed */}
 
       <style>{`
         @keyframes hpulse    { 0%,100%{opacity:1} 50%{opacity:0.3} }
