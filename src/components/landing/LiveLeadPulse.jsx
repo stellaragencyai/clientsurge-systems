@@ -78,37 +78,7 @@ export default function LiveLeadPulse() {
         </span>
       </div>
 
-      {/* Location dots */}
-      {recentLeads.length > 0 && (
-        <div
-          style={{
-            display: "flex",
-            gap: "8px",
-            animation: "fadeIn 0.4s ease",
-          }}
-        >
-          {recentLeads.map((lead) => (
-            <div
-              key={lead.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "4px",
-                background: "rgba(34,197,94,0.08)",
-                border: "1px solid rgba(34,197,94,0.2)",
-                borderRadius: "20px",
-                padding: "4px 8px",
-                fontSize: "10px",
-                color: "#22c55e",
-                fontWeight: "600",
-              }}
-            >
-              <MapPin style={{ width: "10px", height: "10px" }} />
-              {lead.location}
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Location stickers removed */}
 
       <style>{`
         @keyframes hPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }

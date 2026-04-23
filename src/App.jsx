@@ -54,6 +54,11 @@ const PUBLIC_PATHS = [
   "/contact",
   "/leads/capture",
   "/onboarding",
+  "/test-option-1",
+  "/test-option-2",
+  "/test-option-3",
+  "/preview-idea-1",
+  "/preview-idea-2",
 ];
 
 const NOINDEX_PREFIXES = [
@@ -102,7 +107,10 @@ function RouteIndexingGuard() {
         location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)
     );
 
-    robotsMeta.setAttribute("content", shouldNoindex ? "noindex,nofollow" : "index,follow");
+    robotsMeta.setAttribute(
+      "content",
+      shouldNoindex ? "noindex,nofollow" : "index,follow"
+    );
 
     return () => {
       robotsMeta.setAttribute("content", previous);
@@ -160,6 +168,8 @@ const AuthenticatedApp = () => {
       <Route path="/test-option-1" element={<Navigate to="/" replace />} />
       <Route path="/test-option-2" element={<Navigate to="/" replace />} />
       <Route path="/test-option-3" element={<Navigate to="/" replace />} />
+      <Route path="/preview-idea-1" element={<Navigate to="/" replace />} />
+      <Route path="/preview-idea-2" element={<Navigate to="/" replace />} />
       <Route path="/med-spa" element={<MedSpa />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />

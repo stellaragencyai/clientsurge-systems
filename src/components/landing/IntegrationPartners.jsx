@@ -3,39 +3,29 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const INTEGRATIONS = [
   {
-    name: "Calendly",
-    logo: "https://images.ctfassets.net/c7lxnbtvjsut/5tL8xOqxKKVs1v4q7U2UBd/24ee4a3eacba1e047e8cbedb42b2cc54/calendly.png",
-    description: "Appointment booking",
-  },
-  {
     name: "Google Calendar",
-    logo: "https://www.svgrepo.com/show/303108/google-calendar-logo.svg",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/4988f34b3_Gemini_Generated_Image_ejrt4cejrt4cejrt.png",
     description: "Calendar sync",
   },
   {
-    name: "Zapier",
-    logo: "https://www.svgrepo.com/show/376510/zapier.svg",
-    description: "Workflow automation",
-  },
-  {
     name: "HubSpot",
-    logo: "https://www.svgrepo.com/show/349346/hubspot.svg",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/60ca2df22_Gemini_Generated_Image_7xnq7j7xnq7j7xnq.png",
     description: "CRM & leads",
   },
   {
+    name: "Zapier",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/90405ee3c_Gemini_Generated_Image_tvhs5gtvhs5gtvhs.png",
+    description: "Workflow automation",
+  },
+  {
     name: "Stripe",
-    logo: "https://www.svgrepo.com/show/353659/stripe.svg",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/cc62e8a20_Gemini_Generated_Image_gabn1ugabn1ugabn.png",
     description: "Payments",
   },
   {
     name: "Twilio",
-    logo: "https://www.svgrepo.com/show/373595/twilio.svg",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/d5f38c7a4_Gemini_Generated_Image_9xxvlp9xxvlp9xxv.png",
     description: "SMS & voice",
-  },
-  {
-    name: "Acuity Scheduling",
-    logo: "https://www.squarespace.com/favicon.ico",
-    description: "Appointment management",
   },
 ];
 
@@ -71,7 +61,7 @@ export default function IntegrationPartners() {
         {/* Header */}
         <div className="text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">Integrations</p>
-          <h2 className="font-titles text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
+          <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-4">
             We Easily Integrate With
           </h2>
           <p className="text-muted-foreground text-base max-w-xl mx-auto">
@@ -104,7 +94,7 @@ export default function IntegrationPartners() {
                     <img
                       src={integration.logo}
                       alt={integration.name}
-                      className="w-10 h-10 object-contain"
+                      className="w-12 h-12 object-contain"
                       loading="lazy"
                     />
                   </div>

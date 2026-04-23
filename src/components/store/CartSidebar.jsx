@@ -5,7 +5,15 @@ import { base44 } from "@/api/base44Client";
 import { formatCurrency, getPackageDisplayLabel } from "@/lib/aiProducts";
 
 export default function CartSidebar() {
-  const { items, removeItem, cartOpen, setCartOpen, pricingSummary, totalSetup, totalMonthly } = useCart();
+  const {
+    items,
+    removeItem,
+    cartOpen,
+    setCartOpen,
+    pricingSummary,
+    totalSetup,
+    totalMonthly,
+  } = useCart();
   const [step, setStep] = useState("cart");
   const [form, setForm] = useState({ name: "", email: "", phone: "", business: "" });
   const [error, setError] = useState("");
@@ -55,7 +63,13 @@ export default function CartSidebar() {
     <>
       <div
         onClick={() => setCartOpen(false)}
-        style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", backdropFilter: "blur(4px)", zIndex: 100 }}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.35)",
+          backdropFilter: "blur(4px)",
+          zIndex: 100,
+        }}
       />
 
       <div
@@ -74,17 +88,44 @@ export default function CartSidebar() {
           fontFamily: "'Inter', sans-serif",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: "1px solid rgba(154,92,46,0.12)" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "20px 24px",
+            borderBottom: "1px solid rgba(154,92,46,0.12)",
+          }}
+        >
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <ShoppingCart style={{ width: "20px", height: "20px", color: "#9a5c2e" }} />
-            <span style={{ fontWeight: "700", fontSize: "16px", color: "#1a1209" }}>Canonical Service Bundle</span>
+            <span style={{ fontWeight: "700", fontSize: "16px", color: "#1a1209" }}>
+              Canonical Service Bundle
+            </span>
             {items.length > 0 && (
-              <span style={{ background: "#9a5c2e", color: "#fff", borderRadius: "9999px", width: "20px", height: "20px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: "700" }}>
+              <span
+                style={{
+                  background: "#9a5c2e",
+                  color: "#fff",
+                  borderRadius: "9999px",
+                  width: "20px",
+                  height: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "11px",
+                  fontWeight: "700",
+                }}
+              >
                 {items.length}
               </span>
             )}
           </div>
-          <button type="button" onClick={() => setCartOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px" }}>
+          <button
+            type="button"
+            onClick={() => setCartOpen(false)}
+            style={{ background: "none", border: "none", cursor: "pointer", padding: "4px" }}
+          >
             <X style={{ width: "20px", height: "20px", color: "#888" }} />
           </button>
         </div>
@@ -94,22 +135,49 @@ export default function CartSidebar() {
             <div style={{ textAlign: "center", padding: "48px 0", color: "rgba(26,18,9,0.4)" }}>
               <ShoppingCart style={{ width: "40px", height: "40px", margin: "0 auto 12px", opacity: 0.3 }} />
               <p style={{ fontSize: "14px", fontWeight: "600" }}>Your cart is empty</p>
-              <p style={{ fontSize: "12px", marginTop: "6px" }}>Pick a canonical package or add individual services.</p>
+              <p style={{ fontSize: "12px", marginTop: "6px" }}>
+                Pick a canonical package or add individual services.
+              </p>
             </div>
           ) : step === "cart" ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {items.map((item) => (
-                <div key={item.product_id} style={{ background: "rgba(255,255,255,0.8)", border: "1px solid rgba(154,92,46,0.12)", borderRadius: "14px", padding: "14px 16px", display: "flex", alignItems: "center", gap: "12px" }}>
+                <div
+                  key={item.product_id}
+                  style={{
+                    background: "rgba(255,255,255,0.8)",
+                    border: "1px solid rgba(154,92,46,0.12)",
+                    borderRadius: "14px",
+                    padding: "14px 16px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                  }}
+                >
                   <span style={{ fontSize: "22px" }}>{item.icon}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209", margin: "0 0 3px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <p
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: "700",
+                        color: "#1a1209",
+                        margin: "0 0 3px",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       {item.name}
                     </p>
                     <p style={{ fontSize: "11px", color: "rgba(26,18,9,0.5)", margin: 0 }}>
                       ${formatCurrency(item.setup_fee)} setup · ${formatCurrency(item.monthly_fee)}/mo
                     </p>
                   </div>
-                  <button type="button" onClick={() => removeItem(item.product_id)} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", color: "#e57373" }}>
+                  <button
+                    type="button"
+                    onClick={() => removeItem(item.product_id)}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", color: "#e57373" }}
+                  >
                     <Trash2 style={{ width: "14px", height: "14px" }} />
                   </button>
                 </div>
@@ -117,7 +185,9 @@ export default function CartSidebar() {
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-              <p style={{ fontSize: "13px", fontWeight: "600", color: "rgba(26,18,9,0.6)", margin: 0 }}>Enter your details to continue to payment</p>
+              <p style={{ fontSize: "13px", fontWeight: "600", color: "rgba(26,18,9,0.6)", margin: 0 }}>
+                Enter your details to continue to payment
+              </p>
               {[
                 { key: "name", label: "Full Name *", placeholder: "Jane Smith" },
                 { key: "email", label: "Email Address *", placeholder: "jane@yourbiz.com" },
@@ -125,7 +195,17 @@ export default function CartSidebar() {
                 { key: "business", label: "Business Name *", placeholder: "Glow Med Spa" },
               ].map((field) => (
                 <div key={field.key}>
-                  <label style={{ fontSize: "11px", fontWeight: "700", color: "rgba(26,18,9,0.55)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>
+                  <label
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: "700",
+                      color: "rgba(26,18,9,0.55)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                      display: "block",
+                      marginBottom: "5px",
+                    }}
+                  >
                     {field.label}
                   </label>
                   <input
@@ -134,7 +214,16 @@ export default function CartSidebar() {
                     value={form[field.key]}
                     onChange={(event) => setForm({ ...form, [field.key]: event.target.value })}
                     disabled={step === "loading"}
-                    style={{ width: "100%", borderRadius: "10px", border: "1.5px solid rgba(154,92,46,0.2)", padding: "10px 14px", fontSize: "13px", background: "rgba(255,255,255,0.8)", outline: "none", boxSizing: "border-box" }}
+                    style={{
+                      width: "100%",
+                      borderRadius: "10px",
+                      border: "1.5px solid rgba(154,92,46,0.2)",
+                      padding: "10px 14px",
+                      fontSize: "13px",
+                      background: "rgba(255,255,255,0.8)",
+                      outline: "none",
+                      boxSizing: "border-box",
+                    }}
                   />
                 </div>
               ))}
@@ -144,9 +233,33 @@ export default function CartSidebar() {
         </div>
 
         {items.length > 0 && (
-          <div style={{ padding: "16px 24px", borderTop: "1px solid rgba(154,92,46,0.12)", background: "rgba(255,255,255,0.6)", backdropFilter: "blur(10px)" }}>
-            <div style={{ borderRadius: "12px", border: "1px solid rgba(154,92,46,0.14)", background: "rgba(154,92,46,0.06)", padding: "12px 14px", marginBottom: "14px" }}>
-              <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(26,18,9,0.45)", textTransform: "uppercase", letterSpacing: "0.08em", margin: 0 }}>
+          <div
+            style={{
+              padding: "16px 24px",
+              borderTop: "1px solid rgba(154,92,46,0.12)",
+              background: "rgba(255,255,255,0.6)",
+              backdropFilter: "blur(10px)",
+            }}
+          >
+            <div
+              style={{
+                borderRadius: "12px",
+                border: "1px solid rgba(154,92,46,0.14)",
+                background: "rgba(154,92,46,0.06)",
+                padding: "12px 14px",
+                marginBottom: "14px",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "10px",
+                  fontWeight: "700",
+                  color: "rgba(26,18,9,0.45)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  margin: 0,
+                }}
+              >
                 Purchased Bundle
               </p>
               <p style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209", margin: "6px 0 0" }}>
@@ -161,16 +274,30 @@ export default function CartSidebar() {
 
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
               <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>One-time setup total</span>
-              <span style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209" }}>${formatCurrency(totalSetup)}</span>
+              <span style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209" }}>
+                ${formatCurrency(totalSetup)}
+              </span>
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
               <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>Monthly total</span>
-              <span style={{ fontSize: "13px", fontWeight: "700", color: "#9a5c2e" }}>${formatCurrency(totalMonthly)}/mo</span>
+              <span style={{ fontSize: "13px", fontWeight: "700", color: "#9a5c2e" }}>
+                ${formatCurrency(totalMonthly)}/mo
+              </span>
             </div>
 
-            {(pricingSummary.setup_discount_total > 0 || pricingSummary.monthly_discount_total > 0) ? (
-              <div style={{ marginBottom: "16px", borderRadius: "12px", border: "1px solid rgba(34,197,94,0.2)", background: "rgba(34,197,94,0.08)", padding: "10px 12px" }}>
-                <p style={{ margin: 0, fontSize: "11px", fontWeight: "700", color: "#15803d" }}>Explicit bundle savings applied</p>
+            {pricingSummary.setup_discount_total > 0 || pricingSummary.monthly_discount_total > 0 ? (
+              <div
+                style={{
+                  marginBottom: "16px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(34,197,94,0.2)",
+                  background: "rgba(34,197,94,0.08)",
+                  padding: "10px 12px",
+                }}
+              >
+                <p style={{ margin: 0, fontSize: "11px", fontWeight: "700", color: "#15803d" }}>
+                  Explicit bundle savings applied
+                </p>
                 <p style={{ margin: "4px 0 0", fontSize: "11px", color: "rgba(26,18,9,0.55)" }}>
                   Save ${formatCurrency(pricingSummary.setup_discount_total)} setup and ${formatCurrency(pricingSummary.monthly_discount_total)}/mo versus buying the same services a la carte.
                 </p>
@@ -181,9 +308,31 @@ export default function CartSidebar() {
               <button
                 type="button"
                 onClick={() => setStep("info")}
-                style={{ width: "100%", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", border: "none", cursor: "pointer", boxShadow: "0 4px 18px rgba(120,70,20,0.35)" }}
+                style={{
+                  width: "100%",
+                  borderRadius: "9999px",
+                  padding: "2px",
+                  background:
+                    "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                  border: "none",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                }}
               >
-                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "48px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "14px" }}>
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "6px",
+                    height: "48px",
+                    borderRadius: "9999px",
+                    background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                    color: "#f5e6d0",
+                    fontWeight: "700",
+                    fontSize: "14px",
+                  }}
+                >
                   Continue to Checkout <ArrowRight style={{ width: "15px", height: "15px" }} />
                 </span>
               </button>
@@ -193,20 +342,54 @@ export default function CartSidebar() {
                   type="button"
                   onClick={handleCheckout}
                   disabled={step === "loading"}
-                  style={{ width: "100%", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", border: "none", cursor: step === "loading" ? "not-allowed" : "pointer", opacity: step === "loading" ? 0.7 : 1, boxShadow: "0 4px 18px rgba(120,70,20,0.35)" }}
+                  style={{
+                    width: "100%",
+                    borderRadius: "9999px",
+                    padding: "2px",
+                    background:
+                      "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                    border: "none",
+                    cursor: step === "loading" ? "not-allowed" : "pointer",
+                    opacity: step === "loading" ? 0.7 : 1,
+                    boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                  }}
                 >
-                  <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "48px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "14px" }}>
-                    {step === "loading"
-                      ? "Redirecting to Stripe..."
-                      : (
-                        <>
-                          <Lock style={{ width: "13px", height: "13px" }} />
-                          Pay Securely with Stripe
-                        </>
-                      )}
+                  <span
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "6px",
+                      height: "48px",
+                      borderRadius: "9999px",
+                      background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                      color: "#f5e6d0",
+                      fontWeight: "700",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {step === "loading" ? (
+                      "Redirecting to Stripe..."
+                    ) : (
+                      <>
+                        <Lock style={{ width: "13px", height: "13px" }} />
+                        Pay Securely with Stripe
+                      </>
+                    )}
                   </span>
                 </button>
-                <button type="button" onClick={() => setStep("cart")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "12px", color: "rgba(26,18,9,0.4)", textDecoration: "underline" }}>
+                <button
+                  type="button"
+                  onClick={() => setStep("cart")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    fontSize: "12px",
+                    color: "rgba(26,18,9,0.4)",
+                    textDecoration: "underline",
+                  }}
+                >
                   ← Back to cart
                 </button>
               </div>
