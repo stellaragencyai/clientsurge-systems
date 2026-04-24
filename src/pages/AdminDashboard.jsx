@@ -15,6 +15,7 @@ import QaCustomerPanel from '../components/admin/QaCustomerPanel';
 import LeadRoutingPanel from '../components/admin/LeadRoutingPanel';
 import DripCampaignPanel from '../components/admin/DripCampaignPanel';
 import EmailCampaignPanel from '../components/admin/EmailCampaignPanel';
+import NurtureCampaignPanel from '../components/admin/NurtureCampaignPanel';
 import PerformanceDashboard from '../components/admin/PerformanceDashboard';
 import LeadPriorityQueue from '../components/admin/LeadPriorityQueue';
 
@@ -28,6 +29,7 @@ const NAV_ITEMS = [
   { id: 'templates', label: 'Templates', icon: MessageSquare },
   { id: 'health', label: 'Integration Health', icon: Activity },
   { id: 'drip', label: 'Drip Campaigns', icon: Send },
+  { id: 'nurture', label: 'Nurture Campaigns', icon: Flame },
   { id: 'email-campaigns', label: 'Email Campaigns', icon: Mail },
   { id: 'routing', label: 'Lead Routing', icon: Users },
   { id: 'performance', label: 'Performance', icon: BarChart3 },
@@ -85,6 +87,8 @@ export default function AdminDashboard() {
         return null;
       case 'drip':
         return <DripCampaignPanel />;
+      case 'nurture':
+        return <NurtureCampaignPanel />;
       case 'email-campaigns':
         return <EmailCampaignPanel />;
       case 'routing':
