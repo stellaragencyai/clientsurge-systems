@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame, Mail } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame, Mail, Target } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
@@ -18,6 +18,7 @@ import EmailCampaignPanel from '../components/admin/EmailCampaignPanel';
 import NurtureCampaignPanel from '../components/admin/NurtureCampaignPanel';
 import PerformanceDashboard from '../components/admin/PerformanceDashboard';
 import LeadPriorityQueue from '../components/admin/LeadPriorityQueue';
+import LeadSourceAttribution from '../components/admin/LeadSourceAttribution';
 
 const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -34,6 +35,7 @@ const NAV_ITEMS = [
   { id: 'routing', label: 'Lead Routing', icon: Users },
   { id: 'performance', label: 'Performance', icon: BarChart3 },
   { id: 'priority', label: 'Priority Queue', icon: Flame },
+  { id: 'attribution', label: 'Source Attribution', icon: Target },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
@@ -97,6 +99,8 @@ export default function AdminDashboard() {
         return <PerformanceDashboard />;
       case 'priority':
         return <LeadPriorityQueue />;
+      case 'attribution':
+        return <LeadSourceAttribution />;
       case 'settings':
         return <AdminSettingsPanel />;
       case 'overview':
