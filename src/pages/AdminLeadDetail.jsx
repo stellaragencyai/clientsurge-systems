@@ -8,6 +8,7 @@ import MessagingPanel from "../components/dashboard/MessagingPanel";
 import EmailHistoryPanel from "../components/dashboard/EmailHistoryPanel";
 import NotesSection from "../components/dashboard/NotesSection";
 import LeadTimeline from "../components/dashboard/LeadTimeline";
+import AILeadInsightPanel from "../components/admin/AILeadInsightPanel";
 
 const intakeTypeLabels = {
   lead_capture: "Lead Capture",
@@ -200,6 +201,9 @@ export default function AdminLeadDetail() {
           ))}
         </div>
       )}
+
+      {/* AI Lead Qualification Panel */}
+      <AILeadInsightPanel lead={lead} onLeadUpdated={loadLead} />
 
       {/* Timeline with AI Classification */}
       <LeadTimeline leadId={leadId} lead={lead} />
