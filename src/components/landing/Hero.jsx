@@ -16,8 +16,37 @@ export default function Hero() {
         alignItems: "center",
       }}
     >
+      {/* ── AI Image Background Layer (Heavily Faded) ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundImage: "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/d01b0111a_Gemini_Generated_Image_jlrxmdjlrxmdjlrx.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center right",
+          backgroundAttachment: "fixed",
+          opacity: 0.12,
+          filter: "brightness(1.08) contrast(0.92) saturate(0.8)",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Color overlay to maintain warm palette harmony ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(135deg, rgba(253,252,250,0.88) 0%, rgba(248,244,238,0.92) 40%, rgba(250,247,242,0.9) 100%)",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      />
+
       {/* ── Dark atmospheric wash — right side only (Fix 1) ── */}
-      <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}>
+      <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 2 }}>
         {/* Main dark radial field centered-right — creates deep space effect */}
         <div style={{ position: "absolute", top: "50%", right: "15%", width: "100vw", height: "100vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(13,15,30,0.75) 0%, rgba(13,15,30,0.4) 35%, rgba(13,15,30,0.15) 60%, transparent 85%)", transform: "translateY(-50%)", filter: "blur(3px)" }} />
         {/* Warm accent layers — still present but now against dark backdrop */}
@@ -76,7 +105,7 @@ export default function Hero() {
           position: "absolute",
           inset: 0,
           pointerEvents: "none",
-          zIndex: 1,
+          zIndex: 2,
           backgroundImage: "radial-gradient(circle, rgba(154,92,46,0.09) 1px, transparent 1px)",
           backgroundSize: "28px 28px",
           maskImage: "radial-gradient(ellipse 70% 100% at 75% 50%, rgba(0,0,0,0.5) 0%, transparent 75%)",
@@ -102,7 +131,7 @@ export default function Hero() {
           transform: "perspective(2200px) rotateY(-14deg) rotateX(6deg) rotateZ(0.5deg)",
           transformOrigin: "right top",
           opacity: 0.34,
-          zIndex: 1,
+          zIndex: 2,
           pointerEvents: "none",
           overflow: "hidden",
           maskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 85%)",
@@ -159,7 +188,7 @@ export default function Hero() {
           transform: "perspective(2200px) rotateY(-10deg) rotateX(-4deg) rotateZ(-1deg)",
           transformOrigin: "right bottom",
           opacity: 0.26,
-          zIndex: 1,
+          zIndex: 2,
           pointerEvents: "none",
           overflow: "hidden",
           maskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 55%, transparent 80%)",
@@ -192,7 +221,7 @@ export default function Hero() {
           background: "radial-gradient(ellipse at center, rgba(200,150,92,0.09) 0%, rgba(253,252,250,0.5) 50%, transparent 80%)",
           filter: "blur(28px)",
           transform: "translateY(30%) scaleY(0.35)",
-          zIndex: 1,
+          zIndex: 2,
           pointerEvents: "none",
         }}
       />
@@ -215,7 +244,7 @@ export default function Hero() {
           transformOrigin: "center center",
           animation: "haloglow 5.6s ease-in-out infinite, floatTablet 8.4s ease-in-out infinite",
           imageRendering: "crisp-edges",
-          zIndex: 1,
+          zIndex: 2,
           pointerEvents: "none",
         }}
       />
@@ -234,7 +263,7 @@ export default function Hero() {
           borderRadius: "50% 50% 0 0",
           filter: "blur(20px)",
           transform: "scaleY(0.4) perspective(2200px) rotateX(75deg)",
-          zIndex: 0,
+          zIndex: 1,
           pointerEvents: "none",
         }}
       />
@@ -252,7 +281,7 @@ export default function Hero() {
           background: "linear-gradient(to right, rgba(200,150,92,0.8) 0%, rgba(200,150,92,0.3) 100%)",
           borderRadius: "1px",
           transform: "perspective(2200px) rotateX(80deg) rotateZ(-15deg)",
-          zIndex: 0,
+          zIndex: 1,
           pointerEvents: "none",
           boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
         }}
@@ -268,7 +297,7 @@ export default function Hero() {
           width: "80vw",
           height: "25vh",
           background: "linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 40%, transparent 100%)",
-          zIndex: 0,
+          zIndex: 1,
           pointerEvents: "none",
         }}
       />
@@ -286,7 +315,7 @@ export default function Hero() {
           background: "radial-gradient(ellipse at center, rgba(0,0,0,0.18) 0%, transparent 70%)",
           filter: "blur(18px)",
           transform: "perspective(2200px) rotateX(80deg) scaleY(0.4)",
-          zIndex: 1,
+          zIndex: 2,
           pointerEvents: "none",
         }}
       />
