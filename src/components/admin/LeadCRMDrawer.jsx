@@ -6,6 +6,7 @@ import {
 import { base44 } from "@/api/base44Client";
 import { saveLeadStatus, getLeadPipelineError } from "@/lib/leadPipelineApi";
 import LeadScoreBadge from "./LeadScoreBadge";
+import ActivityTimeline from "./ActivityTimeline";
 
 const STATUSES = ["New", "Contacted", "Replied", "Qualified", "Booking Prompt Sent", "Booked", "Closed"];
 
@@ -179,6 +180,7 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
     { key: "sequences", label: "Sequences" },
     { key: "whatsapp", label: "WhatsApp" },
     { key: "notes", label: "Notes" },
+    { key: "timeline", label: "Timeline" },
   ];
 
   return (
@@ -206,12 +208,12 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-border flex-shrink-0">
+        <div className="flex border-b border-border flex-shrink-0 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
+              className={`flex-shrink-0 flex-1 min-w-[80px] py-2.5 text-xs font-medium transition-colors ${
                 activeTab === tab.key
                   ? "border-b-2 border-primary text-primary"
                   : "text-muted-foreground hover:text-foreground"
@@ -349,6 +351,11 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
                 </p>
               )}
             </div>
+          )}
+
+          {/* ── TIMELINE TAB ── */}
+          {activeTab === "timeline" && (
+            <ActivityTimeline leadId={lead.id} />
           )}
 
           {/* ── NOTES TAB ── */}
