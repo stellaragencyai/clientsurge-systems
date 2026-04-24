@@ -88,6 +88,32 @@ const TEMPLATE_GROUPS = [
     ],
   },
   {
+    id: "qualified_followup",
+    label: "Qualified → Booking Prompt (24h)",
+    icon: Zap,
+    description: "Sent automatically 24h after a lead reaches Qualified status, if they haven't booked yet.",
+    templates: [
+      {
+        key: "follow_up_booking_prompt_sms",
+        label: "Qualified Booking Prompt SMS",
+        type: "sms",
+        rows: 4,
+        placeholder: "Hi {name}! You're all set — here's your link to book your free consultation: {booking_link}. We'd love to connect!",
+        variables: ["{name}", "{business_name}", "{booking_link}"],
+        tip: "This fires 24h after a lead reaches Qualified with no booking. Keep it warm and action-oriented.",
+      },
+      {
+        key: "follow_up_booking_prompt_email",
+        label: "Qualified Booking Prompt Email",
+        type: "email",
+        rows: 6,
+        placeholder: "Hi {name},\n\nGreat news — you're qualified and ready to take the next step!\n\nBook your free consultation here: {booking_link}\n\nLooking forward to speaking with you!\n\nBest,\n{business_name}",
+        variables: ["{name}", "{business_name}", "{booking_link}"],
+        tip: "Sent alongside the SMS. Reinforces the booking CTA with a more detailed message.",
+      },
+    ],
+  },
+  {
     id: "admin",
     label: "Admin Notifications",
     icon: Bell,
