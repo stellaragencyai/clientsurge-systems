@@ -283,3 +283,16 @@ export const INDUSTRY_RECOMMENDATIONS_BY_ID = Object.fromEntries(
 export function getIndustryRecommendation(industryId) {
   return INDUSTRY_RECOMMENDATIONS_BY_ID[industryId] || null;
 }
+
+export function getSelectedIndustryId() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  return window.sessionStorage.getItem(INDUSTRY_SELECTION_STORAGE_KEY);
+}
+
+export function getSelectedIndustryRecommendation() {
+  const industryId = getSelectedIndustryId();
+  return industryId ? getIndustryRecommendation(industryId) : null;
+}

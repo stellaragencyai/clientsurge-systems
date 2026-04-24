@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
+import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
 
 function GlowingCheck() {
   return (
@@ -88,6 +89,27 @@ const plans = [
 
 export default function Pricing() {
   const demoBooking = useDemoBooking();
+  const [selectedIndustry, setSelectedIndustry] = useState(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const syncIndustry = () => {
+      setSelectedIndustry(getSelectedIndustryRecommendation());
+    };
+
+    syncIndustry();
+    window.addEventListener("storage", syncIndustry);
+    window.addEventListener("clientsurge:industry-selected", syncIndustry);
+
+    return () => {
+      window.removeEventListener("storage", syncIndustry);
+      window.removeEventListener("clientsurge:industry-selected", syncIndustry);
+    };
+  }, []);
+
   return (
     <section id="pricing" className="nebula-pricing py-24 md:py-32 px-6 overflow-visible">
       <div className="max-w-7xl mx-auto">
@@ -104,9 +126,28 @@ export default function Pricing() {
           </p>
         </div>
 
+        {selectedIndustry ? (
+          <div className="max-w-4xl mx-auto mb-10 rounded-3xl border border-primary/15 bg-primary/5 px-6 py-5 text-center">
+            <p className="text-xs font-semibold text-primary tracking-[0.22em] uppercase mb-2">
+              Recommended For {selectedIndustry.shortName}
+            </p>
+            <p className="text-lg font-semibold text-foreground">
+              Start with the {selectedIndustry.recommendedPackage?.name}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              {selectedIndustry.summary}
+            </p>
+          </div>
+        ) : null}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {plans.map((plan, i) => (
-            <PricingCard key={i} plan={plan} demoBooking={demoBooking} />
+            <PricingCard
+              key={i}
+              plan={plan}
+              demoBooking={demoBooking}
+              selectedIndustry={selectedIndustry}
+            />
           ))}
         </div>
 
@@ -145,7 +186,11 @@ export default function Pricing() {
           {demoBooking ? (
             <button
               type="button"
-              onClick={demoBooking.openDemoBooking}
+              onClick={() =>
+                demoBooking.openDemoBooking({
+                  prefillIndustry: selectedIndustry?.name || "",
+                })
+              }
               className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full border-2 border-primary/40 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/60 transition-all duration-200"
             >
               Book Your Free Demo
@@ -287,8 +332,9 @@ export default function Pricing() {
   );
 }
 
-function PricingCard({ plan, demoBooking }) {
+function PricingCard({ plan, demoBooking, selectedIndustry }) {
   const [isHovered, setIsHovered] = useState(false);
+  const isRecommended = selectedIndustry?.recommendedPackage?.name === plan.name;
 
   return (
     <div
@@ -334,13 +380,15 @@ function PricingCard({ plan, demoBooking }) {
         />
       )}
 
-      {plan.badge && (
+      {(plan.badge || isRecommended) && (
         <div className="pricing-badge-float" style={{ zIndex: 30 }}>
           <span
             className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl"
             style={{ background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)" }}
           >
-            {plan.badge}
+            {isRecommended
+              ? `Best fit for ${selectedIndustry.shortName}`
+              : plan.badge}
           </span>
         </div>
       )}
@@ -349,6 +397,11 @@ function PricingCard({ plan, demoBooking }) {
         <div className="mb-7">
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">{plan.name}</h3>
           {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Best choice for most businesses.</p>}
+          {isRecommended && (
+            <p className="text-xs font-bold text-primary mb-2">
+              Recommended based on your selected industry.
+            </p>
+          )}
           <p className="text-xs font-semibold text-foreground/70 leading-snug">{plan.fit}</p>
         </div>
         {/* Value justification above the price */}
@@ -392,7 +445,9 @@ function PricingCard({ plan, demoBooking }) {
           type="button"
           onClick={() => {
             if (demoBooking) {
-              demoBooking.openDemoBooking();
+              demoBooking.openDemoBooking({
+                prefillIndustry: selectedIndustry?.name || "",
+              });
               return;
             }
             window.location.href = "/book";

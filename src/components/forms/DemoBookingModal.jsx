@@ -28,6 +28,13 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   const [loadingSlots, setLoadingSlots] = useState(false);
 
   useEffect(() => {
+    setForm((current) => ({
+      ...current,
+      industry: prefillIndustry || current.industry,
+    }));
+  }, [prefillIndustry]);
+
+  useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 

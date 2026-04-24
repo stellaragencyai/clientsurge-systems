@@ -1,5 +1,5 @@
-import { lazy, Suspense, useMemo, useState } from "react";
-import { ShoppingCart, Zap, Search } from "lucide-react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { ShoppingCart, Zap, Search, ArrowRight } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
 import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
@@ -7,15 +7,38 @@ import CartSidebar from "@/components/store/CartSidebar";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
+import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
 
 const InteractiveStackBuilder = lazy(() => import("@/components/store/InteractiveStackBuilder"));
 
 function StoreInner() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
+  const [selectedIndustry, setSelectedIndustry] = useState(null);
   const { items, setCartOpen, totalSetup, totalMonthly } = useCart();
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const syncIndustry = () => {
+      setSelectedIndustry(getSelectedIndustryRecommendation());
+    };
+
+    syncIndustry();
+    window.addEventListener("storage", syncIndustry);
+    window.addEventListener("clientsurge:industry-selected", syncIndustry);
+
+    return () => {
+      window.removeEventListener("storage", syncIndustry);
+      window.removeEventListener("clientsurge:industry-selected", syncIndustry);
+    };
+  }, []);
+
   const filtered = useMemo(() => {
+    const recommendedKeys = new Set(selectedIndustry?.recommendedServiceKeys || []);
+
     return AI_PRODUCTS.filter((product) => {
       const matchCategory = activeCategory === "All" || product.category === activeCategory;
       const matchSearch =
@@ -23,8 +46,17 @@ function StoreInner() {
         product.name.toLowerCase().includes(search.toLowerCase()) ||
         product.description.toLowerCase().includes(search.toLowerCase());
       return matchCategory && matchSearch;
+    }).sort((left, right) => {
+      const leftRecommended = recommendedKeys.has(left.service_key);
+      const rightRecommended = recommendedKeys.has(right.service_key);
+
+      if (leftRecommended === rightRecommended) {
+        return 0;
+      }
+
+      return leftRecommended ? -1 : 1;
     });
-  }, [activeCategory, search]);
+  }, [activeCategory, search, selectedIndustry]);
 
   return (
     <div
@@ -98,6 +130,53 @@ function StoreInner() {
           Your automations go live within 5-7 days.
         </p>
 
+        {selectedIndustry ? (
+          <div
+            style={{
+              maxWidth: "760px",
+              margin: "0 auto 28px",
+              padding: "18px 22px",
+              borderRadius: "24px",
+              background: "rgba(154,92,46,0.06)",
+              border: "1px solid rgba(154,92,46,0.16)",
+            }}
+          >
+            <p
+              style={{
+                fontSize: "11px",
+                fontWeight: "700",
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: "#9a5c2e",
+                margin: "0 0 8px",
+              }}
+            >
+              Personalized For {selectedIndustry.shortName}
+            </p>
+            <p
+              style={{
+                fontSize: "15px",
+                color: "#1a1209",
+                fontWeight: "600",
+                margin: "0 0 6px",
+              }}
+            >
+              We moved your recommended services to the top and suggest starting with the{" "}
+              {selectedIndustry.recommendedPackage?.name}.
+            </p>
+            <p
+              style={{
+                fontSize: "13px",
+                color: "rgba(26,18,9,0.58)",
+                lineHeight: 1.6,
+                margin: 0,
+              }}
+            >
+              {selectedIndustry.whyItWorks}
+            </p>
+          </div>
+        ) : null}
+
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "24px", marginBottom: "16px" }}>
           {[
             { label: "AI Services Available", val: "12" },
@@ -161,6 +240,63 @@ function StoreInner() {
       )}
 
       <div style={{ maxWidth: "1300px", margin: "0 auto", padding: "0 24px 24px" }}>
+        {selectedIndustry ? (
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "12px",
+              marginBottom: "18px",
+              padding: "14px 18px",
+              borderRadius: "18px",
+              background: "rgba(255,255,255,0.7)",
+              border: "1px solid rgba(154,92,46,0.12)",
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "700",
+                  color: "#9a5c2e",
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  margin: "0 0 4px",
+                }}
+              >
+                Recommended Stack
+              </p>
+              <p
+                style={{
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#1a1209",
+                  margin: 0,
+                }}
+              >
+                {selectedIndustry.recommendedServices.map((service) => service.name).join(" • ")}
+              </p>
+            </div>
+            <a
+              href="#top"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                fontSize: "13px",
+                fontWeight: "700",
+                color: "#9a5c2e",
+                textDecoration: "none",
+              }}
+            >
+              Reviewing {selectedIndustry.shortName} recommendations
+              <ArrowRight style={{ width: "14px", height: "14px" }} />
+            </a>
+          </div>
+        ) : null}
+
         <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center", marginBottom: "24px" }}>
           <div style={{ position: "relative", flex: "1", minWidth: "200px", maxWidth: "300px" }}>
             <Search

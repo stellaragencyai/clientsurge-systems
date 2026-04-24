@@ -305,6 +305,8 @@ const launchTimelineSteps = [
   },
 ];
 
+const orderedSystemIds = Object.keys(systemsById);
+
 function CoreOfferHeader({ industryContext }) {
   return (
     <div className="text-center mx-auto max-w-3xl">
@@ -340,7 +342,7 @@ function CoreOfferHeader({ industryContext }) {
   );
 }
 
-function SystemMap({ selectedSystemId }) {
+function SystemMap({ selectedSystemId, onStageSelect }) {
   return (
     <div className="mt-12 md:mt-14">
       <div className="hidden lg:block relative">
@@ -356,9 +358,11 @@ function SystemMap({ selectedSystemId }) {
           {systemMapStages.map((stage) => {
             const active = stage.systemsIncluded.includes(selectedSystemId);
             return (
-              <div
+              <button
+                type="button"
                 key={stage.id}
                 className="relative rounded-2xl px-5 pt-5 pb-4"
+                onClick={() => onStageSelect(stage.systemsIncluded[0])}
                 style={{
                   background: active
                     ? "linear-gradient(135deg, rgba(255,249,240,0.98) 0%, rgba(251,239,219,0.94) 100%)"
@@ -369,6 +373,8 @@ function SystemMap({ selectedSystemId }) {
                   boxShadow: active
                     ? "0 16px 40px rgba(154,92,46,0.14)"
                     : "0 6px 18px rgba(0,0,0,0.04)",
+                  cursor: "pointer",
+                  textAlign: "left",
                 }}
               >
                 <span
@@ -389,7 +395,7 @@ function SystemMap({ selectedSystemId }) {
                 <p className="text-xs leading-relaxed text-foreground/65">
                   {stage.summary}
                 </p>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -399,9 +405,11 @@ function SystemMap({ selectedSystemId }) {
         {systemMapStages.map((stage) => {
           const active = stage.systemsIncluded.includes(selectedSystemId);
           return (
-            <div
+            <button
+              type="button"
               key={stage.id}
               className="rounded-2xl px-4 py-4"
+              onClick={() => onStageSelect(stage.systemsIncluded[0])}
               style={{
                 background: active
                   ? "linear-gradient(135deg, rgba(255,249,240,0.98) 0%, rgba(251,239,219,0.94) 100%)"
@@ -409,6 +417,8 @@ function SystemMap({ selectedSystemId }) {
                 border: active
                   ? "1.5px solid rgba(154,92,46,0.4)"
                   : "1px solid rgba(154,92,46,0.16)",
+                cursor: "pointer",
+                textAlign: "left",
               }}
             >
               <h3 className="text-sm font-semibold text-foreground leading-snug mb-1.5">
@@ -417,7 +427,7 @@ function SystemMap({ selectedSystemId }) {
               <p className="text-xs leading-relaxed text-foreground/65">
                 {stage.summary}
               </p>
-            </div>
+            </button>
           );
         })}
       </div>
@@ -556,7 +566,7 @@ function DetailBlock({ label, value }) {
   );
 }
 
-function SystemDetailPanel({ systemId, onBookDemo }) {
+function SystemDetailPanel({ systemId, onBookDemo, onPrevious, onNext }) {
   const system = systemsById[systemId];
   if (!system) return null;
   const Icon = iconMap[system.icon];
@@ -623,6 +633,20 @@ function SystemDetailPanel({ systemId, onBookDemo }) {
       </div>
 
       <div className="mt-6 flex flex-col sm:flex-row gap-3">
+        <button
+          type="button"
+          onClick={onPrevious}
+          className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-foreground border border-[rgba(154,92,46,0.16)] bg-white/70 hover:bg-white transition-colors"
+        >
+          Previous System
+        </button>
+        <button
+          type="button"
+          onClick={onNext}
+          className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-foreground border border-[rgba(154,92,46,0.16)] bg-white/70 hover:bg-white transition-colors"
+        >
+          Next System
+        </button>
         <a
           href={coreOfferSectionConfig.primaryCta.href}
           className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
@@ -821,6 +845,19 @@ export default function CoreOffer() {
       .filter(Boolean)
   );
 
+  const handleNextSystem = () => {
+    const currentIndex = orderedSystemIds.indexOf(selectedSystemId);
+    const nextIndex = (currentIndex + 1) % orderedSystemIds.length;
+    setSelectedSystemId(orderedSystemIds[nextIndex]);
+  };
+
+  const handlePreviousSystem = () => {
+    const currentIndex = orderedSystemIds.indexOf(selectedSystemId);
+    const previousIndex =
+      (currentIndex - 1 + orderedSystemIds.length) % orderedSystemIds.length;
+    setSelectedSystemId(orderedSystemIds[previousIndex]);
+  };
+
   return (
     <section
       id="services"
@@ -837,7 +874,10 @@ export default function CoreOffer() {
 
       <div className="max-w-6xl mx-auto relative z-10">
         <CoreOfferHeader industryContext={industryContext} />
-        <SystemMap selectedSystemId={selectedSystemId} />
+        <SystemMap
+          selectedSystemId={selectedSystemId}
+          onStageSelect={setSelectedSystemId}
+        />
         <SystemGroupList
           selectedSystemId={selectedSystemId}
           onSelect={setSelectedSystemId}
@@ -849,6 +889,8 @@ export default function CoreOffer() {
         <SystemDetailPanel
           systemId={selectedSystemId}
           onBookDemo={() => setShowBookingModal(true)}
+          onPrevious={handlePreviousSystem}
+          onNext={handleNextSystem}
         />
         <LaunchTimeline />
         <CoreOfferCTA onBookDemo={() => setShowBookingModal(true)} />
