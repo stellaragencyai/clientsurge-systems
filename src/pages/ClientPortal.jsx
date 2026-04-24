@@ -6,8 +6,10 @@ import SupportChat from "../components/portal/SupportChat";
 import PlanManager from "../components/portal/PlanManager";
 import LeadActivityFeed from "../components/portal/LeadActivityFeed";
 import PaymentFailedBanner from "../components/portal/PaymentFailedBanner";
+import LeadFlowDashboard from "../components/portal/LeadFlowDashboard";
 
 const TABS = [
+  { id: "metrics", label: "Lead Flow" },
   { id: "leads", label: "My Leads" },
   { id: "progress", label: "Build Progress" },
   { id: "support", label: "Support & Messaging" },
@@ -207,6 +209,9 @@ export default function ClientPortal() {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
+        {activeTab === "metrics" && (
+          <LeadFlowDashboard />
+        )}
         {activeTab === "leads" && (
           <LeadActivityFeed project={project} />
         )}
