@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const INTEGRATIONS = [
   {
@@ -57,6 +57,17 @@ const INTEGRATIONS = [
   },
 ];
 
+// Track scroll position for dynamic enhancement
+const ScrollTrackIntegrationContext = ({ children }) => {
+  const [scrollY, setScrollY] = useState(0);
+  useEffect(() => {
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return children(scrollY);
+};
+
 // Triple for extra-seamless loop
 const TRIPLED = [...INTEGRATIONS, ...INTEGRATIONS, ...INTEGRATIONS];
 
@@ -77,7 +88,7 @@ export default function IntegrationPartners() {
       <div className="max-w-6xl mx-auto relative z-10">
 
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
             Integrations
           </p>
@@ -94,9 +105,14 @@ export default function IntegrationPartners() {
             <div style={{ height: "1px", width: "48px", background: "linear-gradient(to left, transparent, rgba(154,92,46,0.5))" }} />
           </div>
 
-          <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
-            Every tool you already rely on — plugged in, synced, and firing automatically the moment a lead comes in.
+          <p className="text-muted-foreground text-base max-w-2xl mx-auto leading-relaxed">
+            Every tool you already rely on — plugged in, synced, and firing automatically the moment a lead comes in. Seamless integrations that work behind the scenes.
           </p>
+
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mt-6">
+            <span aria-hidden="true">🔗</span>
+            Scroll to see all integrations in action
+          </div>
         </div>
 
         {/* Infinite scroll marquee */}
@@ -132,30 +148,33 @@ export default function IntegrationPartners() {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`Visit ${integration.name}`}
-                className="flex-shrink-0 group relative flex flex-col items-center"
-                style={{ outline: "none" }}
+                className="flex-shrink-0 group relative flex flex-col items-center transition-opacity duration-300 hover:opacity-100"
+                style={{ outline: "none", opacity: 0.85 }}
               >
                 <img
-                  src={integration.logo}
-                  alt={integration.name}
-                  loading="lazy"
-                  style={{
-                    height: "110px",
-                    width: "auto",
-                    maxWidth: "240px",
-                    objectFit: "contain",
-                    transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease",
-                    filter: "drop-shadow(0 0 0px rgba(200,150,92,0))",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "scale(1.18) translateY(-6px)";
-                    e.currentTarget.style.filter = "drop-shadow(0 10px 24px rgba(200,150,92,0.5))";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "scale(1) translateY(0)";
-                    e.currentTarget.style.filter = "drop-shadow(0 0 0px rgba(200,150,92,0))";
-                  }}
-                />
+                   src={integration.logo}
+                   alt={integration.name}
+                   loading="lazy"
+                   style={{
+                     height: "130px",
+                     width: "auto",
+                     maxWidth: "280px",
+                     objectFit: "contain",
+                     transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease, opacity 0.35s ease",
+                     filter: "drop-shadow(0 0 0px rgba(200,150,92,0)) brightness(1) contrast(1.05)",
+                     opacity: 0.9,
+                   }}
+                   onMouseEnter={(e) => {
+                     e.currentTarget.style.transform = "scale(1.22) translateY(-8px)";
+                     e.currentTarget.style.filter = "drop-shadow(0 12px 32px rgba(200,150,92,0.6)) brightness(1.08) contrast(1.15)";
+                     e.currentTarget.style.opacity = "1";
+                   }}
+                   onMouseLeave={(e) => {
+                     e.currentTarget.style.transform = "scale(1) translateY(0)";
+                     e.currentTarget.style.filter = "drop-shadow(0 0 0px rgba(200,150,92,0)) brightness(1) contrast(1.05)";
+                     e.currentTarget.style.opacity = "0.9";
+                   }}
+                 />
                 <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase tracking-widest">
                   {integration.description}
                 </span>
@@ -165,24 +184,35 @@ export default function IntegrationPartners() {
         </div>
 
         {/* Bottom CTA pill */}
-        <div className="flex justify-center mt-2">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8">
           <div
             className="inline-flex items-center gap-3 px-6 py-3 rounded-full border"
             style={{
-              background: "rgba(255,255,255,0.7)",
-              border: "1.5px solid rgba(180,185,195,0.5)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.9), 0 2px 8px rgba(0,0,0,0.04)",
-              backdropFilter: "blur(8px)",
+              background: "rgba(255,255,255,0.8)",
+              border: "1.5px solid rgba(180,185,195,0.6)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.95), 0 4px 12px rgba(0,0,0,0.08)",
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
             }}
           >
-            <span className="text-sm text-foreground/60">Don't see your tool?</span>
+            <span className="text-sm text-foreground/70 font-medium">Don't see your tool?</span>
             <a
               href="/contact"
               className="text-sm font-bold text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
             >
               Contact us →
             </a>
-            <span className="text-sm text-foreground/40">We connect to virtually anything.</span>
+            <span className="text-sm text-foreground/50">We connect to virtually anything.</span>
+          </div>
+          <div
+            className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border"
+            style={{
+              background: "rgba(154,92,46,0.08)",
+              border: "1.5px solid rgba(154,92,46,0.25)",
+              boxShadow: "0 2px 8px rgba(154,92,46,0.12)",
+            }}
+          >
+            <span className="text-xs font-bold text-primary uppercase tracking-widest">✓ Pre-built integrations available</span>
           </div>
         </div>
 

@@ -94,12 +94,12 @@ function FeatureCard({ item, onSelect }) {
       <div
         className="flex flex-col rounded-2xl overflow-hidden transition-all duration-300"
         style={{
-          background: hovered ? "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,240,235,0.9) 100%)" : "linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(252,247,242,0.75) 100%)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          border: hovered ? "1.5px solid rgba(154,92,46,0.6)" : "1.5px solid rgba(154,92,46,0.3)",
-          boxShadow: hovered ? "0 20px 50px rgba(154,92,46,0.25), 0 8px 16px rgba(0,0,0,0.1), inset 0 1px 2px rgba(255,255,255,0.6)" : "0 8px 24px rgba(154,92,46,0.12), 0 2px 8px rgba(0,0,0,0.05), inset 0 1px 2px rgba(255,255,255,0.5)",
-          transform: hovered ? "translateY(-4px) scale(1.02)" : "translateY(0)",
+          background: hovered ? "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(245,240,235,0.92) 100%)" : "linear-gradient(135deg, rgba(255,255,255,0.85) 0%, rgba(252,247,242,0.8) 100%)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+          border: hovered ? "1.5px solid rgba(154,92,46,0.7)" : "1.5px solid rgba(154,92,46,0.4)",
+          boxShadow: hovered ? "0 24px 60px rgba(154,92,46,0.3), 0 12px 20px rgba(0,0,0,0.12), inset 0 1px 2px rgba(255,255,255,0.7)" : "0 12px 32px rgba(154,92,46,0.15), 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 2px rgba(255,255,255,0.6)",
+          transform: hovered ? "translateY(-6px) scale(1.025)" : "translateY(0)",
           transition: "all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1)",
         }}
       >
@@ -345,20 +345,24 @@ export default function CoreOffer() {
         {/* 8-Step Clickable Cards — with left rail timeline */}
         <div className="mb-10">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-5 text-center">Core Automation — Steps 1–5</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-7.5">
             {coreAutomation.map((item) => (
-              <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
+              <div key={item.step} style={{ transform: "scale(1.25)", transformOrigin: "center" }}>
+                <FeatureCard item={item} onSelect={setSelectedStep} />
+              </div>
             ))}
           </div>
 
-          <div className="mt-10 mb-5 flex items-center gap-4">
+          <div className="mt-16 mb-8 flex items-center gap-4">
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
             <p className="text-xs font-semibold text-primary tracking-widest uppercase whitespace-nowrap">Done-For-You Services — Steps 6–8</p>
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-7.5">
             {doneForYou.map((item) => (
-              <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
+              <div key={item.step} style={{ transform: "scale(1.25)", transformOrigin: "center" }}>
+                <FeatureCard item={item} onSelect={setSelectedStep} />
+              </div>
             ))}
           </div>
         </div>
@@ -370,9 +374,9 @@ export default function CoreOffer() {
         </div>
 
         {/* 3-step timeline */}
-        <div className="mb-5 mt-6">
+        <div className="mb-5 mt-20">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase text-center mb-2">How We Get You Live</p>
-          <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-8">One Call. We Build. You're Live in 7 Days.</h3>
+          <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-12">One Call. We Build. You're Live in 7 Days.</h3>
         </div>
         <div className="mb-8 rounded-2xl border border-primary/15 overflow-hidden">
           <div className="grid grid-cols-3 bg-primary/5">
