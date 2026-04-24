@@ -8,6 +8,7 @@ import LeadActivityFeed from "../components/portal/LeadActivityFeed";
 import PaymentFailedBanner from "../components/portal/PaymentFailedBanner";
 import LeadFlowDashboard from "../components/portal/LeadFlowDashboard";
 import NotificationBell from "../components/portal/NotificationBell";
+import ClientOnboardingWizard from "../components/portal/ClientOnboardingWizard";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
@@ -27,6 +28,7 @@ export default function ClientPortal() {
   const [notFound, setNotFound] = useState(false);
   const [portalError, setPortalError] = useState("");
   const [activeTab, setActiveTab] = useState("leads");
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useLeadNotifications();
 
   useEffect(() => {
@@ -43,6 +45,8 @@ export default function ClientPortal() {
         setProject(context.project || null);
         setPortalOrder(context.order || null);
         setSubscription(context.subscription || null);
+        // Show wizard if not completed
+        setShowOnboarding(!context.project?.onboarding_wizard_completed);
         setNotFound(false);
         setPortalError("");
       } catch (error) {
@@ -144,6 +148,14 @@ export default function ClientPortal() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Onboarding Wizard */}
+      {showOnboarding && project && (
+        <ClientOnboardingWizard
+          project={project}
+          onComplete={() => setShowOnboarding(false)}
+        />
+      )}
+
       {/* Top bar */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-border px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
