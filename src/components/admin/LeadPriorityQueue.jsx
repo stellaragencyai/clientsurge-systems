@@ -77,9 +77,21 @@ function SentimentBadge({ sentiment }) {
   );
 }
 
+function isHotLead(lead) {
+  if (lead.status === "Closed" || lead.status === "Booked") return false;
+  // Hot = high score AND (positive sentiment OR hot status OR replied recently)
+  const score = lead.lead_score || 0;
+  const hotStatus = ["Replied", "Qualified", "Booking Prompt Sent"].includes(lead.status);
+  const positiveSignal = lead.reply_sentiment === "Positive";
+  return score >= 70 && (hotStatus || positiveSignal);
+}
+
 function priorityScore(lead) {
   let p = lead.lead_score || 0;
   const daysSince = (d) => d ? (Date.now() - new Date(d).getTime()) / 86400000 : 999;
+
+  // Hot tier gets pinned to very top
+  if (isHotLead(lead)) p += 100;
 
   // Boost for hot statuses
   if (lead.status === "Replied") p += 30;
@@ -101,7 +113,7 @@ function priorityScore(lead) {
   // Boost for enriched leads
   if (lead.enriched_at) p += 5;
 
-  return Math.min(p, 250);
+  return Math.min(p, 350);
 }
 
 export default function LeadPriorityQueue() {
@@ -134,14 +146,17 @@ export default function LeadPriorityQueue() {
     }
   };
 
-  const STATUS_FILTERS = ["all", "New", "Contacted", "Replied", "Qualified", "Booking Prompt Sent"];
+  const STATUS_FILTERS = ["all", "hot", "New", "Contacted", "Replied", "Qualified", "Booking Prompt Sent"];
 
-  const filtered = leads
-    .filter((l) => l.status !== "Closed" && l.status !== "Booked")
-    .filter((l) => filter === "all" || l.status === filter)
+  const activeleads = leads.filter((l) => l.status !== "Closed" && l.status !== "Booked");
+
+  const filtered = activeleads
+    .filter((l) => filter === "all" || (filter === "hot" ? isHotLead(l) : l.status === filter))
     .filter((l) => sentimentFilter === "all" || l.reply_sentiment === sentimentFilter)
     .sort((a, b) => priorityScore(b) - priorityScore(a))
     .slice(0, 50);
+
+  const hotLeads = activeleads.filter(isHotLead);
 
   const urgentCount = leads.filter((l) => {
     const age = (Date.now() - new Date(l.created_date).getTime()) / 86400000;
@@ -203,6 +218,20 @@ export default function LeadPriorityQueue() {
           </span>
           <span className="text-xs text-green-500">reply sentiment</span>
         </div>
+        <button
+          onClick={() => setFilter("hot")}
+          className={`flex items-center gap-2 rounded-xl border px-4 py-2 transition-colors ${
+            filter === "hot"
+              ? "bg-red-600 border-red-600 text-white"
+              : "bg-red-50 border-red-200"
+          }`}
+        >
+          <Flame className="h-4 w-4 text-red-600" style={filter === "hot" ? { color: "white" } : {}} />
+          <span className={`text-sm font-bold ${filter === "hot" ? "text-white" : "text-red-700"}`}>
+            {hotLeads.length} hot
+          </span>
+          <span className={`text-xs ${filter === "hot" ? "text-red-100" : "text-red-500"}`}>immediate outreach</span>
+        </button>
       </div>
 
       {/* Filters */}
@@ -212,10 +241,16 @@ export default function LeadPriorityQueue() {
             key={s}
             onClick={() => setFilter(s)}
             className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-              filter === s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"
+              s === "hot"
+                ? filter === "hot"
+                  ? "bg-red-600 text-white"
+                  : "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                : filter === s
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
             }`}
           >
-            {s === "all" ? "All Active" : s}
+            {s === "all" ? "All Active" : s === "hot" ? "🔥 Hot Leads" : s}
           </button>
         ))}
       </div>
@@ -252,12 +287,14 @@ export default function LeadPriorityQueue() {
           {filtered.map((lead, idx) => {
             const reasons = urgencyReasons(lead);
             const action = nextAction(lead);
-            const isUrgent = reasons.some((r) => r.color.includes("red"));
+            const hot = isHotLead(lead);
+            const isUrgent = hot || reasons.some((r) => r.color.includes("red"));
 
             return (
               <div
                 key={lead.id}
                 className={`rounded-xl border p-4 transition-all hover:shadow-sm ${
+                  hot ? "border-red-300 bg-gradient-to-r from-red-50/60 to-orange-50/30 ring-1 ring-red-200" :
                   isUrgent ? "border-red-200 bg-red-50/30" :
                   idx < 5 ? "border-amber-200 bg-amber-50/20" : "border-border bg-white"
                 }`}
@@ -265,17 +302,23 @@ export default function LeadPriorityQueue() {
                 <div className="flex items-start gap-4">
                   {/* Rank */}
                   <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+                    hot ? "bg-red-600 text-white" :
                     idx === 0 ? "bg-red-100 text-red-700" :
                     idx < 3 ? "bg-amber-100 text-amber-700" :
                     "bg-muted text-muted-foreground"
                   }`}>
-                    {idx + 1}
+                    {hot ? "🔥" : idx + 1}
                   </div>
 
                   {/* Main info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
                       <span className="font-semibold text-foreground">{lead.full_name}</span>
+                      {hot && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-red-600 text-white px-2 py-0.5 text-[10px] font-bold">
+                          🔥 HOT — Outreach Now
+                        </span>
+                      )}
                       <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${STATUS_COLORS[lead.status] || "bg-gray-100 text-gray-700"}`}>
                         {lead.status}
                       </span>
