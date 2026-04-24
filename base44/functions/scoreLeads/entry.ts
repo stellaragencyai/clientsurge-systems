@@ -10,42 +10,32 @@
  *   Qualified        → 22
  *   Booking Prompt   → 26
  *   Booked           → 30
- *   Closed           →  0  (already converted — remove from active scoring)
+ *   Closed           →  0
  *
  * RECENCY — days since created (up to 20 pts)
- *   0–2 days         → 20
- *   3–7 days         → 15
- *   8–14 days        → 10
- *   15–30 days       →  5
- *   >30 days         →  0
+ *   0–2 days  → 20 | 3–7 → 15 | 8–14 → 10 | 15–30 → 5 | >30 → 0
  *
  * COMMUNICATION ACTIVITY — outbound events (up to 25 pts)
- *   1 event          →  8
- *   2–3 events       → 14
- *   4–6 events       → 20
- *   7+ events        → 25
+ *   1 → 8 | 2–3 → 14 | 4–6 → 20 | 7+ → 25
  *
- * INBOUND REPLY — any inbound event (up to 15 pts)
- *   1 inbound        →  8
- *   2+ inbound       → 15
+ * INBOUND REPLY (up to 15 pts)
+ *   1 → 8 | 2+ → 15
  *
  * RECENCY OF LAST CONTACT (up to 10 pts)
- *   Contacted <24h   → 10
- *   <3 days          →  7
- *   <7 days          →  4
- *   never contacted  →  0
+ *   <24h → 10 | <3d → 7 | <7d → 4
+ *
+ * ENRICHMENT BONUS (up to 10 pts — new)
+ *   Has industry_tags    → +3
+ *   Has social_profiles  → +3
+ *   company_size known   → +2
+ *   Has website          → +2
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 const STATUS_SCORE = {
-  New: 5,
-  Contacted: 10,
-  Replied: 18,
-  Qualified: 22,
-  "Booking Prompt Sent": 26,
-  Booked: 30,
-  Closed: 0,
+  New: 5, Contacted: 10, Replied: 18, Qualified: 22,
+  "Booking Prompt Sent": 26, Booked: 30, Closed: 0,
 };
 
 function daysSince(isoDate) {
@@ -54,37 +44,31 @@ function daysSince(isoDate) {
 }
 
 function recencyScore(days) {
-  if (days <= 2) return 20;
-  if (days <= 7) return 15;
-  if (days <= 14) return 10;
-  if (days <= 30) return 5;
-  return 0;
+  if (days <= 2) return 20; if (days <= 7) return 15;
+  if (days <= 14) return 10; if (days <= 30) return 5; return 0;
 }
 
-function activityScore(outboundCount) {
-  if (outboundCount >= 7) return 25;
-  if (outboundCount >= 4) return 20;
-  if (outboundCount >= 2) return 14;
-  if (outboundCount >= 1) return 8;
-  return 0;
+function activityScore(n) {
+  if (n >= 7) return 25; if (n >= 4) return 20; if (n >= 2) return 14; if (n >= 1) return 8; return 0;
 }
 
-function inboundScore(inboundCount) {
-  if (inboundCount >= 2) return 15;
-  if (inboundCount >= 1) return 8;
-  return 0;
-}
+function inboundScore(n) { return n >= 2 ? 15 : n >= 1 ? 8 : 0; }
 
 function lastContactScore(days) {
-  if (days < 1) return 10;
-  if (days < 3) return 7;
-  if (days < 7) return 4;
-  return 0;
+  if (days < 1) return 10; if (days < 3) return 7; if (days < 7) return 4; return 0;
+}
+
+function enrichmentBonus(lead) {
+  let bonus = 0;
+  if (Array.isArray(lead.industry_tags) && lead.industry_tags.length > 0) bonus += 3;
+  if (lead.social_profiles && Object.keys(lead.social_profiles).some((k) => lead.social_profiles[k])) bonus += 3;
+  if (lead.company_size && lead.company_size !== "unknown") bonus += 2;
+  if (lead.website) bonus += 2;
+  return bonus;
 }
 
 function computeScore(lead, eventsByLead) {
   const events = eventsByLead[lead.id] || [];
-
   const outbound = events.filter((e) => e.direction === "outbound").length;
   const inbound = events.filter((e) => e.direction === "inbound").length;
 
@@ -93,7 +77,8 @@ function computeScore(lead, eventsByLead) {
     recencyScore(daysSince(lead.created_date)) +
     activityScore(outbound) +
     inboundScore(inbound) +
-    lastContactScore(daysSince(lead.last_contacted_at));
+    lastContactScore(daysSince(lead.last_contacted_at)) +
+    enrichmentBonus(lead);
 
   return Math.min(100, Math.max(1, score));
 }
@@ -102,7 +87,6 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Allow both admin-triggered and scheduled (no user) calls
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
@@ -110,9 +94,8 @@ Deno.serve(async (req) => {
     }
 
     const payload = req.method === "POST" ? await req.json().catch(() => ({})) : {};
-    const leadIdFilter = payload?.lead_id ?? null; // optional single-lead mode
+    const leadIdFilter = payload?.lead_id ?? null;
 
-    // Fetch leads & events
     const [leads, events] = await Promise.all([
       leadIdFilter
         ? base44.asServiceRole.entities.Leads.filter({ id: leadIdFilter })
@@ -124,18 +107,13 @@ Deno.serve(async (req) => {
       return Response.json({ success: true, scored: 0, message: "No leads to score" });
     }
 
-    // Index events by lead_id
     const eventsByLead = {};
     for (const ev of events || []) {
       if (!ev.lead_id) continue;
       (eventsByLead[ev.lead_id] ??= []).push(ev);
     }
 
-    // Score and persist in parallel (batched to avoid rate limits)
-    const updates = leads.map((lead) => {
-      const score = computeScore(lead, eventsByLead);
-      return { lead, score };
-    });
+    const updates = leads.map((lead) => ({ lead, score: computeScore(lead, eventsByLead) }));
 
     const BATCH = 20;
     let updated = 0;
@@ -143,7 +121,7 @@ Deno.serve(async (req) => {
       const batch = updates.slice(i, i + BATCH);
       await Promise.all(
         batch.map(({ lead, score }) => {
-          if (lead.lead_score === score) return Promise.resolve(); // skip no-ops
+          if (lead.lead_score === score) return Promise.resolve();
           return base44.asServiceRole.entities.Leads.update(lead.id, { lead_score: score });
         })
       );
@@ -151,9 +129,7 @@ Deno.serve(async (req) => {
     }
 
     return Response.json({
-      success: true,
-      scored: updates.length,
-      updated,
+      success: true, scored: updates.length, updated,
       scores: updates.map(({ lead, score }) => ({ id: lead.id, name: lead.full_name, score })),
     });
 
