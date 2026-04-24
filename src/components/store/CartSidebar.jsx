@@ -2,18 +2,9 @@ import { useState } from "react";
 import { X, ShoppingCart, Trash2, ArrowRight, Lock } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
 import { base44 } from "@/api/base44Client";
-import { formatCurrency, getPackageDisplayLabel } from "@/lib/aiProducts";
 
 export default function CartSidebar() {
-  const {
-    items,
-    removeItem,
-    cartOpen,
-    setCartOpen,
-    pricingSummary,
-    totalSetup,
-    totalMonthly,
-  } = useCart();
+  const { items, removeItem, cartOpen, setCartOpen, totalSetup, totalMonthly } = useCart();
   const [step, setStep] = useState("cart");
   const [form, setForm] = useState({ name: "", email: "", phone: "", business: "" });
   const [error, setError] = useState("");
@@ -34,8 +25,8 @@ export default function CartSidebar() {
     }
 
     try {
-      const res = await base44.functions.invoke("createCheckoutSession", {
-        product_ids: items.map((item) => item.product_id),
+      const response = await base44.functions.invoke("createCheckoutSession", {
+        items,
         customer_name: form.name,
         customer_email: form.email,
         customer_phone: form.phone,
@@ -44,8 +35,8 @@ export default function CartSidebar() {
         cancel_url: `${window.location.origin}/store`,
       });
 
-      if (res.data?.url) {
-        window.location.href = res.data.url;
+      if (response.data?.url) {
+        window.location.href = response.data.url;
         return;
       }
 
@@ -99,10 +90,8 @@ export default function CartSidebar() {
         >
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <ShoppingCart style={{ width: "20px", height: "20px", color: "#9a5c2e" }} />
-            <span style={{ fontWeight: "700", fontSize: "16px", color: "#1a1209" }}>
-              Canonical Service Bundle
-            </span>
-            {items.length > 0 && (
+            <span style={{ fontWeight: "700", fontSize: "16px", color: "#1a1209" }}>Your AI Stack</span>
+            {items.length > 0 ? (
               <span
                 style={{
                   background: "#9a5c2e",
@@ -119,10 +108,9 @@ export default function CartSidebar() {
               >
                 {items.length}
               </span>
-            )}
+            ) : null}
           </div>
           <button
-            type="button"
             onClick={() => setCartOpen(false)}
             style={{ background: "none", border: "none", cursor: "pointer", padding: "4px" }}
           >
@@ -135,9 +123,7 @@ export default function CartSidebar() {
             <div style={{ textAlign: "center", padding: "48px 0", color: "rgba(26,18,9,0.4)" }}>
               <ShoppingCart style={{ width: "40px", height: "40px", margin: "0 auto 12px", opacity: 0.3 }} />
               <p style={{ fontSize: "14px", fontWeight: "600" }}>Your cart is empty</p>
-              <p style={{ fontSize: "12px", marginTop: "6px" }}>
-                Pick a canonical package or add individual services.
-              </p>
+              <p style={{ fontSize: "12px", marginTop: "6px" }}>Browse the store and add AI services</p>
             </div>
           ) : step === "cart" ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -170,11 +156,10 @@ export default function CartSidebar() {
                       {item.name}
                     </p>
                     <p style={{ fontSize: "11px", color: "rgba(26,18,9,0.5)", margin: 0 }}>
-                      ${formatCurrency(item.setup_fee)} setup · ${formatCurrency(item.monthly_fee)}/mo
+                      ${item.setup_fee} setup · ${item.monthly_fee}/mo
                     </p>
                   </div>
                   <button
-                    type="button"
                     onClick={() => removeItem(item.product_id)}
                     style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", color: "#e57373" }}
                   >
@@ -232,7 +217,7 @@ export default function CartSidebar() {
           )}
         </div>
 
-        {items.length > 0 && (
+        {items.length > 0 ? (
           <div
             style={{
               padding: "16px 24px",
@@ -241,72 +226,17 @@ export default function CartSidebar() {
               backdropFilter: "blur(10px)",
             }}
           >
-            <div
-              style={{
-                borderRadius: "12px",
-                border: "1px solid rgba(154,92,46,0.14)",
-                background: "rgba(154,92,46,0.06)",
-                padding: "12px 14px",
-                marginBottom: "14px",
-              }}
-            >
-              <p
-                style={{
-                  fontSize: "10px",
-                  fontWeight: "700",
-                  color: "rgba(26,18,9,0.45)",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.08em",
-                  margin: 0,
-                }}
-              >
-                Purchased Bundle
-              </p>
-              <p style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209", margin: "6px 0 0" }}>
-                {getPackageDisplayLabel(pricingSummary)}
-              </p>
-              <p style={{ fontSize: "11px", color: "rgba(26,18,9,0.55)", margin: "4px 0 0" }}>
-                {pricingSummary.package_offer
-                  ? `Includes ${pricingSummary.package_offer.included_services.length} canonical installable service${pricingSummary.package_offer.included_services.length === 1 ? "" : "s"}${pricingSummary.add_on_service_keys.length ? ` plus ${pricingSummary.add_on_service_keys.length} add-on${pricingSummary.add_on_service_keys.length === 1 ? "" : "s"}` : ""}.`
-                  : "Custom bundle of canonical installable services."}
-              </p>
-            </div>
-
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
               <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>One-time setup total</span>
-              <span style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209" }}>
-                ${formatCurrency(totalSetup)}
-              </span>
+              <span style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209" }}>${totalSetup}</span>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
               <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>Monthly total</span>
-              <span style={{ fontSize: "13px", fontWeight: "700", color: "#9a5c2e" }}>
-                ${formatCurrency(totalMonthly)}/mo
-              </span>
+              <span style={{ fontSize: "13px", fontWeight: "700", color: "#9a5c2e" }}>${totalMonthly}/mo</span>
             </div>
-
-            {pricingSummary.setup_discount_total > 0 || pricingSummary.monthly_discount_total > 0 ? (
-              <div
-                style={{
-                  marginBottom: "16px",
-                  borderRadius: "12px",
-                  border: "1px solid rgba(34,197,94,0.2)",
-                  background: "rgba(34,197,94,0.08)",
-                  padding: "10px 12px",
-                }}
-              >
-                <p style={{ margin: 0, fontSize: "11px", fontWeight: "700", color: "#15803d" }}>
-                  Explicit bundle savings applied
-                </p>
-                <p style={{ margin: "4px 0 0", fontSize: "11px", color: "rgba(26,18,9,0.55)" }}>
-                  Save ${formatCurrency(pricingSummary.setup_discount_total)} setup and ${formatCurrency(pricingSummary.monthly_discount_total)}/mo versus buying the same services a la carte.
-                </p>
-              </div>
-            ) : null}
 
             {step === "cart" ? (
               <button
-                type="button"
                 onClick={() => setStep("info")}
                 style={{
                   width: "100%",
@@ -339,7 +269,6 @@ export default function CartSidebar() {
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <button
-                  type="button"
                   onClick={handleCheckout}
                   disabled={step === "loading"}
                   style={{
@@ -372,14 +301,12 @@ export default function CartSidebar() {
                       "Redirecting to Stripe..."
                     ) : (
                       <>
-                        <Lock style={{ width: "13px", height: "13px" }} />
-                        Pay Securely with Stripe
+                        <Lock style={{ width: "13px", height: "13px" }} /> Pay Securely with Stripe
                       </>
                     )}
                   </span>
                 </button>
                 <button
-                  type="button"
                   onClick={() => setStep("cart")}
                   style={{
                     background: "none",
@@ -396,10 +323,10 @@ export default function CartSidebar() {
             )}
 
             <p style={{ textAlign: "center", fontSize: "10px", color: "rgba(26,18,9,0.3)", marginTop: "10px" }}>
-              Secured by Stripe · Canonical order-driven install flow
+              🔒 Secured by Stripe · Cancel anytime
             </p>
           </div>
-        )}
+        ) : null}
       </div>
     </>
   );

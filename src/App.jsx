@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
   BrowserRouter as Router,
@@ -30,8 +30,9 @@ import LegalPage from "./pages/LegalPage";
 import Contact from "./pages/Contact";
 import AdminOnboarding from "./pages/AdminOnboarding";
 import Industries from "./pages/Industries";
-import Store from "./pages/Store";
 import OrderSuccess from "./pages/OrderSuccess";
+
+const Store = lazy(() => import("./pages/Store"));
 
 const PUBLIC_PATHS = [
   "/",
@@ -187,7 +188,20 @@ const AuthenticatedApp = () => {
       <Route path="/leads/capture" element={<CaptureLeads />} />
       <Route path="/legal/:type" element={<LegalPage />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/store" element={<Store />} />
+      <Route
+        path="/store"
+        element={
+          <Suspense
+            fallback={
+              <div className="fixed inset-0 flex items-center justify-center">
+                <div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
+              </div>
+            }
+          >
+            <Store />
+          </Suspense>
+        }
+      />
       <Route path="/order-success" element={<OrderSuccess />} />
 
       <Route
