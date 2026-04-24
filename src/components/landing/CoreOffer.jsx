@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   CalendarCheck,
@@ -12,6 +12,10 @@ import {
   Zap,
 } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
+import {
+  INDUSTRY_RECOMMENDATIONS_BY_ID,
+  INDUSTRY_SELECTION_STORAGE_KEY,
+} from "@/lib/industryRecommendations";
 
 const iconMap = {
   Zap,
@@ -99,6 +103,7 @@ const systemGroups = [
 const systemsById = {
   "01": {
     id: "01",
+    service_key: "instant_lead_response",
     icon: "Zap",
     title: "Instant Lead Response",
     shortDescription:
@@ -118,6 +123,7 @@ const systemsById = {
   },
   "02": {
     id: "02",
+    service_key: "missed_call_text_back",
     icon: "PhoneCall",
     title: "Missed Call Text-Back",
     shortDescription:
@@ -139,6 +145,7 @@ const systemsById = {
   },
   "03": {
     id: "03",
+    service_key: "ai_booking_agent",
     icon: "MessageSquare",
     title: "Booking Conversation",
     shortDescription:
@@ -160,6 +167,7 @@ const systemsById = {
   },
   "04": {
     id: "04",
+    service_key: "nurture_sequence_14d",
     icon: "Send",
     title: "Follow-Up Sequence",
     shortDescription:
@@ -179,6 +187,7 @@ const systemsById = {
   },
   "05": {
     id: "05",
+    service_key: "lead_reactivation",
     icon: "RotateCcw",
     title: "Lead Reactivation",
     shortDescription:
@@ -201,6 +210,7 @@ const systemsById = {
   },
   "06": {
     id: "06",
+    service_key: "ai_booking_agent",
     icon: "CalendarCheck",
     title: "Booking Flow",
     shortDescription:
@@ -223,6 +233,7 @@ const systemsById = {
   },
   "07": {
     id: "07",
+    service_key: "pipeline_organization",
     icon: "LayoutDashboard",
     title: "Pipeline Organization",
     shortDescription:
@@ -247,6 +258,7 @@ const systemsById = {
   },
   "08": {
     id: "08",
+    service_key: "ongoing_support",
     icon: "HeadphonesIcon",
     title: "Ongoing Support",
     shortDescription:
@@ -293,7 +305,7 @@ const launchTimelineSteps = [
   },
 ];
 
-function CoreOfferHeader() {
+function CoreOfferHeader({ industryContext }) {
   return (
     <div className="text-center mx-auto max-w-3xl">
       <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase mb-4">
@@ -312,6 +324,18 @@ function CoreOfferHeader() {
       <p className="mt-4 text-sm md:text-base text-foreground/65 max-w-xl mx-auto leading-relaxed">
         {coreOfferSectionConfig.helperLine}
       </p>
+      {industryContext ? (
+        <div
+          className="mt-5 inline-flex items-center rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em]"
+          style={{
+            background: "rgba(154,92,46,0.08)",
+            border: "1px solid rgba(154,92,46,0.16)",
+            color: "#9a5c2e",
+          }}
+        >
+          Showing the most relevant systems for {industryContext.shortName}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -401,7 +425,7 @@ function SystemMap({ selectedSystemId }) {
   );
 }
 
-function SystemCard({ system, selected, onSelect }) {
+function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
   const Icon = iconMap[system.icon];
 
   return (
@@ -454,22 +478,36 @@ function SystemCard({ system, selected, onSelect }) {
         <p className="text-sm leading-relaxed text-foreground/70">
           {system.shortDescription}
         </p>
-        <span
-          className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.08em] w-fit"
-          style={{
-            background: "rgba(154,92,46,0.08)",
-            color: "#9a5c2e",
-            border: "1px solid rgba(154,92,46,0.14)",
-          }}
-        >
-          {system.badge}
-        </span>
+        <div className="flex flex-wrap gap-2">
+          <span
+            className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.08em] w-fit"
+            style={{
+              background: "rgba(154,92,46,0.08)",
+              color: "#9a5c2e",
+              border: "1px solid rgba(154,92,46,0.14)",
+            }}
+          >
+            {system.badge}
+          </span>
+          {emphasizedLabel ? (
+            <span
+              className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.08em] w-fit"
+              style={{
+                background: "rgba(245,217,168,0.2)",
+                color: "#7a4825",
+                border: "1px solid rgba(200,150,92,0.26)",
+              }}
+            >
+              {emphasizedLabel}
+            </span>
+          ) : null}
+        </div>
       </div>
     </button>
   );
 }
 
-function SystemGroupList({ selectedSystemId, onSelect }) {
+function SystemGroupList({ selectedSystemId, onSelect, emphasizedSystemIds, emphasizedLabel }) {
   return (
     <div className="mt-12 md:mt-14 space-y-10 md:space-y-12">
       {systemGroups.map((group) => (
@@ -489,6 +527,9 @@ function SystemGroupList({ selectedSystemId, onSelect }) {
                 system={systemsById[systemId]}
                 selected={selectedSystemId === systemId}
                 onSelect={onSelect}
+                emphasizedLabel={
+                  emphasizedSystemIds.has(systemId) ? emphasizedLabel : null
+                }
               />
             ))}
           </div>
@@ -729,6 +770,56 @@ function CoreOfferCTA({ onBookDemo }) {
 export default function CoreOffer() {
   const [selectedSystemId, setSelectedSystemId] = useState("01");
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedIndustryId, setSelectedIndustryId] = useState(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const applyIndustrySelection = () => {
+      const storedIndustryId = window.sessionStorage.getItem(
+        INDUSTRY_SELECTION_STORAGE_KEY
+      );
+      const industryContext = storedIndustryId
+        ? INDUSTRY_RECOMMENDATIONS_BY_ID[storedIndustryId]
+        : null;
+
+      setSelectedIndustryId(industryContext?.id || null);
+
+      const priorityServiceKey = industryContext?.priorityServiceKeys?.[0];
+      const matchingSystem = Object.values(systemsById).find(
+        (system) => system.service_key === priorityServiceKey
+      );
+
+      if (matchingSystem) {
+        setSelectedSystemId(matchingSystem.id);
+      }
+    };
+
+    applyIndustrySelection();
+    window.addEventListener("storage", applyIndustrySelection);
+    window.addEventListener("clientsurge:industry-selected", applyIndustrySelection);
+
+    return () => {
+      window.removeEventListener("storage", applyIndustrySelection);
+      window.removeEventListener(
+        "clientsurge:industry-selected",
+        applyIndustrySelection
+      );
+    };
+  }, []);
+
+  const industryContext = selectedIndustryId
+    ? INDUSTRY_RECOMMENDATIONS_BY_ID[selectedIndustryId]
+    : null;
+  const emphasizedSystemIds = new Set(
+    (industryContext?.priorityServiceKeys || [])
+      .map((serviceKey) =>
+        Object.values(systemsById).find((system) => system.service_key === serviceKey)?.id
+      )
+      .filter(Boolean)
+  );
 
   return (
     <section
@@ -745,11 +836,15 @@ export default function CoreOffer() {
       />
 
       <div className="max-w-6xl mx-auto relative z-10">
-        <CoreOfferHeader />
+        <CoreOfferHeader industryContext={industryContext} />
         <SystemMap selectedSystemId={selectedSystemId} />
         <SystemGroupList
           selectedSystemId={selectedSystemId}
           onSelect={setSelectedSystemId}
+          emphasizedSystemIds={emphasizedSystemIds}
+          emphasizedLabel={
+            industryContext ? `Best fit for ${industryContext.shortName}` : null
+          }
         />
         <SystemDetailPanel
           systemId={selectedSystemId}
