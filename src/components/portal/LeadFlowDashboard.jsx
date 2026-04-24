@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Activity, CheckCircle2, PhoneOff, RefreshCw, TrendingUp, Loader2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import ConversionFunnel from './ConversionFunnel';
 
 function MetricCard({ icon: Icon, label, value, trend, color = 'blue' }) {
   const colors = {
@@ -118,6 +119,11 @@ export default function LeadFlowDashboard() {
           Last updated: {lastUpdated.toLocaleTimeString()}
         </p>
       )}
+
+      {/* Conversion Funnel */}
+      <div className="mt-8 border-t border-border pt-8">
+        <ConversionFunnel />
+      </div>
     </div>
   );
 }
