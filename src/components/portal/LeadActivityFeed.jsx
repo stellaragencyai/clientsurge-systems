@@ -10,6 +10,7 @@ import {
   Loader2, RefreshCw, AlertCircle, Zap, PhoneCall, Star,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import LeadScoreCard from "./LeadScoreCard";
 
 const STATUS_COLORS = {
   New: "bg-blue-100 text-blue-700",
@@ -57,44 +58,47 @@ function ActivityRow({ lead }) {
     : null;
 
   return (
-    <div className="flex items-center gap-4 py-3 border-b border-border last:border-0">
-      {/* Status dot */}
-      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-        <div className={`w-3 h-3 rounded-full ${
-          lead.status === "Booked" ? "bg-emerald-500" :
-          lead.status === "Qualified" ? "bg-green-500" :
-          lead.status === "Replied" ? "bg-indigo-500" :
-          lead.status === "Contacted" ? "bg-purple-400" :
-          "bg-blue-400"
-        }`} />
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className="text-sm font-semibold text-foreground truncate">{lead.full_name}</p>
-          <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold ${STATUS_COLORS[lead.status] || "bg-gray-100 text-gray-700"}`}>
-            {lead.status}
-          </span>
+    <div className="space-y-2 py-3 border-b border-border last:border-0">
+      <div className="flex items-center gap-4">
+        {/* Status dot */}
+        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+          <div className={`w-3 h-3 rounded-full ${
+            lead.status === "Booked" ? "bg-emerald-500" :
+            lead.status === "Qualified" ? "bg-green-500" :
+            lead.status === "Replied" ? "bg-indigo-500" :
+            lead.status === "Contacted" ? "bg-purple-400" :
+            "bg-blue-400"
+          }`} />
         </div>
-        <p className="text-xs text-muted-foreground truncate">{lead.business_name || lead.business_type}</p>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-sm font-semibold text-foreground truncate">{lead.full_name}</p>
+            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold ${STATUS_COLORS[lead.status] || "bg-gray-100 text-gray-700"}`}>
+              {lead.status}
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground truncate">{lead.business_name || lead.business_type}</p>
+        </div>
+
+        <div className="text-right flex-shrink-0">
+          {daysSinceContact !== null && (
+            <p className="text-[10px] text-muted-foreground">
+              {daysSinceContact === 0 ? "Contacted today" : `Contacted ${daysSinceContact}d ago`}
+            </p>
+          )}
+          {lead.last_contacted_at === null && (
+            <p className="text-[10px] text-amber-600 font-medium">Pending contact</p>
+          )}
+        </div>
       </div>
 
-      <div className="text-right flex-shrink-0">
-        {lead.lead_score != null && (
-          <div className="flex items-center gap-1 justify-end mb-0.5">
-            <Star className="w-3 h-3 text-amber-500" />
-            <span className="text-xs font-bold text-foreground">{lead.lead_score}</span>
-          </div>
-        )}
-        {daysSinceContact !== null && (
-          <p className="text-[10px] text-muted-foreground">
-            {daysSinceContact === 0 ? "Contacted today" : `Contacted ${daysSinceContact}d ago`}
-          </p>
-        )}
-        {lead.last_contacted_at === null && (
-          <p className="text-[10px] text-amber-600 font-medium">Pending contact</p>
-        )}
-      </div>
+      {/* Inline Score Card */}
+      {lead.lead_score != null && (
+        <div className="ml-12">
+          <LeadScoreCard lead={lead} />
+        </div>
+      )}
     </div>
   );
 }
