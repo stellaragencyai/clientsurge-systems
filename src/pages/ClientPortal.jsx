@@ -5,6 +5,7 @@ import BuildTracker from "../components/portal/BuildTracker";
 import SupportChat from "../components/portal/SupportChat";
 import PlanManager from "../components/portal/PlanManager";
 import LeadActivityFeed from "../components/portal/LeadActivityFeed";
+import PaymentFailedBanner from "../components/portal/PaymentFailedBanner";
 
 const TABS = [
   { id: "leads", label: "My Leads" },
@@ -181,6 +182,9 @@ export default function ClientPortal() {
           </p>
         </div>
       </div>
+
+      {/* Payment Failed Banner */}
+      <PaymentFailedBanner subscription={subscription} order={portalOrder} />
 
       {/* Tabs */}
       <div className="border-b border-border bg-white px-6">
