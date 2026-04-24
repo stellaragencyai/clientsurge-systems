@@ -138,17 +138,7 @@ export default function AdminLeadDetail() {
               </p>
               <p className="text-sm text-foreground">{formatSource(lead.source)}</p>
             </div>
-            {lead.assigned_to && (
-              <div>
-                <p className="text-xs text-muted-foreground uppercase font-semibold">Assigned Rep</p>
-                <p className="text-sm text-foreground">{lead.assigned_to}</p>
-                {lead.assigned_at && (
-                  <p className="text-xs text-muted-foreground mt-0.5">
-                    Assigned {new Date(lead.assigned_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                  </p>
-                )}
-              </div>
-            )}
+
           </div>
         </div>
 
