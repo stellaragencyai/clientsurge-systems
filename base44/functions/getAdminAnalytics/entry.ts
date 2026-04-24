@@ -153,6 +153,18 @@ Deno.serve(async (req) => {
     const avg_time_to_contact_hours = contactTimes.length
       ? Math.round(contactTimes.reduce((a, b) => a + b, 0) / contactTimes.length * 10) / 10 : null;
 
+    // ── Top Lead Sources ──────────────────────────────────────────────────────
+    const sourceCounts = {};
+    for (const lead of allLeads) {
+      if (lead.source) {
+        sourceCounts[lead.source] = (sourceCounts[lead.source] || 0) + 1;
+      }
+    }
+    const top_sources = Object.entries(sourceCounts)
+      .map(([source, count]) => ({ source, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
     // ── Recent activity log ───────────────────────────────────────────────────
     const recentActivity = (events || []).slice(0, 30).map((ev) => ({
       id: ev.id,
@@ -177,6 +189,7 @@ Deno.serve(async (req) => {
       drip,
       enrichment,
       avg_time_to_contact_hours,
+      top_sources,
       recent_activity: recentActivity,
     });
 

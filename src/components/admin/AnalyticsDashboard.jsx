@@ -167,7 +167,7 @@ export default function AnalyticsDashboard() {
     );
   }
 
-  const { users, leads, last30Days, recent_activity } = data || {};
+  const { users, leads, last30Days, recent_activity, avg_time_to_contact_hours, top_sources, funnel } = data || {};
 
   const pipelineData = Object.entries(leads?.status_counts || {}).map(([name, value]) => ({
     name,
@@ -199,37 +199,32 @@ export default function AnalyticsDashboard() {
       {/* ── KPI Row ──────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          icon={Users}
-          label="Active Users"
-          value={users?.active ?? 0}
-          sub={`${users?.admins ?? 0} admin · ${users?.total ?? 0} total registered`}
-          color="blue"
-        />
-        <MetricCard
           icon={TrendingUp}
           label="Leads This Month"
           value={leads?.new_last_30_days ?? 0}
-          sub={`${leads?.total ?? 0} all-time in pipeline`}
-          trend={leads?.new_last_30_days ?? 0}
+          sub={`${leads?.total ?? 0} all-time leads`}
+          color="blue"
+        />
+        <MetricCard
+          icon={Target}
+          label="Conversion Rate"
+          value={`${leads?.total > 0 ? Math.round((((leads?.status_counts?.Booked ?? 0) + (leads?.status_counts?.Closed ?? 0)) / leads.total) * 100) : 0}%`}
+          sub={`${(leads?.status_counts?.Booked ?? 0) + (leads?.status_counts?.Closed ?? 0)} booked / ${leads?.total ?? 0} total`}
           color="green"
         />
         <MetricCard
-          icon={Star}
-          label="Avg Lead Score"
-          value={leads?.avg_score ?? 0}
-          sub={`${leads?.high_intent_count ?? 0} high-intent (score ≥ 60)`}
+          icon={Activity}
+          label="Avg Response Time"
+          value={avg_time_to_contact_hours != null ? `${avg_time_to_contact_hours} hrs` : "N/A"}
+          sub="Create to first contact"
           color="amber"
         />
         <MetricCard
-          icon={Flame}
-          label="Booked"
-          value={leads?.status_counts?.Booked ?? 0}
-          sub={`${leads?.status_counts?.Qualified ?? 0} qualified · ${
-            leads?.total > 0
-              ? Math.round(((leads?.status_counts?.Booked ?? 0) / leads.total) * 100)
-              : 0
-          }% book rate`}
-          color="emerald"
+          icon={Star}
+          label="Top Lead Source"
+          value={top_sources?.[0]?.source || "N/A"}
+          sub={top_sources?.[0] ? `${top_sources[0].count} leads` : "No data"}
+          color="purple"
         />
       </div>
 
