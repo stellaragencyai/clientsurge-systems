@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mail, MessageSquare, Key, Save, AlertCircle, CheckCircle } from 'lucide-react';
+import { Mail, MessageSquare, Key, Save, AlertCircle, CheckCircle, MessageCircle } from 'lucide-react';
 import {
   fetchAdminSettings,
   getAdminSettingsError,
@@ -12,6 +12,8 @@ export default function AdminSettingsPanel() {
     resend_from_email: '',
     twilio_from_number: '',
     twilio_enabled: false,
+    whatsapp_enabled: false,
+    whatsapp_from_number: '',
     resend_enabled: false,
     sms_template: '',
     email_confirmation_template: '',
@@ -139,6 +141,49 @@ export default function AdminSettingsPanel() {
           <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
             <div className={`w-2 h-2 rounded-full ${settings.twilio_enabled ? 'bg-green-500' : 'bg-gray-400'}`} />
             <span className="text-sm text-foreground">Twilio Status: {settings.twilio_enabled ? 'Connected' : 'Not Connected'}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* WhatsApp Settings */}
+      <div className="bg-white rounded-xl border border-border p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <MessageCircle className="w-5 h-5 text-green-600" />
+          <h3 className="text-lg font-semibold text-foreground">WhatsApp Business (via Twilio)</h3>
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3 p-3 rounded-lg border border-border">
+            <button
+              onClick={() => handleChange('whatsapp_enabled', !settings.whatsapp_enabled)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.whatsapp_enabled ? 'bg-green-500' : 'bg-muted'}`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${settings.whatsapp_enabled ? 'translate-x-6' : 'translate-x-1'}`} />
+            </button>
+            <span className="text-sm font-medium text-foreground">
+              {settings.whatsapp_enabled ? 'WhatsApp Enabled' : 'WhatsApp Disabled'}
+            </span>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              WhatsApp From Number
+            </label>
+            <input
+              type="text"
+              value={settings.whatsapp_from_number}
+              onChange={(e) => handleChange('whatsapp_from_number', e.target.value)}
+              className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="whatsapp:+14155238886"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Must include <code className="bg-muted px-1 rounded">whatsapp:</code> prefix — use your Twilio WhatsApp sender number.
+            </p>
+          </div>
+          <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-xs text-green-800 space-y-1">
+            <p className="font-semibold">Webhook setup required:</p>
+            <p>In Twilio Console → Messaging → WhatsApp Sandbox (or approved sender), set the inbound webhook URL to:</p>
+            <code className="block bg-white border border-green-200 rounded px-2 py-1 mt-1 font-mono break-all">
+              https://&lt;your-app&gt;.base44.app/api/functions/receiveWhatsAppWebhook
+            </code>
           </div>
         </div>
       </div>

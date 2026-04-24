@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   X, Send, Save, CheckCircle, AlertCircle, Loader2, Trash2,
-  MessageSquare, StickyNote, ChevronRight, PhoneCall, RotateCcw, Zap
+  MessageSquare, StickyNote, ChevronRight, PhoneCall, RotateCcw, Zap, MessageCircle
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { saveLeadStatus, getLeadPipelineError } from "@/lib/leadPipelineApi";
@@ -49,7 +49,9 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
   const [newNote, setNewNote] = useState("");
   const [noteSaving, setNoteSaving] = useState(false);
 
-  const [triggerLoading, setTriggerLoading] = useState(null); // key of sequence being triggered
+  const [triggerLoading, setTriggerLoading] = useState(null);
+  const [whatsappMessage, setWhatsappMessage] = useState("");
+  const [whatsappSending, setWhatsappSending] = useState(false);
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
@@ -153,9 +155,29 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
 
   const formatDate = (d) => d ? new Date(d).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
 
+  const handleSendWhatsApp = async (e) => {
+    e.preventDefault();
+    if (!whatsappMessage.trim() || whatsappSending) return;
+    setWhatsappSending(true);
+    try {
+      const res = await base44.functions.invoke("sendWhatsAppMessage", {
+        lead_id: lead.id,
+        message: whatsappMessage.trim(),
+      });
+      showToast("WhatsApp message sent!");
+      setWhatsappMessage("");
+      onLeadUpdated?.({ ...lead, last_contacted_at: new Date().toISOString() });
+    } catch (err) {
+      showToast(err?.response?.data?.error || "Failed to send WhatsApp message", "error");
+    } finally {
+      setWhatsappSending(false);
+    }
+  };
+
   const tabs = [
     { key: "status", label: "Status" },
     { key: "sequences", label: "Sequences" },
+    { key: "whatsapp", label: "WhatsApp" },
     { key: "notes", label: "Notes" },
   ];
 
@@ -287,6 +309,45 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
               <div className="rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground mt-2">
                 <strong>Tip:</strong> Triggering a sequence logs a <code>CommunicationEvent</code> and updates <em>last_contacted_at</em>. You can review all events on the lead detail page.
               </div>
+            </div>
+          )}
+
+          {/* ── WHATSAPP TAB ── */}
+          {activeTab === "whatsapp" && (
+            <div className="space-y-4">
+              <div className="rounded-xl border border-green-200 bg-green-50 p-3 flex items-start gap-2">
+                <MessageCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                <div className="text-xs text-green-800">
+                  <p className="font-semibold mb-0.5">WhatsApp via Twilio</p>
+                  <p>Messages sent here use your WhatsApp Business sender configured in Settings. The lead's phone number must be WhatsApp-registered.</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Sending to: <strong>{lead.phone || "No phone set"}</strong></p>
+              </div>
+              <form onSubmit={handleSendWhatsApp} className="space-y-2">
+                <textarea
+                  value={whatsappMessage}
+                  onChange={(e) => setWhatsappMessage(e.target.value)}
+                  rows={4}
+                  placeholder="Type your WhatsApp message…"
+                  disabled={whatsappSending}
+                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground resize-none focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-muted-foreground disabled:opacity-50"
+                />
+                <button
+                  type="submit"
+                  disabled={whatsappSending || !whatsappMessage.trim() || !lead.phone}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-green-600 text-white text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition-colors"
+                >
+                  {whatsappSending ? <Loader2 className="w-4 h-4 animate-spin" /> : <MessageCircle className="w-4 h-4" />}
+                  {whatsappSending ? "Sending…" : "Send WhatsApp Message"}
+                </button>
+              </form>
+              {!lead.phone && (
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                  This lead has no phone number — WhatsApp cannot be sent.
+                </p>
+              )}
             </div>
           )}
 

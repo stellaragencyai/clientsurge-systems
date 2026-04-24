@@ -21,6 +21,16 @@
       "title": "Twilio Auth Token Present",
       "default": false
     },
+    "whatsapp_enabled": {
+      "type": "boolean",
+      "title": "WhatsApp Enabled",
+      "default": false
+    },
+    "whatsapp_from_number": {
+      "type": "string",
+      "title": "WhatsApp From Number (Twilio)",
+      "description": "Format: whatsapp:+1XXXXXXXXXX"
+    },
     "resend_enabled": {
       "type": "boolean",
       "title": "Resend Email Enabled",
