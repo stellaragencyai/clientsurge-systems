@@ -126,6 +126,86 @@
     "go_live_date": {
       "type": "string",
       "title": "Go-Live Date"
+    },
+    "deadlines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "in_progress",
+              "completed",
+              "overdue"
+            ],
+            "default": "pending"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "setup",
+              "payment",
+              "testing",
+              "launch"
+            ],
+            "default": "setup"
+          }
+        }
+      },
+      "title": "Project Deadlines"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          },
+          "file_type": {
+            "type": "string"
+          },
+          "uploaded_at": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "documentation",
+              "setup-guide",
+              "credentials",
+              "report"
+            ],
+            "default": "documentation"
+          }
+        }
+      },
+      "title": "Project Files"
+    },
+    "onboarding_wizard_completed": {
+      "type": "boolean",
+      "title": "Onboarding Wizard Completed",
+      "default": false
     }
   },
   "required": [

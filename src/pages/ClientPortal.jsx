@@ -9,12 +9,16 @@ import PaymentFailedBanner from "../components/portal/PaymentFailedBanner";
 import LeadFlowDashboard from "../components/portal/LeadFlowDashboard";
 import NotificationBell from "../components/portal/NotificationBell";
 import ClientOnboardingWizard from "../components/portal/ClientOnboardingWizard";
+import DeadlinesPanel from "../components/portal/DeadlinesPanel";
+import FilesPanel from "../components/portal/FilesPanel";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
   { id: "metrics", label: "Lead Flow" },
   { id: "leads", label: "My Leads" },
   { id: "progress", label: "Build Progress" },
+  { id: "deadlines", label: "Deadlines" },
+  { id: "files", label: "Files & Docs" },
   { id: "support", label: "Support & Messaging" },
   { id: "plan", label: "My Plan" },
 ];
@@ -239,6 +243,12 @@ export default function ClientPortal() {
         )}
         {activeTab === "progress" && (
           <BuildTracker project={project} order={portalOrder} />
+        )}
+        {activeTab === "deadlines" && (
+          <DeadlinesPanel project={project} />
+        )}
+        {activeTab === "files" && (
+          <FilesPanel project={project} />
         )}
         {activeTab === "support" && (
           <SupportChat project={project} user={user} />
