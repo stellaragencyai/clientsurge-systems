@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle, ArrowRight, Clock, Flame, Loader2, RefreshCw,
-  Star, Tag, TrendingUp, Users, Zap,
+  Star, Tag, TrendingUp, Users, Zap, ThumbsUp, ThumbsDown, Minus,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import LeadScoreBadge from "./LeadScoreBadge";
@@ -39,6 +39,9 @@ function urgencyReasons(lead) {
 
   if (lead.lead_score >= 70) reasons.push({ icon: TrendingUp, label: `High score ${lead.lead_score}`, color: "text-emerald-700" });
 
+  if (lead.reply_sentiment === "Positive") reasons.push({ icon: ThumbsUp, label: "Positive reply", color: "text-green-700" });
+  if (lead.reply_sentiment === "Negative") reasons.push({ icon: ThumbsDown, label: "Negative sentiment", color: "text-red-500" });
+
   if (lead.industry_tags?.length) reasons.push({ icon: Tag, label: lead.industry_tags[0], color: "text-slate-600" });
 
   if (!lead.last_contacted_at) reasons.push({ icon: AlertTriangle, label: "Never contacted", color: "text-red-600" });
@@ -56,6 +59,24 @@ function nextAction(lead) {
   return "Review and engage";
 }
 
+const SENTIMENT_CONFIG = {
+  Positive: { label: "Positive", icon: ThumbsUp, color: "text-green-600", bg: "bg-green-50 border-green-200", boost: 40 },
+  Neutral:  { label: "Neutral",  icon: Minus,    color: "text-amber-600", bg: "bg-amber-50 border-amber-200",  boost: 0  },
+  Negative: { label: "Negative", icon: ThumbsDown, color: "text-red-600", bg: "bg-red-50 border-red-200",      boost: -10 },
+  Unknown:  { label: "Unknown",  icon: Minus,    color: "text-slate-400", bg: "bg-slate-50 border-slate-200",  boost: 0  },
+};
+
+function SentimentBadge({ sentiment }) {
+  if (!sentiment || sentiment === "Unknown") return null;
+  const cfg = SENTIMENT_CONFIG[sentiment] || SENTIMENT_CONFIG.Unknown;
+  const Icon = cfg.icon;
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold ${cfg.bg} ${cfg.color}`}>
+      <Icon className="h-2.5 w-2.5" /> {cfg.label}
+    </span>
+  );
+}
+
 function priorityScore(lead) {
   let p = lead.lead_score || 0;
   const daysSince = (d) => d ? (Date.now() - new Date(d).getTime()) / 86400000 : 999;
@@ -65,18 +86,22 @@ function priorityScore(lead) {
   if (lead.status === "Qualified") p += 20;
   if (lead.status === "Booking Prompt Sent") p += 15;
 
+  // Sentiment boost — Positive Replied leads jump to the top
+  const sentimentBoost = SENTIMENT_CONFIG[lead.reply_sentiment]?.boost ?? 0;
+  p += sentimentBoost;
+
   // Boost for very new leads
   const age = daysSince(lead.created_date);
   if (age <= 1) p += 25;
   else if (age <= 3) p += 15;
 
-  // Penalty for never contacted
-  if (!lead.last_contacted_at) p += 10; // surface un-contacted leads
+  // Surface un-contacted leads
+  if (!lead.last_contacted_at) p += 10;
 
-  // Boost for enriched leads (more context = better outreach)
+  // Boost for enriched leads
   if (lead.enriched_at) p += 5;
 
-  return Math.min(p, 200);
+  return Math.min(p, 250);
 }
 
 export default function LeadPriorityQueue() {
@@ -85,6 +110,7 @@ export default function LeadPriorityQueue() {
   const [loading, setLoading] = useState(true);
   const [scoring, setScoring] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [sentimentFilter, setSentimentFilter] = useState("all");
 
   useEffect(() => { loadLeads(); }, []);
 
@@ -113,6 +139,7 @@ export default function LeadPriorityQueue() {
   const filtered = leads
     .filter((l) => l.status !== "Closed" && l.status !== "Booked")
     .filter((l) => filter === "all" || l.status === filter)
+    .filter((l) => sentimentFilter === "all" || l.reply_sentiment === sentimentFilter)
     .sort((a, b) => priorityScore(b) - priorityScore(a))
     .slice(0, 50);
 
@@ -169,6 +196,13 @@ export default function LeadPriorityQueue() {
           </span>
           <span className="text-xs text-emerald-500">score ≥60</span>
         </div>
+        <div className="flex items-center gap-2 rounded-xl bg-green-50 border border-green-200 px-4 py-2">
+          <ThumbsUp className="h-4 w-4 text-green-600" />
+          <span className="text-sm font-bold text-green-700">
+            {leads.filter((l) => l.reply_sentiment === "Positive").length} positive
+          </span>
+          <span className="text-xs text-green-500">reply sentiment</span>
+        </div>
       </div>
 
       {/* Filters */}
@@ -184,6 +218,26 @@ export default function LeadPriorityQueue() {
             {s === "all" ? "All Active" : s}
           </button>
         ))}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {["all", "Positive", "Neutral", "Negative"].map((s) => {
+          const cfg = s !== "all" ? SENTIMENT_CONFIG[s] : null;
+          const Icon = cfg?.icon;
+          return (
+            <button
+              key={s}
+              onClick={() => setSentimentFilter(s)}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border transition-colors ${
+                sentimentFilter === s
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : cfg ? `${cfg.bg} ${cfg.color}` : "bg-muted text-muted-foreground border-transparent hover:bg-muted/80"
+              }`}
+            >
+              {Icon && <Icon className="h-3 w-3" />}
+              {s === "all" ? "All Sentiments" : s}
+            </button>
+          );
+        })}
       </div>
 
       {/* Queue */}
@@ -226,6 +280,7 @@ export default function LeadPriorityQueue() {
                         {lead.status}
                       </span>
                       {lead.lead_score != null && <LeadScoreBadge score={lead.lead_score} />}
+                      <SentimentBadge sentiment={lead.reply_sentiment} />
                     </div>
                     <p className="text-xs text-muted-foreground mb-2">{lead.business_name} · {lead.business_type || "Unknown type"}</p>
 
@@ -255,6 +310,13 @@ export default function LeadPriorityQueue() {
                           </span>
                         )}
                       </div>
+                    )}
+
+                    {/* Sentiment reason */}
+                    {lead.reply_sentiment_reason && lead.reply_sentiment !== "Unknown" && (
+                      <p className="text-[11px] text-muted-foreground italic">
+                        "{lead.reply_sentiment_reason}"
+                      </p>
                     )}
 
                     {/* Next action */}

@@ -86,6 +86,25 @@
       "type": "string",
       "title": "Booked At"
     },
+    "reply_sentiment": {
+      "type": "string",
+      "title": "Reply Sentiment (AI)",
+      "enum": [
+        "Positive",
+        "Neutral",
+        "Negative",
+        "Unknown"
+      ],
+      "default": "Unknown"
+    },
+    "reply_sentiment_reason": {
+      "type": "string",
+      "title": "Sentiment Reason (AI)"
+    },
+    "reply_sentiment_analyzed_at": {
+      "type": "string",
+      "title": "Sentiment Last Analyzed At"
+    },
     "ai_intent": {
       "type": "string",
       "title": "AI Intent",
