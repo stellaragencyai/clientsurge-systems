@@ -11,6 +11,7 @@ import NotificationBell from "../components/portal/NotificationBell";
 import ClientOnboardingWizard from "../components/portal/ClientOnboardingWizard";
 import DeadlinesPanel from "../components/portal/DeadlinesPanel";
 import FilesPanel from "../components/portal/FilesPanel";
+import BillingPanel from "../components/portal/BillingPanel";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
@@ -19,6 +20,7 @@ const TABS = [
   { id: "progress", label: "Build Progress" },
   { id: "deadlines", label: "Deadlines" },
   { id: "files", label: "Files & Docs" },
+  { id: "billing", label: "Billing & Invoices" },
   { id: "support", label: "Support & Messaging" },
   { id: "plan", label: "My Plan" },
 ];
@@ -249,6 +251,9 @@ export default function ClientPortal() {
         )}
         {activeTab === "files" && (
           <FilesPanel project={project} />
+        )}
+        {activeTab === "billing" && (
+          <BillingPanel project={project} />
         )}
         {activeTab === "support" && (
           <SupportChat project={project} user={user} />
