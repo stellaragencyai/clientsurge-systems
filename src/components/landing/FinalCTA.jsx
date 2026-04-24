@@ -32,6 +32,9 @@ export default function FinalCTA() {
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
             Book a free 15-minute demo. We will map out exactly where you are losing bookings and show you what an automated system would look like for your business with no obligation.
           </p>
+          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80" style={{ background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.18)" }}>
+            Join businesses already converting 3x more leads with automation
+          </div>
         </div>
 
         <div className="max-w-3xl mx-auto text-center mt-10 relative z-10">
@@ -79,17 +82,21 @@ export default function FinalCTA() {
               </span>
             </button>
             <a
-              href="#services"
-              onClick={() => trackCTA("review_8_system_flow", "final_cta")}
+              href="#pricing"
+              onClick={() => trackCTA("see_pricing", "final_cta")}
               className="inline-flex items-center justify-center h-14 px-6 rounded-full border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200"
             >
-              Review the 8-step system
+              See pricing
             </a>
           </div>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-muted-foreground">
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             {["Free 15-min call", "No commitment required", "Live in 5-7 days"].map((text) => (
-              <span key={text} className="flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-muted-foreground" />
+              <span
+                key={text}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80"
+                style={{ background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.18)" }}
+              >
+                <svg className="w-3.5 h-3.5 text-green-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 {text}
               </span>
             ))}

@@ -351,6 +351,14 @@ function PricingCard({ plan, demoBooking }) {
           {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Best choice for most businesses.</p>}
           <p className="text-xs font-semibold text-foreground/70 leading-snug">{plan.fit}</p>
         </div>
+        {/* Value justification above the price */}
+        <div className="mb-5 text-xs text-muted-foreground leading-relaxed px-3 py-2 rounded-xl bg-primary/5 border border-primary/10">
+          {plan.highlight
+            ? "Most clients recover this cost with just 2–3 additional bookings per month."
+            : plan.monthly === "$397"
+            ? "Even one extra booking per month typically covers the monthly fee."
+            : "High-volume businesses often recover this within the first week of going live."}
+        </div>
 
         <div className="mb-7 pb-7 border-b border-border">
           <div className="flex items-end gap-2 mb-1">

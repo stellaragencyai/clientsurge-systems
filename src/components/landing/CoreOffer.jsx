@@ -345,14 +345,18 @@ export default function CoreOffer() {
         {/* 8-Step Clickable Cards — with left rail timeline */}
         <div className="mb-10">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-5 text-center">Core Automation — Steps 1–5</p>
-
-          <div className="flex flex-col gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {coreAutomation.map((item) => (
               <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
             ))}
           </div>
 
-          <div className="flex flex-col gap-6">
+          <div className="mt-10 mb-5 flex items-center gap-4">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            <p className="text-xs font-semibold text-primary tracking-widest uppercase whitespace-nowrap">Done-For-You Services — Steps 6–8</p>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {doneForYou.map((item) => (
               <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
             ))}
@@ -366,7 +370,11 @@ export default function CoreOffer() {
         </div>
 
         {/* 3-step timeline */}
-        <div className="mb-8 mt-12 rounded-2xl border border-primary/15 overflow-hidden">
+        <div className="mb-5 mt-6">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase text-center mb-2">How We Get You Live</p>
+          <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-8">One Call. We Build. You're Live in 7 Days.</h3>
+        </div>
+        <div className="mb-8 rounded-2xl border border-primary/15 overflow-hidden">
           <div className="grid grid-cols-3 bg-primary/5">
             {[
               { num: "1", label: "Onboarding Call", sub: "One 15-min call with our team" },

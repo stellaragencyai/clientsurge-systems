@@ -5,7 +5,6 @@ import LiveLeadPulse from "../components/landing/LiveLeadPulse";
 import TrustBar from "../components/landing/TrustBar";
 import Industries from "../components/landing/Industries";
 import ProblemSolution from "../components/landing/ProblemSolution.jsx";
-import Testimonials from "../components/landing/Testimonials";
 import CoreOffer from "../components/landing/CoreOffer";
 import IntegrationPartners from "../components/landing/IntegrationPartners";
 import FAQ from "../components/landing/FAQ";
@@ -15,6 +14,7 @@ import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import { FAQ_ITEMS } from "../components/landing/FAQ";
+
 import {
   getFAQSchema,
   getLocalBusinessSchema,
@@ -112,7 +112,6 @@ export default function Home() {
         <Industries />
         <section aria-label="Proof and trust">
           <TrustBar />
-          <Testimonials />
         </section>
         <ProblemSolution />
         <CoreOffer />

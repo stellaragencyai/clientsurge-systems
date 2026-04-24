@@ -1,5 +1,5 @@
 import { useState } from "react";
-import StardustOverlay from "./StardustOverlay";
+
 import {
   Accordion,
   AccordionContent,
@@ -82,6 +82,7 @@ export default function FAQ() {
   const [helpfulVotes, setHelpfulVotes] = useState({});
 
   const categories = ["all", "setup", "pricing", "integration", "support"];
+  const categoryLabels = { all: "All", setup: "Getting Started", pricing: "Pricing", integration: "Integrations", support: "Support" };
 
   const filtered = FAQ_ITEMS.filter((item, idx) => {
     const matchesSearch = item.q.toLowerCase().includes(search.toLowerCase()) || 
@@ -105,8 +106,8 @@ export default function FAQ() {
   };
 
   return (
-    <section id="faq" className="nebula-faq px-6 py-24 md:py-32 relative overflow-hidden">
-      <StardustOverlay seed={7} opacity={0.5} />
+    <section id="faq" className="px-6 py-24 md:py-32 relative overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(240,242,246,0.98) 0%, rgba(228,232,240,0.97) 50%, rgba(238,240,246,0.98) 100%)" }}>
+
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Questions</p>
@@ -142,7 +143,7 @@ export default function FAQ() {
                   : "bg-primary/10 text-primary hover:bg-primary/20"
               }`}
             >
-              {cat === "all" ? "All" : cat}
+              {categoryLabels[cat]}
             </button>
           ))}
         </div>
@@ -155,13 +156,13 @@ export default function FAQ() {
               <AccordionItem
                 key={idx}
                 value={`faq-${idx}`}
-                className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary transition-all duration-300"
+                className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary/40 transition-all duration-300"
                 style={{
-                  background: "linear-gradient(135deg, rgba(255,252,247,0.7) 0%, rgba(252,240,220,0.5) 100%)",
-                  backdropFilter: "blur(14px)",
-                  WebkitBackdropFilter: "blur(14px)",
-                  border: "1.5px solid rgba(200,150,92,0.2)",
-                  boxShadow: "0 2px 14px rgba(154,92,46,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
+                  background: "rgba(255,255,255,0.75)",
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                  border: "1.5px solid rgba(200,205,215,0.55)",
+                  boxShadow: "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
                 }}
               >
                   <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
@@ -183,15 +184,20 @@ export default function FAQ() {
                           👍 Yes
                         </button>
                         <button
-                          onClick={() => handleVote(originalIdx, false)}
-                          className={`px-3 py-1 rounded-full transition-all ${
-                            helpfulVotes[originalIdx] === "no"
-                              ? "bg-red-100 text-red-700"
-                              : "hover:bg-primary/10"
-                          }`}
+                        onClick={() => handleVote(originalIdx, false)}
+                        className={`px-3 py-1 rounded-full transition-all ${
+                          helpfulVotes[originalIdx] === "no"
+                            ? "bg-red-100 text-red-700"
+                            : "hover:bg-primary/10"
+                        }`}
                         >
-                          👎 No
+                        👎 No
                         </button>
+                        {helpfulVotes[originalIdx] === "no" && (
+                        <a href="/contact" className="ml-2 text-xs font-semibold text-primary hover:underline">
+                          Send us a question →
+                        </a>
+                        )}
                       </div>
                     </div>
                   </AccordionContent>

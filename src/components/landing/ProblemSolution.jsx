@@ -5,22 +5,27 @@ const problems = [
   {
     problem: "Leads don't hear back fast enough",
     solution: "Instant automated response within seconds of inquiry",
+    result: "Under 60 sec response",
   },
   {
     problem: "Missed calls go unanswered",
     solution: "Automatic text-back sent the moment a call is missed",
+    result: "0 leads lost",
   },
   {
     problem: "Follow-up falls through the cracks",
     solution: "14-day automated nurture sequence keeps leads warm",
+    result: "14-day nurture",
   },
   {
     problem: "Old leads are forgotten",
     solution: "Reactivation campaigns turn dormant contacts into revenue",
+    result: "Avg. $4k recovered/mo",
   },
   {
     problem: "Booking friction loses clients",
     solution: "Guided booking flow converts inquiries to confirmed appointments",
+    result: "3x more bookings",
   },
 ];
 
@@ -104,8 +109,8 @@ export default function ProblemSolution() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-foreground leading-snug">{item.problem}</p>
-                      <div className="mt-2 flex items-center gap-1 text-xs text-primary font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
-                        Click to highlight <ArrowRight className="w-3 h-3" />
+                      <div className="mt-2 flex items-center gap-1 text-xs text-primary font-semibold">
+                        ← Click to reveal the fix
                       </div>
                     </div>
                   </div>
@@ -124,7 +129,7 @@ export default function ProblemSolution() {
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-foreground leading-snug">{item.solution}</p>
                       <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/25">
-                        ✨ +3x Bookings
+                        ✨ {item.result}
                       </div>
                     </div>
                   </div>

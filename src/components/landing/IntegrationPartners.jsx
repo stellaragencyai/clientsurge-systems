@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 const INTEGRATIONS = [
   {
@@ -31,52 +31,75 @@ const INTEGRATIONS = [
     href: "https://zapier.com",
     description: "Workflow automation",
   },
+  {
+    name: "Calendly",
+    logo: "https://asset.brandfetch.io/idZFtKcrFb/idF1j3M28n.png",
+    href: "https://calendly.com",
+    description: "Booking",
+  },
+  {
+    name: "Facebook Ads",
+    logo: "https://asset.brandfetch.io/idFdo8ulhr/idMNSwbv-X.png",
+    href: "https://facebook.com/ads",
+    description: "Lead ads",
+  },
+  {
+    name: "ActiveCampaign",
+    logo: "https://asset.brandfetch.io/idpJKJvfE9/id7BH9t9D0.png",
+    href: "https://activecampaign.com",
+    description: "Email automation",
+  },
+  {
+    name: "GoHighLevel",
+    logo: "https://asset.brandfetch.io/idmEBJvJIq/idBi3b2U7f.png",
+    href: "https://gohighlevel.com",
+    description: "CRM platform",
+  },
 ];
 
-// Triple for extra-seamless loop with no gap on faster screens
+// Triple for extra-seamless loop
 const TRIPLED = [...INTEGRATIONS, ...INTEGRATIONS, ...INTEGRATIONS];
 
 export default function IntegrationPartners() {
   const [paused, setPaused] = useState(false);
 
   return (
-    <section className="py-14 px-6 relative overflow-hidden" style={{ background: "#ffffff" }}>
+    <section
+      className="py-14 px-6 relative overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, rgba(245,246,248,0.98) 0%, rgba(238,240,244,0.97) 100%)",
+      }}
+    >
+      {/* Subtle top/bottom border lines */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300/60 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-slate-300/60 to-transparent pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative z-10">
 
         {/* Header */}
-        {/* FIX 3: Reduced mb-16 → mb-10 */}
         <div className="text-center mb-10">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
             Integrations
           </p>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
-            We Easily{" "}
-            {/* FIX 1: Matched exact site golden-brown #9a5c2e with glow — was #7a4825 (too dark) */}
-            <span style={{
-              color: "#9a5c2e",
-              textShadow: "0 0 28px rgba(154,92,46,0.35)",
-            }}>
-              Integrate
-            </span>{" "}
-            With
+            Works With{" "}
+            <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.35)" }}>
+              50+ Tools
+            </span>
           </h2>
 
-          {/* FIX 6: Gold accent divider — consistent with rest of landing page */}
           <div className="flex items-center justify-center gap-3 mt-5 mb-5">
             <div style={{ height: "1px", width: "48px", background: "linear-gradient(to right, transparent, rgba(154,92,46,0.5))" }} />
             <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#9a5c2e" }} />
             <div style={{ height: "1px", width: "48px", background: "linear-gradient(to left, transparent, rgba(154,92,46,0.5))" }} />
           </div>
 
-          {/* FIX 8: More punchy on-brand subtitle copy */}
           <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
             Every tool you already rely on — plugged in, synced, and firing automatically the moment a lead comes in.
           </p>
         </div>
 
-        {/* ── Infinite scroll marquee ── */}
-        {/* FIX 7: Pause on hover so users can actually click the logos */}
+        {/* Infinite scroll marquee */}
         <div
           className="relative overflow-hidden"
           style={{ padding: "28px 0 40px" }}
@@ -84,11 +107,13 @@ export default function IntegrationPartners() {
           onMouseLeave={() => setPaused(false)}
         >
           {/* Left fade */}
-          <div className="absolute left-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to right, #ffffff 0%, transparent 100%)" }}
+          <div
+            className="absolute left-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
+            style={{ background: "linear-gradient(to right, rgba(245,246,248,1) 0%, transparent 100%)" }}
           />
-          <div className="absolute right-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to left, #ffffff 0%, transparent 100%)" }}
+          <div
+            className="absolute right-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
+            style={{ background: "linear-gradient(to left, rgba(245,246,248,1) 0%, transparent 100%)" }}
           />
 
           <div
@@ -96,9 +121,7 @@ export default function IntegrationPartners() {
             style={{
               width: "max-content",
               gap: "80px",
-              // FIX 4: Slowed from 22s → 34s so logos are comfortably readable
-              // FIX 7: Animation pauses on hover
-              animation: `integrationScroll 18s linear infinite`,
+              animation: `integrationScroll 24s linear infinite`,
               animationPlayState: paused ? "paused" : "running",
             }}
           >
@@ -112,7 +135,6 @@ export default function IntegrationPartners() {
                 className="flex-shrink-0 group relative flex flex-col items-center"
                 style={{ outline: "none" }}
               >
-                {/* FIX 2: Increased logo height 64px → 90px for real visual weight */}
                 <img
                   src={integration.logo}
                   alt={integration.name}
@@ -134,11 +156,7 @@ export default function IntegrationPartners() {
                     e.currentTarget.style.filter = "drop-shadow(0 0 0px rgba(200,150,92,0))";
                   }}
                 />
-
-                {/* Tooltip label on hover */}
-                <span
-                  className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase tracking-widest"
-                >
+                <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase tracking-widest">
                   {integration.description}
                 </span>
               </a>
@@ -146,24 +164,25 @@ export default function IntegrationPartners() {
           </div>
         </div>
 
-        {/* FIX 9: Styled pill banner CTA — was a plain grey text line */}
+        {/* Bottom CTA pill */}
         <div className="flex justify-center mt-2">
           <div
             className="inline-flex items-center gap-3 px-6 py-3 rounded-full border"
             style={{
-              background: "linear-gradient(135deg, rgba(154,92,46,0.07) 0%, rgba(200,150,92,0.05) 100%)",
-              border: "1.5px solid rgba(154,92,46,0.2)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6)",
+              background: "rgba(255,255,255,0.7)",
+              border: "1.5px solid rgba(180,185,195,0.5)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.9), 0 2px 8px rgba(0,0,0,0.04)",
+              backdropFilter: "blur(8px)",
             }}
           >
-            <span className="text-sm text-foreground/70">Don't see your tool?</span>
+            <span className="text-sm text-foreground/60">Don't see your tool?</span>
             <a
               href="/contact"
               className="text-sm font-bold text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
             >
               Contact us →
             </a>
-            <span className="text-sm text-foreground/50">We connect to virtually anything.</span>
+            <span className="text-sm text-foreground/40">We connect to virtually anything.</span>
           </div>
         </div>
 
