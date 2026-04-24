@@ -26,6 +26,7 @@ import {
 } from "@/lib/leadPipelineApi";
 import LeadCRMDrawer from "./LeadCRMDrawer";
 import LeadScoreBadge from "./LeadScoreBadge";
+import BulkActionToolbar from "./BulkActionToolbar";
 
 const intakeTypeLabels = {
   lead_capture: "Lead Capture",
@@ -191,6 +192,7 @@ export default function LeadManagementDashboard() {
   const [error, setError] = useState("");
   const [importOpen, setImportOpen] = useState(false);
   const [drawerLead, setDrawerLead] = useState(null);
+  const [selectedIds, setSelectedIds] = useState(new Set());
   const [importSource, setImportSource] = useState("manual_import");
   const [importRaw, setImportRaw] = useState("");
   const [importPreview, setImportPreview] = useState(null);
@@ -321,6 +323,24 @@ export default function LeadManagementDashboard() {
 
   const sourceOptions = useMemo(() => snapshot.filter_options?.sources || [], [snapshot.filter_options]);
   const leads = snapshot.leads || [];
+
+  const toggleSelect = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === leads.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(leads.map((l) => l.id)));
+    }
+  };
+
+  const clearSelection = () => setSelectedIds(new Set());
   const activationQueue = snapshot.summary.priority_queue || [];
   const activationSegments = snapshot.summary.activation_segments || [];
   const offerMix = snapshot.summary.recommended_offer_counts || {};
@@ -657,6 +677,11 @@ export default function LeadManagementDashboard() {
       ) : null}
 
       <div className="rounded-xl border border-border bg-white p-4 space-y-4">
+          <BulkActionToolbar
+            selectedIds={Array.from(selectedIds)}
+            onClearSelection={clearSelection}
+            onActionComplete={() => loadSnapshot({ append: false, nextOffset: 0 })}
+          />
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h3 className="text-lg font-semibold text-foreground">Actionable Lead Queue</h3>
@@ -774,6 +799,14 @@ export default function LeadManagementDashboard() {
               <table className="w-full min-w-[900px] text-sm">
                 <thead className="bg-muted/50">
                   <tr>
+                    <th className="px-4 py-3 w-10">
+                      <input
+                        type="checkbox"
+                        checked={leads.length > 0 && selectedIds.size === leads.length}
+                        onChange={toggleSelectAll}
+                        className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
+                      />
+                    </th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Lead</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Score</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Why Now</th>
@@ -798,7 +831,15 @@ export default function LeadManagementDashboard() {
                     </tr>
                   ) : (
                     leads.map((lead) => (
-                      <tr key={lead.id} className="hover:bg-muted/20">
+                      <tr key={lead.id} className={`hover:bg-muted/20 transition-colors ${selectedIds.has(lead.id) ? "bg-primary/5" : ""}`}>
+                        <td className="px-4 py-4 w-10">
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(lead.id)}
+                            onChange={() => toggleSelect(lead.id)}
+                            className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
+                          />
+                        </td>
                         <td className="px-4 py-4">
                           <div>
                             <div className="flex flex-wrap items-center gap-2">
