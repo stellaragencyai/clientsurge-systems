@@ -19,6 +19,7 @@ import NurtureCampaignPanel from '../components/admin/NurtureCampaignPanel';
 import PerformanceDashboard from '../components/admin/PerformanceDashboard';
 import LeadPriorityQueue from '../components/admin/LeadPriorityQueue';
 import LeadSourceAttribution from '../components/admin/LeadSourceAttribution';
+import CampaignLibrary from '../components/admin/CampaignLibrary';
 
 const NAV_ITEMS = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -36,6 +37,7 @@ const NAV_ITEMS = [
   { id: 'performance', label: 'Performance', icon: BarChart3 },
   { id: 'priority', label: 'Priority Queue', icon: Flame },
   { id: 'attribution', label: 'Source Attribution', icon: Target },
+  { id: 'campaign-builder', label: 'Campaign Builder', icon: Mail },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
@@ -101,6 +103,8 @@ export default function AdminDashboard() {
         return <LeadPriorityQueue />;
       case 'attribution':
         return <LeadSourceAttribution />;
+      case 'campaign-builder':
+        return <CampaignLibrary />;
       case 'settings':
         return <AdminSettingsPanel />;
       case 'overview':
