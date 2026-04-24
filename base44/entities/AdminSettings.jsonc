@@ -102,6 +102,70 @@
       "type": "string",
       "title": "Admin Notification Email Template"
     },
+    "nurture_step1_subject": {
+      "type": "string",
+      "title": "Nurture Step 1 Subject (Day 0 \u2014 Welcome)"
+    },
+    "nurture_step1_body": {
+      "type": "string",
+      "title": "Nurture Step 1 Body (Day 0 \u2014 Welcome)"
+    },
+    "nurture_step2_subject": {
+      "type": "string",
+      "title": "Nurture Step 2 Subject (Day 3 \u2014 Case Study)"
+    },
+    "nurture_step2_body": {
+      "type": "string",
+      "title": "Nurture Step 2 Body (Day 3 \u2014 Case Study)"
+    },
+    "nurture_step3_subject": {
+      "type": "string",
+      "title": "Nurture Step 3 Subject (Day 7 \u2014 Testimonial)"
+    },
+    "nurture_step3_body": {
+      "type": "string",
+      "title": "Nurture Step 3 Body (Day 7 \u2014 Testimonial)"
+    },
+    "nurture_step4_subject": {
+      "type": "string",
+      "title": "Nurture Step 4 Subject (Day 10 \u2014 Tip)"
+    },
+    "nurture_step4_body": {
+      "type": "string",
+      "title": "Nurture Step 4 Body (Day 10 \u2014 Tip)"
+    },
+    "nurture_step5_subject": {
+      "type": "string",
+      "title": "Nurture Step 5 Subject (Day 14 \u2014 Case Study 2)"
+    },
+    "nurture_step5_body": {
+      "type": "string",
+      "title": "Nurture Step 5 Body (Day 14 \u2014 Case Study 2)"
+    },
+    "nurture_step6_subject": {
+      "type": "string",
+      "title": "Nurture Step 6 Subject (Day 18 \u2014 Testimonial 2)"
+    },
+    "nurture_step6_body": {
+      "type": "string",
+      "title": "Nurture Step 6 Body (Day 18 \u2014 Testimonial 2)"
+    },
+    "nurture_step7_subject": {
+      "type": "string",
+      "title": "Nurture Step 7 Subject (Day 23 \u2014 Tip + Offer)"
+    },
+    "nurture_step7_body": {
+      "type": "string",
+      "title": "Nurture Step 7 Body (Day 23 \u2014 Tip + Offer)"
+    },
+    "nurture_step8_subject": {
+      "type": "string",
+      "title": "Nurture Step 8 Subject (Day 30 \u2014 Final CTA)"
+    },
+    "nurture_step8_body": {
+      "type": "string",
+      "title": "Nurture Step 8 Body (Day 30 \u2014 Final CTA)"
+    },
     "last_webhook_test_result": {
       "type": "string",
       "title": "Last Webhook Test Result"

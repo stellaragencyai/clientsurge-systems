@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  MessageSquare, Mail, Phone, Send, Bell, Zap,
+  MessageSquare, Mail, Phone, Send, Bell, Zap, BookOpen,
   Eye, Save, X, AlertCircle, CheckCircle, ChevronDown, ChevronUp,
   Lightbulb, Copy, Check
 } from "lucide-react";
@@ -111,6 +111,30 @@ const TEMPLATE_GROUPS = [
         variables: ["{name}", "{business_name}", "{booking_link}"],
         tip: "Sent alongside the SMS. Reinforces the booking CTA with a more detailed message.",
       },
+    ],
+  },
+  {
+    id: "nurture",
+    label: "30-Day Nurture Email Sequence",
+    icon: Mail,
+    description: "8-step email sequence sent automatically to leads over 30 days. Leave subject/body blank to use the built-in defaults.",
+    templates: [
+      { key: "nurture_step1_subject", label: "Step 1 Subject (Day 0 — Welcome)", type: "email", rows: 1, placeholder: "Welcome, {name} — here's what's coming your way", variables: ["{name}", "{business_name}"], tip: "Day 0: sent immediately on enrollment." },
+      { key: "nurture_step1_body",    label: "Step 1 Body (Day 0 — Welcome)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nWelcome! Over the next 30 days...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Introduce your value prop and set expectations." },
+      { key: "nurture_step2_subject", label: "Step 2 Subject (Day 3 — Case Study)", type: "email", rows: 1, placeholder: "{name}, how a med spa went from 14% to 61% lead conversion", variables: ["{name}", "{business_name}"], tip: "Day 3: lead a case study." },
+      { key: "nurture_step2_body",    label: "Step 2 Body (Day 3 — Case Study)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nA real result worth sharing...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Share a concrete before/after story." },
+      { key: "nurture_step3_subject", label: "Step 3 Subject (Day 7 — Testimonial)", type: "email", rows: 1, placeholder: '"I didn\'t realize how many leads I was losing" — {name}, read this', variables: ["{name}"], tip: "Day 7: social proof." },
+      { key: "nurture_step3_body",    label: "Step 3 Body (Day 7 — Testimonial)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nA client said it best...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Use a direct quote from a real or representative client." },
+      { key: "nurture_step4_subject", label: "Step 4 Subject (Day 10 — Tip)", type: "email", rows: 1, placeholder: "The 5-minute rule that recovers 30% more leads — for {name}", variables: ["{name}"], tip: "Day 10: actionable tip." },
+      { key: "nurture_step4_body",    label: "Step 4 Body (Day 10 — Tip)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nQuick tip for {business_name}...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Give one concrete, easy-to-digest tip." },
+      { key: "nurture_step5_subject", label: "Step 5 Subject (Day 14 — Case Study 2)", type: "email", rows: 1, placeholder: "{name} — how a home service company recovered $12k in lost leads", variables: ["{name}"], tip: "Day 14: second case study, different industry." },
+      { key: "nurture_step5_body",    label: "Step 5 Body (Day 14 — Case Study 2)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nAnother result worth sharing...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Vary the industry to broaden relevance." },
+      { key: "nurture_step6_subject", label: "Step 6 Subject (Day 18 — Testimonial 2)", type: "email", rows: 1, placeholder: '{name}, this is what "set it and forget it" actually looks like', variables: ["{name}"], tip: "Day 18: second testimonial." },
+      { key: "nurture_step6_body",    label: "Step 6 Body (Day 18 — Testimonial 2)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nAnother client story...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Focus on ease-of-use and trust." },
+      { key: "nurture_step7_subject", label: "Step 7 Subject (Day 23 — Tip + Offer)", type: "email", rows: 1, placeholder: "{name} — 3 follow-up mistakes that kill conversions (+ a free offer)", variables: ["{name}"], tip: "Day 23: tips + soft offer." },
+      { key: "nurture_step7_body",    label: "Step 7 Body (Day 23 — Tip + Offer)",   type: "email", rows: 8, placeholder: "Hi {name},\n\n3 mistakes we see constantly...\n\nFree offer: {booking_link}", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Combine value with a clear CTA." },
+      { key: "nurture_step8_subject", label: "Step 8 Subject (Day 30 — Final CTA)", type: "email", rows: 1, placeholder: "{name} — last message from us (your call)", variables: ["{name}"], tip: "Day 30: final, respectful send." },
+      { key: "nurture_step8_body",    label: "Step 8 Body (Day 30 — Final CTA)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nThis is our last scheduled email...\n\nBook here: {booking_link}", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Give a clear final CTA and an opt-out path." },
     ],
   },
   {

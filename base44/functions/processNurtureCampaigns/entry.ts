@@ -252,11 +252,26 @@ Deno.serve(async (req) => {
 
           allDone = false;
 
-          const content = EMAIL_CONTENT[step.theme];
           const name = lead.full_name || "there";
           const biz = lead.business_name || "your business";
-          const subject = content.subject(name, biz);
-          const html = content.html(name, biz);
+          const bookingLink = settings.booking_link_default || "";
+
+          // Use admin-editable templates if set, otherwise fall back to hardcoded defaults
+          const adminSubject = settings[`nurture_step${step.num}_subject`];
+          const adminBody    = settings[`nurture_step${step.num}_body`];
+
+          const content = EMAIL_CONTENT[step.theme];
+          const subject = adminSubject
+            ? adminSubject.replace(/{name}/g, name).replace(/{business_name}/g, biz)
+            : content.subject(name, biz);
+          const html = adminBody
+            ? `<div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a;white-space:pre-wrap">${
+                adminBody
+                  .replace(/{name}/g, name)
+                  .replace(/{business_name}/g, biz)
+                  .replace(/{booking_link}/g, bookingLink)
+              }</div>`
+            : content.html(name, biz);
 
           let sent = false;
           let error = null;
