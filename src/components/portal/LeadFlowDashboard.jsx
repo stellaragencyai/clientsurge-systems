@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Activity, CheckCircle2, PhoneOff, RefreshCw, TrendingUp, Loader2 } from 'lucide-react';
+import { Activity, CheckCircle2, PhoneOff, RefreshCw, TrendingUp, Loader2, Download } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ConversionFunnel from './ConversionFunnel';
 
@@ -52,6 +52,24 @@ export default function LeadFlowDashboard() {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      const res = await base44.functions.invoke('exportLeadMetricsCSV', {});
+      const csv = res.data;
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `lead-metrics-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error('Export failed:', err);
+    }
+  };
+
   useEffect(() => {
     fetchMetrics();
 
@@ -66,19 +84,28 @@ export default function LeadFlowDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <div>
           <h3 className="text-xl font-semibold text-foreground">Lead Flow Summary</h3>
           <p className="text-sm text-muted-foreground mt-1">Real-time metrics across all your leads</p>
         </div>
-        <button
-          onClick={fetchMetrics}
-          disabled={loading}
-          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
-        >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExport}
+            className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
+          <button
+            onClick={fetchMetrics}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Error */}
