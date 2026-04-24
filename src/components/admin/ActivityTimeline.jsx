@@ -8,7 +8,8 @@ import {
   MessageSquare, Mail, Phone, Loader2, RefreshCw,
   StickyNote, ArrowUpCircle, Zap, CheckCircle2,
   AlertCircle, MessageCircle, Globe, ArrowDownLeft,
-  ArrowUpRight, Activity, Info,
+  ArrowUpRight, Activity, Info, ChevronDown, ChevronUp,
+  ThumbsUp, ThumbsDown, Minus, ListChecks, Mic,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -38,6 +39,138 @@ const EVENT_TYPE_CONFIG = {
 
 const DEFAULT_CONFIG = { icon: Info, label: "Event", color: "bg-slate-100 text-slate-600", dot: "bg-slate-300" };
 
+// ── Call Summary Card ─────────────────────────────────────────────────────────
+
+function CallSummaryCard({ item }) {
+  const [expanded, setExpanded] = useState(false);
+  let aiSummary = null;
+
+  // Try to parse from event data
+  try {
+    if (item.raw_metadata) {
+      const meta = JSON.parse(item.raw_metadata);
+      aiSummary = meta?.ai_summary || null;
+    } else if (item.ai_summary) {
+      aiSummary = item.ai_summary;
+    }
+  } catch (_) {}
+
+  const sentimentColor = {
+    Positive: "bg-green-50 border-green-200 text-green-700",
+    Neutral: "bg-amber-50 border-amber-200 text-amber-700",
+    Negative: "bg-red-50 border-red-200 text-red-700",
+  }[aiSummary?.overall_sentiment] || "bg-slate-50 border-slate-200 text-slate-600";
+
+  const SentimentIcon = {
+    Positive: ThumbsUp,
+    Negative: ThumbsDown,
+    Neutral: Minus,
+  }[aiSummary?.overall_sentiment] || Minus;
+
+  if (!aiSummary) {
+    return (
+      <p className={`text-xs text-foreground leading-relaxed ${!expanded ? "line-clamp-3" : ""}`}>
+        {item.message_body || item.note_text}
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-2 space-y-2">
+      {/* Sentiment + quality row */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold ${sentimentColor}`}>
+          <SentimentIcon className="w-3 h-3" /> {aiSummary.overall_sentiment}
+        </span>
+        {aiSummary.call_quality && (
+          <span className="rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground capitalize">
+            {aiSummary.call_quality.replace(/_/g, " ")}
+          </span>
+        )}
+        {aiSummary.follow_up_timing && (
+          <span className="rounded-full bg-blue-50 text-blue-600 px-2.5 py-0.5 text-[11px] font-semibold">
+            Follow-up: {aiSummary.follow_up_timing}
+          </span>
+        )}
+      </div>
+
+      {/* Summary */}
+      {aiSummary.summary && (
+        <p className="text-xs text-foreground leading-relaxed">{aiSummary.summary}</p>
+      )}
+
+      {/* Expandable details */}
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="inline-flex items-center gap-1 text-[10px] text-primary font-semibold hover:underline"
+      >
+        {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        {expanded ? "Hide details" : "Show details"}
+      </button>
+
+      {expanded && (
+        <div className="space-y-2 border-t border-border pt-2">
+          {aiSummary.key_pain_points?.length > 0 && (
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-1">Pain Points</p>
+              <ul className="space-y-0.5">
+                {aiSummary.key_pain_points.map((p, i) => (
+                  <li key={i} className="text-[11px] text-foreground flex gap-1.5">
+                    <span className="text-red-500 flex-shrink-0">•</span> {p}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {aiSummary.buying_signals?.length > 0 && (
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-1">Buying Signals</p>
+              <ul className="space-y-0.5">
+                {aiSummary.buying_signals.map((s, i) => (
+                  <li key={i} className="text-[11px] text-foreground flex gap-1.5">
+                    <span className="text-green-500 flex-shrink-0">✓</span> {s}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {aiSummary.objections_raised?.length > 0 && (
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-1">Objections</p>
+              <ul className="space-y-0.5">
+                {aiSummary.objections_raised.map((o, i) => (
+                  <li key={i} className="text-[11px] text-foreground flex gap-1.5">
+                    <span className="text-amber-500 flex-shrink-0">⚠</span> {o}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {aiSummary.action_items?.length > 0 && (
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground mb-1">Action Items</p>
+              <ul className="space-y-0.5">
+                {aiSummary.action_items.map((a, i) => (
+                  <li key={i} className="text-[11px] text-foreground flex gap-1.5">
+                    <ListChecks className="w-3 h-3 text-primary flex-shrink-0 mt-0.5" />
+                    <span>[{a.priority?.toUpperCase()}] {a.task} <span className="text-muted-foreground">({a.owner})</span></span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {aiSummary.recommended_next_step && (
+            <div className="rounded-lg bg-primary/5 border border-primary/15 px-3 py-2">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-primary mb-0.5">Recommended Next Step</p>
+              <p className="text-[11px] text-foreground">{aiSummary.recommended_next_step}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const CHANNEL_LABELS = { sms: "SMS", email: "Email", whatsapp: "WhatsApp", webhook: "Webhook", internal: "Internal" };
 const DIRECTION_LABELS = { outbound: "Outbound", inbound: "Inbound", system: "System" };
 
@@ -65,7 +198,13 @@ function formatFull(iso) {
 
 function TimelineItem({ item }) {
   const [expanded, setExpanded] = useState(false);
-  const cfg = EVENT_TYPE_CONFIG[item.event_type] || DEFAULT_CONFIG;
+
+  // Detect call recording summaries
+  const isCallSummary = item.is_call_summary || item.subject?.includes("Call Recording");
+
+  const cfg = isCallSummary
+    ? { icon: Mic, label: "Call Summary", color: "bg-violet-100 text-violet-700", dot: "bg-violet-400" }
+    : (EVENT_TYPE_CONFIG[item.event_type] || DEFAULT_CONFIG);
   const Icon = cfg.icon;
 
   const hasBody = !!(item.message_body || item.note_text || item.subject);
@@ -80,7 +219,7 @@ function TimelineItem({ item }) {
       </div>
 
       {/* Card */}
-      <div className="flex-1 pb-4 min-w-0">
+      <div className={`flex-1 pb-4 min-w-0 ${isCallSummary ? "rounded-xl border border-violet-100 bg-violet-50/30 p-3" : ""}`}>
         {/* Header row */}
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div className="flex items-center gap-1.5 flex-wrap">
@@ -88,17 +227,17 @@ function TimelineItem({ item }) {
               <Icon className="w-2.5 h-2.5" />
               {cfg.label}
             </span>
-            {item.channel && item.source === "comm" && (
+            {!isCallSummary && item.channel && item.source === "comm" && (
               <span className="text-[10px] text-muted-foreground font-medium">
                 {CHANNEL_LABELS[item.channel] || item.channel}
               </span>
             )}
-            {item.direction && item.source === "comm" && (
+            {!isCallSummary && item.direction && item.source === "comm" && (
               <span className="text-[10px] text-muted-foreground">
                 · {DIRECTION_LABELS[item.direction] || item.direction}
               </span>
             )}
-            {item.status && item.source === "comm" && (
+            {!isCallSummary && item.status && item.source === "comm" && (
               <span className={`text-[10px] font-semibold rounded-full px-1.5 py-0.5 ${
                 item.status === "sent" || item.status === "delivered" ? "bg-green-50 text-green-700" :
                 item.status === "failed" ? "bg-red-50 text-red-700" :
@@ -122,8 +261,10 @@ function TimelineItem({ item }) {
           <p className="text-xs font-semibold text-foreground mt-1">{item.subject}</p>
         )}
 
-        {/* Body preview */}
-        {hasBody && (
+        {/* Call summary uses rich card; everything else uses plain text */}
+        {isCallSummary ? (
+          <CallSummaryCard item={item} />
+        ) : hasBody ? (
           <div className="mt-1">
             <p className={`text-xs text-foreground leading-relaxed ${!expanded && "line-clamp-2"}`}>
               {item.message_body || item.note_text}
@@ -137,7 +278,7 @@ function TimelineItem({ item }) {
               </button>
             )}
           </div>
-        )}
+        ) : null}
 
         {/* Error */}
         {hasError && (
@@ -148,7 +289,7 @@ function TimelineItem({ item }) {
         )}
 
         {/* Provider */}
-        {item.provider && item.provider !== "internal" && (
+        {!isCallSummary && item.provider && item.provider !== "internal" && (
           <p className="text-[10px] text-muted-foreground mt-0.5">via {item.provider}</p>
         )}
       </div>
@@ -189,6 +330,8 @@ export default function ActivityTimeline({ leadId }) {
         message_body: e.message_body,
         error_message: e.error_message,
         provider: e.provider,
+        raw_metadata: e.metadata_json || null,
+        is_call_summary: e.subject?.includes("Call Recording") || (e.metadata_json && e.metadata_json.includes("processCallRecording")),
         created_date: e.created_date,
       }));
 
@@ -199,6 +342,8 @@ export default function ActivityTimeline({ leadId }) {
         event_type: e.event_type || "note",
         note_text: e.data?.text || e.data?.note || (typeof e.data === "string" ? e.data : null),
         subject: e.data?.subject || null,
+        is_call_summary: e.data?.source === "call_recording_ai",
+        ai_summary: e.data?.ai_summary || null,
         created_date: e.created_date,
       }));
 
@@ -219,6 +364,7 @@ export default function ActivityTimeline({ leadId }) {
   // Filter options
   const FILTERS = [
     { key: "all", label: "All" },
+    { key: "calls", label: "Calls" },
     { key: "sms", label: "SMS" },
     { key: "email", label: "Email" },
     { key: "whatsapp", label: "WhatsApp" },
@@ -228,11 +374,12 @@ export default function ActivityTimeline({ leadId }) {
 
   const filtered = items.filter((item) => {
     if (filter === "all") return true;
+    if (filter === "calls") return item.is_call_summary || item.subject?.includes("Call Recording");
     if (filter === "sms") return item.channel === "sms" || item.event_type?.startsWith("sms_");
     if (filter === "email") return item.channel === "email" || item.event_type?.startsWith("email_");
     if (filter === "whatsapp") return item.channel === "whatsapp" || item.event_type?.startsWith("whatsapp_");
-    if (filter === "note") return item.event_type === "note";
-    if (filter === "workflow") return ["workflow_triggered", "status_update", "status_changed", "lead_created", "follow_up_scheduled"].includes(item.event_type);
+    if (filter === "note") return item.event_type === "note" && !item.is_call_summary;
+    if (filter === "workflow") return ["workflow_triggered", "status_update", "status_changed", "lead_created", "follow_up_scheduled"].includes(item.event_type) && !item.is_call_summary;
     return true;
   });
 
