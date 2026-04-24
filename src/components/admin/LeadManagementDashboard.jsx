@@ -808,7 +808,6 @@ export default function LeadManagementDashboard() {
                       />
                     </th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Lead</th>
-                    <th className="px-4 py-3 text-left font-semibold text-foreground">Score</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Why Now</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Next Action</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Recommended Offer</th>
@@ -853,6 +852,16 @@ export default function LeadManagementDashboard() {
                               {lead.lead_score != null && (
                                 <LeadScoreBadge score={lead.lead_score} />
                               )}
+                              {(() => {
+                                const isStale = ["New","Contacted"].includes(lead.status) &&
+                                  (!lead.last_contacted_at ||
+                                    (Date.now() - new Date(lead.last_contacted_at).getTime()) > 7 * 86400000);
+                                return isStale ? (
+                                  <span className="rounded-full bg-red-100 text-red-700 px-2 py-1 text-[10px] font-bold">
+                                    Stale
+                                  </span>
+                                ) : null;
+                              })()}
                             </div>
                             <p className="mt-1 text-xs text-muted-foreground">{lead.business_name}</p>
                             <p className="mt-1 text-xs text-muted-foreground">
@@ -861,15 +870,6 @@ export default function LeadManagementDashboard() {
                             <p className="mt-2 text-[11px] text-muted-foreground">
                               {lead.source || "unknown"} • {intakeTypeLabels[lead.intake_type] || lead.intake_type || "Legacy"}
                             </p>
-                          </div>
-                        </td>
-                        <td className="px-4 py-4">
-                          <div className="flex flex-col items-start gap-1">
-                            {lead.lead_score != null ? (
-                              <LeadScoreBadge score={lead.lead_score} size="lg" />
-                            ) : (
-                              <span className="text-xs text-muted-foreground">—</span>
-                            )}
                           </div>
                         </td>
                         <td className="px-4 py-4">

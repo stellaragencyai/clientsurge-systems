@@ -4,8 +4,10 @@ import { Loader2, LogOut, LayoutDashboard } from "lucide-react";
 import BuildTracker from "../components/portal/BuildTracker";
 import SupportChat from "../components/portal/SupportChat";
 import PlanManager from "../components/portal/PlanManager";
+import LeadActivityFeed from "../components/portal/LeadActivityFeed";
 
 const TABS = [
+  { id: "leads", label: "My Leads" },
   { id: "progress", label: "Build Progress" },
   { id: "support", label: "Support & Messaging" },
   { id: "plan", label: "My Plan" },
@@ -19,7 +21,7 @@ export default function ClientPortal() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [portalError, setPortalError] = useState("");
-  const [activeTab, setActiveTab] = useState("progress");
+  const [activeTab, setActiveTab] = useState("leads");
 
   useEffect(() => {
     const init = async () => {
@@ -201,6 +203,9 @@ export default function ClientPortal() {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
+        {activeTab === "leads" && (
+          <LeadActivityFeed project={project} />
+        )}
         {activeTab === "progress" && (
           <BuildTracker project={project} order={portalOrder} />
         )}

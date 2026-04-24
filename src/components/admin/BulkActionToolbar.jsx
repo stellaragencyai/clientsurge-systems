@@ -5,7 +5,7 @@
 
 import { useState } from "react";
 import {
-  X, ChevronDown, CheckCircle, Loader2, MessageSquare, StickyNote, Tag, AlertCircle
+  X, ChevronDown, CheckCircle, Loader2, MessageSquare, StickyNote, Tag, AlertCircle, Sparkles
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -124,6 +124,7 @@ export default function BulkActionToolbar({ selectedIds, onClearSelection, onAct
     await runAction("add_note", { note });
     setShowNoteModal(false);
   };
+  const handleBulkEnrich = () => runAction("bulk_enrich");
 
   if (count === 0) return null;
 
@@ -168,6 +169,17 @@ export default function BulkActionToolbar({ selectedIds, onClearSelection, onAct
           >
             <StickyNote className="w-3.5 h-3.5" />
             Add Note
+          </button>
+
+          {/* Bulk enrich */}
+          <button
+            onClick={handleBulkEnrich}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors disabled:opacity-50"
+            title="Run AI enrichment on selected leads"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            Enrich
           </button>
 
           {/* Result feedback */}

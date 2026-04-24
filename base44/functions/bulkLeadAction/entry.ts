@@ -202,7 +202,22 @@ Deno.serve(async (req) => {
       return Response.json({ success: true, action, ...results });
     }
 
-    return Response.json({ error: `Unknown action: ${action}. Must be status_change, trigger_sequence, or add_note.` }, { status: 400 });
+    // ── BULK ENRICH ───────────────────────────────────────────────────────────
+    if (action === "bulk_enrich") {
+      for (const lead_id of lead_ids) {
+        try {
+          await base44.asServiceRole.functions.invoke("enrichLead", { lead_id });
+          results.success++;
+        } catch (err) {
+          results.failed++;
+          results.errors.push({ lead_id, error: err.message });
+          console.error(`bulkLeadAction enrich error for ${lead_id}:`, err.message);
+        }
+      }
+      return Response.json({ success: true, action, ...results });
+    }
+
+    return Response.json({ error: `Unknown action: ${action}. Must be status_change, trigger_sequence, add_note, or bulk_enrich.` }, { status: 400 });
 
   } catch (error) {
     console.error("bulkLeadAction error:", error);

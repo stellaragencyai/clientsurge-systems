@@ -308,7 +308,31 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
                   );
                 })}
               </div>
-              <div className="rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground mt-2">
+              {/* Enroll in Drip */}
+              <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 mt-2">
+                <p className="text-xs font-semibold text-blue-800 mb-1">Drip Campaign</p>
+                <p className="text-xs text-blue-700 mb-2">Enroll this lead in the automated Day 1 → Day 3 → Day 7 follow-up sequence.</p>
+                <button
+                  onClick={async () => {
+                    setTriggerLoading("drip_enroll");
+                    try {
+                      await base44.functions.invoke("startDripCampaign", { lead_id: lead.id });
+                      showToast("Lead enrolled in drip campaign");
+                    } catch (err) {
+                      showToast(err?.response?.data?.error || "Failed to enroll in drip", "error");
+                    } finally {
+                      setTriggerLoading(null);
+                    }
+                  }}
+                  disabled={!!triggerLoading}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  {triggerLoading === "drip_enroll" ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+                  Enroll in Drip
+                </button>
+              </div>
+
+              <div className="rounded-xl border border-border bg-muted/30 p-3 text-xs text-muted-foreground">
                 <strong>Tip:</strong> Triggering a sequence logs a <code>CommunicationEvent</code> and updates <em>last_contacted_at</em>. You can review all events on the lead detail page.
               </div>
             </div>
