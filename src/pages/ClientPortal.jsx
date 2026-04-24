@@ -7,6 +7,8 @@ import PlanManager from "../components/portal/PlanManager";
 import LeadActivityFeed from "../components/portal/LeadActivityFeed";
 import PaymentFailedBanner from "../components/portal/PaymentFailedBanner";
 import LeadFlowDashboard from "../components/portal/LeadFlowDashboard";
+import NotificationBell from "../components/portal/NotificationBell";
+import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
   { id: "metrics", label: "Lead Flow" },
@@ -25,6 +27,7 @@ export default function ClientPortal() {
   const [notFound, setNotFound] = useState(false);
   const [portalError, setPortalError] = useState("");
   const [activeTab, setActiveTab] = useState("leads");
+  const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useLeadNotifications();
 
   useEffect(() => {
     const init = async () => {
@@ -152,6 +155,13 @@ export default function ClientPortal() {
           <span className="text-sm font-medium text-muted-foreground">Client Portal</span>
         </div>
         <div className="flex items-center gap-4">
+          <NotificationBell
+            notifications={notifications}
+            unreadCount={unreadCount}
+            onMarkAsRead={markAsRead}
+            onMarkAllAsRead={markAllAsRead}
+            onClear={clearNotifications}
+          />
           <div className="text-right hidden sm:block">
             <p className="text-xs font-semibold text-foreground">{project.business_name}</p>
             <p className="text-xs text-muted-foreground">{user.email}</p>
