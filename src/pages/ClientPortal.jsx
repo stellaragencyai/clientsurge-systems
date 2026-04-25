@@ -13,10 +13,12 @@ import DeadlinesPanel from "../components/portal/DeadlinesPanel";
 import FilesPanel from "../components/portal/FilesPanel";
 import BillingPanel from "../components/portal/BillingPanel";
 import WebhookSettings from "../components/portal/WebhookSettings";
+import TasksDashboard from "../components/portal/TasksDashboard";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
   { id: "metrics", label: "Lead Flow" },
+  { id: "tasks", label: "Tasks" },
   { id: "leads", label: "My Leads" },
   { id: "progress", label: "Build Progress" },
   { id: "deadlines", label: "Deadlines" },
@@ -241,6 +243,9 @@ export default function ClientPortal() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         {activeTab === "metrics" && (
           <LeadFlowDashboard />
+        )}
+        {activeTab === "tasks" && (
+          <TasksDashboard project={project} />
         )}
         {activeTab === "leads" && (
           <LeadActivityFeed project={project} />
