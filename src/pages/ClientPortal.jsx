@@ -12,6 +12,7 @@ import ClientOnboardingWizard from "../components/portal/ClientOnboardingWizard"
 import DeadlinesPanel from "../components/portal/DeadlinesPanel";
 import FilesPanel from "../components/portal/FilesPanel";
 import BillingPanel from "../components/portal/BillingPanel";
+import WebhookSettings from "../components/portal/WebhookSettings";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
@@ -23,6 +24,7 @@ const TABS = [
   { id: "billing", label: "Billing" },
   { id: "support", label: "Support & Messaging" },
   { id: "plan", label: "My Plan" },
+  { id: "settings", label: "Settings" },
 ];
 
 export default function ClientPortal() {
@@ -260,6 +262,9 @@ export default function ClientPortal() {
         )}
         {activeTab === "plan" && (
           <PlanManager project={project} subscription={subscription} onUpdated={refreshProject} />
+        )}
+        {activeTab === "settings" && (
+          <WebhookSettings project={project} />
         )}
       </div>
     </div>
