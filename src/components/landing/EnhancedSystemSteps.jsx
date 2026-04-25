@@ -108,30 +108,30 @@ export default function EnhancedSystemSteps() {
           const tag = step[5];
           const diagram = step[6];
           return (
-            <article key={stepNum} className="group relative overflow-hidden rounded-[2rem] border border-[#b98b61]/40 shadow-[0_24px_60px_rgba(15,23,42,0.08)] ring-1 ring-black/5 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 hover:border-[#9a6c45]/70 hover:shadow-[0_36px_90px_rgba(15,23,42,0.12)]" style={{ background: "linear-gradient(180deg,#7a4825 0%,#9a5c2e 18%,#ffffff 38%,#fffaf5 100%)", animation: `stepCardIn 560ms ease ${index * 90}ms both` }}>
+            <article key={stepNum} className="group relative overflow-hidden rounded-[2rem] border border-[#b98b61]/25 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,248,239,0.82))] shadow-[0_24px_60px_rgba(15,23,42,0.08)] ring-1 ring-black/5 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 hover:border-[#9a6c45]/55 hover:shadow-[0_36px_90px_rgba(15,23,42,0.12)]" style={{ animation: `stepCardIn 560ms ease ${index * 90}ms both` }}>
               <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-[linear-gradient(180deg,#f0cf9b_0%,#b77b47_55%,#7a4f2e_100%)]" />
               <div className="pointer-events-none absolute inset-x-10 top-0 h-24 rounded-full bg-[#f7dfb8]/45 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(201,156,110,0.08),transparent_40%)] opacity-80" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.28),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(201,156,110,0.14),transparent_36%)] opacity-90" />
 
               <div className="relative grid gap-6 px-7 py-7 md:grid-cols-[1.1fr_1.2fr_0.9fr] md:px-9 md:py-9">
                 <div className="flex flex-col justify-between gap-5">
                   <div>
-                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-100 shadow-sm backdrop-blur">
+                    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#c8965c]/25 bg-white/75 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8a684a] shadow-sm backdrop-blur">
                       Step {stepNum}
-                      <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#c8965c]" />
                       {lane}
                     </div>
                     <div className="mb-4 flex items-start gap-4">
-                      <div className="mt-1 flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-white/30 bg-white/20 backdrop-blur">
-                        <StepIcon className="h-6 w-6 text-amber-100" />
+                      <div className="mt-1 flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-[#c8965c]/25 bg-[linear-gradient(135deg,rgba(255,255,255,0.84),rgba(248,235,214,0.95))]">
+                        <StepIcon className="h-6 w-6 text-[#8a5a32]" />
                       </div>
                       <div>
-                        <h3 className="font-display text-2xl font-semibold leading-tight text-white md:text-[1.95rem]">{title}</h3>
-                        <p className="mt-3 max-w-xl text-[15px] leading-7 text-amber-100/80">{desc}</p>
+                        <h3 className="font-display text-2xl font-semibold leading-tight text-slate-900 md:text-[1.95rem]">{title}</h3>
+                        <p className="mt-3 max-w-xl text-[15px] leading-7 text-slate-600">{desc}</p>
                       </div>
                     </div>
                   </div>
-                  <div className="inline-flex items-center gap-2 self-start rounded-full bg-white/20 border border-white/30 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-amber-100 backdrop-blur">
+                  <div className="inline-flex items-center gap-2 self-start rounded-full bg-[linear-gradient(135deg,#6b3f1f,#9a5c2e)] px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-amber-100 shadow-[0_10px_26px_rgba(122,72,37,0.22)]">
                     <TrendingUp className="h-3.5 w-3.5" />
                     {tag}
                   </div>
