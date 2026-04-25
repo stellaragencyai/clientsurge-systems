@@ -40,14 +40,7 @@ function twilioAuth(accountSid, authToken) {
 }
 
 async function fetchTwilioTranscript(accountSid, authToken, recordingSid) {
-  // Try Twilio Intelligence transcription first
-  const res = await fetch(
-    `https://intelligence.twilio.com/v2/Services`,
-    { headers: { Authorization: twilioAuth(accountSid, authToken) } }
-  );
-  if (!res.ok) return null;
-
-  // Fallback: try fetching recording transcription via Recordings API
+  // Fetch recording transcription via Recordings API when available.
   const transcriptRes = await fetch(
     `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Recordings/${recordingSid}/Transcriptions.json`,
     { headers: { Authorization: twilioAuth(accountSid, authToken) } }

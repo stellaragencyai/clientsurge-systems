@@ -27,6 +27,13 @@ function daysSince(isoDate) {
   return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60 * 60 * 24);
 }
 
+function getWinBackAnchorDate(order) {
+  if (["canceled", "past_due", "unpaid"].includes(order.subscription_status) && order.current_period_end) {
+    return order.current_period_end;
+  }
+  return order.updated_date || order.created_date;
+}
+
 function hasWinBackTag(notes, tag) {
   return (notes || "").includes(`[WinBack:${tag}]`);
 }
@@ -229,9 +236,9 @@ Deno.serve(async (req) => {
       const isFailedPayment = order.payment_status === "failed";
       const isCanceledSub   = ["canceled", "past_due", "unpaid"].includes(order.subscription_status);
       if (!isFailedPayment && !isCanceledSub) return false;
-      // Must have been in this state for 30+ days (updated_date older than 30 days ago)
-      const updatedAt = new Date(order.updated_date || order.created_date);
-      return updatedAt < thirtyDaysAgo;
+      // Must have been in this state for 30+ days.
+      const anchorDate = new Date(getWinBackAnchorDate(order));
+      return anchorDate < thirtyDaysAgo;
     });
 
     if (winBackCandidates.length === 0) {
@@ -255,8 +262,8 @@ Deno.serve(async (req) => {
         notes,
       };
 
-      const updatedAt = new Date(order.updated_date || order.created_date);
-      const msElapsed = Date.now() - updatedAt.getTime();
+      const anchorDate = new Date(getWinBackAnchorDate(order));
+      const msElapsed = Date.now() - anchorDate.getTime();
 
       let stepSent = null;
       let updatedNotes = notes;

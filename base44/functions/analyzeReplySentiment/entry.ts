@@ -106,6 +106,7 @@ Respond ONLY with valid JSON in this exact format:
     // Validate the result
     const validSentiments = ["Positive", "Neutral", "Negative"];
     const finalSentiment = validSentiments.includes(sentiment) ? sentiment : (lead.reply_sentiment || "Unknown");
+    textToAnalyze = `[${textToAnalyze.length} chars analyzed]`;
 
     // Save to lead record
     await base44.asServiceRole.entities.Leads.update(leadId, {
