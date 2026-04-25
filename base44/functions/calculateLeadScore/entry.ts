@@ -1,104 +1,176 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+/**
+ * calculateLeadScore
+ *
+ * Can be called two ways:
+ *   1. Entity automation payload: { event: { entity_id }, data: { ...leadFields } }
+ *   2. Manual/frontend call:      { lead_id: "abc123" }
+ *
+ * Scoring model (additive, capped at 100):
+ *   Status           up to 30 pts
+ *   Recency          up to 20 pts
+ *   Outbound comms   up to 25 pts
+ *   Inbound replies  up to 15 pts
+ *   Last contact     up to 10 pts
+ *   Email engagement up to 15 pts  (opens + clicks from EmailCampaignRecipient)
+ *   Reply sentiment  up to 15 pts
+ *   Enrichment bonus up to 10 pts
+ *
+ * After scoring, writes back:
+ *   - lead_score        (0–100 int)
+ *   - activation_priority ("Hot" | "High" | "Medium" | "Low")
+ */
+
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+
+const STATUS_SCORE = {
+  New: 5, Contacted: 10, Replied: 18, Qualified: 22,
+  "Booking Prompt Sent": 26, Booked: 30, Closed: 0,
+};
+
+function daysSince(isoDate) {
+  if (!isoDate) return 9999;
+  return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60 * 60 * 24);
+}
+
+function recencyScore(days) {
+  if (days <= 2) return 20;
+  if (days <= 7) return 15;
+  if (days <= 14) return 10;
+  if (days <= 30) return 5;
+  return 0;
+}
+
+function activityScore(n) {
+  if (n >= 7) return 25;
+  if (n >= 4) return 20;
+  if (n >= 2) return 14;
+  if (n >= 1) return 8;
+  return 0;
+}
+
+function inboundScore(n) { return n >= 2 ? 15 : n >= 1 ? 8 : 0; }
+
+function lastContactScore(days) {
+  if (days < 1) return 10;
+  if (days < 3) return 7;
+  if (days < 7) return 4;
+  return 0;
+}
+
+function emailEngagementScore(opens, clicks) {
+  let pts = 0;
+  if (opens >= 5) pts += 10;
+  else if (opens >= 3) pts += 8;
+  else if (opens >= 1) pts += 5;
+  if (clicks >= 1) pts += 5;
+  return Math.min(pts, 15);
+}
+
+function sentimentScore(sentiment) {
+  if (sentiment === "Positive") return 15;
+  if (sentiment === "Neutral") return 5;
+  if (sentiment === "Negative") return -5;
+  return 0;
+}
+
+function enrichmentBonus(lead) {
+  let bonus = 0;
+  if (Array.isArray(lead.industry_tags) && lead.industry_tags.length > 0) bonus += 3;
+  if (lead.social_profiles && Object.keys(lead.social_profiles).some((k) => lead.social_profiles[k])) bonus += 3;
+  if (lead.company_size && lead.company_size !== "unknown") bonus += 2;
+  if (lead.website) bonus += 2;
+  return bonus;
+}
+
+function activationPriority(score, lead) {
+  const hotStatus = ["Replied", "Qualified", "Booking Prompt Sent"].includes(lead.status);
+  const positiveSignal = lead.reply_sentiment === "Positive";
+  if (score >= 70 && (hotStatus || positiveSignal)) return "Hot";
+  if (score >= 70) return "High";
+  if (score >= 45) return "Medium";
+  return "Low";
+}
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { lead_id } = await req.json();
 
-    if (!lead_id) {
-      return Response.json({ error: 'Missing lead_id' }, { status: 400 });
+    // Auth check — allow automation (no user) or admin
+    let user = null;
+    try { user = await base44.auth.me(); } catch (_) {}
+    if (user && user.role !== "admin") {
+      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
     }
 
-    // Fetch lead and related data
-    const lead = await base44.entities.Leads.list('', 1, { id: lead_id });
-    if (!lead || lead.length === 0) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+    const body = await req.json().catch(() => ({}));
+
+    // Support both entity automation payload and direct call
+    const leadId = body?.lead_id || body?.event?.entity_id || body?.data?.id || null;
+
+    if (!leadId) {
+      return Response.json({ error: "Missing lead_id" }, { status: 400 });
     }
 
-    const leadData = lead[0];
-    let score = 0;
+    // Fetch lead + communication events + email engagement in parallel
+    const [leadList, events, emailRecipients] = await Promise.all([
+      base44.asServiceRole.entities.Leads.filter({ id: leadId }),
+      base44.asServiceRole.entities.CommunicationEvent.filter({ lead_id: leadId }),
+      base44.asServiceRole.entities.EmailCampaignRecipient.filter({ lead_id: leadId }),
+    ]);
 
-    // Base score: Lead recency
-    if (leadData.created_date) {
-      const daysSinceCreated = (Date.now() - new Date(leadData.created_date).getTime()) / 86400000;
-      if (daysSinceCreated < 1) score += 15; // New lead bonus
-      else if (daysSinceCreated < 3) score += 10;
-      else if (daysSinceCreated < 7) score += 5;
+    if (!leadList?.length) {
+      return Response.json({ error: "Lead not found" }, { status: 404 });
     }
 
-    // Status scoring
-    const statusScores = {
-      'New': 5,
-      'Contacted': 10,
-      'Replied': 25,
-      'Qualified': 35,
-      'Booking Prompt Sent': 20,
-      'Booked': 50,
-      'Closed': 0,
+    const lead = leadList[0];
+
+    // Tally communication events
+    const outbound = (events || []).filter((e) => e.direction === "outbound").length;
+    const inbound = (events || []).filter((e) => e.direction === "inbound").length;
+
+    // Tally email engagement
+    const totalOpens = (emailRecipients || []).reduce((s, r) => s + (r.open_count || 0), 0);
+    const totalClicks = (emailRecipients || []).reduce((s, r) => s + (r.click_count || 0), 0);
+
+    // Compute score
+    const breakdown = {
+      status:       STATUS_SCORE[lead.status] ?? 5,
+      recency:      recencyScore(daysSince(lead.created_date)),
+      outbound:     activityScore(outbound),
+      inbound:      inboundScore(inbound),
+      last_contact: lastContactScore(daysSince(lead.last_contacted_at)),
+      email_opens:  emailEngagementScore(totalOpens, totalClicks),
+      sentiment:    sentimentScore(lead.reply_sentiment),
+      enrichment:   enrichmentBonus(lead),
     };
-    score += statusScores[leadData.status] || 0;
 
-    // Lead quality factors
-    if (leadData.lead_category === 'High-Value') score += 20;
-    if (leadData.lead_score && leadData.lead_score > 0) score += Math.min(leadData.lead_score / 2, 25);
+    const rawScore = Object.values(breakdown).reduce((a, b) => a + b, 0);
+    const finalScore = Math.min(100, Math.max(1, rawScore));
+    const priority = activationPriority(finalScore, lead);
 
-    // Engagement tracking
-    if (leadData.last_contacted_at) {
-      const hoursSinceContact = (Date.now() - new Date(leadData.last_contacted_at).getTime()) / 3600000;
-      if (hoursSinceContact < 24) score += 15; // Recently engaged
-      else if (hoursSinceContact < 72) score += 10;
-    }
+    // Persist only if changed (avoids infinite automation loops)
+    const scoreChanged = lead.lead_score !== finalScore;
+    const priorityChanged = lead.activation_priority !== priority;
 
-    // Reply sentiment
-    const sentimentScores = {
-      'Positive': 30,
-      'Neutral': 10,
-      'Negative': -10,
-    };
-    score += sentimentScores[leadData.reply_sentiment] || 0;
-
-    // Fetch communication events for engagement signals
-    const events = await base44.entities.CommunicationEvent.list('-created_date', 50, { lead_id });
-    if (events) {
-      const recentWindow = new Date(Date.now() - 7 * 86400000); // Last 7 days
-      
-      events.forEach(event => {
-        const eventDate = new Date(event.created_date);
-        if (eventDate > recentWindow) {
-          if (event.event_type === 'email_sent' && event.status === 'delivered') score += 2;
-          if (event.event_type === 'sms_sent' && event.status === 'delivered') score += 3;
-          if (event.event_type === 'sms_received') score += 15;
-        }
+    if (scoreChanged || priorityChanged) {
+      await base44.asServiceRole.entities.Leads.update(leadId, {
+        lead_score: finalScore,
+        activation_priority: priority,
       });
     }
 
-    // Enrichment bonus
-    if (leadData.enriched_at) score += 10;
-    if (leadData.industry_tags?.length > 0) score += 5;
-
-    // Cap score at 100
-    const finalScore = Math.min(Math.max(score, 0), 100);
-
-    // Update lead with calculated score
-    await base44.entities.Leads.update(lead_id, {
-      lead_score: finalScore,
-    });
+    console.log(`[calculateLeadScore] ${lead.full_name} → score=${finalScore} priority=${priority}`, breakdown);
 
     return Response.json({
       success: true,
-      lead_id,
+      lead_id: leadId,
       score: finalScore,
-      breakdown: {
-        recency: daysSinceCreated ? (daysSinceCreated < 1 ? 15 : daysSinceCreated < 3 ? 10 : daysSinceCreated < 7 ? 5 : 0) : 0,
-        status: statusScores[leadData.status] || 0,
-        quality: leadData.lead_category === 'High-Value' ? 20 : 0,
-        engagement: leadData.last_contacted_at ? 15 : 0,
-        sentiment: sentimentScores[leadData.reply_sentiment] || 0,
-        enrichment: leadData.enriched_at ? 10 : 0,
-      },
+      activation_priority: priority,
+      changed: scoreChanged || priorityChanged,
+      breakdown,
     });
   } catch (error) {
-    console.error('Error calculating lead score:', error);
+    console.error("calculateLeadScore error:", error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

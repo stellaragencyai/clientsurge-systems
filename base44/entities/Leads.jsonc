@@ -53,6 +53,17 @@
       "title": "Lead Score (0-100)",
       "default": 0
     },
+    "activation_priority": {
+      "type": "string",
+      "title": "Activation Priority",
+      "enum": [
+        "Hot",
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "default": "Low"
+    },
     "lead_category": {
       "type": "string",
       "title": "Lead Category",

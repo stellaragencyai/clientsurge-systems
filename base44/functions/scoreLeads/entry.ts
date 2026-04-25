@@ -1,38 +1,22 @@
 /**
- * scoreLeads — batch-scores all Leads and persists lead_score (1–100).
+ * scoreLeads — batch re-scores ALL Leads and persists lead_score + activation_priority.
+ * Admin-only. Called manually from Priority Queue "Re-Score" button or on a schedule.
  *
  * Scoring model (additive, capped at 100):
+ *   Status           up to 30 pts
+ *   Recency          up to 20 pts
+ *   Outbound comms   up to 25 pts
+ *   Inbound replies  up to 15 pts
+ *   Last contact     up to 10 pts
+ *   Email engagement up to 15 pts  (opens + clicks from EmailCampaignRecipient)
+ *   Reply sentiment  up to 15 pts  (set by analyzeReplySentiment / processCallRecording)
+ *   Enrichment bonus up to 10 pts
  *
- * PIPELINE STATUS (up to 30 pts)
- *   New              →  5
- *   Contacted        → 10
- *   Replied          → 18
- *   Qualified        → 22
- *   Booking Prompt   → 26
- *   Booked           → 30
- *   Closed           →  0
- *
- * RECENCY — days since created (up to 20 pts)
- *   0–2 days → 20 | 3–7 → 15 | 8–14 → 10 | 15–30 → 5 | >30 → 0
- *
- * COMMUNICATION ACTIVITY — outbound CommunicationEvents (up to 25 pts)
- *   1 → 8 | 2–3 → 14 | 4–6 → 20 | 7+ → 25
- *
- * INBOUND REPLY (up to 15 pts)
- *   1 → 8 | 2+ → 15
- *
- * RECENCY OF LAST CONTACT (up to 10 pts)
- *   <24h → 10 | <3d → 7 | <7d → 4
- *
- * EMAIL ENGAGEMENT — opens + clicks from EmailCampaignRecipient (up to 15 pts)
- *   1+ opens  → +5  | 3+ opens  → +8  | 5+ opens  → +10
- *   1+ clicks → +5  (stacks with opens, max 15)
- *
- * CALL SENTIMENT — from reply_sentiment set by processCallRecording (up to 15 pts)
- *   Positive → +15 | Neutral → +5 | Negative → -5
- *
- * ENRICHMENT BONUS (up to 10 pts)
- *   Has industry_tags → +3 | social_profiles → +3 | company_size known → +2 | website → +2
+ * activation_priority:
+ *   "Hot"    → score ≥70 AND (hot status OR positive sentiment)
+ *   "High"   → score ≥70
+ *   "Medium" → score ≥45
+ *   "Low"    → below 45
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
@@ -71,8 +55,7 @@ function emailEngagementScore(opens, clicks) {
   return Math.min(pts, 15);
 }
 
-function callSentimentScore(lead) {
-  // reply_sentiment is updated by both analyzeReplySentiment and processCallRecording
+function sentimentScore(lead) {
   if (lead.reply_sentiment === "Positive") return 15;
   if (lead.reply_sentiment === "Neutral") return 5;
   if (lead.reply_sentiment === "Negative") return -5;
@@ -88,24 +71,32 @@ function enrichmentBonus(lead) {
   return bonus;
 }
 
+function computeActivationPriority(score, lead) {
+  const hotStatus = ["Replied", "Qualified", "Booking Prompt Sent"].includes(lead.status);
+  const positiveSignal = lead.reply_sentiment === "Positive";
+  if (score >= 70 && (hotStatus || positiveSignal)) return "Hot";
+  if (score >= 70) return "High";
+  if (score >= 45) return "Medium";
+  return "Low";
+}
+
 function computeScore(lead, eventsByLead, emailStatsByLead) {
   const events = eventsByLead[lead.id] || [];
   const outbound = events.filter((e) => e.direction === "outbound").length;
   const inbound = events.filter((e) => e.direction === "inbound").length;
-
   const emailStats = emailStatsByLead[lead.id] || { opens: 0, clicks: 0 };
 
-  const score =
+  const raw =
     (STATUS_SCORE[lead.status] ?? 5) +
     recencyScore(daysSince(lead.created_date)) +
     activityScore(outbound) +
     inboundScore(inbound) +
     lastContactScore(daysSince(lead.last_contacted_at)) +
     emailEngagementScore(emailStats.opens, emailStats.clicks) +
-    callSentimentScore(lead) +
+    sentimentScore(lead) +
     enrichmentBonus(lead);
 
-  return Math.min(100, Math.max(1, score));
+  return Math.min(100, Math.max(1, raw));
 }
 
 Deno.serve(async (req) => {
@@ -121,11 +112,13 @@ Deno.serve(async (req) => {
     const payload = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const leadIdFilter = payload?.lead_id ?? null;
 
+    console.log(`[scoreLeads] Starting batch score${leadIdFilter ? ` for lead ${leadIdFilter}` : " for all leads"}`);
+
     const [leads, events, emailRecipients] = await Promise.all([
       leadIdFilter
         ? base44.asServiceRole.entities.Leads.filter({ id: leadIdFilter })
         : base44.asServiceRole.entities.Leads.list("-created_date", 2000),
-      base44.asServiceRole.entities.CommunicationEvent.list("-created_date", 2000),
+      base44.asServiceRole.entities.CommunicationEvent.list("-created_date", 5000),
       base44.asServiceRole.entities.EmailCampaignRecipient.list("-created_date", 5000),
     ]);
 
@@ -133,13 +126,14 @@ Deno.serve(async (req) => {
       return Response.json({ success: true, scored: 0, message: "No leads to score" });
     }
 
+    // Index events by lead_id
     const eventsByLead = {};
     for (const ev of events || []) {
       if (!ev.lead_id) continue;
       (eventsByLead[ev.lead_id] ??= []).push(ev);
     }
 
-    // Aggregate email opens + clicks per lead_id
+    // Index email stats by lead_id
     const emailStatsByLead = {};
     for (const r of emailRecipients || []) {
       if (!r.lead_id) continue;
@@ -148,24 +142,42 @@ Deno.serve(async (req) => {
       emailStatsByLead[r.lead_id].clicks += r.click_count || 0;
     }
 
-    const updates = leads.map((lead) => ({ lead, score: computeScore(lead, eventsByLead, emailStatsByLead) }));
+    // Compute scores
+    const updates = leads.map((lead) => {
+      const score = computeScore(lead, eventsByLead, emailStatsByLead);
+      const priority = computeActivationPriority(score, lead);
+      return { lead, score, priority };
+    });
 
+    // Batch-write only changed records (20 at a time)
     const BATCH = 20;
     let updated = 0;
     for (let i = 0; i < updates.length; i += BATCH) {
       const batch = updates.slice(i, i + BATCH);
       await Promise.all(
-        batch.map(({ lead, score }) => {
-          if (lead.lead_score === score) return Promise.resolve();
-          return base44.asServiceRole.entities.Leads.update(lead.id, { lead_score: score });
+        batch.map(({ lead, score, priority }) => {
+          if (lead.lead_score === score && lead.activation_priority === priority) return Promise.resolve();
+          updated++;
+          return base44.asServiceRole.entities.Leads.update(lead.id, {
+            lead_score: score,
+            activation_priority: priority,
+          });
         })
       );
-      updated += batch.length;
     }
 
+    console.log(`[scoreLeads] Done — scored ${updates.length} leads, updated ${updated}`);
+
     return Response.json({
-      success: true, scored: updates.length, updated,
-      scores: updates.map(({ lead, score }) => ({ id: lead.id, name: lead.full_name, score })),
+      success: true,
+      scored: updates.length,
+      updated,
+      scores: updates.map(({ lead, score, priority }) => ({
+        id: lead.id,
+        name: lead.full_name,
+        score,
+        priority,
+      })),
     });
 
   } catch (error) {

@@ -66,6 +66,22 @@ const SENTIMENT_CONFIG = {
   Unknown:  { label: "Unknown",  icon: Minus,    color: "text-slate-400", bg: "bg-slate-50 border-slate-200",  boost: 0  },
 };
 
+const PRIORITY_STYLE = {
+  Hot:    "bg-red-100 text-red-800 border-red-300",
+  High:   "bg-orange-100 text-orange-800 border-orange-300",
+  Medium: "bg-amber-100 text-amber-800 border-amber-300",
+  Low:    "bg-slate-100 text-slate-600 border-slate-300",
+};
+
+function ActivationPriorityBadge({ priority }) {
+  if (!priority) return null;
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold ${PRIORITY_STYLE[priority] || PRIORITY_STYLE.Low}`}>
+      Priority: {priority}
+    </span>
+  );
+}
+
 function SentimentBadge({ sentiment }) {
   if (!sentiment || sentiment === "Unknown") return null;
   const cfg = SENTIMENT_CONFIG[sentiment] || SENTIMENT_CONFIG.Unknown;
@@ -323,6 +339,7 @@ export default function LeadPriorityQueue() {
                         {lead.status}
                       </span>
                       {lead.lead_score != null && <LeadScoreBadge score={lead.lead_score} />}
+                      <ActivationPriorityBadge priority={lead.activation_priority} />
                       <SentimentBadge sentiment={lead.reply_sentiment} />
                     </div>
                     <p className="text-xs text-muted-foreground mb-2">{lead.business_name} · {lead.business_type || "Unknown type"}</p>
