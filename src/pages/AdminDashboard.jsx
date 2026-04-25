@@ -48,6 +48,13 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
+  useEffect(() => {
+    if (activeTab === 'onboarding') {
+      navigate('/admin/onboarding');
+      setActiveTab('overview');
+    }
+  }, [activeTab]);
+
   if (isLoadingAuth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -87,7 +94,6 @@ export default function AdminDashboard() {
       case 'automations':
         return <AutomationsPanel />;
       case 'onboarding':
-        navigate('/admin/onboarding');
         return null;
       case 'drip':
         return <DripCampaignPanel />;
@@ -117,13 +123,13 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <div
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-border transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-background border-r border-border transition-transform duration-300 lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 border-b border-border">
+          <div className="p-6 border-b border-border bg-background">
             <h1 className="font-display text-xl font-semibold text-foreground">
               ClientSurge <span className="text-primary">Admin</span>
             </h1>

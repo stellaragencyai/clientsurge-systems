@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
-import { AlertTriangle, ArrowLeft, Loader2 } from "lucide-react";
+import { AlertTriangle, ArrowLeft, Loader2, Mail, Zap } from "lucide-react";
 import StatusControl from "../components/dashboard/StatusControl";
 import MessagingPanel from "../components/dashboard/MessagingPanel";
 import EmailHistoryPanel from "../components/dashboard/EmailHistoryPanel";
@@ -27,6 +27,9 @@ export default function AdminLeadDetail() {
   const [lead, setLead] = useState(null);
   const [failedEvents, setFailedEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [campaigns, setCampaigns] = useState([]);
+  const [enrolling, setEnrolling] = useState(false);
+  const [enrollSuccess, setEnrollSuccess] = useState("");
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -38,16 +41,32 @@ export default function AdminLeadDetail() {
 
   const loadLead = async () => {
     try {
-      const [data, events] = await Promise.all([
+      const [data, events, seqs] = await Promise.all([
         base44.entities.Leads.get(leadId),
         base44.entities.CommunicationEvent.filter({ lead_id: leadId, status: "failed" }, "-created_date", 20),
+        base44.entities.EmailSequence.filter({ active: true }, "-created_date", 20),
       ]);
       setLead(data);
       setFailedEvents(events || []);
+      setCampaigns(seqs || []);
     } catch (err) {
       console.error("Error loading lead:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const enrollInCampaign = async (sequenceId) => {
+    setEnrolling(true);
+    setEnrollSuccess("");
+    try {
+      await base44.functions.invoke("startNurtureCampaign", { lead_id: leadId, sequence_id: sequenceId });
+      setEnrollSuccess("Lead enrolled in campaign successfully!");
+      setTimeout(() => setEnrollSuccess(""), 3000);
+    } catch (err) {
+      console.error("Enroll error:", err);
+    } finally {
+      setEnrolling(false);
     }
   };
 
@@ -213,6 +232,32 @@ export default function AdminLeadDetail() {
         <MessagingPanel leadId={leadId} leadPhone={lead.phone} />
         <EmailHistoryPanel leadId={leadId} />
       </div>
+
+      {/* Campaign Enrollment */}
+      {campaigns.length > 0 && (
+        <div className="bg-white rounded-lg border border-border p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Mail className="w-5 h-5 text-primary" />
+            <h3 className="text-lg font-semibold text-foreground">Enroll in Email Campaign</h3>
+          </div>
+          {enrollSuccess && (
+            <div className="mb-3 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-2">{enrollSuccess}</div>
+          )}
+          <div className="flex flex-wrap gap-2">
+            {campaigns.map(c => (
+              <button
+                key={c.id}
+                onClick={() => enrollInCampaign(c.id)}
+                disabled={enrolling}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-primary/30 bg-primary/5 text-sm font-medium text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
+              >
+                {enrolling ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+                {c.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Notes */}
       <NotesSection leadId={leadId} />

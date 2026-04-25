@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { TrendingUp, Zap, MessageSquare, Star, Clock, Sparkles } from 'lucide-react';
 
 export default function LeadScoreDisplay({ lead }) {
@@ -13,8 +14,12 @@ export default function LeadScoreDisplay({ lead }) {
 
   const tier = getScoreTier(score);
 
-  // Calculate percentage
-  const percentage = score;
+  // Calculate percentage — animate in on mount
+  const [displayedScore, setDisplayedScore] = useState(0);
+  useEffect(() => {
+    const t = setTimeout(() => setDisplayedScore(score), 100);
+    return () => clearTimeout(t);
+  }, [score]);
 
   return (
     <div className="space-y-4">
@@ -24,7 +29,7 @@ export default function LeadScoreDisplay({ lead }) {
           {/* Background circle */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
             <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" strokeWidth="8" />
-            {/* Progress circle */}
+            {/* Progress circle — animates from 0 to score */}
             <circle
               cx="50"
               cy="50"
@@ -32,9 +37,9 @@ export default function LeadScoreDisplay({ lead }) {
               fill="none"
               stroke={tier.color}
               strokeWidth="8"
-              strokeDasharray={`${(percentage / 100) * 282.7} 282.7`}
+              strokeDasharray={`${(displayedScore / 100) * 282.7} 282.7`}
               strokeLinecap="round"
-              style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%', transition: 'stroke-dasharray 0.5s ease' }}
+              style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%', transition: 'stroke-dasharray 1s ease' }}
             />
           </svg>
           

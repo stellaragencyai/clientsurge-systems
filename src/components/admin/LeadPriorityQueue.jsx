@@ -189,11 +189,11 @@ export default function LeadPriorityQueue() {
             Ranked by urgency — score + status + recency + enrichment. Work top-to-bottom.
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2 rounded-lg border border-border overflow-hidden divide-x divide-border">
           <button
             onClick={handleRunScoring}
             disabled={scoring}
-            className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
           >
             {scoring ? <Loader2 className="h-4 w-4 animate-spin" /> : <TrendingUp className="h-4 w-4" />}
             Re-Score
@@ -201,7 +201,7 @@ export default function LeadPriorityQueue() {
           <button
             onClick={loadLeads}
             disabled={loading}
-            className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Refresh

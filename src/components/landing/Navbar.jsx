@@ -306,7 +306,9 @@ export default function Navbar() {
       </div>
 
       {open && (
-        <div className="md:hidden bg-background border-b border-border px-6 pb-6 pt-2 space-y-4">
+        <>
+          <div className="fixed inset-0 z-40 md:hidden" onClick={() => setOpen(false)} />
+        <div className="md:hidden bg-background border-b border-border px-6 pb-6 pt-2 space-y-4 relative z-50">
           {sectionLinks.map((link) => (
             <a
               key={link.href}
@@ -368,6 +370,7 @@ export default function Navbar() {
             </span>
           </button>
         </div>
+        </>
       )}
 
       {showLoginModal && <PortalLoginModal onClose={() => setShowLoginModal(false)} />}

@@ -116,12 +116,19 @@ export default function LeadActivityFeed({ project }) {
     setLoading(true);
     setError("");
     try {
-      // Load leads — the Leads entity is shared; we show all leads visible to this user
-      // (non-admin users only see leads they created or are assigned to, per entity security)
-      const data = await base44.entities.Leads.list("-updated_date", 100);
+      // Filter leads by client_email matching the project's client_email for safety
+      const data = project?.client_email
+        ? await base44.entities.Leads.filter({ created_by: project.client_email }, "-updated_date", 100)
+        : await base44.entities.Leads.list("-updated_date", 100);
       setLeads(data || []);
     } catch (err) {
-      setError("Unable to load lead activity right now.");
+      // Fallback: list all visible to this user (RLS will enforce permissions)
+      try {
+        const data = await base44.entities.Leads.list("-updated_date", 100);
+        setLeads(data || []);
+      } catch {
+        setError("Unable to load lead activity right now.");
+      }
     } finally {
       setLoading(false);
     }

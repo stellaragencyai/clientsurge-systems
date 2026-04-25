@@ -115,9 +115,12 @@ export default function BillingPanel({ project }) {
         </div>
 
         {invoices.length === 0 ? (
-          <div className="p-8 text-center">
-            <FileText className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
-            <p className="text-muted-foreground">No invoices yet</p>
+          <div className="p-12 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+              <FileText className="w-8 h-8 text-primary/50" />
+            </div>
+            <p className="font-semibold text-foreground mb-1">No invoices yet</p>
+            <p className="text-sm text-muted-foreground">Your invoices will appear here once your project begins billing.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">

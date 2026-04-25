@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Plus, Trash2, Eye, Save, X, Loader2, ChevronRight, Mail, Clock } from 'lucide-react';
+import { Plus, Trash2, Save, Loader2, ChevronRight, Mail, Eye } from 'lucide-react';
 
 export default function CampaignBuilder({ sequenceId = null, onClose }) {
   const [campaign, setCampaign] = useState({
@@ -15,6 +15,7 @@ export default function CampaignBuilder({ sequenceId = null, onClose }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     if (sequenceId) {
@@ -234,13 +235,28 @@ export default function CampaignBuilder({ sequenceId = null, onClose }) {
 
             {/* Body */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-foreground block">Email Body</label>
-              <textarea
-                value={selectedStep.body}
-                onChange={(e) => updateStep(selectedStep.id, { body: e.target.value })}
-                placeholder="Email content (HTML supported)"
-                className="w-full px-3 py-2 border border-border rounded-lg text-sm h-32"
-              />
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-foreground block">Email Body (HTML)</label>
+                <button
+                  onClick={() => setShowPreview(p => !p)}
+                  className="text-xs text-primary hover:text-primary/80 flex items-center gap-1"
+                >
+                  <Eye className="w-3 h-3" /> {showPreview ? 'Edit' : 'Preview'}
+                </button>
+              </div>
+              {showPreview ? (
+                <div
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm min-h-32 bg-white prose prose-sm max-w-none overflow-auto"
+                  dangerouslySetInnerHTML={{ __html: selectedStep.body || '<p class="text-muted">No content yet</p>' }}
+                />
+              ) : (
+                <textarea
+                  value={selectedStep.body}
+                  onChange={(e) => updateStep(selectedStep.id, { body: e.target.value })}
+                  placeholder="Email content (HTML supported)"
+                  className="w-full px-3 py-2 border border-border rounded-lg text-sm h-40 font-mono text-xs"
+                />
+              )}
             </div>
 
             {/* Condition */}

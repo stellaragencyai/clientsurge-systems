@@ -16,10 +16,12 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing project_id' }, { status: 400 });
     }
 
-    // Fetch invoices for this project
-    const invoices = await base44.asServiceRole.entities.Invoice.list('-created_date', 100, {
-      project_id: projectId,
-    }) || [];
+    // Fetch invoices for this project using filter (not list with 3rd arg)
+    const invoices = await base44.asServiceRole.entities.Invoice.filter(
+      { project_id: projectId },
+      '-created_date',
+      100
+    ) || [];
 
     // Sort by due date, unpaid first
     invoices.sort((a, b) => {

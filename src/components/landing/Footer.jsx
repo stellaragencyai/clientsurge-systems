@@ -36,10 +36,10 @@ const navColumns = [
 ];
 
 const socialLinks = [
-  { icon: Facebook, href: "#", label: "Facebook" },
-  { icon: Instagram, href: "#", label: "Instagram" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
-  { icon: Twitter, href: "#", label: "Twitter" },
+  { icon: Facebook, href: "https://facebook.com/clientsurgesystems", label: "Facebook" },
+  { icon: Instagram, href: "https://instagram.com/clientsurgesystems", label: "Instagram" },
+  { icon: Linkedin, href: "https://linkedin.com/company/clientsurgesystems", label: "LinkedIn" },
+  { icon: Twitter, href: "https://twitter.com/clientsurge", label: "Twitter" },
 ];
 
 export default function Footer() {
@@ -86,9 +86,11 @@ export default function Footer() {
             <p className="text-xs text-foreground/60 font-medium">Ready to transform your lead game?</p>
             <button
               onClick={() => demoBooking?.openDemoBooking?.()}
-              className="rounded-full px-4 py-2 bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 transition-all"
+              style={{ borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", border: "none", cursor: "pointer", display: "inline-block" }}
             >
-              Book Demo
+              <span style={{ display: "flex", alignItems: "center", height: "32px", padding: "0 16px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "600", fontSize: "0.75rem" }}>
+                Book Demo
+              </span>
             </button>
           </div>
 

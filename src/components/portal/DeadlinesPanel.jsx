@@ -66,9 +66,10 @@ export default function DeadlinesPanel({ project }) {
                   key={deadline.id}
                   className={`rounded-xl border-2 p-5 transition-all ${
                     isOverdue
-                      ? 'border-red-300 bg-red-50/40'
+                      ? 'border-red-300 bg-red-50/40 animate-pulse'
                       : 'border-border hover:border-primary/30'
                   }`}
+                  style={isOverdue ? { animationDuration: '2s' } : {}}
                 >
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 mt-1">

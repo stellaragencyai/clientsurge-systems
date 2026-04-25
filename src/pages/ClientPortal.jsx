@@ -20,7 +20,7 @@ const TABS = [
   { id: "progress", label: "Build Progress" },
   { id: "deadlines", label: "Deadlines" },
   { id: "files", label: "Files & Docs" },
-  { id: "billing", label: "Billing & Invoices" },
+  { id: "billing", label: "Billing" },
   { id: "support", label: "Support & Messaging" },
   { id: "plan", label: "My Plan" },
 ];
@@ -216,14 +216,14 @@ export default function ClientPortal() {
       {/* Payment Failed Banner */}
       <PaymentFailedBanner subscription={subscription} order={portalOrder} />
 
-      {/* Tabs */}
-      <div className="border-b border-border bg-white px-6">
-        <div className="max-w-4xl mx-auto flex gap-1">
+      {/* Tabs — horizontally scrollable on mobile */}
+      <div className="border-b border-border bg-white px-6 overflow-x-auto">
+        <div className="max-w-4xl mx-auto flex gap-1 min-w-max">
           {TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-5 py-4 text-sm font-semibold border-b-2 transition-all ${
+              className={`px-4 py-4 text-sm font-semibold border-b-2 transition-all whitespace-nowrap ${
                 activeTab === tab.id
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"

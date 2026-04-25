@@ -185,6 +185,7 @@ export default function LeadManagementDashboard() {
     intake_type: "all",
     stage_group: "all",
     segment: "all",
+    priority: "all",
   });
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -792,6 +793,18 @@ export default function LeadManagementDashboard() {
                 </option>
               ))}
             </select>
+
+            <select
+              value={filters.priority}
+              onChange={(event) => handleFilterChange("priority", event.target.value)}
+              className="rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            >
+              <option value="all">All Priorities</option>
+              <option value="Hot">🔥 Hot</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
           </div>
 
           <div className="overflow-hidden rounded-xl border border-border">
@@ -851,6 +864,15 @@ export default function LeadManagementDashboard() {
                               </span>
                               {lead.lead_score != null && (
                                 <LeadScoreBadge score={lead.lead_score} />
+                              )}
+                              {lead.activation_priority && lead.activation_priority !== 'Low' && (
+                                <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${
+                                  lead.activation_priority === 'Hot' ? 'bg-red-100 text-red-700' :
+                                  lead.activation_priority === 'High' ? 'bg-orange-100 text-orange-700' :
+                                  'bg-amber-100 text-amber-700'
+                                }`}>
+                                  {lead.activation_priority === 'Hot' ? '🔥' : ''} {lead.activation_priority}
+                                </span>
                               )}
                               {(() => {
                                 const isStale = ["New","Contacted"].includes(lead.status) &&
