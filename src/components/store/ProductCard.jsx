@@ -14,13 +14,15 @@ export default function ProductCard({ product }) {
     <div
       style={{
         borderRadius: "20px",
-        border: inCart ? "2px solid rgba(154,92,46,0.6)" : "1.5px solid rgba(154,92,46,0.15)",
+        border: inCart ? "2px solid rgba(240,200,120,0.55)" : "1.5px solid rgba(200,150,92,0.25)",
         background: inCart
-          ? "linear-gradient(135deg, rgba(255,248,235,0.95) 0%, rgba(252,238,210,0.9) 100%)"
-          : "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(252,248,242,0.85) 100%)",
+          ? "rgba(154,92,46,0.22)"
+          : "rgba(255,255,255,0.07)",
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
         boxShadow: inCart
-          ? "0 8px 32px rgba(154,92,46,0.18), inset 0 1px 0 rgba(255,255,255,0.9)"
-          : "0 2px 12px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.8)",
+          ? "0 8px 36px rgba(154,92,46,0.28), inset 0 1px 0 rgba(255,255,255,0.15)"
+          : "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
         padding: "24px",
         display: "flex",
         flexDirection: "column",
@@ -58,11 +60,11 @@ export default function ProductCard({ product }) {
             fontWeight: "700",
             textTransform: "uppercase",
             letterSpacing: "0.12em",
-            color: "rgba(154,92,46,0.7)",
-            background: "rgba(154,92,46,0.08)",
+            color: "#f0c878",
+            background: "rgba(200,150,92,0.18)",
             padding: "3px 9px",
             borderRadius: "20px",
-            border: "1px solid rgba(154,92,46,0.15)",
+            border: "1px solid rgba(200,150,92,0.35)",
           }}
         >
           {product.category}
@@ -74,19 +76,20 @@ export default function ProductCard({ product }) {
           style={{
             fontSize: "15px",
             fontWeight: "700",
-            color: "#1a1209",
+            color: "#fff",
             margin: "0 0 2px",
             lineHeight: 1.2,
+            textShadow: "0 1px 4px rgba(0,0,0,0.3)",
           }}
         >
           {product.name}
         </h3>
-        <p style={{ fontSize: "11px", color: "rgba(154,92,46,0.7)", fontWeight: "600", margin: 0 }}>
+        <p style={{ fontSize: "11px", color: "rgba(240,200,120,0.85)", fontWeight: "600", margin: 0 }}>
           {product.subtitle}
         </p>
       </div>
 
-      <p style={{ fontSize: "12.5px", color: "rgba(26,18,9,0.6)", lineHeight: 1.6, margin: 0 }}>
+      <p style={{ fontSize: "12.5px", color: "rgba(255,225,175,0.72)", lineHeight: 1.6, margin: 0 }}>
         {product.description}
       </p>
 
@@ -94,27 +97,28 @@ export default function ProductCard({ product }) {
         {product.highlights.map((highlight) => (
           <div key={highlight} style={{ display: "flex", alignItems: "center", gap: "7px" }}>
             <CheckCircle2 style={{ width: "12px", height: "12px", color: "#22c55e", flexShrink: 0 }} />
-            <span style={{ fontSize: "11.5px", color: "rgba(26,18,9,0.65)", fontWeight: "500" }}>
+            <span style={{ fontSize: "11.5px", color: "rgba(255,220,170,0.8)", fontWeight: "500" }}>
               {highlight}
             </span>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "flex", gap: "10px", paddingTop: "8px", borderTop: "1px solid rgba(154,92,46,0.1)" }}>
+      <div style={{ display: "flex", gap: "10px", paddingTop: "8px", borderTop: "1px solid rgba(200,150,92,0.2)" }}>
         <div
           style={{
             flex: 1,
-            background: "rgba(154,92,46,0.06)",
+            background: "rgba(255,255,255,0.07)",
             borderRadius: "10px",
             padding: "8px 10px",
             textAlign: "center",
+            border: "1px solid rgba(200,150,92,0.18)",
           }}
         >
           <p
             style={{
               fontSize: "9px",
-              color: "rgba(26,18,9,0.4)",
+              color: "rgba(240,200,120,0.6)",
               fontWeight: "600",
               textTransform: "uppercase",
               letterSpacing: "0.08em",
@@ -123,24 +127,25 @@ export default function ProductCard({ product }) {
           >
             Setup
           </p>
-          <p style={{ fontSize: "17px", fontWeight: "800", color: "#1a1209", margin: 0 }}>
+          <p style={{ fontSize: "17px", fontWeight: "800", color: "#fff", margin: 0 }}>
             ${product.setup_fee}
           </p>
-          <p style={{ fontSize: "9px", color: "rgba(26,18,9,0.35)", margin: 0 }}>one-time</p>
+          <p style={{ fontSize: "9px", color: "rgba(255,200,120,0.45)", margin: 0 }}>one-time</p>
         </div>
         <div
           style={{
             flex: 1,
-            background: "rgba(154,92,46,0.06)",
+            background: "rgba(255,255,255,0.07)",
             borderRadius: "10px",
             padding: "8px 10px",
             textAlign: "center",
+            border: "1px solid rgba(200,150,92,0.18)",
           }}
         >
           <p
             style={{
               fontSize: "9px",
-              color: "rgba(26,18,9,0.4)",
+              color: "rgba(240,200,120,0.6)",
               fontWeight: "600",
               textTransform: "uppercase",
               letterSpacing: "0.08em",
@@ -149,10 +154,10 @@ export default function ProductCard({ product }) {
           >
             Monthly
           </p>
-          <p style={{ fontSize: "17px", fontWeight: "800", color: "#9a5c2e", margin: 0 }}>
+          <p style={{ fontSize: "17px", fontWeight: "800", color: "#f0c878", margin: 0 }}>
             ${product.monthly_fee}
           </p>
-          <p style={{ fontSize: "9px", color: "rgba(26,18,9,0.35)", margin: 0 }}>per month</p>
+          <p style={{ fontSize: "9px", color: "rgba(255,200,120,0.45)", margin: 0 }}>per month</p>
         </div>
       </div>
 

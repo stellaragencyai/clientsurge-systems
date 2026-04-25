@@ -62,10 +62,50 @@ function StoreInner() {
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #fdfcfa 0%, #f8f4ee 40%, #faf7f2 100%)",
         fontFamily: "'Inter', sans-serif",
+        position: "relative",
       }}
     >
+      {/* Full-page wallpaper */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          backgroundImage: "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/b3df6b4fc_Gemini_Generated_Image_jlrxmdjlrxmdjlrx.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+      {/* Dark overlay for readability */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 1,
+          background: "linear-gradient(135deg, rgba(15,8,2,0.62) 0%, rgba(30,15,5,0.55) 50%, rgba(20,10,2,0.65) 100%)",
+        }}
+      />
+
+      {/* All content sits above the fixed background */}
+      <div style={{ position: "relative", zIndex: 2 }}>
+      <style>{`
+        .store-page nav {
+          background: rgba(15,8,2,0.35) !important;
+          border-bottom-color: rgba(200,150,92,0.2) !important;
+          backdrop-filter: blur(20px) !important;
+          -webkit-backdrop-filter: blur(20px) !important;
+        }
+        .store-page nav .text-foreground { color: #f5e6d0 !important; }
+        .store-page nav .text-muted-foreground { color: rgba(245,230,208,0.6) !important; }
+        .store-page nav .border-border { border-color: rgba(200,150,92,0.25) !important; }
+        .store-page nav .bg-background\\/50, .store-page nav .bg-background\\/70 { background: rgba(255,255,255,0.06) !important; }
+        .store-page footer { background: rgba(10,5,0,0.7) !important; border-top-color: rgba(200,150,92,0.2) !important; }
+      `}</style>
+      <div className="store-page">
       <Navbar />
 
       <div style={{ textAlign: "center", padding: "64px 24px 48px", position: "relative" }}>
@@ -77,16 +117,18 @@ function StoreInner() {
             borderRadius: "9999px",
             padding: "6px 16px",
             marginBottom: "20px",
-            background: "rgba(154,92,46,0.08)",
-            border: "1px solid rgba(154,92,46,0.2)",
+            background: "rgba(200,150,92,0.18)",
+            border: "1px solid rgba(200,150,92,0.4)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
           }}
         >
-          <Zap style={{ width: "12px", height: "12px", color: "#9a5c2e" }} />
+          <Zap style={{ width: "12px", height: "12px", color: "#f0c878" }} />
           <span
             style={{
               fontSize: "11px",
               fontWeight: "700",
-              color: "#9a5c2e",
+              color: "#f0c878",
               letterSpacing: "0.16em",
               textTransform: "uppercase",
             }}
@@ -101,14 +143,15 @@ function StoreInner() {
             fontWeight: "800",
             lineHeight: 1.08,
             letterSpacing: "-0.02em",
-            color: "#1a1209",
+            color: "#fff",
             marginBottom: "16px",
+            textShadow: "0 2px 20px rgba(0,0,0,0.5)",
           }}
         >
           Build Your{" "}
           <span
             style={{
-              background: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 50%, #9a5c2e 100%)",
+              background: "linear-gradient(135deg, #f5d9a8 0%, #e8a84a 50%, #c8965c 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -120,7 +163,7 @@ function StoreInner() {
         <p
           style={{
             fontSize: "1.1rem",
-            color: "rgba(26,18,9,0.55)",
+            color: "rgba(255,240,210,0.75)",
             lineHeight: 1.7,
             maxWidth: "560px",
             margin: "0 auto 32px",
@@ -137,8 +180,10 @@ function StoreInner() {
               margin: "0 auto 28px",
               padding: "18px 22px",
               borderRadius: "24px",
-              background: "rgba(154,92,46,0.06)",
-              border: "1px solid rgba(154,92,46,0.16)",
+              background: "rgba(255,255,255,0.07)",
+              border: "1px solid rgba(200,150,92,0.35)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
             }}
           >
             <p
@@ -147,7 +192,7 @@ function StoreInner() {
                 fontWeight: "700",
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
-                color: "#9a5c2e",
+                color: "#f0c878",
                 margin: "0 0 8px",
               }}
             >
@@ -156,7 +201,7 @@ function StoreInner() {
             <p
               style={{
                 fontSize: "15px",
-                color: "#1a1209",
+                color: "#fff",
                 fontWeight: "600",
                 margin: "0 0 6px",
               }}
@@ -167,7 +212,7 @@ function StoreInner() {
             <p
               style={{
                 fontSize: "13px",
-                color: "rgba(26,18,9,0.58)",
+                color: "rgba(255,230,180,0.7)",
                 lineHeight: 1.6,
                 margin: 0,
               }}
@@ -184,10 +229,10 @@ function StoreInner() {
             { label: "Cancel Anytime", val: "No Contracts" },
           ].map((stat) => (
             <div key={stat.label} style={{ textAlign: "center" }}>
-              <p style={{ fontSize: "20px", fontWeight: "800", color: "#9a5c2e", margin: "0 0 2px" }}>
+              <p style={{ fontSize: "20px", fontWeight: "800", color: "#f0c878", margin: "0 0 2px", textShadow: "0 2px 10px rgba(0,0,0,0.4)" }}>
                 {stat.val}
               </p>
-              <p style={{ fontSize: "11px", color: "rgba(26,18,9,0.4)", margin: 0, fontWeight: "600" }}>
+              <p style={{ fontSize: "11px", color: "rgba(255,220,160,0.55)", margin: 0, fontWeight: "600" }}>
                 {stat.label}
               </p>
             </div>
@@ -251,8 +296,10 @@ function StoreInner() {
               marginBottom: "18px",
               padding: "14px 18px",
               borderRadius: "18px",
-              background: "rgba(255,255,255,0.7)",
-              border: "1px solid rgba(154,92,46,0.12)",
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(200,150,92,0.3)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
             }}
           >
             <div>
@@ -260,7 +307,7 @@ function StoreInner() {
                 style={{
                   fontSize: "12px",
                   fontWeight: "700",
-                  color: "#9a5c2e",
+                  color: "#f0c878",
                   letterSpacing: "0.14em",
                   textTransform: "uppercase",
                   margin: "0 0 4px",
@@ -272,7 +319,7 @@ function StoreInner() {
                 style={{
                   fontSize: "14px",
                   fontWeight: "600",
-                  color: "#1a1209",
+                  color: "#fff",
                   margin: 0,
                 }}
               >
@@ -287,7 +334,7 @@ function StoreInner() {
                 gap: "8px",
                 fontSize: "13px",
                 fontWeight: "700",
-                color: "#9a5c2e",
+                color: "#f0c878",
                 textDecoration: "none",
               }}
             >
@@ -307,7 +354,7 @@ function StoreInner() {
                 transform: "translateY(-50%)",
                 width: "14px",
                 height: "14px",
-                color: "rgba(154,92,46,0.5)",
+                color: "rgba(240,200,120,0.6)",
               }}
             />
             <input
@@ -318,12 +365,15 @@ function StoreInner() {
               style={{
                 width: "100%",
                 borderRadius: "9999px",
-                border: "1.5px solid rgba(154,92,46,0.2)",
+                border: "1.5px solid rgba(200,150,92,0.35)",
                 padding: "9px 14px 9px 34px",
                 fontSize: "13px",
-                background: "rgba(255,255,255,0.8)",
+                background: "rgba(255,255,255,0.08)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
                 outline: "none",
                 boxSizing: "border-box",
+                color: "#fff",
               }}
             />
           </div>
@@ -338,16 +388,16 @@ function StoreInner() {
                   padding: "7px 16px",
                   fontSize: "12px",
                   fontWeight: "600",
-                  border: "none",
+                  border: activeCategory === category ? "1.5px solid rgba(240,200,120,0.6)" : "1.5px solid rgba(200,150,92,0.25)",
                   cursor: "pointer",
-                  background:
-                    activeCategory === category
-                      ? "linear-gradient(135deg,#6b3f1f,#9a5c2e)"
-                      : "rgba(154,92,46,0.07)",
-                  color: activeCategory === category ? "#f5e6d0" : "rgba(26,18,9,0.6)",
+                  background: activeCategory === category
+                    ? "linear-gradient(135deg,#6b3f1f,#9a5c2e)"
+                    : "rgba(255,255,255,0.08)",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                  color: activeCategory === category ? "#f5e6d0" : "rgba(255,220,160,0.8)",
                   transition: "all 0.2s",
-                  boxShadow:
-                    activeCategory === category ? "0 2px 8px rgba(120,70,20,0.25)" : "none",
+                  boxShadow: activeCategory === category ? "0 2px 12px rgba(120,70,20,0.4)" : "none",
                 }}
               >
                 {category}
@@ -363,7 +413,7 @@ function StoreInner() {
         </div>
 
         {filtered.length === 0 && (
-          <div style={{ textAlign: "center", padding: "48px", color: "rgba(26,18,9,0.4)" }}>
+          <div style={{ textAlign: "center", padding: "48px", color: "rgba(255,220,160,0.5)" }}>
             <p style={{ fontSize: "16px", fontWeight: "600" }}>No services match your search</p>
           </div>
         )}
@@ -377,6 +427,8 @@ function StoreInner() {
 
       <CartSidebar />
       <Footer />
+      </div>
+      </div>
     </div>
   );
 }
