@@ -12,26 +12,49 @@ export default function ProductCard({ product }) {
 
   return (
     <div
+      className="product-card"
       style={{
         borderRadius: "20px",
-        border: inCart ? "2px solid rgba(240,200,120,0.55)" : "1.5px solid rgba(200,150,92,0.25)",
+        border: inCart ? "2px solid rgba(240,200,120,0.55)" : "1.5px solid rgba(200,150,92,0.18)",
         background: inCart
-          ? "rgba(154,92,46,0.22)"
-          : "rgba(255,255,255,0.07)",
-        backdropFilter: "blur(18px)",
-        WebkitBackdropFilter: "blur(18px)",
+          ? "rgba(154,92,46,0.14)"
+          : "rgba(255,255,255,0.03)",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
         boxShadow: inCart
-          ? "0 8px 36px rgba(154,92,46,0.28), inset 0 1px 0 rgba(255,255,255,0.15)"
-          : "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1)",
+          ? "0 8px 36px rgba(154,92,46,0.22), inset 0 1px 0 rgba(255,255,255,0.1)"
+          : "0 4px 24px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.06)",
         padding: "24px",
         display: "flex",
         flexDirection: "column",
         gap: "14px",
         position: "relative",
-        transition: "all 0.2s ease",
+        transition: "all 0.35s ease",
         cursor: "default",
+        overflow: "hidden",
       }}
     >
+      {/* Hover glow sweep */}
+      <div className="card-glow" style={{
+        position: "absolute",
+        inset: 0,
+        borderRadius: "20px",
+        background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,150,92,0.22) 0%, transparent 70%)",
+        opacity: 0,
+        transition: "opacity 0.4s ease",
+        pointerEvents: "none",
+        zIndex: 0,
+      }} />
+      <style>{`
+        .product-card:hover .card-glow { opacity: 1 !important; }
+        .product-card:hover {
+          border-color: rgba(240,200,120,0.45) !important;
+          background: rgba(255,255,255,0.06) !important;
+          box-shadow: 0 12px 48px rgba(154,92,46,0.28), 0 0 0 1px rgba(240,200,120,0.15), inset 0 1px 0 rgba(255,255,255,0.12) !important;
+          transform: translateY(-3px);
+        }
+      `}</style>
+      {/* content wrapper (display:contents passes flex layout through) */}
       {product.popular ? (
         <div
           style={{
