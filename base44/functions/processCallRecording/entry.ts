@@ -25,6 +25,10 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  buildWebhookAuthErrorResponse,
+  verifyTwilioWebhookRequest,
+} from "../_shared/webhookSecurity.js";
 
 function normalizePhone(phone) {
   if (!phone) return "";
@@ -65,19 +69,36 @@ async function fetchRecordingMetadata(accountSid, authToken, recordingSid) {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
+    let user = null;
+    try { user = await base44.auth.me(); } catch (_) {}
 
     // Parse Twilio webhook form data (Twilio sends as application/x-www-form-urlencoded)
     const contentType = req.headers.get("content-type") || "";
     let params = {};
+    let verifiedTwilioWebhook = false;
 
     if (contentType.includes("application/x-www-form-urlencoded")) {
-      const text = await req.text();
-      params = Object.fromEntries(new URLSearchParams(text));
-    } else if (contentType.includes("application/json")) {
-      params = await req.json().catch(() => ({}));
+      const formData = await req.formData();
+      const verification = await verifyTwilioWebhookRequest({ req, formData });
+      if (!verification.ok) {
+        console.warn("Rejected untrusted Twilio recording webhook", verification);
+        return buildWebhookAuthErrorResponse({
+          provider: "twilio",
+          code: verification.code,
+        });
+      }
+      verifiedTwilioWebhook = true;
+      params = Object.fromEntries(formData.entries());
     } else {
       // Support direct admin test call
+      if (!user || user.role !== "admin") {
+        return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+      }
       params = await req.json().catch(() => ({}));
     }
 
@@ -104,7 +125,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: "RecordingSid required" }, { status: 400 });
     }
 
-    console.log(`processCallRecording: RecordingSid=${recordingSid}, CallSid=${callSid}, caller=${callerRaw}, duration=${durationSecs}s`);
+    console.log(`processCallRecording: RecordingSid=${recordingSid}, CallSid=${callSid}, duration=${durationSecs}s, verified=${verifiedTwilioWebhook}`);
 
     // Find matching lead by phone number
     let lead = null;
@@ -115,7 +136,7 @@ Deno.serve(async (req) => {
       const callerNorm = normalizePhone(callerRaw);
       const calledNorm = normalizePhone(calledRaw);
 
-      const allLeads = await base44.asServiceRole.entities.Leads.list("-created_date", 500);
+      const allLeads = await base44.asServiceRole.entities.Leads.list("-created_date", 5000);
       for (const l of allLeads || []) {
         const leadPhoneNorm = normalizePhone(l.phone);
         if (leadPhoneNorm && (leadPhoneNorm === callerNorm || leadPhoneNorm === calledNorm)) {
@@ -262,14 +283,14 @@ Short calls (< 60s) likely indicate voicemail or no answer.`;
       call_sid: callSid,
       duration_secs: durationSecs,
       has_transcript: !!transcript,
-      recording_url: recordingMp3Url,
+      recording_url_present: !!recordingMp3Url,
       ai_summary: aiSummary,
     });
 
     // Step 4: Save to CommunicationEvent (shows in Activity Timeline)
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id: leadId,
-      channel: "sms", // using closest existing enum — "phone" not in enum
+      channel: "internal",
       direction: "inbound",
       event_type: "status_update",
       provider: "twilio",
@@ -302,6 +323,9 @@ Short calls (< 60s) likely indicate voicemail or no answer.`;
       leadUpdate.reply_sentiment = aiSummary.overall_sentiment;
       leadUpdate.reply_sentiment_reason = `From call recording: ${aiSummary.summary?.slice(0, 200)}`;
       leadUpdate.reply_sentiment_analyzed_at = new Date().toISOString();
+    }
+    if (aiSummary.recommended_next_status && ["Contacted", "Replied", "Qualified", "Booking Prompt Sent", "Booked"].includes(aiSummary.recommended_next_status)) {
+      leadUpdate.status = aiSummary.recommended_next_status;
     }
     await base44.asServiceRole.entities.Leads.update(leadId, leadUpdate);
 

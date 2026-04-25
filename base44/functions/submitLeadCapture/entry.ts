@@ -12,6 +12,8 @@ function sanitizeString(value: unknown) {
 }
 
 function normalizeLeadInput(payload: Record<string, unknown>) {
+  const realWebsite = sanitizeString(payload.website_url || payload.website);
+  const honeypot = sanitizeString(payload.website_hp || payload.website_honeypot || payload.company_website_hp);
   return {
     full_name: sanitizeString(payload.full_name),
     business_name: sanitizeString(payload.business_name),
@@ -19,13 +21,20 @@ function normalizeLeadInput(payload: Record<string, unknown>) {
     phone: sanitizeString(payload.phone),
     business_type: sanitizeString(payload.business_type),
     problem: sanitizeString(payload.problem),
-    website_url: sanitizeString(payload.website_url),
+    website_url: realWebsite,
+    honeypot,
   };
 }
 
 function buildLeadPayload(lead: ReturnType<typeof normalizeLeadInput>, status: string) {
   return {
-    ...lead,
+    full_name: lead.full_name,
+    business_name: lead.business_name,
+    email: lead.email,
+    phone: lead.phone,
+    business_type: lead.business_type,
+    problem: lead.problem,
+    website: lead.website_url,
     source: LEAD_SOURCE,
     intake_type: INTAKE_TYPE,
     status,
@@ -120,7 +129,7 @@ Deno.serve(async (req) => {
     const payload = await req.json();
     const lead = normalizeLeadInput(payload);
 
-    if (lead.website_url) {
+    if (lead.honeypot) {
       return Response.json({ success: true, ignored: true });
     }
 
@@ -154,7 +163,18 @@ Deno.serve(async (req) => {
             ? duplicateLead.status
             : 'New';
 
-      await base44.asServiceRole.entities.Leads.update(duplicateLead.id, buildLeadPayload(lead, nextStatus));
+      await base44.asServiceRole.entities.Leads.update(duplicateLead.id, {
+        status: nextStatus,
+        full_name: duplicateLead.full_name || lead.full_name,
+        business_name: duplicateLead.business_name || lead.business_name,
+        email: duplicateLead.email || lead.email,
+        phone: duplicateLead.phone || lead.phone,
+        business_type: duplicateLead.business_type || lead.business_type,
+        problem: duplicateLead.problem || lead.problem,
+        website: duplicateLead.website || lead.website_url,
+        source: duplicateLead.source || LEAD_SOURCE,
+        intake_type: duplicateLead.intake_type || INTAKE_TYPE,
+      });
       await logLeadCreated(base44, duplicateLead.id, 'updated', lead);
 
       return Response.json({

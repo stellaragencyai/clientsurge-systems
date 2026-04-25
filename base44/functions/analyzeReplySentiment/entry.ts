@@ -15,8 +15,22 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
+    const isAutomationPayload = !!(body?.event?.entity_id || body?.data?.id);
+
+    let user = null;
+    try { user = await base44.auth.me(); } catch (_) {}
+    if (user && user.role !== "admin") {
+      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    }
+    if (!user && !isAutomationPayload) {
+      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    }
 
     // Support automation payload (Messages entity) and direct call
     const messageData = body?.data ?? {};
@@ -86,12 +100,12 @@ Respond ONLY with valid JSON in this exact format:
       }
     });
 
-    const sentiment = result?.sentiment ?? "Unknown";
+    const sentiment = result?.sentiment ?? null;
     const reason = result?.reason ?? "";
 
     // Validate the result
     const validSentiments = ["Positive", "Neutral", "Negative"];
-    const finalSentiment = validSentiments.includes(sentiment) ? sentiment : "Unknown";
+    const finalSentiment = validSentiments.includes(sentiment) ? sentiment : (lead.reply_sentiment || "Unknown");
 
     // Save to lead record
     await base44.asServiceRole.entities.Leads.update(leadId, {

@@ -8,6 +8,10 @@ import { syncSubscriptionFromStripe } from "../_shared/subscriptionSync.js";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 
+function normalizeEmail(value) {
+  return typeof value === "string" ? value.trim().toLowerCase() : "";
+}
+
 Deno.serve(async (req) => {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -92,7 +96,6 @@ Deno.serve(async (req) => {
     // ── Payment Failed: pause campaigns + update order + notify admin ──
     if (event.type === "invoice.payment_failed") {
       const invoice = event.data.object;
-      const invoice = event.data.object;
       const stripeCustomerId = invoice.customer;
       console.log(`Payment failed for Stripe customer: ${stripeCustomerId}`);
 
@@ -108,22 +111,25 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.entities.Order.update(order.id, { payment_status: "failed" });
         console.log(`Order ${order.id} marked as payment failed`);
 
-        // 2. Pause all active DripCampaigns for leads linked to this client
-        const dripCampaigns = await base44.asServiceRole.entities.DripCampaign.filter({ status: "active" });
-        // Pause all active nurture campaigns too
-        const nurtureCampaigns = await base44.asServiceRole.entities.NurtureCampaign.filter({ status: "active" });
+        const normalizedCustomerEmail = normalizeEmail(order.customer_email);
+        const dripCampaigns = await base44.asServiceRole.entities.DripCampaign.filter({ status: "active" }, "-created_date", 5000);
+        const nurtureCampaigns = await base44.asServiceRole.entities.NurtureCampaign.filter({ status: "active" }, "-created_date", 5000);
+        const matchingDripCampaigns = (dripCampaigns || []).filter((campaign) =>
+          normalizeEmail(campaign.lead_email) === normalizedCustomerEmail
+        );
+        const matchingNurtureCampaigns = (nurtureCampaigns || []).filter((campaign) =>
+          normalizeEmail(campaign.lead_email) === normalizedCustomerEmail
+        );
 
-        // We pause ALL active campaigns as a blanket action (client-level pause)
-        // A more targeted approach would need a client_id on each campaign
         const pauseResults = await Promise.allSettled([
-          ...dripCampaigns.map(c =>
+          ...matchingDripCampaigns.map(c =>
             base44.asServiceRole.entities.DripCampaign.update(c.id, { status: "paused", stop_reason: "manual_pause", notes: (c.notes || "") + `\n[Payment Failed: ${new Date().toISOString()}] Paused due to failed payment for order ${order.id}.` })
           ),
-          ...nurtureCampaigns.map(c =>
+          ...matchingNurtureCampaigns.map(c =>
             base44.asServiceRole.entities.NurtureCampaign.update(c.id, { status: "paused", notes: (c.notes || "") + `\n[Payment Failed: ${new Date().toISOString()}] Paused due to failed payment for order ${order.id}.` })
           ),
         ]);
-        console.log(`Paused ${dripCampaigns.length} drip + ${nurtureCampaigns.length} nurture campaigns`);
+        console.log(`Paused ${matchingDripCampaigns.length} drip + ${matchingNurtureCampaigns.length} nurture campaigns`);
 
         // 3. Notify admin via email
         const adminEmail = `
@@ -144,10 +150,10 @@ Deno.serve(async (req) => {
       <p style="margin:0;font-size:13px;color:#7f1d1d;font-weight:600;">Actions Taken Automatically</p>
       <ul style="margin:8px 0 0;padding-left:18px;font-size:13px;color:#991b1b;line-height:1.8;">
         <li>Order payment_status set to <strong>failed</strong></li>
-        <li>${dripCampaigns.length} drip campaign(s) paused</li>
-        <li>${nurtureCampaigns.length} nurture campaign(s) paused</li>
-      </ul>
-    </div>
+          <li>${matchingDripCampaigns.length} drip campaign(s) paused</li>
+          <li>${matchingNurtureCampaigns.length} nurture campaign(s) paused</li>
+        </ul>
+      </div>
     <p style="margin-top:16px;font-size:13px;color:#555;">The client's portal now shows a payment failed banner prompting them to update their payment method. Campaigns will remain paused until payment is resolved.</p>
     <div style="margin-top:20px;text-align:center;">
       <a href="https://dashboard.stripe.com/customers/${stripeCustomerId}" style="display:inline-block;background:#dc2626;color:white;text-decoration:none;font-weight:700;font-size:14px;padding:12px 28px;border-radius:9999px;">View in Stripe →</a>
@@ -161,6 +167,11 @@ Deno.serve(async (req) => {
           subject: `⚠️ Payment Failed — ${order.business_name || order.customer_name} (${order.customer_email})`,
           body: adminEmail,
         });
+
+        const failedPauseCount = pauseResults.filter((result) => result.status === "rejected").length;
+        if (failedPauseCount > 0) {
+          console.warn(`Failed to pause ${failedPauseCount} campaign(s) for order ${order.id}`);
+        }
 
         console.log(`Admin notified of payment failure for order ${order.id}`);
       }

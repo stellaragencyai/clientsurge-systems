@@ -1,12 +1,39 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 Deno.serve(async (req) => {
   try {
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
+    let user = null;
+    try { user = await base44.auth.me(); } catch (_) {}
+    if (!user || user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden: Admin only' }, { status: 403 });
+    }
+
     const { lead_id, lead_name, lead_email, business_name, client_email } = await req.json();
 
     if (!lead_id || !lead_email || !client_email) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
+    if (!lead) {
+      return Response.json({ error: 'Lead not found' }, { status: 404 });
+    }
+    if (lead.email !== lead_email) {
+      return Response.json({ error: 'lead_email does not match lead record' }, { status: 400 });
     }
 
     const subject = `✅ Appointment Booked: ${lead_name}`;
@@ -36,22 +63,22 @@ Deno.serve(async (req) => {
     <div class="content">
       <h2 style="color: #2d2d2d; margin-top: 0;">Booking Confirmed</h2>
       
-      <p><strong>${lead_name}</strong> from <strong>${business_name}</strong> has successfully booked an appointment.</p>
+      <p><strong>${escapeHtml(lead_name)}</strong> from <strong>${escapeHtml(business_name)}</strong> has successfully booked an appointment.</p>
       
       <div style="background: white; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #10b981;">
         <div class="metric">
           <div class="metric-label">Lead Name</div>
-          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${lead_name}</div>
+          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${escapeHtml(lead_name)}</div>
         </div>
         <br />
         <div class="metric">
           <div class="metric-label">Business</div>
-          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${business_name}</div>
+          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${escapeHtml(business_name)}</div>
         </div>
         <br />
         <div class="metric">
           <div class="metric-label">Email</div>
-          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${lead_email}</div>
+          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${escapeHtml(lead_email)}</div>
         </div>
       </div>
 
@@ -78,6 +105,21 @@ Deno.serve(async (req) => {
       from_name: 'ClientSurge Systems',
       subject,
       body,
+    });
+
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id,
+      channel: 'email',
+      direction: 'outbound',
+      event_type: 'email_sent',
+      provider: 'internal',
+      status: 'sent',
+      subject,
+      message_body: 'Appointment booked notification sent to client.',
+      metadata_json: JSON.stringify({
+        target: 'appointment_booked_notification',
+        client_email,
+      }),
     });
 
     return Response.json({ success: true, message: 'Appointment booked email sent' });

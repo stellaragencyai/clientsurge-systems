@@ -1,12 +1,39 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 Deno.serve(async (req) => {
   try {
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
+    let user = null;
+    try { user = await base44.auth.me(); } catch (_) {}
+    if (!user || user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden: Admin only' }, { status: 403 });
+    }
+
     const { lead_id, lead_name, lead_phone, business_name, client_email } = await req.json();
 
     if (!lead_id || !lead_phone || !client_email) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
+    if (!lead) {
+      return Response.json({ error: 'Lead not found' }, { status: 404 });
+    }
+    if (lead.phone !== lead_phone) {
+      return Response.json({ error: 'lead_phone does not match lead record' }, { status: 400 });
     }
 
     const subject = `📞 Missed Call Recovered: ${lead_name}`;
@@ -37,7 +64,7 @@ Deno.serve(async (req) => {
     <div class="content">
       <h2 style="color: #2d2d2d; margin-top: 0;">Quick Recovery</h2>
       
-      <p>A missed call from <strong>${lead_name}</strong> (${business_name}) was automatically recovered before the lead was lost.</p>
+      <p>A missed call from <strong>${escapeHtml(lead_name)}</strong> (${escapeHtml(business_name)}) was automatically recovered before the lead was lost.</p>
       
       <div class="alert-box">
         <p style="margin: 0; color: #92400e;"><strong>⚡ What happened:</strong> When the call was missed, your system immediately sent an SMS follow-up, bringing the lead back into the conversation.</p>
@@ -46,17 +73,17 @@ Deno.serve(async (req) => {
       <div style="background: white; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #f59e0b;">
         <div class="metric">
           <div class="metric-label">Lead Name</div>
-          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${lead_name}</div>
+          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${escapeHtml(lead_name)}</div>
         </div>
         <br />
         <div class="metric">
           <div class="metric-label">Business</div>
-          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${business_name}</div>
+          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${escapeHtml(business_name)}</div>
         </div>
         <br />
         <div class="metric">
           <div class="metric-label">Phone</div>
-          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${lead_phone}</div>
+          <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${escapeHtml(lead_phone)}</div>
         </div>
       </div>
 
@@ -83,6 +110,21 @@ Deno.serve(async (req) => {
       from_name: 'ClientSurge Systems',
       subject,
       body,
+    });
+
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id,
+      channel: 'email',
+      direction: 'outbound',
+      event_type: 'email_sent',
+      provider: 'internal',
+      status: 'sent',
+      subject,
+      message_body: 'Missed call recovery notification sent to client.',
+      metadata_json: JSON.stringify({
+        target: 'missed_call_recovery_notification',
+        client_email,
+      }),
     });
 
     return Response.json({ success: true, message: 'Missed call recovery email sent' });

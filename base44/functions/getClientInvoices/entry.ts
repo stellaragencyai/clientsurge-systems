@@ -1,7 +1,12 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resolveClientPortalAccess } from '../_shared/portalOwnership.js';
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
@@ -16,7 +21,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing project_id' }, { status: 400 });
     }
 
-    // Fetch invoices for this project using filter (not list with 3rd arg)
+    if (user.role !== 'admin') {
+      const resolution = await resolveClientPortalAccess({
+        base44,
+        userEmail: user.email,
+      });
+
+      if (resolution.status !== 'resolved' || !resolution.project || resolution.project.id !== projectId) {
+        return Response.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     const invoices = await base44.asServiceRole.entities.Invoice.filter(
       { project_id: projectId },
       '-created_date',
@@ -28,7 +43,7 @@ Deno.serve(async (req) => {
       if (a.payment_status !== b.payment_status) {
         return a.payment_status === 'unpaid' ? -1 : 1;
       }
-      return new Date(b.due_date || 0) - new Date(a.due_date || 0);
+      return new Date(a.due_date || 0).getTime() - new Date(b.due_date || 0).getTime();
     });
 
     // Calculate summaries

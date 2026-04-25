@@ -202,7 +202,7 @@ Deno.serve(async (req) => {
     const campaigns = await base44.asServiceRole.entities.NurtureCampaign.filter(
       { status: "active" },
       "-enrolled_at",
-      500
+      5000
     );
 
     if (!campaigns?.length) {
@@ -277,7 +277,7 @@ Deno.serve(async (req) => {
           let error = null;
 
           try {
-            await sendEmail(campaign.lead_email, subject, html, resendKey, fromEmail);
+            await sendEmail(lead.email || campaign.lead_email, subject, html, resendKey, fromEmail);
             sent = true;
           } catch (err) {
             error = err.message;

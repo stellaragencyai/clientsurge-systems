@@ -18,8 +18,19 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+const EVENT_LIMIT = 200;
+const MESSAGE_LIMIT = 50;
+const VALID_TIERS = ["Hot", "Warm", "Cold", "Not Qualified"];
+const VALID_CHANNELS = ["sms", "email", "call", "internal"];
+const VALID_TIMINGS = ["now", "within 24h", "within 48h", "this week"];
+const VALID_OFFERS = ["Starter System", "Growth System", "Pro System", "None — not a fit"];
+
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
 
     let user = null;
@@ -37,8 +48,8 @@ Deno.serve(async (req) => {
     // Load lead + communication history in parallel
     const [lead, events, messages] = await Promise.all([
       base44.asServiceRole.entities.Leads.get(leadId),
-      base44.asServiceRole.entities.CommunicationEvent.filter({ lead_id: leadId }, "-created_date", 50),
-      base44.asServiceRole.entities.Messages.filter({ lead_id: leadId }, "-created_date", 20),
+      base44.asServiceRole.entities.CommunicationEvent.filter({ lead_id: leadId }, "-created_date", EVENT_LIMIT),
+      base44.asServiceRole.entities.Messages.filter({ lead_id: leadId }, "-created_date", MESSAGE_LIMIT),
     ]);
 
     if (!lead) {
@@ -126,7 +137,7 @@ Based on ALL this data, provide a comprehensive lead qualification analysis. Ret
       response_json_schema: {
         type: "object",
         properties: {
-          qualification_tier: { type: "string" },
+          qualification_tier: { type: "string", enum: VALID_TIERS },
           qualification_summary: { type: "string" },
           key_signals: { type: "array", items: { type: "string" } },
           follow_up_actions: {
@@ -137,16 +148,29 @@ Based on ALL this data, provide a comprehensive lead qualification analysis. Ret
                 priority: { type: "number" },
                 action: { type: "string" },
                 detail: { type: "string" },
-                channel: { type: "string" },
-                timing: { type: "string" },
-              }
+                channel: { type: "string", enum: VALID_CHANNELS },
+                timing: { type: "string", enum: VALID_TIMINGS },
+              },
+              required: ["priority", "action", "detail", "channel", "timing"],
             }
           },
-          recommended_offer: { type: "string" },
+          recommended_offer: { type: "string", enum: VALID_OFFERS },
           offer_reason: { type: "string" },
-        }
+        },
+        required: [
+          "qualification_tier",
+          "qualification_summary",
+          "key_signals",
+          "follow_up_actions",
+          "recommended_offer",
+          "offer_reason",
+        ],
       }
     });
+
+    if (!VALID_TIERS.includes(result?.qualification_tier)) {
+      return Response.json({ error: "AI qualification response was invalid" }, { status: 502 });
+    }
 
     // Save key qualification fields back to lead
     const tierToCategory = {
@@ -167,7 +191,14 @@ Based on ALL this data, provide a comprehensive lead qualification analysis. Ret
         offer_reason: result.offer_reason,
         generated_at: new Date().toISOString(),
       }),
-      ai_confidence: result.qualification_tier === "Hot" ? 0.9 : result.qualification_tier === "Warm" ? 0.7 : 0.5,
+      ai_confidence:
+        typeof result.confidence === "number"
+          ? Math.max(0, Math.min(1, result.confidence))
+          : result.qualification_tier === "Hot"
+            ? 0.9
+            : result.qualification_tier === "Warm"
+              ? 0.7
+              : 0.5,
     });
 
     // Log event

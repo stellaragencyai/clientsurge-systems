@@ -5,10 +5,33 @@
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 Deno.serve(async (req) => {
   try {
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const isAutomationPayload = !!(body?.event?.entity_id || body?.data?.id);
+
+    let user = null;
+    try { user = await base44.auth.me(); } catch (_) {}
+    if (user && user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden: Admin only' }, { status: 403 });
+    }
+    if (!user && !isAutomationPayload) {
+      return Response.json({ error: 'Forbidden: Admin only' }, { status: 403 });
+    }
 
     // Support both direct call (lead_id) and entity automation payload (event.entity_id)
     const lead_id = body?.lead_id || body?.event?.entity_id || body?.data?.id;
@@ -24,6 +47,9 @@ Deno.serve(async (req) => {
 
     const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
     const settings = settingsRecords?.[0] || {};
+    if (!settings.resend_enabled) {
+      return Response.json({ skipped: true, reason: 'Resend is disabled in AdminSettings' });
+    }
 
     const toEmail = settings.lead_notification_email;
     if (!toEmail) {
@@ -41,6 +67,13 @@ Deno.serve(async (req) => {
       month: 'short', day: 'numeric', year: 'numeric',
       hour: '2-digit', minute: '2-digit',
     });
+    lead.full_name = escapeHtml(lead.full_name || '');
+    lead.business_name = escapeHtml(lead.business_name || '');
+    lead.email = escapeHtml(lead.email || '');
+    lead.phone = escapeHtml(lead.phone || '');
+    lead.business_type = escapeHtml(lead.business_type || '');
+    lead.source = escapeHtml(lead.source || '');
+    lead.problem = escapeHtml(lead.problem || '');
 
     const htmlBody = `
 <!DOCTYPE html>
@@ -92,8 +125,23 @@ Deno.serve(async (req) => {
       return Response.json({ error: err?.message || 'Resend failed' }, { status: 500 });
     }
 
+    const resendData = await res.json().catch(() => ({}));
+
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id,
+      channel: 'email',
+      direction: 'outbound',
+      event_type: 'email_sent',
+      provider: 'resend',
+      status: 'sent',
+      subject: `Lead notification sent to ${toEmail}`,
+      message_body: 'Admin lead notification email sent successfully.',
+      provider_message_id: resendData?.id,
+      metadata_json: JSON.stringify({ target: 'admin_notification', to_email: toEmail }),
+    });
+
     console.log(`Lead notification sent to ${toEmail} for lead ${lead_id}`);
-    return Response.json({ success: true, sent_to: toEmail });
+    return Response.json({ success: true, sent_to: toEmail, email_id: resendData?.id || null });
 
   } catch (error) {
     console.error('sendAdminLeadNotification error:', error);

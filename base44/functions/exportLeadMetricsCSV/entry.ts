@@ -1,7 +1,25 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
+
+const MAX_EXPORT_ROWS = 10000;
+
+function escapeCsvCell(value) {
+  let str = String(value ?? '');
+  if (/^[=+\-@]/.test(str)) {
+    str = `'${str}`;
+  }
+  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
@@ -9,8 +27,18 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    if (user.role !== 'admin') {
+      const access = await resolveClientPortalAccess({
+        base44,
+        userEmail: user.email,
+      });
+      if (access.status !== 'resolved') {
+        return Response.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     // Fetch all leads
-    const leads = await base44.entities.Leads.list('-created_date', 5000);
+    const leads = await base44.asServiceRole.entities.Leads.list('-created_date', MAX_EXPORT_ROWS);
 
     if (!leads || leads.length === 0) {
       return Response.json({ error: 'No leads to export' }, { status: 400 });
@@ -43,8 +71,8 @@ Deno.serve(async (req) => {
       lead.lead_category || '',
       lead.source || '',
       lead.business_type || '',
-      lead.created_date ? new Date(lead.created_date).toLocaleDateString() : '',
-      lead.last_contacted_at ? new Date(lead.last_contacted_at).toLocaleDateString() : '',
+      lead.created_date ? new Date(lead.created_date).toISOString() : '',
+      lead.last_contacted_at ? new Date(lead.last_contacted_at).toISOString() : '',
       lead.reply_sentiment || 'Unknown',
     ]);
 
@@ -70,14 +98,7 @@ Deno.serve(async (req) => {
 
     // Convert to CSV string
     const csv = allRows.map((row) =>
-      row.map((cell) => {
-        // Escape quotes and wrap in quotes if contains comma or quotes
-        const str = String(cell);
-        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-          return `"${str.replace(/"/g, '""')}"`;
-        }
-        return str;
-      }).join(',')
+      row.map((cell) => escapeCsvCell(cell)).join(',')
     ).join('\n');
 
     const fileName = `lead-metrics-${new Date().toISOString().split('T')[0]}.csv`;

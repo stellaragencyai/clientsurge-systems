@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
     // Load settings + all leads that have a due next_follow_up_at
     const [settingsRecords, allLeads] = await Promise.all([
       base44.asServiceRole.entities.AdminSettings.list("-created_date", 1),
-      base44.asServiceRole.entities.Leads.list("-created_date", 2000),
+      base44.asServiceRole.entities.Leads.list("-created_date", 5000),
     ]);
 
     const settings = settingsRecords?.[0] || {};
@@ -148,13 +148,14 @@ Deno.serve(async (req) => {
             }
           }
 
-          // Update lead: move to Booking Prompt Sent, clear next_follow_up_at
-          await base44.asServiceRole.entities.Leads.update(lead.id, {
-            status: "Booking Prompt Sent",
-            booking_link_sent_at: now,
-            last_contacted_at: now,
-            next_follow_up_at: null,
-          });
+          if (smsSent || emailSent) {
+            await base44.asServiceRole.entities.Leads.update(lead.id, {
+              status: "Booking Prompt Sent",
+              booking_link_sent_at: now,
+              last_contacted_at: now,
+              next_follow_up_at: null,
+            });
+          }
 
           // Log event
           await base44.asServiceRole.entities.CommunicationEvent.create({
@@ -163,13 +164,17 @@ Deno.serve(async (req) => {
             direction: "outbound",
             event_type: smsSent ? "sms_sent" : emailSent ? "email_sent" : "workflow_triggered",
             provider: smsSent ? "twilio" : emailSent ? "resend" : "internal",
-            status: smsSent || emailSent ? "sent" : "pending",
+            status: smsSent || emailSent ? "sent" : "failed",
             subject: "Automated Booking Prompt — Qualified lead 24h follow-up",
             message_body: smsBody,
             metadata_json: JSON.stringify({ flow: "qualified_booking_prompt", sms_sent: smsSent, email_sent: emailSent }),
           });
 
-          results.qualified_prompted++;
+          if (smsSent || emailSent) {
+            results.qualified_prompted++;
+          } else {
+            results.errors++;
+          }
         }
 
         // ── FLOW 2: Replied → Rep Reminder ────────────────────────────────────

@@ -1,7 +1,14 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
+
+const MAX_LEADS = 5000;
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
@@ -9,8 +16,18 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    if (user.role !== 'admin') {
+      const access = await resolveClientPortalAccess({
+        base44,
+        userEmail: user.email,
+      });
+      if (access.status !== 'resolved') {
+        return Response.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     // Fetch all leads
-    const leads = await base44.entities.Leads.list('-created_date', 1000);
+    const leads = await base44.asServiceRole.entities.Leads.list('-created_date', MAX_LEADS);
 
     if (!leads) {
       return Response.json({ stages: [] });
@@ -18,11 +35,11 @@ Deno.serve(async (req) => {
 
     // Define funnel stages with status mapping
     const stages = [
-      { name: 'Leads', statuses: ['New'], color: 'blue' },
-      { name: 'Contacted', statuses: ['Contacted'], color: 'purple' },
-      { name: 'Replied', statuses: ['Replied'], color: 'indigo' },
-      { name: 'Qualified', statuses: ['Qualified', 'Booking Prompt Sent'], color: 'amber' },
-      { name: 'Booked', statuses: ['Booked'], color: 'green' },
+      { name: 'Leads', statuses: ['New', 'Contacted', 'Replied', 'Qualified', 'Booking Prompt Sent', 'Booked', 'Closed'], color: 'blue' },
+      { name: 'Contacted', statuses: ['Contacted', 'Replied', 'Qualified', 'Booking Prompt Sent', 'Booked', 'Closed'], color: 'purple' },
+      { name: 'Replied', statuses: ['Replied', 'Qualified', 'Booking Prompt Sent', 'Booked', 'Closed'], color: 'indigo' },
+      { name: 'Qualified', statuses: ['Qualified', 'Booking Prompt Sent', 'Booked', 'Closed'], color: 'amber' },
+      { name: 'Booked', statuses: ['Booked', 'Closed'], color: 'green' },
     ];
 
     // Count leads at each stage

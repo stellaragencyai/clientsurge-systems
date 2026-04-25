@@ -1,7 +1,15 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+const DEFAULT_LIMIT = 100;
+const MAX_LIMIT = 500;
+const MAX_FETCH = 5000;
+
 Deno.serve(async (req) => {
   try {
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
@@ -10,14 +18,16 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const limit = body.limit || 100;
-    const offset = body.offset || 0;
+    const limit = Math.min(Math.max(Number(body.limit) || DEFAULT_LIMIT, 1), MAX_LIMIT);
+    const offset = Math.max(Number(body.offset) || 0, 0);
+    const fetchLimit = Math.min(limit + offset, MAX_FETCH);
 
     // Fetch all leads
-    const leads = await base44.entities.Leads.list('-updated_date', limit) || [];
+    const allFetchedLeads = await base44.asServiceRole.entities.Leads.list('-updated_date', fetchLimit) || [];
+    const leads = allFetchedLeads.slice(offset, offset + limit);
 
     // Calculate summary statistics
-    const total_leads = leads.length;
+    const total_leads = allFetchedLeads.length;
     const status_counts = {};
     const segment_counts = {
       follow_up: 0,
@@ -37,9 +47,8 @@ Deno.serve(async (req) => {
     // Process leads and calculate segments
     const priorityQueue = [];
     const recentActivity = [];
-    const last7Days = [];
 
-    leads.forEach(lead => {
+    allFetchedLeads.forEach(lead => {
       // Status counts
       status_counts[lead.status] = (status_counts[lead.status] || 0) + 1;
 
@@ -76,7 +85,7 @@ Deno.serve(async (req) => {
         business_name: lead.business_name,
         status: lead.status,
         lead_score: lead.lead_score || 0,
-        activation_priority: leadScore >= 80 ? 'High' : leadScore >= 60 ? 'Medium' : 'Low',
+        activation_priority: lead.activation_priority || (leadScore >= 80 ? 'High' : leadScore >= 60 ? 'Medium' : 'Low'),
         next_action: {
           label: lead.status === 'Booked' ? 'Follow-up Demo' : lead.status === 'Qualified' ? 'Send Booking Link' : 'Reach Out',
           detail: lead.status === 'Booked' ? 'Prepare demo materials' : lead.status === 'Qualified' ? 'Send booking link via SMS' : 'Initial contact sequence',
@@ -104,7 +113,25 @@ Deno.serve(async (req) => {
     priorityQueue.sort((a, b) => b.lead_score - a.lead_score);
 
     // Recent activity (last 5)
-    const recent = recentActivity.slice(0, 5);
+    const recent = recentActivity
+      .sort((a, b) => new Date(b.last_activity_at || 0).getTime() - new Date(a.last_activity_at || 0).getTime())
+      .slice(0, 5);
+
+    const dayBuckets = {};
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setHours(0, 0, 0, 0);
+      date.setDate(date.getDate() - i);
+      const key = date.toISOString().slice(0, 10);
+      dayBuckets[key] = 0;
+    }
+    for (const lead of allFetchedLeads) {
+      const key = lead.created_date ? new Date(lead.created_date).toISOString().slice(0, 10) : null;
+      if (key && key in dayBuckets) {
+        dayBuckets[key]++;
+      }
+    }
+    const last7Days = Object.entries(dayBuckets).map(([date, count]) => ({ date, leads: count }));
 
     return Response.json({
       summary: {
@@ -114,7 +141,7 @@ Deno.serve(async (req) => {
         recommended_offer_counts,
         priority_queue: priorityQueue.slice(0, 10),
         recent_lead_activity: recent,
-        last7Days: [{ leads: leads.length, date: new Date().toISOString() }],
+        last7Days,
       },
       leads,
       pagination: { limit, offset, total: total_leads },

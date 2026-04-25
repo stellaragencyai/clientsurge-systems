@@ -15,6 +15,11 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+const USER_LIMIT = 5000;
+const LEAD_LIMIT = 10000;
+const EVENT_LIMIT = 5000;
+const DRIP_LIMIT = 10000;
+
 function formatDay(date) {
   return date.toISOString().slice(0, 10);
 }
@@ -36,6 +41,10 @@ function hoursBetween(a, b) {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
 
     let user = null;
@@ -45,10 +54,10 @@ Deno.serve(async (req) => {
     }
 
     const [users, leads, events, drips] = await Promise.all([
-      base44.asServiceRole.entities.User.list("-created_date", 500),
-      base44.asServiceRole.entities.Leads.list("-created_date", 2000),
-      base44.asServiceRole.entities.CommunicationEvent.list("-created_date", 300),
-      base44.asServiceRole.entities.DripCampaign.list("-created_date", 2000),
+      base44.asServiceRole.entities.User.list("-created_date", USER_LIMIT),
+      base44.asServiceRole.entities.Leads.list("-created_date", LEAD_LIMIT),
+      base44.asServiceRole.entities.CommunicationEvent.list("-created_date", EVENT_LIMIT),
+      base44.asServiceRole.entities.DripCampaign.list("-created_date", DRIP_LIMIT),
     ]);
 
     const allLeads = leads || [];

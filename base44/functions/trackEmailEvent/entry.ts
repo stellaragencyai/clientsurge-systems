@@ -12,6 +12,10 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  buildWebhookAuthErrorResponse,
+  verifySvixWebhookRequest,
+} from "../_shared/webhookSecurity.js";
 
 async function updateCampaignMetrics(base44, campaignId) {
   // Get all recipients for this campaign and recalculate totals
@@ -36,8 +40,32 @@ async function updateCampaignMetrics(base44, campaignId) {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
-    const body = await req.json().catch(() => ({}));
+    const rawPayload = await req.text();
+    const verification = await verifySvixWebhookRequest({
+      payload: rawPayload,
+      headers: req.headers,
+      secret: Deno.env.get("RESEND_WEBHOOK_SECRET"),
+    });
+    const user = verification.ok ? null : await base44.auth.me().catch(() => null);
+
+    if (!verification.ok && (!user || user.role !== "admin")) {
+      return buildWebhookAuthErrorResponse({
+        provider: "resend",
+        code: verification.code,
+      });
+    }
+
+    let body = {};
+    try {
+      body = rawPayload ? JSON.parse(rawPayload) : {};
+    } catch {
+      return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
+    }
 
     // Resend webhook payload structure
     const eventType = body?.type;
@@ -67,6 +95,10 @@ Deno.serve(async (req) => {
     if (!recipient) {
       console.log(`trackEmailEvent: No recipient found for event ${eventType}`);
       return Response.json({ success: true, skipped: true, reason: "Recipient not found" });
+    }
+
+    if (campaignId && recipient.campaign_id && recipient.campaign_id !== campaignId) {
+      return Response.json({ error: "Recipient campaign mismatch" }, { status: 400 });
     }
 
     const now = new Date().toISOString();
@@ -130,11 +162,15 @@ Deno.serve(async (req) => {
         lead_id: recipient.lead_id,
         channel: "email",
         direction: "inbound",
-        event_type: eventType.replace("email.", "email_"),
+        event_type: "status_update",
         provider: "resend",
         status: "processed",
         subject: `Email ${eventType.split(".")[1]} — campaign tracking`,
-        metadata_json: JSON.stringify({ campaign_id: finalCampaignId, recipient_id: recipient.id }),
+        metadata_json: JSON.stringify({
+          campaign_id: finalCampaignId,
+          recipient_id: recipient.id,
+          email_event_type: eventType,
+        }),
       });
     }
 

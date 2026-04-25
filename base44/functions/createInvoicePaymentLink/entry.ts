@@ -1,7 +1,15 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import Stripe from 'npm:stripe@14.21.0';
+import { resolveClientPortalAccess } from '../_shared/portalOwnership.js';
+
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', { apiVersion: '2024-06-20' });
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
@@ -9,25 +17,29 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const { invoice_id } = body;
 
     if (!invoice_id) {
       return Response.json({ error: 'Missing invoice_id' }, { status: 400 });
     }
 
-    // Fetch invoice
-    const invoices = await base44.asServiceRole.entities.Invoice.list('', 1, {
-      id: invoice_id,
-    });
-
-    if (!invoices || invoices.length === 0) {
+    const invoice = await base44.asServiceRole.entities.Invoice.get(invoice_id).catch(() => null);
+    if (!invoice) {
       return Response.json({ error: 'Invoice not found' }, { status: 404 });
     }
 
-    const invoice = invoices[0];
+    if (user.role !== 'admin') {
+      const resolution = await resolveClientPortalAccess({
+        base44,
+        userEmail: user.email,
+      });
 
-    // Check if already paid
+      if (resolution.status !== 'resolved' || !resolution.project || resolution.project.id !== invoice.project_id) {
+        return Response.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    }
+
     if (invoice.payment_status === 'paid') {
       return Response.json({
         error: 'Invoice already paid',
@@ -35,10 +47,26 @@ Deno.serve(async (req) => {
       }, { status: 400 });
     }
 
-    // For demo: return a mock payment link (in production, integrate with Stripe)
-    const paymentLink = `https://pay.stripe.com/pay/${Math.random().toString(36).substr(2, 9)}`;
+    if (invoice.payment_link) {
+      return Response.json({
+        success: true,
+        payment_link: invoice.payment_link,
+        invoice_id,
+        amount: invoice.amount_outstanding || invoice.amount,
+      });
+    }
 
-    // Update invoice with payment link
+    if (!invoice.stripe_invoice_id) {
+      return Response.json({ error: 'This invoice is not linked to Stripe yet.' }, { status: 409 });
+    }
+
+    const stripeInvoice = await stripe.invoices.retrieve(invoice.stripe_invoice_id);
+    const paymentLink = stripeInvoice.hosted_invoice_url || stripeInvoice.invoice_pdf || null;
+
+    if (!paymentLink) {
+      return Response.json({ error: 'Stripe invoice does not have a hosted payment URL.' }, { status: 409 });
+    }
+
     await base44.asServiceRole.entities.Invoice.update(invoice_id, {
       payment_link: paymentLink,
     });

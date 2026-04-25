@@ -14,6 +14,8 @@ function sanitizeString(value: unknown, maxLength = MAX_FIELD_LENGTH) {
 }
 
 function normalizeContactInput(payload: Record<string, unknown>) {
+  const realWebsite = sanitizeString(payload.website_url || payload.website);
+  const honeypot = sanitizeString(payload.website_hp || payload.website_honeypot || payload.company_website_hp);
   return {
     full_name: sanitizeString(payload.full_name),
     email: sanitizeString(payload.email).toLowerCase(),
@@ -21,7 +23,8 @@ function normalizeContactInput(payload: Record<string, unknown>) {
     business_name: sanitizeString(payload.business_name),
     business_type: sanitizeString(payload.business_type) || 'General Inquiry',
     message: sanitizeString(payload.message, MAX_MESSAGE_LENGTH),
-    website_url: sanitizeString(payload.website_url),
+    website_url: realWebsite,
+    honeypot,
   };
 }
 
@@ -67,9 +70,10 @@ function buildLeadPayload(contact: ReturnType<typeof normalizeContactInput>, sta
     full_name: contact.full_name,
     business_name: contact.business_name || `${contact.business_type} Inquiry`,
     email: contact.email,
-    phone: contact.phone || 'Not provided',
+    phone: contact.phone || '',
     business_type: contact.business_type,
     problem: `${CONTACT_PREFIX}${contact.message}`.slice(0, MAX_MESSAGE_LENGTH),
+    website: contact.website_url,
     source: LEAD_SOURCE,
     intake_type: INTAKE_TYPE,
     status,
@@ -144,7 +148,7 @@ async function sendAdminNotification(contact: ReturnType<typeof normalizeContact
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'ClientSurge Systems <onboarding@resend.dev>',
+      from: 'ClientSurge Systems <system@clientsurgesystems.com>',
       to: ['system@clientsurgesystems.com'],
       reply_to: contact.email,
       subject: `New Contact: ${contact.full_name} - ${contact.business_type}`,
@@ -199,7 +203,7 @@ async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContact
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'ClientSurge Systems <onboarding@resend.dev>',
+      from: 'ClientSurge Systems <system@clientsurgesystems.com>',
       to: [contact.email],
       subject: `Thank You for Your Message, ${contact.full_name.split(' ')[0]}!`,
       html: emailBody,
@@ -224,7 +228,7 @@ Deno.serve(async (req) => {
     const payload = await req.json();
     const contact = normalizeContactInput(payload);
 
-    if (contact.website_url) {
+    if (contact.honeypot) {
       return Response.json({ success: true, ignored: true });
     }
 
@@ -260,7 +264,18 @@ Deno.serve(async (req) => {
             ? existingInquiry.status
             : 'New';
 
-      await base44.asServiceRole.entities.Leads.update(existingInquiry.id, buildLeadPayload(contact, nextStatus));
+      await base44.asServiceRole.entities.Leads.update(existingInquiry.id, {
+        status: nextStatus,
+        full_name: existingInquiry.full_name || contact.full_name,
+        business_name: existingInquiry.business_name || (contact.business_name || `${contact.business_type} Inquiry`),
+        email: existingInquiry.email || contact.email,
+        phone: existingInquiry.phone || contact.phone || '',
+        business_type: existingInquiry.business_type || contact.business_type,
+        problem: existingInquiry.problem || `${CONTACT_PREFIX}${contact.message}`.slice(0, MAX_MESSAGE_LENGTH),
+        website: existingInquiry.website || contact.website_url,
+        source: existingInquiry.source || LEAD_SOURCE,
+        intake_type: existingInquiry.intake_type || INTAKE_TYPE,
+      });
       leadId = existingInquiry.id;
       action = 'updated';
     } else {

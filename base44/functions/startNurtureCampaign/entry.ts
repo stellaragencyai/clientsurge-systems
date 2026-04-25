@@ -15,8 +15,22 @@ const SKIP_STATUSES = ["Booked", "Closed"];
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
+    const isAutomationPayload = !!(body?.event?.entity_id || body?.data?.id);
+
+    let user = null;
+    try { user = await base44.auth.me(); } catch (_) {}
+    if (user && user.role !== "admin") {
+      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    }
+    if (!user && !isAutomationPayload) {
+      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    }
 
     // Support automation payload AND direct call
     const leadId = body?.lead_id ?? body?.event?.entity_id ?? body?.data?.id ?? null;
@@ -44,13 +58,22 @@ Deno.serve(async (req) => {
       return Response.json({ success: true, skipped: true, reason: "Lead has no email address" });
     }
 
+    const leadTags = Array.isArray(lead.industry_tags) ? lead.industry_tags : [];
+    if (isAutomationPayload && !leadTags.includes("Nurture")) {
+      return Response.json({ success: true, skipped: true, reason: "Lead is not tagged for nurture enrollment" });
+    }
+
+    if (lead.reply_sentiment === "Negative") {
+      return Response.json({ success: true, skipped: true, reason: "Lead sentiment is not eligible for nurture enrollment" });
+    }
+
     // Guard: check for existing active/paused campaign
     const existing = await base44.asServiceRole.entities.NurtureCampaign.filter(
       { lead_id: leadId },
       "-created_date",
-      1
+      25
     );
-    if (existing?.length > 0 && ["active", "paused"].includes(existing[0].status)) {
+    if ((existing || []).some((campaign) => ["active", "paused"].includes(campaign.status))) {
       return Response.json({ success: true, skipped: true, reason: "Active nurture campaign already exists for this lead." });
     }
 

@@ -93,7 +93,13 @@ function activationPriority(score, lead) {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
+    const body = await req.json().catch(() => ({}));
+    const isAutomationPayload = !!(body?.event?.entity_id || body?.data?.id);
 
     // Auth check — allow automation (no user) or admin
     let user = null;
@@ -101,8 +107,9 @@ Deno.serve(async (req) => {
     if (user && user.role !== "admin") {
       return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
     }
-
-    const body = await req.json().catch(() => ({}));
+    if (!user && !isAutomationPayload) {
+      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    }
 
     // Support both entity automation payload and direct call
     const leadId = body?.lead_id || body?.event?.entity_id || body?.data?.id || null;

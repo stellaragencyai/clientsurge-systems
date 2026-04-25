@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
     }
 
     // Load all active campaigns
-    const campaigns = await base44.asServiceRole.entities.DripCampaign.filter({ status: "active" }, "-enrolled_at", 500);
+    const campaigns = await base44.asServiceRole.entities.DripCampaign.filter({ status: "active" }, "-enrolled_at", 5000);
     if (!campaigns?.length) {
       return Response.json({ success: true, processed: 0, message: "No active drip campaigns." });
     }
@@ -201,7 +201,9 @@ Deno.serve(async (req) => {
 
           const stepStatus = sent ? "sent" : "failed";
           campaignUpdates[step.statusField] = stepStatus;
-          campaignUpdates[step.sentAtField] = new Date().toISOString();
+          if (sent) {
+            campaignUpdates[step.sentAtField] = new Date().toISOString();
+          }
 
           // Log CommunicationEvent
           await base44.asServiceRole.entities.CommunicationEvent.create({
@@ -218,9 +220,11 @@ Deno.serve(async (req) => {
           });
 
           // Update lead last_contacted_at
-          await base44.asServiceRole.entities.Leads.update(campaign.lead_id, {
-            last_contacted_at: new Date().toISOString(),
-          });
+          if (sent) {
+            await base44.asServiceRole.entities.Leads.update(campaign.lead_id, {
+              last_contacted_at: new Date().toISOString(),
+            });
+          }
 
           sent ? results.fired++ : results.errors++;
         }

@@ -17,8 +17,10 @@ const THIRTY_DAYS_MS  = 30 * 24 * 60 * 60 * 1000;
 const THIRTY_SEVEN_MS = 37 * 24 * 60 * 60 * 1000;
 const FORTY_FOUR_MS   = 44 * 24 * 60 * 60 * 1000;
 
-const CALENDLY = "https://calendly.com/nolan-clientsurgesystems";
-const PORTAL   = "https://clientsurgesystems.com/client-portal";
+const CALENDLY = Deno.env.get("WINBACK_CALENDLY_URL") || "https://calendly.com/nolan-clientsurgesystems";
+const PORTAL   = Deno.env.get("WINBACK_PORTAL_URL") || "https://clientsurgesystems.com/client-portal";
+const ORDER_LIMIT = 5000;
+const CLIENT_LIMIT = 5000;
 
 function daysSince(isoDate) {
   if (!isoDate) return 0;
@@ -196,6 +198,10 @@ function buildStep3Email(client) {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
 
     // Allow scheduled (no user) OR admin direct call
@@ -206,10 +212,10 @@ Deno.serve(async (req) => {
     }
 
     // Load all orders with failed/canceled payment or subscription status
-    const allOrders = await base44.asServiceRole.entities.Order.list("-created_date", 500);
+    const allOrders = await base44.asServiceRole.entities.Order.list("-created_date", ORDER_LIMIT);
 
     // Also load OnboardingClient records for email + name lookup
-    const allClients = await base44.asServiceRole.entities.OnboardingClient.list("-created_date", 500);
+    const allClients = await base44.asServiceRole.entities.OnboardingClient.list("-created_date", CLIENT_LIMIT);
     const clientsByEmail = {};
     for (const c of allClients) {
       if (c.email) clientsByEmail[c.email.toLowerCase()] = c;
@@ -301,12 +307,11 @@ Deno.serve(async (req) => {
 
         // Persist the updated notes so we don't re-send
         if (stepSent) {
-          // Update OnboardingClient if we have one, otherwise update Order notes
+          // Keep both client and order notes aligned so resend protection stays consistent.
           if (client?.id) {
             await base44.asServiceRole.entities.OnboardingClient.update(client.id, { notes: updatedNotes });
-          } else {
-            await base44.asServiceRole.entities.Order.update(order.id, { notes: updatedNotes });
           }
+          await base44.asServiceRole.entities.Order.update(order.id, { notes: updatedNotes });
           console.log(`Win-back ${stepSent} sent to ${clientData.email} (${clientData.business_name})`);
         }
 

@@ -16,6 +16,7 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 const BATCH_SIZE = 50; // Resend recommends batching
+const MAX_LEADS = 5000;
 
 function matchesFilters(lead, filters) {
   if (!filters) return true;
@@ -85,6 +86,10 @@ async function sendViaResend(to, subject, html, text, fromEmail, resendKey, camp
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
 
     // Auth check
@@ -123,7 +128,7 @@ Deno.serve(async (req) => {
     }
 
     // Get all leads with email
-    const allLeads = await base44.asServiceRole.entities.Leads.list("-created_date", 5000);
+    const allLeads = await base44.asServiceRole.entities.Leads.list("-created_date", MAX_LEADS);
     const eligibleLeads = (allLeads || []).filter(lead => {
       if (!lead.email) return false;
       return matchesFilters(lead, campaign.segment_filters);
@@ -142,6 +147,17 @@ Deno.serve(async (req) => {
       });
     }
 
+    const existingRecipients = await base44.asServiceRole.entities.EmailCampaignRecipient.filter(
+      { campaign_id },
+      "-created_date",
+      MAX_LEADS
+    );
+    const existingRecipientByLeadId = new Map(
+      (existingRecipients || [])
+        .filter((recipient) => recipient?.lead_id)
+        .map((recipient) => [recipient.lead_id, recipient])
+    );
+
     // Mark campaign as sending
     await base44.asServiceRole.entities.EmailCampaign.update(campaign_id, {
       status: "sending",
@@ -157,17 +173,28 @@ Deno.serve(async (req) => {
       const batch = eligibleLeads.slice(i, i + BATCH_SIZE);
 
       for (const lead of batch) {
+        const existingRecipient = existingRecipientByLeadId.get(lead.id) || null;
+        let recipient = existingRecipient;
         try {
-          // Create recipient record first
-          const recipient = await base44.asServiceRole.entities.EmailCampaignRecipient.create({
-            campaign_id,
-            lead_id: lead.id,
-            email: lead.email,
-            lead_name: lead.full_name || "",
-            status: "pending",
-          });
+          if (existingRecipient && ["sent", "delivered", "opened", "clicked"].includes(existingRecipient.status)) {
+            continue;
+          }
 
-          // Personalize content
+          recipient = existingRecipient
+            ? await base44.asServiceRole.entities.EmailCampaignRecipient.update(existingRecipient.id, {
+                email: lead.email,
+                lead_name: lead.full_name || "",
+                status: "pending",
+                error_message: undefined,
+              })
+            : await base44.asServiceRole.entities.EmailCampaignRecipient.create({
+                campaign_id,
+                lead_id: lead.id,
+                email: lead.email,
+                lead_name: lead.full_name || "",
+                status: "pending",
+              });
+
           const personalizedSubject = personalizeContent(campaign.subject, lead);
           const personalizedHtml = personalizeContent(campaign.body_html, lead);
           const personalizedText = personalizeContent(campaign.body_text, lead);
@@ -189,6 +216,7 @@ Deno.serve(async (req) => {
             status: "sent",
             sent_at: new Date().toISOString(),
             resend_message_id: messageId,
+            error_message: undefined,
           });
 
           // Log communication event
@@ -208,6 +236,12 @@ Deno.serve(async (req) => {
         } catch (err) {
           failed++;
           errors.push({ email: lead.email, error: err.message });
+          if (recipient?.id) {
+            await base44.asServiceRole.entities.EmailCampaignRecipient.update(recipient.id, {
+              status: "failed",
+              error_message: err.message,
+            }).catch(() => null);
+          }
           console.error(`sendEmailCampaign error for ${lead.email}:`, err.message);
         }
       }
@@ -220,7 +254,7 @@ Deno.serve(async (req) => {
 
     // Update campaign final status
     await base44.asServiceRole.entities.EmailCampaign.update(campaign_id, {
-      status: "sent",
+      status: failed > 0 && sent === 0 ? "paused" : "sent",
       sent_at: new Date().toISOString(),
       total_sent: sent,
     });

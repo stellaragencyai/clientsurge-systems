@@ -64,8 +64,21 @@ Primary focus:
 ### 2026-04-25
 
 - Created remediation plan document.
-- Pending push to GitHub.
-- Pending Batch 1 implementation.
+- Pushed plan to GitHub on branch `codex/backend-remediation-2026-04-25`.
+- Began Batch 1 implementation in the clean latest clone to avoid disturbing dirty local worktrees.
+- Fixed the Stripe invoice webhook compile blocker and narrowed failed-payment campaign pauses to the affected customer email.
+- Replaced fake invoice payment-link generation with real Stripe invoice URL retrieval plus ownership checks.
+- Added client portal ownership checks to invoice retrieval and Stripe payment-update URL generation.
+- Tightened subscription change validation to require a real target plan and avoid stale pending plan state.
+- Added Resend webhook signature verification and JSON validation to email tracking.
+- Made email campaign sends idempotent enough to reuse recipients safely and mark failed recipients correctly.
+- Prevented drip and qualified follow-up runners from stamping send timestamps when delivery did not happen.
+- Increased multiple analytics and campaign processing caps to reduce silent truncation.
+- Added method guards and admin-or-automation gating to several automation-triggered handlers.
+- Hardened call recording ingestion with Twilio signature verification, safer metadata storage, larger lead matching scope, and lead-status application from AI next-step recommendations.
+- Hardened admin/client notification mailers with admin checks, lead-record validation, and communication audit events.
+- Corrected lead and contact intake handling so real website fields are preserved, honeypots use dedicated fields, duplicate updates preserve prior context, and production email senders no longer use `@resend.dev`.
+- Updated the portal welcome mailer to validate inputs, require admin access, use the current portal URL, and fail if the admin notification email send fails.
 
 ## Verification Approach
 

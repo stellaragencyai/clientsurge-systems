@@ -21,6 +21,10 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+const LEAD_LIMIT = 10000;
+const EVENT_LIMIT = 10000;
+const EMAIL_RECIPIENT_LIMIT = 10000;
+
 const STATUS_SCORE = {
   New: 5, Contacted: 10, Replied: 18, Qualified: 22,
   "Booking Prompt Sent": 26, Booked: 30, Closed: 0,
@@ -101,6 +105,10 @@ function computeScore(lead, eventsByLead, emailStatsByLead) {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
 
     let user = null;
@@ -117,9 +125,9 @@ Deno.serve(async (req) => {
     const [leads, events, emailRecipients] = await Promise.all([
       leadIdFilter
         ? base44.asServiceRole.entities.Leads.filter({ id: leadIdFilter })
-        : base44.asServiceRole.entities.Leads.list("-created_date", 2000),
-      base44.asServiceRole.entities.CommunicationEvent.list("-created_date", 5000),
-      base44.asServiceRole.entities.EmailCampaignRecipient.list("-created_date", 5000),
+        : base44.asServiceRole.entities.Leads.list("-created_date", LEAD_LIMIT),
+      base44.asServiceRole.entities.CommunicationEvent.list("-created_date", EVENT_LIMIT),
+      base44.asServiceRole.entities.EmailCampaignRecipient.list("-created_date", EMAIL_RECIPIENT_LIMIT),
     ]);
 
     if (!leads?.length) {

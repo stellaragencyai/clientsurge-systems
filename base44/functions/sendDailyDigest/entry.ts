@@ -1,7 +1,13 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+const LEAD_LIMIT = 5000;
+
 Deno.serve(async (req) => {
   try {
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
 
     // Allow scheduled runs (no user) or admin users
@@ -17,14 +23,20 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'No admin notification email configured in settings' }, { status: 400 });
     }
 
-    const allLeads = await base44.asServiceRole.entities.Leads.list('-updated_date', 500);
+    const allLeads = await base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_LIMIT);
     const now = Date.now();
     const dayMs = 86400000;
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
 
-    const newToday = allLeads.filter(l => (now - new Date(l.created_date).getTime()) < dayMs).length;
+    const newToday = allLeads.filter(l => new Date(l.created_date).getTime() >= startOfToday.getTime()).length;
     const hotLeads = allLeads.filter(l => l.activation_priority === 'Hot' && l.status !== 'Booked' && l.status !== 'Closed');
     const overdueFollowUp = allLeads.filter(l => {
       const isActive = !['Booked', 'Closed'].includes(l.status);
+      const nextFollowUpAt = l.next_follow_up_at ? new Date(l.next_follow_up_at).getTime() : null;
+      if (nextFollowUpAt) {
+        return isActive && nextFollowUpAt <= now;
+      }
       const noContact = !l.last_contacted_at || (now - new Date(l.last_contacted_at).getTime()) > dayMs;
       return isActive && noContact;
     });

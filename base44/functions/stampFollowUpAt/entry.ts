@@ -12,8 +12,22 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
+    const isAutomationPayload = !!(body?.event?.entity_id || body?.data?.id);
+
+    let user = null;
+    try { user = await base44.auth.me(); } catch (_) {}
+    if (user && user.role !== "admin") {
+      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    }
+    if (!user && !isAutomationPayload) {
+      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    }
 
     const leadId = body?.lead_id ?? body?.event?.entity_id ?? body?.data?.id ?? null;
     const leadData = body?.data ?? null;
@@ -36,6 +50,11 @@ Deno.serve(async (req) => {
 
     if (!hoursToAdd) {
       return Response.json({ success: true, skipped: true, reason: `Status ${lead.status} not handled by this function` });
+    }
+
+    const changedFields = Array.isArray(body?.changed_fields) ? body.changed_fields : [];
+    if (isAutomationPayload && changedFields.length > 0 && !changedFields.includes("status")) {
+      return Response.json({ success: true, skipped: true, reason: "Status did not change" });
     }
 
     const followUpAt = new Date(Date.now() + hoursToAdd * 3600000).toISOString();
