@@ -78,6 +78,9 @@ Primary focus:
 - Hardened call recording ingestion with Twilio signature verification, safer metadata storage, larger lead matching scope, and lead-status application from AI next-step recommendations.
 - Hardened admin/client notification mailers with admin checks, lead-record validation, and communication audit events.
 - Corrected lead and contact intake handling so real website fields are preserved, honeypots use dedicated fields, duplicate updates preserve prior context, and production email senders no longer use `@resend.dev`.
+- Added optional `AUTOMATION_SHARED_SECRET` support for anonymous scheduled runners so cron-style endpoints can be locked down without breaking current behavior before the secret is configured.
+- Replaced the custom lead pipeline summary implementation with the shared canonical `leadPipeline` snapshot builder used by the admin lead dashboard.
+- Replaced the missed-call recovery metric heuristic with canonical missed-call runtime success events.
 - Updated the portal welcome mailer to validate inputs, require admin access, use the current portal URL, and fail if the admin notification email send fails.
 
 ## Verification Approach

@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: "RecordingSid required" }, { status: 400 });
     }
 
-    console.log(`processCallRecording: RecordingSid=${recordingSid}, CallSid=${callSid}, duration=${durationSecs}s, verified=${verifiedTwilioWebhook}`);
+    console.log(`processCallRecording: duration=${durationSecs}s, verified=${verifiedTwilioWebhook}, directLead=${!!directLeadId}`);
 
     // Find matching lead by phone number
     let lead = null;

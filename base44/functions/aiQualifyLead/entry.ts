@@ -128,7 +128,8 @@ Based on ALL this data, provide a comprehensive lead qualification analysis. Ret
     }
   ],
   "recommended_offer": "Starter System" | "Growth System" | "Pro System" | "None — not a fit",
-  "offer_reason": "One sentence explaining why this offer fits"
+  "offer_reason": "One sentence explaining why this offer fits",
+  "confidence": 0.0-1.0
 }`;
 
     const result = await base44.asServiceRole.integrations.Core.InvokeLLM({
@@ -156,6 +157,7 @@ Based on ALL this data, provide a comprehensive lead qualification analysis. Ret
           },
           recommended_offer: { type: "string", enum: VALID_OFFERS },
           offer_reason: { type: "string" },
+          confidence: { type: "number" },
         },
         required: [
           "qualification_tier",
@@ -164,6 +166,7 @@ Based on ALL this data, provide a comprehensive lead qualification analysis. Ret
           "follow_up_actions",
           "recommended_offer",
           "offer_reason",
+          "confidence",
         ],
       }
     });

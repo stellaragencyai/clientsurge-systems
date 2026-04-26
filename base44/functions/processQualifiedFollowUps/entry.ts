@@ -18,6 +18,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
 
 function renderTemplate(template, lead, bookingLink) {
   return (template || "")
@@ -75,6 +76,9 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (!user && !allowAnonymousAutomation(req)) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 

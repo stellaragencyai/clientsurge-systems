@@ -2,6 +2,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
 
 const MAX_LEADS = 5000;
+const MAX_EVENTS = 5000;
 
 Deno.serve(async (req) => {
   try {
@@ -11,13 +12,14 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
+    let access = null;
 
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     if (user.role !== 'admin') {
-      const access = await resolveClientPortalAccess({
+      access = await resolveClientPortalAccess({
         base44,
         userEmail: user.email,
       });
@@ -42,13 +44,22 @@ Deno.serve(async (req) => {
       (lead) => lead.status === 'Booked'
     );
 
-    // Count missed calls recovered - proxy: leads with status "Contacted" or "Replied" that are recent
-    const missedCallsRecovered = leads.filter(
-      (lead) =>
-        (lead.status === 'Contacted' || lead.status === 'Replied') &&
-        lead.last_contacted_at &&
-        (Date.now() - new Date(lead.last_contacted_at).getTime()) < 7 * 86400000 // last 7 days
-    ).length;
+    const missedCallEvents = await base44.asServiceRole.entities.CommunicationEvent.filter(
+      { service_key: 'missed_call_text_back', event_type: 'provider_send_succeeded' },
+      '-created_date',
+      MAX_EVENTS
+    );
+    const sevenDaysAgo = Date.now() - 7 * 86400000;
+    const missedCallsRecovered = (missedCallEvents || []).filter((event) => {
+      const createdAt = new Date(event.created_date || 0).getTime();
+      if (!Number.isFinite(createdAt) || createdAt < sevenDaysAgo) {
+        return false;
+      }
+      if (user.role === 'admin') {
+        return true;
+      }
+      return !!(access?.order?.id && event.order_id === access.order.id);
+    }).length;
 
     return Response.json({
       active_leads: activeLeads.length,

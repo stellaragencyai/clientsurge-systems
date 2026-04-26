@@ -20,6 +20,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
 
 const LEAD_LIMIT = 10000;
 const EVENT_LIMIT = 10000;
@@ -115,6 +116,9 @@ Deno.serve(async (req) => {
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
       return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    }
+    if (!user && !allowAnonymousAutomation(req)) {
+      return Response.json({ error: "Forbidden: Trusted automation only" }, { status: 403 });
     }
 
     const payload = req.method === "POST" ? await req.json().catch(() => ({})) : {};

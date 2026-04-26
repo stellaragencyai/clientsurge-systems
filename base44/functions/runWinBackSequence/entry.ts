@@ -12,6 +12,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
 
 const THIRTY_DAYS_MS  = 30 * 24 * 60 * 60 * 1000;
 const THIRTY_SEVEN_MS = 37 * 24 * 60 * 60 * 1000;
@@ -216,6 +217,9 @@ Deno.serve(async (req) => {
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
       return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    }
+    if (!user && !allowAnonymousAutomation(req)) {
+      return Response.json({ error: "Forbidden: Trusted automation only" }, { status: 403 });
     }
 
     // Load all orders with failed/canceled payment or subscription status
