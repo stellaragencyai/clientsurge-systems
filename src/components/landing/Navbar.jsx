@@ -310,14 +310,28 @@ export default function Navbar() {
           <div className="fixed inset-0 z-40 md:hidden" onClick={() => setOpen(false)} />
         <div className="md:hidden bg-background border-b border-border px-6 pb-6 pt-2 space-y-4 relative z-50">
           {sectionLinks.map((link) => (
-            <a
-              key={link.href}
-              href={`/${link.href}`}
-              className="block text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded px-2 py-1"
-              onClick={(e) => handleSectionNavigation(e, link.href)}
-            >
-              {link.label}
-            </a>
+            link.isPage ? (
+              <a
+                key={link.href}
+                href={link.href}
+                className="block text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded px-2 py-1"
+                onClick={() => {
+                  trackCTA("ai_store", "mobile_nav");
+                  setOpen(false);
+                }}
+              >
+                {link.label}
+              </a>
+            ) : (
+              <a
+                key={link.href}
+                href={`/${link.href}`}
+                className="block text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded px-2 py-1"
+                onClick={(e) => handleSectionNavigation(e, link.href)}
+              >
+                {link.label}
+              </a>
+            )
           ))}
 
           <div className="pt-2 border-t border-border">

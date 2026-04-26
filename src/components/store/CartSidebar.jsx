@@ -4,9 +4,21 @@ import { useCart } from "@/lib/cartContext";
 import { base44 } from "@/api/base44Client";
 
 export default function CartSidebar() {
-  const { items, removeItem, cartOpen, setCartOpen, totalSetup, totalMonthly } = useCart();
+  const {
+    items,
+    removeItem,
+    cartOpen,
+    setCartOpen,
+    totalSetup,
+    totalMonthly,
+  } = useCart();
   const [step, setStep] = useState("cart");
-  const [form, setForm] = useState({ name: "", email: "", phone: "", business: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    business: "",
+  });
   const [error, setError] = useState("");
 
   const handleCheckout = async () => {
@@ -19,7 +31,9 @@ export default function CartSidebar() {
     setStep("loading");
 
     if (window.self !== window.top) {
-      alert("Checkout only works from the published app, not the preview.");
+      setError(
+        "Checkout is available on the live Base44 site. Open the published app to continue."
+      );
       setStep("info");
       return;
     }
@@ -57,8 +71,8 @@ export default function CartSidebar() {
         style={{
           position: "fixed",
           inset: 0,
-          background: "rgba(0,0,0,0.35)",
-          backdropFilter: "blur(4px)",
+          background: "rgba(0,0,0,0.42)",
+          backdropFilter: "blur(6px)",
           zIndex: 100,
         }}
       />
@@ -69,10 +83,10 @@ export default function CartSidebar() {
           top: 0,
           right: 0,
           bottom: 0,
-          width: "min(460px, 100vw)",
-          background: "linear-gradient(160deg, #fdfcfa 0%, #f8f3ec 100%)",
-          borderLeft: "1.5px solid rgba(154,92,46,0.15)",
-          boxShadow: "-20px 0 60px rgba(0,0,0,0.15)",
+          width: "min(430px, 100vw)",
+          background: "linear-gradient(180deg, #fdfbf8 0%, #f6efe5 100%)",
+          borderLeft: "1px solid rgba(154,92,46,0.14)",
+          boxShadow: "-20px 0 60px rgba(0,0,0,0.18)",
           zIndex: 101,
           display: "flex",
           flexDirection: "column",
@@ -84,13 +98,21 @@ export default function CartSidebar() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "20px 24px",
-            borderBottom: "1px solid rgba(154,92,46,0.12)",
+            padding: "20px 22px",
+            borderBottom: "1px solid rgba(154,92,46,0.1)",
+            background: "rgba(255,255,255,0.56)",
+            backdropFilter: "blur(12px)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <ShoppingCart style={{ width: "20px", height: "20px", color: "#9a5c2e" }} />
-            <span style={{ fontWeight: "700", fontSize: "16px", color: "#1a1209" }}>Your AI Stack</span>
+            <ShoppingCart
+              style={{ width: "20px", height: "20px", color: "#9a5c2e" }}
+            />
+            <span
+              style={{ fontWeight: "700", fontSize: "16px", color: "#1a1209" }}
+            >
+              Your AI Stack
+            </span>
             {items.length > 0 ? (
               <span
                 style={{
@@ -112,18 +134,40 @@ export default function CartSidebar() {
           </div>
           <button
             onClick={() => setCartOpen(false)}
-            style={{ background: "none", border: "none", cursor: "pointer", padding: "4px" }}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "4px",
+            }}
           >
-            <X style={{ width: "20px", height: "20px", color: "#888" }} />
+            <X style={{ width: "20px", height: "20px", color: "#7b6b5d" }} />
           </button>
         </div>
 
-        <div style={{ flex: 1, overflowY: "auto", padding: "16px 24px" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "18px 20px" }}>
           {items.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "48px 0", color: "rgba(26,18,9,0.4)" }}>
-              <ShoppingCart style={{ width: "40px", height: "40px", margin: "0 auto 12px", opacity: 0.3 }} />
-              <p style={{ fontSize: "14px", fontWeight: "600" }}>Your cart is empty</p>
-              <p style={{ fontSize: "12px", marginTop: "6px" }}>Browse the store and add AI services</p>
+            <div
+              style={{
+                textAlign: "center",
+                padding: "48px 0",
+                color: "rgba(26,18,9,0.46)",
+              }}
+            >
+              <ShoppingCart
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  margin: "0 auto 12px",
+                  opacity: 0.3,
+                }}
+              />
+              <p style={{ fontSize: "14px", fontWeight: "600" }}>
+                Your cart is empty
+              </p>
+              <p style={{ fontSize: "12px", marginTop: "6px" }}>
+                Browse the store and add the services you want us to build.
+              </p>
             </div>
           ) : step === "cart" ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -132,12 +176,13 @@ export default function CartSidebar() {
                   key={item.product_id}
                   style={{
                     background: "rgba(255,255,255,0.8)",
-                    border: "1px solid rgba(154,92,46,0.12)",
-                    borderRadius: "14px",
+                    border: "1px solid rgba(154,92,46,0.1)",
+                    borderRadius: "16px",
                     padding: "14px 16px",
                     display: "flex",
                     alignItems: "center",
                     gap: "12px",
+                    boxShadow: "0 6px 16px rgba(0,0,0,0.04)",
                   }}
                 >
                   <span style={{ fontSize: "22px" }}>{item.icon}</span>
@@ -155,13 +200,25 @@ export default function CartSidebar() {
                     >
                       {item.name}
                     </p>
-                    <p style={{ fontSize: "11px", color: "rgba(26,18,9,0.5)", margin: 0 }}>
-                      ${item.setup_fee} setup · ${item.monthly_fee}/mo
+                    <p
+                      style={{
+                        fontSize: "11px",
+                        color: "rgba(26,18,9,0.54)",
+                        margin: 0,
+                      }}
+                    >
+                      ${item.setup_fee} setup - ${item.monthly_fee}/mo
                     </p>
                   </div>
                   <button
                     onClick={() => removeItem(item.product_id)}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", color: "#e57373" }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: "4px",
+                      color: "#d46d6d",
+                    }}
                   >
                     <Trash2 style={{ width: "14px", height: "14px" }} />
                   </button>
@@ -170,14 +227,43 @@ export default function CartSidebar() {
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-              <p style={{ fontSize: "13px", fontWeight: "600", color: "rgba(26,18,9,0.6)", margin: 0 }}>
-                Enter your details to continue to payment
-              </p>
+              <div
+                style={{
+                  borderRadius: "14px",
+                  background: "rgba(154,92,46,0.06)",
+                  border: "1px solid rgba(154,92,46,0.1)",
+                  padding: "12px 14px",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    color: "rgba(26,18,9,0.68)",
+                    margin: 0,
+                  }}
+                >
+                  Enter your details to continue to payment.
+                </p>
+              </div>
+
               {[
                 { key: "name", label: "Full Name *", placeholder: "Jane Smith" },
-                { key: "email", label: "Email Address *", placeholder: "jane@yourbiz.com" },
-                { key: "phone", label: "Phone Number", placeholder: "+1 (602) 555-0123" },
-                { key: "business", label: "Business Name *", placeholder: "Glow Med Spa" },
+                {
+                  key: "email",
+                  label: "Email Address *",
+                  placeholder: "jane@yourbiz.com",
+                },
+                {
+                  key: "phone",
+                  label: "Phone Number",
+                  placeholder: "+1 (602) 555-0123",
+                },
+                {
+                  key: "business",
+                  label: "Business Name *",
+                  placeholder: "Glow Med Spa",
+                },
               ].map((field) => (
                 <div key={field.key}>
                   <label
@@ -197,22 +283,35 @@ export default function CartSidebar() {
                     type={field.key === "email" ? "email" : "text"}
                     placeholder={field.placeholder}
                     value={form[field.key]}
-                    onChange={(event) => setForm({ ...form, [field.key]: event.target.value })}
+                    onChange={(event) =>
+                      setForm({ ...form, [field.key]: event.target.value })
+                    }
                     disabled={step === "loading"}
                     style={{
                       width: "100%",
-                      borderRadius: "10px",
-                      border: "1.5px solid rgba(154,92,46,0.2)",
-                      padding: "10px 14px",
+                      borderRadius: "12px",
+                      border: "1.5px solid rgba(154,92,46,0.18)",
+                      padding: "11px 14px",
                       fontSize: "13px",
-                      background: "rgba(255,255,255,0.8)",
+                      background: "rgba(255,255,255,0.86)",
                       outline: "none",
                       boxSizing: "border-box",
                     }}
                   />
                 </div>
               ))}
-              {error ? <p style={{ fontSize: "12px", color: "#e53e3e", fontWeight: "600" }}>{error}</p> : null}
+              {error ? (
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "#d14343",
+                    fontWeight: "600",
+                    lineHeight: 1.55,
+                  }}
+                >
+                  {error}
+                </p>
+              ) : null}
             </div>
           )}
         </div>
@@ -220,19 +319,55 @@ export default function CartSidebar() {
         {items.length > 0 ? (
           <div
             style={{
-              padding: "16px 24px",
-              borderTop: "1px solid rgba(154,92,46,0.12)",
-              background: "rgba(255,255,255,0.6)",
-              backdropFilter: "blur(10px)",
+              padding: "16px 20px 18px",
+              borderTop: "1px solid rgba(154,92,46,0.1)",
+              background: "rgba(255,255,255,0.7)",
+              backdropFilter: "blur(12px)",
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}>
-              <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>One-time setup total</span>
-              <span style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209" }}>${totalSetup}</span>
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
-              <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>Monthly total</span>
-              <span style={{ fontSize: "13px", fontWeight: "700", color: "#9a5c2e" }}>${totalMonthly}/mo</span>
+            <div
+              style={{
+                borderRadius: "16px",
+                background: "rgba(255,255,255,0.74)",
+                border: "1px solid rgba(154,92,46,0.1)",
+                padding: "14px 14px 12px",
+                marginBottom: "14px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginBottom: "6px",
+                }}
+              >
+                <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>
+                  One-time setup total
+                </span>
+                <span
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: "700",
+                    color: "#1a1209",
+                  }}
+                >
+                  ${totalSetup}
+                </span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>
+                  Monthly total
+                </span>
+                <span
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: "800",
+                    color: "#9a5c2e",
+                  }}
+                >
+                  ${totalMonthly}/mo
+                </span>
+              </div>
             </div>
 
             {step === "cart" ? (
@@ -246,7 +381,7 @@ export default function CartSidebar() {
                     "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
                   border: "none",
                   cursor: "pointer",
-                  boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                  boxShadow: "0 4px 18px rgba(120,70,20,0.28)",
                 }}
               >
                 <span
@@ -257,13 +392,15 @@ export default function CartSidebar() {
                     gap: "6px",
                     height: "48px",
                     borderRadius: "9999px",
-                    background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                    background:
+                      "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
                     color: "#f5e6d0",
                     fontWeight: "700",
                     fontSize: "14px",
                   }}
                 >
-                  Continue to Checkout <ArrowRight style={{ width: "15px", height: "15px" }} />
+                  Continue to Checkout{" "}
+                  <ArrowRight style={{ width: "15px", height: "15px" }} />
                 </span>
               </button>
             ) : (
@@ -280,7 +417,7 @@ export default function CartSidebar() {
                     border: "none",
                     cursor: step === "loading" ? "not-allowed" : "pointer",
                     opacity: step === "loading" ? 0.7 : 1,
-                    boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                    boxShadow: "0 4px 18px rgba(120,70,20,0.28)",
                   }}
                 >
                   <span
@@ -291,7 +428,8 @@ export default function CartSidebar() {
                       gap: "6px",
                       height: "48px",
                       borderRadius: "9999px",
-                      background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                      background:
+                        "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
                       color: "#f5e6d0",
                       fontWeight: "700",
                       fontSize: "14px",
@@ -301,7 +439,8 @@ export default function CartSidebar() {
                       "Redirecting to Stripe..."
                     ) : (
                       <>
-                        <Lock style={{ width: "13px", height: "13px" }} /> Pay Securely with Stripe
+                        <Lock style={{ width: "13px", height: "13px" }} /> Pay
+                        Securely with Stripe
                       </>
                     )}
                   </span>
@@ -313,17 +452,24 @@ export default function CartSidebar() {
                     border: "none",
                     cursor: "pointer",
                     fontSize: "12px",
-                    color: "rgba(26,18,9,0.4)",
+                    color: "rgba(26,18,9,0.46)",
                     textDecoration: "underline",
                   }}
                 >
-                  ← Back to cart
+                  {"<"} Back to cart
                 </button>
               </div>
             )}
 
-            <p style={{ textAlign: "center", fontSize: "10px", color: "rgba(26,18,9,0.3)", marginTop: "10px" }}>
-              🔒 Secured by Stripe · Cancel anytime
+            <p
+              style={{
+                textAlign: "center",
+                fontSize: "10px",
+                color: "rgba(26,18,9,0.38)",
+                marginTop: "10px",
+              }}
+            >
+              Secured by Stripe - Cancel anytime
             </p>
           </div>
         ) : null}
