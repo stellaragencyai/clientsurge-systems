@@ -2,15 +2,17 @@
  * LeadActivityFeed — read-only client portal view of their lead pipeline.
  * Shows aggregate stats + recent lead movement from the Leads entity,
  * filtered to only the leads generated for this client.
+ * Supports bulk selection with floating action toolbar.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Users, TrendingUp, CheckCircle2, Clock, MessageSquare,
-  Loader2, RefreshCw, AlertCircle, Zap, PhoneCall, Star,
+  Loader2, RefreshCw, AlertCircle, Zap, PhoneCall,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import LeadScoreCard from "./LeadScoreCard";
+import LeadBulkToolbar from "./LeadBulkToolbar";
 
 const STATUS_COLORS = {
   New: "bg-blue-100 text-blue-700",
@@ -20,6 +22,13 @@ const STATUS_COLORS = {
   "Booking Prompt Sent": "bg-amber-100 text-amber-700",
   Booked: "bg-emerald-100 text-emerald-700",
   Closed: "bg-gray-100 text-gray-700",
+};
+
+const STATUS_DOT = {
+  Booked: "bg-emerald-500",
+  Qualified: "bg-green-500",
+  Replied: "bg-indigo-500",
+  Contacted: "bg-purple-400",
 };
 
 function StatCard({ icon: Icon, label, value, sub, color }) {
@@ -52,53 +61,53 @@ function formatDate(iso) {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function ActivityRow({ lead }) {
+function LeadRow({ lead, selected, onToggle }) {
   const daysSinceContact = lead.last_contacted_at
     ? Math.floor((Date.now() - new Date(lead.last_contacted_at)) / 86400000)
     : null;
 
   return (
-    <div className="space-y-2 py-3 border-b border-border last:border-0">
-      <div className="flex items-center gap-4">
-        {/* Status dot */}
-        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-          <div className={`w-3 h-3 rounded-full ${
-            lead.status === "Booked" ? "bg-emerald-500" :
-            lead.status === "Qualified" ? "bg-green-500" :
-            lead.status === "Replied" ? "bg-indigo-500" :
-            lead.status === "Contacted" ? "bg-purple-400" :
-            "bg-blue-400"
-          }`} />
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <p className="text-sm font-semibold text-foreground truncate">{lead.full_name}</p>
-            <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold ${STATUS_COLORS[lead.status] || "bg-gray-100 text-gray-700"}`}>
-              {lead.status}
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground truncate">{lead.business_name || lead.business_type}</p>
-        </div>
-
-        <div className="text-right flex-shrink-0">
-          {daysSinceContact !== null && (
-            <p className="text-[10px] text-muted-foreground">
-              {daysSinceContact === 0 ? "Contacted today" : `Contacted ${daysSinceContact}d ago`}
-            </p>
-          )}
-          {lead.last_contacted_at === null && (
-            <p className="text-[10px] text-amber-600 font-medium">Pending contact</p>
-          )}
-        </div>
+    <div
+      className={`flex items-start gap-3 py-3 border-b border-border last:border-0 transition-colors rounded-lg px-2 -mx-2 ${selected ? "bg-primary/5" : "hover:bg-muted/40"}`}
+    >
+      {/* Checkbox */}
+      <div className="flex-shrink-0 pt-0.5">
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={() => onToggle(lead.id)}
+          className="w-4 h-4 accent-primary rounded cursor-pointer"
+        />
       </div>
 
-      {/* Inline Score Card */}
-      {lead.lead_score != null && (
-        <div className="ml-12">
-          <LeadScoreCard lead={lead} />
+      {/* Status dot */}
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center mt-0.5">
+        <div className={`w-3 h-3 rounded-full ${STATUS_DOT[lead.status] || "bg-blue-400"}`} />
+      </div>
+
+      <div className="flex-1 min-w-0 space-y-1.5">
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="text-sm font-semibold text-foreground truncate">{lead.full_name}</p>
+          <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold ${STATUS_COLORS[lead.status] || "bg-gray-100 text-gray-700"}`}>
+            {lead.status}
+          </span>
         </div>
-      )}
+        <p className="text-xs text-muted-foreground truncate">{lead.business_name || lead.business_type}</p>
+        {lead.lead_score != null && (
+          <LeadScoreCard lead={lead} />
+        )}
+      </div>
+
+      <div className="text-right flex-shrink-0">
+        {daysSinceContact !== null && (
+          <p className="text-[10px] text-muted-foreground">
+            {daysSinceContact === 0 ? "Contacted today" : `${daysSinceContact}d ago`}
+          </p>
+        )}
+        {lead.last_contacted_at === null && (
+          <p className="text-[10px] text-amber-600 font-medium">Pending</p>
+        )}
+      </div>
     </div>
   );
 }
@@ -107,22 +116,17 @@ export default function LeadActivityFeed({ project }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selected, setSelected] = useState(new Set());
 
-  useEffect(() => {
-    loadLeads();
-  }, []);
-
-  const loadLeads = async () => {
+  const loadLeads = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      // Filter leads by client_email matching the project's client_email for safety
       const data = project?.client_email
         ? await base44.entities.Leads.filter({ created_by: project.client_email }, "-updated_date", 100)
         : await base44.entities.Leads.list("-updated_date", 100);
       setLeads(data || []);
-    } catch (err) {
-      // Fallback: list all visible to this user (RLS will enforce permissions)
+    } catch {
       try {
         const data = await base44.entities.Leads.list("-updated_date", 100);
         setLeads(data || []);
@@ -132,17 +136,42 @@ export default function LeadActivityFeed({ project }) {
     } finally {
       setLoading(false);
     }
+  }, [project?.client_email]);
+
+  useEffect(() => { loadLeads(); }, [loadLeads]);
+
+  // Selection helpers
+  const toggleOne = (id) => setSelected(prev => {
+    const next = new Set(prev);
+    next.has(id) ? next.delete(id) : next.add(id);
+    return next;
+  });
+
+  const recentLeads = [...leads].sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date)).slice(0, 30);
+  const allPageIds = recentLeads.map(l => l.id);
+  const allSelected = allPageIds.length > 0 && allPageIds.every(id => selected.has(id));
+  const someSelected = allPageIds.some(id => selected.has(id)) && !allSelected;
+
+  const toggleAll = () => {
+    if (allSelected) {
+      setSelected(prev => { const next = new Set(prev); allPageIds.forEach(id => next.delete(id)); return next; });
+    } else {
+      setSelected(prev => { const next = new Set(prev); allPageIds.forEach(id => next.add(id)); return next; });
+    }
   };
 
-  // Compute stats
+  const selectedIds = [...selected];
+
+  const handleBulkDone = (action) => {
+    setSelected(new Set());
+    loadLeads();
+  };
+
+  // Stats
   const total = leads.length;
   const contacted = leads.filter(l => ["Contacted","Replied","Qualified","Booking Prompt Sent","Booked"].includes(l.status)).length;
   const booked = leads.filter(l => l.status === "Booked").length;
   const qualified = leads.filter(l => l.status === "Qualified").length;
-  const recentLeads = [...leads].sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date)).slice(0, 10);
-
-  // Drip activity
-  const dripActive = leads.filter(l => l.status === "Contacted" && l.last_contacted_at).length;
 
   if (loading) {
     return (
@@ -184,7 +213,7 @@ export default function LeadActivityFeed({ project }) {
           ].map(({ Icon, label, desc }) => (
             <div key={label} className="flex gap-3 items-start">
               <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(154,92,46,0.12)" }}>
-                <Icon className="w-4 h-4 text-primary" style={{ color: "#9a5c2e" }} />
+                <Icon className="w-4 h-4" style={{ color: "#9a5c2e" }} />
               </div>
               <div>
                 <p className="text-xs font-semibold text-foreground">{label}</p>
@@ -212,31 +241,29 @@ export default function LeadActivityFeed({ project }) {
           </div>
 
           {/* Conversion bar */}
-          {total > 0 && (
-            <div className="rounded-2xl border border-border bg-white p-5">
-              <div className="flex items-center justify-between mb-3">
-                <p className="text-sm font-semibold text-foreground">Pipeline Conversion</p>
-                <p className="text-xs text-muted-foreground">{booked} of {total} leads booked</p>
-              </div>
-              <div className="h-3 rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{
-                    width: `${Math.round((booked / total) * 100)}%`,
-                    background: "linear-gradient(90deg, #7a4825, #c8965c)",
-                    minWidth: booked > 0 ? "4px" : "0",
-                  }}
-                />
-              </div>
-              <div className="flex justify-between mt-2 text-[11px] text-muted-foreground">
-                <span>0%</span>
-                <span className="font-semibold text-foreground">{Math.round((booked / total) * 100)}% book rate</span>
-                <span>100%</span>
-              </div>
+          <div className="rounded-2xl border border-border bg-white p-5">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-sm font-semibold text-foreground">Pipeline Conversion</p>
+              <p className="text-xs text-muted-foreground">{booked} of {total} leads booked</p>
             </div>
-          )}
+            <div className="h-3 rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{
+                  width: `${Math.round((booked / total) * 100)}%`,
+                  background: "linear-gradient(90deg, #7a4825, #c8965c)",
+                  minWidth: booked > 0 ? "4px" : "0",
+                }}
+              />
+            </div>
+            <div className="flex justify-between mt-2 text-[11px] text-muted-foreground">
+              <span>0%</span>
+              <span className="font-semibold text-foreground">{Math.round((booked / total) * 100)}% book rate</span>
+              <span>100%</span>
+            </div>
+          </div>
 
-          {/* Recent Activity */}
+          {/* Leads table with bulk select */}
           <div
             className="rounded-2xl p-6"
             style={{ background: "rgba(255,255,255,0.92)", border: "1px solid rgba(154,92,46,0.12)" }}
@@ -244,7 +271,11 @@ export default function LeadActivityFeed({ project }) {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="font-semibold text-foreground">Recent Lead Activity</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">Most recently updated leads in your pipeline</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {selectedIds.length > 0
+                    ? `${selectedIds.length} lead${selectedIds.length > 1 ? "s" : ""} selected`
+                    : "Most recently updated leads in your pipeline"}
+                </p>
               </div>
               <button
                 onClick={loadLeads}
@@ -256,12 +287,31 @@ export default function LeadActivityFeed({ project }) {
               </button>
             </div>
 
+            {/* Select-all header row */}
+            <div className="flex items-center gap-3 pb-2 mb-1 border-b border-border">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                ref={el => { if (el) el.indeterminate = someSelected; }}
+                onChange={toggleAll}
+                className="w-4 h-4 accent-primary rounded cursor-pointer"
+              />
+              <span className="text-xs font-semibold text-muted-foreground">
+                {allSelected ? "Deselect all" : "Select all"}
+              </span>
+            </div>
+
             {recentLeads.length === 0 ? (
               <p className="text-sm text-muted-foreground py-4">No recent activity yet.</p>
             ) : (
               <div>
                 {recentLeads.map(lead => (
-                  <ActivityRow key={lead.id} lead={lead} />
+                  <LeadRow
+                    key={lead.id}
+                    lead={lead}
+                    selected={selected.has(lead.id)}
+                    onToggle={toggleOne}
+                  />
                 ))}
               </div>
             )}
@@ -293,6 +343,15 @@ export default function LeadActivityFeed({ project }) {
             </div>
           </div>
         </>
+      )}
+
+      {/* Floating bulk action toolbar */}
+      {selectedIds.length > 0 && (
+        <LeadBulkToolbar
+          selectedIds={selectedIds}
+          onClear={() => setSelected(new Set())}
+          onDone={handleBulkDone}
+        />
       )}
     </div>
   );

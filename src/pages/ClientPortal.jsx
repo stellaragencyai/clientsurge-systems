@@ -11,12 +11,14 @@ import NotificationBell from "../components/portal/NotificationBell";
 import ClientOnboardingWizard from "../components/portal/ClientOnboardingWizard";
 import DeadlinesPanel from "../components/portal/DeadlinesPanel";
 import FilesPanel from "../components/portal/FilesPanel";
-import BillingPanel from "../components/portal/BillingPanel";
+import BillingDashboard from "../components/portal/BillingDashboard";
 import WebhookSettings from "../components/portal/WebhookSettings";
+import TasksDashboard from "../components/portal/TasksDashboard";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
   { id: "metrics", label: "Lead Flow" },
+  { id: "tasks", label: "Tasks" },
   { id: "leads", label: "My Leads" },
   { id: "progress", label: "Build Progress" },
   { id: "deadlines", label: "Deadlines" },
@@ -242,6 +244,9 @@ export default function ClientPortal() {
         {activeTab === "metrics" && (
           <LeadFlowDashboard />
         )}
+        {activeTab === "tasks" && (
+          <TasksDashboard project={project} />
+        )}
         {activeTab === "leads" && (
           <LeadActivityFeed project={project} />
         )}
@@ -255,7 +260,7 @@ export default function ClientPortal() {
           <FilesPanel project={project} />
         )}
         {activeTab === "billing" && (
-          <BillingPanel project={project} />
+          <BillingDashboard project={project} subscription={subscription} />
         )}
         {activeTab === "support" && (
           <SupportChat project={project} user={user} />
