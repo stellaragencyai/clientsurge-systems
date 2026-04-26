@@ -59,7 +59,192 @@ const industries = [
   },
 ];
 
+function MobilePanelSection({ title, isOpen, onToggle, children, countLabel }) {
+  return (
+    <div
+      className="rounded-2xl border border-[rgba(154,92,46,0.12)] bg-white/78 overflow-hidden"
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between gap-3 px-4 py-4 text-left"
+      >
+        <span className="text-sm font-semibold text-foreground">{title}</span>
+        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-primary">
+          {countLabel || (isOpen ? "Hide" : "Show")}
+        </span>
+      </button>
+      {isOpen ? <div className="px-4 pb-4">{children}</div> : null}
+    </div>
+  );
+}
+
+function MobileIndustryRecommendationDrawer({
+  recommendation,
+  isOpen,
+  onClose,
+  onBookDemo,
+}) {
+  if (!recommendation || !isOpen) {
+    return null;
+  }
+
+  const previewServices = recommendation.recommendedServices.slice(0, 3);
+
+  return (
+    <div className="lg:hidden mt-5">
+      <div
+        className="rounded-[26px] overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(250,245,239,0.92) 100%)",
+          border: "1.5px solid rgba(154,92,46,0.16)",
+          boxShadow: "0 18px 44px rgba(26,18,9,0.1)",
+        }}
+      >
+        <div
+          className="px-5 pt-5 pb-4 flex items-start justify-between gap-4"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(154,92,46,0.08) 0%, rgba(154,92,46,0.03) 100%)",
+            borderBottom: "1px solid rgba(154,92,46,0.1)",
+          }}
+        >
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary mb-2">
+              Recommended For {recommendation.shortName}
+            </p>
+            <h3 className="font-display text-2xl font-bold text-foreground leading-tight">
+              Best-Fit AI Stack
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              {recommendation.summary}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-primary border border-primary/15 bg-white/70"
+          >
+            Close
+          </button>
+        </div>
+
+        <div className="px-5 py-5 space-y-4">
+          <div
+            className="rounded-2xl px-4 py-4"
+            style={{
+              background: "rgba(255,255,255,0.78)",
+              border: "1px solid rgba(154,92,46,0.12)",
+            }}
+          >
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary mb-2">
+              Recommended Package
+            </p>
+            <p className="text-lg font-semibold text-foreground">
+              {recommendation.recommendedPackage?.name}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              {recommendation.recommendedPackage?.fit}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary mb-3">
+              Start With These
+            </p>
+            <div className="grid gap-3">
+              {previewServices.map((service) => (
+                <div
+                  key={service.product_id}
+                  className="rounded-2xl px-4 py-4"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(255,255,255,0.88) 0%, rgba(250,245,239,0.74) 100%)",
+                    border: "1px solid rgba(154,92,46,0.12)",
+                  }}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        {service.name}
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                        {service.whyThisMatters}
+                      </p>
+                    </div>
+                    <span
+                      className="inline-flex items-center rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em]"
+                      style={{
+                        background: "rgba(154,92,46,0.08)",
+                        border: "1px solid rgba(154,92,46,0.14)",
+                        color: "#9a5c2e",
+                      }}
+                    >
+                      {service.availability_label}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <button
+              type="button"
+              onClick={onBookDemo}
+              style={{
+                borderRadius: "9999px",
+                padding: "2px",
+                background:
+                  "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                boxShadow: "0 4px 18px rgba(120,70,20,0.26)",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              <span
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                  height: "46px",
+                  padding: "0 20px",
+                  borderRadius: "9999px",
+                  background:
+                    "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                  color: "#f5e6d0",
+                  fontWeight: "700",
+                  fontSize: "0.95rem",
+                }}
+              >
+                Book Your Free Demo
+                <ArrowRight className="w-4 h-4" />
+              </span>
+            </button>
+
+            <a
+              href="/store"
+              className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
+            >
+              See The Full AI Store
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function IndustryRecommendationPanel({ recommendation, onBookDemo }) {
+  const [openMobileSection, setOpenMobileSection] = useState("available");
+
+  useEffect(() => {
+    setOpenMobileSection("available");
+  }, [recommendation?.shortName]);
+
   if (!recommendation) {
     return null;
   }
@@ -142,7 +327,7 @@ function IndustryRecommendationPanel({ recommendation, onBookDemo }) {
         </div>
       </div>
 
-      <div className="px-6 md:px-8 py-7 md:py-8 grid lg:grid-cols-[0.9fr,1.1fr] gap-7">
+      <div className="hidden lg:grid px-6 md:px-8 py-7 md:py-8 lg:grid-cols-[0.9fr,1.1fr] gap-7">
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-4">
             Why This Stack Fits
@@ -227,6 +412,107 @@ function IndustryRecommendationPanel({ recommendation, onBookDemo }) {
         </div>
       </div>
 
+      <div className="lg:hidden px-5 py-5 space-y-3">
+        <MobilePanelSection
+          title="Why this stack fits"
+          countLabel={`${recommendation.pressurePoints.length} reasons`}
+          isOpen={openMobileSection === "why"}
+          onToggle={() =>
+            setOpenMobileSection((current) => (current === "why" ? "" : "why"))
+          }
+        >
+          <div className="space-y-3">
+            {recommendation.pressurePoints.map((point) => (
+              <div
+                key={point}
+                className="rounded-2xl px-4 py-4"
+                style={{
+                  background: "rgba(154,92,46,0.05)",
+                  border: "1px solid rgba(154,92,46,0.12)",
+                }}
+              >
+                <p className="text-sm leading-6 text-foreground/78">{point}</p>
+              </div>
+            ))}
+          </div>
+        </MobilePanelSection>
+
+        <MobilePanelSection
+          title="Available now"
+          countLabel={`${recommendation.recommendedServices.length} services`}
+          isOpen={openMobileSection === "available"}
+          onToggle={() =>
+            setOpenMobileSection((current) =>
+              current === "available" ? "" : "available"
+            )
+          }
+        >
+          <div className="grid gap-3">
+            {recommendation.recommendedServices.map((service) => (
+              <div
+                key={service.product_id}
+                className="rounded-2xl px-4 py-4"
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(255,255,255,0.88) 0%, rgba(250,245,239,0.72) 100%)",
+                  border: "1px solid rgba(154,92,46,0.12)",
+                }}
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-base font-semibold text-foreground">{service.name}</p>
+                    <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                      {service.whyThisMatters}
+                    </p>
+                  </div>
+                  <span
+                    className="inline-flex items-center rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em]"
+                    style={{
+                      background: "rgba(154,92,46,0.08)",
+                      border: "1px solid rgba(154,92,46,0.14)",
+                      color: "#9a5c2e",
+                    }}
+                  >
+                    {service.availability_label}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </MobilePanelSection>
+
+        {recommendation.addOnsByReview.length ? (
+          <MobilePanelSection
+            title="Add-ons by review"
+            countLabel={`${recommendation.addOnsByReview.length} add-ons`}
+            isOpen={openMobileSection === "addons"}
+            onToggle={() =>
+              setOpenMobileSection((current) =>
+                current === "addons" ? "" : "addons"
+              )
+            }
+          >
+            <div className="grid gap-3">
+              {recommendation.addOnsByReview.map((product) => (
+                <div
+                  key={product.product_id}
+                  className="rounded-2xl px-4 py-4"
+                  style={{
+                    background: "rgba(26,18,9,0.04)",
+                    border: "1px solid rgba(26,18,9,0.08)",
+                  }}
+                >
+                  <p className="text-sm font-semibold text-foreground">{product.name}</p>
+                  <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                    {product.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </MobilePanelSection>
+        ) : null}
+      </div>
+
       <div
         className="px-6 md:px-8 py-5 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between"
         style={{
@@ -289,6 +575,8 @@ export default function Industries() {
   const demoBooking = useDemoBooking();
   const [sectionVisible, setSectionVisible] = useState(false);
   const [selectedIndustryId, setSelectedIndustryId] = useState("med-spa");
+  const [hoveredIndustryId, setHoveredIndustryId] = useState("");
+  const [mobileRecommendationOpen, setMobileRecommendationOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -345,6 +633,14 @@ export default function Industries() {
     INDUSTRY_RECOMMENDATIONS_BY_ID[selectedIndustryId] ||
     INDUSTRY_RECOMMENDATIONS_BY_ID["med-spa"];
 
+  const handleIndustrySelect = (industryId) => {
+    setSelectedIndustryId(industryId);
+
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      setMobileRecommendationOpen(true);
+    }
+  };
+
   return (
     <section
       id="industries"
@@ -367,14 +663,18 @@ export default function Industries() {
       <div className="max-w-[1800px] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10">
         {industries.map((industry, index) => {
           const Icon = industry.icon;
-          const selected = selectedIndustryId === industry.id;
+          const highlighted = hoveredIndustryId === industry.id;
 
           return (
             <button
               key={industry.id}
               type="button"
-              className="group relative block overflow-hidden h-[27.6rem] text-left"
-              onClick={() => setSelectedIndustryId(industry.id)}
+              className="group relative block overflow-hidden h-[17.5rem] sm:h-[21rem] md:h-[27.6rem] text-left"
+              onClick={() => handleIndustrySelect(industry.id)}
+              onMouseEnter={() => setHoveredIndustryId(industry.id)}
+              onMouseLeave={() => setHoveredIndustryId("")}
+              onFocus={() => setHoveredIndustryId(industry.id)}
+              onBlur={() => setHoveredIndustryId("")}
               style={{
                 opacity: sectionVisible ? 1 : 0,
                 transform: sectionVisible ? "translateY(0)" : "translateY(32px)",
@@ -397,18 +697,18 @@ export default function Industries() {
               <div
                 className="absolute inset-0"
                 style={{
-                  background: selected
+                  background: highlighted
                     ? "linear-gradient(to bottom, rgba(10,10,14,0.28) 0%, rgba(10,10,14,0.74) 100%)"
                     : "linear-gradient(to bottom, rgba(10,10,14,0.18) 0%, rgba(10,10,14,0.66) 100%)",
                 }}
               />
 
               <div
-                className="absolute inset-0 border-2 transition-opacity duration-300"
+                className="absolute inset-0 border-2 transition-all duration-300"
                 style={{
-                  borderColor: selected ? "#c8965c" : "rgba(255,255,255,0.08)",
-                  boxShadow: selected
-                    ? "inset 0 0 0 1px rgba(245,217,168,0.2)"
+                  borderColor: highlighted ? "#c8965c" : "rgba(255,255,255,0.08)",
+                  boxShadow: highlighted
+                    ? "inset 0 0 0 1px rgba(245,217,168,0.26), inset 0 0 32px rgba(200,150,92,0.2), 0 0 0 2px rgba(200,150,92,0.34), 0 0 24px rgba(200,150,92,0.22)"
                     : "none",
                 }}
               />
@@ -426,28 +726,6 @@ export default function Industries() {
                   <Icon style={{ width: "18px", height: "18px", color: "#fff" }} />
                 </div>
 
-                <span
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    padding: "6px 12px",
-                    borderRadius: "9999px",
-                    background: selected
-                      ? "rgba(200,150,92,0.22)"
-                      : "rgba(255,255,255,0.12)",
-                    border: selected
-                      ? "1px solid rgba(200,150,92,0.4)"
-                      : "1px solid rgba(255,255,255,0.18)",
-                    backdropFilter: "blur(8px)",
-                    fontSize: "10px",
-                    fontWeight: "700",
-                    letterSpacing: "0.18em",
-                    textTransform: "uppercase",
-                    color: selected ? "#f5d9a8" : "rgba(255,255,255,0.88)",
-                  }}
-                >
-                  Tailored Stack
-                </span>
               </div>
 
               <div className="absolute bottom-0 inset-x-0 px-5 pb-5 pt-12">
@@ -478,7 +756,7 @@ export default function Industries() {
               <div
                 className="absolute bottom-0 left-0 h-[2px] transition-all duration-500 ease-out"
                 style={{
-                  width: selected ? "100%" : "0%",
+                  width: highlighted ? "100%" : "0%",
                   background:
                     "linear-gradient(to right, #c8965c, #f5d9a8, #c8965c)",
                 }}
@@ -489,6 +767,15 @@ export default function Industries() {
       </div>
 
       <div className="max-w-6xl mx-auto px-6">
+        <MobileIndustryRecommendationDrawer
+          recommendation={selectedRecommendation}
+          isOpen={mobileRecommendationOpen}
+          onClose={() => setMobileRecommendationOpen(false)}
+          onBookDemo={() => demoBooking?.openDemoBooking?.()}
+        />
+      </div>
+
+      <div className="hidden lg:block max-w-6xl mx-auto px-6">
         <IndustryRecommendationPanel
           recommendation={selectedRecommendation}
           onBookDemo={() => demoBooking?.openDemoBooking?.()}
