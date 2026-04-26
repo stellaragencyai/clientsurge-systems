@@ -315,11 +315,11 @@ const flowBorder = "1.5px solid rgba(212, 184, 142, 0.42)";
 const flowBorderActive = "1.5px solid rgba(222, 194, 152, 0.72)";
 const flowShadow = "0 16px 34px rgba(111,67,31,0.08), 0 2px 12px rgba(111,67,31,0.05)";
 const flowShadowActive =
-  "0 24px 54px rgba(67,39,18,0.18), 0 8px 24px rgba(111,67,31,0.1)";
+  "0 22px 48px rgba(122,72,37,0.16), 0 8px 22px rgba(154,92,46,0.1)";
 const flowBrown =
-  "linear-gradient(180deg, #281509 0%, #332012 18%, #46301c 42%, #5f4229 68%, #755536 86%, #624327 100%)";
+  "linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 40%, #7a4825 100%)";
 const flowBrownSoft =
-  "linear-gradient(180deg, #301a0c 0%, #3c2615 18%, #513621 42%, #6c4a2d 68%, #856240 86%, #6d4a2c 100%)";
+  "linear-gradient(135deg, #7a4825 0%, #b1723b 42%, #8a542b 100%)";
 const flowTextLight = "rgba(252, 241, 222, 0.98)";
 const flowTextMuted = "rgba(247, 225, 194, 0.92)";
 const flowChipBg = "rgba(245, 217, 168, 0.14)";
@@ -332,13 +332,13 @@ const flowDivider =
 const flowHeaderGlass =
   "linear-gradient(180deg, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0) 100%)";
 const flowBodyMesh =
-  "radial-gradient(circle at 16% 20%, rgba(255,233,197,0.2) 0%, rgba(255,233,197,0.08) 22%, transparent 52%), radial-gradient(circle at 82% 14%, rgba(255,247,230,0.14) 0%, transparent 34%), radial-gradient(circle at 70% 78%, rgba(201,155,103,0.12) 0%, transparent 38%), radial-gradient(circle at 36% 90%, rgba(55,31,15,0.18) 0%, transparent 42%)";
+  "radial-gradient(circle at 16% 20%, rgba(255,233,197,0.22) 0%, rgba(255,233,197,0.1) 22%, transparent 50%), radial-gradient(circle at 82% 14%, rgba(255,247,230,0.16) 0%, transparent 34%), radial-gradient(circle at 70% 78%, rgba(245,217,168,0.14) 0%, transparent 38%), radial-gradient(circle at 38% 92%, rgba(122,72,37,0.12) 0%, transparent 40%)";
 const flowSpotlight =
   "linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,247,233,0.1) 16%, rgba(255,255,255,0.03) 30%, rgba(255,255,255,0) 52%)";
 const flowShine =
   "linear-gradient(140deg, rgba(255,255,255,0.22) 0%, rgba(255,247,232,0.14) 12%, rgba(255,235,205,0.06) 24%, rgba(255,255,255,0.01) 34%, rgba(255,255,255,0) 48%)";
 const flowInnerFrame =
-  "inset 0 1px 0 rgba(255,248,235,0.22), inset 0 0 0 1px rgba(255,227,186,0.08), inset 0 -18px 28px rgba(24,12,5,0.08)";
+  "inset 0 1px 0 rgba(255,248,235,0.24), inset 0 0 0 1px rgba(255,227,186,0.1), inset 0 -16px 24px rgba(122,72,37,0.06)";
 const mapCardSurface =
   "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,250,250,0.96) 100%)";
 const mapCardSurfaceActive =
