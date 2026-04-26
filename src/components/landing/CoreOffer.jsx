@@ -306,6 +306,53 @@ const launchTimelineSteps = [
 ];
 
 const orderedSystemIds = Object.keys(systemsById);
+const mobileVisibleSystemIds = new Set(["01", "02", "03", "04"]);
+const flowSurface =
+  "linear-gradient(180deg, rgba(252,247,241,0.99) 0%, rgba(246,238,228,0.97) 100%)";
+const flowSurfaceStrong =
+  "linear-gradient(180deg, rgba(255,250,245,1) 0%, rgba(248,240,230,0.99) 100%)";
+const flowBorder = "1.5px solid rgba(212, 184, 142, 0.42)";
+const flowBorderActive = "1.5px solid rgba(222, 194, 152, 0.72)";
+const flowShadow = "0 16px 34px rgba(111,67,31,0.08), 0 2px 12px rgba(111,67,31,0.05)";
+const flowShadowActive =
+  "0 24px 54px rgba(67,39,18,0.18), 0 8px 24px rgba(111,67,31,0.1)";
+const flowBrown =
+  "linear-gradient(180deg, #281509 0%, #332012 18%, #46301c 42%, #5f4229 68%, #755536 86%, #624327 100%)";
+const flowBrownSoft =
+  "linear-gradient(180deg, #301a0c 0%, #3c2615 18%, #513621 42%, #6c4a2d 68%, #856240 86%, #6d4a2c 100%)";
+const flowTextLight = "rgba(252, 241, 222, 0.98)";
+const flowTextMuted = "rgba(247, 225, 194, 0.92)";
+const flowChipBg = "rgba(245, 217, 168, 0.14)";
+const flowChipBorder = "1px solid rgba(238, 204, 157, 0.4)";
+const flowTopText = "rgba(184, 129, 72, 0.92)";
+const flowIconColor = "#9a5c2e";
+const flowIconGlow = "0 0 0 1px rgba(255,255,255,0.18), 0 0 28px rgba(245,217,168,0.24)";
+const flowDivider =
+  "linear-gradient(90deg, rgba(255,232,192,0) 0%, rgba(245,217,168,0.72) 18%, rgba(255,244,223,0.96) 50%, rgba(245,217,168,0.72) 82%, rgba(255,232,192,0) 100%)";
+const flowHeaderGlass =
+  "linear-gradient(180deg, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0) 100%)";
+const flowBodyMesh =
+  "radial-gradient(circle at 16% 20%, rgba(255,233,197,0.2) 0%, rgba(255,233,197,0.08) 22%, transparent 52%), radial-gradient(circle at 82% 14%, rgba(255,247,230,0.14) 0%, transparent 34%), radial-gradient(circle at 70% 78%, rgba(201,155,103,0.12) 0%, transparent 38%), radial-gradient(circle at 36% 90%, rgba(55,31,15,0.18) 0%, transparent 42%)";
+const flowSpotlight =
+  "linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,247,233,0.1) 16%, rgba(255,255,255,0.03) 30%, rgba(255,255,255,0) 52%)";
+const flowShine =
+  "linear-gradient(140deg, rgba(255,255,255,0.22) 0%, rgba(255,247,232,0.14) 12%, rgba(255,235,205,0.06) 24%, rgba(255,255,255,0.01) 34%, rgba(255,255,255,0) 48%)";
+const flowInnerFrame =
+  "inset 0 1px 0 rgba(255,248,235,0.22), inset 0 0 0 1px rgba(255,227,186,0.08), inset 0 -18px 28px rgba(24,12,5,0.08)";
+const mapCardSurface =
+  "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,250,250,0.96) 100%)";
+const mapCardSurfaceActive =
+  "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(247,247,247,0.98) 100%)";
+const mapCardBorder = "1.5px solid rgba(148, 163, 184, 0.18)";
+const mapCardBorderActive = "1.5px solid rgba(148, 163, 184, 0.26)";
+const mapCardShadow =
+  "0 8px 22px rgba(15, 23, 42, 0.05)";
+const mapCardShadowActive =
+  "0 12px 28px rgba(15, 23, 42, 0.08)";
+const mapCardSheen = "transparent";
+const mapCardMesh = "transparent";
+const mapCardDivider = "transparent";
+const mapCardInnerFrame = "inset 0 0 0 1px rgba(148,163,184,0.1)";
 
 function CoreOfferHeader({ industryContext }) {
   return (
@@ -361,40 +408,65 @@ function SystemMap({ selectedSystemId, onStageSelect }) {
               <button
                 type="button"
                 key={stage.id}
-                className="relative rounded-2xl px-5 pt-5 pb-4"
+                className="relative rounded-2xl px-5 pt-5 pb-4 overflow-hidden"
                 onClick={() => onStageSelect(stage.systemsIncluded[0])}
                 style={{
-                  background: active
-                    ? "linear-gradient(135deg, rgba(255,249,240,0.98) 0%, rgba(251,239,219,0.94) 100%)"
-                    : "linear-gradient(135deg, rgba(255,255,255,0.88) 0%, rgba(250,245,239,0.78) 100%)",
-                  border: active
-                    ? "1.5px solid rgba(154,92,46,0.4)"
-                    : "1px solid rgba(154,92,46,0.16)",
-                  boxShadow: active
-                    ? "0 16px 40px rgba(154,92,46,0.14)"
-                    : "0 6px 18px rgba(0,0,0,0.04)",
+                  background: active ? mapCardSurfaceActive : mapCardSurface,
+                  border: active ? mapCardBorderActive : mapCardBorder,
+                  boxShadow: active ? mapCardShadowActive : mapCardShadow,
                   cursor: "pointer",
                   textAlign: "left",
                 }}
               >
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background: mapCardMesh,
+                    opacity: active ? 1 : 0.82,
+                  }}
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-x-0 top-0 h-[52%] pointer-events-none"
+                  style={{
+                    background: mapCardSheen,
+                    opacity: active ? 1 : 0.8,
+                  }}
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute left-0 right-0 top-0 h-px pointer-events-none"
+                  style={{ background: mapCardDivider }}
+                />
                 <span
                   className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full"
                   style={{
                     background: active
-                      ? "linear-gradient(135deg,#9a5c2e,#c8965c)"
-                      : "rgba(154,92,46,0.22)",
+                      ? "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)"
+                      : "linear-gradient(135deg, #f8fafc 0%, #e5e7eb 100%)",
                     border: active
-                      ? "2px solid rgba(255,248,235,0.95)"
-                      : "2px solid rgba(255,255,255,0.92)",
-                    boxShadow: active ? "0 0 0 6px rgba(154,92,46,0.09)" : "none",
+                      ? "2px solid rgba(255,255,255,0.98)"
+                      : "2px solid rgba(246,250,255,0.96)",
+                    boxShadow: active
+                      ? "0 0 0 6px rgba(226,232,240,0.35), 0 6px 14px rgba(100,116,139,0.12)"
+                      : "0 4px 10px rgba(100,116,139,0.08)",
                   }}
                 />
-                <h3 className="text-sm font-semibold text-foreground leading-snug mb-2">
+                <h3
+                  className="relative z-10 text-sm font-semibold text-foreground leading-snug mb-2"
+                  style={{ textShadow: active ? "0 1px 0 rgba(255,255,255,0.42)" : "none" }}
+                >
                   {stage.title}
                 </h3>
-                <p className="text-xs leading-relaxed text-foreground/65">
+                <p className="relative z-10 text-xs leading-relaxed text-slate-700/90">
                   {stage.summary}
                 </p>
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 rounded-2xl pointer-events-none"
+                  style={{ boxShadow: mapCardInnerFrame }}
+                />
               </button>
             );
           })}
@@ -408,25 +480,51 @@ function SystemMap({ selectedSystemId, onStageSelect }) {
             <button
               type="button"
               key={stage.id}
-              className="rounded-2xl px-4 py-4"
+              className="rounded-2xl px-4 py-4 relative overflow-hidden"
               onClick={() => onStageSelect(stage.systemsIncluded[0])}
               style={{
-                background: active
-                  ? "linear-gradient(135deg, rgba(255,249,240,0.98) 0%, rgba(251,239,219,0.94) 100%)"
-                  : "linear-gradient(135deg, rgba(255,255,255,0.88) 0%, rgba(250,245,239,0.78) 100%)",
-                border: active
-                  ? "1.5px solid rgba(154,92,46,0.4)"
-                  : "1px solid rgba(154,92,46,0.16)",
+                background: active ? mapCardSurfaceActive : mapCardSurface,
+                border: active ? mapCardBorderActive : mapCardBorder,
+                boxShadow: active ? mapCardShadowActive : mapCardShadow,
                 cursor: "pointer",
                 textAlign: "left",
               }}
             >
-              <h3 className="text-sm font-semibold text-foreground leading-snug mb-1.5">
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: mapCardMesh,
+                  opacity: active ? 1 : 0.82,
+                }}
+              />
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-0 top-0 h-[52%] pointer-events-none"
+                style={{
+                  background: mapCardSheen,
+                  opacity: active ? 1 : 0.8,
+                }}
+              />
+              <div
+                aria-hidden="true"
+                className="absolute left-0 right-0 top-0 h-px pointer-events-none"
+                style={{ background: mapCardDivider }}
+              />
+              <h3
+                className="relative z-10 text-sm font-semibold text-foreground leading-snug mb-1.5"
+                style={{ textShadow: active ? "0 1px 0 rgba(255,255,255,0.42)" : "none" }}
+              >
                 {stage.title}
               </h3>
-              <p className="text-xs leading-relaxed text-foreground/65">
+              <p className="relative z-10 text-xs leading-relaxed text-slate-700/90">
                 {stage.summary}
               </p>
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 rounded-2xl pointer-events-none"
+                style={{ boxShadow: mapCardInnerFrame }}
+              />
             </button>
           );
         })}
@@ -445,56 +543,132 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
       aria-pressed={selected}
       className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       style={{
-        background: selected
-          ? "linear-gradient(135deg, rgba(255,248,235,0.98) 0%, rgba(252,239,216,0.92) 100%)"
-          : "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(252,248,242,0.85) 100%)",
-        border: selected
-          ? "1.5px solid rgba(154,92,46,0.42)"
-          : "1.5px solid rgba(154,92,46,0.18)",
-        boxShadow: selected
-          ? "0 16px 36px rgba(154,92,46,0.14)"
-          : "0 6px 18px rgba(0,0,0,0.05)",
+        background: selected ? flowSurfaceStrong : flowSurface,
+        border: selected ? flowBorderActive : flowBorder,
+        boxShadow: selected ? flowShadowActive : flowShadow,
         transform: selected ? "translateY(-1px)" : "translateY(0)",
       }}
     >
       <div
-        className="px-5 md:px-6 pt-5 pb-4 flex items-center justify-between"
+        className="px-5 md:px-6 pt-5 pb-4 flex items-center justify-between relative overflow-hidden"
         style={{
-          background:
-            "linear-gradient(135deg, rgba(154,92,46,0.08) 0%, rgba(154,92,46,0.03) 100%)",
+          background: flowSurfaceStrong,
+          borderBottom: "1px solid rgba(208,166,114,0.18)",
         }}
       >
-        <span
-          className="text-[11px] font-black uppercase tracking-[0.2em]"
-          style={{ color: "rgba(90,55,28,0.88)" }}
-        >
-          Step {system.id}
-        </span>
         <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center"
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-full pointer-events-none"
           style={{
-            background: selected ? "rgba(154,92,46,0.16)" : "rgba(154,92,46,0.08)",
-            border: "1px solid rgba(154,92,46,0.18)",
+            background: flowHeaderGlass,
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.84), inset 0 -1px 0 rgba(255,255,255,0.22)",
           }}
-        >
-          <Icon className="w-4 h-4" style={{ color: "#9a5c2e" }} />
+        />
+        <div className="flex items-center gap-3">
+          <span
+            className="relative z-10 text-[11px] font-black uppercase tracking-[0.2em]"
+            style={{ color: flowTopText }}
+          >
+            Step {system.id}
+          </span>
+        </div>
+        <div className="flex items-center gap-3 relative z-10">
+          <span
+            className="hidden sm:inline text-[11px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: "rgba(198,160,119,0.82)" }}
+          >
+            Tap to expand
+          </span>
+          <div className="relative">
+            <div
+              aria-hidden="true"
+              className="absolute inset-[-6px] rounded-[18px] pointer-events-none"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(245,217,168,0.34) 0%, rgba(245,217,168,0.1) 48%, transparent 76%)",
+                filter: "blur(4px)",
+                opacity: selected ? 1 : 0.75,
+              }}
+            />
+            <div
+              className="relative w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(255,249,241,0.96) 0%, rgba(246,232,214,0.88) 100%)",
+                border: "1px solid rgba(205,164,114,0.52)",
+                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.78), ${flowIconGlow}`,
+              }}
+            >
+              <Icon className="w-4 h-4" style={{ color: flowIconColor }} />
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="px-5 md:px-6 py-5 md:py-6 flex flex-col gap-3">
-        <h3 className="text-lg font-semibold leading-snug text-foreground">
+      <div
+        className="px-5 md:px-6 py-5 md:py-6 flex flex-col gap-3 relative overflow-hidden"
+        style={{
+          background: selected ? flowBrownSoft : flowBrown,
+        }}
+      >
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: flowBodyMesh,
+            opacity: selected ? 1 : 0.84,
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute left-0 right-0 top-0 h-px pointer-events-none"
+          style={{ background: flowDivider }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-y-0 left-[-18%] w-[70%] pointer-events-none"
+          style={{
+            background: flowSpotlight,
+            opacity: selected ? 0.82 : 0.52,
+            transform: selected ? "translateX(8%)" : "translateX(0)",
+            transition: "opacity 200ms ease, transform 200ms ease",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-[48%] pointer-events-none"
+          style={{
+            background: flowShine,
+            opacity: selected ? 0.92 : 0.7,
+          }}
+        />
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            right: "-8%",
+            bottom: "-20%",
+            width: "180px",
+            height: "180px",
+            borderRadius: "999px",
+            background:
+              "radial-gradient(circle, rgba(255,224,180,0.18) 0%, rgba(255,224,180,0.05) 42%, transparent 70%)",
+            pointerEvents: "none",
+          }}
+        />
+        <h3 className="text-lg font-semibold leading-snug relative z-10" style={{ color: flowTextLight }}>
           {system.title}
         </h3>
-        <p className="text-sm leading-relaxed text-foreground/70">
+        <p className="text-sm leading-relaxed relative z-10" style={{ color: flowTextMuted }}>
           {system.shortDescription}
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 relative z-10">
           <span
             className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.08em] w-fit"
             style={{
-              background: "rgba(154,92,46,0.08)",
-              color: "#9a5c2e",
-              border: "1px solid rgba(154,92,46,0.14)",
+              background: flowChipBg,
+              color: flowTextLight,
+              border: flowChipBorder,
             }}
           >
             {system.badge}
@@ -503,9 +677,9 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
             <span
               className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.08em] w-fit"
               style={{
-                background: "rgba(245,217,168,0.2)",
-                color: "#7a4825",
-                border: "1px solid rgba(200,150,92,0.26)",
+                background: "rgba(255,241,223,0.14)",
+                color: "rgba(255,242,223,0.96)",
+                border: "1px solid rgba(245,217,168,0.3)",
               }}
             >
               {emphasizedLabel}
@@ -532,15 +706,19 @@ function SystemGroupList({ selectedSystemId, onSelect, emphasizedSystemIds, emph
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {group.systems.map((systemId) => (
-              <SystemCard
+              <div
                 key={systemId}
-                system={systemsById[systemId]}
-                selected={selectedSystemId === systemId}
-                onSelect={onSelect}
-                emphasizedLabel={
-                  emphasizedSystemIds.has(systemId) ? emphasizedLabel : null
-                }
-              />
+                className={mobileVisibleSystemIds.has(systemId) ? "block" : "hidden md:block"}
+              >
+                <SystemCard
+                  system={systemsById[systemId]}
+                  selected={selectedSystemId === systemId}
+                  onSelect={onSelect}
+                  emphasizedLabel={
+                    emphasizedSystemIds.has(systemId) ? emphasizedLabel : null
+                  }
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -549,19 +727,105 @@ function SystemGroupList({ selectedSystemId, onSelect, emphasizedSystemIds, emph
   );
 }
 
+function MobileSystemGroupList({
+  selectedSystemId,
+  onSelect,
+  emphasizedSystemIds,
+  emphasizedLabel,
+  showAll,
+  onToggle,
+}) {
+  return (
+    <div className="mt-12 space-y-8 md:hidden">
+      {systemGroups.map((group) => {
+        const visibleSystems = group.systems.filter(
+          (systemId) => showAll || mobileVisibleSystemIds.has(systemId)
+        );
+        if (!visibleSystems.length) return null;
+
+        return (
+          <div key={group.id}>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
+              <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase whitespace-nowrap">
+                {group.label}
+              </p>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {visibleSystems.map((systemId) => (
+                <SystemCard
+                  key={systemId}
+                  system={systemsById[systemId]}
+                  selected={selectedSystemId === systemId}
+                  onSelect={onSelect}
+                  emphasizedLabel={
+                    emphasizedSystemIds.has(systemId) ? emphasizedLabel : null
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-white/80"
+      >
+        {showAll ? "Show condensed view" : "See full 8-system flow"}
+        <ArrowRight className="w-4 h-4" />
+      </button>
+    </div>
+  );
+}
+
 function DetailBlock({ label, value }) {
   return (
     <div
-      className="rounded-2xl px-4 py-4"
+      className="rounded-2xl overflow-hidden"
       style={{
-        background: "rgba(154,92,46,0.05)",
-        border: "1px solid rgba(154,92,46,0.14)",
+        background: flowSurface,
+        border: flowBorder,
+        boxShadow: flowShadow,
       }}
     >
-      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary mb-2">
-        {label}
-      </p>
-      <p className="text-sm leading-6 text-foreground/80">{value}</p>
+      <div
+        className="px-4 py-3 relative overflow-hidden"
+        style={{
+          background: flowSurfaceStrong,
+          borderBottom: "1px solid rgba(208,166,114,0.18)",
+        }}
+      >
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-full pointer-events-none"
+          style={{ background: flowHeaderGlass }}
+        />
+        <p className="relative z-10 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: flowTopText }}>
+          {label}
+        </p>
+      </div>
+      <div className="px-4 py-4 relative overflow-hidden" style={{ background: flowBrown }}>
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: flowBodyMesh, opacity: 0.72 }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 top-0 h-[46%] pointer-events-none"
+          style={{ background: flowShine, opacity: 0.62 }}
+        />
+        <div
+          aria-hidden="true"
+          className="absolute left-0 right-0 top-0 h-px pointer-events-none"
+          style={{ background: flowDivider }}
+        />
+        <p className="relative z-10 text-sm leading-6" style={{ color: flowTextMuted }}>{value}</p>
+      </div>
     </div>
   );
 }
@@ -575,24 +839,30 @@ function SystemDetailPanel({ systemId, onBookDemo, onPrevious, onNext }) {
     <div
       className="mt-12 md:mt-14 rounded-[24px] px-5 py-6 md:px-7 md:py-7"
       style={{
-        background:
-          "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(252,248,242,0.9) 100%)",
-        border: "1.5px solid rgba(154,92,46,0.2)",
-        boxShadow: "0 18px 52px rgba(0,0,0,0.08)",
+        background: flowSurfaceStrong,
+        border: flowBorderActive,
+        boxShadow: flowShadowActive,
       }}
     >
       <div className="grid lg:grid-cols-[280px,1fr] gap-6 md:gap-7">
         <div>
           <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4"
+            className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 relative overflow-hidden"
             style={{
-              background: "linear-gradient(135deg,#7a4825 0%,#c8965c 100%)",
-              boxShadow: "0 8px 20px rgba(154,92,46,0.22)",
+              background:
+                "linear-gradient(180deg, rgba(255,249,241,0.96) 0%, rgba(246,232,214,0.9) 100%)",
+              border: "1px solid rgba(205,164,114,0.5)",
+              boxShadow: `0 8px 20px rgba(154,92,46,0.2), ${flowIconGlow}`,
             }}
           >
-            <Icon className="w-5 h-5 text-white" />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 pointer-events-none"
+              style={{ background: flowHeaderGlass }}
+            />
+            <Icon className="w-5 h-5 relative z-10" style={{ color: flowIconColor }} />
           </div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary mb-2">
+          <p className="text-[11px] font-bold uppercase tracking-[0.18em] mb-2" style={{ color: flowTopText }}>
             Selected System
           </p>
           <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
@@ -621,12 +891,13 @@ function SystemDetailPanel({ systemId, onBookDemo, onPrevious, onNext }) {
               key={item}
               className="flex items-center gap-3 rounded-2xl px-4 py-3"
               style={{
-                background: "rgba(154,92,46,0.05)",
-                border: "1px solid rgba(154,92,46,0.12)",
+                background: flowBrown,
+                border: flowChipBorder,
+                boxShadow: `${flowInnerFrame}, inset 0 1px 0 rgba(255,255,255,0.04)`,
               }}
             >
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-primary" />
-              <span className="text-sm font-medium text-foreground/80">{item}</span>
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0" style={{ color: "#ffd49a" }} />
+              <span className="text-sm font-medium" style={{ color: flowTextLight }}>{item}</span>
             </div>
           ))}
         </div>
@@ -708,10 +979,9 @@ function LaunchTimeline() {
             key={step.id}
             className="rounded-2xl px-5 py-5 text-center"
             style={{
-              background:
-                "linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(250,245,239,0.84) 100%)",
-              border: "1px solid rgba(154,92,46,0.15)",
-              boxShadow: "0 8px 22px rgba(0,0,0,0.05)",
+              background: flowSurface,
+              border: flowBorder,
+              boxShadow: flowShadow,
             }}
           >
             <div
@@ -795,6 +1065,7 @@ export default function CoreOffer() {
   const [selectedSystemId, setSelectedSystemId] = useState("01");
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedIndustryId, setSelectedIndustryId] = useState(null);
+  const [showAllMobileSystems, setShowAllMobileSystems] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -819,6 +1090,8 @@ export default function CoreOffer() {
       if (matchingSystem) {
         setSelectedSystemId(matchingSystem.id);
       }
+
+      setShowAllMobileSystems(false);
     };
 
     applyIndustrySelection();
@@ -878,13 +1151,25 @@ export default function CoreOffer() {
           selectedSystemId={selectedSystemId}
           onStageSelect={setSelectedSystemId}
         />
-        <SystemGroupList
+        <div className="hidden md:block">
+          <SystemGroupList
+            selectedSystemId={selectedSystemId}
+            onSelect={setSelectedSystemId}
+            emphasizedSystemIds={emphasizedSystemIds}
+            emphasizedLabel={
+              industryContext ? `Best fit for ${industryContext.shortName}` : null
+            }
+          />
+        </div>
+        <MobileSystemGroupList
           selectedSystemId={selectedSystemId}
           onSelect={setSelectedSystemId}
           emphasizedSystemIds={emphasizedSystemIds}
           emphasizedLabel={
             industryContext ? `Best fit for ${industryContext.shortName}` : null
           }
+          showAll={showAllMobileSystems}
+          onToggle={() => setShowAllMobileSystems((current) => !current)}
         />
         <SystemDetailPanel
           systemId={selectedSystemId}

@@ -4,14 +4,14 @@ import { getPublicDemoEntries, getDemoCoverageSummary } from "@/lib/demoVideoCat
 const demoCream = "linear-gradient(180deg, rgba(252,247,241,0.99) 0%, rgba(246,238,228,0.97) 100%)";
 const demoCreamStrong = "linear-gradient(180deg, rgba(255,250,245,1) 0%, rgba(248,240,230,0.99) 100%)";
 const demoBrown =
-  "linear-gradient(180deg, #4d2810 0%, #5d3416 18%, #74431d 42%, #926033 72%, #5b3113 100%)";
+  "linear-gradient(180deg, #281509 0%, #332012 18%, #46301c 42%, #5f4229 68%, #755536 86%, #624327 100%)";
 const demoBrownSoft =
-  "linear-gradient(180deg, #573016 0%, #6a3c1a 18%, #825026 42%, #a36e3d 72%, #653617 100%)";
+  "linear-gradient(180deg, #301a0c 0%, #3c2615 18%, #513621 42%, #6c4a2d 68%, #856240 86%, #6d4a2c 100%)";
 const demoBorder = "1.5px solid rgba(212, 184, 142, 0.42)";
 const demoBorderStrong = "1.5px solid rgba(222, 194, 152, 0.72)";
 const demoShadow = "0 16px 34px rgba(111,67,31,0.08), 0 2px 12px rgba(111,67,31,0.05)";
 const demoShadowStrong =
-  "0 20px 42px rgba(111,67,31,0.15), 0 4px 16px rgba(111,67,31,0.08)";
+  "0 24px 54px rgba(67,39,18,0.18), 0 8px 24px rgba(111,67,31,0.1)";
 const demoTextLight = "rgba(252, 241, 222, 0.98)";
 const demoTextMuted = "rgba(247, 225, 194, 0.92)";
 const demoTopText = "rgba(184, 129, 72, 0.92)";
@@ -20,17 +20,17 @@ const demoChipBorder = "1px solid rgba(238, 204, 157, 0.4)";
 const demoIconColor = "#9a5c2e";
 const demoIconGlow = "0 0 0 1px rgba(255,255,255,0.18), 0 0 28px rgba(245,217,168,0.24)";
 const demoDivider =
-  "linear-gradient(90deg, rgba(245,217,168,0) 0%, rgba(245,217,168,0.86) 50%, rgba(245,217,168,0) 100%)";
+  "linear-gradient(90deg, rgba(255,232,192,0) 0%, rgba(245,217,168,0.72) 18%, rgba(255,244,223,0.96) 50%, rgba(245,217,168,0.72) 82%, rgba(255,232,192,0) 100%)";
 const demoHeaderGlass =
   "linear-gradient(180deg, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0) 100%)";
 const demoBodyMesh =
-  "radial-gradient(circle at 14% 18%, rgba(245,217,168,0.14) 0%, transparent 34%), radial-gradient(circle at 84% 18%, rgba(255,241,211,0.12) 0%, transparent 28%), radial-gradient(circle at 60% 72%, rgba(107,63,31,0.12) 0%, transparent 38%)";
+  "radial-gradient(circle at 16% 20%, rgba(255,233,197,0.2) 0%, rgba(255,233,197,0.08) 22%, transparent 52%), radial-gradient(circle at 82% 14%, rgba(255,247,230,0.14) 0%, transparent 34%), radial-gradient(circle at 70% 78%, rgba(201,155,103,0.12) 0%, transparent 38%), radial-gradient(circle at 36% 90%, rgba(55,31,15,0.18) 0%, transparent 42%)";
 const demoSpotlight =
-  "linear-gradient(115deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.04) 22%, rgba(255,255,255,0) 42%)";
+  "linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,247,233,0.1) 16%, rgba(255,255,255,0.03) 30%, rgba(255,255,255,0) 52%)";
 const demoShine =
-  "linear-gradient(138deg, rgba(255,255,255,0.24) 0%, rgba(255,245,226,0.12) 14%, rgba(255,255,255,0.02) 28%, rgba(255,255,255,0) 46%)";
+  "linear-gradient(140deg, rgba(255,255,255,0.22) 0%, rgba(255,247,232,0.14) 12%, rgba(255,235,205,0.06) 24%, rgba(255,255,255,0.01) 34%, rgba(255,255,255,0) 48%)";
 const demoInnerFrame =
-  "inset 0 1px 0 rgba(255,245,227,0.16), inset 0 0 0 1px rgba(95,52,20,0.12)";
+  "inset 0 1px 0 rgba(255,248,235,0.22), inset 0 0 0 1px rgba(255,227,186,0.08), inset 0 -18px 28px rgba(24,12,5,0.08)";
 
 function StatusPill({ label }) {
   return (
