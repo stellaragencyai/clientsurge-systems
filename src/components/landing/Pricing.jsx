@@ -3,16 +3,12 @@ import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
 
-function GlowingCheck() {
+function SimpleCheck() {
   return (
     <svg
       className="w-4 h-4 flex-shrink-0 mt-0.5"
       viewBox="0 0 24 24"
       fill="none"
-      style={{
-        filter: "drop-shadow(0 0 6px rgba(34,197,94,0.6))",
-        animation: "checkPulse 2s ease-in-out infinite",
-      }}
     >
       <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2" />
       <path
@@ -161,8 +157,7 @@ export default function Pricing() {
               Your setup fee covers the actual buildout, launch prep, and handoff work required to get the system live.
             </p>
           </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-x-6 gap-y-3">
             {[
               "Lead-response flow mapping and message logic",
               "SMS and email follow-up sequence setup",
@@ -171,8 +166,8 @@ export default function Pricing() {
               "Launch testing, polish, and go-live support",
               "Short onboarding call plus implementation handoff",
             ].map((item) => (
-              <div key={item} className="rounded-2xl border border-border bg-background px-4 py-4 flex items-start gap-3">
-                <GlowingCheck />
+              <div key={item} className="flex items-start gap-3 py-1">
+                <SimpleCheck />
                 <p className="text-sm text-foreground/80">{item}</p>
               </div>
             ))}
@@ -229,11 +224,6 @@ export default function Pricing() {
         .pricing-card.highlight-hover {
           background: linear-gradient(135deg, rgba(255,248,235,0.98) 0%, rgba(245,217,168,0.4) 100%);
         }
-        .pricing-card:hover {
-          border-color: #c8965c !important;
-          box-shadow: 0 14px 36px rgba(160, 90, 20, 0.16), 0 2px 10px rgba(0, 0, 0, 0.06) !important;
-        }
-        
         .pricing-card::before {
           content: '';
           position: absolute;
@@ -243,15 +233,10 @@ export default function Pricing() {
           height: 120px;
           border-radius: 50%;
           background: radial-gradient(circle, rgba(200,150,92,0.15) 0%, transparent 70%);
-          animation: drift 8s ease-in-out infinite;
           pointer-events: none;
           z-index: 0;
         }
-        .pricing-card:nth-child(2)::before {
-          animation-delay: -2s;
-        }
         .pricing-card:nth-child(3)::before {
-          animation-delay: -4s;
           top: auto;
           bottom: 5%;
           right: auto;
@@ -276,8 +261,6 @@ export default function Pricing() {
           transition: box-shadow 0.3s ease, transform 0.3s ease;
           cursor: pointer;
           border: none;
-          background-size: 200% 200%;
-          animation: shimmer 3.5s ease-in-out infinite;
           position: relative;
         }
         .shiny-brown-btn::after {
@@ -289,7 +272,6 @@ export default function Pricing() {
           height: 100%;
           background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
           border-radius: 9999px;
-          animation: shineWave 3s ease-in-out infinite;
           pointer-events: none;
         }
         .shiny-brown-btn:hover {
@@ -307,14 +289,6 @@ export default function Pricing() {
           z-index: 1;
         }
         
-        @keyframes shimmer {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        @keyframes shineWave {
-          0% { left: -100%; }
-          100% { left: 100%; }
-        }
         @keyframes slideIn {
           from {
             opacity: 0;
@@ -324,16 +298,6 @@ export default function Pricing() {
             opacity: 1;
             transform: translateX(0);
           }
-        }
-        @keyframes checkPulse {
-          0%, 100% { filter: drop-shadow(0 0 6px rgba(34,197,94,0.6)); }
-          50% { filter: drop-shadow(0 0 12px rgba(34,197,94,0.9)); }
-        }
-        @keyframes drift {
-          0%, 100% { transform: translateY(0px) translateX(0px); }
-          25% { transform: translateY(-20px) translateX(10px); }
-          50% { transform: translateY(-30px) translateX(-10px); }
-          75% { transform: translateY(-15px) translateX(15px); }
         }
       `}</style>
     </section>
@@ -366,8 +330,8 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
             ? "0 20px 54px rgba(160,90,20,0.22), inset 0 1px 0 rgba(255,255,255,0.9)"
             : "0 8px 30px rgba(160,90,20,0.14), inset 0 1px 0 rgba(255,255,255,0.8)"
           : isHovered
-            ? "0 16px 36px rgba(160,90,20,0.12), inset 0 1px 0 rgba(255,255,255,0.85)"
-            : "0 4px 24px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.6)",
+            ? "0 10px 26px rgba(160,90,20,0.1), inset 0 1px 0 rgba(255,255,255,0.85)"
+            : "0 4px 18px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.6)",
         transform: isHovered ? "translateY(-4px)" : plan.highlight ? "translateY(-2px)" : "translateY(0)",
         transition: "all 0.35s ease",
         zIndex: plan.highlight ? 2 : 1,
@@ -443,36 +407,55 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
                 animation: `slideIn 0.5s ease-out ${index * 0.05}s both`,
               }}
             >
-              <GlowingCheck />
+              <SimpleCheck />
               <span className="text-sm text-foreground/75">{feature}</span>
             </li>
           ))}
         </ul>
 
-        <button
-          type="button"
-          onClick={() => {
-            if (demoBooking) {
-              demoBooking.openDemoBooking({
-                prefillIndustry: selectedIndustry?.name || "",
-              });
-              return;
-            }
-            window.location.href = "/book";
-          }}
-          className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none"
-          onMouseEnter={(event) => {
-            event.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
-          }}
-          onMouseLeave={(event) => {
-            event.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
-          }}
-        >
-          <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
+        {plan.highlight ? (
+          <button
+            type="button"
+            onClick={() => {
+              if (demoBooking) {
+                demoBooking.openDemoBooking({
+                  prefillIndustry: selectedIndustry?.name || "",
+                });
+                return;
+              }
+              window.location.href = "/book";
+            }}
+            className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none"
+            onMouseEnter={(event) => {
+              event.currentTarget.style.boxShadow = "0 8px 32px rgba(161,120,35,0.46), 0 4px 18px rgba(120,70,20,0.35)";
+            }}
+            onMouseLeave={(event) => {
+              event.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
+            }}
+          >
+            <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
+              Book Your Free Demo
+              <ArrowRight className="w-4 h-4" />
+            </span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              if (demoBooking) {
+                demoBooking.openDemoBooking({
+                  prefillIndustry: selectedIndustry?.name || "",
+                });
+                return;
+              }
+              window.location.href = "/book";
+            }}
+            className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full border border-primary/25 bg-white/82 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
+          >
             Book Your Free Demo
             <ArrowRight className="w-4 h-4" />
-          </span>
-        </button>
+          </button>
+        )}
       </div>
     </div>
   );

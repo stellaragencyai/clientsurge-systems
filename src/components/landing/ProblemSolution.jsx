@@ -1,16 +1,16 @@
 import { useState, useEffect, useRef } from "react";
-import { X, CheckCircle2, ArrowRight } from "lucide-react";
+import { X, CheckCircle2 } from "lucide-react";
 
 const problems = [
   {
-    problem: "Leads don't hear back fast enough",
+    problem: "Leads do not hear back fast enough",
     solution: "Instant automated response within seconds of inquiry",
     result: "Under 60 sec response",
   },
   {
     problem: "Missed calls go unanswered",
     solution: "Automatic text-back sent the moment a call is missed",
-    result: "0 leads lost",
+    result: "Fewer missed opportunities",
   },
   {
     problem: "Follow-up falls through the cracks",
@@ -20,12 +20,12 @@ const problems = [
   {
     problem: "Old leads are forgotten",
     solution: "Reactivation campaigns turn dormant contacts into revenue",
-    result: "Avg. $4k recovered/mo",
+    result: "Old leads re-engaged",
   },
   {
     problem: "Booking friction loses clients",
     solution: "Guided booking flow converts inquiries to confirmed appointments",
-    result: "3x more bookings",
+    result: "Cleaner path to booking",
   },
 ];
 
@@ -48,6 +48,7 @@ function CardWithFadeIn({ children, delay = 0 }) {
       },
       { threshold: 0.1 }
     );
+
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
@@ -77,59 +78,53 @@ export default function ProblemSolution() {
             Every Problem Has a System Behind It
           </h2>
           <p className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-            These are the exact gaps killing your conversion rate — and exactly how we fix them.
+            These are the exact gaps killing your conversion rate and how the
+            right automation closes them.
           </p>
         </div>
 
         <div className="relative">
-          {/* Connecting flow line */}
-          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20" aria-hidden="true" />
-          
+          <div
+            className="hidden md:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20"
+            aria-hidden="true"
+          />
+
           <div className="space-y-4">
             {problems.map((item, i) => (
-              <CardWithFadeIn key={i} delay={i * 80}>
-                <div 
-                  className="group grid md:grid-cols-2 gap-0 rounded-2xl overflow-hidden border border-border shadow-sm cursor-pointer hover:shadow-md transition-all"
-                  onClick={() => {
-                    const solEl = document.querySelector(`[data-solution-id="${i}"]`);
-                    if (solEl) {
-                      solEl.style.background = "linear-gradient(135deg, rgba(34,197,94,0.2) 0%, rgba(34,197,94,0.1) 100%)";
-                      solEl.style.boxShadow = "0 0 25px rgba(34,197,94,0.25)";
-                      setTimeout(() => {
-                        solEl.style.background = "rgba(34,197,94,0.05)";
-                        solEl.style.boxShadow = "0 2px 14px rgba(154,92,46,0.05), inset 0 1px 0 rgba(255,255,255,0.7)";
-                      }, 1500);
-                    }
-                  }}
-                >
-                  {/* Problem side */}
+              <CardWithFadeIn key={item.problem} delay={i * 80}>
+                <div className="grid md:grid-cols-2 gap-0 rounded-2xl overflow-hidden border border-border shadow-sm">
                   <div className="flex items-center gap-4 px-6 py-5 bg-white border-b md:border-b-0 md:border-r border-border">
                     <div className="w-9 h-9 rounded-xl bg-destructive/15 flex items-center justify-center flex-shrink-0">
                       <X className="w-4 h-4 text-destructive" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground leading-snug">{item.problem}</p>
-                      <div className="mt-2 flex items-center gap-1 text-xs text-primary font-semibold">
-                        ← Click to reveal the fix
-                      </div>
+                      <p className="text-sm font-semibold text-foreground leading-snug">
+                        {item.problem}
+                      </p>
+                      <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-foreground/45">
+                        What usually breaks
+                      </p>
                     </div>
                   </div>
-                  {/* Solution side */}
-                  <div 
-                    data-solution-id={i}
-                    className="flex items-center gap-4 px-6 py-5 bg-white transition-all duration-500"
+
+                  <div
+                    className="flex items-center gap-4 px-6 py-5"
                     style={{
-                      background: "rgba(255,255,255,1)",
-                      boxShadow: "0 2px 14px rgba(154,92,46,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
+                      background:
+                        "linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(248,252,248,1) 100%)",
+                      boxShadow:
+                        "0 2px 14px rgba(154,92,46,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
                     }}
                   >
                     <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
                       <CheckCircle2 className="w-4 h-4 text-primary" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground leading-snug">{item.solution}</p>
-                      <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/25">
-                        ✨ {item.result}
+                      <p className="text-sm font-semibold text-foreground leading-snug">
+                        {item.solution}
+                      </p>
+                      <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/25 uppercase tracking-[0.08em]">
+                        {item.result}
                       </div>
                     </div>
                   </div>

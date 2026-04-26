@@ -12,28 +12,38 @@ export default function FinalCTA() {
       <section id="book-demo" className="nebula-cta py-24 md:py-32 px-6 relative overflow-hidden">
         <StardustOverlay seed={13} opacity={0.6} />
 
-        {/* Glass panel */}
         <div
           className="relative z-10 max-w-3xl mx-auto rounded-3xl px-10 py-12 text-center"
           style={{
-            background: "linear-gradient(135deg, rgba(255,252,247,0.68) 0%, rgba(252,240,220,0.52) 100%)",
+            background:
+              "linear-gradient(135deg, rgba(255,252,247,0.68) 0%, rgba(252,240,220,0.52) 100%)",
             backdropFilter: "blur(22px)",
             WebkitBackdropFilter: "blur(22px)",
             border: "1.5px solid rgba(200,150,92,0.28)",
             boxShadow: "0 8px 48px rgba(154,92,46,0.12), inset 0 1px 0 rgba(255,255,255,0.8)",
           }}
         >
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">Ready to Start?</p>
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">
+            Ready to Start?
+          </p>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-            You're Already Getting Leads.
+            You&apos;re Already Getting Leads.
             <br />
-            <span className="text-primary">Let's Make Sure You're Converting Them.</span>
+            <span className="text-primary">Let&apos;s Make Sure You&apos;re Converting Them.</span>
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
-            Book a free 15-minute demo. We will map out exactly where you are losing bookings and show you what an automated system would look like for your business with no obligation.
+            Book a free 15-minute demo. We will map out exactly where you are
+            losing bookings and show you what an automated system would look like
+            for your business with no obligation.
           </p>
-          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80" style={{ background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.18)" }}>
-            Join businesses already converting 3x more leads with automation
+          <div
+            className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80"
+            style={{
+              background: "rgba(154,92,46,0.08)",
+              border: "1px solid rgba(154,92,46,0.18)",
+            }}
+          >
+            Free 15-minute call · no commitment required · live in 5-7 days
           </div>
         </div>
 
@@ -49,17 +59,20 @@ export default function FinalCTA() {
               style={{
                 borderRadius: "9999px",
                 padding: "2px",
-                background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                background:
+                  "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
                 boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
                 border: "none",
                 cursor: "pointer",
                 textDecoration: "none",
               }}
               onMouseEnter={(event) => {
-                event.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+                event.currentTarget.style.boxShadow =
+                  "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
               }}
               onMouseLeave={(event) => {
-                event.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
+                event.currentTarget.style.boxShadow =
+                  "0 4px 18px rgba(120,70,20,0.35)";
               }}
             >
               <span
@@ -88,18 +101,6 @@ export default function FinalCTA() {
             >
               See pricing
             </a>
-          </div>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            {["Free 15-min call", "No commitment required", "Live in 5-7 days"].map((text) => (
-              <span
-                key={text}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80"
-                style={{ background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.18)" }}
-              >
-                <svg className="w-3.5 h-3.5 text-green-500 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                {text}
-              </span>
-            ))}
           </div>
         </div>
       </section>
