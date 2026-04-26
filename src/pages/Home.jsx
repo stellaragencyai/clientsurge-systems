@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
+import LeadAutomationShowcase from "../components/landing/LeadAutomationShowcase";
 import LiveLeadPulse from "../components/landing/LiveLeadPulse";
 import TrustBar from "../components/landing/TrustBar";
 import Industries from "../components/landing/Industries";
@@ -108,6 +109,7 @@ export default function Home() {
       <div className="min-h-screen pb-16">
         <Navbar />
         <Hero />
+        <LeadAutomationShowcase />
         <LiveLeadPulse />
         <Industries />
         <section aria-label="Proof and trust">

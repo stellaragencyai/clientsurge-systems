@@ -1,381 +1,583 @@
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import HeroDashboardScreen from "./HeroDashboardScreen";
-
-const checklist = [
-  "Instant SMS response to every new lead",
-  "14-day automated follow-up sequence",
-  "Missed call text-back so fewer leads go cold",
-  "Live in 5-7 business days, fully built for you",
-];
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Hero() {
   const demoBooking = useDemoBooking();
+  const isMobile = useIsMobile();
+
+  const handleSeeHowItWorks = (event) => {
+    event.preventDefault();
+
+    const target = document.getElementById("lead-automation-showcase");
+    if (!target) {
+      window.location.hash = "lead-automation-showcase";
+      return;
+    }
+
+    window.history.replaceState({}, "", "#lead-automation-showcase");
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    window.setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("lead-showcase-focus"));
+    }, 520);
+  };
 
   return (
     <section
-      className="landing-hero"
       style={{
         position: "relative",
+        minHeight: "100vh",
         overflow: "hidden",
-        background:
-          "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 46%, #fcfaf6 100%)",
+        background: "linear-gradient(135deg, #fdfcfa 0%, #f8f4ee 40%, #faf7f2 100%)",
+        display: "flex",
+        alignItems: "center",
       }}
     >
+      <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}>
+        <div style={{ position: "absolute", top: "50%", right: "15%", width: "100vw", height: "100vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(13,15,30,0.75) 0%, rgba(13,15,30,0.4) 35%, rgba(13,15,30,0.15) 60%, transparent 85%)", transform: "translateY(-50%)", filter: "blur(3px)" }} />
+        <div style={{ position: "absolute", top: "-10%", right: "-10%", width: "80vw", height: "120vh", background: "radial-gradient(ellipse at 65% 45%, rgba(200,150,92,0.08) 0%, rgba(154,92,46,0.04) 30%, transparent 55%)", filter: "blur(2px)" }} />
+        <div style={{ position: "absolute", top: "30%", right: "15%", width: "40vw", height: "50vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(34,197,94,0.05) 0%, transparent 65%)", filter: "blur(8px)" }} />
+        <div style={{ position: "absolute", bottom: "15%", right: "10%", width: "30vw", height: "40vh", borderRadius: "50%", background: "radial-gradient(ellipse at center, rgba(167,139,250,0.03) 0%, transparent 65%)", filter: "blur(10px)" }} />
+      </div>
+
       <div
         aria-hidden="true"
-        className="landing-hero__ambient"
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "-8%",
+          transform: "translateY(-50%)",
+          width: "42vw",
+          maxWidth: "620px",
+          height: "68vh",
+          minHeight: "420px",
+          background: "linear-gradient(145deg, rgba(26,18,9,0.12) 0%, rgba(200,150,92,0.06) 100%)",
+          borderRadius: "20px",
+          border: "none",
+          backdropFilter: "blur(14px)",
+          WebkitBackdropFilter: "blur(14px)",
+          opacity: 0.35,
+          zIndex: 0,
+          pointerEvents: "none",
+          overflow: "hidden",
+          maskImage: "radial-gradient(ellipse at right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, transparent 85%)",
+          WebkitMaskImage: "radial-gradient(ellipse at right, rgba(0,0,0,1) 0%, rgba(0,0,0,0.6) 50%, transparent 85%)",
+        }}
+      >
+        <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "14px", opacity: 0.65 }}>
+          <div style={{ height: "12px", width: "70%", borderRadius: "6px", background: "rgba(154,92,46,0.3)" }} />
+          <div style={{ height: "10px", width: "90%", borderRadius: "6px", background: "rgba(154,92,46,0.2)" }} />
+          <div style={{ marginTop: "16px", height: "80px", borderRadius: "12px", background: "rgba(34,197,94,0.12)", border: "1px solid rgba(34,197,94,0.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ height: "10px", width: "45%", borderRadius: "4px", background: "rgba(34,197,94,0.35)" }} />
+          </div>
+          <div style={{ display: "flex", gap: "8px", marginTop: "10px" }}>
+            {[65, 48, 72, 55, 80].map((w, i) => (
+              <div key={i} style={{ flex: 1, height: "45px", borderRadius: "10px", background: `rgba(154,92,46,${0.08 + i * 0.03})`, border: "1px solid rgba(154,92,46,0.12)" }} />
+            ))}
+          </div>
+          <div style={{ height: "10px", width: "85%", borderRadius: "6px", background: "rgba(154,92,46,0.15)", marginTop: "8px" }} />
+          <div style={{ height: "8px", width: "65%", borderRadius: "6px", background: "rgba(154,92,46,0.1)" }} />
+        </div>
+      </div>
+
+      <div
+        aria-hidden="true"
         style={{
           position: "absolute",
           inset: 0,
           pointerEvents: "none",
+          zIndex: 1,
+          backgroundImage: "radial-gradient(circle, rgba(154,92,46,0.09) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          maskImage: "radial-gradient(ellipse 70% 100% at 75% 50%, rgba(0,0,0,0.5) 0%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(ellipse 70% 100% at 75% 50%, rgba(0,0,0,0.5) 0%, transparent 75%)",
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: "-8%",
+          right: "-2%",
+          width: "44vw",
+          maxWidth: "640px",
+          height: "55vh",
+          minHeight: "360px",
+          background: "linear-gradient(145deg, rgba(26,18,9,0.06) 0%, rgba(200,150,92,0.04) 100%)",
+          borderRadius: "22px",
+          border: "none",
+          filter: "blur(12px)",
+          transform: "perspective(2200px) rotateY(-14deg) rotateX(6deg) rotateZ(0.5deg)",
+          transformOrigin: "right top",
+          opacity: 0.55,
+          zIndex: 1,
+          pointerEvents: "none",
+          overflow: "hidden",
+          maskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 85%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 60%, transparent 85%)",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(circle at 18% 20%, rgba(200,150,92,0.12) 0%, transparent 30%), radial-gradient(circle at 72% 22%, rgba(92,164,138,0.12) 0%, transparent 24%), radial-gradient(circle at 78% 56%, rgba(122,72,37,0.1) 0%, transparent 32%)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(to right, rgba(253,251,248,0.98) 0%, rgba(253,251,248,0.94) 40%, rgba(253,251,248,0.68) 60%, rgba(253,251,248,0.2) 100%)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, transparent 28%, rgba(255,255,255,0.34) 100%)",
-          }}
-        />
+        <div style={{ padding: "24px", display: "flex", flexDirection: "column", gap: "14px", opacity: 0.75 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div style={{ width: "20px", height: "20px", borderRadius: "6px", background: "rgba(154,92,46,0.65)" }} />
+            <div style={{ height: "10px", width: "55%", borderRadius: "4px", background: "rgba(154,92,46,0.58)" }} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-around", gap: "8px" }}>
+            {["247", "94%", "$4.2k"].map((val, i) => (
+              <div key={i} style={{ flex: 1, textAlign: "center", padding: "10px", borderRadius: "10px", background: "rgba(154,92,46,0.18)", border: "1px solid rgba(154,92,46,0.28)" }}>
+                <div style={{ height: "14px", background: `linear-gradient(to bottom, rgba(154,92,46,0.${55 + i * 15}), rgba(154,92,46,0.${45 + i * 10}))`, borderRadius: "2px", marginBottom: "3px" }} />
+                <div style={{ height: "8px", width: "70%", borderRadius: "3px", background: "rgba(154,92,46,0.42)", margin: "0 auto" }} />
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: "8px" }}>
+            <div style={{ height: "8px", width: "40%", borderRadius: "3px", background: "rgba(154,92,46,0.48)", marginBottom: "6px" }} />
+            <div style={{ height: "20px", borderRadius: "6px", background: "rgba(34,197,94,0.25)", border: "1px solid rgba(34,197,94,0.35)", position: "relative", overflow: "hidden" }}>
+              <div style={{ height: "100%", width: "72%", background: "rgba(34,197,94,0.55)", borderRadius: "6px" }} />
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "flex-end", gap: "6px", height: "50px", marginTop: "10px" }}>
+            {[35, 52, 68, 44, 76].map((h, i) => (
+              <div key={i} style={{ flex: 1, height: `${h}%`, borderRadius: "4px", background: `rgba(200,150,92,${0.28 + i * 0.12})`, border: "1px solid rgba(200,150,92,0.28)" }} />
+            ))}
+          </div>
+        </div>
       </div>
 
       <div
-        className="landing-hero__inner"
+        aria-hidden="true"
         style={{
-          position: "relative",
-          zIndex: 2,
-          maxWidth: "1400px",
-          margin: "0 auto",
-          padding: "112px 48px 88px",
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 560px) minmax(420px, 1fr)",
-          gap: "48px",
-          alignItems: "center",
-          minHeight: "100vh",
+          position: "absolute",
+          bottom: "-12%",
+          right: "6%",
+          width: "38vw",
+          maxWidth: "560px",
+          height: "48vh",
+          minHeight: "300px",
+          background: "linear-gradient(145deg, rgba(26,18,9,0.05) 0%, rgba(200,150,92,0.03) 100%)",
+          borderRadius: "20px",
+          border: "none",
+          filter: "blur(20px)",
+          transform: "perspective(2200px) rotateY(-10deg) rotateX(-4deg) rotateZ(-1deg)",
+          transformOrigin: "right bottom",
+          opacity: 0.45,
+          zIndex: 1,
+          pointerEvents: "none",
+          overflow: "hidden",
+          maskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 55%, transparent 80%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 55%, transparent 80%)",
         }}
       >
-        <div className="landing-hero__copy" style={{ maxWidth: "560px" }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "10px 14px",
-              borderRadius: "9999px",
-              background: "rgba(255,255,255,0.74)",
-              border: "1px solid rgba(154,92,46,0.14)",
-              boxShadow: "0 10px 26px rgba(44,31,16,0.06)",
-              marginBottom: "22px",
-            }}
-          >
-            <span
-              style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "9999px",
-                background: "#34c759",
-                boxShadow: "0 0 0 6px rgba(52,199,89,0.12)",
-              }}
-            />
-            <span
-              style={{
-                fontSize: "12px",
-                fontWeight: "700",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "#7a4825",
-              }}
-            >
-              AI Lead Response Systems
-            </span>
-          </div>
+        <div style={{ padding: "18px", display: "flex", flexDirection: "column", gap: "8px", opacity: 0.7 }}>
+          {[90, 75, 60, 80, 55, 70].map((w, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 10px", borderRadius: "10px", background: "rgba(154,92,46,0.04)", border: "1px solid rgba(154,92,46,0.08)" }}>
+              <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: `rgba(154,92,46,${0.12 + i * 0.03})`, flexShrink: 0 }} />
+              <div style={{ height: "7px", width: `${w}%`, borderRadius: "4px", background: "rgba(26,18,9,0.12)" }} />
+              <div style={{ marginLeft: "auto", height: "7px", width: "15%", borderRadius: "4px", background: "rgba(34,197,94,0.2)", flexShrink: 0 }} />
+            </div>
+          ))}
+        </div>
+      </div>
 
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: "52%",
+          right: "2%",
+          width: "52vw",
+          maxWidth: "780px",
+          height: "20vh",
+          borderRadius: "50%",
+          background: "radial-gradient(ellipse at center, rgba(200,150,92,0.09) 0%, rgba(253,252,250,0.5) 50%, transparent 80%)",
+          filter: "blur(28px)",
+          transform: "translateY(30%) scaleY(0.35)",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: "50%",
+          right: "2%",
+          width: "60vw",
+          maxWidth: "900px",
+          height: "84vh",
+          minHeight: "580px",
+          borderRadius: "32px",
+          background: "transparent",
+          boxShadow: "0 0 60px 16px rgba(200,150,92,0.16), 0 0 130px 50px rgba(154,92,46,0.09)",
+          transform: "translateY(-48%) perspective(2200px) rotateY(-10deg) rotateX(4deg) rotateZ(0.5deg)",
+          transformOrigin: "center center",
+          animation: "haloglow 4s ease-in-out infinite, floatTablet 6s ease-in-out infinite",
+          imageRendering: "crisp-edges",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: "-18%",
+          right: "2%",
+          width: "60vw",
+          maxWidth: "900px",
+          height: "40vh",
+          background: "linear-gradient(to bottom, rgba(255,255,255,0.4) 0%, rgba(220,220,220,0.15) 30%, transparent 70%)",
+          borderRadius: "50% 50% 0 0",
+          filter: "blur(20px)",
+          transform: "scaleY(0.4) perspective(2200px) rotateX(75deg)",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: "14%",
+          right: "32%",
+          width: "12vw",
+          maxWidth: "180px",
+          height: "2px",
+          background: "linear-gradient(to right, rgba(200,150,92,0.8) 0%, rgba(200,150,92,0.3) 100%)",
+          borderRadius: "1px",
+          transform: "perspective(2200px) rotateX(80deg) rotateZ(-15deg)",
+          zIndex: 0,
+          pointerEvents: "none",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: "0",
+          right: "0",
+          width: "80vw",
+          height: "25vh",
+          background: "linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.05) 40%, transparent 100%)",
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: "88%",
+          right: "4%",
+          width: "60vw",
+          maxWidth: "900px",
+          height: "60px",
+          background: "radial-gradient(ellipse at center, rgba(0,0,0,0.18) 0%, transparent 70%)",
+          filter: "blur(18px)",
+          transform: "perspective(2200px) rotateX(80deg) scaleY(0.4)",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          top: "50%",
+          right: "2%",
+          transform: "translateY(-48%) perspective(2500px) rotateY(-8deg) rotateX(5deg) rotateZ(1.5deg)",
+          transformOrigin: "center center",
+          transformStyle: "preserve-3d",
+          width: "60vw",
+          maxWidth: "900px",
+          height: "84vh",
+          minHeight: "580px",
+          opacity: 0.99,
+          background: "linear-gradient(160deg, #22253a 0%, #141620 60%, #0e1018 100%)",
+          borderRadius: "36px",
+          border: "1.5px solid rgba(255,255,255,0.12)",
+          boxShadow: `
+            0 0 0 8px #0d0f18,
+            0 0 0 10px rgba(255,255,255,0.04),
+            0 0 0 11px rgba(200,150,92,0.08),
+            0 80px 160px rgba(0,0,0,0.65),
+            0 35px 80px rgba(0,0,0,0.45),
+            inset 0 1px 0 rgba(255,255,255,0.08),
+            inset 0 -1px 0 rgba(0,0,0,0.3)
+          `,
+          padding: "16px",
+          zIndex: 2,
+        }}
+      >
+        <div style={{
+          position: "absolute",
+          top: "6px",
+          left: "12%",
+          right: "12%",
+          height: "2px",
+          borderRadius: "9999px",
+          background: "linear-gradient(to right, transparent, rgba(255,255,255,0.28) 30%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.28) 70%, transparent)",
+          pointerEvents: "none",
+          zIndex: 15,
+          animation: "glassShine 3s ease-in-out infinite",
+        }} />
+
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "28px",
+          background: "linear-gradient(to right, rgba(248,244,238,0.18) 0%, transparent 18%)",
+          pointerEvents: "none",
+          zIndex: 11,
+        }} />
+
+        <div style={{ position: "absolute", inset: "12px", borderRadius: "18px", border: "1px solid rgba(255,255,255,0.07)", pointerEvents: "none", zIndex: 10 }} />
+
+        <div style={{ width: "100%", height: "100%", borderRadius: "16px", overflow: "hidden", position: "relative", transform: "translateZ(0)", willChange: "transform", WebkitFontSmoothing: "antialiased" }}>
+          <HeroDashboardScreen />
+        </div>
+
+        <div style={{ position: "absolute", top: "8px", left: "50%", transform: "translateX(-50%)", width: "6px", height: "6px", borderRadius: "50%", background: "#2a2d3e", border: "1px solid rgba(255,255,255,0.12)" }} />
+      </div>
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: "0",
+          right: "2%",
+          width: "60vw",
+          maxWidth: "900px",
+          height: "100px",
+          background: "linear-gradient(to top, rgba(253,252,250,1) 0%, rgba(248,244,238,0.5) 50%, transparent 100%)",
+          backdropFilter: "blur(6px)",
+          WebkitBackdropFilter: "blur(6px)",
+          zIndex: 3,
+          pointerEvents: "none",
+          borderRadius: "0 0 32px 32px",
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(to bottom, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.2) 100%)",
+          zIndex: 3,
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(to right, rgba(253,252,250,1) 0%, rgba(253,252,250,0.98) 28%, rgba(253,252,250,0.55) 44%, rgba(253,252,250,0.08) 58%, transparent 70%)",
+          zIndex: 3,
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: "180px",
+          background: "linear-gradient(to top, rgba(253,252,250,1) 0%, transparent 100%)",
+          zIndex: 4,
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
+          width: "100%",
+          maxWidth: "1400px",
+          margin: "0 auto",
+          padding: "0 48px",
+          paddingTop: "60px",
+          paddingBottom: "120px",
+        }}
+      >
+        <div style={{ maxWidth: "540px" }}>
           <h1
-            className="landing-hero__headline"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(3.1rem, 5.2vw, 5.2rem)",
+              fontSize: "clamp(2.5rem, 4.5vw, 3.8rem)",
               fontWeight: "700",
-              lineHeight: 0.98,
-              letterSpacing: "-0.035em",
-              color: "#1b140d",
-              marginBottom: "22px",
+              lineHeight: 1.07,
+              letterSpacing: "-0.01em",
+              color: "#1a1209",
+              marginBottom: "20px",
             }}
           >
             Turn Every Lead Into a{" "}
             <span
               style={{
-                background:
-                  "linear-gradient(135deg, #7a3f1a 0%, #c8965c 52%, #9a5c2e 100%)",
+                background: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 50%, #9a5c2e 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
               }}
             >
               Booked Appointment
-            </span>{" "}
-            Automatically
+            </span>
+            {" "}Automatically
           </h1>
 
-          <p
-            className="landing-hero__body"
-            style={{
-              fontSize: "1.14rem",
-              color: "rgba(27,20,13,0.74)",
-              lineHeight: 1.72,
-              marginBottom: "28px",
-              maxWidth: "34rem",
-            }}
-          >
-            We build AI-powered systems that respond in seconds, nurture leads
-            for 14 days, and fill your calendar without you lifting a finger.
+          <p style={{ fontSize: "1.1rem", color: "rgba(26,18,9,0.58)", lineHeight: 1.75, marginBottom: "28px" }}>
+            We build AI-powered systems that respond in seconds, nurture leads for 14 days, and fill your calendar without you lifting a finger.
           </p>
 
-          <div
-            className="landing-hero__checklist"
-            style={{
-              display: "grid",
-              gap: "12px",
-              marginBottom: "34px",
-            }}
-          >
-            {checklist.map((item) => (
-              <div
-                key={item}
-                style={{ display: "flex", alignItems: "center", gap: "11px" }}
-              >
-                <CheckCircle2
-                  style={{
-                    width: "18px",
-                    height: "18px",
-                    color: "#26b05f",
-                    flexShrink: 0,
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: "15px",
-                    fontWeight: "600",
-                    color: "rgba(27,20,13,0.8)",
-                  }}
-                >
-                  {item}
-                </span>
+          <div style={{ display: "flex", flexDirection: "column", gap: "11px", marginBottom: "36px" }}>
+            {[
+              "Instant SMS response to every new lead",
+              "14-day automated follow-up sequence",
+              "Missed call text-back with no lead left hanging",
+              "Live in 5-7 business days, fully built for you",
+            ].map((pt) => (
+              <div key={pt} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <CheckCircle2 style={{ width: "17px", height: "17px", color: "#22c55e", flexShrink: 0 }} />
+                <span style={{ fontSize: "14.5px", fontWeight: "500", color: "rgba(26,18,9,0.72)" }}>{pt}</span>
               </div>
             ))}
           </div>
 
-          <div
-            className="landing-hero__actions"
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "12px",
-              alignItems: "center",
-            }}
-          >
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center" }}>
             <button
-              type="button"
               onClick={demoBooking?.openDemoBooking}
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                minHeight: "58px",
-                padding: "0 32px",
                 borderRadius: "9999px",
+                padding: "2px",
+                background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                boxShadow: "0 6px 28px rgba(120,70,20,0.38)",
                 border: "none",
-                background:
-                  "linear-gradient(135deg, #7a4825 0%, #9a5c2e 46%, #c8965c 100%)",
-                color: "#fff8ee",
-                fontSize: "1rem",
-                fontWeight: "700",
-                boxShadow: "0 16px 36px rgba(122,72,37,0.24)",
                 cursor: "pointer",
+                transition: "box-shadow 0.3s ease, transform 0.2s ease",
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 10px 44px rgba(120,70,20,0.55)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 6px 28px rgba(120,70,20,0.38)"; e.currentTarget.style.transform = "translateY(0)"; }}
             >
-              Book Your Free Demo
-              <ArrowRight style={{ width: "18px", height: "18px" }} />
+              <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "56px", padding: "0 38px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1rem" }}>
+                Book Your Free Demo
+                <ArrowRight style={{ width: "17px", height: "17px" }} />
+              </span>
             </button>
 
             <a
-              href="#services"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: "58px",
-                padding: "0 28px",
-                borderRadius: "9999px",
-                border: "1.5px solid rgba(154,92,46,0.22)",
-                background: "rgba(255,255,255,0.72)",
-                color: "rgba(27,20,13,0.75)",
-                fontSize: "14px",
-                fontWeight: "700",
-                textDecoration: "none",
-                boxShadow: "0 10px 24px rgba(44,31,16,0.04)",
-              }}
+              href="#lead-automation-showcase"
+              onClick={handleSeeHowItWorks}
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px", height: "56px", padding: "0 26px", borderRadius: "9999px", border: "1.5px solid rgba(154,92,46,0.28)", color: "rgba(26,18,9,0.6)", fontSize: "14px", fontWeight: "600", textDecoration: "none", transition: "all 0.2s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.55)"; e.currentTarget.style.color = "#1a1209"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.28)"; e.currentTarget.style.color = "rgba(26,18,9,0.6)"; }}
             >
               See how it works
             </a>
           </div>
 
-          <p
-            style={{
-              marginTop: "18px",
-              fontSize: "12px",
-              color: "rgba(27,20,13,0.48)",
-              letterSpacing: "0.04em",
-            }}
-          >
-            No contracts · Most clients see ROI within 30 days
-          </p>
-        </div>
-
-        <div
-          className="landing-hero__visualWrap"
-          style={{
-            position: "relative",
-            minHeight: "620px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <div
-            aria-hidden="true"
-            className="landing-hero__visualGlow"
-            style={{
-              position: "absolute",
-              width: "90%",
-              height: "72%",
-              borderRadius: "36px",
-              background:
-                "radial-gradient(circle at center, rgba(200,150,92,0.22) 0%, rgba(154,92,46,0.1) 38%, transparent 72%)",
-              filter: "blur(36px)",
-              transform: "translateY(6%)",
-            }}
-          />
-
-          <div
-            className="landing-hero__tablet"
-            style={{
-              position: "relative",
-              width: "min(100%, 860px)",
-              aspectRatio: "1.15 / 1",
-              borderRadius: "34px",
-              padding: "16px",
-              background:
-                "linear-gradient(160deg, #23263b 0%, #141722 58%, #0d0f16 100%)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              boxShadow:
-                "0 44px 110px rgba(17,12,7,0.34), 0 18px 44px rgba(17,12,7,0.18), inset 0 1px 0 rgba(255,255,255,0.12)",
-              transform:
-                "perspective(2400px) rotateY(-10deg) rotateX(4deg) rotateZ(1.4deg)",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: "8px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                width: "88px",
-                height: "4px",
-                borderRadius: "999px",
-                background: "rgba(255,255,255,0.14)",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: "9px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                width: "8px",
-                height: "8px",
-                borderRadius: "999px",
-                background: "#22252f",
-                border: "1px solid rgba(255,255,255,0.16)",
-              }}
-            />
-
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                borderRadius: "20px",
-                overflow: "hidden",
-                background: "#f7f3ec",
-                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
-              }}
-            >
-              <HeroDashboardScreen />
+          {isMobile ? (
+            <div style={{ marginTop: "30px", position: "relative" }}>
+              <div
+                aria-hidden="true"
+                style={{
+                  position: "absolute",
+                  inset: "8% 10% -4%",
+                  borderRadius: "28px",
+                  background: "radial-gradient(circle at center, rgba(200,150,92,0.22) 0%, rgba(154,92,46,0.08) 42%, transparent 76%)",
+                  filter: "blur(28px)",
+                }}
+              />
+              <div
+                style={{
+                  position: "relative",
+                  margin: "0 auto",
+                  width: "100%",
+                  maxWidth: "360px",
+                  height: "430px",
+                  background: "linear-gradient(160deg, #22253a 0%, #141620 60%, #0e1018 100%)",
+                  borderRadius: "30px",
+                  border: "1.5px solid rgba(255,255,255,0.12)",
+                  boxShadow:
+                    "0 0 0 7px #0d0f18, 0 0 0 9px rgba(255,255,255,0.04), 0 42px 90px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.08)",
+                  padding: "13px",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    top: "6px",
+                    left: "12%",
+                    right: "12%",
+                    height: "2px",
+                    borderRadius: "9999px",
+                    background:
+                      "linear-gradient(to right, transparent, rgba(255,255,255,0.28) 30%, rgba(255,255,255,0.45) 50%, rgba(255,255,255,0.28) 70%, transparent)",
+                  }}
+                />
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: "18px",
+                    overflow: "hidden",
+                    position: "relative",
+                    background: "linear-gradient(180deg, rgba(249,246,241,1) 0%, rgba(244,238,231,1) 100%)",
+                  }}
+                >
+                  <HeroDashboardScreen />
+                </div>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    top: "8px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "6px",
+                    height: "6px",
+                    borderRadius: "999px",
+                    background: "#2a2d3e",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                  }}
+                />
+              </div>
             </div>
-          </div>
+          ) : null}
+
+          <p style={{ marginTop: "18px", fontSize: "11px", color: "rgba(26,18,9,0.3)", letterSpacing: "0.04em" }}>
+            No contracts / Most clients see ROI within 30 days
+          </p>
         </div>
       </div>
 
       <style>{`
-        @media (max-width: 1100px) {
-          .landing-hero__inner {
-            grid-template-columns: 1fr !important;
-            gap: 30px !important;
-            min-height: auto !important;
-            padding: 104px 28px 64px !important;
-          }
+        @keyframes hpulse    { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        @keyframes haloglow  { 0%,100%{opacity:0.7} 50%{opacity:1} }
+        @keyframes floatTablet { 0%,100%{transform: translateY(-48%) perspective(2500px) rotateY(-8deg) rotateX(5deg) rotateZ(1.5deg)} 50%{transform: translateY(-52%) perspective(2500px) rotateY(-8deg) rotateX(5deg) rotateZ(1.5deg)} }
+        @keyframes glassShine { 0%,100%{opacity:0.4} 50%{opacity:0.8} }
 
-          .landing-hero__visualWrap {
-            display: none !important;
-          }
-
-          .landing-hero__copy {
-            max-width: 100% !important;
-          }
-        }
-
-        @media (max-width: 720px) {
-          .landing-hero__inner {
-            padding: 96px 20px 56px !important;
-          }
-
-          .landing-hero__headline {
-            font-size: clamp(2.7rem, 12vw, 4rem) !important;
-            line-height: 0.99 !important;
-          }
-
-          .landing-hero__body {
-            font-size: 1rem !important;
-            line-height: 1.66 !important;
-          }
-
-          .landing-hero__actions {
-            flex-direction: column !important;
-            align-items: stretch !important;
-          }
-
-          .landing-hero__actions > * {
-            width: 100% !important;
+        @media (max-width: 1024px) {
+          html {
+            scroll-padding-top: 18px;
           }
         }
       `}</style>
