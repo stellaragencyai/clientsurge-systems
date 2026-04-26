@@ -12,7 +12,7 @@ import ClientOnboardingWizard from "../components/portal/ClientOnboardingWizard"
 import DeadlinesPanel from "../components/portal/DeadlinesPanel";
 import FilesPanel from "../components/portal/FilesPanel";
 import BillingDashboard from "../components/portal/BillingDashboard";
-import WebhookSettings from "../components/portal/WebhookSettings";
+import PortalSettings from "../components/portal/PortalSettings";
 import TasksDashboard from "../components/portal/TasksDashboard";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
@@ -269,7 +269,7 @@ export default function ClientPortal() {
           <PlanManager project={project} subscription={subscription} onUpdated={refreshProject} />
         )}
         {activeTab === "settings" && (
-          <WebhookSettings project={project} />
+          <PortalSettings project={project} user={user} onUpdated={refreshProject} />
         )}
       </div>
     </div>
