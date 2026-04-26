@@ -82,6 +82,8 @@ Primary focus:
 - Replaced the custom lead pipeline summary implementation with the shared canonical `leadPipeline` snapshot builder used by the admin lead dashboard.
 - Replaced the missed-call recovery metric heuristic with canonical missed-call runtime success events.
 - Updated the portal welcome mailer to validate inputs, require admin access, use the current portal URL, and fail if the admin notification email send fails.
+- Added explicit data-window and truncation metadata to admin analytics, lead scoring, client lead-flow metrics, and funnel/export responses so capped datasets no longer look complete.
+- Continued reviewing remaining portal-scoping and scheduler-auth gaps for fixes that can be applied safely without changing UI behavior or inventing unsupported data relationships.
 
 ## Verification Approach
 
@@ -91,4 +93,5 @@ Primary focus:
 
 ## Deferred / Needs Research
 
-- None yet.
+- Full per-client lead scoping for some portal metrics and exports is constrained by the current data model because `Leads` does not consistently carry a tenant/project ownership key.
+- Full lock-down of anonymous scheduled endpoints depends on rolling out `AUTOMATION_SHARED_SECRET` (or another scheduler identity mechanism) in the deployment environment.

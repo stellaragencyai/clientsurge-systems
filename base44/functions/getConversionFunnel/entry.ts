@@ -58,7 +58,13 @@ Deno.serve(async (req) => {
       return { ...stage, conversionRate };
     });
 
-    return Response.json({ stages: funnelWithRates });
+    return Response.json({
+      stages: funnelWithRates,
+      data_window: {
+        lead_limit: MAX_LEADS,
+        truncated: leads.length >= MAX_LEADS,
+      },
+    });
   } catch (error) {
     console.error('Error fetching funnel:', error);
     return Response.json({ error: error.message }, { status: 500 });

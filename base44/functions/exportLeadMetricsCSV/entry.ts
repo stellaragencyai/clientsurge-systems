@@ -91,6 +91,7 @@ Deno.serve(async (req) => {
       ['Replied', statusCounts['Replied'] || 0],
       ['Qualified', (statusCounts['Qualified'] || 0) + (statusCounts['Booking Prompt Sent'] || 0)],
       ['Booked', statusCounts['Booked'] || 0],
+      ['Export Window', leads.length >= MAX_EXPORT_ROWS ? `Capped at ${MAX_EXPORT_ROWS} rows` : 'Complete'],
     ];
 
     // Combine all rows

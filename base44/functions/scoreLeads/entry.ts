@@ -184,6 +184,18 @@ Deno.serve(async (req) => {
       success: true,
       scored: updates.length,
       updated,
+      data_window: {
+        limits: {
+          leads: leadIdFilter ? 1 : LEAD_LIMIT,
+          events: EVENT_LIMIT,
+          email_recipients: EMAIL_RECIPIENT_LIMIT,
+        },
+        truncated: {
+          leads_capped: !leadIdFilter && (leads || []).length >= LEAD_LIMIT,
+          events_capped: (events || []).length >= EVENT_LIMIT,
+          email_recipients_capped: (emailRecipients || []).length >= EMAIL_RECIPIENT_LIMIT,
+        },
+      },
       scores: updates.map(({ lead, score, priority }) => ({
         id: lead.id,
         name: lead.full_name,

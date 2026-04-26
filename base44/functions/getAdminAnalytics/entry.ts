@@ -188,6 +188,13 @@ Deno.serve(async (req) => {
       created_date: ev.created_date,
     }));
 
+    const truncation = {
+      users_capped: allUsers.length >= USER_LIMIT,
+      leads_capped: allLeads.length >= LEAD_LIMIT,
+      events_capped: (events || []).length >= EVENT_LIMIT,
+      drip_campaigns_capped: allDrips.length >= DRIP_LIMIT,
+    };
+
     return Response.json({
       success: true,
       users: { total: allUsers.length, active: activeUserCount, admins: adminCount },
@@ -200,6 +207,15 @@ Deno.serve(async (req) => {
       avg_time_to_contact_hours,
       top_sources,
       recent_activity: recentActivity,
+      data_window: {
+        limits: {
+          users: USER_LIMIT,
+          leads: LEAD_LIMIT,
+          events: EVENT_LIMIT,
+          drip_campaigns: DRIP_LIMIT,
+        },
+        truncated: truncation,
+      },
     });
 
   } catch (error) {

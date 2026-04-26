@@ -66,6 +66,12 @@ Deno.serve(async (req) => {
       appointments_booked: appointmentsBooked.length,
       missed_calls_recovered: missedCallsRecovered,
       last_updated: new Date().toISOString(),
+      data_window: {
+        lead_limit: MAX_LEADS,
+        event_limit: MAX_EVENTS,
+        leads_truncated: leads.length >= MAX_LEADS,
+        missed_call_events_truncated: (missedCallEvents || []).length >= MAX_EVENTS,
+      },
     });
   } catch (error) {
     console.error('Error fetching metrics:', error);
