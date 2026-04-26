@@ -21,6 +21,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
 
 const STATUS_SCORE = {
   New: 5, Contacted: 10, Replied: 18, Qualified: 22,
@@ -107,8 +108,8 @@ Deno.serve(async (req) => {
     if (user && user.role !== "admin") {
       return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
     }
-    if (!user && !isAutomationPayload) {
-      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    if (!user && (!isAutomationPayload || !allowAnonymousAutomation(req))) {
+      return Response.json({ error: "Forbidden: Trusted automation only" }, { status: 403 });
     }
 
     // Support both entity automation payload and direct call

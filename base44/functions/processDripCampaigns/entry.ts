@@ -78,6 +78,10 @@ async function sendEmail(to, subject, body, resendKey, fromEmail) {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
 
     // Allow scheduled (no user) OR admin direct call

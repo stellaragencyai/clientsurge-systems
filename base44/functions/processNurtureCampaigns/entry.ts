@@ -191,6 +191,10 @@ async function sendEmail(to, subject, html, resendKey, fromEmail) {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
 
     // Allow scheduled OR admin direct call
@@ -289,7 +293,9 @@ Deno.serve(async (req) => {
           }
 
           updates[statusKey] = sent ? "sent" : "failed";
-          updates[sentAtKey] = new Date().toISOString();
+          if (sent) {
+            updates[sentAtKey] = new Date().toISOString();
+          }
           updates.current_step = step.num;
 
           await base44.asServiceRole.entities.CommunicationEvent.create({

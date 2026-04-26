@@ -70,6 +70,10 @@ async function sendEmail(to, subject, htmlBody, resendKey, fromEmail) {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
 
     // Allow scheduled (no user) OR admin direct call
@@ -184,6 +188,7 @@ Deno.serve(async (req) => {
         // ── FLOW 2: Replied → Rep Reminder ────────────────────────────────────
         else if (lead.status === "Replied") {
           const repEmail = lead.assigned_to;
+          let reminderSent = false;
 
           if (repEmail && resendReady) {
             const repSubject = `⚡ Follow-up reminder: ${lead.full_name} replied 2 days ago`;
@@ -199,15 +204,18 @@ Deno.serve(async (req) => {
 
             try {
               await sendEmail(repEmail, repSubject, repBody, resendKey, fromEmail);
+              reminderSent = true;
             } catch (err) {
               console.error(`processQualifiedFollowUps rep reminder error lead ${lead.id}:`, err.message);
             }
           }
 
-          // Clear next_follow_up_at so we don't re-fire
-          await base44.asServiceRole.entities.Leads.update(lead.id, {
-            next_follow_up_at: null,
-          });
+          if (reminderSent) {
+            // Clear next_follow_up_at only once the reminder actually goes out.
+            await base44.asServiceRole.entities.Leads.update(lead.id, {
+              next_follow_up_at: null,
+            });
+          }
 
           // Log event
           await base44.asServiceRole.entities.CommunicationEvent.create({
@@ -216,13 +224,17 @@ Deno.serve(async (req) => {
             direction: "internal",
             event_type: "workflow_triggered",
             provider: repEmail && resendReady ? "resend" : "internal",
-            status: repEmail && resendReady ? "sent" : "pending",
+            status: reminderSent ? "sent" : "pending",
             subject: `Rep follow-up reminder sent to ${repEmail || "unassigned"}`,
             message_body: `Reminder sent to assigned rep (${repEmail || "none"}) — lead replied 48h ago with no further action.`,
-            metadata_json: JSON.stringify({ flow: "replied_rep_reminder", rep_email: repEmail }),
+            metadata_json: JSON.stringify({ flow: "replied_rep_reminder", rep_email: repEmail, reminder_sent: reminderSent }),
           });
 
-          results.replied_reminders++;
+          if (reminderSent) {
+            results.replied_reminders++;
+          } else {
+            results.errors++;
+          }
         }
 
       } catch (err) {

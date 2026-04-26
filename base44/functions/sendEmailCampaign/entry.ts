@@ -254,8 +254,8 @@ Deno.serve(async (req) => {
 
     // Update campaign final status
     await base44.asServiceRole.entities.EmailCampaign.update(campaign_id, {
-      status: failed > 0 && sent === 0 ? "paused" : "sent",
-      sent_at: new Date().toISOString(),
+      status: failed > 0 ? "paused" : "sent",
+      sent_at: sent > 0 ? new Date().toISOString() : undefined,
       total_sent: sent,
     });
 

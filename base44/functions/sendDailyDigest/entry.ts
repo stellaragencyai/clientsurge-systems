@@ -2,6 +2,25 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
 
 const LEAD_LIMIT = 5000;
+const BUSINESS_TZ = 'America/Phoenix';
+const PHOENIX_OFFSET = '-07:00';
+
+function getPhoenixDayStart(reference = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: BUSINESS_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(reference);
+  const year = parts.find((part) => part.type === 'year')?.value;
+  const month = parts.find((part) => part.type === 'month')?.value;
+  const day = parts.find((part) => part.type === 'day')?.value;
+  return new Date(`${year}-${month}-${day}T00:00:00${PHOENIX_OFFSET}`);
+}
+
+function formatPhoenixDate(reference = new Date()) {
+  return reference.toLocaleDateString('en-US', { timeZone: BUSINESS_TZ });
+}
 
 Deno.serve(async (req) => {
   try {
@@ -30,8 +49,7 @@ Deno.serve(async (req) => {
     const allLeads = await base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_LIMIT);
     const now = Date.now();
     const dayMs = 86400000;
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
+    const startOfToday = getPhoenixDayStart();
 
     const newToday = allLeads.filter(l => new Date(l.created_date).getTime() >= startOfToday.getTime()).length;
     const hotLeads = allLeads.filter(l => l.activation_priority === 'Hot' && l.status !== 'Booked' && l.status !== 'Closed');
@@ -52,7 +70,7 @@ Deno.serve(async (req) => {
 
     const body = `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-  <h2 style="color:#9a5c2e;">📊 Daily Lead Digest — ${new Date().toLocaleDateString()}</h2>
+  <h2 style="color:#9a5c2e;">📊 Daily Lead Digest — ${formatPhoenixDate()}</h2>
   
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;">
     <div style="background:#eff6ff;border-radius:8px;padding:16px;text-align:center;">

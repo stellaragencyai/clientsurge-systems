@@ -4,6 +4,7 @@
  * Sends a rich HTML email to the admin via Resend.
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -29,8 +30,8 @@ Deno.serve(async (req) => {
     if (user && user.role !== 'admin') {
       return Response.json({ error: 'Forbidden: Admin only' }, { status: 403 });
     }
-    if (!user && !isAutomationPayload) {
-      return Response.json({ error: 'Forbidden: Admin only' }, { status: 403 });
+    if (!user && (!isAutomationPayload || !allowAnonymousAutomation(req))) {
+      return Response.json({ error: 'Forbidden: Trusted automation only' }, { status: 403 });
     }
 
     // Support both direct call (lead_id) and entity automation payload (event.entity_id)

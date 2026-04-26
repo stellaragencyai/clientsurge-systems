@@ -84,6 +84,12 @@ Primary focus:
 - Updated the portal welcome mailer to validate inputs, require admin access, use the current portal URL, and fail if the admin notification email send fails.
 - Added explicit data-window and truncation metadata to admin analytics, lead scoring, client lead-flow metrics, and funnel/export responses so capped datasets no longer look complete.
 - Continued reviewing remaining portal-scoping and scheduler-auth gaps for fixes that can be applied safely without changing UI behavior or inventing unsupported data relationships.
+- Tightened `calculateLeadScore` so anonymous callers can no longer bypass admin access just by posting an automation-shaped payload.
+- Added `POST` guards to the major scheduled runners that were still accepting any HTTP method.
+- Corrected nurture and campaign completion bookkeeping so failed sends do not look like successful sends or fully healthy campaigns.
+- Anchored the daily digest to the Arizona business day explicitly instead of depending on server-local midnight behavior.
+- Stopped replied-lead rep reminders from clearing follow-up state when the reminder email never actually sent.
+- Expanded the shared automation-secret trust model to the remaining automation-shaped handlers (`analyzeReplySentiment`, `sendAdminLeadNotification`, `stampFollowUpAt`, and `startNurtureCampaign`) so anonymous calls no longer become trusted just because the payload looks like an entity hook.
 
 ## Verification Approach
 
