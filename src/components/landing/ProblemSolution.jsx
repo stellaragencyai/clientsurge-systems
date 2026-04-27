@@ -3,28 +3,33 @@ import { X, CheckCircle2 } from "lucide-react";
 
 const problems = [
   {
-    problem: "Leads do not hear back fast enough",
-    solution: "Instant automated response within seconds of inquiry",
+    problem: "Missed calls with no instant text-back",
+    solution: "Automatic SMS sent the moment a call is missed — keeps the conversation alive",
+    result: "Zero missed opportunities",
+  },
+  {
+    problem: "Form leads followed up too late",
+    solution: "Instant automated response within seconds of every form submission",
     result: "Under 60 sec response",
   },
   {
-    problem: "Missed calls go unanswered",
-    solution: "Automatic text-back sent the moment a call is missed",
-    result: "Fewer missed opportunities",
-  },
-  {
-    problem: "Follow-up falls through the cracks",
-    solution: "14-day automated nurture sequence keeps leads warm",
+    problem: "No automated SMS or email nurture",
+    solution: "14-day automated nurture sequence keeps every lead warm without manual effort",
     result: "14-day nurture",
   },
   {
-    problem: "Old leads are forgotten",
-    solution: "Reactivation campaigns turn dormant contacts into revenue",
+    problem: "No CRM pipeline tracking every opportunity",
+    solution: "Every lead is tracked from first contact to booked appointment automatically",
+    result: "Full pipeline visibility",
+  },
+  {
+    problem: "Old leads sit with no reactivation",
+    solution: "Reactivation campaigns re-engage dormant contacts and recover lost revenue",
     result: "Old leads re-engaged",
   },
   {
-    problem: "Booking friction loses clients",
-    solution: "Guided booking flow converts inquiries to confirmed appointments",
+    problem: "Interested people never get pushed to book",
+    solution: "Guided booking flow converts warm inquiries into confirmed appointments",
     result: "Cleaner path to booking",
   },
 ];
@@ -75,11 +80,10 @@ export default function ProblemSolution() {
             Where Leads Are Lost
           </p>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-            Every Problem Has a System Behind It
+            You Don't Need More Leads —<br className="hidden md:block" /> You're Losing the Ones You Already Have
           </h2>
           <p className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-            These are the exact gaps killing your conversion rate and how the
-            right automation closes them.
+            Most local businesses don't lose money because nobody is interested. They lose money because calls get missed, form leads sit too long, follow-up happens manually, and interested people never get pushed into a booking flow.
           </p>
         </div>
 
