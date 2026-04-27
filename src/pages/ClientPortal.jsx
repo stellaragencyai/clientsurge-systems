@@ -14,6 +14,7 @@ import FilesPanel from "../components/portal/FilesPanel";
 import BillingDashboard from "../components/portal/BillingDashboard";
 import PortalSettings from "../components/portal/PortalSettings";
 import TasksDashboard from "../components/portal/TasksDashboard";
+import WeeklyReports from "../components/portal/WeeklyReports";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
@@ -26,6 +27,7 @@ const TABS = [
   { id: "billing", label: "Billing" },
   { id: "support", label: "Support & Messaging" },
   { id: "plan", label: "My Plan" },
+  { id: "reports", label: "Weekly Report" },
   { id: "settings", label: "Settings" },
 ];
 
@@ -272,6 +274,9 @@ export default function ClientPortal() {
         )}
         {activeTab === "plan" && (
           <PlanManager project={project} subscription={subscription} onUpdated={refreshProject} />
+        )}
+        {activeTab === "reports" && (
+          <WeeklyReports project={project} />
         )}
         {activeTab === "settings" && (
           <PortalSettings project={project} user={user} onUpdated={refreshProject} />
