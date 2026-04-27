@@ -13,6 +13,7 @@ import DemoVideoSection from "../components/landing/DemoVideoSection";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
+import ChatBubble from "../components/landing/ChatBubble";
 import { FAQ_ITEMS } from "../components/landing/FAQ";
 
 import {
@@ -121,6 +122,7 @@ export default function Home() {
         <FAQ />
         <FinalCTA />
         <Footer />
+        <ChatBubble />
       </div>
     </DemoBookingProvider>
   );
