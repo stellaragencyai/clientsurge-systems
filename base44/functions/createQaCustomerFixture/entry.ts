@@ -40,34 +40,36 @@ Deno.serve(async (req) => {
     let project;
     if (existingProjects && existingProjects.length > 0) {
       project = await base44.asServiceRole.entities.ClientProject.update(existingProjects[0].id, {
+        client_name: full_name,
         business_name,
         plan,
         client_email: email,
-        client_phone: phone,
-        website_url: website || '',
-        status: 'Active',
+        step_onboarding: 'complete',
+        step_payment: 'complete',
       });
     } else {
       project = await base44.asServiceRole.entities.ClientProject.create({
+        client_name: full_name,
         business_name,
         plan,
         client_email: email,
-        client_phone: phone,
-        website_url: website || '',
-        status: 'Active',
+        step_onboarding: 'complete',
+        step_payment: 'complete',
       });
     }
 
     // Create Order
     const order = await base44.asServiceRole.entities.Order.create({
-      client_email: email,
-      client_name: full_name,
+      customer_email: email,
+      customer_name: full_name,
+      customer_phone: phone,
       business_name,
       plan_type: plan,
-      monthly_rate,
+      total_monthly: monthly_rate,
       payment_status: 'paid',
       pipeline_status: 'Live',
-      project_id: project.id,
+      order_status: 'fully_live',
+      client_project_id: project.id,
       notes: 'QA fixture — created by admin',
     });
 
@@ -77,11 +79,8 @@ Deno.serve(async (req) => {
     nextMonth.setMonth(nextMonth.getMonth() + 1);
 
     const subscription = await base44.asServiceRole.entities.Subscription.create({
-      client_email: email,
-      project_id: project.id,
       order_id: order.id,
       plan_type: plan,
-      monthly_rate,
       status: 'active',
       current_period_start: now.toISOString(),
       current_period_end: nextMonth.toISOString(),
