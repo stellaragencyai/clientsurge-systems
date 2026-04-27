@@ -12,17 +12,7 @@ export default function FinalCTA() {
       <section id="book-demo" className="nebula-cta py-24 md:py-32 px-6 relative overflow-hidden">
         <StardustOverlay seed={13} opacity={0.6} />
 
-        <div
-          className="relative z-10 max-w-3xl mx-auto rounded-3xl px-10 py-12 text-center"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(255,252,247,0.68) 0%, rgba(252,240,220,0.52) 100%)",
-            backdropFilter: "blur(22px)",
-            WebkitBackdropFilter: "blur(22px)",
-            border: "1.5px solid rgba(200,150,92,0.28)",
-            boxShadow: "0 8px 48px rgba(154,92,46,0.12), inset 0 1px 0 rgba(255,255,255,0.8)",
-          }}
-        >
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">
             Ready to Start?
           </p>

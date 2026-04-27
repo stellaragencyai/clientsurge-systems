@@ -79,7 +79,6 @@ export default function FAQ() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [expandedIndex, setExpandedIndex] = useState(0);
-  const [helpfulVotes, setHelpfulVotes] = useState({});
 
   const categories = ["all", "setup", "pricing", "integration", "support"];
   const categoryLabels = { all: "All", setup: "Getting Started", pricing: "Pricing", integration: "Integrations", support: "Support" };
@@ -91,22 +90,8 @@ export default function FAQ() {
     return matchesSearch && matchesCategory;
   });
 
-  const handleVote = (idx, helpful) => {
-    setHelpfulVotes(prev => ({
-      ...prev,
-      [idx]: helpful ? "yes" : "no"
-    }));
-    setTimeout(() => {
-      setHelpfulVotes(prev => {
-        const newVotes = { ...prev };
-        delete newVotes[idx];
-        return newVotes;
-      });
-    }, 2000);
-  };
-
   return (
-    <section id="faq" className="px-6 py-24 md:py-32 relative overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(240,242,246,0.98) 0%, rgba(228,232,240,0.97) 50%, rgba(238,240,246,0.98) 100%)" }}>
+    <section id="faq" className="px-6 py-24 md:py-32 relative overflow-hidden bg-white">
 
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="text-center mb-14">
@@ -139,8 +124,8 @@ export default function FAQ() {
               onClick={() => setCategory(cat)}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-all ${
                 category === cat
-                  ? "bg-primary text-white"
-                  : "bg-primary/10 text-primary hover:bg-primary/20"
+                  ? "bg-foreground text-background"
+                  : "bg-muted text-foreground hover:bg-muted/80"
               }`}
             >
               {categoryLabels[cat]}
@@ -171,34 +156,6 @@ export default function FAQ() {
                   <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5">
                     <div>
                       <p>{faq.a}</p>
-                      <div className="mt-4 flex items-center gap-3 text-xs font-semibold text-muted-foreground border-t border-border pt-3">
-                        <span>Was this helpful?</span>
-                        <button
-                          onClick={() => handleVote(originalIdx, true)}
-                          className={`px-3 py-1 rounded-full transition-all ${
-                            helpfulVotes[originalIdx] === "yes"
-                              ? "bg-green-100 text-green-700"
-                              : "hover:bg-primary/10"
-                          }`}
-                        >
-                          👍 Yes
-                        </button>
-                        <button
-                        onClick={() => handleVote(originalIdx, false)}
-                        className={`px-3 py-1 rounded-full transition-all ${
-                          helpfulVotes[originalIdx] === "no"
-                            ? "bg-red-100 text-red-700"
-                            : "hover:bg-primary/10"
-                        }`}
-                        >
-                        👎 No
-                        </button>
-                        {helpfulVotes[originalIdx] === "no" && (
-                        <a href="/contact" className="ml-2 text-xs font-semibold text-primary hover:underline">
-                          Send us a question →
-                        </a>
-                        )}
-                      </div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>

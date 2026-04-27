@@ -1,8 +1,8 @@
 import { PlayCircle, Video, Clapperboard, ArrowRight } from "lucide-react";
 import { getPublicDemoEntries, getDemoCoverageSummary } from "@/lib/demoVideoCatalog";
 
-const demoCream = "linear-gradient(180deg, rgba(252,247,241,0.99) 0%, rgba(246,238,228,0.97) 100%)";
-const demoCreamStrong = "linear-gradient(180deg, rgba(255,250,245,1) 0%, rgba(248,240,230,0.99) 100%)";
+const demoCream = "linear-gradient(180deg, #f5e6d0 0%, #eedfc7 100%)";
+const demoCreamStrong = "linear-gradient(180deg, #f8ead8 0%, #f2e0c8 100%)";
 const demoBrown =
   "linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 40%, #7a4825 100%)";
 const demoBrownSoft =
@@ -328,7 +328,7 @@ function DemoShellCompact({ eyebrow, icon: Icon, title, body, badge, highlighted
         {/* Header */}
         <div
           className="px-4 py-4 flex items-center justify-between gap-2 relative overflow-hidden"
-          style={{ background: demoCreamStrong, borderBottom: "1px solid rgba(208,166,114,0.18)" }}
+          style={{ background: demoCreamStrong, borderBottom: "1px solid rgba(154,92,46,0.15)" }}
         >
           <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{ background: demoHeaderGlass }} />
           <div className="relative z-10 flex-1 min-w-0">
@@ -350,14 +350,12 @@ function DemoShellCompact({ eyebrow, icon: Icon, title, body, badge, highlighted
         </div>
 
         {/* Body */}
-        <div className="px-4 py-4 flex flex-col flex-1 gap-3 relative overflow-hidden" style={{ background: highlighted ? demoBrownSoft : demoBrown }}>
-          <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{ background: demoBodyMesh, opacity: 0.84 }} />
-          <div aria-hidden="true" className="absolute left-0 right-0 top-0 h-px pointer-events-none" style={{ background: demoDivider }} />
-          <p className="text-xs leading-relaxed relative z-10 flex-1 line-clamp-3" style={{ color: demoTextMuted }}>{body}</p>
+        <div className="px-4 py-4 flex flex-col flex-1 gap-3" style={{ background: demoCream }}>
+          <p className="text-xs leading-relaxed flex-1 line-clamp-3 text-foreground/70">{body}</p>
           {badge && (
             <span
-              className="relative z-10 inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em]"
-              style={{ background: demoChipBg, color: demoTextLight, border: demoChipBorder }}
+              className="inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em]"
+              style={{ background: "rgba(154,92,46,0.10)", color: "#7a4825", border: "1px solid rgba(154,92,46,0.18)" }}
             >
               {badge}
             </span>
@@ -365,7 +363,7 @@ function DemoShellCompact({ eyebrow, icon: Icon, title, body, badge, highlighted
           <a
             href={href}
             {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-            className="relative z-10 inline-flex items-center justify-center gap-1.5 rounded-full text-[11px] font-semibold"
+            className="inline-flex items-center justify-center gap-1.5 rounded-full text-[11px] font-semibold"
             style={{
               padding: "2px",
               background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
