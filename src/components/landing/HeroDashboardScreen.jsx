@@ -440,6 +440,7 @@ export default function HeroDashboardScreen() {
   const [freshStep, setFreshStep] = useState(0);
   const [ripple, setRipple] = useState(null);
   const [glareVisible, setGlareVisible] = useState(false);
+  const [todayLeadTick, setTodayLeadTick] = useState(0);
   const touchStartX = useRef(null);
   const cycleRef = useRef(0);
 
@@ -493,6 +494,14 @@ export default function HeroDashboardScreen() {
     };
     triggerGlare();
     const id = setInterval(triggerGlare, 8000);
+    return () => clearInterval(id);
+  }, []);
+
+  // Functionality enhancement 2: live "today" lead ticker in header
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (Math.random() > 0.6) setTodayLeadTick((v) => v + 1);
+    }, scaleMs(7000));
     return () => clearInterval(id);
   }, []);
 
@@ -700,7 +709,18 @@ export default function HeroDashboardScreen() {
               <span style={{ fontSize: "8px", color: textMuted }}>{currentMode.helper}</span>
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            {/* Functionality enhancement 2: live today counter badge */}
+            <div style={{
+              display: "flex", alignItems: "center", gap: "3px",
+              background: "linear-gradient(135deg,rgba(154,92,46,0.12),rgba(200,150,92,0.1))",
+              border: "1px solid rgba(154,92,46,0.2)",
+              borderRadius: "8px", padding: "2px 6px",
+            }}>
+              <span style={{ fontSize: "8px", fontWeight: "800", color: "#9a5c2e", letterSpacing: "0.04em" }}>
+                +{todayLeadTick + 3} today
+              </span>
+            </div>
             <div
               style={{
                 width: "6px",
@@ -737,14 +757,16 @@ export default function HeroDashboardScreen() {
                     style={{
                       overflow: "hidden",
                   flex: 1,
-                  border: "none",
+                  border: isActive ? "1.5px solid rgba(200,150,92,0.55)" : "1.5px solid transparent",
                   borderRadius: "8px",
                   padding: "8px 6px",
-                  background: isActive ? "#1a1209" : "transparent",
-                  color: isActive ? "#fff" : textPrimary,
+                  background: isActive
+                    ? "linear-gradient(135deg,#1a1209 0%,#2a1e0f 100%)"
+                    : "transparent",
+                  color: isActive ? "#f5e6d0" : textPrimary,
                   cursor: "pointer",
-                  transition: `background ${scaleMs(220)}ms ease, color ${scaleMs(220)}ms ease, transform ${scaleMs(220)}ms ease`,
-                  boxShadow: isActive ? "0 6px 14px rgba(26,18,9,0.15)" : "none",
+                  transition: `background ${scaleMs(220)}ms ease, color ${scaleMs(220)}ms ease, border-color ${scaleMs(220)}ms ease`,
+                  boxShadow: isActive ? "0 6px 14px rgba(26,18,9,0.2), inset 0 1px 0 rgba(200,150,92,0.2)" : "none",
                 }}
               >
                 {/* Enhancement 1: Tap ripple */}
@@ -780,29 +802,45 @@ export default function HeroDashboardScreen() {
               }}
             >
               <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: "3px",
-                  background: stat.accent,
-                }}
-              />
-              <div style={{ fontSize: "8px", fontWeight: "700", color: textMuted, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                {stat.label}
-              </div>
-              <div
-                style={{
-                  fontSize: "14px",
-                  fontWeight: "800",
-                  color: stat.accent,
-                  lineHeight: 1.15,
-                  marginTop: "5px",
-                }}
-              >
-                {stat.value}
-              </div>
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: "3px",
+                    background: `linear-gradient(90deg,${stat.accent}80,${stat.accent})`,
+                  }}
+                />
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ fontSize: "8px", fontWeight: "700", color: textMuted, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                      {stat.label}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "800",
+                        color: stat.accent,
+                        lineHeight: 1.15,
+                        marginTop: "5px",
+                      }}
+                    >
+                      {stat.value}
+                    </div>
+                  </div>
+                  {/* Functionality enhancement 1: mini sparkline */}
+                  <svg width="28" height="16" viewBox="0 0 28 16" style={{ marginTop: "2px", opacity: 0.7 }}>
+                    <polyline
+                      points="0,14 5,10 9,11 13,6 17,8 22,3 28,1"
+                      fill="none"
+                      stroke={stat.accent}
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <circle cx="28" cy="1" r="2" fill={stat.accent} />
+                  </svg>
+                </div>
             </div>
           ))}
         </div>

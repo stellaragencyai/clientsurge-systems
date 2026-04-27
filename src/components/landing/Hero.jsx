@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import HeroDashboardScreen from "./HeroDashboardScreen";
 
@@ -135,6 +135,14 @@ export default function Hero() {
             Automatically
           </h1>
 
+          {/* Visual enhancement: shimmer divider under headline */}
+          <div style={{
+            height: "2px",
+            borderRadius: "999px",
+            marginBottom: "22px",
+            background: "linear-gradient(90deg, transparent 0%, rgba(200,150,92,0.5) 30%, rgba(245,217,168,0.9) 50%, rgba(200,150,92,0.5) 70%, transparent 100%)",
+          }} />
+
           <p
             className="landing-hero__body"
             style={{
@@ -153,26 +161,36 @@ export default function Hero() {
             className="landing-hero__checklist"
             style={{
               display: "grid",
-              gap: "12px",
+              gap: "9px",
               marginBottom: "34px",
             }}
           >
             {checklist.map((item) => (
               <div
                 key={item}
-                style={{ display: "flex", alignItems: "center", gap: "11px" }}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "10px",
+                  padding: "7px 14px 7px 10px",
+                  borderRadius: "9999px",
+                  background: "rgba(255,255,255,0.72)",
+                  border: "1px solid rgba(200,150,92,0.22)",
+                  boxShadow: "0 2px 8px rgba(122,72,37,0.06)",
+                  width: "fit-content",
+                }}
               >
-                <CheckCircle2
-                  style={{
-                    width: "18px",
-                    height: "18px",
-                    color: "#26b05f",
-                    flexShrink: 0,
-                  }}
-                />
+                <div style={{
+                  width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0,
+                  background: "linear-gradient(135deg,#26b05f,#16a34a)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: "0 2px 6px rgba(34,197,94,0.25)",
+                }}>
+                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                    <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
                 <span
                   style={{
-                    fontSize: "15px",
+                    fontSize: "14px",
                     fontWeight: "600",
                     color: "rgba(27,20,13,0.8)",
                   }}
@@ -283,17 +301,24 @@ export default function Hero() {
               width: "min(100%, 860px)",
               aspectRatio: "1.15 / 1",
               borderRadius: "34px",
-              padding: "16px",
+              padding: "3px",
               background:
-                "linear-gradient(160deg, #23263b 0%, #141722 58%, #0d0f16 100%)",
-              border: "1px solid rgba(255,255,255,0.12)",
+                "linear-gradient(135deg, #a0714f 0%, #c8965c 25%, #f5d9a8 50%, #c8965c 75%, #7a4f2e 100%)",
               boxShadow:
-                "0 44px 110px rgba(17,12,7,0.34), 0 18px 44px rgba(17,12,7,0.18), inset 0 1px 0 rgba(255,255,255,0.12)",
+                "0 44px 110px rgba(17,12,7,0.34), 0 18px 44px rgba(17,12,7,0.18), 0 0 60px rgba(200,150,92,0.18)",
               transform:
                 "perspective(2400px) rotateY(-10deg) rotateX(4deg) rotateZ(1.4deg)",
-              overflow: "hidden",
             }}
           >
+            <div style={{
+              width: "100%",
+              height: "100%",
+              borderRadius: "32px",
+              padding: "13px",
+              background: "linear-gradient(160deg, #23263b 0%, #141722 58%, #0d0f16 100%)",
+              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12)",
+              overflow: "hidden",
+            }}>
             <div
               style={{
                 position: "absolute",
@@ -331,6 +356,7 @@ export default function Hero() {
               }}
             >
               <HeroDashboardScreen />
+            </div>
             </div>
           </div>
         </div>

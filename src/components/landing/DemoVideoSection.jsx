@@ -7,8 +7,8 @@ const demoBrown =
   "linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 40%, #7a4825 100%)";
 const demoBrownSoft =
   "linear-gradient(135deg, #7a4825 0%, #b1723b 42%, #8a542b 100%)";
-const demoBorder = "1.5px solid rgba(212, 184, 142, 0.42)";
-const demoBorderStrong = "1.5px solid rgba(222, 194, 152, 0.72)";
+const demoBorder = "1.5px solid rgba(212, 184, 142, 0.42)"; // kept for InfoTile/inner uses
+const demoBorderStrong = "1.5px solid rgba(222, 194, 152, 0.72)"; // kept for InfoTile/inner uses
 const demoShadow = "0 16px 34px rgba(111,67,31,0.08), 0 2px 12px rgba(111,67,31,0.05)";
 const demoShadowStrong =
   "0 22px 48px rgba(122,72,37,0.16), 0 8px 22px rgba(154,92,46,0.1)";
@@ -96,11 +96,21 @@ function DemoCTA({ href, children, external = false }) {
 function DemoShell({ eyebrow, icon: Icon, title, body, badge, children, highlighted = false }) {
   return (
     <div
+      className="rounded-[30px]"
+      style={{
+        padding: highlighted ? "2.5px" : "2px",
+        background: highlighted
+          ? "linear-gradient(135deg,#a0714f 0%,#e8c080 28%,#f5d9a8 50%,#d4a055 72%,#7a4f2e 100%)"
+          : premiumRing,
+        boxShadow: highlighted
+          ? "0 8px 40px rgba(120,70,20,0.32), 0 4px 16px rgba(120,70,20,0.18)"
+          : premiumRingShadow,
+      }}
+    >
+    <div
       className="rounded-[28px] overflow-hidden relative"
       style={{
         background: highlighted ? demoCreamStrong : demoCream,
-        border: highlighted ? demoBorderStrong : demoBorder,
-        boxShadow: highlighted ? demoShadowStrong : demoShadow,
       }}
     >
       <div
@@ -213,6 +223,7 @@ function DemoShell({ eyebrow, icon: Icon, title, body, badge, children, highligh
         ) : null}
         <div className="mt-6 relative z-10">{children}</div>
       </div>
+    </div>
     </div>
   );
 }
@@ -398,13 +409,19 @@ export default function DemoVideoSection() {
   );
 }
 
+const premiumRing = "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)";
+const premiumRingShadow = "0 4px 24px rgba(120,70,20,0.22), 0 2px 8px rgba(120,70,20,0.12)";
+
 function SummaryCard({ icon: Icon, label, value, helper }) {
   return (
     <div
-      className="rounded-[24px] overflow-hidden"
+      className="rounded-[26px]"
+      style={{ padding: "2px", background: premiumRing, boxShadow: premiumRingShadow }}
+    >
+    <div
+      className="rounded-[24px] overflow-hidden h-full"
       style={{
         background: demoCream,
-        border: demoBorder,
         boxShadow: demoShadow,
       }}
     >
@@ -463,6 +480,7 @@ function SummaryCard({ icon: Icon, label, value, helper }) {
           {helper}
         </p>
       </div>
+    </div>
     </div>
   );
 }
