@@ -3,10 +3,11 @@ import { useDemoBooking } from "./DemoBookingContext";
 import HeroDashboardScreen from "./HeroDashboardScreen";
 
 const checklist = [
-  "Instant SMS response to every new lead",
-  "14-day automated follow-up sequence",
-  "Missed call text-back so fewer leads go cold",
-  "Live in 5-7 business days, fully built for you",
+  "Instant response to every new lead — within seconds",
+  "Missed call recovery so no opportunity goes unanswered",
+  "Automated follow-up that runs for 14 days without you",
+  "Booking flow support to convert ready leads faster",
+  "Live in 5–7 business days, fully built for you",
 ];
 
 export default function Hero() {
@@ -120,7 +121,7 @@ export default function Hero() {
               marginBottom: "22px",
             }}
           >
-            Turn Every Lead Into a{" "}
+            Turn Missed Leads Into{" "}
             <span
               style={{
                 background:
@@ -130,9 +131,8 @@ export default function Hero() {
                 backgroundClip: "text",
               }}
             >
-              Booked Appointment
-            </span>{" "}
-            Automatically
+              Booked Appointments
+            </span>
           </h1>
 
           {/* Visual enhancement: shimmer divider under headline */}
@@ -153,8 +153,7 @@ export default function Hero() {
               maxWidth: "34rem",
             }}
           >
-            We build AI-powered systems that respond in seconds, nurture leads
-            for 14 days, and fill your calendar without you lifting a finger.
+            ClientSurge installs AI-powered conversion systems that capture leads, respond instantly, follow up automatically, and turn more of your existing demand into booked clients.
           </p>
 
           <div
@@ -253,7 +252,7 @@ export default function Hero() {
                 boxShadow: "0 10px 24px rgba(44,31,16,0.04)",
               }}
             >
-              See how it works
+              See The System
             </a>
           </div>
 
