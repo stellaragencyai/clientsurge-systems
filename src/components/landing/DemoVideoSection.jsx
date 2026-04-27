@@ -276,72 +276,13 @@ export default function DemoVideoSection() {
           />
         </div>
 
-        {featuredEntry ? (
-          <div className="mb-8">
-            <DemoShell
-              eyebrow="Featured Walkthrough"
-              icon={PlayCircle}
-              title={featuredEntry.title}
-              body={featuredEntry.goal}
-              badge={featuredEntry.public_url ? "Watch now" : "Live walkthrough"}
-              highlighted
-            >
-              <div className="grid gap-4 lg:grid-cols-[1.1fr,0.9fr] items-start">
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <InfoTile label="Format" value={formatType(featuredEntry.type)} />
-                  <InfoTile label="Length" value={featuredEntry.duration_target} />
-                </div>
-                <div
-                  className="rounded-2xl overflow-hidden"
-                  style={{
-                    background: "rgba(255,245,230,0.08)",
-                    border: demoChipBorder,
-                  }}
-                >
-                  <div
-                    className="px-4 py-3"
-                    style={{
-                      background: "rgba(255,248,240,0.08)",
-                      borderBottom: "1px solid rgba(233,197,150,0.18)",
-                    }}
-                  >
-                    <p className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "#f6ddb0" }}>
-                      Why start here
-                    </p>
-                  </div>
-                  <ul className="px-4 py-4 space-y-2">
-                    <li className="text-sm" style={{ color: demoTextMuted }}>
-                      Covers the clearest end-to-end buyer journey.
-                    </li>
-                    <li className="text-sm" style={{ color: demoTextMuted }}>
-                      Shows what the system feels like when a new lead comes in.
-                    </li>
-                    <li className="text-sm" style={{ color: demoTextMuted }}>
-                      Makes the live demo call shorter and more specific.
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {featuredEntry.public_url ? (
-                <DemoCTA href={featuredEntry.public_url} external>
-                  Watch Featured Demo
-                  <ArrowRight className="w-4 h-4" />
-                </DemoCTA>
-              ) : (
-                <DemoCTA href="/book">
-                  See It In A Live Walkthrough
-                  <ArrowRight className="w-4 h-4" />
-                </DemoCTA>
-              )}
-            </DemoShell>
-          </div>
-        ) : null}
-
-        <div className="grid gap-5 lg:grid-cols-3">
-          {supportingEntries.map((entry) => {
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[featuredEntry, ...supportingEntries].filter(Boolean).map((entry, i) => {
+            const isFirst = i === 0;
             const published = Boolean(entry.public_url);
-            const label = published
+            const label = isFirst
+              ? "Featured"
+              : published
               ? "Published"
               : entry.status === "record_next"
               ? "Record next"
@@ -350,62 +291,99 @@ export default function DemoVideoSection() {
               : "Planned";
 
             return (
-              <DemoShell
+              <DemoShellCompact
                 key={entry.demo_key}
                 eyebrow={label}
                 icon={published ? PlayCircle : Video}
                 title={entry.title}
                 body={entry.goal}
                 badge={formatType(entry.type)}
-              >
-                <div className="space-y-4">
-                  <InfoTile label="Target Length" value={entry.duration_target} />
-
-                  <div
-                    className="rounded-2xl overflow-hidden"
-                    style={{
-                      background: "rgba(255,245,230,0.08)",
-                      border: demoChipBorder,
-                    }}
-                  >
-                    <div
-                      className="px-4 py-3"
-                      style={{
-                        background: "rgba(255,248,240,0.08)",
-                        borderBottom: "1px solid rgba(233,197,150,0.18)",
-                      }}
-                    >
-                      <p className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "#f6ddb0" }}>
-                        What this demo helps answer
-                      </p>
-                    </div>
-                    <ul className="px-4 py-4 space-y-2">
-                      {(entry.source_of_truth || ["Live operator walkthrough"]).map((source) => (
-                        <li key={source} className="text-sm" style={{ color: demoTextMuted }}>
-                          {source}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {published ? (
-                    <DemoCTA href={entry.public_url} external>
-                      Watch Demo
-                      <ArrowRight className="w-4 h-4" />
-                    </DemoCTA>
-                  ) : (
-                    <DemoCTA href="/book">
-                      See It In A Live Walkthrough
-                      <ArrowRight className="w-4 h-4" />
-                    </DemoCTA>
-                  )}
-                </div>
-              </DemoShell>
+                highlighted={isFirst}
+                href={published ? entry.public_url : "/book"}
+                external={published}
+              />
             );
           })}
         </div>
       </div>
     </section>
+  );
+}
+
+function DemoShellCompact({ eyebrow, icon: Icon, title, body, badge, highlighted, href, external }) {
+  return (
+    <div
+      className="rounded-[24px] flex flex-col h-full"
+      style={{
+        padding: highlighted ? "2.5px" : "2px",
+        background: highlighted
+          ? "linear-gradient(135deg,#a0714f 0%,#e8c080 28%,#f5d9a8 50%,#d4a055 72%,#7a4f2e 100%)"
+          : premiumRing,
+        boxShadow: highlighted
+          ? "0 8px 40px rgba(120,70,20,0.32), 0 4px 16px rgba(120,70,20,0.18)"
+          : premiumRingShadow,
+      }}
+    >
+      <div className="rounded-[22px] overflow-hidden flex flex-col h-full" style={{ background: highlighted ? demoCreamStrong : demoCream }}>
+        {/* Header */}
+        <div
+          className="px-4 py-4 flex items-center justify-between gap-2 relative overflow-hidden"
+          style={{ background: demoCreamStrong, borderBottom: "1px solid rgba(208,166,114,0.18)" }}
+        >
+          <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{ background: demoHeaderGlass }} />
+          <div className="relative z-10 flex-1 min-w-0">
+            <p className="text-[10px] font-black uppercase tracking-[0.18em]" style={{ color: demoTopText }}>{eyebrow}</p>
+            <p className="mt-1 text-sm font-semibold text-foreground leading-snug line-clamp-2">{title}</p>
+          </div>
+          <div className="relative z-10 flex-shrink-0">
+            <div
+              className="w-8 h-8 rounded-xl flex items-center justify-center overflow-hidden"
+              style={{
+                background: "linear-gradient(180deg, rgba(255,249,241,0.96) 0%, rgba(246,232,214,0.9) 100%)",
+                border: "1px solid rgba(205,164,114,0.52)",
+                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.78), ${demoIconGlow}`,
+              }}
+            >
+              <Icon className="w-4 h-4" style={{ color: demoIconColor }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="px-4 py-4 flex flex-col flex-1 gap-3 relative overflow-hidden" style={{ background: highlighted ? demoBrownSoft : demoBrown }}>
+          <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{ background: demoBodyMesh, opacity: 0.84 }} />
+          <div aria-hidden="true" className="absolute left-0 right-0 top-0 h-px pointer-events-none" style={{ background: demoDivider }} />
+          <p className="text-xs leading-relaxed relative z-10 flex-1 line-clamp-3" style={{ color: demoTextMuted }}>{body}</p>
+          {badge && (
+            <span
+              className="relative z-10 inline-flex w-fit items-center rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em]"
+              style={{ background: demoChipBg, color: demoTextLight, border: demoChipBorder }}
+            >
+              {badge}
+            </span>
+          )}
+          <a
+            href={href}
+            {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+            className="relative z-10 inline-flex items-center justify-center gap-1.5 rounded-full text-[11px] font-semibold"
+            style={{
+              padding: "2px",
+              background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+              boxShadow: "0 3px 10px rgba(120,70,20,0.3)",
+              textDecoration: "none",
+            }}
+          >
+            <span
+              className="flex items-center gap-1.5 rounded-full px-3 py-1.5"
+              style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0" }}
+            >
+              {external ? "Watch Demo" : "See Walkthrough"}
+              <ArrowRight className="w-3 h-3" />
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
   );
 }
 
