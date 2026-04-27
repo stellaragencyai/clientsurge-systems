@@ -169,7 +169,7 @@ export default function IntegrationHealth() {
 
       <div className="bg-white rounded-xl border border-border p-6">
         <h3 className="font-semibold text-foreground mb-4">System Health</h3>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
             <p className="text-xs text-muted-foreground mb-1">Overall Uptime</p>
             <p className="text-2xl font-bold text-muted-foreground">{system.uptime?.label || "Unavailable"}</p>

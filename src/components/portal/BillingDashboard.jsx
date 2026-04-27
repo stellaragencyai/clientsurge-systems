@@ -58,7 +58,7 @@ function InvoiceRow({ invoice, onPay, paying }) {
       </td>
       <td className="px-5 py-4 text-sm text-foreground">{formatDate(invoice.issue_date)}</td>
       <td className="px-5 py-4 text-sm text-foreground">{formatDate(invoice.due_date)}</td>
-      <td className="px-5 py-4 text-sm font-semibold text-foreground">${invoice.amount?.toFixed(2)}</td>
+      <td className="px-5 py-4 text-sm font-semibold text-foreground">{formatCurrency((invoice.amount || 0) * 100)}</td>
       <td className="px-5 py-4"><StatusBadge status={invoice.payment_status} /></td>
       <td className="px-5 py-4">
         <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ export default function BillingDashboard({ project, subscription }) {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full min-w-[600px]">
               <thead className="bg-muted/40 border-b border-border text-xs font-semibold text-foreground uppercase tracking-wide">
                 <tr>
                   <th className="px-5 py-3 text-left">Invoice</th>

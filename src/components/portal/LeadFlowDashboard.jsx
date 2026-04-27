@@ -37,21 +37,6 @@ export default function LeadFlowDashboard() {
   const [error, setError] = useState('');
   const [lastUpdated, setLastUpdated] = useState(null);
 
-  const fetchMetrics = async () => {
-    try {
-      setLoading(true);
-      const res = await base44.functions.invoke('getClientLeadFlowMetrics', {});
-      setMetrics(res.data);
-      setLastUpdated(new Date());
-      setError('');
-    } catch (err) {
-      setError('Failed to load metrics');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleExport = async () => {
     try {
       const res = await base44.functions.invoke('exportLeadMetricsCSV', {});
@@ -71,14 +56,32 @@ export default function LeadFlowDashboard() {
   };
 
   useEffect(() => {
-    fetchMetrics();
+    let isMounted = true;
+    const safeSetMetrics = (data) => { if (isMounted) setMetrics(data); };
+    const safeSetError = (msg) => { if (isMounted) setError(msg); };
+    const safeSetLoading = (v) => { if (isMounted) setLoading(v); };
+    const safeSetUpdated = (v) => { if (isMounted) setLastUpdated(v); };
 
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(() => {
-      fetchMetrics();
-    }, 30000);
+    const load = async () => {
+      try {
+        safeSetLoading(true);
+        const res = await base44.functions.invoke('getClientLeadFlowMetrics', {});
+        safeSetMetrics(res.data);
+        safeSetUpdated(new Date());
+        safeSetError('');
+      } catch (err) {
+        safeSetError('Failed to load metrics');
+      } finally {
+        safeSetLoading(false);
+      }
+    };
 
-    return () => clearInterval(interval);
+    load();
+    const interval = setInterval(load, 30000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -98,7 +101,7 @@ export default function LeadFlowDashboard() {
             Export CSV
           </button>
           <button
-            onClick={fetchMetrics}
+            onClick={() => { setLoading(true); base44.functions.invoke('getClientLeadFlowMetrics', {}).then(res => { setMetrics(res.data); setLastUpdated(new Date()); setError(''); }).catch(() => setError('Failed to load metrics')).finally(() => setLoading(false)); }}
             disabled={loading}
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-50"
           >

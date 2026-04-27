@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame, Mail, Target } from 'lucide-react';
+import { LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare, Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame, Mail, Target, TrendingUp, Star, PieChart, Layers } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
@@ -33,11 +33,11 @@ const NAV_ITEMS = [
   { id: 'drip', label: 'Drip Campaigns', icon: Send },
   { id: 'nurture', label: 'Nurture Campaigns', icon: Flame },
   { id: 'email-campaigns', label: 'Email Campaigns', icon: Mail },
-  { id: 'routing', label: 'Lead Routing', icon: Users },
-  { id: 'performance', label: 'Performance', icon: BarChart3 },
-  { id: 'priority', label: 'Priority Queue', icon: Flame },
-  { id: 'attribution', label: 'Source Attribution', icon: Target },
-  { id: 'campaign-builder', label: 'Campaign Builder', icon: Mail },
+  { id: 'routing', label: 'Lead Routing', icon: Target },
+  { id: 'performance', label: 'Performance', icon: TrendingUp },
+  { id: 'priority', label: 'Priority Queue', icon: Star },
+  { id: 'attribution', label: 'Source Attribution', icon: PieChart },
+  { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
@@ -94,7 +94,11 @@ export default function AdminDashboard() {
       case 'automations':
         return <AutomationsPanel />;
       case 'onboarding':
-        return null;
+        return (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        );
       case 'drip':
         return <DripCampaignPanel />;
       case 'nurture':
@@ -136,28 +140,40 @@ export default function AdminDashboard() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            {NAV_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    setActiveTab(item.id);
-                    setSidebarOpen(false);
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-sm ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-foreground hover:bg-muted'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {item.label}
-                </button>
-              );
-            })}
+          <nav className="flex-1 p-4 overflow-y-auto space-y-4">
+            {[
+              { group: 'Main', items: ['overview', 'leads', 'client-projects', 'onboarding'] },
+              { group: 'Automation', items: ['automations', 'drip', 'nurture', 'email-campaigns', 'campaign-builder', 'routing'] },
+              { group: 'Insights', items: ['analytics', 'performance', 'priority', 'attribution'] },
+              { group: 'System', items: ['health', 'templates', 'settings'] },
+            ].map(({ group, items }) => (
+              <div key={group}>
+                <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{group}</p>
+                <div className="space-y-0.5">
+                  {NAV_ITEMS.filter(n => items.includes(n.id)).map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          if (window.innerWidth < 1024) setSidebarOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors font-medium text-sm ${
+                          isActive
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-foreground hover:bg-muted'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        {item.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
 
           {/* User Section */}
@@ -186,7 +202,7 @@ export default function AdminDashboard() {
       <div className="flex-1 flex flex-col">
         {/* Top Bar */}
         <div className="bg-white border-b border-border px-6 py-4 flex items-center justify-between lg:justify-end sticky top-0 z-10">
-          <h2 className="text-lg font-semibold text-foreground hidden sm:block">
+          <h2 className="text-lg font-semibold text-foreground">
             {NAV_ITEMS.find(item => item.id === activeTab)?.label || 'Dashboard'}
           </h2>
           <button
@@ -289,7 +305,11 @@ function OverviewDashboard() {
         {stats.map((stat, idx) => (
           <div key={idx} className={`rounded-xl border border-border p-6 ${colors[stat.color]}`}>
             <p className="text-sm font-medium opacity-75">{stat.label}</p>
-            <p className="text-4xl font-bold mt-2">{loading ? '-' : stat.value}</p>
+            <p className="text-4xl font-bold mt-2">
+              {loading
+                ? <span className="inline-block w-10 h-8 rounded bg-current opacity-10 animate-pulse" />
+                : stat.value}
+            </p>
           </div>
         ))}
       </div>

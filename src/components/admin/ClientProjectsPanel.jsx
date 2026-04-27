@@ -70,7 +70,10 @@ export default function ClientProjectsPanel() {
     }
 
     setExpanded(id);
-    loadMessages(id);
+    // Only fetch if not already loaded
+    if (!messages[id]) {
+      loadMessages(id);
+    }
   };
 
   const sendReply = async (project) => {

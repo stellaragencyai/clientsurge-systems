@@ -15,12 +15,15 @@ Deno.serve(async (req) => {
 
     if (!project) return Response.json({ error: 'No project found for this user' }, { status: 404 });
 
-    // Get automation jobs for this client's leads
-    // First get leads associated with this client
+    // Get leads associated with this client (filtered at DB level)
     const leads = await base44.asServiceRole.entities.Leads.filter({ created_by: user.email }, '-created_date', 200);
     const leadIds = leads.map(l => l.id);
 
-    // Get all automation jobs
+    if (leadIds.length === 0) {
+      return Response.json({ jobs: [], stats: { total: 0, completed: 0, queued: 0, processing: 0, failed: 0 }, events: [] });
+    }
+
+    // Get all automation jobs then filter client-side (no bulk filter by array in SDK)
     let jobs = await base44.asServiceRole.entities.AutomationJob.list('-created_date', limit);
 
     // Filter to only jobs for this client's leads

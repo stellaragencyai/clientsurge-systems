@@ -17,6 +17,7 @@ export default function TasksDashboard({ project }) {
   const [activeTab, setActiveTab] = useState("jobs");
   const [retriggering, setRetriggering] = useState(null);
   const [lastRefreshed, setLastRefreshed] = useState(null);
+  const [tickNow, setTickNow] = useState(Date.now());
 
   const load = useCallback(async () => {
     setError("");
@@ -35,8 +36,9 @@ export default function TasksDashboard({ project }) {
 
   useEffect(() => {
     load();
-    const interval = setInterval(load, 15000); // auto-refresh every 15s
-    return () => clearInterval(interval);
+    const interval = setInterval(load, 15000);
+    const tickInterval = setInterval(() => setTickNow(Date.now()), 1000);
+    return () => { clearInterval(interval); clearInterval(tickInterval); };
   }, [load]);
 
   const handleRetrigger = async (jobId) => {
@@ -68,7 +70,7 @@ export default function TasksDashboard({ project }) {
             Real-time view of AI service jobs running for your business.
             {lastRefreshed && (
               <span className="ml-2 text-xs opacity-60">
-                Updated {Math.floor((Date.now() - lastRefreshed) / 1000)}s ago
+                Updated {Math.floor((tickNow - lastRefreshed) / 1000)}s ago
               </span>
             )}
           </p>

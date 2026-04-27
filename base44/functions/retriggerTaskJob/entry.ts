@@ -22,11 +22,12 @@ Deno.serve(async (req) => {
     if (!job) return Response.json({ error: 'Job not found' }, { status: 404 });
     if (!leadIds.has(job.lead_id)) return Response.json({ error: 'Unauthorized' }, { status: 403 });
 
-    // Re-queue the job
+    // Re-queue the job and clear stale timestamps
     await base44.asServiceRole.entities.AutomationJob.update(job_id, {
       status: 'queued',
       attempts: 0,
       last_error: null,
+      processed_at: null,
       scheduled_for: new Date().toISOString(),
     });
 

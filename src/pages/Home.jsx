@@ -105,7 +105,7 @@ export default function Home() {
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen pb-16">
+      <div className="min-h-screen">
         <Navbar />
         <Hero />
         <LiveLeadPulse />

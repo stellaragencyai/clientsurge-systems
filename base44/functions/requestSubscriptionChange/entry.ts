@@ -58,6 +58,13 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Requested plan matches the current subscription plan" }, { status: 400 });
     }
 
+    // Block duplicate pending requests
+    if (subscription.change_request_status === "pending_review") {
+      return Response.json({
+        error: "A subscription change request is already pending review. Please wait for it to be processed before submitting another.",
+      }, { status: 409 });
+    }
+
     const updated = await requestSubscriptionChange({
       base44,
       subscription,

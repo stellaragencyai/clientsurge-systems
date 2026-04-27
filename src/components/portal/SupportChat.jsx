@@ -100,13 +100,13 @@ export default function SupportChat({ project, user }) {
             <div
               className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                 msg.role === "client"
-                  ? "text-amber-50 border-b-r-sm"
-                  : "bg-muted text-foreground border-b-l-sm"
+                  ? "text-amber-50"
+                  : "text-foreground"
               }`}
               style={
                 msg.role === "client"
                   ? { background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)", borderBottomRightRadius: "4px" }
-                  : { borderBottomLeftRadius: "4px" }
+                  : { background: "hsl(var(--muted))", borderBottomLeftRadius: "4px" }
               }
             >
               {msg.role === "admin" && (

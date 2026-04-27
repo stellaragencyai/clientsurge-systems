@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 import WebhookSettings from "./WebhookSettings";
 
 const SETTINGS_SECTIONS = [
-  { id: "timeline", label: "Time line", icon: CalendarDays },
+  { id: "timeline", label: "Timeline", icon: CalendarDays },
   { id: "webhooks", label: "Webhooks", icon: Webhook },
 ];
 
@@ -83,7 +83,7 @@ function TimelineVisualization({ values }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary/70">
-            Time line
+            Timeline
           </p>
           <h3 className="mt-2 font-display text-2xl font-semibold text-foreground">
             {personName}
@@ -292,7 +292,7 @@ export default function PortalSettings({ project, user, onUpdated }) {
             <div className="rounded-[28px] border border-border bg-white p-6 shadow-sm">
               <div className="mb-6">
                 <h2 className="font-display text-2xl font-semibold text-foreground">
-                  Edit Time line
+                  Edit Timeline
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   Update the email address, person name, birth date, and death date.
@@ -362,7 +362,7 @@ export default function PortalSettings({ project, user, onUpdated }) {
                 style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-                {saving ? "Saving..." : "Save Time line"}
+                {saving ? "Saving..." : "Save Timeline"}
               </button>
             </div>
           </div>
