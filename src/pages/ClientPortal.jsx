@@ -8,7 +8,8 @@ import LeadActivityFeed from "../components/portal/LeadActivityFeed";
 import PaymentFailedBanner from "../components/portal/PaymentFailedBanner";
 import LeadFlowDashboard from "../components/portal/LeadFlowDashboard";
 import NotificationBell from "../components/portal/NotificationBell";
-import ClientOnboardingWizard from "../components/portal/ClientOnboardingWizard";
+import QuickStartWizard from "../components/portal/QuickStartWizard";
+import QuickStartInline from "../components/portal/QuickStartInline";
 import DeadlinesPanel from "../components/portal/DeadlinesPanel";
 import FilesPanel from "../components/portal/FilesPanel";
 import BillingDashboard from "../components/portal/BillingDashboard";
@@ -18,6 +19,7 @@ import WeeklyReports from "../components/portal/WeeklyReports";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
+  { id: "quickstart", label: "⚡ Quick Start" },
   { id: "metrics", label: "Lead Flow" },
   { id: "tasks", label: "Tasks" },
   { id: "leads", label: "My Leads" },
@@ -40,7 +42,7 @@ export default function ClientPortal() {
   const [notFound, setNotFound] = useState(false);
   const [portalError, setPortalError] = useState("");
   const [activeTab, setActiveTab] = useState("leads");
-  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showQuickStart, setShowQuickStart] = useState(false);
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useLeadNotifications();
 
   useEffect(() => {
@@ -57,8 +59,8 @@ export default function ClientPortal() {
         setProject(context.project || null);
         setPortalOrder(context.order || null);
         setSubscription(context.subscription || null);
-        // Show wizard if not completed
-        setShowOnboarding(!context.project?.onboarding_wizard_completed);
+        // Show Quick Start wizard if not yet completed
+        setShowQuickStart(!context.project?.quick_start_completed);
         setNotFound(false);
         setPortalError("");
       } catch (error) {
@@ -160,11 +162,12 @@ export default function ClientPortal() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Onboarding Wizard */}
-      {showOnboarding && project && (
-        <ClientOnboardingWizard
+      {/* Quick Start Wizard (modal overlay) */}
+      {showQuickStart && project && (
+        <QuickStartWizard
           project={project}
-          onComplete={() => setShowOnboarding(false)}
+          onComplete={() => { setShowQuickStart(false); refreshProject(); }}
+          onDismiss={() => setShowQuickStart(false)}
         />
       )}
 
@@ -248,6 +251,12 @@ export default function ClientPortal() {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
+        {activeTab === "quickstart" && (
+          <QuickStartInline
+            project={project}
+            onComplete={() => { refreshProject(); setActiveTab("metrics"); }}
+          />
+        )}
         {activeTab === "metrics" && (
           <LeadFlowDashboard />
         )}
