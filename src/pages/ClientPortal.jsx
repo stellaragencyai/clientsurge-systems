@@ -169,12 +169,16 @@ export default function ClientPortal() {
       {/* Top bar */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-border px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="font-display font-semibold text-foreground flex flex-col leading-tight">
-            <span className="text-sm">ClientSurge</span>
-            <span className="text-xs text-primary">Systems</span>
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+          >
+            <span className="text-white text-xs font-bold">CS</span>
           </div>
-          <span className="text-muted-foreground/40 text-lg">·</span>
-          <span className="text-sm font-medium text-muted-foreground">Client Portal</span>
+          <div className="flex flex-col leading-tight">
+            <span className="text-sm font-semibold" style={{ background: "linear-gradient(135deg,#6b3f1f,#c8965c)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>ClientSurge Systems</span>
+            <span className="text-[10px] text-muted-foreground">Client Portal</span>
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <NotificationBell
