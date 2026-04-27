@@ -415,72 +415,27 @@ const premiumRingShadow = "0 4px 24px rgba(120,70,20,0.22), 0 2px 8px rgba(120,7
 function SummaryCard({ icon: Icon, label, value, helper }) {
   return (
     <div
-      className="rounded-[26px]"
-      style={{ padding: "2px", background: premiumRing, boxShadow: premiumRingShadow }}
-    >
-    <div
-      className="rounded-[24px] overflow-hidden h-full"
+      className="rounded-[26px] px-5 py-5 text-center"
       style={{
         background: demoCream,
+        border: "1.5px solid rgba(212, 184, 142, 0.42)",
         boxShadow: demoShadow,
       }}
     >
       <div
-        className="px-5 py-4 flex items-center gap-3 relative overflow-hidden"
+        className="w-9 h-9 rounded-full flex items-center justify-center mx-auto mb-3"
         style={{
-          background: demoCreamStrong,
-          borderBottom: "1px solid rgba(208,166,114,0.18)",
+          background: "linear-gradient(135deg,#9a5c2e,#7a4825)",
+          boxShadow: "0 2px 8px rgba(154,92,46,0.3)",
         }}
       >
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-full pointer-events-none"
-          style={{ background: demoHeaderGlass }}
-        />
-        <div
-          className="relative flex h-11 w-11 items-center justify-center rounded-xl overflow-hidden"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(255,249,241,0.96) 0%, rgba(246,232,214,0.9) 100%)",
-            border: "1px solid rgba(205,164,114,0.5)",
-            boxShadow: demoIconGlow,
-          }}
-        >
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: demoHeaderGlass }}
-          />
-          <Icon className="relative z-10 h-5 w-5" style={{ color: demoIconColor }} />
-        </div>
-        <div>
-          <p className="relative z-10 text-xs font-semibold uppercase tracking-wide" style={{ color: demoTopText }}>
-            {label}
-          </p>
-          <p className="relative z-10 mt-1 text-2xl font-bold text-foreground">{value}</p>
-        </div>
+        <Icon className="h-4 w-4 text-white" />
       </div>
-      <div className="px-5 py-5 relative overflow-hidden" style={{ background: demoBrown }}>
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: demoBodyMesh, opacity: 0.72 }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-[46%] pointer-events-none"
-          style={{ background: demoShine, opacity: 0.62 }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute left-0 right-0 top-0 h-px pointer-events-none"
-          style={{ background: demoDivider }}
-        />
-        <p className="relative z-10 text-sm leading-relaxed" style={{ color: demoTextMuted }}>
-          {helper}
-        </p>
-      </div>
-    </div>
+      <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: demoTopText }}>
+        {label}
+      </p>
+      <p className="text-2xl font-bold text-foreground mb-2">{value}</p>
+      <p className="text-sm text-muted-foreground leading-relaxed">{helper}</p>
     </div>
   );
 }

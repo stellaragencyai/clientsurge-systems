@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
-import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
+import { getSelectedIndustryRecommendation, INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 
 function SimpleCheck() {
   return (
@@ -93,7 +93,9 @@ export default function Pricing() {
     }
 
     const syncIndustry = () => {
-      setSelectedIndustry(getSelectedIndustryRecommendation());
+      // Only show recommendation if user has explicitly selected an industry in this session
+      const storedId = window.sessionStorage.getItem(INDUSTRY_SELECTION_STORAGE_KEY);
+      setSelectedIndustry(storedId ? getSelectedIndustryRecommendation() : null);
     };
 
     syncIndustry();
