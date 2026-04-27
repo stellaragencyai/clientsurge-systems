@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Plus, Edit2, Trash2, Play, Pause, Loader2, Mail } from 'lucide-react';
 import CampaignBuilder from './CampaignBuilder';
+import DeleteConfirmModal from './DeleteConfirmModal';
 
 const TYPE_COLORS = {
   onboarding: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -16,6 +17,7 @@ export default function CampaignLibrary() {
   const [editingId, setEditingId] = useState(null);
   const [showBuilder, setShowBuilder] = useState(false);
   const [error, setError] = useState('');
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   useEffect(() => {
     loadCampaigns();
@@ -46,12 +48,13 @@ export default function CampaignLibrary() {
   };
 
   const deleteCampaign = async (id) => {
-    if (!confirm('Delete this campaign?')) return;
     try {
       await base44.entities.EmailSequence.delete(id);
       loadCampaigns();
     } catch (err) {
       setError('Failed to delete campaign');
+    } finally {
+      setConfirmDeleteId(null);
     }
   };
 
@@ -177,7 +180,7 @@ export default function CampaignLibrary() {
                   )}
                 </button>
                 <button
-                  onClick={() => deleteCampaign(campaign.id)}
+                  onClick={() => setConfirmDeleteId(campaign.id)}
                   className="px-3 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -187,6 +190,15 @@ export default function CampaignLibrary() {
           ))}
         </div>
       )}
+    {confirmDeleteId && (
+      <DeleteConfirmModal
+        title="Delete Campaign?"
+        description="This will permanently delete the campaign and all its steps. This cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={() => deleteCampaign(confirmDeleteId)}
+        onCancel={() => setConfirmDeleteId(null)}
+      />
+    )}
     </div>
   );
 }

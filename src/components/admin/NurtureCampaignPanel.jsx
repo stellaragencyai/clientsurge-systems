@@ -10,6 +10,7 @@ import {
   Clock, Heart, Lightbulb, Loader2, Pause, Play, Plus,
   RefreshCw, Send, Star, Users, XCircle, Zap,
 } from "lucide-react";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 const STEP_DEFINITIONS = [
   { num: 1, day: 0,  label: "Welcome",       theme: "welcome",       icon: Heart,     color: "bg-blue-100 text-blue-700" },
@@ -86,7 +87,7 @@ function ProgressTimeline({ campaign }) {
   );
 }
 
-function CampaignCard({ campaign, onPause, onResume, onStop, actionLoading }) {
+function CampaignCard({ campaign, onPause, onResume, onStop, onRequestStop, actionLoading }) {
   const cfg = STATUS_CONFIG[campaign.status] || STATUS_CONFIG.active;
   const Icon = cfg.icon;
   const isActive = campaign.status === "active";
@@ -135,7 +136,7 @@ function CampaignCard({ campaign, onPause, onResume, onStop, actionLoading }) {
           )}
           {(isActive || isPaused) && (
             <button
-              onClick={() => onStop(campaign.id)}
+              onClick={() => onRequestStop(campaign.id)}
               disabled={actionLoading === campaign.id}
               className="inline-flex items-center gap-1 rounded-lg border border-red-200 text-red-600 bg-red-50 px-2.5 py-1.5 text-xs font-medium hover:bg-red-100 transition-colors disabled:opacity-50"
             >
@@ -245,6 +246,7 @@ export default function NurtureCampaignPanel() {
   const [running, setRunning] = useState(false);
   const [runResult, setRunResult] = useState(null);
   const [showEnroll, setShowEnroll] = useState(false);
+  const [confirmStopId, setConfirmStopId] = useState(null);
 
   useEffect(() => { loadCampaigns(); }, []);
 
@@ -278,12 +280,11 @@ export default function NurtureCampaignPanel() {
   };
 
   const handleStop = async (id) => {
-    if (!confirm("Permanently stop this nurture campaign for this lead?")) return;
     setActionLoading(id);
     try {
       await base44.entities.NurtureCampaign.update(id, { status: "stopped", stop_reason: "manual_stop" });
       setCampaigns(prev => prev.map(c => c.id === id ? { ...c, status: "stopped", stop_reason: "manual_stop" } : c));
-    } finally { setActionLoading(null); }
+    } finally { setActionLoading(null); setConfirmStopId(null); }
   };
 
   const handleRunNow = async () => {
@@ -440,10 +441,21 @@ export default function NurtureCampaignPanel() {
               onPause={handlePause}
               onResume={handleResume}
               onStop={handleStop}
+              onRequestStop={setConfirmStopId}
               actionLoading={actionLoading}
             />
           ))}
         </div>
+      )}
+
+      {confirmStopId && (
+        <DeleteConfirmModal
+          title="Stop Nurture Campaign?"
+          description="This will permanently stop this lead's nurture sequence. It cannot be restarted from the same position."
+          confirmLabel="Stop Campaign"
+          onConfirm={() => handleStop(confirmStopId)}
+          onCancel={() => setConfirmStopId(null)}
+        />
       )}
 
       {showEnroll && (

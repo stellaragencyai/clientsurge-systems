@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, AlertCircle, Clock, RefreshCw } from "lucide-react";
+import { CheckCircle, AlertCircle, Clock, RefreshCw, Zap, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 export default function IntegrationHealth() {
@@ -15,6 +15,8 @@ export default function IntegrationHealth() {
   const [generatedAt, setGeneratedAt] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [testResults, setTestResults] = useState({});
+  const [testingId, setTestingId] = useState(null);
 
   const loadIntegrationHealth = async () => {
     try {
@@ -60,6 +62,18 @@ export default function IntegrationHealth() {
 
   const successRateLabel =
     system.success_rate_percent === null ? "Unavailable" : `${system.success_rate_percent}%`;
+
+  const testConnection = async (integration) => {
+    setTestingId(integration.id);
+    try {
+      const res = await base44.functions.invoke("testProviderConnections", { provider: integration.id });
+      setTestResults(prev => ({ ...prev, [integration.id]: { success: true, message: res.data?.message || "Connection successful" } }));
+    } catch (err) {
+      setTestResults(prev => ({ ...prev, [integration.id]: { success: false, message: err?.data?.error || err?.message || "Test failed" } }));
+    } finally {
+      setTestingId(null);
+    }
+  };
 
   useEffect(() => {
     loadIntegrationHealth();
@@ -113,6 +127,19 @@ export default function IntegrationHealth() {
                 Missing: {integration.missing_configuration.join(", ")}
               </p>
             )}
+            {testResults[integration.id] && (
+              <p className={`text-xs mt-2 font-medium ${testResults[integration.id].success ? "text-green-700" : "text-red-600"}`}>
+                {testResults[integration.id].success ? "✓" : "✗"} {testResults[integration.id].message}
+              </p>
+            )}
+            <button
+              onClick={() => testConnection(integration)}
+              disabled={testingId === integration.id}
+              className="mt-3 w-full inline-flex items-center justify-center gap-1.5 rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+            >
+              {testingId === integration.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
+              {testingId === integration.id ? "Testing…" : "Test Connection"}
+            </button>
           </div>
         ))}
       </div>
