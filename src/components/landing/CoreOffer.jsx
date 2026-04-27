@@ -373,18 +373,7 @@ function CoreOfferHeader({ industryContext }) {
       <p className="mt-4 text-sm md:text-base text-foreground/65 max-w-xl mx-auto leading-relaxed">
         {coreOfferSectionConfig.helperLine}
       </p>
-      {industryContext ? (
-        <div
-          className="mt-5 inline-flex items-center rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.14em]"
-          style={{
-            background: "rgba(154,92,46,0.08)",
-            border: "1px solid rgba(154,92,46,0.16)",
-            color: "#9a5c2e",
-          }}
-        >
-          Showing the most relevant systems for {industryContext.shortName}
-        </div>
-      ) : null}
+      {industryContext ? null : null}
     </div>
   );
 }
@@ -552,8 +541,8 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
       <div
         className="px-5 md:px-6 pt-5 pb-4 flex items-center justify-between relative overflow-hidden"
         style={{
-          background: flowSurfaceStrong,
-          borderBottom: "1px solid rgba(208,166,114,0.18)",
+          background: selected ? flowBrownSoft : flowBrown,
+          borderBottom: "1px solid rgba(0,0,0,0.15)",
         }}
       >
         <div
@@ -567,7 +556,7 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
         <div className="flex items-center gap-3">
           <span
             className="relative z-10 text-[11px] font-black uppercase tracking-[0.2em]"
-            style={{ color: flowTopText }}
+            style={{ color: selected ? "rgba(255,242,223,0.96)" : flowTextLight }}
           >
             Step {system.id}
           </span>
@@ -575,7 +564,7 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
         <div className="flex items-center gap-3 relative z-10">
           <span
             className="hidden sm:inline text-[11px] font-semibold uppercase tracking-[0.16em]"
-            style={{ color: "rgba(198,160,119,0.82)" }}
+            style={{ color: selected ? "rgba(255,242,223,0.72)" : "rgba(198,160,119,0.82)" }}
           >
             Tap to expand
           </span>
@@ -593,13 +582,15 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
             <div
               className="relative w-10 h-10 rounded-xl flex items-center justify-center"
               style={{
-                background:
-                  "linear-gradient(180deg, rgba(255,249,241,0.96) 0%, rgba(246,232,214,0.88) 100%)",
-                border: "1px solid rgba(205,164,114,0.52)",
-                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.78), ${flowIconGlow}`,
+                background: selected
+                  ? "linear-gradient(180deg, rgba(255,242,223,0.96) 0%, rgba(245,217,168,0.88) 100%)"
+                  : "linear-gradient(180deg, rgba(255,249,241,0.96) 0%, rgba(246,232,214,0.88) 100%)",
+                border: selected ? "1px solid rgba(255,227,186,0.72)" : "1px solid rgba(205,164,114,0.52)",
+                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.78), ${selected ? "0 0 0 2px rgba(255,242,223,0.5)" : flowIconGlow}`,
+                transition: "all 200ms ease",
               }}
             >
-              <Icon className="w-4 h-4" style={{ color: flowIconColor }} />
+              <Icon className="w-4 h-4" style={{ color: selected ? "#7a4825" : flowIconColor }} />
             </div>
           </div>
         </div>
@@ -608,29 +599,29 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
       <div
         className="px-5 md:px-6 py-5 md:py-6 flex flex-col gap-3 relative overflow-hidden"
         style={{
-          background: selected ? flowBrownSoft : flowBrown,
+          background: flowSurface,
         }}
       >
         <div
           aria-hidden="true"
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: flowBodyMesh,
-            opacity: selected ? 1 : 0.84,
+            background: "transparent",
+            opacity: 1,
           }}
         />
         <div
           aria-hidden="true"
           className="absolute left-0 right-0 top-0 h-px pointer-events-none"
-          style={{ background: flowDivider }}
+          style={{ background: "transparent" }}
         />
         <div
           aria-hidden="true"
           className="absolute inset-y-0 left-[-18%] w-[70%] pointer-events-none"
           style={{
-            background: flowSpotlight,
-            opacity: selected ? 0.82 : 0.52,
-            transform: selected ? "translateX(8%)" : "translateX(0)",
+            background: "transparent",
+            opacity: 0,
+            transform: "translateX(0)",
             transition: "opacity 200ms ease, transform 200ms ease",
           }}
         />
@@ -638,8 +629,8 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
           aria-hidden="true"
           className="absolute inset-x-0 top-0 h-[48%] pointer-events-none"
           style={{
-            background: flowShine,
-            opacity: selected ? 0.92 : 0.7,
+            background: "transparent",
+            opacity: 0,
           }}
         />
         <div
@@ -651,15 +642,14 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
             width: "180px",
             height: "180px",
             borderRadius: "999px",
-            background:
-              "radial-gradient(circle, rgba(255,224,180,0.18) 0%, rgba(255,224,180,0.05) 42%, transparent 70%)",
+            background: "transparent",
             pointerEvents: "none",
           }}
         />
-        <h3 className="text-lg font-semibold leading-snug relative z-10" style={{ color: flowTextLight }}>
+        <h3 className="text-lg font-semibold leading-snug relative z-10 text-foreground">
           {system.title}
         </h3>
-        <p className="text-sm leading-relaxed relative z-10" style={{ color: flowTextMuted }}>
+        <p className="text-sm leading-relaxed relative z-10 text-foreground/75">
           {system.shortDescription}
         </p>
         <div className="flex flex-wrap gap-2 relative z-10">
