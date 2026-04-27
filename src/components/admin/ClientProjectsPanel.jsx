@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Loader2, Lock, MessageSquare, ChevronDown, ChevronUp, Send } from "lucide-react";
+import { Loader2, Lock, MessageSquare, ChevronDown, ChevronUp, Send, Search } from "lucide-react";
+
+function HealthDot({ project, unreadCount }) {
+  const isLive = project.step_live === "complete";
+  const hasUnread = unreadCount > 0;
+  if (isLive && !hasUnread) return <span title="Healthy" className="w-2.5 h-2.5 rounded-full bg-green-500 flex-shrink-0" />;
+  if (hasUnread) return <span title="Unread messages" className="w-2.5 h-2.5 rounded-full bg-amber-400 flex-shrink-0" />;
+  return <span title="In setup" className="w-2.5 h-2.5 rounded-full bg-blue-400 flex-shrink-0" />;
+}
 import InstallQueuePanel from "./InstallQueuePanel";
 
 const STEP_KEYS = [
