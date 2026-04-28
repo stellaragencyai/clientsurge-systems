@@ -9,7 +9,6 @@ import IntegrationPartners from "../components/landing/IntegrationPartners";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
 import LeadLeakage from "../components/landing/LeadLeakage";
-import DetailedProcess from "../components/landing/DetailedProcess";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
@@ -115,7 +114,6 @@ export default function Home() {
         </section>
         <ProblemSolution />
         <LeadLeakage />
-        <DetailedProcess />
         <CoreOffer />
         <IntegrationPartners />
         <Pricing />
