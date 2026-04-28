@@ -901,31 +901,69 @@ function LaunchTimeline() {
         We Set It Up For You
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {launchTimelineSteps.map((step) => (
-          <div
+          <button
             key={step.id}
-            className="rounded-2xl px-5 py-5 text-center"
+            type="button"
+            className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             style={{
-              background: "rgba(255,255,255,0.9)",
-              border: "1.5px solid rgba(212,184,142,0.38)",
-              boxShadow: "0 4px 18px rgba(111,67,31,0.07)",
+              background: "linear-gradient(180deg, rgba(252,247,241,0.99) 0%, rgba(246,238,228,0.97) 100%)",
+              border: "1.5px solid rgba(212, 184, 142, 0.42)",
+              boxShadow: "0 16px 34px rgba(111,67,31,0.08), 0 2px 12px rgba(111,67,31,0.05)",
             }}
           >
             <div
-              className="w-9 h-9 rounded-2xl flex items-center justify-center mx-auto mb-3 text-sm font-black"
+              className="px-5 md:px-6 pt-5 pb-4 flex items-center justify-between relative overflow-hidden"
               style={{
-                background: "linear-gradient(135deg,#9a5c2e,#7a4825)",
-                color: "#f5e6d0",
+                background: "linear-gradient(135deg, #7a4825 0%, #b1723b 42%, #8a542b 100%)",
+                borderBottom: "1px solid rgba(0,0,0,0.15)",
               }}
             >
-              {step.number}
+              <div
+                aria-hidden="true"
+                className="absolute inset-x-0 top-0 h-full pointer-events-none"
+                style={{
+                  background: "linear-gradient(180deg, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0) 100%)",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.84), inset 0 -1px 0 rgba(255,255,255,0.22)",
+                }}
+              />
+              <span
+                className="relative z-10 text-[11px] font-black uppercase tracking-[0.2em]"
+                style={{ color: "rgba(255,242,223,0.96)" }}
+              >
+                Step {step.number}
+              </span>
+              <div
+                className="relative w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{
+                  background: "linear-gradient(180deg, rgba(255,242,223,0.96) 0%, rgba(245,217,168,0.88) 100%)",
+                  border: "1px solid rgba(255,227,186,0.72)",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.78), 0 0 0 2px rgba(255,242,223,0.5)",
+                }}
+              >
+                <span className="text-sm font-black" style={{ color: "#7a4825" }}>
+                  {step.number}
+                </span>
+              </div>
             </div>
-            <p className="text-sm font-bold text-foreground mb-2">{step.title}</p>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {step.description}
-            </p>
-          </div>
+
+            <div
+              className="rounded-2xl px-5 py-5 flex flex-col gap-3"
+              style={{
+                background: "rgba(255,255,255,0.9)",
+                border: "1.5px solid rgba(212,184,142,0.38)",
+                boxShadow: "0 4px 18px rgba(111,67,31,0.07)",
+              }}
+            >
+              <h3 className="text-lg font-semibold leading-snug text-foreground">
+                {step.title}
+              </h3>
+              <p className="text-sm leading-relaxed text-foreground/75">
+                {step.description}
+              </p>
+            </div>
+          </button>
         ))}
       </div>
     </div>
