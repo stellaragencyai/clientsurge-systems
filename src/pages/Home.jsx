@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
-import LiveLeadPulse from "../components/landing/LiveLeadPulse";
 import TrustBar from "../components/landing/TrustBar";
 import Industries from "../components/landing/Industries";
 import ProblemSolution from "../components/landing/ProblemSolution.jsx";
@@ -9,7 +8,6 @@ import CoreOffer from "../components/landing/CoreOffer";
 import IntegrationPartners from "../components/landing/IntegrationPartners";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
-import DemoVideoSection from "../components/landing/DemoVideoSection";
 import LeadLeakage from "../components/landing/LeadLeakage";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
@@ -110,7 +108,6 @@ export default function Home() {
       <div className="min-h-screen">
         <Navbar />
         <Hero />
-        <LiveLeadPulse />
         <Industries />
         <section aria-label="Proof and trust">
           <TrustBar />
@@ -120,7 +117,6 @@ export default function Home() {
         <CoreOffer />
         <IntegrationPartners />
         <Pricing />
-        <DemoVideoSection />
         <FAQ />
         <FinalCTA />
         <Footer />
