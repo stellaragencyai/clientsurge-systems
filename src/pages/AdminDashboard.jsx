@@ -28,6 +28,7 @@ import AdminInbox from '../components/admin/AdminInbox';
 import AdminGlobalSearch from '../components/admin/AdminGlobalSearch';
 import InstallQueuePanel from '../components/admin/InstallQueuePanel';
 import WebsiteLeadsDashboard from '../components/admin/WebsiteLeadsDashboard';
+import CommunicationLogsPanel from '../components/admin/CommunicationLogsPanel';
 
 const NAV_GROUPS = [
   {
@@ -66,6 +67,7 @@ const NAV_GROUPS = [
     group: 'System',
     items: [
       { id: 'health', label: 'Integration Health', icon: Activity },
+      { id: 'logs', label: 'Communication Logs', icon: MessageSquare },
       { id: 'templates', label: 'Templates', icon: MessageSquare },
       { id: 'settings', label: 'Settings', icon: Settings },
       { id: 'qa', label: 'QA Tools', icon: RefreshCw },
@@ -158,6 +160,7 @@ export default function AdminDashboard() {
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
       case 'website-leads': return <WebsiteLeadsDashboard />;
+      case 'logs': return <CommunicationLogsPanel />;
       case 'qa': return (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">QA Tools</h2>
