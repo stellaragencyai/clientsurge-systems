@@ -339,11 +339,12 @@ function StoreInner() {
                 style={{
                   maxWidth: "760px",
                   margin: "0 auto 20px",
-                  padding: "16px 18px",
-                  borderRadius: "24px",
-                  background: "rgba(255,255,255,0.85)",
-                  border: "1.5px solid rgba(154,92,46,0.2)",
-                  boxShadow: "0 8px 28px rgba(111,67,31,0.07)",
+                  padding: "12px 16px",
+                  borderRadius: "16px",
+                  background: "rgba(255,255,255,0.5)",
+                  border: "none",
+                  borderBottom: "1px solid rgba(154,92,46,0.12)",
+                  boxShadow: "none",
                 }}
               >
                 <p
@@ -392,11 +393,12 @@ function StoreInner() {
                   key={stat.label}
                   style={{
                     textAlign: "center",
-                    borderRadius: "18px",
-                    padding: "14px 16px",
-                    background: "rgba(255,255,255,0.82)",
-                    border: "1.5px solid rgba(212,184,142,0.42)",
-                    boxShadow: "0 4px 16px rgba(111,67,31,0.06)",
+                    borderRadius: "12px",
+                    padding: "12px 14px",
+                    background: "rgba(255,255,255,0.5)",
+                    border: "none",
+                    borderTop: "1px solid rgba(154,92,46,0.12)",
+                    boxShadow: "none",
                   }}
                 >
                   <p
@@ -473,7 +475,7 @@ function StoreInner() {
             }}
           >
             {selectedIndustry ? (
-              <div
+               <div
                 style={{
                   display: "flex",
                   flexWrap: "wrap",
@@ -481,11 +483,12 @@ function StoreInner() {
                   justifyContent: "space-between",
                   gap: "12px",
                   marginBottom: "18px",
-                  padding: "14px 18px",
-                  borderRadius: "18px",
-                  background: "rgba(255,255,255,0.82)",
-                  border: "1.5px solid rgba(154,92,46,0.18)",
-                  boxShadow: "0 4px 14px rgba(111,67,31,0.05)",
+                  padding: "10px 14px",
+                  borderRadius: "12px",
+                  background: "rgba(255,255,255,0.4)",
+                  border: "none",
+                  borderBottom: "1px solid rgba(154,92,46,0.1)",
+                  boxShadow: "none",
                 }}
               >
                 <div>

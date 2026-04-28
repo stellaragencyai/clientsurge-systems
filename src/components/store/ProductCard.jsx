@@ -19,20 +19,20 @@ export default function ProductCard({ product }) {
     <div
       className="product-card"
       style={{
-        borderRadius: "22px",
+        borderRadius: "16px",
         border: inCart
-          ? "1.5px solid rgba(154,92,46,0.55)"
-          : "1.5px solid rgba(154,92,46,0.18)",
+          ? "1px solid rgba(154,92,46,0.3)"
+          : "1px solid rgba(154,92,46,0.12)",
         background: inCart
-          ? "linear-gradient(180deg, rgba(255,248,235,0.98) 0%, rgba(248,235,215,0.96) 100%)"
-          : "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(252,248,242,0.92) 100%)",
+          ? "linear-gradient(180deg, rgba(255,248,235,0.85) 0%, rgba(248,235,215,0.82) 100%)"
+          : "linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(252,248,242,0.78) 100%)",
         boxShadow: inCart
-          ? "0 10px 34px rgba(111,67,31,0.14), inset 0 1px 0 rgba(255,255,255,0.9)"
-          : "0 6px 28px rgba(111,67,31,0.07), inset 0 1px 0 rgba(255,255,255,0.8)",
-        padding: "22px",
+          ? "0 6px 20px rgba(111,67,31,0.08)"
+          : "0 2px 8px rgba(111,67,31,0.04)",
+        padding: "18px",
         display: "flex",
         flexDirection: "column",
-        gap: "16px",
+        gap: "14px",
         position: "relative",
         transition: "all 0.3s ease",
         overflow: "hidden",
@@ -55,9 +55,9 @@ export default function ProductCard({ product }) {
       <style>{`
         .product-card:hover .card-glow { opacity: 1 !important; }
         .product-card:hover {
-        border-color: rgba(154,92,46,0.42) !important;
-        box-shadow: 0 12px 40px rgba(111,67,31,0.14), 0 0 0 1px rgba(154,92,46,0.1), inset 0 1px 0 rgba(255,255,255,0.9) !important;
-        transform: translateY(-2px);
+        border-color: rgba(154,92,46,0.25) !important;
+        box-shadow: 0 8px 24px rgba(111,67,31,0.1) !important;
+        transform: translateY(-1px);
         }
       `}</style>
 
