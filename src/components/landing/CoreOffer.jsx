@@ -957,31 +957,27 @@ function LaunchTimeline() {
           }}
         />
 
-        <div className="space-y-12 md:space-y-16 ml-20 md:ml-0">
+        <div className="space-y-16 md:space-y-20 ml-20 md:ml-0">
           {launchTimelineSteps.map((step, idx) => {
             const isEven = idx % 2 === 0;
             return (
               <div key={step.id} className="relative">
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-start ${isEven ? "" : "md:[direction:rtl]"}`}>
-                  {/* Step Badge - Outside */}
-                  <div className="md:[direction:ltr] flex md:justify-end">
-                    <div
-                      className="absolute -left-20 md:relative md:flex md:justify-end md:mb-4"
-                      style={{}}
-                    >
-                      <div
-                        className="inline-block px-3 py-1.5 rounded text-[10px] font-bold text-white"
-                        style={{
-                          background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
-                        }}
-                      >
-                        STEP {step.number}
-                      </div>
-                    </div>
+                {/* Step Badge */}
+                <div className="absolute -left-20 md:left-0 md:mb-4">
+                  <div
+                    className="inline-block px-3 py-1.5 rounded text-[10px] font-bold text-white"
+                    style={{
+                      background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+                    }}
+                  >
+                    STEP {step.number}
                   </div>
+                </div>
 
+                {/* Content and Image Row */}
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center mt-6 ${isEven ? "" : "md:grid-cols-2 md:[&>:nth-child(1)]:order-2 md:[&>:nth-child(2)]:order-1"}`}>
                   {/* Content Side */}
-                  <div className="md:[direction:ltr]">
+                  <div>
                     <div
                       className="rounded-2xl p-6 md:p-7"
                       style={{
@@ -1009,7 +1005,7 @@ function LaunchTimeline() {
                   </div>
 
                   {/* Image Side */}
-                  <div className="md:[direction:ltr]">
+                  <div>
                     <div
                       className="rounded-2xl overflow-hidden h-64 md:h-72 bg-slate-300"
                       style={{
