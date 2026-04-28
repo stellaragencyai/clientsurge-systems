@@ -597,23 +597,43 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
       </div>
 
       <div
-        className="rounded-2xl px-5 py-5 text-center"
+        className="rounded-2xl px-5 py-5 flex flex-col gap-3"
         style={{
           background: "rgba(255,255,255,0.9)",
           border: "1.5px solid rgba(212,184,142,0.38)",
           boxShadow: "0 4px 18px rgba(111,67,31,0.07)",
         }}
       >
-        <div
-          className="w-9 h-9 rounded-2xl flex items-center justify-center mx-auto mb-3 text-sm font-black"
-          style={{
-            background: "linear-gradient(135deg,#9a5c2e,#7a4825)",
-            color: "#f5e6d0",
-          }}
-        >
-          <Icon className="w-4 h-4" />
+        <h3 className="text-lg font-semibold leading-snug text-foreground">
+          {system.title}
+        </h3>
+        <p className="text-sm leading-relaxed text-foreground/75">
+          {system.shortDescription}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <span
+            className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.08em] w-fit"
+            style={{
+              background: "rgba(154,92,46,0.08)",
+              color: "#9a5c2e",
+              border: "1px solid rgba(154,92,46,0.18)",
+            }}
+          >
+            {system.badge}
+          </span>
+          {emphasizedLabel ? (
+            <span
+              className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.08em] w-fit"
+              style={{
+                background: "rgba(154,92,46,0.08)",
+                color: "#9a5c2e",
+                border: "1px solid rgba(154,92,46,0.18)",
+              }}
+            >
+              {emphasizedLabel}
+            </span>
+          ) : null}
         </div>
-        <p className="text-sm font-bold text-foreground">{system.title}</p>
       </div>
     </button>
   );
