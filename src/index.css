@@ -112,6 +112,37 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
+/* CTA Button Focus States */
+button[type="button"],
+button[type="submit"],
+a[role="button"],
+.shiny-brown-btn,
+[class*="cta"],
+[class*="btn"] {
+  position: relative;
+}
+
+button[type="button"]:focus,
+button[type="submit"]:focus,
+a[role="button"]:focus,
+.shiny-brown-btn:focus,
+[class*="cta"]:focus,
+[class*="btn"]:focus {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+button[type="button"]:focus-visible,
+button[type="submit"]:focus-visible,
+a[role="button"]:focus-visible,
+.shiny-brown-btn:focus-visible,
+[class*="cta"]:focus-visible,
+[class*="btn"]:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px hsla(var(--primary), 0.15);
+}
+
 /* ============================================
    MOBILE / CROSS-BROWSER GLOBAL FIXES
    ============================================ */

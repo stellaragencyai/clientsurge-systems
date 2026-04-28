@@ -91,6 +91,10 @@ export default function Navbar() {
     setDarkMode(isDark);
     safeApplyTheme(isDark);
     safeSetThemePreference(isDark ? "dark" : "light");
+    // Also update document attribute for CSS targeting
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    }
   };
 
   const smoothScrollToHash = (href) => {
@@ -122,8 +126,15 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    // Check stored preference first, then system preference
     const storedTheme = safeGetThemePreference();
-    const shouldUseDark = storedTheme === "dark";
+    let shouldUseDark = storedTheme === "dark";
+    
+    if (!storedTheme && typeof window !== "undefined") {
+      // Fallback to system preference if no stored preference
+      shouldUseDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    
     setDarkMode(shouldUseDark);
     safeApplyTheme(shouldUseDark);
   }, []);
@@ -160,6 +171,7 @@ export default function Navbar() {
       return;
     }
 
+    // Always scroll to top smoothly
     const start = window.scrollY;
     const distance = -start;
     const duration = 900;
