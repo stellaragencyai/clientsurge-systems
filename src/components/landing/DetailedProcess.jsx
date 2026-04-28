@@ -69,7 +69,7 @@ const steps = [
   },
 ];
 
-function StepCard({ step, index }) {
+function StepCard({ step, index, isLast }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
   const Icon = step.icon;
@@ -86,61 +86,54 @@ function StepCard({ step, index }) {
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-      style={{ transitionDelay: `${index * 80}ms`, height: "420px" }}
+      className={`transition-all duration-700 relative ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+      style={{ transitionDelay: `${index * 80}ms` }}
     >
-      <div
-        className="group relative flex flex-col md:flex-row rounded-2xl overflow-hidden border border-border bg-white transition-all duration-300 h-full"
-        style={{
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)",
-        }}
-        onMouseEnter={e => {
-          e.currentTarget.style.borderColor = "#000000";
-          e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)";
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.borderColor = "hsl(var(--border))";
-          e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)";
-        }}
-      >
-        {/* Left — content */}
-        <div className="flex-1 p-8 md:p-10">
-          {/* Step badge */}
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-xs font-bold text-black/80 uppercase tracking-widest">{step.step}</span>
-            <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
-              {step.timeframe}
-            </span>
+      {/* Vertical timeline line */}
+      {!isLast && (
+        <div className="absolute left-6 top-20 w-0.5 h-32 bg-gradient-to-b from-primary/60 to-primary/20" style={{ background: "linear-gradient(180deg, rgba(161,120,35,0.6) 0%, rgba(161,120,35,0.2) 100%)" }} />
+      )}
+
+      <div className="relative flex gap-8 md:gap-0 md:grid md:grid-cols-[80px_1fr_400px]">
+        {/* Left — Step Badge & Timeline Dot */}
+        <div className="flex flex-col items-center flex-shrink-0">
+          <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6 font-bold text-white text-sm uppercase tracking-wider" style={{ background: "linear-gradient(135deg, rgba(161,120,35,1) 0%, rgba(139,91,52,1) 100%)" }}>
+            {index + 1}
+          </div>
+          {!isLast && <div className="w-0.5 flex-1 min-h-24" style={{ background: "linear-gradient(180deg, rgba(161,120,35,0.4) 0%, rgba(161,120,35,0.1) 100%)" }} />}
+        </div>
+
+        {/* Middle — Content */}
+        <div className="flex-1 p-8 rounded-2xl border-2 bg-white" style={{ borderColor: "rgba(209,182,155,0.4)", boxShadow: "0 8px 24px rgba(107,63,31,0.08)" }}>
+          {/* Title & Timeframe */}
+          <div className="mb-4">
+            <h3 className="font-display text-2xl font-semibold text-black mb-2">{step.title}</h3>
+            <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "rgba(161,120,35,1)" }}>{step.timeframe}</p>
           </div>
 
-          {/* Icon + Title */}
-          <div className="flex items-center gap-4 mb-5">
-            <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-5 h-5 text-primary" />
-            </div>
-            <h3 className="font-display text-2xl font-semibold text-black">{step.title}</h3>
-          </div>
-
-          <p className="text-sm text-black/70 leading-relaxed mb-6 font-medium">
+          <p className="text-sm text-slate-600 leading-relaxed mb-6">
             {step.desc}
           </p>
 
+          {/* Checkmark Bullets */}
           <ul className="space-y-3">
             {step.bullets.map((b, i) => (
-              <li key={i} className="flex items-start gap-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary/60 mt-1.5 flex-shrink-0" />
-                <span className="text-sm text-black/60 font-medium">{b}</span>
+              <li key={i} className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "rgba(161,120,35,0.15)", border: "1.5px solid rgba(161,120,35,0.4)" }}>
+                  <CheckCircle2 className="w-3.5 h-3.5" style={{ color: "rgba(161,120,35,1)" }} />
+                </div>
+                <span className="text-sm text-slate-700 font-medium">{b}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Right — image */}
-        <div className="md:w-80 lg:w-96 h-60 md:h-auto overflow-hidden flex-shrink-0">
+        {/* Right — Image */}
+        <div className="hidden md:block h-80 rounded-2xl overflow-hidden flex-shrink-0 border-2" style={{ borderColor: "rgba(209,182,155,0.4)", boxShadow: "0 8px 24px rgba(107,63,31,0.08)" }}>
           <img
             src={step.image}
             alt={step.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
           />
         </div>
       </div>
@@ -188,9 +181,9 @@ export default function DetailedProcess() {
           Our Detailed Process
         </h3>
 
-        <div className="grid grid-cols-1 gap-8">
+        <div className="space-y-0">
           {steps.map((step, i) => (
-            <StepCard key={i} step={step} index={i} />
+            <StepCard key={i} step={step} index={i} isLast={i === steps.length - 1} />
           ))}
         </div>
       </div>
