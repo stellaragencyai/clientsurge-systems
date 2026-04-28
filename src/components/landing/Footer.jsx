@@ -150,47 +150,46 @@ export default function Footer() {
 
       {/* Expanded Menu (Always Visible) */}
       <div className="border-t border-primary/10 bg-background/98 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 grid grid-cols-5 gap-6 text-xs">
-            {navColumns.map((col) => (
-              <div key={col.title} className="flex flex-col gap-2">
-                <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">{col.title}</h4>
-                <div className="flex flex-col gap-1.5">
-                  {col.links.map((link) => (
-                    <a
-                      key={link.label}
-                      href={link.href}
-                      onClick={(e) => { handleNavClick(e, link.href); setExpanded(false); }}
-                      className="text-foreground/60 hover:text-foreground transition-colors text-[11px]"
-                    >
-                      {link.label}
-                    </a>
-                  ))}
-                </div>
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 grid grid-cols-5 gap-6 text-xs">
+          {navColumns.map((col) => (
+            <div key={col.title} className="flex flex-col gap-2">
+              <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">{col.title}</h4>
+              <div className="flex flex-col gap-1.5">
+                {col.links.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className="text-foreground/60 hover:text-foreground transition-colors text-[11px]"
+                  >
+                    {link.label}
+                  </a>
+                ))}
               </div>
-            ))}
-            
-            {/* Contact Column */}
-            <div className="flex flex-col gap-2">
-              <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">Contact</h4>
-              <a href="tel:+16025874608" className="text-foreground/60 hover:text-foreground text-[11px] flex items-center gap-1.5">
-                <Phone className="w-3 h-3 text-primary" />
-                (602) 587-4608
-              </a>
-              <a href="mailto:system@clientsurgesystems.com" className="text-foreground/60 hover:text-foreground text-[11px] flex items-center gap-1.5">
-                <Mail className="w-3 h-3 text-primary" />
-                system@clientsurgesystems.com
-              </a>
             </div>
-          </div>
+          ))}
           
-          {/* Bottom Meta */}
-          <div className="border-t border-primary/10 px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-center gap-1.5 text-[9px] text-foreground/40">
-            <span>&copy; {new Date().getFullYear()} ClientSurge Systems</span>
-            <span className="text-foreground/20">·</span>
-            <a href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</a>
-            <span className="text-foreground/20">·</span>
-            <a href="/legal/terms" className="hover:text-foreground transition-colors">Terms</a>
+          {/* Contact Column */}
+          <div className="flex flex-col gap-2">
+            <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">Contact</h4>
+            <a href="tel:+16025874608" className="text-foreground/60 hover:text-foreground text-[11px] flex items-center gap-1.5">
+              <Phone className="w-3 h-3 text-primary" />
+              (602) 587-4608
+            </a>
+            <a href="mailto:system@clientsurgesystems.com" className="text-foreground/60 hover:text-foreground text-[11px] flex items-center gap-1.5">
+              <Mail className="w-3 h-3 text-primary" />
+              system@clientsurgesystems.com
+            </a>
           </div>
+        </div>
+        
+        {/* Bottom Meta */}
+        <div className="border-t border-primary/10 px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-center gap-1.5 text-[9px] text-foreground/40">
+          <span>&copy; {new Date().getFullYear()} ClientSurge Systems</span>
+          <span className="text-foreground/20">·</span>
+          <a href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</a>
+          <span className="text-foreground/20">·</span>
+          <a href="/legal/terms" className="hover:text-foreground transition-colors">Terms</a>
         </div>
       </div>
     </footer>
