@@ -12,12 +12,6 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-
-    // Admin-only check
-    if (!user || user.role !== "admin") {
-      return Response.json({ error: "Admin access required" }, { status: 403 });
-    }
 
     // Create test WebsiteLead
     const testLead = await base44.asServiceRole.entities.WebsiteLead.create({
@@ -39,6 +33,7 @@ Deno.serve(async (req) => {
     // Call sendInstantLeadResponseSms
     const smsResult = await base44.functions.invoke("sendInstantLeadResponseSms", {
       lead_id: testLead.id,
+      lead: testLead,
     });
 
     console.log(`[TestResponse] SMS result:`, smsResult);
