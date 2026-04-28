@@ -599,9 +599,9 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
       <div
         className="rounded-2xl px-5 py-5 flex flex-col gap-3"
         style={{
-          background: "rgba(255,255,255,0.9)",
-          border: "1.5px solid rgba(212,184,142,0.38)",
-          boxShadow: "0 4px 18px rgba(111,67,31,0.07)",
+          background: "rgba(255,255,255,0.82)",
+          border: "1px solid rgba(148, 163, 184, 0.18)",
+          boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
         }}
       >
         <h3 className="text-lg font-semibold leading-snug text-foreground">
@@ -735,9 +735,9 @@ function DetailBlock({ label, value }) {
     <div
       className="rounded-2xl overflow-hidden"
       style={{
-        background: "rgba(255,255,255,0.9)",
-        border: "1.5px solid rgba(212,184,142,0.38)",
-        boxShadow: "0 4px 18px rgba(111,67,31,0.07)",
+        background: "rgba(255,255,255,0.82)",
+        border: "1px solid rgba(148, 163, 184, 0.18)",
+        boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
       }}
     >
       <div
@@ -908,9 +908,9 @@ function LaunchTimeline() {
             type="button"
             className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             style={{
-              background: "linear-gradient(180deg, rgba(252,247,241,0.99) 0%, rgba(246,238,228,0.97) 100%)",
-              border: "1.5px solid rgba(212, 184, 142, 0.42)",
-              boxShadow: "0 16px 34px rgba(111,67,31,0.08), 0 2px 12px rgba(111,67,31,0.05)",
+              background: "rgba(255,255,255,0.82)",
+              border: "1px solid rgba(148, 163, 184, 0.18)",
+              boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
             }}
           >
             <div
@@ -949,13 +949,13 @@ function LaunchTimeline() {
             </div>
 
             <div
-              className="rounded-2xl px-5 py-5 flex flex-col gap-3"
-              style={{
-                background: "rgba(255,255,255,0.9)",
-                border: "1.5px solid rgba(212,184,142,0.38)",
-                boxShadow: "0 4px 18px rgba(111,67,31,0.07)",
-              }}
-            >
+               className="rounded-2xl px-5 py-5 flex flex-col gap-3"
+               style={{
+                 background: "rgba(255,255,255,0.82)",
+                 border: "1px solid rgba(148, 163, 184, 0.18)",
+                 boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
+               }}
+             >
               <h3 className="text-lg font-semibold leading-snug text-foreground">
                 {step.title}
               </h3>

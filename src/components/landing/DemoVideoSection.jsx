@@ -5,9 +5,9 @@ import DemoBookingModal from "@/components/forms/DemoBookingModal";
 
 const premiumRing = "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)";
 const premiumRingShadow = "0 4px 24px rgba(120,70,20,0.22), 0 2px 8px rgba(120,70,20,0.12)";
-const cardSurface = "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,248,244,0.96) 100%)";
-const cardBorder = "1.5px solid rgba(212,184,142,0.38)";
-const cardShadow = "0 8px 28px rgba(111,67,31,0.07), 0 2px 8px rgba(111,67,31,0.04)";
+const cardSurface = "rgba(255,255,255,0.82)";
+const cardBorder = "1px solid rgba(148, 163, 184, 0.18)";
+const cardShadow = "0 8px 22px rgba(15, 23, 42, 0.05)";
 const topText = "rgba(184, 129, 72, 0.92)";
 const iconColor = "#9a5c2e";
 
