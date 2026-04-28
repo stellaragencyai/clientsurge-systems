@@ -89,16 +89,19 @@ Deno.serve(async (req) => {
     // Invite the user
     let invite_sent = false;
     let invite_status = 'not_sent';
+    let activation_link = '';
     try {
-      await base44.users.inviteUser(email, 'user');
+      const inviteResult = await base44.users.inviteUser(email, 'user');
       invite_sent = true;
       invite_status = 'invite_sent';
+      activation_link = inviteResult?.activation_link || '';
+      console.log(`[QA Customer] Invite sent to ${email}, activation link: ${activation_link}`);
     } catch (inviteErr) {
       invite_status = inviteErr?.message?.includes('already') ? 'already_exists' : 'failed';
-      console.warn('Invite warning:', inviteErr?.message);
+      console.warn(`[QA Customer] Invite warning for ${email}:`, inviteErr?.message);
     }
 
-    const origin = req.headers.get('origin') || 'https://apexflow.base44.app';
+    const origin = req.headers.get('origin') || 'https://clientsurgesystems.com';
     const portal_url = `${origin.replace(/\/$/, '')}/client-portal`;
 
     return Response.json({
@@ -110,11 +113,14 @@ Deno.serve(async (req) => {
       portal_url,
       invite_sent,
       invite_status,
+      activation_link,
       login_steps: [
-        `Check ${email} for a Base44 invite email and activate your account.`,
-        `Navigate to: ${portal_url}`,
-        'Log in with your email and the password you set during activation.',
-        'Explore the full client portal experience as this QA customer.',
+        `1. Check ${email} for a Base44 invite email (subject: "You're invited to join ClientSurge Systems")`,
+        `2. Click the activation link in the email to set your password`,
+        `3. After activation, log in to: ${portal_url}`,
+        `4. You'll have full access to your QA customer portal.`,
+        '',
+        `Direct activation link: ${activation_link}`,
       ],
     });
 
