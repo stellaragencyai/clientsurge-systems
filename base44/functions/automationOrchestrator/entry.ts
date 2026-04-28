@@ -142,8 +142,38 @@ Deno.serve(async (req) => {
         : { error: predictResult.error };
     }
 
-    // STEP 7: Churn analysis (if customer has booked before)
-    console.log("[Orchestrator] Step 7/7: Analyzing churn risk...");
+    // STEP 7: Detect objection patterns (if they've replied)
+    console.log("[Orchestrator] Step 7/10: Detecting objection patterns...");
+    const objectionResult = await base44.asServiceRole.functions.invoke(
+      "detectObjectionPatterns",
+      { lead_id, message_text: lead.problem || "" }
+    );
+    results.steps.objections = objectionResult.success
+      ? objectionResult.data
+      : { error: objectionResult.error };
+
+    // STEP 8: Predict churn window (if customer engaged)
+    console.log("[Orchestrator] Step 8/10: Predicting churn window...");
+    const churnWindowResult = await base44.asServiceRole.functions.invoke(
+      "predictChurnWindow",
+      { lead_id }
+    );
+    results.steps.churn_window = churnWindowResult.success
+      ? churnWindowResult.data
+      : { error: churnWindowResult.error };
+
+    // STEP 9: Optimize follow-up sequence
+    console.log("[Orchestrator] Step 9/10: Optimizing follow-up sequence...");
+    const sequenceResult = await base44.asServiceRole.functions.invoke(
+      "optimizeFollowupSequence",
+      { lead_id, current_step: 1 }
+    );
+    results.steps.sequence_optimization = sequenceResult.success
+      ? sequenceResult.data
+      : { error: sequenceResult.error };
+
+    // STEP 10: Legacy churn risk analysis
+    console.log("[Orchestrator] Step 10/10: Analyzing churn risk...");
     const churnResult = await base44.asServiceRole.functions.invoke(
       "predictChurnRisk",
       { lead_id, project_id }
