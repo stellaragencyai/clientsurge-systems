@@ -975,7 +975,7 @@ function LaunchTimeline() {
             }}
           >
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center mx-auto mb-3 text-sm font-black"
+              className="w-9 h-9 rounded-2xl flex items-center justify-center mx-auto mb-3 text-sm font-black"
               style={{
                 background: "linear-gradient(135deg,#9a5c2e,#7a4825)",
                 color: "#f5e6d0",
@@ -1124,7 +1124,7 @@ export default function CoreOffer() {
   return (
     <section
       id="services"
-      className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-blue-50/30 via-slate-50 to-background relative overflow-hidden"
+      className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card via-background to-background relative overflow-hidden"
     >
       <div
         aria-hidden="true"

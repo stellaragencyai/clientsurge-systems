@@ -150,7 +150,7 @@ export default function Footer() {
                   key={social.label}
                   href={social.href}
                   aria-label={social.label}
-                  className="w-9 h-9 rounded-full border border-primary/20 flex items-center justify-center text-foreground/50 hover:text-primary hover:border-primary/50 transition-all group"
+                  className="w-9 h-9 rounded-xl border border-primary/20 flex items-center justify-center text-foreground/50 hover:text-primary hover:border-primary/50 transition-all group"
                 >
                   <Icon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
                 </a>

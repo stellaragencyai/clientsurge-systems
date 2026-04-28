@@ -91,7 +91,7 @@ export default function FAQ() {
   });
 
   return (
-    <section id="faq" className="px-6 py-24 md:py-32 relative overflow-hidden bg-white">
+    <section id="faq" className="px-6 py-24 md:py-32 relative overflow-hidden bg-gradient-to-b from-card to-background">
 
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="text-center mb-14">

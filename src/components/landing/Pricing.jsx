@@ -122,6 +122,7 @@ export default function Pricing() {
           </p>
           <div
             className="mt-6 inline-block rounded-2xl px-5 py-3 text-sm text-foreground/75 leading-relaxed max-w-xl mx-auto"
+            style={{ borderRadius: "16px" }}
             style={{
               background: "rgba(154,92,46,0.05)",
               border: "1px solid rgba(154,92,46,0.12)",

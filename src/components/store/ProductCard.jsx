@@ -16,16 +16,14 @@ export default function ProductCard({ product }) {
       style={{
         borderRadius: "22px",
         border: inCart
-          ? "1.5px solid rgba(240,200,120,0.46)"
-          : "1.5px solid rgba(200,150,92,0.18)",
+          ? "1.5px solid rgba(154,92,46,0.55)"
+          : "1.5px solid rgba(154,92,46,0.18)",
         background: inCart
-          ? "linear-gradient(180deg, rgba(58,32,15,0.92) 0%, rgba(46,25,11,0.9) 100%)"
-          : "linear-gradient(180deg, rgba(34,20,10,0.82) 0%, rgba(23,13,6,0.88) 100%)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+          ? "linear-gradient(180deg, rgba(255,248,235,0.98) 0%, rgba(248,235,215,0.96) 100%)"
+          : "linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(252,248,242,0.92) 100%)",
         boxShadow: inCart
-          ? "0 10px 34px rgba(12,7,3,0.28), inset 0 1px 0 rgba(255,255,255,0.08)"
-          : "0 6px 28px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.05)",
+          ? "0 10px 34px rgba(111,67,31,0.14), inset 0 1px 0 rgba(255,255,255,0.9)"
+          : "0 6px 28px rgba(111,67,31,0.07), inset 0 1px 0 rgba(255,255,255,0.8)",
         padding: "22px",
         display: "flex",
         flexDirection: "column",
@@ -52,9 +50,9 @@ export default function ProductCard({ product }) {
       <style>{`
         .product-card:hover .card-glow { opacity: 1 !important; }
         .product-card:hover {
-          border-color: rgba(240,200,120,0.34) !important;
-          box-shadow: 0 12px 40px rgba(12,7,3,0.24), 0 0 0 1px rgba(240,200,120,0.08), inset 0 1px 0 rgba(255,255,255,0.08) !important;
-          transform: translateY(-2px);
+        border-color: rgba(154,92,46,0.42) !important;
+        box-shadow: 0 12px 40px rgba(111,67,31,0.14), 0 0 0 1px rgba(154,92,46,0.1), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+        transform: translateY(-2px);
         }
       `}</style>
 
@@ -98,9 +96,9 @@ export default function ProductCard({ product }) {
             alignItems: "center",
             justifyContent: "center",
             fontSize: "26px",
-            background: "rgba(255,255,255,0.08)",
-            border: "1px solid rgba(200,150,92,0.18)",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
+            background: "rgba(154,92,46,0.08)",
+            border: "1px solid rgba(154,92,46,0.18)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6)",
           }}
         >
           {product.icon}
@@ -108,14 +106,14 @@ export default function ProductCard({ product }) {
         <span
           style={{
             fontSize: "10px",
-            fontWeight: "700",
-            textTransform: "uppercase",
-            letterSpacing: "0.12em",
-            color: "#f0c878",
-            background: "rgba(200,150,92,0.16)",
-            padding: "4px 10px",
-            borderRadius: "999px",
-            border: "1px solid rgba(200,150,92,0.28)",
+                      fontWeight: "700",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.12em",
+                      color: "#7a4825",
+                      background: "rgba(154,92,46,0.1)",
+                      padding: "4px 10px",
+                      borderRadius: "999px",
+                      border: "1px solid rgba(154,92,46,0.22)",
           }}
         >
           {product.category}
@@ -127,7 +125,7 @@ export default function ProductCard({ product }) {
           style={{
             fontSize: "18px",
             fontWeight: "700",
-            color: "#fff8ee",
+            color: "#1b140d",
             margin: "0 0 4px",
             lineHeight: 1.2,
           }}
@@ -137,7 +135,7 @@ export default function ProductCard({ product }) {
         <p
           style={{
             fontSize: "11px",
-            color: "rgba(240,200,120,0.92)",
+            color: "#9a5c2e",
             fontWeight: "700",
             margin: 0,
             textTransform: "uppercase",
@@ -151,7 +149,7 @@ export default function ProductCard({ product }) {
       <p
         style={{
           fontSize: "13px",
-          color: "rgba(255,228,190,0.84)",
+          color: "rgba(27,20,13,0.70)",
           lineHeight: 1.65,
           margin: 0,
           position: "relative",
@@ -186,7 +184,7 @@ export default function ProductCard({ product }) {
             <span
               style={{
                 fontSize: "12px",
-                color: "rgba(255,234,201,0.82)",
+                color: "rgba(27,20,13,0.72)",
                 fontWeight: "500",
               }}
             >
@@ -201,7 +199,7 @@ export default function ProductCard({ product }) {
           display: "flex",
           gap: "10px",
           paddingTop: "10px",
-          borderTop: "1px solid rgba(200,150,92,0.16)",
+          borderTop: "1px solid rgba(154,92,46,0.14)",
           position: "relative",
           zIndex: 1,
         }}
@@ -209,17 +207,17 @@ export default function ProductCard({ product }) {
         <div
           style={{
             flex: 1,
-            background: "rgba(255,255,255,0.06)",
+            background: "rgba(154,92,46,0.06)",
             borderRadius: "12px",
             padding: "10px 10px",
             textAlign: "center",
-            border: "1px solid rgba(200,150,92,0.16)",
+            border: "1px solid rgba(154,92,46,0.14)",
           }}
         >
           <p
             style={{
               fontSize: "9px",
-              color: "rgba(240,200,120,0.66)",
+              color: "rgba(154,92,46,0.7)",
               fontWeight: "700",
               textTransform: "uppercase",
               letterSpacing: "0.08em",
@@ -232,7 +230,7 @@ export default function ProductCard({ product }) {
             style={{
               fontSize: "18px",
               fontWeight: "800",
-              color: "#fff8ee",
+              color: "#1b140d",
               margin: 0,
             }}
           >
@@ -241,7 +239,7 @@ export default function ProductCard({ product }) {
           <p
             style={{
               fontSize: "9px",
-              color: "rgba(255,220,170,0.52)",
+              color: "rgba(27,20,13,0.45)",
               margin: 0,
             }}
           >
@@ -251,17 +249,17 @@ export default function ProductCard({ product }) {
         <div
           style={{
             flex: 1,
-            background: "rgba(255,255,255,0.06)",
+            background: "rgba(154,92,46,0.06)",
             borderRadius: "12px",
             padding: "10px 10px",
             textAlign: "center",
-            border: "1px solid rgba(200,150,92,0.16)",
+            border: "1px solid rgba(154,92,46,0.14)",
           }}
         >
           <p
             style={{
               fontSize: "9px",
-              color: "rgba(240,200,120,0.66)",
+              color: "rgba(154,92,46,0.7)",
               fontWeight: "700",
               textTransform: "uppercase",
               letterSpacing: "0.08em",
@@ -274,7 +272,7 @@ export default function ProductCard({ product }) {
             style={{
               fontSize: "18px",
               fontWeight: "800",
-              color: "#f0c878",
+              color: "#9a5c2e",
               margin: 0,
             }}
           >
@@ -283,7 +281,7 @@ export default function ProductCard({ product }) {
           <p
             style={{
               fontSize: "9px",
-              color: "rgba(255,220,170,0.52)",
+              color: "rgba(27,20,13,0.45)",
               margin: 0,
             }}
           >

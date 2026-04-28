@@ -184,7 +184,7 @@ export default function IntegrationPartners() {
         </div>
 
         {/* Bottom CTA pill */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-10 pt-10 border-t border-border/30">
           <div
             className="inline-flex items-center gap-3 px-6 py-3 rounded-full border"
             style={{

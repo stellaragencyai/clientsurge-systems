@@ -89,7 +89,7 @@ export default function LeadLeakage() {
             ].map(({ label, lost }) => (
               <div
                 key={label}
-                className="flex items-center gap-3 rounded-xl px-4 py-3"
+                className="flex items-center gap-3 rounded-2xl px-4 py-3"
                 style={{
                   background: lost ? "rgba(220,38,38,0.05)" : "rgba(34,197,94,0.07)",
                   border: lost ? "1px solid rgba(220,38,38,0.12)" : "1px solid rgba(34,197,94,0.15)",

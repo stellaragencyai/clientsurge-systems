@@ -97,7 +97,7 @@ export default function ProblemSolution() {
             {problems.map((item, i) => (
               <CardWithFadeIn key={item.problem} delay={i * 80}>
                 <div className="grid md:grid-cols-2 gap-0 rounded-2xl overflow-hidden border border-border shadow-sm">
-                  <div className="flex items-center gap-4 px-6 py-5 bg-white border-b md:border-b-0 md:border-r border-border">
+                  <div className="flex items-center gap-4 px-6 py-5 border-b md:border-b-0 md:border-r border-border" style={{ background: "rgba(255,255,255,0.82)" }}>
                     <div className="w-9 h-9 rounded-xl bg-destructive/15 flex items-center justify-center flex-shrink-0">
                       <X className="w-4 h-4 text-destructive" />
                     </div>

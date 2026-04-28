@@ -82,29 +82,30 @@ function StatCard({ item, index, inView }) {
 
   return (
     <article
-      className="relative rounded-2xl border border-border px-5 py-5 text-left shadow-sm transition-all duration-300"
+      className="relative rounded-2xl border border-border text-left shadow-sm"
       style={{
         background: "rgba(255,255,255,0.82)",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
+        minHeight: "190px",
+        padding: "18px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(16px)",
         transition: `opacity 0.5s ease ${index * 0.08}s, transform 0.5s ease ${index * 0.08}s`,
       }}
     >
-      <div className="flex items-start gap-4">
-        <div className="w-11 h-11 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm">
-          <Icon className="w-[18px] h-[18px] text-primary" />
-        </div>
-        <div className="flex-1">
-          <p className="font-display text-xl font-semibold text-foreground leading-tight">
-            {statText}
-          </p>
-          <p className="text-[10px] uppercase tracking-[0.18em] text-primary/80 mt-1.5 mb-2.5">
-            {item.label}
-          </p>
-          <p className="text-sm text-foreground/68 leading-relaxed">{item.story}</p>
-        </div>
+      <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3">
+        <Icon className="w-[17px] h-[17px] text-primary" />
+      </div>
+      <div>
+        <p className="font-display text-xl font-semibold text-foreground leading-tight">
+          {statText}
+        </p>
+        <p className="text-[10px] uppercase tracking-[0.18em] text-primary/80 mt-1 mb-2">
+          {item.label}
+        </p>
+        <p className="text-xs text-foreground/60 leading-relaxed">{item.story}</p>
       </div>
     </article>
   );
