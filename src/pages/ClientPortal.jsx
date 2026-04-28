@@ -16,10 +16,14 @@ import BillingDashboard from "../components/portal/BillingDashboard";
 import PortalSettings from "../components/portal/PortalSettings";
 import TasksDashboard from "../components/portal/TasksDashboard";
 import WeeklyReports from "../components/portal/WeeklyReports";
+import AutomationsOverview from "../components/portal/AutomationsOverview";
+import RevenueMetricsPanel from "../components/portal/RevenueMetricsPanel";
+import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
   { id: "quickstart", label: "⚡ Quick Start" },
+  { id: "performance", label: "🎯 Performance" },
   { id: "metrics", label: "Lead Flow" },
   { id: "tasks", label: "Tasks" },
   { id: "leads", label: "My Leads" },
@@ -256,6 +260,23 @@ export default function ClientPortal() {
             project={project}
             onComplete={() => { refreshProject(); setActiveTab("metrics"); }}
           />
+        )}
+        {activeTab === "performance" && (
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Revenue & Automations</h2>
+              <p className="text-muted-foreground">Track your system performance, active automations, and revenue impact.</p>
+            </div>
+            <RevenueMetricsPanel />
+            <div className="border-t border-border pt-8">
+              <h3 className="text-xl font-bold text-foreground mb-4">Active Automations</h3>
+              <AutomationsOverview />
+            </div>
+            <div className="border-t border-border pt-8">
+              <h3 className="text-xl font-bold text-foreground mb-4">System Activity</h3>
+              <AutomatedResponsesLog />
+            </div>
+          </div>
         )}
         {activeTab === "metrics" && (
           <LeadFlowDashboard />
