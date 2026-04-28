@@ -266,19 +266,19 @@ export default function Navbar() {
               <div className="absolute top-full left-1/2 mt-3 w-60 -translate-x-1/2 rounded-2xl border border-border bg-background/95 backdrop-blur shadow-lg p-3">
                 <div className="space-y-1">
                   {industryLinks.map((item) => (
-                    <a
+                    <button
                       key={item.label}
-                      href={item.href}
                       onClick={() => {
                         trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
+                        navigate(item.href);
                         setIndustriesOpen(false);
                       }}
-                      className={`block rounded-xl px-3 py-2 text-sm transition-colors ${
+                      className={`w-full text-left block rounded-xl px-3 py-2 text-sm transition-colors border-none bg-transparent cursor-pointer ${
                         item.live ? "font-medium text-foreground hover:bg-muted" : "text-muted-foreground hover:bg-muted"
                       }`}
                     >
                       {item.label}
-                    </a>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -366,17 +366,17 @@ export default function Navbar() {
             <p className="text-[11px] font-semibold uppercase tracking-widest text-primary mb-2">Industries</p>
             <div className="space-y-1">
               {industryLinks.map((item) => (
-                <a
+                <button
                   key={item.label}
-                  href={item.href}
-                  className="block rounded px-2 py-1 text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none"
                   onClick={() => {
                     trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
+                    navigate(item.href);
                     setOpen(false);
                   }}
+                  className="w-full text-left block rounded px-2 py-1 text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer"
                 >
                   {item.label}
-                </a>
+                </button>
               ))}
             </div>
           </div>
