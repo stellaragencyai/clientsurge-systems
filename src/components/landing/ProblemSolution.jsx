@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { X, CheckCircle2 } from "lucide-react";
+import ProblemMatcher from "./ProblemMatcher";
+import ProblemVideoButton from "./ProblemVideoButton";
+import AnimatedStats from "./AnimatedStats";
 
 const problems = [
   {
@@ -78,6 +81,12 @@ function CardWithFadeIn({ children, delay = 0 }) {
 }
 
 export default function ProblemSolution() {
+  const animatedStats = [
+    { value: 62, suffix: "%", label: "of callers won't leave a voicemail" },
+    { value: 21, suffix: "x", label: "drop in qualification odds after 5 min" },
+    { value: 80, suffix: "%", label: "of sales need 5+ follow-up touchpoints" },
+  ];
+
   return (
     <section id="problem-solution" className="nebula-problem py-16 md:py-32 px-4 md:px-6" style={{ overflowX: "hidden" }}>
       <div className="max-w-5xl mx-auto">
@@ -91,6 +100,12 @@ export default function ProblemSolution() {
           <p className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
             Most local businesses don't lose money because nobody is interested. They lose money because calls get missed, form leads sit too long, follow-up happens manually, and interested people never get pushed into a booking flow.
           </p>
+        </div>
+
+        <AnimatedStats stats={animatedStats} />
+
+        <div className="mb-16 rounded-2xl border border-border bg-card/50 p-8 backdrop-blur-sm">
+          <ProblemMatcher />
         </div>
 
         <div className="relative">

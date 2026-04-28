@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import { getSelectedIndustryRecommendation, INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
+import CustomerProofCards from "./CustomerProofCards";
+import MoneyBackGuarantee from "./MoneyBackGuarantee";
 
 function SimpleCheck() {
   return (
@@ -147,6 +149,8 @@ export default function Pricing() {
           </div>
         ) : null}
 
+        <MoneyBackGuarantee />
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {plans.map((plan, i) => (
             <PricingCard
@@ -157,6 +161,8 @@ export default function Pricing() {
             />
           ))}
         </div>
+
+        <CustomerProofCards />
 
         <div className="max-w-2xl mb-6 mt-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What&apos;s Included In Setup</p>
