@@ -861,15 +861,57 @@ function SystemDetailPanel({ systemId, onBookDemo, onPrevious, onNext }) {
   );
 }
 
-function LaunchTimelineHeader() {
+function SummarizedProcessTimeline() {
   return (
-    <div className="mb-12 md:mb-16">
+    <div className="mb-16 md:mb-20">
       <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3">
         Get Live In 2 Hours
       </p>
-      <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-10">
-        From Browse To Live Automations
+      <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
+        Our Summarized Process
       </h3>
+      <p className="text-center text-sm text-muted-foreground mb-10">
+        From first contact to successful launch in 5 clear steps. We make it easy.
+      </p>
+
+      {/* Horizontal Timeline */}
+      <div className="flex justify-center items-center gap-3 md:gap-6 flex-wrap px-4">
+        {launchTimelineSteps.map((step, idx) => {
+          const Icon = iconMap[step.icon];
+          return (
+            <div key={step.id} className="flex items-center gap-3 md:gap-6">
+              <div className="flex flex-col items-center gap-2">
+                <div
+                  className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{
+                    background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+                    boxShadow: "0 4px 12px rgba(154,92,46,0.3)",
+                  }}
+                >
+                  <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                </div>
+                <p className="text-xs md:text-sm font-semibold text-foreground text-center">{step.title}</p>
+              </div>
+              {idx < launchTimelineSteps.length - 1 && (
+                <div className="text-xl md:text-2xl text-primary/40 hidden sm:block">→</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function LaunchTimelineHeader() {
+  return (
+    <div className="mb-12 md:mb-16">
+      <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
+        Our Detailed Process
+      </h3>
+      <p className="text-center text-sm text-muted-foreground">
+        A deep dive into each step of your project journey.
+      </p>
 
       {/* Horizontal Timeline */}
       <div className="hidden md:flex justify-center items-center gap-2 md:gap-4 mb-8 px-4">
@@ -901,45 +943,54 @@ function LaunchTimelineHeader() {
 function LaunchTimeline() {
   return (
     <div className="mt-16 md:mt-20">
+      <SummarizedProcessTimeline />
       <LaunchTimelineHeader />
 
       {/* Vertical Timeline */}
       <div className="relative">
         {/* Vertical line */}
         <div
-          className="absolute left-8 md:left-1/2 top-0 bottom-0 w-1"
+          className="absolute left-6 md:left-1/4 top-0 bottom-0 w-1"
           style={{
-            background: "linear-gradient(180deg, rgba(154,92,46,0.4) 0%, rgba(154,92,46,0.2) 50%, rgba(154,92,46,0.1) 100%)",
+            background: "linear-gradient(180deg, rgba(154,92,46,0.6) 0%, rgba(154,92,46,0.3) 50%, rgba(154,92,46,0.1) 100%)",
             transform: "translateX(-50%)",
           }}
         />
 
-        <div className="space-y-12 md:space-y-16">
+        <div className="space-y-12 md:space-y-16 ml-20 md:ml-0">
           {launchTimelineSteps.map((step, idx) => {
             const isEven = idx % 2 === 0;
             return (
               <div key={step.id} className="relative">
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center ${isEven ? "" : "md:[direction:rtl]"}`}>
-                  {/* Content Side */}
-                  <div className="md:[direction:ltr]">
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-start ${isEven ? "" : "md:[direction:rtl]"}`}>
+                  {/* Step Badge - Outside */}
+                  <div className="md:[direction:ltr] flex md:justify-end">
                     <div
-                      className="rounded-2xl p-6 md:p-7"
-                      style={{
-                        background: "rgba(255,255,255,0.85)",
-                        border: "1.5px solid rgba(154,92,46,0.15)",
-                        boxShadow: "0 8px 24px rgba(111,67,31,0.08)",
-                      }}
+                      className="absolute -left-20 md:relative md:flex md:justify-end md:mb-4"
+                      style={{}}
                     >
                       <div
-                        className="inline-block px-3 py-1.5 rounded-full text-[10px] font-bold text-white mb-3"
+                        className="inline-block px-3 py-1.5 rounded text-[10px] font-bold text-white"
                         style={{
                           background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
                         }}
                       >
                         STEP {step.number}
                       </div>
+                    </div>
+                  </div>
 
-                      <h4 className="font-display text-xl md:text-2xl font-bold text-foreground mb-1">
+                  {/* Content Side */}
+                  <div className="md:[direction:ltr]">
+                    <div
+                      className="rounded-2xl p-6 md:p-7"
+                      style={{
+                        background: "rgba(255,255,255,0.9)",
+                        border: "1.5px solid rgba(154,92,46,0.12)",
+                        boxShadow: "0 8px 24px rgba(111,67,31,0.06)",
+                      }}
+                    >
+                      <h4 className="font-semibold text-lg md:text-xl font-bold text-foreground mb-1">
                         {step.title}
                       </h4>
                       <p className="text-xs md:text-sm text-muted-foreground mb-4" style={{ color: "rgba(154,92,46,0.8)" }}>
@@ -960,7 +1011,7 @@ function LaunchTimeline() {
                   {/* Image Side */}
                   <div className="md:[direction:ltr]">
                     <div
-                      className="rounded-2xl overflow-hidden h-64 md:h-80 bg-slate-300"
+                      className="rounded-2xl overflow-hidden h-64 md:h-72 bg-slate-300"
                       style={{
                         border: "1.5px solid rgba(154,92,46,0.12)",
                         boxShadow: "0 8px 24px rgba(111,67,31,0.1)",
