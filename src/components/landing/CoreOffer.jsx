@@ -61,7 +61,7 @@ const systemMapStages = [
     id: "respond-fast",
     title: "The System Responds Fast",
     summary: "The lead hears from your business right away instead of waiting.",
-    systemsIncluded: ["01", "02", "03"],
+    systemsIncluded: ["02", "03"],
   },
   {
     id: "follow-up",
@@ -87,7 +87,7 @@ const systemGroups = [
   {
     id: "get-the-lead",
     label: "Get The Lead",
-    systems: ["01", "02"],
+    systems: ["02"],
   },
   {
     id: "move-the-lead",
@@ -107,26 +107,6 @@ const systemGroups = [
 ];
 
 const systemsById = {
-  "01": {
-    id: "01",
-    service_key: "instant_lead_response",
-    icon: "Zap",
-    title: "Instant Lead Response",
-    shortDescription:
-      "When a new lead comes in, the system replies right away so they hear from your business while they are still paying attention.",
-    badge: "Fast first response",
-    mapStageId: "respond-fast",
-    detail: {
-      summary: "Fast replies stop new leads from going cold.",
-      trigger:
-        "A new lead fills out a form, sends a message, or reaches out for the first time.",
-      action: "The system sends the first reply automatically right away.",
-      leadView: "They hear from your business immediately instead of waiting.",
-      businessValue:
-        "Fast replies help you win more conversations before competitors respond.",
-      includes: ["Replies quickly", "Uses lead context", "Works after hours"],
-    },
-  },
   "02": {
     id: "02",
     service_key: "missed_call_text_back",
