@@ -156,7 +156,7 @@ function StoreInner() {
           }
           .store-page .store-hero {
             text-align: center;
-            padding: 48px 24px 34px;
+            padding: 24px 24px 14px;
             position: relative;
           }
           .store-page .store-hero-copy {
@@ -251,7 +251,7 @@ function StoreInner() {
           }
           @media (max-width: 720px) {
             .store-page .store-hero {
-              padding: 34px 20px 22px;
+              padding: 18px 16px 10px;
             }
             .store-page .store-stat-grid {
               grid-template-columns: 1fr;
@@ -316,15 +316,15 @@ function StoreInner() {
               </div>
 
               <h1
-                className="font-display"
-                style={{
-                  fontSize: "clamp(2rem, 5vw, 3.5rem)",
-                  fontWeight: "800",
-                  lineHeight: 1.04,
-                  letterSpacing: "-0.035em",
-                  color: "#1b140d",
-                  marginBottom: "12px",
-                }}
+               className="font-display"
+               style={{
+                 fontSize: "clamp(1.5rem, 4.5vw, 2.6rem)",
+                 fontWeight: "800",
+                 lineHeight: 1.08,
+                 letterSpacing: "-0.035em",
+                 color: "#1b140d",
+                 marginBottom: "8px",
+               }}
               >
                 Build Your{" "}
                 <span
@@ -342,11 +342,11 @@ function StoreInner() {
 
               <p
                 style={{
-                  fontSize: "1.02rem",
+                  fontSize: "0.9rem",
                   color: "rgba(27,20,13,0.72)",
-                  lineHeight: 1.68,
+                  lineHeight: 1.6,
                   maxWidth: "620px",
-                  margin: "0 auto 24px",
+                  margin: "0 auto 12px",
                 }}
               >
                 Pick the services you need, add them to your cart, and we handle
@@ -358,89 +358,80 @@ function StoreInner() {
               <div
                 style={{
                   maxWidth: "760px",
-                  margin: "0 auto 20px",
-                  padding: "12px 16px",
-                  borderRadius: "16px",
-                  background: "rgba(255,255,255,0.5)",
+                  margin: "0 auto 10px",
+                  padding: "8px 12px",
+                  borderRadius: "12px",
+                  background: "rgba(255,255,255,0.4)",
                   border: "none",
-                  borderBottom: "1px solid rgba(154,92,46,0.12)",
+                  borderBottom: "1px solid rgba(154,92,46,0.1)",
                   boxShadow: "none",
+                  fontSize: "12px",
                 }}
               >
                 <p
                   style={{
-                    fontSize: "11px",
+                    fontSize: "10px",
                     fontWeight: "700",
-                    letterSpacing: "0.18em",
+                    letterSpacing: "0.16em",
                     textTransform: "uppercase",
-                    color: "#f0c878",
-                    margin: "0 0 8px",
+                    color: "#9a5c2e",
+                    margin: "0 0 4px",
                   }}
                 >
                   Personalized For {selectedIndustry.shortName}
                 </p>
                 <p
                   style={{
-                    fontSize: "15px",
+                    fontSize: "13px",
                     color: "#1b140d",
                     fontWeight: "600",
-                    margin: "0 0 6px",
+                    margin: "0 0 2px",
+                    lineHeight: 1.4,
                   }}
                 >
-                  We moved your recommended services to the top and suggest
-                  starting with the {selectedIndustry.recommendedPackage?.name}.
-                </p>
-                <p
-                  style={{
-                    fontSize: "13px",
-                    color: "rgba(27,20,13,0.65)",
-                    lineHeight: 1.6,
-                    margin: 0,
-                  }}
-                >
-                  {selectedIndustry.whyItWorks}
+                  Recommended: {selectedIndustry.recommendedPackage?.name}
                 </p>
               </div>
             ) : null}
 
-            <div className="store-stat-grid" style={{ marginBottom: "16px" }}>
+            <div className="store-stat-grid" style={{ marginBottom: "8px" }}>
               {[
                 { label: "AI Services Available", val: "12" },
                 { label: "Avg. Setup Time", val: "4-6 hours" },
                 { label: "Cancel Anytime", val: "No Contracts" },
               ].map((stat) => (
                 <div
-                  key={stat.label}
-                  style={{
-                    textAlign: "center",
-                    borderRadius: "12px",
-                    padding: "12px 14px",
-                    background: "rgba(255,255,255,0.5)",
-                    border: "none",
-                    borderTop: "1px solid rgba(154,92,46,0.12)",
-                    boxShadow: "none",
-                  }}
+                 key={stat.label}
+                 style={{
+                   textAlign: "center",
+                   borderRadius: "10px",
+                   padding: "8px 10px",
+                   background: "rgba(255,255,255,0.4)",
+                   border: "none",
+                   borderTop: "1px solid rgba(154,92,46,0.08)",
+                   boxShadow: "none",
+                 }}
                 >
-                  <p
-                    style={{
-                      fontSize: "21px",
-                      fontWeight: "800",
-                      color: "#9a5c2e",
-                      margin: "0 0 4px",
-                    }}
-                  >
-                    {stat.val}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "11px",
-                      color: "rgba(27,20,13,0.6)",
-                      margin: 0,
-                      fontWeight: "600",
-                    }}
-                  >
-                    {stat.label}
-                  </p>
+                 <p
+                   style={{
+                     fontSize: "16px",
+                     fontWeight: "800",
+                     color: "#9a5c2e",
+                     margin: "0 0 2px",
+                   }}
+                 >
+                   {stat.val}
+                 </p>
+                 <p
+                   style={{
+                     fontSize: "10px",
+                     color: "rgba(27,20,13,0.6)",
+                     margin: 0,
+                     fontWeight: "600",
+                   }}
+                 >
+                   {stat.label}
+                 </p>
                 </div>
               ))}
             </div>
