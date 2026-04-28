@@ -8,7 +8,6 @@ import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 
 const sectionLinks = [
   { label: "How It Works", href: "#problem-solution" },
-  { label: "Our System", href: "#services" },
   { label: "AI Store", href: "/store", isPage: true },
   { label: "Pricing", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
@@ -201,14 +200,14 @@ export default function Navbar() {
           </div>
         </button>
 
-        <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+        <div className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
           {sectionLinks.map((link) => (
             link.isPage ? (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => { trackCTA("ai_store", "navbar"); }}
-                className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors border border-primary/25 px-3 py-1 rounded-full hover:bg-primary/5"
+                className="text-xs lg:text-sm font-semibold text-primary hover:text-primary/80 transition-colors border border-primary/25 px-2 lg:px-3 py-1 rounded-full hover:bg-primary/5 whitespace-nowrap"
               >
                 {link.label} ✦
               </a>
@@ -217,7 +216,7 @@ export default function Navbar() {
                 key={link.href}
                 href={`/${link.href}`}
                 onClick={(e) => handleSectionNavigation(e, link.href)}
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                className="text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap"
               >
                 {link.label}
               </a>
@@ -232,7 +231,7 @@ export default function Navbar() {
           >
             <button
               onClick={() => setIndustriesOpen((prev) => !prev)}
-              className="inline-flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary transition-colors"
+              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap"
             >
               Industries
               <ChevronDown className={`w-4 h-4 transition-transform ${industriesOpen ? "rotate-180" : ""}`} />
@@ -262,7 +261,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-3 shrink-0">
+        <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
           <button
             onClick={toggleDark}
             title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
@@ -277,7 +276,7 @@ export default function Navbar() {
               trackCTA("login", "navbar");
               setShowLoginModal(true);
             }}
-            className="text-sm font-semibold text-foreground hover:text-primary border border-border hover:border-primary/40 bg-background/50 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-4 py-1.5 transition-colors"
+            className="hidden lg:block text-sm font-semibold text-foreground hover:text-primary border border-border hover:border-primary/40 bg-background/50 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-4 py-1.5 transition-colors"
           >
             Login
           </button>
@@ -289,10 +288,10 @@ export default function Navbar() {
             style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.35)", transition: "box-shadow 0.3s ease, transform 0.3s ease", border: "none", cursor: "pointer" }}
             onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)")}
             onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 4px 14px rgba(120,70,20,0.35)")}
-            className="focus:ring-2 focus:ring-primary focus:outline-none rounded"
+            className="hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded"
           >
-            <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 20px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "600", fontSize: "0.875rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
-              Book Your Free Demo
+            <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 16px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "600", fontSize: "0.75rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
+              Book Demo
             </span>
           </button>
         </div>
