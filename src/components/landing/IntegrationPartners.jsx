@@ -72,8 +72,6 @@ const ScrollTrackIntegrationContext = ({ children }) => {
 const TRIPLED = [...INTEGRATIONS, ...INTEGRATIONS, ...INTEGRATIONS];
 
 export default function IntegrationPartners() {
-  const [paused, setPaused] = useState(false);
-
   return (
     <section
       className="py-14 px-6 relative overflow-hidden"
@@ -119,8 +117,7 @@ export default function IntegrationPartners() {
         <div
           className="relative overflow-hidden"
           style={{ padding: "28px 0 40px" }}
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
+
         >
           {/* Left fade */}
           <div
@@ -137,8 +134,7 @@ export default function IntegrationPartners() {
             style={{
               width: "max-content",
               gap: "80px",
-              animation: `integrationScroll 24s linear infinite`,
-              animationPlayState: paused ? "paused" : "running",
+              animation: `integrationScroll 28s linear infinite`,
             }}
           >
             {TRIPLED.map((integration, idx) => (
@@ -156,23 +152,21 @@ export default function IntegrationPartners() {
                    alt={integration.name}
                    loading="lazy"
                    style={{
-                     height: "130px",
+                     height: "100px",
                      width: "auto",
-                     maxWidth: "280px",
+                     maxWidth: "220px",
                      objectFit: "contain",
-                     transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease, opacity 0.35s ease",
-                     filter: "drop-shadow(0 0 0px rgba(200,150,92,0)) brightness(1) contrast(1.05)",
-                     opacity: 0.9,
+                     transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease",
+                     filter: "brightness(1) contrast(1.1) saturate(1.1)",
+                     opacity: 1,
                    }}
                    onMouseEnter={(e) => {
-                     e.currentTarget.style.transform = "scale(1.22) translateY(-8px)";
-                     e.currentTarget.style.filter = "drop-shadow(0 12px 32px rgba(200,150,92,0.6)) brightness(1.08) contrast(1.15)";
-                     e.currentTarget.style.opacity = "1";
+                     e.currentTarget.style.transform = "scale(1.18) translateY(-6px)";
+                     e.currentTarget.style.filter = "brightness(1.1) contrast(1.15) saturate(1.2) drop-shadow(0 8px 24px rgba(154,92,46,0.35))";
                    }}
                    onMouseLeave={(e) => {
                      e.currentTarget.style.transform = "scale(1) translateY(0)";
-                     e.currentTarget.style.filter = "drop-shadow(0 0 0px rgba(200,150,92,0)) brightness(1) contrast(1.05)";
-                     e.currentTarget.style.opacity = "0.9";
+                     e.currentTarget.style.filter = "brightness(1) contrast(1.1) saturate(1.1)";
                    }}
                  />
                 <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase tracking-widest">
@@ -183,37 +177,24 @@ export default function IntegrationPartners() {
           </div>
         </div>
 
-        {/* Bottom CTA pill */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-10 pt-10 border-t border-border/30">
-          <div
-            className="inline-flex items-center gap-3 px-6 py-3 rounded-full border"
-            style={{
-              background: "rgba(255,255,255,0.8)",
-              border: "1.5px solid rgba(180,185,195,0.6)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.95), 0 4px 12px rgba(0,0,0,0.08)",
-              backdropFilter: "blur(10px)",
-              WebkitBackdropFilter: "blur(10px)",
-            }}
-          >
-            <span className="text-sm text-foreground/70 font-medium">Don't see your tool?</span>
-            <a
-              href="/contact"
-              className="text-sm font-bold text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+        {/* Visual enhancement: glowing integration pill row */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-10 pt-10 border-t border-border/30">
+          {["Plug & play setup", "No custom dev needed", "Syncs automatically", "50+ tools supported", "Works with what you have"].map((label) => (
+            <div
+              key={label}
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-primary"
+              style={{
+                background: "rgba(255,255,255,0.7)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                border: "1px solid rgba(154,92,46,0.18)",
+                boxShadow: "0 2px 10px rgba(154,92,46,0.08), inset 0 1px 0 rgba(255,255,255,0.9)",
+              }}
             >
-              Contact us →
-            </a>
-            <span className="text-sm text-foreground/50">We connect to virtually anything.</span>
-          </div>
-          <div
-            className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border"
-            style={{
-              background: "rgba(154,92,46,0.08)",
-              border: "1.5px solid rgba(154,92,46,0.25)",
-              boxShadow: "0 2px 8px rgba(154,92,46,0.12)",
-            }}
-          >
-            <span className="text-xs font-bold text-primary uppercase tracking-widest">✓ Pre-built integrations available</span>
-          </div>
+              <span className="w-1.5 h-1.5 rounded-full bg-primary/60 flex-shrink-0" />
+              {label}
+            </div>
+          ))}
         </div>
 
       </div>
