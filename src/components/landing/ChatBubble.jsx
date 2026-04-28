@@ -95,7 +95,7 @@ export default function ChatBubble() {
       {/* Chat window */}
       {open && (
         <div
-          className="fixed bottom-24 right-5 sm:right-8 z-[9990] w-[calc(100vw-2.5rem)] sm:w-96 flex flex-col rounded-3xl overflow-hidden shadow-2xl"
+          className="fixed bottom-32 right-5 sm:right-8 z-[9990] w-[calc(100vw-2.5rem)] sm:w-96 flex flex-col rounded-3xl overflow-hidden shadow-2xl"
           style={{
             maxHeight: "min(580px, calc(100dvh - 120px))",
             border: "2px solid transparent",
@@ -255,7 +255,7 @@ export default function ChatBubble() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Open chat"
-        className="fixed bottom-5 right-5 sm:right-8 z-[9991] w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
+        className="fixed bottom-5 right-5 sm:right-8 z-[9991] h-14 px-4 rounded-full flex items-center gap-2.5 shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
         style={{
           background: open
             ? "linear-gradient(135deg,#3a2010,#6b3f1f)"
@@ -269,7 +269,10 @@ export default function ChatBubble() {
         {open ? (
           <X className="w-6 h-6 text-white" />
         ) : (
-          <MessageCircle className="w-6 h-6 text-white" />
+          <>
+            <MessageCircle className="w-5 h-5 text-white flex-shrink-0" />
+            <span className="text-sm font-semibold text-white hidden sm:inline">Chat with me</span>
+          </>
         )}
         {hasUnread && !open && (
           <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 border-2 border-white text-white text-[9px] font-bold flex items-center justify-center">

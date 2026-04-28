@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ArrowUp, Mail, Phone, Shield, Facebook, Instagram, Linkedin, Twitter, FileText, Lock, HelpCircle } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDemoBooking } from "./DemoBookingContext";
 
 const navColumns = [
   {
@@ -43,7 +42,6 @@ const socialLinks = [
 ];
 
 export default function Footer() {
-  const demoBooking = useDemoBooking();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -74,29 +72,18 @@ export default function Footer() {
 
   return (
     <footer 
-      className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-primary/10 z-40"
+      className="bg-background/95 backdrop-blur-md border-t border-primary/10"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       {/* Main Footer Bar */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
         
-        {/* Left: Logo + CTA */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-              <span className="text-white font-black text-xs">CS</span>
-            </div>
-            <span className="font-display font-bold text-xs hidden sm:inline">ClientSurge</span>
+        {/* Left: Logo */}
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+            <span className="text-white font-black text-xs">CS</span>
           </div>
-          
-          <button
-            onClick={() => demoBooking?.openDemoBooking?.()}
-            style={{ borderRadius: "9999px", padding: "1px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", border: "none", cursor: "pointer" }}
-          >
-            <span style={{ display: "flex", alignItems: "center", height: "28px", padding: "0 12px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "600", fontSize: "0.65rem" }}>
-              Demo
-            </span>
-          </button>
+          <span className="font-display font-bold text-xs hidden sm:inline">ClientSurge</span>
         </div>
 
         {/* Center: Icon Navigation (Progressive Disclosure) */}
