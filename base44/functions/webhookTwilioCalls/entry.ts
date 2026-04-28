@@ -1,119 +1,229 @@
 /**
  * Webhook: /webhooks/twilio-calls
- * Handles Twilio call events: missed calls, voicemails, status updates
- * Triggers missed call recovery SMS and logging
+ * Handles Twilio call events with robust validation & error logging
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import crypto from "node:crypto";
+
+const CALL_STATUS_VALID = ["queued", "ringing", "in-progress", "completed", "failed", "busy", "no-answer", "canceled"];
 
 Deno.serve(async (req) => {
-  // Twilio sends form-encoded data, not JSON
   if (req.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
+  let base44;
+  let callEvent = {};
+
   try {
-    const base44 = createClientFromRequest(req);
-    
+    base44 = createClientFromRequest(req);
+
     // Parse form-encoded Twilio webhook
     const formData = await req.formData();
     const payload = Object.fromEntries(formData);
 
     console.log("[TwilioCalls] Received event:", payload.CallStatus);
 
-    // Validate Twilio request signature (optional, but recommended)
-    // const isValid = validateTwilioRequest(req, payload);
-    // if (!isValid) return new Response("Unauthorized", { status: 403 });
+    // ─────────────────────────────────────────────────────
+    // STEP 1: Validate Twilio signature
+    // ─────────────────────────────────────────────────────
+    const signature = req.headers.get("X-Twilio-Signature");
+    const token = Deno.env.get("TWILIO_AUTH_TOKEN");
+    if (signature && token) {
+      const url = new URL(req.url).toString();
+      const data = new URLSearchParams(formData);
+      const toSign = url + Array.from(data.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([k, v]) => `${k}${v}`)
+        .join("");
+      const computed = crypto.createHmac("sha1", token).update(toSign).digest("base64");
+      if (computed !== signature) {
+        console.warn("[TwilioCalls] Signature mismatch");
+        await logValidationError(base44, {
+          error_code: "INVALID_SIGNATURE",
+          error_message: "Twilio signature mismatch",
+          payload_preview: { CallSid: payload.CallSid, From: payload.From },
+        });
+        return Response.json({ error: "Unauthorized" }, { status: 403 });
+      }
+    }
 
-    const callEvent = {
-      call_sid: payload.CallSid || "",
-      from_number: payload.From || "",
-      to_number: payload.To || "",
-      call_status: payload.CallStatus || "unknown",
-      call_duration: payload.CallDuration || "0",
-      recording_url: payload.RecordingUrl || null,
+    // ─────────────────────────────────────────────────────
+    // STEP 2: Validate required fields
+    // ─────────────────────────────────────────────────────
+    const errors = [];
+    if (!payload.CallSid) errors.push("CallSid is required");
+    if (!payload.From) errors.push("From is required");
+    if (!payload.To) errors.push("To is required");
+    if (!payload.CallStatus) errors.push("CallStatus is required");
+    if (payload.CallStatus && !CALL_STATUS_VALID.includes(payload.CallStatus)) {
+      errors.push(`CallStatus must be one of: ${CALL_STATUS_VALID.join(", ")}`);
+    }
+    if (payload.CallDuration && !/^\d+$/.test(payload.CallDuration)) {
+      errors.push("CallDuration must be numeric");
+    }
+    if (payload.From && !/^[\+]?[1-9]\d{1,14}$/.test(payload.From)) {
+      errors.push("From number format invalid");
+    }
+    if (payload.To && !/^[\+]?[1-9]\d{1,14}$/.test(payload.To)) {
+      errors.push("To number format invalid");
+    }
+
+    if (errors.length > 0) {
+      console.warn("[TwilioCalls] Validation errors:", errors);
+      await logValidationError(base44, {
+        error_code: "INVALID_PAYLOAD",
+        error_message: errors.join("; "),
+        payload_preview: { CallSid: payload.CallSid, From: payload.From },
+      });
+      return Response.json({ error: "Invalid payload", details: errors }, { status: 400 });
+    }
+
+    // ─────────────────────────────────────────────────────
+    // STEP 3: Normalize and sanitize
+    // ─────────────────────────────────────────────────────
+    callEvent = {
+      call_sid: (payload.CallSid || "").trim(),
+      from_number: (payload.From || "").trim(),
+      to_number: (payload.To || "").trim(),
+      call_status: (payload.CallStatus || "unknown").toLowerCase(),
+      call_duration: parseInt(payload.CallDuration || "0", 10),
+      recording_url: (payload.RecordingUrl || "").trim() || null,
+      recording_sid: (payload.RecordingSid || "").trim() || null,
       timestamp: new Date().toISOString(),
     };
 
-    console.log("[TwilioCalls] Parsed event:", callEvent);
+    console.log("[TwilioCalls] Validated event:", callEvent);
 
-    // 1. Find client project by phone number
+    // ─────────────────────────────────────────────────────
+    // STEP 4: Find project & lead
+    // ─────────────────────────────────────────────────────
     const project = await findProjectByPhoneNumber(base44, callEvent.to_number);
     if (!project) {
-      console.warn("[TwilioCalls] No matching project for number:", callEvent.to_number);
-      return new Response("OK", { status: 200 }); // Accept but don't process
+      console.warn("[TwilioCalls] No project for number:", callEvent.to_number);
+      await logValidationError(base44, {
+        error_code: "NO_PROJECT_FOUND",
+        error_message: `No project matched phone ${callEvent.to_number}`,
+        payload_preview: { CallSid: callEvent.call_sid, To: callEvent.to_number },
+      });
+      return new Response("OK", { status: 200 });
     }
 
-    // 2. Find or create lead by phone number
     const lead = await findOrCreateLeadByPhone(base44, callEvent.from_number, project);
 
-    // 3. Log call event
+    // ─────────────────────────────────────────────────────
+    // STEP 5: Log & process
+    // ─────────────────────────────────────────────────────
     await logCallEvent(base44, lead, project, callEvent);
 
-    // 4. Handle missed call (trigger SMS recovery if applicable)
     if (callEvent.call_status === "no-answer" || callEvent.call_status === "failed") {
       await handleMissedCall(base44, lead, project, callEvent);
     }
 
-    // 5. Log recording if present
     if (callEvent.recording_url) {
       await logRecording(base44, lead, callEvent);
     }
 
-    return new Response("OK", { status: 200 }); // Twilio expects 200 OK
+    // Log success
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id: lead.id,
+      channel: "webhook",
+      direction: "inbound",
+      event_type: "webhook_processed",
+      provider: "twilio",
+      status: "success",
+      subject: `[TWILIO] Call ${callEvent.call_status}`,
+      metadata_json: JSON.stringify({
+        call_sid: callEvent.call_sid,
+        from: callEvent.from_number,
+        processed_at: new Date().toISOString(),
+      }),
+    });
+
+    return new Response("OK", { status: 200 });
   } catch (error) {
-    console.error("[TwilioCalls] Error:", error.message);
-    return new Response(`Error: ${error.message}`, { status: 500 });
+    console.error("[TwilioCalls] Runtime error:", error.message);
+    if (base44) {
+      try {
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          channel: "webhook",
+          direction: "inbound",
+          event_type: "webhook_processing_error",
+          provider: "twilio",
+          status: "failed",
+          subject: "[TWILIO] Processing Error",
+          message_body: error.message,
+          error_message: error.message,
+          metadata_json: JSON.stringify({
+            call_sid: callEvent.call_sid || "unknown",
+            error_stage: "processing",
+            timestamp: new Date().toISOString(),
+          }),
+        });
+      } catch (logErr) {
+        console.error("[TwilioCalls] Failed to log error:", logErr.message);
+      }
+    }
+    return Response.json({ error: error.message }, { status: 500 });
   }
 });
 
 // ─────────────────────────────────────────────────────
-// HELPERS
+// VALIDATION HELPERS
+// ─────────────────────────────────────────────────────
+
+async function logValidationError(base44, { error_code, error_message, payload_preview }) {
+  try {
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      channel: "webhook",
+      direction: "inbound",
+      event_type: "webhook_validation_failed",
+      provider: "twilio",
+      status: "failed",
+      subject: `[TWILIO] Validation Failed: ${error_code}`,
+      message_body: error_message,
+      metadata_json: JSON.stringify({
+        error_code,
+        payload_preview,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+  } catch (err) {
+    console.error("[logValidationError] Failed:", err.message);
+  }
+}
+
+// ─────────────────────────────────────────────────────
+// CORE HELPERS
 // ─────────────────────────────────────────────────────
 
 async function findProjectByPhoneNumber(base44, toNumber) {
-  // Format number consistently
   const formattedNumber = toNumber.replace(/\D/g, "");
-
-  // Search for project with matching Twilio number
-  const projects = await base44.asServiceRole.entities.ClientProject.filter(
-    {},
-    "-created_date",
-    500
-  );
-
+  const projects = await base44.asServiceRole.entities.ClientProject.filter({}, "-created_date", 500);
   if (!projects) return null;
 
-  // Check install_configuration for Twilio number
   for (const project of projects) {
     const config = project.install_configuration?.services?.missed_call_text_back;
     if (config?.twilio_number) {
       const projectNumber = config.twilio_number.replace(/\D/g, "");
-      if (projectNumber === formattedNumber) {
-        return project;
-      }
+      if (projectNumber === formattedNumber) return project;
     }
   }
-
   return null;
 }
 
 async function findOrCreateLeadByPhone(base44, fromNumber, project) {
-  // Search for existing lead with this phone
   const existing = await base44.asServiceRole.entities.Leads.filter(
     { phone: fromNumber },
     "-created_date",
     1
   );
 
-  if (existing?.length > 0) {
-    return existing[0];
-  }
+  if (existing?.length > 0) return existing[0];
 
-  // Create new lead from phone number
   console.log("[TwilioCalls] Creating new lead from inbound call");
-
-  const lead = await base44.asServiceRole.entities.Leads.create({
+  return await base44.asServiceRole.entities.Leads.create({
     full_name: "Unknown Caller",
     business_name: "Not provided",
     email: "",
@@ -123,26 +233,20 @@ async function findOrCreateLeadByPhone(base44, fromNumber, project) {
     source: "phone_call",
     status: "New",
     lead_score: 40,
-    activation_priority: "High", // Phone calls are high priority
+    activation_priority: "High",
     intake_type: "call",
     assigned_to: project.owner_email,
-    created_date: new Date().toISOString(),
   });
-
-  return lead;
 }
 
 async function logCallEvent(base44, lead, project, callEvent) {
-  console.log("[TwilioCalls] Logging call event");
-
   await base44.asServiceRole.entities.CommunicationEvent.create({
     lead_id: lead.id,
     client_project_id: project.id,
     service_key: "missed_call_text_back",
     channel: "call",
     direction: "inbound",
-    event_type:
-      callEvent.call_status === "completed" ? "call_received" : "call_missed",
+    event_type: callEvent.call_status === "completed" ? "call_received" : "call_missed",
     provider: "twilio",
     status: callEvent.call_status,
     subject: `Inbound call from ${callEvent.from_number}`,
@@ -158,16 +262,14 @@ async function logCallEvent(base44, lead, project, callEvent) {
 }
 
 async function handleMissedCall(base44, lead, project, callEvent) {
-  console.log("[TwilioCalls] Handling missed call - triggering SMS recovery");
+  console.log("[TwilioCalls] Handling missed call");
 
-  // Get missed call config
   const config = project.install_configuration?.services?.missed_call_text_back;
   if (!config?.enabled) {
     console.warn("[TwilioCalls] Missed call recovery not enabled");
     return;
   }
 
-  // Get SMS template
   const template = await base44.asServiceRole.entities.MessageTemplate.get(
     config.sms_template_id
   ).catch(() => null);
@@ -177,14 +279,12 @@ async function handleMissedCall(base44, lead, project, callEvent) {
     return;
   }
 
-  // Fill template
   const messageBody = fillTemplate(template.body, {
     name: lead.full_name,
     days: project.business_hours || "Mon-Fri 9am-5pm",
     booking_link: project.booking_link || "https://calendly.com/",
   });
 
-  // Queue SMS send
   await base44.asServiceRole.entities.AutomationJob.create({
     lead_id: lead.id,
     job_type: "instant_sms",
@@ -199,7 +299,6 @@ async function handleMissedCall(base44, lead, project, callEvent) {
     }),
   });
 
-  // Log the SMS that will be sent
   await base44.asServiceRole.entities.CommunicationEvent.create({
     lead_id: lead.id,
     client_project_id: project.id,
@@ -216,7 +315,6 @@ async function handleMissedCall(base44, lead, project, callEvent) {
     }),
   });
 
-  // Update lead status
   await base44.asServiceRole.entities.Leads.update(lead.id, {
     status: "Contacted",
     last_contacted_at: new Date().toISOString(),
@@ -226,8 +324,6 @@ async function handleMissedCall(base44, lead, project, callEvent) {
 }
 
 async function logRecording(base44, lead, callEvent) {
-  console.log("[TwilioCalls] Logging call recording");
-
   await base44.asServiceRole.entities.CommunicationEvent.create({
     lead_id: lead.id,
     event_type: "call_recording",
@@ -238,9 +334,7 @@ async function logRecording(base44, lead, callEvent) {
     subject: "Call recording available",
     message_body: callEvent.recording_url,
     provider_message_id: callEvent.call_sid,
-    metadata_json: JSON.stringify({
-      recording_url: callEvent.recording_url,
-    }),
+    metadata_json: JSON.stringify({ recording_url: callEvent.recording_url }),
   });
 }
 
@@ -251,14 +345,3 @@ function fillTemplate(template, variables) {
   }
   return result;
 }
-
-// Optional: Validate Twilio request signature
-// function validateTwilioRequest(req, payload) {
-//   const signature = req.headers.get("X-Twilio-Signature");
-//   const url = new URL(req.url).toString();
-//   const token = Deno.env.get("TWILIO_AUTH_TOKEN");
-//
-//   // Implement Twilio signature validation
-//   // See: https://www.twilio.com/docs/usage/security#validating-requests
-//   return true; // Simplified for now
-// }
