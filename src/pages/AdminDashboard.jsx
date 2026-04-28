@@ -21,6 +21,7 @@ import DripCampaignPanel from '../components/admin/DripCampaignPanel';
 import EmailCampaignPanel from '../components/admin/EmailCampaignPanel';
 import NurtureCampaignPanel from '../components/admin/NurtureCampaignPanel';
 import LeadPriorityQueue from '../components/admin/LeadPriorityQueue';
+import DynamicCadencePanel from '../components/admin/DynamicCadencePanel';
 import LeadSourceAttribution from '../components/admin/LeadSourceAttribution';
 import CampaignLibrary from '../components/admin/CampaignLibrary';
 import RevenueDashboard from '../components/admin/RevenueDashboard';
@@ -49,6 +50,7 @@ const NAV_GROUPS = [
       { id: 'automations', label: 'Automation Status', icon: Zap },
       { id: 'drip', label: 'Drip Campaigns', icon: Send },
       { id: 'nurture', label: 'Nurture Campaigns', icon: Flame },
+      { id: 'cadence', label: 'Dynamic Cadence', icon: Settings },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Mail },
       { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
       { id: 'routing', label: 'Lead Routing', icon: Target },
@@ -161,6 +163,7 @@ export default function AdminDashboard() {
       case 'install-queue': return <InstallQueuePanel />;
       case 'website-leads': return <WebsiteLeadsDashboard />;
       case 'logs': return <CommunicationLogsPanel />;
+      case 'cadence': return <DynamicCadencePanel />;
       case 'qa': return (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">QA Tools</h2>

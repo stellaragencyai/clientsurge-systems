@@ -181,6 +181,39 @@
     "last_webhook_test_at": {
       "type": "string",
       "title": "Last Webhook Test At"
+    },
+    "cadence_default_mode": {
+      "type": "string",
+      "title": "Default Cadence Mode",
+      "enum": [
+        "auto",
+        "sms_first",
+        "email_first"
+      ],
+      "default": "auto"
+    },
+    "cadence_switch_attempts": {
+      "type": "integer",
+      "title": "Switch Channel After N Attempts",
+      "default": 3,
+      "description": "After 3 attempts with no response, switch to alternate channel"
+    },
+    "cadence_pause_on_reply": {
+      "type": "boolean",
+      "title": "Pause Sequence on Lead Reply",
+      "default": true
+    },
+    "cadence_engagement_threshold": {
+      "type": "number",
+      "title": "Engagement Score Threshold (0-100)",
+      "default": 50,
+      "description": "Increase follow-up frequency if lead engagement > threshold"
+    },
+    "cadence_max_attempts": {
+      "type": "integer",
+      "title": "Max Follow-Up Attempts",
+      "default": 6,
+      "description": "Stop automation after N total attempts"
     }
   },
   "required": []
