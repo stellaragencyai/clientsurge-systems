@@ -27,6 +27,7 @@ import RevenueDashboard from '../components/admin/RevenueDashboard';
 import AdminInbox from '../components/admin/AdminInbox';
 import AdminGlobalSearch from '../components/admin/AdminGlobalSearch';
 import InstallQueuePanel from '../components/admin/InstallQueuePanel';
+import WebsiteLeadsDashboard from '../components/admin/WebsiteLeadsDashboard';
 
 const NAV_GROUPS = [
   {
@@ -42,6 +43,7 @@ const NAV_GROUPS = [
   {
     group: 'Automation',
     items: [
+      { id: 'website-leads', label: 'Website Leads', icon: Target },
       { id: 'install-queue', label: 'Install Queue', icon: Zap },
       { id: 'automations', label: 'Automation Status', icon: Zap },
       { id: 'drip', label: 'Drip Campaigns', icon: Send },
@@ -155,6 +157,7 @@ export default function AdminDashboard() {
       case 'revenue': return <RevenueDashboard />;
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
+      case 'website-leads': return <WebsiteLeadsDashboard />;
       case 'qa': return (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">QA Tools</h2>

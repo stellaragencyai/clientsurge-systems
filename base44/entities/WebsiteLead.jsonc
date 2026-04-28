@@ -1,0 +1,126 @@
+{
+  "name": "WebsiteLead",
+  "type": "object",
+  "properties": {
+    "full_name": {
+      "type": "string",
+      "title": "Full Name"
+    },
+    "first_name": {
+      "type": "string",
+      "title": "First Name"
+    },
+    "phone_number": {
+      "type": "string",
+      "title": "Phone Number"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email Address",
+      "format": "email"
+    },
+    "service_interest": {
+      "type": "string",
+      "title": "Service Interest"
+    },
+    "message": {
+      "type": "string",
+      "title": "Message"
+    },
+    "source": {
+      "type": "string",
+      "title": "Lead Source",
+      "enum": [
+        "website_form",
+        "contact_page",
+        "pricing_page",
+        "landing_page"
+      ],
+      "default": "website_form"
+    },
+    "lead_status": {
+      "type": "string",
+      "title": "Lead Status",
+      "enum": [
+        "new",
+        "contacted",
+        "responded",
+        "hot",
+        "booked",
+        "closed",
+        "ignored"
+      ],
+      "default": "new"
+    },
+    "reply_status": {
+      "type": "string",
+      "title": "Reply Status",
+      "enum": [
+        "none",
+        "responded"
+      ],
+      "default": "none"
+    },
+    "booking_status": {
+      "type": "string",
+      "title": "Booking Status",
+      "enum": [
+        "none",
+        "clicked",
+        "booked"
+      ],
+      "default": "none"
+    },
+    "follow_up_step": {
+      "type": "integer",
+      "title": "Follow-Up Step",
+      "default": 0,
+      "description": "0=new, 1=10min SMS sent, 2=1hr email sent, 3=24hr SMS sent"
+    },
+    "next_follow_up_at": {
+      "type": "string",
+      "title": "Next Follow-Up At",
+      "format": "date-time"
+    },
+    "last_message_sent": {
+      "type": "string",
+      "title": "Last Message Sent",
+      "format": "date-time"
+    },
+    "initial_response_sent_at": {
+      "type": "string",
+      "title": "Initial Response Sent At",
+      "format": "date-time"
+    },
+    "dedup_key": {
+      "type": "string",
+      "title": "Deduplication Key"
+    },
+    "automation_enabled": {
+      "type": "boolean",
+      "title": "Automation Enabled",
+      "default": true
+    }
+  },
+  "required": [
+    "email"
+  ],
+  "rls": {
+    "create": true,
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
