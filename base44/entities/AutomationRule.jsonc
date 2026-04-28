@@ -1,0 +1,99 @@
+{
+  "name": "AutomationRule",
+  "type": "object",
+  "properties": {
+    "rule_name": {
+      "type": "string",
+      "title": "Rule Name",
+      "description": "e.g. 'Hot Lead Router', 'Churn Alert'"
+    },
+    "project_id": {
+      "type": "string",
+      "title": "Project ID",
+      "description": "Project this rule belongs to"
+    },
+    "enabled": {
+      "type": "boolean",
+      "title": "Enabled",
+      "default": true
+    },
+    "trigger_type": {
+      "type": "string",
+      "title": "Trigger Type",
+      "enum": [
+        "lead_created",
+        "lead_replied",
+        "lead_scored",
+        "daily_rescore",
+        "churn_check"
+      ],
+      "description": "When this rule fires"
+    },
+    "conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "operator": {
+            "type": "string",
+            "enum": [
+              "equals",
+              "greater_than",
+              "less_than",
+              "contains",
+              "in_range"
+            ]
+          },
+          "value": {
+            "type": [
+              "string",
+              "number"
+            ]
+          }
+        }
+      },
+      "title": "Conditions",
+      "description": "All conditions must be true to fire rule"
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action_type": {
+            "type": "string"
+          },
+          "params": {
+            "type": "object"
+          }
+        }
+      },
+      "title": "Actions to Execute",
+      "description": "What happens when rule fires"
+    },
+    "priority": {
+      "type": "number",
+      "title": "Priority",
+      "default": 0,
+      "description": "Execution order (higher = first)"
+    },
+    "created_by": {
+      "type": "string",
+      "title": "Created By"
+    },
+    "last_fired_at": {
+      "type": "string",
+      "title": "Last Fired At"
+    }
+  },
+  "required": [
+    "rule_name",
+    "project_id",
+    "trigger_type",
+    "conditions",
+    "actions"
+  ]
+}
