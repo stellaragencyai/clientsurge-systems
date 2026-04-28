@@ -76,7 +76,7 @@ export default function IntegrationPartners() {
     <section
       className="py-14 px-6 relative overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, rgba(245,246,248,0.98) 0%, rgba(238,240,244,0.97) 100%)",
+        background: "#ffffff",
       }}
     >
       {/* Subtle top/bottom border lines */}
@@ -107,10 +107,7 @@ export default function IntegrationPartners() {
             Every tool you already rely on — plugged in, synced, and firing automatically the moment a lead comes in. Seamless integrations that work behind the scenes.
           </p>
 
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mt-6">
-            <span aria-hidden="true">🔗</span>
-            Scroll to see all integrations in action
-          </div>
+
         </div>
 
         {/* Infinite scroll marquee */}
@@ -122,11 +119,11 @@ export default function IntegrationPartners() {
           {/* Left fade */}
           <div
             className="absolute left-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to right, rgba(245,246,248,1) 0%, transparent 100%)" }}
+            style={{ background: "linear-gradient(to right, rgba(255,255,255,1) 0%, transparent 100%)" }}
           />
           <div
             className="absolute right-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to left, rgba(245,246,248,1) 0%, transparent 100%)" }}
+            style={{ background: "linear-gradient(to left, rgba(255,255,255,1) 0%, transparent 100%)" }}
           />
 
           <div
@@ -145,24 +142,24 @@ export default function IntegrationPartners() {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`Visit ${integration.name}`}
-                className="flex-shrink-0 group relative flex flex-col items-center transition-opacity duration-300 hover:opacity-100"
-                style={{ outline: "none", opacity: 0.85 }}
+                className="flex-shrink-0 group relative flex flex-col items-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg p-2"
+                style={{ cursor: "pointer" }}
               >
                 <img
                    src={integration.logo}
                    alt={integration.name}
                    loading="lazy"
                    style={{
-                     height: "100px",
+                     height: "120px",
                      width: "auto",
-                     maxWidth: "220px",
+                     maxWidth: "260px",
                      objectFit: "contain",
                      transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease",
                      filter: "brightness(1) contrast(1.1) saturate(1.1)",
                      opacity: 1,
                    }}
                    onMouseEnter={(e) => {
-                     e.currentTarget.style.transform = "scale(1.18) translateY(-6px)";
+                     e.currentTarget.style.transform = "scale(1.2) translateY(-8px)";
                      e.currentTarget.style.filter = "brightness(1.1) contrast(1.15) saturate(1.2) drop-shadow(0 8px 24px rgba(154,92,46,0.35))";
                    }}
                    onMouseLeave={(e) => {
@@ -170,7 +167,7 @@ export default function IntegrationPartners() {
                      e.currentTarget.style.filter = "brightness(1) contrast(1.1) saturate(1.1)";
                    }}
                  />
-                <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase tracking-widest">
+                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase tracking-widest">
                   {integration.description}
                 </span>
               </a>
@@ -184,8 +181,8 @@ export default function IntegrationPartners() {
 
       <style>{`
         @keyframes integrationScroll {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-33.333%); }
+          0% { transform: translateX(0); }
+          100% { transform: translateX(calc(-100% / 3)); }
         }
         @media (prefers-reduced-motion: reduce) {
           @keyframes integrationScroll {
