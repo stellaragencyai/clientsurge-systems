@@ -74,7 +74,6 @@ export default function Footer() {
   ];
 
   return (
-    <>
     <footer 
       className="fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t border-primary/10 z-40"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
@@ -154,7 +153,6 @@ export default function Footer() {
 
       {/* Expanded Menu (Progressive Disclosure) */}
       {expanded && (
-        <>
         <div className="border-t border-primary/10 bg-background/98 backdrop-blur-md animate-in fade-in duration-200">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 grid grid-cols-5 gap-6 text-xs">
             {navColumns.map((col) => (
