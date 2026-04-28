@@ -33,25 +33,19 @@ const INTEGRATIONS = [
   },
   {
     name: "Calendly",
-    logo: "https://asset.brandfetch.io/idZFtKcrFb/idF1j3M28n.png",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/4f0f85e13_7493f3ba-6389-437c-b4cc-50b5c2baa75a.png",
     href: "https://calendly.com",
     description: "Booking",
   },
   {
     name: "Facebook Ads",
-    logo: "https://asset.brandfetch.io/idFdo8ulhr/idMNSwbv-X.png",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/40001c42d_ChatGPTImageApr28202605_59_43AM.png",
     href: "https://facebook.com/ads",
     description: "Lead ads",
   },
   {
-    name: "ActiveCampaign",
-    logo: "https://asset.brandfetch.io/idpJKJvfE9/id7BH9t9D0.png",
-    href: "https://activecampaign.com",
-    description: "Email automation",
-  },
-  {
-    name: "GoHighLevel",
-    logo: "https://asset.brandfetch.io/idmEBJvJIq/idBi3b2U7f.png",
+    name: "HighLevel",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/eec622a96_effc8d6b-84de-4143-b7f8-fad489dba492.png",
     href: "https://gohighlevel.com",
     description: "CRM platform",
   },
@@ -150,10 +144,10 @@ export default function IntegrationPartners() {
                    alt={integration.name}
                    loading="lazy"
                    style={{
-                     height: "120px",
-                     width: "auto",
-                     maxWidth: "260px",
+                     height: "100px",
+                     width: "200px",
                      objectFit: "contain",
+                     objectPosition: "center",
                      transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease",
                      filter: "brightness(1) contrast(1.1) saturate(1.1)",
                      opacity: 1,
