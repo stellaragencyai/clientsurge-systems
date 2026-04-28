@@ -123,6 +123,7 @@ export default function ProblemSolution() {
                       backdropFilter: "blur(18px)",
                       WebkitBackdropFilter: "blur(18px)",
                       boxShadow: "0 4px 20px rgba(220,38,38,0.06), inset 0 1px 0 rgba(255,255,255,0.85)",
+                      animation: `problemSlideIn 0.7s ease-out ${i * 0.15}s both`,
                     }}
                   >
                     <div
@@ -150,8 +151,17 @@ export default function ProblemSolution() {
                       backdropFilter: "blur(18px)",
                       WebkitBackdropFilter: "blur(18px)",
                       boxShadow: "0 4px 20px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.9)",
+                      animation: `solutionSlideIn 0.7s ease-out ${0.2 + i * 0.15}s both`,
                     }}
                   >
+                    <div
+                      aria-hidden="true"
+                      className="absolute left-0 top-0 h-full w-1"
+                      style={{
+                        background: "linear-gradient(to bottom, #9a5c2e, rgba(154,92,46,0))",
+                        animation: `progressFill 0.8s ease-out ${0.25 + i * 0.15}s both`,
+                      }}
+                    />
                     <div
                       aria-hidden="true"
                       className="absolute inset-x-0 top-0 h-px"
@@ -172,6 +182,39 @@ export default function ProblemSolution() {
             ))}
           </div>
         </div>
+
+        <style>{`
+          @keyframes problemSlideIn {
+            from {
+              opacity: 0;
+              transform: translateX(-12px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+          @keyframes solutionSlideIn {
+            from {
+              opacity: 0;
+              transform: translateX(12px);
+            }
+            to {
+              opacity: 1;
+              transform: translateX(0);
+            }
+          }
+          @keyframes progressFill {
+            from {
+              height: 0%;
+              opacity: 0;
+            }
+            to {
+              height: 100%;
+              opacity: 1;
+            }
+          }
+        `}</style>
       </div>
     </section>
   );

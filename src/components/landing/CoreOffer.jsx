@@ -837,35 +837,53 @@ function LaunchTimeline() {
         We Set It Up For You
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {launchTimelineSteps.map((step) => (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative">
+        <div
+          aria-hidden="true"
+          className="hidden md:block absolute top-8 left-0 right-0 h-px"
+          style={{
+            background: "linear-gradient(to right, transparent, rgba(154,92,46,0.3), transparent)",
+            animation: "timelineLineIn 1.2s ease-out 0.3s both",
+          }}
+        />
+        {launchTimelineSteps.map((step, idx) => (
           <button
             key={step.id}
             type="button"
-            className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 relative"
             style={{
               background: "rgba(255,255,255,0.82)",
               border: "1px solid rgba(148, 163, 184, 0.18)",
               boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
+              animation: `timelineCardIn 0.6s ease-out ${0.4 + idx * 0.15}s both`,
             }}
           >
             <div
-               className="px-5 md:px-6 pt-5 pb-3 flex items-center justify-between"
+               className="px-5 md:px-6 pt-5 pb-3 flex items-center justify-between relative"
                style={{
                  background: "rgba(255,255,255,0.82)",
                }}
              >
-               <div className="flex-1 min-w-0">
+               <div
+                 aria-hidden="true"
+                 className="absolute inset-0 opacity-0"
+                 style={{
+                   background: "linear-gradient(180deg, rgba(154,92,46,0.08) 0%, transparent 100%)",
+                   animation: `timelineHeaderFill 0.5s ease-out ${0.55 + idx * 0.15}s both`,
+                 }}
+               />
+               <div className="flex-1 min-w-0 relative z-10">
                  <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(154,92,46,0.7)" }}>
                    Step {step.number}
                  </p>
                  <p className="mt-1 text-sm font-semibold text-foreground leading-snug">{step.title}</p>
                </div>
                <div
-                 className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                 className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 relative z-10"
                  style={{
                    background: "linear-gradient(135deg,#9a5c2e,#7a4825)",
                    boxShadow: "0 2px 8px rgba(154,92,46,0.3)",
+                   animation: `timelineNumberPulse 0.6s cubic-bezier(0.34,1.56,0.64,1) ${0.6 + idx * 0.15}s both`,
                  }}
                >
                  <span className="text-sm font-black text-white">
@@ -886,10 +904,51 @@ function LaunchTimeline() {
              </div>
           </button>
         ))}
-      </div>
-    </div>
-  );
-}
+        </div>
+
+        <style>{`
+        @keyframes timelineLineIn {
+          from {
+            width: 0%;
+            opacity: 0;
+          }
+          to {
+            width: 100%;
+            opacity: 1;
+          }
+        }
+        @keyframes timelineCardIn {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes timelineHeaderFill {
+          to {
+            opacity: 1;
+          }
+        }
+        @keyframes timelineNumberPulse {
+          0% {
+            transform: scale(0.5);
+            opacity: 0;
+          }
+          70% {
+            transform: scale(1.15);
+          }
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        `}</style>
+        </div>
+        );
+        }
 
 function CoreOfferCTA({ onBookDemo }) {
   return (

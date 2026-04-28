@@ -253,7 +253,7 @@ export default function Hero() {
               letterSpacing: "0.04em",
             }}
           >
-            No contracts · Most clients see ROI within 30 days
+            No contracts · Most clients go live in 2–3 business days
           </p>
         </div>
 
