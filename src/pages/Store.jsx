@@ -485,69 +485,7 @@ function StoreInner() {
               padding: "0 24px 24px",
             }}
           >
-            {selectedIndustry ? (
-               <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  gap: "12px",
-                  marginBottom: "18px",
-                  padding: "10px 14px",
-                  borderRadius: "12px",
-                  background: "rgba(255,255,255,0.4)",
-                  border: "none",
-                  borderBottom: "1px solid rgba(154,92,46,0.1)",
-                  boxShadow: "none",
-                }}
-              >
-                <div>
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "700",
-                      color: "#9a5c2e",
-                      letterSpacing: "0.14em",
-                      textTransform: "uppercase",
-                      margin: "0 0 4px",
-                    }}
-                  >
-                    Recommended Stack
-                  </p>
-                  <div className="store-recommendation-pills">
-                    {recommendedPreview.map((service) => (
-                      <span
-                        key={service.product_id}
-                        className="store-summary-chip"
-                      >
-                        {service.name}
-                      </span>
-                    ))}
-                    {recommendedOverflow > 0 ? (
-                      <span className="store-summary-chip">
-                        +{recommendedOverflow} more
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-                <a
-                  href="#top"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    fontSize: "13px",
-                    fontWeight: "700",
-                    color: "#f0c878",
-                    textDecoration: "none",
-                  }}
-                >
-                  Reviewing {selectedIndustry.shortName}
-                  <ArrowRight style={{ width: "14px", height: "14px" }} />
-                </a>
-              </div>
-            ) : null}
+
 
             <div style={{ display: "flex", gap: "10px", marginBottom: "18px", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
               <button
@@ -666,49 +604,7 @@ function StoreInner() {
                   AI_PRODUCTS
                 );
                 return (
-                  <div key={product.product_id}>
-                    <ProductCard product={product} />
-                    {recommendations.length > 0 && (
-                      <div style={{ marginTop: "12px" }}>
-                        <p
-                          style={{
-                            fontSize: "10px",
-                            fontWeight: "700",
-                            color: "rgba(154,92,46,0.7)",
-                            textTransform: "uppercase",
-                            letterSpacing: "0.1em",
-                            marginBottom: "6px",
-                          }}
-                        >
-                          Usually Paired With
-                        </p>
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "6px",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          {recommendations.map((rec) => (
-                            <span
-                              key={rec.product_id}
-                              style={{
-                                fontSize: "11px",
-                                fontWeight: "600",
-                                padding: "4px 8px",
-                                borderRadius: "6px",
-                                background: "rgba(200,150,92,0.12)",
-                                color: "#9a5c2e",
-                                border: "1px solid rgba(200,150,92,0.18)",
-                              }}
-                            >
-                              {rec.name}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  <ProductCard product={product} />
                 );
               })}
             </div>
