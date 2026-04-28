@@ -31,6 +31,11 @@ import Contact from "./pages/Contact";
 import AdminOnboarding from "./pages/AdminOnboarding";
 import Industries from "./pages/Industries";
 import OrderSuccess from "./pages/OrderSuccess";
+import Dental from "./pages/Dental";
+import HVAC from "./pages/HVAC";
+import Roofing from "./pages/Roofing";
+import Contractors from "./pages/Contractors";
+import Chiropractic from "./pages/Chiropractic";
 
 const Store = lazy(() => import("./pages/Store"));
 
@@ -39,6 +44,11 @@ const PUBLIC_PATHS = [
   "/store",
   "/order-success",
   "/med-spa",
+  "/dental",
+  "/hvac",
+  "/roofing",
+  "/contractors",
+  "/chiropractic",
   "/start",
   "/book",
   "/book-demo",
@@ -203,6 +213,11 @@ const AuthenticatedApp = () => {
         }
       />
       <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/dental" element={<Dental />} />
+      <Route path="/hvac" element={<HVAC />} />
+      <Route path="/roofing" element={<Roofing />} />
+      <Route path="/contractors" element={<Contractors />} />
+      <Route path="/chiropractic" element={<Chiropractic />} />
 
       <Route
         element={

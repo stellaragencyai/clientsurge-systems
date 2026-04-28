@@ -16,11 +16,11 @@ const sectionLinks = [
 
 const industryLinks = [
   { label: "Med Spas & Aesthetic Clinics", href: "/med-spa", live: true },
-  { label: "Dental & Orthodontics", href: "/industries#dental", live: false },
-  { label: "Chiropractic & Physical Therapy", href: "/industries#chiropractic", live: false },
-  { label: "HVAC, Plumbing & Home Services", href: "/industries#hvac", live: false },
-  { label: "Roofing & Restoration", href: "/industries#roofing", live: false },
-  { label: "Contractors & Trades", href: "/industries#contractors", live: false },
+  { label: "Dental & Orthodontics", href: "/dental", live: true },
+  { label: "Chiropractic & Physical Therapy", href: "/chiropractic", live: true },
+  { label: "HVAC, Plumbing & Home Services", href: "/hvac", live: true },
+  { label: "Roofing & Restoration", href: "/roofing", live: true },
+  { label: "Contractors & Trades", href: "/contractors", live: true },
 ];
 
 const SAFE_SECTION_HASHES = new Set([
