@@ -286,22 +286,46 @@ const launchTimelineSteps = [
   {
     id: "01",
     number: "1",
+    icon: "MessageSquare",
     title: "Quick Onboarding Call",
+    duration: "Day 1",
     description: "We learn your business, your offers, and how your lead flow works.",
+    bullets: [
+      "Fill out our contact form with your project details and goals",
+      "Receive an automated welcome email within 24 hours",
+      "30-minute video discovery call to discuss your vision and requirements",
+      "We review your target audience, competitors, budget, and timeline"
+    ]
   },
   {
     id: "02",
     number: "2",
+    icon: "Zap",
     title: "We Build And Configure",
+    duration: "Days 2-5",
     description:
       "We set up the messaging, automation logic, follow-up flow, and booking path.",
+    bullets: [
+      "Receive a detailed custom proposal within 24 hours of discovery call",
+      "Review scope, timeline, deliverables, and investment breakdown",
+      "Sign contract electronically and pay 50% deposit to begin",
+      "Complete intake form with brand assets and meet your dedicated team"
+    ]
   },
   {
     id: "03",
     number: "3",
+    icon: "CheckCircle2",
     title: "Launch And Improve",
+    duration: "Day 6+",
     description:
       "You go live, and we keep refining the system as it starts handling real leads.",
+    bullets: [
+      "We create wireframes showing structure and user flow for approval",
+      "Design high-fidelity mockups for desktop, tablet, and mobile views",
+      "Two rounds of revisions included to refine the design",
+      "You provide feedback and we move forward until you're happy"
+    ]
   },
 ];
 
@@ -827,122 +851,146 @@ function SystemDetailPanel({ systemId, onBookDemo, onPrevious, onNext }) {
   );
 }
 
-function LaunchTimeline() {
+function LaunchTimelineHeader() {
   return (
-    <div className="mt-16 md:mt-20">
+    <div className="mb-12 md:mb-16">
       <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3">
         How You Get Live
       </p>
-      <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-8 md:mb-10">
+      <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-10">
         We Set It Up For You
       </h3>
 
-      <div className="space-y-5">
+      {/* Horizontal Timeline */}
+      <div className="hidden md:flex justify-center items-center gap-2 md:gap-4 mb-8 px-4">
         {launchTimelineSteps.map((step, idx) => (
-          <button
-            key={step.id}
-            type="button"
-            className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 relative"
-            style={{
-              background: "rgba(255,255,255,0.82)",
-              border: "1px solid rgba(148, 163, 184, 0.18)",
-              boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
-              animation: `timelineCardIn 0.6s ease-out ${0.4 + idx * 0.15}s both`,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "translateY(-4px)";
-              e.currentTarget.style.boxShadow = "0 16px 40px rgba(111,67,31,0.18)";
-              e.currentTarget.style.borderColor = "rgba(154,92,46,0.35)";
-              e.currentTarget.style.background = "rgba(255,255,255,0.92)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = "0 8px 22px rgba(15, 23, 42, 0.05)";
-              e.currentTarget.style.borderColor = "rgba(148, 163, 184, 0.18)";
-              e.currentTarget.style.background = "rgba(255,255,255,0.82)";
-            }}
-          >
-            <div
-               className="px-5 md:px-6 pt-5 pb-3 flex items-center justify-between relative"
-               style={{
-                 background: "rgba(255,255,255,0.82)",
-               }}
-             >
-               <div
-                 aria-hidden="true"
-                 className="absolute inset-0 opacity-0"
-                 style={{
-                   background: "linear-gradient(180deg, rgba(154,92,46,0.08) 0%, transparent 100%)",
-                   animation: `timelineHeaderFill 0.5s ease-out ${0.55 + idx * 0.15}s both`,
-                 }}
-               />
-               <div className="flex-1 min-w-0 relative z-10">
-                 <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(154,92,46,0.7)" }}>
-                   Step {step.number}
-                 </p>
-                 <p className="mt-1 text-sm font-semibold text-foreground leading-snug">{step.title}</p>
-               </div>
-               <div
-                 className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 relative z-10"
-                 style={{
-                   background: "linear-gradient(135deg,#9a5c2e,#7a4825)",
-                   boxShadow: "0 2px 8px rgba(154,92,46,0.3)",
-                   animation: `timelineNumberPulse 0.6s cubic-bezier(0.34,1.56,0.64,1) ${0.6 + idx * 0.15}s both`,
-                 }}
-               >
-                 <span className="text-sm font-black text-white">
-                   {step.number}
-                 </span>
-               </div>
-             </div>
-
-            <div
-               className="px-5 pb-5 flex flex-col gap-3"
-               style={{
-                 background: "transparent",
-               }}
-             >
-               <p className="text-sm leading-relaxed text-foreground/75">
-                 {step.description}
-               </p>
-             </div>
-          </button>
+          <div key={step.id} className="flex items-center gap-2 md:gap-4">
+            <div className="flex flex-col items-center">
+              <div
+                className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mb-2 flex-shrink-0"
+                style={{
+                  background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+                  boxShadow: "0 4px 12px rgba(154,92,46,0.3)",
+                }}
+              >
+                <span className="text-lg md:text-xl font-black text-white">{step.number}</span>
+              </div>
+              <p className="text-xs md:text-sm font-semibold text-foreground text-center">{step.title}</p>
+              <p className="text-[10px] md:text-xs text-muted-foreground text-center">{step.duration}</p>
+            </div>
+            {idx < launchTimelineSteps.length - 1 && (
+              <div className="text-2xl text-primary/40 mb-8">→</div>
+            )}
+          </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function LaunchTimeline() {
+  return (
+    <div className="mt-16 md:mt-20">
+      <LaunchTimelineHeader />
+
+      {/* Vertical Timeline */}
+      <div className="relative">
+        {/* Vertical line */}
+        <div
+          className="absolute left-8 md:left-1/2 top-0 bottom-0 w-1"
+          style={{
+            background: "linear-gradient(180deg, rgba(154,92,46,0.4) 0%, rgba(154,92,46,0.2) 50%, rgba(154,92,46,0.1) 100%)",
+            transform: "translateX(-50%)",
+          }}
+        />
+
+        <div className="space-y-12 md:space-y-16">
+          {launchTimelineSteps.map((step, idx) => {
+            const isEven = idx % 2 === 0;
+            return (
+              <div key={step.id} className="relative">
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center ${isEven ? "" : "md:[direction:rtl]"}`}>
+                  {/* Content Side */}
+                  <div className="md:[direction:ltr]">
+                    <div
+                      className="rounded-2xl p-6 md:p-7"
+                      style={{
+                        background: "rgba(255,255,255,0.85)",
+                        border: "1.5px solid rgba(154,92,46,0.15)",
+                        boxShadow: "0 8px 24px rgba(111,67,31,0.08)",
+                      }}
+                    >
+                      <div
+                        className="inline-block px-3 py-1.5 rounded-full text-[10px] font-bold text-white mb-3"
+                        style={{
+                          background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+                        }}
+                      >
+                        STEP {step.number}
+                      </div>
+
+                      <h4 className="font-display text-xl md:text-2xl font-bold text-foreground mb-1">
+                        {step.title}
+                      </h4>
+                      <p className="text-xs md:text-sm text-muted-foreground mb-4" style={{ color: "rgba(154,92,46,0.8)" }}>
+                        {step.duration}
+                      </p>
+
+                      <ul className="space-y-2.5">
+                        {step.bullets.map((bullet, i) => (
+                          <li key={i} className="flex items-start gap-2.5">
+                            <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#22c55e" }} />
+                            <span className="text-sm leading-relaxed text-foreground/75">{bullet}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {/* Image Side */}
+                  <div className="md:[direction:ltr]">
+                    <div
+                      className="rounded-2xl overflow-hidden h-64 md:h-80 bg-slate-300"
+                      style={{
+                        border: "1.5px solid rgba(154,92,46,0.12)",
+                        boxShadow: "0 8px 24px rgba(111,67,31,0.1)",
+                      }}
+                    >
+                      <img
+                        src={
+                          idx === 0
+                            ? "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=95"
+                            : idx === 1
+                            ? "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=95"
+                            : "https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&q=95"
+                        }
+                        alt={step.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         <style>{`
-        @keyframes timelineCardIn {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
+          @keyframes timelineCardIn {
+            from {
+              opacity: 0;
+              transform: translateY(12px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes timelineHeaderFill {
-          to {
-            opacity: 1;
-          }
-        }
-        @keyframes timelineNumberPulse {
-          0% {
-            transform: scale(0.5);
-            opacity: 0;
-          }
-          70% {
-            transform: scale(1.15);
-          }
-          100% {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
         `}</style>
-        </div>
-        );
-        }
+      </div>
+    </div>
+  );
+}
 
 function CoreOfferCTA({ onBookDemo }) {
   return (
