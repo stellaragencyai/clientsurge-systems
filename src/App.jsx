@@ -37,6 +37,8 @@ import AdminOnboarding from "./pages/AdminOnboarding";
 import Industries from "./pages/Industries";
 import OrderSuccess from "./pages/OrderSuccess";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
+import BusinessSetup from "./pages/BusinessSetup";
+import AdminAutomation from "./pages/AdminAutomation";
 
 const Store = lazy(() => import("./pages/Store"));
 
@@ -213,6 +215,7 @@ const AuthenticatedApp = () => {
         }
       />
       <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/setup" element={<BusinessSetup />} />
       <Route path="/:slug" element={<IndustryTemplate />} />
 
       <Route
@@ -237,6 +240,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/leads" element={<AdminLeads />} />
         <Route path="/admin/leads/:leadId" element={<AdminLeadDetail />} />
+        <Route path="/admin/automations" element={<AdminAutomation />} />
         <Route path="/lead-intelligence" element={<Navigate to="/admin" replace />} />
         <Route path="/sam" element={<Navigate to="/admin" replace />} />
         <Route path="/medspa-dashboard" element={<Navigate to="/admin" replace />} />
