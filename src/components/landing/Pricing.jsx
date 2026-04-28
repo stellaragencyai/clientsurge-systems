@@ -359,12 +359,12 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
           : isHovered ? "2px solid rgba(200,150,92,0.45)" : "1.5px solid rgba(154,92,46,0.15)",
         boxShadow: plan.highlight
           ? isHovered
-            ? "0 20px 54px rgba(160,90,20,0.22), inset 0 1px 0 rgba(255,255,255,0.9)"
-            : "0 8px 30px rgba(160,90,20,0.14), inset 0 1px 0 rgba(255,255,255,0.8)"
+            ? "0 24px 64px rgba(160,90,20,0.28), inset 0 1px 0 rgba(255,255,255,0.9)"
+            : "0 12px 40px rgba(160,90,20,0.18), inset 0 1px 0 rgba(255,255,255,0.8)"
           : isHovered
-            ? "0 10px 26px rgba(160,90,20,0.1), inset 0 1px 0 rgba(255,255,255,0.85)"
-            : "0 4px 18px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.6)",
-        transform: isHovered ? "translateY(-4px)" : plan.highlight ? "translateY(-2px)" : "translateY(0)",
+            ? "0 14px 36px rgba(160,90,20,0.15), inset 0 1px 0 rgba(255,255,255,0.85)"
+            : "0 6px 22px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
+        transform: isHovered ? "translateY(-8px) scale(1.02)" : plan.highlight ? "translateY(-2px)" : "translateY(0)",
         transition: "all 0.35s ease",
         zIndex: plan.highlight ? 2 : 1,
       }}

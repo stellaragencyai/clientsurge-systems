@@ -236,8 +236,17 @@ export default function Hero() {
                 color: "#fff8ee",
                 fontSize: "1rem",
                 fontWeight: "700",
-                boxShadow: "0 16px 36px rgba(122,72,37,0.24)",
+                boxShadow: "0 12px 48px rgba(154, 92, 46, 0.35)",
                 cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.05)";
+                e.currentTarget.style.boxShadow = "0 18px 60px rgba(154, 92, 46, 0.5)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "0 12px 48px rgba(154, 92, 46, 0.35)";
               }}
             >
               Book Your Free Demo

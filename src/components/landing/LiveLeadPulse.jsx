@@ -7,13 +7,20 @@ export default function LiveLeadPulse() {
         <div
           className="rounded-full px-4 py-3 md:px-6 md:py-4 flex flex-col md:flex-row items-center justify-center gap-3 md:gap-6 text-center shadow-sm"
           style={{
-            background: "rgba(255,255,255,0.9)",
-            border: "1px solid rgba(154,92,46,0.14)",
-            boxShadow: "0 16px 40px rgba(27,20,13,0.06)",
+            background: "rgba(255,255,255,0.95)",
+            border: "1.5px solid rgba(154,92,46,0.28)",
+            boxShadow: "0 20px 50px rgba(27,20,13,0.12), inset 0 1px 0 rgba(255,255,255,0.8)",
             backdropFilter: "blur(12px)",
             WebkitBackdropFilter: "blur(12px)",
+            animation: "live-pulse 2s ease-in-out infinite",
           }}
         >
+          <style>{`
+            @keyframes live-pulse {
+              0%, 100% { opacity: 1; box-shadow: 0 20px 50px rgba(27,20,13,0.12), inset 0 1px 0 rgba(255,255,255,0.8); }
+              50% { opacity: 0.85; box-shadow: 0 24px 60px rgba(27,20,13,0.18), inset 0 1px 0 rgba(255,255,255,0.8); }
+            }
+          `}</style>
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
             <Clock3 className="w-4 h-4 text-primary" />
             Replying to new leads in seconds

@@ -181,7 +181,7 @@ export default function Navbar() {
     <nav
       className={`sticky top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-white/40 backdrop-blur-2xl border-b border-white/30 shadow-lg"
+          ? "bg-white/60 backdrop-blur-2xl border-b border-white/40 shadow-lg"
           : "bg-white/15 backdrop-blur-md border-b border-white/20"
       }`}
       style={{ paddingTop: "env(safe-area-inset-top)" }}
@@ -328,7 +328,10 @@ export default function Navbar() {
                 key={link.href}
                 href={`/${link.href}`}
                 className="block text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded px-2 py-1"
-                onClick={(e) => handleSectionNavigation(e, link.href)}
+                onClick={(e) => {
+                  handleSectionNavigation(e, link.href);
+                  setOpen(false);
+                }}
               >
                 {link.label}
               </a>

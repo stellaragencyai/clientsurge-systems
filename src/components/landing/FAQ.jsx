@@ -112,7 +112,7 @@ export default function FAQ() {
             placeholder="Search FAQs..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+            className="w-full px-4 py-2.5 rounded-lg border border-border bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm"
           />
         </div>
 
@@ -141,7 +141,7 @@ export default function FAQ() {
               <AccordionItem
                 key={idx}
                 value={`faq-${idx}`}
-                className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary/40 transition-all duration-300"
+                className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-all duration-300"
                 style={{
                   background: "rgba(255,255,255,0.75)",
                   backdropFilter: "blur(16px)",
@@ -153,8 +153,8 @@ export default function FAQ() {
                   <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
                     {faq.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5">
-                    <div>
+                  <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5 word-wrap break-words">
+                    <div style={{ wordWrap: "break-word", overflowWrap: "break-word" }}>
                       <p>{faq.a}</p>
                     </div>
                   </AccordionContent>

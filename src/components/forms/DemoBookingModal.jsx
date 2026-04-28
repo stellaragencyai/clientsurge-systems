@@ -225,7 +225,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   onChange={handleChange}
                   autoComplete="name"
                   placeholder="Jane Smith"
-                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.full_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.full_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
                 {errors.full_name && <p className="text-red-600 text-xs mt-1">Error: {errors.full_name}</p>}
               </div>
@@ -237,7 +237,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   onChange={handleChange}
                   autoComplete="organization"
                   placeholder="My Business"
-                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.business_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.business_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
                 {errors.business_name && <p className="text-red-600 text-xs mt-1">Error: {errors.business_name}</p>}
               </div>
@@ -253,7 +253,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   onChange={handleChange}
                   autoComplete="email"
                   placeholder="jane@business.com"
-                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.email ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.email ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
                 {errors.email && <p className="text-red-600 text-xs mt-1">Error: {errors.email}</p>}
               </div>
@@ -267,7 +267,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   autoComplete="tel"
                   inputMode="tel"
                   placeholder="(555) 000-0000"
-                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.phone ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.phone ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
                 {errors.phone && <p className="text-red-600 text-xs mt-1">Error: {errors.phone}</p>}
               </div>
@@ -333,7 +333,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                 value={scheduling.date}
                 min={new Date().toISOString().split('T')[0]}
                 onChange={handleSchedulingChange}
-                className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
               />
             </div>
 
@@ -347,7 +347,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                 value={scheduling.time}
                 onChange={handleSchedulingChange}
                 disabled={!scheduling.date || loadingSlots}
-                className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition disabled:opacity-50 disabled:cursor-not-allowed ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition disabled:opacity-50 disabled:cursor-not-allowed ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
               >
                 <option value="">{!scheduling.date ? 'Select a date first...' : 'Choose a time...'}</option>
                 {[
@@ -414,4 +414,3 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
     document.body
   );
 }
-
