@@ -144,6 +144,21 @@ Deno.serve(async (req) => {
       results.steps.message = messageResult.success
         ? messageResult.data
         : { error: messageResult.error };
+
+      // If email, generate AI subject line
+      if (messageType === "email" && messageResult.data?.message_body) {
+        console.log("[Orchestrator] Generating AI subject line...");
+        const subjectResult = await base44.asServiceRole.functions.invoke(
+          "generateSmartSubjectLine",
+          {
+            lead_id,
+            campaign_type: results.steps.action?.campaign_type,
+            intent,
+            message_preview: messageResult.data.message_body.substring(0, 100),
+          }
+        );
+        results.steps.email_subject = subjectResult.data || {};
+      }
     }
 
     // STEP 6: Route to team member (if hot lead or ready to assign)
