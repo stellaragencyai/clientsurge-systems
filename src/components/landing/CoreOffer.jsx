@@ -588,7 +588,7 @@ function SystemGroupList({ selectedSystemId, onSelect, emphasizedSystemIds, emph
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 gap-5">
             {group.systems.map((systemId) => (
               <div
                 key={systemId}
