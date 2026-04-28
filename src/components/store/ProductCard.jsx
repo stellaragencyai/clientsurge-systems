@@ -65,14 +65,14 @@ export default function ProductCard({ product }) {
         <div
           style={{
             position: "absolute",
-            top: "-10px",
-            left: "20px",
+            top: "12px",
+            right: "18px",
             background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
             color: "#fff",
-            fontSize: "10px",
+            fontSize: "9px",
             fontWeight: "700",
-            padding: "3px 12px",
-            borderRadius: "20px",
+            padding: "4px 10px",
+            borderRadius: "18px",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
             zIndex: 2,
@@ -199,115 +199,66 @@ export default function ProductCard({ product }) {
         ))}
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          paddingTop: "10px",
-          borderTop: "1px solid rgba(154,92,46,0.14)",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
+      <div style={{ position: "relative", zIndex: 1, paddingTop: "4px" }}>
         <div
           style={{
-            flex: 1,
-            background: "rgba(154,92,46,0.06)",
-            borderRadius: "12px",
-            padding: "10px 10px",
-            textAlign: "center",
-            border: "1px solid rgba(154,92,46,0.14)",
+            display: "flex",
+            alignItems: "baseline",
+            gap: "12px",
+            marginBottom: "12px",
           }}
         >
-          <p
-            style={{
-              fontSize: "9px",
-              color: "rgba(154,92,46,0.7)",
-              fontWeight: "700",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              margin: "0 0 3px",
-            }}
-          >
-            Setup
-          </p>
-          <p
-            style={{
-              fontSize: "18px",
-              fontWeight: "800",
-              color: "#1b140d",
-              margin: 0,
-            }}
-          >
-            ${product.setup_fee}
-          </p>
-          <p
-            style={{
-              fontSize: "9px",
-              color: "rgba(27,20,13,0.45)",
-              margin: 0,
-            }}
-          >
-            one-time
-          </p>
-        </div>
-        <div
-          style={{
-            flex: 1,
-            background: "rgba(154,92,46,0.06)",
-            borderRadius: "12px",
-            padding: "10px 10px",
-            textAlign: "center",
-            border: "1px solid rgba(154,92,46,0.14)",
-          }}
-        >
-          <p
-            style={{
-              fontSize: "9px",
-              color: "rgba(154,92,46,0.7)",
-              fontWeight: "700",
-              textTransform: "uppercase",
-              letterSpacing: "0.08em",
-              margin: "0 0 3px",
-            }}
-          >
-            Monthly
-          </p>
-          <p
-            style={{
-              fontSize: "18px",
-              fontWeight: "800",
-              color: "#9a5c2e",
-              margin: 0,
-            }}
-          >
-            ${product.monthly_fee}
-          </p>
-          <p
-            style={{
-              fontSize: "9px",
-              color: "rgba(27,20,13,0.45)",
-              margin: 0,
-            }}
-          >
-            per month
-          </p>
+          <div>
+            <p
+              style={{
+                fontSize: "9px",
+                color: "rgba(154,92,46,0.7)",
+                fontWeight: "700",
+                textTransform: "uppercase",
+                letterSpacing: "0.08em",
+                margin: "0 0 2px",
+              }}
+            >
+              Monthly
+            </p>
+            <p
+              style={{
+                fontSize: "22px",
+                fontWeight: "800",
+                color: "#9a5c2e",
+                margin: 0,
+                lineHeight: 1,
+              }}
+            >
+              ${product.monthly_fee}
+            </p>
+          </div>
+          <div style={{ fontSize: "12px", color: "rgba(27,20,13,0.5)", lineHeight: 1.4 }}>
+            <p style={{ margin: 0, fontWeight: "600" }}>Setup</p>
+            <p style={{ margin: "2px 0 0", fontSize: "14px", fontWeight: "700" }}>${product.setup_fee}</p>
+          </div>
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "10px", position: "relative", zIndex: 1 }}>
+      <div style={{ display: "flex", gap: "8px", alignItems: "center", position: "relative", zIndex: 1 }}>
         <button
           onClick={() => setShowDemo(true)}
           style={{
-            flex: 1,
-            borderRadius: "9999px",
-            padding: "2px",
+            width: "36px",
+            height: "36px",
+            borderRadius: "8px",
+            padding: "0",
             background: "rgba(100,116,139,0.1)",
-            border: "1.5px solid rgba(100,116,139,0.22)",
+            border: "1px solid rgba(100,116,139,0.22)",
             cursor: "pointer",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+            boxShadow: "none",
             transition: "all 0.2s",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
           }}
+          title="Watch demo"
           onMouseEnter={(e) => {
             e.currentTarget.style.background = "rgba(100,116,139,0.15)";
             e.currentTarget.style.borderColor = "rgba(100,116,139,0.35)";
@@ -317,26 +268,13 @@ export default function ProductCard({ product }) {
             e.currentTarget.style.borderColor = "rgba(100,116,139,0.22)";
           }}
         >
-          <span
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "6px",
-              height: "44px",
-              color: "#64748b",
-              fontWeight: "700",
-              fontSize: "13px",
-            }}
-          >
-            <Play style={{ width: "14px", height: "14px" }} /> Watch Demo
-          </span>
+          <Play style={{ width: "14px", height: "14px", color: "#64748b" }} />
         </button>
 
         <button
           onClick={toggle}
           style={{
-            flex: 1.2,
+            flex: 1,
             borderRadius: "9999px",
             padding: "2px",
             background: inCart
@@ -356,7 +294,7 @@ export default function ProductCard({ product }) {
               alignItems: "center",
               justifyContent: "center",
               gap: "6px",
-              height: "44px",
+              height: "40px",
               borderRadius: "9999px",
               background: inCart
                 ? "linear-gradient(135deg,#16a34a,#15803d)"
@@ -368,7 +306,7 @@ export default function ProductCard({ product }) {
           >
             {inCart ? (
               <>
-                <Check style={{ width: "14px", height: "14px" }} /> Added to Cart
+                <Check style={{ width: "14px", height: "14px" }} /> Added
               </>
             ) : (
               <>
