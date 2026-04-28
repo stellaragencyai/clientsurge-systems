@@ -57,7 +57,8 @@ export default function ProductCard({ product }) {
         .product-card:hover {
         border-color: rgba(154,92,46,0.25) !important;
         box-shadow: 0 8px 24px rgba(111,67,31,0.1) !important;
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(252,248,242,0.88) 100%) !important;
         }
       `}</style>
 
@@ -76,11 +77,22 @@ export default function ProductCard({ product }) {
             letterSpacing: "0.08em",
             textTransform: "uppercase",
             zIndex: 2,
+            opacity: 0,
+            transform: "scale(0.8)",
+            transition: "opacity 0.3s ease, transform 0.3s ease",
+            pointerEvents: "none",
           }}
+          className="popular-badge"
         >
           Popular
         </div>
       ) : null}
+      <style>{`
+        .product-card:hover .popular-badge {
+          opacity: 1 !important;
+          transform: scale(1) !important;
+        }
+      `}</style>
 
       <div
         style={{

@@ -180,7 +180,7 @@ function StoreInner() {
           .store-page .store-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 20px;
+            gap: 28px;
           }
           .store-page .store-sticky-cart {
             position: sticky;
@@ -227,6 +227,7 @@ function StoreInner() {
           @media (max-width: 1080px) {
             .store-page .store-grid {
               grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 24px;
             }
           }
           @media (max-width: 720px) {
@@ -251,7 +252,7 @@ function StoreInner() {
             }
             .store-page .store-grid {
               grid-template-columns: 1fr;
-              gap: 16px;
+              gap: 20px;
             }
             .store-page .store-sticky-cart {
               margin: 0 16px 18px;
@@ -386,7 +387,7 @@ function StoreInner() {
             <div className="store-stat-grid" style={{ marginBottom: "16px" }}>
               {[
                 { label: "AI Services Available", val: "12" },
-                { label: "Avg. Setup Time", val: "5-7 days" },
+                { label: "Avg. Setup Time", val: "4-6 hours" },
                 { label: "Cancel Anytime", val: "No Contracts" },
               ].map((stat) => (
                 <div
