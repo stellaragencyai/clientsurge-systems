@@ -68,12 +68,12 @@ export default function Hero() {
           zIndex: 2,
           maxWidth: "1400px",
           margin: "0 auto",
-          padding: "112px 48px 88px",
+          padding: "clamp(5.5rem, 14vw, 7rem) clamp(1.25rem, 5vw, 3rem) clamp(3.5rem, 8vw, 5.5rem)",
           display: "grid",
           gridTemplateColumns: "minmax(0, 560px) minmax(420px, 1fr)",
           gap: "48px",
           alignItems: "center",
-          minHeight: "100vh",
+          minHeight: "100svh",
         }}
       >
         <div className="landing-hero__copy" style={{ maxWidth: "560px" }}>
@@ -218,6 +218,7 @@ export default function Hero() {
               flexWrap: "wrap",
               gap: "12px",
               alignItems: "center",
+              WebkitTapHighlightColor: "transparent",
             }}
           >
             <button
@@ -409,7 +410,6 @@ export default function Hero() {
             grid-template-columns: 1fr !important;
             gap: 30px !important;
             min-height: auto !important;
-            padding: 104px 28px 64px !important;
           }
 
           .landing-hero__visualWrap {
@@ -422,17 +422,13 @@ export default function Hero() {
         }
 
         @media (max-width: 720px) {
-          .landing-hero__inner {
-            padding: 96px 20px 56px !important;
-          }
-
           .landing-hero__headline {
-            font-size: clamp(2.7rem, 12vw, 4rem) !important;
-            line-height: 0.99 !important;
+            font-size: clamp(2.2rem, 9vw, 3.6rem) !important;
+            line-height: 1.02 !important;
           }
 
           .landing-hero__body {
-            font-size: 1rem !important;
+            font-size: 0.97rem !important;
             line-height: 1.66 !important;
           }
 
@@ -443,6 +439,18 @@ export default function Hero() {
 
           .landing-hero__actions > * {
             width: 100% !important;
+            justify-content: center !important;
+          }
+
+          .hero-check-item {
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+        }
+
+        @media (max-width: 390px) {
+          .landing-hero__headline {
+            font-size: clamp(1.9rem, 8.5vw, 2.6rem) !important;
           }
         }
       `}</style>

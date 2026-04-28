@@ -184,8 +184,9 @@ export default function Navbar() {
           ? "bg-white/40 backdrop-blur-2xl border-b border-white/30 shadow-lg"
           : "bg-white/15 backdrop-blur-md border-b border-white/20"
       }`}
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      <div className="w-full px-6 md:px-8 h-16 flex items-center justify-between">
+      <div className="w-full px-4 md:px-8 h-14 md:h-16 flex items-center justify-between" style={{ paddingLeft: "max(1rem, env(safe-area-inset-left))", paddingRight: "max(1rem, env(safe-area-inset-right))" }}>
         <button
           onClick={handleLogoClick}
           className="font-display font-bold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2"

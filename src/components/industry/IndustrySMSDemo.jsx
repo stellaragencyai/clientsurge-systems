@@ -72,7 +72,7 @@ export default function IndustrySMSDemo({
   useEffect(() => () => timeouts.current.forEach(clearTimeout), []);
 
   return (
-    <section id="demo-flow" className="py-20 px-6" style={{ background: "linear-gradient(180deg, #fdfbf8 0%, #f5ede0 100%)" }}>
+    <section id="demo-flow" className="py-16 md:py-20 px-4 md:px-6" style={{ background: "linear-gradient(180deg, #fdfbf8 0%, #f5ede0 100%)" }}>
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary mb-3">
@@ -86,7 +86,7 @@ export default function IndustrySMSDemo({
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 items-start">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-start">
           {/* Left: trigger card */}
           <div
             className="rounded-3xl p-6"
@@ -166,7 +166,7 @@ export default function IndustrySMSDemo({
               background: "#1c1c1e",
               border: "8px solid #2c2c2e",
               boxShadow: "0 24px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
-              minHeight: "420px",
+              minHeight: "360px",
               maxHeight: "520px",
               display: "flex",
               flexDirection: "column",

@@ -1124,7 +1124,8 @@ export default function CoreOffer() {
   return (
     <section
       id="services"
-      className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card via-background to-background relative overflow-hidden"
+      className="py-16 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card via-background to-background relative overflow-hidden"
+      style={{ overflowX: "hidden" }}
     >
       <div
         aria-hidden="true"

@@ -133,8 +133,9 @@ export default function IntegrationPartners() {
             className="flex items-center"
             style={{
               width: "max-content",
-              gap: "80px",
+              gap: "clamp(40px, 6vw, 80px)",
               animation: `integrationScroll 28s linear infinite`,
+              willChange: "transform",
             }}
           >
             {TRIPLED.map((integration, idx) => (

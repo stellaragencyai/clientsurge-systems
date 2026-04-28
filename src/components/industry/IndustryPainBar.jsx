@@ -1,6 +1,6 @@
 export default function IndustryPainBar({ stats }) {
   return (
-    <section className="py-14 px-6" style={{ background: "rgba(253,251,248,0.98)" }}>
+    <section className="py-10 md:py-14 px-4 md:px-6" style={{ background: "rgba(253,251,248,0.98)" }}>
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {stats.map((stat, i) => (

@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 
 export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
   return (
-    <section id="results" className="py-20 px-6" style={{ background: "rgba(253,251,248,0.98)" }}>
+    <section id="results" className="py-16 md:py-20 px-4 md:px-6" style={{ background: "rgba(253,251,248,0.98)", overflowX: "hidden" }}>
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary mb-3">Real Results</p>

@@ -256,7 +256,7 @@ export default function Industries() {
         </p>
       </div>
 
-      <div className="max-w-[1800px] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10">
+      <div className="max-w-[1800px] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10" style={{ overflowX: "hidden" }}>
         {industries.map((industry, index) => {
           const Icon = industry.icon;
           const highlighted = hoveredIndustryId === industry.id;
@@ -265,7 +265,7 @@ export default function Industries() {
             <button
               key={industry.id}
               type="button"
-              className="group relative block overflow-hidden h-[17.5rem] sm:h-[21rem] md:h-[27.6rem] text-left"
+              className="group relative block overflow-hidden h-[14rem] sm:h-[18rem] md:h-[27.6rem] text-left"
               onClick={() => handleIndustrySelect(industry.id)}
               onMouseEnter={() => setHoveredIndustryId(industry.id)}
               onMouseLeave={() => setHoveredIndustryId("")}

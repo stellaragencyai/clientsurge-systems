@@ -69,7 +69,7 @@ export default function Footer() {
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <footer className="bg-background border-t border-primary/20">
+    <footer className="bg-background border-t border-primary/20" style={{ paddingBottom: "env(safe-area-inset-bottom)" }}>
       <div className="max-w-7xl mx-auto px-6 py-16">
         
         {/* Premium Header Section */}

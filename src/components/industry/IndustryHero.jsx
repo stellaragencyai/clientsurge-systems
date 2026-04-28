@@ -7,7 +7,7 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
     : [headline];
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+    <section className="relative overflow-hidden" style={{ minHeight: "100svh", display: "flex", alignItems: "center" }}>
       {/* Full-bleed background image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -15,6 +15,8 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
           alt={eyebrow}
           className="w-full h-full object-cover object-center"
           loading="eager"
+          fetchpriority="high"
+          decoding="async"
         />
         {/* Dark gradient overlay for readability */}
         <div
@@ -34,14 +36,15 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10 py-32 md:py-40 w-full">
-        <div className="max-w-2xl">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-5 md:px-10" style={{ paddingTop: "clamp(7rem, 18vw, 10rem)", paddingBottom: "clamp(5rem, 12vw, 8rem)" }}>
+        <div style={{ maxWidth: "min(640px, 100%)" }}>
           {/* Eyebrow */}
           <div
             className="inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6"
             style={{
               background: "rgba(255,255,255,0.12)",
               border: "1px solid rgba(255,255,255,0.22)",
+              WebkitBackdropFilter: "blur(12px)",
               backdropFilter: "blur(12px)",
             }}
           >
@@ -88,7 +91,7 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-wrap gap-4">
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
             <button
               type="button"
               onClick={onBookDemo}
@@ -96,39 +99,43 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "10px",
-                minHeight: "56px",
-                padding: "0 32px",
+                minHeight: "52px",
+                padding: "0 28px",
                 borderRadius: "9999px",
                 border: "none",
                 background: "linear-gradient(135deg, #7a4825 0%, #9a5c2e 46%, #c8965c 100%)",
                 color: "#fff8ee",
-                fontSize: "1rem",
+                fontSize: "0.95rem",
                 fontWeight: "700",
                 boxShadow: "0 16px 36px rgba(0,0,0,0.35)",
                 cursor: "pointer",
+                WebkitTapHighlightColor: "transparent",
+                touchAction: "manipulation",
               }}
             >
               {ctaLabel}
-              <ArrowRight style={{ width: "18px", height: "18px" }} />
+              <ArrowRight style={{ width: "18px", height: "18px", flexShrink: 0 }} />
             </button>
 
             <a
-              href="#how-it-works"
+              href="#demo-flow"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "8px",
-                minHeight: "56px",
-                padding: "0 28px",
+                minHeight: "52px",
+                padding: "0 24px",
                 borderRadius: "9999px",
                 border: "1.5px solid rgba(255,255,255,0.3)",
                 background: "rgba(255,255,255,0.1)",
+                WebkitBackdropFilter: "blur(12px)",
                 backdropFilter: "blur(12px)",
                 color: "rgba(255,255,255,0.9)",
                 fontSize: "14px",
                 fontWeight: "600",
                 textDecoration: "none",
                 cursor: "pointer",
+                WebkitTapHighlightColor: "transparent",
               }}
             >
               See How It Works
