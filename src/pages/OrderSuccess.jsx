@@ -3,6 +3,7 @@ import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
+import OrderTracker from "@/components/landing/OrderTracker";
 
 export default function OrderSuccess() {
   const [sessionId, setSessionId] = useState("");
@@ -168,9 +169,11 @@ export default function OrderSuccess() {
             </Link>
           </div>
 
-          {sessionId ? (
-            <p className="mt-6 text-xs text-muted-foreground">Order session: {sessionId}</p>
-          ) : null}
+          {sessionId && (
+            <div className="mt-8 text-left">
+              <OrderTracker sessionId={sessionId} />
+            </div>
+          )}
         </div>
       </div>
     </DemoBookingProvider>
