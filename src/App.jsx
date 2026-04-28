@@ -15,8 +15,13 @@ import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import PageNotFound from "./lib/PageNotFound";
+import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
+
+// Initialize auto-tracking on app load
+if (typeof window !== "undefined") {
+  initializeAnalyticsObserver();
+}
 import Home from "./pages/Home";
-import MedSpa from "./pages/MedSpa";
 import Onboarding from "./pages/Onboarding";
 import CaptureLeads from "./pages/CaptureLeads";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -31,11 +36,7 @@ import Contact from "./pages/Contact";
 import AdminOnboarding from "./pages/AdminOnboarding";
 import Industries from "./pages/Industries";
 import OrderSuccess from "./pages/OrderSuccess";
-import Dental from "./pages/Dental";
-import HVAC from "./pages/HVAC";
-import Roofing from "./pages/Roofing";
-import Contractors from "./pages/Contractors";
-import Chiropractic from "./pages/Chiropractic";
+import IndustryTemplate from "./components/landing/IndustryTemplate";
 
 const Store = lazy(() => import("./pages/Store"));
 
@@ -181,7 +182,6 @@ const AuthenticatedApp = () => {
       <Route path="/test-option-3" element={<Navigate to="/" replace />} />
       <Route path="/preview-idea-1" element={<Navigate to="/" replace />} />
       <Route path="/preview-idea-2" element={<Navigate to="/" replace />} />
-      <Route path="/med-spa" element={<MedSpa />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
@@ -213,11 +213,7 @@ const AuthenticatedApp = () => {
         }
       />
       <Route path="/order-success" element={<OrderSuccess />} />
-      <Route path="/dental" element={<Dental />} />
-      <Route path="/hvac" element={<HVAC />} />
-      <Route path="/roofing" element={<Roofing />} />
-      <Route path="/contractors" element={<Contractors />} />
-      <Route path="/chiropractic" element={<Chiropractic />} />
+      <Route path="/:slug" element={<IndustryTemplate />} />
 
       <Route
         element={
