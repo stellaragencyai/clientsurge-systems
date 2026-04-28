@@ -227,139 +227,140 @@ export default function ProductCard({ product }) {
         ))}
       </div>
 
-      <div style={{ position: "relative", zIndex: 1, paddingTop: "4px" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            gap: "12px",
-            marginBottom: "12px",
-            opacity: product.coming_soon ? 0.6 : 1,
-          }}
-        >
-          <div>
-            <p
-              style={{
-                fontSize: "9px",
-                color: product.coming_soon ? "rgba(100,100,100,0.5)" : "rgba(154,92,46,0.7)",
-                fontWeight: "700",
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                margin: "0 0 2px",
-              }}
-            >
-              Monthly
-            </p>
-            <p
-              style={{
-                fontSize: "22px",
-                fontWeight: "800",
-                color: product.coming_soon ? "#a0a0a0" : "#9a5c2e",
-                margin: 0,
-                lineHeight: 1,
-              }}
-            >
-              ${product.monthly_fee}
-            </p>
-          </div>
-          <div style={{ fontSize: "12px", color: product.coming_soon ? "rgba(100,100,100,0.5)" : "rgba(27,20,13,0.5)", lineHeight: 1.4 }}>
-            <p style={{ margin: 0, fontWeight: "600" }}>Setup</p>
-            <p style={{ margin: "2px 0 0", fontSize: "14px", fontWeight: "700" }}>${product.setup_fee}</p>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: "flex", gap: "8px", alignItems: "center", position: "relative", zIndex: 1, pointerEvents: product.coming_soon ? "none" : "auto" }}>
-        <button
-          onClick={() => setShowDemo(true)}
-          disabled={product.coming_soon}
-          style={{
-            width: "36px",
-            height: "36px",
-            borderRadius: "8px",
-            padding: "0",
-            background: product.coming_soon ? "rgba(100,100,100,0.08)" : "rgba(100,116,139,0.1)",
-            border: product.coming_soon ? "1px solid rgba(100,100,100,0.1)" : "1px solid rgba(100,116,139,0.22)",
-            cursor: product.coming_soon ? "not-allowed" : "pointer",
-            boxShadow: "none",
-            transition: "all 0.2s",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-          title={product.coming_soon ? "Coming soon" : "Watch demo"}
-          onMouseEnter={(e) => {
-            if (!product.coming_soon) {
-              e.currentTarget.style.background = "rgba(100,116,139,0.15)";
-              e.currentTarget.style.borderColor = "rgba(100,116,139,0.35)";
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!product.coming_soon) {
-              e.currentTarget.style.background = "rgba(100,116,139,0.1)";
-              e.currentTarget.style.borderColor = "rgba(100,116,139,0.22)";
-            }
-          }}
-        >
-          <Play style={{ width: "14px", height: "14px", color: product.coming_soon ? "#a0a0a0" : "#64748b", opacity: product.coming_soon ? 0.6 : 1 }} />
-        </button>
-
-        <button
-          onClick={toggle}
-          disabled={product.coming_soon}
-          style={{
-            flex: 1,
-            borderRadius: "9999px",
-            padding: "2px",
-            background: product.coming_soon
-              ? "linear-gradient(135deg,#c0c0c0,#b0b0b0)"
-              : inCart
-              ? "linear-gradient(135deg,#22c55e,#16a34a)"
-              : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-            border: "none",
-            cursor: product.coming_soon ? "not-allowed" : "pointer",
-            boxShadow: inCart
-              ? "0 4px 14px rgba(34,197,94,0.32)"
-              : product.coming_soon
-              ? "none"
-              : "0 4px 14px rgba(120,70,20,0.28)",
-            transition: "all 0.2s",
-          }}
-        >
-          <span
+      <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+        <div style={{ opacity: product.coming_soon ? 0.6 : 1 }}>
+          <p
             style={{
+              fontSize: "9px",
+              color: product.coming_soon ? "rgba(100,100,100,0.5)" : "rgba(154,92,46,0.7)",
+              fontWeight: "700",
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              margin: 0,
+            }}
+          >
+            Monthly
+          </p>
+          <p
+            style={{
+              fontSize: "18px",
+              fontWeight: "800",
+              color: product.coming_soon ? "#a0a0a0" : "#9a5c2e",
+              margin: 0,
+              lineHeight: 1,
+            }}
+          >
+            ${product.monthly_fee}
+          </p>
+          <p style={{ fontSize: "8px", color: product.coming_soon ? "rgba(100,100,100,0.5)" : "rgba(27,20,13,0.5)", margin: "2px 0 0", fontWeight: "600" }}>
+            Setup ${product.setup_fee}
+          </p>
+        </div>
+
+        <div style={{ display: "flex", gap: "6px", alignItems: "center", position: "relative", zIndex: 1, pointerEvents: product.coming_soon ? "none" : "auto" }}>
+          <button
+            onClick={() => setShowDemo(true)}
+            disabled={product.coming_soon}
+            style={{
+              width: "30px",
+              height: "30px",
+              borderRadius: "6px",
+              padding: "0",
+              background: product.coming_soon ? "rgba(100,100,100,0.08)" : "rgba(100,116,139,0.1)",
+              border: product.coming_soon ? "1px solid rgba(100,100,100,0.1)" : "1px solid rgba(100,116,139,0.22)",
+              cursor: product.coming_soon ? "not-allowed" : "pointer",
+              boxShadow: "none",
+              transition: "all 0.2s",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              gap: "6px",
-              height: "40px",
-              borderRadius: "9999px",
-              background: product.coming_soon
-                ? "linear-gradient(135deg,#a0a0a0,#909090)"
-                : inCart
-                ? "linear-gradient(135deg,#16a34a,#15803d)"
-                : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-              color: "#fff",
-              fontWeight: "700",
-              fontSize: "13px",
-              opacity: product.coming_soon ? 0.7 : 1,
+              flexShrink: 0,
+              opacity: 0,
+              pointerEvents: "none",
+            }}
+            className="demo-btn"
+            title={product.coming_soon ? "Coming soon" : "Watch demo"}
+            onMouseEnter={(e) => {
+              if (!product.coming_soon) {
+                e.currentTarget.style.background = "rgba(100,116,139,0.15)";
+                e.currentTarget.style.borderColor = "rgba(100,116,139,0.35)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!product.coming_soon) {
+                e.currentTarget.style.background = "rgba(100,116,139,0.1)";
+                e.currentTarget.style.borderColor = "rgba(100,116,139,0.22)";
+              }
             }}
           >
-            {product.coming_soon ? (
-              "Coming Soon"
-            ) : inCart ? (
-              <>
-                <Check style={{ width: "14px", height: "14px" }} /> Added
-              </>
-            ) : (
-              <>
-                <Plus style={{ width: "14px", height: "14px" }} /> Add to Cart
-              </>
-            )}
-          </span>
-        </button>
+            <Play style={{ width: "12px", height: "12px", color: product.coming_soon ? "#a0a0a0" : "#64748b", opacity: product.coming_soon ? 0.6 : 1 }} />
+          </button>
+
+          <button
+            onClick={toggle}
+            disabled={product.coming_soon}
+            style={{
+              borderRadius: "9999px",
+              padding: "2px",
+              background: product.coming_soon
+                ? "linear-gradient(135deg,#c0c0c0,#b0b0b0)"
+                : inCart
+                ? "linear-gradient(135deg,#22c55e,#16a34a)"
+                : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+              border: "none",
+              cursor: product.coming_soon ? "not-allowed" : "pointer",
+              boxShadow: inCart
+                ? "0 4px 14px rgba(34,197,94,0.32)"
+                : product.coming_soon
+                ? "none"
+                : "0 4px 14px rgba(120,70,20,0.28)",
+              transition: "all 0.2s",
+            }}
+          >
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "4px",
+                height: "30px",
+                paddingLeft: "12px",
+                paddingRight: "12px",
+                borderRadius: "9999px",
+                background: product.coming_soon
+                  ? "linear-gradient(135deg,#a0a0a0,#909090)"
+                  : inCart
+                  ? "linear-gradient(135deg,#16a34a,#15803d)"
+                  : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                color: "#fff",
+                fontWeight: "700",
+                fontSize: "11px",
+                opacity: product.coming_soon ? 0.7 : 1,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {product.coming_soon ? (
+                "Coming Soon"
+              ) : inCart ? (
+                <>
+                  <Check style={{ width: "12px", height: "12px" }} /> Added
+                </>
+              ) : (
+                <>
+                  <Plus style={{ width: "12px", height: "12px" }} /> Add
+                </>
+              )}
+            </span>
+          </button>
+        </div>
       </div>
+
+      <style>{`
+        .product-card:hover .demo-btn {
+          opacity: 1 !important;
+          pointer-events: auto !important;
+        }
+      `}</style>
 
       {product.coming_soon && (
         <div
