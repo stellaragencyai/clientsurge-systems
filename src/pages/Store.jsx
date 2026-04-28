@@ -11,6 +11,9 @@ import Footer from "@/components/landing/Footer";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
 import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
+import BuildYourStackFlow from "@/components/store/BuildYourStackFlow";
+import GuidedPathToggle from "@/components/store/GuidedPathToggle";
+import { getRecommendedProducts } from "@/lib/productRecommendations";
 
 const InteractiveStackBuilder = lazy(() =>
   import("@/components/store/InteractiveStackBuilder")
@@ -21,6 +24,7 @@ function StoreInner() {
   const [search, setSearch] = useState("");
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [showComparison, setShowComparison] = useState(false);
+  const [pathMode, setPathMode] = useState("guided");
   const { items, setCartOpen, totalSetup, totalMonthly } = useCart();
 
   useEffect(() => {
@@ -62,7 +66,7 @@ function StoreInner() {
       selectedIndustry?.recommendedServiceKeys || []
     );
 
-    return AI_PRODUCTS.filter((product) => {
+    let results = AI_PRODUCTS.filter((product) => {
       const matchCategory =
         activeCategory === "All" || product.category === activeCategory;
       const matchSearch =
@@ -80,7 +84,19 @@ function StoreInner() {
 
       return leftRecommended ? -1 : 1;
     });
-  }, [activeCategory, search, selectedIndustry]);
+
+    // In guided mode, show only recommended + featured services
+    if (pathMode === "guided" && selectedIndustry) {
+      const recommendedNames = new Set(
+        selectedIndustry?.recommendedServices?.map((s) => s.name) || []
+      );
+      results = results.filter(
+        (p) => recommendedNames.has(p.name)
+      ).slice(0, 6);
+    }
+
+    return results;
+  }, [activeCategory, search, selectedIndustry, pathMode]);
 
   const recommendedPreview = useMemo(
     () => selectedIndustry?.recommendedServices?.slice(0, 4) || [],
@@ -542,7 +558,7 @@ function StoreInner() {
               </div>
             ) : null}
 
-            <div style={{ display: "flex", gap: "10px", marginBottom: "18px" }}>
+            <div style={{ display: "flex", gap: "10px", marginBottom: "18px", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
               <button
                 onClick={() => setShowComparison(true)}
                 style={{
@@ -567,6 +583,7 @@ function StoreInner() {
               >
                 📊 Compare All Services
               </button>
+              <GuidedPathToggle mode={pathMode} onModeChange={setPathMode} />
             </div>
 
             <div className="store-toolbar">
@@ -652,9 +669,57 @@ function StoreInner() {
             </div>
 
             <div className="store-grid">
-              {filtered.map((product) => (
-                <ProductCard key={product.product_id} product={product} />
-              ))}
+              {filtered.map((product) => {
+                const recommendations = getRecommendedProducts(
+                  product.product_id,
+                  AI_PRODUCTS
+                );
+                return (
+                  <div key={product.product_id}>
+                    <ProductCard product={product} />
+                    {recommendations.length > 0 && (
+                      <div style={{ marginTop: "12px" }}>
+                        <p
+                          style={{
+                            fontSize: "10px",
+                            fontWeight: "700",
+                            color: "rgba(154,92,46,0.7)",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.1em",
+                            marginBottom: "6px",
+                          }}
+                        >
+                          Usually Paired With
+                        </p>
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "6px",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          {recommendations.map((rec) => (
+                            <span
+                              key={rec.product_id}
+                              style={{
+                                fontSize: "11px",
+                                fontWeight: "600",
+                                padding: "4px 8px",
+                                borderRadius: "6px",
+                                background: "rgba(200,150,92,0.12)",
+                                color: "#9a5c2e",
+                                border: "1px solid rgba(200,150,92,0.18)",
+                              }}
+                            >
+                              {rec.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
 
             {filtered.length === 0 ? (
@@ -666,7 +731,9 @@ function StoreInner() {
                 }}
               >
                 <p style={{ fontSize: "16px", fontWeight: "600" }}>
-                  No services match your search
+                  {pathMode === "guided" && selectedIndustry
+                    ? "Try switching to 'Explore All' to see more services"
+                    : "No services match your search"}
                 </p>
               </div>
             ) : null}
@@ -678,6 +745,7 @@ function StoreInner() {
             ) : null}
           </div>
 
+          <BuildYourStackFlow />
           <CartSidebar />
           <Footer />
           <SocialProofTicker />
