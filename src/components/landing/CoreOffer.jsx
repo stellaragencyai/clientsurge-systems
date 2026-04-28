@@ -539,10 +539,9 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
       }}
     >
       <div
-        className="px-5 md:px-6 pt-5 pb-4 flex items-center justify-between gap-3 rounded-t-2xl"
+        className="px-5 md:px-6 pt-5 pb-3 flex items-center justify-between gap-3"
         style={{
           background: "rgba(255,255,255,0.82)",
-          borderBottom: "1px solid rgba(148, 163, 184, 0.18)",
         }}
       >
         <div className="flex-1 min-w-0">
@@ -563,11 +562,9 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
       </div>
 
       <div
-        className="rounded-2xl px-5 py-5 flex flex-col gap-3"
+        className="px-5 pb-5 flex flex-col gap-3"
         style={{
-          background: "rgba(255,255,255,0.82)",
-          border: "1px solid rgba(148, 163, 184, 0.18)",
-          boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
+          background: "transparent",
         }}
       >
         <h3 className="text-lg font-semibold leading-snug text-foreground">
