@@ -102,6 +102,22 @@ Deno.serve(async (req) => {
     const bookingProbability =
       results.steps.outcome?.booking_probability || 0;
 
+    // DEDUP: Check for duplicates before proceeding
+    console.log("[Orchestrator] Deduplication check...");
+    const dedupResult = await base44.asServiceRole.functions.invoke(
+      "deduplicateLeads",
+      { lead_id }
+    );
+    results.steps.deduplication = dedupResult.data || {};
+
+    // THREADING: Build conversation context
+    console.log("[Orchestrator] Building conversation thread...");
+    const threadResult = await base44.asServiceRole.functions.invoke(
+      "conversationThreading",
+      { lead_id }
+    );
+    results.steps.conversation_thread = threadResult.data || {};
+
     // STEP 4: Decide next action
     console.log("[Orchestrator] Step 4/7: Deciding next action...");
     const actionResult = await base44.asServiceRole.functions.invoke(
@@ -182,15 +198,39 @@ Deno.serve(async (req) => {
       ? churnResult.data
       : { error: churnResult.error };
 
-    // Summary
+    // STEP 11: Smart booking link deployment
+    console.log("[Orchestrator] Step 11/14: Smart booking link deployment...");
+    const bookingLinkResult = await base44.asServiceRole.functions.invoke(
+      "smartBookingLinkDeployment",
+      { lead_id, project_id, booking_link: "https://booking.example.com" }
+    );
+    results.steps.booking_link = bookingLinkResult.data || {};
+
+    // STEP 12: Auto pipeline advancement
+    console.log("[Orchestrator] Step 12/14: Auto pipeline advancement...");
+    const pipelineResult = await base44.asServiceRole.functions.invoke(
+      "autoPipelineAdvancement",
+      { lead_id }
+    );
+    results.steps.pipeline_advancement = pipelineResult.data || {};
+
+    // SUMMARY: Update summary with all steps
     results.summary = {
       score: results.steps.score?.score,
       intent,
       booking_probability: bookingProbability,
       next_action: results.steps.action?.action,
-      assigned_to: results.steps.routing?.assigned_to_name,
+      assigned_to: results.steps.routing?.recommended_closer,
       churn_risk: results.steps.churn?.churn_risk_level,
+      pipeline_stage: results.steps.pipeline_advancement?.current_stage,
+      booking_link_deployed: results.steps.booking_link?.should_deploy,
+      duplicates_merged: results.steps.deduplication?.duplicates_merged,
+      conversation_context: results.steps.conversation_thread?.context_summary,
+      objection_detected: results.steps.objections?.primary_objection,
+      sequence_recommendation: results.steps.sequence_optimization?.recommended_delay_hours,
     };
+
+
 
     console.log(`[Orchestrator] ✅ Complete workflow for ${lead_id}`);
 
