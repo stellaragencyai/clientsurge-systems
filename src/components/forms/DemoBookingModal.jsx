@@ -116,11 +116,10 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
       if (result.data.success) {
         setSubmitWarnings(result.data.warnings || []);
         setSuccess(true);
-        // Show success for 2 seconds, then close + optionally redirect
+        // Show success for 2 seconds, then close + redirect
         setTimeout(() => {
           onClose();
-          // Uncomment to redirect to success page after closing modal:
-          // window.location.href = '/success';
+          window.location.href = '/success';
         }, 2000);
       }
     } catch (error) {

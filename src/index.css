@@ -112,7 +112,7 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
-/* CTA Button Focus States */
+/* CTA Button Focus States - Enhanced for Accessibility */
 button[type="button"],
 button[type="submit"],
 a[role="button"],
@@ -122,16 +122,17 @@ a[role="button"],
   position: relative;
 }
 
-button[type="button"]:focus,
-button[type="submit"]:focus,
-a[role="button"]:focus,
-.shiny-brown-btn:focus,
-[class*="cta"]:focus,
-[class*="btn"]:focus {
+/* Focus for all interactive elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
 }
 
+/* Enhanced focus ring for CTAs */
 button[type="button"]:focus-visible,
 button[type="submit"]:focus-visible,
 a[role="button"]:focus-visible,

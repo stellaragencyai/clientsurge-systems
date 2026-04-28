@@ -73,9 +73,13 @@ export function setPageMetadata({
 
   ensureMeta("property", "og:title").setAttribute("content", ogTitle || title);
   ensureMeta("property", "og:description").setAttribute("content", ogDescription || description);
+  ensureMeta("property", "og:type").setAttribute("content", "website");
   ensureMeta("property", "og:url").setAttribute("content", canonicalUrl);
   ensureMeta("property", "og:image").setAttribute("content", ogImage);
+  ensureMeta("property", "og:image:width").setAttribute("content", "1200");
+  ensureMeta("property", "og:image:height").setAttribute("content", "630");
 
+  ensureMeta("property", "twitter:card").setAttribute("content", "summary_large_image");
   ensureMeta("property", "twitter:title").setAttribute("content", ogTitle || title);
   ensureMeta("property", "twitter:description").setAttribute("content", ogDescription || description);
   ensureMeta("property", "twitter:image").setAttribute("content", ogImage);

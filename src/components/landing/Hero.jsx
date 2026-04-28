@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
-import HeroDashboardScreen from "./HeroDashboardScreen";
 import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
+
+const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
 
 const checklist = [
   "Instant response to every new lead — within seconds",
@@ -353,7 +354,9 @@ export default function Hero() {
                 boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
               }}
             >
-              <HeroDashboardScreen />
+              <Suspense fallback={<div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-100 animate-pulse" />}>
+                <HeroDashboardScreen />
+              </Suspense>
             </div>
             </div>
           </div>
