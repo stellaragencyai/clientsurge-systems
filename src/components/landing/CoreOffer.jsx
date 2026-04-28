@@ -3,12 +3,15 @@ import {
   ArrowRight,
   CalendarCheck,
   CheckCircle2,
+  CreditCard,
   HeadphonesIcon,
   LayoutDashboard,
   MessageSquare,
   PhoneCall,
+  Rocket,
   RotateCcw,
   Send,
+  ShoppingCart,
   Zap,
 } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
@@ -26,6 +29,9 @@ const iconMap = {
   CalendarCheck,
   LayoutDashboard,
   HeadphonesIcon,
+  ShoppingCart,
+  CreditCard,
+  Rocket,
 };
 
 const coreOfferSectionConfig = {
@@ -286,45 +292,71 @@ const launchTimelineSteps = [
   {
     id: "01",
     number: "1",
-    icon: "MessageSquare",
-    title: "Quick Onboarding Call",
-    duration: "Day 1",
-    description: "We learn your business, your offers, and how your lead flow works.",
+    icon: "ShoppingCart",
+    title: "Browse & Select",
+    duration: "5-10 min",
+    description: "Pick the automations you need from our AI Store.",
     bullets: [
-      "Fill out our contact form with your project details and goals",
-      "Receive an automated welcome email within 24 hours",
-      "30-minute video discovery call to discuss your vision and requirements",
-      "We review your target audience, competitors, budget, and timeline"
+      "Explore 12+ automation services in the AI Store",
+      "Watch 2-3 minute demo videos for each automation",
+      "See exactly what each service does and when it runs",
+      "Build your custom stack—only pay for what you need"
     ]
   },
   {
     id: "02",
     number: "2",
-    icon: "Zap",
-    title: "We Build And Configure",
-    duration: "Days 2-5",
-    description:
-      "We set up the messaging, automation logic, follow-up flow, and booking path.",
+    icon: "CreditCard",
+    title: "Quick Signup & Checkout",
+    duration: "5 min",
+    description: "Create account, add to cart, and pay securely.",
     bullets: [
-      "Receive a detailed custom proposal within 24 hours of discovery call",
-      "Review scope, timeline, deliverables, and investment breakdown",
-      "Sign contract electronically and pay 50% deposit to begin",
-      "Complete intake form with brand assets and meet your dedicated team"
+      "Sign up with email and password in 60 seconds",
+      "Add your selected automations to cart",
+      "Review total setup fee and monthly cost",
+      "Pay securely via Stripe—done"
     ]
   },
   {
     id: "03",
     number: "3",
-    icon: "CheckCircle2",
-    title: "Launch And Improve",
-    duration: "Day 6+",
-    description:
-      "You go live, and we keep refining the system as it starts handling real leads.",
+    icon: "LayoutDashboard",
+    title: "Instant Dashboard Access",
+    duration: "Immediate",
+    description: "You're in the system right now with everything ready.",
     bullets: [
-      "We create wireframes showing structure and user flow for approval",
-      "Design high-fidelity mockups for desktop, tablet, and mobile views",
-      "Two rounds of revisions included to refine the design",
-      "You provide feedback and we move forward until you're happy"
+      "Access your private dashboard immediately after payment",
+      "Download setup guides and integration docs",
+      "Watch video tutorials for each automation",
+      "See real-time status of your services"
+    ]
+  },
+  {
+    id: "04",
+    number: "4",
+    icon: "Zap",
+    title: "We Install Everything",
+    duration: "1-2 hours",
+    description: "Our system configures everything in the background while you watch.",
+    bullets: [
+      "Automated setup connects your integrations",
+      "Your messaging and automation logic configured instantly",
+      "All follow-up sequences and booking flows activated",
+      "You don't have to do anything—we handle it all"
+    ]
+  },
+  {
+    id: "05",
+    number: "5",
+    icon: "Rocket",
+    title: "You're Live & We Notify You",
+    duration: "Fully automated",
+    description: "Your automations are running and generating value now.",
+    bullets: [
+      "All services live and actively handling leads",
+      "Real-time dashboard shows leads coming through",
+      "We send you a notification and onboarding session invite",
+      "We optimize your setup based on your actual lead flow"
     ]
   },
 ];
@@ -855,10 +887,10 @@ function LaunchTimelineHeader() {
   return (
     <div className="mb-12 md:mb-16">
       <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3">
-        How You Get Live
+        Get Live In 2 Hours
       </p>
       <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-10">
-        We Set It Up For You
+        From Browse To Live Automations
       </h3>
 
       {/* Horizontal Timeline */}
