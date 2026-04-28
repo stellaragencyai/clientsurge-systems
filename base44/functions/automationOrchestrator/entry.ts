@@ -25,6 +25,25 @@ Deno.serve(async (req) => {
       steps: {},
     };
 
+    // PRE-STEP: Validate lead quality (reject spam early)
+    console.log("[Orchestrator] Pre-step: Validating lead quality...");
+    const qualityResult = await base44.asServiceRole.functions.invoke(
+      "validateLeadQuality",
+      { full_name: lead.full_name, email: lead.email, phone: lead.phone }
+    );
+    results.steps.quality_check = qualityResult.data || {};
+    
+    if (qualityResult.data?.should_reject) {
+      console.log(`[Orchestrator] Lead rejected due to low quality (score: ${qualityResult.data.quality_score})`);
+      return Response.json({
+        success: false,
+        lead_id,
+        reason: "Lead failed quality validation",
+        quality_score: qualityResult.data.quality_score,
+        flags: qualityResult.data.flags,
+      });
+    }
+
     // STEP 1: Score the lead
     console.log("[Orchestrator] Step 1/7: Scoring lead...");
     const scoreResult = await base44.asServiceRole.functions.invoke(
@@ -51,13 +70,20 @@ Deno.serve(async (req) => {
     const intent = results.steps.intent?.intent || "general";
     const score = results.steps.score?.score || 50;
 
-    // STEP 2B: Enroll in Email Drip Campaign (parallel with SMS, not replacing)
+    // STEP 2B: Calculate optimal send time + Enroll in Email Drip Campaign
     if (intent && ["asking_question", "pricing_concern", "uncertain"].includes(intent)) {
-      console.log("[Orchestrator] Enrolling in email drip campaign...");
+      console.log("[Orchestrator] Calculating optimal send time...");
+      const sendTimeResult = await base44.asServiceRole.functions.invoke(
+        "calculateOptimalSendTime",
+        { lead_id, message_type: "email" }
+      );
+      
+      console.log("[Orchestrator] Enrolling in email drip campaign at optimal time...");
       const emailResult = await base44.asServiceRole.functions.invoke(
         "enrollEmailDripCampaign",
         { lead_id, trigger_intent: intent, campaign_type: "case_study", project_id }
       );
+      results.steps.optimal_send_time = sendTimeResult.data || {};
       results.steps.email_drip = emailResult.success
         ? emailResult.data
         : { skipped: true, reason: emailResult.data?.message };
@@ -106,14 +132,14 @@ Deno.serve(async (req) => {
 
     // STEP 6: Route to team member (if hot lead or ready to assign)
     if (score > 60 || bookingProbability > 50) {
-      console.log("[Orchestrator] Step 6/7: Routing to optimal team member...");
-      const routeResult = await base44.asServiceRole.functions.invoke(
-        "routeToOptimalTeamMember",
+      console.log("[Orchestrator] Step 6/7: Routing to optimal team member (AI-predicted)...");
+      const predictResult = await base44.asServiceRole.functions.invoke(
+        "predictOptimalCloser",
         { lead_id, project_id }
       );
-      results.steps.routing = routeResult.success
-        ? routeResult.data
-        : { error: routeResult.error };
+      results.steps.routing = predictResult.success
+        ? predictResult.data
+        : { error: predictResult.error };
     }
 
     // STEP 7: Churn analysis (if customer has booked before)
