@@ -22,12 +22,18 @@ export default function ProductCard({ product }) {
         borderRadius: "16px",
         border: inCart
           ? "1px solid rgba(154,92,46,0.3)"
+          : product.coming_soon
+          ? "1px solid rgba(154,92,46,0.08)"
           : "1px solid rgba(154,92,46,0.12)",
         background: inCart
           ? "linear-gradient(180deg, rgba(255,248,235,0.85) 0%, rgba(248,235,215,0.82) 100%)"
+          : product.coming_soon
+          ? "linear-gradient(180deg, rgba(242,242,242,0.7) 0%, rgba(235,235,235,0.65) 100%)"
           : "linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(252,248,242,0.78) 100%)",
         boxShadow: inCart
           ? "0 6px 20px rgba(111,67,31,0.08)"
+          : product.coming_soon
+          ? "0 1px 4px rgba(0,0,0,0.02)"
           : "0 2px 8px rgba(111,67,31,0.04)",
         padding: "18px",
         display: "flex",
@@ -36,6 +42,7 @@ export default function ProductCard({ product }) {
         position: "relative",
         transition: "all 0.3s ease",
         overflow: "hidden",
+        opacity: product.coming_soon ? 0.6 : 1,
       }}
     >
       <div
@@ -44,8 +51,9 @@ export default function ProductCard({ product }) {
           position: "absolute",
           inset: 0,
           borderRadius: "22px",
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,150,92,0.16) 0%, transparent 72%)",
+          background: product.coming_soon
+            ? "transparent"
+            : "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,150,92,0.16) 0%, transparent 72%)",
           opacity: 0,
           transition: "opacity 0.35s ease",
           pointerEvents: "none",
@@ -188,20 +196,20 @@ export default function ProductCard({ product }) {
         {product.highlights.map((highlight) => (
           <div
             key={highlight}
-            style={{ display: "flex", alignItems: "center", gap: "8px" }}
+            style={{ display: "flex", alignItems: "center", gap: "8px", opacity: product.coming_soon ? 0.5 : 1 }}
           >
             <CheckCircle2
               style={{
                 width: "13px",
                 height: "13px",
-                color: "#4ade80",
+                color: product.coming_soon ? "#b0b0b0" : "#4ade80",
                 flexShrink: 0,
               }}
             />
             <span
               style={{
                 fontSize: "12px",
-                color: "rgba(27,20,13,0.72)",
+                color: product.coming_soon ? "rgba(100,100,100,0.65)" : "rgba(27,20,13,0.72)",
                 fontWeight: "500",
               }}
             >
@@ -211,7 +219,7 @@ export default function ProductCard({ product }) {
         ))}
       </div>
 
-      <div style={{ position: "relative", zIndex: 1, paddingTop: "4px" }}>
+      <div style={{ position: "relative", zIndex: 1, paddingTop: "4px", opacity: product.coming_soon ? 0.5 : 1 }}>
         <div
           style={{
             display: "flex",
@@ -224,7 +232,7 @@ export default function ProductCard({ product }) {
             <p
               style={{
                 fontSize: "9px",
-                color: "rgba(154,92,46,0.7)",
+                color: product.coming_soon ? "rgba(100,100,100,0.5)" : "rgba(154,92,46,0.7)",
                 fontWeight: "700",
                 textTransform: "uppercase",
                 letterSpacing: "0.08em",
@@ -237,7 +245,7 @@ export default function ProductCard({ product }) {
               style={{
                 fontSize: "22px",
                 fontWeight: "800",
-                color: "#9a5c2e",
+                color: product.coming_soon ? "#a0a0a0" : "#9a5c2e",
                 margin: 0,
                 lineHeight: 1,
               }}
@@ -245,59 +253,71 @@ export default function ProductCard({ product }) {
               ${product.monthly_fee}
             </p>
           </div>
-          <div style={{ fontSize: "12px", color: "rgba(27,20,13,0.5)", lineHeight: 1.4 }}>
+          <div style={{ fontSize: "12px", color: product.coming_soon ? "rgba(100,100,100,0.5)" : "rgba(27,20,13,0.5)", lineHeight: 1.4 }}>
             <p style={{ margin: 0, fontWeight: "600" }}>Setup</p>
             <p style={{ margin: "2px 0 0", fontSize: "14px", fontWeight: "700" }}>${product.setup_fee}</p>
           </div>
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "8px", alignItems: "center", position: "relative", zIndex: 1 }}>
+      <div style={{ display: "flex", gap: "8px", alignItems: "center", position: "relative", zIndex: 1, pointerEvents: product.coming_soon ? "none" : "auto" }}>
         <button
           onClick={() => setShowDemo(true)}
+          disabled={product.coming_soon}
           style={{
             width: "36px",
             height: "36px",
             borderRadius: "8px",
             padding: "0",
-            background: "rgba(100,116,139,0.1)",
-            border: "1px solid rgba(100,116,139,0.22)",
-            cursor: "pointer",
+            background: product.coming_soon ? "rgba(100,100,100,0.08)" : "rgba(100,116,139,0.1)",
+            border: product.coming_soon ? "1px solid rgba(100,100,100,0.1)" : "1px solid rgba(100,116,139,0.22)",
+            cursor: product.coming_soon ? "not-allowed" : "pointer",
             boxShadow: "none",
             transition: "all 0.2s",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
+            opacity: product.coming_soon ? 0.5 : 1,
           }}
-          title="Watch demo"
+          title={product.coming_soon ? "Coming soon" : "Watch demo"}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(100,116,139,0.15)";
-            e.currentTarget.style.borderColor = "rgba(100,116,139,0.35)";
+            if (!product.coming_soon) {
+              e.currentTarget.style.background = "rgba(100,116,139,0.15)";
+              e.currentTarget.style.borderColor = "rgba(100,116,139,0.35)";
+            }
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(100,116,139,0.1)";
-            e.currentTarget.style.borderColor = "rgba(100,116,139,0.22)";
+            if (!product.coming_soon) {
+              e.currentTarget.style.background = "rgba(100,116,139,0.1)";
+              e.currentTarget.style.borderColor = "rgba(100,116,139,0.22)";
+            }
           }}
         >
-          <Play style={{ width: "14px", height: "14px", color: "#64748b" }} />
+          <Play style={{ width: "14px", height: "14px", color: product.coming_soon ? "#a0a0a0" : "#64748b" }} />
         </button>
 
         <button
           onClick={toggle}
+          disabled={product.coming_soon}
           style={{
             flex: 1,
             borderRadius: "9999px",
             padding: "2px",
-            background: inCart
+            background: product.coming_soon
+              ? "linear-gradient(135deg,#c0c0c0,#b0b0b0)"
+              : inCart
               ? "linear-gradient(135deg,#22c55e,#16a34a)"
               : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
             border: "none",
-            cursor: "pointer",
+            cursor: product.coming_soon ? "not-allowed" : "pointer",
             boxShadow: inCart
               ? "0 4px 14px rgba(34,197,94,0.32)"
+              : product.coming_soon
+              ? "none"
               : "0 4px 14px rgba(120,70,20,0.28)",
             transition: "all 0.2s",
+            opacity: product.coming_soon ? 0.6 : 1,
           }}
         >
           <span
@@ -308,7 +328,9 @@ export default function ProductCard({ product }) {
               gap: "6px",
               height: "40px",
               borderRadius: "9999px",
-              background: inCart
+              background: product.coming_soon
+                ? "linear-gradient(135deg,#a0a0a0,#909090)"
+                : inCart
                 ? "linear-gradient(135deg,#16a34a,#15803d)"
                 : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
               color: "#fff",
@@ -316,7 +338,9 @@ export default function ProductCard({ product }) {
               fontSize: "13px",
             }}
           >
-            {inCart ? (
+            {product.coming_soon ? (
+              "Coming Soon"
+            ) : inCart ? (
               <>
                 <Check style={{ width: "14px", height: "14px" }} /> Added
               </>
