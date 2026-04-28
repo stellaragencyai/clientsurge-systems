@@ -1,9 +1,14 @@
-import { CheckCircle2, Plus, Check } from "lucide-react";
+import { CheckCircle2, Plus, Check, Play } from "lucide-react";
+import { useState } from "react";
 import { useCart } from "@/lib/cartContext";
+import DemoModal from "@/components/store/DemoModal";
+import DetailsModal from "@/components/store/DetailsModal";
 
 export default function ProductCard({ product }) {
   const { items, addItem, removeItem } = useCart();
   const inCart = items.some((item) => item.product_id === product.product_id);
+  const [showDemo, setShowDemo] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   const toggle = () => {
     if (inCart) removeItem(product.product_id);
@@ -290,51 +295,97 @@ export default function ProductCard({ product }) {
         </div>
       </div>
 
-      <button
-        onClick={toggle}
-        style={{
-          borderRadius: "9999px",
-          padding: "2px",
-          background: inCart
-            ? "linear-gradient(135deg,#22c55e,#16a34a)"
-            : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-          border: "none",
-          cursor: "pointer",
-          boxShadow: inCart
-            ? "0 4px 14px rgba(34,197,94,0.32)"
-            : "0 4px 14px rgba(120,70,20,0.28)",
-          transition: "all 0.2s",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <span
+      <div style={{ display: "flex", gap: "10px", position: "relative", zIndex: 1 }}>
+        <button
+          onClick={() => setShowDemo(true)}
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "6px",
-            height: "44px",
+            flex: 1,
             borderRadius: "9999px",
-            background: inCart
-              ? "linear-gradient(135deg,#16a34a,#15803d)"
-              : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-            color: "#fff",
-            fontWeight: "700",
-            fontSize: "13px",
+            padding: "2px",
+            background: "rgba(100,116,139,0.1)",
+            border: "1.5px solid rgba(100,116,139,0.22)",
+            cursor: "pointer",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = "rgba(100,116,139,0.15)";
+            e.currentTarget.style.borderColor = "rgba(100,116,139,0.35)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "rgba(100,116,139,0.1)";
+            e.currentTarget.style.borderColor = "rgba(100,116,139,0.22)";
           }}
         >
-          {inCart ? (
-            <>
-              <Check style={{ width: "14px", height: "14px" }} /> Added to Cart
-            </>
-          ) : (
-            <>
-              <Plus style={{ width: "14px", height: "14px" }} /> Add to Cart
-            </>
-          )}
-        </span>
-      </button>
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "6px",
+              height: "44px",
+              color: "#64748b",
+              fontWeight: "700",
+              fontSize: "13px",
+            }}
+          >
+            <Play style={{ width: "14px", height: "14px" }} /> Watch Demo
+          </span>
+        </button>
+
+        <button
+          onClick={toggle}
+          style={{
+            flex: 1.2,
+            borderRadius: "9999px",
+            padding: "2px",
+            background: inCart
+              ? "linear-gradient(135deg,#22c55e,#16a34a)"
+              : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+            border: "none",
+            cursor: "pointer",
+            boxShadow: inCart
+              ? "0 4px 14px rgba(34,197,94,0.32)"
+              : "0 4px 14px rgba(120,70,20,0.28)",
+            transition: "all 0.2s",
+          }}
+        >
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "6px",
+              height: "44px",
+              borderRadius: "9999px",
+              background: inCart
+                ? "linear-gradient(135deg,#16a34a,#15803d)"
+                : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+              color: "#fff",
+              fontWeight: "700",
+              fontSize: "13px",
+            }}
+          >
+            {inCart ? (
+              <>
+                <Check style={{ width: "14px", height: "14px" }} /> Added to Cart
+              </>
+            ) : (
+              <>
+                <Plus style={{ width: "14px", height: "14px" }} /> Add to Cart
+              </>
+            )}
+          </span>
+        </button>
+      </div>
+
+      {showDemo && (
+        <DemoModal product={product} onClose={() => setShowDemo(false)} />
+      )}
+
+      {showDetails && (
+        <DetailsModal product={product} onClose={() => setShowDetails(false)} />
+      )}
     </div>
   );
 }
