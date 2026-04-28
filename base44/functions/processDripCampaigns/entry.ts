@@ -13,7 +13,6 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
 
 const STOP_STATUSES = ["Qualified", "Booking Prompt Sent", "Booked", "Closed"];
 
@@ -84,13 +83,10 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
 
-    // Allow scheduled (no user) OR admin direct call
+    // Allow scheduled automation (no user required) or admin direct call
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
-    }
-    if (!user && !allowAnonymousAutomation(req)) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -113,10 +109,11 @@ Deno.serve(async (req) => {
     const fromEmail   = settings.resend_from_email || "noreply@clientsurge.com";
     const resendReady = !!(resendKey && settings.resend_enabled);
 
+    // Support both generic drip templates and missed-call-specific ones
     const templateMap = {
-      day1: settings.follow_up_day1_sms,
-      day3: settings.follow_up_day3_sms,
-      day7: settings.follow_up_day7_sms,
+      day1: settings.follow_up_day1_sms || "Just wanted to follow up — we can usually get you taken care of pretty quickly.\n\nWhat's going on?",
+      day3: settings.follow_up_day3_sms || "We've got a few open spots today/tomorrow.\n\nWant me to lock one in for you?",
+      day7: settings.follow_up_day7_sms || "Haven't heard back — totally fine if now's not the right time.\n\nIf you still need help, you can book here: {booking_link}\n\nOtherwise I'll close this out 👍",
     };
 
     const results = { fired: 0, skipped: 0, stopped: 0, errors: 0 };
