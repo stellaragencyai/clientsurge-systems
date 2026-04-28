@@ -31,119 +31,110 @@ function DemoCard({ eyebrow, icon: Icon, title, body, badge, highlighted, href, 
 
   return (
     <div
-      className="rounded-[24px] flex flex-col h-full transition-all duration-300"
+      className="rounded-2xl flex flex-col h-full transition-all duration-300"
       style={{
-        padding: highlighted ? "2.5px" : "2px",
-        background: highlighted
-          ? "linear-gradient(135deg,#a0714f 0%,#e8c080 28%,#f5d9a8 50%,#d4a055 72%,#7a4f2e 100%)"
-          : premiumRing,
+        background: cardSurface,
+        border: highlighted ? "1.5px solid rgba(154,92,46,0.42)" : cardBorder,
         boxShadow: hovered
-          ? "0 14px 44px rgba(120,70,20,0.26), 0 4px 16px rgba(120,70,20,0.16)"
+          ? "0 12px 36px rgba(111,67,31,0.14), 0 4px 12px rgba(111,67,31,0.08)"
           : highlighted
-          ? "0 8px 40px rgba(120,70,20,0.32), 0 4px 16px rgba(120,70,20,0.18)"
-          : premiumRingShadow,
+          ? "0 8px 32px rgba(111,67,31,0.12), 0 2px 8px rgba(111,67,31,0.07)"
+          : cardShadow,
         transform: hovered ? "translateY(-3px)" : "translateY(0)",
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {/* Header */}
       <div
-        className="rounded-[22px] overflow-hidden flex flex-col h-full"
-        style={{ background: cardSurface }}
+        className="px-5 py-4 flex items-center justify-between gap-3 rounded-t-2xl"
+        style={{
+          background: "linear-gradient(180deg, rgba(255,249,241,0.98) 0%, rgba(246,232,214,0.7) 100%)",
+          borderBottom: "1px solid rgba(212,184,142,0.38)",
+        }}
       >
-        {/* Header — cream/beige top */}
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: topText }}>
+            {eyebrow}
+          </p>
+          <p className="mt-1 text-sm font-semibold text-foreground leading-snug line-clamp-2">
+            {title}
+          </p>
+        </div>
         <div
-          className="px-5 py-4 flex items-center justify-between gap-3 relative overflow-hidden"
+          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
           style={{
-            background: "linear-gradient(180deg, #f8ead8 0%, #f2e0c8 100%)",
-            borderBottom: "1px solid rgba(154,92,46,0.15)",
+            background: "linear-gradient(135deg,#9a5c2e,#7a4825)",
+            boxShadow: "0 2px 8px rgba(154,92,46,0.3)",
           }}
         >
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: topText }}>
-              {eyebrow}
-            </p>
-            <p className="mt-1 text-sm font-semibold text-foreground leading-snug line-clamp-2">
-              {title}
-            </p>
-          </div>
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+          <Icon className="w-4 h-4 text-white" />
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="px-5 py-5 flex flex-col flex-1 gap-4">
+        <p className="text-sm leading-relaxed flex-1 text-foreground/70">{body}</p>
+
+        {badge && (
+          <span
+            className="inline-flex w-fit items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em]"
             style={{
-              background: "linear-gradient(180deg, rgba(255,249,241,0.96) 0%, rgba(246,232,214,0.9) 100%)",
-              border: "1px solid rgba(205,164,114,0.52)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.78), 0 0 0 1px rgba(255,255,255,0.18)",
+              background: "rgba(154,92,46,0.08)",
+              color: "#7a4825",
+              border: "1px solid rgba(154,92,46,0.18)",
             }}
           >
-            <Icon className="w-4 h-4" style={{ color: iconColor }} />
-          </div>
-        </div>
+            {badge}
+          </span>
+        )}
 
-        {/* Body — white/light */}
-        <div className="px-5 py-5 flex flex-col flex-1 gap-4">
-          <p className="text-sm leading-relaxed flex-1 text-foreground/70 line-clamp-3">{body}</p>
-
-          {badge && (
+        {highlighted ? (
+          <button
+            type="button"
+            onClick={() => onBookDemo()}
+            style={{
+              display: "inline-block",
+              borderRadius: "9999px",
+              padding: "2px",
+              background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+              boxShadow: "0 4px 14px rgba(120,70,20,0.35)",
+              border: "none",
+              cursor: "pointer",
+              width: "100%",
+            }}
+          >
             <span
-              className="inline-flex w-fit items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.1em]"
               style={{
-                background: "rgba(154,92,46,0.08)",
-                color: "#7a4825",
-                border: "1px solid rgba(154,92,46,0.18)",
-              }}
-            >
-              {badge}
-            </span>
-          )}
-
-          {/* CTA — matches site-wide gold pill style */}
-          {highlighted ? (
-            <button
-              type="button"
-              onClick={() => onBookDemo()}
-              style={{
-                display: "inline-block",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+                height: "40px",
                 borderRadius: "9999px",
-                padding: "2px",
-                background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                boxShadow: "0 4px 14px rgba(120,70,20,0.35)",
-                border: "none",
-                cursor: "pointer",
-                width: "100%",
+                background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                color: "#f5e6d0",
+                fontWeight: "700",
+                fontSize: "0.8rem",
+                textShadow: "0 1px 2px rgba(0,0,0,0.3)",
               }}
             >
-              <span
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "6px",
-                  height: "40px",
-                  borderRadius: "9999px",
-                  background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                  color: "#f5e6d0",
-                  fontWeight: "700",
-                  fontSize: "0.8rem",
-                  textShadow: "0 1px 2px rgba(0,0,0,0.3)",
-                }}
-              >
-                Book Your Free Demo
-                <ArrowRight className="w-3.5 h-3.5" />
-              </span>
-            </button>
-          ) : (
-            <a
-              href={href}
-              onClick={handleCTA}
-              {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
-              className="inline-flex items-center justify-center gap-2 w-full h-10 rounded-full border border-primary/25 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
-              style={{ textDecoration: "none" }}
-            >
-              {external ? "Watch Demo" : "Book Your Free Demo"}
+              Book Your Free Demo
               <ArrowRight className="w-3.5 h-3.5" />
-            </a>
-          )}
-        </div>
+            </span>
+          </button>
+        ) : (
+          <a
+            href={href}
+            onClick={handleCTA}
+            {...(external ? { target: "_blank", rel: "noreferrer" } : {})}
+            className="inline-flex items-center justify-center gap-2 w-full h-10 rounded-full border border-primary/25 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
+            style={{ textDecoration: "none" }}
+          >
+            {external ? "Watch Demo" : "Book Your Free Demo"}
+            <ArrowRight className="w-3.5 h-3.5" />
+          </a>
+        )}
       </div>
     </div>
   );

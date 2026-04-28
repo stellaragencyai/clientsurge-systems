@@ -94,19 +94,30 @@ export default function ProblemSolution() {
         </div>
 
         <div className="relative">
-          <div className="grid md:grid-cols-2 gap-5">
-            {/* Problems Column */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded-lg bg-destructive/15 flex items-center justify-center">
-                  <X className="w-3.5 h-3.5 text-destructive" />
-                </div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-destructive/70">What Usually Breaks</p>
+          {/* Column headers */}
+          <div className="grid md:grid-cols-2 gap-5 mb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-destructive/15 flex items-center justify-center">
+                <X className="w-3.5 h-3.5 text-destructive" />
               </div>
-              {problems.map((item, i) => (
-                <CardWithFadeIn key={item.problem} delay={i * 70}>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-destructive/70">What Usually Breaks</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-lg bg-primary/15 flex items-center justify-center">
+                <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+              </div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary/70">How We Fix It</p>
+            </div>
+          </div>
+
+          {/* Rows — each problem paired with its solution */}
+          <div className="space-y-3">
+            {problems.map((item, i) => (
+              <CardWithFadeIn key={item.problem} delay={i * 70}>
+                <div className="grid md:grid-cols-2 gap-5 items-stretch">
+                  {/* Problem */}
                   <div
-                    className="rounded-2xl px-5 py-4 border border-red-200/60 relative overflow-hidden"
+                    className="rounded-2xl px-5 py-4 border border-red-200/60 relative overflow-hidden flex items-start gap-3"
                     style={{
                       background: "rgba(255,255,255,0.55)",
                       backdropFilter: "blur(18px)",
@@ -119,35 +130,21 @@ export default function ProblemSolution() {
                       className="absolute inset-x-0 top-0 h-px"
                       style={{ background: "linear-gradient(90deg, transparent, rgba(220,38,38,0.18), transparent)" }}
                     />
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-red-50 border border-red-200/70 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <X className="w-3.5 h-3.5 text-destructive" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-foreground leading-snug">{item.problem}</p>
-                        <div className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200/60 uppercase tracking-[0.08em]">
-                          <span className="w-1 h-1 rounded-full bg-red-500 flex-shrink-0" />
-                          {item.stat}
-                        </div>
+                    <div className="w-8 h-8 rounded-xl bg-red-50 border border-red-200/70 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <X className="w-3.5 h-3.5 text-destructive" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-foreground leading-snug">{item.problem}</p>
+                      <div className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200/60 uppercase tracking-[0.08em]">
+                        <span className="w-1 h-1 rounded-full bg-red-500 flex-shrink-0" />
+                        {item.stat}
                       </div>
                     </div>
                   </div>
-                </CardWithFadeIn>
-              ))}
-            </div>
 
-            {/* Solutions Column */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded-lg bg-primary/15 flex items-center justify-center">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                </div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary/70">How We Fix It</p>
-              </div>
-              {problems.map((item, i) => (
-                <CardWithFadeIn key={item.solution} delay={i * 70 + 40}>
+                  {/* Solution */}
                   <div
-                    className="rounded-2xl px-5 py-4 border border-primary/20 relative overflow-hidden"
+                    className="rounded-2xl px-5 py-4 border border-primary/20 relative overflow-hidden flex items-start gap-3"
                     style={{
                       background: "rgba(255,255,255,0.55)",
                       backdropFilter: "blur(18px)",
@@ -160,21 +157,19 @@ export default function ProblemSolution() {
                       className="absolute inset-x-0 top-0 h-px"
                       style={{ background: "linear-gradient(90deg, transparent, rgba(154,92,46,0.25), transparent)" }}
                     />
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-foreground leading-snug">{item.solution}</p>
-                        <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/12 text-primary border border-primary/25 uppercase tracking-[0.08em]">
-                          {item.result}
-                        </div>
+                    <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-foreground leading-snug">{item.solution}</p>
+                      <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/25 uppercase tracking-[0.08em]">
+                        {item.result}
                       </div>
                     </div>
                   </div>
-                </CardWithFadeIn>
-              ))}
-            </div>
+                </div>
+              </CardWithFadeIn>
+            ))}
           </div>
         </div>
       </div>
