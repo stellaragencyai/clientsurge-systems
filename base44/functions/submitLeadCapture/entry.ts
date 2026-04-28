@@ -178,6 +178,13 @@ Deno.serve(async (req) => {
       });
       await logLeadCreated(base44, duplicateLead.id, 'updated', lead);
 
+      // Send instant SMS response asynchronously if not already sent
+      if (!duplicateLead.initial_response_sent_at) {
+        base44.functions.invoke('sendInstantLeadResponseSms', {
+          lead_id: duplicateLead.id,
+        }).catch((err) => console.error(`[SubmitLead] SMS send failed: ${err.message}`));
+      }
+
       return Response.json({
         success: true,
         lead_id: duplicateLead.id,
@@ -201,6 +208,11 @@ Deno.serve(async (req) => {
       automation_enabled: true,
     });
     await logLeadCreated(base44, createdLead.id, 'created', lead);
+
+    // Send instant SMS response asynchronously (don't wait for it)
+    base44.functions.invoke('sendInstantLeadResponseSms', {
+      lead_id: createdLead.id,
+    }).catch((err) => console.error(`[SubmitLead] SMS send failed: ${err.message}`));
 
     return Response.json({
       success: true,
