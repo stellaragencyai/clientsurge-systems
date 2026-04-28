@@ -92,40 +92,32 @@ function StoreInner() {
           position: "fixed",
           inset: 0,
           zIndex: 0,
-          backgroundImage:
-            "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/b3df6b4fc_Gemini_Generated_Image_jlrxmdjlrxmdjlrx.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
+          background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 46%, #fcfaf6 100%)",
         }}
       />
+      {/* Subtle texture overlay matching main page */}
       <div
         aria-hidden="true"
         style={{
           position: "fixed",
           inset: 0,
           zIndex: 1,
-          background:
-            "linear-gradient(135deg, rgba(10,6,2,0.76) 0%, rgba(20,11,4,0.72) 46%, rgba(12,7,2,0.8) 100%)",
+          backgroundImage: "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          opacity: 0.05,
+          pointerEvents: "none",
         }}
       />
 
       <div style={{ position: "relative", zIndex: 2 }}>
         <style>{`
           .store-page nav {
-            background: rgba(16,9,3,0.62) !important;
-            border-bottom-color: rgba(200,150,92,0.22) !important;
+            background: rgba(253,251,248,0.85) !important;
+            border-bottom-color: rgba(154,92,46,0.14) !important;
             backdrop-filter: blur(22px) !important;
             -webkit-backdrop-filter: blur(22px) !important;
-          }
-          .store-page nav .text-foreground { color: #f5e6d0 !important; }
-          .store-page nav .text-muted-foreground { color: rgba(245,230,208,0.72) !important; }
-          .store-page nav .border-border { border-color: rgba(200,150,92,0.25) !important; }
-          .store-page nav .bg-background\\/50,
-          .store-page nav .bg-background\\/70 { background: rgba(255,255,255,0.08) !important; }
-          .store-page footer {
-            background: rgba(10,5,0,0.7) !important;
-            border-top-color: rgba(200,150,92,0.2) !important;
           }
           .store-page .store-hero {
             text-align: center;
@@ -269,18 +261,16 @@ function StoreInner() {
                   borderRadius: "9999px",
                   padding: "6px 16px",
                   marginBottom: "18px",
-                  background: "rgba(200,150,92,0.16)",
-                  border: "1px solid rgba(200,150,92,0.34)",
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
+                  background: "rgba(154,92,46,0.08)",
+                  border: "1px solid rgba(154,92,46,0.18)",
                 }}
               >
-                <Zap style={{ width: "12px", height: "12px", color: "#f0c878" }} />
+                <Zap style={{ width: "12px", height: "12px", color: "#9a5c2e" }} />
                 <span
                   style={{
                     fontSize: "11px",
                     fontWeight: "700",
-                    color: "#f0c878",
+                    color: "#9a5c2e",
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
                   }}
@@ -295,17 +285,16 @@ function StoreInner() {
                   fontSize: "clamp(2rem, 5vw, 3.5rem)",
                   fontWeight: "800",
                   lineHeight: 1.04,
-                  letterSpacing: "-0.02em",
-                  color: "#fffdf8",
+                  letterSpacing: "-0.035em",
+                  color: "#1b140d",
                   marginBottom: "12px",
-                  textShadow: "0 2px 24px rgba(0,0,0,0.6)",
                 }}
               >
                 Build Your{" "}
                 <span
                   style={{
                     background:
-                      "linear-gradient(135deg, #fff2d2 0%, #e9b45b 48%, #c48a4b 100%)",
+                      "linear-gradient(135deg, #7a3f1a 0%, #c8965c 52%, #9a5c2e 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
@@ -318,7 +307,7 @@ function StoreInner() {
               <p
                 style={{
                   fontSize: "1.02rem",
-                  color: "rgba(255,241,218,0.88)",
+                  color: "rgba(27,20,13,0.72)",
                   lineHeight: 1.68,
                   maxWidth: "620px",
                   margin: "0 auto 24px",
@@ -336,11 +325,9 @@ function StoreInner() {
                   margin: "0 auto 20px",
                   padding: "16px 18px",
                   borderRadius: "24px",
-                  background: "rgba(24,14,6,0.52)",
-                  border: "1px solid rgba(200,150,92,0.26)",
-                  backdropFilter: "blur(18px)",
-                  WebkitBackdropFilter: "blur(18px)",
-                  boxShadow: "0 12px 34px rgba(0,0,0,0.12)",
+                  background: "rgba(255,255,255,0.85)",
+                  border: "1.5px solid rgba(154,92,46,0.2)",
+                  boxShadow: "0 8px 28px rgba(111,67,31,0.07)",
                 }}
               >
                 <p
@@ -358,7 +345,7 @@ function StoreInner() {
                 <p
                   style={{
                     fontSize: "15px",
-                    color: "#fff6e8",
+                    color: "#1b140d",
                     fontWeight: "600",
                     margin: "0 0 6px",
                   }}
@@ -369,7 +356,7 @@ function StoreInner() {
                 <p
                   style={{
                     fontSize: "13px",
-                    color: "rgba(255,230,180,0.82)",
+                    color: "rgba(27,20,13,0.65)",
                     lineHeight: 1.6,
                     margin: 0,
                   }}
@@ -391,19 +378,17 @@ function StoreInner() {
                     textAlign: "center",
                     borderRadius: "18px",
                     padding: "14px 16px",
-                    background: "rgba(20,11,4,0.38)",
-                    border: "1px solid rgba(200,150,92,0.16)",
-                    backdropFilter: "blur(12px)",
-                    WebkitBackdropFilter: "blur(12px)",
+                    background: "rgba(255,255,255,0.82)",
+                    border: "1.5px solid rgba(212,184,142,0.42)",
+                    boxShadow: "0 4px 16px rgba(111,67,31,0.06)",
                   }}
                 >
                   <p
                     style={{
                       fontSize: "21px",
                       fontWeight: "800",
-                      color: "#f0c878",
+                      color: "#9a5c2e",
                       margin: "0 0 4px",
-                      textShadow: "0 2px 10px rgba(0,0,0,0.4)",
                     }}
                   >
                     {stat.val}
@@ -411,7 +396,7 @@ function StoreInner() {
                   <p
                     style={{
                       fontSize: "11px",
-                      color: "rgba(255,232,193,0.68)",
+                      color: "rgba(27,20,13,0.6)",
                       margin: 0,
                       fontWeight: "600",
                     }}
@@ -482,10 +467,9 @@ function StoreInner() {
                   marginBottom: "18px",
                   padding: "14px 18px",
                   borderRadius: "18px",
-                  background: "rgba(20,11,4,0.42)",
-                  border: "1px solid rgba(200,150,92,0.22)",
-                  backdropFilter: "blur(16px)",
-                  WebkitBackdropFilter: "blur(16px)",
+                  background: "rgba(255,255,255,0.82)",
+                  border: "1.5px solid rgba(154,92,46,0.18)",
+                  boxShadow: "0 4px 14px rgba(111,67,31,0.05)",
                 }}
               >
                 <div>
@@ -493,7 +477,7 @@ function StoreInner() {
                     style={{
                       fontSize: "12px",
                       fontWeight: "700",
-                      color: "#f0c878",
+                      color: "#9a5c2e",
                       letterSpacing: "0.14em",
                       textTransform: "uppercase",
                       margin: "0 0 4px",
@@ -545,7 +529,7 @@ function StoreInner() {
                     transform: "translateY(-50%)",
                     width: "14px",
                     height: "14px",
-                    color: "rgba(255,232,193,0.72)",
+                    color: "rgba(154,92,46,0.6)",
                   }}
                 />
                 <input
@@ -556,15 +540,14 @@ function StoreInner() {
                   style={{
                     width: "100%",
                     borderRadius: "9999px",
-                    border: "1.5px solid rgba(200,150,92,0.3)",
+                    border: "1.5px solid rgba(154,92,46,0.22)",
                     padding: "11px 16px 11px 38px",
                     fontSize: "13px",
-                    background: "rgba(22,12,5,0.45)",
-                    backdropFilter: "blur(14px)",
-                    WebkitBackdropFilter: "blur(14px)",
+                    background: "rgba(255,255,255,0.85)",
                     outline: "none",
                     boxSizing: "border-box",
-                    color: "#fff7eb",
+                    color: "#1b140d",
+                    boxShadow: "0 2px 8px rgba(111,67,31,0.05)",
                   }}
                 />
               </div>
@@ -574,7 +557,7 @@ function StoreInner() {
                   style={{
                     fontSize: "12px",
                     fontWeight: "700",
-                    color: "rgba(255,232,193,0.86)",
+                    color: "rgba(27,20,13,0.55)",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                   }}
@@ -593,24 +576,22 @@ function StoreInner() {
                         fontWeight: "600",
                         border:
                           activeCategory === category
-                            ? "1.5px solid rgba(240,200,120,0.64)"
-                            : "1.5px solid rgba(200,150,92,0.22)",
+                            ? "1.5px solid rgba(154,92,46,0.5)"
+                            : "1.5px solid rgba(154,92,46,0.18)",
                         cursor: "pointer",
                         background:
                           activeCategory === category
                             ? "linear-gradient(135deg,#6b3f1f,#9a5c2e)"
-                            : "rgba(18,10,4,0.42)",
-                        backdropFilter: "blur(10px)",
-                        WebkitBackdropFilter: "blur(10px)",
+                            : "rgba(255,255,255,0.75)",
                         color:
                           activeCategory === category
                             ? "#f5e6d0"
-                            : "rgba(255,232,193,0.84)",
+                            : "rgba(27,20,13,0.72)",
                         transition: "all 0.2s",
                         boxShadow:
                           activeCategory === category
-                            ? "0 4px 14px rgba(120,70,20,0.36)"
-                            : "none",
+                            ? "0 4px 14px rgba(120,70,20,0.28)"
+                            : "0 1px 4px rgba(111,67,31,0.06)",
                       }}
                     >
                       {category}
@@ -631,7 +612,7 @@ function StoreInner() {
                 style={{
                   textAlign: "center",
                   padding: "48px",
-                  color: "rgba(255,220,160,0.6)",
+                  color: "rgba(27,20,13,0.45)",
                 }}
               >
                 <p style={{ fontSize: "16px", fontWeight: "600" }}>
