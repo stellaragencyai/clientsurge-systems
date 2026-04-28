@@ -158,34 +158,32 @@ export default function Pricing() {
           ))}
         </div>
 
-        <div className="mt-12 max-w-5xl mx-auto rounded-3xl border border-border bg-card/80 p-6 md:p-8 shadow-sm">
-          <div className="max-w-2xl mb-6">
-            <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What&apos;s Included In Setup</p>
-            <h3 className="font-titles text-2xl md:text-3xl font-bold text-foreground">
-              We build and install the system for you — not just the strategy
-            </h3>
-            <p className="mt-3 text-sm md:text-base text-muted-foreground">
-              Your setup fee covers the full buildout of your AI lead conversion system — launch prep, messaging logic, booking flow, and handoff — done for you.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-x-6 gap-y-3">
-            {[
-              "AI lead conversion system setup and message logic",
-              "Automated SMS and email follow-up sequence",
-              "Booking link or booking flow integration",
-              "Missed-call recovery system setup when included",
-              "Launch testing, polish, and go-live support",
-              "Onboarding call plus full implementation handoff",
-            ].map((item) => (
-              <div key={item} className="flex items-start gap-3 py-1">
-                <SimpleCheck />
-                <p className="text-sm text-foreground/80">{item}</p>
-              </div>
-            ))}
-          </div>
+        <div className="max-w-2xl mb-6 mt-12">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What&apos;s Included In Setup</p>
+          <h3 className="font-titles text-2xl md:text-3xl font-bold text-foreground">
+            We build and install the system for you — not just the strategy
+          </h3>
+          <p className="mt-3 text-sm md:text-base text-muted-foreground">
+            Your setup fee covers the full buildout of your AI lead conversion system — launch prep, messaging logic, booking flow, and handoff — done for you.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-x-6 gap-y-3 mb-14">
+          {[
+            "AI lead conversion system setup and message logic",
+            "Automated SMS and email follow-up sequence",
+            "Booking link or booking flow integration",
+            "Missed-call recovery system setup when included",
+            "Launch testing, polish, and go-live support",
+            "Onboarding call plus full implementation handoff",
+          ].map((item) => (
+            <div key={item} className="flex items-start gap-3 py-1">
+              <SimpleCheck />
+              <p className="text-sm text-foreground/80">{item}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="mt-14 text-center max-w-xl mx-auto border-t border-border pt-10">
+        <div className="text-center max-w-xl mx-auto border-t border-border pt-10">
           <p className="text-foreground font-semibold text-base mb-5">
             Not sure which system fits your business? We will recommend the best option based on your lead flow.
           </p>
