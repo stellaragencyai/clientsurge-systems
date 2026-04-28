@@ -191,6 +191,21 @@
     "enriched_at": {
       "type": "string",
       "title": "Last Enriched At"
+    },
+    "missed_call_step_sent": {
+      "type": "integer",
+      "title": "Missed-Call Follow-Up Step (1-4)",
+      "default": 0,
+      "description": "Highest follow-up step sent (0=none, 1=2min SMS, 2=10min email, 3=1hr SMS, 4=24hr email)"
+    },
+    "missed_call_last_step_at": {
+      "type": "string",
+      "title": "Missed-Call Last Step Sent At"
+    },
+    "missed_call_sequence_complete": {
+      "type": "boolean",
+      "title": "Missed-Call Sequence Complete",
+      "default": false
     }
   },
   "required": [
