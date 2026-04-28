@@ -782,9 +782,7 @@ function SystemDetailPanel({ systemId, onBookDemo, onPrevious, onNext }) {
             />
             <Icon className="w-5 h-5 relative z-10" style={{ color: flowIconColor }} />
           </div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.18em] mb-2" style={{ color: flowTopText }}>
-            Selected System
-          </p>
+
           <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
             {system.title}
           </h3>
