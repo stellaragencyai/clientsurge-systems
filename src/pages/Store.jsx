@@ -4,6 +4,8 @@ import { CartProvider, useCart } from "@/lib/cartContext";
 import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
 import CartSidebar from "@/components/store/CartSidebar";
+import SocialProofTicker from "@/components/store/SocialProofTicker";
+import ServiceComparisonModal from "@/components/store/ServiceComparisonModal";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
@@ -18,6 +20,7 @@ function StoreInner() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [selectedIndustry, setSelectedIndustry] = useState(null);
+  const [showComparison, setShowComparison] = useState(false);
   const { items, setCartOpen, totalSetup, totalMonthly } = useCart();
 
   useEffect(() => {
@@ -539,6 +542,33 @@ function StoreInner() {
               </div>
             ) : null}
 
+            <div style={{ display: "flex", gap: "10px", marginBottom: "18px" }}>
+              <button
+                onClick={() => setShowComparison(true)}
+                style={{
+                  borderRadius: "9999px",
+                  padding: "8px 20px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  border: "1.5px solid rgba(154,92,46,0.3)",
+                  background: "rgba(255,255,255,0.7)",
+                  color: "#9a5c2e",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.9)";
+                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.5)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.7)";
+                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.3)";
+                }}
+              >
+                📊 Compare All Services
+              </button>
+            </div>
+
             <div className="store-toolbar">
               <div className="store-searchWrap">
                 <Search
@@ -650,6 +680,8 @@ function StoreInner() {
 
           <CartSidebar />
           <Footer />
+          <SocialProofTicker />
+          {showComparison && <ServiceComparisonModal onClose={() => setShowComparison(false)} />}
         </div>
       </div>
     </div>
