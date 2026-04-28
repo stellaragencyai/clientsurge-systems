@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { handleBookingStop } from '../_shared/missedCallRecovery.js';
 
 Deno.serve(async (req) => {
   try {
@@ -66,9 +67,15 @@ Deno.serve(async (req) => {
     }
 
     // Update lead status and timestamp
-    await base44.entities.Leads.update(lead.id, {
+    const updatedLead = await base44.entities.Leads.update(lead.id, {
       status: 'Booking Prompt Sent',
       booking_link_sent_at: new Date().toISOString(),
+    });
+
+    await handleBookingStop({
+      base44,
+      lead: updatedLead,
+      now: new Date().toISOString(),
     });
 
     return Response.json({

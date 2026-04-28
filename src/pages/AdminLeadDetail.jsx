@@ -179,6 +179,24 @@ export default function AdminLeadDetail() {
                 {formatDate(lead.created_date)}
               </p>
             </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase font-semibold">
+                Next Follow-Up
+              </p>
+              <p className="text-sm text-foreground">{lead.next_follow_up_at ? formatDate(lead.next_follow_up_at) : "None scheduled"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase font-semibold">
+                Booking Status
+              </p>
+              <p className="text-sm text-foreground">{lead.booked_at ? `Booked ${formatDate(lead.booked_at)}` : lead.booking_link_sent_at ? `Link sent ${formatDate(lead.booking_link_sent_at)}` : "Not booked"}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase font-semibold">
+                Missed Call Sequence
+              </p>
+              <p className="text-sm text-foreground">{lead.automation_context_json ? (() => { try { const ctx = JSON.parse(lead.automation_context_json)?.missed_call_recovery; return ctx ? `Step ${ctx.follow_up_step || 0}, ${ctx.next_follow_up_at ? `next ${formatDate(ctx.next_follow_up_at)}` : ctx.sequence_state || 'inactive'}` : 'Not enrolled'; } catch { return 'Unavailable'; } })() : 'Not enrolled'}</p>
+            </div>
           </div>
         </div>
       </div>

@@ -1,9 +1,12 @@
 import {
-  executeOrderServiceRuntime,
   findPaidOrderByConfiguredPhone,
   MISSED_CALL_TRIGGER_STATUSES,
-  RuntimeExecutionError,
 } from "./installRuntime.js";
+import {
+  createOrReuseMissedCallLead,
+  handleInboundReplyStop,
+  runMissedCallInitialResponse,
+} from "./missedCallRecovery.js";
 
 export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
   const messageId = formData.get("MessageSid");
@@ -83,40 +86,54 @@ export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
     };
   }
 
-  try {
-    const result = await executeOrderServiceRuntime({
-      base44,
-      order,
-      serviceKey: "missed_call_text_back",
-      runtimeType: "missed_call_live",
-      recipientPhone: fromPhone,
-      runtimeData: {
-        caller_name: callerName,
-        caller_phone: fromPhone,
-        call_sid: callSid,
-        call_status: callStatus,
-      },
-      consentGranted: true,
-    });
+  const now = new Date().toISOString();
+  const { lead, created, duplicatePrevented } = await createOrReuseMissedCallLead({
+    base44,
+    order,
+    callerPhone: fromPhone,
+    callerName,
+    callSid,
+    callStatus,
+    businessPhone: toPhone,
+    now,
+  });
 
+  await runMissedCallInitialResponse({
+    base44,
+    order,
+    lead,
+    sharedConfig: order.install_configuration?.shared || {},
+    now,
+  });
+
+  return {
+    success: true,
+    handled_as: "call_status",
+    lead_id: lead.id,
+    lead_created: created,
+    duplicate_prevented: duplicatePrevented,
+    call_status: callStatus,
+    call_sid: callSid,
+  };
+}
+
+export async function handleTrustedTwilioSmsWebhook({ base44, formData }) {
+  const fromPhone = String(formData.get("From") || "");
+  const body = String(formData.get("Body") || "");
+
+  if (!fromPhone) {
     return {
-      success: true,
-      runtime_result: result,
-      handled_as: "call_status",
+      error: "Missing From in Twilio SMS payload",
+      status: 400,
     };
-  } catch (error) {
-    if (error instanceof RuntimeExecutionError) {
-      return {
-        success: true,
-        blocked: true,
-        error: error.message,
-        details: error.details,
-        handled_as: "call_status",
-      };
-    }
-
-    throw error;
   }
+
+  return handleInboundReplyStop({
+    base44,
+    fromPhone,
+    body,
+    now: new Date().toISOString(),
+  });
 }
 
 export async function handleTrustedResendWebhook({ base44, payload }) {

@@ -1,5 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
+import { stopMissedCallSequence } from "../_shared/missedCallRecovery.js";
 import {
   buildLeadStatusEvent,
   LEAD_STATUSES,
@@ -53,6 +54,16 @@ Deno.serve(async (req) => {
     const updatedLead = await base44.asServiceRole.entities.Leads.update(leadId, {
       ...statusPatch,
     });
+
+    if (["Closed", "Booked"].includes(nextStatus)) {
+      await stopMissedCallSequence({
+        base44,
+        lead: updatedLead,
+        reason: `lead_status_${nextStatus.toLowerCase()}`,
+        now,
+        note: `Lead status changed to ${nextStatus}, missed-call follow-ups stopped.`,
+      });
+    }
 
     const event = await base44.asServiceRole.entities.CommunicationEvent.create(
       buildLeadStatusEvent({
