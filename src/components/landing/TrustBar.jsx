@@ -80,11 +80,15 @@ function StatCard({ item, index, inView }) {
   const statText =
     typeof item.animatedValue === "number" ? `${count}${item.suffix || ""}` : item.display;
 
+  const isHighlighted = index === 1; // 3x more bookings stat
+  
   return (
     <article
       className="relative rounded-2xl border border-border text-left shadow-sm"
       style={{
-        background: "rgba(255,255,255,0.82)",
+        background: isHighlighted 
+          ? "linear-gradient(180deg, rgba(245,217,168,0.3) 0%, rgba(255,255,255,0.9) 100%)"
+          : "rgba(255,255,255,0.82)",
         minHeight: "190px",
         padding: "18px",
         display: "flex",
@@ -93,13 +97,14 @@ function StatCard({ item, index, inView }) {
         opacity: inView ? 1 : 0,
         transform: inView ? "translateY(0)" : "translateY(16px)",
         transition: `opacity 0.5s ease ${index * 0.08}s, transform 0.5s ease ${index * 0.08}s`,
+        boxShadow: isHighlighted && inView ? "0 0 20px rgba(245,217,168,0.4), 0 6px 22px rgba(0,0,0,0.06)" : "0 6px 22px rgba(0,0,0,0.06)",
       }}
     >
-      <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3">
+      <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3" style={isHighlighted ? { boxShadow: "0 0 12px rgba(34,199,89,0.4)" } : {}}>
         <Icon className="w-[17px] h-[17px] text-primary" />
       </div>
       <div>
-        <p className="font-display text-xl font-semibold text-foreground leading-tight">
+        <p className="font-display text-xl font-semibold text-foreground leading-tight" style={isHighlighted ? { fontSize: "1.35rem" } : {}}>
           {statText}
         </p>
         <p className="text-[10px] uppercase tracking-[0.18em] text-primary/80 mt-1 mb-2">

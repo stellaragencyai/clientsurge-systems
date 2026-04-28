@@ -187,7 +187,7 @@ export default function Hero() {
                     width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0,
                     background: "linear-gradient(135deg,#26b05f,#16a34a)",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    boxShadow: "0 2px 6px rgba(34,197,94,0.25)",
+                    boxShadow: "0 0 12px rgba(34,199,89,0.4), 0 2px 6px rgba(34,197,94,0.25)",
                     animation: `heroCheckPop 0.4s cubic-bezier(0.34,1.56,0.64,1) ${0.55 + i * 0.13}s both`,
                   }}
                 >

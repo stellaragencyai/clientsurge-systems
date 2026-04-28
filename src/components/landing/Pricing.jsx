@@ -114,10 +114,10 @@ export default function Pricing() {
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Pricing & Packages</p>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-           Choose the System That Turns Your Leads Into Booked Clients
+           Most Businesses Already Have the Leads — Here's What It Costs to Stop Losing Them
           </h2>
           <p className="mt-5 text-foreground font-semibold text-base mb-3">
-            Most businesses recover the cost with just a few additional bookings.
+            Recovery happens fast. Most clients cover their entire investment with just 2–3 additional bookings per month.
           </p>
           <p className="text-muted-foreground text-lg leading-relaxed">
             We install done-for-you AI lead conversion systems that respond instantly, automate follow-up, and turn more of your existing demand into booked appointments.
@@ -406,10 +406,10 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
       <div className="flex flex-col flex-1 p-6 md:p-8 lg:p-10 relative z-10">
         <div className="mb-7">
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">{plan.name}</h3>
-          {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Best choice for most businesses.</p>}
+          {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Most Popular — Best for businesses losing 20+ leads/month</p>}
           {isRecommended && (
             <p className="text-xs font-bold text-primary mb-2">
-              Recommended based on your selected industry.
+              Recommended for {selectedIndustry.shortName}
             </p>
           )}
           <p className="text-xs font-semibold text-foreground/70 leading-snug">{plan.fit}</p>

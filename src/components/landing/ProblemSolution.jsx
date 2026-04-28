@@ -160,14 +160,14 @@ export default function ProblemSolution() {
 
                   {/* Solution */}
                   <div
-                    className="rounded-2xl px-5 py-4 border border-primary/20 relative overflow-hidden flex items-start gap-3"
-                    style={{
-                      background: "rgba(255,255,255,0.55)",
-                      backdropFilter: "blur(18px)",
-                      WebkitBackdropFilter: "blur(18px)",
-                      boxShadow: "0 4px 20px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.9)",
-                      animation: `solutionSlideIn 0.7s ease-out ${0.2 + i * 0.15}s both`,
-                    }}
+                   className="rounded-2xl px-5 py-4 border border-green-200/50 relative overflow-hidden flex items-start gap-3"
+                   style={{
+                     background: "linear-gradient(135deg, rgba(240,253,244,0.6) 0%, rgba(255,255,255,0.7) 100%)",
+                     backdropFilter: "blur(18px)",
+                     WebkitBackdropFilter: "blur(18px)",
+                     boxShadow: "0 4px 20px rgba(22,163,74,0.08), inset 0 1px 0 rgba(255,255,255,0.95)",
+                     animation: `solutionSlideIn 0.7s ease-out ${0.2 + i * 0.15}s both`,
+                   }}
                   >
                     <div
                       aria-hidden="true"

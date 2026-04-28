@@ -171,12 +171,17 @@ export default function Footer() {
         </div>
         
         {/* Bottom Meta */}
-        <div className="border-t border-primary/10 px-4 md:px-6 py-2.5 flex flex-wrap items-center justify-center gap-1.5 text-[9px] text-foreground/40">
-          <span>&copy; {new Date().getFullYear()} ClientSurge Systems</span>
-          <span className="text-foreground/20">·</span>
-          <a href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</a>
-          <span className="text-foreground/20">·</span>
-          <a href="/legal/terms" className="hover:text-foreground transition-colors">Terms</a>
+        <div className="border-t border-primary/10 px-4 md:px-6 py-4 text-center">
+          <p className="text-sm font-semibold text-foreground mb-3">
+            Ready to recover leads you've already lost? Most businesses recover their investment in 30 days.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-1.5 text-[9px] text-foreground/40">
+            <span>&copy; {new Date().getFullYear()} ClientSurge Systems</span>
+            <span className="text-foreground/20">·</span>
+            <a href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</a>
+            <span className="text-foreground/20">·</span>
+            <a href="/legal/terms" className="hover:text-foreground transition-colors">Terms</a>
+          </div>
         </div>
       </div>
     </footer>
