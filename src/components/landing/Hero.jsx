@@ -158,15 +158,12 @@ export default function Hero() {
 
           <div
             className="landing-hero__checklist"
-            style={{
-              display: "grid",
-              gap: "9px",
-              marginBottom: "34px",
-            }}
+            style={{ display: "grid", gap: "9px", marginBottom: "34px" }}
           >
-            {checklist.map((item) => (
+            {checklist.map((item, i) => (
               <div
                 key={item}
+                className="hero-check-item"
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "10px",
                   padding: "7px 14px 7px 10px",
@@ -175,30 +172,41 @@ export default function Hero() {
                   border: "1px solid rgba(200,150,92,0.22)",
                   boxShadow: "0 2px 8px rgba(122,72,37,0.06)",
                   width: "fit-content",
+                  opacity: 0,
+                  transform: "translateX(-18px)",
+                  animation: `heroCheckIn 0.55s cubic-bezier(0.22,1,0.36,1) ${0.35 + i * 0.13}s forwards`,
                 }}
               >
-                <div style={{
-                  width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0,
-                  background: "linear-gradient(135deg,#26b05f,#16a34a)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: "0 2px 6px rgba(34,197,94,0.25)",
-                }}>
+                <div
+                  className="hero-check-circle"
+                  style={{
+                    width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0,
+                    background: "linear-gradient(135deg,#26b05f,#16a34a)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    boxShadow: "0 2px 6px rgba(34,197,94,0.25)",
+                    animation: `heroCheckPop 0.4s cubic-bezier(0.34,1.56,0.64,1) ${0.55 + i * 0.13}s both`,
+                  }}
+                >
                   <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
                     <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <span
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "600",
-                    color: "rgba(27,20,13,0.8)",
-                  }}
-                >
+                <span style={{ fontSize: "14px", fontWeight: "600", color: "rgba(27,20,13,0.8)" }}>
                   {item}
                 </span>
               </div>
             ))}
           </div>
+          <style>{`
+            @keyframes heroCheckIn {
+              to { opacity: 1; transform: translateX(0); }
+            }
+            @keyframes heroCheckPop {
+              0% { transform: scale(0.4); }
+              70% { transform: scale(1.15); }
+              100% { transform: scale(1); }
+            }
+          `}</style>
 
           <div
             className="landing-hero__actions"
