@@ -8,6 +8,7 @@ import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
+import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 
 const InteractiveStackBuilder = lazy(() =>
   import("@/components/store/InteractiveStackBuilder")
@@ -25,6 +26,21 @@ function StoreInner() {
     }
 
     const syncIndustry = () => {
+      // Check if quiz routed here with a package key
+      const quizPackage = window.sessionStorage.getItem("clientsurge:quiz-package");
+      if (quizPackage) {
+        const pkg = PACKAGE_OFFERS.find((p) => p.package_key === quizPackage);
+        if (pkg) {
+          setSelectedIndustry({
+            shortName: pkg.name,
+            recommendedPackage: pkg,
+            recommendedServiceKeys: pkg.included_service_keys,
+            recommendedServices: pkg.included_services.map((s) => ({ ...s, whyThisMatters: s.description })),
+            whyItWorks: pkg.fit,
+          });
+          return;
+        }
+      }
       setSelectedIndustry(getSelectedIndustryRecommendation());
     };
 
