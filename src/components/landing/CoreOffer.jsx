@@ -532,9 +532,9 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
       aria-pressed={selected}
       className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       style={{
-        background: selected ? flowSurfaceStrong : flowSurface,
-        border: selected ? flowBorderActive : flowBorder,
-        boxShadow: selected ? flowShadowActive : flowShadow,
+        background: "rgba(255,255,255,0.82)",
+        border: "1px solid rgba(148, 163, 184, 0.18)",
+        boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
         transform: selected ? "translateY(-1px)" : "translateY(0)",
       }}
     >
@@ -767,9 +767,9 @@ function SystemDetailPanel({ systemId, onBookDemo, onPrevious, onNext }) {
     <div
       className="mt-12 md:mt-14 rounded-[24px] px-5 py-6 md:px-7 md:py-7"
       style={{
-        background: flowSurfaceStrong,
-        border: flowBorderActive,
-        boxShadow: flowShadowActive,
+        background: "rgba(255,255,255,0.82)",
+        border: "1px solid rgba(148, 163, 184, 0.18)",
+        boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
       }}
     >
       <div className="grid lg:grid-cols-[280px,1fr] gap-6 md:gap-7">
