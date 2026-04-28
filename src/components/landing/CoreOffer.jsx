@@ -837,25 +837,29 @@ function LaunchTimeline() {
         We Set It Up For You
       </h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 relative">
-        <div
-          aria-hidden="true"
-          className="hidden md:block absolute top-8 left-0 right-0 h-px"
-          style={{
-            background: "linear-gradient(to right, transparent, rgba(154,92,46,0.3), transparent)",
-            animation: "timelineLineIn 1.2s ease-out 0.3s both",
-          }}
-        />
+      <div className="space-y-5">
         {launchTimelineSteps.map((step, idx) => (
           <button
             key={step.id}
             type="button"
-            className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 relative"
+            className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 relative"
             style={{
               background: "rgba(255,255,255,0.82)",
               border: "1px solid rgba(148, 163, 184, 0.18)",
               boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
               animation: `timelineCardIn 0.6s ease-out ${0.4 + idx * 0.15}s both`,
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-4px)";
+              e.currentTarget.style.boxShadow = "0 16px 40px rgba(111,67,31,0.18)";
+              e.currentTarget.style.borderColor = "rgba(154,92,46,0.35)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.92)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 8px 22px rgba(15, 23, 42, 0.05)";
+              e.currentTarget.style.borderColor = "rgba(148, 163, 184, 0.18)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.82)";
             }}
           >
             <div
@@ -907,16 +911,6 @@ function LaunchTimeline() {
         </div>
 
         <style>{`
-        @keyframes timelineLineIn {
-          from {
-            width: 0%;
-            opacity: 0;
-          }
-          to {
-            width: 100%;
-            opacity: 1;
-          }
-        }
         @keyframes timelineCardIn {
           from {
             opacity: 0;

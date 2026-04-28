@@ -178,25 +178,7 @@ export default function IntegrationPartners() {
           </div>
         </div>
 
-        {/* Visual enhancement: glowing integration pill row */}
-        <div className="flex flex-wrap items-center justify-center gap-3 mt-10 pt-10 border-t border-border/30">
-          {["Plug & play setup", "No custom dev needed", "Syncs automatically", "50+ tools supported", "Works with what you have"].map((label) => (
-            <div
-              key={label}
-              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-primary"
-              style={{
-                background: "rgba(255,255,255,0.7)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                border: "1px solid rgba(154,92,46,0.18)",
-                boxShadow: "0 2px 10px rgba(154,92,46,0.08), inset 0 1px 0 rgba(255,255,255,0.9)",
-              }}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-primary/60 flex-shrink-0" />
-              {label}
-            </div>
-          ))}
-        </div>
+
 
       </div>
 
