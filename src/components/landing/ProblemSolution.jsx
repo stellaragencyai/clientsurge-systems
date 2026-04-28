@@ -41,6 +41,18 @@ const problems = [
     solution: "Guided booking flow converts warm inquiries into confirmed appointments",
     result: "Cleaner path to booking",
   },
+  {
+    problem: "No insight into which leads are hot prospects",
+    stat: "AI scoring catches high-intent signals that reps miss 40% of the time",
+    solution: "AI analyzes every lead response and flags hot prospects for immediate follow-up",
+    result: "Hot leads prioritized",
+  },
+  {
+    problem: "Follow-up stops after booking — no post-appointment automation",
+    stat: "Post-booking confirmations reduce no-shows by 35%",
+    solution: "Automated appointment reminders, confirmations, and feedback requests close the loop",
+    result: "Complete follow-through",
+  },
 ];
 
 function CardWithFadeIn({ children, delay = 0 }) {
