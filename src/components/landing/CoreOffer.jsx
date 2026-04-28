@@ -539,60 +539,26 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
       }}
     >
       <div
-        className="px-5 md:px-6 pt-5 pb-4 flex items-center justify-between relative overflow-hidden"
+        className="px-5 md:px-6 pt-5 pb-4 flex items-center justify-between gap-3 rounded-t-2xl"
         style={{
-          background: selected ? flowBrownSoft : flowBrown,
-          borderBottom: "1px solid rgba(0,0,0,0.15)",
+          background: "rgba(255,255,255,0.82)",
+          borderBottom: "1px solid rgba(148, 163, 184, 0.18)",
         }}
       >
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-full pointer-events-none"
-          style={{
-            background: flowHeaderGlass,
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.84), inset 0 -1px 0 rgba(255,255,255,0.22)",
-          }}
-        />
-        <div className="flex items-center gap-3">
-          <span
-            className="relative z-10 text-[11px] font-black uppercase tracking-[0.2em]"
-            style={{ color: selected ? "rgba(255,242,223,0.96)" : flowTextLight }}
-          >
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(154,92,46,0.7)" }}>
             Step {system.id}
-          </span>
+          </p>
+          <p className="mt-1 text-sm font-semibold text-foreground leading-snug">{system.title}</p>
         </div>
-        <div className="flex items-center gap-3 relative z-10">
-          <span
-            className="hidden sm:inline text-[11px] font-semibold uppercase tracking-[0.16em]"
-            style={{ color: selected ? "rgba(255,242,223,0.72)" : "rgba(198,160,119,0.82)" }}
-          >
-            Tap to expand
-          </span>
-          <div className="relative">
-            <div
-              aria-hidden="true"
-              className="absolute inset-[-6px] rounded-[18px] pointer-events-none"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(245,217,168,0.34) 0%, rgba(245,217,168,0.1) 48%, transparent 76%)",
-                filter: "blur(4px)",
-                opacity: selected ? 1 : 0.75,
-              }}
-            />
-            <div
-              className="relative w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{
-                background: selected
-                  ? "linear-gradient(180deg, rgba(255,242,223,0.96) 0%, rgba(245,217,168,0.88) 100%)"
-                  : "linear-gradient(180deg, rgba(255,249,241,0.96) 0%, rgba(246,232,214,0.88) 100%)",
-                border: selected ? "1px solid rgba(255,227,186,0.72)" : "1px solid rgba(205,164,114,0.52)",
-                boxShadow: `inset 0 1px 0 rgba(255,255,255,0.78), ${selected ? "0 0 0 2px rgba(255,242,223,0.5)" : flowIconGlow}`,
-                transition: "all 200ms ease",
-              }}
-            >
-              <Icon className="w-4 h-4" style={{ color: selected ? "#7a4825" : flowIconColor }} />
-            </div>
-          </div>
+        <div
+          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{
+            background: "linear-gradient(135deg,#9a5c2e,#7a4825)",
+            boxShadow: "0 2px 8px rgba(154,92,46,0.3)",
+          }}
+        >
+          <Icon className="w-4 h-4 text-white" />
         </div>
       </div>
 
@@ -914,39 +880,30 @@ function LaunchTimeline() {
             }}
           >
             <div
-              className="px-5 md:px-6 pt-5 pb-4 flex items-center justify-between relative overflow-hidden"
-              style={{
-                background: "linear-gradient(135deg, #7a4825 0%, #b1723b 42%, #8a542b 100%)",
-                borderBottom: "1px solid rgba(0,0,0,0.15)",
-              }}
-            >
-              <div
-                aria-hidden="true"
-                className="absolute inset-x-0 top-0 h-full pointer-events-none"
-                style={{
-                  background: "linear-gradient(180deg, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0) 100%)",
-                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.84), inset 0 -1px 0 rgba(255,255,255,0.22)",
-                }}
-              />
-              <span
-                className="relative z-10 text-[11px] font-black uppercase tracking-[0.2em]"
-                style={{ color: "rgba(255,242,223,0.96)" }}
-              >
-                Step {step.number}
-              </span>
-              <div
-                className="relative w-10 h-10 rounded-xl flex items-center justify-center"
-                style={{
-                  background: "linear-gradient(180deg, rgba(255,242,223,0.96) 0%, rgba(245,217,168,0.88) 100%)",
-                  border: "1px solid rgba(255,227,186,0.72)",
-                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.78), 0 0 0 2px rgba(255,242,223,0.5)",
-                }}
-              >
-                <span className="text-sm font-black" style={{ color: "#7a4825" }}>
-                  {step.number}
-                </span>
-              </div>
-            </div>
+               className="px-5 md:px-6 pt-5 pb-4 flex items-center justify-between rounded-t-2xl"
+               style={{
+                 background: "rgba(255,255,255,0.82)",
+                 borderBottom: "1px solid rgba(148, 163, 184, 0.18)",
+               }}
+             >
+               <span
+                 className="text-[11px] font-black uppercase tracking-[0.2em]"
+                 style={{ color: "rgba(154,92,46,0.7)" }}
+               >
+                 Step {step.number}
+               </span>
+               <div
+                 className="relative w-10 h-10 rounded-xl flex items-center justify-center"
+                 style={{
+                   background: "linear-gradient(135deg,#9a5c2e,#7a4825)",
+                   boxShadow: "0 2px 8px rgba(154,92,46,0.3)",
+                 }}
+               >
+                 <span className="text-sm font-black text-white">
+                   {step.number}
+                 </span>
+               </div>
+             </div>
 
             <div
                className="rounded-2xl px-5 py-5 flex flex-col gap-3"
