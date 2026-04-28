@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { ArrowRight, Wand2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import HeroDashboardScreen from "./HeroDashboardScreen";
-import SystemQuiz from "./SystemQuiz";
 
 const checklist = [
   "Instant response to every new lead — within seconds",
@@ -14,7 +13,6 @@ const checklist = [
 
 export default function Hero() {
   const demoBooking = useDemoBooking();
-  const [showQuiz, setShowQuiz] = useState(false);
 
   return (
     <section
@@ -245,51 +243,6 @@ export default function Hero() {
               Book Your Free Demo
               <ArrowRight style={{ width: "18px", height: "18px" }} />
             </button>
-
-            <button
-              type="button"
-              onClick={() => setShowQuiz(true)}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                minHeight: "58px",
-                padding: "0 28px",
-                borderRadius: "9999px",
-                border: "1.5px solid rgba(154,92,46,0.35)",
-                background: "rgba(255,255,255,0.82)",
-                color: "#7a4825",
-                fontSize: "14px",
-                fontWeight: "700",
-                cursor: "pointer",
-                boxShadow: "0 10px 24px rgba(44,31,16,0.06)",
-              }}
-            >
-              <Wand2 style={{ width: "16px", height: "16px" }} />
-              Find My System
-            </button>
-
-            <a
-              href="#services"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minHeight: "58px",
-                padding: "0 28px",
-                borderRadius: "9999px",
-                border: "1.5px solid rgba(154,92,46,0.22)",
-                background: "rgba(255,255,255,0.72)",
-                color: "rgba(27,20,13,0.75)",
-                fontSize: "14px",
-                fontWeight: "700",
-                textDecoration: "none",
-                boxShadow: "0 10px 24px rgba(44,31,16,0.04)",
-              }}
-            >
-              See The System
-            </a>
           </div>
 
           <p
@@ -303,13 +256,6 @@ export default function Hero() {
             No contracts · Most clients see ROI within 30 days
           </p>
         </div>
-
-        {showQuiz && (
-          <SystemQuiz
-            onClose={() => setShowQuiz(false)}
-            onBookDemo={demoBooking?.openDemoBooking}
-          />
-        )}
 
         <div
           className="landing-hero__visualWrap"
