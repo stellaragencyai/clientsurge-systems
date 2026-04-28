@@ -5,6 +5,7 @@ import PortalLoginModal from "../forms/PortalLoginModal";
 import DemoBookingModal from "../forms/DemoBookingModal";
 import { trackCTA } from "@/lib/analytics";
 import { usePageViewTracking } from "../../hooks/usePageViewTracking";
+import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
 
 const sectionLinks = [
   { label: "How It Works", href: "#problem-solution" },
@@ -124,6 +125,18 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    // Prevent body scroll when nav is open
+    if (open) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [open]);
 
   useEffect(() => {
     // Check stored preference first, then system preference
@@ -294,16 +307,16 @@ export default function Navbar() {
           </button>
           <button
             onClick={() => {
-              trackCTA("book_your_free_demo", "navbar");
+              trackCTA("book_demo", "navbar");
               setShowBookingModal(true);
             }}
             style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.35)", transition: "box-shadow 0.3s ease, transform 0.3s ease", border: "none", cursor: "pointer" }}
-            onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)")}
+            onMouseEnter={(e) => (e.currentTarget.style.boxShadow = BUTTON_STYLES.BROWN_GRADIENT_HOVER.boxShadow)}
             onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 4px 14px rgba(120,70,20,0.35)")}
             className="hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded"
           >
             <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 16px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "600", fontSize: "0.75rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
-              Book Demo
+              {BUTTON_TEXT.BOOK_DEMO_SHORT}
             </span>
           </button>
         </div>
@@ -388,14 +401,14 @@ export default function Navbar() {
           </button>
           <button
             onClick={() => {
-              trackCTA("book_your_free_demo", "mobile_nav");
+              trackCTA("book_demo", "mobile_nav");
               setOpen(false);
               setShowBookingModal(true);
             }}
             style={{ display: "block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.35)", border: "none", cursor: "pointer", width: "100%" }}
           >
             <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "600", fontSize: "0.875rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
-              Book Your Free Demo
+              {BUTTON_TEXT.BOOK_DEMO}
             </span>
           </button>
         </div>

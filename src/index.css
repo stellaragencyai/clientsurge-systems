@@ -168,6 +168,13 @@ body {
   max-width: 100vw;
 }
 
+/* Mobile nav drawer fix */
+body.nav-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
 /* Fix iOS Safari fixed positioning issues */
 @supports (-webkit-touch-callout: none) {
   /* Sticky navbar safe area padding */
@@ -510,4 +517,12 @@ body > * {
 /* Ensure text on dark stays legible */
 .dark p, .dark h1, .dark h2, .dark h3, .dark h4, .dark span:not([style*="color"]) {
   color: inherit;
+}
+
+/* Dark mode gradient text fix */
+.dark span[style*="background"] {
+  background: linear-gradient(135deg, #f5d9a8 0%, #e8c499 52%, #d4a570 100%) !important;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import HeroDashboardScreen from "./HeroDashboardScreen";
+import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
 
 const checklist = [
   "Instant response to every new lead — within seconds",
@@ -236,20 +237,20 @@ export default function Hero() {
                 color: "#fff8ee",
                 fontSize: "1rem",
                 fontWeight: "700",
-                boxShadow: "0 12px 48px rgba(154, 92, 46, 0.35)",
+                boxShadow: BUTTON_STYLES.BROWN_GRADIENT.boxShadow,
                 cursor: "pointer",
                 transition: "all 0.3s ease",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.boxShadow = "0 18px 60px rgba(154, 92, 46, 0.5)";
+                e.currentTarget.style.boxShadow = BUTTON_STYLES.BROWN_GRADIENT_HOVER.boxShadow;
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 12px 48px rgba(154, 92, 46, 0.35)";
+                e.currentTarget.style.boxShadow = BUTTON_STYLES.BROWN_GRADIENT.boxShadow;
               }}
             >
-              Book Your Free Demo
+              {BUTTON_TEXT.BOOK_DEMO}
               <ArrowRight style={{ width: "18px", height: "18px" }} />
             </button>
           </div>
