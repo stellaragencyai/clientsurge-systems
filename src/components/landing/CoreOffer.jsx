@@ -567,36 +567,9 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
           background: "transparent",
         }}
       >
-        <h3 className="text-lg font-semibold leading-snug text-foreground">
-          {system.title}
-        </h3>
         <p className="text-sm leading-relaxed text-foreground/75">
           {system.shortDescription}
         </p>
-        <div className="flex flex-wrap gap-2">
-          <span
-            className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.08em] w-fit"
-            style={{
-              background: "rgba(154,92,46,0.08)",
-              color: "#9a5c2e",
-              border: "1px solid rgba(154,92,46,0.18)",
-            }}
-          >
-            {system.badge}
-          </span>
-          {emphasizedLabel ? (
-            <span
-              className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.08em] w-fit"
-              style={{
-                background: "rgba(154,92,46,0.08)",
-                color: "#9a5c2e",
-                border: "1px solid rgba(154,92,46,0.18)",
-              }}
-            >
-              {emphasizedLabel}
-            </span>
-          ) : null}
-        </div>
       </div>
     </button>
   );
@@ -877,20 +850,19 @@ function LaunchTimeline() {
             }}
           >
             <div
-               className="px-5 md:px-6 pt-5 pb-4 flex items-center justify-between rounded-t-2xl"
+               className="px-5 md:px-6 pt-5 pb-3 flex items-center justify-between"
                style={{
                  background: "rgba(255,255,255,0.82)",
-                 borderBottom: "1px solid rgba(148, 163, 184, 0.18)",
                }}
              >
-               <span
-                 className="text-[11px] font-black uppercase tracking-[0.2em]"
-                 style={{ color: "rgba(154,92,46,0.7)" }}
-               >
-                 Step {step.number}
-               </span>
+               <div className="flex-1 min-w-0">
+                 <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(154,92,46,0.7)" }}>
+                   Step {step.number}
+                 </p>
+                 <p className="mt-1 text-sm font-semibold text-foreground leading-snug">{step.title}</p>
+               </div>
                <div
-                 className="relative w-10 h-10 rounded-xl flex items-center justify-center"
+                 className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
                  style={{
                    background: "linear-gradient(135deg,#9a5c2e,#7a4825)",
                    boxShadow: "0 2px 8px rgba(154,92,46,0.3)",
@@ -903,20 +875,15 @@ function LaunchTimeline() {
              </div>
 
             <div
-               className="rounded-2xl px-5 py-5 flex flex-col gap-3"
+               className="px-5 pb-5 flex flex-col gap-3"
                style={{
-                 background: "rgba(255,255,255,0.82)",
-                 border: "1px solid rgba(148, 163, 184, 0.18)",
-                 boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
+                 background: "transparent",
                }}
              >
-              <h3 className="text-lg font-semibold leading-snug text-foreground">
-                {step.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-foreground/75">
-                {step.description}
-              </p>
-            </div>
+               <p className="text-sm leading-relaxed text-foreground/75">
+                 {step.description}
+               </p>
+             </div>
           </button>
         ))}
       </div>
