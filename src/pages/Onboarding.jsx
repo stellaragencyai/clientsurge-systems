@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { CheckCircle2, AlertCircle } from "lucide-react";
+import { CheckCircle2, AlertCircle, Zap } from "lucide-react";
 import OnboardingChatWidget from "../components/onboarding/OnboardingChatWidget";
+import QuickSetupStep1 from "../components/onboarding/QuickSetupStep1";
+import QuickSetupStep2 from "../components/onboarding/QuickSetupStep2";
+import QuickSetupStep3 from "../components/onboarding/QuickSetupStep3";
 
 const SERVICES = ["Botox / Injectables", "Fillers", "Laser Treatments", "Facials / Skincare", "Body Contouring", "Weight Loss"];
 const LEAD_SOURCES = ["Website Forms", "Instagram DMs", "Phone Calls", "Paid Ads"];
@@ -25,7 +28,9 @@ const sections = [
 ];
 
 export default function Onboarding() {
+  const [setupMode, setSetupMode] = useState(null); // null, "quick", or "detailed"
   const [currentSection, setCurrentSection] = useState(1);
+  const [currentQuickStep, setCurrentQuickStep] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -50,11 +55,11 @@ export default function Onboarding() {
     has_old_leads: "",
     access_info: "",
     goals: "",
+    // Quick setup fields
+    industry: "",
+    crm_type: "",
+    workflow_template: "",
   });
-
-  const updateField = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
 
   const toggleCheckbox = (field, value) => {
     setFormData((prev) => ({
@@ -83,6 +88,10 @@ export default function Onboarding() {
     }
   };
 
+  const updateField = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
   if (submitted) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-6">
@@ -106,13 +115,183 @@ export default function Onboarding() {
     );
   }
 
+  // Quick setup mode
+  if (setupMode === "quick") {
+    return (
+      <div className="min-h-screen bg-background py-12 px-6">
+        <div className="max-w-2xl mx-auto">
+          {/* Header */}
+          <div className="mb-12 text-center">
+            <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">
+              Quick Setup
+            </p>
+            <h1 className="font-display text-4xl font-semibold text-foreground mb-2">
+              Set Up in 3 Steps
+            </h1>
+            <p className="text-muted-foreground text-lg">Get your automation running in minutes</p>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-foreground">
+                Step {currentQuickStep} of 3
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {Math.round((currentQuickStep / 3) * 100)}%
+              </span>
+            </div>
+            <div className="h-2 bg-border rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary transition-all duration-300"
+                style={{ width: `${(currentQuickStep / 3) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Quick Setup Form */}
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setLoading(true);
+              setError(null);
+              try {
+                await base44.functions.invoke("submitClientOnboarding", {
+                  industry: formData.industry,
+                  crm_type: formData.crm_type,
+                  booking_link: formData.booking_link,
+                  workflow_template: formData.workflow_template,
+                  flow: "quick_setup",
+                });
+                setSubmitted(true);
+              } catch (err) {
+                setError(err?.data?.error || err.message || "Failed to submit");
+                setLoading(false);
+              }
+            }}
+          >
+            {currentQuickStep === 1 && (
+              <QuickSetupStep1 value={formData.industry} onChange={updateField} />
+            )}
+
+            {currentQuickStep === 2 && (
+              <QuickSetupStep2 formData={formData} onChange={updateField} />
+            )}
+
+            {currentQuickStep === 3 && (
+              <QuickSetupStep3 value={formData.workflow_template} onChange={updateField} />
+            )}
+
+            {error && (
+              <div className="mt-8 bg-destructive/10 border border-destructive/30 rounded-xl p-4 flex gap-3">
+                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+            )}
+
+            {/* Navigation */}
+            <div className="mt-10 flex items-center justify-between gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  if (currentQuickStep === 1) setSetupMode(null);
+                  else setCurrentQuickStep(currentQuickStep - 1);
+                }}
+                className="px-6 py-2.5 rounded-lg border border-border text-foreground font-medium hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {currentQuickStep === 1 ? "Change Mode" : "Previous"}
+              </button>
+
+              {currentQuickStep === 3 ? (
+                <button
+                  type="submit"
+                  disabled={loading || !formData.industry || !formData.crm_type || !formData.workflow_template}
+                  className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {loading ? "Submitting..." : "Complete Setup"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setCurrentQuickStep(currentQuickStep + 1)}
+                  disabled={
+                    (currentQuickStep === 1 && !formData.industry) ||
+                    (currentQuickStep === 2 && !formData.crm_type)
+                  }
+                  className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+        <OnboardingChatWidget />
+      </div>
+    );
+  }
+
+  // Mode selection
+  if (!setupMode) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="max-w-2xl w-full">
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">
+              Welcome to ClientSurge
+            </p>
+            <h1 className="font-display text-4xl font-semibold text-foreground mb-3">
+              How would you like to set up?
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              Choose the pace that works best for you
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Quick Setup */}
+            <button
+              onClick={() => setSetupMode("quick")}
+              className="p-8 rounded-2xl border-2 border-primary bg-primary/5 hover:shadow-lg transition-all text-left"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <Zap className="w-6 h-6 text-primary" />
+                <h2 className="font-display text-2xl font-semibold text-foreground">Quick Setup</h2>
+              </div>
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                Get started in 3 simple steps. Pick your industry, connect your booking system, and select your automation level.
+              </p>
+              <p className="text-sm font-semibold text-primary">Takes ~5 minutes →</p>
+            </button>
+
+            {/* Detailed Setup */}
+            <button
+              onClick={() => setSetupMode("detailed")}
+              className="p-8 rounded-2xl border-2 border-border hover:border-primary/30 hover:shadow-lg transition-all text-left"
+            >
+              <div className="mb-4">
+                <h2 className="font-display text-2xl font-semibold text-foreground">
+                  Detailed Setup
+                </h2>
+              </div>
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                Complete questionnaire with 12 detailed sections. Perfect if you want to provide comprehensive information about your business.
+              </p>
+              <p className="text-sm font-semibold text-foreground">Takes ~15 minutes →</p>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background py-12 px-6">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-12 text-center">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">
-            Client Onboarding
+            Detailed Onboarding
           </p>
           <h1 className="font-display text-4xl font-semibold text-foreground mb-2">
             Let's Set Up Your System
@@ -120,6 +299,13 @@ export default function Onboarding() {
           <p className="text-muted-foreground text-lg">
             Complete all sections to get started
           </p>
+          <button
+            type="button"
+            onClick={() => setSetupMode(null)}
+            className="mt-4 text-sm text-primary hover:underline font-medium"
+          >
+            ← Back to mode selection
+          </button>
         </div>
 
         {/* Progress Bar */}
