@@ -40,7 +40,7 @@ export default function ProductCard({ product }) {
         flexDirection: "column",
         gap: "14px",
         position: "relative",
-        transition: "all 0.3s ease",
+        transition: "all 0.8s ease",
         overflow: "hidden",
       }}
     >
@@ -54,18 +54,35 @@ export default function ProductCard({ product }) {
             ? "transparent"
             : "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(200,150,92,0.16) 0%, transparent 72%)",
           opacity: 0,
-          transition: "opacity 0.35s ease",
+          transition: "opacity 0.8s ease",
           pointerEvents: "none",
           zIndex: 0,
         }}
       />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "16px",
+          background: product.coming_soon
+            ? "transparent"
+            : "linear-gradient(135deg, rgba(245,217,168,0.12) 0%, rgba(200,150,92,0.06) 50%, rgba(154,92,46,0.04) 100%)",
+          opacity: 0,
+          transition: "opacity 0.8s ease",
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+        className="premium-gradient"
+      />
       <style>{`
         .product-card:hover .card-glow { opacity: 1 !important; }
+        .product-card:hover .premium-gradient { opacity: 1 !important; }
         .product-card:hover {
         border-color: rgba(154,92,46,0.25) !important;
-        box-shadow: 0 8px 24px rgba(111,67,31,0.1) !important;
+        box-shadow: 0 12px 32px rgba(111,67,31,0.12), inset 0 1px 0 rgba(255,255,255,0.8) !important;
         transform: translateY(-2px);
-        background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(252,248,242,0.88) 100%) !important;
+        background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(252,248,242,0.92) 100%) !important;
+        transition: all 0.8s ease !important;
         }
       `}</style>
 
@@ -73,21 +90,22 @@ export default function ProductCard({ product }) {
         <div
           style={{
             position: "absolute",
-            top: "12px",
-            right: "18px",
+            top: "14px",
+            right: "14px",
             background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
             color: "#fff",
             fontSize: "9px",
             fontWeight: "700",
-            padding: "4px 10px",
+            padding: "5px 11px",
             borderRadius: "18px",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
             zIndex: 2,
             opacity: 0,
-            transform: "scale(0.8)",
-            transition: "opacity 0.3s ease, transform 0.3s ease",
+            transform: "translateX(8px) scale(0.9)",
+            transition: "opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s",
             pointerEvents: "none",
+            boxShadow: "0 2px 8px rgba(111,67,31,0.15)",
           }}
           className="popular-badge"
         >
@@ -97,7 +115,7 @@ export default function ProductCard({ product }) {
       <style>{`
         .product-card:hover .popular-badge {
           opacity: 1 !important;
-          transform: scale(1) !important;
+          transform: translateX(0) scale(1) !important;
         }
       `}</style>
 
@@ -231,7 +249,7 @@ export default function ProductCard({ product }) {
         <div style={{ opacity: product.coming_soon ? 0.6 : 1 }}>
           <p
             style={{
-              fontSize: "9px",
+              fontSize: "8px",
               color: product.coming_soon ? "rgba(100,100,100,0.5)" : "rgba(154,92,46,0.7)",
               fontWeight: "700",
               textTransform: "uppercase",
@@ -243,8 +261,8 @@ export default function ProductCard({ product }) {
           </p>
           <p
             style={{
-              fontSize: "18px",
-              fontWeight: "800",
+              fontSize: "26px",
+              fontWeight: "900",
               color: product.coming_soon ? "#a0a0a0" : "#9a5c2e",
               margin: 0,
               lineHeight: 1,
@@ -252,7 +270,7 @@ export default function ProductCard({ product }) {
           >
             ${product.monthly_fee}
           </p>
-          <p style={{ fontSize: "8px", color: product.coming_soon ? "rgba(100,100,100,0.5)" : "rgba(27,20,13,0.5)", margin: "2px 0 0", fontWeight: "600" }}>
+          <p style={{ fontSize: "9px", color: product.coming_soon ? "rgba(100,100,100,0.5)" : "rgba(27,20,13,0.5)", margin: "3px 0 0", fontWeight: "600" }}>
             Setup ${product.setup_fee}
           </p>
         </div>
