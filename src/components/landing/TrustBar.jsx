@@ -32,11 +32,11 @@ function useCountUp(value, inView, duration = 1400) {
 const items = [
   {
     icon: Zap,
-    label: "Lead response time",
+    label: "Your leads hear from you before competitors do",
     display: "Under 60 sec",
     animatedValue: null,
     story:
-      "Your leads get an immediate response the moment they call or submit a form, even after hours.",
+      "The moment a lead calls or submits a form, they get an instant response — even after business hours.",
   },
   {
     icon: TrendingUp,

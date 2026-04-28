@@ -6,11 +6,11 @@ import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
 
 const checklist = [
-  "Instant response to every new lead — within seconds",
-  "Missed call recovery so no opportunity goes unanswered",
-  "Automated follow-up that runs for 14 days without you",
-  "Booking flow support to convert ready leads faster",
-  "Live in 5–7 business days, fully built for you",
+  "Every lead hears from you within 60 seconds — even after hours",
+  "Missed calls instantly turn into text conversations, not dead ends",
+  "14 days of automated follow-up keeps leads warm without manual work",
+  "Guided booking flow converts ready prospects into confirmed appointments",
+  "Fully built and live in 5–7 days — we handle everything",
 ];
 
 export default function Hero() {
@@ -124,7 +124,7 @@ export default function Hero() {
               marginBottom: "22px",
             }}
           >
-            Turn Missed Leads Into{" "}
+            Stop Losing Leads to Slow Response —{" "}
             <span
               style={{
                 background:
@@ -134,8 +134,9 @@ export default function Hero() {
                 backgroundClip: "text",
               }}
             >
-              Booked Appointments
+              AI Systems That Book 3x More
             </span>
+            {" "}Appointments
           </h1>
 
           {/* Visual enhancement: shimmer divider under headline */}
