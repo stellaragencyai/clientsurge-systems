@@ -597,55 +597,13 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
       </div>
 
       <div
-        className="px-5 md:px-6 py-5 md:py-6 flex flex-col gap-3 relative overflow-hidden"
+        className="px-5 md:px-6 py-5 md:py-6 flex flex-col gap-3 relative overflow-hidden rounded-2xl"
         style={{
-          background: flowSurface,
+          background: "rgba(255,255,255,0.9)",
+          border: "1.5px solid rgba(212,184,142,0.38)",
+          boxShadow: "0 4px 18px rgba(111,67,31,0.07)",
         }}
       >
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: "transparent",
-            opacity: 1,
-          }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute left-0 right-0 top-0 h-px pointer-events-none"
-          style={{ background: "transparent" }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-y-0 left-[-18%] w-[70%] pointer-events-none"
-          style={{
-            background: "transparent",
-            opacity: 0,
-            transform: "translateX(0)",
-            transition: "opacity 200ms ease, transform 200ms ease",
-          }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-[48%] pointer-events-none"
-          style={{
-            background: "transparent",
-            opacity: 0,
-          }}
-        />
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            right: "-8%",
-            bottom: "-20%",
-            width: "180px",
-            height: "180px",
-            borderRadius: "999px",
-            background: "transparent",
-            pointerEvents: "none",
-          }}
-        />
         <h3 className="text-lg font-semibold leading-snug relative z-10 text-foreground">
           {system.title}
         </h3>
@@ -656,9 +614,9 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
           <span
             className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.08em] w-fit"
             style={{
-              background: flowChipBg,
-              color: flowTextLight,
-              border: flowChipBorder,
+              background: "rgba(154,92,46,0.08)",
+              color: "#9a5c2e",
+              border: "1px solid rgba(154,92,46,0.18)",
             }}
           >
             {system.badge}
@@ -667,9 +625,9 @@ function SystemCard({ system, selected, onSelect, emphasizedLabel }) {
             <span
               className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1.5 rounded-full uppercase tracking-[0.08em] w-fit"
               style={{
-                background: "rgba(255,241,223,0.14)",
-                color: "rgba(255,242,223,0.96)",
-                border: "1px solid rgba(245,217,168,0.3)",
+                background: "rgba(154,92,46,0.08)",
+                color: "#9a5c2e",
+                border: "1px solid rgba(154,92,46,0.18)",
               }}
             >
               {emphasizedLabel}
@@ -777,44 +735,24 @@ function DetailBlock({ label, value }) {
     <div
       className="rounded-2xl overflow-hidden"
       style={{
-        background: flowSurface,
-        border: flowBorder,
-        boxShadow: flowShadow,
+        background: "rgba(255,255,255,0.9)",
+        border: "1.5px solid rgba(212,184,142,0.38)",
+        boxShadow: "0 4px 18px rgba(111,67,31,0.07)",
       }}
     >
       <div
-        className="px-4 py-3 relative overflow-hidden"
+        className="px-4 py-3"
         style={{
-          background: flowSurfaceStrong,
-          borderBottom: "1px solid rgba(208,166,114,0.18)",
+          background: "#ffffff",
+          borderBottom: "1px solid rgba(212,184,142,0.25)",
         }}
       >
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-full pointer-events-none"
-          style={{ background: flowHeaderGlass }}
-        />
-        <p className="relative z-10 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: flowTopText }}>
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "#9a5c2e" }}>
           {label}
         </p>
       </div>
-      <div className="px-4 py-4 relative overflow-hidden" style={{ background: flowBrown }}>
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: flowBodyMesh, opacity: 0.72 }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-[46%] pointer-events-none"
-          style={{ background: flowShine, opacity: 0.62 }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute left-0 right-0 top-0 h-px pointer-events-none"
-          style={{ background: flowDivider }}
-        />
-        <p className="relative z-10 text-sm leading-6" style={{ color: flowTextMuted }}>{value}</p>
+      <div className="px-4 py-4" style={{ background: "#ffffff" }}>
+        <p className="text-sm leading-6" style={{ color: "rgba(27,20,13,0.7)" }}>{value}</p>
       </div>
     </div>
   );
@@ -969,9 +907,9 @@ function LaunchTimeline() {
             key={step.id}
             className="rounded-2xl px-5 py-5 text-center"
             style={{
-              background: flowSurface,
-              border: flowBorder,
-              boxShadow: flowShadow,
+              background: "rgba(255,255,255,0.9)",
+              border: "1.5px solid rgba(212,184,142,0.38)",
+              boxShadow: "0 4px 18px rgba(111,67,31,0.07)",
             }}
           >
             <div
