@@ -23,17 +23,17 @@ export default function ProductCard({ product }) {
         border: inCart
           ? "1px solid rgba(154,92,46,0.3)"
           : product.coming_soon
-          ? "1px solid rgba(154,92,46,0.08)"
+          ? "1px solid rgba(180,180,180,0.25)"
           : "1px solid rgba(154,92,46,0.12)",
         background: inCart
           ? "linear-gradient(180deg, rgba(255,248,235,0.85) 0%, rgba(248,235,215,0.82) 100%)"
           : product.coming_soon
-          ? "linear-gradient(180deg, rgba(242,242,242,0.7) 0%, rgba(235,235,235,0.65) 100%)"
+          ? "linear-gradient(180deg, rgba(245,245,245,0.8) 0%, rgba(238,238,238,0.75) 100%)"
           : "linear-gradient(180deg, rgba(255,255,255,0.8) 0%, rgba(252,248,242,0.78) 100%)",
         boxShadow: inCart
           ? "0 6px 20px rgba(111,67,31,0.08)"
           : product.coming_soon
-          ? "0 1px 4px rgba(0,0,0,0.02)"
+          ? "0 2px 8px rgba(0,0,0,0.05)"
           : "0 2px 8px rgba(111,67,31,0.04)",
         padding: "18px",
         display: "flex",
@@ -42,7 +42,6 @@ export default function ProductCard({ product }) {
         position: "relative",
         transition: "all 0.3s ease",
         overflow: "hidden",
-        opacity: product.coming_soon ? 0.6 : 1,
       }}
     >
       <div
@@ -121,9 +120,17 @@ export default function ProductCard({ product }) {
             alignItems: "center",
             justifyContent: "center",
             fontSize: "26px",
-            background: "rgba(154,92,46,0.08)",
-            border: "1px solid rgba(154,92,46,0.18)",
-            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.6)",
+            background: product.coming_soon
+              ? "rgba(180,180,180,0.15)"
+              : "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)",
+            border: product.coming_soon
+              ? "1px solid rgba(180,180,180,0.2)"
+              : "1px solid rgba(154,92,46,0.2)",
+            boxShadow: product.coming_soon
+              ? "inset 0 1px 0 rgba(255,255,255,0.3)"
+              : "inset 0 1px 0 rgba(255,255,255,0.6), 0 2px 8px rgba(154,92,46,0.1)",
+            filter: product.coming_soon ? "grayscale(80%)" : "none",
+            opacity: product.coming_soon ? 0.7 : 1,
           }}
         >
           {product.icon}
@@ -150,7 +157,7 @@ export default function ProductCard({ product }) {
           style={{
             fontSize: "18px",
             fontWeight: "700",
-            color: "#1b140d",
+            color: product.coming_soon ? "rgba(27,20,13,0.5)" : "#1b140d",
             margin: "0 0 4px",
             lineHeight: 1.2,
           }}
@@ -160,7 +167,7 @@ export default function ProductCard({ product }) {
         <p
           style={{
             fontSize: "11px",
-            color: "#9a5c2e",
+            color: product.coming_soon ? "rgba(154,92,46,0.5)" : "#9a5c2e",
             fontWeight: "700",
             margin: 0,
             textTransform: "uppercase",
@@ -174,7 +181,7 @@ export default function ProductCard({ product }) {
       <p
         style={{
           fontSize: "13px",
-          color: "rgba(27,20,13,0.70)",
+          color: product.coming_soon ? "rgba(27,20,13,0.45)" : "rgba(27,20,13,0.70)",
           lineHeight: 1.65,
           margin: 0,
           position: "relative",
@@ -196,7 +203,7 @@ export default function ProductCard({ product }) {
         {product.highlights.map((highlight) => (
           <div
             key={highlight}
-            style={{ display: "flex", alignItems: "center", gap: "8px", opacity: product.coming_soon ? 0.5 : 1 }}
+            style={{ display: "flex", alignItems: "center", gap: "8px" }}
           >
             <CheckCircle2
               style={{
@@ -204,12 +211,13 @@ export default function ProductCard({ product }) {
                 height: "13px",
                 color: product.coming_soon ? "#b0b0b0" : "#4ade80",
                 flexShrink: 0,
+                opacity: product.coming_soon ? 0.6 : 1,
               }}
             />
             <span
               style={{
                 fontSize: "12px",
-                color: product.coming_soon ? "rgba(100,100,100,0.65)" : "rgba(27,20,13,0.72)",
+                color: product.coming_soon ? "rgba(100,100,100,0.55)" : "rgba(27,20,13,0.72)",
                 fontWeight: "500",
               }}
             >
@@ -219,13 +227,14 @@ export default function ProductCard({ product }) {
         ))}
       </div>
 
-      <div style={{ position: "relative", zIndex: 1, paddingTop: "4px", opacity: product.coming_soon ? 0.5 : 1 }}>
+      <div style={{ position: "relative", zIndex: 1, paddingTop: "4px" }}>
         <div
           style={{
             display: "flex",
             alignItems: "baseline",
             gap: "12px",
             marginBottom: "12px",
+            opacity: product.coming_soon ? 0.6 : 1,
           }}
         >
           <div>
@@ -278,7 +287,6 @@ export default function ProductCard({ product }) {
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
-            opacity: product.coming_soon ? 0.5 : 1,
           }}
           title={product.coming_soon ? "Coming soon" : "Watch demo"}
           onMouseEnter={(e) => {
@@ -294,7 +302,7 @@ export default function ProductCard({ product }) {
             }
           }}
         >
-          <Play style={{ width: "14px", height: "14px", color: product.coming_soon ? "#a0a0a0" : "#64748b" }} />
+          <Play style={{ width: "14px", height: "14px", color: product.coming_soon ? "#a0a0a0" : "#64748b", opacity: product.coming_soon ? 0.6 : 1 }} />
         </button>
 
         <button
@@ -317,7 +325,6 @@ export default function ProductCard({ product }) {
               ? "none"
               : "0 4px 14px rgba(120,70,20,0.28)",
             transition: "all 0.2s",
-            opacity: product.coming_soon ? 0.6 : 1,
           }}
         >
           <span
@@ -336,6 +343,7 @@ export default function ProductCard({ product }) {
               color: "#fff",
               fontWeight: "700",
               fontSize: "13px",
+              opacity: product.coming_soon ? 0.7 : 1,
             }}
           >
             {product.coming_soon ? (
@@ -352,6 +360,31 @@ export default function ProductCard({ product }) {
           </span>
         </button>
       </div>
+
+      {product.coming_soon && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%) rotate(-45deg)",
+            background: "rgba(180,180,180,0.5)",
+            padding: "8px 24px",
+            borderRadius: "2px",
+            fontSize: "13px",
+            fontWeight: "700",
+            color: "rgba(120,120,120,0.8)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            zIndex: 5,
+            pointerEvents: "none",
+            whiteSpace: "nowrap",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          }}
+        >
+          Coming Soon
+        </div>
+      )}
 
       {showDemo && (
         <DemoModal product={product} onClose={() => setShowDemo(false)} />
