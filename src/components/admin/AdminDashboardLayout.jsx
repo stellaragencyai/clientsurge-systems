@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import MetricsDashboard from "./MetricsDashboard";
 import AutomationRulesPanel from "./AutomationRulesPanel";
-import { Settings, BarChart3, Zap } from "lucide-react";
+import RevenueAttributionDashboard from "./RevenueAttributionDashboard";
+import { Settings, BarChart3, Zap, TrendingUp } from "lucide-react";
 
 export default function AdminDashboardLayout() {
   const [projectId, setProjectId] = useState(null);
@@ -67,6 +68,12 @@ export default function AdminDashboardLayout() {
       label: "Automation Rules",
       icon: Zap,
       component: <AutomationRulesPanel projectId={projectId} />,
+    },
+    {
+      id: "revenue",
+      label: "Revenue Attribution",
+      icon: TrendingUp,
+      component: <RevenueAttributionDashboard projectId={projectId} />,
     },
     {
       id: "settings",

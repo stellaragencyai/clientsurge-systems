@@ -51,6 +51,18 @@ Deno.serve(async (req) => {
     const intent = results.steps.intent?.intent || "general";
     const score = results.steps.score?.score || 50;
 
+    // STEP 2B: Enroll in Email Drip Campaign (parallel with SMS, not replacing)
+    if (intent && ["asking_question", "pricing_concern", "uncertain"].includes(intent)) {
+      console.log("[Orchestrator] Enrolling in email drip campaign...");
+      const emailResult = await base44.asServiceRole.functions.invoke(
+        "enrollEmailDripCampaign",
+        { lead_id, trigger_intent: intent, campaign_type: "case_study", project_id }
+      );
+      results.steps.email_drip = emailResult.success
+        ? emailResult.data
+        : { skipped: true, reason: emailResult.data?.message };
+    }
+
     // STEP 3: Predict outcome
     console.log("[Orchestrator] Step 3/7: Predicting outcome...");
     const outcomeResult = await base44.asServiceRole.functions.invoke(
