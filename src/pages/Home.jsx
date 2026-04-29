@@ -4,7 +4,7 @@ import Hero from "../components/landing/Hero.jsx";
 import TrustBar from "../components/landing/TrustBar";
 import Industries from "../components/landing/Industries";
 import ProblemSolution from "../components/landing/ProblemSolution.jsx";
-import CoreOffer from "../components/landing/CoreOffer.jsx";
+import CoreOffer from "../components/landing/CoreOffer";
 import IntegrationPartners from "../components/landing/IntegrationPartners";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
