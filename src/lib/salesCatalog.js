@@ -13,7 +13,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 97,
     setup_price_id: "price_1TOwfiB9GU5ysJqEcmQHl3gE",
     monthly_price_id: "price_1TOwfiB9GU5ysJqE20FYUfVc",
-    icon: "\u26A1",
+    icon: "⚡",
     category: "Response",
     highlights: [
       "Responds in under 4 seconds",
@@ -35,7 +35,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 67,
     setup_price_id: "price_1TOwfiB9GU5ysJqEJuEDhpKS",
     monthly_price_id: "price_1TOwfiB9GU5ysJqE8knUfswZ",
-    icon: "\u260E",
+    icon: "📞",
     category: "Response",
     highlights: [
       "60-second auto text-back",
@@ -56,7 +56,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 127,
     setup_price_id: "price_1TOwfiB9GU5ysJqEtwQAmCuN",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEsoZmFl6D",
-    icon: "\u21BB",
+    icon: "🔄",
     category: "Follow-Up",
     highlights: [
       "14-day automated sequence",
@@ -78,7 +78,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 147,
     setup_price_id: "price_1TOwfiB9GU5ysJqEij8Qq9rd",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEKhYvS71r",
-    icon: "\u270D",
+    icon: "📅",
     category: "Booking",
     highlights: [
       "Booking link and intake flow",
@@ -100,7 +100,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 97,
     setup_price_id: "price_1TOwfiB9GU5ysJqExMxwfoFr",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEfsJEvPcI",
-    icon: "\u27F3",
+    icon: "💰",
     category: "Revenue",
     highlights: [
       "Uses canonical Leads",
@@ -121,7 +121,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 67,
     setup_price_id: "price_1TOwfiB9GU5ysJqEO8byuwlT",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEryd66HuE",
-    icon: "\u2605",
+    icon: "⭐",
     category: "Reputation",
     highlights: [
       "Manual or post-completion trigger",
