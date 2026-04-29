@@ -5,6 +5,42 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import crypto from "node:crypto";
+
+async function validateTwilioSignature(req, rawBody) {
+  const token = Deno.env.get("TWILIO_AUTH_TOKEN");
+  if (!token) {
+    console.error("[MissedCall] TWILIO_AUTH_TOKEN is not set — cannot validate signature");
+    return { valid: false, missing_token: true };
+  }
+
+  const signature = req.headers.get("X-Twilio-Signature");
+  if (!signature) {
+    console.warn("[MissedCall] X-Twilio-Signature header is missing");
+    return { valid: false, missing_signature: true };
+  }
+
+  console.log("[MissedCall] Validating Twilio signature...");
+
+  const url = new URL(req.url).toString();
+  const params = new URLSearchParams(rawBody);
+  const toSign =
+    url +
+    Array.from(params.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([k, v]) => `${k}${v}`)
+      .join("");
+
+  const computed = crypto.createHmac("sha1", token).update(toSign).digest("base64");
+
+  if (computed !== signature) {
+    console.warn("[MissedCall] Signature invalid — request rejected");
+    return { valid: false };
+  }
+
+  console.log("[MissedCall] Signature valid");
+  return { valid: true };
+}
 
 const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
 const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
@@ -61,8 +97,20 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Method not allowed" }, { status: 405 });
     }
 
+    // Read raw body for signature validation (must be done before formData)
+    const rawBody = await req.text();
+
+    // Validate Twilio signature before processing anything
+    const sigResult = await validateTwilioSignature(req, rawBody);
+    if (sigResult.missing_token) {
+      return Response.json({ error: "Server configuration error" }, { status: 500 });
+    }
+    if (!sigResult.valid) {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     // Parse Twilio webhook payload
-    const formData = await req.formData();
+    const formData = new URLSearchParams(rawBody);
     const callSid = formData.get("CallSid");
     const fromNumber = formData.get("From");
     const callStatus = formData.get("CallStatus");
@@ -89,7 +137,7 @@ Deno.serve(async (req) => {
     let lead;
     try {
       const leads = await base44.asServiceRole.entities.WebsiteLead.filter(
-        { phone_number: normalizedPhone },
+        { phone_number: normalizedPhone },  
         "-created_date",
         1
       );

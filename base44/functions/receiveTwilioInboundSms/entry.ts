@@ -113,30 +113,37 @@ Deno.serve(async (req) => {
     );
 
     // ─────────────────────────────────────────────────────
-    // STEP 1: Validate Twilio signature
+    // STEP 1: Validate Twilio signature (hard gate)
     // ─────────────────────────────────────────────────────
-    const signature = req.headers.get("X-Twilio-Signature");
+    console.log("[receiveTwilioInboundSms] Validating Twilio signature...");
     const token = Deno.env.get("TWILIO_AUTH_TOKEN");
-
-    if (signature && token) {
-      const url = new URL(req.url).toString();
-      const data = new URLSearchParams(formData);
-      const toSign =
-        url +
-        Array.from(data.entries())
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([k, v]) => `${k}${v}`)
-          .join("");
-      const computed = crypto
-        .createHmac("sha1", token)
-        .update(toSign)
-        .digest("base64");
-
-      if (computed !== signature) {
-        console.warn("[receiveTwilioInboundSms] Signature mismatch - rejecting");
-        return Response.json({ error: "Unauthorized" }, { status: 403 });
-      }
+    if (!token) {
+      console.error("[receiveTwilioInboundSms] TWILIO_AUTH_TOKEN is not set — rejecting");
+      return Response.json({ error: "Server configuration error" }, { status: 500 });
     }
+
+    const signature = req.headers.get("X-Twilio-Signature");
+    if (!signature) {
+      console.warn("[receiveTwilioInboundSms] X-Twilio-Signature header is missing — rejecting");
+      return Response.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const url = new URL(req.url).toString();
+    const data = new URLSearchParams(formData);
+    const toSign =
+      url +
+      Array.from(data.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([k, v]) => `${k}${v}`)
+        .join("");
+    const computed = crypto.createHmac("sha1", token).update(toSign).digest("base64");
+
+    if (computed !== signature) {
+      console.warn("[receiveTwilioInboundSms] Signature invalid — rejecting");
+      return Response.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    console.log("[receiveTwilioInboundSms] Signature valid");
 
     // ─────────────────────────────────────────────────────
     // STEP 2: Validate required fields
