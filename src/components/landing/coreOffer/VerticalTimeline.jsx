@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { systemsById, coreOfferSectionConfig, iconMap } from "./coreOfferData";
+import HighlightedText from "./HighlightedText";
 
 const orderedSystemIds = Object.keys(systemsById);
 const CONNECTOR_COLOR = "#c4a374"; // Golden brown
@@ -163,7 +164,7 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
                 {system.title}
               </h3>
               <p style={{ fontSize: "16px", color: "rgba(27,20,13,0.7)", lineHeight: "1.6", margin: "0 0 20px" }}>
-                {system.detail.summary}
+                <HighlightedText>{system.detail.summary}</HighlightedText>
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "20px" }}>
                 <DetailBlock label="Trigger" value={system.detail.trigger} />
@@ -196,7 +197,7 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
                 {system.title}
               </h3>
               <p style={{ fontSize: "16px", color: "rgba(27,20,13,0.7)", lineHeight: "1.6", margin: "0 0 20px" }}>
-                {system.detail.summary}
+                <HighlightedText>{system.detail.summary}</HighlightedText>
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "20px" }}>
                 <DetailBlock label="Trigger" value={system.detail.trigger} />
