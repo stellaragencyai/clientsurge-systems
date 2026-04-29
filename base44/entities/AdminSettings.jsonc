@@ -76,19 +76,27 @@
     },
     "missed_call_sms_template": {
       "type": "string",
-      "title": "Missed Call SMS Template"
+      "title": "Missed Call SMS Template (Initial)"
     },
     "follow_up_day1_sms": {
       "type": "string",
-      "title": "Follow-Up Day 1 SMS"
+      "title": "Follow-Up SMS #2 (2 min after initial) \u2014 Light Nudge"
     },
     "follow_up_day3_sms": {
       "type": "string",
-      "title": "Follow-Up Day 3 SMS"
+      "title": "Follow-Up SMS #3 (1 hour) \u2014 Urgency Trigger"
     },
     "follow_up_day7_sms": {
       "type": "string",
-      "title": "Follow-Up Day 7 SMS"
+      "title": "Follow-Up SMS #4 (24 hours) \u2014 Clean Exit"
+    },
+    "missed_call_followup_email_1": {
+      "type": "string",
+      "title": "Follow-Up Email #2 (10 min) \u2014 Reduce Friction"
+    },
+    "missed_call_followup_email_2": {
+      "type": "string",
+      "title": "Follow-Up Email #3 (24 hours) \u2014 Final CTA"
     },
     "follow_up_booking_prompt_sms": {
       "type": "string",
@@ -173,6 +181,39 @@
     "last_webhook_test_at": {
       "type": "string",
       "title": "Last Webhook Test At"
+    },
+    "cadence_default_mode": {
+      "type": "string",
+      "title": "Default Cadence Mode",
+      "enum": [
+        "auto",
+        "sms_first",
+        "email_first"
+      ],
+      "default": "auto"
+    },
+    "cadence_switch_attempts": {
+      "type": "integer",
+      "title": "Switch Channel After N Attempts",
+      "default": 3,
+      "description": "After 3 attempts with no response, switch to alternate channel"
+    },
+    "cadence_pause_on_reply": {
+      "type": "boolean",
+      "title": "Pause Sequence on Lead Reply",
+      "default": true
+    },
+    "cadence_engagement_threshold": {
+      "type": "number",
+      "title": "Engagement Score Threshold (0-100)",
+      "default": 50,
+      "description": "Increase follow-up frequency if lead engagement > threshold"
+    },
+    "cadence_max_attempts": {
+      "type": "integer",
+      "title": "Max Follow-Up Attempts",
+      "default": 6,
+      "description": "Stop automation after N total attempts"
     }
   },
   "required": []

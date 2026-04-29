@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { ArrowUp, Mail, Phone, Shield, Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { ArrowUp, Mail, Phone, Shield, Facebook, Instagram, Linkedin, Twitter, FileText, Lock, HelpCircle } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useDemoBooking } from "./DemoBookingContext";
 
 const navColumns = [
   {
@@ -43,9 +42,6 @@ const socialLinks = [
 ];
 
 export default function Footer() {
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [privacyOpen, setPrivacyOpen] = useState(false);
-  const demoBooking = useDemoBooking();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -68,43 +64,90 @@ export default function Footer() {
 
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  return (
-    <footer className="bg-background border-t border-primary/20">
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        
-        {/* Premium Header Section */}
-        <div className="grid md:grid-cols-5 gap-12 mb-12">
-          
-          {/* Brand + CTA Section */}
-          <div className="md:col-span-1 flex flex-col gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                <span className="text-white font-black text-sm">CS</span>
-              </div>
-              <span className="font-display font-bold text-sm">ClientSurge</span>
-            </div>
-            <p className="text-xs text-foreground/60 font-medium">Ready to transform your lead game?</p>
-            <button
-              onClick={() => demoBooking?.openDemoBooking?.()}
-              style={{ borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", border: "none", cursor: "pointer", display: "inline-block" }}
-            >
-              <span style={{ display: "flex", alignItems: "center", height: "32px", padding: "0 16px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "600", fontSize: "0.75rem" }}>
-                Book Demo
-              </span>
-            </button>
-          </div>
+  const navLinks = [
+    { icon: HelpCircle, label: "How It Works", href: "/#problem-solution" },
+    { icon: FileText, label: "Pricing", href: "/#pricing" },
+    { icon: Lock, label: "Privacy", href: "/legal/privacy" },
+  ];
 
-          {/* Link Columns */}
+  return (
+    <footer 
+      className="bg-background/95 backdrop-blur-md border-t border-primary/10"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      {/* Main Footer Bar */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
+        
+        {/* Left: Logo */}
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+            <span className="text-white font-black text-xs">CS</span>
+          </div>
+          <span className="font-display font-bold text-xs hidden sm:inline">ClientSurge</span>
+        </div>
+
+        {/* Center: Icon Navigation (Progressive Disclosure) */}
+        <div className="flex items-center gap-2">
+          {navLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={(e) => handleNavClick(e, link.href)}
+                title={link.label}
+                className="group relative w-8 h-8 rounded-lg border border-primary/15 flex items-center justify-center text-foreground/50 hover:text-primary hover:border-primary/40 transition-all"
+              >
+                <Icon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
+                {/* Tooltip on hover */}
+                <span className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-foreground text-background text-[10px] px-2 py-1 rounded whitespace-nowrap pointer-events-none">
+                  {link.label}
+                </span>
+              </a>
+            );
+          })}
+        </div>
+
+        {/* Right: Social + Utility Icons */}
+        <div className="flex items-center gap-2">
+          {socialLinks.map((social) => {
+            const Icon = social.icon;
+            return (
+              <a
+                key={social.label}
+                href={social.href}
+                aria-label={social.label}
+                title={social.label}
+                className="group w-7 h-7 rounded-lg border border-primary/15 flex items-center justify-center text-foreground/50 hover:text-primary hover:border-primary/40 transition-all"
+              >
+                <Icon className="w-3 h-3 group-hover:scale-110 transition-transform" />
+              </a>
+            );
+          })}
+          
+          <button
+            onClick={scrollTop}
+            title="Back to top"
+            className="group w-7 h-7 rounded-lg border border-primary/15 flex items-center justify-center text-foreground/50 hover:text-primary hover:border-primary/40 transition-all ml-1"
+          >
+            <ArrowUp className="w-3 h-3 group-hover:scale-110 transition-transform" />
+          </button>
+        </div>
+      </div>
+
+      {/* Expanded Menu (Always Visible) */}
+      <div className="border-t border-primary/10 bg-background/98 backdrop-blur-md animate-in fade-in duration-200">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 grid grid-cols-5 gap-6 text-xs">
           {navColumns.map((col) => (
-            <div key={col.title} className="flex flex-col gap-3">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-primary">{col.title}</h3>
-              <div className="flex flex-col gap-2">
+            <div key={col.title} className="flex flex-col gap-2">
+              <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">{col.title}</h4>
+              <div className="flex flex-col gap-1.5">
                 {col.links.map((link) => (
                   <a
                     key={link.label}
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className="text-xs text-foreground/60 hover:text-foreground font-medium transition-colors"
+                    className="text-foreground/60 hover:text-foreground transition-colors text-[11px]"
                   >
                     {link.label}
                   </a>
@@ -112,89 +155,33 @@ export default function Footer() {
               </div>
             </div>
           ))}
-
+          
           {/* Contact Column */}
-          <div className="flex flex-col gap-3">
-            <h3 className="text-xs font-bold uppercase tracking-widest text-primary">Contact</h3>
-            <div className="flex flex-col gap-2.5">
-              <a
-                href="tel:+16025874608"
-                className="flex items-center gap-2 text-xs text-foreground/60 hover:text-foreground font-medium transition-colors group"
-              >
-                <Phone className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
-                (602) 587-4608
-              </a>
-              <a
-                href="mailto:system@clientsurgesystems.com"
-                className="flex items-center gap-2 text-xs text-foreground/60 hover:text-foreground font-medium transition-colors group"
-              >
-                <Mail className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
-                system@clientsurgesystems.com
-              </a>
-            </div>
+          <div className="flex flex-col gap-2">
+            <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">Contact</h4>
+            <a href="tel:+16025874608" className="text-foreground/60 hover:text-foreground text-[11px] flex items-center gap-1.5">
+              <Phone className="w-3 h-3 text-primary" />
+              (602) 587-4608
+            </a>
+            <a href="mailto:system@clientsurgesystems.com" className="text-foreground/60 hover:text-foreground text-[11px] flex items-center gap-1.5">
+              <Mail className="w-3 h-3 text-primary" />
+              system@clientsurgesystems.com
+            </a>
           </div>
         </div>
-
-        {/* Premium Divider */}
-        <div className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent mb-8" />
-
-        {/* Social + Bottom Bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          
-          {/* Social Icons */}
-          <div className="flex items-center gap-3">
-            {socialLinks.map((social) => {
-              const Icon = social.icon;
-              return (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="w-9 h-9 rounded-full border border-primary/20 flex items-center justify-center text-foreground/50 hover:text-primary hover:border-primary/50 transition-all group"
-                >
-                  <Icon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                </a>
-              );
-            })}
-          </div>
-
-          {/* Copyright + Privacy */}
-          <div className="flex flex-wrap items-center justify-center gap-2 text-[10px] text-foreground/40">
+        
+        {/* Bottom Meta */}
+        <div className="border-t border-primary/10 px-4 md:px-6 py-4 text-center">
+          <p className="text-sm font-semibold text-foreground mb-3">
+            Ready to recover leads you've already lost? Most businesses recover their investment in 30 days.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-1.5 text-[9px] text-foreground/40">
             <span>&copy; {new Date().getFullYear()} ClientSurge Systems</span>
             <span className="text-foreground/20">·</span>
             <a href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</a>
             <span className="text-foreground/20">·</span>
             <a href="/legal/terms" className="hover:text-foreground transition-colors">Terms</a>
-            <span className="text-foreground/20">·</span>
-            
-            {/* Privacy Choices Toggle */}
-            <button
-              onClick={() => setPrivacyOpen(!privacyOpen)}
-              className="flex items-center gap-1 hover:text-foreground transition-colors group"
-              title="Privacy choices"
-            >
-              My Privacy Choices
-              <Shield className="w-2.5 h-2.5 group-hover:scale-110 transition-transform" />
-            </button>
-
-            {/* Back to Top */}
-            <span className="text-foreground/20">·</span>
-            <button
-              onClick={scrollTop}
-              className="flex items-center gap-1 hover:text-foreground transition-colors group"
-              title="Back to top"
-            >
-              <ArrowUp className="w-2.5 h-2.5 group-hover:scale-110 transition-transform" />
-              Top
-            </button>
           </div>
-        </div>
-
-        {/* System Requirements Footer */}
-        <div className="mt-8 pt-6 border-t border-border/30 text-center">
-          <p className="text-[9px] text-foreground/30 font-medium tracking-wide uppercase">
-            ClientSurge Systems © 2026 | Automating lead follow-up for service businesses | Phoenix, AZ
-          </p>
         </div>
       </div>
     </footer>

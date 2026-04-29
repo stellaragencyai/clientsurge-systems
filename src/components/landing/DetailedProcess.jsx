@@ -69,81 +69,96 @@ const steps = [
   },
 ];
 
-function StepCard({ step, index }) {
+function StepCard({ step, index, isLast }) {
   const ref = useRef(null);
+  const innerRef = useRef(null);
   const [visible, setVisible] = useState(false);
+  const [height, setHeight] = useState(0);
   const Icon = step.icon;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
-      { threshold: 0.15 }
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (innerRef.current) {
+      setHeight(innerRef.current.scrollHeight);
+    }
+  }, []);
+
+  const delay = index * 120;
+
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-      style={{ transitionDelay: `${index * 80}ms`, height: "420px" }}
+      className="relative overflow-hidden"
+      style={{
+        opacity: visible ? 1 : 0,
+        maxHeight: visible ? `${height + 40}px` : "0px",
+        transform: visible ? "translateY(0) scaleY(1)" : "translateY(24px) scaleY(0.92)",
+        transformOrigin: "top center",
+        transition: `opacity 0.6s ease ${delay}ms, max-height 0.65s cubic-bezier(0.4,0,0.2,1) ${delay}ms, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${delay}ms`,
+      }}
     >
-      <div
-        className="group relative flex flex-col md:flex-row rounded-2xl overflow-hidden border border-border bg-white transition-all duration-300 h-full"
-        style={{
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)",
-        }}
-        onMouseEnter={e => {
-          e.currentTarget.style.borderColor = "#000000";
-          e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)";
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.borderColor = "hsl(var(--border))";
-          e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05), 0 1px 4px rgba(0,0,0,0.04)";
-        }}
-      >
-        {/* Left — content */}
-        <div className="flex-1 p-8 md:p-10">
-          {/* Step badge */}
-          <div className="flex items-center gap-3 mb-6">
-            <span className="text-xs font-bold text-black/80 uppercase tracking-widest">{step.step}</span>
-            <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
-              {step.timeframe}
-            </span>
-          </div>
+    <div ref={innerRef}>
+      {/* Vertical timeline line */}
+      {!isLast && (
+        <div className="absolute left-8 top-24 w-1 h-40 rounded-full" style={{ background: "linear-gradient(180deg, rgba(161,120,35,0.8) 0%, rgba(161,120,35,0.2) 100%)" }} />
+      )}
 
-          {/* Icon + Title */}
-          <div className="flex items-center gap-4 mb-5">
-            <div className="w-11 h-11 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Icon className="w-5 h-5 text-primary" />
-            </div>
-            <h3 className="font-display text-2xl font-semibold text-black">{step.title}</h3>
+      <div className="relative grid grid-cols-1 md:grid-cols-[120px_1fr_380px] gap-8 md:gap-6">
+        {/* Left — Step Badge & Timeline Dot */}
+        <div className="flex md:flex-col items-start md:items-center justify-start md:justify-start gap-4 md:gap-0">
+          <div className="w-16 h-16 md:w-14 md:h-14 flex items-center justify-center font-bold text-white text-sm uppercase tracking-wider rounded-lg flex-shrink-0" style={{ background: "linear-gradient(135deg, rgba(161,120,35,1) 0%, rgba(139,91,52,1) 100%)" }}>
+            STEP {index + 1}
           </div>
+        </div>
 
-          <p className="text-sm text-black/70 leading-relaxed mb-6 font-medium">
+        {/* Middle — Content */}
+        <div className="p-6 md:p-7 rounded-3xl border-2 bg-white h-fit" style={{ borderColor: "rgba(209,182,155,0.5)" }}>
+          {/* Title */}
+          <h3 className="font-display text-2xl md:text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
+          
+          {/* Timeframe */}
+          <p className="text-xs font-semibold uppercase tracking-wide mb-4" style={{ color: "rgba(161,120,35,1)" }}>{step.timeframe}</p>
+
+          <p className="text-sm text-slate-600 leading-relaxed mb-5">
             {step.desc}
           </p>
 
-          <ul className="space-y-3">
+          {/* Checkmark Bullets */}
+          <ul className="space-y-2.5">
             {step.bullets.map((b, i) => (
               <li key={i} className="flex items-start gap-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary/60 mt-1.5 flex-shrink-0" />
-                <span className="text-sm text-black/60 font-medium">{b}</span>
+                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: "rgba(161,120,35,0.15)", border: "2px solid rgba(161,120,35,0.5)" }}>
+                  <CheckCircle2 className="w-3 h-3" style={{ color: "rgba(161,120,35,1)" }} />
+                </div>
+                <span className="text-xs md:text-sm text-slate-700 font-medium leading-relaxed">{b}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Right — image */}
-        <div className="md:w-80 lg:w-96 h-60 md:h-auto overflow-hidden flex-shrink-0">
+        {/* Right — Image */}
+        <div className="hidden md:block h-72 rounded-3xl overflow-hidden flex-shrink-0 border-2" style={{ borderColor: "rgba(209,182,155,0.5)" }}>
           <img
             src={step.image}
             alt={step.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
           />
         </div>
       </div>
+    </div>
     </div>
   );
 }
@@ -152,45 +167,22 @@ function StepCard({ step, index }) {
 
 export default function DetailedProcess() {
   return (
-    <section className="py-20 md:py-32 px-4 md:px-6 bg-gradient-to-b from-background via-background to-card border-t-2 border-border">
-      <div className="max-w-5xl mx-auto">
+    <section className="py-20 md:py-28 px-4 md:px-6 bg-white">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl md:text-5xl lg:text-5xl font-semibold tracking-tight" style={{color: "rgba(161,120,35,1)", textShadow: "0 0 50px rgba(161,120,35,0.8), 0 0 100px rgba(161,120,35,0.4)"}}>
-            How You Turn Leads Into Booked Appointments
+        <div className="text-center mb-20">
+          <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-3">
+            Our Detailed Process
           </h2>
-          <p className="mt-4 text-muted-foreground text-lg max-w-2xl mx-auto">
-            From first contact to confirmed booking. Five clear steps. All automated.
+          <p className="text-slate-600 text-base md:text-lg max-w-2xl mx-auto">
+            A deep dive into each step of your project journey.
           </p>
         </div>
 
-        {/* Summarized flow */}
-        <div className="mb-20 flex flex-col md:flex-row items-center justify-between gap-4 px-4">
-          {steps.map((step, i) => {
-            const Icon = step.icon;
-            return (
-              <div key={i} className="flex items-center gap-4 w-full md:w-auto">
-                <div className="flex flex-col items-center">
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3 transition-all" style={{background: "rgba(161,120,35,0.15)", border: "2px solid rgba(161,120,35,0.3)", boxShadow: "0 0 30px rgba(161,120,35,0.25)"}}>
-                    <Icon className="w-7 h-7" style={{color: "rgba(161,120,35,1)"}} />
-                  </div>
-                  <p className="text-xs font-bold uppercase tracking-widest" style={{color: "rgba(161,120,35,1)"}}>{step.step}</p>
-                  <p className="text-xs font-semibold text-foreground mt-1 text-center">{step.title}</p>
-                </div>
-                {i < steps.length - 1 && <ArrowRight className="w-5 h-5 text-muted-foreground hidden md:block" style={{color: "rgba(161,120,35,0.6)"}} />}
-              </div>
-            );
-          })}
-        </div>
-
         {/* Detailed steps */}
-        <h3 className="font-display text-3xl md:text-4xl font-semibold text-center mb-12" style={{color: "rgba(161,120,35,1)", textShadow: "0 0 40px rgba(161,120,35,0.7), 0 0 80px rgba(161,120,35,0.35)"}}>
-          Our Detailed Process
-        </h3>
-
-        <div className="grid grid-cols-1 gap-8">
+        <div className="space-y-12">
           {steps.map((step, i) => (
-            <StepCard key={i} step={step} index={i} />
+            <StepCard key={i} step={step} index={i} isLast={i === steps.length - 1} />
           ))}
         </div>
       </div>

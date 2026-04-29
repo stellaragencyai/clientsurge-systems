@@ -1,0 +1,59 @@
+{
+  "name": "WebhookRegistration",
+  "type": "object",
+  "properties": {
+    "service_key": {
+      "type": "string",
+      "title": "Service Key",
+      "description": "Which service this webhook is for"
+    },
+    "webhook_url": {
+      "type": "string",
+      "title": "Webhook URL",
+      "description": "External URL to POST events to"
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Events",
+      "description": "Array of event names to subscribe to (e.g. ['lead.created', 'call.missed'])"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "active",
+        "inactive",
+        "failed"
+      ],
+      "default": "active"
+    },
+    "last_triggered_at": {
+      "type": "string",
+      "title": "Last Triggered At",
+      "description": "Timestamp of last successful webhook call"
+    },
+    "failure_count": {
+      "type": "integer",
+      "title": "Failure Count",
+      "default": 0,
+      "description": "Number of consecutive failed attempts"
+    },
+    "last_error": {
+      "type": "string",
+      "title": "Last Error",
+      "description": "Error message from last failed attempt"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At"
+    }
+  },
+  "required": [
+    "service_key",
+    "webhook_url",
+    "events"
+  ]
+}

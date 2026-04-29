@@ -1,7 +1,7 @@
 import { Star, TrendingUp } from 'lucide-react';
 
 export default function LeadScoreCard({ lead }) {
-  const score = lead.lead_score || 0;
+  const score = lead.lead_score ?? 0;
 
   const getColor = (s) => {
     if (s >= 80) return { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', icon: '🔥' };
@@ -28,7 +28,7 @@ export default function LeadScoreCard({ lead }) {
       <div className="flex-1 hidden sm:block">
         <div className="h-2 bg-white rounded-full overflow-hidden border border-current opacity-20">
           <div
-            className={colors.text.replace('text-', 'bg-')}
+            className="h-full rounded-full bg-current"
             style={{ width: `${score}%`, transition: 'width 0.3s ease' }}
           />
         </div>

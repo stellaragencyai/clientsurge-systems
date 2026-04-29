@@ -79,7 +79,6 @@ export default function FAQ() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [expandedIndex, setExpandedIndex] = useState(0);
-  const [helpfulVotes, setHelpfulVotes] = useState({});
 
   const categories = ["all", "setup", "pricing", "integration", "support"];
   const categoryLabels = { all: "All", setup: "Getting Started", pricing: "Pricing", integration: "Integrations", support: "Support" };
@@ -91,22 +90,8 @@ export default function FAQ() {
     return matchesSearch && matchesCategory;
   });
 
-  const handleVote = (idx, helpful) => {
-    setHelpfulVotes(prev => ({
-      ...prev,
-      [idx]: helpful ? "yes" : "no"
-    }));
-    setTimeout(() => {
-      setHelpfulVotes(prev => {
-        const newVotes = { ...prev };
-        delete newVotes[idx];
-        return newVotes;
-      });
-    }, 2000);
-  };
-
   return (
-    <section id="faq" className="px-6 py-24 md:py-32 relative overflow-hidden" style={{ background: "linear-gradient(135deg, rgba(240,242,246,0.98) 0%, rgba(228,232,240,0.97) 50%, rgba(238,240,246,0.98) 100%)" }}>
+    <section id="faq" className="px-6 py-24 md:py-32 relative overflow-hidden bg-gradient-to-b from-card to-background">
 
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="text-center mb-14">
@@ -115,7 +100,7 @@ export default function FAQ() {
            Frequently Asked Questions
           </h2>
           <p className="mt-4 text-muted-foreground text-base">
-            Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message</a>
+            Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">See your specific gaps</a> or <a href="#pricing" className="text-primary font-semibold hover:underline">get your custom plan</a>
           </p>
           <div className="mt-8 border-t border-border/40" />
         </div>
@@ -127,7 +112,7 @@ export default function FAQ() {
             placeholder="Search FAQs..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+            className="w-full px-4 py-2.5 rounded-lg border border-border bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm"
           />
         </div>
 
@@ -139,8 +124,8 @@ export default function FAQ() {
               onClick={() => setCategory(cat)}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-all ${
                 category === cat
-                  ? "bg-primary text-white"
-                  : "bg-primary/10 text-primary hover:bg-primary/20"
+                  ? "bg-foreground text-background"
+                  : "bg-muted text-foreground hover:bg-muted/80"
               }`}
             >
               {categoryLabels[cat]}
@@ -156,7 +141,7 @@ export default function FAQ() {
               <AccordionItem
                 key={idx}
                 value={`faq-${idx}`}
-                className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary/40 transition-all duration-300"
+                className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-all duration-300"
                 style={{
                   background: "rgba(255,255,255,0.75)",
                   backdropFilter: "blur(16px)",
@@ -168,37 +153,9 @@ export default function FAQ() {
                   <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
                     {faq.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5">
-                    <div>
+                  <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5 word-wrap break-words">
+                    <div style={{ wordWrap: "break-word", overflowWrap: "break-word" }}>
                       <p>{faq.a}</p>
-                      <div className="mt-4 flex items-center gap-3 text-xs font-semibold text-muted-foreground border-t border-border pt-3">
-                        <span>Was this helpful?</span>
-                        <button
-                          onClick={() => handleVote(originalIdx, true)}
-                          className={`px-3 py-1 rounded-full transition-all ${
-                            helpfulVotes[originalIdx] === "yes"
-                              ? "bg-green-100 text-green-700"
-                              : "hover:bg-primary/10"
-                          }`}
-                        >
-                          👍 Yes
-                        </button>
-                        <button
-                        onClick={() => handleVote(originalIdx, false)}
-                        className={`px-3 py-1 rounded-full transition-all ${
-                          helpfulVotes[originalIdx] === "no"
-                            ? "bg-red-100 text-red-700"
-                            : "hover:bg-primary/10"
-                        }`}
-                        >
-                        👎 No
-                        </button>
-                        {helpfulVotes[originalIdx] === "no" && (
-                        <a href="/contact" className="ml-2 text-xs font-semibold text-primary hover:underline">
-                          Send us a question →
-                        </a>
-                        )}
-                      </div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>

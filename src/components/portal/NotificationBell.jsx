@@ -40,7 +40,7 @@ export default function NotificationBell({ notifications, unreadCount, onMarkAsR
             onClick={() => setOpen(false)}
           />
           <div
-            className="absolute right-0 mt-2 w-80 bg-white rounded-xl border border-border shadow-lg z-40 overflow-hidden"
+            className="absolute right-0 mt-2 w-80 bg-white rounded-xl border border-border shadow-lg z-50 overflow-hidden"
             style={{ animation: 'slideDownFade 0.18s ease-out' }}
           >
           <style>{`@keyframes slideDownFade { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }`}</style>

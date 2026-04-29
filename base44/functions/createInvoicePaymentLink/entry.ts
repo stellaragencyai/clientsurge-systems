@@ -47,19 +47,11 @@ Deno.serve(async (req) => {
       }, { status: 400 });
     }
 
-    if (invoice.payment_link) {
-      return Response.json({
-        success: true,
-        payment_link: invoice.payment_link,
-        invoice_id,
-        amount: invoice.amount_outstanding || invoice.amount,
-      });
-    }
-
     if (!invoice.stripe_invoice_id) {
       return Response.json({ error: 'This invoice is not linked to Stripe yet.' }, { status: 409 });
     }
 
+    // Always re-fetch from Stripe to avoid stale/expired cached links
     const stripeInvoice = await stripe.invoices.retrieve(invoice.stripe_invoice_id);
     const paymentLink = stripeInvoice.hosted_invoice_url || stripeInvoice.invoice_pdf || null;
 

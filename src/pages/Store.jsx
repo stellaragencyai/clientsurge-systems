@@ -4,10 +4,16 @@ import { CartProvider, useCart } from "@/lib/cartContext";
 import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
 import CartSidebar from "@/components/store/CartSidebar";
+import SocialProofTicker from "@/components/store/SocialProofTicker";
+import ServiceComparisonModal from "@/components/store/ServiceComparisonModal";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
+import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
+import BuildYourStackFlow from "@/components/store/BuildYourStackFlow";
+import GuidedPathToggle from "@/components/store/GuidedPathToggle";
+import { getRecommendedProducts } from "@/lib/productRecommendations";
 
 const InteractiveStackBuilder = lazy(() =>
   import("@/components/store/InteractiveStackBuilder")
@@ -17,6 +23,8 @@ function StoreInner() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [selectedIndustry, setSelectedIndustry] = useState(null);
+  const [showComparison, setShowComparison] = useState(false);
+  const [pathMode, setPathMode] = useState("guided");
   const { items, setCartOpen, totalSetup, totalMonthly } = useCart();
 
   useEffect(() => {
@@ -25,6 +33,21 @@ function StoreInner() {
     }
 
     const syncIndustry = () => {
+      // Check if quiz routed here with a package key
+      const quizPackage = window.sessionStorage.getItem("clientsurge:quiz-package");
+      if (quizPackage) {
+        const pkg = PACKAGE_OFFERS.find((p) => p.package_key === quizPackage);
+        if (pkg) {
+          setSelectedIndustry({
+            shortName: pkg.name,
+            recommendedPackage: pkg,
+            recommendedServiceKeys: pkg.included_service_keys,
+            recommendedServices: pkg.included_services.map((s) => ({ ...s, whyThisMatters: s.description })),
+            whyItWorks: pkg.fit,
+          });
+          return;
+        }
+      }
       setSelectedIndustry(getSelectedIndustryRecommendation());
     };
 
@@ -43,7 +66,7 @@ function StoreInner() {
       selectedIndustry?.recommendedServiceKeys || []
     );
 
-    return AI_PRODUCTS.filter((product) => {
+    let results = AI_PRODUCTS.filter((product) => {
       const matchCategory =
         activeCategory === "All" || product.category === activeCategory;
       const matchSearch =
@@ -61,7 +84,19 @@ function StoreInner() {
 
       return leftRecommended ? -1 : 1;
     });
-  }, [activeCategory, search, selectedIndustry]);
+
+    // In guided mode, show only recommended + featured services
+    if (pathMode === "guided" && selectedIndustry) {
+      const recommendedNames = new Set(
+        selectedIndustry?.recommendedServices?.map((s) => s.name) || []
+      );
+      results = results.filter(
+        (p) => recommendedNames.has(p.name)
+      ).slice(0, 6);
+    }
+
+    return results;
+  }, [activeCategory, search, selectedIndustry, pathMode]);
 
   const recommendedPreview = useMemo(
     () => selectedIndustry?.recommendedServices?.slice(0, 4) || [],
@@ -92,44 +127,36 @@ function StoreInner() {
           position: "fixed",
           inset: 0,
           zIndex: 0,
-          backgroundImage:
-            "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/b3df6b4fc_Gemini_Generated_Image_jlrxmdjlrxmdjlrx.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
+          background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 46%, #fcfaf6 100%)",
         }}
       />
+      {/* Subtle texture overlay matching main page */}
       <div
         aria-hidden="true"
         style={{
           position: "fixed",
           inset: 0,
           zIndex: 1,
-          background:
-            "linear-gradient(135deg, rgba(10,6,2,0.76) 0%, rgba(20,11,4,0.72) 46%, rgba(12,7,2,0.8) 100%)",
+          backgroundImage: "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          opacity: 0.05,
+          pointerEvents: "none",
         }}
       />
 
       <div style={{ position: "relative", zIndex: 2 }}>
         <style>{`
           .store-page nav {
-            background: rgba(16,9,3,0.62) !important;
-            border-bottom-color: rgba(200,150,92,0.22) !important;
+            background: rgba(253,251,248,0.85) !important;
+            border-bottom-color: rgba(154,92,46,0.14) !important;
             backdrop-filter: blur(22px) !important;
             -webkit-backdrop-filter: blur(22px) !important;
           }
-          .store-page nav .text-foreground { color: #f5e6d0 !important; }
-          .store-page nav .text-muted-foreground { color: rgba(245,230,208,0.72) !important; }
-          .store-page nav .border-border { border-color: rgba(200,150,92,0.25) !important; }
-          .store-page nav .bg-background\\/50,
-          .store-page nav .bg-background\\/70 { background: rgba(255,255,255,0.08) !important; }
-          .store-page footer {
-            background: rgba(10,5,0,0.7) !important;
-            border-top-color: rgba(200,150,92,0.2) !important;
-          }
           .store-page .store-hero {
             text-align: center;
-            padding: 48px 24px 34px;
+            padding: 24px 24px 14px;
             position: relative;
           }
           .store-page .store-hero-copy {
@@ -172,7 +199,7 @@ function StoreInner() {
           .store-page .store-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 20px;
+            gap: 28px;
           }
           .store-page .store-sticky-cart {
             position: sticky;
@@ -219,11 +246,12 @@ function StoreInner() {
           @media (max-width: 1080px) {
             .store-page .store-grid {
               grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 24px;
             }
           }
           @media (max-width: 720px) {
             .store-page .store-hero {
-              padding: 34px 20px 22px;
+              padding: 18px 16px 10px;
             }
             .store-page .store-stat-grid {
               grid-template-columns: 1fr;
@@ -243,7 +271,7 @@ function StoreInner() {
             }
             .store-page .store-grid {
               grid-template-columns: 1fr;
-              gap: 16px;
+              gap: 20px;
             }
             .store-page .store-sticky-cart {
               margin: 0 16px 18px;
@@ -269,18 +297,16 @@ function StoreInner() {
                   borderRadius: "9999px",
                   padding: "6px 16px",
                   marginBottom: "18px",
-                  background: "rgba(200,150,92,0.16)",
-                  border: "1px solid rgba(200,150,92,0.34)",
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
+                  background: "rgba(154,92,46,0.08)",
+                  border: "1px solid rgba(154,92,46,0.18)",
                 }}
               >
-                <Zap style={{ width: "12px", height: "12px", color: "#f0c878" }} />
+                <Zap style={{ width: "12px", height: "12px", color: "#9a5c2e" }} />
                 <span
                   style={{
                     fontSize: "11px",
                     fontWeight: "700",
-                    color: "#f0c878",
+                    color: "#9a5c2e",
                     letterSpacing: "0.16em",
                     textTransform: "uppercase",
                   }}
@@ -290,22 +316,21 @@ function StoreInner() {
               </div>
 
               <h1
-                className="font-display"
-                style={{
-                  fontSize: "clamp(2rem, 5vw, 3.5rem)",
-                  fontWeight: "800",
-                  lineHeight: 1.04,
-                  letterSpacing: "-0.02em",
-                  color: "#fffdf8",
-                  marginBottom: "12px",
-                  textShadow: "0 2px 24px rgba(0,0,0,0.6)",
-                }}
+               className="font-display"
+               style={{
+                 fontSize: "clamp(1.5rem, 4.5vw, 2.6rem)",
+                 fontWeight: "800",
+                 lineHeight: 1.08,
+                 letterSpacing: "-0.035em",
+                 color: "#1b140d",
+                 marginBottom: "8px",
+               }}
               >
                 Build Your{" "}
                 <span
                   style={{
                     background:
-                      "linear-gradient(135deg, #fff2d2 0%, #e9b45b 48%, #c48a4b 100%)",
+                      "linear-gradient(135deg, #7a3f1a 0%, #c8965c 52%, #9a5c2e 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
@@ -317,11 +342,11 @@ function StoreInner() {
 
               <p
                 style={{
-                  fontSize: "1.02rem",
-                  color: "rgba(255,241,218,0.88)",
-                  lineHeight: 1.68,
+                  fontSize: "0.9rem",
+                  color: "rgba(27,20,13,0.72)",
+                  lineHeight: 1.6,
                   maxWidth: "620px",
-                  margin: "0 auto 24px",
+                  margin: "0 auto 12px",
                 }}
               >
                 Pick the services you need, add them to your cart, and we handle
@@ -333,91 +358,80 @@ function StoreInner() {
               <div
                 style={{
                   maxWidth: "760px",
-                  margin: "0 auto 20px",
-                  padding: "16px 18px",
-                  borderRadius: "24px",
-                  background: "rgba(24,14,6,0.52)",
-                  border: "1px solid rgba(200,150,92,0.26)",
-                  backdropFilter: "blur(18px)",
-                  WebkitBackdropFilter: "blur(18px)",
-                  boxShadow: "0 12px 34px rgba(0,0,0,0.12)",
+                  margin: "0 auto 10px",
+                  padding: "8px 12px",
+                  borderRadius: "12px",
+                  background: "rgba(255,255,255,0.4)",
+                  border: "none",
+                  borderBottom: "1px solid rgba(154,92,46,0.1)",
+                  boxShadow: "none",
+                  fontSize: "12px",
                 }}
               >
                 <p
                   style={{
-                    fontSize: "11px",
+                    fontSize: "10px",
                     fontWeight: "700",
-                    letterSpacing: "0.18em",
+                    letterSpacing: "0.16em",
                     textTransform: "uppercase",
-                    color: "#f0c878",
-                    margin: "0 0 8px",
+                    color: "#9a5c2e",
+                    margin: "0 0 4px",
                   }}
                 >
                   Personalized For {selectedIndustry.shortName}
                 </p>
                 <p
                   style={{
-                    fontSize: "15px",
-                    color: "#fff6e8",
-                    fontWeight: "600",
-                    margin: "0 0 6px",
-                  }}
-                >
-                  We moved your recommended services to the top and suggest
-                  starting with the {selectedIndustry.recommendedPackage?.name}.
-                </p>
-                <p
-                  style={{
                     fontSize: "13px",
-                    color: "rgba(255,230,180,0.82)",
-                    lineHeight: 1.6,
-                    margin: 0,
+                    color: "#1b140d",
+                    fontWeight: "600",
+                    margin: "0 0 2px",
+                    lineHeight: 1.4,
                   }}
                 >
-                  {selectedIndustry.whyItWorks}
+                  Recommended: {selectedIndustry.recommendedPackage?.name}
                 </p>
               </div>
             ) : null}
 
-            <div className="store-stat-grid" style={{ marginBottom: "16px" }}>
+            <div className="store-stat-grid" style={{ marginBottom: "8px" }}>
               {[
                 { label: "AI Services Available", val: "12" },
-                { label: "Avg. Setup Time", val: "5-7 days" },
+                { label: "Avg. Setup Time", val: "4-6 hours" },
                 { label: "Cancel Anytime", val: "No Contracts" },
               ].map((stat) => (
                 <div
-                  key={stat.label}
-                  style={{
-                    textAlign: "center",
-                    borderRadius: "18px",
-                    padding: "14px 16px",
-                    background: "rgba(20,11,4,0.38)",
-                    border: "1px solid rgba(200,150,92,0.16)",
-                    backdropFilter: "blur(12px)",
-                    WebkitBackdropFilter: "blur(12px)",
-                  }}
+                 key={stat.label}
+                 style={{
+                   textAlign: "center",
+                   borderRadius: "10px",
+                   padding: "8px 10px",
+                   background: "rgba(255,255,255,0.4)",
+                   border: "none",
+                   borderTop: "1px solid rgba(154,92,46,0.08)",
+                   boxShadow: "none",
+                 }}
                 >
-                  <p
-                    style={{
-                      fontSize: "21px",
-                      fontWeight: "800",
-                      color: "#f0c878",
-                      margin: "0 0 4px",
-                      textShadow: "0 2px 10px rgba(0,0,0,0.4)",
-                    }}
-                  >
-                    {stat.val}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "11px",
-                      color: "rgba(255,232,193,0.68)",
-                      margin: 0,
-                      fontWeight: "600",
-                    }}
-                  >
-                    {stat.label}
-                  </p>
+                 <p
+                   style={{
+                     fontSize: "16px",
+                     fontWeight: "800",
+                     color: "#9a5c2e",
+                     margin: "0 0 2px",
+                   }}
+                 >
+                   {stat.val}
+                 </p>
+                 <p
+                   style={{
+                     fontSize: "10px",
+                     color: "rgba(27,20,13,0.6)",
+                     margin: 0,
+                     fontWeight: "600",
+                   }}
+                 >
+                   {stat.label}
+                 </p>
                 </div>
               ))}
             </div>
@@ -471,69 +485,35 @@ function StoreInner() {
               padding: "0 24px 24px",
             }}
           >
-            {selectedIndustry ? (
-              <div
+
+
+            <div style={{ display: "flex", gap: "10px", marginBottom: "18px", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
+              <button
+                onClick={() => setShowComparison(true)}
                 style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  gap: "12px",
-                  marginBottom: "18px",
-                  padding: "14px 18px",
-                  borderRadius: "18px",
-                  background: "rgba(20,11,4,0.42)",
-                  border: "1px solid rgba(200,150,92,0.22)",
-                  backdropFilter: "blur(16px)",
-                  WebkitBackdropFilter: "blur(16px)",
+                  borderRadius: "9999px",
+                  padding: "8px 20px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  border: "1.5px solid rgba(154,92,46,0.3)",
+                  background: "rgba(255,255,255,0.7)",
+                  color: "#9a5c2e",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.9)";
+                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.5)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.7)";
+                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.3)";
                 }}
               >
-                <div>
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      fontWeight: "700",
-                      color: "#f0c878",
-                      letterSpacing: "0.14em",
-                      textTransform: "uppercase",
-                      margin: "0 0 4px",
-                    }}
-                  >
-                    Recommended Stack
-                  </p>
-                  <div className="store-recommendation-pills">
-                    {recommendedPreview.map((service) => (
-                      <span
-                        key={service.product_id}
-                        className="store-summary-chip"
-                      >
-                        {service.name}
-                      </span>
-                    ))}
-                    {recommendedOverflow > 0 ? (
-                      <span className="store-summary-chip">
-                        +{recommendedOverflow} more
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-                <a
-                  href="#top"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    fontSize: "13px",
-                    fontWeight: "700",
-                    color: "#f0c878",
-                    textDecoration: "none",
-                  }}
-                >
-                  Reviewing {selectedIndustry.shortName}
-                  <ArrowRight style={{ width: "14px", height: "14px" }} />
-                </a>
-              </div>
-            ) : null}
+                📊 Compare All Services
+              </button>
+              <GuidedPathToggle mode={pathMode} onModeChange={setPathMode} />
+            </div>
 
             <div className="store-toolbar">
               <div className="store-searchWrap">
@@ -545,7 +525,7 @@ function StoreInner() {
                     transform: "translateY(-50%)",
                     width: "14px",
                     height: "14px",
-                    color: "rgba(255,232,193,0.72)",
+                    color: "rgba(154,92,46,0.6)",
                   }}
                 />
                 <input
@@ -556,15 +536,14 @@ function StoreInner() {
                   style={{
                     width: "100%",
                     borderRadius: "9999px",
-                    border: "1.5px solid rgba(200,150,92,0.3)",
+                    border: "1.5px solid rgba(154,92,46,0.22)",
                     padding: "11px 16px 11px 38px",
                     fontSize: "13px",
-                    background: "rgba(22,12,5,0.45)",
-                    backdropFilter: "blur(14px)",
-                    WebkitBackdropFilter: "blur(14px)",
+                    background: "rgba(255,255,255,0.85)",
                     outline: "none",
                     boxSizing: "border-box",
-                    color: "#fff7eb",
+                    color: "#1b140d",
+                    boxShadow: "0 2px 8px rgba(111,67,31,0.05)",
                   }}
                 />
               </div>
@@ -574,7 +553,7 @@ function StoreInner() {
                   style={{
                     fontSize: "12px",
                     fontWeight: "700",
-                    color: "rgba(255,232,193,0.86)",
+                    color: "rgba(27,20,13,0.55)",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                   }}
@@ -593,24 +572,22 @@ function StoreInner() {
                         fontWeight: "600",
                         border:
                           activeCategory === category
-                            ? "1.5px solid rgba(240,200,120,0.64)"
-                            : "1.5px solid rgba(200,150,92,0.22)",
+                            ? "1.5px solid rgba(154,92,46,0.5)"
+                            : "1.5px solid rgba(154,92,46,0.18)",
                         cursor: "pointer",
                         background:
                           activeCategory === category
                             ? "linear-gradient(135deg,#6b3f1f,#9a5c2e)"
-                            : "rgba(18,10,4,0.42)",
-                        backdropFilter: "blur(10px)",
-                        WebkitBackdropFilter: "blur(10px)",
+                            : "rgba(255,255,255,0.75)",
                         color:
                           activeCategory === category
                             ? "#f5e6d0"
-                            : "rgba(255,232,193,0.84)",
+                            : "rgba(27,20,13,0.72)",
                         transition: "all 0.2s",
                         boxShadow:
                           activeCategory === category
-                            ? "0 4px 14px rgba(120,70,20,0.36)"
-                            : "none",
+                            ? "0 4px 14px rgba(120,70,20,0.28)"
+                            : "0 1px 4px rgba(111,67,31,0.06)",
                       }}
                     >
                       {category}
@@ -621,9 +598,15 @@ function StoreInner() {
             </div>
 
             <div className="store-grid">
-              {filtered.map((product) => (
-                <ProductCard key={product.product_id} product={product} />
-              ))}
+              {filtered.map((product) => {
+                const recommendations = getRecommendedProducts(
+                  product.product_id,
+                  AI_PRODUCTS
+                );
+                return (
+                  <ProductCard product={product} />
+                );
+              })}
             </div>
 
             {filtered.length === 0 ? (
@@ -631,11 +614,13 @@ function StoreInner() {
                 style={{
                   textAlign: "center",
                   padding: "48px",
-                  color: "rgba(255,220,160,0.6)",
+                  color: "rgba(27,20,13,0.45)",
                 }}
               >
                 <p style={{ fontSize: "16px", fontWeight: "600" }}>
-                  No services match your search
+                  {pathMode === "guided" && selectedIndustry
+                    ? "Try switching to 'Explore All' to see more services"
+                    : "No services match your search"}
                 </p>
               </div>
             ) : null}
@@ -647,8 +632,11 @@ function StoreInner() {
             ) : null}
           </div>
 
+          <BuildYourStackFlow />
           <CartSidebar />
           <Footer />
+          <SocialProofTicker />
+          {showComparison && <ServiceComparisonModal onClose={() => setShowComparison(false)} />}
         </div>
       </div>
     </div>

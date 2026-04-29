@@ -14,6 +14,24 @@ import { base44 } from "@/api/base44Client";
 import LeadScoreCard from "./LeadScoreCard";
 import LeadBulkToolbar from "./LeadBulkToolbar";
 
+import { useRef, useEffect as useLayoutEffect } from "react";
+
+function SelectAllCheckbox({ allSelected, someSelected, onToggle }) {
+  const ref = useRef(null);
+  useLayoutEffect(() => {
+    if (ref.current) ref.current.indeterminate = someSelected;
+  }, [someSelected]);
+  return (
+    <input
+      ref={ref}
+      type="checkbox"
+      checked={allSelected}
+      onChange={onToggle}
+      className="w-4 h-4 accent-primary rounded cursor-pointer"
+    />
+  );
+}
+
 const STATUS_COLORS = {
   New: "bg-blue-100 text-blue-700",
   Contacted: "bg-purple-100 text-purple-700",
@@ -93,7 +111,7 @@ function LeadRow({ lead, selected, onToggle }) {
           </span>
         </div>
         <p className="text-xs text-muted-foreground truncate">{lead.business_name || lead.business_type}</p>
-        {lead.lead_score != null && (
+        {lead.lead_score !== undefined && lead.lead_score !== null && (
           <LeadScoreCard lead={lead} />
         )}
       </div>
@@ -252,7 +270,6 @@ export default function LeadActivityFeed({ project }) {
                 style={{
                   width: `${Math.round((booked / total) * 100)}%`,
                   background: "linear-gradient(90deg, #7a4825, #c8965c)",
-                  minWidth: booked > 0 ? "4px" : "0",
                 }}
               />
             </div>
@@ -289,13 +306,7 @@ export default function LeadActivityFeed({ project }) {
 
             {/* Select-all header row */}
             <div className="flex items-center gap-3 pb-2 mb-1 border-b border-border">
-              <input
-                type="checkbox"
-                checked={allSelected}
-                ref={el => { if (el) el.indeterminate = someSelected; }}
-                onChange={toggleAll}
-                className="w-4 h-4 accent-primary rounded cursor-pointer"
-              />
+              <SelectAllCheckbox allSelected={allSelected} someSelected={someSelected} onToggle={toggleAll} />
               <span className="text-xs font-semibold text-muted-foreground">
                 {allSelected ? "Deselect all" : "Select all"}
               </span>

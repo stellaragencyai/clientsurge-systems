@@ -134,7 +134,7 @@ export default function FilesPanel({ project }) {
             <div className="p-6">
               <iframe
                 src={files.find(f => f.id === previewUrl)?.file_url}
-                className="w-full h-[600px] rounded-lg border border-border"
+                className="w-full h-[60vh] min-h-[300px] rounded-lg border border-border"
                 title="Preview"
               />
             </div>

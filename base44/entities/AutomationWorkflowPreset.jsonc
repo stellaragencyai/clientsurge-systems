@@ -1,0 +1,96 @@
+{
+  "name": "AutomationWorkflowPreset",
+  "type": "object",
+  "properties": {
+    "preset_name": {
+      "type": "string",
+      "title": "Preset Name",
+      "enum": [
+        "hot_lead_express",
+        "nurture_and_qualify",
+        "win_back_strategy",
+        "standard_sequence"
+      ],
+      "description": "Name of the workflow preset"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "description": "What this preset does"
+    },
+    "best_for": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Best For",
+      "description": "Lead types or intents this preset handles"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "type": "number"
+          },
+          "condition": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "message_type": {
+            "type": "string",
+            "enum": [
+              "sms",
+              "email",
+              "none"
+            ]
+          },
+          "delay_hours": {
+            "type": "number"
+          },
+          "next_if_reply": {
+            "type": "string"
+          },
+          "next_if_no_reply": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "Workflow Steps",
+      "description": "Sequence of actions in this workflow"
+    },
+    "success_criteria": {
+      "type": "object",
+      "title": "Success Criteria",
+      "properties": {
+        "metric": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        }
+      }
+    },
+    "estimated_timeline_days": {
+      "type": "number",
+      "title": "Estimated Timeline (days)",
+      "description": "How long this workflow typically runs"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "archived"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "preset_name",
+    "description",
+    "steps"
+  ]
+}

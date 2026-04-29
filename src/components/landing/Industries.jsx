@@ -59,509 +59,121 @@ const industries = [
   },
 ];
 
-function MobilePanelSection({ title, isOpen, onToggle, children, countLabel }) {
+function IndustryModal({ recommendation, onClose, onBookDemo }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  if (!recommendation) return null;
+
   return (
     <div
-      className="rounded-2xl border border-[rgba(154,92,46,0.12)] bg-white/78 overflow-hidden"
+      className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8"
+      style={{ background: "rgba(10,8,5,0.72)", backdropFilter: "blur(6px)" }}
+      onClick={onClose}
     >
-      <button
-        type="button"
-        onClick={onToggle}
-        className="w-full flex items-center justify-between gap-3 px-4 py-4 text-left"
-      >
-        <span className="text-sm font-semibold text-foreground">{title}</span>
-        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-primary">
-          {countLabel || (isOpen ? "Hide" : "Show")}
-        </span>
-      </button>
-      {isOpen ? <div className="px-4 pb-4">{children}</div> : null}
-    </div>
-  );
-}
-
-function MobileIndustryRecommendationDrawer({
-  recommendation,
-  isOpen,
-  onClose,
-  onBookDemo,
-}) {
-  if (!recommendation || !isOpen) {
-    return null;
-  }
-
-  const previewServices = recommendation.recommendedServices.slice(0, 3);
-
-  return (
-    <div className="lg:hidden mt-5">
       <div
-        className="rounded-[26px] overflow-hidden"
+        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[28px]"
         style={{
-          background:
-            "linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(250,245,239,0.92) 100%)",
-          border: "1.5px solid rgba(154,92,46,0.16)",
-          boxShadow: "0 18px 44px rgba(26,18,9,0.1)",
+          background: "linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,245,239,0.94) 100%)",
+          border: "1.5px solid rgba(154,92,46,0.22)",
+          boxShadow: "0 32px 80px rgba(10,6,2,0.28)",
         }}
+        onClick={(e) => e.stopPropagation()}
       >
+        {/* Header */}
         <div
-          className="px-5 pt-5 pb-4 flex items-start justify-between gap-4"
+          className="px-7 pt-7 pb-5 flex items-start justify-between gap-4 sticky top-0 rounded-t-[28px] z-10"
           style={{
-            background:
-              "linear-gradient(135deg, rgba(154,92,46,0.08) 0%, rgba(154,92,46,0.03) 100%)",
-            borderBottom: "1px solid rgba(154,92,46,0.1)",
+            background: "linear-gradient(135deg, rgba(154,92,46,0.09) 0%, rgba(250,245,239,0.97) 100%)",
+            borderBottom: "1px solid rgba(154,92,46,0.12)",
           }}
         >
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary mb-2">
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary mb-2">
               Recommended For {recommendation.shortName}
             </p>
-            <h3 className="font-display text-2xl font-bold text-foreground leading-tight">
-              Best-Fit AI Stack
+            <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
+              Your Best-Fit AI Service Stack
             </h3>
-            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-lg">
               {recommendation.summary}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="shrink-0 rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-primary border border-primary/15 bg-white/70"
+            className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-black/8 transition-colors text-xl font-light"
           >
-            Close
+            ✕
           </button>
         </div>
 
-        <div className="px-5 py-5 space-y-4">
-          <div
-            className="rounded-2xl px-4 py-4"
-            style={{
-              background: "rgba(255,255,255,0.78)",
-              border: "1px solid rgba(154,92,46,0.12)",
-            }}
-          >
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary mb-2">
-              Recommended Package
-            </p>
-            <p className="text-lg font-semibold text-foreground">
-              {recommendation.recommendedPackage?.name}
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              {recommendation.recommendedPackage?.fit}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary mb-3">
-              Start With These
-            </p>
-            <div className="grid gap-3">
-              {previewServices.map((service) => (
-                <div
-                  key={service.product_id}
-                  className="rounded-2xl px-4 py-4"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(255,255,255,0.88) 0%, rgba(250,245,239,0.74) 100%)",
-                    border: "1px solid rgba(154,92,46,0.12)",
-                  }}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">
-                        {service.name}
-                      </p>
-                      <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                        {service.whyThisMatters}
-                      </p>
-                    </div>
-                    <span
-                      className="inline-flex items-center rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em]"
-                      style={{
-                        background: "rgba(154,92,46,0.08)",
-                        border: "1px solid rgba(154,92,46,0.14)",
-                        color: "#9a5c2e",
-                      }}
-                    >
-                      {service.availability_label}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={onBookDemo}
-              style={{
-                borderRadius: "9999px",
-                padding: "2px",
-                background:
-                  "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.26)",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
-              <span
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  height: "46px",
-                  padding: "0 20px",
-                  borderRadius: "9999px",
-                  background:
-                    "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                  color: "#f5e6d0",
-                  fontWeight: "700",
-                  fontSize: "0.95rem",
-                }}
-              >
-                Book Your Free Demo
-                <ArrowRight className="w-4 h-4" />
-              </span>
-            </button>
-
-            <a
-              href="/store"
-              className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
-            >
-              See The Full AI Store
-              <ArrowRight className="w-4 h-4" />
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function IndustryRecommendationPanel({ recommendation, onBookDemo }) {
-  const [openMobileSection, setOpenMobileSection] = useState("available");
-
-  useEffect(() => {
-    setOpenMobileSection("available");
-  }, [recommendation?.shortName]);
-
-  if (!recommendation) {
-    return null;
-  }
-
-  return (
-    <div
-      className="mt-10 md:mt-12 rounded-[28px] overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(135deg, rgba(255,255,255,0.94) 0%, rgba(250,245,239,0.9) 100%)",
-        border: "1.5px solid rgba(154,92,46,0.18)",
-        boxShadow: "0 18px 54px rgba(0,0,0,0.08)",
-      }}
-    >
-      <div
-        className="px-6 md:px-8 pt-7 md:pt-8 pb-6"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(154,92,46,0.08) 0%, rgba(154,92,46,0.03) 100%)",
-          borderBottom: "1px solid rgba(154,92,46,0.12)",
-        }}
-      >
-        <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase mb-3">
-          Recommended For {recommendation.shortName}
-        </p>
-        <div className="grid lg:grid-cols-[1.3fr,0.9fr] gap-6 lg:gap-8 items-start">
-          <div>
-            <h3 className="font-display text-3xl md:text-4xl font-bold text-foreground leading-tight">
-              Your Best-Fit AI Service Stack
-            </h3>
-            <p className="mt-4 text-base md:text-lg text-foreground/72 leading-relaxed">
-              {recommendation.summary}
-            </p>
-            <p className="mt-4 text-sm md:text-base text-muted-foreground leading-relaxed">
-              {recommendation.whyItWorks}
-            </p>
-          </div>
-
+        {/* Body */}
+        <div className="px-7 py-6 space-y-6">
+          {/* Recommended package */}
           <div
             className="rounded-2xl px-5 py-5"
-            style={{
-              background: "rgba(255,255,255,0.72)",
-              border: "1px solid rgba(154,92,46,0.14)",
-            }}
+            style={{ background: "rgba(255,255,255,0.78)", border: "1px solid rgba(154,92,46,0.14)" }}
           >
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-2">
-              Recommended Package
-            </p>
-            <h4 className="text-xl font-semibold text-foreground">
-              {recommendation.recommendedPackage?.name}
-            </h4>
-            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              {recommendation.recommendedPackage?.fit}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <span
-                className="inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]"
-                style={{
-                  background: "rgba(154,92,46,0.08)",
-                  border: "1px solid rgba(154,92,46,0.14)",
-                  color: "#9a5c2e",
-                }}
-              >
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-2">Recommended Package</p>
+            <h4 className="text-xl font-semibold text-foreground">{recommendation.recommendedPackage?.name}</h4>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{recommendation.recommendedPackage?.fit}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.14)", color: "#9a5c2e" }}>
                 {recommendation.recommendedServices.length} services recommended
               </span>
               {recommendation.addOnsByReview.length ? (
-                <span
-                  className="inline-flex items-center rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em]"
-                  style={{
-                    background: "rgba(26,18,9,0.05)",
-                    border: "1px solid rgba(26,18,9,0.08)",
-                    color: "rgba(26,18,9,0.65)",
-                  }}
-                >
+                <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(26,18,9,0.05)", border: "1px solid rgba(26,18,9,0.08)", color: "rgba(26,18,9,0.6)" }}>
                   {recommendation.addOnsByReview.length} add-ons by review
                 </span>
               ) : null}
             </div>
           </div>
-        </div>
-      </div>
 
-      <div className="hidden lg:grid px-6 md:px-8 py-7 md:py-8 lg:grid-cols-[0.9fr,1.1fr] gap-7">
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-4">
-            Why This Stack Fits
-          </p>
-          <div className="space-y-3">
-            {recommendation.pressurePoints.map((point) => (
-              <div
-                key={point}
-                className="rounded-2xl px-4 py-4"
-                style={{
-                  background: "rgba(154,92,46,0.05)",
-                  border: "1px solid rgba(154,92,46,0.12)",
-                }}
-              >
-                <p className="text-sm leading-6 text-foreground/78">{point}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-4">
-            Available Now
-          </p>
-          <div className="grid gap-3">
-            {recommendation.recommendedServices.map((service) => (
-              <div
-                key={service.product_id}
-                className="rounded-2xl px-4 py-4"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(255,255,255,0.88) 0%, rgba(250,245,239,0.72) 100%)",
-                  border: "1px solid rgba(154,92,46,0.12)",
-                }}
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="text-base font-semibold text-foreground">{service.name}</p>
-                    <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                      {service.whyThisMatters}
-                    </p>
-                  </div>
-                  <span
-                    className="inline-flex items-center rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em]"
-                    style={{
-                      background: "rgba(154,92,46,0.08)",
-                      border: "1px solid rgba(154,92,46,0.14)",
-                      color: "#9a5c2e",
-                    }}
-                  >
-                    {service.availability_label}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {recommendation.addOnsByReview.length ? (
-            <>
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mt-6 mb-4">
-                Add-Ons By Review
-              </p>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {recommendation.addOnsByReview.map((product) => (
-                  <div
-                    key={product.product_id}
-                    className="rounded-2xl px-4 py-4"
-                    style={{
-                      background: "rgba(26,18,9,0.04)",
-                      border: "1px solid rgba(26,18,9,0.08)",
-                    }}
-                  >
-                    <p className="text-sm font-semibold text-foreground">{product.name}</p>
-                    <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                      {product.description}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="lg:hidden px-5 py-5 space-y-3">
-        <MobilePanelSection
-          title="Why this stack fits"
-          countLabel={`${recommendation.pressurePoints.length} reasons`}
-          isOpen={openMobileSection === "why"}
-          onToggle={() =>
-            setOpenMobileSection((current) => (current === "why" ? "" : "why"))
-          }
-        >
-          <div className="space-y-3">
-            {recommendation.pressurePoints.map((point) => (
-              <div
-                key={point}
-                className="rounded-2xl px-4 py-4"
-                style={{
-                  background: "rgba(154,92,46,0.05)",
-                  border: "1px solid rgba(154,92,46,0.12)",
-                }}
-              >
-                <p className="text-sm leading-6 text-foreground/78">{point}</p>
-              </div>
-            ))}
-          </div>
-        </MobilePanelSection>
-
-        <MobilePanelSection
-          title="Available now"
-          countLabel={`${recommendation.recommendedServices.length} services`}
-          isOpen={openMobileSection === "available"}
-          onToggle={() =>
-            setOpenMobileSection((current) =>
-              current === "available" ? "" : "available"
-            )
-          }
-        >
-          <div className="grid gap-3">
-            {recommendation.recommendedServices.map((service) => (
-              <div
-                key={service.product_id}
-                className="rounded-2xl px-4 py-4"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(255,255,255,0.88) 0%, rgba(250,245,239,0.72) 100%)",
-                  border: "1px solid rgba(154,92,46,0.12)",
-                }}
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="text-base font-semibold text-foreground">{service.name}</p>
-                    <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                      {service.whyThisMatters}
-                    </p>
-                  </div>
-                  <span
-                    className="inline-flex items-center rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em]"
-                    style={{
-                      background: "rgba(154,92,46,0.08)",
-                      border: "1px solid rgba(154,92,46,0.14)",
-                      color: "#9a5c2e",
-                    }}
-                  >
-                    {service.availability_label}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </MobilePanelSection>
-
-        {recommendation.addOnsByReview.length ? (
-          <MobilePanelSection
-            title="Add-ons by review"
-            countLabel={`${recommendation.addOnsByReview.length} add-ons`}
-            isOpen={openMobileSection === "addons"}
-            onToggle={() =>
-              setOpenMobileSection((current) =>
-                current === "addons" ? "" : "addons"
-              )
-            }
-          >
-            <div className="grid gap-3">
-              {recommendation.addOnsByReview.map((product) => (
-                <div
-                  key={product.product_id}
-                  className="rounded-2xl px-4 py-4"
-                  style={{
-                    background: "rgba(26,18,9,0.04)",
-                    border: "1px solid rgba(26,18,9,0.08)",
-                  }}
-                >
-                  <p className="text-sm font-semibold text-foreground">{product.name}</p>
-                  <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                    {product.description}
-                  </p>
+          {/* Why it fits */}
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-3">Why This Stack Fits</p>
+            <div className="space-y-2">
+              {recommendation.pressurePoints.map((point) => (
+                <div key={point} className="rounded-2xl px-4 py-3" style={{ background: "rgba(154,92,46,0.05)", border: "1px solid rgba(154,92,46,0.12)" }}>
+                  <p className="text-sm leading-6 text-foreground/78">{point}</p>
                 </div>
               ))}
             </div>
-          </MobilePanelSection>
-        ) : null}
-      </div>
+          </div>
 
-      <div
-        className="px-6 md:px-8 py-5 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between"
-        style={{
-          borderTop: "1px solid rgba(154,92,46,0.12)",
-          background: "rgba(255,255,255,0.6)",
-        }}
-      >
-        <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
-          This recommendation keeps the experience specific to {recommendation.shortName.toLowerCase()} while staying aligned to the real services we can install today.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <a
-            href="/store"
-            className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
-          >
-            See The AI Store
-            <ArrowRight className="w-4 h-4" />
+          {/* Available services */}
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-3">Available Now</p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {recommendation.recommendedServices.map((service) => (
+                <div key={service.product_id} className="rounded-2xl px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(250,245,239,0.74) 100%)", border: "1px solid rgba(154,92,46,0.12)" }}>
+                  <p className="text-sm font-semibold text-foreground">{service.name}</p>
+                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{service.whyThisMatters}</p>
+                  <span className="mt-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em]" style={{ background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.14)", color: "#9a5c2e" }}>
+                    {service.availability_label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer CTAs */}
+        <div className="px-7 py-5 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end" style={{ borderTop: "1px solid rgba(154,92,46,0.12)", background: "rgba(255,255,255,0.6)" }}>
+          <a href="/store" className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
+            See The AI Store <ArrowRight className="w-4 h-4" />
           </a>
-          <button
-            type="button"
-            onClick={onBookDemo}
-            style={{
-              borderRadius: "9999px",
-              padding: "2px",
-              background:
-                "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-              boxShadow: "0 4px 18px rgba(120,70,20,0.3)",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-                height: "44px",
-                padding: "0 24px",
-                borderRadius: "9999px",
-                background:
-                  "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                color: "#f5e6d0",
-                fontWeight: "700",
-                fontSize: "0.95rem",
-              }}
-            >
-              Book Your Free Demo
-              <ArrowRight className="w-4 h-4" />
+          <button type="button" onClick={onBookDemo} style={{ borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.3)", border: "none", cursor: "pointer" }}>
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "42px", padding: "0 24px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.875rem" }}>
+              Book Your Free Demo <ArrowRight className="w-4 h-4" />
             </span>
           </button>
         </div>
@@ -574,35 +186,22 @@ export default function Industries() {
   const sectionRef = useRef(null);
   const demoBooking = useDemoBooking();
   const [sectionVisible, setSectionVisible] = useState(false);
-  const [selectedIndustryId, setSelectedIndustryId] = useState("med-spa");
+  const [selectedIndustryId, setSelectedIndustryId] = useState(null);
   const [hoveredIndustryId, setHoveredIndustryId] = useState("");
-  const [mobileRecommendationOpen, setMobileRecommendationOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return undefined;
-    }
-
-    const savedIndustryId = window.sessionStorage.getItem(
-      INDUSTRY_SELECTION_STORAGE_KEY
-    );
-
+    if (typeof window === "undefined") return undefined;
+    const savedIndustryId = window.sessionStorage.getItem(INDUSTRY_SELECTION_STORAGE_KEY);
     if (savedIndustryId && INDUSTRY_RECOMMENDATIONS_BY_ID[savedIndustryId]) {
       setSelectedIndustryId(savedIndustryId);
     }
-
     return undefined;
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    window.sessionStorage.setItem(
-      INDUSTRY_SELECTION_STORAGE_KEY,
-      selectedIndustryId
-    );
+    if (typeof window === "undefined" || !selectedIndustryId) return;
+    window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, selectedIndustryId);
     window.dispatchEvent(new CustomEvent("clientsurge:industry-selected"));
   }, [selectedIndustryId]);
 
@@ -629,16 +228,13 @@ export default function Industries() {
     return () => observer.disconnect();
   }, []);
 
-  const selectedRecommendation =
-    INDUSTRY_RECOMMENDATIONS_BY_ID[selectedIndustryId] ||
-    INDUSTRY_RECOMMENDATIONS_BY_ID["med-spa"];
+  const selectedRecommendation = selectedIndustryId
+    ? INDUSTRY_RECOMMENDATIONS_BY_ID[selectedIndustryId]
+    : null;
 
   const handleIndustrySelect = (industryId) => {
     setSelectedIndustryId(industryId);
-
-    if (typeof window !== "undefined" && window.innerWidth < 1024) {
-      setMobileRecommendationOpen(true);
-    }
+    setModalOpen(true);
   };
 
   return (
@@ -660,7 +256,7 @@ export default function Industries() {
         </p>
       </div>
 
-      <div className="max-w-[1800px] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10">
+      <div className="max-w-[1800px] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10" style={{ overflowX: "hidden" }}>
         {industries.map((industry, index) => {
           const Icon = industry.icon;
           const highlighted = hoveredIndustryId === industry.id;
@@ -669,7 +265,7 @@ export default function Industries() {
             <button
               key={industry.id}
               type="button"
-              className="group relative block overflow-hidden h-[17.5rem] sm:h-[21rem] md:h-[27.6rem] text-left"
+              className="group relative block overflow-hidden h-[14rem] sm:h-[18rem] md:h-[27.6rem] text-left"
               onClick={() => handleIndustrySelect(industry.id)}
               onMouseEnter={() => setHoveredIndustryId(industry.id)}
               onMouseLeave={() => setHoveredIndustryId("")}
@@ -766,21 +362,13 @@ export default function Industries() {
         })}
       </div>
 
-      <div className="max-w-6xl mx-auto px-6">
-        <MobileIndustryRecommendationDrawer
+      {modalOpen && selectedRecommendation && (
+        <IndustryModal
           recommendation={selectedRecommendation}
-          isOpen={mobileRecommendationOpen}
-          onClose={() => setMobileRecommendationOpen(false)}
-          onBookDemo={() => demoBooking?.openDemoBooking?.()}
+          onClose={() => setModalOpen(false)}
+          onBookDemo={() => { setModalOpen(false); demoBooking?.openDemoBooking?.(); }}
         />
-      </div>
-
-      <div className="hidden lg:block max-w-6xl mx-auto px-6">
-        <IndustryRecommendationPanel
-          recommendation={selectedRecommendation}
-          onBookDemo={() => demoBooking?.openDemoBooking?.()}
-        />
-      </div>
+      )}
     </section>
   );
 }

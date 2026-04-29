@@ -1,9 +1,29 @@
 import Stripe from "npm:stripe@14";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { getTrackedServiceConfig, normalizeInstallConfiguration } from "../_shared/installPipeline.js";
-import { buildPricingSummaryForProducts, buildStoredPricingSummary } from "../../../src/lib/salesCatalog.js";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
+
+// Inlined from salesCatalog — canonical product registry
+// price IDs are populated here; update when Stripe products are created
+const CANONICAL_PRODUCTS = [
+  { product_id: "prod_UNi5RHiKNSTfQl", service_key: "instant_lead_response",  name: "Instant Lead Response",       setup_fee: 297, monthly_fee: 97,  setup_price_id: "price_1TOwfiB9GU5ysJqEcmQHl3gE", monthly_price_id: "price_1TOwfiB9GU5ysJqE20FYUfVc" },
+  { product_id: "prod_UNi5QL0bQl98If", service_key: "missed_call_text_back",   name: "Missed Call Text-Back",        setup_fee: 197, monthly_fee: 67,  setup_price_id: "price_1TOwfiB9GU5ysJqEJuEDhpKS", monthly_price_id: "price_1TOwfiB9GU5ysJqE8knUfswZ" },
+  { product_id: "prod_UNi5N0l5MtaV0R", service_key: "nurture_sequence_14d",    name: "14-Day Nurture Sequence",      setup_fee: 397, monthly_fee: 127, setup_price_id: "price_1TOwfiB9GU5ysJqEtwQAmCuN", monthly_price_id: "price_1TOwfiB9GU5ysJqEsoZmFl6D" },
+  { product_id: "prod_UNi5fLL2SyJJdP", service_key: "ai_booking_agent",        name: "AI Booking Agent",             setup_fee: 497, monthly_fee: 147, setup_price_id: "price_1TOwfiB9GU5ysJqEij8Qq9rd", monthly_price_id: "price_1TOwfiB9GU5ysJqEKhYvS71r" },
+  { product_id: "prod_UNi5PWv05ECzXI", service_key: "lead_reactivation",       name: "Old Lead Reactivation",        setup_fee: 297, monthly_fee: 97,  setup_price_id: "price_1TOwfiB9GU5ysJqExMxwfoFr", monthly_price_id: "price_1TOwfiB9GU5ysJqEfsJEvPcI" },
+  { product_id: "prod_UNi5dvOUm6Fi9i", service_key: "review_request",          name: "Review Request Automation",    setup_fee: 197, monthly_fee: 67,  setup_price_id: "price_1TOwfiB9GU5ysJqEO8byuwlT", monthly_price_id: "price_1TOwfiB9GU5ysJqEryd66HuE" },
+];
+
+const PRODUCT_BY_ID = Object.fromEntries(CANONICAL_PRODUCTS.map((p) => [p.product_id, p]));
+
+// Normalize install configuration for a new order
+function normalizeInstallConfiguration(orderItems = []) {
+  const config = { services: {} };
+  for (const item of orderItems) {
+    if (item.service_key) config.services[item.service_key] = {};
+  }
+  return config;
+}
 
 Deno.serve(async (req) => {
   try {
@@ -29,27 +49,35 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const pricingSummary = buildPricingSummaryForProducts(requestedProductIds);
-    if (!pricingSummary.priced_items.length) {
-      return Response.json({ error: "No canonical services selected for checkout" }, { status: 400 });
+    // Resolve canonical products — skip unknowns
+    const resolvedProducts = requestedProductIds
+      .map((id) => PRODUCT_BY_ID[id])
+      .filter(Boolean);
+
+    if (!resolvedProducts.length) {
+      return Response.json({ error: "No valid products found for checkout" }, { status: 400 });
     }
 
-    const orderItems = pricingSummary.priced_items.map((item) => ({
-      product_id: item.product_id,
-      product_name: item.name,
-      setup_price_id: item.setup_price_id,
-      monthly_price_id: item.monthly_price_id,
-      setup_fee: item.setup_fee,
-      monthly_fee: item.monthly_fee,
-      compare_at_setup_fee: item.compare_at_setup_fee,
-      compare_at_monthly_fee: item.compare_at_monthly_fee,
-      setup_discount_fee: item.setup_discount_fee,
-      monthly_discount_fee: item.monthly_discount_fee,
-      source_package_key: item.source_package_key,
-      source_package_name: item.source_package_name,
+    // Validate all setup_price_ids are present before creating anything
+    const missingPrices = resolvedProducts.filter((p) => !p.setup_price_id);
+    if (missingPrices.length) {
+      const names = missingPrices.map((p) => p.name).join(", ");
+      console.error(`Missing setup_price_id for: ${names}`);
+      return Response.json({ error: `Checkout not yet available for: ${names}` }, { status: 400 });
+    }
+
+    const total_setup = resolvedProducts.reduce((sum, p) => sum + p.setup_fee, 0);
+    const total_monthly = resolvedProducts.reduce((sum, p) => sum + p.monthly_fee, 0);
+
+    const orderItems = resolvedProducts.map((p) => ({
+      product_id: p.product_id,
+      product_name: p.name,
+      setup_price_id: p.setup_price_id,
+      monthly_price_id: p.monthly_price_id,
+      setup_fee: p.setup_fee,
+      monthly_fee: p.monthly_fee,
+      service_key: p.service_key,
       status: "pending",
-      service_key: getTrackedServiceConfig(item.product_id)?.service_key,
-      tracking_enabled: Boolean(getTrackedServiceConfig(item.product_id)),
       service_access_status: "active",
     }));
 
@@ -59,45 +87,24 @@ Deno.serve(async (req) => {
       customer_phone: customer_phone || "",
       business_name,
       items: orderItems,
-      total_setup: pricingSummary.total_setup,
-      total_monthly: pricingSummary.total_monthly,
-      pricing_summary: buildStoredPricingSummary(pricingSummary.priced_items),
-      install_configuration: normalizeInstallConfiguration({}, orderItems),
+      total_setup,
+      total_monthly,
+      install_configuration: normalizeInstallConfiguration(orderItems),
       payment_status: "pending",
       order_status: "pending_payment",
-      plan_type: pricingSummary.package_offer?.name || "Custom Service Bundle",
+      plan_type: "Custom Service Bundle",
     });
 
-    const line_items = pricingSummary.priced_items.flatMap((item) => ([
-      {
-        price: item.setup_price_id,
-        quantity: 1,
-      },
-      {
-        price: item.monthly_price_id,
-        quantity: 1,
-      },
-    ]));
+    const line_items = resolvedProducts.map((p) => ({
+      price: p.setup_price_id,
+      quantity: 1,
+    }));
 
     const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
+      mode: "payment",
       payment_method_types: ["card"],
-      customer_email: customer_email,
+      customer_email,
       line_items,
-      subscription_data: {
-        metadata: {
-          order_id: order.id,
-          plan_type: pricingSummary.package_offer?.name || "Custom Service Bundle",
-          package_key: pricingSummary.package_offer?.package_key || "",
-          services_json: JSON.stringify(
-            pricingSummary.priced_items.map((item) => ({
-              product_id: item.product_id,
-              product_name: item.name,
-              service_key: item.service_key,
-            }))
-          ),
-        },
-      },
       success_url: success_url || `${req.headers.get("origin")}/order-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancel_url || `${req.headers.get("origin")}/store`,
       metadata: {
@@ -106,23 +113,21 @@ Deno.serve(async (req) => {
         customer_name,
         customer_phone: customer_phone || "",
         business_name,
-        items_json: JSON.stringify(
-          pricingSummary.priced_items.map((item) => ({
-            product_id: item.product_id,
-            product_name: item.name,
-            service_key: item.service_key,
-          }))
-        ),
-        package_key: pricingSummary.package_offer?.package_key || "",
+        items_json: JSON.stringify(resolvedProducts.map((p) => ({
+          product_id: p.product_id,
+          product_name: p.name,
+          service_key: p.service_key,
+        }))),
       },
     });
+
     await base44.asServiceRole.entities.Order.update(order.id, {
       stripe_session_id: session.id,
     });
 
     return Response.json({ url: session.url, session_id: session.id });
   } catch (error) {
-    console.error("Checkout error:", error);
+    console.error("Checkout error:", error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

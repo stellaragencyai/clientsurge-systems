@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
-import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
+import { getSelectedIndustryRecommendation, INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
+import CustomerProofCards from "./CustomerProofCards";
+import MoneyBackGuarantee from "./MoneyBackGuarantee";
 
 function SimpleCheck() {
   return (
@@ -25,59 +27,57 @@ function SimpleCheck() {
 const plans = [
   {
     name: "Starter System",
-    fit: "Best for businesses under 30 leads per month",
-    subtitle: "For businesses just getting started with automation.",
-    desc: "A simple automation system to respond faster and capture more opportunities without complexity.",
+    fit: "For businesses that need faster response and basic lead capture",
+    subtitle: "For businesses that need faster response and basic lead capture.",
+    desc: "An AI lead conversion system that ensures every new inquiry gets a fast response, enters a simple follow-up flow, and has a clear path to booking.",
     setup: "$997 setup",
     monthly: "$397",
     features: [
-      "Instant response to new leads by SMS",
-      "Basic confirmation email",
-      "1 follow-up SMS message",
-      "1 follow-up email",
+      "Instant SMS response to every new lead",
+      "Basic email confirmation",
+      "Simple automated follow-up sequence",
       "Booking link integration",
-      "Simple lead tracking dashboard",
+      "Basic lead tracking dashboard",
       "System setup and launch support",
     ],
     highlight: false,
   },
   {
     name: "Growth System",
-    fit: "Best for most businesses already generating steady leads",
+    fit: "For businesses already getting leads and losing revenue through slow response or weak follow-up",
     badge: "Most Popular",
-    subtitle: "Best for businesses actively generating leads and wanting more bookings",
-    desc: "The best option for businesses that want stronger follow-up, better lead conversion, and more automation built into the customer journey.",
+    subtitle: "For businesses already getting leads and losing revenue through slow response or weak follow-up.",
+    desc: "A full missed-call recovery and automated follow-up system built for businesses that want to stop losing bookings they already earned.",
     setup: "$1,997 setup",
     monthly: "$797",
     features: [
       "Everything in Starter",
-      "Full follow-up sequence across multiple touchpoints",
       "Missed call text-back system",
-      "Smart lead response logic",
-      "Combined email and SMS follow-up",
-      "Improved lead tracking and status pipeline",
+      "Multi-touch SMS and email follow-up",
       "Conversion-focused message templates",
-      "14 days of optimization after launch",
+      "Improved lead tracking and pipeline",
+      "14 days of post-launch optimization",
       "Monthly performance check-in",
+      "Conversion-focused landing page included when needed",
     ],
     highlight: true,
   },
   {
     name: "Pro System",
-    fit: "Best for higher-volume teams that want deeper automation",
-    subtitle: "Best for higher-volume businesses ready to scale and maximize conversions",
-    desc: "Deeper automation, stronger reactivation, more optimization, and an advanced follow-up system for businesses serious about growth.",
+    fit: "For businesses that want the full revenue recovery engine",
+    subtitle: "For businesses that want the full revenue recovery engine.",
+    desc: "The complete AI-assisted booking automation and revenue recovery system — old leads reactivated, every inquiry tracked, and the full pipeline optimized.",
     setup: "$3,500 setup",
     monthly: "$1,500",
     features: [
       "Everything in Growth",
       "Old lead reactivation campaigns",
-      "Advanced follow-up and nurture flows",
-      "Multi-channel messaging strategy",
+      "Advanced nurture flows",
+      "AI-assisted follow-up logic",
       "Enhanced dashboard and tracking",
-      "Ongoing optimization and improvements",
-      "Priority support",
+      "Priority optimization and support",
       "Monthly strategy session",
+      "Conversion-focused landing page or site improvement included",
     ],
     highlight: false,
   },
@@ -93,7 +93,9 @@ export default function Pricing() {
     }
 
     const syncIndustry = () => {
-      setSelectedIndustry(getSelectedIndustryRecommendation());
+      // Only show recommendation if user has explicitly selected an industry in this session
+      const storedId = window.sessionStorage.getItem(INDUSTRY_SELECTION_STORAGE_KEY);
+      setSelectedIndustry(storedId ? getSelectedIndustryRecommendation() : null);
     };
 
     syncIndustry();
@@ -112,14 +114,25 @@ export default function Pricing() {
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Pricing & Packages</p>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-           Choose the System That Turns Your Leads Into Booked Clients
+           Most Businesses Already Have the Leads — Here's What It Costs to Stop Losing Them
           </h2>
           <p className="mt-5 text-foreground font-semibold text-base mb-3">
-            Most businesses recover the cost with just a few additional bookings.
+            Recovery happens fast. Most clients cover their entire investment with just 2–3 additional bookings per month.
           </p>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            We install done-for-you systems that respond to leads instantly, automate follow-up, and help turn more inquiries into booked appointments.
+            We install done-for-you AI lead conversion systems that respond instantly, automate follow-up, and turn more of your existing demand into booked appointments.
           </p>
+          <div
+            className="mt-6 inline-block rounded-2xl px-5 py-3 text-sm text-foreground/75 leading-relaxed max-w-xl mx-auto"
+            style={{ borderRadius: "16px" }}
+            style={{
+              background: "rgba(154,92,46,0.05)",
+              border: "1px solid rgba(154,92,46,0.12)",
+            }}
+          >
+            <span className="font-semibold text-foreground/90">On websites and landing pages:</span>{" "}
+            These are only included when they strengthen the conversion system. The real product is the automated system that captures, follows up, and books more leads.
+          </div>
         </div>
 
         {selectedIndustry ? (
@@ -147,59 +160,84 @@ export default function Pricing() {
           ))}
         </div>
 
-        <div className="mt-12 max-w-5xl mx-auto rounded-3xl border border-border bg-card/80 p-6 md:p-8 shadow-sm">
-          <div className="max-w-2xl mb-6">
-            <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What&apos;s Included In Setup</p>
-            <h3 className="font-titles text-2xl md:text-3xl font-bold text-foreground">
-              We handle the implementation work, not just the strategy
-            </h3>
-            <p className="mt-3 text-sm md:text-base text-muted-foreground">
-              Your setup fee covers the actual buildout, launch prep, and handoff work required to get the system live.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-x-6 gap-y-3">
-            {[
-              "Lead-response flow mapping and message logic",
-              "SMS and email follow-up sequence setup",
-              "Booking-link or booking-process integration",
-              "Missed-call response setup when included in your plan",
-              "Launch testing, polish, and go-live support",
-              "Short onboarding call plus implementation handoff",
-            ].map((item) => (
-              <div key={item} className="flex items-start gap-3 py-1">
-                <SimpleCheck />
-                <p className="text-sm text-foreground/80">{item}</p>
-              </div>
-            ))}
-          </div>
+        <CustomerProofCards />
+
+        <MoneyBackGuarantee />
+
+        <div className="max-w-2xl mb-6 mt-12">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What&apos;s Included In Setup</p>
+          <h3 className="font-titles text-2xl md:text-3xl font-bold text-foreground">
+            We build and install the system for you — not just the strategy
+          </h3>
+          <p className="mt-3 text-sm md:text-base text-muted-foreground">
+            Your setup fee covers the full buildout of your AI lead conversion system — launch prep, messaging logic, booking flow, and handoff — done for you.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-x-6 gap-y-3 mb-14">
+          {[
+            "AI lead conversion system setup and message logic",
+            "Automated SMS and email follow-up sequence",
+            "Booking link or booking flow integration",
+            "Missed-call recovery system setup when included",
+            "Launch testing, polish, and go-live support",
+            "Onboarding call plus full implementation handoff",
+          ].map((item) => (
+            <div key={item} className="flex items-start gap-3 py-1">
+              <SimpleCheck />
+              <p className="text-sm text-foreground/80">{item}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="mt-14 text-center max-w-xl mx-auto border-t border-border pt-10">
+        <div className="text-center max-w-xl mx-auto border-t border-border pt-10">
           <p className="text-foreground font-semibold text-base mb-5">
             Not sure which system fits your business? We will recommend the best option based on your lead flow.
           </p>
-          {demoBooking ? (
-            <button
-              type="button"
-              onClick={() =>
-                demoBooking.openDemoBooking({
-                  prefillIndustry: selectedIndustry?.name || "",
-                })
-              }
-              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full border-2 border-primary/40 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/60 transition-all duration-200"
-            >
-              Book Your Free Demo
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          ) : (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            {demoBooking ? (
+              <button
+                type="button"
+                onClick={() =>
+                  demoBooking.openDemoBooking({
+                    prefillIndustry: selectedIndustry?.name || "",
+                  })
+                }
+                style={{
+                  borderRadius: "9999px",
+                  padding: "2px",
+                  background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                  boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }}>
+                  Book Your Free Demo <ArrowRight className="w-4 h-4" />
+                </span>
+              </button>
+            ) : (
+              <a
+                href="/book"
+                style={{
+                  borderRadius: "9999px",
+                  padding: "2px",
+                  background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                  boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                  display: "inline-block",
+                }}
+              >
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }}>
+                  Book Your Free Demo <ArrowRight className="w-4 h-4" />
+                </span>
+              </a>
+            )}
             <a
-              href="/book"
-              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full border-2 border-primary/40 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/60 transition-all duration-200"
+              href="#lead-leakage"
+              className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full border border-primary/30 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 transition-all duration-200"
             >
-              Book Your Free Demo
-              <ArrowRight className="w-4 h-4" />
+              Get a Free Lead Leakage Audit
             </a>
-          )}
+          </div>
         </div>
 
       </div>
@@ -327,12 +365,12 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
           : isHovered ? "2px solid rgba(200,150,92,0.45)" : "1.5px solid rgba(154,92,46,0.15)",
         boxShadow: plan.highlight
           ? isHovered
-            ? "0 20px 54px rgba(160,90,20,0.22), inset 0 1px 0 rgba(255,255,255,0.9)"
-            : "0 8px 30px rgba(160,90,20,0.14), inset 0 1px 0 rgba(255,255,255,0.8)"
+            ? "0 24px 64px rgba(160,90,20,0.28), inset 0 1px 0 rgba(255,255,255,0.9)"
+            : "0 12px 40px rgba(160,90,20,0.18), inset 0 1px 0 rgba(255,255,255,0.8)"
           : isHovered
-            ? "0 10px 26px rgba(160,90,20,0.1), inset 0 1px 0 rgba(255,255,255,0.85)"
-            : "0 4px 18px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.6)",
-        transform: isHovered ? "translateY(-4px)" : plan.highlight ? "translateY(-2px)" : "translateY(0)",
+            ? "0 14px 36px rgba(160,90,20,0.15), inset 0 1px 0 rgba(255,255,255,0.85)"
+            : "0 6px 22px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
+        transform: isHovered ? "translateY(-8px) scale(1.02)" : plan.highlight ? "translateY(-2px)" : "translateY(0)",
         transition: "all 0.35s ease",
         zIndex: plan.highlight ? 2 : 1,
       }}
@@ -368,10 +406,10 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
       <div className="flex flex-col flex-1 p-6 md:p-8 lg:p-10 relative z-10">
         <div className="mb-7">
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">{plan.name}</h3>
-          {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Best choice for most businesses.</p>}
+          {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Most Popular — Best for businesses losing 20+ leads/month</p>}
           {isRecommended && (
             <p className="text-xs font-bold text-primary mb-2">
-              Recommended based on your selected industry.
+              Recommended for {selectedIndustry.shortName}
             </p>
           )}
           <p className="text-xs font-semibold text-foreground/70 leading-snug">{plan.fit}</p>

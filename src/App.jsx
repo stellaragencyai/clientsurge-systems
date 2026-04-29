@@ -15,8 +15,13 @@ import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import PageNotFound from "./lib/PageNotFound";
+import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
+
+// Initialize auto-tracking on app load
+if (typeof window !== "undefined") {
+  initializeAnalyticsObserver();
+}
 import Home from "./pages/Home";
-import MedSpa from "./pages/MedSpa";
 import Onboarding from "./pages/Onboarding";
 import CaptureLeads from "./pages/CaptureLeads";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -31,6 +36,9 @@ import Contact from "./pages/Contact";
 import AdminOnboarding from "./pages/AdminOnboarding";
 import Industries from "./pages/Industries";
 import OrderSuccess from "./pages/OrderSuccess";
+import IndustryTemplate from "./components/landing/IndustryTemplate";
+import BusinessSetup from "./pages/BusinessSetup";
+import AdminAutomation from "./pages/AdminAutomation";
 
 const Store = lazy(() => import("./pages/Store"));
 
@@ -39,6 +47,11 @@ const PUBLIC_PATHS = [
   "/store",
   "/order-success",
   "/med-spa",
+  "/dental",
+  "/hvac",
+  "/roofing",
+  "/contractors",
+  "/chiropractic",
   "/start",
   "/book",
   "/book-demo",
@@ -171,7 +184,6 @@ const AuthenticatedApp = () => {
       <Route path="/test-option-3" element={<Navigate to="/" replace />} />
       <Route path="/preview-idea-1" element={<Navigate to="/" replace />} />
       <Route path="/preview-idea-2" element={<Navigate to="/" replace />} />
-      <Route path="/med-spa" element={<MedSpa />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
@@ -203,6 +215,8 @@ const AuthenticatedApp = () => {
         }
       />
       <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/setup" element={<BusinessSetup />} />
+      <Route path="/:slug" element={<IndustryTemplate />} />
 
       <Route
         element={
@@ -226,6 +240,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/leads" element={<AdminLeads />} />
         <Route path="/admin/leads/:leadId" element={<AdminLeadDetail />} />
+        <Route path="/admin/automations" element={<AdminAutomation />} />
         <Route path="/lead-intelligence" element={<Navigate to="/admin" replace />} />
         <Route path="/sam" element={<Navigate to="/admin" replace />} />
         <Route path="/medspa-dashboard" element={<Navigate to="/admin" replace />} />

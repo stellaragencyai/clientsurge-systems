@@ -12,17 +12,7 @@ export default function FinalCTA() {
       <section id="book-demo" className="nebula-cta py-24 md:py-32 px-6 relative overflow-hidden">
         <StardustOverlay seed={13} opacity={0.6} />
 
-        <div
-          className="relative z-10 max-w-3xl mx-auto rounded-3xl px-10 py-12 text-center"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(255,252,247,0.68) 0%, rgba(252,240,220,0.52) 100%)",
-            backdropFilter: "blur(22px)",
-            WebkitBackdropFilter: "blur(22px)",
-            border: "1.5px solid rgba(200,150,92,0.28)",
-            boxShadow: "0 8px 48px rgba(154,92,46,0.12), inset 0 1px 0 rgba(255,255,255,0.8)",
-          }}
-        >
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">
             Ready to Start?
           </p>
@@ -32,9 +22,7 @@ export default function FinalCTA() {
             <span className="text-primary">Let&apos;s Make Sure You&apos;re Converting Them.</span>
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
-            Book a free 15-minute demo. We will map out exactly where you are
-            losing bookings and show you what an automated system would look like
-            for your business with no obligation.
+            Book a free 15-minute demo. We will map out exactly where your business is leaking bookings and show you what an AI lead conversion system would look like for your specific situation — no obligation.
           </p>
           <div
             className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80"
@@ -95,11 +83,11 @@ export default function FinalCTA() {
               </span>
             </button>
             <a
-              href="#pricing"
-              onClick={() => trackCTA("see_pricing", "final_cta")}
+              href="#lead-leakage"
+              onClick={() => trackCTA("lead_leakage_audit", "final_cta")}
               className="inline-flex items-center justify-center h-14 px-6 rounded-full border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200"
             >
-              See pricing
+              Get a Free Lead Leakage Audit
             </a>
           </div>
         </div>

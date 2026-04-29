@@ -63,7 +63,7 @@ export default function ClientOnboardingWizard({ project, onComplete }) {
     setSaving(true);
     setError('');
     try {
-      await base44.asServiceRole.functions.invoke('saveClientNotificationPreferences', {
+      await base44.functions.invoke('saveClientNotificationPreferences', {
         project_id: project.id,
         preferences: formData,
       });

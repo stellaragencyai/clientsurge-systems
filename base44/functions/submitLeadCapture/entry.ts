@@ -145,37 +145,45 @@ Deno.serve(async (req) => {
 
     let duplicateLead = null;
 
+    // Check WebsiteLead duplicates instead of Leads
     if (lead.email) {
-      const emailMatches = await base44.asServiceRole.entities.Leads.filter({ email: lead.email }, '-created_date', 10);
+      const emailMatches = await base44.asServiceRole.entities.WebsiteLead.filter({ email: lead.email }, '-created_date', 10).catch(() => []);
       duplicateLead = emailMatches.find((item: Record<string, unknown>) => isRecentDuplicate(item, lead)) || null;
     }
 
     if (!duplicateLead && lead.phone) {
-      const phoneMatches = await base44.asServiceRole.entities.Leads.filter({ phone: lead.phone }, '-created_date', 10);
+      const phoneMatches = await base44.asServiceRole.entities.WebsiteLead.filter({ phone_number: lead.phone }, '-created_date', 10).catch(() => []);
       duplicateLead = phoneMatches.find((item: Record<string, unknown>) => isRecentDuplicate(item, lead)) || null;
     }
 
     if (duplicateLead) {
+      // For WebsiteLead duplicates, reset status if closed
       const nextStatus =
-        duplicateLead.status === 'Closed'
-          ? 'New'
-          : typeof duplicateLead.status === 'string' && duplicateLead.status.length > 0
-            ? duplicateLead.status
-            : 'New';
+        duplicateLead.lead_status === 'closed'
+          ? 'new'
+          : duplicateLead.lead_status || 'new';
 
-      await base44.asServiceRole.entities.Leads.update(duplicateLead.id, {
-        status: nextStatus,
+      const firstName = lead.full_name.split(' ')[0] || lead.full_name;
+      await base44.asServiceRole.entities.WebsiteLead.update(duplicateLead.id, {
+        lead_status: nextStatus,
         full_name: duplicateLead.full_name || lead.full_name,
-        business_name: duplicateLead.business_name || lead.business_name,
+        first_name: firstName,
         email: duplicateLead.email || lead.email,
-        phone: duplicateLead.phone || lead.phone,
-        business_type: duplicateLead.business_type || lead.business_type,
-        problem: duplicateLead.problem || lead.problem,
-        website: duplicateLead.website || lead.website_url,
-        source: duplicateLead.source || LEAD_SOURCE,
-        intake_type: duplicateLead.intake_type || INTAKE_TYPE,
+        phone_number: duplicateLead.phone_number || lead.phone,
+        service_interest: duplicateLead.service_interest || lead.business_type,
+        message: duplicateLead.message || lead.problem,
+        source: duplicateLead.source || 'website_form',
+        reply_status: 'none',
+        booking_status: 'none',
       });
       await logLeadCreated(base44, duplicateLead.id, 'updated', lead);
+
+      // Send instant SMS response asynchronously if not already sent
+      if (!duplicateLead.initial_response_sent_at) {
+        base44.functions.invoke('sendInstantLeadResponseSms', {
+          lead_id: duplicateLead.id,
+        }).catch((err) => console.error(`[SubmitLead] SMS send failed: ${err.message}`));
+      }
 
       return Response.json({
         success: true,
@@ -184,10 +192,27 @@ Deno.serve(async (req) => {
       });
     }
 
-    const createdLead = await base44.asServiceRole.entities.Leads.create({
-      ...buildLeadPayload(lead, 'New'),
+    // Create as WebsiteLead instead of Leads (website forms use separate entity)
+    const firstName = lead.full_name.split(' ')[0] || lead.full_name;
+    const createdLead = await base44.asServiceRole.entities.WebsiteLead.create({
+      full_name: lead.full_name,
+      first_name: firstName,
+      email: lead.email,
+      phone_number: lead.phone,
+      service_interest: lead.business_type,
+      message: lead.problem,
+      source: 'website_form',
+      lead_status: 'new',
+      reply_status: 'none',
+      booking_status: 'none',
+      automation_enabled: true,
     });
     await logLeadCreated(base44, createdLead.id, 'created', lead);
+
+    // Send instant SMS response asynchronously (don't wait for it)
+    base44.functions.invoke('sendInstantLeadResponseSms', {
+      lead_id: createdLead.id,
+    }).catch((err) => console.error(`[SubmitLead] SMS send failed: ${err.message}`));
 
     return Response.json({
       success: true,

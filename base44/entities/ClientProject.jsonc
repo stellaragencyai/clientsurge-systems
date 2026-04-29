@@ -10,6 +10,10 @@
       "type": "string",
       "title": "Client Email"
     },
+    "contact_email": {
+      "type": "string",
+      "title": "Contact Email"
+    },
     "client_name": {
       "type": "string",
       "title": "Client Name"
@@ -122,6 +126,18 @@
     "admin_notes": {
       "type": "string",
       "title": "Admin Notes (internal)"
+    },
+    "timeline_person_name": {
+      "type": "string",
+      "title": "Timeline Person Name"
+    },
+    "timeline_birth_date": {
+      "type": "string",
+      "title": "Timeline Birth Date"
+    },
+    "timeline_death_date": {
+      "type": "string",
+      "title": "Timeline Death Date"
     },
     "go_live_date": {
       "type": "string",

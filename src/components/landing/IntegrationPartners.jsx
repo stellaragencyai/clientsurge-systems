@@ -33,25 +33,19 @@ const INTEGRATIONS = [
   },
   {
     name: "Calendly",
-    logo: "https://asset.brandfetch.io/idZFtKcrFb/idF1j3M28n.png",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/4f0f85e13_7493f3ba-6389-437c-b4cc-50b5c2baa75a.png",
     href: "https://calendly.com",
     description: "Booking",
   },
   {
     name: "Facebook Ads",
-    logo: "https://asset.brandfetch.io/idFdo8ulhr/idMNSwbv-X.png",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/40001c42d_ChatGPTImageApr28202605_59_43AM.png",
     href: "https://facebook.com/ads",
     description: "Lead ads",
   },
   {
-    name: "ActiveCampaign",
-    logo: "https://asset.brandfetch.io/idpJKJvfE9/id7BH9t9D0.png",
-    href: "https://activecampaign.com",
-    description: "Email automation",
-  },
-  {
-    name: "GoHighLevel",
-    logo: "https://asset.brandfetch.io/idmEBJvJIq/idBi3b2U7f.png",
+    name: "HighLevel",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/eec622a96_effc8d6b-84de-4143-b7f8-fad489dba492.png",
     href: "https://gohighlevel.com",
     description: "CRM platform",
   },
@@ -72,13 +66,11 @@ const ScrollTrackIntegrationContext = ({ children }) => {
 const TRIPLED = [...INTEGRATIONS, ...INTEGRATIONS, ...INTEGRATIONS];
 
 export default function IntegrationPartners() {
-  const [paused, setPaused] = useState(false);
-
   return (
     <section
       className="py-14 px-6 relative overflow-hidden"
       style={{
-        background: "linear-gradient(135deg, rgba(245,246,248,0.98) 0%, rgba(238,240,244,0.97) 100%)",
+        background: "#ffffff",
       }}
     >
       {/* Subtle top/bottom border lines */}
@@ -109,36 +101,32 @@ export default function IntegrationPartners() {
             Every tool you already rely on — plugged in, synced, and firing automatically the moment a lead comes in. Seamless integrations that work behind the scenes.
           </p>
 
-          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary mt-6">
-            <span aria-hidden="true">🔗</span>
-            Scroll to see all integrations in action
-          </div>
+
         </div>
 
         {/* Infinite scroll marquee */}
         <div
           className="relative overflow-hidden"
           style={{ padding: "28px 0 40px" }}
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
+
         >
           {/* Left fade */}
           <div
             className="absolute left-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to right, rgba(245,246,248,1) 0%, transparent 100%)" }}
+            style={{ background: "linear-gradient(to right, rgba(255,255,255,1) 0%, transparent 100%)" }}
           />
           <div
             className="absolute right-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to left, rgba(245,246,248,1) 0%, transparent 100%)" }}
+            style={{ background: "linear-gradient(to left, rgba(255,255,255,1) 0%, transparent 100%)" }}
           />
 
           <div
             className="flex items-center"
             style={{
               width: "max-content",
-              gap: "80px",
-              animation: `integrationScroll 24s linear infinite`,
-              animationPlayState: paused ? "paused" : "running",
+              gap: "clamp(40px, 6vw, 80px)",
+              animation: `integrationScroll 28s linear infinite`,
+              willChange: "transform",
             }}
           >
             {TRIPLED.map((integration, idx) => (
@@ -148,34 +136,32 @@ export default function IntegrationPartners() {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={`Visit ${integration.name}`}
-                className="flex-shrink-0 group relative flex flex-col items-center transition-opacity duration-300 hover:opacity-100"
-                style={{ outline: "none", opacity: 0.85 }}
+                className="flex-shrink-0 group relative flex flex-col items-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg p-2"
+                style={{ cursor: "pointer" }}
               >
                 <img
                    src={integration.logo}
                    alt={integration.name}
                    loading="lazy"
                    style={{
-                     height: "130px",
-                     width: "auto",
-                     maxWidth: "280px",
+                     height: "100px",
+                     width: "200px",
                      objectFit: "contain",
-                     transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease, opacity 0.35s ease",
-                     filter: "drop-shadow(0 0 0px rgba(200,150,92,0)) brightness(1) contrast(1.05)",
-                     opacity: 0.9,
+                     objectPosition: "center",
+                     transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease",
+                     filter: "brightness(1) contrast(1.1) saturate(1.1)",
+                     opacity: 1,
                    }}
                    onMouseEnter={(e) => {
-                     e.currentTarget.style.transform = "scale(1.22) translateY(-8px)";
-                     e.currentTarget.style.filter = "drop-shadow(0 12px 32px rgba(200,150,92,0.6)) brightness(1.08) contrast(1.15)";
-                     e.currentTarget.style.opacity = "1";
+                     e.currentTarget.style.transform = "scale(1.2) translateY(-8px)";
+                     e.currentTarget.style.filter = "brightness(1.1) contrast(1.15) saturate(1.2) drop-shadow(0 8px 24px rgba(154,92,46,0.35))";
                    }}
                    onMouseLeave={(e) => {
                      e.currentTarget.style.transform = "scale(1) translateY(0)";
-                     e.currentTarget.style.filter = "drop-shadow(0 0 0px rgba(200,150,92,0)) brightness(1) contrast(1.05)";
-                     e.currentTarget.style.opacity = "0.9";
+                     e.currentTarget.style.filter = "brightness(1) contrast(1.1) saturate(1.1)";
                    }}
                  />
-                <span className="absolute -bottom-7 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase tracking-widest">
+                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase tracking-widest">
                   {integration.description}
                 </span>
               </a>
@@ -183,45 +169,14 @@ export default function IntegrationPartners() {
           </div>
         </div>
 
-        {/* Bottom CTA pill */}
-        <div className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8">
-          <div
-            className="inline-flex items-center gap-3 px-6 py-3 rounded-full border"
-            style={{
-              background: "rgba(255,255,255,0.8)",
-              border: "1.5px solid rgba(180,185,195,0.6)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.95), 0 4px 12px rgba(0,0,0,0.08)",
-              backdropFilter: "blur(10px)",
-              WebkitBackdropFilter: "blur(10px)",
-            }}
-          >
-            <span className="text-sm text-foreground/70 font-medium">Don't see your tool?</span>
-            <a
-              href="/contact"
-              className="text-sm font-bold text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
-            >
-              Contact us →
-            </a>
-            <span className="text-sm text-foreground/50">We connect to virtually anything.</span>
-          </div>
-          <div
-            className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border"
-            style={{
-              background: "rgba(154,92,46,0.08)",
-              border: "1.5px solid rgba(154,92,46,0.25)",
-              boxShadow: "0 2px 8px rgba(154,92,46,0.12)",
-            }}
-          >
-            <span className="text-xs font-bold text-primary uppercase tracking-widest">✓ Pre-built integrations available</span>
-          </div>
-        </div>
+
 
       </div>
 
       <style>{`
         @keyframes integrationScroll {
-          0%   { transform: translateX(0); }
-          100% { transform: translateX(-33.333%); }
+          0% { transform: translateX(0); }
+          100% { transform: translateX(calc(-100% / 3)); }
         }
         @media (prefers-reduced-motion: reduce) {
           @keyframes integrationScroll {

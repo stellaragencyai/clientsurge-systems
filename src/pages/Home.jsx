@@ -10,10 +10,11 @@ import CoreOffer from "../components/landing/CoreOffer";
 import IntegrationPartners from "../components/landing/IntegrationPartners";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
-import DemoVideoSection from "../components/landing/DemoVideoSection";
+import LeadLeakage from "../components/landing/LeadLeakage";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
+import ChatBubble from "../components/landing/ChatBubble";
 import { FAQ_ITEMS } from "../components/landing/FAQ";
 
 import {
@@ -106,7 +107,7 @@ export default function Home() {
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen pb-16">
+      <div className="min-h-screen">
         <Navbar />
         <Hero />
         <LeadAutomationShowcase />
@@ -115,14 +116,15 @@ export default function Home() {
         <section aria-label="Proof and trust">
           <TrustBar />
         </section>
+        <LeadLeakage />
         <ProblemSolution />
         <CoreOffer />
         <IntegrationPartners />
         <Pricing />
-        <DemoVideoSection />
         <FAQ />
         <FinalCTA />
         <Footer />
+        <ChatBubble />
       </div>
     </DemoBookingProvider>
   );

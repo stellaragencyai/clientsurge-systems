@@ -93,6 +93,117 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Global focus styles for keyboard navigation */
+:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* CTA Button Focus States - Enhanced for Accessibility */
+button[type="button"],
+button[type="submit"],
+a[role="button"],
+.shiny-brown-btn,
+[class*="cta"],
+[class*="btn"] {
+  position: relative;
+}
+
+/* Focus for all interactive elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Enhanced focus ring for CTAs */
+button[type="button"]:focus-visible,
+button[type="submit"]:focus-visible,
+a[role="button"]:focus-visible,
+.shiny-brown-btn:focus-visible,
+[class*="cta"]:focus-visible,
+[class*="btn"]:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px hsla(var(--primary), 0.15);
+}
+
+/* ============================================
+   MOBILE / CROSS-BROWSER GLOBAL FIXES
+   ============================================ */
+
+/* Prevent content from overflowing on small screens */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Safe area insets for iPhone notch / Dynamic Island */
+.safe-top    { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+/* iOS Safari: disable tap flash on interactive elements */
+a, button, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Prevent horizontal scroll on all pages */
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Mobile nav drawer fix */
+body.nav-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* Fix iOS Safari fixed positioning issues */
+@supports (-webkit-touch-callout: none) {
+  /* Sticky navbar safe area padding */
+  nav {
+    padding-top: max(0px, env(safe-area-inset-top));
+  }
+}
+
+/* Prevent font-size bump on iOS orientation change */
+@media screen and (orientation: landscape) {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* Fix backdrop-filter cross-browser */
+[style*="backdropFilter"], [style*="backdrop-filter"] {
+  -webkit-backdrop-filter: inherit;
+}
+
+/* Smooth scrolling disabled on reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ============================================
@@ -185,11 +296,11 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png');
+  background-image: url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/20a9cba69_generated_image.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.07;
+  opacity: 0.06;
   pointer-events: none;
   z-index: 0;
 }
@@ -407,4 +518,12 @@ body > * {
 /* Ensure text on dark stays legible */
 .dark p, .dark h1, .dark h2, .dark h3, .dark h4, .dark span:not([style*="color"]) {
   color: inherit;
+}
+
+/* Dark mode gradient text fix */
+.dark span[style*="background"] {
+  background: linear-gradient(135deg, #f5d9a8 0%, #e8c499 52%, #d4a570 100%) !important;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
