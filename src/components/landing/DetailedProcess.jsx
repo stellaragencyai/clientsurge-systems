@@ -71,24 +71,46 @@ const steps = [
 
 function StepCard({ step, index, isLast }) {
   const ref = useRef(null);
+  const innerRef = useRef(null);
   const [visible, setVisible] = useState(false);
+  const [height, setHeight] = useState(0);
   const Icon = step.icon;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
-      { threshold: 0.15 }
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (innerRef.current) {
+      setHeight(innerRef.current.scrollHeight);
+    }
+  }, []);
+
+  const delay = index * 120;
+
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 relative ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-      style={{ transitionDelay: `${index * 80}ms` }}
+      className="relative overflow-hidden"
+      style={{
+        opacity: visible ? 1 : 0,
+        maxHeight: visible ? `${height + 40}px` : "0px",
+        transform: visible ? "translateY(0) scaleY(1)" : "translateY(24px) scaleY(0.92)",
+        transformOrigin: "top center",
+        transition: `opacity 0.6s ease ${delay}ms, max-height 0.65s cubic-bezier(0.4,0,0.2,1) ${delay}ms, transform 0.6s cubic-bezier(0.4,0,0.2,1) ${delay}ms`,
+      }}
     >
+    <div ref={innerRef}>
       {/* Vertical timeline line */}
       {!isLast && (
         <div className="absolute left-8 top-24 w-1 h-40 rounded-full" style={{ background: "linear-gradient(180deg, rgba(161,120,35,0.8) 0%, rgba(161,120,35,0.2) 100%)" }} />
@@ -136,6 +158,7 @@ function StepCard({ step, index, isLast }) {
           />
         </div>
       </div>
+    </div>
     </div>
   );
 }
