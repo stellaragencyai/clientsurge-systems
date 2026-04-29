@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { ArrowDown, CheckCircle2 } from "lucide-react";
 import { launchTimelineSteps, iconMap } from "./coreOfferData";
+import { useDemoBooking } from "@/components/landing/DemoBookingContext";
 
 // Step durations as proportional weights (for the timeline bar)
-const STEP_WEIGHTS = [1, 0.5, 0.5, 2.5, 0.5]; // relative time weight per step
+const STEP_WEIGHTS = [1, 0.5, 0.5, 2.5, 0.5];
 const TOTAL_WEIGHT = STEP_WEIGHTS.reduce((a, b) => a + b, 0);
 
 function useInView(threshold = 0.15) {
@@ -21,7 +22,6 @@ function useInView(threshold = 0.15) {
   return [ref, visible];
 }
 
-// Enhancement 5: Timeline summary bar
 function TimelineSummaryBar({ activeStep, onStepClick }) {
   const [barRef, barVisible] = useInView(0.3);
 
@@ -43,7 +43,6 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
           boxShadow: "0 6px 20px rgba(111,67,31,0.07)",
         }}
       >
-        {/* Header */}
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs font-semibold text-foreground">Your estimated setup timeline</p>
           <span
@@ -54,7 +53,6 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
           </span>
         </div>
 
-        {/* Proportional bar segments */}
         <div className="flex gap-1 h-3 rounded-full overflow-hidden mb-3">
           {launchTimelineSteps.map((step, idx) => {
             const widthPct = (STEP_WEIGHTS[idx] / TOTAL_WEIGHT) * 100;
@@ -81,7 +79,6 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
           })}
         </div>
 
-        {/* Step labels under bar */}
         <div className="flex">
           {launchTimelineSteps.map((step, idx) => {
             const widthPct = (STEP_WEIGHTS[idx] / TOTAL_WEIGHT) * 100;
@@ -116,13 +113,12 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
   );
 }
 
-// Enhancement 3: Each step row with staggered scroll reveal
 function StepRow({ step, idx }) {
   const isEven = idx % 2 === 0;
-  const [ref, visible] = useInView(0.1);
+  const [ref, visible] = useInView(0.08);
 
-  const contentDelay = isEven ? idx * 80 : idx * 80 + 120;
-  const imageDelay = isEven ? idx * 80 + 120 : idx * 80;
+  const contentDelay = isEven ? idx * 60 : idx * 60 + 100;
+  const imageDelay = isEven ? idx * 60 + 100 : idx * 60;
 
   return (
     <div ref={ref} className="relative" data-step-id={step.id}>
@@ -132,48 +128,30 @@ function StepRow({ step, idx }) {
         style={{
           background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
           boxShadow: "0 0 0 5px rgba(154,92,46,0.12), 0 4px 14px rgba(154,92,46,0.35)",
-          transition: `opacity 0.5s ease ${contentDelay}ms, transform 0.5s ease ${contentDelay}ms`,
+          transition: `opacity 0.6s ease ${contentDelay}ms, transform 0.6s ease ${contentDelay}ms`,
           opacity: visible ? 1 : 0,
-          transform: visible ? "scale(1) translateX(-50%)" : "scale(0.6) translateX(-50%)",
+          transform: visible ? "scale(1) translateX(-50%)" : "scale(0.4) translateX(-50%)",
         }}
       >
         <span className="text-white font-black text-sm">{step.number}</span>
       </div>
 
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`} style={{ alignItems: "stretch" }}>
+      <div
+        className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}
+        style={{ alignItems: "stretch" }}
+      >
         {/* Content card */}
         <div
           style={{
-            transition: `opacity 0.65s ease ${contentDelay}ms, transform 0.65s ease ${contentDelay}ms`,
+            transition: `opacity 0.75s cubic-bezier(0.16,1,0.3,1) ${contentDelay}ms, transform 0.75s cubic-bezier(0.16,1,0.3,1) ${contentDelay}ms`,
             opacity: visible ? 1 : 0,
-            transform: visible ? "translateX(0)" : `translateX(${isEven ? "-40px" : "40px"})`,
+            transform: visible ? "translateX(0) translateY(0) scale(1)" : `translateX(${isEven ? "-60px" : "60px"}) translateY(30px) scale(0.96)`,
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
             position: "relative",
           }}
         >
-          {/* Step badge - positioned at top of container */}
-          <div
-            style={{
-              position: "absolute",
-              top: "0",
-              left: "0",
-              background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
-              color: "#ffffff",
-              padding: "4px 12px",
-              borderRadius: "6px",
-              fontSize: "11px",
-              fontWeight: "800",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              boxShadow: "0 4px 12px rgba(154, 92, 46, 0.4), 0 0 20px rgba(154, 92, 46, 0.3)",
-              zIndex: 10,
-            }}
-          >
-            Step {step.number}
-          </div>
-        
           <div
             className="rounded-2xl overflow-hidden"
             style={{
@@ -183,6 +161,7 @@ function StepRow({ step, idx }) {
               position: "relative",
             }}
           >
+            {/* Top accent bar */}
             <div
               style={{
                 position: "absolute",
@@ -193,7 +172,28 @@ function StepRow({ step, idx }) {
                 background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)",
               }}
             />
-            <div className="p-6 md:p-7 pt-7">
+            {/* Step badge — inside the card, tight to the top-left */}
+            <div className="px-6 md:px-7 pt-6 pb-0">
+              <div
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+                  color: "#ffffff",
+                  padding: "4px 12px",
+                  borderRadius: "6px",
+                  fontSize: "11px",
+                  fontWeight: "800",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  marginBottom: "12px",
+                }}
+              >
+                Step {step.number}
+              </div>
+            </div>
+            <div className="px-6 md:px-7 pb-6 md:pb-7">
               <h4 className="text-lg md:text-xl font-bold text-foreground mb-4">
                 {step.title}
               </h4>
@@ -212,9 +212,9 @@ function StepRow({ step, idx }) {
         {/* Image */}
         <div
           style={{
-            transition: `opacity 0.65s ease ${imageDelay}ms, transform 0.65s ease ${imageDelay}ms`,
+            transition: `opacity 0.75s cubic-bezier(0.16,1,0.3,1) ${imageDelay}ms, transform 0.75s cubic-bezier(0.16,1,0.3,1) ${imageDelay}ms`,
             opacity: visible ? 1 : 0,
-            transform: visible ? "translateX(0)" : `translateX(${isEven ? "40px" : "-40px"})`,
+            transform: visible ? "translateX(0) translateY(0) scale(1)" : `translateX(${isEven ? "60px" : "-60px"}) translateY(30px) scale(0.96)`,
             display: "flex",
             alignItems: "stretch",
           }}
@@ -224,7 +224,7 @@ function StepRow({ step, idx }) {
             style={{
               border: "1.5px solid rgba(154,92,46,0.12)",
               boxShadow: "0 8px 24px rgba(111,67,31,0.1)",
-              minHeight: "400px",
+              minHeight: "360px",
             }}
           >
             <img src={step.image} alt={step.title} className="w-full h-full object-cover" />
@@ -235,37 +235,150 @@ function StepRow({ step, idx }) {
   );
 }
 
+// Arrow + CTA at the bottom of the center line
+function TimelineArrowCTA({ onBookDemo }) {
+  const [ref, visible] = useInView(0.2);
+
+  return (
+    <div
+      ref={ref}
+      className="hidden md:flex flex-col items-center"
+      style={{
+        transition: "opacity 0.8s ease, transform 0.8s ease",
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(30px)",
+      }}
+    >
+      {/* Extended line segment */}
+      <div
+        style={{
+          width: "2px",
+          height: "56px",
+          background: "linear-gradient(180deg, rgba(154,92,46,0.4) 0%, #c8965c 100%)",
+          transition: "height 0.6s ease 0.2s",
+        }}
+      />
+      {/* Arrowhead */}
+      <div
+        style={{
+          width: "36px",
+          height: "36px",
+          borderRadius: "50%",
+          background: "linear-gradient(135deg, #9a5c2e, #c8965c)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 0 0 8px rgba(154,92,46,0.1), 0 8px 24px rgba(154,92,46,0.3)",
+          animation: visible ? "ctaPulse 2s ease-in-out infinite" : "none",
+        }}
+      >
+        <ArrowDown style={{ width: "18px", height: "18px", color: "#fff" }} />
+      </div>
+
+      {/* CTA card */}
+      <div
+        className="mt-5 rounded-3xl px-8 py-7 text-center max-w-sm"
+        style={{
+          background: "linear-gradient(135deg, rgba(154,92,46,0.07) 0%, rgba(200,150,92,0.05) 100%)",
+          border: "1.5px solid rgba(154,92,46,0.2)",
+          boxShadow: "0 12px 40px rgba(111,67,31,0.1)",
+        }}
+      >
+        <p className="font-display text-xl font-bold text-foreground mb-2 leading-snug">
+          Ready to see which systems fit your business?
+        </p>
+        <p className="text-sm text-muted-foreground mb-5">
+          We'll show you the right setup based on your lead flow and goals.
+        </p>
+        <button
+          type="button"
+          onClick={onBookDemo}
+          style={{
+            borderRadius: "9999px",
+            padding: "2px",
+            background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+            boxShadow: "0 4px 18px rgba(120,70,20,0.3)",
+            border: "none",
+            cursor: "pointer",
+            width: "100%",
+          }}
+        >
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              height: "44px",
+              padding: "0 24px",
+              borderRadius: "9999px",
+              background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+              color: "#f5e6d0",
+              fontWeight: "700",
+              fontSize: "0.9rem",
+            }}
+          >
+            Book a Free Demo
+          </span>
+        </button>
+      </div>
+
+      <style>{`
+        @keyframes ctaPulse {
+          0%, 100% { box-shadow: 0 0 0 8px rgba(154,92,46,0.1), 0 8px 24px rgba(154,92,46,0.3); }
+          50%       { box-shadow: 0 0 0 14px rgba(154,92,46,0.06), 0 8px 32px rgba(154,92,46,0.4); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export default function LaunchTimeline() {
   const [headerRef, headerVisible] = useInView(0.2);
   const [activeStep, setActiveStep] = useState(0);
+  const [lineHeight, setLineHeight] = useState(0);
   const stepRefs = useRef([]);
+  const lineContainerRef = useRef(null);
+  const { openDemoBooking } = useDemoBooking();
+
+  // Scroll-driven line extension
+  useEffect(() => {
+    const container = lineContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const rect = container.getBoundingClientRect();
+      const totalH = container.scrollHeight;
+      const viewportH = window.innerHeight;
+      // How far the top of the container has scrolled past the viewport top
+      const scrolled = Math.max(0, viewportH - rect.top);
+      const pct = Math.min(scrolled / totalH, 1);
+      setLineHeight(pct * 100);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleTrackerClick = (idx) => {
     setActiveStep(idx);
     const el = stepRefs.current[idx];
     if (el) {
       setTimeout(() => {
-        const targetTop = el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2);
+        const targetTop = el.getBoundingClientRect().top + window.scrollY - window.innerHeight / 2;
         const startTop = window.scrollY;
         const distance = targetTop - startTop;
-        const duration = 3000; // 3 seconds for very slow scroll
+        const duration = 2400;
         let startTime = null;
-
-        const ease = (t) => {
-          return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-        };
-
+        const ease = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
         const scroll = (currentTime) => {
           if (!startTime) startTime = currentTime;
           const elapsed = currentTime - startTime;
           const progress = Math.min(elapsed / duration, 1);
           window.scrollTo(0, startTop + distance * ease(progress));
-          
-          if (progress < 1) {
-            requestAnimationFrame(scroll);
-          }
+          if (progress < 1) requestAnimationFrame(scroll);
         };
-
         requestAnimationFrame(scroll);
       }, 100);
     }
@@ -295,7 +408,7 @@ export default function LaunchTimeline() {
         </p>
       </div>
 
-      {/* Enhancement 1: Numbered step circles — Desktop horizontal tracker */}
+      {/* Desktop horizontal tracker */}
       <div className="hidden sm:flex justify-center items-start gap-7 md:gap-10 px-4 mb-6">
         {launchTimelineSteps.map((step, idx) => {
           const Icon = iconMap[step.icon];
@@ -306,21 +419,8 @@ export default function LaunchTimeline() {
                 type="button"
                 onClick={() => handleTrackerClick(idx)}
                 className="flex flex-col items-center gap-3 border-none bg-transparent cursor-pointer group"
-                onMouseEnter={(e) => {
-                  const circle = e.currentTarget.querySelector('[data-icon-circle]');
-                  if (circle && !isActive) {
-                    circle.style.boxShadow = "0 0 0 5px rgba(154,92,46,0.15), 0 0 30px rgba(154,92,46,0.5), 0 4px 14px rgba(154,92,46,0.35)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  const circle = e.currentTarget.querySelector('[data-icon-circle]');
-                  if (circle && !isActive) {
-                    circle.style.boxShadow = "none";
-                  }
-                }}
               >
                 <div
-                  data-icon-circle
                   className="rounded-full flex items-center justify-center flex-shrink-0 relative"
                   style={{
                     width: "70px",
@@ -334,20 +434,10 @@ export default function LaunchTimeline() {
                     transition: "all 0.3s ease",
                   }}
                 >
-                  <span
-                    className="font-black leading-none"
-                    style={{ fontSize: "28px", color: isActive ? "#fff" : "#9a5c2e" }}
-                  >{step.number}</span>
+                  <span className="font-black leading-none" style={{ fontSize: "28px", color: isActive ? "#fff" : "#9a5c2e" }}>{step.number}</span>
                   <div
                     className="absolute rounded-full flex items-center justify-center"
-                    style={{ 
-                      width: "24px",
-                      height: "24px",
-                      bottom: "-3px",
-                      right: "-3px",
-                      background: "#f5e6d0",
-                      border: "2px solid rgba(154,92,46,0.25)"
-                    }}
+                    style={{ width: "24px", height: "24px", bottom: "-3px", right: "-3px", background: "#f5e6d0", border: "2px solid rgba(154,92,46,0.25)" }}
                   >
                     <Icon style={{ width: "14px", height: "14px", color: "#9a5c2e" }} />
                   </div>
@@ -363,62 +453,58 @@ export default function LaunchTimeline() {
         })}
       </div>
 
-      {/* Enhancement 5: Timeline summary bar */}
       <TimelineSummaryBar activeStep={activeStep} onStepClick={handleTrackerClick} />
 
-      {/* Spacing before diagram */}
       <div style={{ marginBottom: "40px" }} />
 
-      {/* Mobile: Vertical Stepper */}
+      {/* Mobile stepper */}
       <div className="sm:hidden relative pl-10 mb-12">
-        <div
-          className="absolute left-4 top-3 bottom-3 w-0.5"
-          style={{ background: "linear-gradient(180deg, #9a5c2e 0%, rgba(154,92,46,0.2) 100%)" }}
-        />
+        <div className="absolute left-4 top-3 bottom-3 w-0.5" style={{ background: "linear-gradient(180deg, #9a5c2e 0%, rgba(154,92,46,0.2) 100%)" }} />
         <div className="space-y-6">
-          {launchTimelineSteps.map((step, idx) => {
-            return (
+          {launchTimelineSteps.map((step) => (
+            <div key={step.id} className="relative flex items-start gap-4">
               <div
-                key={step.id}
-                className="relative flex items-start gap-4"
+                className="absolute -left-10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 z-10"
+                style={{ background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)", boxShadow: "0 2px 8px rgba(154,92,46,0.4)" }}
               >
-                <div
-                  className="absolute -left-10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 z-10"
-                  style={{
-                    background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
-                    boxShadow: "0 2px 8px rgba(154,92,46,0.4)",
-                  }}
-                >
-                  <span className="font-black text-sm" style={{ color: "#fff" }}>{step.number}</span>
-                </div>
-                <div
-                  className="rounded-xl px-4 py-3 flex-1 overflow-hidden relative"
-                  style={{
-                    background: "rgba(255,255,255,0.9)",
-                    border: "1px solid rgba(154,92,46,0.12)",
-                    boxShadow: "0 4px 12px rgba(111,67,31,0.06)",
-                  }}
-                >
-                  <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "3px", background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)" }} />
-                  <p className="text-[11px] font-semibold text-foreground mb-0.5 mt-1">Step {step.number}</p>
-                  <p className="text-sm font-bold text-foreground">{step.title}</p>
-                  <p className="text-xs mt-0.5" style={{ color: "rgba(154,92,46,0.8)" }}>{step.duration}</p>
-                </div>
+                <span className="font-black text-sm" style={{ color: "#fff" }}>{step.number}</span>
               </div>
-            );
-          })}
+              <div
+                className="rounded-xl px-4 py-3 flex-1 overflow-hidden relative"
+                style={{ background: "rgba(255,255,255,0.9)", border: "1px solid rgba(154,92,46,0.12)", boxShadow: "0 4px 12px rgba(111,67,31,0.06)" }}
+              >
+                <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "3px", background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)" }} />
+                <p className="text-[11px] font-semibold text-foreground mb-0.5 mt-1">Step {step.number}</p>
+                <p className="text-sm font-bold text-foreground">{step.title}</p>
+                <p className="text-xs mt-0.5" style={{ color: "rgba(154,92,46,0.8)" }}>{step.duration}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Detailed vertical timeline */}
-      <div className="relative">
+      {/* Detailed vertical timeline with scroll-driven center line */}
+      <div ref={lineContainerRef} className="relative">
+        {/* Background static line */}
         <div
           className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block"
           style={{
-            background: "linear-gradient(180deg, rgba(154,92,46,0.6) 0%, rgba(154,92,46,0.3) 50%, rgba(154,92,46,0.1) 100%)",
+            background: "rgba(154,92,46,0.1)",
             transform: "translateX(-50%)",
           }}
         />
+        {/* Scroll-driven animated line */}
+        <div
+          className="absolute left-6 md:left-1/2 top-0 w-0.5 hidden md:block pointer-events-none"
+          style={{
+            height: `${lineHeight}%`,
+            background: "linear-gradient(180deg, #9a5c2e 0%, #c8965c 50%, rgba(200,150,92,0.6) 100%)",
+            transform: "translateX(-50%)",
+            transition: "height 0.15s linear",
+            boxShadow: "0 0 8px rgba(200,150,92,0.3)",
+          }}
+        />
+
         <div className="space-y-10 md:space-y-14">
           {launchTimelineSteps.map((step, idx) => (
             <div key={step.id} ref={(el) => (stepRefs.current[idx] = el)}>
@@ -426,6 +512,11 @@ export default function LaunchTimeline() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Arrow + CTA hanging off the bottom of the line */}
+      <div className="mt-6">
+        <TimelineArrowCTA onBookDemo={openDemoBooking} />
       </div>
     </div>
   );
