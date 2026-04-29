@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { CheckCircle2, ChevronDown } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { launchTimelineSteps, iconMap } from "./coreOfferData";
 
 // Step durations as proportional weights (for the timeline bar)
@@ -116,11 +116,10 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
   );
 }
 
-// Enhancement 3 + 4: Each step row with scroll reveal + collapsible
-function StepRow({ step, idx, isOpen, onToggle }) {
+// Enhancement 3: Each step row with staggered scroll reveal
+function StepRow({ step, idx }) {
   const isEven = idx % 2 === 0;
-  const Icon = iconMap[step.icon];
-  const [ref, visible] = useInView(0.08);
+  const [ref, visible] = useInView(0.1);
 
   const contentDelay = isEven ? idx * 80 : idx * 80 + 120;
   const imageDelay = isEven ? idx * 80 + 120 : idx * 80;
@@ -141,8 +140,8 @@ function StepRow({ step, idx, isOpen, onToggle }) {
         <span className="text-white font-black text-sm">{step.number}</span>
       </div>
 
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-start ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}>
-        {/* Content card — Enhancement 4: collapsible */}
+      <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}>
+        {/* Content card */}
         <div
           style={{
             transition: `opacity 0.65s ease ${contentDelay}ms, transform 0.65s ease ${contentDelay}ms`,
@@ -159,7 +158,6 @@ function StepRow({ step, idx, isOpen, onToggle }) {
               position: "relative",
             }}
           >
-            {/* Color band */}
             <div
               style={{
                 position: "absolute",
@@ -170,40 +168,14 @@ function StepRow({ step, idx, isOpen, onToggle }) {
                 background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)",
               }}
             />
-
-            {/* Clickable header — toggles expansion */}
-            <button
-              type="button"
-              onClick={onToggle}
-              className="w-full text-left px-6 md:px-7 pt-7 pb-4 flex items-start justify-between gap-3 border-none bg-transparent cursor-pointer"
-            >
-              <div>
-                <p className="text-sm font-semibold text-foreground mb-1">
-                  Step {step.number} — {step.duration}
-                </p>
-                <h4 className="text-lg md:text-xl font-bold text-foreground">
-                  {step.title}
-                </h4>
-              </div>
-              <ChevronDown
-                className="w-5 h-5 flex-shrink-0 mt-2"
-                style={{
-                  color: "#9a5c2e",
-                  transition: "transform 0.3s ease",
-                  transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
-                }}
-              />
-            </button>
-
-            {/* Collapsible bullets */}
-            <div
-              style={{
-                maxHeight: isOpen ? "400px" : "0px",
-                overflow: "hidden",
-                transition: "max-height 0.4s ease",
-              }}
-            >
-              <ul className="space-y-2.5 px-6 md:px-7 pb-6">
+            <div className="p-6 md:p-7 pt-7">
+              <p className="text-sm font-semibold text-foreground mb-1">
+                Step {step.number} — {step.duration}
+              </p>
+              <h4 className="text-lg md:text-xl font-bold text-foreground mb-4">
+                {step.title}
+              </h4>
+              <ul className="space-y-2.5">
                 {step.bullets.map((bullet, i) => (
                   <li key={i} className="flex items-start gap-2.5">
                     <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#22c55e" }} />
@@ -215,15 +187,12 @@ function StepRow({ step, idx, isOpen, onToggle }) {
           </div>
         </div>
 
-        {/* Image — only shown when expanded */}
+        {/* Image */}
         <div
           style={{
             transition: `opacity 0.65s ease ${imageDelay}ms, transform 0.65s ease ${imageDelay}ms`,
-            opacity: visible && isOpen ? 1 : 0,
-            transform: visible && isOpen ? "translateX(0)" : `translateX(${isEven ? "40px" : "-40px"})`,
-            pointerEvents: isOpen ? "auto" : "none",
-            maxHeight: isOpen ? "400px" : "0px",
-            overflow: "hidden",
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateX(0)" : `translateX(${isEven ? "40px" : "-40px"})`,
           }}
         >
           <div
@@ -243,19 +212,13 @@ function StepRow({ step, idx, isOpen, onToggle }) {
 
 export default function LaunchTimeline() {
   const [headerRef, headerVisible] = useInView(0.2);
-  // Enhancement 4: track which step is open (default: step 0 open)
-  const [openStep, setOpenStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(0);
   const stepRefs = useRef([]);
 
   const handleTrackerClick = (idx) => {
-    setOpenStep(idx);
-    // Scroll to the detailed step row
+    setActiveStep(idx);
     const el = stepRefs.current[idx];
     if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-  };
-
-  const handleRowToggle = (idx) => {
-    setOpenStep((prev) => (prev === idx ? -1 : idx));
   };
 
   return (
@@ -329,7 +292,7 @@ export default function LaunchTimeline() {
       </div>
 
       {/* Enhancement 5: Timeline summary bar */}
-      <TimelineSummaryBar activeStep={openStep} onStepClick={handleTrackerClick} />
+      <TimelineSummaryBar activeStep={activeStep} onStepClick={handleTrackerClick} />
 
       {/* Mobile: Vertical Stepper */}
       <div className="sm:hidden relative pl-10 mb-12">
@@ -339,33 +302,26 @@ export default function LaunchTimeline() {
         />
         <div className="space-y-6">
           {launchTimelineSteps.map((step, idx) => {
-            const isActive = openStep === idx;
             return (
-              <button
+              <div
                 key={step.id}
-                type="button"
-                onClick={() => handleRowToggle(idx)}
-                className="relative flex items-start gap-4 w-full text-left border-none bg-transparent cursor-pointer"
+                className="relative flex items-start gap-4"
               >
                 <div
                   className="absolute -left-10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 z-10"
                   style={{
-                    background: isActive
-                      ? "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)"
-                      : "rgba(154,92,46,0.15)",
-                    boxShadow: isActive ? "0 2px 8px rgba(154,92,46,0.4)" : "none",
-                    transition: "all 0.3s ease",
+                    background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+                    boxShadow: "0 2px 8px rgba(154,92,46,0.4)",
                   }}
                 >
-                  <span className="font-black text-sm" style={{ color: isActive ? "#fff" : "#9a5c2e" }}>{step.number}</span>
+                  <span className="font-black text-sm" style={{ color: "#fff" }}>{step.number}</span>
                 </div>
                 <div
                   className="rounded-xl px-4 py-3 flex-1 overflow-hidden relative"
                   style={{
                     background: "rgba(255,255,255,0.9)",
-                    border: `1px solid ${isActive ? "rgba(154,92,46,0.3)" : "rgba(154,92,46,0.12)"}`,
-                    boxShadow: isActive ? "0 4px 16px rgba(111,67,31,0.1)" : "0 4px 12px rgba(111,67,31,0.06)",
-                    transition: "border 0.3s ease, box-shadow 0.3s ease",
+                    border: "1px solid rgba(154,92,46,0.12)",
+                    boxShadow: "0 4px 12px rgba(111,67,31,0.06)",
                   }}
                 >
                   <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "3px", background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)" }} />
@@ -373,7 +329,7 @@ export default function LaunchTimeline() {
                   <p className="text-sm font-bold text-foreground">{step.title}</p>
                   <p className="text-xs mt-0.5" style={{ color: "rgba(154,92,46,0.8)" }}>{step.duration}</p>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
@@ -391,12 +347,7 @@ export default function LaunchTimeline() {
         <div className="space-y-10 md:space-y-14">
           {launchTimelineSteps.map((step, idx) => (
             <div key={step.id} ref={(el) => (stepRefs.current[idx] = el)}>
-              <StepRow
-                step={step}
-                idx={idx}
-                isOpen={openStep === idx}
-                onToggle={() => handleRowToggle(idx)}
-              />
+              <StepRow step={step} idx={idx} />
             </div>
           ))}
         </div>
