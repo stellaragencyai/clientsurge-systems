@@ -24,6 +24,26 @@ export default function FinalCTA() {
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
             Book a free 15-minute demo. We will map out exactly where your business is leaking bookings and show you what an AI lead conversion system would look like for your specific situation — no obligation.
           </p>
+
+          {/* Enhancement 1: Live social proof numbers */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10">
+            {[
+              { value: "2x", label: "avg. booking rate increase" },
+              { value: "90s", label: "first response time" },
+              { value: "30 days", label: "avg. time to ROI" },
+            ].map((stat) => (
+              <div key={stat.label} className="flex flex-col items-center">
+                <span
+                  className="font-display text-3xl font-black"
+                  style={{ color: "#9a5c2e" }}
+                >
+                  {stat.value}
+                </span>
+                <span className="text-xs text-muted-foreground font-medium mt-0.5">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+
           <div
             className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80"
             style={{
@@ -35,7 +55,26 @@ export default function FinalCTA() {
           </div>
         </div>
 
-        <div className="max-w-3xl mx-auto text-center mt-10 relative z-10">
+        {/* Enhancement 2: Urgency strip above buttons */}
+        <div className="max-w-xl mx-auto mt-8 mb-2 relative z-10">
+          <div
+            className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold"
+            style={{
+              background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)",
+              border: "1.5px solid rgba(154,92,46,0.22)",
+            }}
+          >
+            <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+            </span>
+            <span style={{ color: "rgba(154,92,46,0.9)" }}>
+              Demo slots are limited — we only take on a few new clients each month
+            </span>
+          </div>
+        </div>
+
+        <div className="max-w-3xl mx-auto text-center mt-4 relative z-10">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               type="button"

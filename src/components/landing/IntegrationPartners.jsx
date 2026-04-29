@@ -62,23 +62,26 @@ const ScrollTrackIntegrationContext = ({ children }) => {
   return children(scrollY);
 };
 
-// Triple for extra-seamless loop
-const TRIPLED = [...INTEGRATIONS, ...INTEGRATIONS, ...INTEGRATIONS];
+// Double is enough — animation translates exactly one set width
+const DOUBLED = [...INTEGRATIONS, ...INTEGRATIONS];
+
+// Gap between items in px — must match the inline style below
+const ITEM_GAP = 72;
+const ITEM_WIDTH = 180;
 
 export default function IntegrationPartners() {
+  // Total width of one set = N items * (width + gap)
+  const oneSetWidth = INTEGRATIONS.length * (ITEM_WIDTH + ITEM_GAP);
+
   return (
     <section
       className="py-14 px-6 relative overflow-hidden"
-      style={{
-        background: "#ffffff",
-      }}
+      style={{ background: "#ffffff" }}
     >
-      {/* Subtle top/bottom border lines */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300/60 to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-slate-300/60 to-transparent pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative z-10">
-
         {/* Header */}
         <div className="text-center mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
@@ -90,98 +93,83 @@ export default function IntegrationPartners() {
               50+ Tools
             </span>
           </h2>
-
           <div className="flex items-center justify-center gap-3 mt-5 mb-5">
             <div style={{ height: "1px", width: "48px", background: "linear-gradient(to right, transparent, rgba(154,92,46,0.5))" }} />
             <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#9a5c2e" }} />
             <div style={{ height: "1px", width: "48px", background: "linear-gradient(to left, transparent, rgba(154,92,46,0.5))" }} />
           </div>
-
           <p className="text-muted-foreground text-base max-w-2xl mx-auto leading-relaxed">
-            Every tool you already rely on — plugged in, synced, and firing automatically the moment a lead comes in. Seamless integrations that work behind the scenes.
+            Every tool you already rely on — plugged in, synced, and firing automatically the moment a lead comes in.
           </p>
-
-
         </div>
 
-        {/* Infinite scroll marquee */}
-        <div
-          className="relative overflow-hidden"
-          style={{ padding: "28px 0 40px" }}
-
-        >
-          {/* Left fade */}
-          <div
-            className="absolute left-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to right, rgba(255,255,255,1) 0%, transparent 100%)" }}
-          />
-          <div
-            className="absolute right-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
-            style={{ background: "linear-gradient(to left, rgba(255,255,255,1) 0%, transparent 100%)" }}
-          />
+        {/* Infinite scroll marquee — proper pixel-based loop */}
+        <div className="relative overflow-hidden" style={{ padding: "28px 0 40px" }}>
+          {/* Edge fades */}
+          <div className="absolute left-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
+            style={{ background: "linear-gradient(to right, #ffffff 0%, transparent 100%)" }} />
+          <div className="absolute right-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
+            style={{ background: "linear-gradient(to left, #ffffff 0%, transparent 100%)" }} />
 
           <div
             className="flex items-center"
             style={{
               width: "max-content",
-              gap: "clamp(40px, 6vw, 80px)",
-              animation: `integrationScroll 28s linear infinite`,
+              gap: `${ITEM_GAP}px`,
+              animation: `integrationScroll 26s linear infinite`,
               willChange: "transform",
             }}
           >
-            {TRIPLED.map((integration, idx) => (
+            {DOUBLED.map((integration, idx) => (
               <a
                 key={idx}
                 href={integration.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                title={`Visit ${integration.name}`}
-                className="flex-shrink-0 group relative flex flex-col items-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg p-2"
-                style={{ cursor: "pointer" }}
+                title={integration.name}
+                className="flex-shrink-0 group relative flex flex-col items-center focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+                style={{ width: `${ITEM_WIDTH}px` }}
               >
                 <img
-                   src={integration.logo}
-                   alt={integration.name}
-                   loading="lazy"
-                   style={{
-                     height: "100px",
-                     width: "200px",
-                     objectFit: "contain",
-                     objectPosition: "center",
-                     transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease",
-                     filter: "brightness(1) contrast(1.1) saturate(1.1)",
-                     opacity: 1,
-                   }}
-                   onMouseEnter={(e) => {
-                     e.currentTarget.style.transform = "scale(1.2) translateY(-8px)";
-                     e.currentTarget.style.filter = "brightness(1.1) contrast(1.15) saturate(1.2) drop-shadow(0 8px 24px rgba(154,92,46,0.35))";
-                   }}
-                   onMouseLeave={(e) => {
-                     e.currentTarget.style.transform = "scale(1) translateY(0)";
-                     e.currentTarget.style.filter = "brightness(1) contrast(1.1) saturate(1.1)";
-                   }}
-                 />
-                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] font-bold text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap uppercase tracking-widest">
-                  {integration.description}
+                  src={integration.logo}
+                  alt={integration.name}
+                  loading="eager"
+                  decoding="async"
+                  style={{
+                    height: "72px",
+                    width: `${ITEM_WIDTH}px`,
+                    objectFit: "contain",
+                    objectPosition: "center",
+                    imageRendering: "auto",
+                    transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease",
+                    filter: "contrast(1.05) saturate(1.05)",
+                    display: "block",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.15) translateY(-6px)";
+                    e.currentTarget.style.filter = "contrast(1.1) saturate(1.15) drop-shadow(0 8px 20px rgba(154,92,46,0.3))";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1) translateY(0)";
+                    e.currentTarget.style.filter = "contrast(1.05) saturate(1.05)";
+                  }}
+                />
+                <span className="mt-2 text-[10px] font-semibold text-primary/60 group-hover:text-primary transition-colors uppercase tracking-widest">
+                  {integration.name}
                 </span>
               </a>
             ))}
           </div>
         </div>
-
-
-
       </div>
 
       <style>{`
         @keyframes integrationScroll {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(calc(-100% / 3)); }
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-${oneSetWidth}px); }
         }
         @media (prefers-reduced-motion: reduce) {
-          @keyframes integrationScroll {
-            0%, 100% { transform: translateX(0); }
-          }
+          @keyframes integrationScroll { 0%, 100% { transform: translateX(0); } }
         }
       `}</style>
     </section>

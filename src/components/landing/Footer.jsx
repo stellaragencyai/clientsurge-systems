@@ -71,10 +71,16 @@ export default function Footer() {
   ];
 
   return (
-    <footer 
-      className="bg-background/95 backdrop-blur-md border-t border-primary/10"
+    <footer
+      className="relative bg-background/98 backdrop-blur-md border-t border-primary/10"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
+      {/* Enhancement 1: Gradient top accent bar */}
+      <div
+        className="absolute inset-x-0 top-0 h-0.5 pointer-events-none"
+        style={{ background: "linear-gradient(90deg, transparent 0%, #9a5c2e 25%, #c8965c 50%, #9a5c2e 75%, transparent 100%)" }}
+      />
+
       {/* Main Footer Bar */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
         
@@ -170,17 +176,40 @@ export default function Footer() {
           </div>
         </div>
         
-        {/* Bottom Meta */}
-        <div className="border-t border-primary/10 px-4 md:px-6 py-4 text-center">
-          <p className="text-sm font-semibold text-foreground mb-3">
-            Ready to recover leads you've already lost? Most businesses recover their investment in 30 days.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-1.5 text-[9px] text-foreground/40">
-            <span>&copy; {new Date().getFullYear()} ClientSurge Systems</span>
-            <span className="text-foreground/20">·</span>
-            <a href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</a>
-            <span className="text-foreground/20">·</span>
-            <a href="/legal/terms" className="hover:text-foreground transition-colors">Terms</a>
+        {/* Enhancement 2: Rich bottom strip with mini-CTA + trust badges */}
+        <div
+          className="border-t border-primary/10 px-4 md:px-6 py-5"
+          style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.04) 0%, rgba(200,150,92,0.02) 100%)" }}
+        >
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            {/* Trust badges row */}
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+              {[
+                "🔒 No long-term contracts",
+                "⚡ Live in 5–7 days",
+                "💬 SMS + Email included",
+              ].map((badge) => (
+                <span
+                  key={badge}
+                  className="text-[10px] font-semibold px-3 py-1.5 rounded-full"
+                  style={{
+                    background: "rgba(154,92,46,0.07)",
+                    border: "1px solid rgba(154,92,46,0.14)",
+                    color: "rgba(154,92,46,0.85)",
+                  }}
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
+            {/* Copyright */}
+            <div className="flex flex-wrap items-center justify-center gap-1.5 text-[9px] text-foreground/40">
+              <span>&copy; {new Date().getFullYear()} ClientSurge Systems</span>
+              <span className="text-foreground/20">·</span>
+              <a href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</a>
+              <span className="text-foreground/20">·</span>
+              <a href="/legal/terms" className="hover:text-foreground transition-colors">Terms</a>
+            </div>
           </div>
         </div>
       </div>
