@@ -55,7 +55,7 @@ async function logSmsEvent(base44, leadId, status, messageId, errorMessage = nul
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id: leadId,
       context_id: leadId,
-      context_type: "website_lead",
+      context_type: "WebsiteLead",
       channel: "sms",
       direction: "outbound",
       event_type: status === "sent" ? "sms_sent" : "sms_failed",
