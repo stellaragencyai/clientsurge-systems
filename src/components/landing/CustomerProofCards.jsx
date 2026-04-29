@@ -87,7 +87,7 @@ const proofCards = [
     customerName: "Tom Bradley",
     customerRole: "Owner, Bradley Contracting",
     customerPhoto: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
-    quote: "Our follow-up system now runs on autopilot. Best investment we made.",
+    quote: "Our follow-up is finally consistent and our team is not chasing every lead by hand anymore.",
     industryColor: "from-orange-50 to-orange-100",
     industryBadgeColor: "text-orange-700 bg-orange-100 border-orange-200",
     featured: false,

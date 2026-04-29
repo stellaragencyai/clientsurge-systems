@@ -598,10 +598,12 @@ export function buildNurtureSequenceSchedulePreview(serviceConfig = {}) {
   const firstStep = steps[0] || null;
 
   return {
-    mode: "placeholder",
-    available: false,
-    label: "Scheduler Placeholder",
-    reason: "Live 14-day cron sequencing is not enabled yet. The admin test action triggers the first configured step only.",
+    mode: "manual_runner",
+    available: steps.length > 0,
+    label: "Manual / Cron Due-Step Runner",
+    reason: steps.length > 0
+      ? "The canonical due-step runner can process enrolled nurture steps now. A recurring scheduler or admin runner still needs to invoke it."
+      : "No nurture steps are configured yet, so the canonical due-step runner has nothing to process.",
     step_count: steps.length,
     first_step: firstStep,
   };

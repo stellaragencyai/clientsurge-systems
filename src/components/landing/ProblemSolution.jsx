@@ -20,7 +20,7 @@ const problems = [
   {
     problem: "No automated SMS or email nurture",
     stat: "80% of sales require 5+ follow-up touchpoints",
-    solution: "14-day automated nurture sequence keeps every lead warm without manual effort",
+    solution: "Pilot-configured nurture follow-up keeps more leads warm while the full scheduler remains in rollout",
     result: "14-day nurture",
   },
   {

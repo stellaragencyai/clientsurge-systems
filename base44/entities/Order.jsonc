@@ -212,6 +212,54 @@
         }
       }
     },
+    "legal_acceptance": {
+      "type": "object",
+      "title": "Legal Acceptance",
+      "properties": {
+        "accepted_at": {
+          "type": "string",
+          "title": "Accepted At"
+        },
+        "version": {
+          "type": "string",
+          "title": "Acceptance Version"
+        },
+        "accepted_by_name": {
+          "type": "string",
+          "title": "Accepted By Name"
+        },
+        "accepted_by_email": {
+          "type": "string",
+          "title": "Accepted By Email"
+        },
+        "ip_address": {
+          "type": "string",
+          "title": "IP Address"
+        },
+        "user_agent": {
+          "type": "string",
+          "title": "User Agent"
+        },
+        "documents": {
+          "type": "array",
+          "title": "Accepted Documents",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
     "stripe_session_id": {
       "type": "string",
       "title": "Stripe Session ID"

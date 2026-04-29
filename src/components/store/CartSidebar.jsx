@@ -2,6 +2,10 @@ import { useState } from "react";
 import { X, ShoppingCart, Trash2, ArrowRight, Lock } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
 import { base44 } from "@/api/base44Client";
+import {
+  CHECKOUT_LEGAL_DOCUMENTS,
+  CHECKOUT_LEGAL_VERSION,
+} from "@/lib/legalDocuments";
 
 export default function CartSidebar() {
   const {
@@ -18,12 +22,18 @@ export default function CartSidebar() {
     email: "",
     phone: "",
     business: "",
+    accepted_legal: false,
   });
   const [error, setError] = useState("");
 
   const handleCheckout = async () => {
     if (!form.name || !form.email || !form.business) {
       setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (!form.accepted_legal) {
+      setError("Please accept the legal terms before continuing to checkout.");
       return;
     }
 
@@ -45,6 +55,10 @@ export default function CartSidebar() {
         customer_email: form.email,
         customer_phone: form.phone,
         business_name: form.business,
+        legal_acceptance: {
+          accepted: true,
+          version: CHECKOUT_LEGAL_VERSION,
+        },
         success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${window.location.origin}/store`,
       });
@@ -300,6 +314,71 @@ export default function CartSidebar() {
                   />
                 </div>
               ))}
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: "10px",
+                  borderRadius: "14px",
+                  border: "1px solid rgba(154,92,46,0.12)",
+                  background: "rgba(255,255,255,0.86)",
+                  padding: "12px 14px",
+                  cursor: "pointer",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={form.accepted_legal}
+                  onChange={(event) => {
+                    setForm({
+                      ...form,
+                      accepted_legal: event.target.checked,
+                    });
+                    if (event.target.checked) {
+                      setError("");
+                    }
+                  }}
+                  disabled={step === "loading"}
+                  style={{
+                    marginTop: "2px",
+                    width: "15px",
+                    height: "15px",
+                    accentColor: "#9a5c2e",
+                    flexShrink: 0,
+                  }}
+                />
+                <span
+                  style={{
+                    fontSize: "11px",
+                    lineHeight: 1.65,
+                    color: "rgba(26,18,9,0.66)",
+                  }}
+                >
+                  I agree to the{" "}
+                  {CHECKOUT_LEGAL_DOCUMENTS.map((document, index) => (
+                    <span key={document.key}>
+                      <a
+                        href={document.path}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          color: "#9a5c2e",
+                          fontWeight: "700",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        {document.label}
+                      </a>
+                      {index === CHECKOUT_LEGAL_DOCUMENTS.length - 2
+                        ? " and "
+                        : index < CHECKOUT_LEGAL_DOCUMENTS.length - 2
+                        ? ", "
+                        : ""}
+                    </span>
+                  ))}
+                  . By continuing, you confirm you are authorized to purchase services for this business.
+                </span>
+              </label>
               {error ? (
                 <p
                   style={{

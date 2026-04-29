@@ -2,6 +2,7 @@ import { loadAdminSettings } from "./adminSettings.js";
 import { deriveIntegrationHealth } from "./integrationHealth.js";
 import { buildInstallSnapshot, LEAD_REACTIVATION_SEGMENTS } from "./installPipeline.js";
 import { buildNurtureSequenceSchedulePreview, listLeadReactivationTargets } from "./installRuntime.js";
+import { getServiceExecutionProfile } from "./canonicalAutomationRuntime.js";
 
 export const REMOTE_SETUP_SEQUENCE = [
   { step: 1, title: "Open paid order", detail: "Start in the paid install queue and open the selected order in the canonical install workspace." },
@@ -613,6 +614,10 @@ function getLatestMatchingEvent(events, predicate) {
     .sort((a, b) => new Date(b.created_date || 0).getTime() - new Date(a.created_date || 0).getTime())[0] || null;
 }
 
+function isProductionRuntimeEvent(event) {
+  return parseMetadataJson(event.metadata_json)?.production_runtime === true;
+}
+
 function formatActionTitleFromField(field, label) {
   if (label) {
     if (/^(Add|Enable|Save|Set|Choose|Configure)\b/.test(label)) {
@@ -750,6 +755,8 @@ function deriveServiceRuntimeSummary(events, orderId, serviceKey) {
   const serviceEvents = events.filter(
     (event) => event.order_id === orderId && event.service_key === serviceKey
   );
+  const productionEvents = serviceEvents.filter(isProductionRuntimeEvent);
+  const nonProductionEvents = serviceEvents.filter((event) => !isProductionRuntimeEvent(event));
 
   const latestRuntimeEvent = getLatestMatchingEvent(
     serviceEvents,
@@ -788,11 +795,60 @@ function deriveServiceRuntimeSummary(events, orderId, serviceKey) {
   const latestReviewTriggerMetadata = latestReviewTriggerEvent
     ? parseMetadataJson(latestReviewTriggerEvent.metadata_json)
     : null;
+  const latestProductionRuntimeEvent = getLatestMatchingEvent(
+    productionEvents,
+    (event) =>
+      [
+        "runtime_attempt_started",
+        "runtime_attempt_blocked",
+        "provider_send_attempted",
+        "provider_send_succeeded",
+        "provider_send_failed",
+      ].includes(event.event_type)
+  );
+  const latestProductionSuccessEvent = getLatestMatchingEvent(
+    productionEvents,
+    (event) => event.event_type === "provider_send_succeeded"
+  );
+  const latestProductionBlockedEvent = getLatestMatchingEvent(
+    productionEvents,
+    (event) => event.event_type === "runtime_attempt_blocked"
+  );
+  const latestProductionFailedEvent = getLatestMatchingEvent(
+    productionEvents,
+    (event) => event.event_type === "provider_send_failed"
+  );
+  const latestTestSuccessEvent = getLatestMatchingEvent(
+    nonProductionEvents,
+    (event) => event.event_type === "provider_send_succeeded"
+  );
+  const latestTestRuntimeEvent = getLatestMatchingEvent(
+    nonProductionEvents,
+    (event) =>
+      [
+        "runtime_attempt_started",
+        "runtime_attempt_blocked",
+        "provider_send_attempted",
+        "provider_send_succeeded",
+        "provider_send_failed",
+        "booking_simulation_created",
+        "review_request_trigger_simulated",
+        "lead_reactivation_batch_completed",
+      ].includes(event.event_type)
+  );
 
   return {
     latest_runtime_event_type: latestRuntimeEvent?.event_type || null,
     latest_runtime_at: latestRuntimeEvent?.created_date || null,
     latest_runtime_status: latestRuntimeEvent?.status || null,
+    latest_production_runtime_event_type: latestProductionRuntimeEvent?.event_type || null,
+    latest_production_runtime_at: latestProductionRuntimeEvent?.created_date || null,
+    latest_production_runtime_status: latestProductionRuntimeEvent?.status || null,
+    latest_production_success_at: latestProductionSuccessEvent?.created_date || null,
+    latest_production_blocked_at: latestProductionBlockedEvent?.created_date || null,
+    latest_production_failed_at: latestProductionFailedEvent?.created_date || null,
+    latest_test_runtime_at: latestTestRuntimeEvent?.created_date || null,
+    latest_test_success_at: latestTestSuccessEvent?.created_date || null,
     latest_booking_simulation_at: getLatestMatchingEvent(
       serviceEvents,
       (event) => event.event_type === "booking_simulation_created"
@@ -804,6 +860,7 @@ function deriveServiceRuntimeSummary(events, orderId, serviceKey) {
     latest_success_at: latestSuccessEvent?.created_date || null,
     latest_blocked_at: latestBlockedEvent?.created_date || null,
     latest_failed_at: latestFailedEvent?.created_date || null,
+    successful_production_exists: Boolean(latestProductionSuccessEvent),
     successful_test_exists: Boolean(latestSuccessEvent),
   };
 }
@@ -1528,6 +1585,7 @@ export async function buildRemoteSetupWorkspace({ base44, order, orderEvents = [
 
   const services = await Promise.all(snapshot.serviceStates.map(async (serviceState) => {
     const runtimeSummary = deriveServiceRuntimeSummary(orderEvents, order.id, serviceState.service_key);
+    const executionProfile = getServiceExecutionProfile(serviceState.service_key);
     const requiredActionSummary = deriveServiceRequiredActions({
       serviceState,
       providerReadiness,
@@ -1594,6 +1652,7 @@ export async function buildRemoteSetupWorkspace({ base44, order, orderEvents = [
         display_name: serviceState.display_name,
         providers: [],
       },
+      execution_profile: executionProfile,
       config_suggestions: buildConfigSuggestions(order, serviceState, {
         providerReadiness,
         reactivationSegmentInsights,
@@ -1601,16 +1660,21 @@ export async function buildRemoteSetupWorkspace({ base44, order, orderEvents = [
       operator_summary: buildServiceOperatorSummary(serviceState, requiredActionSummary.actions),
       timeline_relevance: {
         latest_event_type:
+          runtimeSummary.latest_production_runtime_event_type ||
           runtimeSummary.latest_runtime_event_type ||
           (runtimeSummary.latest_batch_summary_at ? "lead_reactivation_batch_completed" : null) ||
           (runtimeSummary.latest_booking_simulation_at ? "booking_simulation_created" : null) ||
           (runtimeSummary.latest_review_trigger_at ? "review_request_trigger_simulated" : null),
         latest_event_at:
+          runtimeSummary.latest_production_runtime_at ||
           runtimeSummary.latest_runtime_at ||
           runtimeSummary.latest_batch_summary_at ||
           runtimeSummary.latest_booking_simulation_at ||
           runtimeSummary.latest_review_trigger_at ||
           null,
+        latest_production_success_at: runtimeSummary.latest_production_success_at,
+        latest_test_success_at: runtimeSummary.latest_test_success_at,
+        successful_production_exists: runtimeSummary.successful_production_exists,
         successful_test_exists: runtimeSummary.successful_test_exists,
       },
     };

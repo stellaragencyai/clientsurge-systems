@@ -8,9 +8,9 @@ const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
 const checklist = [
   "Every lead hears from you within 60 seconds — even after hours",
   "Missed calls instantly turn into text conversations, not dead ends",
-  "14 days of automated follow-up keeps leads warm without manual work",
-  "Guided booking flow converts ready prospects into confirmed appointments",
-  "Fully built and live in 5–7 days — we handle everything",
+  "Pilot-configured follow-up keeps leads warm after the first touch",
+  "Guided booking handoff helps ready prospects reach the next step",
+  "Operator-led install with canonical testing before go-live",
 ];
 
 export default function Hero() {
@@ -175,7 +175,7 @@ export default function Hero() {
               maxWidth: "34rem",
             }}
           >
-            ClientSurge installs AI-powered conversion systems that capture leads, respond instantly, follow up automatically, and turn more of your existing demand into booked clients.
+            ClientSurge installs AI-powered conversion systems that capture leads, respond quickly, support follow-up, and turn more of your existing demand into booked clients without pretending every service is already fully automated.
           </p>
 
           <div
@@ -323,7 +323,7 @@ export default function Hero() {
               letterSpacing: "0.04em",
             }}
           >
-            No contracts · Most clients go live in 2–3 business days
+            No contracts · Pilot launch timing depends on setup scope and provider readiness
           </p>
         </div>
 

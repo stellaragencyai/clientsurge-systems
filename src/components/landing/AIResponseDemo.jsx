@@ -411,7 +411,7 @@ Return a JSON object with:
               </button>
             )}
             {phase === "idle" && (
-              <p className="text-xs text-foreground/40">This is the same AI that responds to your leads 24/7, fully automated.</p>
+              <p className="text-xs text-foreground/40">This demo shows the response style used in our pilot-configured lead response flow. Final runtime depends on the service you buy and how it is installed.</p>
             )}
           </div>
         </div>

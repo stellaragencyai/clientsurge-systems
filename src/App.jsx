@@ -16,6 +16,10 @@ import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import PageNotFound from "./lib/PageNotFound";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
+import {
+  isPublicPath,
+  NOINDEX_PREFIXES,
+} from "@/lib/appRouteConfig";
 
 // Initialize auto-tracking on app load
 if (typeof window !== "undefined") {
@@ -42,52 +46,6 @@ import AdminAutomation from "./pages/AdminAutomation";
 import ClientDashboard from "./pages/ClientDashboard";
 
 const Store = lazy(() => import("./pages/Store"));
-
-const PUBLIC_PATHS = [
-  "/",
-  "/store",
-  "/order-success",
-  "/med-spa",
-  "/dental",
-  "/hvac",
-  "/roofing",
-  "/contractors",
-  "/chiropractic",
-  "/start",
-  "/book",
-  "/book-demo",
-  "/industries",
-  "/pricing",
-  "/faq",
-  "/our-system",
-  "/testimonials",
-  "/privacy-policy",
-  "/terms",
-  "/login",
-  "/success",
-  "/legal",
-  "/contact",
-  "/leads/capture",
-  "/onboarding",
-  "/test-option-1",
-  "/test-option-2",
-  "/test-option-3",
-  "/preview-idea-1",
-  "/preview-idea-2",
-];
-
-const NOINDEX_PREFIXES = [
-  "/admin",
-  "/dashboard",
-  "/client-portal",
-  "/lead-intelligence",
-  "/medspa-dashboard",
-  "/sam",
-  "/success",
-];
-
-const isPublicPath = (pathname) =>
-  PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
 function SectionRedirect({ hash }) {
   const navigate = useNavigate();
@@ -180,11 +138,6 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/test-option-1" element={<Navigate to="/" replace />} />
-      <Route path="/test-option-2" element={<Navigate to="/" replace />} />
-      <Route path="/test-option-3" element={<Navigate to="/" replace />} />
-      <Route path="/preview-idea-1" element={<Navigate to="/" replace />} />
-      <Route path="/preview-idea-2" element={<Navigate to="/" replace />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />

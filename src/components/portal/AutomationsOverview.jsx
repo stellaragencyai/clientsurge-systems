@@ -1,177 +1,123 @@
-import { useState, useMemo } from "react";
-import { ToggleLeft, ToggleRight, CheckCircle2, AlertCircle, Clock, Zap } from "lucide-react";
+import { useMemo } from "react";
+import { CheckCircle2, Clock, ShieldCheck, Wrench } from "lucide-react";
 
-const SAMPLE_AUTOMATIONS = [
-  {
-    id: 1,
-    name: "Instant SMS Response",
-    type: "sms",
-    description: "Automatic text reply when leads call",
-    status: "active",
-    triggersPerDay: 24,
-    successRate: 98,
-    lastTriggered: "2 hours ago",
+const MODE_STYLES = {
+  production_real: {
+    label: "Production Real",
+    tone: "bg-green-50 text-green-700",
   },
-  {
-    id: 2,
-    name: "Missed Call Recovery",
-    type: "sms",
-    description: "Follow-up text after missed calls",
-    status: "active",
-    triggersPerDay: 8,
-    successRate: 95,
-    lastTriggered: "45 minutes ago",
+  manual_runner: {
+    label: "Manual / Cron Runner",
+    tone: "bg-amber-50 text-amber-700",
   },
-  {
-    id: 3,
-    name: "Nurture Email Sequence",
-    type: "email",
-    description: "14-day email follow-up campaign",
-    status: "active",
-    triggersPerDay: 16,
-    successRate: 92,
-    lastTriggered: "1 hour ago",
+  manual_triggered: {
+    label: "Manual Triggered",
+    tone: "bg-blue-50 text-blue-700",
   },
-  {
-    id: 4,
-    name: "Booking Reminder",
-    type: "email",
-    description: "24-hour appointment confirmation",
-    status: "inactive",
-    triggersPerDay: 0,
-    successRate: 89,
-    lastTriggered: "3 days ago",
+  placeholder: {
+    label: "Placeholder / Handoff",
+    tone: "bg-slate-100 text-slate-600",
   },
-  {
-    id: 5,
-    name: "Reactivation Campaign",
-    type: "sms",
-    description: "Win-back outreach for inactive leads",
-    status: "active",
-    triggersPerDay: 5,
-    successRate: 78,
-    lastTriggered: "12 hours ago",
-  },
-];
-
-const TYPE_CONFIG = {
-  sms: { label: "SMS", color: "text-blue-600", bg: "bg-blue-50" },
-  email: { label: "Email", color: "text-amber-600", bg: "bg-amber-50" },
 };
 
-export default function AutomationsOverview() {
-  const [automations, setAutomations] = useState(SAMPLE_AUTOMATIONS);
+function StatusPill({ value }) {
+  const tone =
+    value === "Live"
+      ? "bg-green-50 text-green-700"
+      : value === "Testing"
+      ? "bg-blue-50 text-blue-700"
+      : value === "Configuring"
+      ? "bg-amber-50 text-amber-700"
+      : "bg-slate-100 text-slate-600";
 
-  const toggleAutomation = (id) => {
-    setAutomations((prev) =>
-      prev.map((auto) =>
-        auto.id === id
-          ? { ...auto, status: auto.status === "active" ? "inactive" : "active" }
-          : auto
-      )
+  return (
+    <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${tone}`}>
+      {value || "Unknown"}
+    </span>
+  );
+}
+
+export default function AutomationsOverview({ services = [] }) {
+  const summary = useMemo(() => ({
+    live: services.filter((service) => service.install_status === "Live").length,
+    productionReal: services.filter((service) => service.execution_profile?.mode === "production_real").length,
+    operatorManaged: services.filter((service) => ["manual_runner", "manual_triggered"].includes(service.execution_profile?.mode)).length,
+  }), [services]);
+
+  if (!services.length) {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground">
+        No purchased automation services are linked to this portal yet.
+      </div>
     );
-  };
-
-  const activeCount = useMemo(() => automations.filter((a) => a.status === "active").length, [automations]);
-  const totalTriggers = useMemo(() => automations.reduce((sum, a) => sum + a.triggersPerDay, 0), [automations]);
-  const avgSuccessRate = useMemo(() => {
-    const activeAutomations = automations.filter((a) => a.status === "active");
-    return activeAutomations.length
-      ? Math.round(activeAutomations.reduce((sum, a) => sum + a.successRate, 0) / activeAutomations.length)
-      : 0;
-  }, [automations]);
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header Stats */}
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="bg-card border border-border rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Active Automations</p>
-            <Zap className="w-4 h-4 text-primary" />
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Live Services</p>
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
           </div>
-          <p className="text-3xl font-bold text-foreground">{activeCount}</p>
-          <p className="text-xs text-muted-foreground mt-1">of {automations.length} configured</p>
+          <p className="text-3xl font-bold text-foreground">{summary.live}</p>
+          <p className="mt-1 text-xs text-muted-foreground">currently marked Live in the install workspace</p>
         </div>
-
-        <div className="bg-card border border-border rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Daily Triggers</p>
-            <Clock className="w-4 h-4 text-primary" />
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Production Triggers</p>
+            <ShieldCheck className="h-4 w-4 text-primary" />
           </div>
-          <p className="text-3xl font-bold text-foreground">{totalTriggers}</p>
-          <p className="text-xs text-muted-foreground mt-1">automated actions per day</p>
+          <p className="text-3xl font-bold text-foreground">{summary.productionReal}</p>
+          <p className="mt-1 text-xs text-muted-foreground">services with a real production trigger path</p>
         </div>
-
-        <div className="bg-card border border-border rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Avg Success Rate</p>
-            <CheckCircle2 className="w-4 h-4 text-green-600" />
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Operator Managed</p>
+            <Wrench className="h-4 w-4 text-amber-600" />
           </div>
-          <p className="text-3xl font-bold text-foreground">{avgSuccessRate}%</p>
-          <p className="text-xs text-muted-foreground mt-1">across active automations</p>
+          <p className="text-3xl font-bold text-foreground">{summary.operatorManaged}</p>
+          <p className="mt-1 text-xs text-muted-foreground">services that still require manual runs or approval</p>
         </div>
       </div>
 
-      {/* Automations List */}
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-border">
-          <h3 className="font-semibold text-foreground">Your Automations</h3>
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="border-b border-border px-6 py-4">
+          <h3 className="font-semibold text-foreground">Purchased Services</h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            This portal shows canonical install status and runtime mode only. It does not simulate automation activity.
+          </p>
         </div>
 
         <div className="divide-y divide-border/50">
-          {automations.map((automation) => (
-            <div
-              key={automation.id}
-              className="p-6 hover:bg-muted/30 transition-colors flex items-start justify-between gap-4"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${TYPE_CONFIG[automation.type].bg}`}>
-                    {TYPE_CONFIG[automation.type].label}
-                  </span>
-                  <span
-                    className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                      automation.status === "active"
-                        ? "bg-green-50 text-green-700"
-                        : "bg-slate-100 text-slate-600"
-                    }`}
-                  >
-                    {automation.status === "active" ? "Active" : "Inactive"}
-                  </span>
-                </div>
-                <h4 className="font-semibold text-foreground mb-1">{automation.name}</h4>
-                <p className="text-sm text-muted-foreground mb-3">{automation.description}</p>
-
-                <div className="flex flex-wrap gap-4 text-xs">
-                  <div>
-                    <span className="text-muted-foreground">Triggers/day:</span>{" "}
-                    <span className="font-semibold text-foreground">{automation.triggersPerDay}</span>
+          {services.map((service) => {
+            const mode = MODE_STYLES[service.execution_profile?.mode] || MODE_STYLES.placeholder;
+            return (
+              <div key={service.service_key} className="p-6">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex flex-wrap items-center gap-2">
+                      <StatusPill value={service.install_status} />
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${mode.tone}`}>
+                        {mode.label}
+                      </span>
+                    </div>
+                    <h4 className="font-semibold text-foreground">{service.display_name}</h4>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {service.execution_profile?.trigger_label || "No runtime trigger recorded."}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {service.execution_profile?.trigger_detail || "Production runtime details are not available for this service yet."}
+                    </p>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Success rate:</span>{" "}
-                    <span className="font-semibold text-foreground">{automation.successRate}%</span>
-                  </div>
-                  <div>
-                    <span className="text-muted-foreground">Last triggered:</span>{" "}
-                    <span className="font-semibold text-foreground">{automation.lastTriggered}</span>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Clock className="h-3.5 w-3.5" />
+                    Access: {service.service_access_status || "active"}
                   </div>
                 </div>
               </div>
-
-              <button
-                onClick={() => toggleAutomation(automation.id)}
-                className="flex-shrink-0 mt-1 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg p-1"
-                title={`Toggle ${automation.name}`}
-              >
-                {automation.status === "active" ? (
-                  <ToggleRight className="w-7 h-7 text-green-600" />
-                ) : (
-                  <ToggleLeft className="w-7 h-7 text-muted-foreground" />
-                )}
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

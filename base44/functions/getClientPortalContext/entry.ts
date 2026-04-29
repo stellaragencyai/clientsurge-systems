@@ -2,6 +2,7 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
 import { buildInstallSnapshot } from "../_shared/installPipeline.js";
 import { buildSubscriptionSummary } from "../_shared/subscriptionSync.js";
+import { getServiceExecutionProfile } from "../_shared/canonicalAutomationRuntime.js";
 
 Deno.serve(async (req) => {
   try {
@@ -67,12 +68,15 @@ Deno.serve(async (req) => {
             onboarding_client_id: resolution.order.onboarding_client_id,
             stripe_subscription_id: resolution.order.stripe_subscription_id || null,
             subscription_status: resolution.order.subscription_status || "",
+            billing_status: resolution.order.billing_status || "",
             current_period_end: resolution.order.current_period_end || null,
             plan_type: resolution.order.plan_type || "",
             services: snapshot.serviceStates.map((service) => ({
               service_key: service.service_key,
               display_name: service.display_name,
               install_status: service.install_status,
+              service_access_status: service.service_access_status || "active",
+              execution_profile: getServiceExecutionProfile(service.service_key),
             })),
           };
         })()
@@ -92,6 +96,7 @@ Deno.serve(async (req) => {
             stripe_subscription_id: resolution.order.stripe_subscription_id || null,
             plan_type: resolution.order.plan_type || "",
             status: resolution.order.subscription_status || "",
+            billing_status: resolution.order.billing_status || resolution.order.subscription_status || "",
             current_period_start: resolution.order.current_period_start || null,
             current_period_end: resolution.order.current_period_end || null,
             services_included: resolution.order.pricing_summary?.selected_service_keys || [],

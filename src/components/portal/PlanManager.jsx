@@ -1,25 +1,16 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { CheckCircle2, ArrowRight, Loader2, CircleAlert } from "lucide-react";
+import { PACKAGE_OFFERS, formatCurrency } from "@/lib/aiProducts";
+import { buildBillingSummary, formatBillingDate } from "@/lib/billingSummary";
 
-const PLANS = [
-  {
-    name: "Starter System",
-    monthly: "$197/mo",
-    features: ["Instant lead response", "AI booking handoff"],
-  },
-  {
-    name: "Growth System",
-    monthly: "$349/mo",
-    badge: "Most Popular",
-    features: ["Starter + missed-call text-back", "14-day nurture sequence"],
-  },
-  {
-    name: "Pro System",
-    monthly: "$469/mo",
-    features: ["Growth + lead reactivation", "Review request automation"],
-  },
-];
+const PLANS = PACKAGE_OFFERS.map((offer) => ({
+  name: offer.name,
+  monthly: `$${formatCurrency(offer.monthly_total)}/mo`,
+  setup: `$${formatCurrency(offer.setup_total)} setup`,
+  badge: offer.badge,
+  features: (offer.display_features || offer.features).slice(0, 3),
+}));
 
 const PLAN_RANK = {
   "Starter System": 1,
@@ -27,13 +18,9 @@ const PLAN_RANK = {
   "Pro System": 3,
 };
 
-function formatDate(value) {
-  if (!value) return "Unavailable";
-  return new Date(value).toLocaleDateString();
-}
-
 export default function PlanManager({ project, subscription, onUpdated }) {
-  const currentPlan = subscription?.plan_type || project.plan;
+  const billing = buildBillingSummary({ project, subscription });
+  const currentPlan = billing.currentPlan;
   const [selected, setSelected] = useState(null);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState("");
@@ -79,8 +66,8 @@ export default function PlanManager({ project, subscription, onUpdated }) {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <SummaryCard label="Billing Status" value={subscription?.status || "Unavailable"} />
-        <SummaryCard label="Renews" value={formatDate(subscription?.current_period_end)} />
+        <SummaryCard label="Billing Status" value={billing.billingStatus || "Unavailable"} />
+        <SummaryCard label="Renews" value={formatBillingDate(billing.renewalDate)} />
         <SummaryCard label="Services Included" value={String(subscription?.services_included?.length || 0)} />
         <SummaryCard label="Plan Requests" value={subscription?.change_request_status || "None"} />
       </div>
@@ -108,6 +95,7 @@ export default function PlanManager({ project, subscription, onUpdated }) {
                 {plan.badge && !isCurrent && <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">{plan.badge}</span>}
               </div>
               <p className="text-sm font-semibold text-primary mb-3">{plan.monthly}</p>
+              <p className="text-[11px] text-muted-foreground mb-3">{plan.setup}</p>
               <ul className="space-y-1.5">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2">
@@ -128,7 +116,7 @@ export default function PlanManager({ project, subscription, onUpdated }) {
               Request plan change to <span className="text-primary">{selected}</span>
             </p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              This only creates an operator-reviewed request. Billing changes stay manual until approved.
+              {billing.manualChangeMessage}
             </p>
           </div>
           <button

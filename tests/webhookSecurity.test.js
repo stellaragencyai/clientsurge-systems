@@ -111,6 +111,8 @@ function createFakeBase44(orderOverrides = {}, eventOverrides = []) {
         total_setup: 494,
         total_monthly: 164,
         payment_status: "pending",
+        subscription_status: "active",
+        billing_status: "active",
         order_status: "pending_payment",
         ...orderOverrides,
       },
@@ -118,6 +120,7 @@ function createFakeBase44(orderOverrides = {}, eventOverrides = []) {
     Client: new InMemoryCollection(),
     ClientProject: new InMemoryCollection(),
     OnboardingClient: new InMemoryCollection(),
+    Leads: new InMemoryCollection(),
     CommunicationEvent: new InMemoryCollection(eventOverrides),
   };
 
@@ -291,6 +294,18 @@ test("canonical runtime and message-status behavior still works for trusted Twil
     nextStatus: "Testing",
     now: "2026-04-22T12:12:00.000Z",
   });
+  await entities.Order.update(order.id, {
+    items: order.items.map((item) =>
+      item.service_key === "missed_call_text_back"
+        ? {
+            ...item,
+            install_status: "Live",
+            service_access_status: "active",
+            status: "live",
+          }
+        : item
+    ),
+  });
 
   const messageStatusData = new FormData();
   messageStatusData.set("MessageSid", "SM_status");
@@ -360,6 +375,63 @@ test("canonical runtime and message-status behavior still works for trusted Twil
   assert.ok(
     entities.CommunicationEvent.records.some(
       (event) => event.event_type === "provider_send_succeeded" && event.service_key === "missed_call_text_back"
+    )
+  );
+});
+
+test("trusted Twilio missed-call path stays blocked until the service is Live", async () => {
+  const { base44, entities } = createFakeBase44({
+    subscription_status: "active",
+    billing_status: "active",
+  });
+
+  let order = await entities.Order.get("order_1");
+  await initializePaidOrderInstallPipeline({
+    base44,
+    order,
+    stripeCustomerId: "cus_123",
+    now: "2026-04-22T12:05:00.000Z",
+  });
+
+  order = await entities.Order.get("order_1");
+  order = await updateOrderInstallConfiguration({
+    base44,
+    order,
+    patch: buildCompleteConfigPatch(),
+    now: "2026-04-22T12:08:00.000Z",
+  });
+  order = await updateTrackedServiceInstallStatus({
+    base44,
+    order,
+    serviceKey: "missed_call_text_back",
+    nextStatus: "Configuring",
+    now: "2026-04-22T12:10:00.000Z",
+  });
+  order = await updateTrackedServiceInstallStatus({
+    base44,
+    order,
+    serviceKey: "missed_call_text_back",
+    nextStatus: "Testing",
+    now: "2026-04-22T12:12:00.000Z",
+  });
+
+  const callStatusData = new FormData();
+  callStatusData.set("CallSid", "CA_blocked");
+  callStatusData.set("CallStatus", "no-answer");
+  callStatusData.set("To", "+16025550999");
+  callStatusData.set("From", "+16025550077");
+
+  const result = await handleTrustedTwilioStatusWebhook({
+    base44,
+    formData: callStatusData,
+  });
+
+  assert.equal(result.success, true);
+  assert.equal(result.blocked, true);
+  assert.equal(result.reason, "service_not_live");
+  assert.ok(
+    entities.CommunicationEvent.records.some(
+      (event) => event.event_type === "runtime_attempt_blocked" && event.service_key === "missed_call_text_back"
     )
   );
 });

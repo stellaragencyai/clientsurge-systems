@@ -10,8 +10,8 @@ const reasons = [
   },
   {
     icon: Rocket,
-    title: "Live in Days",
-    desc: "Running within 5-7 business days. We handle the entire build.",
+    title: "Pilot Launch Process",
+    desc: "Operator-led setup, testing, and QA before anything moves live.",
   },
   {
     icon: Fingerprint,
@@ -21,7 +21,7 @@ const reasons = [
   {
     icon: EyeOff,
     title: "Invisible to Your Team",
-    desc: "Works silently in the background. No training. It just runs.",
+    desc: "When a service is ready, it should feel easy for your team. We do not call it live until canonical tests pass.",
   },
   {
     icon: Hammer,
@@ -44,14 +44,14 @@ const platformItems = [
 
 const systemItems = [
   "Fully built and managed for you",
-  "Live within 5-7 days",
-  "Runs 24/7 automatically",
+  "Launch timing depends on install and provider readiness",
+  "Manual QA before go-live",
   "Designed to increase bookings",
 ];
 
 const stats = [
   { value: "< 60s", label: "Lead Response Time" },
-  { value: "5-7", label: "Days to Go Live" },
+  { value: "Pilot", label: "Launch Model" },
   { value: "2-5x", label: "More Bookings" },
   { value: "30 Day", label: "Money-Back Guarantee" },
 ];
@@ -101,7 +101,7 @@ export default function WhyUs() {
             Stop Paying for Tools. Start Getting Results.
           </h2>
           <p className="text-lg text-foreground/65 max-w-2xl mx-auto leading-relaxed">
-            We don't hand you software to figure out. We build, install, and run the system - so you get more bookings without lifting a finger.
+            We do not hand you software to figure out. We build and install the system with operator review, then move it live only after the canonical setup and test flow passes.
           </p>
         </div>
 
@@ -202,7 +202,7 @@ export default function WhyUs() {
           </div>
           <div className="px-6 py-4 text-center" style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 60%,#7a4825 100%)" }}>
             <p className="text-xs font-bold uppercase tracking-widest text-amber-200/60 mb-0.5">After That</p>
-            <p className="text-sm font-bold text-amber-100">Everything Runs on Autopilot</p>
+            <p className="text-sm font-bold text-amber-100">Go Live Only After Canonical QA</p>
           </div>
         </div>
 

@@ -7,6 +7,8 @@ import {
   handleInboundReplyStop,
   runMissedCallInitialResponse,
 } from "./missedCallRecovery.js";
+import { RuntimeExecutionError } from "./installRuntime.js";
+import { assertProductionServiceReady } from "./canonicalAutomationRuntime.js";
 
 export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
   const messageId = formData.get("MessageSid");
@@ -87,6 +89,36 @@ export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
   }
 
   const now = new Date().toISOString();
+  try {
+    await assertProductionServiceReady({
+      base44,
+      order,
+      serviceKey: "missed_call_text_back",
+      runtimeType: "missed_call_initial_response",
+      triggerSource: "twilio_missed_call_webhook",
+      recipientPhone: fromPhone,
+      requirePhone: true,
+      now,
+      extraMetadata: {
+        call_sid: callSid,
+        call_status: callStatus,
+      },
+    });
+  } catch (error) {
+    if (error instanceof RuntimeExecutionError) {
+      return {
+        success: true,
+        blocked: true,
+        reason: error.code || "runtime_blocked",
+        handled_as: "call_status",
+        call_status: callStatus,
+        call_sid: callSid,
+      };
+    }
+
+    throw error;
+  }
+
   const { lead, created, duplicatePrevented } = await createOrReuseMissedCallLead({
     base44,
     order,
@@ -98,7 +130,7 @@ export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
     now,
   });
 
-  await runMissedCallInitialResponse({
+  const runtimeResult = await runMissedCallInitialResponse({
     base44,
     order,
     lead,
@@ -114,6 +146,7 @@ export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
     duplicate_prevented: duplicatePrevented,
     call_status: callStatus,
     call_sid: callSid,
+    runtime_result: runtimeResult || null,
   };
 }
 

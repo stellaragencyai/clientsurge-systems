@@ -122,7 +122,7 @@ export default function ClientProjectsPanel() {
 
   return (
     <div className="space-y-4">
-      <InstallQueuePanel />
+      <InstallQueuePanel showWorkspace={false} />
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>

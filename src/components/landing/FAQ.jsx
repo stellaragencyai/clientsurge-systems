@@ -25,7 +25,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "How fast can I get set up?",
-  a: "Most clients are fully live within 5-7 business days. We do the work. You just need to show up for one onboarding call.",
+  a: "Pilot install timing depends on provider readiness, configuration complexity, and manual QA. We review the realistic launch plan with you before anything is marked live.",
   category: "setup"
 },
 {
@@ -55,7 +55,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "How much time will I need to spend managing this?",
-  a: "Almost none. The system runs on autopilot. You check in weekly to review results, and we handle all updates and optimization. No learning curve and no training required for your team.",
+  a: "Very little once a service is live, but some services are still pilot or manual-review offerings. We handle setup and QA, and we tell you clearly when something still needs operator involvement.",
   category: "support"
 },
 {

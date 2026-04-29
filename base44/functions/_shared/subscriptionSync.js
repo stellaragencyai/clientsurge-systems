@@ -113,6 +113,7 @@ function buildSubscriptionEvent({
   messageBody,
   status = "processed",
   metadata = {},
+  providerMessageId = "",
 }) {
   return buildCommunicationEvent({
     order,
@@ -121,6 +122,7 @@ function buildSubscriptionEvent({
     status,
     subject,
     message_body: messageBody,
+    provider_message_id: providerMessageId || undefined,
     metadata: {
       context_type: "subscription_sync",
       subscription_id: subscriptionRecord?.id || null,
@@ -380,6 +382,7 @@ export async function syncSubscriptionFromStripe({
   stripeSubscription,
   eventType,
   fallbackOrderId = "",
+  sourceEventId = "",
   now = new Date().toISOString(),
 }) {
   const order = await resolveOrderForSubscription({
@@ -410,17 +413,26 @@ export async function syncSubscriptionFromStripe({
     now,
   });
 
-  await base44.asServiceRole.entities.CommunicationEvent.create(
-    buildSubscriptionEvent({
-      order: updatedOrder,
-      subscriptionRecord,
-      subject: `Subscription ${subscriptionRecord.status}`,
-      messageBody: `Stripe ${eventType} synced ${subscriptionRecord.plan_type || "subscription"} as ${subscriptionRecord.status}.`,
-      metadata: {
-        stripe_event_type: eventType,
-      },
-    })
-  );
+  const existingEvent = sourceEventId
+    ? (await base44.asServiceRole.entities.CommunicationEvent.filter({
+        provider_message_id: sourceEventId,
+      }))[0]
+    : null;
+
+  if (!existingEvent) {
+    await base44.asServiceRole.entities.CommunicationEvent.create(
+      buildSubscriptionEvent({
+        order: updatedOrder,
+        subscriptionRecord,
+        subject: `Subscription ${subscriptionRecord.status}`,
+        messageBody: `Stripe ${eventType} synced ${subscriptionRecord.plan_type || "subscription"} as ${subscriptionRecord.status}.`,
+        metadata: {
+          stripe_event_type: eventType,
+        },
+        providerMessageId: sourceEventId,
+      })
+    );
+  }
 
   return {
     success: true,
@@ -441,6 +453,7 @@ export function buildSubscriptionSummary(subscription) {
     stripe_subscription_id: subscription.stripe_subscription_id || null,
     plan_type: subscription.plan_type || "",
     status: subscription.status || "",
+    billing_status: subscription.status || "",
     current_period_start: subscription.current_period_start || null,
     current_period_end: subscription.current_period_end || null,
     services_included: subscription.services_included || [],

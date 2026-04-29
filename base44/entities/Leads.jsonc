@@ -116,6 +116,38 @@
       "type": "string",
       "title": "Sentiment Last Analyzed At"
     },
+    "normalized_email": {
+      "type": "string",
+      "title": "Normalized Email"
+    },
+    "normalized_phone": {
+      "type": "string",
+      "title": "Normalized Phone"
+    },
+    "normalized_business_name": {
+      "type": "string",
+      "title": "Normalized Business Name"
+    },
+    "dedupe_key": {
+      "type": "string",
+      "title": "Lead Dedupe Key"
+    },
+    "automation_context_json": {
+      "type": "string",
+      "title": "Automation Context JSON"
+    },
+    "last_activity_at": {
+      "type": "string",
+      "title": "Last Activity At"
+    },
+    "import_source": {
+      "type": "string",
+      "title": "Import Source"
+    },
+    "import_batch_id": {
+      "type": "string",
+      "title": "Import Batch ID"
+    },
     "ai_intent": {
       "type": "string",
       "title": "AI Intent",

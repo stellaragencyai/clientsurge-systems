@@ -302,7 +302,8 @@ test("remote setup workspace derives nurture sequence blockers and scheduler pre
   const service = workspace.services[0];
   assert.ok(service.required_actions.some((action) => action.title === "Enable SMS or Email"));
   assert.ok(service.required_actions.some((action) => action.title === "Add sequence steps"));
-  assert.equal(service.scheduler.label, "Scheduler Placeholder");
+  assert.equal(service.scheduler.label, "Manual / Cron Due-Step Runner");
+  assert.equal(service.execution_profile.mode, "manual_runner");
   assert.equal(service.go_live_readiness.can_move_to_live, false);
 });
 

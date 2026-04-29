@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import { buildBillingSummary, formatBillingDate } from '@/lib/billingSummary';
 import {
   CreditCard, Download, ExternalLink, Loader2, AlertCircle,
   CheckCircle2, Clock, RefreshCw, FileText, ShieldCheck, Zap,
@@ -98,6 +99,7 @@ export default function BillingDashboard({ project, subscription }) {
   const [payingId, setPayingId]     = useState(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const [portalError, setPortalError]     = useState('');
+  const billing = buildBillingSummary({ project, subscription });
 
   useEffect(() => { loadInvoices(); }, [project?.id]);
 
@@ -143,9 +145,9 @@ export default function BillingDashboard({ project, subscription }) {
   };
 
   // ── subscription status derived ──────────────────────────────────────────
-  const subStatus   = subscription?.status || 'unknown';
-  const renewsOn    = subscription?.current_period_end;
-  const currentPlan = subscription?.plan_type || project?.plan || '—';
+  const subStatus   = billing.subscriptionStatus;
+  const renewsOn    = billing.renewalDate;
+  const currentPlan = billing.currentPlan;
 
   return (
     <div className="space-y-8">
@@ -163,9 +165,10 @@ export default function BillingDashboard({ project, subscription }) {
           </div>
         </div>
 
-        <div className="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <SummaryCard label="Status"     value={subStatus === 'active' ? 'Active' : subStatus} accent={subStatus === 'active'} />
-          <SummaryCard label="Next Renewal" value={renewsOn ? formatDate(renewsOn) : '—'} sub="Auto-renews" />
+        <div className="p-6 grid grid-cols-2 sm:grid-cols-5 gap-4">
+          <SummaryCard label="Status" value={subStatus === 'active' ? 'Active' : subStatus} accent={subStatus === 'active'} />
+          <SummaryCard label="Billing" value={billing.billingStatus} sub={billing.warnings[0] || 'Stripe-backed recurring billing'} accent={billing.billingStatus === 'past_due'} />
+          <SummaryCard label="Next Renewal" value={renewsOn ? formatBillingDate(renewsOn) : '—'} sub="Auto-renews when active" />
           <SummaryCard label="Outstanding" value={summary ? `$${(summary.total_outstanding || 0).toFixed(2)}` : '—'} accent={summary?.total_outstanding > 0} />
           <SummaryCard label="Invoices" value={summary?.total_invoices ?? '—'} sub={`${summary?.unpaid_count || 0} unpaid`} />
         </div>
@@ -206,7 +209,7 @@ export default function BillingDashboard({ project, subscription }) {
       {/* ── Security note ─────────────────────────────────────── */}
       <div className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
         <ShieldCheck className="w-4 h-4 flex-shrink-0 text-green-600" />
-        Payment details are managed securely by Stripe. We never store your full card number.
+        Payment details are managed securely by Stripe. Plan changes still require manual approval before billing is changed.
       </div>
 
       {/* ── Invoices ──────────────────────────────────────────── */}
@@ -278,7 +281,7 @@ export default function BillingDashboard({ project, subscription }) {
           <li className="flex gap-2"><span>•</span><span>Click <strong>Pay Now</strong> to securely complete outstanding invoices via Stripe.</span></li>
           <li className="flex gap-2"><span>•</span><span>Click <strong>Manage Payment</strong> above to update your card or view payment history in Stripe.</span></li>
           <li className="flex gap-2"><span>•</span><span>PDF invoices can be downloaded using the <Download className="inline w-3 h-3" /> icon on each row.</span></li>
-          <li className="flex gap-2"><span>•</span><span>Payment receipts are automatically emailed to you after each successful charge.</span></li>
+          <li className="flex gap-2"><span>•</span><span>Stripe receipts and invoice emails depend on your live Stripe billing configuration.</span></li>
         </ul>
       </div>
 

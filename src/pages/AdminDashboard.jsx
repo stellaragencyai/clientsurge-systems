@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
@@ -32,6 +32,11 @@ import WebsiteLeadsDashboard from '../components/admin/WebsiteLeadsDashboard';
 import CommunicationLogsPanel from '../components/admin/CommunicationLogsPanel';
 import AutomationInstallChecklist from '../components/admin/AutomationInstallChecklist';
 import ReviewRequestPanel from '../components/admin/ReviewRequestPanel';
+import {
+  buildAdminDashboardSearch,
+  DEFAULT_ADMIN_TAB,
+  parseAdminDashboardSearch,
+} from "@/lib/adminDashboardNavigation";
 
 const NAV_GROUPS = [
   {
@@ -93,10 +98,16 @@ const TAB_ACTIONS = {
 export default function AdminDashboard() {
   const { user, isLoadingAuth } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const location = useLocation();
+  const dashboardState = parseAdminDashboardSearch(location.search);
+  const [activeTab, setActiveTab] = useState(dashboardState.tab || DEFAULT_ADMIN_TAB);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
   const [inboxUnread, setInboxUnread] = useState(0);
+
+  useEffect(() => {
+    setActiveTab(dashboardState.tab || DEFAULT_ADMIN_TAB);
+  }, [dashboardState.tab]);
 
   // Load unread message count for inbox badge
   useEffect(() => {
@@ -136,12 +147,18 @@ export default function AdminDashboard() {
     base44.auth.logout('/');
   };
 
+  const updateDashboardSearch = (tabId, orderId = "") => {
+    const search = buildAdminDashboardSearch({ tab: tabId, orderId });
+    navigate({ pathname: "/admin", search }, { replace: true });
+  };
+
   const handleTabChange = (tabId, external) => {
     if (external) {
       navigate('/admin/onboarding');
       return;
     }
     setActiveTab(tabId);
+    updateDashboardSearch(tabId, tabId === "install-queue" ? dashboardState.orderId : "");
     if (window.innerWidth < 1024) setSidebarOpen(false);
   };
 
@@ -164,7 +181,14 @@ export default function AdminDashboard() {
       case 'campaign-builder': return <CampaignLibrary />;
       case 'revenue': return <RevenueDashboard />;
       case 'inbox': return <AdminInbox />;
-      case 'install-queue': return <InstallQueuePanel />;
+      case 'install-queue':
+        return (
+          <InstallQueuePanel
+            selectedOrderId={dashboardState.orderId}
+            onSelectOrder={(orderId) => updateDashboardSearch("install-queue", orderId)}
+            showWorkspace
+          />
+        );
       case 'install-checklists': return <AutomationInstallChecklist />;
       case 'website-leads': return <WebsiteLeadsDashboard />;
       case 'logs': return <CommunicationLogsPanel />;
@@ -180,7 +204,7 @@ export default function AdminDashboard() {
       case 'settings': return <AdminSettingsPanel />;
       case 'overview':
       default:
-        return <OverviewDashboard onNavigate={setActiveTab} />;
+        return <OverviewDashboard onNavigate={(tabId) => handleTabChange(tabId, false)} />;
     }
   };
 
@@ -201,7 +225,13 @@ export default function AdminDashboard() {
 
         {/* Global Search */}
         <div className="px-3 py-2 border-b border-border">
-          <AdminGlobalSearch onNavigate={(tab) => { setActiveTab(tab); if (window.innerWidth < 1024) setSidebarOpen(false); }} />
+          <AdminGlobalSearch
+            onNavigate={(tab) => {
+              setActiveTab(tab);
+              updateDashboardSearch(tab);
+              if (window.innerWidth < 1024) setSidebarOpen(false);
+            }}
+          />
         </div>
 
         {/* Navigation */}

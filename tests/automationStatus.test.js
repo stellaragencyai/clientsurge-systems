@@ -56,12 +56,15 @@ test("automation status is deterministic from canonical order states and unsuppo
   const instant = statuses.find((status) => status.id === "instant_response");
   const missed = statuses.find((status) => status.id === "missed_call");
   const booking = statuses.find((status) => status.id === "booking_link");
+  const nurture = statuses.find((status) => status.id === "email_sequence");
 
   assert.equal(instant.state, "ready_for_install");
   assert.equal(instant.tracked_order_count, 1);
   assert.equal(missed.state, "not_purchased");
-  assert.equal(booking.state, "not_canonicalized");
-  assert.equal(booking.supported, false);
+  assert.equal(booking.execution_profile.mode, "placeholder");
+  assert.equal(booking.supported, true);
+  assert.equal(nurture.supported, true);
+  assert.equal(nurture.execution_profile.mode, "manual_runner");
 });
 
 test("automation status tracks install transitions and runtime event outcomes", () => {
@@ -125,4 +128,5 @@ test("automation status tracks install transitions and runtime event outcomes", 
   assert.equal(instant.runtime.successful_runs, 1);
   assert.equal(instant.runtime.failed_runs, 1);
   assert.equal(instant.runtime.last_signal.event_type, "runtime_attempt_blocked");
+  assert.equal(instant.execution_profile.mode, "production_real");
 });

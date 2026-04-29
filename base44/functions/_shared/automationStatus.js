@@ -1,18 +1,20 @@
 import { buildInstallSnapshot } from "./installPipeline.js";
+import { getServiceExecutionProfile } from "./canonicalAutomationRuntime.js";
 
 export const AUTOMATION_STATUS_DEFINITIONS = [
   {
     id: "instant_response",
     step: 1,
     title: "Instant Lead Response",
-    description: "Sends instant SMS + email within 60 seconds of a new lead being captured.",
+    description: "Sends the canonical first-response SMS when a signed customer lead-capture webhook hits a Live order.",
     service_key: "instant_lead_response",
   },
   {
     id: "booking_link",
     step: 2,
-    title: "Booking Link (Qualified Leads)",
-    description: "Automatically sends a booking link when a lead is marked Qualified.",
+    title: "AI Booking Agent / Booking Handoff",
+    description: "Honest booking-link handoff or simulation only until a real booking provider is wired.",
+    service_key: "ai_booking_agent",
   },
   {
     id: "followup_sms",
@@ -30,27 +32,28 @@ export const AUTOMATION_STATUS_DEFINITIONS = [
     id: "missed_call",
     step: 5,
     title: "Missed Call Text-Back",
-    description: "Immediately texts any lead that called but did not get answered.",
+    description: "Sends the configured missed-call SMS when a signed Twilio call-status webhook resolves a Live order.",
     service_key: "missed_call_text_back",
   },
   {
     id: "email_sequence",
     step: 6,
-    title: "Email Follow-Up Sequence",
-    description: "Multi-day email nurture sequence for leads who have not booked yet.",
+    title: "14-Day Nurture Sequence",
+    description: "Canonical due-step nurture runner with real sends only after Live enrollment and recurring invocation.",
+    service_key: "nurture_sequence_14d",
   },
   {
     id: "reactivation",
     step: 7,
     title: "Old Lead Reactivation",
-    description: "Re-engages dormant leads with a targeted re-activation campaign.",
+    description: "Runs only as an admin-approved reactivation batch with cooldown and canonical lead targeting.",
     service_key: "lead_reactivation",
   },
   {
     id: "review_request",
     step: 8,
     title: "Review Request Automation",
-    description: "Sends a review request after a configured trigger event using the canonical order-backed setup flow.",
+    description: "Manual review-request runtime only until a real post-appointment trigger source exists.",
     service_key: "review_request",
   },
   {
@@ -166,6 +169,7 @@ function summarizeRuntimeSignals(events) {
 }
 
 function buildUnsupportedAutomationStatus(definition) {
+  const executionProfile = getServiceExecutionProfile(definition.service_key || "");
   return {
     ...definition,
     supported: false,
@@ -183,6 +187,7 @@ function buildUnsupportedAutomationStatus(definition) {
       event_counts: {},
       last_signal: null,
     },
+    execution_profile: executionProfile,
   };
 }
 
@@ -215,6 +220,7 @@ function buildSupportedAutomationStatus(definition, orders, events) {
   const runtimeEvents = events.filter(
     (event) => event.service_key === definition.service_key
   );
+  const executionProfile = getServiceExecutionProfile(definition.service_key);
 
   return {
     ...definition,
@@ -229,6 +235,7 @@ function buildSupportedAutomationStatus(definition, orders, events) {
     tracked_pipeline_counts: buildCounts(serviceOrders.map((order) => order.pipeline_status)),
     tracked_install_counts: buildCounts(serviceStates.map((serviceState) => serviceState.install_status)),
     runtime: summarizeRuntimeSignals(runtimeEvents),
+    execution_profile: executionProfile,
   };
 }
 

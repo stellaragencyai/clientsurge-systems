@@ -29,6 +29,30 @@ test("public store catalog exposes all 12 offers while checkout stays canonical"
     AI_PRODUCTS.filter((product) => product.checkout_enabled === false).length,
     6
   );
+  assert.equal(
+    AI_PRODUCTS.filter((product) => product.store_status === "pilot").length,
+    2
+  );
+  assert.equal(
+    AI_PRODUCTS.filter((product) => product.store_status === "manual_review").length,
+    4
+  );
+  assert.equal(
+    AI_PRODUCTS.filter((product) => product.store_status === "coming_soon").length,
+    6
+  );
+});
+
+test("store truth labels distinguish pilot installs from manual-review and coming-soon offers", () => {
+  const instant = AI_PRODUCTS.find((product) => product.service_key === "instant_lead_response");
+  const nurture = AI_PRODUCTS.find((product) => product.service_key === "nurture_sequence_14d");
+  const email = AI_PRODUCTS.find((product) => product.name === "AI Email Follow-Up");
+
+  assert.equal(instant.store_purchase_enabled, true);
+  assert.equal(instant.availability_label, "Pilot Install Available");
+  assert.equal(nurture.store_purchase_enabled, false);
+  assert.match(nurture.fulfillment_label, /Not self-serve/i);
+  assert.equal(email.coming_soon, true);
 });
 
 test("package offers map directly to canonical service bundles", () => {

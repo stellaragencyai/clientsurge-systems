@@ -58,7 +58,7 @@ const plans = [
       "Improved lead tracking and pipeline",
       "14 days of post-launch optimization",
       "Monthly performance check-in",
-      "Conversion-focused landing page included when needed",
+      "Landing page work available as a manual add-on when it improves conversion",
     ],
     highlight: true,
   },
@@ -66,18 +66,18 @@ const plans = [
     name: "Pro System",
     fit: "For businesses that want the full revenue recovery engine",
     subtitle: "For businesses that want the full revenue recovery engine.",
-    desc: "The complete AI-assisted booking automation and revenue recovery system — old leads reactivated, every inquiry tracked, and the full pipeline optimized.",
+    desc: "The complete AI-assisted revenue recovery package — with operator-reviewed reactivation, guided follow-up planning, and pipeline visibility.",
     setup: "$3,500 setup",
     monthly: "$1,500",
     features: [
       "Everything in Growth",
-      "Old lead reactivation campaigns",
-      "Advanced nurture flows",
-      "AI-assisted follow-up logic",
+      "Old lead reactivation planning and target review",
+      "Advanced nurture flow planning",
+      "AI-assisted follow-up strategy",
       "Enhanced dashboard and tracking",
       "Priority optimization and support",
       "Monthly strategy session",
-      "Conversion-focused landing page or site improvement included",
+      "Landing page or site improvement available as a manual scope item",
     ],
     highlight: false,
   },
@@ -117,7 +117,7 @@ export default function Pricing() {
            Most Businesses Already Have the Leads — Here's What It Costs to Stop Losing Them
           </h2>
           <p className="mt-5 text-foreground font-semibold text-base mb-3">
-            Recovery happens fast. Most clients cover their entire investment with just 2–3 additional bookings per month.
+            Launch timing and results depend on provider readiness, install complexity, and manual QA. We scope that honestly before anything is called live.
           </p>
           <p className="text-muted-foreground text-lg leading-relaxed">
             We install done-for-you AI lead conversion systems that respond instantly, automate follow-up, and turn more of your existing demand into booked appointments.
@@ -131,7 +131,7 @@ export default function Pricing() {
             }}
           >
             <span className="font-semibold text-foreground/90">On websites and landing pages:</span>{" "}
-            These are only included when they strengthen the conversion system. The real product is the automated system that captures, follows up, and books more leads.
+            These are manual scope items when they strengthen the conversion system. They are not a guaranteed included product on every package.
           </div>
         </div>
 
@@ -170,13 +170,13 @@ export default function Pricing() {
             We build and install the system for you — not just the strategy
           </h3>
           <p className="mt-3 text-sm md:text-base text-muted-foreground">
-            Your setup fee covers the full buildout of your AI lead conversion system — launch prep, messaging logic, booking flow, and handoff — done for you.
+            Your setup fee covers buildout, configuration, testing, and handoff for the services included in your package. Some pilot services still require manual operator review before go-live.
           </p>
         </div>
         <div className="grid md:grid-cols-2 gap-x-6 gap-y-3 mb-14">
           {[
             "AI lead conversion system setup and message logic",
-            "Automated SMS and email follow-up sequence",
+            "Configured SMS and email follow-up sequence",
             "Booking link or booking flow integration",
             "Missed-call recovery system setup when included",
             "Launch testing, polish, and go-live support",
@@ -344,6 +344,7 @@ export default function Pricing() {
 
 function PricingCard({ plan, demoBooking, selectedIndustry }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isExpandedMobile, setIsExpandedMobile] = useState(false);
   const isRecommended = selectedIndustry?.recommendedPackage?.name === plan.name;
 
   return (
@@ -403,7 +404,7 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
         </div>
       )}
 
-      <div className="flex flex-col flex-1 p-6 md:p-8 lg:p-10 relative z-10">
+      <div className="flex flex-col flex-1 p-5 md:p-8 lg:p-10 relative z-10">
         <div className="mb-7">
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">{plan.name}</h3>
           {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Most Popular — Best for businesses losing 20+ leads/month</p>}
@@ -417,7 +418,7 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
         {/* Value justification above the price */}
         <div className="mb-5 text-xs text-muted-foreground leading-relaxed px-3 py-2 rounded-xl bg-primary/5 border border-primary/10">
           {plan.highlight
-            ? "Most clients recover this cost with just 2–3 additional bookings per month."
+            ? "Most clients recover this cost with just 2-3 additional bookings per month."
             : plan.monthly === "$397"
             ? "Even one extra booking per month typically covers the monthly fee."
             : "High-volume businesses often recover this within the first week of going live."}
@@ -436,11 +437,13 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
 
         <p className="text-sm text-muted-foreground leading-relaxed mb-7">{plan.desc}</p>
 
-        <ul className="space-y-3.5 flex-1 mb-9">
+        <ul className="space-y-3.5 flex-1 mb-5 md:mb-9">
           {plan.features.map((feature, index) => (
             <li
               key={index}
-              className="flex items-start gap-3"
+              className={`items-start gap-3 ${
+                index < 4 || isExpandedMobile ? "flex" : "hidden md:flex"
+              }`}
               style={{
                 animation: `slideIn 0.5s ease-out ${index * 0.05}s both`,
               }}
@@ -450,6 +453,16 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
             </li>
           ))}
         </ul>
+
+        {plan.features.length > 4 ? (
+          <button
+            type="button"
+            onClick={() => setIsExpandedMobile((current) => !current)}
+            className="md:hidden mb-5 inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-primary"
+          >
+            {isExpandedMobile ? "Show fewer details" : "See everything included"}
+          </button>
+        ) : null}
 
         {plan.highlight ? (
           <button

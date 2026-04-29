@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, HeartPulse, Loader2, Save, Webhook } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import WebhookSettings from "./WebhookSettings";
+import {
+  PORTAL_AUTOMATION_ACCESS_NOTE,
+  PORTAL_SETTINGS_SECTIONS,
+} from "@/lib/portalSettingsConfig";
 
-const SETTINGS_SECTIONS = [
-  { id: "timeline", label: "Timeline", icon: CalendarDays },
-  { id: "webhooks", label: "Webhooks", icon: Webhook },
-];
+const ICONS = {
+  CalendarDays,
+  Webhook,
+};
 
 function formatDisplayDate(value) {
   if (!value) {
@@ -254,9 +257,9 @@ export default function PortalSettings({ project, user, onUpdated }) {
           Settings
         </p>
         <div className="space-y-2">
-          {SETTINGS_SECTIONS.map((section) => {
+          {PORTAL_SETTINGS_SECTIONS.map((section) => {
             const isActive = section.id === activeSection;
-            const Icon = section.icon;
+            const Icon = ICONS[section.icon];
             return (
               <button
                 key={section.id}
@@ -368,8 +371,40 @@ export default function PortalSettings({ project, user, onUpdated }) {
           </div>
         )}
 
-        {activeSection === "webhooks" && (
-          <WebhookSettings project={project} />
+        {activeSection === "automation-access" && (
+          <div className="rounded-[28px] border border-border bg-white p-6 shadow-sm">
+            <div className="mb-4 flex items-center gap-3">
+              <div
+                className="flex h-11 w-11 items-center justify-center rounded-2xl"
+                style={{ background: "rgba(154,92,46,0.08)" }}
+              >
+                <Webhook className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary/70">
+                  {PORTAL_AUTOMATION_ACCESS_NOTE.eyebrow}
+                </p>
+                <h2 className="font-display text-2xl font-semibold text-foreground">
+                  {PORTAL_AUTOMATION_ACCESS_NOTE.title}
+                </h2>
+              </div>
+            </div>
+            <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+              {PORTAL_AUTOMATION_ACCESS_NOTE.body}
+            </p>
+            <div
+              className="mt-5 rounded-2xl border px-4 py-4 text-sm"
+              style={{
+                background: "rgba(154,92,46,0.06)",
+                borderColor: "rgba(154,92,46,0.12)",
+              }}
+            >
+              <p className="font-semibold text-foreground">Need a webhook or integration change?</p>
+              <p className="mt-1 text-muted-foreground">
+                Use Support & Messaging in the portal or contact ClientSurge ops. We’ll update the canonical install workspace and test it before anything moves live.
+              </p>
+            </div>
+          </div>
         )}
       </div>
     </div>

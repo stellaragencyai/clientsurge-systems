@@ -1,37 +1,51 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import Stripe from 'npm:stripe@14.21.0';
+import Stripe from "npm:stripe@14.21.0";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), { apiVersion: '2023-10-16' });
+import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
+
+const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+  apiVersion: "2024-06-20",
+});
+
+function cleanString(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!user?.email) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const { return_url } = await req.json().catch(() => ({}));
+    const body = await req.json().catch(() => ({}));
+    const returnUrl = cleanString(body.return_url) || "https://clientsurgesystems.com/client-portal";
 
-    // Find the client project for this user
-    const projects = await base44.asServiceRole.entities.ClientProject.filter({ client_email: user.email });
-    const project = projects?.[0];
-    if (!project) return Response.json({ error: 'No project found' }, { status: 404 });
+    const resolution = await resolveClientPortalAccess({
+      base44,
+      userEmail: user.email,
+    });
 
-    // Get stripe customer ID from order
-    const orders = await base44.asServiceRole.entities.Order.filter({ customer_email: user.email });
-    const stripeCustomerId = orders?.[0]?.stripe_customer_id;
-
-    if (!stripeCustomerId) {
-      return Response.json({ error: 'No Stripe customer found. Please contact support.' }, { status: 404 });
+    if (resolution.status !== "resolved" || !resolution.order?.stripe_customer_id) {
+      return Response.json(
+        { error: "No Stripe customer found for this account. Please contact support." },
+        { status: 404 }
+      );
     }
 
     const session = await stripe.billingPortal.sessions.create({
-      customer: stripeCustomerId,
-      return_url: return_url || 'https://app.base44.com',
+      customer: resolution.order.stripe_customer_id,
+      return_url: returnUrl,
     });
 
     return Response.json({ url: session.url });
   } catch (error) {
-    console.error('Stripe portal error:', error);
+    console.error("Stripe portal error:", error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

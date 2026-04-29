@@ -77,6 +77,66 @@ const LEGACY_ENDPOINTS = {
     reason:
       "This provisioning flow still points purchased numbers at retired Twilio handlers and should stay paused until canonical live routing is finalized.",
   },
+  autoAdvanceInstallPipeline: {
+    replacement: [
+      "listInstallQueue",
+      "getInstallConfiguration",
+      "updateInstallConfiguration",
+      "updateInstallStatus",
+      "runAssistedSetupSequence",
+    ],
+    reason:
+      "This auto-advance path can mark paid services Live without the canonical install workspace, runtime test proof, and per-service status guards.",
+  },
+  twilioinbound: {
+    replacement: [
+      "receiveTwilioStatusWebhook",
+      "receiveTwilioInboundSms",
+      "Canonical order-backed missed-call runtime",
+    ],
+    reason:
+      "This legacy Twilio call handler writes Leads and AutomationJob records outside the canonical WebsiteLead and order-backed install/runtime flow.",
+  },
+  receiveTwilioMissedCallWebhook: {
+    replacement: [
+      "receiveTwilioStatusWebhook",
+      "Canonical order-backed missed-call runtime",
+    ],
+    reason:
+      "This deprecated Twilio missed-call webhook reads WebsiteLead and AdminSettings instead of canonical paid Order.install_configuration and Live service gating.",
+  },
+  processNurtureCampaigns: {
+    replacement: [
+      "processNurtureSequenceRuntime",
+      "Canonical 14-day nurture runner",
+    ],
+    reason:
+      "This legacy nurture scheduler operates on NurtureCampaign records and a retired 30-day email-only flow instead of the canonical order-backed 14-day nurture runtime.",
+  },
+  reactivateLeadOutreach: {
+    replacement: [
+      "runLeadReactivationBatch",
+      "Canonical manual-approved reactivation batch",
+    ],
+    reason:
+      "This legacy reactivation flow queues AutomationJob records against LeadReactivation instead of using the canonical manual-approved batch on order-backed service config.",
+  },
+  handleBookingTrigger: {
+    replacement: [
+      "runBookingAgentTest",
+      "Canonical booking handoff placeholder",
+    ],
+    reason:
+      "This legacy booking trigger sends generic SMS/email outside the canonical order-backed booking handoff model and should stay retired until a real provider is chosen.",
+  },
+  stripeInvoiceWebhook: {
+    replacement: [
+      "stripeWebhookOrders",
+      "Canonical Subscription and Order billing sync",
+    ],
+    reason:
+      "This duplicate Stripe invoice webhook conflicts with the canonical order-backed billing sync path and can create divergent invoice and subscription truth.",
+  },
 };
 
 export function getLegacyEndpointQuarantine(endpointName) {

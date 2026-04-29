@@ -347,7 +347,7 @@ function StoreInner() {
                 }}
               >
                 Pick the services you need, add them to your cart, and we handle
-                the setup. Your automations go live in 5 to 7 business days.
+                the setup. Pilot services are installed manually and only move live after canonical testing.
               </p>
             </div>
 
@@ -394,7 +394,7 @@ function StoreInner() {
             <div className="store-stat-grid" style={{ marginBottom: "8px" }}>
               {[
                 { label: "AI Services Available", val: "12" },
-                { label: "Avg. Setup Time", val: "4-6 hours" },
+                { label: "Pilot Install Review", val: "Operator-Led" },
                 { label: "Cancel Anytime", val: "No Contracts" },
               ].map((stat) => (
                 <div
@@ -429,6 +429,38 @@ function StoreInner() {
                    {stat.label}
                  </p>
                 </div>
+                ))}
+            </div>
+
+            <div
+              style={{
+                maxWidth: "760px",
+                margin: "8px auto 0",
+                padding: "10px 12px",
+                borderRadius: "12px",
+                background: "rgba(255,255,255,0.45)",
+                border: "1px solid rgba(154,92,46,0.12)",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "8px",
+                justifyContent: "center",
+              }}
+            >
+              {[
+                "Pilot Install Available = sellable now with manual setup and QA",
+                "Manual Review Required = not self-serve today",
+                "Coming Soon = not yet available for checkout",
+              ].map((item) => (
+                <span
+                  key={item}
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: "600",
+                    color: "#5a4635",
+                  }}
+                >
+                  {item}
+                </span>
               ))}
             </div>
           </div>

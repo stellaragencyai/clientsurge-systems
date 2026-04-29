@@ -265,16 +265,16 @@ export default function ClientPortal() {
           <div className="space-y-8">
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-2">Revenue & Automations</h2>
-              <p className="text-muted-foreground">Track your system performance, active automations, and revenue impact.</p>
+              <p className="text-muted-foreground">Track canonical service status, billing truth, and what is really installed for your account.</p>
             </div>
             <RevenueMetricsPanel />
             <div className="border-t border-border pt-8">
               <h3 className="text-xl font-bold text-foreground mb-4">Active Automations</h3>
-              <AutomationsOverview />
+              <AutomationsOverview services={portalOrder?.services || []} />
             </div>
             <div className="border-t border-border pt-8">
-              <h3 className="text-xl font-bold text-foreground mb-4">System Activity</h3>
-              <AutomatedResponsesLog />
+              <h3 className="text-xl font-bold text-foreground mb-4">Runtime Activity Truth</h3>
+              <AutomatedResponsesLog services={portalOrder?.services || []} subscription={subscription} />
             </div>
           </div>
         )}

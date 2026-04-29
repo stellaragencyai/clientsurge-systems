@@ -31,7 +31,7 @@ export default function FinalCTA() {
               border: "1px solid rgba(154,92,46,0.18)",
             }}
           >
-            Free 15-minute call · no commitment required · live in 5-7 days
+            Free 15-minute call · no commitment required · pilot launch plan reviewed with you first
           </div>
         </div>
 

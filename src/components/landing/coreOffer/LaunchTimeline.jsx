@@ -291,7 +291,7 @@ export default function LaunchTimeline() {
           className="text-center text-sm text-muted-foreground mb-10"
           style={{ transition: "opacity 0.5s ease 160ms, transform 0.5s ease 160ms", opacity: headerVisible ? 1 : 0, transform: headerVisible ? "translateY(0)" : "translateY(12px)" }}
         >
-          From first contact to fully live in 5 clear steps — most setups complete in 3–5 hours.
+          From first contact to launch review in 5 clear steps — operator setup and QA still determine the real go-live timing.
         </p>
       </div>
 

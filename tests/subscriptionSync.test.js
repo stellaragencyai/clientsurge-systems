@@ -359,3 +359,63 @@ test("subscription change requests remain manual but are logged canonically", as
   const events = await base44.asServiceRole.entities.CommunicationEvent.filter({ order_id: order.id });
   assert.ok(events.some((event) => event.subject === "Subscription change requested"));
 });
+
+test("subscription sync suppresses duplicate billing timeline events on Stripe retry", async () => {
+  const order = buildOrder({
+    subscription_id: "sub_rec_1",
+    stripe_subscription_id: "sub_123",
+    subscription_status: "active",
+  });
+  const base44 = createFakeBase44({
+    orders: [order],
+    subscriptions: [
+      {
+        id: "sub_rec_1",
+        order_id: order.id,
+        stripe_subscription_id: "sub_123",
+        stripe_customer_id: "cus_123",
+        status: "active",
+        plan_type: "Starter System",
+        services_included: ["instant_lead_response"],
+      },
+    ],
+    projects: [{ id: "project_1", plan: "Starter System", plan_change_request: "None" }],
+    onboardingClients: [{ id: "onboarding_1", business_name: "Signal Med Spa", status: "active" }],
+  });
+
+  await syncSubscriptionFromStripe({
+    base44,
+    stripeSubscription: buildStripeSubscription(),
+    eventType: "customer.subscription.updated",
+    fallbackOrderId: order.id,
+    sourceEventId: "evt_sub_retry_1",
+  });
+
+  await syncSubscriptionFromStripe({
+    base44,
+    stripeSubscription: buildStripeSubscription(),
+    eventType: "customer.subscription.updated",
+    fallbackOrderId: order.id,
+    sourceEventId: "evt_sub_retry_1",
+  });
+
+  const events = await base44.asServiceRole.entities.CommunicationEvent.filter({
+    provider_message_id: "evt_sub_retry_1",
+  });
+  assert.equal(events.length, 1);
+});
+
+test("subscription summary exposes billing status for portal and admin views", () => {
+  const summary = buildSubscriptionSummary({
+    id: "sub_rec_1",
+    stripe_customer_id: "cus_123",
+    stripe_subscription_id: "sub_123",
+    plan_type: "Starter System",
+    status: "active",
+    current_period_end: "2026-05-22T12:00:00.000Z",
+    services_included: ["instant_lead_response"],
+  });
+
+  assert.equal(summary.billing_status, "active");
+  assert.equal(summary.plan_type, "Starter System");
+});

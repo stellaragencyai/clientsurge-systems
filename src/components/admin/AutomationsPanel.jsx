@@ -168,6 +168,10 @@ function RuntimeSummary({ automation }) {
   return (
     <div className="space-y-0.5 border-t border-border pt-3 text-xs text-muted-foreground">
       <div className="flex justify-between">
+        <span>Runtime mode</span>
+        <span className="font-semibold text-foreground">{automation.execution_profile?.label || "Unknown"}</span>
+      </div>
+      <div className="flex justify-between">
         <span>Tracked orders</span>
         <span className="font-semibold text-foreground">{automation.tracked_order_count}</span>
       </div>
@@ -187,6 +191,9 @@ function RuntimeSummary({ automation }) {
         <p className="font-semibold text-foreground">Derived from canonical state</p>
         <p className="mt-1 leading-relaxed">
           {automation.state_reason}
+          {automation.execution_profile?.trigger_label
+            ? ` Trigger: ${automation.execution_profile.trigger_label}.`
+            : ""}
           {runtime.last_signal
             ? ` Latest signal: ${runtime.last_signal.event_type} (${runtime.last_signal.status || "processed"}).`
             : " No runtime signal recorded yet."}

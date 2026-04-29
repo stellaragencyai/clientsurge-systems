@@ -1,4 +1,5 @@
 import { sendEmailMessage, sendTwilioSms } from "./installRuntime.js";
+import { assertProductionServiceReady } from "./canonicalAutomationRuntime.js";
 
 const SERVICE_KEY = "missed_call_text_back";
 const FOLLOW_UP_STEPS = [
@@ -197,7 +198,7 @@ export async function stopMissedCallSequence({ base44, lead, reason, now = new D
   return updatedLead;
 }
 
-export async function findLeadByMissedCall({ base44, callSid, callerPhone }) {
+export async function findLeadByMissedCall({ base44, orderId = "", businessName = "", callSid, callerPhone }) {
   if (callSid) {
     const byCallSid = await base44.asServiceRole.entities.CommunicationEvent.filter({
       service_key: SERVICE_KEY,
@@ -219,7 +220,13 @@ export async function findLeadByMissedCall({ base44, callSid, callerPhone }) {
   if (!normalizedCaller) return null;
 
   const leads = await base44.asServiceRole.entities.Leads.filter({ phone: normalizedCaller }, "-created_date", 20);
-  return leads?.[0] || null;
+  return (leads || []).find((lead) => {
+    const runtime = extractLeadRuntime(lead);
+    return (
+      (orderId && runtime.missedCall.order_id === orderId) ||
+      (businessName && cleanString(lead.business_name) === cleanString(businessName))
+    );
+  }) || leads?.[0] || null;
 }
 
 export async function createOrReuseMissedCallLead({
@@ -233,7 +240,13 @@ export async function createOrReuseMissedCallLead({
   now = new Date().toISOString(),
 }) {
   const normalizedCallerPhone = normalizePhone(callerPhone);
-  const existingLead = await findLeadByMissedCall({ base44, callSid, callerPhone: normalizedCallerPhone });
+  const existingLead = await findLeadByMissedCall({
+    base44,
+    orderId: order.id,
+    businessName: cleanString(order.business_name) || cleanString(order.customer_name),
+    callSid,
+    callerPhone: normalizedCallerPhone,
+  });
 
   if (existingLead) {
     await logMissedCallEvent(base44, {
@@ -391,6 +404,63 @@ export async function runMissedCallInitialResponse({
   const step = FOLLOW_UP_STEPS[0];
   const messageBody = buildMissedCallMessage({ order, lead, step, sharedConfig });
   const runtime = extractLeadRuntime(lead);
+  let runtimeResult = null;
+  const leadPhone = normalizePhone(lead.phone);
+
+  await assertProductionServiceReady({
+    base44,
+    order,
+    serviceKey: SERVICE_KEY,
+    runtimeType: "missed_call_initial_response",
+    triggerSource: "twilio_missed_call_webhook",
+    recipientPhone: leadPhone,
+    lead,
+    requirePhone: true,
+    now,
+    extraMetadata: {
+      step_key: step.key,
+      automation_key: "missed_call_initial_response",
+    },
+  });
+
+  const duplicateEvents = await base44.asServiceRole.entities.CommunicationEvent.filter({
+    lead_id: lead.id,
+    service_key: SERVICE_KEY,
+    event_type: "provider_send_succeeded",
+  }, "-created_date", 50);
+  const existingInitialSend = (duplicateEvents || []).find((event) => {
+    const metadata = safeJsonParse(event.metadata_json, {});
+    return metadata.step_key === step.key || metadata.automation_key === "missed_call_initial_response";
+  });
+
+  if (existingInitialSend) {
+    await logMissedCallEvent(base44, {
+      leadId: lead.id,
+      orderId: order.id,
+      eventType: "runtime_attempt_blocked",
+      status: "failed",
+      subject: "Missed call duplicate prevented",
+      messageBody: "An initial missed-call reply was already sent for this caller.",
+      metadata: {
+        source: "missed_call_recovery",
+        production_runtime: true,
+        runtime_type: "missed_call_initial_response",
+        trigger_source: "twilio_missed_call_webhook",
+        action: "duplicate_prevented",
+        automation_key: "missed_call_initial_response",
+        step_key: step.key,
+        duplicate_event_id: existingInitialSend.id,
+        timestamp: now,
+      },
+    });
+
+    return {
+      success: true,
+      duplicate_prevented: true,
+      service_key: SERVICE_KEY,
+      recipient_phone: leadPhone,
+    };
+  }
 
   await logMissedCallEvent(base44, {
     leadId: lead.id,
@@ -400,17 +470,49 @@ export async function runMissedCallInitialResponse({
     messageBody: "Initial missed-call recovery sequence started.",
     metadata: {
       source: "missed_call_recovery",
+      production_runtime: true,
+      runtime_type: "missed_call_initial_response",
+      trigger_source: "twilio_missed_call_webhook",
       action: "initial_response_started",
+      automation_key: "missed_call_initial_response",
+      step_key: step.key,
+      timestamp: now,
+    },
+  });
+  await logMissedCallEvent(base44, {
+    leadId: lead.id,
+    orderId: order.id,
+    channel: "sms",
+    direction: "outbound",
+    eventType: "provider_send_attempted",
+    provider: "twilio",
+    status: "pending",
+    subject: "Missed call SMS #1 attempted",
+    messageBody,
+    metadata: {
+      source: "missed_call_recovery",
+      production_runtime: true,
+      runtime_type: "missed_call_initial_response",
+      trigger_source: "twilio_missed_call_webhook",
+      action: "sms_attempted",
+      automation_key: "missed_call_initial_response",
+      step_key: step.key,
       timestamp: now,
     },
   });
 
   try {
     const sendResult = await sendTwilioSms({
-      to: normalizePhone(lead.phone),
+      to: leadPhone,
       from: cleanString(sharedConfig?.twilio_business_phone),
       body: messageBody,
     });
+    runtimeResult = {
+      service_key: SERVICE_KEY,
+      recipient_phone: leadPhone,
+      provider_message_id: sendResult.provider_message_id,
+      provider_status: sendResult.provider_status || "sent",
+    };
 
     const lastMessageSent = {
       step_key: step.key,
@@ -449,7 +551,11 @@ export async function runMissedCallInitialResponse({
       messageBody,
       metadata: {
         source: "missed_call_recovery",
+        production_runtime: true,
+        runtime_type: "missed_call_initial_response",
+        trigger_source: "twilio_missed_call_webhook",
         action: "sms_sent",
+        automation_key: "missed_call_initial_response",
         step_key: step.key,
         provider_message_id: sendResult.provider_message_id,
         timestamp: now,
@@ -469,7 +575,11 @@ export async function runMissedCallInitialResponse({
       errorMessage: error instanceof Error ? error.message : "SMS send failed",
       metadata: {
         source: "missed_call_recovery",
+        production_runtime: true,
+        runtime_type: "missed_call_initial_response",
+        trigger_source: "twilio_missed_call_webhook",
         action: "send_failure",
+        automation_key: "missed_call_initial_response",
         step_key: step.key,
         timestamp: now,
       },
@@ -497,6 +607,8 @@ export async function runMissedCallInitialResponse({
       },
     });
   }
+
+  return runtimeResult;
 }
 
 export async function handleInboundReplyStop({ base44, fromPhone, body, now = new Date().toISOString() }) {
@@ -631,6 +743,37 @@ export async function processMissedCallFollowUps({ base44, now = new Date().toIS
       continue;
     }
 
+    const readiness = await assertProductionServiceReady({
+      base44,
+      order,
+      serviceKey: SERVICE_KEY,
+      runtimeType: "process_missed_call_follow_up",
+      triggerSource: "missed_call_follow_up_runner",
+      recipientPhone: currentStep.channel === "sms" ? normalizePhone(lead.phone) : "",
+      recipientEmail: currentStep.channel === "email" ? getLeadEmail(lead) : "",
+      lead,
+      requirePhone: false,
+      requireEmail: false,
+      now,
+      extraMetadata: {
+        step_key: currentStep.key,
+      },
+    }).catch(async (error) => {
+      await stopMissedCallSequence({
+        base44,
+        lead,
+        reason: error.code || "runtime_blocked",
+        now,
+        note: `Missed-call follow-up stopped because runtime is no longer allowed: ${error.message}`,
+      });
+      results.push({ lead_id: lead.id, skipped: true, reason: error.code || "runtime_blocked", step: currentStep.key });
+      return null;
+    });
+
+    if (!readiness) {
+      continue;
+    }
+
     const sharedConfig = order.install_configuration?.shared || {};
     const messageBody = buildMissedCallMessage({ order, lead, step: currentStep, sharedConfig });
     const nextStep = getNextStep(currentStep.index);
@@ -683,6 +826,43 @@ export async function processMissedCallFollowUps({ base44, now = new Date().toIS
     }
 
     try {
+      await logMissedCallEvent(base44, {
+        leadId: lead.id,
+        orderId: order.id,
+        eventType: "runtime_attempt_started",
+        subject: `Missed call ${currentStep.key} started`,
+        messageBody: `Processing ${currentStep.key} for missed-call recovery.`,
+        metadata: {
+          source: "missed_call_recovery",
+          production_runtime: true,
+          runtime_type: "process_missed_call_follow_up",
+          trigger_source: "missed_call_follow_up_runner",
+          action: "follow_up_started",
+          step_key: currentStep.key,
+          timestamp: now,
+        },
+      });
+      await logMissedCallEvent(base44, {
+        leadId: lead.id,
+        orderId: order.id,
+        channel: currentStep.channel,
+        direction: "outbound",
+        eventType: "provider_send_attempted",
+        provider: currentStep.channel === "sms" ? "twilio" : "resend",
+        status: "pending",
+        subject: `Missed call ${currentStep.key} attempted`,
+        messageBody,
+        metadata: {
+          source: "missed_call_recovery",
+          production_runtime: true,
+          runtime_type: "process_missed_call_follow_up",
+          trigger_source: "missed_call_follow_up_runner",
+          action: "send_attempted",
+          step_key: currentStep.key,
+          timestamp: now,
+        },
+      });
+
       let sendResult;
       if (currentStep.channel === "sms") {
         sendResult = await sendTwilioSms({
@@ -692,7 +872,7 @@ export async function processMissedCallFollowUps({ base44, now = new Date().toIS
         });
       } else {
         sendResult = await sendEmailMessage({
-          base44: base44.asServiceRole,
+          base44,
           to: getLeadEmail(lead),
           subject: getMissedCallEmailSubject({ order, step: currentStep }),
           body: messageBody,
@@ -734,6 +914,9 @@ export async function processMissedCallFollowUps({ base44, now = new Date().toIS
         messageBody,
         metadata: {
           source: "missed_call_recovery",
+          production_runtime: true,
+          runtime_type: "process_missed_call_follow_up",
+          trigger_source: "missed_call_follow_up_runner",
           action: `${currentStep.channel}_sent`,
           step_key: currentStep.key,
           provider_message_id: sendResult.provider_message_id,
@@ -756,6 +939,9 @@ export async function processMissedCallFollowUps({ base44, now = new Date().toIS
         errorMessage: error instanceof Error ? error.message : "Send failed",
         metadata: {
           source: "missed_call_recovery",
+          production_runtime: true,
+          runtime_type: "process_missed_call_follow_up",
+          trigger_source: "missed_call_follow_up_runner",
           action: "send_failure",
           step_key: currentStep.key,
           timestamp: now,

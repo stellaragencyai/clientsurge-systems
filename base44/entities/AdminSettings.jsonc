@@ -66,6 +66,10 @@
       "type": "string",
       "title": "Webhook URL"
     },
+    "webhook_secret_token": {
+      "type": "string",
+      "title": "Webhook Secret Token"
+    },
     "sms_template": {
       "type": "string",
       "title": "Lead Response SMS Template"

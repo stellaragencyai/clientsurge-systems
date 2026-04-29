@@ -1,234 +1,403 @@
-/**
- * Webhook: /webhooks/lead-capture
- * Handles incoming lead data from forms, API integrations, and call tracking
- * Triggers instant SMS response and lead creation automation
- */
-
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { loadAdminSettings } from "../_shared/adminSettings.js";
+import { buildCommunicationEvent, buildInstallSnapshot } from "../_shared/installPipeline.js";
+import { RuntimeExecutionError } from "../_shared/installRuntime.js";
+import {
+  enrollLeadInNurtureSequence,
+  executeProductionInstantLeadResponse,
+} from "../_shared/canonicalAutomationRuntime.js";
+
+function cleanString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeEmail(value) {
+  return cleanString(value).toLowerCase();
+}
+
+function normalizePhone(value) {
+  const digits = cleanString(value).replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  if (digits.length === 10) return `+1${digits}`;
+  return value.startsWith("+") ? value : `+${digits}`;
+}
+
+function normalizeBusinessName(value) {
+  return cleanString(value).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+function safeJsonParse(value, fallback = {}) {
+  if (!value) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
+function parseCapturePayload(payload = {}) {
+  const lead = payload?.lead && typeof payload.lead === "object" ? payload.lead : payload;
+  return {
+    name:
+      cleanString(lead.full_name) ||
+      cleanString(lead.name) ||
+      cleanString(lead.contact_name) ||
+      "Unknown Lead",
+    email:
+      normalizeEmail(lead.email) ||
+      normalizeEmail(lead.contact_email),
+    phone:
+      normalizePhone(lead.phone) ||
+      normalizePhone(lead.contact_phone),
+    business_name:
+      cleanString(lead.business_name) ||
+      cleanString(lead.company) ||
+      cleanString(payload.business_name),
+    business_type:
+      cleanString(lead.business_type) ||
+      cleanString(lead.industry) ||
+      "Not specified",
+    problem:
+      cleanString(lead.problem) ||
+      cleanString(lead.message) ||
+      cleanString(lead.inquiry) ||
+      "Customer lead capture webhook",
+    source:
+      cleanString(lead.source) ||
+      cleanString(lead.utm_source) ||
+      cleanString(payload.event) ||
+      "customer_webhook",
+    intake_type:
+      cleanString(lead.intake_type) ||
+      "customer_webhook",
+  };
+}
+
+function readPresentedSecret(req, payload) {
+  const headerSecret =
+    cleanString(req.headers.get("x-webhook-secret")) ||
+    cleanString(req.headers.get("x-webhook-secret-token")) ||
+    cleanString(req.headers.get("authorization")).replace(/^Bearer\s+/i, "");
+  const bodySecret = cleanString(payload?.webhook_secret_token);
+  return headerSecret || bodySecret;
+}
+
+function findServiceState(order, serviceKey) {
+  return buildInstallSnapshot(order).serviceStates.find((service) => service.service_key === serviceKey) || null;
+}
+
+function orderSupportsCustomerLeadCapture(order) {
+  return Boolean(
+    findServiceState(order, "instant_lead_response") ||
+    findServiceState(order, "nurture_sequence_14d")
+  );
+}
+
+async function resolveOrderByProject(base44, projectId) {
+  const orders = await base44.asServiceRole.entities.Order.filter(
+    {
+      client_project_id: projectId,
+      payment_status: "paid",
+    },
+    "-created_date",
+    20
+  ).catch(() => []);
+
+  const supported = (orders || []).filter((order) => orderSupportsCustomerLeadCapture(order));
+  if (supported.length === 1) {
+    return supported[0];
+  }
+
+  if (supported.length > 1) {
+    throw new RuntimeExecutionError("Multiple paid customer lead-capture orders are linked to this project.", {
+      status: 409,
+      code: "ambiguous_customer_lead_capture_order",
+    });
+  }
+
+  return null;
+}
+
+async function resolveOrderFromPayload(base44, payload) {
+  const explicitOrderId =
+    cleanString(payload?.order_id) ||
+    cleanString(payload?.lead?.order_id) ||
+    cleanString(payload?.order?.id);
+
+  if (explicitOrderId) {
+    const order = await base44.asServiceRole.entities.Order.get(explicitOrderId).catch(() => null);
+    if (!order) {
+      throw new RuntimeExecutionError("The provided order_id does not match an Order record.", {
+        status: 404,
+        code: "order_not_found",
+      });
+    }
+
+    if (!orderSupportsCustomerLeadCapture(order)) {
+      throw new RuntimeExecutionError("This order does not include a canonical customer lead-capture automation service.", {
+        status: 409,
+        code: "service_not_purchased",
+      });
+    }
+
+    return order;
+  }
+
+  const projectId =
+    cleanString(payload?.client_project_id) ||
+    cleanString(payload?.project_id) ||
+    cleanString(payload?.lead?.client_project_id) ||
+    cleanString(payload?.lead?.project_id);
+
+  if (projectId) {
+    const projectOrder = await resolveOrderByProject(base44, projectId);
+    if (projectOrder) {
+      return projectOrder;
+    }
+  }
+
+  throw new RuntimeExecutionError("A canonical customer lead-capture webhook must include order_id or a unique client_project_id.", {
+    status: 400,
+    code: "order_resolution_required",
+  });
+}
+
+async function findExistingLeadForOrder(base44, {
+  orderId,
+  businessName,
+  normalizedEmail,
+  normalizedPhone,
+}) {
+  const leads = await base44.asServiceRole.entities.Leads.list("-created_date", 500).catch(() => []);
+  const normalizedBusiness = normalizeBusinessName(businessName);
+
+  return (leads || []).find((lead) => {
+    const context = safeJsonParse(lead.automation_context_json, {});
+    const sameOrder = context.order_id === orderId;
+    const sameBusiness = normalizeBusinessName(lead.business_name) === normalizedBusiness;
+    const emailMatch = normalizedEmail && normalizeEmail(lead.normalized_email || lead.email) === normalizedEmail;
+    const phoneMatch = normalizedPhone && normalizePhone(lead.normalized_phone || lead.phone) === normalizedPhone;
+    return (sameOrder || sameBusiness) && (emailMatch || phoneMatch);
+  }) || null;
+}
+
+function buildLeadAutomationContext({ existingLead, order, payload, now }) {
+  const existingContext = safeJsonParse(existingLead?.automation_context_json, {});
+  return {
+    ...existingContext,
+    order_id: order.id,
+    client_project_id: order.client_project_id || existingContext.client_project_id || null,
+    customer_lead_capture: {
+      received_at: now,
+      latest_payload_at: now,
+      latest_payload_source: cleanString(payload?.event) || "customer_webhook",
+    },
+  };
+}
+
+async function upsertOrderScopedLead(base44, { order, parsedLead, payload, now }) {
+  const normalizedEmail = normalizeEmail(parsedLead.email);
+  const normalizedPhone = normalizePhone(parsedLead.phone);
+  const businessName =
+    parsedLead.business_name ||
+    cleanString(order.business_name) ||
+    cleanString(order.customer_name) ||
+    "Unknown Business";
+
+  const existingLead = await findExistingLeadForOrder(base44, {
+    orderId: order.id,
+    businessName,
+    normalizedEmail,
+    normalizedPhone,
+  });
+
+  const patch = {
+    full_name: parsedLead.name,
+    business_name: businessName,
+    email: normalizedEmail,
+    phone: normalizedPhone,
+    business_type: parsedLead.business_type,
+    problem: parsedLead.problem,
+    source: parsedLead.source,
+    intake_type: parsedLead.intake_type,
+    status: existingLead?.status || "New",
+    lead_score: existingLead?.lead_score ?? 50,
+    activation_priority: existingLead?.activation_priority || "Medium",
+    normalized_email: normalizedEmail,
+    normalized_phone: normalizedPhone,
+    normalized_business_name: normalizeBusinessName(businessName),
+    dedupe_key:
+      normalizedEmail
+        ? `email:${normalizedEmail}`
+        : normalizedPhone
+        ? `phone:${normalizedPhone}`
+        : "",
+    automation_context_json: JSON.stringify(
+      buildLeadAutomationContext({
+        existingLead,
+        order,
+        payload,
+        now,
+      })
+    ),
+    last_activity_at: now,
+  };
+
+  if (existingLead) {
+    const updatedLead = await base44.asServiceRole.entities.Leads.update(existingLead.id, patch);
+    return { lead: updatedLead, created: false };
+  }
+
+  const createdLead = await base44.asServiceRole.entities.Leads.create({
+    ...patch,
+    assigned_to: cleanString(order.customer_email) || undefined,
+    assigned_at: cleanString(order.customer_email) ? now : undefined,
+  });
+
+  return { lead: createdLead, created: true };
+}
+
+async function logInboundLeadCapture(base44, { order, lead, payload, now }) {
+  const serviceKey = findServiceState(order, "instant_lead_response")
+    ? "instant_lead_response"
+    : "nurture_sequence_14d";
+  return base44.asServiceRole.entities.CommunicationEvent.create({
+    ...buildCommunicationEvent({
+      order,
+      service_key: serviceKey,
+      channel: "webhook",
+      direction: "inbound",
+      event_type: "lead_created",
+      provider: "internal",
+      status: "received",
+      subject: "Customer lead captured",
+      message_body: lead.problem || "Customer lead capture webhook received.",
+      metadata: {
+        production_runtime: true,
+        runtime_type: "customer_lead_capture_webhook",
+        trigger_source: "customer_lead_capture_webhook",
+        lead_id: lead.id,
+        payload_keys: Object.keys(payload || {}),
+        received_at: now,
+      },
+    }),
+    lead_id: lead.id,
+  });
+}
 
 Deno.serve(async (req) => {
-  // Only accept POST
   if (req.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
   try {
     const base44 = createClientFromRequest(req);
-    const payload = await req.json();
+    const payload = await req.json().catch(() => ({}));
+    const { settings } = await loadAdminSettings(base44);
+    const expectedSecret =
+      cleanString(settings.webhook_secret_token) ||
+      cleanString(Deno.env.get("LEAD_CAPTURE_WEBHOOK_SECRET"));
+    const presentedSecret = readPresentedSecret(req, payload);
 
-    console.log("[LeadCapture] Received webhook:", JSON.stringify(payload, null, 2));
-
-    // Parse incoming data (supports multiple formats)
-    const lead = parseCapturePayload(payload);
-
-    if (!lead.email && !lead.phone) {
+    if (!expectedSecret) {
       return Response.json(
-        { error: "Email or phone required" },
+        {
+          error: "Customer lead-capture webhook secret is not configured.",
+          code: "webhook_secret_not_configured",
+        },
+        { status: 503 }
+      );
+    }
+
+    if (!presentedSecret || presentedSecret !== expectedSecret) {
+      return Response.json(
+        {
+          error: "Webhook signature verification failed.",
+          code: "webhook_signature_invalid",
+        },
+        { status: 401 }
+      );
+    }
+
+    const parsedLead = parseCapturePayload(payload);
+    if (!parsedLead.email && !parsedLead.phone) {
+      return Response.json(
+        {
+          error: "Email or phone is required.",
+          code: "lead_identity_required",
+        },
         { status: 400 }
       );
     }
 
-    // 1. Get client project from webhook context or find by domain/identifier
-    const project = await findClientProject(base44, payload, lead);
-    if (!project) {
-      console.warn("[LeadCapture] No matching project found, skipping");
-      return Response.json({
-        success: false,
-        message: "No matching project configuration found",
+    const now = new Date().toISOString();
+    const order = await resolveOrderFromPayload(base44, payload);
+    const { lead, created } = await upsertOrderScopedLead(base44, {
+      order,
+      parsedLead,
+      payload,
+      now,
+    });
+
+    await logInboundLeadCapture(base44, {
+      base44,
+      order,
+      lead,
+      payload,
+      now,
+    });
+
+    let instantResult = null;
+    try {
+      instantResult = await executeProductionInstantLeadResponse({
+        base44,
+        order,
+        lead,
+        runtimeType: "customer_lead_capture_runtime",
+        triggerSource: "customer_lead_capture_webhook",
+        now,
       });
+    } catch (error) {
+      if (!(error instanceof RuntimeExecutionError) || error.code !== "duplicate_prevented") {
+        throw error;
+      }
+
+      instantResult = {
+        success: true,
+        duplicate_prevented: true,
+        code: error.code,
+      };
     }
 
-    // 2. Create or update lead record
-    const createdLead = await base44.asServiceRole.entities.Leads.create({
-      full_name: lead.name || "Unknown",
-      business_name: lead.business || "Not provided",
-      email: lead.email || "",
-      phone: lead.phone || "",
-      business_type: lead.business_type || "Not specified",
-      problem: lead.problem || payload.message || "Form submission",
-      source: lead.source || "form_submission",
-      status: "New",
-      lead_score: 50, // Default score
-      activation_priority: "Medium",
-      intake_type: "form",
-      assigned_to: project.owner_email,
-      created_date: new Date().toISOString(),
+    const nurtureEnrollment = await enrollLeadInNurtureSequence({
+      base44,
+      order,
+      lead,
+      now,
     });
-
-    console.log("[LeadCapture] Created lead:", createdLead.id);
-
-    // 3. Log communication event
-    await base44.asServiceRole.entities.CommunicationEvent.create({
-      lead_id: createdLead.id,
-      client_project_id: project.id,
-      service_key: "instant_lead_response",
-      channel: "form",
-      direction: "inbound",
-      event_type: "lead_created",
-      provider: "internal",
-      status: "received",
-      message_body: lead.problem || payload.message,
-      metadata_json: JSON.stringify(payload),
-    });
-
-    // 4. Trigger instant SMS response if configured
-    const serviceConfig = project.install_configuration?.services?.instant_lead_response;
-    if (serviceConfig?.enabled && lead.phone) {
-      await triggerInstantResponse(base44, createdLead, project, serviceConfig);
-    }
-
-    // 5. Trigger lead assignment workflow
-    await triggerLeadAssignment(base44, createdLead, project);
 
     return Response.json({
       success: true,
-      lead_id: createdLead.id,
-      message: "Lead captured and instant response triggered",
+      order_id: order.id,
+      lead_id: lead.id,
+      lead_created: created,
+      runtime: {
+        instant_lead_response: instantResult,
+        nurture_sequence_14d: nurtureEnrollment,
+      },
     });
   } catch (error) {
-    console.error("[LeadCapture] Error:", error.message);
+    const message = error instanceof Error ? error.message : "Failed to process customer lead capture webhook";
+    const status = error instanceof RuntimeExecutionError ? error.status || 409 : 500;
+    const code = error instanceof RuntimeExecutionError ? error.code : "lead_capture_runtime_failed";
     return Response.json(
-      { error: error.message, success: false },
-      { status: 500 }
+      {
+        error: message,
+        code,
+        details: error instanceof RuntimeExecutionError ? error.details : undefined,
+      },
+      { status }
     );
   }
 });
-
-// ─────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────
-
-function parseCapturePayload(payload) {
-  // Support multiple webhook formats
-  return {
-    name: payload.full_name || payload.name || payload.contact_name || "",
-    email: payload.email || payload.contact_email || "",
-    phone: payload.phone || payload.contact_phone || "",
-    business: payload.business_name || payload.company || "",
-    business_type: payload.business_type || payload.industry || "",
-    problem: payload.problem || payload.message || payload.inquiry || "",
-    source: payload.source || payload.utm_source || "unknown",
-  };
-}
-
-async function findClientProject(base44, payload, lead) {
-  // Try to match by project_id in payload first
-  if (payload.project_id) {
-    try {
-      return await base44.asServiceRole.entities.ClientProject.get(payload.project_id);
-    } catch {
-      console.warn("[LeadCapture] Project ID not found:", payload.project_id);
-    }
-  }
-
-  // Try to match by webhook registration
-  if (payload.webhook_key) {
-    const webhook = await base44.asServiceRole.entities.WebhookRegistration.filter(
-      { webhook_registered: true, service_key: "instant_lead_response" },
-      "-created_at",
-      1
-    );
-
-    if (webhook?.length > 0) {
-      const order = await base44.asServiceRole.entities.Order.filter(
-        { id: webhook[0].order_id },
-        "-created_date",
-        1
-      );
-
-      if (order?.length > 0 && order[0].client_id) {
-        return await base44.asServiceRole.entities.ClientProject.get(order[0].client_id);
-      }
-    }
-  }
-
-  // Default: return first active project (for testing)
-  const projects = await base44.asServiceRole.entities.ClientProject.filter(
-    { status: "Active" },
-    "-created_date",
-    1
-  );
-
-  return projects?.[0] || null;
-}
-
-async function triggerInstantResponse(base44, lead, project, serviceConfig) {
-  console.log("[LeadCapture] Triggering instant SMS response");
-
-  // Get template
-  const template = await base44.asServiceRole.entities.MessageTemplate.get(
-    serviceConfig.sms_template_id
-  ).catch(() => null);
-
-  if (!template) {
-    console.warn("[LeadCapture] SMS template not found, skipping");
-    return;
-  }
-
-  // Fill template variables
-  const messageBody = fillTemplate(template.body, {
-    name: lead.full_name,
-    business: project.business_name,
-    response_time: "within 1 hour",
-  });
-
-  // Queue SMS send job
-  await base44.asServiceRole.entities.AutomationJob.create({
-    lead_id: lead.id,
-    job_type: "instant_sms",
-    trigger_event: "lead_created",
-    status: "queued",
-    scheduled_for: new Date().toISOString(),
-    result_metadata: JSON.stringify({
-      template_id: serviceConfig.sms_template_id,
-      recipient_phone: lead.phone,
-      message_body: messageBody,
-    }),
-  });
-
-  // Log communication
-  await base44.asServiceRole.entities.CommunicationEvent.create({
-    lead_id: lead.id,
-    client_project_id: project.id,
-    service_key: "instant_lead_response",
-    channel: "sms",
-    direction: "outbound",
-    event_type: "sms_sent",
-    provider: "twilio",
-    status: "pending",
-    message_body: messageBody,
-  });
-
-  console.log("[LeadCapture] SMS queued for:", lead.phone);
-}
-
-async function triggerLeadAssignment(base44, lead, project) {
-  console.log("[LeadCapture] Triggering lead assignment workflow");
-
-  // Create assignment task
-  await base44.asServiceRole.entities.AutomationJob.create({
-    lead_id: lead.id,
-    job_type: "lead_assignment",
-    trigger_event: "lead_created",
-    status: "queued",
-    scheduled_for: new Date().toISOString(),
-    result_metadata: JSON.stringify({
-      assigned_to: project.owner_email,
-      priority: "High",
-    }),
-  });
-
-  // Update lead with assignment
-  await base44.asServiceRole.entities.Leads.update(lead.id, {
-    assigned_to: project.owner_email,
-    assigned_at: new Date().toISOString(),
-  });
-}
-
-function fillTemplate(template, variables) {
-  let result = template;
-  for (const [key, value] of Object.entries(variables)) {
-    result = result.replace(new RegExp(`{{${key}}}`, "g"), value || "");
-  }
-  return result;
-}

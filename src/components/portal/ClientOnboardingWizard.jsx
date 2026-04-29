@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { ArrowRight, ArrowLeft, CheckCircle2, Loader2, Bell, Mail, MessageSquare, Phone } from 'lucide-react';
+import { ArrowRight, ArrowLeft, CheckCircle2, Loader2, Mail, MessageSquare } from 'lucide-react';
 
 const STEPS = [
   {

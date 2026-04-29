@@ -3,6 +3,7 @@ import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import { setPageMetadata } from "@/lib/seo";
 import { useEffect } from "react";
+import { CHECKOUT_LEGAL_DOCUMENTS } from "@/lib/legalDocuments";
 
 const content = {
   privacy: {
@@ -23,10 +24,22 @@ const content = {
     body: [
       { heading: "Acceptance of Terms", text: "By accessing and using ClientSurge Systems services, you accept and agree to be bound by the terms and provisions of this agreement." },
       { heading: "Services", text: "ClientSurge Systems provides done-for-you automation systems for lead capture, follow-up, and appointment booking for service businesses." },
-      { heading: "Payment Terms", text: "Services require a one-time setup fee and monthly subscription. Payments are due as outlined in your service agreement. We reserve the right to suspend services for non-payment." },
-      { heading: "Cancellation", text: "You may cancel your subscription at any time with 30 days written notice. Setup fees are non-refundable." },
+      { heading: "Payment Terms", text: "Services require a one-time setup fee and a recurring monthly subscription. Payments are due as outlined at checkout or in your service agreement. We reserve the right to suspend services for non-payment." },
+      { heading: "Cancellation", text: "Subscriptions renew month-to-month until canceled. To avoid another renewal, send written cancellation before your next billing date. Setup fees are non-refundable except where a stated written guarantee applies." },
       { heading: "Limitation of Liability", text: "ClientSurge Systems shall not be liable for any indirect, incidental, special, or consequential damages resulting from your use of our services." },
       { heading: "Contact Us", text: "For questions about these Terms, contact us at system@clientsurgesystems.com." },
+    ],
+  },
+  billing: {
+    title: "Billing & Cancellation Terms",
+    updated: "April 2026",
+    body: [
+      { heading: "Billing Model", text: "ClientSurge Systems charges a one-time setup fee plus a recurring monthly subscription for active services." },
+      { heading: "Subscription Renewal", text: "Subscriptions renew month-to-month until canceled. Ongoing billing begins once checkout is completed and your subscription is activated." },
+      { heading: "Cancellation Timing", text: "To avoid another monthly renewal, send written cancellation before your next billing date. Cancellation stops future renewals; already billed amounts are generally not prorated." },
+      { heading: "Setup Fees & Guarantee", text: "Setup fees cover implementation work and are generally non-refundable, except where a stated written guarantee expressly applies to your purchase." },
+      { heading: "Failed Payments", text: "If a payment fails, we may pause service delivery, automations, or account access until billing is resolved." },
+      { heading: "Contact Us", text: "For billing or cancellation questions, contact us at system@clientsurgesystems.com." },
     ],
   },
   cookies: {
@@ -67,8 +80,10 @@ export default function LegalPage() {
   }
 
   const policyLinks = [
-    { label: "Privacy Policy", to: "/legal/privacy" },
-    { label: "Terms of Service", to: "/legal/terms" },
+    ...CHECKOUT_LEGAL_DOCUMENTS.map((document) => ({
+      label: document.label,
+      to: document.path,
+    })),
     { label: "Cookie Policy", to: "/legal/cookies" },
     { label: "Contact Us", to: "/contact" },
   ];

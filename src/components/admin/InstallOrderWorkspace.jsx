@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { formatCurrency, getPackageDisplayLabel } from "@/lib/aiProducts";
+import { buildBillingSummary, formatBillingDate } from "@/lib/billingSummary";
 import {
   CheckCircle2,
   Clock3,
@@ -763,14 +764,18 @@ function ServiceOperatorSummary({ service }) {
 
 function OperationalReadiness({ service }) {
   const readiness = service.go_live_readiness;
+  const executionProfile = service.execution_profile || {};
+  const testSuccessAt = service.test_summary?.latest_test_success_at || service.test_summary?.latest_success_at;
+  const productionSuccessAt = service.test_summary?.latest_production_success_at;
 
   return (
     <div className="rounded-xl border border-border bg-white p-4">
       <p className="text-sm font-semibold text-foreground">Go-Live Readiness</p>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
         <InfoTile label="Config Complete" value={readiness.config_complete ? "Yes" : "No"} />
         <InfoTile label="Provider Ready" value={readiness.provider_ready ? "Yes" : "No"} />
-        <InfoTile label="Successful Test" value={readiness.tested ? "Yes" : "No"} helper={service.test_summary.latest_success_at ? formatDateTime(service.test_summary.latest_success_at) : "No successful runtime yet"} />
+        <InfoTile label="Successful Test" value={readiness.tested ? "Yes" : "No"} helper={testSuccessAt ? formatDateTime(testSuccessAt) : "No successful test yet"} />
+        <InfoTile label="Real Runtime" value={productionSuccessAt ? "Seen" : "Not yet"} helper={productionSuccessAt ? formatDateTime(productionSuccessAt) : executionProfile.trigger_label || "No production runtime yet"} />
         <InfoTile label="Recommended Next" value={readiness.recommended_next_action} />
       </div>
       {readiness.blocking_items.length > 0 && (
@@ -1226,13 +1231,29 @@ function ReviewRequestBuilder({ serviceKey, value, suggestions, onChange, onAppl
   );
 }
 
-function getRuntimeButtonLabel(serviceKey) {
+function getRuntimeButtonLabel(service) {
+  const serviceKey = service?.service_key;
+  const executionMode = service?.execution_profile?.mode;
+  const isLive = service?.install_status === "Live";
   if (serviceKey === "instant_lead_response") return "Send Test Lead";
   if (serviceKey === "missed_call_text_back") return "Simulate Missed Call";
-  if (serviceKey === "ai_booking_agent") return "Run Booking Agent Test";
-  if (serviceKey === "lead_reactivation") return "Run Reactivation Test";
-  if (serviceKey === "review_request") return "Run Review Request Test";
-  return "Run Nurture Sequence Test";
+  if (serviceKey === "ai_booking_agent") return "Run Booking Handoff Test";
+  if (serviceKey === "lead_reactivation") {
+    return executionMode === "manual_triggered" && isLive
+      ? "Run Approved Batch"
+      : "Run Reactivation Test";
+  }
+  if (serviceKey === "review_request") {
+    return executionMode === "manual_triggered" && isLive
+      ? "Send Manual Review Request"
+      : "Run Review Request Test";
+  }
+  if (serviceKey === "nurture_sequence_14d") {
+    return executionMode === "manual_runner" && isLive
+      ? "Run Due Steps"
+      : "Run Nurture Sequence Test";
+  }
+  return "Run Runtime Action";
 }
 
 function getSuggestionField(suggestions, field) {
@@ -1452,33 +1473,37 @@ function ServiceConfigEditor({ service, value, onChange, onApplySuggestion, onAp
 
 function ServiceLastResult({ service }) {
   const summary = service.test_summary || {};
+  const executionProfile = service.execution_profile || {};
   const value =
-    service.service_key === "lead_reactivation"
+    summary.latest_production_runtime_at ||
+    (service.service_key === "lead_reactivation"
       ? summary.latest_batch_summary_at || summary.latest_runtime_at
       : service.service_key === "review_request"
       ? summary.latest_review_trigger_at || summary.latest_runtime_at
-      : summary.latest_runtime_at;
+      : summary.latest_runtime_at);
 
   const helper =
     service.service_key === "lead_reactivation"
       ? summary.latest_batch_summary
-        ? `${summary.latest_batch_summary.selected_lead_count || 0} lead(s) in last test batch`
+        ? `${summary.latest_batch_summary.selected_lead_count || 0} lead(s) in last approved/test batch`
         : "No reactivation batch recorded yet."
       : service.service_key === "review_request"
-      ? `${service.configuration?.channel || "No channel selected"} | ${summary.latest_review_trigger_at ? "Trigger simulated" : "No trigger simulation yet"}`
+      ? `${service.configuration?.channel || "No channel selected"} | ${summary.latest_production_success_at ? "Manual request sent" : summary.latest_review_trigger_at ? "Trigger simulated" : "No manual trigger yet"}`
       : service.service_key === "ai_booking_agent"
       ? summary.latest_booking_simulation_at
         ? "Booking simulation recorded in canonical timeline."
         : "No booking simulation recorded yet."
-      : summary.latest_runtime_event_type || "No runtime result recorded yet.";
+      : summary.latest_production_runtime_event_type
+        ? `${executionProfile.label} | ${summary.latest_production_runtime_event_type}`
+        : summary.latest_runtime_event_type || executionProfile.trigger_label || "No runtime result recorded yet.";
 
   return (
     <div className="rounded-xl border border-border bg-white p-4">
       <p className="text-sm font-semibold text-foreground">Last Result</p>
       <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <InfoTile label="Latest Result" value={value ? formatDateTime(value) : "Not yet"} helper={helper} />
-        <InfoTile label="Successful Test" value={summary.successful_test_exists ? "Yes" : "No"} helper={summary.latest_success_at ? `Last success ${formatDateTime(summary.latest_success_at)}` : "No successful test yet"} />
-        <InfoTile label="Latest Outcome" value={summary.latest_runtime_event_type || "No runtime yet"} helper={summary.latest_failed_at ? `Last failure ${formatDateTime(summary.latest_failed_at)}` : summary.latest_blocked_at ? `Last blocked ${formatDateTime(summary.latest_blocked_at)}` : "No blocked or failed runtime recorded"} />
+        <InfoTile label="Successful Test" value={summary.successful_test_exists ? "Yes" : "No"} helper={summary.latest_test_success_at ? `Last test success ${formatDateTime(summary.latest_test_success_at)}` : "No successful test yet"} />
+        <InfoTile label="Latest Outcome" value={summary.latest_production_runtime_event_type || summary.latest_runtime_event_type || "No runtime yet"} helper={summary.latest_production_failed_at ? `Last production failure ${formatDateTime(summary.latest_production_failed_at)}` : summary.latest_production_blocked_at ? `Last production block ${formatDateTime(summary.latest_production_blocked_at)}` : summary.latest_failed_at ? `Last failure ${formatDateTime(summary.latest_failed_at)}` : summary.latest_blocked_at ? `Last blocked ${formatDateTime(summary.latest_blocked_at)}` : "No blocked or failed runtime recorded"} />
       </div>
     </div>
   );
@@ -1486,6 +1511,7 @@ function ServiceLastResult({ service }) {
 
 function ServiceTimelineRelevance({ service }) {
   const relevance = service.timeline_relevance || {};
+  const executionProfile = service.execution_profile || {};
 
   return (
     <div className="rounded-xl border border-border bg-white p-4">
@@ -1496,7 +1522,7 @@ function ServiceTimelineRelevance({ service }) {
       <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <InfoTile label="Latest Service Event" value={relevance.latest_event_type ? relevance.latest_event_type.replaceAll("_", " ") : "No service event yet"} />
         <InfoTile label="Event Time" value={relevance.latest_event_at ? formatDateTime(relevance.latest_event_at) : "Not yet"} />
-        <InfoTile label="Test Evidence" value={relevance.successful_test_exists ? "Successful test logged" : "No successful test logged"} />
+        <InfoTile label="Runtime Truth" value={relevance.successful_production_exists ? "Production runtime logged" : relevance.successful_test_exists ? "Test-only evidence" : executionProfile.label || "No evidence yet"} helper={relevance.latest_production_success_at ? `Last production success ${formatDateTime(relevance.latest_production_success_at)}` : relevance.latest_test_success_at ? `Last test success ${formatDateTime(relevance.latest_test_success_at)}` : executionProfile.trigger_detail} />
       </div>
     </div>
   );
@@ -1904,18 +1930,28 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
     if (!detail) return;
 
     const saveKey = service.service_key;
+    const executionMode = service.execution_profile?.mode;
+    const runProductionNurture = service.service_key === "nurture_sequence_14d" && executionMode === "manual_runner" && service.install_status === "Live";
+    const runProductionReactivation = service.service_key === "lead_reactivation" && executionMode === "manual_triggered" && service.install_status === "Live";
+    const runProductionReview = service.service_key === "review_request" && executionMode === "manual_triggered" && service.install_status === "Live";
     const endpoint =
       service.service_key === "instant_lead_response"
         ? "sendTestLead"
-        : service.service_key === "missed_call_text_back"
+      : service.service_key === "missed_call_text_back"
         ? "simulateMissedCall"
-        : service.service_key === "ai_booking_agent"
+      : service.service_key === "ai_booking_agent"
         ? "runBookingAgentTest"
-        : service.service_key === "lead_reactivation"
+      : runProductionReactivation
+        ? "runLeadReactivationBatch"
+      : runProductionReview
+        ? "triggerReviewRequestManual"
+      : service.service_key === "lead_reactivation"
         ? "runLeadReactivationTest"
-        : service.service_key === "review_request"
+      : service.service_key === "review_request"
         ? "runReviewRequestTest"
-        : "runNurtureSequenceTest";
+      : runProductionNurture
+        ? "processNurtureSequenceRuntime"
+      : "runNurtureSequenceTest";
 
     const payload =
       service.service_key === "instant_lead_response"
@@ -1939,18 +1975,40 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
             lead_phone: runtimeTargetPhone || detail.customer_phone,
             scheduled_at: new Date().toISOString(),
           }
-        : service.service_key === "lead_reactivation"
+      : service.service_key === "lead_reactivation"
+        ? runProductionReactivation
+          ? {
+              order_id: detail.id,
+              approved: true,
+            }
+          : {
+              order_id: detail.id,
+              max_test_leads: 3,
+            }
+      : service.service_key === "review_request"
+        ? runProductionReview
+          ? {
+              order_id: detail.id,
+              target_phone: runtimeTargetPhone || detail.customer_phone,
+              target_email: runtimeTargetEmail || detail.customer_email,
+              customer_name: detail.customer_name || "Review Request Customer",
+            }
+          : {
+              order_id: detail.id,
+              target_phone: runtimeTargetPhone || detail.customer_phone,
+              target_email: runtimeTargetEmail || detail.customer_email,
+              customer_name: detail.customer_name || "Review Request Test Customer",
+              trigger_event: service.configuration?.trigger_event || "manual_trigger",
+            }
+      : runProductionNurture
+        ? {
+            order_id: detail.id,
+            limit: 25,
+          }
+      : service.service_key === "lead_reactivation"
         ? {
             order_id: detail.id,
             max_test_leads: 3,
-          }
-        : service.service_key === "review_request"
-        ? {
-            order_id: detail.id,
-            target_phone: runtimeTargetPhone || detail.customer_phone,
-            target_email: runtimeTargetEmail || detail.customer_email,
-            customer_name: detail.customer_name || "Review Request Test Customer",
-            trigger_event: service.configuration?.trigger_event || "manual_trigger",
           }
         : {
             order_id: detail.id,
@@ -1980,11 +2038,17 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
         ...current,
         [service.service_key]:
           service.service_key === "ai_booking_agent"
-            ? `Booking agent test succeeded. Confirmation logged for ${destination}.`
+            ? `Booking handoff test succeeded. Confirmation logged for ${destination}.`
+            : runProductionReactivation
+            ? `Approved reactivation batch processed for ${result?.selected_lead_count || 0} lead(s).`
             : service.service_key === "lead_reactivation"
             ? `Reactivation test succeeded for ${result?.target_size || 0} lead(s).`
+            : runProductionReview
+            ? `Manual review request sent via ${result?.channel || service.configuration?.channel || "selected channel"}.`
             : service.service_key === "review_request"
             ? `Review request test succeeded via ${result?.channel || service.configuration?.channel || "selected channel"}.`
+            : runProductionNurture
+            ? `Due nurture steps processed for ${result?.processed || 0} lead(s).`
             : `Runtime succeeded. First step sent to ${destination}.`,
       }));
       await loadDetail();
@@ -2029,6 +2093,12 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
     );
   }
 
+  const billing = buildBillingSummary({
+    order: detail,
+    subscription: detail.subscription,
+    project: detail.client_project,
+  });
+
   return (
     <div className="space-y-6">
       <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
@@ -2046,14 +2116,25 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
               Order {detail.id} | Payment {detail.payment_status} | Setup ${detail.total_setup} | Monthly ${detail.total_monthly}/mo
             </p>
             {detail.subscription ? (
-              <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900">
+              <div className={`rounded-xl px-4 py-3 text-sm ${
+                billing.billingStatus === "past_due" || detail.payment_status === "failed"
+                  ? "border border-amber-200 bg-amber-50 text-amber-900"
+                  : billing.billingStatus === "canceled"
+                  ? "border border-red-200 bg-red-50 text-red-900"
+                  : "border border-green-200 bg-green-50 text-green-900"
+              }`}>
                 <p className="font-semibold">
-                  {detail.subscription.plan_type || detail.plan_type || "Subscription"} · <span className="capitalize">{detail.subscription.status || detail.subscription_status || "pending"}</span>
+                  {billing.currentPlan} · <span className="capitalize">{billing.subscriptionStatus}</span> · Billing {billing.billingStatus}
                 </p>
-                <p className="mt-1 text-xs text-green-800">
-                  Renewal date: {detail.subscription.current_period_end ? new Date(detail.subscription.current_period_end).toLocaleDateString() : "Unavailable"}
+                <p className="mt-1 text-xs">
+                  Renewal date: {formatBillingDate(billing.renewalDate)}
                   {detail.subscription.change_request_status ? ` · Request: ${detail.subscription.change_request_status}` : ""}
                 </p>
+                {billing.warnings.length > 0 ? (
+                  <p className="mt-2 text-xs font-semibold">
+                    {billing.warnings.join(" · ")}
+                  </p>
+                ) : null}
               </div>
             ) : null}
             {detail.pricing_summary ? (
@@ -2267,7 +2348,7 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
                   These are reused across runtime tests so operators do not have to re-enter them on every service card.
                 </p>
                 <div className="mt-4 grid gap-3">
-                  <LabeledField label="Runtime Test Phone" helper="Used by SMS-based tests, booking simulations, and nurture steps with SMS.">
+                  <LabeledField label="Runtime Target Phone" helper="Used by SMS-based tests, manual triggers, booking handoff simulations, and nurture steps with SMS.">
                     <input
                       type="text"
                       value={runtimeTargetPhone}
@@ -2276,7 +2357,7 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
                       placeholder={workspaceSummary?.runtime_targets?.suggested_phone || detail.customer_phone || "+1 (555) 555-5555"}
                     />
                   </LabeledField>
-                  <LabeledField label="Runtime Test Email" helper="Used for nurture email tests, booking simulations, and email review-request tests.">
+                  <LabeledField label="Runtime Target Email" helper="Used for nurture email sends, booking handoff simulations, and email review-request actions.">
                     <input
                       type="email"
                       value={runtimeTargetEmail}
@@ -2434,11 +2515,12 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
                       <h4 className="text-lg font-semibold text-foreground">{service.display_name}</h4>
                       <StatusBadge value={service.install_status} />
                     </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Purchased service control surface for remote configuration, testing, and Live activation.
+                      <p className="mt-1 text-sm text-muted-foreground">
+                      Canonical configuration and runtime truth for this purchased service. Production sends only run through the trigger model shown below.
                     </p>
                   </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <InfoTile label="Runtime Mode" value={service.execution_profile?.label || "Unknown"} helper={service.execution_profile?.trigger_label || "No trigger model recorded"} />
                     <InfoTile label="Allowed Next" value={service.allowed_next_statuses.length > 0 ? service.allowed_next_statuses.join(", ") : "None"} />
                     <InfoTile
                       label={
@@ -2447,18 +2529,22 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
                           : service.service_key === "lead_reactivation"
                           ? "Last Reactivation Run"
                           : service.service_key === "review_request"
-                          ? "Last Review Test"
+                          ? "Last Review Trigger"
+                          : service.execution_profile?.mode === "production_real"
+                          ? "Last Real Runtime"
+                          : service.execution_profile?.mode === "manual_runner"
+                          ? "Last Due-Step Run"
                           : "Last Successful Test"
                       }
-                      value={service.test_summary.latest_runtime_at ? formatDateTime(service.test_summary.latest_runtime_at) : "Not yet"}
+                      value={(service.test_summary.latest_production_runtime_at || service.test_summary.latest_runtime_at) ? formatDateTime(service.test_summary.latest_production_runtime_at || service.test_summary.latest_runtime_at) : "Not yet"}
                       helper={
                         service.service_key === "ai_booking_agent"
                           ? `${service.test_summary.latest_runtime_event_type || "No booking-agent runtime yet"}${service.test_summary.latest_success_at ? ` | last success ${formatDateTime(service.test_summary.latest_success_at)}` : ""}`
                           : service.service_key === "lead_reactivation"
                           ? `${service.target_size || 0} eligible lead(s) currently match the configured segment${service.test_summary.latest_batch_summary_at ? ` | last batch ${formatDateTime(service.test_summary.latest_batch_summary_at)}` : ""}`
                           : service.service_key === "review_request"
-                          ? `${service.configuration?.channel || "No channel selected"} | ${service.test_summary.latest_review_trigger_at ? `last trigger ${formatDateTime(service.test_summary.latest_review_trigger_at)}` : "No review-request trigger yet"}`
-                          : service.scheduler?.label
+                          ? `${service.configuration?.channel || "No channel selected"} | ${service.test_summary.latest_production_success_at ? `last send ${formatDateTime(service.test_summary.latest_production_success_at)}` : service.test_summary.latest_review_trigger_at ? `last test ${formatDateTime(service.test_summary.latest_review_trigger_at)}` : "No review-request trigger yet"}`
+                          : `${service.execution_profile?.label || "Unknown mode"} | ${service.execution_profile?.trigger_label || service.scheduler?.label || "No runtime trigger configured"}`
                       }
                     />
                   </div>
@@ -2488,7 +2574,7 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
                     ) : service.service_key === "review_request" ? (
                       <div className="mt-4 grid gap-3 sm:grid-cols-3">
                         <InfoTile label="Channel" value={service.configuration?.channel || "Not set"} helper={service.configuration?.trigger_event || "No trigger selected"} />
-                        <InfoTile label="Send Delay" value={service.configuration?.send_delay_minutes != null ? `${service.configuration.send_delay_minutes} min` : "Immediate"} helper={service.test_summary.latest_review_trigger_at ? formatDateTime(service.test_summary.latest_review_trigger_at) : "No trigger simulation yet"} />
+                        <InfoTile label="Send Delay" value={service.configuration?.send_delay_minutes != null ? `${service.configuration.send_delay_minutes} min` : "Immediate"} helper={service.test_summary.latest_production_success_at ? formatDateTime(service.test_summary.latest_production_success_at) : service.test_summary.latest_review_trigger_at ? formatDateTime(service.test_summary.latest_review_trigger_at) : "No trigger simulation yet"} />
                         <InfoTile label="Fallback Feedback" value={service.configuration?.fallback_internal_feedback_enabled ? "Enabled" : "Disabled"} helper={service.configuration?.review_link || "No review link saved"} />
                       </div>
                     ) : null}
@@ -2528,10 +2614,10 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
                   <div className="rounded-xl border border-border bg-white p-4">
                     <div className="flex items-center gap-2">
                       <TestTube2 className="h-4 w-4 text-primary" />
-                      <p className="text-sm font-semibold text-foreground">Test</p>
+                      <p className="text-sm font-semibold text-foreground">Runtime Control</p>
                     </div>
                     <p className="mt-3 text-xs text-muted-foreground">
-                      Uses shared runtime test targets: {runtimeTargetPhone || workspaceSummary?.runtime_targets?.suggested_phone || "No phone"} | {runtimeTargetEmail || workspaceSummary?.runtime_targets?.suggested_email || "No email"}.
+                      {service.execution_profile?.trigger_detail || "Uses canonical runtime handling for this service."} Shared targets: {runtimeTargetPhone || workspaceSummary?.runtime_targets?.suggested_phone || "No phone"} | {runtimeTargetEmail || workspaceSummary?.runtime_targets?.suggested_email || "No email"}.
                     </p>
 
                     <div className="mt-4 flex flex-wrap gap-2">
@@ -2574,7 +2660,7 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
                         className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-white px-4 py-2 text-xs font-semibold text-foreground hover:border-primary hover:text-primary disabled:opacity-60"
                       >
                         {runtimeSavingKey === service.service_key ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                        {getRuntimeButtonLabel(service.service_key)}
+                        {getRuntimeButtonLabel(service)}
                       </button>
                     </div>
 
