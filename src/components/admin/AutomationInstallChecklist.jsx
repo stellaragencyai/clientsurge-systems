@@ -160,14 +160,86 @@ function StepRow({ step, completed, onToggle }) {
   );
 }
 
+const DB_STEP_STATUS_CONFIG = {
+  pending:     { label: "Pending",     color: "bg-gray-100 text-gray-600" },
+  in_progress: { label: "In Progress", color: "bg-blue-100 text-blue-700" },
+  complete:    { label: "Complete",    color: "bg-green-100 text-green-700" },
+  failed:      { label: "Failed",      color: "bg-red-100 text-red-700" },
+};
+
+function DbStepRow({ step, onToggle, saving }) {
+  const cfg = DB_STEP_STATUS_CONFIG[step.status] || DB_STEP_STATUS_CONFIG.pending;
+  const isComplete = step.status === "complete";
+  return (
+    <div
+      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+        isComplete ? "bg-green-50 border-green-200" : "bg-white border-slate-200 hover:bg-slate-50"
+      }`}
+      onClick={() => !saving && onToggle(step)}
+    >
+      <div className="flex-shrink-0">
+        {isComplete
+          ? <CheckCircle2 className="w-4 h-4 text-green-600" />
+          : <Circle className="w-4 h-4 text-slate-300" />}
+      </div>
+      <span className={`flex-1 text-sm ${isComplete ? "line-through text-green-800 opacity-70" : "text-slate-700"}`}>
+        {step.step_label}
+      </span>
+      <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${cfg.color}`}>
+        {cfg.label}
+      </span>
+    </div>
+  );
+}
+
 function ChecklistCard({ checklist, onUpdate, onDelete }) {
   const { user } = useAuth();
   const [expanded, setExpanded] = useState(false);
+  const [activeView, setActiveView] = useState("template"); // "template" | "db_steps"
+  const [dbSteps, setDbSteps] = useState([]);
+  const [loadingDbSteps, setLoadingDbSteps] = useState(false);
+  const [savingStep, setSavingStep] = useState(null);
   const [saving, setSaving] = useState(false);
   const [editingNotes, setEditingNotes] = useState(false);
   const [notesValue, setNotesValue] = useState(checklist.admin_notes || "");
   const [failureNotes, setFailureNotes] = useState(checklist.failure_notes || "");
   const [editingFailure, setEditingFailure] = useState(false);
+
+  const loadDbSteps = async () => {
+    setLoadingDbSteps(true);
+    try {
+      const data = await base44.entities.AutomationChecklistStep.filter(
+        { automation_checklist_id: checklist.id },
+        "step_order",
+        50
+      );
+      setDbSteps(data || []);
+    } finally {
+      setLoadingDbSteps(false);
+    }
+  };
+
+  useEffect(() => {
+    if (expanded && activeView === "db_steps" && dbSteps.length === 0) {
+      loadDbSteps();
+    }
+  }, [expanded, activeView]);
+
+  const handleDbStepToggle = async (step) => {
+    const newStatus = step.status === "complete" ? "pending" : "complete";
+    setSavingStep(step.id);
+    const patch = { status: newStatus };
+    if (newStatus === "complete") {
+      patch.completed_at = new Date().toISOString();
+      patch.completed_by = user?.email || "admin";
+    } else {
+      patch.completed_at = null;
+      patch.completed_by = null;
+    }
+    await base44.entities.AutomationChecklistStep.update(step.id, patch);
+    setDbSteps(prev => prev.map(s => s.id === step.id ? { ...s, ...patch } : s));
+    setSavingStep(null);
+  };
 
   const def = SERVICE_DEFINITIONS[checklist.service_key];
   const stepsCompleted = checklist.steps_completed || [];
@@ -257,6 +329,22 @@ function ChecklistCard({ checklist, onUpdate, onDelete }) {
 
       {expanded && (
         <div className="border-t border-slate-100 p-4 space-y-5">
+          {/* View toggle */}
+          <div className="flex gap-1 p-1 bg-slate-100 rounded-lg w-fit">
+            <button
+              onClick={() => setActiveView("template")}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${activeView === "template" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+            >
+              Install Checklist
+            </button>
+            <button
+              onClick={() => { setActiveView("db_steps"); if (dbSteps.length === 0) loadDbSteps(); }}
+              className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${activeView === "db_steps" ? "bg-white text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+            >
+              DB Steps {dbSteps.length > 0 && `(${dbSteps.filter(s => s.status === "complete").length}/${dbSteps.length})`}
+            </button>
+          </div>
+
           {/* Meta info */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
             <div>
@@ -277,26 +365,61 @@ function ChecklistCard({ checklist, onUpdate, onDelete }) {
             </div>
           </div>
 
-          {/* Steps by section */}
-          <div className="space-y-4">
-            {Object.entries(groupedSteps).map(([section, steps]) => (
-              <div key={section}>
-                <p className={`text-[11px] font-bold uppercase tracking-widest mb-2 px-2 py-1 rounded-md w-fit ${SECTION_COLORS[section] || "text-slate-600 bg-slate-100"}`}>
-                  {section}
+          {/* Steps — template view OR db steps view */}
+          {activeView === "template" ? (
+            <div className="space-y-4">
+              {Object.entries(groupedSteps).map(([section, steps]) => (
+                <div key={section}>
+                  <p className={`text-[11px] font-bold uppercase tracking-widest mb-2 px-2 py-1 rounded-md w-fit ${SECTION_COLORS[section] || "text-slate-600 bg-slate-100"}`}>
+                    {section}
+                  </p>
+                  <div className="space-y-1.5">
+                    {steps.map(step => (
+                      <StepRow
+                        key={step.id}
+                        step={step}
+                        completed={stepsCompleted.includes(step.id)}
+                        onToggle={toggleStep}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs font-semibold text-slate-500">
+                  Persisted step records from <code className="bg-slate-100 px-1 rounded text-[10px]">AutomationChecklistStep</code>
                 </p>
+                <button onClick={loadDbSteps} disabled={loadingDbSteps} className="text-xs text-primary hover:text-primary/80 flex items-center gap-1">
+                  <RefreshCw className={`w-3 h-3 ${loadingDbSteps ? "animate-spin" : ""}`} />
+                  Refresh
+                </button>
+              </div>
+              {loadingDbSteps ? (
+                <div className="flex items-center justify-center py-8 text-slate-400 gap-2 text-sm">
+                  <Loader2 className="w-4 h-4 animate-spin" /> Loading…
+                </div>
+              ) : dbSteps.length === 0 ? (
+                <div className="text-center py-8 text-slate-400 text-sm">
+                  <p>No DB steps found.</p>
+                  <p className="text-xs mt-1">Steps are created automatically by <strong>initializeInstallOS</strong> when an order is paid.</p>
+                </div>
+              ) : (
                 <div className="space-y-1.5">
-                  {steps.map(step => (
-                    <StepRow
+                  {dbSteps.map(step => (
+                    <DbStepRow
                       key={step.id}
                       step={step}
-                      completed={stepsCompleted.includes(step.id)}
-                      onToggle={toggleStep}
+                      onToggle={handleDbStepToggle}
+                      saving={savingStep === step.id}
                     />
                   ))}
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Action buttons */}
           <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100">
