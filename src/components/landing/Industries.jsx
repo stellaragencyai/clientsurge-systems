@@ -8,6 +8,7 @@ import {
   Sparkles,
   Wrench,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useDemoBooking } from "./DemoBookingContext";
 import {
   INDUSTRY_RECOMMENDATIONS_BY_ID,
@@ -74,19 +75,14 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8"
-      style={{ background: "rgba(10,8,5,0.72)", backdropFilter: "blur(6px)" }}
-      onClick={onClose}
+      className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[28px] mx-auto"
+      style={{
+        background: "linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,245,239,0.94) 100%)",
+        border: "1.5px solid rgba(154,92,46,0.22)",
+        boxShadow: "0 50px 130px rgba(0,0,0,0.45)",
+      }}
+      onClick={(e) => e.stopPropagation()}
     >
-      <div
-        className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[28px]"
-        style={{
-          background: "linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,245,239,0.94) 100%)",
-          border: "1.5px solid rgba(154,92,46,0.22)",
-          boxShadow: "0 32px 80px rgba(10,6,2,0.28)",
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
         {/* Header */}
         <div
           className="px-7 pt-7 pb-5 flex items-start justify-between gap-4 sticky top-0 rounded-t-[28px] z-10"
@@ -177,7 +173,6 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
             </span>
           </button>
         </div>
-      </div>
     </div>
   );
 }
@@ -362,13 +357,51 @@ export default function Industries() {
         })}
       </div>
 
-      {modalOpen && selectedRecommendation && (
-        <IndustryModal
-          recommendation={selectedRecommendation}
-          onClose={() => setModalOpen(false)}
-          onBookDemo={() => { setModalOpen(false); demoBooking?.openDemoBooking?.(); }}
-        />
-      )}
+      <AnimatePresence>
+        {modalOpen && selectedRecommendation && (
+          <>
+            <motion.div
+              key="industry-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+              onClick={() => setModalOpen(false)}
+              style={{
+                position: "fixed", inset: 0, zIndex: 199,
+                background: "rgba(4,2,1,0.35)",
+                backdropFilter: "blur(8px) saturate(0.8)",
+                WebkitBackdropFilter: "blur(8px) saturate(0.8)",
+              }}
+            />
+            <motion.div
+              key="industry-modal-wrap"
+              initial={{ opacity: 0, y: 140, scale: 0.72, rotateX: 10 }}
+              animate={{ opacity: 1, y: 0,   scale: 1,    rotateX: 0  }}
+              exit={{    opacity: 0, y: 60,  scale: 0.88, rotateX: 4  }}
+              transition={{
+                type: "spring", stiffness: 260, damping: 26, mass: 0.9,
+                opacity: { duration: 0.3, ease: "easeOut" },
+              }}
+              style={{
+                position: "fixed", inset: 0, zIndex: 200,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                padding: "16px 16px 32px",
+                perspective: "1200px",
+                pointerEvents: "none",
+              }}
+            >
+              <div style={{ pointerEvents: "auto", width: "100%" }}>
+                <IndustryModal
+                  recommendation={selectedRecommendation}
+                  onClose={() => setModalOpen(false)}
+                  onBookDemo={() => { setModalOpen(false); demoBooking?.openDemoBooking?.(); }}
+                />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

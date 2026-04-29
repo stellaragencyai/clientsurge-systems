@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Accordion,
   AccordionContent,
@@ -135,21 +135,24 @@ export default function FAQ() {
 
         {filtered.length > 0 ? (
           <Accordion type="single" collapsible value={`faq-${expandedIndex}`} onValueChange={(val) => setExpandedIndex(parseInt(val.split("-")[1]))} className="space-y-3">
-            {filtered.map((faq, idx) => {
-              const originalIdx = FAQ_ITEMS.indexOf(faq);
-              return (
-              <AccordionItem
+            {filtered.map((faq, idx) => (
+              <motion.div
                 key={idx}
-                value={`faq-${idx}`}
-                className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-all duration-300"
-                style={{
-                  background: "rgba(255,255,255,0.75)",
-                  backdropFilter: "blur(16px)",
-                  WebkitBackdropFilter: "blur(16px)",
-                  border: "1.5px solid rgba(200,205,215,0.55)",
-                  boxShadow: "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
-                }}
+                initial={{ opacity: 0, y: 20, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 280, damping: 28, delay: idx * 0.05 }}
               >
+                <AccordionItem
+                  value={`faq-${idx}`}
+                  className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-all duration-300"
+                  style={{
+                    background: "rgba(255,255,255,0.75)",
+                    backdropFilter: "blur(16px)",
+                    WebkitBackdropFilter: "blur(16px)",
+                    border: "1.5px solid rgba(200,205,215,0.55)",
+                    boxShadow: "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
+                  }}
+                >
                   <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
                     {faq.q}
                   </AccordionTrigger>
@@ -159,8 +162,8 @@ export default function FAQ() {
                     </div>
                   </AccordionContent>
                 </AccordionItem>
-              );
-            })}
+              </motion.div>
+            ))}
           </Accordion>
         ) : (
           <div className="text-center py-12 text-muted-foreground">
