@@ -3,8 +3,12 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 
-// Inlined from salesCatalog — canonical product registry
-// price IDs are populated here; update when Stripe products are created
+// ─────────────────────────────────────────────────────────────────────────────
+// IMPORTANT: TEMPORARY MIRROR OF lib/salesCatalog.js
+// Until Base44 supports reliable shared imports in Deno functions, update
+// Stripe price IDs in BOTH lib/salesCatalog.js AND this registry.
+// Any mismatch between the two files will cause checkout to serve wrong prices.
+// ─────────────────────────────────────────────────────────────────────────────
 const CANONICAL_PRODUCTS = [
   { product_id: "prod_UNi5RHiKNSTfQl", service_key: "instant_lead_response",  name: "Instant Lead Response",       setup_fee: 297, monthly_fee: 97,  setup_price_id: "price_1TOwfiB9GU5ysJqEcmQHl3gE", monthly_price_id: "price_1TOwfiB9GU5ysJqE20FYUfVc" },
   { product_id: "prod_UNi5QL0bQl98If", service_key: "missed_call_text_back",   name: "Missed Call Text-Back",        setup_fee: 197, monthly_fee: 67,  setup_price_id: "price_1TOwfiB9GU5ysJqEJuEDhpKS", monthly_price_id: "price_1TOwfiB9GU5ysJqE8knUfswZ" },
@@ -15,6 +19,33 @@ const CANONICAL_PRODUCTS = [
 ];
 
 const PRODUCT_BY_ID = Object.fromEntries(CANONICAL_PRODUCTS.map((p) => [p.product_id, p]));
+
+// ── Startup validation: detect registry integrity issues immediately ──────────
+(function validateRegistry() {
+  const seenIds = new Set();
+  const seenKeys = new Set();
+  for (const p of CANONICAL_PRODUCTS) {
+    if (!p.product_id) {
+      console.error("[Registry] INVALID: product entry missing product_id", p);
+    } else if (seenIds.has(p.product_id)) {
+      console.error(`[Registry] DUPLICATE product_id detected: ${p.product_id}`);
+    } else {
+      seenIds.add(p.product_id);
+    }
+    if (!p.service_key) {
+      console.error(`[Registry] INVALID: ${p.product_id} missing service_key`);
+    } else if (seenKeys.has(p.service_key)) {
+      console.error(`[Registry] DUPLICATE service_key detected: ${p.service_key}`);
+    } else {
+      seenKeys.add(p.service_key);
+    }
+  }
+  if (seenIds.size !== CANONICAL_PRODUCTS.length) {
+    console.error("[Registry] Registry has duplicate or missing product_ids — checkout may behave incorrectly");
+  } else {
+    console.log(`[Registry] OK — ${CANONICAL_PRODUCTS.length} products validated`);
+  }
+})();
 
 // Normalize install configuration for a new order
 function normalizeInstallConfiguration(orderItems = []) {
@@ -58,12 +89,16 @@ Deno.serve(async (req) => {
       return Response.json({ error: "No valid products found for checkout" }, { status: 400 });
     }
 
-    // Validate all setup_price_ids are present before creating anything
-    const missingPrices = resolvedProducts.filter((p) => !p.setup_price_id);
-    if (missingPrices.length) {
-      const names = missingPrices.map((p) => p.name).join(", ");
-      console.error(`Missing setup_price_id for: ${names}`);
-      return Response.json({ error: `Checkout not yet available for: ${names}` }, { status: 400 });
+    // ── Checkout-time validation: ensure all setup_price_ids exist and are valid ──
+    const invalidPrices = resolvedProducts.filter(
+      (p) => !p.setup_price_id || !String(p.setup_price_id).startsWith("price_")
+    );
+    if (invalidPrices.length) {
+      const names = invalidPrices.map((p) => p.name).join(", ");
+      console.error(`[Checkout] Invalid or missing setup_price_id for: ${names}. Expected format: price_xxx`);
+      return Response.json({
+        error: `Checkout is not yet configured for: ${names}. Please contact support.`,
+      }, { status: 400 });
     }
 
     const total_setup = resolvedProducts.reduce((sum, p) => sum + p.setup_fee, 0);
