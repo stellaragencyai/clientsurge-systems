@@ -249,7 +249,7 @@ export default function LaunchTimeline() {
       <div className="hidden sm:flex justify-center items-start gap-4 md:gap-6 px-4 mb-6">
         {launchTimelineSteps.map((step, idx) => {
           const Icon = iconMap[step.icon];
-          const isActive = openStep === idx;
+          const isActive = activeStep === idx;
           return (
             <div key={step.id} className="flex items-start gap-4 md:gap-6">
               <button
