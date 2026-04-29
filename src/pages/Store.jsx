@@ -123,31 +123,7 @@ function StoreInner() {
         position: "relative",
       }}
     >
-      <div
-        aria-hidden="true"
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 0,
-          background: "linear-gradient(160deg, #0d0805 0%, #120c06 40%, #0f0a05 100%)",
-        }}
-      />
-      {/* Subtle dot grid */}
-      <div aria-hidden="true" style={{
-        position: "fixed", inset: 0, zIndex: 0, opacity: 0.04, pointerEvents: "none",
-        backgroundImage: "radial-gradient(rgba(200,150,92,1) 1px, transparent 1px)",
-        backgroundSize: "32px 32px",
-      }} />
-      {/* Subtle texture overlay matching main page */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 1,
-          display: "none",
-        }}
-      />
+      
 
       <div style={{ position: "relative", zIndex: 2 }}>
         <style>{`
@@ -313,12 +289,11 @@ function StoreInner() {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "8px",
-                  borderRadius: "6px",
+                  borderRadius: "9999px",
                   padding: "6px 16px",
                   marginBottom: "18px",
-                  background: "rgba(200,150,92,0.08)",
-                  border: "1px solid rgba(200,150,92,0.25)",
-                  boxShadow: "0 0 16px rgba(200,150,92,0.08)",
+                  background: "rgba(154,92,46,0.08)",
+                  border: "1px solid rgba(154,92,46,0.18)",
                 }}
               >
                 <Zap style={{ width: "12px", height: "12px", color: "#9a5c2e" }} />
@@ -423,16 +398,32 @@ function StoreInner() {
                 <div
                  key={stat.label}
                  style={{
-                   textAlign: "center", borderRadius: "10px", padding: "8px 10px",
-                   background: "rgba(200,150,92,0.06)",
-                   border: "1px solid rgba(200,150,92,0.18)",
-                   boxShadow: "0 0 14px rgba(200,150,92,0.06)",
+                   textAlign: "center",
+                   borderRadius: "10px",
+                   padding: "8px 10px",
+                   background: "#ffffff",
+                   border: "1.5px solid rgba(0,0,0,0.1)",
+                   boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                  }}
                 >
-                 <p style={{ fontSize: "16px", fontWeight: "800", color: "#c8965c", margin: "0 0 2px", fontFamily: "'Space Grotesk', monospace", textShadow: "0 0 10px rgba(200,150,92,0.4)" }}>
+                 <p
+                   style={{
+                     fontSize: "16px",
+                     fontWeight: "800",
+                     color: "#9a5c2e",
+                     margin: "0 0 2px",
+                   }}
+                 >
                    {stat.val}
                  </p>
-                 <p style={{ fontSize: "10px", color: "rgba(220,190,150,0.5)", margin: 0, fontWeight: "600" }}>
+                 <p
+                   style={{
+                     fontSize: "10px",
+                     color: "rgba(27,20,13,0.6)",
+                     margin: 0,
+                     fontWeight: "600",
+                   }}
+                 >
                    {stat.label}
                  </p>
                 </div>
@@ -494,25 +485,26 @@ function StoreInner() {
               <button
                 onClick={() => setShowComparison(true)}
                 style={{
-                  borderRadius: "8px", padding: "8px 20px", fontSize: "11px",
-                  fontWeight: "700", letterSpacing: "0.06em",
-                  border: "1px solid rgba(200,150,92,0.2)",
-                  background: "rgba(200,150,92,0.06)",
-                  color: "rgba(200,150,92,0.7)",
-                  cursor: "pointer", transition: "all 0.2s",
+                  borderRadius: "9999px",
+                  padding: "8px 20px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  border: "1.5px solid rgba(154,92,46,0.3)",
+                  background: "rgba(255,255,255,0.7)",
+                  color: "#9a5c2e",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(200,150,92,0.45)";
-                  e.currentTarget.style.color = "#c8965c";
-                  e.currentTarget.style.background = "rgba(200,150,92,0.1)";
+                  e.currentTarget.style.background = "rgba(255,255,255,0.9)";
+                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.5)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "rgba(200,150,92,0.2)";
-                  e.currentTarget.style.color = "rgba(200,150,92,0.7)";
-                  e.currentTarget.style.background = "rgba(200,150,92,0.06)";
+                  e.currentTarget.style.background = "rgba(255,255,255,0.7)";
+                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.3)";
                 }}
               >
-                ▦ Compare All Services
+                📊 Compare All Services
               </button>
               <GuidedPathToggle mode={pathMode} onModeChange={setPathMode} />
             </div>
@@ -537,15 +529,15 @@ function StoreInner() {
                   onChange={(event) => setSearch(event.target.value)}
                   style={{
                     width: "100%",
-                    borderRadius: "8px",
-                    border: "1px solid rgba(200,150,92,0.2)",
+                    borderRadius: "9999px",
+                    border: "1.5px solid rgba(154,92,46,0.22)",
                     padding: "11px 16px 11px 38px",
                     fontSize: "13px",
-                    background: "rgba(200,150,92,0.05)",
+                    background: "rgba(255,255,255,0.85)",
                     outline: "none",
                     boxSizing: "border-box",
-                    color: "rgba(245,225,195,0.9)",
-                    boxShadow: "none",
+                    color: "#1b140d",
+                    boxShadow: "0 2px 8px rgba(111,67,31,0.05)",
                   }}
                 />
               </div>
@@ -553,63 +545,49 @@ function StoreInner() {
               <div className="store-filterMeta">
                 <span
                   style={{
-                    fontSize: "11px",
+                    fontSize: "12px",
                     fontWeight: "700",
-                    color: "rgba(200,150,92,0.45)",
-                    letterSpacing: "0.12em",
+                    color: "rgba(27,20,13,0.55)",
+                    letterSpacing: "0.08em",
                     textTransform: "uppercase",
-                    fontFamily: "monospace",
                   }}
                 >
                   {resultLabel}
                 </span>
                 <div className="store-categories">
-                  {CATEGORIES.map((category) => {
-                    const isActive = activeCategory === category;
-                    return (
-                      <button
-                        key={category}
-                        onClick={() => setActiveCategory(category)}
-                        className={`ai-module-btn${isActive ? " active-module" : ""}`}
-                        style={{
-                          borderRadius: "8px",
-                          padding: "6px 14px",
-                          fontSize: "11px",
-                          fontWeight: "700",
-                          letterSpacing: "0.06em",
-                          border: isActive
-                            ? "1px solid rgba(200,150,92,0.55)"
-                            : "1px solid rgba(200,150,92,0.15)",
-                          cursor: "pointer",
-                          background: isActive
-                            ? "rgba(200,150,92,0.12)"
-                            : "rgba(255,255,255,0.03)",
-                          color: isActive ? "#c8965c" : "rgba(200,165,115,0.5)",
-                          transition: "all 0.2s",
-                          boxShadow: isActive
-                            ? "0 0 16px rgba(200,130,60,0.2), inset 0 1px 0 rgba(255,255,255,0.04)"
-                            : "none",
-                          display: "flex", alignItems: "center", gap: "6px",
-                        }}
-                      >
-                        {/* Pulsing indicator dot */}
-                        <span style={{
-                          width: "5px", height: "5px", borderRadius: "50%", flexShrink: 0,
-                          background: isActive ? "#c8965c" : "rgba(200,150,92,0.25)",
-                          boxShadow: isActive ? "0 0 6px rgba(200,150,92,0.8)" : "none",
-                          animation: isActive ? "modulePulse 1.8s ease-in-out infinite" : "none",
-                        }} />
-                        {category}
-                      </button>
-                    );
-                  })}
+                  {CATEGORIES.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setActiveCategory(category)}
+                      style={{
+                        borderRadius: "9999px",
+                        padding: "7px 16px",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        border:
+                          activeCategory === category
+                            ? "1.5px solid rgba(154,92,46,0.5)"
+                            : "1.5px solid rgba(154,92,46,0.18)",
+                        cursor: "pointer",
+                        background:
+                          activeCategory === category
+                            ? "linear-gradient(135deg,#6b3f1f,#9a5c2e)"
+                            : "rgba(255,255,255,0.75)",
+                        color:
+                          activeCategory === category
+                            ? "#f5e6d0"
+                            : "rgba(27,20,13,0.72)",
+                        transition: "all 0.2s",
+                        boxShadow:
+                          activeCategory === category
+                            ? "0 4px 14px rgba(120,70,20,0.28)"
+                            : "0 1px 4px rgba(111,67,31,0.06)",
+                      }}
+                    >
+                      {category}
+                    </button>
+                  ))}
                 </div>
-                <style>{`
-                  @keyframes modulePulse {
-                    0%, 100% { box-shadow: 0 0 4px rgba(200,150,92,0.6); }
-                    50%       { box-shadow: 0 0 10px rgba(200,150,92,1); }
-                  }
-                `}</style>
               </div>
             </div>
 
