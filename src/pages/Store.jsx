@@ -14,6 +14,8 @@ import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 import BuildYourStackFlow from "@/components/store/BuildYourStackFlow";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { getRecommendedProducts } from "@/lib/productRecommendations";
+import StackValueCounter from "@/components/store/StackValueCounter";
+import BundleUnlockToast from "@/components/store/BundleUnlockToast";
 
 const InteractiveStackBuilder = lazy(() =>
   import("@/components/store/InteractiveStackBuilder")
@@ -436,6 +438,9 @@ function StoreInner() {
               ))}
             </div>
           </div>
+
+          <StackValueCounter />
+          <BundleUnlockToast />
 
           {items.length > 0 ? (
             <div onClick={() => setCartOpen(true)} className="store-sticky-cart">
