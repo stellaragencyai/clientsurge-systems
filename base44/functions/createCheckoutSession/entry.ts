@@ -71,38 +71,50 @@ function normalizeInstallConfiguration(orderItems = []) {
   return config;
 }
 
-// Detect package type from service_keys
+// Helper: Compare sets for exact equality
+function setsEqual(setA, setB) {
+  if (setA.size !== setB.size) return false;
+  for (const item of setA) {
+    if (!setB.has(item)) return false;
+  }
+  return true;
+}
+
+// Detect package type from service_keys (EXACT MATCHING)
 function detectPackageType(serviceKeys = []) {
   const keySet = new Set(serviceKeys);
 
-  // Pro System: all 6 services
-  if (
-    keySet.has("instant_lead_response") &&
-    keySet.has("missed_call_text_back") &&
-    keySet.has("nurture_sequence_14d") &&
-    keySet.has("ai_booking_agent") &&
-    keySet.has("lead_reactivation") &&
-    keySet.has("review_request")
-  ) {
+  // Pro System: EXACTLY these 6 services
+  const proSet = new Set([
+    "instant_lead_response",
+    "missed_call_text_back",
+    "nurture_sequence_14d",
+    "ai_booking_agent",
+    "lead_reactivation",
+    "review_request",
+  ]);
+  if (setsEqual(keySet, proSet)) {
     return "pro_system";
   }
 
-  // Growth System: 4 services
-  if (
-    keySet.has("instant_lead_response") &&
-    keySet.has("missed_call_text_back") &&
-    keySet.has("nurture_sequence_14d") &&
-    keySet.has("ai_booking_agent")
-  ) {
+  // Growth System: EXACTLY these 4 services
+  const growthSet = new Set([
+    "instant_lead_response",
+    "missed_call_text_back",
+    "nurture_sequence_14d",
+    "ai_booking_agent",
+  ]);
+  if (setsEqual(keySet, growthSet)) {
     return "growth_system";
   }
 
-  // Starter System: 2 services
-  if (keySet.has("instant_lead_response") && keySet.has("ai_booking_agent")) {
+  // Starter System: EXACTLY these 2 services
+  const starterSet = new Set(["instant_lead_response", "ai_booking_agent"]);
+  if (setsEqual(keySet, starterSet)) {
     return "starter_system";
   }
 
-  // Individual services or unknown combination
+  // Any other combination (including partial + add-ons)
   return null;
 }
 
@@ -191,14 +203,14 @@ Deno.serve(async (req) => {
       console.log(`[Checkout] User did not select a predefined package`);
     }
 
-    // Detect which package (if any) was purchased from service_keys
+    // Detect which package (if any) was purchased from service_keys (exact matching)
     const serviceKeys = orderItems.map((item) => item.service_key);
     const detectedPackageType = detectPackageType(serviceKeys);
 
     if (detectedPackageType) {
-      console.log(`[Checkout] Computed package_type: ${detectedPackageType}`);
+      console.log(`[Checkout] Exact package match: ${detectedPackageType}`);
     } else {
-      console.log(`[Checkout] No package detected (individual services)`);
+      console.log(`[Checkout] No exact package match; custom bundle (services: ${serviceKeys.join(", ")})`);
     }
 
     const order = await base44.asServiceRole.entities.Order.create({
