@@ -136,19 +136,42 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
 
-    // Find matching lead
+    // ─────────────────────────────────────────────────────────
+    // STEP 1: Find or create lead in Leads entity (for missed-call processor)
+    // ─────────────────────────────────────────────────────────
     let lead;
+    const now = new Date().toISOString();
+    
     try {
-      const leads = await base44.asServiceRole.entities.WebsiteLead.filter(
-        { phone_number: normalizedPhone },  
-        "-created_date",
+      const leads = await base44.asServiceRole.entities.Leads.filter(
+        { phone: normalizedPhone },  
+        "-last_contacted_at",
         1
       );
+      
       if (leads && leads.length > 0) {
         lead = leads[0];
+        console.log(`[MissedCall] Found existing lead ${lead.id}`);
+      } else {
+        // Create new lead with "Contacted" status so processMissedCallFollowUps will pick it up
+        lead = await base44.asServiceRole.entities.Leads.create({
+          full_name: "Unknown Caller",
+          business_name: "Unknown Business",
+          email: "unknown@example.com",
+          phone: normalizedPhone,
+          business_type: "Unknown",
+          problem: "Missed call inbound",
+          source: "twilio_missed_call",
+          status: "Contacted",
+          activation_priority: "Hot",
+          last_contacted_at: now,
+        });
+        console.log(`[MissedCall] Created new lead ${lead.id} from missed call`);
       }
     } catch (e) {
-      console.warn(`[MissedCall] Lead lookup failed: ${e.message}`);
+      console.error(`[MissedCall] Lead lookup/creation failed: ${e.message}`);
+      // Continue anyway — SMS will still be sent
+      lead = null;
     }
 
     // Get SMS template from settings
@@ -170,19 +193,54 @@ Deno.serve(async (req) => {
     // Send SMS
     const messageSid = await sendTwilioSms(normalizedPhone, messageBody);
 
-    // Update lead if found
+    // ─────────────────────────────────────────────────────────
+    // STEP 2: Update lead and log missed-call inbound event
+    // ─────────────────────────────────────────────────────────
     if (lead) {
       try {
-        await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
-          last_engagement_type: "call",
-          last_engagement_at: new Date().toISOString(),
+        // Update lead: ensure activation_priority stays Hot and last_contacted_at is current
+        await base44.asServiceRole.entities.Leads.update(lead.id, {
+          status: "Contacted",
+          activation_priority: "Hot",
+          last_contacted_at: now,
         });
-        console.log(`[MissedCall] Updated lead ${lead.id}`);
+        console.log(`[MissedCall] Updated lead ${lead.id} — status=Contacted, priority=Hot`);
       } catch (e) {
-        console.warn(`[MissedCall] Failed to update lead: ${e.message}`);
+        console.error(`[MissedCall] Failed to update lead: ${e.message}`);
       }
 
-      // Log event
+      // ─────────────────────────────────────────────────────────
+      // STEP 3: Log inbound missed call event
+      // ─────────────────────────────────────────────────────────
+      try {
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          lead_id: lead.id,
+          channel: "sms",
+          direction: "inbound",
+          event_type: "missed_call",
+          provider: "twilio",
+          status: "received",
+          subject: `[TWILIO] Missed call from ${normalizedPhone}`,
+          message_body: `Missed call (no answer / failed). Automated text-back sent.`,
+          provider_message_id: callSid,
+          metadata_json: JSON.stringify({
+            service_key: "missed_call_text_back",
+            inbound_call_sid: callSid,
+            caller_phone: normalizedPhone,
+            call_status: callStatus,
+            sms_response_sent: messageSid,
+            timestamp: now,
+            trigger: "missed_call_webhook",
+          }),
+        });
+        console.log(`[MissedCall] Logged missed-call event for lead ${lead.id}`);
+      } catch (e) {
+        console.warn(`[MissedCall] Failed to log event: ${e.message}`);
+      }
+
+      // ─────────────────────────────────────────────────────────
+      // STEP 4: Log outbound SMS response
+      // ─────────────────────────────────────────────────────────
       try {
         await base44.asServiceRole.entities.CommunicationEvent.create({
           lead_id: lead.id,
@@ -195,15 +253,16 @@ Deno.serve(async (req) => {
           provider_message_id: messageSid,
           metadata_json: JSON.stringify({
             service_key: "missed_call_text_back",
-            trigger: "no-answer",
-            timestamp: new Date().toISOString(),
+            trigger: "missed_call_webhook",
+            timestamp: now,
           }),
         });
+        console.log(`[MissedCall] Logged SMS response for lead ${lead.id}`);
       } catch (e) {
-        console.warn(`[MissedCall] Failed to log event: ${e.message}`);
+        console.warn(`[MissedCall] Failed to log SMS event: ${e.message}`);
       }
     } else {
-      console.log(`[MissedCall] No lead found for ${normalizedPhone}, SMS sent anyway`);
+      console.log(`[MissedCall] No lead created/found for ${normalizedPhone}, SMS sent anyway`);
     }
 
     return Response.json({ success: true, message_id: messageSid });
