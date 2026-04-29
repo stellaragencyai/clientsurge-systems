@@ -31,6 +31,7 @@ import InstallQueuePanel from '../components/admin/InstallQueuePanel';
 import WebsiteLeadsDashboard from '../components/admin/WebsiteLeadsDashboard';
 import CommunicationLogsPanel from '../components/admin/CommunicationLogsPanel';
 import AutomationInstallChecklist from '../components/admin/AutomationInstallChecklist';
+import ReviewRequestPanel from '../components/admin/ReviewRequestPanel';
 
 const NAV_GROUPS = [
   {
@@ -73,6 +74,7 @@ const NAV_GROUPS = [
       { id: 'health', label: 'Integration Health', icon: Activity },
       { id: 'logs', label: 'Communication Logs', icon: MessageSquare },
       { id: 'templates', label: 'Templates', icon: MessageSquare },
+      { id: 'review-request', label: 'Review Requests', icon: Star },
       { id: 'settings', label: 'Settings', icon: Settings },
       { id: 'qa', label: 'QA Tools', icon: RefreshCw },
     ],
@@ -167,6 +169,7 @@ export default function AdminDashboard() {
       case 'website-leads': return <WebsiteLeadsDashboard />;
       case 'logs': return <CommunicationLogsPanel />;
       case 'cadence': return <DynamicCadencePanel />;
+      case 'review-request': return <ReviewRequestPanel />;
       case 'qa': return (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">QA Tools</h2>
