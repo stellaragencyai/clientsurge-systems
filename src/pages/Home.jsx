@@ -112,7 +112,6 @@ export default function Home() {
         <section aria-label="Proof and trust">
           <TrustBar />
         </section>
-        <ProblemSolution />
         <LeadLeakage />
         <CoreOffer />
         <IntegrationPartners />
