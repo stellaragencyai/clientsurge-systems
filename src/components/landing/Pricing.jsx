@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import { getSelectedIndustryRecommendation, INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
@@ -347,7 +348,7 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
   const isRecommended = selectedIndustry?.recommendedPackage?.name === plan.name;
 
   return (
-    <div
+    <motion.div
       className={`pricing-card relative flex flex-col rounded-2xl transition-all duration-300 ${
         plan.highlight ? "highlight-glow" : ""
       } ${isHovered && plan.highlight ? "highlight-hover" : ""}`}
@@ -370,10 +371,10 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
           : isHovered
             ? "0 14px 36px rgba(160,90,20,0.15), inset 0 1px 0 rgba(255,255,255,0.85)"
             : "0 6px 22px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
-        transform: isHovered ? "translateY(-8px) scale(1.02)" : plan.highlight ? "translateY(-2px)" : "translateY(0)",
-        transition: "all 0.35s ease",
-        zIndex: plan.highlight ? 2 : 1,
+        perspective: "1200px",
       }}
+      animate={isHovered ? { rotateY: 6, rotateX: -2, scale: 1.03 } : { rotateY: 0, rotateX: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -495,6 +496,6 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
           </button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

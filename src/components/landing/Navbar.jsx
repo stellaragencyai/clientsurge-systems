@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion, useScroll, useMotionValueEvent, useTransform } from "framer-motion";
 import { ChevronDown, Menu, Moon, Sun, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
@@ -83,6 +84,9 @@ export default function Navbar() {
   const [industriesOpen, setIndustriesOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { scrollY } = useScroll();
+  const navOpacity = useTransform(scrollY, [0, 50], [0.15, 0.6]);
+  const navBlur = useTransform(scrollY, [0, 50], [8, 22]);
 
   // Track page views
   usePageViewTracking();
@@ -202,13 +206,22 @@ export default function Navbar() {
   };
 
   return (
-    <nav
-      className={`sticky top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? "bg-white/60 backdrop-blur-2xl border-b border-white/40 shadow-lg"
-          : "bg-white/15 backdrop-blur-md border-b border-white/20"
-      }`}
-      style={{ paddingTop: "env(safe-area-inset-top)" }}
+    <motion.nav
+      className="sticky top-0 left-0 right-0 z-50 border-b border-white/20"
+      style={{
+        backgroundColor: navOpacity.get() > 0.4 ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.15)",
+        backdropFilter: navBlur.get() > 15 ? "blur(22px)" : "blur(8px)",
+        WebkitBackdropFilter: navBlur.get() > 15 ? "blur(22px)" : "blur(8px)",
+        paddingTop: "env(safe-area-inset-top)",
+      }}
+      onScroll={(scrollProgress) => {
+        const threshold = 50;
+        if (typeof window !== "undefined") {
+          const isBelowThreshold = window.scrollY > threshold;
+          if (isBelowThreshold && !scrolled) setScrolled(true);
+          if (!isBelowThreshold && scrolled) setScrolled(false);
+        }
+      }}
     >
       <div className="w-full px-4 md:px-8 h-14 md:h-16 flex items-center justify-between" style={{ paddingLeft: "max(1rem, env(safe-area-inset-left))", paddingRight: "max(1rem, env(safe-area-inset-right))" }}>
         <button
@@ -417,6 +430,6 @@ export default function Navbar() {
 
       {showLoginModal && <PortalLoginModal onClose={() => setShowLoginModal(false)} />}
       {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
-    </nav>
+    </motion.nav>
   );
 }
