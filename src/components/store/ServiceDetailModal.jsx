@@ -25,9 +25,9 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
         onClick={onClose}
         style={{
           position: "fixed", inset: 0, zIndex: 1000,
-          background: "rgba(4,2,1,0.78)",
-          backdropFilter: "blur(22px) saturate(0.5)",
-          WebkitBackdropFilter: "blur(22px) saturate(0.5)",
+          background: "rgba(4,2,1,0.35)",
+          backdropFilter: "blur(8px) saturate(0.8)",
+          WebkitBackdropFilter: "blur(8px) saturate(0.8)",
         }}
       />
 
