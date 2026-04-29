@@ -125,7 +125,7 @@ function StepRow({ step, idx }) {
   const imageDelay = isEven ? idx * 80 + 120 : idx * 80;
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative" data-step-id={step.id}>
       {/* Center numbered dot on desktop */}
       <div
         className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-8 w-11 h-11 rounded-full items-center justify-center z-10"
@@ -140,13 +140,16 @@ function StepRow({ step, idx }) {
         <span className="text-white font-black text-sm">{step.number}</span>
       </div>
 
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}>
+      <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`} style={{ alignItems: "stretch" }}>
         {/* Content card */}
         <div
           style={{
             transition: `opacity 0.65s ease ${contentDelay}ms, transform 0.65s ease ${contentDelay}ms`,
             opacity: visible ? 1 : 0,
             transform: visible ? "translateX(0)" : `translateX(${isEven ? "-40px" : "40px"})`,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
           <div
@@ -193,13 +196,16 @@ function StepRow({ step, idx }) {
             transition: `opacity 0.65s ease ${imageDelay}ms, transform 0.65s ease ${imageDelay}ms`,
             opacity: visible ? 1 : 0,
             transform: visible ? "translateX(0)" : `translateX(${isEven ? "40px" : "-40px"})`,
+            display: "flex",
+            alignItems: "stretch",
           }}
         >
           <div
-            className="rounded-2xl overflow-hidden h-64 md:h-72"
+            className="rounded-2xl overflow-hidden w-full"
             style={{
               border: "1.5px solid rgba(154,92,46,0.12)",
               boxShadow: "0 8px 24px rgba(111,67,31,0.1)",
+              minHeight: "400px",
             }}
           >
             <img src={step.image} alt={step.title} className="w-full h-full object-cover" />
@@ -218,7 +224,11 @@ export default function LaunchTimeline() {
   const handleTrackerClick = (idx) => {
     setActiveStep(idx);
     const el = stepRefs.current[idx];
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (el) {
+      setTimeout(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
   };
 
   return (
@@ -255,9 +265,22 @@ export default function LaunchTimeline() {
               <button
                 type="button"
                 onClick={() => handleTrackerClick(idx)}
-                className="flex flex-col items-center gap-2 border-none bg-transparent cursor-pointer"
+                className="flex flex-col items-center gap-2 border-none bg-transparent cursor-pointer group"
+                onMouseEnter={(e) => {
+                  const circle = e.currentTarget.querySelector('[data-icon-circle]');
+                  if (circle && !isActive) {
+                    circle.style.boxShadow = "0 0 0 5px rgba(154,92,46,0.15), 0 0 30px rgba(154,92,46,0.5), 0 4px 14px rgba(154,92,46,0.35)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  const circle = e.currentTarget.querySelector('[data-icon-circle]');
+                  if (circle && !isActive) {
+                    circle.style.boxShadow = "none";
+                  }
+                }}
               >
                 <div
+                  data-icon-circle
                   className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 relative"
                   style={{
                     background: isActive
