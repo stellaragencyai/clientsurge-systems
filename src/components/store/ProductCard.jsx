@@ -1,5 +1,5 @@
 import { CheckCircle2, Plus, Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useCart } from "@/lib/cartContext";
 import DemoModal from "@/components/store/DemoModal";
 import ProductCardBack from "@/components/store/ProductCardBack";
@@ -9,10 +9,21 @@ export default function ProductCard({ product }) {
   const inCart = items.some((item) => item.product_id === product.product_id);
   const [showDemo, setShowDemo] = useState(false);
   const [flipped, setFlipped] = useState(false);
+  const cardRef = useRef(null);
 
   const toggle = () => {
     if (inCart) removeItem(product.product_id);
     else addItem(product);
+  };
+
+  // Holographic shimmer follows mouse
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    cardRef.current.style.setProperty("--mx", `${x}%`);
+    cardRef.current.style.setProperty("--my", `${y}%`);
   };
 
   return (
@@ -20,11 +31,9 @@ export default function ProductCard({ product }) {
       <style>{`
         .pcard-scene {
           perspective: 1200px;
-          height: 340px;
+          height: 360px;
         }
-        .pcard-scene.coming-soon {
-          height: 320px;
-        }
+        .pcard-scene.coming-soon { height: 320px; }
         .pcard-inner {
           position: relative;
           width: 100%;
@@ -33,74 +42,108 @@ export default function ProductCard({ product }) {
           transition: transform 1.44s cubic-bezier(0.34, 1.10, 0.64, 1);
           will-change: transform;
         }
-        .pcard-inner.is-flipped {
-          transform: rotateY(180deg);
-        }
+        .pcard-inner.is-flipped { transform: rotateY(180deg); }
         .pcard-face {
           position: absolute;
           inset: 0;
           backface-visibility: hidden;
           -webkit-backface-visibility: hidden;
-          border-radius: 18px;
+          border-radius: 20px;
           overflow: hidden;
         }
-        .pcard-back {
-          transform: rotateY(180deg);
-        }
+        .pcard-back { transform: rotateY(180deg); }
 
-        .crystal-card {
-          background: #ffffff;
-          border: 1.5px solid rgba(0,0,0,0.12);
-          border-radius: 18px;
-          backdrop-filter: blur(18px);
-          -webkit-backdrop-filter: blur(18px);
+        /* ── Dark glass card ── */
+        .dark-glass-card {
+          height: 100%;
+          padding: 18px;
+          display: flex;
+          flex-direction: column;
+          gap: 11px;
+          position: relative;
+          border-radius: 20px;
+          background: linear-gradient(145deg, rgba(18,12,6,0.92) 0%, rgba(28,18,10,0.94) 100%);
+          border: 1px solid rgba(200,150,92,0.22);
           box-shadow:
-            0 2px 12px rgba(0,0,0,0.07),
-            0 1px 3px rgba(0,0,0,0.05);
-          transition: box-shadow 0.4s ease, transform 0.4s ease, border-color 0.3s ease;
+            0 4px 24px rgba(0,0,0,0.45),
+            inset 0 1px 0 rgba(255,255,255,0.06);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+          overflow: hidden;
         }
-        .crystal-card:hover {
-          border-color: rgba(154,92,46,0.35);
+        .dark-glass-card:hover {
+          border-color: rgba(200,150,92,0.55);
           box-shadow:
-            0 16px 42px rgba(0,0,0,0.11),
-            0 2px 8px rgba(0,0,0,0.06);
+            0 16px 48px rgba(0,0,0,0.6),
+            0 0 0 1px rgba(200,150,92,0.2),
+            inset 0 1px 0 rgba(255,255,255,0.08);
           transform: translateY(-3px);
         }
-        .crystal-card.in-cart {
-          background: rgba(240,253,244,0.25);
-          border-image: linear-gradient(135deg, rgba(74,222,128,0.4) 0%, rgba(34,197,94,0.15) 100%) 1;
+        .dark-glass-card.in-cart {
+          border-color: rgba(74,222,128,0.45);
           box-shadow:
-            inset 0 1px 0 rgba(134,239,172,0.4),
-            0 8px 28px rgba(34,197,94,0.12);
+            0 8px 32px rgba(0,0,0,0.5),
+            0 0 20px rgba(34,197,94,0.12),
+            inset 0 1px 0 rgba(134,239,172,0.12);
         }
-        .crystal-card.coming-soon-card {
-          background: rgba(245,245,245,0.08);
-          border-image: linear-gradient(135deg, rgba(200,200,200,0.3) 0%, rgba(150,150,150,0.1) 100%) 1;
+        .dark-glass-card.coming-soon-dark {
+          background: linear-gradient(145deg, rgba(14,12,10,0.8) 0%, rgba(20,16,12,0.85) 100%);
+          border-color: rgba(100,80,60,0.15);
         }
-        .price-chip {
-          background: rgba(255,255,255,0.18);
-          border: 1px solid rgba(255,255,255,0.3);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border-radius: 14px;
-          padding: 8px 14px;
-          box-shadow: 0 4px 14px rgba(111,67,31,0.1), inset 0 1px 0 rgba(255,255,255,0.5);
+
+        /* Holographic shimmer layer */
+        .holo-shimmer {
+          pointer-events: none;
+          position: absolute;
+          inset: 0;
+          border-radius: 20px;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          background: radial-gradient(
+            circle at var(--mx, 50%) var(--my, 50%),
+            rgba(200,150,92,0.18) 0%,
+            rgba(100,180,255,0.08) 30%,
+            transparent 65%
+          );
+          mix-blend-mode: screen;
         }
-        .flip-hint {
+        .dark-glass-card:hover .holo-shimmer { opacity: 1; }
+
+        /* Scanning top line */
+        .scan-line {
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 2px;
+          background: linear-gradient(90deg, transparent 0%, #c8965c 40%, #f5d9a8 60%, transparent 100%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        .dark-glass-card:hover .scan-line { opacity: 1; }
+
+        /* Price chip — data readout style */
+        .price-chip-dark {
+          background: rgba(0,0,0,0.4);
+          border: 1px solid rgba(200,150,92,0.3);
+          border-radius: 12px;
+          padding: 7px 12px;
+          font-family: 'Space Grotesk', monospace;
+          box-shadow: 0 0 12px rgba(200,150,92,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+
+        .flip-hint-dark {
           position: absolute;
           top: 10px;
           right: 10px;
-          font-size: 9px;
+          font-size: 8px;
           font-weight: 700;
-          color: rgba(154,92,46,0.5);
-          letter-spacing: 0.1em;
+          color: rgba(200,150,92,0.4);
+          letter-spacing: 0.12em;
           text-transform: uppercase;
           opacity: 0;
           transition: opacity 0.3s;
         }
-        .pcard-scene:hover .flip-hint {
-          opacity: 1;
-        }
+        .pcard-scene:hover .flip-hint-dark { opacity: 1; }
       `}</style>
 
       <div
@@ -113,64 +156,50 @@ export default function ProductCard({ product }) {
           {/* ── FRONT FACE ── */}
           <div className="pcard-face">
             <div
-              className={`crystal-card${inCart ? " in-cart" : ""}${product.coming_soon ? " coming-soon-card" : ""}`}
-              style={{ height: "100%", padding: "18px", display: "flex", flexDirection: "column", gap: "12px", position: "relative" }}
+              ref={cardRef}
+              className={`dark-glass-card${inCart ? " in-cart" : ""}${product.coming_soon ? " coming-soon-dark" : ""}`}
+              onMouseMove={handleMouseMove}
             >
-              <span className="flip-hint">hover to see how it works →</span>
+              <div className="holo-shimmer" />
+              <div className="scan-line" />
+              <span className="flip-hint-dark">flip to see how it works →</span>
 
               {/* Header row */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div
-                  style={{
-                    width: "46px",
-                    height: "46px",
-                    borderRadius: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "24px",
-                    background: product.coming_soon
-                      ? "rgba(200,200,200,0.15)"
-                      : "rgba(255,255,255,0.3)",
-                    border: product.coming_soon
-                      ? "1px solid rgba(180,180,180,0.2)"
-                      : "1px solid rgba(255,255,255,0.45)",
-                    boxShadow: product.coming_soon ? "none" : "0 2px 8px rgba(154,92,46,0.08), inset 0 1px 0 rgba(255,255,255,0.7)",
-                    filter: product.coming_soon ? "grayscale(60%)" : "none",
-                    opacity: product.coming_soon ? 0.7 : 1,
-                  }}
-                >
+                <div style={{
+                  width: "46px", height: "46px", borderRadius: "14px",
+                  display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px",
+                  background: product.coming_soon ? "rgba(60,50,40,0.4)" : "rgba(200,150,92,0.1)",
+                  border: `1px solid ${product.coming_soon ? "rgba(100,80,60,0.2)" : "rgba(200,150,92,0.25)"}`,
+                  boxShadow: product.coming_soon ? "none" : "0 0 16px rgba(200,150,92,0.12)",
+                  filter: product.coming_soon ? "grayscale(70%) brightness(0.6)" : "none",
+                }}>
                   {product.icon}
                 </div>
-                <span
-                  style={{
-                    fontSize: "9px",
-                    fontWeight: "700",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.12em",
-                    color: product.coming_soon ? "#999" : "#7a4825",
-                    background: product.coming_soon ? "rgba(180,180,180,0.12)" : "rgba(255,255,255,0.3)",
-                    padding: "4px 10px",
-                    borderRadius: "999px",
-                    border: product.coming_soon ? "1px solid rgba(180,180,180,0.2)" : "1px solid rgba(154,92,46,0.18)",
-                  }}
-                >
+                <span style={{
+                  fontSize: "8px", fontWeight: "800", textTransform: "uppercase",
+                  letterSpacing: "0.16em",
+                  color: product.coming_soon ? "rgba(120,100,80,0.5)" : "rgba(200,150,92,0.75)",
+                  background: product.coming_soon ? "rgba(40,30,20,0.4)" : "rgba(200,150,92,0.08)",
+                  padding: "4px 10px", borderRadius: "999px",
+                  border: `1px solid ${product.coming_soon ? "rgba(80,60,40,0.2)" : "rgba(200,150,92,0.2)"}`,
+                }}>
                   {product.category}
                 </span>
               </div>
 
               {/* Title */}
               <div>
-                <h3 style={{ fontSize: "16px", fontWeight: "700", color: product.coming_soon ? "rgba(27,20,13,0.4)" : "#1b140d", margin: "0 0 2px", lineHeight: 1.2 }}>
+                <h3 style={{ fontSize: "15px", fontWeight: "700", color: product.coming_soon ? "rgba(180,150,110,0.35)" : "rgba(245,230,208,0.95)", margin: "0 0 2px", lineHeight: 1.2 }}>
                   {product.name}
                 </h3>
-                <p style={{ fontSize: "10px", color: product.coming_soon ? "rgba(154,92,46,0.4)" : "#9a5c2e", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <p style={{ fontSize: "9px", color: product.coming_soon ? "rgba(154,92,46,0.3)" : "rgba(200,150,92,0.7)", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
                   {product.subtitle}
                 </p>
               </div>
 
               {/* Description */}
-              <p style={{ fontSize: "12px", color: product.coming_soon ? "rgba(27,20,13,0.35)" : "rgba(27,20,13,0.68)", lineHeight: 1.6, margin: 0, flex: 1 }}>
+              <p style={{ fontSize: "12px", color: product.coming_soon ? "rgba(180,160,130,0.3)" : "rgba(220,195,160,0.72)", lineHeight: 1.6, margin: 0, flex: 1 }}>
                 {product.description}
               </p>
 
@@ -178,8 +207,8 @@ export default function ProductCard({ product }) {
               <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
                 {product.highlights.map((h) => (
                   <div key={h} style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-                    <CheckCircle2 style={{ width: "11px", height: "11px", color: product.coming_soon ? "#ccc" : "#4ade80", flexShrink: 0 }} />
-                    <span style={{ fontSize: "11px", color: product.coming_soon ? "rgba(100,100,100,0.45)" : "rgba(27,20,13,0.68)", fontWeight: "500" }}>
+                    <CheckCircle2 style={{ width: "11px", height: "11px", color: product.coming_soon ? "rgba(80,70,60,0.4)" : "#4ade80", flexShrink: 0 }} />
+                    <span style={{ fontSize: "11px", color: product.coming_soon ? "rgba(140,120,90,0.35)" : "rgba(220,195,160,0.65)", fontWeight: "500" }}>
                       {h}
                     </span>
                   </div>
@@ -188,81 +217,63 @@ export default function ProductCard({ product }) {
 
               {/* Price chip + CTA */}
               <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "10px", marginTop: "auto" }}>
-                <div className="price-chip" style={{ opacity: product.coming_soon ? 0.55 : 1 }}>
-                  <p style={{ fontSize: "7px", color: "rgba(154,92,46,0.7)", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>Monthly</p>
-                  <p style={{ fontSize: "22px", fontWeight: "900", color: "#9a5c2e", margin: 0, lineHeight: 1 }}>${product.monthly_fee}</p>
-                  <p style={{ fontSize: "8px", color: "rgba(27,20,13,0.45)", margin: "2px 0 0", fontWeight: "600" }}>Setup ${product.setup_fee}</p>
+                <div className="price-chip-dark" style={{ opacity: product.coming_soon ? 0.4 : 1 }}>
+                  <p style={{ fontSize: "7px", color: "rgba(200,150,92,0.6)", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.12em", margin: 0, fontFamily: "monospace" }}>$/mo</p>
+                  <p style={{ fontSize: "22px", fontWeight: "900", color: "#c8965c", margin: 0, lineHeight: 1, fontFamily: "'Space Grotesk', monospace", textShadow: "0 0 14px rgba(200,150,92,0.4)" }}>${product.monthly_fee}</p>
+                  <p style={{ fontSize: "8px", color: "rgba(200,150,92,0.45)", margin: "2px 0 0", fontWeight: "600", fontFamily: "monospace" }}>+${product.setup_fee} setup</p>
                 </div>
 
                 <button
                   onClick={(e) => { e.stopPropagation(); toggle(); }}
                   disabled={product.coming_soon}
                   style={{
-                    borderRadius: "9999px",
-                    padding: "2px",
+                    borderRadius: "9999px", padding: "2px",
                     background: product.coming_soon
-                      ? "linear-gradient(135deg,#c0c0c0,#b0b0b0)"
+                      ? "rgba(80,60,40,0.3)"
                       : inCart
                       ? "linear-gradient(135deg,#22c55e,#16a34a)"
                       : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
                     border: "none",
                     cursor: product.coming_soon ? "not-allowed" : "pointer",
-                    boxShadow: inCart ? "0 4px 14px rgba(34,197,94,0.32)" : product.coming_soon ? "none" : "0 4px 14px rgba(120,70,20,0.28)",
+                    boxShadow: inCart ? "0 4px 16px rgba(34,197,94,0.35)" : product.coming_soon ? "none" : "0 4px 16px rgba(200,130,60,0.4)",
                     transition: "all 0.2s",
                   }}
                 >
-                  <span
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "4px",
-                      height: "30px",
-                      paddingLeft: "14px",
-                      paddingRight: "14px",
-                      borderRadius: "9999px",
-                      background: product.coming_soon
-                        ? "linear-gradient(135deg,#a0a0a0,#909090)"
-                        : inCart
-                        ? "linear-gradient(135deg,#16a34a,#15803d)"
-                        : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                      color: "#fff",
-                      fontWeight: "700",
-                      fontSize: "11px",
-                      opacity: product.coming_soon ? 0.7 : 1,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {product.coming_soon ? "Coming Soon" : inCart ? <><Check style={{ width: "11px", height: "11px" }} /> Added</> : <><Plus style={{ width: "11px", height: "11px" }} /> Add</>}
+                  <span style={{
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: "4px",
+                    height: "30px", paddingLeft: "14px", paddingRight: "14px", borderRadius: "9999px",
+                    background: product.coming_soon
+                      ? "rgba(60,45,30,0.6)"
+                      : inCart
+                      ? "linear-gradient(135deg,#16a34a,#15803d)"
+                      : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                    color: product.coming_soon ? "rgba(180,150,100,0.4)" : "#fff",
+                    fontWeight: "700", fontSize: "11px", whiteSpace: "nowrap",
+                  }}>
+                    {product.coming_soon ? "Coming Soon" : inCart
+                      ? <><Check style={{ width: "11px", height: "11px" }} /> Added</>
+                      : <><Plus style={{ width: "11px", height: "11px" }} /> Add</>}
                   </span>
                 </button>
               </div>
 
               {/* Popular badge */}
               {product.popular && !product.coming_soon && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "12px",
-                    right: "12px",
-                    background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
-                    color: "#fff",
-                    fontSize: "8px",
-                    fontWeight: "700",
-                    padding: "4px 10px",
-                    borderRadius: "18px",
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                    boxShadow: "0 2px 8px rgba(111,67,31,0.2)",
-                  }}
-                >
+                <div style={{
+                  position: "absolute", top: "12px", right: "12px",
+                  background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
+                  color: "#fff", fontSize: "8px", fontWeight: "700",
+                  padding: "4px 10px", borderRadius: "18px",
+                  letterSpacing: "0.08em", textTransform: "uppercase",
+                  boxShadow: "0 0 14px rgba(200,130,60,0.45)",
+                }}>
                   Popular
                 </div>
               )}
             </div>
           </div>
 
-          {/* ── BACK FACE — "How It Works" ── */}
+          {/* ── BACK FACE ── */}
           {!product.coming_soon && (
             <div className="pcard-face pcard-back">
               <ProductCardBack product={product} inCart={inCart} onToggle={toggle} />
