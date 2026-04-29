@@ -134,13 +134,20 @@ Deno.serve(async (req) => {
   </p>
 </div>`;
 
-    await base44.asServiceRole.integrations.Core.SendEmail({
-      to: notificationEmail,
-      subject: `Daily Lead Digest — ${newToday} new, ${hotLeads.length} hot, ${overdueFollowUp.length} overdue`,
-      body,
-    });
+    console.log(`[sendDailyDigest] Preparing digest — total leads: ${allLeads.length}, new today: ${newToday}, hot: ${hotLeads.length}, overdue: ${overdueFollowUp.length}, replied: ${replied.length}`);
 
-    console.log(`Daily digest sent to ${notificationEmail}`);
+    try {
+      await base44.asServiceRole.integrations.Core.SendEmail({
+        to: notificationEmail,
+        subject: `Daily Lead Digest — ${newToday} new, ${hotLeads.length} hot, ${overdueFollowUp.length} overdue`,
+        body,
+      });
+      console.log(`[sendDailyDigest] ✓ Digest sent successfully to ${notificationEmail}`);
+    } catch (emailError) {
+      console.error(`[sendDailyDigest] ✗ SendEmail failed: ${emailError.message}`);
+      throw emailError;
+    }
+
     return Response.json({ success: true, stats: { newToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length } });
   } catch (error) {
     console.error('sendDailyDigest error:', error);
