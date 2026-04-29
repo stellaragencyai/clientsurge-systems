@@ -30,7 +30,7 @@ export default function ProductCard({ product }) {
           width: 100%;
           height: 100%;
           transform-style: preserve-3d;
-          transition: transform 0.72s cubic-bezier(0.34, 1.10, 0.64, 1);
+          transition: transform 1.44s cubic-bezier(0.34, 1.10, 0.64, 1);
           will-change: transform;
         }
         .pcard-inner.is-flipped {
