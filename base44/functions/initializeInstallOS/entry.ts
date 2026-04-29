@@ -41,6 +41,18 @@ Deno.serve(async (req) => {
 
     console.log(`[Install OS] Initializing Client Installation OS for order ${order_id}`);
 
+    // ─────────────────────────────────────
+    // VALID SERVICE KEYS (from canonical registry)
+    // ─────────────────────────────────────
+    const VALID_SERVICE_KEYS = new Set([
+      "instant_lead_response",
+      "missed_call_text_back",
+      "nurture_sequence_14d",
+      "ai_booking_agent",
+      "lead_reactivation",
+      "review_request",
+    ]);
+
     // Create ClientInstallationOS
     const installOS = await base44.asServiceRole.entities.ClientInstallationOS.create({
       order_id,
@@ -54,17 +66,45 @@ Deno.serve(async (req) => {
     });
 
     // Create AutomationChecklist for each service
+    // DEFENSIVE: validate and deduplicate service_keys
     const allChecklistIds = [];
+    const seenServiceKeys = new Set();
+
     for (const item of order.items || []) {
+      const serviceKey = item.service_key;
+
+      // Validate service_key exists
+      if (!serviceKey) {
+        console.warn(`[Install OS] Skipped item with missing service_key`);
+        continue;
+      }
+
+      // Validate service_key is known
+      if (!VALID_SERVICE_KEYS.has(serviceKey)) {
+        console.warn(`[Install OS] Skipped invalid service_key: "${serviceKey}" (not in canonical registry)`);
+        continue;
+      }
+
+      // Deduplicate: skip if already processed
+      if (seenServiceKeys.has(serviceKey)) {
+        console.warn(`[Install OS] Skipped duplicate service_key: "${serviceKey}"`);
+        continue;
+      }
+
+      seenServiceKeys.add(serviceKey);
+      console.log(`[Install OS] Processing service_key: "${serviceKey}"`);
+
       const checklist = await base44.asServiceRole.entities.AutomationChecklist.create({
         client_email: order.customer_email,
         client_name: order.customer_name,
         business_name: order.business_name,
         order_id,
-        service_key: item.service_key,
+        service_key: serviceKey,
         status: "not_started",
       });
+
       allChecklistIds.push(checklist.id);
+      console.log(`[Install OS] Checklist created for service_key: "${serviceKey}"`);
     }
 
     // Update installOS with checklist IDs

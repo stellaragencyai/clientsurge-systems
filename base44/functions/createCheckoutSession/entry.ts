@@ -9,6 +9,21 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 // Stripe price IDs in BOTH lib/salesCatalog.js AND this registry.
 // Any mismatch between the two files will cause checkout to serve wrong prices.
 // ─────────────────────────────────────────────────────────────────────────────
+//
+// FRONTEND → BACKEND RESPONSIBILITY BOUNDARY:
+//   Frontend (Store UI): Expands packages into individual product_ids
+//   Backend (this function): Validates and deduplicates service_keys
+//
+// Example flow:
+//   1. Frontend calculates package offer (e.g., Growth System)
+//   2. Frontend sends expanded product_ids (4 individual services) to this function
+//   3. This function validates prices and creates Order with service_keys
+//   4. initializeInstallOS then validates and deduplicates service_keys further
+//
+// The backend does NOT expand packages—it expects the frontend to send
+// the expanded product_ids. This function validates what it receives but
+// assumes the frontend has already handled package logic.
+// ─────────────────────────────────────────────────────────────────────────────
 const CANONICAL_PRODUCTS = [
   { product_id: "prod_UNi5RHiKNSTfQl", service_key: "instant_lead_response",  name: "Instant Lead Response",       setup_fee: 297, monthly_fee: 97,  setup_price_id: "price_1TOwfiB9GU5ysJqEcmQHl3gE", monthly_price_id: "price_1TOwfiB9GU5ysJqE20FYUfVc" },
   { product_id: "prod_UNi5QL0bQl98If", service_key: "missed_call_text_back",   name: "Missed Call Text-Back",        setup_fee: 197, monthly_fee: 67,  setup_price_id: "price_1TOwfiB9GU5ysJqEJuEDhpKS", monthly_price_id: "price_1TOwfiB9GU5ysJqE8knUfswZ" },
