@@ -74,6 +74,18 @@ Deno.serve(async (req) => {
         console.warn(`[Webhook] Client Installation OS init failed for order ${order.id}: ${osError.message}`);
         // Non-blocking: don't fail webhook if checklist initialization fails
       }
+
+      // Send onboarding email to client (non-blocking)
+      try {
+        console.log(`[Webhook] Sending onboarding email for order ${order.id}`);
+        await base44.asServiceRole.functions.invoke("sendClientWelcomeEmail", {
+          order_id: order.id,
+        });
+        console.log(`[Webhook] Onboarding email sent successfully for order ${order.id}`);
+      } catch (emailError) {
+        console.warn(`[Webhook] Onboarding email failed for order ${order.id}: ${emailError.message}`);
+        // Non-blocking: don't fail webhook if email fails
+      }
     }
   }
 
