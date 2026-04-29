@@ -1,53 +1,198 @@
+import { useEffect, useRef, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { launchTimelineSteps, iconMap } from "./coreOfferData";
 
+function useInView(threshold = 0.15) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") { setVisible(true); return; }
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
+      { threshold }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, visible];
+}
+
+function StepRow({ step, idx, totalSteps }) {
+  const isEven = idx % 2 === 0;
+  const Icon = iconMap[step.icon];
+  const [ref, visible] = useInView(0.1);
+
+  const contentDelay = isEven ? idx * 80 : idx * 80 + 120;
+  const imageDelay = isEven ? idx * 80 + 120 : idx * 80;
+
+  return (
+    <div ref={ref} className="relative">
+      {/* Center dot on desktop */}
+      <div
+        className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-8 w-11 h-11 rounded-full items-center justify-center z-10"
+        style={{
+          background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+          boxShadow: "0 0 0 5px rgba(154,92,46,0.12), 0 4px 14px rgba(154,92,46,0.35)",
+          transition: `opacity 0.5s ease ${contentDelay}ms, transform 0.5s ease ${contentDelay}ms`,
+          opacity: visible ? 1 : 0,
+          transform: visible ? "scale(1) translateX(-50%)" : "scale(0.6) translateX(-50%)",
+        }}
+      >
+        <span className="text-white font-black text-sm">{step.number}</span>
+      </div>
+
+      <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}>
+        {/* Content card */}
+        <div
+          style={{
+            transition: `opacity 0.65s ease ${contentDelay}ms, transform 0.65s ease ${contentDelay}ms`,
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateX(0)" : `translateX(${isEven ? "-40px" : "40px"})`,
+          }}
+        >
+          <div
+            className="rounded-2xl overflow-hidden"
+            style={{
+              background: "rgba(255,255,255,0.94)",
+              border: "1.5px solid rgba(154,92,46,0.13)",
+              boxShadow: "0 8px 28px rgba(111,67,31,0.07)",
+              position: "relative",
+            }}
+          >
+            {/* Enhancement 2: Diagonal color band */}
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "4px",
+                background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)",
+              }}
+            />
+            <div className="p-6 md:p-7 pt-7">
+              <p className="text-sm font-semibold text-foreground mb-1">
+                Step {step.number} — {step.duration}
+              </p>
+              <h4 className="text-lg md:text-xl font-bold text-foreground mb-4">
+                {step.title}
+              </h4>
+              <ul className="space-y-2.5">
+                {step.bullets.map((bullet, i) => (
+                  <li key={i} className="flex items-start gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#22c55e" }} />
+                    <span className="text-sm leading-relaxed text-foreground/75">{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Image */}
+        <div
+          style={{
+            transition: `opacity 0.65s ease ${imageDelay}ms, transform 0.65s ease ${imageDelay}ms`,
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateX(0)" : `translateX(${isEven ? "40px" : "-40px"})`,
+          }}
+        >
+          <div
+            className="rounded-2xl overflow-hidden h-64 md:h-72"
+            style={{
+              border: "1.5px solid rgba(154,92,46,0.12)",
+              boxShadow: "0 8px 24px rgba(111,67,31,0.1)",
+            }}
+          >
+            <img
+              src={step.image}
+              alt={step.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function LaunchTimeline() {
+  const [headerRef, headerVisible] = useInView(0.2);
+
   return (
     <div className="mt-16 md:mt-20">
       {/* Section Header */}
-      <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3">
-        Get Live In 2 Hours
-      </p>
-      <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
-        Our Process — Start To Launch
-      </h3>
-      <p className="text-center text-sm text-muted-foreground mb-10">
-        From first contact to successful launch in 5 clear steps. We make it easy.
-      </p>
+      <div ref={headerRef}>
+        <p
+          className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3"
+          style={{
+            transition: "opacity 0.5s ease, transform 0.5s ease",
+            opacity: headerVisible ? 1 : 0,
+            transform: headerVisible ? "translateY(0)" : "translateY(12px)",
+          }}
+        >
+          Get Live In 2 Hours
+        </p>
+        <h3
+          className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2"
+          style={{
+            transition: "opacity 0.5s ease 80ms, transform 0.5s ease 80ms",
+            opacity: headerVisible ? 1 : 0,
+            transform: headerVisible ? "translateY(0)" : "translateY(12px)",
+          }}
+        >
+          Our Process — Start To Launch
+        </h3>
+        <p
+          className="text-center text-sm text-muted-foreground mb-10"
+          style={{
+            transition: "opacity 0.5s ease 160ms, transform 0.5s ease 160ms",
+            opacity: headerVisible ? 1 : 0,
+            transform: headerVisible ? "translateY(0)" : "translateY(12px)",
+          }}
+        >
+          From first contact to successful launch in 5 clear steps. We make it easy.
+        </p>
+      </div>
 
-      {/* Desktop: Horizontal step tracker with icon + step number + title + duration */}
+      {/* Enhancement 1: Numbered step circles — Desktop horizontal tracker */}
       <div className="hidden sm:flex justify-center items-start gap-4 md:gap-6 px-4 mb-14">
         {launchTimelineSteps.map((step, idx) => {
           const Icon = iconMap[step.icon];
           return (
             <div key={step.id} className="flex items-start gap-4 md:gap-6">
-              <div className="flex flex-col items-center gap-1.5">
-                {/* Step number plain text */}
-                <span className="text-[11px] font-semibold text-foreground">
-                  Step {step.number}
-                </span>
-                {/* Icon circle */}
+              <div className="flex flex-col items-center gap-2">
+                {/* Large numbered circle */}
                 <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
+                  className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 relative"
                   style={{
                     background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
-                    boxShadow: "0 4px 12px rgba(154,92,46,0.3)",
+                    boxShadow: "0 0 0 5px rgba(154,92,46,0.12), 0 4px 14px rgba(154,92,46,0.3)",
                   }}
                 >
-                  <Icon className="w-6 h-6 text-white" />
+                  <span className="text-white font-black text-xl leading-none">{step.number}</span>
+                  {/* Small icon overlay */}
+                  <div
+                    className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
+                    style={{ background: "#f5e6d0", border: "1.5px solid rgba(154,92,46,0.25)" }}
+                  >
+                    <Icon className="w-3 h-3" style={{ color: "#9a5c2e" }} />
+                  </div>
                 </div>
                 <p className="text-xs font-semibold text-foreground text-center max-w-[80px] leading-tight">{step.title}</p>
                 <p className="text-[10px] text-muted-foreground text-center">{step.duration}</p>
               </div>
               {idx < launchTimelineSteps.length - 1 && (
-                <div className="flex-shrink-0 text-primary/30 text-2xl mt-10">→</div>
+                <div className="flex-shrink-0 text-primary/30 text-2xl mt-5">→</div>
               )}
             </div>
           );
         })}
       </div>
 
-      {/* Mobile: Vertical Stepper summary */}
+      {/* Mobile: Vertical Stepper */}
       <div className="sm:hidden relative pl-10 mb-12">
         <div
           className="absolute left-4 top-3 bottom-3 w-0.5"
@@ -65,17 +210,28 @@ export default function LaunchTimeline() {
                     boxShadow: "0 2px 8px rgba(154,92,46,0.4)",
                   }}
                 >
-                  <Icon className="w-4 h-4 text-white" />
+                  <span className="text-white font-black text-sm">{step.number}</span>
                 </div>
                 <div
-                  className="rounded-xl px-4 py-3 flex-1"
+                  className="rounded-xl px-4 py-3 flex-1 overflow-hidden relative"
                   style={{
                     background: "rgba(255,255,255,0.9)",
                     border: "1px solid rgba(154,92,46,0.12)",
                     boxShadow: "0 4px 12px rgba(111,67,31,0.06)",
                   }}
                 >
-                  <p className="text-[11px] font-semibold text-foreground mb-0.5">
+                  {/* Diagonal band on mobile cards too */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "3px",
+                      background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)",
+                    }}
+                  />
+                  <p className="text-[11px] font-semibold text-foreground mb-0.5 mt-1">
                     Step {step.number}
                   </p>
                   <p className="text-sm font-bold text-foreground">{step.title}</p>
@@ -87,7 +243,7 @@ export default function LaunchTimeline() {
         </div>
       </div>
 
-      {/* Detailed vertical timeline with alternating image/content */}
+      {/* Detailed vertical timeline — Enhancement 3: scroll-reveal per step */}
       <div className="relative">
         <div
           className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block"
@@ -96,70 +252,10 @@ export default function LaunchTimeline() {
             transform: "translateX(-50%)",
           }}
         />
-
         <div className="space-y-16 md:space-y-20">
-          {launchTimelineSteps.map((step, idx) => {
-            const isEven = idx % 2 === 0;
-            const Icon = iconMap[step.icon];
-            return (
-              <div key={step.id} className="relative">
-                {/* Center dot on desktop */}
-                <div
-                  className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-8 w-10 h-10 rounded-full items-center justify-center z-10"
-                  style={{
-                    background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
-                    boxShadow: "0 0 0 4px rgba(154,92,46,0.15), 0 4px 12px rgba(154,92,46,0.3)",
-                  }}
-                >
-                  <Icon className="w-4 h-4 text-white" />
-                </div>
-
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}>
-                  {/* Content */}
-                  <div>
-                    <div
-                      className="rounded-2xl p-6 md:p-7"
-                      style={{
-                        background: "rgba(255,255,255,0.9)",
-                        border: "1.5px solid rgba(154,92,46,0.12)",
-                        boxShadow: "0 8px 24px rgba(111,67,31,0.06)",
-                      }}
-                    >
-                      <p className="text-sm font-semibold text-foreground mb-3">
-                        Step {step.number} — {step.duration}
-                      </p>
-                      <h4 className="text-lg md:text-xl font-bold text-foreground mb-4">
-                        {step.title}
-                      </h4>
-                      <ul className="space-y-2.5">
-                        {step.bullets.map((bullet, i) => (
-                          <li key={i} className="flex items-start gap-2.5">
-                            <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#22c55e" }} />
-                            <span className="text-sm leading-relaxed text-foreground/75">{bullet}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  {/* Image */}
-                  <div
-                    className="rounded-2xl overflow-hidden h-64 md:h-72"
-                    style={{
-                      border: "1.5px solid rgba(154,92,46,0.12)",
-                      boxShadow: "0 8px 24px rgba(111,67,31,0.1)",
-                    }}
-                  >
-                    <img
-                      src={step.image}
-                      alt={step.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {launchTimelineSteps.map((step, idx) => (
+            <StepRow key={step.id} step={step} idx={idx} totalSteps={launchTimelineSteps.length} />
+          ))}
         </div>
       </div>
     </div>
