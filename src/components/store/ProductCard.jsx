@@ -48,24 +48,20 @@ export default function ProductCard({ product }) {
           transform: rotateY(180deg);
         }
         .crystal-card {
-          background: rgba(255,255,255,0.12);
-          border: 1px solid;
-          border-image: linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(200,150,92,0.2) 50%, rgba(255,255,255,0.08) 100%) 1;
+          background: #ffffff;
+          border: 1.5px solid rgba(0,0,0,0.12);
           border-radius: 18px;
           backdrop-filter: blur(18px);
           -webkit-backdrop-filter: blur(18px);
           box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.5),
-            inset 0 -1px 0 rgba(0,0,0,0.04),
-            0 4px 24px rgba(111,67,31,0.07),
+            0 2px 12px rgba(0,0,0,0.07),
             0 1px 3px rgba(0,0,0,0.05);
-          transition: box-shadow 0.4s ease, transform 0.4s ease, background 0.4s ease;
+          transition: box-shadow 0.4s ease, transform 0.4s ease, border-color 0.3s ease;
         }
         .crystal-card:hover {
-          background: rgba(255,255,255,0.18);
+          border-color: rgba(154,92,46,0.35);
           box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.6),
-            0 12px 40px rgba(111,67,31,0.13),
+            0 12px 36px rgba(0,0,0,0.1),
             0 2px 8px rgba(0,0,0,0.06);
           transform: translateY(-2px);
         }

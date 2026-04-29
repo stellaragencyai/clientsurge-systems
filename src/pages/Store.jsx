@@ -403,10 +403,9 @@ function StoreInner() {
                    textAlign: "center",
                    borderRadius: "10px",
                    padding: "8px 10px",
-                   background: "rgba(255,255,255,0.4)",
-                   border: "none",
-                   borderTop: "1px solid rgba(154,92,46,0.08)",
-                   boxShadow: "none",
+                   background: "#ffffff",
+                   border: "1.5px solid rgba(0,0,0,0.1)",
+                   boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                  }}
                 >
                  <p
