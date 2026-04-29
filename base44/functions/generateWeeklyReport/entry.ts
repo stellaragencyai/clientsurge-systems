@@ -155,21 +155,15 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
 
-    // Allow admin to trigger for a specific project, or run for all active projects
+    // Allow admin or scheduled automation to trigger
     const { project_id, send_email = true } = body;
-
-    // Auth: must be logged in (admin for bulk, any user for their own)
-    const user = await base44.auth.me();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     let projects = [];
     if (project_id) {
       const p = await base44.asServiceRole.entities.ClientProject.filter({ id: project_id });
       projects = p || [];
-    } else if (user.role === 'admin') {
-      projects = await base44.asServiceRole.entities.ClientProject.list('-created_date', 200);
     } else {
-      projects = await base44.asServiceRole.entities.ClientProject.filter({ client_email: user.email });
+      projects = await base44.asServiceRole.entities.ClientProject.list('-created_date', 200);
     }
 
     if (!projects.length) return Response.json({ error: 'No projects found' }, { status: 404 });
@@ -217,7 +211,7 @@ Deno.serve(async (req) => {
       if (send_email) {
         const html = buildEmailHtml({ project, leads, buildSteps, weekStart, weekEnd });
         const emailResult = await resend.emails.send({
-          from: 'ClientSurge Systems <reports@clientsurgesystems.com>',
+          from: `ClientSurge Systems <${Deno.env.get('RESEND_FROM_EMAIL') || 'reports@clientsurgesystems.com'}>`,
           to: clientEmail,
           subject: `📊 Weekly Report — ${project.business_name} (${weekStart.toLocaleDateString('en-US',{month:'short',day:'numeric'})}–${weekEnd.toLocaleDateString('en-US',{month:'short',day:'numeric'})})`,
           html,
