@@ -489,8 +489,6 @@ function StoreInner() {
           >
 
 
-            <StackValueCounter />
-
             <div style={{ display: "flex", gap: "10px", marginBottom: "18px", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
               <button
                 onClick={() => setShowComparison(true)}
