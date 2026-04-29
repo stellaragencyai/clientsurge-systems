@@ -7,7 +7,7 @@ import Benefits from "../components/landing/Benefits";
 import DetailedProcess from "../components/landing/DetailedProcess";
 import Testimonials from "../components/landing/Testimonials";
 import Industries from "../components/landing/Industries";
-import CoreOffer from "../components/landing/CoreOffer";
+import CoreOffer from "../components/landing/CoreOffer.jsx";
 import WhyUs from "../components/landing/WhyUs";
 import FAQ from "../components/landing/FAQ";
 import Pricing from "../components/landing/Pricing";
