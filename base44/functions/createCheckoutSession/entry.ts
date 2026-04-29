@@ -89,17 +89,32 @@ Deno.serve(async (req) => {
       return Response.json({ error: "No valid products found for checkout" }, { status: 400 });
     }
 
-    // ── Checkout-time validation: ensure all setup_price_ids exist and are valid ──
-    const invalidPrices = resolvedProducts.filter(
-      (p) => !p.setup_price_id || !String(p.setup_price_id).startsWith("price_")
-    );
-    if (invalidPrices.length) {
-      const names = invalidPrices.map((p) => p.name).join(", ");
-      console.error(`[Checkout] Invalid or missing setup_price_id for: ${names}. Expected format: price_xxx`);
+    // ── TASK 2: Validate pricing data before creating line items ──
+    const validationErrors = [];
+    for (const p of resolvedProducts) {
+      if (!p.name) {
+        validationErrors.push(`Product ${p.product_id} missing name`);
+      }
+      if (p.setup_fee === undefined || p.setup_fee === null) {
+        validationErrors.push(`Product ${p.name} missing setup_fee`);
+      } else {
+        const setupFeeCents = Math.round(Number(p.setup_fee) * 100);
+        if (isNaN(setupFeeCents) || setupFeeCents <= 0) {
+          validationErrors.push(`Product ${p.name} has invalid setup_fee: ${p.setup_fee}`);
+        }
+        if (setupFeeCents < 50) {
+          validationErrors.push(`Product ${p.name} setup_fee too low (minimum $0.50, got $${(setupFeeCents / 100).toFixed(2)})`);
+        }
+      }
+    }
+    if (validationErrors.length) {
+      console.error(`[Checkout] Validation failed: ${validationErrors.join("; ")}`);
       return Response.json({
-        error: `Checkout is not yet configured for: ${names}. Please contact support.`,
+        error: "Invalid product pricing configuration. Please contact support.",
       }, { status: 400 });
     }
+
+    console.log(`[Checkout] Selected products: ${resolvedProducts.map((p) => p.product_id).join(", ")}`);
 
     const total_setup = resolvedProducts.reduce((sum, p) => sum + p.setup_fee, 0);
     const total_monthly = resolvedProducts.reduce((sum, p) => sum + p.monthly_fee, 0);
@@ -130,11 +145,24 @@ Deno.serve(async (req) => {
       plan_type: "Custom Service Bundle",
     });
 
-    const line_items = resolvedProducts.map((p) => ({
-      price: p.setup_price_id,
-      quantity: 1,
-    }));
+    // ── TASK 1: Build line_items using inline price_data instead of Stripe Price IDs ──
+    const line_items = resolvedProducts.map((p) => {
+      const unit_amount = Math.round(Number(p.setup_fee) * 100);
+      console.log(`[Checkout] Line item: ${p.name} (${p.product_id}) → $${(unit_amount / 100).toFixed(2)}`);
+      return {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: p.name,
+            description: p.description || undefined,
+          },
+          unit_amount,
+        },
+        quantity: 1,
+      };
+    });
 
+    // ── TASK 3: Create Stripe Checkout Session with inline pricing ──
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -156,10 +184,13 @@ Deno.serve(async (req) => {
       },
     });
 
+    console.log(`[Checkout] Stripe session created: ${session.id} for order ${order.id}`);
+
     await base44.asServiceRole.entities.Order.update(order.id, {
       stripe_session_id: session.id,
     });
 
+    console.log(`[Checkout] Order ${order.id} updated with Stripe session ${session.id}`);
     return Response.json({ url: session.url, session_id: session.id });
   } catch (error) {
     console.error("Checkout error:", error.message);
