@@ -39,6 +39,7 @@ import OrderSuccess from "./pages/OrderSuccess";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
 import BusinessSetup from "./pages/BusinessSetup";
 import AdminAutomation from "./pages/AdminAutomation";
+import ClientDashboard from "./pages/ClientDashboard";
 
 const Store = lazy(() => import("./pages/Store"));
 
@@ -224,6 +225,7 @@ const AuthenticatedApp = () => {
         }
       >
         <Route path="/client-portal" element={<ClientPortal />} />
+        <Route path="/client-dashboard" element={<ClientDashboard />} />
       </Route>
 
       <Route
