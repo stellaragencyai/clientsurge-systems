@@ -1,7 +1,8 @@
-import { CheckCircle2, Plus, Check, Play } from "lucide-react";
+import { CheckCircle2, Plus, Check } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cartContext";
 import DemoModal from "@/components/store/DemoModal";
+import ProductCardBack from "@/components/store/ProductCardBack";
 
 export default function ProductCard({ product }) {
   const { items, addItem, removeItem } = useCart();
@@ -13,8 +14,6 @@ export default function ProductCard({ product }) {
     if (inCart) removeItem(product.product_id);
     else addItem(product);
   };
-
-  const howItWorks = product.highlights || [];
 
   return (
     <>
@@ -301,97 +300,7 @@ export default function ProductCard({ product }) {
           {/* ── BACK FACE — "How It Works" ── */}
           {!product.coming_soon && (
             <div className="pcard-face pcard-back">
-              <div
-                className="crystal-card"
-                style={{
-                  height: "100%",
-                  padding: "22px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "16px",
-                  background: "rgba(255,255,255,0.18)",
-                }}
-              >
-                <div className="pcard-back-header" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ fontSize: "26px" }}>{product.icon}</span>
-                  <div>
-                    <p style={{ fontSize: "10px", fontWeight: "700", color: "#9a5c2e", textTransform: "uppercase", letterSpacing: "0.12em", margin: 0 }}>How It Works</p>
-                    <h3 style={{ fontSize: "15px", fontWeight: "700", color: "#1b140d", margin: 0 }}>{product.name}</h3>
-                  </div>
-                </div>
-
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
-                  {howItWorks.map((step, i) => (
-                    <div
-                      key={i}
-                      className="pcard-back-step"
-                      style={{
-                        display: "flex",
-                        alignItems: "flex-start",
-                        gap: "12px",
-                        padding: "10px 14px",
-                        borderRadius: "12px",
-                        background: "rgba(255,255,255,0.25)",
-                        border: "1px solid rgba(255,255,255,0.35)",
-                        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.5)",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "22px",
-                          height: "22px",
-                          borderRadius: "50%",
-                          background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
-                          color: "#fff",
-                          fontSize: "10px",
-                          fontWeight: "800",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          flexShrink: 0,
-                          boxShadow: "0 2px 6px rgba(154,92,46,0.3)",
-                        }}
-                      >
-                        {i + 1}
-                      </div>
-                      <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.75)", fontWeight: "500", margin: 0, lineHeight: 1.5 }}>{step}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  className="pcard-back-cta"
-                  onClick={(e) => { e.stopPropagation(); toggle(); }}
-                  style={{
-                    borderRadius: "9999px",
-                    padding: "2px",
-                    background: inCart
-                      ? "linear-gradient(135deg,#22c55e,#16a34a)"
-                      : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                    border: "none",
-                    cursor: "pointer",
-                    width: "100%",
-                    boxShadow: inCart ? "0 4px 14px rgba(34,197,94,0.32)" : "0 4px 14px rgba(120,70,20,0.28)",
-                  }}
-                >
-                  <span
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "6px",
-                      height: "36px",
-                      borderRadius: "9999px",
-                      background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                      color: "#fff",
-                      fontWeight: "700",
-                      fontSize: "12px",
-                    }}
-                  >
-                    {inCart ? <><Check style={{ width: "12px", height: "12px" }} /> In Cart</> : <><Plus style={{ width: "12px", height: "12px" }} /> Add to Cart — ${product.monthly_fee}/mo</>}
-                  </span>
-                </button>
-              </div>
+              <ProductCardBack product={product} inCart={inCart} onToggle={toggle} />
             </div>
           )}
         </div>
