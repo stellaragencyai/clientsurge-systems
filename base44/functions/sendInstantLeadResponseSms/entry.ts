@@ -51,21 +51,28 @@ async function sendTwilioSms(toNumber, messageBody) {
 }
 
 async function logSmsEvent(base44, leadId, status, messageId, errorMessage = null) {
-  await base44.asServiceRole.entities.CommunicationEvent.create({
-    lead_id: leadId,
-    channel: "sms",
-    direction: "outbound",
-    event_type: status === "sent" ? "sms_sent" : "sms_failed",
-    provider: "twilio",
-    status: status === "sent" ? "sent" : "failed",
-    message_body: null,
-    provider_message_id: messageId || null,
-    error_message: errorMessage || null,
-    metadata_json: JSON.stringify({
-      service_key: "instant_lead_response",
-      timestamp: new Date().toISOString(),
-    }),
-  });
+  try {
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id: leadId,
+      context_id: leadId,
+      context_type: "website_lead",
+      channel: "sms",
+      direction: "outbound",
+      event_type: status === "sent" ? "sms_sent" : "sms_failed",
+      provider: "twilio",
+      status: status === "sent" ? "sent" : "failed",
+      message_body: null,
+      provider_message_id: messageId || null,
+      error_message: errorMessage || null,
+      metadata_json: JSON.stringify({
+        service_key: "instant_lead_response",
+        timestamp: new Date().toISOString(),
+      }),
+    });
+    console.log(`[InstantResponse] CommunicationEvent written — status: ${status}, lead: ${leadId}`);
+  } catch (e) {
+    console.error(`[InstantResponse] CommunicationEvent write failed for lead ${leadId}: ${e.message}`);
+  }
 }
 
 Deno.serve(async (req) => {
@@ -77,34 +84,29 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const { lead_id, order_id, lead } = await req.json();
 
+    console.log(`[InstantResponse] START — lead_id: ${lead_id}`);
+
     if (!lead_id) {
       return Response.json({ error: "lead_id is required" }, { status: 400 });
     }
 
-    // Use passed lead object or fetch it
-    let leadData = lead;
-    if (!leadData) {
-      try {
-        const leads = await base44.asServiceRole.entities.WebsiteLead.filter(
-          { id: lead_id },
-          null,
-          1
-        );
-        if (leads && leads.length > 0) {
-          leadData = leads[0];
-        }
-      } catch (e) {
-        // Silently continue if fetch fails, leadData will be null
-      }
+    // Fetch lead — always fetch fresh from DB (ignore passed lead object to ensure idempotency check is against live data)
+    let leadData = null;
+    try {
+      leadData = await base44.asServiceRole.entities.WebsiteLead.get(lead_id);
+      console.log(`[InstantResponse] Lead found: ${lead_id}`);
+    } catch (e) {
+      console.error(`[InstantResponse] Lead fetch failed for ${lead_id}: ${e.message}`);
     }
 
     if (!leadData) {
+      console.error(`[InstantResponse] Lead not found: ${lead_id}`);
       return Response.json({ error: "Lead not found" }, { status: 404 });
     }
 
-    // Check if we already sent initial response
+    // IDEMPOTENCY — only condition: initial_response_sent_at already set
     if (leadData.initial_response_sent_at) {
-      console.log(`[InstantResponse] Lead ${lead_id} already received initial response`);
+      console.log(`[InstantResponse] SKIPPED — already sent for lead ${lead_id}`);
       return Response.json({ success: false, reason: "Already sent" });
     }
 
@@ -138,19 +140,35 @@ Deno.serve(async (req) => {
 
     // Format and send SMS
     const messageBody = formatSmsTemplate(smsTemplate, leadData);
-    const messageSid = await sendTwilioSms(leadData.phone_number, messageBody);
+    let messageSid;
+    try {
+      messageSid = await sendTwilioSms(leadData.phone_number, messageBody);
+      console.log(`[InstantResponse] SMS send success — SID: ${messageSid}, lead: ${lead_id}`);
+    } catch (smsError) {
+      console.error(`[InstantResponse] SMS send failed for lead ${lead_id}: ${smsError.message}`);
+      await logSmsEvent(base44, lead_id, "failed", null, smsError.message);
+      return Response.json({ error: smsError.message }, { status: 500 });
+    }
 
-    // Update lead with initial response timestamp and log event
-    await base44.asServiceRole.entities.WebsiteLead.update(lead_id, {
-      initial_response_sent_at: new Date().toISOString(),
-      sms_attempt_count: (leadData.sms_attempt_count || 0) + 1,
-      last_engagement_type: "sms",
-      last_engagement_at: new Date().toISOString(),
-    });
+    // Update WebsiteLead — set contacted status and follow-up anchor
+    const now = new Date().toISOString();
+    try {
+      await base44.asServiceRole.entities.WebsiteLead.update(lead_id, {
+        initial_response_sent_at: now,
+        lead_status: "contacted",
+        next_follow_up_at: now,
+        sms_attempt_count: (leadData.sms_attempt_count || 0) + 1,
+        last_engagement_type: "sms",
+        last_engagement_at: now,
+      });
+      console.log(`[InstantResponse] WebsiteLead updated — lead: ${lead_id}`);
+    } catch (updateError) {
+      console.error(`[InstantResponse] WebsiteLead update failed for lead ${lead_id}: ${updateError.message}`);
+      // SMS was sent — still log the event and return success
+    }
 
-    // Skip logging in test mode - can cause auth issues
-
-    console.log(`[InstantResponse] Sent SMS to ${leadData.phone_number} (SID: ${messageSid})`);
+    // Log CommunicationEvent
+    await logSmsEvent(base44, lead_id, "sent", messageSid);
 
     return Response.json({ success: true, message_id: messageSid });
   } catch (error) {
