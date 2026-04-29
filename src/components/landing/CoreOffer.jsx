@@ -378,13 +378,13 @@ const flowInnerFrame =
 const mapCardSurface =
   "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,250,250,0.96) 100%)";
 const mapCardSurfaceActive =
-  "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(247,247,247,0.98) 100%)";
+  "linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 40%, #7a4825 100%)";
 const mapCardBorder = "1.5px solid rgba(148, 163, 184, 0.18)";
-const mapCardBorderActive = "1.5px solid rgba(148, 163, 184, 0.26)";
+const mapCardBorderActive = "2px solid rgba(200,150,92,0.6)";
 const mapCardShadow =
   "0 8px 22px rgba(15, 23, 42, 0.05)";
 const mapCardShadowActive =
-  "0 12px 28px rgba(15, 23, 42, 0.08)";
+  "0 12px 32px rgba(122,72,37,0.35), 0 0 0 3px rgba(200,150,92,0.2)";
 const mapCardSheen = "transparent";
 const mapCardMesh = "transparent";
 const mapCardDivider = "transparent";
@@ -479,18 +479,24 @@ function SystemMap({ selectedSystemId, onStageSelect }) {
                   }}
                 />
                 <h3
-                  className="relative z-10 text-sm font-semibold text-foreground leading-snug mb-2"
-                  style={{ textShadow: active ? "0 1px 0 rgba(255,255,255,0.42)" : "none" }}
+                  className="relative z-10 text-sm font-semibold leading-snug mb-2"
+                  style={{ color: active ? "rgba(252,241,222,0.98)" : "hsl(var(--foreground))" }}
                 >
                   {stage.title}
                 </h3>
-                <p className="relative z-10 text-xs leading-relaxed text-slate-700/90">
+                <p className="relative z-10 text-xs leading-relaxed" style={{ color: active ? "rgba(245,217,168,0.85)" : "rgba(51,65,85,0.9)" }}>
                   {stage.summary}
                 </p>
+                {active && (
+                  <div className="relative z-10 mt-3 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-amber-200">Active</span>
+                  </div>
+                )}
                 <div
                   aria-hidden="true"
                   className="absolute inset-0 rounded-2xl pointer-events-none"
-                  style={{ boxShadow: mapCardInnerFrame }}
+                  style={{ boxShadow: active ? "inset 0 1px 0 rgba(255,248,235,0.15)" : mapCardInnerFrame }}
                 />
               </button>
             );
@@ -505,7 +511,7 @@ function SystemMap({ selectedSystemId, onStageSelect }) {
             <button
               type="button"
               key={stage.id}
-              className="rounded-2xl px-4 py-4 relative overflow-hidden"
+              className="rounded-2xl px-4 py-4 relative overflow-hidden transition-all duration-200"
               onClick={() => onStageSelect(stage.systemsIncluded[0])}
               style={{
                 background: active ? mapCardSurfaceActive : mapCardSurface,
@@ -515,41 +521,21 @@ function SystemMap({ selectedSystemId, onStageSelect }) {
                 textAlign: "left",
               }}
             >
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: mapCardMesh,
-                  opacity: active ? 1 : 0.82,
-                }}
-              />
-              <div
-                aria-hidden="true"
-                className="absolute inset-x-0 top-0 h-[52%] pointer-events-none"
-                style={{
-                  background: mapCardSheen,
-                  opacity: active ? 1 : 0.8,
-                }}
-              />
-              <div
-                aria-hidden="true"
-                className="absolute left-0 right-0 top-0 h-px pointer-events-none"
-                style={{ background: mapCardDivider }}
-              />
               <h3
-                className="relative z-10 text-sm font-semibold text-foreground leading-snug mb-1.5"
-                style={{ textShadow: active ? "0 1px 0 rgba(255,255,255,0.42)" : "none" }}
+                className="relative z-10 text-sm font-semibold leading-snug mb-1.5"
+                style={{ color: active ? "rgba(252,241,222,0.98)" : "hsl(var(--foreground))" }}
               >
                 {stage.title}
               </h3>
-              <p className="relative z-10 text-xs leading-relaxed text-slate-700/90">
+              <p className="relative z-10 text-xs leading-relaxed" style={{ color: active ? "rgba(245,217,168,0.85)" : "rgba(51,65,85,0.9)" }}>
                 {stage.summary}
               </p>
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 rounded-2xl pointer-events-none"
-                style={{ boxShadow: mapCardInnerFrame }}
-              />
+              {active && (
+                <div className="relative z-10 mt-2 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-amber-200">Active</span>
+                </div>
+              )}
             </button>
           );
         })}
@@ -874,30 +860,70 @@ function SummarizedProcessTimeline() {
         From first contact to successful launch in 5 clear steps. We make it easy.
       </p>
 
-      {/* Horizontal Timeline */}
-      <div className="flex justify-center items-center gap-3 md:gap-6 flex-wrap px-4">
+      {/* Desktop: Horizontal Timeline */}
+      <div className="hidden sm:flex justify-center items-center gap-4 md:gap-6 px-4">
         {launchTimelineSteps.map((step, idx) => {
           const Icon = iconMap[step.icon];
           return (
-            <div key={step.id} className="flex items-center gap-3 md:gap-6">
+            <div key={step.id} className="flex items-center gap-4 md:gap-6">
               <div className="flex flex-col items-center gap-2">
                 <div
-                  className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center flex-shrink-0"
+                  className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0"
                   style={{
                     background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
                     boxShadow: "0 4px 12px rgba(154,92,46,0.3)",
                   }}
                 >
-                  <Icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                  <Icon className="w-6 h-6 text-white" />
                 </div>
-                <p className="text-xs md:text-sm font-semibold text-foreground text-center">{step.title}</p>
+                <p className="text-xs font-semibold text-foreground text-center max-w-[80px] leading-tight">{step.title}</p>
+                <p className="text-[10px] text-muted-foreground text-center">{step.duration}</p>
               </div>
               {idx < launchTimelineSteps.length - 1 && (
-                <div className="text-xl md:text-2xl text-primary/40 hidden sm:block">→</div>
+                <div className="flex-shrink-0 text-primary/30 text-2xl mb-6">→</div>
               )}
             </div>
           );
         })}
+      </div>
+
+      {/* Mobile: Vertical Stepper */}
+      <div className="sm:hidden relative pl-10">
+        <div
+          className="absolute left-4 top-3 bottom-3 w-0.5"
+          style={{ background: "linear-gradient(180deg, #9a5c2e 0%, rgba(154,92,46,0.2) 100%)" }}
+        />
+        <div className="space-y-6">
+          {launchTimelineSteps.map((step, idx) => {
+            const Icon = iconMap[step.icon];
+            return (
+              <div key={step.id} className="relative flex items-start gap-4">
+                {/* Circle on the line */}
+                <div
+                  className="absolute -left-10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 z-10"
+                  style={{
+                    background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+                    boxShadow: "0 2px 8px rgba(154,92,46,0.4)",
+                  }}
+                >
+                  <Icon className="w-4 h-4 text-white" />
+                </div>
+                {/* Content */}
+                <div
+                  className="rounded-xl px-4 py-3 flex-1"
+                  style={{
+                    background: "rgba(255,255,255,0.9)",
+                    border: "1px solid rgba(154,92,46,0.12)",
+                    boxShadow: "0 4px 12px rgba(111,67,31,0.06)",
+                  }}
+                >
+                  <p className="text-sm font-bold text-foreground">{step.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5" style={{ color: "rgba(154,92,46,0.8)" }}>{step.duration}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
