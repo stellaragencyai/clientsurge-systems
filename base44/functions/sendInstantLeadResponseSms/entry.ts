@@ -23,20 +23,27 @@ function formatSmsTemplate(template, lead) {
 
 async function sendTwilioSms(toNumber, messageBody) {
   const auth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
-  
+  const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
+  if (!statusCallbackUrl) {
+    console.warn("[Twilio] TWILIO_SMS_STATUS_CALLBACK_URL not set — delivery tracking disabled");
+  }
+
   console.log(`[Twilio] Sending SMS to ${toNumber} from ${TWILIO_FROM_NUMBER}`);
-  
+
+  const params = {
+    From: TWILIO_FROM_NUMBER,
+    To: toNumber,
+    Body: messageBody,
+  };
+  if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
+
   const response = await fetch(TWILIO_API_URL, {
     method: "POST",
     headers: {
       Authorization: `Basic ${auth}`,
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: new URLSearchParams({
-      From: TWILIO_FROM_NUMBER,
-      To: toNumber,
-      Body: messageBody,
-    }).toString(),
+    body: new URLSearchParams(params).toString(),
   });
 
   if (!response.ok) {
