@@ -75,6 +75,63 @@ async function logSmsEvent(base44, leadId, status, messageId, errorMessage = nul
   }
 }
 
+async function sendResendEmail(base44, leadId, toEmail, firstName, businessName) {
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "noreply@clientsurgesystems.com";
+
+  const subject = "We received your request";
+  const body = `Hi ${firstName},\n\nWe received your request and will be reaching out shortly.\n\nIf this is urgent, feel free to reply to this email or text us back.\n\n– ${businessName}`;
+
+  console.log(`[InstantResponse] Sending email to ${toEmail} — lead: ${leadId}`);
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": `instant-response/${leadId}/initial-email`,
+      },
+      body: JSON.stringify({ from: fromEmail, to: toEmail, subject, text: body }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(`Resend error: ${err?.message || res.status}`);
+    }
+
+    const result = await res.json();
+    console.log(`[InstantResponse] Email send success — id: ${result.id}, lead: ${leadId}`);
+
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id: leadId,
+      context_id: leadId,
+      context_type: "WebsiteLead",
+      channel: "email",
+      direction: "outbound",
+      event_type: "instant_email_sent",
+      provider: "resend",
+      status: "sent",
+      provider_message_id: result.id || null,
+      metadata_json: JSON.stringify({ service_key: "instant_lead_response", timestamp: new Date().toISOString() }),
+    });
+  } catch (emailError) {
+    console.error(`[InstantResponse] Email send failed for lead ${leadId}: ${emailError.message}`);
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id: leadId,
+      context_id: leadId,
+      context_type: "WebsiteLead",
+      channel: "email",
+      direction: "outbound",
+      event_type: "instant_email_sent",
+      provider: "resend",
+      status: "failed",
+      error_message: emailError.message,
+      metadata_json: JSON.stringify({ service_key: "instant_lead_response", timestamp: new Date().toISOString() }),
+    });
+  }
+}
+
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
@@ -167,8 +224,17 @@ Deno.serve(async (req) => {
       // SMS was sent — still log the event and return success
     }
 
-    // Log CommunicationEvent
+    // Log CommunicationEvent for SMS
     await logSmsEvent(base44, lead_id, "sent", messageSid);
+
+    // Send email if lead has an email address
+    if (leadData.email) {
+      const firstName = leadData.first_name || leadData.full_name?.split(" ")[0] || "there";
+      const businessName = Deno.env.get("DEFAULT_BUSINESS_NAME") || "ClientSurge Systems";
+      await sendResendEmail(base44, lead_id, leadData.email, firstName, businessName);
+    } else {
+      console.log(`[InstantResponse] No email address on lead ${lead_id} — email skipped`);
+    }
 
     return Response.json({ success: true, message_id: messageSid });
   } catch (error) {
