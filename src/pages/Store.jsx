@@ -129,7 +129,7 @@ function StoreInner() {
           position: "fixed",
           inset: 0,
           zIndex: 0,
-          background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 46%, #fcfaf6 100%)",
+          background: "#ffffff",
         }}
       />
       {/* Subtle texture overlay matching main page */}
@@ -139,12 +139,7 @@ function StoreInner() {
           position: "fixed",
           inset: 0,
           zIndex: 1,
-          backgroundImage: "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          opacity: 0.05,
-          pointerEvents: "none",
+          display: "none",
         }}
       />
 
