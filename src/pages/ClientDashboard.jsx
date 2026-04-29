@@ -4,6 +4,7 @@ import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import SystemProgressTracker from "@/components/dashboard/SystemProgressTracker";
 import NextActionsPanel from "@/components/dashboard/NextActionsPanel";
+import HorizontalStageTracker from "@/components/dashboard/HorizontalStageTracker";
 import { Loader2 } from "lucide-react";
 
 export default function ClientDashboard() {
@@ -92,36 +93,54 @@ export default function ClientDashboard() {
               </p>
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))", gap: "32px" }}>
-              {activeServices.map((service, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    borderRadius: "16px",
-                    background: "rgba(255,255,255,0.82)",
-                    border: "1px solid rgba(148, 163, 184, 0.18)",
-                    padding: "24px",
-                    boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
-                  }}
-                >
-                  <div style={{ marginBottom: "16px" }}>
-                    <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#1b140d", margin: "0 0 4px" }}>
-                      {service.productName}
-                    </h3>
-                    <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.5)", margin: 0 }}>
-                      Order: {service.orderId.slice(0, 8)}... •{" "}
-                      <span style={{ color: service.paymentStatus === "paid" ? "#22c55e" : "#f59e0b" }}>
-                        {service.paymentStatus === "paid" ? "Paid" : "Pending"}
-                      </span>
-                    </p>
+            <>
+              {/* Primary stage tracker for first service */}
+              <HorizontalStageTracker
+                serviceKey={activeServices[0].serviceKey}
+                currentStage={
+                  activeServices[0].orderStatus === "active"
+                    ? 4
+                    : activeServices[0].orderStatus === "in_progress"
+                    ? 3
+                    : activeServices[0].paymentStatus === "paid"
+                    ? 2
+                    : 1
+                }
+                productName={activeServices[0].productName}
+              />
+
+              {/* Remaining services in grid */}
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(500px, 1fr))", gap: "32px" }}>
+                {activeServices.map((service, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      borderRadius: "16px",
+                      background: "rgba(255,255,255,0.82)",
+                      border: "1px solid rgba(148, 163, 184, 0.18)",
+                      padding: "24px",
+                      boxShadow: "0 8px 22px rgba(15, 23, 42, 0.05)",
+                    }}
+                  >
+                    <div style={{ marginBottom: "16px" }}>
+                      <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#1b140d", margin: "0 0 4px" }}>
+                        {service.productName}
+                      </h3>
+                      <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.5)", margin: 0 }}>
+                        Order: {service.orderId.slice(0, 8)}... •{" "}
+                        <span style={{ color: service.paymentStatus === "paid" ? "#22c55e" : "#f59e0b" }}>
+                          {service.paymentStatus === "paid" ? "Paid" : "Pending"}
+                        </span>
+                      </p>
+                    </div>
+
+                    <SystemProgressTracker serviceKey={service.serviceKey} currentStage={service.orderStatus === "active" ? 3 : service.orderStatus === "in_progress" ? 2 : 1} />
+
+                    <NextActionsPanel serviceKey={service.serviceKey} />
                   </div>
-
-                  <SystemProgressTracker serviceKey={service.serviceKey} currentStage={service.orderStatus === "active" ? 3 : service.orderStatus === "in_progress" ? 2 : 1} />
-
-                  <NextActionsPanel serviceKey={service.serviceKey} />
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           )}
 
           {orders.length > 0 && (
