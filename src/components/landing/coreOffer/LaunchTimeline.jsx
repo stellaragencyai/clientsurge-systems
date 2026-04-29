@@ -22,14 +22,8 @@ export default function LaunchTimeline() {
           return (
             <div key={step.id} className="flex items-start gap-4 md:gap-6">
               <div className="flex flex-col items-center gap-1.5">
-                {/* Step number badge above circle */}
-                <span
-                  className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full"
-                  style={{
-                    background: "rgba(154,92,46,0.12)",
-                    color: "#9a5c2e",
-                  }}
-                >
+                {/* Step number plain text */}
+                <span className="text-[11px] font-semibold text-foreground">
                   Step {step.number}
                 </span>
                 {/* Icon circle */}
@@ -81,7 +75,7 @@ export default function LaunchTimeline() {
                     boxShadow: "0 4px 12px rgba(111,67,31,0.06)",
                   }}
                 >
-                  <p className="text-[10px] font-black uppercase tracking-widest mb-0.5" style={{ color: "#9a5c2e" }}>
+                  <p className="text-[11px] font-semibold text-foreground mb-0.5">
                     Step {step.number}
                   </p>
                   <p className="text-sm font-bold text-foreground">{step.title}</p>
@@ -131,13 +125,9 @@ export default function LaunchTimeline() {
                         boxShadow: "0 8px 24px rgba(111,67,31,0.06)",
                       }}
                     >
-                      <div
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-white mb-4"
-                        style={{ background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)" }}
-                      >
-                        <Icon className="w-3 h-3" />
+                      <p className="text-sm font-semibold text-foreground mb-3">
                         Step {step.number} — {step.duration}
-                      </div>
+                      </p>
                       <h4 className="text-lg md:text-xl font-bold text-foreground mb-4">
                         {step.title}
                       </h4>
