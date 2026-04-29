@@ -36,10 +36,17 @@ async function checkAlreadySent(base44, leadId, stepKey) {
 async function sendSMS(base44, lead, messageBody, fromNumber, stepKey) {
   const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
   const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+  const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
+  if (!statusCallbackUrl) {
+    console.warn("[processMissedCallFollowUps] TWILIO_SMS_STATUS_CALLBACK_URL missing — SMS delivery tracking disabled");
+  }
 
   if (!accountSid || !authToken || !fromNumber) {
     throw new Error("Twilio credentials missing");
   }
+
+  const params = { To: lead.phone, From: fromNumber, Body: messageBody };
+  if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 
   const res = await fetch(
     `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
@@ -49,11 +56,7 @@ async function sendSMS(base44, lead, messageBody, fromNumber, stepKey) {
         Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams({
-        To: lead.phone,
-        From: fromNumber,
-        Body: messageBody,
-      }),
+      body: new URLSearchParams(params),
     }
   );
 
