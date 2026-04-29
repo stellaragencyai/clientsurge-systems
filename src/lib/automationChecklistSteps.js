@@ -1,4 +1,14 @@
 // Automation checklist step definitions for each service
+//
+// IMPORTANT: This file is the frontend source of truth for checklist step templates.
+// A mirror of CHECKLIST_STEPS_BY_SERVICE is inlined in functions/initializeInstallOS
+// because Base44 Deno functions cannot import frontend lib files.
+// When editing steps here, update the inlined copy in initializeInstallOS too.
+//
+// Bump this version constant (and the copy in functions/initializeInstallOS)
+// whenever step content changes so any drift is immediately visible in backend logs.
+export const CHECKLIST_TEMPLATE_VERSION = "2026-04-29-v1";
+
 export const CHECKLIST_STEPS_BY_SERVICE = {
   instant_lead_response: [
     { id: "lead_form_connected", label: "Lead form connected", order: 1 },

@@ -10,6 +10,16 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
  */
 
 // ─── Step templates (mirrors lib/automationChecklistSteps.js) ───────────────
+//
+// IMPORTANT: TEMPORARY MIRROR OF lib/automationChecklistSteps.js
+// Base44 Deno functions are deployed independently and cannot reliably import
+// frontend/lib files. When editing checklist templates, update BOTH this
+// inlined map AND lib/automationChecklistSteps.js to keep them in sync.
+//
+// Template version constant — bump this (and the copy in lib/automationChecklistSteps.js)
+// whenever step content changes so drift is immediately visible in logs.
+const CHECKLIST_TEMPLATE_VERSION = "2026-04-29-v1";
+
 const CHECKLIST_STEPS_BY_SERVICE = {
   instant_lead_response: [
     { id: "lead_form_connected",    label: "Lead form connected",                   order: 1 },
@@ -114,7 +124,7 @@ async function createChecklistSteps(base44, checklistId, orderId, serviceKey) {
     created++;
   }
 
-  console.log(`[Install OS] Steps for "${serviceKey}": ${created} created, ${skipped} skipped (already existed)`);
+  console.log(`[Install OS] Steps for "${serviceKey}" [template v${CHECKLIST_TEMPLATE_VERSION}]: ${created} created, ${skipped} skipped (already existed)`);
   return { created, skipped };
 }
 Deno.serve(async (req) => {
