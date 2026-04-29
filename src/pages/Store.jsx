@@ -15,7 +15,7 @@ import BuildYourStackFlow from "@/components/store/BuildYourStackFlow";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { getRecommendedProducts } from "@/lib/productRecommendations";
 import StackValueCounter from "@/components/store/StackValueCounter";
-import BundleUnlockToast from "@/components/store/BundleUnlockToast";
+import BundleSavingsToast from "@/components/store/BundleSavingsToast";
 
 const InteractiveStackBuilder = lazy(() =>
   import("@/components/store/InteractiveStackBuilder")
@@ -439,9 +439,6 @@ function StoreInner() {
             </div>
           </div>
 
-          <StackValueCounter />
-          <BundleUnlockToast />
-
           {items.length > 0 ? (
             <div onClick={() => setCartOpen(true)} className="store-sticky-cart">
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -491,6 +488,8 @@ function StoreInner() {
             }}
           >
 
+
+            <StackValueCounter />
 
             <div style={{ display: "flex", gap: "10px", marginBottom: "18px", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
               <button
@@ -641,6 +640,7 @@ function StoreInner() {
           <CartSidebar />
           <Footer />
           <SocialProofTicker />
+          <BundleSavingsToast />
           {showComparison && <ServiceComparisonModal onClose={() => setShowComparison(false)} />}
         </div>
       </div>
