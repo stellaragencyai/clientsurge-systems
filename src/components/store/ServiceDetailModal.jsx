@@ -58,16 +58,15 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
           boxShadow: isVisible && !isExit
             ? "0 48px 120px rgba(0,0,0,0.45), 0 0 0 1px rgba(154,92,46,0.1)"
             : "0 0 0 rgba(0,0,0,0)",
-          // The card-to-center animation: starts small+low, springs to full size
           opacity: isVisible && !isExit ? 1 : 0,
           transform: isVisible && !isExit
-            ? "scale(1) translateY(0px)"
+            ? "scale(1) translateY(0px) perspective(1000px) rotateX(0deg)"
             : isExit
-            ? "scale(0.92) translateY(24px)"
-            : "scale(0.78) translateY(60px)",
+            ? "scale(0.94) translateY(18px) perspective(1000px) rotateX(1deg)"
+            : "scale(0.55) translateY(120px) perspective(1000px) rotateX(6deg)",
           transition: isExit
-            ? "opacity 0.32s ease, transform 0.32s ease, box-shadow 0.32s ease"
-            : "opacity 0.52s cubic-bezier(0.22,1,0.36,1), transform 0.52s cubic-bezier(0.22,1,0.36,1), box-shadow 0.52s ease",
+            ? "opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease"
+            : "opacity 0.65s cubic-bezier(0.16,1,0.3,1), transform 0.65s cubic-bezier(0.16,1,0.3,1), box-shadow 0.65s ease",
         }}
       >
         {/* Top gradient bar */}
