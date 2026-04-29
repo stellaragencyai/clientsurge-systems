@@ -8,58 +8,55 @@ export default function ProductCardBack({ product, inCart, onToggle }) {
       height: "100%", padding: "18px",
       display: "flex", flexDirection: "column", gap: "12px",
       borderRadius: "20px",
-      background: "linear-gradient(145deg, rgba(16,10,4,0.96) 0%, rgba(24,16,8,0.98) 100%)",
-      border: "1px solid rgba(200,150,92,0.28)",
-      boxShadow: "0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)",
+      background: "linear-gradient(145deg, rgba(255,252,248,0.97) 0%, rgba(255,248,240,0.98) 100%)",
+      border: "1.5px solid rgba(154,92,46,0.18)",
+      boxShadow: "0 4px 24px rgba(111,67,31,0.1)",
       position: "relative",
       overflow: "hidden",
     }}>
-      {/* Subtle grid overlay */}
+      {/* Top accent bar */}
       <div style={{
-        pointerEvents: "none", position: "absolute", inset: 0, borderRadius: "20px", opacity: 0.04,
-        backgroundImage: "linear-gradient(rgba(200,150,92,1) 1px, transparent 1px), linear-gradient(90deg, rgba(200,150,92,1) 1px, transparent 1px)",
-        backgroundSize: "28px 28px",
+        position: "absolute", top: 0, left: 0, right: 0, height: "3px",
+        background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)",
       }} />
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: "10px", position: "relative" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "4px" }}>
         <div style={{
-          width: "38px", height: "38px", borderRadius: "10px", flexShrink: 0,
+          width: "36px", height: "36px", borderRadius: "10px", flexShrink: 0,
           display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px",
-          background: "rgba(200,150,92,0.1)", border: "1px solid rgba(200,150,92,0.22)",
-          boxShadow: "0 0 12px rgba(200,150,92,0.1)",
+          background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.16)",
         }}>
           {product.icon}
         </div>
         <div>
-          <p style={{ fontSize: "8px", fontWeight: "800", color: "rgba(200,150,92,0.65)", textTransform: "uppercase", letterSpacing: "0.18em", margin: 0 }}>
-            // HOW IT WORKS
+          <p style={{ fontSize: "8px", fontWeight: "800", color: "rgba(154,92,46,0.6)", textTransform: "uppercase", letterSpacing: "0.18em", margin: 0 }}>
+            How It Works
           </p>
-          <h3 style={{ fontSize: "13px", fontWeight: "700", color: "rgba(245,225,195,0.92)", margin: 0, lineHeight: 1.2 }}>
+          <h3 style={{ fontSize: "13px", fontWeight: "700", color: "#1b140d", margin: 0, lineHeight: 1.2 }}>
             {product.name}
           </h3>
         </div>
       </div>
 
       {/* Steps */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "7px", position: "relative" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "7px" }}>
         {steps.map((step, i) => (
           <div key={i} style={{
             display: "flex", alignItems: "flex-start", gap: "10px",
             padding: "8px 11px", borderRadius: "10px",
-            background: "rgba(200,150,92,0.05)",
-            border: "1px solid rgba(200,150,92,0.12)",
+            background: "rgba(154,92,46,0.04)",
+            border: "1px solid rgba(154,92,46,0.1)",
           }}>
             <div style={{
               width: "20px", height: "20px", borderRadius: "5px", flexShrink: 0,
-              background: "rgba(200,150,92,0.15)", border: "1px solid rgba(200,150,92,0.3)",
-              color: "#c8965c", fontSize: "9px", fontWeight: "900",
+              background: "linear-gradient(135deg,#9a5c2e,#7a4825)",
+              color: "#fff", fontSize: "9px", fontWeight: "900",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: "monospace",
             }}>
-              {String(i + 1).padStart(2, "0")}
+              {i + 1}
             </div>
-            <p style={{ fontSize: "11px", color: "rgba(220,190,150,0.75)", fontWeight: "500", margin: 0, lineHeight: 1.5 }}>
+            <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.7)", fontWeight: "500", margin: 0, lineHeight: 1.5 }}>
               {step}
             </p>
           </div>
@@ -75,8 +72,7 @@ export default function ProductCardBack({ product, inCart, onToggle }) {
             ? "linear-gradient(135deg,#22c55e,#16a34a)"
             : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
           border: "none", cursor: "pointer", width: "100%",
-          boxShadow: inCart ? "0 4px 16px rgba(34,197,94,0.35)" : "0 4px 16px rgba(200,130,60,0.4)",
-          position: "relative",
+          boxShadow: inCart ? "0 4px 14px rgba(34,197,94,0.3)" : "0 4px 14px rgba(120,70,20,0.28)",
         }}
       >
         <span style={{
