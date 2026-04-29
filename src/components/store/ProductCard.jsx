@@ -48,41 +48,6 @@ export default function ProductCard({ product }) {
           transform: rotateY(180deg);
         }
 
-        /* Back-face step rows fade + slide in after flip lands */
-        .pcard-back-step {
-          opacity: 0;
-          transform: translateY(8px);
-          transition: opacity 0.28s ease, transform 0.28s ease;
-        }
-        .pcard-inner.is-flipped .pcard-back-step:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.38s; }
-        .pcard-inner.is-flipped .pcard-back-step:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.46s; }
-        .pcard-inner.is-flipped .pcard-back-step:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.54s; }
-        .pcard-inner.is-flipped .pcard-back-step:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 0.62s; }
-        .pcard-inner.is-flipped .pcard-back-step:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 0.70s; }
-
-        /* Back-face header also fades in */
-        .pcard-back-header {
-          opacity: 0;
-          transform: translateY(-6px);
-          transition: opacity 0.26s ease 0.32s, transform 0.26s ease 0.32s;
-        }
-        .pcard-inner.is-flipped .pcard-back-header {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        /* Back-face CTA button slides up */
-        .pcard-back-cta {
-          opacity: 0;
-          transform: translateY(10px);
-          transition: opacity 0.26s ease, transform 0.26s ease;
-        }
-        .pcard-inner.is-flipped .pcard-back-cta {
-          opacity: 1;
-          transform: translateY(0);
-          transition-delay: 0.76s;
-        }
-
         .crystal-card {
           background: #ffffff;
           border: 1.5px solid rgba(0,0,0,0.12);
