@@ -18,7 +18,7 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 //
 // Template version constant — bump this (and the copy in lib/automationChecklistSteps.js)
 // whenever step content changes so drift is immediately visible in logs.
-const CHECKLIST_TEMPLATE_VERSION = "2026-04-29-v1";
+const BACKEND_TEMPLATE_VERSION = "2026-04-29-v1";
 
 const CHECKLIST_STEPS_BY_SERVICE = {
   instant_lead_response: [
@@ -124,13 +124,20 @@ async function createChecklistSteps(base44, checklistId, orderId, serviceKey) {
     created++;
   }
 
-  console.log(`[Install OS] Steps for "${serviceKey}" [template v${CHECKLIST_TEMPLATE_VERSION}]: ${created} created, ${skipped} skipped (already existed)`);
+  console.log(`[Install OS] Steps for "${serviceKey}" [template v${BACKEND_TEMPLATE_VERSION}]: ${created} created, ${skipped} skipped (already existed)`);
   return { created, skipped };
 }
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { order_id } = await req.json();
+    const { order_id, frontend_template_version } = await req.json();
+
+    // ─── Template version drift detection ────────────────────────────────────
+    console.log(`[Checklist] Using template version: ${BACKEND_TEMPLATE_VERSION}`);
+    if (frontend_template_version && frontend_template_version !== BACKEND_TEMPLATE_VERSION) {
+      console.warn(`[Checklist] WARNING — Template version mismatch detected: backend=${BACKEND_TEMPLATE_VERSION}, frontend=${frontend_template_version}`);
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
     if (!order_id) {
       return Response.json({ error: "order_id required" }, { status: 400 });
