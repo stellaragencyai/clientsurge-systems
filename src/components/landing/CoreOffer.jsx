@@ -7,7 +7,7 @@ import {
 } from "@/lib/industryRecommendations";
 import { systemsById, systemGroups, coreOfferSectionConfig, iconMap } from "./coreOffer/coreOfferData";
 import SystemMap from "./coreOffer/SystemMapSection";
-import SystemDetailPanel from "./coreOffer/SystemDetailPanel";
+import VerticalTimeline from "./coreOffer/VerticalTimeline";
 import LaunchTimeline from "./coreOffer/LaunchTimeline";
 
 const orderedSystemIds = Object.keys(systemsById);
@@ -244,21 +244,10 @@ export default function CoreOffer() {
 
       <div className="max-w-6xl mx-auto relative z-10">
         <CoreOfferHeader />
-        <SystemMap selectedSystemId={selectedSystemId} onStageSelect={setSelectedSystemId} />
-        <div className="hidden md:block">
-          <SystemGroupList selectedSystemId={selectedSystemId} onSelect={setSelectedSystemId} />
-        </div>
-        <MobileSystemGroupList
+        <VerticalTimeline
           selectedSystemId={selectedSystemId}
-          onSelect={setSelectedSystemId}
-          showAll={showAllMobileSystems}
-          onToggle={() => setShowAllMobileSystems((c) => !c)}
-        />
-        <SystemDetailPanel
-          systemId={selectedSystemId}
+          onSystemSelect={setSelectedSystemId}
           onBookDemo={() => setShowBookingModal(true)}
-          onPrevious={handlePreviousSystem}
-          onNext={handleNextSystem}
         />
         <LaunchTimeline />
         <CoreOfferCTA onBookDemo={() => setShowBookingModal(true)} />
