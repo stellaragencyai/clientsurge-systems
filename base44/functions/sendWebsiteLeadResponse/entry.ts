@@ -99,7 +99,9 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const payload = await req.json();
-    const leadId = payload.lead_id || payload.id;
+    
+    // Handle both direct calls (lead_id) and entity automation (data.id)
+    const leadId = payload.lead_id || payload.id || payload.data?.id;
 
     if (!leadId) {
       return Response.json(
