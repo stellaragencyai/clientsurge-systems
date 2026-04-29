@@ -150,8 +150,29 @@ function StepRow({ step, idx }) {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
+            position: "relative",
           }}
         >
+          {/* Step badge - positioned top left outside */}
+          <div
+            style={{
+              position: "absolute",
+              top: "-16px",
+              left: "0",
+              background: "#7a4825",
+              color: "#ffffff",
+              padding: "4px 12px",
+              borderRadius: "6px",
+              fontSize: "11px",
+              fontWeight: "800",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              boxShadow: "0 2px 8px rgba(122, 72, 37, 0.3)",
+            }}
+          >
+            Step {step.number}
+          </div>
+        
           <div
             className="rounded-2xl overflow-hidden"
             style={{
@@ -172,9 +193,6 @@ function StepRow({ step, idx }) {
               }}
             />
             <div className="p-6 md:p-7 pt-7">
-              <p className="text-sm font-semibold text-foreground mb-1">
-                Step {step.number} — {step.duration}
-              </p>
               <h4 className="text-lg md:text-xl font-bold text-foreground mb-4">
                 {step.title}
               </h4>
@@ -226,7 +244,28 @@ export default function LaunchTimeline() {
     const el = stepRefs.current[idx];
     if (el) {
       setTimeout(() => {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        const targetTop = el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2);
+        const startTop = window.scrollY;
+        const distance = targetTop - startTop;
+        const duration = 3000; // 3 seconds for very slow scroll
+        let startTime = null;
+
+        const ease = (t) => {
+          return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        };
+
+        const scroll = (currentTime) => {
+          if (!startTime) startTime = currentTime;
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          window.scrollTo(0, startTop + distance * ease(progress));
+          
+          if (progress < 1) {
+            requestAnimationFrame(scroll);
+          }
+        };
+
+        requestAnimationFrame(scroll);
       }, 100);
     }
   };
