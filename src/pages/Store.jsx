@@ -14,6 +14,8 @@ import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 import BuildYourStackFlow from "@/components/store/BuildYourStackFlow";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { getRecommendedProducts } from "@/lib/productRecommendations";
+import StackValueCounter from "@/components/store/StackValueCounter";
+import BundleSavingsToast from "@/components/store/BundleSavingsToast";
 
 const InteractiveStackBuilder = lazy(() =>
   import("@/components/store/InteractiveStackBuilder")
@@ -127,7 +129,7 @@ function StoreInner() {
           position: "fixed",
           inset: 0,
           zIndex: 0,
-          background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 46%, #fcfaf6 100%)",
+          background: "#ffffff",
         }}
       />
       {/* Subtle texture overlay matching main page */}
@@ -137,12 +139,7 @@ function StoreInner() {
           position: "fixed",
           inset: 0,
           zIndex: 1,
-          backgroundImage: "url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          opacity: 0.05,
-          pointerEvents: "none",
+          display: "none",
         }}
       />
 
@@ -406,10 +403,9 @@ function StoreInner() {
                    textAlign: "center",
                    borderRadius: "10px",
                    padding: "8px 10px",
-                   background: "rgba(255,255,255,0.4)",
-                   border: "none",
-                   borderTop: "1px solid rgba(154,92,46,0.08)",
-                   boxShadow: "none",
+                   background: "#ffffff",
+                   border: "1.5px solid rgba(0,0,0,0.1)",
+                   boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
                  }}
                 >
                  <p
@@ -636,6 +632,7 @@ function StoreInner() {
           <CartSidebar />
           <Footer />
           <SocialProofTicker />
+          <BundleSavingsToast />
           {showComparison && <ServiceComparisonModal onClose={() => setShowComparison(false)} />}
         </div>
       </div>

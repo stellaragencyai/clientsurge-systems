@@ -1,0 +1,75 @@
+{
+  "name": "AutomationChecklistStep",
+  "type": "object",
+  "properties": {
+    "automation_checklist_id": {
+      "type": "string",
+      "title": "Parent Checklist ID"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "service_key": {
+      "type": "string",
+      "title": "Service Key",
+      "enum": [
+        "instant_lead_response",
+        "missed_call_text_back",
+        "nurture_sequence_14d",
+        "ai_booking_agent",
+        "lead_reactivation",
+        "review_request"
+      ]
+    },
+    "step_id": {
+      "type": "string",
+      "title": "Step Identifier (e.g., 'lead_form_connected')",
+      "description": "Unique key for this checkbox"
+    },
+    "step_label": {
+      "type": "string",
+      "title": "Display Label",
+      "description": "Human-readable label (e.g., 'Lead form connected')"
+    },
+    "step_order": {
+      "type": "integer",
+      "title": "Display Order",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "title": "Checkbox Status",
+      "enum": [
+        "pending",
+        "in_progress",
+        "complete",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Completed At",
+      "format": "date-time"
+    },
+    "completed_by": {
+      "type": "string",
+      "title": "Completed By (Admin Email)"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Step Notes"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message (if failed)"
+    }
+  },
+  "required": [
+    "automation_checklist_id",
+    "service_key",
+    "step_id",
+    "step_label"
+  ]
+}

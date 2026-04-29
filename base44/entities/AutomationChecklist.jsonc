@@ -1,0 +1,125 @@
+{
+  "name": "AutomationChecklist",
+  "type": "object",
+  "properties": {
+    "client_name": {
+      "type": "string",
+      "title": "Client Name"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "service_key": {
+      "type": "string",
+      "title": "Service Key",
+      "enum": [
+        "instant_lead_response",
+        "missed_call_text_back",
+        "nurture_sequence_14d",
+        "ai_booking_agent",
+        "lead_reactivation",
+        "review_request"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "title": "Automation Status",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "active",
+        "failed",
+        "paused"
+      ],
+      "default": "not_started"
+    },
+    "installed_by": {
+      "type": "string",
+      "title": "Installed By (Admin Email)"
+    },
+    "last_tested_at": {
+      "type": "string",
+      "title": "Last Tested At",
+      "format": "date-time"
+    },
+    "went_live_at": {
+      "type": "string",
+      "title": "Went Live At",
+      "format": "date-time"
+    },
+    "failure_notes": {
+      "type": "string",
+      "title": "Failure Notes"
+    },
+    "admin_notes": {
+      "type": "string",
+      "title": "Admin Notes"
+    },
+    "steps_completed": {
+      "type": "array",
+      "title": "Completed Step IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "twilio_configured": {
+      "type": "boolean",
+      "title": "Twilio Configured",
+      "default": false
+    },
+    "resend_configured": {
+      "type": "boolean",
+      "title": "Resend Configured",
+      "default": false
+    },
+    "booking_link_set": {
+      "type": "boolean",
+      "title": "Booking Link Set",
+      "default": false
+    },
+    "review_link_set": {
+      "type": "boolean",
+      "title": "Review Link Set",
+      "default": false
+    },
+    "lead_form_connected": {
+      "type": "boolean",
+      "title": "Lead Form Connected",
+      "default": false
+    },
+    "communication_event_logging_verified": {
+      "type": "boolean",
+      "title": "CommunicationEvent Logging Verified",
+      "default": false
+    },
+    "test_lead_sent": {
+      "type": "boolean",
+      "title": "Test Lead Sent",
+      "default": false
+    },
+    "test_response_received": {
+      "type": "boolean",
+      "title": "Test Response Received",
+      "default": false
+    },
+    "client_approved": {
+      "type": "boolean",
+      "title": "Client Sign-Off Received",
+      "default": false
+    }
+  },
+  "required": [
+    "client_email",
+    "service_key",
+    "business_name"
+  ]
+}

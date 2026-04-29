@@ -125,7 +125,7 @@ function StepRow({ step, idx }) {
   const imageDelay = isEven ? idx * 80 + 120 : idx * 80;
 
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="relative" data-step-id={step.id}>
       {/* Center numbered dot on desktop */}
       <div
         className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-8 w-11 h-11 rounded-full items-center justify-center z-10"
@@ -140,15 +140,40 @@ function StepRow({ step, idx }) {
         <span className="text-white font-black text-sm">{step.number}</span>
       </div>
 
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}>
+      <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`} style={{ alignItems: "stretch" }}>
         {/* Content card */}
         <div
           style={{
             transition: `opacity 0.65s ease ${contentDelay}ms, transform 0.65s ease ${contentDelay}ms`,
             opacity: visible ? 1 : 0,
             transform: visible ? "translateX(0)" : `translateX(${isEven ? "-40px" : "40px"})`,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            position: "relative",
           }}
         >
+          {/* Step badge - positioned at top of container */}
+          <div
+            style={{
+              position: "absolute",
+              top: "0",
+              left: "0",
+              background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+              color: "#ffffff",
+              padding: "4px 12px",
+              borderRadius: "6px",
+              fontSize: "11px",
+              fontWeight: "800",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              boxShadow: "0 4px 12px rgba(154, 92, 46, 0.4), 0 0 20px rgba(154, 92, 46, 0.3)",
+              zIndex: 10,
+            }}
+          >
+            Step {step.number}
+          </div>
+        
           <div
             className="rounded-2xl overflow-hidden"
             style={{
@@ -169,9 +194,6 @@ function StepRow({ step, idx }) {
               }}
             />
             <div className="p-6 md:p-7 pt-7">
-              <p className="text-sm font-semibold text-foreground mb-1">
-                Step {step.number} — {step.duration}
-              </p>
               <h4 className="text-lg md:text-xl font-bold text-foreground mb-4">
                 {step.title}
               </h4>
@@ -193,13 +215,16 @@ function StepRow({ step, idx }) {
             transition: `opacity 0.65s ease ${imageDelay}ms, transform 0.65s ease ${imageDelay}ms`,
             opacity: visible ? 1 : 0,
             transform: visible ? "translateX(0)" : `translateX(${isEven ? "40px" : "-40px"})`,
+            display: "flex",
+            alignItems: "stretch",
           }}
         >
           <div
-            className="rounded-2xl overflow-hidden h-64 md:h-72"
+            className="rounded-2xl overflow-hidden w-full"
             style={{
               border: "1.5px solid rgba(154,92,46,0.12)",
               boxShadow: "0 8px 24px rgba(111,67,31,0.1)",
+              minHeight: "400px",
             }}
           >
             <img src={step.image} alt={step.title} className="w-full h-full object-cover" />
@@ -218,7 +243,32 @@ export default function LaunchTimeline() {
   const handleTrackerClick = (idx) => {
     setActiveStep(idx);
     const el = stepRefs.current[idx];
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (el) {
+      setTimeout(() => {
+        const targetTop = el.getBoundingClientRect().top + window.scrollY - (window.innerHeight / 2);
+        const startTop = window.scrollY;
+        const distance = targetTop - startTop;
+        const duration = 3000; // 3 seconds for very slow scroll
+        let startTime = null;
+
+        const ease = (t) => {
+          return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        };
+
+        const scroll = (currentTime) => {
+          if (!startTime) startTime = currentTime;
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          window.scrollTo(0, startTop + distance * ease(progress));
+          
+          if (progress < 1) {
+            requestAnimationFrame(scroll);
+          }
+        };
+
+        requestAnimationFrame(scroll);
+      }, 100);
+    }
   };
 
   return (
@@ -246,20 +296,35 @@ export default function LaunchTimeline() {
       </div>
 
       {/* Enhancement 1: Numbered step circles — Desktop horizontal tracker */}
-      <div className="hidden sm:flex justify-center items-start gap-4 md:gap-6 px-4 mb-6">
+      <div className="hidden sm:flex justify-center items-start gap-7 md:gap-10 px-4 mb-6">
         {launchTimelineSteps.map((step, idx) => {
           const Icon = iconMap[step.icon];
           const isActive = activeStep === idx;
           return (
-            <div key={step.id} className="flex items-start gap-4 md:gap-6">
+            <div key={step.id} className="flex items-start gap-7 md:gap-10">
               <button
                 type="button"
                 onClick={() => handleTrackerClick(idx)}
-                className="flex flex-col items-center gap-2 border-none bg-transparent cursor-pointer"
+                className="flex flex-col items-center gap-3 border-none bg-transparent cursor-pointer group"
+                onMouseEnter={(e) => {
+                  const circle = e.currentTarget.querySelector('[data-icon-circle]');
+                  if (circle && !isActive) {
+                    circle.style.boxShadow = "0 0 0 5px rgba(154,92,46,0.15), 0 0 30px rgba(154,92,46,0.5), 0 4px 14px rgba(154,92,46,0.35)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  const circle = e.currentTarget.querySelector('[data-icon-circle]');
+                  if (circle && !isActive) {
+                    circle.style.boxShadow = "none";
+                  }
+                }}
               >
                 <div
-                  className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 relative"
+                  data-icon-circle
+                  className="rounded-full flex items-center justify-center flex-shrink-0 relative"
                   style={{
+                    width: "70px",
+                    height: "70px",
                     background: isActive
                       ? "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)"
                       : "rgba(154,92,46,0.12)",
@@ -270,17 +335,24 @@ export default function LaunchTimeline() {
                   }}
                 >
                   <span
-                    className="font-black text-xl leading-none"
-                    style={{ color: isActive ? "#fff" : "#9a5c2e" }}
+                    className="font-black leading-none"
+                    style={{ fontSize: "28px", color: isActive ? "#fff" : "#9a5c2e" }}
                   >{step.number}</span>
                   <div
-                    className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center"
-                    style={{ background: "#f5e6d0", border: "1.5px solid rgba(154,92,46,0.25)" }}
+                    className="absolute rounded-full flex items-center justify-center"
+                    style={{ 
+                      width: "24px",
+                      height: "24px",
+                      bottom: "-3px",
+                      right: "-3px",
+                      background: "#f5e6d0",
+                      border: "2px solid rgba(154,92,46,0.25)"
+                    }}
                   >
-                    <Icon className="w-3 h-3" style={{ color: "#9a5c2e" }} />
+                    <Icon style={{ width: "14px", height: "14px", color: "#9a5c2e" }} />
                   </div>
                 </div>
-                <p className="text-xs font-semibold text-foreground text-center max-w-[80px] leading-tight">{step.title}</p>
+                <p className="text-xs font-semibold text-foreground text-center max-w-[90px] leading-tight">{step.title}</p>
                 <p className="text-[10px] text-muted-foreground text-center">{step.duration}</p>
               </button>
               {idx < launchTimelineSteps.length - 1 && (
@@ -293,6 +365,9 @@ export default function LaunchTimeline() {
 
       {/* Enhancement 5: Timeline summary bar */}
       <TimelineSummaryBar activeStep={activeStep} onStepClick={handleTrackerClick} />
+
+      {/* Spacing before diagram */}
+      <div style={{ marginBottom: "40px" }} />
 
       {/* Mobile: Vertical Stepper */}
       <div className="sm:hidden relative pl-10 mb-12">

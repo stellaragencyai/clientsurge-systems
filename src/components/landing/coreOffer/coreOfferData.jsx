@@ -47,13 +47,13 @@ export const systemMapStages = [
     id: "lead-in",
     title: "New Lead Comes In",
     summary: "A form is filled out, a message comes in, or a call is missed.",
-    systemsIncluded: ["01", "02"],
+    systemsIncluded: ["01"],
   },
   {
     id: "respond-fast",
     title: "The System Responds Fast",
     summary: "The lead hears from your business right away instead of waiting.",
-    systemsIncluded: ["02", "03"],
+    systemsIncluded: ["03"],
   },
   {
     id: "follow-up",
@@ -76,31 +76,12 @@ export const systemMapStages = [
 ];
 
 export const systemGroups = [
-  { id: "get-the-lead", label: "Get The Lead", systems: ["02"] },
   { id: "move-the-lead", label: "Move The Lead", systems: ["03", "04", "05"] },
   { id: "close-and-organize", label: "Close And Organize", systems: ["06", "07"] },
   { id: "improve-over-time", label: "Improve Over Time", systems: ["08"] },
 ];
 
 export const systemsById = {
-  "02": {
-    id: "02",
-    service_key: "missed_call_text_back",
-    icon: "PhoneCall",
-    title: "Missed Call Text-Back",
-    shortDescription:
-      "If someone calls and you miss it, the system sends a text back automatically so the conversation does not stop there.",
-    badge: "Missed calls get a reply",
-    mapStageId: "lead-in",
-    detail: {
-      summary: "Missed calls turn into a second chance instead of a dead end.",
-      trigger: "A call comes in and no one answers.",
-      action: "The system sends a text back automatically to reopen the conversation.",
-      leadView: "They still get a fast response instead of feeling ignored.",
-      businessValue: "Missed calls stop turning into lost opportunities.",
-      includes: ["Automatic text-back", "Fast reply after missed call", "Works when staff is busy"],
-    },
-  },
   "03": {
     id: "03",
     service_key: "ai_booking_agent",

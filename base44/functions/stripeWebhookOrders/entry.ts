@@ -57,10 +57,112 @@ Deno.serve(async (req) => {
         if (subscriptionId) {
           console.log(`Subscription ${subscriptionId} created with order`);
         }
-        console.log(`Order ${order.id} marked as paid and initialization queued`);
+        console.log(`Order ${order.id} marked as paid and installation pipeline initialized`);
       } catch (error) {
-        console.warn(`Order ${order.id} payment processed but install initialization error:`, error.message);
+        console.warn(`Order ${order.id} payment processed but install pipeline error:`, error.message);
         // Don't fail webhook - order is still paid
+      }
+
+      // Initialize Client Installation OS + checklists (non-blocking)
+      try {
+        console.log(`[Webhook] Initializing Client Installation OS for order ${order.id}`);
+        await base44.asServiceRole.functions.invoke("initializeInstallOS", {
+          order_id: order.id,
+        });
+        console.log(`[Webhook] Client Installation OS initialized successfully for order ${order.id}`);
+      } catch (osError) {
+        console.warn(`[Webhook] Client Installation OS init failed for order ${order.id}: ${osError.message}`);
+        // Non-blocking: don't fail webhook if checklist initialization fails
+      }
+
+      // Send onboarding email to client (non-blocking)
+      try {
+        console.log(`[Webhook] Sending onboarding email for order ${order.id}`);
+        await base44.asServiceRole.functions.invoke("sendClientWelcomeEmail", {
+          order_id: order.id,
+        });
+        console.log(`[Webhook] Onboarding email sent successfully for order ${order.id}`);
+      } catch (emailError) {
+        console.warn(`[Webhook] Onboarding email failed for order ${order.id}: ${emailError.message}`);
+        // Non-blocking: don't fail webhook if email fails
+      }
+
+      // Send admin notification (non-blocking)
+      try {
+        const adminEmail = Deno.env.get("ADMIN_NOTIFICATION_EMAIL");
+        if (adminEmail) {
+          console.log(`[Webhook] Sending admin notification for order ${order.id}`);
+          
+          const servicesList = order.items?.map((i) => `${i.product_name} (${i.service_key})`).join(", ") || "—";
+          
+          const body = `
+<div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 580px; margin: 0 auto; color: #1a1a1a;">
+  <div style="background: linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 100%); padding: 40px 30px; border-radius: 12px 12px 0 0; text-align: center;">
+    <h1 style="margin: 0; font-size: 28px; color: white;">✓ New Order Received</h1>
+  </div>
+  
+  <div style="background: white; padding: 40px 30px; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px;">
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px;">
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666; width: 160px;">Customer</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${order.customer_name || "—"}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Email</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${order.customer_email || "—"}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Business</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${order.business_name || "—"}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Order ID</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${order.id}</td>
+      </tr>
+    </table>
+
+    <div style="background: #f9f9f9; border-left: 4px solid #9a5c2e; padding: 16px; border-radius: 4px; margin-bottom: 24px;">
+      <p style="margin: 0 0 8px; font-weight: 600; color: #9a5c2e; font-size: 13px; text-transform: uppercase;">Services Ordered</p>
+      <p style="margin: 0; color: #333; font-size: 13px; line-height: 1.6;">${servicesList}</p>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Selected Package</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${order.selected_package_type || "Custom"}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Detected Package</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${order.package_type || "Custom"}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Setup Total</td>
+        <td style="padding: 10px 0; color: #1a1a1a; font-weight: 700;">$${order.total_setup || 0}</td>
+      </tr>
+      <tr>
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Monthly Total</td>
+        <td style="padding: 10px 0; color: #1a1a1a; font-weight: 700;">$${order.total_monthly || 0}/mo</td>
+      </tr>
+    </table>
+
+    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb; text-align: center;">
+      <p style="margin: 0; font-size: 12px; color: #999;">Order automatically transitioned to "Paid → Ready for Install"</p>
+    </div>
+  </div>
+</div>`;
+
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: adminEmail,
+            subject: `✓ New Order — ${order.business_name || order.customer_name} ($${order.total_setup} setup)`,
+            body,
+            from_name: "ClientSurge Systems",
+          });
+
+          console.log(`[Webhook] Admin notified of new order ${order.id}`);
+        }
+      } catch (adminEmailError) {
+        console.warn(`[Webhook] Admin notification failed for order ${order.id}: ${adminEmailError.message}`);
+        // Non-blocking: don't fail webhook if admin email fails
       }
     }
   }

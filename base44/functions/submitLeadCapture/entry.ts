@@ -185,6 +185,11 @@ Deno.serve(async (req) => {
         }).catch((err) => console.error(`[SubmitLead] SMS send failed: ${err.message}`));
       }
 
+      // Enroll in nurture campaign asynchronously (non-blocking)
+      base44.functions.invoke('startNurtureCampaign', {
+        lead_email: duplicateLead.email || lead.email,
+      }).catch((err) => console.error(`[SubmitLead] Nurture enrollment failed: ${err.message}`));
+
       return Response.json({
         success: true,
         lead_id: duplicateLead.id,
@@ -213,6 +218,73 @@ Deno.serve(async (req) => {
     base44.functions.invoke('sendInstantLeadResponseSms', {
       lead_id: createdLead.id,
     }).catch((err) => console.error(`[SubmitLead] SMS send failed: ${err.message}`));
+
+    // Enroll in nurture campaign asynchronously (non-blocking)
+    base44.functions.invoke('startNurtureCampaign', {
+      lead_email: createdLead.email,
+    }).catch((err) => console.error(`[SubmitLead] Nurture enrollment failed: ${err.message}`));
+
+    // Send admin notification asynchronously (non-blocking)
+    try {
+      const adminEmail = Deno.env.get("ADMIN_NOTIFICATION_EMAIL");
+      if (adminEmail) {
+        const timestamp = new Date().toISOString();
+        const body = `
+<div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 580px; margin: 0 auto; color: #1a1a1a;">
+  <div style="background: linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 100%); padding: 40px 30px; border-radius: 12px 12px 0 0; text-align: center;">
+    <h1 style="margin: 0; font-size: 28px; color: white;">🔔 New Lead Received</h1>
+  </div>
+  
+  <div style="background: white; padding: 40px 30px; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px;">
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px;">
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666; width: 140px;">Name</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${lead.full_name}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Email</td>
+        <td style="padding: 10px 0; color: #1a1a1a;"><a href="mailto:${lead.email}" style="color: #9a5c2e; text-decoration: none;">${lead.email}</a></td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Phone</td>
+        <td style="padding: 10px 0; color: #1a1a1a;"><a href="tel:${lead.phone}" style="color: #9a5c2e; text-decoration: none;">${lead.phone}</a></td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Business</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${lead.business_name}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Service Interest</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${lead.business_type}</td>
+      </tr>
+      <tr>
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Received</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${timestamp}</td>
+      </tr>
+    </table>
+
+    <div style="background: #f9f9f9; border-left: 4px solid #9a5c2e; padding: 16px; border-radius: 4px; margin-bottom: 24px;">
+      <p style="margin: 0 0 8px; font-weight: 600; color: #9a5c2e; font-size: 13px; text-transform: uppercase;">Problem/Message</p>
+      <p style="margin: 0; color: #333; font-size: 13px; line-height: 1.6;">${lead.problem}</p>
+    </div>
+
+    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb; text-align: center;">
+      <p style="margin: 0; font-size: 12px; color: #999;">Lead ID: ${createdLead.id}</p>
+    </div>
+  </div>
+</div>`;
+
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: adminEmail,
+          subject: `🔔 New Lead — ${lead.full_name} (${lead.business_name})`,
+          body,
+          from_name: "ClientSurge Systems",
+        });
+        console.log(`[SubmitLead] Admin notified of new lead ${createdLead.id}`);
+      }
+    } catch (adminEmailError) {
+      console.warn(`[SubmitLead] Admin notification failed for lead ${createdLead.id}: ${adminEmailError.message}`);
+    }
 
     return Response.json({
       success: true,
