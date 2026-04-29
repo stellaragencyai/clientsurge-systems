@@ -32,6 +32,7 @@ import WebsiteLeadsDashboard from '../components/admin/WebsiteLeadsDashboard';
 import CommunicationLogsPanel from '../components/admin/CommunicationLogsPanel';
 import AutomationInstallChecklist from '../components/admin/AutomationInstallChecklist';
 import ReviewRequestPanel from '../components/admin/ReviewRequestPanel';
+import LeadReactivationPanel from '../components/admin/LeadReactivationPanel';
 
 const NAV_GROUPS = [
   {
@@ -56,6 +57,7 @@ const NAV_GROUPS = [
       { id: 'cadence', label: 'Dynamic Cadence', icon: Settings },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Mail },
       { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
+      { id: 'reactivation', label: 'Lead Reactivation', icon: Zap },
       { id: 'routing', label: 'Lead Routing', icon: Target },
     ],
   },
@@ -169,6 +171,7 @@ export default function AdminDashboard() {
       case 'website-leads': return <WebsiteLeadsDashboard />;
       case 'logs': return <CommunicationLogsPanel />;
       case 'cadence': return <DynamicCadencePanel />;
+      case 'reactivation': return <LeadReactivationPanel />;
       case 'review-request': return <ReviewRequestPanel />;
       case 'qa': return (
         <div className="space-y-4">
