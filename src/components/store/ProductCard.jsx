@@ -20,7 +20,7 @@ export default function ProductCard({ product }) {
     <>
       <style>{`
         .pcard-scene {
-          perspective: 1000px;
+          perspective: 1200px;
           height: 340px;
         }
         .pcard-scene.coming-soon {
@@ -31,7 +31,8 @@ export default function ProductCard({ product }) {
           width: 100%;
           height: 100%;
           transform-style: preserve-3d;
-          transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: transform 0.72s cubic-bezier(0.34, 1.10, 0.64, 1);
+          will-change: transform;
         }
         .pcard-inner.is-flipped {
           transform: rotateY(180deg);
@@ -47,6 +48,42 @@ export default function ProductCard({ product }) {
         .pcard-back {
           transform: rotateY(180deg);
         }
+
+        /* Back-face step rows fade + slide in after flip lands */
+        .pcard-back-step {
+          opacity: 0;
+          transform: translateY(8px);
+          transition: opacity 0.28s ease, transform 0.28s ease;
+        }
+        .pcard-inner.is-flipped .pcard-back-step:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: 0.38s; }
+        .pcard-inner.is-flipped .pcard-back-step:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: 0.46s; }
+        .pcard-inner.is-flipped .pcard-back-step:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: 0.54s; }
+        .pcard-inner.is-flipped .pcard-back-step:nth-child(4) { opacity: 1; transform: translateY(0); transition-delay: 0.62s; }
+        .pcard-inner.is-flipped .pcard-back-step:nth-child(5) { opacity: 1; transform: translateY(0); transition-delay: 0.70s; }
+
+        /* Back-face header also fades in */
+        .pcard-back-header {
+          opacity: 0;
+          transform: translateY(-6px);
+          transition: opacity 0.26s ease 0.32s, transform 0.26s ease 0.32s;
+        }
+        .pcard-inner.is-flipped .pcard-back-header {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* Back-face CTA button slides up */
+        .pcard-back-cta {
+          opacity: 0;
+          transform: translateY(10px);
+          transition: opacity 0.26s ease, transform 0.26s ease;
+        }
+        .pcard-inner.is-flipped .pcard-back-cta {
+          opacity: 1;
+          transform: translateY(0);
+          transition-delay: 0.76s;
+        }
+
         .crystal-card {
           background: #ffffff;
           border: 1.5px solid rgba(0,0,0,0.12);
@@ -61,9 +98,9 @@ export default function ProductCard({ product }) {
         .crystal-card:hover {
           border-color: rgba(154,92,46,0.35);
           box-shadow:
-            0 12px 36px rgba(0,0,0,0.1),
+            0 16px 42px rgba(0,0,0,0.11),
             0 2px 8px rgba(0,0,0,0.06);
-          transform: translateY(-2px);
+          transform: translateY(-3px);
         }
         .crystal-card.in-cart {
           background: rgba(240,253,244,0.25);
@@ -275,7 +312,7 @@ export default function ProductCard({ product }) {
                   background: "rgba(255,255,255,0.18)",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <div className="pcard-back-header" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   <span style={{ fontSize: "26px" }}>{product.icon}</span>
                   <div>
                     <p style={{ fontSize: "10px", fontWeight: "700", color: "#9a5c2e", textTransform: "uppercase", letterSpacing: "0.12em", margin: 0 }}>How It Works</p>
@@ -287,6 +324,7 @@ export default function ProductCard({ product }) {
                   {howItWorks.map((step, i) => (
                     <div
                       key={i}
+                      className="pcard-back-step"
                       style={{
                         display: "flex",
                         alignItems: "flex-start",
@@ -322,6 +360,7 @@ export default function ProductCard({ product }) {
                 </div>
 
                 <button
+                  className="pcard-back-cta"
                   onClick={(e) => { e.stopPropagation(); toggle(); }}
                   style={{
                     borderRadius: "9999px",
