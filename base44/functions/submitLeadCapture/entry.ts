@@ -185,6 +185,11 @@ Deno.serve(async (req) => {
         }).catch((err) => console.error(`[SubmitLead] SMS send failed: ${err.message}`));
       }
 
+      // Enroll in nurture campaign asynchronously (non-blocking)
+      base44.functions.invoke('startNurtureCampaign', {
+        lead_email: duplicateLead.email || lead.email,
+      }).catch((err) => console.error(`[SubmitLead] Nurture enrollment failed: ${err.message}`));
+
       return Response.json({
         success: true,
         lead_id: duplicateLead.id,
@@ -213,6 +218,11 @@ Deno.serve(async (req) => {
     base44.functions.invoke('sendInstantLeadResponseSms', {
       lead_id: createdLead.id,
     }).catch((err) => console.error(`[SubmitLead] SMS send failed: ${err.message}`));
+
+    // Enroll in nurture campaign asynchronously (non-blocking)
+    base44.functions.invoke('startNurtureCampaign', {
+      lead_email: createdLead.email,
+    }).catch((err) => console.error(`[SubmitLead] Nurture enrollment failed: ${err.message}`));
 
     // Send admin notification asynchronously (non-blocking)
     try {
