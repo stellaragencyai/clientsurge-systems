@@ -118,6 +118,8 @@ Deno.serve(async (req) => {
       business_name,
       success_url,
       cancel_url,
+      package_key,
+      package_type,
     } = await req.json();
 
     const requestedProductIds = Array.isArray(product_ids) && product_ids.length
@@ -181,12 +183,20 @@ Deno.serve(async (req) => {
       service_access_status: "active",
     }));
 
+    // Capture user's selected package (if provided by frontend)
+    const selectedPackage = package_key || package_type;
+    if (selectedPackage) {
+      console.log(`[Checkout] User selected package: ${selectedPackage}`);
+    } else {
+      console.log(`[Checkout] User did not select a predefined package`);
+    }
+
     // Detect which package (if any) was purchased from service_keys
     const serviceKeys = orderItems.map((item) => item.service_key);
     const detectedPackageType = detectPackageType(serviceKeys);
 
     if (detectedPackageType) {
-      console.log(`[Checkout] Order created with package_type: ${detectedPackageType}`);
+      console.log(`[Checkout] Computed package_type: ${detectedPackageType}`);
     } else {
       console.log(`[Checkout] No package detected (individual services)`);
     }
@@ -203,6 +213,7 @@ Deno.serve(async (req) => {
       payment_status: "pending",
       order_status: "pending_payment",
       plan_type: "Custom Service Bundle",
+      selected_package_type: selectedPackage || null,
       package_type: detectedPackageType,
     });
 
