@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   CalendarCheck,
@@ -96,9 +97,42 @@ export default function EnhancedSystemSteps() {
   const [activeStep, setActiveStep] = useState(null);
   const [showDemoModal, setShowDemoModal] = useState(false);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.12,
+        delayChildren: 0.1,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30, rotateX: -15, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: 260,
+        damping: 30,
+        mass: 0.8,
+      },
+    },
+  };
+
   return (
     <>
-      <div className="space-y-6">
+      <motion.div
+        className="space-y-6"
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+      >
         {steps.map((step, index) => {
           const stepNum = step[0];
           const lane = step[1];
@@ -108,7 +142,7 @@ export default function EnhancedSystemSteps() {
           const tag = step[5];
           const diagram = step[6];
           return (
-            <article key={stepNum} className="group relative overflow-hidden rounded-[2rem] border border-[#b98b61]/40 shadow-[0_24px_60px_rgba(15,23,42,0.08)] ring-1 ring-black/5 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 hover:border-[#9a6c45]/70 hover:shadow-[0_36px_90px_rgba(15,23,42,0.12)]" style={{ background: "linear-gradient(180deg,#7a4825 0%,#9a5c2e 18%,#ffffff 38%,#fffaf5 100%)", animation: `stepCardIn 560ms ease ${index * 90}ms both` }}>
+            <motion.article key={stepNum} variants={cardVariants} className="group relative overflow-hidden rounded-[2rem] border border-[#b98b61]/40 shadow-[0_24px_60px_rgba(15,23,42,0.08)] ring-1 ring-black/5 backdrop-blur-xl transition-all duration-500 hover:-translate-y-1.5 hover:border-[#9a6c45]/70 hover:shadow-[0_36px_90px_rgba(15,23,42,0.12)]" style={{ background: "linear-gradient(180deg,#7a4825 0%,#9a5c2e 18%,#ffffff 38%,#fffaf5 100%)", perspective: "1200px" }}>
               <div className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-[linear-gradient(180deg,#f0cf9b_0%,#b77b47_55%,#7a4f2e_100%)]" />
               <div className="pointer-events-none absolute inset-x-10 top-0 h-24 rounded-full bg-[#f7dfb8]/45 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100" />
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(201,156,110,0.08),transparent_40%)] opacity-80" />
@@ -171,19 +205,15 @@ export default function EnhancedSystemSteps() {
                   </div>
                 </div>
               </div>
-            </article>
-          );
-        })}
-      </div>
+              </motion.article>
+              );
+              })}
+              </motion.div>
 
       {activeStep && <StepModal activeStep={activeStep} onClose={() => setActiveStep(null)} onBook={() => { setActiveStep(null); setShowDemoModal(true); }} />}
       {showDemoModal && <DemoBookingModal onClose={() => setShowDemoModal(false)} />}
 
       <style>{`
-        @keyframes stepCardIn {
-          from { opacity: 0; transform: translateY(22px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
         @keyframes slidePointIn {
           from { opacity: 0; transform: translateX(-10px); }
           to { opacity: 1; transform: translateX(0); }
