@@ -30,6 +30,7 @@ import AdminGlobalSearch from '../components/admin/AdminGlobalSearch';
 import InstallQueuePanel from '../components/admin/InstallQueuePanel';
 import WebsiteLeadsDashboard from '../components/admin/WebsiteLeadsDashboard';
 import CommunicationLogsPanel from '../components/admin/CommunicationLogsPanel';
+import AutomationInstallChecklist from '../components/admin/AutomationInstallChecklist';
 
 const NAV_GROUPS = [
   {
@@ -47,6 +48,7 @@ const NAV_GROUPS = [
     items: [
       { id: 'website-leads', label: 'Website Leads', icon: Target },
       { id: 'install-queue', label: 'Install Queue', icon: Zap },
+      { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
       { id: 'automations', label: 'Automation Status', icon: Zap },
       { id: 'drip', label: 'Drip Campaigns', icon: Send },
       { id: 'nurture', label: 'Nurture Campaigns', icon: Flame },
@@ -161,6 +163,7 @@ export default function AdminDashboard() {
       case 'revenue': return <RevenueDashboard />;
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
+      case 'install-checklists': return <AutomationInstallChecklist />;
       case 'website-leads': return <WebsiteLeadsDashboard />;
       case 'logs': return <CommunicationLogsPanel />;
       case 'cadence': return <DynamicCadencePanel />;
