@@ -1,5 +1,11 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
+
+// Inline: allow scheduler/automation calls that have no authenticated user
+function allowAnonymousAutomation(req) {
+  const ua = req.headers.get('user-agent') || '';
+  const auth = req.headers.get('authorization') || '';
+  return ua.includes('base44') || auth.startsWith('Bearer ');
+}
 
 const LEAD_LIMIT = 5000;
 const BUSINESS_TZ = 'America/Phoenix';
@@ -41,10 +47,29 @@ Deno.serve(async (req) => {
     }
 
     const [settings] = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
-    const notificationEmail = settings?.lead_notification_email;
+    const notificationEmail =
+      settings?.lead_notification_email ||
+      Deno.env.get('ADMIN_NOTIFICATION_EMAIL') ||
+      Deno.env.get('ADMIN_EMAIL');
+
     if (!notificationEmail) {
-      return Response.json({ error: 'No admin notification email configured in settings' }, { status: 400 });
+      console.error(
+        '[sendDailyDigest] No admin email resolved. ' +
+        `AdminSettings.lead_notification_email=${settings?.lead_notification_email ?? 'not set'}, ` +
+        `ADMIN_NOTIFICATION_EMAIL env=${Deno.env.get('ADMIN_NOTIFICATION_EMAIL') ?? 'not set'}, ` +
+        `ADMIN_EMAIL env=${Deno.env.get('ADMIN_EMAIL') ?? 'not set'}`
+      );
+      return Response.json(
+        { error: 'No admin notification email configured. Set AdminSettings.lead_notification_email or ADMIN_NOTIFICATION_EMAIL secret.' },
+        { status: 400 }
+      );
     }
+
+    const emailSource =
+      settings?.lead_notification_email ? 'AdminSettings' :
+      Deno.env.get('ADMIN_NOTIFICATION_EMAIL') ? 'ADMIN_NOTIFICATION_EMAIL env' :
+      'ADMIN_EMAIL env';
+    console.log(`[sendDailyDigest] Resolved notification email from: ${emailSource}`);
 
     const allLeads = await base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_LIMIT);
     const now = Date.now();
