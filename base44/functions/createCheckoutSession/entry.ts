@@ -71,6 +71,41 @@ function normalizeInstallConfiguration(orderItems = []) {
   return config;
 }
 
+// Detect package type from service_keys
+function detectPackageType(serviceKeys = []) {
+  const keySet = new Set(serviceKeys);
+
+  // Pro System: all 6 services
+  if (
+    keySet.has("instant_lead_response") &&
+    keySet.has("missed_call_text_back") &&
+    keySet.has("nurture_sequence_14d") &&
+    keySet.has("ai_booking_agent") &&
+    keySet.has("lead_reactivation") &&
+    keySet.has("review_request")
+  ) {
+    return "pro_system";
+  }
+
+  // Growth System: 4 services
+  if (
+    keySet.has("instant_lead_response") &&
+    keySet.has("missed_call_text_back") &&
+    keySet.has("nurture_sequence_14d") &&
+    keySet.has("ai_booking_agent")
+  ) {
+    return "growth_system";
+  }
+
+  // Starter System: 2 services
+  if (keySet.has("instant_lead_response") && keySet.has("ai_booking_agent")) {
+    return "starter_system";
+  }
+
+  // Individual services or unknown combination
+  return null;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -146,6 +181,16 @@ Deno.serve(async (req) => {
       service_access_status: "active",
     }));
 
+    // Detect which package (if any) was purchased from service_keys
+    const serviceKeys = orderItems.map((item) => item.service_key);
+    const detectedPackageType = detectPackageType(serviceKeys);
+
+    if (detectedPackageType) {
+      console.log(`[Checkout] Order created with package_type: ${detectedPackageType}`);
+    } else {
+      console.log(`[Checkout] No package detected (individual services)`);
+    }
+
     const order = await base44.asServiceRole.entities.Order.create({
       customer_email,
       customer_name,
@@ -158,6 +203,7 @@ Deno.serve(async (req) => {
       payment_status: "pending",
       order_status: "pending_payment",
       plan_type: "Custom Service Bundle",
+      package_type: detectedPackageType,
     });
 
     // ── TASK 1: Build line_items using inline price_data instead of Stripe Price IDs ──

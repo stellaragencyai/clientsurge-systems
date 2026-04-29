@@ -248,6 +248,16 @@
       "type": "string",
       "title": "Plan Type"
     },
+    "package_type": {
+      "type": "string",
+      "title": "Detected Package Type",
+      "enum": [
+        "starter_system",
+        "growth_system",
+        "pro_system"
+      ],
+      "description": "Auto-detected package type based on purchased services (null if individual services)"
+    },
     "payment_status": {
       "type": "string",
       "title": "Payment Status",
