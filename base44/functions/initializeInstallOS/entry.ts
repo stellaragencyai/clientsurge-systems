@@ -2,17 +2,12 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 /**
  * Initialize ClientInstallationOS for a new order
- * Called when order is first created or when admin manually initializes
+ * Called via webhook after successful payment
+ * Idempotent: safe to call multiple times for same order
  */
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-
-    if (user?.role !== "admin") {
-      return Response.json({ error: "Admin only" }, { status: 403 });
-    }
-
     const { order_id } = await req.json();
 
     if (!order_id) {
@@ -24,6 +19,27 @@ Deno.serve(async (req) => {
     if (!order) {
       return Response.json({ error: "Order not found" }, { status: 404 });
     }
+
+    // ─────────────────────────────────────
+    // IDEMPOTENCY CHECK: prevent duplicate creation
+    // ─────────────────────────────────────
+    const existing = await base44.asServiceRole.entities.ClientInstallationOS.filter(
+      { order_id },
+      "-created_date",
+      1
+    );
+
+    if (existing?.length > 0) {
+      console.log(`[Install OS] Already initialized for order ${order_id}, skipping`);
+      return Response.json({
+        success: true,
+        install_os_id: existing[0].id,
+        already_initialized: true,
+        checklist_ids: existing[0].all_automations_checklists || [],
+      });
+    }
+
+    console.log(`[Install OS] Initializing Client Installation OS for order ${order_id}`);
 
     // Create ClientInstallationOS
     const installOS = await base44.asServiceRole.entities.ClientInstallationOS.create({
@@ -56,7 +72,7 @@ Deno.serve(async (req) => {
       all_automations_checklists: allChecklistIds,
     });
 
-    console.log(`[Install OS] Initialized for order ${order_id} with ${allChecklistIds.length} automations`);
+    console.log(`[Install OS] Created successfully for order ${order_id} with ${allChecklistIds.length} automation checklists`);
 
     return Response.json({
       success: true,

@@ -57,10 +57,22 @@ Deno.serve(async (req) => {
         if (subscriptionId) {
           console.log(`Subscription ${subscriptionId} created with order`);
         }
-        console.log(`Order ${order.id} marked as paid and initialization queued`);
+        console.log(`Order ${order.id} marked as paid and installation pipeline initialized`);
       } catch (error) {
-        console.warn(`Order ${order.id} payment processed but install initialization error:`, error.message);
+        console.warn(`Order ${order.id} payment processed but install pipeline error:`, error.message);
         // Don't fail webhook - order is still paid
+      }
+
+      // Initialize Client Installation OS + checklists (non-blocking)
+      try {
+        console.log(`[Webhook] Initializing Client Installation OS for order ${order.id}`);
+        await base44.asServiceRole.functions.invoke("initializeInstallOS", {
+          order_id: order.id,
+        });
+        console.log(`[Webhook] Client Installation OS initialized successfully for order ${order.id}`);
+      } catch (osError) {
+        console.warn(`[Webhook] Client Installation OS init failed for order ${order.id}: ${osError.message}`);
+        // Non-blocking: don't fail webhook if checklist initialization fails
       }
     }
   }
