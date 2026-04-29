@@ -279,7 +279,7 @@ export const launchTimelineSteps = [
     title: "You're Live & We Notify You",
     duration: "Fully automated",
     description: "Your automations are running and generating value now.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80",
     bullets: [
       "All services live and actively handling leads",
       "Real-time dashboard shows leads coming through",
