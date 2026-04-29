@@ -35,6 +35,18 @@ Deno.serve(async (req) => {
       : await base44.asServiceRole.entities.Order.filter({ stripe_session_id: sessionId });
     if (orders && orders.length > 0) {
       const order = orders[0];
+
+      // Mark order as paid FIRST — before pipeline, so it's never orphaned
+      try {
+        await base44.asServiceRole.entities.Order.update(order.id, {
+          payment_status: "paid",
+          order_status: "paid_setup_in_progress",
+        });
+        console.log(`Order ${order.id} marked as paid`);
+      } catch (updateError) {
+        console.error(`Order ${order.id} payment status update failed:`, updateError.message);
+      }
+
       // Trigger install pipeline via dedicated function
       try {
         await base44.asServiceRole.functions.invoke("installPipeline", {
