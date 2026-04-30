@@ -114,7 +114,7 @@ export default function Pricing() {
       <div className="max-w-7xl mx-auto">
         <div className="max-w-3xl mx-auto text-center pt-10 mb-16">
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-            Activate your revenue engine
+            Choose from one of our 3 systems
           </h2>
         </div>
 
