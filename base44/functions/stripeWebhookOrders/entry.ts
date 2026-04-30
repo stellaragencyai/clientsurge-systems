@@ -33,6 +33,11 @@ Deno.serve(async (req) => {
     const orders = orderId
       ? [await base44.asServiceRole.entities.Order.get(orderId).catch(() => null)].filter(Boolean)
       : await base44.asServiceRole.entities.Order.filter({ stripe_session_id: sessionId });
+    if (!orders || orders.length === 0) {
+      console.error(`[Webhook] No order found for session ${sessionId} (order_id metadata: "${orderId}"). Cannot process payment.`);
+      return Response.json({ received: true, warning: "Order not found" });
+    }
+
     if (orders && orders.length > 0) {
       const order = orders[0];
 
