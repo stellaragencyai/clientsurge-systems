@@ -207,12 +207,14 @@ export default function Navbar() {
 
   return (
     <motion.nav
-      className="sticky top-0 left-0 right-0 z-50 border-b border-white/20"
+      className="sticky top-4 left-4 right-4 z-50 rounded-2xl border border-white/20"
       style={{
-        backgroundColor: navOpacity.get() > 0.4 ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.15)",
-        backdropFilter: navBlur.get() > 15 ? "blur(22px)" : "blur(8px)",
-        WebkitBackdropFilter: navBlur.get() > 15 ? "blur(22px)" : "blur(8px)",
+        backgroundColor: navOpacity.get() > 0.4 ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.08)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
         paddingTop: "env(safe-area-inset-top)",
+        boxShadow: scrolled ? "0 20px 60px rgba(0,0,0,0.12)" : "0 8px 32px rgba(0,0,0,0.06)",
+        transition: "all 0.35s ease-out",
       }}
       onScroll={(scrollProgress) => {
         const threshold = 50;
@@ -223,7 +225,7 @@ export default function Navbar() {
         }
       }}
     >
-      <div className="w-full h-14 md:h-16 flex items-center justify-between" style={{ paddingLeft: "max(1rem, env(safe-area-inset-left))", paddingRight: "max(1rem, env(safe-area-inset-right))" }}>
+      <div className="w-full h-14 md:h-16 flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
         <button
           onClick={handleLogoClick}
           className="font-display font-bold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5 md:gap-2"
