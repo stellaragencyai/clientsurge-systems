@@ -7,11 +7,17 @@ export default function ProductCard({ product }) {
   const { items, addItem, removeItem } = useCart();
   const inCart = items.some((item) => item.product_id === product.product_id);
   const [modalOpen, setModalOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const toggle = (e) => {
     e.stopPropagation();
     if (inCart) removeItem(product.product_id);
     else addItem(product);
+  };
+
+  const handleExpandToggle = (e) => {
+    e.stopPropagation();
+    setExpanded(!expanded);
   };
 
   return (
@@ -28,9 +34,9 @@ export default function ProductCard({ product }) {
           border: 1.5px solid rgba(154,92,46,0.14);
           box-shadow: 0 4px 18px rgba(111,67,31,0.07);
           cursor: pointer;
-          transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-          height: 340px;
-          overflow: hidden;
+          transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+          min-height: 340px;
+          overflow: visible;
         }
         .pcard:hover {
           border-color: rgba(154,92,46,0.32);
@@ -63,6 +69,59 @@ export default function ProductCard({ product }) {
           border: 1.5px solid rgba(154,92,46,0.18);
           border-radius: 14px;
           padding: 8px 14px;
+        }
+        .highlight-pills {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        .highlight-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          padding: 6px 10px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, rgba(154,92,46,0.08), rgba(200,150,92,0.04));
+          border: 1px solid rgba(154,92,46,0.15);
+          font-size: 10px;
+          font-weight: 600;
+          color: rgba(27,20,13,0.72);
+          white-space: nowrap;
+        }
+        .highlight-pill svg {
+          width: 10px;
+          height: 10px;
+          color: #22c55e;
+        }
+        .features-count-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 8px;
+          border-radius: 6px;
+          background: rgba(34,197,94,0.1);
+          border: 1px solid rgba(34,197,94,0.25);
+          font-size: 9px;
+          font-weight: 700;
+          color: #16a34a;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+        .see-more-btn {
+          background: none;
+          border: none;
+          color: #9a5c2e;
+          font-size: 10px;
+          font-weight: 700;
+          cursor: pointer;
+          padding: 0;
+          margin-top: 8px;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          transition: color 0.2s ease;
+        }
+        .see-more-btn:hover {
+          color: #c8965c;
         }
       `}</style>
 
@@ -105,13 +164,31 @@ export default function ProductCard({ product }) {
         </p>
 
         {/* Highlights */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
-          {product.highlights.slice(0, 3).map((h) => (
-            <div key={h} style={{ display: "flex", alignItems: "center", gap: "7px" }}>
-              <CheckCircle2 style={{ width: "11px", height: "11px", color: "#22c55e", flexShrink: 0 }} />
-              <span style={{ fontSize: "11px", color: "rgba(27,20,13,0.58)", fontWeight: "500" }}>{h}</span>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", justifyContent: "space-between" }}>
+            <div className="features-count-badge">
+              {product.highlights.length} key features
             </div>
-          ))}
+            {product.highlights.length > 3 && !expanded && (
+              <button onClick={handleExpandToggle} className="see-more-btn">
+                See all →
+              </button>
+            )}
+            {expanded && (
+              <button onClick={handleExpandToggle} className="see-more-btn">
+                Show less ↑
+              </button>
+            )}
+          </div>
+          
+          <div className="highlight-pills">
+            {product.highlights.slice(0, expanded ? product.highlights.length : 3).map((h) => (
+              <div key={h} className="highlight-pill">
+                <CheckCircle2 />
+                {h}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Price + CTA */}
