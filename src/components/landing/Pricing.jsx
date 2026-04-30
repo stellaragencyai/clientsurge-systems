@@ -112,28 +112,10 @@ export default function Pricing() {
   return (
     <section id="pricing" className="nebula-pricing pt-10 pb-24 md:pb-32 px-6 overflow-visible">
       <div className="max-w-7xl mx-auto">
-        <div className="max-w-2xl mx-auto text-center pt-10 mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Pricing & Packages</p>
+        <div className="max-w-3xl mx-auto text-center pt-10 mb-16">
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-           Most Businesses Already Have the Leads — Here's What It Costs to Stop Losing Them
+            Choose one of our 3 systems
           </h2>
-          <p className="mt-5 text-foreground font-semibold text-base mb-3">
-            Recovery happens fast. Most clients cover their entire investment with just 2–3 additional bookings per month.
-          </p>
-          <p className="text-muted-foreground text-lg leading-relaxed">
-            We install done-for-you AI lead conversion systems that respond instantly, automate follow-up, and turn more of your existing demand into booked appointments.
-          </p>
-          <div
-            className="mt-6 inline-block rounded-2xl px-5 py-3 text-sm text-foreground/75 leading-relaxed max-w-xl mx-auto"
-            style={{ borderRadius: "16px" }}
-            style={{
-              background: "rgba(154,92,46,0.05)",
-              border: "1px solid rgba(154,92,46,0.12)",
-            }}
-          >
-            <span className="font-semibold text-foreground/90">On websites and landing pages:</span>{" "}
-            These are only included when they strengthen the conversion system. The real product is the automated system that captures, follows up, and books more leads.
-          </div>
         </div>
 
         {selectedIndustry ? (
