@@ -47,7 +47,7 @@ export default function LeadLeakage() {
           </div>
 
           {/* Revenue Recovery Counter Visual */}
-          <div className="flex justify-center scale-[2.66] origin-center">
+          <div className="flex justify-center scale-200 origin-center">
             <RevenueRecoveryCounter />
           </div>
         </div>
