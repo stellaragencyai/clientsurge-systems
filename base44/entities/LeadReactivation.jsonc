@@ -2,6 +2,11 @@
   "name": "LeadReactivation",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "lead_id": {
       "type": "string",
       "title": "Lead ID"

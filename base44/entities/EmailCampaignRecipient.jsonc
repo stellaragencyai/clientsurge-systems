@@ -2,6 +2,11 @@
   "name": "EmailCampaignRecipient",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "campaign_id": {
       "type": "string",
       "title": "Campaign ID"

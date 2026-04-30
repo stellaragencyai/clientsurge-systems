@@ -2,6 +2,11 @@
   "name": "MetricsSnapshot",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "project_id": {
       "type": "string",
       "title": "Project ID"

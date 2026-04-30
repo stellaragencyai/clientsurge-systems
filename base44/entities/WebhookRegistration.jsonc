@@ -2,6 +2,11 @@
   "name": "WebhookRegistration",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "service_key": {
       "type": "string",
       "title": "Service Key",

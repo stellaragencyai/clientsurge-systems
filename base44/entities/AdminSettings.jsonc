@@ -2,6 +2,11 @@
   "name": "AdminSettings",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "twilio_enabled": {
       "type": "boolean",
       "title": "Twilio Enabled",

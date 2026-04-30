@@ -2,6 +2,11 @@
   "name": "AutomationChecklist",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "client_name": {
       "type": "string",
       "title": "Client Name"
