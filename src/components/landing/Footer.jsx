@@ -141,74 +141,102 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Expanded Menu (Always Visible) */}
+      {/* Expanded Menu (Two Column Layout) */}
       <div className="border-t border-primary/10 bg-background/98 backdrop-blur-md animate-in fade-in duration-200">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 text-xs">
-          {navColumns.map((col) => (
-            <div key={col.title} className="flex flex-col gap-2">
-              <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">{col.title}</h4>
-              <div className="flex flex-col gap-1.5">
-                {col.links.map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    onClick={(e) => handleNavClick(e, link.href)}
-                    className="text-foreground/60 hover:text-foreground transition-colors text-[11px]"
-                  >
-                    {link.label}
-                  </a>
-                ))}
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Left: Navigation Columns */}
+          <div className="lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-6 md:gap-8">
+            {navColumns.map((col) => (
+              <div key={col.title} className="flex flex-col gap-3">
+                <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">{col.title}</h4>
+                <div className="flex flex-col gap-2">
+                  {col.links.map((link) => (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      onClick={(e) => handleNavClick(e, link.href)}
+                      className="text-foreground/60 hover:text-foreground transition-colors text-[11px] hover:translate-x-0.5"
+                    >
+                      {link.label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {/* Right: Contact Card */}
+          <div className="lg:col-span-1">
+            <div
+              className="rounded-2xl p-5 h-full flex flex-col gap-4"
+              style={{
+                background: "linear-gradient(135deg, rgba(154,92,46,0.08) 0%, rgba(200,150,92,0.04) 100%)",
+                border: "1px solid rgba(154,92,46,0.15)",
+              }}
+            >
+              <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">Get in Touch</h4>
+              <div className="flex flex-col gap-3">
+                <a href="tel:+16025874608" className="flex items-start gap-3 text-foreground/70 hover:text-foreground transition-colors group">
+                  <Phone className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] text-primary/70 uppercase tracking-wider">Phone</span>
+                    <span className="text-[12px] font-semibold group-hover:text-primary">(602) 587-4608</span>
+                  </div>
+                </a>
+                <a href="mailto:system@clientsurgesystems.com" className="flex items-start gap-3 text-foreground/70 hover:text-foreground transition-colors group">
+                  <Mail className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[10px] text-primary/70 uppercase tracking-wider">Email</span>
+                    <span className="text-[11px] font-semibold group-hover:text-primary break-all">system@clientsurgesystems.com</span>
+                  </div>
+                </a>
               </div>
             </div>
-          ))}
-          
-          {/* Contact Column */}
-          <div className="flex flex-col gap-2">
-            <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">Contact</h4>
-            <a href="tel:+16025874608" className="text-foreground/60 hover:text-foreground text-[11px] flex items-center gap-1.5">
-              <Phone className="w-3 h-3 text-primary" />
-              (602) 587-4608
-            </a>
-            <a href="mailto:system@clientsurgesystems.com" className="text-foreground/60 hover:text-foreground text-[11px] flex items-center gap-1.5">
-              <Mail className="w-3 h-3 text-primary" />
-              system@clientsurgesystems.com
-            </a>
           </div>
         </div>
         
-        {/* Enhancement 2: Rich bottom strip with mini-CTA + trust badges */}
+        {/* Enhancement 2: Rich bottom strip with trust badges + security info */}
         <div
-          className="border-t border-primary/10 px-4 md:px-6 py-5"
-          style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.04) 0%, rgba(200,150,92,0.02) 100%)" }}
+          className="border-t border-primary/10 px-4 md:px-6 py-6"
+          style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.06) 0%, rgba(200,150,92,0.03) 100%)" }}
         >
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="max-w-7xl mx-auto">
             {/* Trust badges row */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-5">
               {[
-                "🔒 No long-term contracts",
-                "⚡ Live in 5–7 days",
-                "💬 SMS + Email included",
+                { icon: "🔒", text: "No long-term contracts" },
+                { icon: "⚡", text: "Live in 5–7 days" },
+                { icon: "💬", text: "SMS + Email included" },
               ].map((badge) => (
-                <span
-                  key={badge}
-                  className="text-[10px] font-semibold px-3 py-1.5 rounded-full"
+                <div
+                  key={badge.text}
+                  className="flex items-center gap-2 text-[11px] font-semibold px-4 py-2 rounded-full"
                   style={{
-                    background: "rgba(154,92,46,0.07)",
-                    border: "1px solid rgba(154,92,46,0.14)",
-                    color: "rgba(154,92,46,0.85)",
+                    background: "rgba(154,92,46,0.09)",
+                    border: "1px solid rgba(154,92,46,0.18)",
+                    color: "rgba(154,92,46,0.9)",
                   }}
                 >
-                  {badge}
-                </span>
+                  <span className="text-sm">{badge.icon}</span>
+                  <span>{badge.text}</span>
+                </div>
               ))}
             </div>
-            {/* Copyright */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 text-[9px] text-foreground/40">
-              <span>&copy; {new Date().getFullYear()} ClientSurge Systems</span>
-              <span className="text-foreground/20">·</span>
-              <a href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</a>
-              <span className="text-foreground/20">·</span>
-              <a href="/legal/terms" className="hover:text-foreground transition-colors">Terms</a>
+
+            {/* Copyright + Security */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-[9px] text-foreground/40 pt-5 border-t border-primary/8">
+              <div className="flex items-center gap-1.5">
+                <span>&copy; {new Date().getFullYear()} ClientSurge Systems</span>
+                <span>·</span>
+                <a href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</a>
+                <span>·</span>
+                <a href="/legal/terms" className="hover:text-foreground transition-colors">Terms</a>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Shield className="w-3 h-3 text-primary/60" />
+                <span>Secure & SSL Encrypted</span>
+              </div>
             </div>
           </div>
         </div>
