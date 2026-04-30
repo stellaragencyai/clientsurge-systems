@@ -472,18 +472,12 @@ export default function LaunchTimeline() {
   }, [activeStep]);
 
   useEffect(() => {
-    let scrollTimeout;
     const handleScroll = () => {
       clearAutoAdvanceTimer();
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        startAutoAdvanceTimer();
-      }, 5000);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      clearTimeout(scrollTimeout);
     };
   }, [activeStep]);
 
