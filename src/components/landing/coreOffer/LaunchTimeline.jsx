@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import { ArrowDown, CheckCircle2 } from "lucide-react";
 import { launchTimelineSteps, iconMap } from "./coreOfferData";
 import { useDemoBooking } from "@/components/landing/DemoBookingContext";
@@ -19,6 +20,57 @@ function useInView(threshold = 0.15) {
     return () => observer.disconnect();
   }, [threshold]);
   return [ref, visible];
+}
+
+function ProgressRing({ activeStep }) {
+  const [ringRef, ringVisible] = useInView(0.3);
+  const circumference = 2 * Math.PI * 45;
+  const progress = ((activeStep + 1) / launchTimelineSteps.length) * 100;
+  const offset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div
+      ref={ringRef}
+      className="mb-8 mx-auto flex flex-col items-center"
+      style={{
+        opacity: ringVisible ? 1 : 0,
+        transform: ringVisible ? "scale(1)" : "scale(0.8)",
+        transition: "opacity 0.6s ease, transform 0.6s ease",
+      }}
+    >
+      <div style={{ position: "relative", width: "140px", height: "140px" }}>
+        <svg width="140" height="140" style={{ transform: "rotate(-90deg)" }}>
+          <circle cx="70" cy="70" r="45" fill="none" stroke="rgba(154,92,46,0.1)" strokeWidth="6" />
+          <motion.circle
+            cx="70"
+            cy="70"
+            r="45"
+            fill="none"
+            stroke="url(#ringGradient)"
+            strokeWidth="6"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            animate={{ strokeDashoffset: offset }}
+            transition={{ type: "spring", stiffness: 80, damping: 20 }}
+            style={{ filter: "drop-shadow(0 0 8px rgba(200,150,92,0.4))" }}
+          />
+          <defs>
+            <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#9a5c2e" />
+              <stop offset="50%" stopColor="#c8965c" />
+              <stop offset="100%" stopColor="#7a4825" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+          <div style={{ fontSize: "28px", fontWeight: "800", color: "#9a5c2e" }}>{activeStep + 1}/{launchTimelineSteps.length}</div>
+          <div style={{ fontSize: "10px", color: "rgba(154,92,46,0.6)", fontWeight: "600", marginTop: "2px" }}>STEPS</div>
+        </div>
+      </div>
+      <p style={{ marginTop: "16px", fontSize: "12px", fontWeight: "600", color: "#9a5c2e" }}>{launchTimelineSteps[activeStep].title}</p>
+    </div>
+  );
 }
 
 function TimelineSummaryBar({ activeStep, onStepClick }) {
@@ -117,6 +169,35 @@ function StepRow({ step, idx }) {
   const isEven = idx % 2 === 0;
   const [ref, visible] = useInView(0.08);
 
+  const stepVariants = {
+    hidden: { 
+      rotateY: -90,
+      opacity: 0,
+      y: 20,
+    },
+    visible: { 
+      rotateY: 0,
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 80,
+        damping: 16,
+        duration: 0.8,
+      }
+    }
+  };
+
+  const contentVariants = {
+    hidden: { opacity: 0, y: 16, filter: "blur(8px)" },
+    visible: { 
+      opacity: 1,
+      y: 0,
+      filter: "blur(0px)",
+      transition: { duration: 0.6, ease: "easeOut", delay: 0.2 }
+    }
+  };
+
   const contentDelay = idx * 80;
   const imageDelay   = idx * 80 + 120;
 
@@ -154,21 +235,23 @@ function StepRow({ step, idx }) {
 
       <div
         className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}
-        style={{ alignItems: "stretch" }}
+        style={{ alignItems: "stretch", perspective: "1200px" }}
       >
         {/* ── CONTENT CARD ── */}
-        <div
+        <motion.div
+          variants={stepVariants}
+          initial="hidden"
+          animate={visible ? "visible" : "hidden"}
           style={{
-            transition: `opacity 0.85s cubic-bezier(0.16,1,0.3,1) ${contentDelay}ms, transform 0.85s cubic-bezier(0.16,1,0.3,1) ${contentDelay}ms, filter 0.85s ease ${contentDelay}ms`,
-            opacity: visible ? 1 : 0,
-            transform: visible ? "translateX(0) translateY(0) scale(1)" : contentFrom,
-            filter: visible ? "blur(0px)" : "blur(3px)",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
           }}
         >
-          <div
+          <motion.div
+            variants={contentVariants}
+            initial="hidden"
+            animate={visible ? "visible" : "hidden"}
             className="rounded-2xl overflow-hidden h-full"
             style={{ background: cardBg, border: cardBorder, boxShadow: cardShadow, position: "relative" }}
           >
@@ -209,8 +292,8 @@ function StepRow({ step, idx }) {
                 ))}
               </ul>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* ── IMAGE ── */}
         <div
@@ -420,6 +503,9 @@ export default function LaunchTimeline() {
           );
         })}
       </div>
+
+      {/* Progress Ring */}
+      <ProgressRing activeStep={activeStep} />
 
       {/* Summary bar — pushed further down with extra top margin */}
       <div style={{ marginTop: "32px" }}>
