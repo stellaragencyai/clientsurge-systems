@@ -80,7 +80,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -90,17 +89,6 @@ export default function Navbar() {
 
   // Track page views
   usePageViewTracking();
-
-  const toggleDark = () => {
-    const isDark = !darkMode;
-    setDarkMode(isDark);
-    safeApplyTheme(isDark);
-    safeSetThemePreference(isDark ? "dark" : "light");
-    // Also update document attribute for CSS targeting
-    if (typeof document !== "undefined") {
-      document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
-    }
-  };
 
   const smoothScrollToHash = (href) => {
     const el = getSafeHashTarget(href);
@@ -142,19 +130,7 @@ export default function Navbar() {
     };
   }, [open]);
 
-  useEffect(() => {
-    // Check stored preference first, then system preference
-    const storedTheme = safeGetThemePreference();
-    let shouldUseDark = storedTheme === "dark";
-    
-    if (!storedTheme && typeof window !== "undefined") {
-      // Fallback to system preference if no stored preference
-      shouldUseDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    }
-    
-    setDarkMode(shouldUseDark);
-    safeApplyTheme(shouldUseDark);
-  }, []);
+
 
   useEffect(() => {
     if (!location.hash || !SAFE_SECTION_HASHES.has(location.hash)) return;
@@ -302,15 +278,6 @@ export default function Navbar() {
         </div>
 
         <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
-          <button
-            onClick={toggleDark}
-            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            aria-label={darkMode ? "Switch to light theme" : "Switch to dark theme"}
-            aria-pressed={darkMode}
-            className="w-9 h-9 rounded-full inline-flex items-center justify-center border border-border bg-background/50 hover:bg-muted transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            {darkMode ? <Sun className="w-4 h-4 text-primary" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
-          </button>
           <a
             href="/client-dashboard"
             className="hidden lg:block text-[11px] font-semibold text-muted-foreground hover:text-primary transition-colors px-2 py-1 rounded border border-dashed border-border hover:border-primary/40"
@@ -406,13 +373,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          <button
-            onClick={toggleDark}
-            className="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold text-foreground hover:text-primary border border-border rounded-full py-2 transition-colors"
-          >
-            {darkMode ? <Sun className="w-4 h-4 text-primary" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
-            Theme
-          </button>
+
 
           <button
             onClick={() => {
