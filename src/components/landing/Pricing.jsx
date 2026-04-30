@@ -5,6 +5,7 @@ import { useDemoBooking } from "./DemoBookingContext";
 import { getSelectedIndustryRecommendation, INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import CustomerProofCards from "./CustomerProofCards";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
+import StaggeredFadeUp from "@/components/visual-effects/StaggeredFadeUp";
 
 function SimpleCheck() {
   return (
@@ -132,16 +133,18 @@ export default function Pricing() {
           </div>
         ) : null}
 
-        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-stretch">
-          {plans.map((plan, i) => (
-            <PricingCard
-              key={i}
-              plan={plan}
-              demoBooking={demoBooking}
-              selectedIndustry={selectedIndustry}
-            />
-          ))}
-        </div>
+        <StaggeredFadeUp staggerDelay={0.15}>
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-stretch">
+            {plans.map((plan, i) => (
+              <PricingCard
+                key={i}
+                plan={plan}
+                demoBooking={demoBooking}
+                selectedIndustry={selectedIndustry}
+              />
+            ))}
+          </div>
+        </StaggeredFadeUp>
 
         <CustomerProofCards />
 
