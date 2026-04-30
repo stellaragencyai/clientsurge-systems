@@ -11,11 +11,11 @@ export default function MoneyBackGuarantee() {
       <div
         className="absolute inset-0"
         style={{
-          background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)",
-        }}
-      />
+          background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)"
+        }} />
+      
 
-      <div className="relative z-10 px-6 md:px-10 py-8 flex items-start gap-6">
+      <div className="relative z-10 px-6 md:px-10 py-8 flex items-start gap-6 hidden">
         <div className="flex-shrink-0">
           <div className="flex items-center justify-center h-14 w-14 rounded-lg bg-primary/15">
             <Shield className="h-7 w-7 text-primary" />
@@ -48,6 +48,6 @@ export default function MoneyBackGuarantee() {
       </div>
 
       <div className="absolute inset-0 rounded-2xl border border-primary/20 pointer-events-none" />
-    </div>
-  );
+    </div>);
+
 }

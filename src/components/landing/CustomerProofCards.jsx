@@ -99,7 +99,7 @@ export default function CustomerProofCards() {
   const navigate = useNavigate();
 
   return (
-    <section className="mt-24 pt-20 border-t border-border">
+    <section className="mt-24 pt-20 border-t border-border hidden">
       <div className="max-w-7xl mx-auto px-6 hidden">
         {/* Header */}
         <div className="text-center mb-16">
