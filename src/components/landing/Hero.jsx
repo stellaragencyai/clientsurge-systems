@@ -24,7 +24,8 @@ export default function Hero() {
         position: "relative",
         overflow: "hidden",
         background:
-          "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 46%, #fcfaf6 100%)",
+          "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 46%, #fcfaf6 70%, #faf6f0 100%)",
+        paddingBottom: "clamp(3rem, 6vw, 5rem)",
       }}
     >
       <div

@@ -236,7 +236,7 @@ export default function Industries() {
     <section
       id="industries"
       ref={sectionRef}
-      className="pt-10 pb-24 md:pb-32 px-0 bg-gradient-to-b from-card via-background to-card"
+      className="pt-16 md:pt-24 pb-32 md:pb-40 px-0 bg-gradient-to-b from-card via-background via-70% to-slate-50/40"
     >
       <div className="max-w-6xl mx-auto text-center px-6 pt-10 pb-14">
         <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">

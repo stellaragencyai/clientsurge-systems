@@ -297,7 +297,7 @@ export default function CoreOffer() {
   return (
     <section
       id="services"
-      className="pt-10 pb-16 md:pb-28 px-4 md:px-6 bg-gradient-to-b from-card via-background to-background relative overflow-hidden"
+      className="pt-16 md:pt-28 pb-24 md:pb-32 px-4 md:px-6 bg-gradient-to-b from-card via-background via-70% to-slate-50/30 relative overflow-hidden"
       style={{ overflowX: "hidden" }}
     >
       <div

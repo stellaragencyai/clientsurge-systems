@@ -23,9 +23,9 @@ export default function LeadLeakage() {
   return (
     <section
       id="lead-leakage"
-      className="pt-10 pb-24 md:pb-32 px-6"
+      className="pt-16 md:pt-28 pb-32 md:pb-40 px-6"
       style={{
-        background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 60%, #fdfbf8 100%)",
+        background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 50%, #f3ebe2 85%, #ede5db 100%)",
       }}
     >
       <div className="max-w-5xl mx-auto">
