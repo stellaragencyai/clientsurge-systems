@@ -378,9 +378,9 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
 
       {(plan.badge || isRecommended) &&
       <div className="pricing-badge-float" style={{ zIndex: 30 }}>
-          <span
-          className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl"
-          style={{ background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)" }}>
+          <span className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl hidden"
+
+        style={{ background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)" }}>
           
             {isRecommended ?
           `Best fit for ${selectedIndustry.shortName}` :
