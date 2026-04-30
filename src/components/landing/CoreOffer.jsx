@@ -15,21 +15,38 @@ const mobileVisibleSystemIds = new Set(["02", "03", "04", "05"]);
 
 function CoreOfferHeader() {
   return (
-    <div className="text-center mx-auto max-w-3xl">
-      <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase mb-4">
-        {coreOfferSectionConfig.eyebrow}
-      </p>
-      <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-foreground">
+    <div className="text-center mx-auto max-w-4xl">
+      {/* Eyebrow */}
+      <div className="inline-flex items-center gap-2 mb-5">
+        <div className="h-px w-8" style={{ background: "linear-gradient(to right, transparent, rgba(154,92,46,0.6))" }} />
+        <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-primary">
+          {coreOfferSectionConfig.eyebrow}
+        </p>
+        <div className="h-px w-8" style={{ background: "linear-gradient(to left, transparent, rgba(154,92,46,0.6))" }} />
+      </div>
+
+      {/* Title — forced single line via whitespace-nowrap on desktop */}
+      <h2 className="font-display font-bold tracking-tight leading-none text-foreground"
+        style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)" }}>
         How The{" "}
-        <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.25)" }}>
+        <span style={{ color: "#9a5c2e", textShadow: "0 0 32px rgba(154,92,46,0.28)" }}>
           8-System
         </span>{" "}
         Flow Works
       </h2>
-      <p className="mt-5 text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
+
+      {/* Thin gold rule */}
+      <div className="flex items-center justify-center gap-3 mt-5 mb-6">
+        <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to right, transparent, rgba(154,92,46,0.45))" }} />
+        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#c8965c" }} />
+        <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to left, transparent, rgba(154,92,46,0.45))" }} />
+      </div>
+
+      {/* Subheadline — tighter, more editorial */}
+      <p className="text-base md:text-lg font-medium text-foreground/80 max-w-2xl mx-auto leading-relaxed">
         {coreOfferSectionConfig.subheadline}
       </p>
-      <p className="mt-4 text-sm md:text-base text-foreground/65 max-w-xl mx-auto leading-relaxed">
+      <p className="mt-3 text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
         {coreOfferSectionConfig.helperLine}
       </p>
     </div>
