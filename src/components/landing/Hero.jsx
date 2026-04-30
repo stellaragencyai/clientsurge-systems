@@ -77,7 +77,7 @@ export default function Hero() {
           minHeight: "100svh",
         }}
       >
-        <div className="landing-hero__copy" style={{ gridColumn: "1 / -1", marginBottom: "-32px" }}>
+        <div className="landing-hero__copy" style={{ gridColumn: "1 / -1", marginBottom: "-32px", textAlign: "center", maxWidth: "100%" }}>
 
 
           <h1
@@ -122,6 +122,8 @@ export default function Hero() {
               color: "rgba(27,20,13,0.74)",
               lineHeight: 1.65,
               marginBottom: "18px",
+              maxWidth: "600px",
+              margin: "0 auto 18px",
             }}
           >
             ClientSurge installs AI-powered conversion systems that capture leads, respond instantly, follow up automatically, and turn more of your existing demand into booked clients.
@@ -129,7 +131,7 @@ export default function Hero() {
 
           <div
             className="landing-hero__checklist"
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "32px", maxWidth: "100%" }}
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "32px", maxWidth: "100%", margin: "0 auto 32px" }}
           >
             {checklist.map((item, i) => (
               <div
@@ -186,7 +188,9 @@ export default function Hero() {
               flexWrap: "wrap",
               gap: "12px",
               alignItems: "center",
+              justifyContent: "center",
               WebkitTapHighlightColor: "transparent",
+              marginTop: "32px",
             }}
           >
             <button
