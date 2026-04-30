@@ -71,62 +71,29 @@ export default function Hero() {
           margin: "0 auto",
           padding: "clamp(5rem, 12vw, 7rem) clamp(1rem, 5vw, 3rem) clamp(3rem, 6vw, 5.5rem)",
           display: "grid",
-          gridTemplateColumns: "minmax(0, 560px) minmax(420px, 1fr)",
+          gridTemplateColumns: "1fr",
           gap: "clamp(24px, 4vw, 48px)",
           alignItems: "center",
           minHeight: "100svh",
         }}
       >
-        <div className="landing-hero__copy" style={{ maxWidth: "560px" }}>
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "10px 14px",
-              borderRadius: "9999px",
-              background: "rgba(255,255,255,0.74)",
-              border: "1px solid rgba(154,92,46,0.14)",
-              boxShadow: "0 10px 26px rgba(44,31,16,0.06)",
-              marginBottom: "22px",
-            }}
-          >
-            <span
-              style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "9999px",
-                background: "#34c759",
-                boxShadow: "0 0 0 6px rgba(52,199,89,0.12)",
-              }}
-            />
-            <span
-              style={{
-                fontSize: "12px",
-                fontWeight: "700",
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
-                color: "#7a4825",
-              }}
-            >
-              AI Lead Response Systems
-            </span>
-          </div>
+        <div className="landing-hero__copy" style={{ maxWidth: "560px", gridColumn: "1 / -1", marginBottom: "-32px" }}>
+
 
           <h1
             className="landing-hero__headline"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(2.1rem, 5.8vw, 4.6rem)",
+              fontSize: "clamp(2.3rem, 6.5vw, 5.2rem)",
               fontWeight: "700",
-              lineHeight: 1.08,
+              lineHeight: 1.02,
               letterSpacing: "-0.03em",
               color: "#1b140d",
               marginBottom: "22px",
-              maxWidth: "600px",
+              gridColumn: "1 / -1",
             }}
           >
-            Stop Losing Leads —{" "}
+            Stop Losing Leads to Slow Response —{" "}
             <span
               style={{
                 background:
@@ -136,8 +103,9 @@ export default function Hero() {
                 backgroundClip: "text",
               }}
             >
-              Book 3x More with AI
+              AI Systems That Book 3x More
             </span>
+            {" "}Appointments
           </h1>
 
           {/* Visual enhancement: shimmer divider under headline */}
