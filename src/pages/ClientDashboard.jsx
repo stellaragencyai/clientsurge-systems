@@ -3,7 +3,6 @@ import { base44 } from "@/api/base44Client";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import HorizontalStageTracker from "@/components/dashboard/HorizontalStageTracker";
-import VerticalPhaseTracker from "@/components/dashboard/VerticalPhaseTracker";
 import ServiceCard from "@/components/dashboard/ServiceCard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import ChatAssistant from "@/components/dashboard/ChatAssistant";
@@ -244,9 +243,6 @@ export default function ClientDashboard() {
 
                 {activeServices.length === 0 ? <EmptyState /> : (
                   <>
-                    {/* Vertical phase tracker — pizza-order style */}
-                    <VerticalPhaseTracker currentPhaseIndex={activeServices[0].stageIndex} />
-
                     {/* Primary stage tracker — uses first service's real install_status */}
                     <HorizontalStageTracker
                       serviceKey={activeServices[0].serviceKey}
