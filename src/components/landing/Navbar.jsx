@@ -309,6 +309,13 @@ export default function Navbar() {
           >
             {darkMode ? <Sun className="w-4 h-4 text-primary" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
           </button>
+          <a
+            href="/client-dashboard"
+            className="hidden lg:block text-[11px] font-semibold text-muted-foreground hover:text-primary transition-colors px-2 py-1 rounded border border-dashed border-border hover:border-primary/40"
+            title="Temp: Member Dashboard"
+          >
+            📊 Dashboard
+          </a>
           <button
             onClick={() => {
               trackCTA("login", "navbar");
