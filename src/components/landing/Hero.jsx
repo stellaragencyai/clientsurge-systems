@@ -84,12 +84,12 @@ export default function Hero() {
             className="landing-hero__headline"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(2.3rem, 6.5vw, 5.2rem)",
+              fontSize: "clamp(2rem, 5.2vw, 3.8rem)",
               fontWeight: "700",
-              lineHeight: 1.02,
+              lineHeight: 1.1,
               letterSpacing: "-0.03em",
               color: "#1b140d",
-              marginBottom: "22px",
+              marginBottom: "16px",
               gridColumn: "1 / -1",
             }}
           >
@@ -103,9 +103,8 @@ export default function Hero() {
                 backgroundClip: "text",
               }}
             >
-              AI Systems That Book 3x More
+              AI Systems That Book 3x More Appointments
             </span>
-            {" "}Appointments
           </h1>
 
           {/* Visual enhancement: shimmer divider under headline */}
@@ -119,11 +118,10 @@ export default function Hero() {
           <p
             className="landing-hero__body"
             style={{
-              fontSize: "clamp(1rem, 2.5vw, 1.14rem)",
+              fontSize: "clamp(0.95rem, 2.2vw, 1.05rem)",
               color: "rgba(27,20,13,0.74)",
-              lineHeight: 1.72,
-              marginBottom: "28px",
-              maxWidth: "min(34rem, 100%)",
+              lineHeight: 1.65,
+              marginBottom: "18px",
             }}
           >
             ClientSurge installs AI-powered conversion systems that capture leads, respond instantly, follow up automatically, and turn more of your existing demand into booked clients.
@@ -131,7 +129,7 @@ export default function Hero() {
 
           <div
             className="landing-hero__checklist"
-            style={{ display: "grid", gap: "9px", marginBottom: "34px" }}
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "32px", maxWidth: "100%" }}
           >
             {checklist.map((item, i) => (
               <div
@@ -164,7 +162,7 @@ export default function Hero() {
                     <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </div>
-                <span style={{ fontSize: "14px", fontWeight: "600", color: "rgba(27,20,13,0.8)" }}>
+                <span style={{ fontSize: "12px", fontWeight: "600", color: "rgba(27,20,13,0.8)", lineHeight: 1.4 }}>
                   {item}
                 </span>
               </div>
@@ -246,6 +244,7 @@ export default function Hero() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            gridColumn: "1 / -1",
           }}
         >
           <div
