@@ -64,6 +64,10 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
       type="button"
       onClick={() => onSelect(system.id)}
       whileHover={{ y: -2 }}
+      initial={{ opacity: 0, x: -50 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      viewport={{ once: true, margin: "-50px" }}
       className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       style={{
         background: "rgba(255,255,255,0.82)",
