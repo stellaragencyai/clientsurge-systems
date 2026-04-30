@@ -26,40 +26,27 @@ export default function ProductCard({ product }) {
         .pcard {
           position: relative;
           border-radius: 20px;
-          padding: 0;
+          padding: 20px;
           display: flex;
           flex-direction: column;
-          gap: 0;
-          background: rgba(255,255,255,0.88);
-          backdrop-filter: blur(14px);
-          -webkit-backdrop-filter: blur(14px);
-          border: 1.5px solid rgba(154,92,46,0.08);
-          box-shadow: 0 8px 24px rgba(111,67,31,0.06);
+          gap: 12px;
+          background: rgba(255,255,255,0.93);
+          border: 2px solid;
+          border-image: linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #9a5c2e 100%) 1;
+          box-shadow: 0 4px 18px rgba(111,67,31,0.07), inset 0 1px 0 rgba(255,255,255,0.3);
           cursor: pointer;
           transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
           min-height: 340px;
-          overflow: hidden;
-        }
-        .pcard::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 4px;
-          background: linear-gradient(90deg, #9a5c2e, #c8965c, #9a5c2e);
-          z-index: 10;
+          overflow: visible;
         }
         .pcard:hover {
-          border-color: rgba(154,92,46,0.18);
-          box-shadow: 0 12px 32px rgba(111,67,31,0.1);
-          transform: translateY(-2px);
+          border-image: linear-gradient(135deg, #c8965c 0%, #f5d9a8 50%, #c8965c 100%) 1;
+          box-shadow: 0 8px 28px rgba(111,67,31,0.15), inset 0 1px 0 rgba(255,255,255,0.4);
+          transform: translateY(-3px);
         }
         .pcard.in-cart {
-          border-color: rgba(34,197,94,0.15);
-        }
-        .pcard.in-cart::before {
-          background: linear-gradient(90deg, #22c55e, #4ade80, #22c55e);
+          border-image: linear-gradient(135deg, #22c55e 0%, #4ade80 50%, #22c55e 100%) 1;
+          box-shadow: 0 8px 28px rgba(34,197,94,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
         }
         .pcard.coming-soon-card {
           cursor: default;
@@ -174,76 +161,70 @@ export default function ProductCard({ product }) {
         className={`pcard${inCart ? " in-cart" : ""}${product.coming_soon ? " coming-soon-card" : ""}`}
         onClick={() => !product.coming_soon && setModalOpen(true)}
       >
-        {/* Content Wrapper with padding */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "20px 20px 0", flex: 1 }}>
-          {/* Header */}
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
-            <div style={{
-              width: "60px", height: "60px", borderRadius: "16px",
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: "32px",
-              background: "rgba(154,92,46,0.12)",
-              border: "1.5px solid rgba(154,92,46,0.18)",
-              boxShadow: "0 4px 12px rgba(154,92,46,0.15)",
-            }}>
-              {product.icon}
-            </div>
-            <span style={{
-              fontSize: "8px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.16em",
-              color: "rgba(154,92,46,0.7)", background: "rgba(154,92,46,0.08)",
-              padding: "4px 10px", borderRadius: "999px", border: "1px solid rgba(154,92,46,0.14)",
-            }}>
-              {product.category}
-            </span>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{
+            width: "48px", height: "48px", borderRadius: "14px",
+            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px",
+            background: "rgba(154,92,46,0.08)",
+            border: "1px solid rgba(154,92,46,0.16)",
+          }}>
+            {product.icon}
           </div>
-
-          {/* Title */}
-          <div>
-            <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#1b140d", margin: "0 0 3px", lineHeight: 1.2 }}>
-              {product.name}
-            </h3>
-            <p style={{ fontSize: "9px", color: "rgba(154,92,46,0.65)", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
-              {product.subtitle}
-            </p>
-          </div>
-
-          {/* Description */}
-          <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.62)", lineHeight: 1.65, margin: 0 }}>
-            {product.description}
-          </p>
-
-          {/* All Features - Grid (max 4, with see more) */}
-          <div className="highlight-pills">
-            {product.highlights.slice(0, 4).map((h) => (
-              <div key={h} className="highlight-pill">
-                <CheckCircle2 />
-                <span>{h}</span>
-              </div>
-            ))}
-          </div>
-          
-          {product.highlights.length > 4 && (
-            <button 
-              onClick={(e) => { e.stopPropagation(); setModalOpen(true); }} 
-              className="see-more-btn"
-            >
-              + See {product.highlights.length - 4} more feature{product.highlights.length - 4 > 1 ? 's' : ''}
-            </button>
-          )}
+          <span style={{
+            fontSize: "8px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.16em",
+            color: "rgba(154,92,46,0.7)", background: "rgba(154,92,46,0.07)",
+            padding: "4px 10px", borderRadius: "999px", border: "1px solid rgba(154,92,46,0.14)",
+          }}>
+            {product.category}
+          </span>
         </div>
 
-        {/* Price Highlight Box - On Gradient Background */}
-        <div style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.08) 0%, rgba(200,150,92,0.04) 100%)", padding: "14px 20px", marginTop: "8px" }}>
-          <div className="price-highlight-box" style={{ background: "none", border: "none", padding: 0 }}>
-            <div className="price-value">
-              <span>💰</span>
-              ${product.monthly_fee}<span>/mo</span>
+        {/* Title */}
+        <div>
+          <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#1b140d", margin: "0 0 3px", lineHeight: 1.2 }}>
+            {product.name}
+          </h3>
+          <p style={{ fontSize: "9px", color: "rgba(154,92,46,0.65)", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+            {product.subtitle}
+          </p>
+        </div>
+
+        {/* Description */}
+        <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.62)", lineHeight: 1.65, margin: 0, flex: 1 }}>
+          {product.description}
+        </p>
+
+        {/* All Features - Grid (max 4, with see more) */}
+        <div className="highlight-pills">
+          {product.highlights.slice(0, 4).map((h) => (
+            <div key={h} className="highlight-pill">
+              <CheckCircle2 />
+              <span>{h}</span>
             </div>
-            <div className="setup-fee">+${product.setup_fee} setup</div>
+          ))}
+        </div>
+        
+        {product.highlights.length > 4 && (
+          <button 
+            onClick={(e) => { e.stopPropagation(); setModalOpen(true); }} 
+            className="see-more-btn"
+          >
+            + See {product.highlights.length - 4} more feature{product.highlights.length - 4 > 1 ? 's' : ''}
+          </button>
+        )}
+
+        {/* Price Highlight Box */}
+        <div className="price-highlight-box">
+          <div className="price-value">
+            <span>💰</span>
+            ${product.monthly_fee}<span>/mo</span>
           </div>
+          <div className="setup-fee">+${product.setup_fee} setup</div>
         </div>
 
         {/* Full-Width CTA Footer */}
-        <div style={{ padding: "0 20px 20px", display: "flex", flexDirection: "column", gap: "8px" }}>
+        <div style={{ marginTop: "auto", paddingTop: "2px", display: "flex", flexDirection: "column", gap: "8px" }}>
           {!product.coming_soon && (
             <button
               onClick={toggle}
