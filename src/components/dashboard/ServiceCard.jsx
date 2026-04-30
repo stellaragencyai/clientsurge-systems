@@ -6,6 +6,8 @@ import NextActionsPanel from "./NextActionsPanel";
 import GoLiveCountdown from "./GoLiveCountdown";
 import WhatHappensNext from "./WhatHappensNext";
 import WhileWeSetUpCard from "./WhileWeSetUpCard";
+import ActivityFeed from "./ActivityFeed";
+import NotificationPreferences from "./NotificationPreferences";
 
 const TOTAL_STAGES = 5;
 
@@ -47,7 +49,12 @@ export default function ServiceCard({ service }) {
               <h3 style={{ fontSize: "15px", fontWeight: "800", color: "#1b140d", margin: 0, lineHeight: 1.3 }}>
                 {productName}
               </h3>
-              <ServiceStatusBadge installStatus={installStatus} />
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span style={{ fontSize: "12px", fontWeight: "700", color: "#9a5c2e", background: "rgba(154,92,46,0.08)", padding: "2px 8px", borderRadius: "9999px" }}>
+                  {Math.round((currentStage / totalStages) * 100)}%
+                </span>
+                <ServiceStatusBadge installStatus={installStatus} />
+              </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
               <span style={{ fontSize: "11px", color: "rgba(27,20,13,0.45)", fontFamily: "monospace" }}>
@@ -75,6 +82,12 @@ export default function ServiceCard({ service }) {
 
         {/* While we set up checklist */}
         <WhileWeSetUpCard installStatus={installStatus} />
+
+        {/* Activity timeline */}
+        <ActivityFeed installStatus={installStatus} createdDate={new Date().toISOString()} />
+
+        {/* Notification preferences */}
+        <NotificationPreferences orderId={orderId} />
       </div>
     </div>
   );
