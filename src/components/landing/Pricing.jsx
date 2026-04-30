@@ -389,7 +389,7 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
         </div>
       }
 
-      <div className="flex flex-col flex-1 p-6 md:p-8 lg:p-10 relative z-10">
+      <div className="p-6 opacity-100 flex flex-col flex-1 md:p-8 lg:p-10 relative z-10">
         <div className="mb-7">
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">{plan.name}</h3>
           {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Most Popular — Best for businesses losing 20+ leads/month</p>}
