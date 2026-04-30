@@ -8,6 +8,34 @@
 import { motion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
+// Status bar animation
+const StatusBar = () => {
+  const [time, setTime] = useState("9:41");
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      setTime(now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: false }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div style={{
+      display: "flex", justifyContent: "space-between", alignItems: "center",
+      padding: "8px 16px", fontSize: "11px", fontWeight: "600",
+      background: "rgba(0,0,0,0.2)", borderBottom: "1px solid rgba(200,150,92,0.1)",
+      color: "rgba(255,255,255,0.7)",
+    }}>
+      <span>{time}</span>
+      <div style={{ display: "flex", gap: "3px", alignItems: "center" }}>
+        <span>📶</span>
+        <span>📡</span>
+        <span>🔋 100%</span>
+      </div>
+    </div>
+  );
+};
+
 const LEADS = [
   { name: "Sarah M.",  value: 480,  service: "Consultation" },
   { name: "James T.",  value: 720,  service: "Premium Package" },
@@ -53,15 +81,32 @@ export default function RevenueRecoveryCounter() {
   return (
     <div
       ref={ref}
-      className="rounded-3xl p-6 max-w-sm w-full"
+      className="rounded-3xl overflow-hidden max-w-sm w-full"
       style={{
-        background: "linear-gradient(160deg, #1a100600 0%, #1a1008 100%)",
         background: "linear-gradient(160deg, #110b04 0%, #1e1509 100%)",
-        border: "1.5px solid rgba(200,150,92,0.28)",
-        boxShadow: "0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(200,150,92,0.15)",
+        border: "2px solid rgba(200,150,92,0.3)",
+        boxShadow: `
+          0 40px 80px rgba(0,0,0,0.7),
+          inset 0 1px 0 rgba(255,255,255,0.08),
+          inset -2px -2px 8px rgba(0,0,0,0.6),
+          0 0 40px rgba(200,150,92,0.15)
+        `,
+        position: "relative",
       }}
       aria-label="Revenue recovery visual"
     >
+      {/* Screen reflection */}
+      <div style={{
+        position: "absolute", top: 0, left: "8%", right: "auto",
+        width: "200px", height: "200px",
+        background: "radial-gradient(circle at center, rgba(255,255,255,0.12) 0%, transparent 70%)",
+        borderRadius: "50%", pointerEvents: "none", zIndex: 1,
+      }} />
+      
+      <div style={{ position: "relative", zIndex: 2 }}>
+        <StatusBar />
+        
+        <div className="p-6">
       {/* Header */}
       <div className="flex items-start justify-between mb-5">
         <div>
@@ -90,7 +135,7 @@ export default function RevenueRecoveryCounter() {
           return (
             <motion.div
               key={lead.name}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 relative overflow-hidden"
               style={{
                 background: recovered ? "rgba(34,197,94,0.08)" : "rgba(255,255,255,0.04)",
                 border: recovered ? "1px solid rgba(34,197,94,0.2)" : "1px solid rgba(255,255,255,0.06)",
@@ -99,7 +144,20 @@ export default function RevenueRecoveryCounter() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.07 }}
+              onTap={() => {}} // Enable touch ripple
             >
+              {/* Touch ripple */}
+              {recovered && (
+                <motion.div
+                  style={{
+                    position: "absolute", inset: 0,
+                    background: "radial-gradient(circle, rgba(74,222,128,0.3) 0%, transparent 70%)",
+                    pointerEvents: "none",
+                  }}
+                  animate={{ scale: [0.5, 2] }}
+                  transition={{ duration: 0.6 }}
+                />
+              )}
               <div
                 className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                 style={{
@@ -143,6 +201,24 @@ export default function RevenueRecoveryCounter() {
           transition={{ duration: 1.4, repeat: Infinity }}
         />
       </div>
-    </div>
-  );
-}
+      </div>
+
+      {/* Home indicator */}
+      <div style={{
+       height: "20px", background: "rgba(0,0,0,0.3)",
+       display: "flex", alignItems: "center", justifyContent: "center",
+       borderTop: "1px solid rgba(200,150,92,0.08)",
+      }}>
+       <motion.div
+         style={{
+           width: "120px", height: "4px", borderRadius: "2px",
+           background: "rgba(255,255,255,0.2)",
+         }}
+         animate={{ opacity: [0.3, 0.6, 0.3] }}
+         transition={{ duration: 2, repeat: Infinity }}
+       />
+      </div>
+      </div>
+      </div>
+      );
+      }
