@@ -9,7 +9,7 @@ export default function LeadLeakage() {
       id="lead-leakage"
       className="pt-16 md:pt-28 pb-32 md:pb-40 px-6"
       style={{
-        background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 50%, #f3ebe2 85%, #ede5db 100%)",
+        background: "#ffffff",
       }}
     >
       <div className="max-w-5xl mx-auto">

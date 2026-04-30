@@ -23,8 +23,7 @@ export default function Hero() {
       style={{
         position: "relative",
         overflow: "hidden",
-        background:
-          "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 46%, #fcfaf6 70%, #faf6f0 100%)",
+        background: "#ffffff",
         paddingBottom: "clamp(3rem, 6vw, 5rem)",
       }}
     >
