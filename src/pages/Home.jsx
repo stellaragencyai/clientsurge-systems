@@ -4,6 +4,8 @@ import Hero from "../components/landing/Hero.jsx";
 import TrustBar from "../components/landing/TrustBar";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
+import ScrollProgressBar from "../components/landing/ScrollProgressBar";
+import { SectionSkeleton, SmallSectionSkeleton, LargeSectionSkeleton } from "../components/landing/SkeletonLoader";
 
 // Lazy load below-the-fold sections
 const Industries = lazy(() => import("../components/landing/Industries"));
@@ -106,11 +108,14 @@ export default function Home() {
     };
   }, []);
 
-  const LoadingFallback = () => <div className="h-96 bg-background animate-pulse" />;
+  const LoadingFallback = () => <SectionSkeleton />;
+  const SmallLoadingFallback = () => <SmallSectionSkeleton />;
+  const LargeLoadingFallback = () => <LargeSectionSkeleton />;
 
   return (
     <DemoBookingProvider>
       <div className="min-h-screen">
+        <ScrollProgressBar />
         <Navbar />
         <Hero />
         <Suspense fallback={<LoadingFallback />}>
@@ -121,7 +126,7 @@ export default function Home() {
         <section aria-label="Proof and trust">
           <TrustBar />
         </section>
-        <Suspense fallback={<LoadingFallback />}>
+        <Suspense fallback={<LargeLoadingFallback />}>
           <SectionBreak />
           <LeadLeakage />
           <SectionBreak />
