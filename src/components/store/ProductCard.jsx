@@ -173,44 +173,44 @@ export default function ProductCard({ product }) {
           ))}
         </div>
 
-        {/* Price - Top aligned */}
-        <div style={{ marginTop: "auto", paddingTop: "12px", borderTop: "1px solid rgba(154,92,46,0.1)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "12px" }}>
-            <div>
-              <p style={{ fontSize: "8px", color: "rgba(154,92,46,0.5)", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>pricing</p>
-              <p style={{ fontSize: "18px", fontWeight: "900", color: "#9a5c2e", margin: "2px 0 0", lineHeight: 1 }}>${product.monthly_fee}<span style={{ fontSize: "10px", color: "rgba(154,92,46,0.5)", fontWeight: "600" }}>/mo</span></p>
-              <p style={{ fontSize: "8px", color: "rgba(154,92,46,0.45)", margin: "2px 0 0", fontWeight: "600" }}>Setup: ${product.setup_fee}</p>
-            </div>
-
-            {!product.coming_soon && (
-              <button
-                onClick={toggle}
-                style={{
-                  borderRadius: "9999px", padding: "2px",
-                  background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                  border: "none", cursor: "pointer",
-                  boxShadow: inCart ? "0 4px 14px rgba(34,197,94,0.3)" : "0 4px 14px rgba(120,70,20,0.28)",
-                  transition: "all 0.2s",
-                  width: "100%",
-                }}
-              >
-                <span style={{
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: "4px",
-                  height: "32px", paddingLeft: "14px", paddingRight: "14px", borderRadius: "9999px",
-                  background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                  color: "#fff", fontWeight: "700", fontSize: "11px", whiteSpace: "nowrap",
-                }}>
-                  {inCart ? <><Check style={{ width: "11px", height: "11px" }} /> Added</> : <><Plus style={{ width: "11px", height: "11px" }} /> Add to Cart</>}
-                </span>
-              </button>
-            )}
-
-            {product.coming_soon && (
-              <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(154,92,46,0.4)", background: "rgba(154,92,46,0.06)", padding: "8px 14px", borderRadius: "9999px", border: "1px solid rgba(154,92,46,0.12)", textAlign: "center", width: "100%" }}>
-                Coming Soon
-              </span>
-            )}
+        {/* Price & CTA Footer */}
+        <div style={{ marginTop: "auto", paddingTop: "14px", borderTop: "1px solid rgba(154,92,46,0.1)", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "12px" }}>
+          {/* Price - Left */}
+          <div>
+            <p style={{ fontSize: "8px", color: "rgba(154,92,46,0.5)", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>pricing</p>
+            <p style={{ fontSize: "20px", fontWeight: "900", color: "#9a5c2e", margin: "3px 0 0", lineHeight: 1 }}>${product.monthly_fee}<span style={{ fontSize: "10px", color: "rgba(154,92,46,0.5)", fontWeight: "600" }}>/mo</span></p>
+            <p style={{ fontSize: "8px", color: "rgba(154,92,46,0.45)", margin: "2px 0 0", fontWeight: "600" }}>+${product.setup_fee} setup</p>
           </div>
+
+          {/* CTA - Right */}
+          {!product.coming_soon && (
+            <button
+              onClick={toggle}
+              style={{
+                borderRadius: "9999px", padding: "1px",
+                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                border: "none", cursor: "pointer",
+                boxShadow: inCart ? "0 2px 8px rgba(34,197,94,0.25)" : "0 2px 8px rgba(120,70,20,0.2)",
+                transition: "all 0.2s",
+                flexShrink: 0,
+              }}
+            >
+              <span style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: "3px",
+                height: "28px", paddingLeft: "10px", paddingRight: "10px", borderRadius: "9999px",
+                background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                color: "#fff", fontWeight: "700", fontSize: "10px", whiteSpace: "nowrap",
+              }}>
+                {inCart ? <><Check style={{ width: "10px", height: "10px" }} /> Added</> : <><Plus style={{ width: "10px", height: "10px" }} /> Add</>}
+              </span>
+            </button>
+          )}
+
+          {product.coming_soon && (
+            <span style={{ fontSize: "10px", fontWeight: "700", color: "rgba(154,92,46,0.4)", background: "rgba(154,92,46,0.06)", padding: "7px 12px", borderRadius: "9999px", border: "1px solid rgba(154,92,46,0.12)", whiteSpace: "nowrap" }}>
+              Coming Soon
+            </span>
+          )}
         </div>
 
         {product.popular && !product.coming_soon && (
