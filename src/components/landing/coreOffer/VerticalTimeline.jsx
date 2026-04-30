@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { systemsById, coreOfferSectionConfig, iconMap } from "./coreOfferData";
 import HighlightedText from "./HighlightedText";
 
@@ -54,6 +55,22 @@ function StepDots({ currentId, onSelect }) {
 }
 
 export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onBookDemo }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / window.innerHeight));
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const system = systemsById[selectedSystemId];
   const currentIndex = orderedSystemIds.indexOf(selectedSystemId);
   const stepNumber = currentIndex + 1;
@@ -73,7 +90,14 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
   };
 
   return (
-    <div style={{ marginTop: "48px", marginBottom: "48px" }}>
+    <motion.div
+      ref={containerRef}
+      style={{ marginTop: "48px", marginBottom: "48px" }}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      viewport={{ once: true, margin: "-100px" }}
+    >
       {/* Step progress indicator */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
         <StepDots currentId={selectedSystemId} onSelect={onSystemSelect} />
@@ -83,7 +107,8 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
       </div>
 
       {/* Main card */}
-      <div
+      <motion.div
+        onClick={() => setIsExpanded(!isExpanded)}
         style={{
           borderRadius: "24px",
           overflow: "hidden",
@@ -96,16 +121,27 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
           boxShadow: isFeatured
             ? "0 24px 64px rgba(15,23,42,0.3), 0 0 0 1px rgba(100,160,255,0.08)"
             : "0 8px 32px rgba(15,23,42,0.07)",
-          transition: "all 0.4s ease",
           position: "relative",
+          cursor: "pointer",
         }}
+        animate={{
+          scale: isExpanded ? 1.02 : 1,
+          boxShadow: isExpanded
+            ? "0 32px 80px rgba(15,23,42,0.5)"
+            : isFeatured
+            ? "0 24px 64px rgba(15,23,42,0.3)"
+            : "0 8px 32px rgba(15,23,42,0.07)",
+        }}
+        transition={{ type: "spring", damping: 20, stiffness: 300 }}
       >
-        {/* Top accent line */}
+        {/* Top accent line with shimmer */}
         <div style={{
           position: "absolute", top: 0, left: 0, right: 0, height: "3px",
           background: isFeatured
             ? "linear-gradient(90deg, transparent, #3b82f6, #818cf8, transparent)"
             : "linear-gradient(90deg, transparent, rgba(59,130,246,0.4), transparent)",
+          backgroundSize: "200% 100%",
+          animation: isFeatured ? "shimmer 3s ease-in-out infinite" : "none",
         }} />
 
         {/* Featured badge */}
@@ -184,7 +220,7 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
             <DetailPill label="Result" value={system.detail.businessValue} dark={isFeatured} />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Navigation */}
       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "20px", flexWrap: "wrap" }}>
@@ -234,10 +270,14 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
       </div>
 
       <style>{`
+        @keyframes shimmer {
+          0%, 100% { background-position: 200% 0; }
+          50% { background-position: -200% 0; }
+        }
         @media (max-width: 640px) {
           .vtl-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
-    </div>
+    </motion.div>
   );
 }
