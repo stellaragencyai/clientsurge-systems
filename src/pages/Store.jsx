@@ -574,15 +574,9 @@ function StoreInner() {
             </div>
 
             <div className="store-grid">
-              {filtered.map((product) => {
-                const recommendations = getRecommendedProducts(
-                  product.product_id,
-                  AI_PRODUCTS
-                );
-                return (
-                  <ProductCard product={product} />
-                );
-              })}
+              {filtered.map((product) => (
+                <ProductCard key={product.product_id} product={product} />
+              ))}
             </div>
 
             {filtered.length === 0 ? (
