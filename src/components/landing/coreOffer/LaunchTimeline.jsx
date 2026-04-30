@@ -392,6 +392,7 @@ function TimelineArrowCTA({ onBookDemo }) {
 export default function LaunchTimeline() {
   const [headerRef, headerVisible] = useInView(0.2);
   const [activeStep, setActiveStep] = useState(0);
+  const [autoAdvanceTimer, setAutoAdvanceTimer] = useState(null);
   const stepRefs = useRef([]);
   const lineContainerRef = useRef(null);
   const { openDemoBooking } = useDemoBooking();
@@ -400,6 +401,7 @@ export default function LaunchTimeline() {
 
   const handleTrackerClick = (idx) => {
     setActiveStep(idx);
+    clearAutoAdvanceTimer();
     const el = stepRefs.current[idx];
     if (el) {
       setTimeout(() => {
@@ -420,6 +422,47 @@ export default function LaunchTimeline() {
       }, 100);
     }
   };
+
+  const clearAutoAdvanceTimer = () => {
+    if (autoAdvanceTimer) {
+      clearTimeout(autoAdvanceTimer);
+      setAutoAdvanceTimer(null);
+    }
+  };
+
+  const startAutoAdvanceTimer = () => {
+    clearAutoAdvanceTimer();
+    const timer = setTimeout(() => {
+      const nextIdx = (activeStep + 1) % launchTimelineSteps.length;
+      handleTrackerClick(nextIdx);
+    }, 3000);
+    setAutoAdvanceTimer(timer);
+  };
+
+  useEffect(() => {
+    startAutoAdvanceTimer();
+    return () => clearAutoAdvanceTimer();
+  }, [activeStep]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        handleTrackerClick((activeStep + 1) % launchTimelineSteps.length);
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        handleTrackerClick((activeStep - 1 + launchTimelineSteps.length) % launchTimelineSteps.length);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        const el = stepRefs.current[activeStep];
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeStep]);
 
   return (
     <div className="mt-16 md:mt-20">
@@ -458,9 +501,13 @@ export default function LaunchTimeline() {
                 className="flex flex-col items-center gap-3 border-none bg-transparent cursor-pointer group"
               >
                 <motion.div
-                  className="rounded-full flex items-center justify-center flex-shrink-0 relative"
+                  className="rounded-full flex items-center justify-center flex-shrink-0 relative group/icon"
                   whileHover={{
                     boxShadow: "0 0 0 3px rgba(0,0,0,0.08), 0 0 24px rgba(154,92,46,0.5), 0 0 40px rgba(154,92,46,0.3), inset 0 0 20px rgba(154,92,46,0.15)",
+                  }}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleTrackerClick(idx);
                   }}
                   style={{
                     width: "70px", height: "70px",
@@ -472,15 +519,32 @@ export default function LaunchTimeline() {
                       ? "0 0 0 5px rgba(154,92,46,0.15), 0 4px 14px rgba(154,92,46,0.35)"
                       : "none",
                     transition: "all 0.3s ease",
+                    outline: "none",
                   }}
+                  onFocus={() => handleTrackerClick(idx)}
                 >
-                  <span className="font-black leading-none" style={{ fontSize: "28px", color: isActive ? "#fff" : "#9a5c2e" }}>{step.number}</span>
+                  {/* Animated gradient pulse background on hover */}
                   <div
+                    className="absolute inset-0 rounded-full opacity-0 group-hover/icon:opacity-100 transition-opacity duration-300"
+                    style={{
+                      background: "radial-gradient(circle at 30% 30%, rgba(245,217,168,0.4) 0%, transparent 60%)",
+                      animation: "none",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 rounded-full opacity-0 group-hover/icon:opacity-100 transition-opacity duration-300"
+                    style={{
+                      background: "radial-gradient(circle at 70% 70%, rgba(200,150,92,0.3) 0%, transparent 60%)",
+                    }}
+                  />
+                  <span className="font-black leading-none relative z-10" style={{ fontSize: "28px", color: isActive ? "#fff" : "#9a5c2e" }}>{step.number}</span>
+                  <motion.div
                     className="absolute rounded-full flex items-center justify-center"
-                    style={{ width: "24px", height: "24px", bottom: "-3px", right: "-3px", background: "#f5e6d0", border: "2px solid #000000" }}
+                    whileHover={{ scale: 1.2 }}
+                    style={{ width: "24px", height: "24px", bottom: "-3px", right: "-3px", background: "#f5e6d0", border: "2px solid #000000", zIndex: 20 }}
                   >
                     <Icon style={{ width: "14px", height: "14px", color: "#9a5c2e" }} />
-                  </div>
+                  </motion.div>
                 </motion.div>
                 <p className="text-xs font-semibold text-foreground text-center max-w-[90px] leading-tight">{step.title}</p>
                 <p className="text-[10px] text-muted-foreground text-center">{step.duration}</p>
@@ -530,23 +594,42 @@ export default function LaunchTimeline() {
         </div>
       </div>
 
-      {/* Detailed vertical timeline with scroll-driven center line */}
+      {/* Detailed vertical timeline with zig-zag SVG connectors */}
       <div ref={lineContainerRef} className="relative">
-        {/* Background static line */}
-        <div
-          className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block"
-          style={{ background: "rgba(154,92,46,0.1)", transform: "translateX(-50%)" }}
-        />
-        {/* Static line */}
-        <div
-          className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block pointer-events-none"
-          style={{
-            background: "linear-gradient(180deg, #9a5c2e 0%, #c8965c 50%, rgba(200,150,92,0.6) 100%)",
-            transform: "translateX(-50%)",
-          }}
-        />
+        {/* SVG zig-zag connector */}
+        <svg
+          className="absolute left-0 top-0 w-full h-full pointer-events-none hidden md:block"
+          style={{ zIndex: 0 }}
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <linearGradient id="connectorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#9a5c2e" stopOpacity="1" />
+              <stop offset="50%" stopColor="#c8965c" stopOpacity="1" />
+              <stop offset="100%" stopColor="rgba(200,150,92,0.6)" stopOpacity="1" />
+            </linearGradient>
+          </defs>
+          {launchTimelineSteps.map((step, idx) => {
+            const isLeft = idx % 2 === 0;
+            const cardTop = (idx * 240) + 60;
+            const nextCardTop = ((idx + 1) * 240) + 60;
+            const iconX = isLeft ? 40 : window.innerWidth - 40;
+            const nextIconX = !isLeft ? 40 : window.innerWidth - 40;
+            const midX = (iconX + nextIconX) / 2;
+            return idx < launchTimelineSteps.length - 1 ? (
+              <path
+                key={`connector-${idx}`}
+                d={`M ${iconX} ${cardTop} Q ${midX} ${(cardTop + nextCardTop) / 2} ${nextIconX} ${nextCardTop}`}
+                stroke="url(#connectorGrad)"
+                strokeWidth="2"
+                fill="none"
+                strokeLinecap="round"
+              />
+            ) : null;
+          })}
+        </svg>
 
-        <div className="space-y-10 md:space-y-20">
+        <div className="space-y-10 md:space-y-20 relative z-10">
           {launchTimelineSteps.map((step, idx) => (
             <div key={step.id} ref={(el) => (stepRefs.current[idx] = el)}>
               <StepRow step={step} idx={idx} />
