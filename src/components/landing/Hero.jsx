@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
+import PulsingLeadOrb from "./visuals/PulsingLeadOrb";
 
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
 
@@ -293,6 +294,19 @@ export default function Hero() {
               transform: "translateY(6%)",
             }}
           />
+
+          {/* Pulsing Lead Orb — floats top-right of the dashboard */}
+          <div
+            style={{
+              position: "absolute",
+              top: "6%",
+              right: "-2%",
+              zIndex: 10,
+              pointerEvents: "none",
+            }}
+          >
+            <PulsingLeadOrb size={220} />
+          </div>
 
           <div
             className="landing-hero__tablet"

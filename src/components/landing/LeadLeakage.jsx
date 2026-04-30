@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Star, ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
+import RevenueRecoveryCounter from "./visuals/RevenueRecoveryCounter";
 
 const checklist = [
   "You have strong reviews but no clear booking funnel",
@@ -61,52 +62,9 @@ export default function LeadLeakage() {
             </div>
           </div>
 
-          {/* Stars visual */}
-          <div
-            className="rounded-3xl p-8 flex flex-col gap-5"
-            style={{
-              background: "linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(252,240,220,0.6) 100%)",
-              border: "1.5px solid rgba(200,150,92,0.22)",
-              boxShadow: "0 8px 32px rgba(154,92,46,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
-            }}
-          >
-            <div className="flex items-center gap-1.5">
-              {[1,2,3,4,5].map((s) => (
-                <Star key={s} className="w-6 h-6 fill-amber-400 text-amber-400" />
-              ))}
-              <span className="ml-2 text-sm font-bold text-foreground">4.9 stars on Google</span>
-            </div>
-            {[
-              { label: "Caller finds you on Google", lost: false },
-              { label: "Calls during your busy hour", lost: true },
-              { label: "No text-back is sent", lost: true },
-              { label: "Lead goes to your competitor", lost: true },
-            ].map(({ label, lost }) => (
-              <div
-                key={label}
-                className="flex items-center gap-3 rounded-2xl px-4 py-3"
-                style={{
-                  background: lost ? "rgba(220,38,38,0.05)" : "rgba(34,197,94,0.07)",
-                  border: lost ? "1px solid rgba(220,38,38,0.12)" : "1px solid rgba(34,197,94,0.15)",
-                }}
-              >
-                <div
-                  className="w-2 h-2 rounded-full flex-shrink-0"
-                  style={{ background: lost ? "#dc2626" : "#16a34a" }}
-                />
-                <span className={`text-sm font-medium ${lost ? "text-red-700" : "text-green-700"}`}>
-                  {label}
-                </span>
-                {lost && (
-                  <span className="ml-auto text-[10px] font-bold uppercase tracking-wider text-red-500 bg-red-50 px-2 py-0.5 rounded-full">
-                    Lost
-                  </span>
-                )}
-              </div>
-            ))}
-            <p className="text-xs text-muted-foreground text-center pt-1">
-              This scenario plays out dozens of times a month for most service businesses.
-            </p>
+          {/* Revenue Recovery Counter Visual */}
+          <div className="flex justify-center">
+            <RevenueRecoveryCounter />
           </div>
         </div>
 

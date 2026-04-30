@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Building2, CalendarCheck, ShieldCheck, TrendingUp, Zap } from "lucide-react";
+import FollowUpTimeline from "./visuals/FollowUpTimeline";
 
 function useCountUp(value, inView, duration = 1400) {
   const [count, setCount] = useState(value);
@@ -150,6 +151,11 @@ export default function TrustBar() {
           {items.map((item, index) => (
             <StatCard key={item.label} item={item} index={index} inView={inView} />
           ))}
+        </div>
+
+        {/* Follow-Up Timeline Visual */}
+        <div className="mt-12 flex justify-center">
+          <FollowUpTimeline />
         </div>
       </div>
     </section>
