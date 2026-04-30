@@ -122,6 +122,25 @@ a[role="button"],
   position: relative;
 }
 
+/* Rotating Border Glow Animation for Premium CTAs */
+@keyframes rotateBorderGlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.rotating-border-glow {
+  position: relative;
+  background-size: 200% 200%;
+  animation: rotateBorderGlow 3s ease-in-out infinite;
+}
+
 /* Focus for all interactive elements */
 button:focus-visible,
 a:focus-visible,
@@ -740,3 +759,48 @@ button, [role="button"] {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+/* ============================================
+   ANIMATION: SVG Path Drawing (strokeDashoffset)
+   ============================================ */
+@keyframes drawStroke {
+  from {
+    stroke-dashoffset: 1000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.svg-draw-line {
+  stroke-dasharray: 1000;
+  animation: drawStroke 1.5s ease-out forwards;
+}
+
+.svg-draw-delay-1 { animation-delay: 0.2s; }
+.svg-draw-delay-2 { animation-delay: 0.4s; }
+.svg-draw-delay-3 { animation-delay: 0.6s; }
+
+/* ============================================
+   ANIMATION: Clip-Path Progressive Reveal
+   ============================================ */
+@keyframes clipPathReveal {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.clip-path-reveal {
+  animation: clipPathReveal 0.8s ease-out forwards;
+}
+
+.clip-delay-1 { animation-delay: 0.1s; }
+.clip-delay-2 { animation-delay: 0.2s; }
+.clip-delay-3 { animation-delay: 0.3s; }
+.clip-delay-4 { animation-delay: 0.4s; }
+.clip-delay-5 { animation-delay: 0.5s; }
+.clip-delay-6 { animation-delay: 0.6s; }
+.clip-delay-7 { animation-delay: 0.7s; }

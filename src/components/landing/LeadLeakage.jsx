@@ -86,7 +86,7 @@ export default function LeadLeakage() {
                 key={i}
                 type="button"
                 onClick={() => toggle(i)}
-                className="w-full flex items-center gap-4 rounded-xl px-5 py-4 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className={`w-full flex items-center gap-4 rounded-xl px-5 py-4 text-left transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary clip-path-reveal clip-delay-${i + 1}`}
                 style={{
                   background: checked[i]
                     ? "linear-gradient(135deg, rgba(154,92,46,0.09) 0%, rgba(200,150,92,0.06) 100%)"
