@@ -594,40 +594,21 @@ export default function LaunchTimeline() {
         </div>
       </div>
 
-      {/* Detailed vertical timeline with zig-zag SVG connectors */}
+      {/* Detailed vertical timeline */}
       <div ref={lineContainerRef} className="relative">
-        {/* SVG zig-zag connector */}
-        <svg
-          className="absolute left-0 top-0 w-full h-full pointer-events-none hidden md:block"
-          style={{ zIndex: 0 }}
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <linearGradient id="connectorGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#9a5c2e" stopOpacity="1" />
-              <stop offset="50%" stopColor="#c8965c" stopOpacity="1" />
-              <stop offset="100%" stopColor="rgba(200,150,92,0.6)" stopOpacity="1" />
-            </linearGradient>
-          </defs>
-          {launchTimelineSteps.map((step, idx) => {
-            const isLeft = idx % 2 === 0;
-            const cardTop = (idx * 240) + 60;
-            const nextCardTop = ((idx + 1) * 240) + 60;
-            const iconX = isLeft ? 40 : window.innerWidth - 40;
-            const nextIconX = !isLeft ? 40 : window.innerWidth - 40;
-            const midX = (iconX + nextIconX) / 2;
-            return idx < launchTimelineSteps.length - 1 ? (
-              <path
-                key={`connector-${idx}`}
-                d={`M ${iconX} ${cardTop} Q ${midX} ${(cardTop + nextCardTop) / 2} ${nextIconX} ${nextCardTop}`}
-                stroke="url(#connectorGrad)"
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
-              />
-            ) : null;
-          })}
-        </svg>
+        {/* Background static line */}
+        <div
+          className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block"
+          style={{ background: "rgba(154,92,46,0.1)", transform: "translateX(-50%)" }}
+        />
+        {/* Static line */}
+        <div
+          className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block pointer-events-none"
+          style={{
+            background: "linear-gradient(180deg, #9a5c2e 0%, #c8965c 50%, rgba(200,150,92,0.6) 100%)",
+            transform: "translateX(-50%)",
+          }}
+        />
 
         <div className="space-y-10 md:space-y-20 relative z-10">
           {launchTimelineSteps.map((step, idx) => (
