@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowDown, CheckCircle2 } from "lucide-react";
+import { ArrowDown, ArrowRight, CheckCircle2 } from "lucide-react";
 import { launchTimelineSteps, iconMap } from "./coreOfferData";
 import { useDemoBooking } from "@/components/landing/DemoBookingContext";
 
@@ -320,64 +320,91 @@ function StepRow({ step, idx }) {
 
 function TimelineArrowCTA({ onBookDemo }) {
   const [ref, visible] = useInView(0.2);
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <div
+    <motion.div
       ref={ref}
       className="hidden md:flex flex-col items-center"
-      style={{
-        transition: "opacity 0.8s ease, transform 0.8s ease",
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(30px)",
-      }}
+      initial={{ opacity: 0, y: 30 }}
+      animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
     >
-      <div style={{ width: "2px", height: "56px", background: "linear-gradient(180deg, rgba(154,92,46,0.4) 0%, #c8965c 100%)" }} />
-      <div
+      {/* Animated connector line */}
+      <motion.div
+        style={{ width: "2px", background: "linear-gradient(180deg, rgba(154,92,46,0.4) 0%, #c8965c 100%)" }}
+        initial={{ height: 0 }}
+        animate={visible ? { height: 56 } : { height: 0 }}
+        transition={{ duration: 1.2, ease: "easeOut" }}
+      />
+
+      {/* Enhanced pulsing arrow icon */}
+      <motion.div
+        whileHover={{ scale: 1.25, y: -4 }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         style={{
-          width: "36px", height: "36px", borderRadius: "50%",
+          width: "44px", height: "44px", borderRadius: "50%",
           background: "linear-gradient(135deg, #9a5c2e, #c8965c)",
           display: "flex", alignItems: "center", justifyContent: "center",
           boxShadow: "0 0 0 8px rgba(154,92,46,0.1), 0 8px 24px rgba(154,92,46,0.3)",
-          animation: visible ? "ctaPulse 2s ease-in-out infinite" : "none",
+          cursor: "pointer",
+          position: "relative",
         }}
       >
-        <ArrowDown style={{ width: "18px", height: "18px", color: "#fff" }} />
-      </div>
+        <motion.div
+          animate={isHovered ? { y: [0, 3, 0] } : { y: 0 }}
+          transition={{ duration: 0.6, repeat: isHovered ? Infinity : 0 }}
+        >
+          <ArrowDown style={{ width: "20px", height: "20px", color: "#fff", strokeWidth: 2.5 }} />
+        </motion.div>
+      </motion.div>
 
-      <div
-        className="mt-5 rounded-3xl px-8 py-7 text-center max-w-sm"
+      {/* CTA Card */}
+      <motion.div
+        className="mt-8 rounded-3xl px-8 py-8 text-center max-w-sm"
+        initial={{ opacity: 0, y: 20 }}
+        animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+        transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+        whileHover={{ boxShadow: "0 20px 60px rgba(111,67,31,0.18)" }}
         style={{
-          background: "linear-gradient(135deg, rgba(154,92,46,0.07) 0%, rgba(200,150,92,0.05) 100%)",
-          border: "1.5px solid rgba(154,92,46,0.2)",
+          background: "linear-gradient(135deg, rgba(154,92,46,0.09) 0%, rgba(200,150,92,0.06) 100%)",
+          border: "1.5px solid rgba(154,92,46,0.25)",
           boxShadow: "0 12px 40px rgba(111,67,31,0.1)",
+          transition: "border-color 0.3s ease",
+          borderColor: isHovered ? "rgba(154,92,46,0.4)" : "rgba(154,92,46,0.25)",
         }}
       >
-        <p className="font-display text-xl font-bold text-foreground mb-2 leading-snug">
+        <p className="font-display text-2xl font-bold text-foreground mb-3 leading-snug">
           Ready to see which systems fit your business?
         </p>
-        <p className="text-sm text-muted-foreground mb-5">
-          We'll show you the right setup based on your lead flow and goals.
+        <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+          We'll show you the exact AI stack we'd recommend based on your lead flow and goals.
         </p>
-        <button
+        <motion.button
           type="button"
           onClick={onBookDemo}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.98 }}
           style={{
             borderRadius: "9999px", padding: "2px",
             background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-            boxShadow: "0 4px 18px rgba(120,70,20,0.3)",
+            boxShadow: isHovered ? "0 8px 28px rgba(120,70,20,0.45)" : "0 4px 18px rgba(120,70,20,0.3)",
             border: "none", cursor: "pointer", width: "100%",
+            transition: "box-shadow 0.3s ease",
           }}
         >
           <span style={{
             display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-            height: "44px", padding: "0 24px", borderRadius: "9999px",
+            height: "48px", padding: "0 28px", borderRadius: "9999px",
             background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-            color: "#f5e6d0", fontWeight: "700", fontSize: "0.9rem",
+            color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem",
           }}>
-            Book a Free Demo
+            Book Your Free Demo
+            <ArrowRight className="w-4 h-4" />
           </span>
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       <style>{`
         @keyframes ctaPulse {
@@ -385,7 +412,7 @@ function TimelineArrowCTA({ onBookDemo }) {
           50%       { box-shadow: 0 0 0 14px rgba(154,92,46,0.06), 0 8px 32px rgba(154,92,46,0.4); }
         }
       `}</style>
-    </div>
+    </motion.div>
   );
 }
 
@@ -442,6 +469,22 @@ export default function LaunchTimeline() {
   useEffect(() => {
     startAutoAdvanceTimer();
     return () => clearAutoAdvanceTimer();
+  }, [activeStep]);
+
+  useEffect(() => {
+    let scrollTimeout;
+    const handleScroll = () => {
+      clearAutoAdvanceTimer();
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        startAutoAdvanceTimer();
+      }, 5000);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(scrollTimeout);
+    };
   }, [activeStep]);
 
   useEffect(() => {
