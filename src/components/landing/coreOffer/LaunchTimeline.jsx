@@ -115,32 +115,26 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
 /* ─── PREMIUM STEP ROW ──────────────────────────────────────────────────── */
 function StepRow({ step, idx }) {
   const isEven = idx % 2 === 0;
-  const isFeatured = idx === 0;
   const [ref, visible] = useInView(0.08);
 
-  /* Cinematic unfold: content slides from one side, image from the other,
-     both clipped from the center seam, with a slight scale + blur lift */
   const contentDelay = idx * 80;
   const imageDelay   = idx * 80 + 120;
 
   const contentFrom = `translateX(${isEven ? "-72px" : "72px"}) translateY(28px) scale(0.94)`;
   const imageFrom   = `translateX(${isEven ? "72px" : "-72px"}) translateY(28px) scale(0.94)`;
 
-  /* Card surface */
-  const cardBg     = isFeatured ? "linear-gradient(145deg, #0f172a 0%, #1e293b 60%, #0f1f35 100%)" : "rgba(255,255,255,0.95)";
-  const cardBorder  = isFeatured ? "1px solid rgba(100,160,255,0.25)" : "1.5px solid rgba(154,92,46,0.13)";
-  const cardShadow  = isFeatured ? "0 20px 60px rgba(15,23,42,0.3), 0 0 0 1px rgba(100,160,255,0.08)" : "0 10px 32px rgba(111,67,31,0.08)";
-  const accentBar   = isFeatured
-    ? "linear-gradient(90deg, transparent, #3b82f6, #818cf8, transparent)"
-    : "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)";
-  const stepLabelBg = isFeatured ? "rgba(59,130,246,0.15)" : "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)";
-  const stepLabelColor = isFeatured ? "#93c5fd" : "#ffffff";
-  const stepLabelBorder = isFeatured ? "1px solid rgba(100,160,255,0.3)" : "none";
-  const titleColor  = isFeatured ? "#f1f5f9" : "hsl(var(--foreground))";
-  const bulletColor = isFeatured ? "rgba(148,163,184,0.85)" : "rgba(15,23,42,0.7)";
-  const checkColor  = isFeatured ? "#60a5fa" : "#22c55e";
-  const imgBorder   = isFeatured ? "1px solid rgba(100,160,255,0.2)" : "1.5px solid rgba(154,92,46,0.12)";
-  const imgShadow   = isFeatured ? "0 20px 60px rgba(15,23,42,0.35)" : "0 8px 24px rgba(111,67,31,0.1)";
+  const cardBg     = "rgba(255,255,255,0.95)";
+  const cardBorder  = "1.5px solid rgba(154,92,46,0.13)";
+  const cardShadow  = "0 10px 32px rgba(111,67,31,0.08)";
+  const accentBar   = "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)";
+  const stepLabelBg = "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)";
+  const stepLabelColor = "#ffffff";
+  const stepLabelBorder = "none";
+  const titleColor  = "hsl(var(--foreground))";
+  const bulletColor = "rgba(15,23,42,0.7)";
+  const checkColor  = "#22c55e";
+  const imgBorder   = "1.5px solid rgba(154,92,46,0.12)";
+  const imgShadow   = "0 8px 24px rgba(111,67,31,0.1)";
 
   return (
     <div ref={ref} className="relative" data-step-id={step.id}>
@@ -148,12 +142,8 @@ function StepRow({ step, idx }) {
       <div
         className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-8 w-11 h-11 rounded-full items-center justify-center z-10"
         style={{
-          background: isFeatured
-            ? "linear-gradient(135deg, #3b82f6, #6366f1)"
-            : "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
-          boxShadow: isFeatured
-            ? "0 0 0 6px rgba(59,130,246,0.12), 0 4px 18px rgba(59,130,246,0.4)"
-            : "0 0 0 5px rgba(154,92,46,0.12), 0 4px 14px rgba(154,92,46,0.35)",
+          background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+          boxShadow: "0 0 0 5px rgba(154,92,46,0.12), 0 4px 14px rgba(154,92,46,0.35)",
           transition: `opacity 0.7s ease ${contentDelay}ms, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${contentDelay}ms`,
           opacity: visible ? 1 : 0,
           transform: visible ? "scale(1) translateX(-50%)" : "scale(0.3) translateX(-50%)",
@@ -477,10 +467,10 @@ export default function LaunchTimeline() {
           className="absolute left-6 md:left-1/2 top-0 w-0.5 hidden md:block pointer-events-none"
           style={{
             height: `${lineHeight}%`,
-            background: "linear-gradient(180deg, #3b82f6 0%, #9a5c2e 40%, #c8965c 80%, rgba(200,150,92,0.6) 100%)",
+            background: "linear-gradient(180deg, #9a5c2e 0%, #c8965c 50%, rgba(200,150,92,0.6) 100%)",
             transform: "translateX(-50%)",
             transition: "height 0.15s linear",
-            boxShadow: "0 0 10px rgba(59,130,246,0.25)",
+            boxShadow: "0 0 8px rgba(200,150,92,0.3)",
           }}
         />
 
