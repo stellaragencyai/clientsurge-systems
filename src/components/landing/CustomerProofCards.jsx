@@ -103,7 +103,7 @@ export default function CustomerProofCards() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 hidden">
             Real Results, Real Businesses
           </h2>
           <p className="text-center text-muted-foreground text-lg max-w-3xl mx-auto leading-relaxed">
@@ -179,7 +179,7 @@ export default function CustomerProofCards() {
 
         {/* CTA Section */}
         <div className="text-center pt-8">
-          <p className="text-muted-foreground text-base mb-6 max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-base mb-6 max-w-2xl mx-auto hidden">
             Your business could be next. See your measurable results within 30 days.
           </p>
           <button
@@ -206,7 +206,7 @@ export default function CustomerProofCards() {
                 color: "#f5e6d0",
                 fontWeight: "700",
                 fontSize: "0.95rem"
-              }} className=" hidden hidden hidden hidden">
+              }} className=" hidden hidden hidden hidden hidden hidden hidden">
               
               See Your Results
             </span>
