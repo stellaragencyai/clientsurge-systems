@@ -5,6 +5,7 @@ import Footer from "@/components/landing/Footer";
 import HorizontalStageTracker from "@/components/dashboard/HorizontalStageTracker";
 import ServiceCard from "@/components/dashboard/ServiceCard";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import ChatAssistant from "@/components/dashboard/ChatAssistant";
 import { Loader2, ShoppingBag, Mail, Phone, RefreshCw } from "lucide-react";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 
@@ -216,6 +217,7 @@ export default function ClientDashboard() {
 
   return (
     <DemoBookingProvider>
+      <ChatAssistant />
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 50%, #fdfbf8 100%)" }}>
         <Navbar />
 
