@@ -4,22 +4,23 @@ import { CartProvider, useCart } from "@/lib/cartContext";
 import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
 import CartSidebar from "@/components/store/CartSidebar";
-import SocialProofTicker from "@/components/store/SocialProofTicker";
-import ServiceComparisonModal from "@/components/store/ServiceComparisonModal";
 import Navbar from "@/components/landing/Navbar";
-import Footer from "@/components/landing/Footer";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
 import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
-import BuildYourStackFlow from "@/components/store/BuildYourStackFlow";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { getRecommendedProducts } from "@/lib/productRecommendations";
 import StackValueCounter from "@/components/store/StackValueCounter";
-import BundleSavingsToast from "@/components/store/BundleSavingsToast";
 
+// Lazy load heavy store components
 const InteractiveStackBuilder = lazy(() =>
   import("@/components/store/InteractiveStackBuilder")
 );
+const SocialProofTicker = lazy(() => import("@/components/store/SocialProofTicker"));
+const ServiceComparisonModal = lazy(() => import("@/components/store/ServiceComparisonModal"));
+const Footer = lazy(() => import("@/components/landing/Footer"));
+const BuildYourStackFlow = lazy(() => import("@/components/store/BuildYourStackFlow"));
+const BundleSavingsToast = lazy(() => import("@/components/store/BundleSavingsToast"));
 
 function StoreInner() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -607,11 +608,20 @@ function StoreInner() {
             ) : null}
           </div>
 
-          <BuildYourStackFlow />
+          <Suspense fallback={null}>
+            <BuildYourStackFlow />
+            <BundleSavingsToast />
+          </Suspense>
            <CartSidebar />
-           <Footer />
-           <SocialProofTicker />
-           {showComparison && <ServiceComparisonModal onClose={() => setShowComparison(false)} />}
+           <Suspense fallback={null}>
+             <Footer />
+             <SocialProofTicker />
+           </Suspense>
+           {showComparison && (
+             <Suspense fallback={null}>
+               <ServiceComparisonModal onClose={() => setShowComparison(false)} />
+             </Suspense>
+           )}
         </div>
       </div>
     </div>

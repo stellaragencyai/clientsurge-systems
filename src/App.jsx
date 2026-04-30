@@ -24,24 +24,24 @@ if (typeof window !== "undefined") {
 import Home from "./pages/Home";
 import Onboarding from "./pages/Onboarding";
 import CaptureLeads from "./pages/CaptureLeads";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminLeads from "./pages/AdminLeads";
-import AdminLeadDetail from "./pages/AdminLeadDetail";
 import Start from "./pages/Start";
-import ClientPortal from "./pages/ClientPortal";
 import Book from "./pages/Book";
 import Success from "./pages/Success";
 import LegalPage from "./pages/LegalPage";
 import Contact from "./pages/Contact";
-import AdminOnboarding from "./pages/AdminOnboarding";
 import Industries from "./pages/Industries";
 import OrderSuccess from "./pages/OrderSuccess";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
 import BusinessSetup from "./pages/BusinessSetup";
-import AdminAutomation from "./pages/AdminAutomation";
-import ClientDashboard from "./pages/ClientDashboard";
 
 const Store = lazy(() => import("./pages/Store"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminLeads = lazy(() => import("./pages/AdminLeads"));
+const AdminLeadDetail = lazy(() => import("./pages/AdminLeadDetail"));
+const AdminAutomation = lazy(() => import("./pages/AdminAutomation"));
+const AdminOnboarding = lazy(() => import("./pages/AdminOnboarding"));
+const ClientPortal = lazy(() => import("./pages/ClientPortal"));
+const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
 
 const PUBLIC_PATHS = [
   "/",
@@ -224,8 +224,8 @@ const AuthenticatedApp = () => {
           <ProtectedRoute unauthenticatedElement={<AuthRedirectFallback />} />
         }
       >
-        <Route path="/client-portal" element={<ClientPortal />} />
-        <Route path="/client-dashboard" element={<ClientDashboard />} />
+        <Route path="/client-portal" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><ClientPortal /></Suspense>} />
+        <Route path="/client-dashboard" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><ClientDashboard /></Suspense>} />
       </Route>
 
       <Route
@@ -239,14 +239,14 @@ const AuthenticatedApp = () => {
       >
         <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
         <Route path="/admin-settings" element={<Navigate to="/admin" replace />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/leads" element={<AdminLeads />} />
-        <Route path="/admin/leads/:leadId" element={<AdminLeadDetail />} />
-        <Route path="/admin/automations" element={<AdminAutomation />} />
+        <Route path="/admin" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminDashboard /></Suspense>} />
+        <Route path="/admin/leads" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminLeads /></Suspense>} />
+        <Route path="/admin/leads/:leadId" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminLeadDetail /></Suspense>} />
+        <Route path="/admin/automations" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminAutomation /></Suspense>} />
         <Route path="/lead-intelligence" element={<Navigate to="/admin" replace />} />
         <Route path="/sam" element={<Navigate to="/admin" replace />} />
         <Route path="/medspa-dashboard" element={<Navigate to="/admin" replace />} />
-        <Route path="/admin/onboarding" element={<AdminOnboarding />} />
+        <Route path="/admin/onboarding" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminOnboarding /></Suspense>} />
       </Route>
 
       <Route path="*" element={<PageNotFound />} />

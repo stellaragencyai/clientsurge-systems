@@ -1,19 +1,21 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import TrustBar from "../components/landing/TrustBar";
-import Industries from "../components/landing/Industries";
-import ProblemSolution from "../components/landing/ProblemSolution.jsx";
-import CoreOffer from "../components/landing/CoreOffer";
-import IntegrationPartners from "../components/landing/IntegrationPartners";
-import FAQ from "../components/landing/FAQ";
-import Pricing from "../components/landing/Pricing";
-import LeadLeakage from "../components/landing/LeadLeakage";
-import FinalCTA from "../components/landing/FinalCTA";
-import Footer from "../components/landing/Footer";
-import SectionBreak from "../components/landing/SectionBreak";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
+
+// Lazy load below-the-fold sections
+const Industries = lazy(() => import("../components/landing/Industries"));
+const ProblemSolution = lazy(() => import("../components/landing/ProblemSolution.jsx"));
+const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
+const IntegrationPartners = lazy(() => import("../components/landing/IntegrationPartners"));
+const FAQ = lazy(() => import("../components/landing/FAQ"));
+const Pricing = lazy(() => import("../components/landing/Pricing"));
+const LeadLeakage = lazy(() => import("../components/landing/LeadLeakage"));
+const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
+const Footer = lazy(() => import("../components/landing/Footer"));
+const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
 import { FAQ_ITEMS } from "../components/landing/FAQ";
 
 import {
@@ -104,30 +106,36 @@ export default function Home() {
     };
   }, []);
 
+  const LoadingFallback = () => <div className="h-96 bg-background animate-pulse" />;
+
   return (
     <DemoBookingProvider>
       <div className="min-h-screen">
         <Navbar />
         <Hero />
-        <SectionBreak />
-        <Industries />
-        <SectionBreak />
+        <Suspense fallback={<LoadingFallback />}>
+          <SectionBreak />
+          <Industries />
+          <SectionBreak />
+        </Suspense>
         <section aria-label="Proof and trust">
           <TrustBar />
         </section>
-        <SectionBreak />
-        <LeadLeakage />
-        <SectionBreak />
-        <CoreOffer />
-        <SectionBreak />
-        <IntegrationPartners />
-        <SectionBreak />
-        <Pricing />
-        <SectionBreak />
-        <FAQ />
-        <SectionBreak />
-        <FinalCTA />
-        <Footer />
+        <Suspense fallback={<LoadingFallback />}>
+          <SectionBreak />
+          <LeadLeakage />
+          <SectionBreak />
+          <CoreOffer />
+          <SectionBreak />
+          <IntegrationPartners />
+          <SectionBreak />
+          <Pricing />
+          <SectionBreak />
+          <FAQ />
+          <SectionBreak />
+          <FinalCTA />
+          <Footer />
+        </Suspense>
         <ChatBubble />
       </div>
     </DemoBookingProvider>
