@@ -28,47 +28,47 @@ export default function FinalCTA() {
           {/* Enhancement 1: Live social proof numbers */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10">
             {[
-              { value: "2x", label: "avg. booking rate increase" },
-              { value: "90s", label: "first response time" },
-              { value: "30 days", label: "avg. time to ROI" },
-            ].map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center">
+            { value: "2x", label: "avg. booking rate increase" },
+            { value: "90s", label: "first response time" },
+            { value: "30 days", label: "avg. time to ROI" }].
+            map((stat) =>
+            <div key={stat.label} className="flex flex-col items-center">
                 <span
-                  className="font-display text-3xl font-black"
-                  style={{ color: "#9a5c2e" }}
-                >
+                className="font-display text-3xl font-black"
+                style={{ color: "#9a5c2e" }}>
+                
                   {stat.value}
                 </span>
                 <span className="text-xs text-muted-foreground font-medium mt-0.5">{stat.label}</span>
               </div>
-            ))}
+            )}
           </div>
 
-          <div
-            className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80"
-            style={{
-              background: "rgba(154,92,46,0.08)",
-              border: "1px solid rgba(154,92,46,0.18)",
-            }}
-          >
+          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80 hidden"
+
+          style={{
+            background: "rgba(154,92,46,0.08)",
+            border: "1px solid rgba(154,92,46,0.18)"
+          }}>
+            
             Free 15-minute call · no commitment required · live in 5-7 days
           </div>
         </div>
 
         {/* Enhancement 2: Urgency strip above buttons */}
         <div className="max-w-xl mx-auto mt-8 mb-2 relative z-10">
-          <div
-            className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold"
-            style={{
-              background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)",
-              border: "1.5px solid rgba(154,92,46,0.22)",
-            }}
-          >
+          <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold hidden"
+
+          style={{
+            background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)",
+            border: "1.5px solid rgba(154,92,46,0.22)"
+          }}>
+            
             <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
             </span>
-            <span style={{ color: "rgba(154,92,46,0.9)" }}>
+            <span style={{ color: "rgba(154,92,46,0.9)" }} className=" hidden">
               Demo slots are limited — we only take on a few new clients each month
             </span>
           </div>
@@ -87,21 +87,21 @@ export default function FinalCTA() {
                 borderRadius: "9999px",
                 padding: "2px",
                 background:
-                  "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
                 boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
                 border: "none",
                 cursor: "pointer",
-                textDecoration: "none",
+                textDecoration: "none"
               }}
               onMouseEnter={(event) => {
                 event.currentTarget.style.boxShadow =
-                  "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+                "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
               }}
               onMouseLeave={(event) => {
                 event.currentTarget.style.boxShadow =
-                  "0 4px 18px rgba(120,70,20,0.35)";
-              }}
-            >
+                "0 4px 18px rgba(120,70,20,0.35)";
+              }}>
+              
               <span
                 style={{
                   display: "flex",
@@ -114,9 +114,9 @@ export default function FinalCTA() {
                   color: "#f5e6d0",
                   fontWeight: "700",
                   fontSize: "1rem",
-                  textShadow: "0 1px 2px rgba(0,0,0,0.3)",
-                }}
-              >
+                  textShadow: "0 1px 2px rgba(0,0,0,0.3)"
+                }}>
+                
                 Book Your Free Demo
                 <ArrowRight className="w-5 h-5" />
               </span>
@@ -124,14 +124,14 @@ export default function FinalCTA() {
             <a
               href="#lead-leakage"
               onClick={() => trackCTA("lead_leakage_audit", "final_cta")}
-              className="inline-flex items-center justify-center h-14 px-6 rounded-full border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200"
-            >
+              className="inline-flex items-center justify-center h-14 px-6 rounded-full border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200">
+              
               Get a Free Lead Leakage Audit
             </a>
           </div>
         </div>
       </section>
       {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
-    </>
-  );
+    </>);
+
 }

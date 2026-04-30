@@ -100,13 +100,13 @@ export default function CustomerProofCards() {
 
   return (
     <section className="mt-24 pt-20 border-t border-border">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6 hidden">
         {/* Header */}
         <div className="text-center mb-16">
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 hidden">
             Real Results, Real Businesses
           </h2>
-          <p className="text-center text-muted-foreground text-lg max-w-3xl mx-auto leading-relaxed">
+          <p className="text-center text-muted-foreground text-lg max-w-3xl mx-auto leading-relaxed hidden">
             These aren't hypotheticals or projections. Real clients, real metrics, real success stories — all within the first 30 days of going live.
           </p>
         </div>
