@@ -203,6 +203,107 @@ export default function RevenueRecoveryCounter() {
       </div>
       </div>
 
+      {/* Side Buttons - Right Edge */}
+      <div style={{
+        position: "absolute",
+        right: "-8px",
+        top: "100px",
+        width: "8px",
+        height: "60px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "12px",
+        justifyContent: "flex-start",
+      }}>
+        {/* Power Button */}
+        <div style={{
+          width: "8px",
+          height: "20px",
+          borderRadius: "2px",
+          background: "linear-gradient(to right, rgba(200,150,92,0.6), rgba(150,100,50,0.8))",
+          boxShadow: "inset 0 1px 2px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.4)",
+        }} />
+        {/* Volume Up Button */}
+        <div style={{
+          width: "8px",
+          height: "16px",
+          borderRadius: "2px",
+          background: "linear-gradient(to right, rgba(180,130,70,0.7), rgba(140,90,40,0.85))",
+          boxShadow: "inset 0 1px 2px rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.35)",
+        }} />
+        {/* Volume Down Button */}
+        <div style={{
+          width: "8px",
+          height: "16px",
+          borderRadius: "2px",
+          background: "linear-gradient(to right, rgba(180,130,70,0.7), rgba(140,90,40,0.85))",
+          boxShadow: "inset 0 1px 2px rgba(255,255,255,0.15), 0 2px 4px rgba(0,0,0,0.35)",
+        }} />
+      </div>
+
+      {/* Bottom Port and Speakers */}
+      <div style={{
+        position: "absolute",
+        bottom: "-12px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "100px",
+        height: "12px",
+        display: "flex",
+        gap: "8px",
+        justifyContent: "center",
+        alignItems: "center",
+      }}>
+        {/* Charging Port */}
+        <div style={{
+          width: "30px",
+          height: "8px",
+          borderRadius: "2px",
+          background: "linear-gradient(to bottom, rgba(100,50,20,0.8), rgba(50,30,10,0.9))",
+          boxShadow: "inset 0 1px 3px rgba(0,0,0,0.8), 0 1px 2px rgba(255,255,255,0.1)",
+        }} />
+        {/* Speaker Grille Left */}
+        <div style={{
+          width: "14px",
+          height: "6px",
+          borderRadius: "1px",
+          background: "repeating-linear-gradient(90deg, rgba(80,40,20,0.9) 0px, rgba(80,40,20,0.9) 1px, rgba(60,30,10,0.95) 1px, rgba(60,30,10,0.95) 3px)",
+        }} />
+        {/* Speaker Grille Right */}
+        <div style={{
+          width: "14px",
+          height: "6px",
+          borderRadius: "1px",
+          background: "repeating-linear-gradient(90deg, rgba(80,40,20,0.9) 0px, rgba(80,40,20,0.9) 1px, rgba(60,30,10,0.95) 1px, rgba(60,30,10,0.95) 3px)",
+        }} />
+      </div>
+
+      {/* Front-Facing Camera */}
+      <div style={{
+        position: "absolute",
+        top: "12px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "12px",
+        height: "12px",
+        borderRadius: "50%",
+        background: "radial-gradient(circle at 35% 35%, rgba(150,150,150,0.9), rgba(40,40,50,0.95))",
+        boxShadow: "inset -1px -1px 2px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.5), inset 0 0 3px rgba(100,100,120,0.3)",
+        zIndex: 5,
+      }}>
+        {/* Camera Lens Gleam */}
+        <div style={{
+          position: "absolute",
+          top: "2px",
+          left: "2px",
+          width: "3px",
+          height: "3px",
+          borderRadius: "50%",
+          background: "rgba(200,200,220,0.6)",
+          filter: "blur(0.5px)",
+        }} />
+      </div>
+
       {/* Home indicator */}
       <div style={{
        height: "20px", background: "rgba(0,0,0,0.3)",
