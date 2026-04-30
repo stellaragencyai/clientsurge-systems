@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { ShoppingCart, Zap, Search, ArrowRight } from "lucide-react";
+import { ShoppingCart, Zap, Search, ArrowRight, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
 import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
@@ -391,41 +391,44 @@ function StoreInner() {
 
             <div className="store-stat-grid" style={{ marginBottom: "8px" }}>
               {[
-                { label: "AI Services Available", val: "12" },
-                { label: "Avg. Setup Time", val: "4-6 hours" },
-                { label: "Cancel Anytime", val: "No Contracts" },
-              ].map((stat) => (
+                { label: "AI Services Available", val: "12", Icon: LayoutGrid },
+                { label: "Avg. Setup Time", val: "4–6 Hours", Icon: Clock },
+                { label: "Cancel Anytime", val: "No Contracts", Icon: BadgeCheck },
+              ].map(({ label, val, Icon }) => (
                 <div
-                 key={stat.label}
+                 key={label}
                  style={{
-                   textAlign: "center",
-                   borderRadius: "10px",
-                   padding: "8px 10px",
+                   display: "flex",
+                   alignItems: "center",
+                   gap: "14px",
+                   borderRadius: "14px",
+                   padding: "14px 18px",
                    background: "#ffffff",
                    border: "1.5px solid rgba(0,0,0,0.1)",
-                   boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                   boxShadow: "0 4px 14px rgba(0,0,0,0.07)",
                  }}
                 >
-                 <p
-                   style={{
-                     fontSize: "16px",
-                     fontWeight: "800",
-                     color: "#9a5c2e",
-                     margin: "0 0 2px",
-                   }}
-                 >
-                   {stat.val}
-                 </p>
-                 <p
-                   style={{
-                     fontSize: "10px",
-                     color: "rgba(27,20,13,0.6)",
-                     margin: 0,
-                     fontWeight: "600",
-                   }}
-                 >
-                   {stat.label}
-                 </p>
+                  <div style={{
+                    width: "42px",
+                    height: "42px",
+                    borderRadius: "12px",
+                    background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)",
+                    border: "1px solid rgba(154,92,46,0.18)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}>
+                    <Icon style={{ width: "18px", height: "18px", color: "#9a5c2e" }} />
+                  </div>
+                  <div style={{ textAlign: "left" }}>
+                    <p style={{ fontSize: "15px", fontWeight: "800", color: "#9a5c2e", margin: "0 0 2px" }}>
+                      {val}
+                    </p>
+                    <p style={{ fontSize: "10px", color: "rgba(27,20,13,0.6)", margin: 0, fontWeight: "600" }}>
+                      {label}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
