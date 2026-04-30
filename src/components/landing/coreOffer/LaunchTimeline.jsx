@@ -428,26 +428,6 @@ export default function LaunchTimeline() {
 
   const handleTrackerClick = (idx) => {
     setActiveStep(idx);
-    clearAutoAdvanceTimer();
-    const el = stepRefs.current[idx];
-    if (el) {
-      setTimeout(() => {
-        const targetTop = el.getBoundingClientRect().top + window.scrollY - window.innerHeight / 2;
-        const startTop = window.scrollY;
-        const distance = targetTop - startTop;
-        const duration = 2400;
-        let startTime = null;
-        const ease = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-        const scroll = (currentTime) => {
-          if (!startTime) startTime = currentTime;
-          const elapsed = currentTime - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          window.scrollTo(0, startTop + distance * ease(progress));
-          if (progress < 1) requestAnimationFrame(scroll);
-        };
-        requestAnimationFrame(scroll);
-      }, 100);
-    }
   };
 
   const clearAutoAdvanceTimer = () => {
@@ -466,10 +446,7 @@ export default function LaunchTimeline() {
     setAutoAdvanceTimer(timer);
   };
 
-  useEffect(() => {
-    startAutoAdvanceTimer();
-    return () => clearAutoAdvanceTimer();
-  }, [activeStep]);
+
 
   useEffect(() => {
     const handleScroll = () => {
