@@ -251,6 +251,8 @@ function StoreInner() {
             .store-page .store-stat-grid {
               grid-template-columns: 1fr;
               gap: 10px;
+              max-width: 100%;
+              padding: 0 4px;
             }
             .store-page .store-toolbar {
               flex-direction: column;

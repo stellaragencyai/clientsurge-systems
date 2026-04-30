@@ -69,10 +69,10 @@ export default function Hero() {
           zIndex: 2,
           maxWidth: "1400px",
           margin: "0 auto",
-          padding: "clamp(5.5rem, 14vw, 7rem) clamp(1.25rem, 5vw, 3rem) clamp(3.5rem, 8vw, 5.5rem)",
+          padding: "clamp(5rem, 12vw, 7rem) clamp(1rem, 5vw, 3rem) clamp(3rem, 6vw, 5.5rem)",
           display: "grid",
           gridTemplateColumns: "minmax(0, 560px) minmax(420px, 1fr)",
-          gap: "48px",
+          gap: "clamp(24px, 4vw, 48px)",
           alignItems: "center",
           minHeight: "100svh",
         }}
@@ -117,10 +117,10 @@ export default function Hero() {
             className="landing-hero__headline"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(3.1rem, 5.2vw, 5.2rem)",
+              fontSize: "clamp(2.3rem, 6.5vw, 5.2rem)",
               fontWeight: "700",
-              lineHeight: 0.98,
-              letterSpacing: "-0.035em",
+              lineHeight: 1.02,
+              letterSpacing: "-0.03em",
               color: "#1b140d",
               marginBottom: "22px",
             }}
@@ -379,52 +379,74 @@ export default function Hero() {
       </div>
 
       <style>{`
+        /* Tablet and below — single column */
         @media (max-width: 1100px) {
           .landing-hero__inner {
             grid-template-columns: 1fr !important;
-            gap: 30px !important;
+            gap: 24px !important;
             min-height: auto !important;
+            padding-top: clamp(4.5rem, 12vw, 6rem) !important;
           }
-
           .landing-hero__visualWrap {
             display: none !important;
           }
-
           .landing-hero__copy {
             max-width: 100% !important;
           }
         }
 
+        /* Mobile — tighten everything */
         @media (max-width: 720px) {
           .landing-hero__headline {
-            font-size: clamp(2.2rem, 9vw, 3.6rem) !important;
-            line-height: 1.02 !important;
+            font-size: clamp(2rem, 8.5vw, 3.4rem) !important;
+            line-height: 1.05 !important;
+            letter-spacing: -0.025em !important;
           }
-
           .landing-hero__body {
-            font-size: 0.97rem !important;
-            line-height: 1.66 !important;
+            font-size: 1rem !important;
+            line-height: 1.7 !important;
           }
-
+          .landing-hero__checklist {
+            gap: 8px !important;
+          }
           .landing-hero__actions {
             flex-direction: column !important;
             align-items: stretch !important;
+            gap: 10px !important;
           }
-
           .landing-hero__actions > * {
             width: 100% !important;
             justify-content: center !important;
           }
-
           .hero-check-item {
             width: 100% !important;
             max-width: 100% !important;
+            padding: 9px 14px 9px 10px !important;
+          }
+          .hero-check-item span {
+            font-size: 13px !important;
           }
         }
 
+        /* iPhone SE (375px) and smaller */
         @media (max-width: 390px) {
+          .landing-hero__inner {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+          }
           .landing-hero__headline {
-            font-size: clamp(1.9rem, 8.5vw, 2.6rem) !important;
+            font-size: clamp(1.85rem, 9vw, 2.4rem) !important;
+          }
+          .landing-hero__body {
+            font-size: 0.95rem !important;
+          }
+        }
+
+        /* iPhone SE specific (320px) */
+        @media (max-width: 360px) {
+          .landing-hero__headline {
+            font-size: 1.75rem !important;
+            letter-spacing: -0.02em !important;
           }
         }
       `}</style>
