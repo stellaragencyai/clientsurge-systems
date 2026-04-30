@@ -2,7 +2,7 @@ import { useState, lazy, Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
-import PulsingLeadOrb from "./visuals/PulsingLeadOrb";
+
 
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
 
@@ -117,15 +117,16 @@ export default function Hero() {
             className="landing-hero__headline"
             style={{
               fontFamily: "var(--font-display)",
-              fontSize: "clamp(2.3rem, 6.5vw, 5.2rem)",
+              fontSize: "clamp(2.1rem, 5.8vw, 4.6rem)",
               fontWeight: "700",
-              lineHeight: 1.02,
+              lineHeight: 1.08,
               letterSpacing: "-0.03em",
               color: "#1b140d",
               marginBottom: "22px",
+              maxWidth: "600px",
             }}
           >
-            Stop Losing Leads to Slow Response —{" "}
+            Stop Losing Leads —{" "}
             <span
               style={{
                 background:
@@ -135,9 +136,8 @@ export default function Hero() {
                 backgroundClip: "text",
               }}
             >
-              AI Systems That Book 3x More
+              Book 3x More with AI
             </span>
-            {" "}Appointments
           </h1>
 
           {/* Visual enhancement: shimmer divider under headline */}
@@ -295,24 +295,13 @@ export default function Hero() {
             }}
           />
 
-          {/* Pulsing Lead Orb — floats top-right of the dashboard */}
-          <div
-            style={{
-              position: "absolute",
-              top: "6%",
-              right: "-2%",
-              zIndex: 10,
-              pointerEvents: "none",
-            }}
-          >
-            <PulsingLeadOrb size={220} />
-          </div>
+
 
           <div
             className="landing-hero__tablet"
             style={{
               position: "relative",
-              width: "min(100%, 860px)",
+              width: "min(100%, 930px)",
               aspectRatio: "1.15 / 1",
               borderRadius: "34px",
               padding: "3px",
@@ -322,6 +311,8 @@ export default function Hero() {
                 "0 44px 110px rgba(17,12,7,0.34), 0 18px 44px rgba(17,12,7,0.18), 0 0 60px rgba(200,150,92,0.18)",
               transform:
                 "perspective(2400px) rotateY(-10deg) rotateX(4deg) rotateZ(1.4deg)",
+              marginLeft: "-35px",
+              marginRight: "-35px",
             }}
           >
             <div style={{
