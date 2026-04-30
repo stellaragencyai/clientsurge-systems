@@ -4,22 +4,21 @@ import ServiceProgressRing from "./ServiceProgressRing";
 import SystemProgressTracker from "./SystemProgressTracker";
 import NextActionsPanel from "./NextActionsPanel";
 
-const stageCounts = {
-  instant_lead_response: 5, missed_call_text_back: 5, nurture_sequence_14d: 5,
-  ai_booking_agent: 5, lead_reactivation: 5, review_request: 5,
-};
+const TOTAL_STAGES = 5;
 
-function getGoLiveLabel(orderStatus) {
-  if (orderStatus === "active") return { text: "Live", color: "#22c55e" };
-  if (orderStatus === "in_progress") return { text: "Est. 3–5 days", color: "#f59e0b" };
+function getGoLiveLabel(installStatus) {
+  if (installStatus === "Live") return { text: "Live ✦", color: "#22c55e" };
+  if (installStatus === "Testing") return { text: "Est. 1–2 days", color: "#3b82f6" };
+  if (installStatus === "Configuring") return { text: "Est. 3–4 days", color: "#f59e0b" };
+  if (installStatus === "Error") return { text: "Action needed", color: "#ef4444" };
   return { text: "Est. 5–7 days", color: "#9a5c2e" };
 }
 
 export default function ServiceCard({ service }) {
-  const { serviceKey, productName, orderId, orderStatus, paymentStatus } = service;
-  const currentStage = orderStatus === "active" ? 4 : orderStatus === "in_progress" ? 2 : paymentStatus === "paid" ? 1 : 0;
-  const totalStages = stageCounts[serviceKey] || 5;
-  const goLive = getGoLiveLabel(orderStatus);
+  const { serviceKey, productName, orderId, installStatus = "Paid", stageIndex = 0, orderStatus, paymentStatus } = service;
+  const currentStage = stageIndex;
+  const totalStages = TOTAL_STAGES;
+  const goLive = getGoLiveLabel(installStatus);
 
   return (
     <div style={{
@@ -45,7 +44,7 @@ export default function ServiceCard({ service }) {
               <h3 style={{ fontSize: "15px", fontWeight: "800", color: "#1b140d", margin: 0, lineHeight: 1.3 }}>
                 {productName}
               </h3>
-              <ServiceStatusBadge orderStatus={orderStatus} paymentStatus={paymentStatus} />
+              <ServiceStatusBadge installStatus={installStatus} />
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
               <span style={{ fontSize: "11px", color: "rgba(27,20,13,0.45)", fontFamily: "monospace" }}>
@@ -63,7 +62,7 @@ export default function ServiceCard({ service }) {
         <SystemProgressTracker serviceKey={serviceKey} currentStage={currentStage} />
 
         {/* Next actions */}
-        <NextActionsPanel serviceKey={serviceKey} />
+        <NextActionsPanel serviceKey={serviceKey} installStatus={installStatus} />
       </div>
     </div>
   );

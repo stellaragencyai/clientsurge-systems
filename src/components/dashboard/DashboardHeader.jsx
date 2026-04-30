@@ -1,8 +1,8 @@
 import { Zap, BarChart2, CheckCircle, Clock } from "lucide-react";
 
-export default function DashboardHeader({ userEmail, activeServices, orders }) {
-  const liveCount = activeServices.filter(s => s.orderStatus === "active").length;
-  const inProgressCount = activeServices.filter(s => s.orderStatus === "in_progress").length;
+export default function DashboardHeader({ userEmail, activeServices, project, order }) {
+  const liveCount = activeServices.filter(s => s.installStatus === "Live").length;
+  const inProgressCount = activeServices.filter(s => ["Configuring", "Testing", "Ready for Install"].includes(s.installStatus)).length;
   const totalServices = activeServices.length;
   const firstName = userEmail ? userEmail.split("@")[0].split(".")[0] : "there";
   const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);

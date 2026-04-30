@@ -1,42 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CheckCircle2, Circle, Clock, ChevronRight, ArrowRight } from "lucide-react";
 
-const actionsByService = {
-  instant_lead_response: [
-    { action: "Verify SMS number is active", detail: "Confirm your Twilio number is configured", status: "in_progress" },
-    { action: "Test with a sample lead", detail: "Submit a test form to trigger the response", status: "pending" },
-    { action: "Review response template", detail: "Check and approve your auto-reply copy", status: "pending" },
+// Actions shown per install stage — contextually correct
+const actionsByStage = {
+  "Paid": [
+    { action: "Payment confirmed", detail: "Your order is in the queue", status: "completed" },
+    { action: "Awaiting install kickoff", detail: "Our team will begin setup shortly", status: "in_progress" },
+    { action: "Onboarding call scheduling", detail: "Check your email for a scheduling link", status: "pending" },
   ],
-  missed_call_text_back: [
-    { action: "Connect Twilio account", detail: "Provide your Twilio SID and auth token", status: "in_progress" },
-    { action: "Configure missed call webhook", detail: "Point your Twilio number to our handler", status: "pending" },
-    { action: "Run a test missed call", detail: "Call your number and confirm the text fires", status: "pending" },
+  "Ready for Install": [
+    { action: "Payment confirmed", detail: "Your order is in the queue", status: "completed" },
+    { action: "Install team assigned", detail: "Your dedicated installer has been assigned", status: "completed" },
+    { action: "Configuration in progress", detail: "Our team is building your system now", status: "in_progress" },
   ],
-  nurture_sequence_14d: [
-    { action: "Approve email templates", detail: "Review the 14-day sequence messages", status: "in_progress" },
-    { action: "Set follow-up timing", detail: "Confirm send times for each step", status: "pending" },
-    { action: "Test sequence with a real email", detail: "Trigger the sequence and verify delivery", status: "pending" },
+  "Configuring": [
+    { action: "System configuration underway", detail: "We're setting up your automation flows", status: "in_progress" },
+    { action: "Review setup details", detail: "Our team may reach out with a quick question", status: "pending" },
+    { action: "Testing phase coming next", detail: "We'll run full tests before going live", status: "pending" },
   ],
-  ai_booking_agent: [
-    { action: "Add your booking link", detail: "Paste your Calendly or booking URL", status: "in_progress" },
-    { action: "Configure intake form fields", detail: "Define which fields to capture from leads", status: "pending" },
-    { action: "Test the full booking flow", detail: "Walk through the booking as a lead", status: "pending" },
+  "Testing": [
+    { action: "Configuration complete", detail: "Your system has been built and is ready for testing", status: "completed" },
+    { action: "Live testing in progress", detail: "We're firing test leads and validating responses", status: "in_progress" },
+    { action: "Your approval", detail: "We'll notify you once testing passes for sign-off", status: "pending" },
   ],
-  lead_reactivation: [
-    { action: "Import your old lead list", detail: "Upload a CSV of dormant leads", status: "in_progress" },
-    { action: "Define reactivation message", detail: "Approve the re-engagement copy", status: "pending" },
-    { action: "Schedule the first batch", detail: "Set the send date for the campaign", status: "pending" },
+  "Live": [
+    { action: "System fully configured", detail: "All automation flows are built", status: "completed" },
+    { action: "Testing passed", detail: "All systems verified and validated", status: "completed" },
+    { action: "System is live and running", detail: "Your automation is capturing and responding to leads", status: "completed" },
   ],
-  review_request: [
-    { action: "Provide your review link", detail: "Paste your Google or Yelp review URL", status: "in_progress" },
-    { action: "Choose trigger event", detail: "Decide when to send the request (post-appointment)", status: "pending" },
-    { action: "Send a test review request", detail: "Fire a test to confirm delivery", status: "pending" },
+  "Error": [
+    { action: "Issue detected", detail: "Our team has been alerted and is investigating", status: "in_progress" },
+    { action: "Contact support", detail: "Email support@clientsurgesystems.com or call us", status: "pending" },
+    { action: "Resolution in progress", detail: "We'll notify you once resolved", status: "pending" },
   ],
 };
 
-export default function NextActionsPanel({ serviceKey }) {
-  const initial = actionsByService[serviceKey] || [];
+export default function NextActionsPanel({ serviceKey, installStatus = "Paid" }) {
+  const initial = actionsByStage[installStatus] || actionsByStage["Paid"];
   const [items, setItems] = useState(initial);
+
+  // Update items when installStatus changes (live polling)
+  useEffect(() => {
+    setItems(actionsByStage[installStatus] || actionsByStage["Paid"]);
+  }, [installStatus]);
 
   const toggle = (idx) => {
     setItems(prev => prev.map((item, i) =>

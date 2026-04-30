@@ -7,7 +7,7 @@ const progressStages = {
   review_request: { label: "Review Requests", stages: ["Setup", "Link Config", "Testing", "Live"] },
 };
 
-export default function SystemProgressTracker({ serviceKey, currentStage = 0 }) {
+export default function SystemProgressTracker({ serviceKey, currentStage = 0, installStatus }) {
   const config = progressStages[serviceKey];
   if (!config) return null;
 

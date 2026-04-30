@@ -9,7 +9,7 @@ const stageConfig = {
   review_request:        ["Order Confirmed", "System Setup", "Link Config", "Testing", "Live ✦"],
 };
 
-export default function HorizontalStageTracker({ serviceKey, currentStage = 0, productName }) {
+export default function HorizontalStageTracker({ serviceKey, currentStage = 0, productName, installStatus }) {
   const stages = stageConfig[serviceKey] || ["Order Confirmed", "Setup", "Testing", "Live ✦"];
 
   return (
@@ -43,12 +43,12 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
           </div>
           <div style={{
             padding: "6px 14px", borderRadius: "9999px",
-            background: currentStage >= stages.length - 1 ? "rgba(34,197,94,0.2)" : "rgba(245,158,11,0.18)",
-            border: `1px solid ${currentStage >= stages.length - 1 ? "rgba(34,197,94,0.4)" : "rgba(245,158,11,0.35)"}`,
+            background: installStatus === "Live" ? "rgba(34,197,94,0.2)" : installStatus === "Error" ? "rgba(239,68,68,0.18)" : "rgba(245,158,11,0.18)",
+            border: `1px solid ${installStatus === "Live" ? "rgba(34,197,94,0.4)" : installStatus === "Error" ? "rgba(239,68,68,0.35)" : "rgba(245,158,11,0.35)"}`,
             fontSize: "12px", fontWeight: "700",
-            color: currentStage >= stages.length - 1 ? "#4ade80" : "#fbbf24",
+            color: installStatus === "Live" ? "#4ade80" : installStatus === "Error" ? "#f87171" : "#fbbf24",
           }}>
-            Step {Math.min(currentStage + 1, stages.length)} of {stages.length}
+            {installStatus === "Live" ? "✦ Live" : installStatus === "Error" ? "⚠ Needs Attention" : `Step ${Math.min(currentStage + 1, stages.length)} of ${stages.length}`}
           </div>
         </div>
 
