@@ -151,7 +151,7 @@ export default function Pricing() {
         <MoneyBackGuarantee />
 
         <div className="max-w-2xl mb-6 mt-12">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What&apos;s Included In Setup</p>
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3 hidden">What&apos;s Included In Setup</p>
           <h3 className="font-titles text-2xl md:text-3xl font-bold text-foreground hidden">
             We build and install the system for you — not just the strategy
           </h3>
@@ -176,7 +176,7 @@ export default function Pricing() {
         </div>
 
         <div className="text-center max-w-xl mx-auto border-t border-border pt-10">
-          <p className="text-foreground font-semibold text-base mb-5">
+          <p className="text-foreground font-semibold text-base mb-5 hidden">
             Not sure which system fits your business? We will recommend the best option based on your lead flow.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -197,7 +197,7 @@ export default function Pricing() {
                 cursor: "pointer"
               }}>
               
-                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }} className=" hidden hidden">
                   Book Your Free Demo <ArrowRight className="w-4 h-4" />
                 </span>
               </button> :
