@@ -580,7 +580,7 @@ async function runServiceTests(base44, service_key, order, configResult) {
   try {
     switch (service_key) {
       case "instant_lead_response":
-        return await testInstantLeadResponse(configResult);
+        return await testInstantLeadResponse(base44, configResult);
       case "missed_call_text_back":
         return await testMissedCallTextBack(configResult);
       case "nurture_sequence_14d":
@@ -600,12 +600,32 @@ async function runServiceTests(base44, service_key, order, configResult) {
   }
 }
 
-async function testInstantLeadResponse(config) {
-  console.log("[Tests] Testing instant lead response");
+async function testInstantLeadResponse(base44, config) {
+  console.log("[Tests] Testing instant lead response - running end-to-end SMS test");
+  
   if (!config.sms_template_id || !config.webhook_url) {
     throw new Error("Missing required SMS template or webhook URL");
   }
-  return { passed: true, tested: ["sms_template", "webhook"] };
+  
+  // Run actual SMS delivery test
+  try {
+    const testResult = await base44.functions.invoke("testInstantLeadResponse", {});
+    
+    if (!testResult.success) {
+      throw new Error(`SMS test failed: ${testResult.summary}`);
+    }
+    
+    console.log(`[Tests] SMS test passed - lead ${testResult.test_lead_id} received SMS`);
+    return { 
+      passed: true, 
+      tested: ["sms_template", "webhook", "sms_delivery"],
+      test_lead_id: testResult.test_lead_id,
+      communication_event_id: testResult.communication_event?.id
+    };
+  } catch (error) {
+    console.error(`[Tests] SMS delivery test failed: ${error.message}`);
+    throw new Error(`SMS delivery test failed: ${error.message}`);
+  }
 }
 
 async function testMissedCallTextBack(config) {
