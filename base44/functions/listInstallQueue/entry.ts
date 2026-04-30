@@ -1,25 +1,38 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { listInstallQueueOrders } from "../_shared/installPipeline.js";
 
-async function requireAdmin(base44: ReturnType<typeof createClientFromRequest>) {
-  const user = await base44.auth.me();
-  if (!user || user.role !== "admin") {
-    throw new Error("Admin access required");
-  }
-}
+const VALID_TRANSITIONS = {
+  "Paid": ["Ready for Install"],
+  "Ready for Install": ["Configuring"],
+  "Configuring": ["Testing"],
+  "Testing": ["Live", "Error"],
+  "Live": ["Live"],
+  "Error": ["Ready for Install", "Configuring"],
+};
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    await requireAdmin(base44);
+    const user = await base44.auth.me();
+    if (!user || user.role !== "admin") {
+      return Response.json({ error: "Admin access required" }, { status: 403 });
+    }
 
     const payload = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const includeLive = Boolean(payload?.include_live);
-    const orders = await listInstallQueueOrders(base44, { includeLive });
 
-    return Response.json({
-      success: true,
-      orders: orders.map((order) => ({
+    const statusFilter = includeLive
+      ? { payment_status: "paid" }
+      : { payment_status: "paid", pipeline_status: { $nin: ["Live"] } };
+
+    const orders = await base44.asServiceRole.entities.Order.filter(
+      statusFilter,
+      "-install_initialized_at",
+      200
+    );
+
+    const mapped = (orders || []).map((order) => {
+      const trackedItems = (order.items || []).filter((i) => i.tracking_enabled || i.service_key);
+      return {
         id: order.id,
         business_name: order.business_name,
         customer_name: order.customer_name,
@@ -44,23 +57,20 @@ Deno.serve(async (req) => {
         created_date: order.created_date,
         last_install_event_at: order.last_install_event_at,
         install_configuration: order.install_configuration,
-        configuration_summary: order.configuration_summary,
-        items: order.trackedItems.map((item) => ({
+        items: trackedItems.map((item) => ({
           product_id: item.product_id,
           product_name: item.product_name,
-          display_name: item.display_name,
           service_key: item.service_key,
-          install_status: item.install_status,
+          install_status: item.install_status || "Paid",
           install_started_at: item.install_started_at,
           install_completed_at: item.install_completed_at,
           install_error: item.install_error,
-          configuration_complete: item.configuration_complete,
-          missing_configuration_fields: item.missing_configuration_fields,
-          missing_configuration_labels: item.missing_configuration_labels,
-          allowed_next_statuses: item.allowed_next_statuses,
+          allowed_next_statuses: VALID_TRANSITIONS[item.install_status || "Paid"] || [],
         })),
-      })),
+      };
     });
+
+    return Response.json({ success: true, orders: mapped });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to load install queue";
     const status = message === "Admin access required" ? 403 : 500;
