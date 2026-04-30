@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import DemoBookingModal from "../forms/DemoBookingModal";
 import {
   INDUSTRY_RECOMMENDATIONS_BY_ID,
-  INDUSTRY_SELECTION_STORAGE_KEY,
-} from "@/lib/industryRecommendations";
+  INDUSTRY_SELECTION_STORAGE_KEY } from
+"@/lib/industryRecommendations";
 import { systemsById, systemGroups, coreOfferSectionConfig, iconMap } from "./coreOffer/coreOfferData";
 import SystemMap from "./coreOffer/SystemMapSection";
 import VerticalTimeline from "./coreOffer/VerticalTimeline";
@@ -29,7 +29,7 @@ function CoreOfferHeader() {
 
       {/* Title — forced single line via whitespace-nowrap on desktop */}
       <h2 className="font-display font-bold tracking-tight leading-none text-foreground"
-        style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)" }}>
+      style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)" }}>
         How The{" "}
         <span style={{ color: "#9a5c2e", textShadow: "0 0 32px rgba(154,92,46,0.28)" }}>
           8-System
@@ -51,8 +51,8 @@ function CoreOfferHeader() {
       <p className="mt-3 text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
         {coreOfferSectionConfig.helperLine}
       </p>
-    </div>
-  );
+    </div>);
+
 }
 
 // CoreOfferHeader is already placed first inside the section — no change needed to section wrapper
@@ -72,11 +72,11 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
       style={{
         background: "rgba(255,255,255,0.82)",
         border: selected ? "1.5px solid rgba(154,92,46,0.4)" : "1px solid rgba(148, 163, 184, 0.18)",
-        boxShadow: selected
-          ? "0 12px 32px rgba(154,92,46,0.15)"
-          : "0 8px 22px rgba(15, 23, 42, 0.05)",
-      }}
-    >
+        boxShadow: selected ?
+        "0 12px 32px rgba(154,92,46,0.15)" :
+        "0 8px 22px rgba(15, 23, 42, 0.05)"
+      }}>
+      
       <div className="px-5 md:px-6 pt-5 pb-3 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.82)" }}>
         <div className="flex-1 min-w-0">
           <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(154,92,46,0.7)" }}>
@@ -87,8 +87,8 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
         <motion.div
           animate={selected ? { scale: 1.1 } : { scale: 1 }}
           className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)", boxShadow: "0 2px 8px rgba(154,92,46,0.3)" }}
-        >
+          style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)", boxShadow: "0 2px 8px rgba(154,92,46,0.3)" }}>
+          
           <Icon className="w-4 h-4 text-white" />
         </motion.div>
       </div>
@@ -102,53 +102,53 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
             e.stopPropagation();
             onAddToStack(system.id);
           }}
-          className="flex-1 py-2 px-3 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-lg text-xs font-semibold text-primary hover:from-primary/15 hover:to-primary/10 transition flex items-center justify-center gap-1"
-        >
+          className="flex-1 py-2 px-3 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-lg text-xs font-semibold text-primary hover:from-primary/15 hover:to-primary/10 transition flex items-center justify-center gap-1">
+          
           <ShoppingCart className="w-3 h-3" /> Add
         </button>
       </div>
-    </motion.button>
-  );
+    </motion.button>);
+
 }
 
 function SystemGroupList({ selectedSystemId, onSelect, onAddToStack }) {
   return (
     <div className="mt-12 md:mt-14 space-y-10 md:space-y-12">
-      {systemGroups.map((group) => (
-        <motion.div
-          key={group.id}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-        >
+      {systemGroups.map((group) =>
+      <motion.div
+        key={group.id}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        viewport={{ once: true }}>
+        
           <div className="flex items-center gap-4 mb-4 md:mb-5">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
             <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase whitespace-nowrap">{group.label}</p>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
           </div>
           <div className="grid grid-cols-1 gap-5">
-            {group.systems.map((systemId, idx) => (
-              <motion.div
-                key={systemId}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: idx * 0.1 }}
-                viewport={{ once: true }}
-              >
+            {group.systems.map((systemId, idx) =>
+          <motion.div
+            key={systemId}
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: idx * 0.1 }}
+            viewport={{ once: true }}>
+            
                 <SystemCard
-                  system={systemsById[systemId]}
-                  selected={selectedSystemId === systemId}
-                  onSelect={onSelect}
-                  onAddToStack={onAddToStack}
-                />
+              system={systemsById[systemId]}
+              selected={selectedSystemId === systemId}
+              onSelect={onSelect}
+              onAddToStack={onAddToStack} />
+            
               </motion.div>
-            ))}
+          )}
           </div>
         </motion.div>
-      ))}
-    </div>
-  );
+      )}
+    </div>);
+
 }
 
 function MobileSystemGroupList({ selectedSystemId, onSelect, showAll, onToggle, onAddToStack }) {
@@ -167,29 +167,29 @@ function MobileSystemGroupList({ selectedSystemId, onSelect, showAll, onToggle, 
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
             </div>
             <div className="grid grid-cols-1 gap-4">
-              {visibleSystems.map((systemId) => (
-                <SystemCard
-                  key={systemId}
-                  system={systemsById[systemId]}
-                  selected={selectedSystemId === systemId}
-                  onSelect={onSelect}
-                  onAddToStack={onAddToStack}
-                />
-              ))}
+              {visibleSystems.map((systemId) =>
+              <SystemCard
+                key={systemId}
+                system={systemsById[systemId]}
+                selected={selectedSystemId === systemId}
+                onSelect={onSelect}
+                onAddToStack={onAddToStack} />
+
+              )}
             </div>
-          </div>
-        );
+          </div>);
+
       })}
       <button
         type="button"
         onClick={onToggle}
-        className="w-full inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-white/80"
-      >
+        className="w-full inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-white/80">
+        
         {showAll ? "Show condensed view" : "See full 8-system flow"}
         <ArrowRight className="w-4 h-4" />
       </button>
-    </div>
-  );
+    </div>);
+
 }
 
 function CoreOfferCTA({ onBookDemo }) {
@@ -204,8 +204,8 @@ function CoreOfferCTA({ onBookDemo }) {
       <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
         <a
           href={coreOfferSectionConfig.primaryCta.href}
-          className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
-        >
+          className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
+          
           {coreOfferSectionConfig.primaryCta.label}
           <ArrowRight className="w-4 h-4" />
         </a>
@@ -218,9 +218,9 @@ function CoreOfferCTA({ onBookDemo }) {
             background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
             boxShadow: "0 4px 18px rgba(120,70,20,0.3)",
             border: "none",
-            cursor: "pointer",
-          }}
-        >
+            cursor: "pointer"
+          }}>
+          
           <span
             style={{
               display: "flex",
@@ -233,16 +233,16 @@ function CoreOfferCTA({ onBookDemo }) {
               background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
               color: "#f5e6d0",
               fontWeight: "700",
-              fontSize: "0.95rem",
-            }}
-          >
+              fontSize: "0.95rem"
+            }}>
+            
             {coreOfferSectionConfig.secondaryCta.label}
             <ArrowRight className="w-4 h-4" />
           </span>
         </button>
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 export default function CoreOffer() {
@@ -289,7 +289,7 @@ export default function CoreOffer() {
   const handleAddToStack = (systemId) => {
     setStackItems((prev) => ({
       ...prev,
-      [systemId]: (prev[systemId] || 0) + 1,
+      [systemId]: (prev[systemId] || 0) + 1
     }));
     setStackBuilderOpen(true);
   };
@@ -298,13 +298,13 @@ export default function CoreOffer() {
     <section
       id="services"
       className="pt-16 md:pt-28 pb-24 md:pb-32 px-4 md:px-6 bg-gradient-to-b from-card via-background via-70% to-slate-50/30 relative overflow-hidden"
-      style={{ overflowX: "hidden" }}
-    >
+      style={{ overflowX: "hidden" }}>
+      
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse 80% 100% at 50% 0%, rgba(154,92,46,0.08) 0%, transparent 70%)" }}
-      />
+        style={{ background: "radial-gradient(ellipse 80% 100% at 50% 0%, rgba(154,92,46,0.08) 0%, transparent 70%)" }} />
+      
 
       <div className="max-w-6xl mx-auto relative z-10 pt-10">
         <CoreOfferHeader />
@@ -314,24 +314,24 @@ export default function CoreOffer() {
           className="mt-8 flex justify-center"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
+          transition={{ delay: 0.3 }}>
+          
           <button
-            onClick={() => setStackBuilderOpen(true)}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 border border-primary/25 text-primary font-semibold text-sm hover:bg-primary/15 transition"
-          >
+            onClick={() => setStackBuilderOpen(true)} className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 border border-primary/25 text-primary font-semibold text-sm hover:bg-primary/15 transition hidden">
+
+            
             <ShoppingCart className="w-4 h-4" />
-            {Object.keys(stackItems).length > 0
-              ? `Build Stack (${Object.values(stackItems).reduce((a, b) => a + b, 0)} items)`
-              : "Build Your Ideal Stack"}
+            {Object.keys(stackItems).length > 0 ?
+            `Build Stack (${Object.values(stackItems).reduce((a, b) => a + b, 0)} items)` :
+            "Build Your Ideal Stack"}
           </button>
         </motion.div>
 
         <VerticalTimeline
           selectedSystemId={selectedSystemId}
           onSystemSelect={setSelectedSystemId}
-          onBookDemo={() => setShowBookingModal(true)}
-        />
+          onBookDemo={() => setShowBookingModal(true)} />
+        
         <LaunchTimeline />
         <CoreOfferCTA onBookDemo={() => setShowBookingModal(true)} />
       </div>
@@ -339,9 +339,9 @@ export default function CoreOffer() {
       <StackBuilder
         isOpen={stackBuilderOpen}
         onClose={() => setStackBuilderOpen(false)}
-        systems={systemsById}
-      />
+        systems={systemsById} />
+      
       {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
-    </section>
-  );
+    </section>);
+
 }

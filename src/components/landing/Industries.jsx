@@ -6,63 +6,63 @@ import {
   Home,
   MapPin,
   Sparkles,
-  Wrench,
-} from "lucide-react";
+  Wrench } from
+"lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDemoBooking } from "./DemoBookingContext";
 import {
   INDUSTRY_RECOMMENDATIONS_BY_ID,
-  INDUSTRY_SELECTION_STORAGE_KEY,
-} from "@/lib/industryRecommendations";
+  INDUSTRY_SELECTION_STORAGE_KEY } from
+"@/lib/industryRecommendations";
 
 const industries = [
-  {
-    id: "med-spa",
-    icon: Sparkles,
-    name: "Med Spas & Aesthetic Clinics",
-    image:
-      "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/741357982_Gemini_Generated_Image_hdkpn1hdkpn1hdkp.png",
-  },
-  {
-    id: "dental",
-    icon: Heart,
-    name: "Dental & Orthodontics",
-    image:
-      "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95",
-  },
-  {
-    id: "chiro-pt",
-    icon: Building2,
-    name: "Chiropractic & Physical Therapy",
-    image:
-      "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=1200&q=95",
-  },
-  {
-    id: "hvac",
-    icon: Wrench,
-    name: "HVAC, Plumbing & Home Services",
-    image:
-      "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=95",
-  },
-  {
-    id: "roofing",
-    icon: Home,
-    name: "Roofing & Restoration",
-    image:
-      "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/3fcc65c06_Screenshot2026-04-21185605.png",
-  },
-  {
-    id: "contractors",
-    icon: MapPin,
-    name: "Contractors & Trades",
-    image:
-      "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=95",
-  },
-];
+{
+  id: "med-spa",
+  icon: Sparkles,
+  name: "Med Spas & Aesthetic Clinics",
+  image:
+  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/741357982_Gemini_Generated_Image_hdkpn1hdkpn1hdkp.png"
+},
+{
+  id: "dental",
+  icon: Heart,
+  name: "Dental & Orthodontics",
+  image:
+  "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95"
+},
+{
+  id: "chiro-pt",
+  icon: Building2,
+  name: "Chiropractic & Physical Therapy",
+  image:
+  "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=1200&q=95"
+},
+{
+  id: "hvac",
+  icon: Wrench,
+  name: "HVAC, Plumbing & Home Services",
+  image:
+  "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=95"
+},
+{
+  id: "roofing",
+  icon: Home,
+  name: "Roofing & Restoration",
+  image:
+  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/3fcc65c06_Screenshot2026-04-21185605.png"
+},
+{
+  id: "contractors",
+  icon: MapPin,
+  name: "Contractors & Trades",
+  image:
+  "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=95"
+}];
+
 
 function IndustryModal({ recommendation, onClose, onBookDemo }) {
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    const onKey = (e) => {if (e.key === "Escape") onClose();};
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
@@ -79,18 +79,18 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
       style={{
         background: "linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,245,239,0.94) 100%)",
         border: "1.5px solid rgba(154,92,46,0.22)",
-        boxShadow: "0 50px 130px rgba(0,0,0,0.45)",
+        boxShadow: "0 50px 130px rgba(0,0,0,0.45)"
       }}
-      onClick={(e) => e.stopPropagation()}
-    >
+      onClick={(e) => e.stopPropagation()}>
+      
         {/* Header */}
         <div
-          className="px-7 pt-7 pb-5 flex items-start justify-between gap-4 sticky top-0 rounded-t-[28px] z-10"
-          style={{
-            background: "linear-gradient(135deg, rgba(154,92,46,0.09) 0%, rgba(250,245,239,0.97) 100%)",
-            borderBottom: "1px solid rgba(154,92,46,0.12)",
-          }}
-        >
+        className="px-7 pt-7 pb-5 flex items-start justify-between gap-4 sticky top-0 rounded-t-[28px] z-10"
+        style={{
+          background: "linear-gradient(135deg, rgba(154,92,46,0.09) 0%, rgba(250,245,239,0.97) 100%)",
+          borderBottom: "1px solid rgba(154,92,46,0.12)"
+        }}>
+        
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary mb-2">
               Recommended For {recommendation.shortName}
@@ -103,10 +103,10 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
             </p>
           </div>
           <button
-            type="button"
-            onClick={onClose}
-            className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-black/8 transition-colors text-xl font-light"
-          >
+          type="button"
+          onClick={onClose}
+          className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-black/8 transition-colors text-xl font-light">
+          
             ✕
           </button>
         </div>
@@ -115,9 +115,9 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
         <div className="px-7 py-6 space-y-6">
           {/* Recommended package */}
           <div
-            className="rounded-2xl px-5 py-5"
-            style={{ background: "rgba(255,255,255,0.78)", border: "1px solid rgba(154,92,46,0.14)" }}
-          >
+          className="rounded-2xl px-5 py-5"
+          style={{ background: "rgba(255,255,255,0.78)", border: "1px solid rgba(154,92,46,0.14)" }}>
+          
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-2">Recommended Package</p>
             <h4 className="text-xl font-semibold text-foreground">{recommendation.recommendedPackage?.name}</h4>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{recommendation.recommendedPackage?.fit}</p>
@@ -125,11 +125,11 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
               <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.14)", color: "#9a5c2e" }}>
                 {recommendation.recommendedServices.length} services recommended
               </span>
-              {recommendation.addOnsByReview.length ? (
-                <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(26,18,9,0.05)", border: "1px solid rgba(26,18,9,0.08)", color: "rgba(26,18,9,0.6)" }}>
+              {recommendation.addOnsByReview.length ?
+            <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(26,18,9,0.05)", border: "1px solid rgba(26,18,9,0.08)", color: "rgba(26,18,9,0.6)" }}>
                   {recommendation.addOnsByReview.length} add-ons by review
-                </span>
-              ) : null}
+                </span> :
+            null}
             </div>
           </div>
 
@@ -137,11 +137,11 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-3">Why This Stack Fits</p>
             <div className="space-y-2">
-              {recommendation.pressurePoints.map((point) => (
-                <div key={point} className="rounded-2xl px-4 py-3" style={{ background: "rgba(154,92,46,0.05)", border: "1px solid rgba(154,92,46,0.12)" }}>
+              {recommendation.pressurePoints.map((point) =>
+            <div key={point} className="rounded-2xl px-4 py-3" style={{ background: "rgba(154,92,46,0.05)", border: "1px solid rgba(154,92,46,0.12)" }}>
                   <p className="text-sm leading-6 text-foreground/78">{point}</p>
                 </div>
-              ))}
+            )}
             </div>
           </div>
 
@@ -149,15 +149,15 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-3">Available Now</p>
             <div className="grid sm:grid-cols-2 gap-3">
-              {recommendation.recommendedServices.map((service) => (
-                <div key={service.product_id} className="rounded-2xl px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(250,245,239,0.74) 100%)", border: "1px solid rgba(154,92,46,0.12)" }}>
+              {recommendation.recommendedServices.map((service) =>
+            <div key={service.product_id} className="rounded-2xl px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(250,245,239,0.74) 100%)", border: "1px solid rgba(154,92,46,0.12)" }}>
                   <p className="text-sm font-semibold text-foreground">{service.name}</p>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{service.whyThisMatters}</p>
                   <span className="mt-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em]" style={{ background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.14)", color: "#9a5c2e" }}>
                     {service.availability_label}
                   </span>
                 </div>
-              ))}
+            )}
             </div>
           </div>
         </div>
@@ -173,8 +173,8 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
             </span>
           </button>
         </div>
-    </div>
-  );
+    </div>);
+
 }
 
 export default function Industries() {
@@ -223,9 +223,9 @@ export default function Industries() {
     return () => observer.disconnect();
   }, []);
 
-  const selectedRecommendation = selectedIndustryId
-    ? INDUSTRY_RECOMMENDATIONS_BY_ID[selectedIndustryId]
-    : null;
+  const selectedRecommendation = selectedIndustryId ?
+  INDUSTRY_RECOMMENDATIONS_BY_ID[selectedIndustryId] :
+  null;
 
   const handleIndustrySelect = (industryId) => {
     setSelectedIndustryId(industryId);
@@ -236,8 +236,8 @@ export default function Industries() {
     <section
       id="industries"
       ref={sectionRef}
-      className="pt-16 md:pt-24 pb-32 md:pb-40 px-0 bg-gradient-to-b from-card via-background via-70% to-slate-50/40"
-    >
+      className="pt-16 md:pt-24 pb-32 md:pb-40 px-0 bg-gradient-to-b from-card via-background via-70% to-slate-50/40">
+      
       <div className="max-w-6xl mx-auto text-center px-6 pt-10 pb-14">
         <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">
           Choose Your Industry
@@ -270,50 +270,50 @@ export default function Industries() {
                 opacity: sectionVisible ? 1 : 0,
                 transform: sectionVisible ? "translateY(0)" : "translateY(32px)",
                 transition: `opacity 600ms ease ${index * 100}ms, transform 600ms ease ${
-                  index * 100
-                }ms`,
+                index * 100}ms`,
+
                 border: "none",
                 padding: 0,
                 background: "transparent",
-                cursor: "pointer",
-              }}
-            >
+                cursor: "pointer"
+              }}>
+              
               <img
                 src={industry.image}
                 alt={industry.name}
                 loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover"
-              />
+                className="absolute inset-0 h-full w-full object-cover" />
+              
 
               <div
                 className="absolute inset-0"
                 style={{
-                  background: highlighted
-                    ? "linear-gradient(to bottom, rgba(10,10,14,0.28) 0%, rgba(10,10,14,0.74) 100%)"
-                    : "linear-gradient(to bottom, rgba(10,10,14,0.18) 0%, rgba(10,10,14,0.66) 100%)",
-                }}
-              />
+                  background: highlighted ?
+                  "linear-gradient(to bottom, rgba(10,10,14,0.28) 0%, rgba(10,10,14,0.74) 100%)" :
+                  "linear-gradient(to bottom, rgba(10,10,14,0.18) 0%, rgba(10,10,14,0.66) 100%)"
+                }} />
+              
 
               <div
                 className="absolute inset-0 border-2 transition-all duration-300"
                 style={{
                   borderColor: highlighted ? "#c8965c" : "rgba(255,255,255,0.08)",
-                  boxShadow: highlighted
-                    ? "inset 0 0 0 1px rgba(245,217,168,0.26), inset 0 0 32px rgba(200,150,92,0.2), 0 0 0 2px rgba(200,150,92,0.34), 0 0 24px rgba(200,150,92,0.22)"
-                    : "none",
-                }}
-              />
+                  boxShadow: highlighted ?
+                  "inset 0 0 0 1px rgba(245,217,168,0.26), inset 0 0 32px rgba(200,150,92,0.2), 0 0 0 2px rgba(200,150,92,0.34), 0 0 24px rgba(200,150,92,0.22)" :
+                  "none"
+                }} />
+              
 
               <div className="absolute top-5 left-5 right-5 flex items-start justify-between gap-3">
-                <div
-                  className="w-11 h-11 rounded-2xl flex items-center justify-center"
-                  style={{
-                    background: "rgba(255,255,255,0.16)",
-                    border: "1px solid rgba(255,255,255,0.18)",
-                    backdropFilter: "blur(10px)",
-                    WebkitBackdropFilter: "blur(10px)",
-                  }}
-                >
+                <div className="w-11 h-11 rounded-2xl flex items-center justify-center hidden"
+
+                style={{
+                  background: "rgba(255,255,255,0.16)",
+                  border: "1px solid rgba(255,255,255,0.18)",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)"
+                }}>
+                  
                   <Icon style={{ width: "18px", height: "18px", color: "#fff" }} />
                 </div>
 
@@ -327,9 +327,9 @@ export default function Industries() {
                     lineHeight: 1.3,
                     color: "#fff",
                     textShadow: "0 1px 10px rgba(0,0,0,0.4)",
-                    margin: 0,
-                  }}
-                >
+                    margin: 0
+                  }}>
+                  
                   {industry.name}
                 </p>
                 <p
@@ -337,9 +337,9 @@ export default function Industries() {
                     fontSize: "12px",
                     lineHeight: 1.6,
                     color: "rgba(255,255,255,0.74)",
-                    margin: "8px 0 0",
-                  }}
-                >
+                    margin: "8px 0 0"
+                  }}>
+                  
                   Click to see the recommended AI service stack for this niche.
                 </p>
               </div>
@@ -349,59 +349,59 @@ export default function Industries() {
                 style={{
                   width: highlighted ? "100%" : "0%",
                   background:
-                    "linear-gradient(to right, #c8965c, #f5d9a8, #c8965c)",
-                }}
-              />
-            </button>
-          );
+                  "linear-gradient(to right, #c8965c, #f5d9a8, #c8965c)"
+                }} />
+              
+            </button>);
+
         })}
       </div>
 
       <AnimatePresence>
-        {modalOpen && selectedRecommendation && (
-          <>
+        {modalOpen && selectedRecommendation &&
+        <>
             <motion.div
-              key="industry-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              onClick={() => setModalOpen(false)}
-              style={{
-                position: "fixed", inset: 0, zIndex: 199,
-                background: "rgba(4,2,1,0.35)",
-                backdropFilter: "blur(8px) saturate(0.8)",
-                WebkitBackdropFilter: "blur(8px) saturate(0.8)",
-              }}
-            />
+            key="industry-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            onClick={() => setModalOpen(false)}
+            style={{
+              position: "fixed", inset: 0, zIndex: 199,
+              background: "rgba(4,2,1,0.35)",
+              backdropFilter: "blur(8px) saturate(0.8)",
+              WebkitBackdropFilter: "blur(8px) saturate(0.8)"
+            }} />
+          
             <motion.div
-              key="industry-modal-wrap"
-              initial={{ opacity: 0, y: 140, scale: 0.72, rotateX: 10 }}
-              animate={{ opacity: 1, y: 0,   scale: 1,    rotateX: 0  }}
-              exit={{    opacity: 0, y: 60,  scale: 0.88, rotateX: 4  }}
-              transition={{
-                type: "spring", stiffness: 260, damping: 26, mass: 0.9,
-                opacity: { duration: 0.3, ease: "easeOut" },
-              }}
-              style={{
-                position: "fixed", inset: 0, zIndex: 200,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                padding: "16px 16px 32px",
-                perspective: "1200px",
-                pointerEvents: "none",
-              }}
-            >
+            key="industry-modal-wrap"
+            initial={{ opacity: 0, y: 140, scale: 0.72, rotateX: 10 }}
+            animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+            exit={{ opacity: 0, y: 60, scale: 0.88, rotateX: 4 }}
+            transition={{
+              type: "spring", stiffness: 260, damping: 26, mass: 0.9,
+              opacity: { duration: 0.3, ease: "easeOut" }
+            }}
+            style={{
+              position: "fixed", inset: 0, zIndex: 200,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              padding: "16px 16px 32px",
+              perspective: "1200px",
+              pointerEvents: "none"
+            }}>
+            
               <div style={{ pointerEvents: "auto", width: "100%" }}>
                 <IndustryModal
-                  recommendation={selectedRecommendation}
-                  onClose={() => setModalOpen(false)}
-                  onBookDemo={() => { setModalOpen(false); demoBooking?.openDemoBooking?.(); }}
-                />
+                recommendation={selectedRecommendation}
+                onClose={() => setModalOpen(false)}
+                onBookDemo={() => {setModalOpen(false);demoBooking?.openDemoBooking?.();}} />
+              
               </div>
             </motion.div>
           </>
-        )}
+        }
       </AnimatePresence>
-    </section>
-  );
+    </section>);
+
 }
