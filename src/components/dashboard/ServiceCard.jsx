@@ -3,6 +3,9 @@ import ServiceStatusBadge from "./ServiceStatusBadge";
 import ServiceProgressRing from "./ServiceProgressRing";
 import SystemProgressTracker from "./SystemProgressTracker";
 import NextActionsPanel from "./NextActionsPanel";
+import GoLiveCountdown from "./GoLiveCountdown";
+import WhatHappensNext from "./WhatHappensNext";
+import WhileWeSetUpCard from "./WhileWeSetUpCard";
 
 const TOTAL_STAGES = 5;
 
@@ -58,11 +61,20 @@ export default function ServiceCard({ service }) {
           <ServiceProgressRing currentStage={currentStage} totalStages={totalStages} size={56} />
         </div>
 
+        {/* Go-live countdown */}
+        <GoLiveCountdown installStatus={installStatus} />
+
         {/* Stage progress */}
         <SystemProgressTracker serviceKey={serviceKey} currentStage={currentStage} />
 
-        {/* Next actions */}
-        <NextActionsPanel serviceKey={serviceKey} installStatus={installStatus} />
+        {/* Read-only installation progress */}
+        <NextActionsPanel installStatus={installStatus} />
+
+        {/* What happens next — plain English */}
+        <WhatHappensNext installStatus={installStatus} />
+
+        {/* While we set up checklist */}
+        <WhileWeSetUpCard installStatus={installStatus} />
       </div>
     </div>
   );
