@@ -90,8 +90,8 @@ function StatCard({ item, index, inView }) {
         background: isHighlighted 
           ? "linear-gradient(180deg, rgba(245,217,168,0.3) 0%, rgba(255,255,255,0.9) 100%)"
           : "rgba(255,255,255,0.82)",
-        minHeight: "190px",
-        padding: "18px",
+        minHeight: "clamp(140px, 20vw, 190px)",
+        padding: "clamp(14px, 3vw, 20px)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -147,7 +147,7 @@ export default function TrustBar() {
             What You Can Expect
           </h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-5">
           {items.map((item, index) => (
             <StatCard key={item.label} item={item} index={index} inView={inView} />
           ))}

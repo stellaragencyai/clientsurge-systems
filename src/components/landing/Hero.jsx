@@ -151,11 +151,11 @@ export default function Hero() {
           <p
             className="landing-hero__body"
             style={{
-              fontSize: "1.14rem",
+              fontSize: "clamp(1rem, 2.5vw, 1.14rem)",
               color: "rgba(27,20,13,0.74)",
               lineHeight: 1.72,
               marginBottom: "28px",
-              maxWidth: "34rem",
+              maxWidth: "min(34rem, 100%)",
             }}
           >
             ClientSurge installs AI-powered conversion systems that capture leads, respond instantly, follow up automatically, and turn more of your existing demand into booked clients.

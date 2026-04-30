@@ -223,11 +223,11 @@ export default function Navbar() {
         }
       }}
     >
-      <div className="w-full px-4 md:px-8 h-14 md:h-16 flex items-center justify-between" style={{ paddingLeft: "max(1rem, env(safe-area-inset-left))", paddingRight: "max(1rem, env(safe-area-inset-right))" }}>
+      <div className="w-full h-14 md:h-16 flex items-center justify-between" style={{ paddingLeft: "max(1rem, env(safe-area-inset-left))", paddingRight: "max(1rem, env(safe-area-inset-right))" }}>
         <button
           onClick={handleLogoClick}
-          className="font-display font-bold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-2"
-          style={{ fontSize: "1rem" }}
+          className="font-display font-bold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5 md:gap-2"
+          style={{ fontSize: "1rem", minHeight: "unset", minWidth: "unset" }}
         >
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
             <span className="text-white font-black text-sm">CS</span>
@@ -353,13 +353,14 @@ export default function Navbar() {
       {open && (
         <>
           <div className="fixed inset-0 z-40 md:hidden" onClick={() => setOpen(false)} />
-        <div className="md:hidden bg-background border-b border-border px-6 pb-6 pt-2 space-y-4 relative z-50">
+        <div className="md:hidden bg-background border-b border-border px-5 pb-safe-bottom pb-6 pt-2 space-y-1 relative z-50" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
           {sectionLinks.map((link) => (
             link.isPage ? (
               <a
                 key={link.href}
                 href={link.href}
-                className="block text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded px-2 py-1"
+                className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-muted/50"
+                style={{ minHeight: "44px" }}
                 onClick={() => {
                   trackCTA("ai_store", "mobile_nav");
                   setOpen(false);
@@ -371,7 +372,8 @@ export default function Navbar() {
               <a
                 key={link.href}
                 href={`/${link.href}`}
-                className="block text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded px-2 py-1"
+                className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-muted/50"
+                style={{ minHeight: "44px" }}
                 onClick={(e) => {
                   handleSectionNavigation(e, link.href);
                   setOpen(false);
@@ -393,7 +395,8 @@ export default function Navbar() {
                     navigate(item.href);
                     setOpen(false);
                   }}
-                  className="w-full text-left block rounded px-2 py-1 text-sm text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer"
+                  className="w-full text-left flex items-center rounded-xl px-3 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
+                  style={{ minHeight: "44px" }}
                 >
                   {item.label}
                 </button>

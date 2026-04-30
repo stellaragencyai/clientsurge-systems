@@ -143,7 +143,7 @@ export default function Footer() {
 
       {/* Expanded Menu (Always Visible) */}
       <div className="border-t border-primary/10 bg-background/98 backdrop-blur-md animate-in fade-in duration-200">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 grid grid-cols-5 gap-6 text-xs">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 text-xs">
           {navColumns.map((col) => (
             <div key={col.title} className="flex flex-col gap-2">
               <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">{col.title}</h4>

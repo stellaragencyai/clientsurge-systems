@@ -641,6 +641,98 @@ p, li, td, th, label, span {
   padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
+/* ============================================
+   ROUND 2: CROSS-BROWSER POLISH
+   ============================================ */
+
+/* 1. Font rendering — crisp on all OS/browsers */
+body, input, button, select, textarea {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+}
+
+/* 2. Image CLS prevention — explicit sizing context */
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+/* Preserve aspect ratio for background/decorative images */
+img[style*="object-fit"] {
+  height: 100%;
+}
+
+/* 3. content-visibility for off-screen sections (Chrome/Edge perf boost) */
+@supports (content-visibility: auto) {
+  section:not(:first-of-type):not(:nth-of-type(2)) {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 600px;
+  }
+}
+
+/* 4. Scrollbar styling — consistent cross-browser thin scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(154,92,46,0.3); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(154,92,46,0.55); }
+@supports (scrollbar-width: thin) {
+  * { scrollbar-width: thin; scrollbar-color: rgba(154,92,46,0.3) transparent; }
+}
+
+/* 5. Input zoom prevention on iOS (font-size must be ≥16px) */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+input[type="password"],
+textarea,
+select {
+  font-size: max(16px, 1rem) !important;
+}
+
+/* 6. Fix `position: sticky` on iOS Safari */
+.sticky, [class*="sticky"] {
+  position: -webkit-sticky;
+  position: sticky;
+}
+
+/* 7. Better tap area for small icon buttons without changing visual size */
+.icon-btn-tap {
+  position: relative;
+}
+.icon-btn-tap::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+/* 8. Prevent text selection on interactive elements (UX polish) */
+button, [role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 9. Landscape phone — prevent massive paddings */
+@media (max-height: 500px) and (orientation: landscape) {
+  section {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  .landing-hero__inner {
+    min-height: auto !important;
+    padding-top: 4rem !important;
+  }
+}
+
+/* 10. High-DPI / Retina display sharpness for borders */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .border, [class*="border-"] {
+    border-width: 0.5px;
+  }
+}
+
 /* Dark mode gradient text fix */
 .dark span[style*="background"] {
   background: linear-gradient(135deg, #f5d9a8 0%, #e8c499 52%, #d4a570 100%) !important;
