@@ -110,9 +110,9 @@ export default function Pricing() {
   }, []);
 
   return (
-    <section id="pricing" className="nebula-pricing py-24 md:py-32 px-6 overflow-visible">
+    <section id="pricing" className="nebula-pricing pt-10 pb-24 md:pb-32 px-6 overflow-visible">
       <div className="max-w-7xl mx-auto">
-        <div className="max-w-2xl mx-auto text-center mb-16">
+        <div className="max-w-2xl mx-auto text-center pt-10 mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Pricing & Packages</p>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
            Most Businesses Already Have the Leads — Here's What It Costs to Stop Losing Them

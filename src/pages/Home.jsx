@@ -11,6 +11,7 @@ import Pricing from "../components/landing/Pricing";
 import LeadLeakage from "../components/landing/LeadLeakage";
 import FinalCTA from "../components/landing/FinalCTA";
 import Footer from "../components/landing/Footer";
+import SectionBreak from "../components/landing/SectionBreak";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
 import { FAQ_ITEMS } from "../components/landing/FAQ";
@@ -108,15 +109,23 @@ export default function Home() {
       <div className="min-h-screen">
         <Navbar />
         <Hero />
+        <SectionBreak />
         <Industries />
+        <SectionBreak />
         <section aria-label="Proof and trust">
           <TrustBar />
         </section>
+        <SectionBreak />
         <LeadLeakage />
+        <SectionBreak />
         <CoreOffer />
+        <SectionBreak />
         <IntegrationPartners />
+        <SectionBreak />
         <Pricing />
+        <SectionBreak />
         <FAQ />
+        <SectionBreak />
         <FinalCTA />
         <Footer />
         <ChatBubble />

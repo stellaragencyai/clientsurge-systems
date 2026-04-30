@@ -36,6 +36,8 @@ function CoreOfferHeader() {
   );
 }
 
+// CoreOfferHeader is already placed first inside the section — no change needed to section wrapper
+
 function SystemCard({ system, selected, onSelect }) {
   const Icon = iconMap[system.icon];
   return (
@@ -233,7 +235,7 @@ export default function CoreOffer() {
   return (
     <section
       id="services"
-      className="py-16 md:py-28 px-4 md:px-6 bg-gradient-to-b from-card via-background to-background relative overflow-hidden"
+      className="pt-10 pb-16 md:pb-28 px-4 md:px-6 bg-gradient-to-b from-card via-background to-background relative overflow-hidden"
       style={{ overflowX: "hidden" }}
     >
       <div
@@ -242,7 +244,7 @@ export default function CoreOffer() {
         style={{ background: "radial-gradient(ellipse 80% 100% at 50% 0%, rgba(154,92,46,0.08) 0%, transparent 70%)" }}
       />
 
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10 pt-10">
         <CoreOfferHeader />
         <VerticalTimeline
           selectedSystemId={selectedSystemId}

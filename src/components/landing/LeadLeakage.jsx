@@ -22,32 +22,27 @@ export default function LeadLeakage() {
   return (
     <section
       id="lead-leakage"
-      className="py-24 md:py-32 px-6"
+      className="pt-10 pb-24 md:pb-32 px-6"
       style={{
         background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 60%, #fdfbf8 100%)",
       }}
     >
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center pt-10 pb-16">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">Revenue You're Missing</p>
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
+            Already Have Great Reviews?{" "}
+            <span style={{ background: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 52%, #9a5c2e 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              You're Sitting on Untapped Revenue.
+            </span>
+          </h2>
+        </div>
+      </div>
       <div className="max-w-5xl mx-auto space-y-20">
 
         {/* --- High-review angle --- */}
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <div>
-            <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
-              Strong Reviews. Untapped Revenue.
-            </p>
-            <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-tight">
-              Already Have Great Reviews?{" "}
-              <span
-                style={{
-                  background: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 52%, #9a5c2e 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                You're Sitting on Untapped Revenue.
-              </span>
-            </h2>
             <p className="mt-5 text-muted-foreground text-base leading-relaxed">
               A business with strong reviews already has trust. The opportunity is not getting more attention — it is capturing and converting the attention you already have.
             </p>

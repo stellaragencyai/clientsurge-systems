@@ -236,9 +236,9 @@ export default function Industries() {
     <section
       id="industries"
       ref={sectionRef}
-      className="py-24 md:py-32 px-0 bg-gradient-to-b from-card via-background to-card"
+      className="pt-10 pb-24 md:pb-32 px-0 bg-gradient-to-b from-card via-background to-card"
     >
-      <div className="max-w-6xl mx-auto mb-16 px-6">
+      <div className="max-w-6xl mx-auto text-center px-6 pt-10 pb-14">
         <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">
           Choose Your Industry
         </p>
@@ -246,7 +246,7 @@ export default function Industries() {
           Built for Businesses That Win on{" "}
           <span className="text-primary">Fast Response</span>
         </h2>
-        <p className="mt-4 text-muted-foreground text-lg max-w-3xl leading-relaxed">
+        <p className="mt-4 text-muted-foreground text-lg max-w-3xl mx-auto leading-relaxed">
           Click your industry and we will show you the AI service stack we would recommend first, why it fits, and which pieces are available now versus by review.
         </p>
       </div>

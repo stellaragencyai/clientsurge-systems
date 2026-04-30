@@ -137,9 +137,15 @@ export default function TrustBar() {
   return (
     <section
       ref={ref}
-      className="py-16 md:py-20 bg-gradient-to-b from-card to-background border-y border-border/50"
+      className="pt-10 pb-16 md:pb-20 bg-gradient-to-b from-card to-background border-y border-border/50"
     >
       <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center mb-10">
+          <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">By The Numbers</p>
+          <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+            What You Can Expect
+          </h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-5">
           {items.map((item, index) => (
             <StatCard key={item.label} item={item} index={index} inView={inView} />

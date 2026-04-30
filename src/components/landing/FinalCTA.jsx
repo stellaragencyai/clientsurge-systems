@@ -9,10 +9,10 @@ export default function FinalCTA() {
 
   return (
     <>
-      <section id="book-demo" className="nebula-cta py-24 md:py-32 px-6 relative overflow-hidden">
+      <section id="book-demo" className="nebula-cta pt-10 pb-24 md:pb-32 px-6 relative overflow-hidden">
         <StardustOverlay seed={13} opacity={0.6} />
 
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
+        <div className="relative z-10 max-w-3xl mx-auto text-center pt-10">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">
             Ready to Start?
           </p>

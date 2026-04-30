@@ -75,15 +75,14 @@ export default function IntegrationPartners() {
 
   return (
     <section
-      className="py-14 px-6 relative overflow-hidden"
+      className="pt-10 pb-14 px-6 relative overflow-hidden"
       style={{ background: "#ffffff" }}
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300/60 to-transparent pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-slate-300/60 to-transparent pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center pt-10 mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
             Integrations
           </p>
