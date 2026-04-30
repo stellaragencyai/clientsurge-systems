@@ -26,7 +26,7 @@ export default function ClientDashboard() {
         setUserEmail(user.email);
 
         // Fetch orders for this user
-        const result = await base44.asServiceRole.entities.Order.filter({
+        const result = await base44.entities.Order.filter({
           customer_email: user.email,
         });
 
