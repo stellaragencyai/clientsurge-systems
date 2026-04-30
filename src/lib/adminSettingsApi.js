@@ -6,12 +6,10 @@ export function getAdminSettingsError(error, fallback) {
 
 export async function fetchAdminSettings() {
   const response = await base44.functions.invoke("getAdminSettings", {});
-  return response?.data?.settings || {};
+  return response?.data || {};
 }
 
 export async function saveAdminSettings(settings) {
-  const response = await base44.functions.invoke("updateAdminSettings", {
-    settings,
-  });
-  return response?.data?.settings || {};
+  const response = await base44.functions.invoke("updateAdminSettings", settings);
+  return response?.data || settings;
 }

@@ -460,9 +460,13 @@ export async function requestSubscriptionChange({
   requestedByEmail = "",
   now = new Date().toISOString(),
 }) {
+  const normalizedRequestedPlanType = requestType === "cancel"
+    ? ""
+    : cleanString(requestedPlanType || subscription.requested_plan_type || "");
+
   const nextSubscription = await base44.asServiceRole.entities.Subscription.update(subscription.id, {
     change_request_type: requestType,
-    requested_plan_type: requestedPlanType || subscription.requested_plan_type || "",
+    requested_plan_type: normalizedRequestedPlanType,
     change_request_status: "pending_review",
     cancel_requested_at: requestType === "cancel" ? now : subscription.cancel_requested_at || undefined,
     updated_at: now,
@@ -473,7 +477,7 @@ export async function requestSubscriptionChange({
       plan_change_request:
         requestType === "cancel"
           ? "None"
-          : requestedPlanType || "None",
+          : normalizedRequestedPlanType || "None",
     });
   }
 
@@ -485,11 +489,11 @@ export async function requestSubscriptionChange({
       messageBody:
         requestType === "cancel"
           ? `${requestedByEmail || order.customer_email || "Client"} requested cancellation.`
-          : `${requestedByEmail || order.customer_email || "Client"} requested change to ${requestedPlanType}.`,
+          : `${requestedByEmail || order.customer_email || "Client"} requested change to ${normalizedRequestedPlanType}.`,
       metadata: {
         requested_by_email: requestedByEmail || null,
         request_type: requestType,
-        requested_plan_type: requestedPlanType || null,
+        requested_plan_type: normalizedRequestedPlanType || null,
       },
     })
   );

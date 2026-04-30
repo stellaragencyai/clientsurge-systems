@@ -1,0 +1,62 @@
+{
+  "name": "MessageTemplate",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Template Name",
+      "description": "e.g. instant_response, nurture_welcome, booking_confirmation"
+    },
+    "type": {
+      "type": "string",
+      "title": "Message Type",
+      "enum": [
+        "sms",
+        "email"
+      ],
+      "description": "SMS or Email template"
+    },
+    "body": {
+      "type": "string",
+      "title": "Template Body",
+      "description": "Message template with {{variables}} for personalization"
+    },
+    "service_key": {
+      "type": "string",
+      "title": "Associated Service",
+      "description": "Which service this template belongs to"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "draft",
+        "active",
+        "archived"
+      ],
+      "default": "active"
+    },
+    "variables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Template Variables",
+      "description": "Auto-extracted variables like name, business, date, etc."
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At"
+    },
+    "updated_at": {
+      "type": "string",
+      "title": "Updated At"
+    }
+  },
+  "required": [
+    "name",
+    "type",
+    "body",
+    "service_key"
+  ]
+}

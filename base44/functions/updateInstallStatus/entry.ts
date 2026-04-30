@@ -1,11 +1,22 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { InstallTransitionError, updateTrackedServiceInstallStatus } from "../_shared/installPipeline.js";
 
-async function requireAdmin(base44: ReturnType<typeof createClientFromRequest>) {
-  const user = await base44.auth.me();
-  if (!user || user.role !== "admin") {
-    throw new Error("Admin access required");
-  }
+const VALID_TRANSITIONS = {
+  "Paid": ["Ready for Install"],
+  "Ready for Install": ["Configuring"],
+  "Configuring": ["Testing"],
+  "Testing": ["Live", "Error"],
+  "Live": ["Live"],
+  "Error": ["Ready for Install", "Configuring"],
+};
+
+function calculatePipelineStatus(items) {
+  const statuses = items.map((i) => i.install_status || "Paid");
+  if (statuses.every((s) => s === "Live")) return "Live";
+  if (statuses.some((s) => s === "Error")) return "Error";
+  if (statuses.some((s) => s === "Testing")) return "Testing";
+  if (statuses.some((s) => s === "Configuring")) return "Configuring";
+  if (statuses.some((s) => s === "Ready for Install")) return "Ready for Install";
+  return "Paid";
 }
 
 Deno.serve(async (req) => {
@@ -15,9 +26,12 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    await requireAdmin(base44);
+    const user = await base44.auth.me();
+    if (!user || user.role !== "admin") {
+      return Response.json({ error: "Admin access required" }, { status: 403 });
+    }
 
-    const payload = await req.json();
+    const payload = await req.json().catch(() => ({}));
     const { order_id, service_key, install_status, note } = payload || {};
 
     if (!order_id || !service_key || !install_status) {
@@ -29,12 +43,35 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Order not found" }, { status: 404 });
     }
 
-    const updatedOrder = await updateTrackedServiceInstallStatus({
-      base44,
-      order,
-      serviceKey: service_key,
-      nextStatus: install_status,
-      note,
+    const item = order.items?.find((i) => i.service_key === service_key);
+    if (!item) {
+      return Response.json({ error: "Service not found on order" }, { status: 404 });
+    }
+
+    const currentStatus = item.install_status || "Paid";
+    if (!VALID_TRANSITIONS[currentStatus]?.includes(install_status)) {
+      return Response.json({
+        error: `Invalid transition: ${currentStatus} → ${install_status}`,
+        valid_transitions: VALID_TRANSITIONS[currentStatus] || [],
+      }, { status: 409 });
+    }
+
+    const timestamp = new Date().toISOString();
+    const updatedItems = order.items.map((i) => {
+      if (i.service_key !== service_key) return i;
+      const updates = { ...i, install_status };
+      if (install_status === "Configuring" && !i.install_started_at) updates.install_started_at = timestamp;
+      if (install_status === "Live") updates.install_completed_at = timestamp;
+      if (install_status === "Error") updates.install_error = note || "";
+      return updates;
+    });
+
+    const newPipelineStatus = calculatePipelineStatus(updatedItems);
+    const updatedOrder = await base44.asServiceRole.entities.Order.update(order_id, {
+      items: updatedItems,
+      pipeline_status: newPipelineStatus,
+      last_install_event_at: timestamp,
+      ...(updatedItems.every((i) => i.install_status === "Live") ? { order_status: "fully_live" } : {}),
     });
 
     return Response.json({
@@ -42,25 +79,11 @@ Deno.serve(async (req) => {
       order: {
         id: updatedOrder.id,
         pipeline_status: updatedOrder.pipeline_status,
-        install_configuration: updatedOrder.install_configuration,
         items: updatedOrder.items,
       },
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to update install status";
-    const status =
-      message === "Admin access required" ? 403 :
-      message === "Tracked service not found on order" ? 404 :
-      message === "Invalid install status" ? 400 :
-      error instanceof InstallTransitionError ? 409 :
-      500;
-
-    return Response.json(
-      {
-        error: message,
-        details: error instanceof InstallTransitionError ? error.details : undefined,
-      },
-      { status }
-    );
+    console.error("[updateInstallStatus] Error:", error.message);
+    return Response.json({ error: error.message || "Failed to update install status" }, { status: 500 });
   }
 });

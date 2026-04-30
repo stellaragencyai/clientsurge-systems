@@ -1,0 +1,84 @@
+{
+  "name": "LeadReactivation",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "last_contact_date": {
+      "type": "string",
+      "title": "Last Contact Date",
+      "description": "When we last communicated with this lead"
+    },
+    "days_dormant": {
+      "type": "number",
+      "title": "Days Dormant",
+      "description": "How many days since last contact"
+    },
+    "reactivation_stage": {
+      "type": "string",
+      "title": "Reactivation Stage",
+      "enum": [
+        "identified",
+        "first_touch",
+        "second_touch",
+        "final_offer",
+        "archived"
+      ],
+      "default": "identified",
+      "description": "Where in re-engagement flow"
+    },
+    "trigger_reason": {
+      "type": "string",
+      "title": "Why Dormant",
+      "enum": [
+        "no_response",
+        "objection_timing",
+        "no_booking",
+        "manual_pause"
+      ],
+      "description": "Reason lead went dormant"
+    },
+    "reactivation_offer": {
+      "type": "string",
+      "title": "Reactivation Offer",
+      "description": "Special offer to win them back (discount, bonus, urgency)"
+    },
+    "attempts": {
+      "type": "number",
+      "title": "Reactivation Attempts",
+      "default": 0,
+      "description": "How many re-engagement attempts made"
+    },
+    "reopened_at": {
+      "type": "string",
+      "title": "Reopened At",
+      "description": "When lead was successfully reactivated"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "dormant",
+        "reactivating",
+        "reactivated",
+        "unrecoverable"
+      ],
+      "default": "dormant"
+    },
+    "created_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "lead_id",
+    "last_contact_date",
+    "days_dormant"
+  ]
+}

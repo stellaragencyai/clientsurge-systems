@@ -2,6 +2,11 @@
   "name": "Leads",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "full_name": {
       "type": "string",
       "title": "Full Name"
@@ -53,6 +58,34 @@
       "title": "Lead Score (0-100)",
       "default": 0
     },
+    "activation_priority": {
+      "type": "string",
+      "title": "Activation Priority",
+      "enum": [
+        "Hot",
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "default": "Low"
+    },
+    "lead_category": {
+      "type": "string",
+      "title": "Lead Category",
+      "enum": [
+        "High-Value",
+        "Standard"
+      ],
+      "default": "Standard"
+    },
+    "assigned_to": {
+      "type": "string",
+      "title": "Assigned To (User Email)"
+    },
+    "assigned_at": {
+      "type": "string",
+      "title": "Assigned At"
+    },
     "last_contacted_at": {
       "type": "string",
       "title": "Last Contacted At"
@@ -68,6 +101,25 @@
     "booked_at": {
       "type": "string",
       "title": "Booked At"
+    },
+    "reply_sentiment": {
+      "type": "string",
+      "title": "Reply Sentiment (AI)",
+      "enum": [
+        "Positive",
+        "Neutral",
+        "Negative",
+        "Unknown"
+      ],
+      "default": "Unknown"
+    },
+    "reply_sentiment_reason": {
+      "type": "string",
+      "title": "Sentiment Reason (AI)"
+    },
+    "reply_sentiment_analyzed_at": {
+      "type": "string",
+      "title": "Sentiment Last Analyzed At"
     },
     "ai_intent": {
       "type": "string",
@@ -93,33 +145,72 @@
       "title": "Last Classification Confidence",
       "default": 0
     },
-    "normalized_email": {
+    "website": {
       "type": "string",
-      "title": "Normalized Email"
+      "title": "Business Website URL"
     },
-    "normalized_phone": {
-      "type": "string",
-      "title": "Normalized Phone"
+    "industry_tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Industry Tags (enriched)"
     },
-    "normalized_business_name": {
+    "company_size": {
       "type": "string",
-      "title": "Normalized Business Name"
+      "title": "Company Size (enriched)",
+      "enum": [
+        "solo",
+        "small",
+        "medium",
+        "large",
+        "unknown"
+      ],
+      "default": "unknown"
     },
-    "dedupe_key": {
-      "type": "string",
-      "title": "Dedupe Key"
+    "social_profiles": {
+      "type": "object",
+      "title": "Social Profiles (enriched)",
+      "properties": {
+        "instagram": {
+          "type": "string"
+        },
+        "facebook": {
+          "type": "string"
+        },
+        "linkedin": {
+          "type": "string"
+        },
+        "tiktok": {
+          "type": "string"
+        },
+        "twitter": {
+          "type": "string"
+        }
+      }
     },
-    "import_source": {
+    "enrichment_notes": {
       "type": "string",
-      "title": "Import Source"
+      "title": "Enrichment Summary"
     },
-    "import_batch_id": {
+    "enriched_at": {
       "type": "string",
-      "title": "Import Batch ID"
+      "title": "Last Enriched At"
     },
-    "last_activity_at": {
+    "missed_call_step_sent": {
+      "type": "integer",
+      "title": "Missed-Call Follow-Up Step (1-4)",
+      "default": 0,
+      "description": "Highest follow-up step sent (0=none, 1=2min SMS, 2=10min email, 3=1hr SMS, 4=24hr email)"
+    },
+    "missed_call_last_step_at": {
       "type": "string",
-      "title": "Last Activity At"
+      "title": "Missed-Call Last Step Sent At"
+    },
+    "missed_call_sequence_complete": {
+      "type": "boolean",
+      "title": "Missed-Call Sequence Complete",
+      "default": false
     }
   },
   "required": [

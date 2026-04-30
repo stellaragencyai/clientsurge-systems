@@ -243,7 +243,7 @@ export default function BuildTracker({ project: initialProject, order, testMode 
           style={{
             width: `${progressPct}%`,
             background: "linear-gradient(90deg, #7a4825, #c8965c)",
-            boxShadow: progressPct > 0 ? "0 0 8px rgba(200,150,92,0.5)" : "none",
+            boxShadow: progressPct > 10 ? "0 0 8px rgba(200,150,92,0.5)" : "none",
           }}
         />
       </div>

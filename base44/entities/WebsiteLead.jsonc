@@ -1,0 +1,168 @@
+{
+  "name": "WebsiteLead",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "full_name": {
+      "type": "string",
+      "title": "Full Name"
+    },
+    "first_name": {
+      "type": "string",
+      "title": "First Name"
+    },
+    "phone_number": {
+      "type": "string",
+      "title": "Phone Number"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email Address",
+      "format": "email"
+    },
+    "service_interest": {
+      "type": "string",
+      "title": "Service Interest"
+    },
+    "message": {
+      "type": "string",
+      "title": "Message"
+    },
+    "source": {
+      "type": "string",
+      "title": "Lead Source",
+      "enum": [
+        "website_form",
+        "contact_page",
+        "pricing_page",
+        "landing_page"
+      ],
+      "default": "website_form"
+    },
+    "lead_status": {
+      "type": "string",
+      "title": "Lead Status",
+      "enum": [
+        "new",
+        "contacted",
+        "responded",
+        "hot",
+        "booked",
+        "closed",
+        "ignored"
+      ],
+      "default": "new"
+    },
+    "reply_status": {
+      "type": "string",
+      "title": "Reply Status",
+      "enum": [
+        "none",
+        "responded"
+      ],
+      "default": "none"
+    },
+    "booking_status": {
+      "type": "string",
+      "title": "Booking Status",
+      "enum": [
+        "none",
+        "clicked",
+        "booked"
+      ],
+      "default": "none"
+    },
+    "follow_up_step": {
+      "type": "integer",
+      "title": "Follow-Up Step",
+      "default": 0,
+      "description": "0=new, 1=10min SMS sent, 2=1hr email sent, 3=24hr SMS sent"
+    },
+    "next_follow_up_at": {
+      "type": "string",
+      "title": "Next Follow-Up At",
+      "format": "date-time"
+    },
+    "last_message_sent": {
+      "type": "string",
+      "title": "Last Message Sent",
+      "format": "date-time"
+    },
+    "initial_response_sent_at": {
+      "type": "string",
+      "title": "Initial Response Sent At",
+      "format": "date-time"
+    },
+    "dedup_key": {
+      "type": "string",
+      "title": "Deduplication Key"
+    },
+    "automation_enabled": {
+      "type": "boolean",
+      "title": "Automation Enabled",
+      "default": true
+    },
+    "engagement_score": {
+      "type": "number",
+      "title": "Engagement Score (0-100)",
+      "default": 0,
+      "description": "Calculated from replies, opens, clicks"
+    },
+    "sms_attempt_count": {
+      "type": "integer",
+      "title": "SMS Attempt Count",
+      "default": 0
+    },
+    "email_attempt_count": {
+      "type": "integer",
+      "title": "Email Attempt Count",
+      "default": 0
+    },
+    "last_engagement_type": {
+      "type": "string",
+      "title": "Last Engagement Type",
+      "enum": [
+        "sms",
+        "email",
+        "call",
+        "none"
+      ],
+      "default": "none"
+    },
+    "last_engagement_at": {
+      "type": "string",
+      "title": "Last Engagement At",
+      "format": "date-time"
+    },
+    "cadence_mode": {
+      "type": "string",
+      "title": "Cadence Mode",
+      "enum": [
+        "auto",
+        "sms_first",
+        "email_first",
+        "custom"
+      ],
+      "default": "auto",
+      "description": "How to sequence follow-up channels"
+    },
+    "cadence_paused": {
+      "type": "boolean",
+      "title": "Cadence Paused",
+      "default": false,
+      "description": "Temporarily pause automation"
+    },
+    "cadence_paused_at": {
+      "type": "string",
+      "title": "Cadence Paused At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "email"
+  ]
+}

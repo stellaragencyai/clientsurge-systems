@@ -1,4 +1,6 @@
 {
+  "name": "User",
+  "type": "object",
   "properties": {
     "role": {
       "type": "string",
@@ -7,11 +9,30 @@
         "admin",
         "user"
       ]
+    },
+    "phone": {
+      "type": "string",
+      "title": "Phone Number (for lead routing SMS)"
+    },
+    "routing_active": {
+      "type": "boolean",
+      "title": "Active in Lead Routing",
+      "default": false
+    },
+    "max_active_leads": {
+      "type": "number",
+      "title": "Max Active Leads",
+      "default": 20
+    },
+    "routing_categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Lead Categories to Handle (e.g. High-Value, Standard)"
     }
   },
   "required": [
     "role"
-  ],
-  "name": "User",
-  "type": "object"
+  ]
 }

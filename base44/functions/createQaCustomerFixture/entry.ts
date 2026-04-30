@@ -1,56 +1,131 @@
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import {
-  createQaCustomerFixture,
-  QaCustomerFixtureError,
-} from "../_shared/qaCustomerFixture.js";
-
-async function requireAdmin(base44: ReturnType<typeof createClientFromRequest>) {
-  const user = await base44.auth.me();
-  if (!user || user.role !== "admin") {
-    throw new Error("Admin access required");
-  }
-}
-
-function resolvePortalUrl(req: Request) {
-  const origin = req.headers.get("origin");
-  if (origin) {
-    return `${origin.replace(/\/$/, "")}/client-portal`;
-  }
-
-  return "https://apexflow.base44.app/client-portal";
-}
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   try {
-    if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
-    await requireAdmin(base44);
+    const user = await base44.auth.me();
+    if (!user || user.role !== 'admin') {
+      return Response.json({ error: 'Admin access required' }, { status: 403 });
+    }
 
     const payload = await req.json().catch(() => ({}));
-    const result = await createQaCustomerFixture({
-      base44,
-      payload,
-      portalUrl: resolvePortalUrl(req),
+    const { full_name, business_name, email, phone, website, package_key } = payload;
+
+    if (!full_name || !business_name || !email || !phone) {
+      return Response.json({ error: 'full_name, business_name, email, and phone are required' }, { status: 400 });
+    }
+
+    // Determine plan from package_key
+    const planMap = {
+      starter_system: 'Starter System',
+      growth_system: 'Growth System',
+      pro_system: 'Pro System',
+    };
+    const plan = planMap[package_key] || 'Growth System';
+
+    // Determine monthly rate
+    const rateMap = {
+      starter_system: 197,
+      growth_system: 349,
+      pro_system: 469,
+    };
+    const monthly_rate = rateMap[package_key] || 349;
+
+    // Create or update ClientProject
+    const existingProjects = await base44.asServiceRole.entities.ClientProject.filter({ client_email: email });
+    let project;
+    if (existingProjects && existingProjects.length > 0) {
+      project = await base44.asServiceRole.entities.ClientProject.update(existingProjects[0].id, {
+        client_name: full_name,
+        business_name,
+        plan,
+        client_email: email,
+        step_onboarding: 'complete',
+        step_payment: 'complete',
+      });
+    } else {
+      project = await base44.asServiceRole.entities.ClientProject.create({
+        client_name: full_name,
+        business_name,
+        plan,
+        client_email: email,
+        step_onboarding: 'complete',
+        step_payment: 'complete',
+      });
+    }
+
+    // Create Order
+    const order = await base44.asServiceRole.entities.Order.create({
+      customer_email: email,
+      customer_name: full_name,
+      customer_phone: phone,
+      business_name,
+      plan_type: plan,
+      total_monthly: monthly_rate,
+      payment_status: 'paid',
+      pipeline_status: 'Live',
+      order_status: 'fully_live',
+      client_project_id: project.id,
+      notes: 'QA fixture — created by admin',
     });
 
-    return Response.json(result);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to create QA customer fixture";
-    const status =
-      message === "Admin access required" ? 403 :
-      error instanceof QaCustomerFixtureError ? error.status :
-      500;
+    // Create Subscription
+    const now = new Date();
+    const nextMonth = new Date(now);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
 
-    return Response.json(
-      {
-        error: message,
-        code: error instanceof QaCustomerFixtureError ? error.code : undefined,
-        details: error instanceof QaCustomerFixtureError ? error.details : undefined,
-      },
-      { status }
-    );
+    const subscription = await base44.asServiceRole.entities.Subscription.create({
+      order_id: order.id,
+      plan_type: plan,
+      status: 'active',
+      current_period_start: now.toISOString(),
+      current_period_end: nextMonth.toISOString(),
+    });
+
+    // Invite the user
+    let invite_sent = false;
+    let invite_status = 'not_sent';
+    let activation_link = '';
+    try {
+      const inviteResult = await base44.users.inviteUser(email, 'user');
+      invite_sent = true;
+      invite_status = 'invite_sent';
+      activation_link = inviteResult?.activation_link || '';
+      console.log(`[QA Customer] Invite sent to ${email}, activation link: ${activation_link}`);
+    } catch (inviteErr) {
+      invite_status = inviteErr?.message?.includes('already') ? 'already_exists' : 'failed';
+      console.warn(`[QA Customer] Invite warning for ${email}:`, inviteErr?.message);
+    }
+
+    const origin = req.headers.get('origin') || 'https://clientsurgesystems.com';
+    const portal_url = `${origin.replace(/\/$/, '')}/client-portal`;
+
+    return Response.json({
+      success: true,
+      order_id: order.id,
+      project_id: project.id,
+      subscription_id: subscription.id,
+      plan_type: plan,
+      portal_url,
+      invite_sent,
+      invite_status,
+      activation_link,
+      login_steps: [
+        `1. Check ${email} for a Base44 invite email (subject: "You're invited to join ClientSurge Systems")`,
+        `2. Click the activation link in the email to set your password`,
+        `3. After activation, log in to: ${portal_url}`,
+        `4. You'll have full access to your QA customer portal.`,
+        '',
+        `Direct activation link: ${activation_link}`,
+      ],
+    });
+
+  } catch (error) {
+    console.error('createQaCustomerFixture error:', error);
+    return Response.json({ error: error.message || 'Failed to create QA customer fixture' }, { status: 500 });
   }
 });

@@ -1,0 +1,104 @@
+{
+  "name": "EmailDripCampaign",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "campaign_type": {
+      "type": "string",
+      "title": "Campaign Type",
+      "enum": [
+        "case_study",
+        "testimonial",
+        "pricing",
+        "feature_highlight",
+        "custom"
+      ],
+      "description": "Type of email sequence"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "active",
+        "paused",
+        "completed",
+        "failed"
+      ],
+      "default": "active"
+    },
+    "trigger_intent": {
+      "type": "string",
+      "title": "Triggered By Intent",
+      "enum": [
+        "asking_question",
+        "pricing_concern",
+        "uncertain",
+        "booking_ready"
+      ],
+      "description": "What lead intent triggered this campaign"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "type": "number",
+            "description": "Step sequence"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "delay_hours": {
+            "type": "number",
+            "description": "Hours to wait after previous step"
+          },
+          "sent_at": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "sent",
+              "opened",
+              "clicked",
+              "failed"
+            ]
+          }
+        }
+      },
+      "title": "Campaign Steps"
+    },
+    "enrolled_at": {
+      "type": "string"
+    },
+    "completed_at": {
+      "type": "string"
+    },
+    "total_opened": {
+      "type": "number",
+      "default": 0
+    },
+    "total_clicked": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "lead_id",
+    "campaign_type",
+    "trigger_intent"
+  ]
+}

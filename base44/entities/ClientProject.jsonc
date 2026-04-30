@@ -2,6 +2,11 @@
   "name": "ClientProject",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "client_id": {
       "type": "string",
       "title": "Client ID (links to Client entity)"
@@ -9,6 +14,10 @@
     "client_email": {
       "type": "string",
       "title": "Client Email"
+    },
+    "contact_email": {
+      "type": "string",
+      "title": "Contact Email"
     },
     "client_name": {
       "type": "string",
@@ -123,9 +132,101 @@
       "type": "string",
       "title": "Admin Notes (internal)"
     },
+    "timeline_person_name": {
+      "type": "string",
+      "title": "Timeline Person Name"
+    },
+    "timeline_birth_date": {
+      "type": "string",
+      "title": "Timeline Birth Date"
+    },
+    "timeline_death_date": {
+      "type": "string",
+      "title": "Timeline Death Date"
+    },
     "go_live_date": {
       "type": "string",
       "title": "Go-Live Date"
+    },
+    "deadlines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "due_date": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "in_progress",
+              "completed",
+              "overdue"
+            ],
+            "default": "pending"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "setup",
+              "payment",
+              "testing",
+              "launch"
+            ],
+            "default": "setup"
+          }
+        }
+      },
+      "title": "Project Deadlines"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "file_url": {
+            "type": "string"
+          },
+          "file_type": {
+            "type": "string"
+          },
+          "uploaded_at": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "documentation",
+              "setup-guide",
+              "credentials",
+              "report"
+            ],
+            "default": "documentation"
+          }
+        }
+      },
+      "title": "Project Files"
+    },
+    "onboarding_wizard_completed": {
+      "type": "boolean",
+      "title": "Onboarding Wizard Completed",
+      "default": false
     }
   },
   "required": [

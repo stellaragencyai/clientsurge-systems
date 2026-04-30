@@ -1,0 +1,114 @@
+{
+  "name": "ClientInstallationOS",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "workflow_stage": {
+      "type": "string",
+      "title": "Workflow Stage",
+      "enum": [
+        "intake_received",
+        "website_building",
+        "website_review",
+        "website_approved",
+        "website_live",
+        "automation_setup",
+        "automation_testing",
+        "activation_ready",
+        "activated"
+      ],
+      "default": "intake_received"
+    },
+    "website_project_id": {
+      "type": "string",
+      "title": "Website Project ID"
+    },
+    "website_status": {
+      "type": "string",
+      "title": "Website Status",
+      "enum": [
+        "not_started",
+        "building",
+        "review",
+        "approved",
+        "live"
+      ],
+      "default": "not_started"
+    },
+    "all_automations_checklists": {
+      "type": "array",
+      "title": "All Automation Checklist IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "activation_eligible": {
+      "type": "boolean",
+      "title": "Eligible for Activation",
+      "default": false,
+      "description": "True if all required checklist items complete"
+    },
+    "activation_status": {
+      "type": "string",
+      "title": "Activation Status",
+      "enum": [
+        "not_ready",
+        "ready_for_approval",
+        "activated",
+        "paused"
+      ],
+      "default": "not_ready"
+    },
+    "activation_approved_at": {
+      "type": "string",
+      "title": "Activation Approved At",
+      "format": "date-time"
+    },
+    "activation_approved_by": {
+      "type": "string",
+      "title": "Activation Approved By (Admin Email)"
+    },
+    "activation_override": {
+      "type": "boolean",
+      "title": "Override Activation Checks",
+      "default": false
+    },
+    "activation_override_reason": {
+      "type": "string",
+      "title": "Override Reason"
+    },
+    "activation_override_by": {
+      "type": "string",
+      "title": "Override By (Admin Email)"
+    },
+    "admin_notes": {
+      "type": "string",
+      "title": "Admin Workflow Notes"
+    }
+  },
+  "required": [
+    "order_id",
+    "client_email",
+    "business_name"
+  ]
+}

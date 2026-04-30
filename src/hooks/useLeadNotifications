@@ -1,0 +1,121 @@
+import { useEffect, useState, useCallback } from 'react';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
+
+export function useLeadNotifications() {
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    let lastSeenLeads = {};
+
+    const unsubscribe = base44.entities.Leads.subscribe((event) => {
+      if (event.type === 'create') {
+        const lead = event.data;
+        const notification = {
+          id: event.id,
+          type: 'new_lead',
+          title: 'New Lead',
+          message: `${lead.full_name} from ${lead.business_name}`,
+          timestamp: new Date(),
+          read: false,
+        };
+        setNotifications((prev) => [notification, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+        toast.success(`New lead: ${lead.full_name}`, {
+          description: `${lead.business_name} · ${lead.business_type || 'Unknown'}`,
+        });
+      } else if (event.type === 'update') {
+        const lead = event.data;
+        const oldStatus = lastSeenLeads[event.id]?.status;
+
+        // Notify on status change
+        if (oldStatus && oldStatus !== lead.status) {
+          let title = 'Lead Status Updated';
+          let icon = '📝';
+
+          if (lead.status === 'Booked') {
+            title = 'Appointment Booked!';
+            icon = '✅';
+            const notification = {
+              id: `${event.id}-booked-${Date.now()}`,
+              type: 'lead_booked',
+              title,
+              message: `${lead.full_name} booked an appointment`,
+              timestamp: new Date(),
+              read: false,
+            };
+            setNotifications((prev) => [notification, ...prev]);
+            setUnreadCount((prev) => prev + 1);
+            toast.success(`${icon} ${title}`, {
+              description: lead.full_name,
+            });
+          } else if (lead.status === 'Replied') {
+            title = 'Lead Replied';
+            icon = '💬';
+            const notification = {
+              id: `${event.id}-replied-${Date.now()}`,
+              type: 'lead_replied',
+              title,
+              message: `${lead.full_name} replied to your message`,
+              timestamp: new Date(),
+              read: false,
+            };
+            setNotifications((prev) => [notification, ...prev]);
+            setUnreadCount((prev) => prev + 1);
+            toast.info(`${icon} ${title}`, {
+              description: lead.full_name,
+            });
+          } else if (lead.status === 'Qualified') {
+            title = 'Lead Qualified';
+            icon = '⭐';
+            const notification = {
+              id: `${event.id}-qualified-${Date.now()}`,
+              type: 'lead_qualified',
+              title,
+              message: `${lead.full_name} is now qualified`,
+              timestamp: new Date(),
+              read: false,
+            };
+            setNotifications((prev) => [notification, ...prev]);
+            setUnreadCount((prev) => prev + 1);
+            toast.success(`${icon} ${title}`, {
+              description: lead.full_name,
+            });
+          }
+        }
+
+        lastSeenLeads[event.id] = lead;
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const markAsRead = useCallback((notificationId) => {
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.id === notificationId ? { ...n, read: true } : n
+      )
+    );
+    setUnreadCount((prev) => Math.max(0, prev - 1));
+  }, []);
+
+  const markAllAsRead = useCallback(() => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    setUnreadCount(0);
+  }, []);
+
+  const clearNotifications = useCallback(() => {
+    setNotifications([]);
+    setUnreadCount(0);
+  }, []);
+
+  return {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    clearNotifications,
+  };
+}

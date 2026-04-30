@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
   BrowserRouter as Router,
@@ -15,8 +15,13 @@ import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import PageNotFound from "./lib/PageNotFound";
+import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
+
+// Initialize auto-tracking on app load
+if (typeof window !== "undefined") {
+  initializeAnalyticsObserver();
+}
 import Home from "./pages/Home";
-import MedSpa from "./pages/MedSpa";
 import Onboarding from "./pages/Onboarding";
 import CaptureLeads from "./pages/CaptureLeads";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -30,14 +35,24 @@ import LegalPage from "./pages/LegalPage";
 import Contact from "./pages/Contact";
 import AdminOnboarding from "./pages/AdminOnboarding";
 import Industries from "./pages/Industries";
-import Store from "./pages/Store";
 import OrderSuccess from "./pages/OrderSuccess";
+import IndustryTemplate from "./components/landing/IndustryTemplate";
+import BusinessSetup from "./pages/BusinessSetup";
+import AdminAutomation from "./pages/AdminAutomation";
+import ClientDashboard from "./pages/ClientDashboard";
+
+const Store = lazy(() => import("./pages/Store"));
 
 const PUBLIC_PATHS = [
   "/",
   "/store",
   "/order-success",
   "/med-spa",
+  "/dental",
+  "/hvac",
+  "/roofing",
+  "/contractors",
+  "/chiropractic",
   "/start",
   "/book",
   "/book-demo",
@@ -170,7 +185,6 @@ const AuthenticatedApp = () => {
       <Route path="/test-option-3" element={<Navigate to="/" replace />} />
       <Route path="/preview-idea-1" element={<Navigate to="/" replace />} />
       <Route path="/preview-idea-2" element={<Navigate to="/" replace />} />
-      <Route path="/med-spa" element={<MedSpa />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
@@ -187,8 +201,23 @@ const AuthenticatedApp = () => {
       <Route path="/leads/capture" element={<CaptureLeads />} />
       <Route path="/legal/:type" element={<LegalPage />} />
       <Route path="/contact" element={<Contact />} />
-      <Route path="/store" element={<Store />} />
+      <Route
+        path="/store"
+        element={
+          <Suspense
+            fallback={
+              <div className="fixed inset-0 flex items-center justify-center">
+                <div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
+              </div>
+            }
+          >
+            <Store />
+          </Suspense>
+        }
+      />
       <Route path="/order-success" element={<OrderSuccess />} />
+      <Route path="/setup" element={<BusinessSetup />} />
+      <Route path="/:slug" element={<IndustryTemplate />} />
 
       <Route
         element={
@@ -196,6 +225,7 @@ const AuthenticatedApp = () => {
         }
       >
         <Route path="/client-portal" element={<ClientPortal />} />
+        <Route path="/client-dashboard" element={<ClientDashboard />} />
       </Route>
 
       <Route
@@ -212,6 +242,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/leads" element={<AdminLeads />} />
         <Route path="/admin/leads/:leadId" element={<AdminLeadDetail />} />
+        <Route path="/admin/automations" element={<AdminAutomation />} />
         <Route path="/lead-intelligence" element={<Navigate to="/admin" replace />} />
         <Route path="/sam" element={<Navigate to="/admin" replace />} />
         <Route path="/medspa-dashboard" element={<Navigate to="/admin" replace />} />

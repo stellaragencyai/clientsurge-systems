@@ -1,0 +1,112 @@
+{
+  "name": "EmailCampaign",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Campaign Name"
+    },
+    "subject": {
+      "type": "string",
+      "title": "Email Subject"
+    },
+    "body_html": {
+      "type": "string",
+      "title": "Email Body (HTML)"
+    },
+    "body_text": {
+      "type": "string",
+      "title": "Email Body (Plain Text)"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "draft",
+        "scheduled",
+        "sending",
+        "sent",
+        "paused",
+        "cancelled"
+      ],
+      "default": "draft"
+    },
+    "scheduled_at": {
+      "type": "string",
+      "title": "Scheduled Send Time"
+    },
+    "sent_at": {
+      "type": "string",
+      "title": "Sent At"
+    },
+    "segment_filters": {
+      "type": "object",
+      "title": "Segment Filters (JSON)",
+      "properties": {
+        "statuses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "lead_score_min": {
+          "type": "number"
+        },
+        "lead_score_max": {
+          "type": "number"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "total_recipients": {
+      "type": "number",
+      "title": "Total Recipients",
+      "default": 0
+    },
+    "total_sent": {
+      "type": "number",
+      "title": "Total Sent",
+      "default": 0
+    },
+    "total_delivered": {
+      "type": "number",
+      "title": "Total Delivered",
+      "default": 0
+    },
+    "total_opened": {
+      "type": "number",
+      "title": "Total Opened",
+      "default": 0
+    },
+    "total_clicked": {
+      "type": "number",
+      "title": "Total Clicked",
+      "default": 0
+    },
+    "total_unsubscribed": {
+      "type": "number",
+      "title": "Total Unsubscribed",
+      "default": 0
+    },
+    "total_bounced": {
+      "type": "number",
+      "title": "Total Bounced",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "subject"
+  ]
+}

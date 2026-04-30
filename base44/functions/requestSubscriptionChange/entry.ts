@@ -17,7 +17,9 @@ Deno.serve(async (req) => {
 
     const payload = await req.json().catch(() => ({}));
     const requestType = payload?.request_type;
-    const requestedPlanType = payload?.requested_plan_type || "";
+    const requestedPlanType = typeof payload?.requested_plan_type === "string"
+      ? payload.requested_plan_type.trim()
+      : "";
 
     if (!["upgrade", "downgrade", "cancel"].includes(requestType)) {
       return Response.json({ error: "Valid request_type is required" }, { status: 400 });
@@ -46,6 +48,21 @@ Deno.serve(async (req) => {
 
     if (!subscription) {
       return Response.json({ error: "No active subscription record is linked to this order" }, { status: 404 });
+    }
+
+    if (requestType !== "cancel" && !requestedPlanType) {
+      return Response.json({ error: "requested_plan_type is required for upgrade and downgrade requests" }, { status: 400 });
+    }
+
+    if (requestType !== "cancel" && requestedPlanType === subscription.plan_type) {
+      return Response.json({ error: "Requested plan matches the current subscription plan" }, { status: 400 });
+    }
+
+    // Block duplicate pending requests
+    if (subscription.change_request_status === "pending_review") {
+      return Response.json({
+        error: "A subscription change request is already pending review. Please wait for it to be processed before submitting another.",
+      }, { status: 409 });
     }
 
     const updated = await requestSubscriptionChange({

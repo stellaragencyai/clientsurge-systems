@@ -1,15 +1,30 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import DemoBookingModal from "../forms/DemoBookingModal";
+import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
 
 const DemoBookingContext = createContext(null);
 
 export function DemoBookingProvider({ children }) {
-  const [open, setOpen] = useState(false);
+  const [modalState, setModalState] = useState({
+    open: false,
+    prefillIndustry: "",
+  });
 
   const value = useMemo(
     () => ({
-      openDemoBooking: () => setOpen(true),
-      closeDemoBooking: () => setOpen(false),
+      openDemoBooking: (options = {}) => {
+        const selectedIndustry = getSelectedIndustryRecommendation();
+        setModalState({
+          open: true,
+          prefillIndustry:
+            options.prefillIndustry || selectedIndustry?.name || "",
+        });
+      },
+      closeDemoBooking: () =>
+        setModalState({
+          open: false,
+          prefillIndustry: "",
+        }),
     }),
     []
   );
@@ -17,7 +32,17 @@ export function DemoBookingProvider({ children }) {
   return (
     <DemoBookingContext.Provider value={value}>
       {children}
-      {open && <DemoBookingModal onClose={() => setOpen(false)} />}
+      {modalState.open && (
+        <DemoBookingModal
+          onClose={() =>
+            setModalState({
+              open: false,
+              prefillIndustry: "",
+            })
+          }
+          prefillIndustry={modalState.prefillIndustry}
+        />
+      )}
     </DemoBookingContext.Provider>
   );
 }

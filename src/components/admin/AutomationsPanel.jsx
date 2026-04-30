@@ -207,6 +207,7 @@ export default function AutomationsPanel() {
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [expandedProject, setExpandedProject] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showInfoBanner, setShowInfoBanner] = useState(false);
 
   const loadData = async () => {
     try {
@@ -267,21 +268,22 @@ export default function AutomationsPanel() {
         </button>
       </div>
 
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="flex items-start gap-3">
-          <Lock className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700" />
-          <div>
-            <p className="text-sm font-semibold text-amber-900">
-              Automation cards are now derived only from canonical backend state
-            </p>
-            <p className="mt-1 text-sm text-amber-800">
-              Status comes from paid orders, tracked service install states, and
-              CommunicationEvent signals. If a workflow is not yet on the canonical
-              order/install path, it is shown explicitly instead of being guessed.
-            </p>
-          </div>
-        </div>
+      <div className="rounded-2xl border border-border bg-muted/30 px-4 py-3 flex items-center justify-between gap-3">
+        <p className="text-xs text-muted-foreground">
+          Status is derived from canonical order/install state and CommunicationEvent signals.
+        </p>
+        <button
+          onClick={() => setShowInfoBanner(v => !v)}
+          className="text-xs text-primary font-semibold hover:text-primary/80 flex-shrink-0"
+        >
+          {showInfoBanner ? "Hide" : "Learn more"}
+        </button>
       </div>
+      {showInfoBanner && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          Automation cards are derived only from canonical backend state. Status comes from paid orders, tracked service install states, and CommunicationEvent signals. If a workflow is not yet on the canonical order/install path, it is shown explicitly instead of being guessed.
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {automations.map((automation) => {

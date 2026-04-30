@@ -9,32 +9,72 @@ export default function FinalCTA() {
 
   return (
     <>
-      <section id="book-demo" className="nebula-cta py-24 md:py-32 px-6 relative overflow-hidden">
+      <section id="book-demo" className="nebula-cta pt-10 pb-24 md:pb-32 px-6 relative overflow-hidden">
         <StardustOverlay seed={13} opacity={0.6} />
 
-        {/* Glass panel */}
-        <div
-          className="relative z-10 max-w-3xl mx-auto rounded-3xl px-10 py-12 text-center"
-          style={{
-            background: "linear-gradient(135deg, rgba(255,252,247,0.68) 0%, rgba(252,240,220,0.52) 100%)",
-            backdropFilter: "blur(22px)",
-            WebkitBackdropFilter: "blur(22px)",
-            border: "1.5px solid rgba(200,150,92,0.28)",
-            boxShadow: "0 8px 48px rgba(154,92,46,0.12), inset 0 1px 0 rgba(255,255,255,0.8)",
-          }}
-        >
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">Ready to Start?</p>
+        <div className="relative z-10 max-w-3xl mx-auto text-center pt-10">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">
+            Ready to Start?
+          </p>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-            You're Already Getting Leads.
+            You&apos;re Already Getting Leads.
             <br />
-            <span className="text-primary">Let's Make Sure You're Converting Them.</span>
+            <span className="text-primary">Let&apos;s Make Sure You&apos;re Converting Them.</span>
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
-            Book a free 15-minute demo. We will map out exactly where you are losing bookings and show you what an automated system would look like for your business with no obligation.
+            Book a free 15-minute demo. We will map out exactly where your business is leaking bookings and show you what an AI lead conversion system would look like for your specific situation — no obligation.
           </p>
+
+          {/* Enhancement 1: Live social proof numbers */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10">
+            {[
+              { value: "2x", label: "avg. booking rate increase" },
+              { value: "90s", label: "first response time" },
+              { value: "30 days", label: "avg. time to ROI" },
+            ].map((stat) => (
+              <div key={stat.label} className="flex flex-col items-center">
+                <span
+                  className="font-display text-3xl font-black"
+                  style={{ color: "#9a5c2e" }}
+                >
+                  {stat.value}
+                </span>
+                <span className="text-xs text-muted-foreground font-medium mt-0.5">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <div
+            className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80"
+            style={{
+              background: "rgba(154,92,46,0.08)",
+              border: "1px solid rgba(154,92,46,0.18)",
+            }}
+          >
+            Free 15-minute call · no commitment required · live in 5-7 days
+          </div>
         </div>
 
-        <div className="max-w-3xl mx-auto text-center mt-10 relative z-10">
+        {/* Enhancement 2: Urgency strip above buttons */}
+        <div className="max-w-xl mx-auto mt-8 mb-2 relative z-10">
+          <div
+            className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold"
+            style={{
+              background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)",
+              border: "1.5px solid rgba(154,92,46,0.22)",
+            }}
+          >
+            <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+            </span>
+            <span style={{ color: "rgba(154,92,46,0.9)" }}>
+              Demo slots are limited — we only take on a few new clients each month
+            </span>
+          </div>
+        </div>
+
+        <div className="max-w-3xl mx-auto text-center mt-4 relative z-10">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               type="button"
@@ -46,17 +86,20 @@ export default function FinalCTA() {
               style={{
                 borderRadius: "9999px",
                 padding: "2px",
-                background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                background:
+                  "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
                 boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
                 border: "none",
                 cursor: "pointer",
                 textDecoration: "none",
               }}
               onMouseEnter={(event) => {
-                event.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+                event.currentTarget.style.boxShadow =
+                  "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
               }}
               onMouseLeave={(event) => {
-                event.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
+                event.currentTarget.style.boxShadow =
+                  "0 4px 18px rgba(120,70,20,0.35)";
               }}
             >
               <span
@@ -79,20 +122,12 @@ export default function FinalCTA() {
               </span>
             </button>
             <a
-              href="#services"
-              onClick={() => trackCTA("review_8_system_flow", "final_cta")}
+              href="#lead-leakage"
+              onClick={() => trackCTA("lead_leakage_audit", "final_cta")}
               className="inline-flex items-center justify-center h-14 px-6 rounded-full border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200"
             >
-              Review the 8-step system
+              Get a Free Lead Leakage Audit
             </a>
-          </div>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-muted-foreground">
-            {["Free 15-min call", "No commitment required", "Live in 5-7 days"].map((text) => (
-              <span key={text} className="flex items-center gap-2">
-                <span className="w-1 h-1 rounded-full bg-muted-foreground" />
-                {text}
-              </span>
-            ))}
           </div>
         </div>
       </section>

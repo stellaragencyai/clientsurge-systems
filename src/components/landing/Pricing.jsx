@@ -1,17 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
+import { getSelectedIndustryRecommendation, INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
+import CustomerProofCards from "./CustomerProofCards";
+import MoneyBackGuarantee from "./MoneyBackGuarantee";
 
-function GlowingCheck() {
+function SimpleCheck() {
   return (
     <svg
       className="w-4 h-4 flex-shrink-0 mt-0.5"
       viewBox="0 0 24 24"
       fill="none"
-      style={{
-        filter: "drop-shadow(0 0 6px rgba(34,197,94,0.6))",
-        animation: "checkPulse 2s ease-in-out infinite",
-      }}
     >
       <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2" />
       <path
@@ -28,62 +28,57 @@ function GlowingCheck() {
 const plans = [
   {
     name: "Starter System",
-    fit: "Best for businesses under 30 leads per month",
-    roiHint: "Often covered by one additional booking each month",
-    subtitle: "For businesses just getting started with automation.",
-    desc: "A simple automation system to respond faster and capture more opportunities without complexity.",
+    fit: "For businesses that need faster response and basic lead capture",
+    subtitle: "For businesses that need faster response and basic lead capture.",
+    desc: "An AI lead conversion system that ensures every new inquiry gets a fast response, enters a simple follow-up flow, and has a clear path to booking.",
     setup: "$997 setup",
     monthly: "$397",
     features: [
-      "Instant response to new leads by SMS",
-      "Basic confirmation email",
-      "1 follow-up SMS message",
-      "1 follow-up email",
+      "Instant SMS response to every new lead",
+      "Basic email confirmation",
+      "Simple automated follow-up sequence",
       "Booking link integration",
-      "Simple lead tracking dashboard",
+      "Basic lead tracking dashboard",
       "System setup and launch support",
     ],
     highlight: false,
   },
   {
     name: "Growth System",
-    fit: "Best for most businesses already generating steady leads",
-    roiHint: "Most clients aim to recover this with 2-3 extra bookings",
+    fit: "For businesses already getting leads and losing revenue through slow response or weak follow-up",
     badge: "Most Popular",
-    subtitle: "Best for businesses actively generating leads and wanting more bookings",
-    desc: "The best option for businesses that want stronger follow-up, better lead conversion, and more automation built into the customer journey.",
+    subtitle: "For businesses already getting leads and losing revenue through slow response or weak follow-up.",
+    desc: "A full missed-call recovery and automated follow-up system built for businesses that want to stop losing bookings they already earned.",
     setup: "$1,997 setup",
     monthly: "$797",
     features: [
       "Everything in Starter",
-      "Full follow-up sequence across multiple touchpoints",
       "Missed call text-back system",
-      "Smart lead response logic",
-      "Combined email and SMS follow-up",
-      "Improved lead tracking and status pipeline",
+      "Multi-touch SMS and email follow-up",
       "Conversion-focused message templates",
-      "14 days of optimization after launch",
+      "Improved lead tracking and pipeline",
+      "14 days of post-launch optimization",
       "Monthly performance check-in",
+      "Conversion-focused landing page included when needed",
     ],
     highlight: true,
   },
   {
     name: "Pro System",
-    fit: "Best for higher-volume teams that want deeper automation",
-    roiHint: "Built for teams that want faster payback from higher lead volume",
-    subtitle: "Best for higher-volume businesses ready to scale and maximize conversions",
-    desc: "Deeper automation, stronger reactivation, more optimization, and an advanced follow-up system for businesses serious about growth.",
+    fit: "For businesses that want the full revenue recovery engine",
+    subtitle: "For businesses that want the full revenue recovery engine.",
+    desc: "The complete AI-assisted booking automation and revenue recovery system — old leads reactivated, every inquiry tracked, and the full pipeline optimized.",
     setup: "$3,500 setup",
     monthly: "$1,500",
     features: [
       "Everything in Growth",
       "Old lead reactivation campaigns",
-      "Advanced follow-up and nurture flows",
-      "Multi-channel messaging strategy",
+      "Advanced nurture flows",
+      "AI-assisted follow-up logic",
       "Enhanced dashboard and tracking",
-      "Ongoing optimization and improvements",
-      "Priority support",
+      "Priority optimization and support",
       "Monthly strategy session",
+      "Conversion-focused landing page or site improvement included",
     ],
     highlight: false,
   },
@@ -91,92 +86,141 @@ const plans = [
 
 export default function Pricing() {
   const demoBooking = useDemoBooking();
+  const [selectedIndustry, setSelectedIndustry] = useState(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const syncIndustry = () => {
+      // Only show recommendation if user has explicitly selected an industry in this session
+      const storedId = window.sessionStorage.getItem(INDUSTRY_SELECTION_STORAGE_KEY);
+      setSelectedIndustry(storedId ? getSelectedIndustryRecommendation() : null);
+    };
+
+    syncIndustry();
+    window.addEventListener("storage", syncIndustry);
+    window.addEventListener("clientsurge:industry-selected", syncIndustry);
+
+    return () => {
+      window.removeEventListener("storage", syncIndustry);
+      window.removeEventListener("clientsurge:industry-selected", syncIndustry);
+    };
+  }, []);
+
   return (
-    <section id="pricing" className="nebula-pricing py-24 md:py-32 px-6 overflow-visible">
+    <section id="pricing" className="nebula-pricing pt-10 pb-24 md:pb-32 px-6 overflow-visible">
       <div className="max-w-7xl mx-auto">
-        <div className="max-w-2xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Pricing & Packages</p>
+        <div className="max-w-3xl mx-auto text-center pt-10 mb-16">
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-           Choose the System That Turns Your Leads Into Booked Clients
+            Choose from one of our 3 systems
           </h2>
-          <p className="mt-5 text-foreground font-semibold text-base mb-3">
-            Most businesses recover the cost with just a few additional bookings.
-          </p>
-          <p className="text-muted-foreground text-lg leading-relaxed">
-            We install done-for-you systems that respond to leads instantly, automate follow-up, and help turn more inquiries into booked appointments.
-          </p>
-          <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
-            {["Plans from $397/mo", "Setup from $997", "Month-to-month only"].map((item) => (
-              <span
-                key={item}
-                className="inline-flex rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-primary"
-                style={{
-                  background: "rgba(154,92,46,0.08)",
-                  borderColor: "rgba(154,92,46,0.16)",
-                }}
-              >
-                {item}
-              </span>
-            ))}
-          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+        {selectedIndustry ? (
+          <div className="max-w-4xl mx-auto mb-10 rounded-3xl border border-primary/15 bg-primary/5 px-6 py-5 text-center">
+            <p className="text-xs font-semibold text-primary tracking-[0.22em] uppercase mb-2">
+              Recommended For {selectedIndustry.shortName}
+            </p>
+            <p className="text-lg font-semibold text-foreground">
+              Start with the {selectedIndustry.recommendedPackage?.name}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+              {selectedIndustry.summary}
+            </p>
+          </div>
+        ) : null}
+
+        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-stretch">
           {plans.map((plan, i) => (
-            <PricingCard key={i} plan={plan} demoBooking={demoBooking} />
+            <PricingCard
+              key={i}
+              plan={plan}
+              demoBooking={demoBooking}
+              selectedIndustry={selectedIndustry}
+            />
           ))}
         </div>
 
-        <div className="mt-12 max-w-5xl mx-auto rounded-3xl border border-border bg-card/80 p-6 md:p-8 shadow-sm">
-          <div className="max-w-2xl mb-6">
-            <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What&apos;s Included In Setup</p>
-            <h3 className="font-titles text-2xl md:text-3xl font-bold text-foreground">
-              We handle the implementation work, not just the strategy
-            </h3>
-            <p className="mt-3 text-sm md:text-base text-muted-foreground">
-              Your setup fee covers the actual buildout, launch prep, and handoff work required to get the system live.
-            </p>
-          </div>
+        <CustomerProofCards />
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {[
-              "Lead-response flow mapping and message logic",
-              "SMS and email follow-up sequence setup",
-              "Booking-link or booking-process integration",
-              "Missed-call response setup when included in your plan",
-              "Launch testing, polish, and go-live support",
-              "Short onboarding call plus implementation handoff",
-            ].map((item) => (
-              <div key={item} className="rounded-2xl border border-border bg-background px-4 py-4 flex items-start gap-3">
-                <GlowingCheck />
-                <p className="text-sm text-foreground/80">{item}</p>
-              </div>
-            ))}
-          </div>
+        <MoneyBackGuarantee />
+
+        <div className="max-w-2xl mb-6 mt-12">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What&apos;s Included In Setup</p>
+          <h3 className="font-titles text-2xl md:text-3xl font-bold text-foreground">
+            We build and install the system for you — not just the strategy
+          </h3>
+          <p className="mt-3 text-sm md:text-base text-muted-foreground">
+            Your setup fee covers the full buildout of your AI lead conversion system — launch prep, messaging logic, booking flow, and handoff — done for you.
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-x-6 gap-y-3 mb-14">
+          {[
+            "AI lead conversion system setup and message logic",
+            "Automated SMS and email follow-up sequence",
+            "Booking link or booking flow integration",
+            "Missed-call recovery system setup when included",
+            "Launch testing, polish, and go-live support",
+            "Onboarding call plus full implementation handoff",
+          ].map((item) => (
+            <div key={item} className="flex items-start gap-3 py-1">
+              <SimpleCheck />
+              <p className="text-sm text-foreground/80">{item}</p>
+            </div>
+          ))}
         </div>
 
-        <div className="mt-14 text-center max-w-xl mx-auto border-t border-border pt-10">
+        <div className="text-center max-w-xl mx-auto border-t border-border pt-10">
           <p className="text-foreground font-semibold text-base mb-5">
             Not sure which system fits your business? We will recommend the best option based on your lead flow.
           </p>
-          {demoBooking ? (
-            <button
-              type="button"
-              onClick={demoBooking.openDemoBooking}
-              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full border-2 border-primary/40 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/60 transition-all duration-200"
-            >
-              Book Your Free Demo
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          ) : (
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            {demoBooking ? (
+              <button
+                type="button"
+                onClick={() =>
+                  demoBooking.openDemoBooking({
+                    prefillIndustry: selectedIndustry?.name || "",
+                  })
+                }
+                style={{
+                  borderRadius: "9999px",
+                  padding: "2px",
+                  background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                  boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }}>
+                  Book Your Free Demo <ArrowRight className="w-4 h-4" />
+                </span>
+              </button>
+            ) : (
+              <a
+                href="/book"
+                style={{
+                  borderRadius: "9999px",
+                  padding: "2px",
+                  background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                  boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                  display: "inline-block",
+                }}
+              >
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }}>
+                  Book Your Free Demo <ArrowRight className="w-4 h-4" />
+                </span>
+              </a>
+            )}
             <a
-              href="/book"
-              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full border-2 border-primary/40 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/60 transition-all duration-200"
+              href="#lead-leakage"
+              className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full border border-primary/30 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 transition-all duration-200"
             >
-              Book Your Free Demo
-              <ArrowRight className="w-4 h-4" />
+              Get a Free Lead Leakage Audit
             </a>
-          )}
+          </div>
         </div>
 
       </div>
@@ -187,17 +231,20 @@ export default function Pricing() {
           position: relative;
           background: linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.58) 100%);
         }
+        .dark .pricing-card {
+          background: linear-gradient(135deg, rgba(30,22,14,0.88) 0%, rgba(20,15,8,0.72) 100%) !important;
+          border-color: rgba(200,150,92,0.18) !important;
+        }
+        .dark .pricing-card.highlight-glow {
+          background: linear-gradient(135deg, rgba(40,28,16,0.96) 0%, rgba(28,20,10,0.88) 100%) !important;
+          border-color: rgba(200,150,92,0.35) !important;
+        }
         .pricing-card.highlight-glow {
           background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.84) 100%);
         }
         .pricing-card.highlight-hover {
           background: linear-gradient(135deg, rgba(255,248,235,0.98) 0%, rgba(245,217,168,0.4) 100%);
         }
-        .pricing-card:hover {
-          border-color: #c8965c !important;
-          box-shadow: 0 14px 36px rgba(160, 90, 20, 0.16), 0 2px 10px rgba(0, 0, 0, 0.06) !important;
-        }
-        
         .pricing-card::before {
           content: '';
           position: absolute;
@@ -235,8 +282,6 @@ export default function Pricing() {
           transition: box-shadow 0.3s ease, transform 0.3s ease;
           cursor: pointer;
           border: none;
-          background-size: 200% 200%;
-          animation: shimmer 3.5s ease-in-out infinite;
           position: relative;
         }
         .shiny-brown-btn::after {
@@ -248,7 +293,6 @@ export default function Pricing() {
           height: 100%;
           background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
           border-radius: 9999px;
-          animation: shineWave 3s ease-in-out infinite;
           pointer-events: none;
         }
         .shiny-brown-btn:hover {
@@ -266,14 +310,6 @@ export default function Pricing() {
           z-index: 1;
         }
         
-        @keyframes shimmer {
-          0%, 100% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-        }
-        @keyframes shineWave {
-          0% { left: -100%; }
-          100% { left: 100%; }
-        }
         @keyframes slideIn {
           from {
             opacity: 0;
@@ -284,36 +320,17 @@ export default function Pricing() {
             transform: translateX(0);
           }
         }
-        @keyframes checkPulse {
-          0%, 100% { filter: drop-shadow(0 0 6px rgba(34,197,94,0.6)); }
-          50% { filter: drop-shadow(0 0 12px rgba(34,197,94,0.9)); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .pricing-card,
-          .pricing-card:hover,
-          .shiny-brown-btn,
-          .shiny-brown-btn:hover {
-            transition: none !important;
-            transform: none !important;
-          }
-
-          .shiny-brown-btn,
-          .shiny-brown-btn::after,
-          .pricing-card::before,
-          .w-4.h-4.flex-shrink-0.mt-0\.5 {
-            animation: none !important;
-          }
-        }
       `}</style>
     </section>
   );
 }
 
-function PricingCard({ plan, demoBooking }) {
+function PricingCard({ plan, demoBooking, selectedIndustry }) {
   const [isHovered, setIsHovered] = useState(false);
+  const isRecommended = selectedIndustry?.recommendedPackage?.name === plan.name;
 
   return (
-    <div
+    <motion.div
       className={`pricing-card relative flex flex-col rounded-2xl transition-all duration-300 ${
         plan.highlight ? "highlight-glow" : ""
       } ${isHovered && plan.highlight ? "highlight-hover" : ""}`}
@@ -331,15 +348,15 @@ function PricingCard({ plan, demoBooking }) {
           : isHovered ? "2px solid rgba(200,150,92,0.45)" : "1.5px solid rgba(154,92,46,0.15)",
         boxShadow: plan.highlight
           ? isHovered
-            ? "0 20px 54px rgba(160,90,20,0.22), inset 0 1px 0 rgba(255,255,255,0.9)"
-            : "0 8px 30px rgba(160,90,20,0.14), inset 0 1px 0 rgba(255,255,255,0.8)"
+            ? "0 24px 64px rgba(160,90,20,0.28), inset 0 1px 0 rgba(255,255,255,0.9)"
+            : "0 12px 40px rgba(160,90,20,0.18), inset 0 1px 0 rgba(255,255,255,0.8)"
           : isHovered
-            ? "0 16px 36px rgba(160,90,20,0.12), inset 0 1px 0 rgba(255,255,255,0.85)"
-            : "0 4px 24px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.6)",
-        transform: isHovered ? "translateY(-4px)" : plan.highlight ? "translateY(-2px)" : "translateY(0)",
-        transition: "all 0.35s ease",
-        zIndex: plan.highlight ? 2 : 1,
+            ? "0 14px 36px rgba(160,90,20,0.15), inset 0 1px 0 rgba(255,255,255,0.85)"
+            : "0 6px 22px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
+        perspective: "1200px",
       }}
+      animate={isHovered ? { rotateY: 6, rotateX: -2, scale: 1.03 } : { rotateY: 0, rotateX: 0, scale: 1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -356,13 +373,15 @@ function PricingCard({ plan, demoBooking }) {
         />
       )}
 
-      {plan.badge && (
+      {(plan.badge || isRecommended) && (
         <div className="pricing-badge-float" style={{ zIndex: 30 }}>
           <span
             className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl"
             style={{ background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)" }}
           >
-            {plan.badge}
+            {isRecommended
+              ? `Best fit for ${selectedIndustry.shortName}`
+              : plan.badge}
           </span>
         </div>
       )}
@@ -370,8 +389,21 @@ function PricingCard({ plan, demoBooking }) {
       <div className="flex flex-col flex-1 p-6 md:p-8 lg:p-10 relative z-10">
         <div className="mb-7">
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">{plan.name}</h3>
-          {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Best choice for most businesses.</p>}
+          {plan.highlight && <p className="text-xs font-bold text-primary mb-2">Most Popular — Best for businesses losing 20+ leads/month</p>}
+          {isRecommended && (
+            <p className="text-xs font-bold text-primary mb-2">
+              Recommended for {selectedIndustry.shortName}
+            </p>
+          )}
           <p className="text-xs font-semibold text-foreground/70 leading-snug">{plan.fit}</p>
+        </div>
+        {/* Value justification above the price */}
+        <div className="mb-5 text-xs text-muted-foreground leading-relaxed px-3 py-2 rounded-xl bg-primary/5 border border-primary/10">
+          {plan.highlight
+            ? "Most clients recover this cost with just 2–3 additional bookings per month."
+            : plan.monthly === "$397"
+            ? "Even one extra booking per month typically covers the monthly fee."
+            : "High-volume businesses often recover this within the first week of going live."}
         </div>
 
         <div className="mb-7 pb-7 border-b border-border">
@@ -380,7 +412,6 @@ function PricingCard({ plan, demoBooking }) {
             <span className="text-sm text-muted-foreground mb-2">/month</span>
           </div>
           <p className="text-xs text-muted-foreground mb-3">{plan.setup}</p>
-          <p className="text-xs font-semibold text-primary/80 mb-3">{plan.roiHint}</p>
           <p className="text-xs text-muted-foreground text-left">
             One-time setup fee plus monthly service. No long-term contracts. Cancel anytime.
           </p>
@@ -397,35 +428,56 @@ function PricingCard({ plan, demoBooking }) {
                 animation: `slideIn 0.5s ease-out ${index * 0.05}s both`,
               }}
             >
-              <GlowingCheck />
+              <SimpleCheck />
               <span className="text-sm text-foreground/75">{feature}</span>
             </li>
           ))}
         </ul>
 
-        <button
-          type="button"
-          onClick={() => {
-            if (demoBooking) {
-              demoBooking.openDemoBooking();
-              return;
-            }
-            window.location.href = "/book";
-          }}
-          className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none"
-          onMouseEnter={(event) => {
-            event.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
-          }}
-          onMouseLeave={(event) => {
-            event.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
-          }}
-        >
-          <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
+        {plan.highlight ? (
+          <button
+            type="button"
+            onClick={() => {
+              if (demoBooking) {
+                demoBooking.openDemoBooking({
+                  prefillIndustry: selectedIndustry?.name || "",
+                });
+                return;
+              }
+              window.location.href = "/book";
+            }}
+            className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none"
+            onMouseEnter={(event) => {
+              event.currentTarget.style.boxShadow = "0 8px 32px rgba(161,120,35,0.46), 0 4px 18px rgba(120,70,20,0.35)";
+            }}
+            onMouseLeave={(event) => {
+              event.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
+            }}
+          >
+            <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
+              Book Your Free Demo
+              <ArrowRight className="w-4 h-4" />
+            </span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              if (demoBooking) {
+                demoBooking.openDemoBooking({
+                  prefillIndustry: selectedIndustry?.name || "",
+                });
+                return;
+              }
+              window.location.href = "/book";
+            }}
+            className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full border border-primary/25 bg-white/82 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
+          >
             Book Your Free Demo
             <ArrowRight className="w-4 h-4" />
-          </span>
-        </button>
+          </button>
+        )}
       </div>
-    </div>
+    </motion.div>
   );
 }

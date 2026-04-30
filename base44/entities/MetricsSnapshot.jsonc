@@ -1,0 +1,120 @@
+{
+  "name": "MetricsSnapshot",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "project_id": {
+      "type": "string",
+      "title": "Project ID"
+    },
+    "period": {
+      "type": "string",
+      "title": "Period",
+      "enum": [
+        "today",
+        "this_week",
+        "this_month",
+        "all_time"
+      ],
+      "description": "Time period for these metrics"
+    },
+    "snapshot_date": {
+      "type": "string",
+      "title": "Snapshot Date"
+    },
+    "leads_captured": {
+      "type": "number",
+      "title": "Leads Captured",
+      "default": 0
+    },
+    "leads_responded": {
+      "type": "number",
+      "title": "Leads Responded To",
+      "default": 0
+    },
+    "response_rate_percent": {
+      "type": "number",
+      "title": "Response Rate (%)",
+      "default": 0
+    },
+    "avg_response_time_minutes": {
+      "type": "number",
+      "title": "Avg Response Time (minutes)"
+    },
+    "leads_booked": {
+      "type": "number",
+      "title": "Leads Booked",
+      "default": 0
+    },
+    "booking_rate_percent": {
+      "type": "number",
+      "title": "Booking Rate (%)",
+      "default": 0
+    },
+    "revenue_booked": {
+      "type": "number",
+      "title": "Revenue Booked",
+      "default": 0
+    },
+    "top_closer": {
+      "type": "string",
+      "title": "Top Closer (Email)"
+    },
+    "top_closer_rate": {
+      "type": "number",
+      "title": "Top Closer Close Rate (%)"
+    },
+    "sla_misses": {
+      "type": "number",
+      "title": "SLA Misses",
+      "default": 0,
+      "description": "Leads not responded to within SLA"
+    },
+    "churn_risk_count": {
+      "type": "number",
+      "title": "Churn Risk Count",
+      "default": 0,
+      "description": "Customers flagged as churn risk"
+    },
+    "automations_fired": {
+      "type": "number",
+      "title": "Automations Fired",
+      "default": 0
+    },
+    "ai_decisions_made": {
+      "type": "number",
+      "title": "AI Decisions Made",
+      "default": 0
+    },
+    "alerts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "red",
+              "yellow",
+              "green"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "title": "Current Alerts",
+      "description": "Red/yellow/green alerts"
+    }
+  },
+  "required": [
+    "project_id",
+    "period",
+    "snapshot_date"
+  ]
+}

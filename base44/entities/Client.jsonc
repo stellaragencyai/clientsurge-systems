@@ -2,6 +2,11 @@
   "name": "Client",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "full_name": {
       "type": "string",
       "title": "Full Name"

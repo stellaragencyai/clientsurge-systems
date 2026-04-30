@@ -1,0 +1,187 @@
+/**
+ * Lead Pipeline Snapshot Builder
+ * Shared module used by getLeadPipelineSummary backend function
+ */
+
+export const LEAD_PIPELINE_MAX_FETCH = 5000;
+
+const PRIORITY_MAP = { Hot: 4, High: 3, Medium: 2, Low: 1 };
+
+function getNextAction(lead) {
+  const status = lead.status || "New";
+  const actions = {
+    New: { label: "Send initial outreach", detail: "Lead is new — reach out to qualify and gauge interest." },
+    Contacted: { label: "Follow up on contact", detail: "Already contacted. Follow up if no reply in 24-48h." },
+    Replied: { label: "Qualify the reply", detail: "They replied — assess intent and move to Qualified or close." },
+    Qualified: { label: "Send booking prompt", detail: "Lead is qualified — send a booking link or schedule a call." },
+    "Booking Prompt Sent": { label: "Confirm booking", detail: "Booking link was sent — confirm if they've scheduled." },
+    Booked: { label: "Prepare for meeting", detail: "Meeting is booked — prep notes and confirm attendance." },
+    Closed: { label: "Post-sale follow-up", detail: "Deal closed — send onboarding info and next steps." },
+  };
+  return actions[status] || { label: "Review lead", detail: "Review lead context and decide next action." };
+}
+
+function getRecommendedOffer(lead) {
+  const score = lead.lead_score || 0;
+  const status = lead.status || "New";
+
+  if (score >= 75 || status === "Booked" || status === "Qualified") {
+    return {
+      package_key: "pro_system",
+      package_name: "Pro System",
+      primary_service_name: "Full-Stack Automation",
+    };
+  }
+  if (score >= 50) {
+    return {
+      package_key: "growth_system",
+      package_name: "Growth System",
+      primary_service_name: "Response + Nurture",
+    };
+  }
+  if (score >= 25) {
+    return {
+      package_key: "starter_system",
+      package_name: "Starter System",
+      primary_service_name: "Response + Booking",
+    };
+  }
+  return {
+    package_key: "single_service",
+    package_name: "Single Service",
+    primary_service_name: "One Core Automation",
+  };
+}
+
+function classifySegment(lead) {
+  const status = lead.status || "New";
+  const score = lead.lead_score || 0;
+  const priority = lead.activation_priority || "Low";
+
+  if (status === "Booked") return "awaiting_close";
+  if (status === "Booking Prompt Sent") return "follow_up";
+  if (status === "Qualified") return "follow_up";
+  if (priority === "Hot" || priority === "High") return "high_value_outreach";
+  if (score >= 60) return "nurture";
+  if (status === "Contacted" || status === "Replied") return "follow_up";
+  if (["Closed", "Rejected"].includes(status)) return "reactivation";
+  if (status === "New" && score < 20) return "low_priority";
+  return "nurture";
+}
+
+export function buildLeadPipelineSnapshot({ leads, events, filters = {}, limit = 100, offset = 0 }) {
+  // ── Status counts ──
+  const status_counts = {};
+  for (const lead of leads) {
+    const s = lead.status || "New";
+    status_counts[s] = (status_counts[s] || 0) + 1;
+  }
+
+  // ── Segment counts ──
+  const segment_counts = { follow_up: 0, awaiting_close: 0, high_value_outreach: 0, nurture: 0, reactivation: 0, low_priority: 0, demo_requested: 0 };
+  for (const lead of leads) {
+    const seg = classifySegment(lead);
+    if (seg in segment_counts) segment_counts[seg]++;
+    if (lead.ai_intent === "booking_ready") segment_counts.demo_requested++;
+  }
+
+  // ── Recommended offer counts ──
+  const recommended_offer_counts = { starter_system: 0, growth_system: 0, pro_system: 0, single_service: 0 };
+  for (const lead of leads) {
+    const offer = getRecommendedOffer(lead);
+    if (offer.package_key in recommended_offer_counts) {
+      recommended_offer_counts[offer.package_key]++;
+    }
+  }
+
+  // ── Priority queue (top leads by score + priority) ──
+  const priority_queue = [...leads]
+    .filter((l) => !["Closed", "Rejected"].includes(l.status))
+    .sort((a, b) => {
+      const pa = PRIORITY_MAP[a.activation_priority] || 0;
+      const pb = PRIORITY_MAP[b.activation_priority] || 0;
+      if (pb !== pa) return pb - pa;
+      return (b.lead_score || 0) - (a.lead_score || 0);
+    })
+    .slice(0, 10)
+    .map((lead) => ({
+      ...lead,
+      next_action: getNextAction(lead),
+      recommended_offer: getRecommendedOffer(lead),
+    }));
+
+  // ── Recent activity (last 7 days by update) ──
+  const now = Date.now();
+  const last7Days = Array.from({ length: 7 }, (_, i) => {
+    const dayStart = new Date(now - (6 - i) * 86400000);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dayStart.getTime() + 86400000);
+    const label = dayStart.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const count = leads.filter((l) => {
+      const t = new Date(l.created_date).getTime();
+      return t >= dayStart.getTime() && t < dayEnd.getTime();
+    }).length;
+    return { date: label, leads: count };
+  });
+
+  // ── Recent lead activity ──
+  const recent_lead_activity = [...leads]
+    .sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date))
+    .slice(0, 20)
+    .map((lead) => ({
+      ...lead,
+      next_action: getNextAction(lead),
+      recommended_offer: getRecommendedOffer(lead),
+      recent_movement: {
+        detail: `Status: ${lead.status || "New"} · Score: ${lead.lead_score || 0}`,
+      },
+    }));
+
+  // ── Apply filters to the full lead list ──
+  let filteredLeads = [...leads];
+  if (filters.status && filters.status !== "all") {
+    filteredLeads = filteredLeads.filter((l) => l.status === filters.status);
+  }
+  if (filters.search) {
+    const q = filters.search.toLowerCase();
+    filteredLeads = filteredLeads.filter(
+      (l) =>
+        (l.full_name || "").toLowerCase().includes(q) ||
+        (l.business_name || "").toLowerCase().includes(q) ||
+        (l.email || "").toLowerCase().includes(q) ||
+        (l.phone || "").toLowerCase().includes(q)
+    );
+  }
+
+  const total = filteredLeads.length;
+  const paginated = filteredLeads
+    .sort((a, b) => (b.lead_score || 0) - (a.lead_score || 0))
+    .slice(offset, offset + limit)
+    .map((lead) => ({
+      ...lead,
+      next_action: getNextAction(lead),
+      recommended_offer: getRecommendedOffer(lead),
+    }));
+
+  return {
+    summary: {
+      total_leads: leads.length,
+      status_counts,
+      segment_counts,
+      recommended_offer_counts,
+      recent_lead_activity,
+      priority_queue,
+      last7Days,
+    },
+    leads: paginated,
+    pagination: {
+      total,
+      limit,
+      offset,
+      has_more: offset + limit < total,
+    },
+    filter_options: {
+      statuses: Object.keys(status_counts),
+    },
+  };
+}

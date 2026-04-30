@@ -93,6 +93,181 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Global focus styles for keyboard navigation */
+:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* CTA Button Focus States - Enhanced for Accessibility */
+button[type="button"],
+button[type="submit"],
+a[role="button"],
+.shiny-brown-btn,
+[class*="cta"],
+[class*="btn"] {
+  position: relative;
+}
+
+/* Focus for all interactive elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+}
+
+/* Enhanced focus ring for CTAs */
+button[type="button"]:focus-visible,
+button[type="submit"]:focus-visible,
+a[role="button"]:focus-visible,
+.shiny-brown-btn:focus-visible,
+[class*="cta"]:focus-visible,
+[class*="btn"]:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px hsla(var(--primary), 0.15);
+}
+
+/* ============================================
+   MOBILE / CROSS-BROWSER GLOBAL FIXES
+   ============================================ */
+
+/* 1. Box-sizing reset — universal */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 2. Prevent horizontal scroll on ALL viewports */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+}
+
+/* 3. Safe area insets — iPhone notch / Dynamic Island / iPad */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+.safe-top    { padding-top: max(12px, var(--sat)); }
+.safe-bottom { padding-bottom: max(12px, var(--sab)); }
+
+/* 4. iOS Safari: kill tap flash, enable fast tapping */
+a, button, [role="button"], label, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* 5. All interactive elements: minimum 44×44px touch target */
+button, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+/* Exceptions for inline text links / icon-only tiny elements */
+nav a, .text-link, .inline-link {
+  min-height: unset;
+  min-width: unset;
+}
+
+/* 6. Mobile nav drawer — lock scroll without layout shift */
+body.nav-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+/* 7. iOS Safari sticky navbar safe-area */
+@supports (-webkit-touch-callout: none) {
+  nav {
+    padding-top: max(0px, env(safe-area-inset-top));
+  }
+  /* Fix 100vh on iOS Safari — use svh where supported */
+  .full-height {
+    height: 100svh;
+  }
+}
+
+/* 8. Prevent iOS font-size bump on landscape rotate */
+@media screen and (orientation: landscape) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+}
+
+/* 9. Ensure minimum readable font size on mobile */
+@media (max-width: 480px) {
+  body {
+    font-size: max(16px, 1rem);
+  }
+  p, li, label, input, textarea, select {
+    font-size: max(16px, 1rem);
+  }
+}
+
+/* 10. Backdrop-filter — explicit vendor prefix for Firefox/Safari */
+.backdrop-blur, [class*="backdrop-blur"] {
+  -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+  backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+}
+
+/* 11. Heading balance for cleaner line breaks across ALL screen sizes */
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* 12. Body text pretty-wrap for readability */
+p, li, blockquote {
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+}
+
+/* 13. Images — prevent layout shift, constrain to container */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* 14. Smooth scrolling — disabled for reduced-motion users */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* 15. Reduced motion — kill ALL animations/transitions for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ============================================
@@ -185,11 +360,11 @@ body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/10c852a82_generated_image.png');
+  background-image: url('https://media.base44.com/images/public/69dc4a79656fdba136d413d3/20a9cba69_generated_image.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.07;
+  opacity: 0.06;
   pointer-events: none;
   z-index: 0;
 }
@@ -407,4 +582,161 @@ body > * {
 /* Ensure text on dark stays legible */
 .dark p, .dark h1, .dark h2, .dark h3, .dark h4, .dark span:not([style*="color"]) {
   color: inherit;
+}
+
+/* ============================================
+   RESPONSIVE SECTION TYPOGRAPHY
+   Ensures all sections look great at every breakpoint
+   ============================================ */
+
+/* Large section titles — fluid scaling */
+.font-display {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Responsive section padding — consistent across all screen sizes */
+@media (max-width: 640px) {
+  section {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  /* Ensure section h2 titles don't overflow on small screens */
+  h2 {
+    font-size: clamp(1.75rem, 7vw, 3rem);
+  }
+  h3 {
+    font-size: clamp(1.25rem, 5vw, 2rem);
+  }
+}
+
+/* iPad/tablet — comfortable spacing */
+@media (min-width: 768px) and (max-width: 1024px) {
+  section {
+    padding-left: max(2rem, env(safe-area-inset-left));
+    padding-right: max(2rem, env(safe-area-inset-right));
+  }
+}
+
+/* Ensure no element ever causes horizontal overflow */
+section, div, article, aside, header, footer, main {
+  max-width: 100%;
+}
+
+/* Prevent long words/URLs from breaking layout */
+p, li, td, th, label, span {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* iPad landscape — fix grid columns that might be too wide */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .grid-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Bottom safe area for floating CTAs / sticky bars (iPhone home indicator) */
+.sticky-bottom-cta {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+/* ============================================
+   ROUND 2: CROSS-BROWSER POLISH
+   ============================================ */
+
+/* 1. Font rendering — crisp on all OS/browsers */
+body, input, button, select, textarea {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+}
+
+/* 2. Image CLS prevention — explicit sizing context */
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+/* Preserve aspect ratio for background/decorative images */
+img[style*="object-fit"] {
+  height: 100%;
+}
+
+/* 3. content-visibility for off-screen sections (Chrome/Edge perf boost) */
+@supports (content-visibility: auto) {
+  section:not(:first-of-type):not(:nth-of-type(2)) {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 600px;
+  }
+}
+
+/* 4. Scrollbar styling — consistent cross-browser thin scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(154,92,46,0.3); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(154,92,46,0.55); }
+@supports (scrollbar-width: thin) {
+  * { scrollbar-width: thin; scrollbar-color: rgba(154,92,46,0.3) transparent; }
+}
+
+/* 5. Input zoom prevention on iOS (font-size must be ≥16px) */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+input[type="password"],
+textarea,
+select {
+  font-size: max(16px, 1rem) !important;
+}
+
+/* 6. Fix `position: sticky` on iOS Safari */
+.sticky, [class*="sticky"] {
+  position: -webkit-sticky;
+  position: sticky;
+}
+
+/* 7. Better tap area for small icon buttons without changing visual size */
+.icon-btn-tap {
+  position: relative;
+}
+.icon-btn-tap::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
+/* 8. Prevent text selection on interactive elements (UX polish) */
+button, [role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 9. Landscape phone — prevent massive paddings */
+@media (max-height: 500px) and (orientation: landscape) {
+  section {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  .landing-hero__inner {
+    min-height: auto !important;
+    padding-top: 4rem !important;
+  }
+}
+
+/* 10. High-DPI / Retina display sharpness for borders */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .border, [class*="border-"] {
+    border-width: 0.5px;
+  }
+}
+
+/* Dark mode gradient text fix */
+.dark span[style*="background"] {
+  background: linear-gradient(135deg, #f5d9a8 0%, #e8c499 52%, #d4a570 100%) !important;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

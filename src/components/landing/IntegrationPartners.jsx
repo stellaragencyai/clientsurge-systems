@@ -1,160 +1,176 @@
-import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const INTEGRATIONS = [
   {
     name: "Google Calendar",
-    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/4988f34b3_Gemini_Generated_Image_ejrt4cejrt4cejrt.png",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/38f003d6f_558c46a6-da27-4e63-9f22-6c0de6240428.png",
+    href: "https://calendar.google.com",
     description: "Calendar sync",
   },
   {
     name: "HubSpot",
-    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/60ca2df22_Gemini_Generated_Image_7xnq7j7xnq7j7xnq.png",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/53f5f9417_Hubspotlogonobackground.png",
+    href: "https://hubspot.com",
     description: "CRM & leads",
   },
   {
-    name: "Zapier",
-    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/90405ee3c_Gemini_Generated_Image_tvhs5gtvhs5gtvhs.png",
-    description: "Workflow automation",
-  },
-  {
     name: "Stripe",
-    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/cc62e8a20_Gemini_Generated_Image_gabn1ugabn1ugabn.png",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/01819ba25_stripenobackgroundlogo.png",
+    href: "https://stripe.com",
     description: "Payments",
   },
   {
     name: "Twilio",
-    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/d5f38c7a4_Gemini_Generated_Image_9xxvlp9xxvlp9xxv.png",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/5d24a83dd_twilionobackgroundlogo.png",
+    href: "https://twilio.com",
     description: "SMS & voice",
+  },
+  {
+    name: "Zapier",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/2d655fab4_zapiernobackgroundlogo.png",
+    href: "https://zapier.com",
+    description: "Workflow automation",
+  },
+  {
+    name: "Calendly",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/4f0f85e13_7493f3ba-6389-437c-b4cc-50b5c2baa75a.png",
+    href: "https://calendly.com",
+    description: "Booking",
+  },
+  {
+    name: "Facebook Ads",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/40001c42d_ChatGPTImageApr28202605_59_43AM.png",
+    href: "https://facebook.com/ads",
+    description: "Lead ads",
+  },
+  {
+    name: "HighLevel",
+    logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/eec622a96_effc8d6b-84de-4143-b7f8-fad489dba492.png",
+    href: "https://gohighlevel.com",
+    description: "CRM platform",
   },
 ];
 
-export default function IntegrationPartners() {
-  const [current, setCurrent] = useState(0);
-  const [autoPlay, setAutoPlay] = useState(true);
-  const itemsPerView = 5;
-  const totalSlides = Math.ceil(INTEGRATIONS.length / itemsPerView);
-
-  const nextSlide = () => {
-    setCurrent((current + 1) % totalSlides);
-    setAutoPlay(false);
-  };
-
-  const prevSlide = () => {
-    setCurrent((current - 1 + totalSlides) % totalSlides);
-    setAutoPlay(false);
-  };
-
+// Track scroll position for dynamic enhancement
+const ScrollTrackIntegrationContext = ({ children }) => {
+  const [scrollY, setScrollY] = useState(0);
   useEffect(() => {
-    if (!autoPlay) return;
-    const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % totalSlides);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [autoPlay, totalSlides]);
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return children(scrollY);
+};
 
-  const visibleItems = INTEGRATIONS.slice(current * itemsPerView, (current + 1) * itemsPerView);
+// Double is enough — animation translates exactly one set width
+const DOUBLED = [...INTEGRATIONS, ...INTEGRATIONS];
+
+// Gap between items in px — must match the inline style below
+const ITEM_GAP = 72;
+const ITEM_WIDTH = 180;
+
+export default function IntegrationPartners() {
+  // Total width of one set = N items * (width + gap)
+  const oneSetWidth = INTEGRATIONS.length * (ITEM_WIDTH + ITEM_GAP);
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-b from-background via-card to-background">
-      <div className="max-w-6xl mx-auto">
+    <section
+      className="pt-10 pb-14 px-6 relative overflow-hidden"
+      style={{ background: "#ffffff" }}
+    >
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-slate-300/60 to-transparent pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">Integrations</p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground mb-4">
-            We Easily Integrate With
+        <div className="text-center pt-10 mb-12">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
+            Integrations
+          </p>
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
+            Works With{" "}
+            <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.35)" }}>
+              50+ Tools
+            </span>
           </h2>
-          <p className="text-muted-foreground text-base max-w-xl mx-auto">
-            Connect your favorite tools directly. Our system works seamlessly with the platforms your business already uses.
+          <div className="flex items-center justify-center gap-3 mt-5 mb-5">
+            <div style={{ height: "1px", width: "48px", background: "linear-gradient(to right, transparent, rgba(154,92,46,0.5))" }} />
+            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#9a5c2e" }} />
+            <div style={{ height: "1px", width: "48px", background: "linear-gradient(to left, transparent, rgba(154,92,46,0.5))" }} />
+          </div>
+          <p className="text-muted-foreground text-base max-w-2xl mx-auto leading-relaxed">
+            Every tool you already rely on — plugged in, synced, and firing automatically the moment a lead comes in.
           </p>
         </div>
 
-        {/* Carousel */}
-        <div className="relative">
-          {/* Carousel Container */}
+        {/* Infinite scroll marquee — proper pixel-based loop */}
+        <div className="relative overflow-hidden" style={{ padding: "28px 0 40px" }}>
+          {/* Edge fades */}
+          <div className="absolute left-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
+            style={{ background: "linear-gradient(to right, #ffffff 0%, transparent 100%)" }} />
+          <div className="absolute right-0 top-0 bottom-0 w-40 z-10 pointer-events-none"
+            style={{ background: "linear-gradient(to left, #ffffff 0%, transparent 100%)" }} />
+
           <div
-            className="flex gap-6 justify-center items-center transition-all duration-500 ease-out"
+            className="flex items-center"
             style={{
-              transform: `translateX(-${current * (100 / itemsPerView)}%)`,
+              width: "max-content",
+              gap: `${ITEM_GAP}px`,
+              animation: `integrationScroll 26s linear infinite`,
+              willChange: "transform",
             }}
           >
-            {INTEGRATIONS.map((integration, idx) => (
-              <div
+            {DOUBLED.map((integration, idx) => (
+              <a
                 key={idx}
-                className="flex-shrink-0 w-1/5 min-w-[120px]"
-                style={{
-                  opacity: visibleItems.includes(integration) ? 1 : 0.3,
-                  transform: visibleItems.includes(integration) ? "scale(1)" : "scale(0.8)",
-                  transition: "opacity 0.5s ease, transform 0.5s ease",
-                }}
+                href={integration.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={integration.name}
+                className="flex-shrink-0 group relative flex flex-col items-center focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+                style={{ width: `${ITEM_WIDTH}px` }}
               >
-                <div className="flex flex-col items-center gap-3 p-4 rounded-2xl border border-border/50 hover:border-primary/30 bg-white/40 backdrop-blur-sm hover:shadow-md transition-all group">
-                  {/* Logo */}
-                  <div className="w-16 h-16 rounded-xl bg-white border border-border flex items-center justify-center group-hover:border-primary/40 transition-all">
-                    <img
-                      src={integration.logo}
-                      alt={integration.name}
-                      className="w-12 h-12 object-contain"
-                      loading="lazy"
-                    />
-                  </div>
-                  
-                  {/* Text */}
-                  <div className="text-center">
-                    <p className="text-xs font-semibold text-foreground">{integration.name}</p>
-                    <p className="text-[10px] text-muted-foreground mt-1">{integration.description}</p>
-                  </div>
-                </div>
-              </div>
+                <img
+                  src={integration.logo}
+                  alt={integration.name}
+                  loading="eager"
+                  decoding="async"
+                  style={{
+                    height: "72px",
+                    width: `${ITEM_WIDTH}px`,
+                    objectFit: "contain",
+                    objectPosition: "center",
+                    imageRendering: "auto",
+                    transition: "transform 0.35s cubic-bezier(0.34,1.4,0.64,1), filter 0.35s ease",
+                    filter: "contrast(1.05) saturate(1.05)",
+                    display: "block",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.15) translateY(-6px)";
+                    e.currentTarget.style.filter = "contrast(1.1) saturate(1.15) drop-shadow(0 8px 20px rgba(154,92,46,0.3))";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1) translateY(0)";
+                    e.currentTarget.style.filter = "contrast(1.05) saturate(1.05)";
+                  }}
+                />
+                <span className="mt-2 text-[10px] font-semibold text-primary/60 group-hover:text-primary transition-colors uppercase tracking-widest">
+                  {integration.name}
+                </span>
+              </a>
             ))}
           </div>
-
-          {/* Navigation Buttons */}
-          <button
-            onClick={prevSlide}
-            onMouseEnter={() => setAutoPlay(false)}
-            onMouseLeave={() => setAutoPlay(true)}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-8 w-10 h-10 rounded-full border border-border hover:border-primary/40 bg-white/80 hover:bg-white shadow-md flex items-center justify-center text-foreground hover:text-primary transition-all z-10"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          <button
-            onClick={nextSlide}
-            onMouseEnter={() => setAutoPlay(false)}
-            onMouseLeave={() => setAutoPlay(true)}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-8 w-10 h-10 rounded-full border border-border hover:border-primary/40 bg-white/80 hover:bg-white shadow-md flex items-center justify-center text-foreground hover:text-primary transition-all z-10"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
         </div>
-
-        {/* Carousel Dots */}
-        <div className="flex justify-center gap-2 mt-10">
-          {Array.from({ length: totalSlides }).map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => {
-                setCurrent(idx);
-                setAutoPlay(false);
-              }}
-              className={`transition-all rounded-full ${
-                idx === current
-                  ? "w-8 h-2 bg-primary"
-                  : "w-2 h-2 bg-primary/30 hover:bg-primary/50"
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
-          ))}
-        </div>
-
-        {/* Trust Text */}
-        <p className="text-center text-xs text-muted-foreground mt-8 max-w-2xl mx-auto">
-          Don't see your tool? Contact us — we can integrate with almost any platform through custom APIs and webhooks.
-        </p>
       </div>
+
+      <style>{`
+        @keyframes integrationScroll {
+          0%   { transform: translateX(0); }
+          100% { transform: translateX(-${oneSetWidth}px); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          @keyframes integrationScroll { 0%, 100% { transform: translateX(0); } }
+        }
+      `}</style>
     </section>
   );
 }

@@ -29,6 +29,20 @@ export default function SupportChat({ project, user }) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const requestCall = async () => {
+    setSending(true);
+    await base44.entities.SupportMessage.create({
+      project_id: project.id,
+      sender_email: user.email,
+      sender_name: user.full_name || user.email,
+      role: "client",
+      message: "📞 CALLBACK REQUEST: Please give me a call when you have a moment. Thank you!",
+      read: false,
+    });
+    setSending(false);
+    loadMessages();
+  };
+
   const sendMessage = async () => {
     if (!input.trim() || sending) return;
 
@@ -84,19 +98,15 @@ export default function SupportChat({ project, user }) {
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === "client" ? "justify-end" : "justify-start"}`}>
             <div
-              className="max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed"
+              className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                msg.role === "client"
+                  ? "text-amber-50"
+                  : "text-foreground"
+              }`}
               style={
                 msg.role === "client"
-                  ? {
-                      background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)",
-                      color: "#f5e6d0",
-                      borderBottomRightRadius: "4px",
-                    }
-                  : {
-                      background: "hsl(var(--muted))",
-                      color: "hsl(var(--foreground))",
-                      borderBottomLeftRadius: "4px",
-                    }
+                  ? { background: "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)", borderBottomRightRadius: "4px" }
+                  : { background: "hsl(var(--muted))", borderBottomLeftRadius: "4px" }
               }
             >
               {msg.role === "admin" && (
@@ -108,6 +118,17 @@ export default function SupportChat({ project, user }) {
         ))}
 
         <div ref={bottomRef} />
+      </div>
+
+      {/* Request a Call button */}
+      <div className="px-4 pt-3 pb-0 flex justify-end">
+        <button
+          onClick={requestCall}
+          disabled={sending}
+          className="text-xs font-semibold text-primary hover:text-primary/80 border border-primary/30 rounded-full px-3 py-1 transition-colors flex items-center gap-1"
+        >
+          📞 Request a Callback
+        </button>
       </div>
 
       <div className="px-4 py-3 border-t border-border flex items-end gap-2">
