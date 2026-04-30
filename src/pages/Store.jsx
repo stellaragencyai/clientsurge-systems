@@ -286,31 +286,7 @@ function StoreInner() {
 
           <div id="top" className="store-hero">
             <div className="store-hero-copy">
-              <div
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  borderRadius: "9999px",
-                  padding: "6px 16px",
-                  marginBottom: "18px",
-                  background: "rgba(154,92,46,0.08)",
-                  border: "1px solid rgba(154,92,46,0.18)",
-                }}
-              >
-                <Zap style={{ width: "12px", height: "12px", color: "#9a5c2e" }} />
-                <span
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: "700",
-                    color: "#9a5c2e",
-                    letterSpacing: "0.16em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  AI Services Marketplace
-                </span>
-              </div>
+
 
               <h1
                className="font-display"
@@ -632,11 +608,10 @@ function StoreInner() {
           </div>
 
           <BuildYourStackFlow />
-          <CartSidebar />
-          <Footer />
-          <SocialProofTicker />
-          <BundleSavingsToast />
-          {showComparison && <ServiceComparisonModal onClose={() => setShowComparison(false)} />}
+           <CartSidebar />
+           <Footer />
+           <SocialProofTicker />
+           {showComparison && <ServiceComparisonModal onClose={() => setShowComparison(false)} />}
         </div>
       </div>
     </div>

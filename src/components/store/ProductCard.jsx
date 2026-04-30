@@ -163,69 +163,54 @@ export default function ProductCard({ product }) {
           {product.description}
         </p>
 
-        {/* Highlights */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", justifyContent: "space-between" }}>
-            <div className="features-count-badge">
-              {product.highlights.length} key features
+        {/* All Features - Stacked */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+          {product.highlights.map((h) => (
+            <div key={h} className="highlight-pill" style={{ width: "100%" }}>
+              <CheckCircle2 />
+              <span>{h}</span>
             </div>
-            {product.highlights.length > 3 && !expanded && (
-              <button onClick={handleExpandToggle} className="see-more-btn">
-                See all →
-              </button>
-            )}
-            {expanded && (
-              <button onClick={handleExpandToggle} className="see-more-btn">
-                Show less ↑
-              </button>
-            )}
-          </div>
-          
-          <div className="highlight-pills">
-            {product.highlights.slice(0, expanded ? product.highlights.length : 3).map((h) => (
-              <div key={h} className="highlight-pill">
-                <CheckCircle2 />
-                {h}
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
 
-        {/* Price + CTA */}
-        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: "10px", marginTop: "auto" }}>
-          <div className="price-chip-light">
-            <p style={{ fontSize: "7px", color: "rgba(154,92,46,0.5)", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>monthly</p>
-            <p style={{ fontSize: "22px", fontWeight: "900", color: "#9a5c2e", margin: 0, lineHeight: 1 }}>${product.monthly_fee}</p>
-            <p style={{ fontSize: "8px", color: "rgba(154,92,46,0.45)", margin: "2px 0 0", fontWeight: "600" }}>+${product.setup_fee} setup</p>
-          </div>
+        {/* Price - Top aligned */}
+        <div style={{ marginTop: "auto", paddingTop: "12px", borderTop: "1px solid rgba(154,92,46,0.1)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "12px" }}>
+            <div>
+              <p style={{ fontSize: "8px", color: "rgba(154,92,46,0.5)", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.1em", margin: 0 }}>pricing</p>
+              <p style={{ fontSize: "18px", fontWeight: "900", color: "#9a5c2e", margin: "2px 0 0", lineHeight: 1 }}>${product.monthly_fee}<span style={{ fontSize: "10px", color: "rgba(154,92,46,0.5)", fontWeight: "600" }}>/mo</span></p>
+              <p style={{ fontSize: "8px", color: "rgba(154,92,46,0.45)", margin: "2px 0 0", fontWeight: "600" }}>Setup: ${product.setup_fee}</p>
+            </div>
 
-          {!product.coming_soon && (
-            <button
-              onClick={toggle}
-              style={{
-                borderRadius: "9999px", padding: "2px",
-                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                border: "none", cursor: "pointer",
-                boxShadow: inCart ? "0 4px 14px rgba(34,197,94,0.3)" : "0 4px 14px rgba(120,70,20,0.28)",
-                transition: "all 0.2s",
-              }}
-            >
-              <span style={{
-                display: "flex", alignItems: "center", justifyContent: "center", gap: "4px",
-                height: "30px", paddingLeft: "14px", paddingRight: "14px", borderRadius: "9999px",
-                background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                color: "#fff", fontWeight: "700", fontSize: "11px", whiteSpace: "nowrap",
-              }}>
-                {inCart ? <><Check style={{ width: "11px", height: "11px" }} /> Added</> : <><Plus style={{ width: "11px", height: "11px" }} /> Add</>}
+            {!product.coming_soon && (
+              <button
+                onClick={toggle}
+                style={{
+                  borderRadius: "9999px", padding: "2px",
+                  background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                  border: "none", cursor: "pointer",
+                  boxShadow: inCart ? "0 4px 14px rgba(34,197,94,0.3)" : "0 4px 14px rgba(120,70,20,0.28)",
+                  transition: "all 0.2s",
+                  width: "100%",
+                }}
+              >
+                <span style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: "4px",
+                  height: "32px", paddingLeft: "14px", paddingRight: "14px", borderRadius: "9999px",
+                  background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                  color: "#fff", fontWeight: "700", fontSize: "11px", whiteSpace: "nowrap",
+                }}>
+                  {inCart ? <><Check style={{ width: "11px", height: "11px" }} /> Added</> : <><Plus style={{ width: "11px", height: "11px" }} /> Add to Cart</>}
+                </span>
+              </button>
+            )}
+
+            {product.coming_soon && (
+              <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(154,92,46,0.4)", background: "rgba(154,92,46,0.06)", padding: "8px 14px", borderRadius: "9999px", border: "1px solid rgba(154,92,46,0.12)", textAlign: "center", width: "100%" }}>
+                Coming Soon
               </span>
-            </button>
-          )}
-
-          {product.coming_soon && (
-            <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(154,92,46,0.4)", background: "rgba(154,92,46,0.06)", padding: "6px 14px", borderRadius: "9999px", border: "1px solid rgba(154,92,46,0.12)" }}>
-              Coming Soon
-            </span>
-          )}
+            )}
+          </div>
         </div>
 
         {product.popular && !product.coming_soon && (
