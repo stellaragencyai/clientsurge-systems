@@ -3,7 +3,9 @@ import { base44 } from "@/api/base44Client";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import HorizontalStageTracker from "@/components/dashboard/HorizontalStageTracker";
-import ServiceCard from "@/components/dashboard/ServiceCard";
+import DashboardMetricsBar from "@/components/dashboard/DashboardMetricsBar";
+import ResponsiveServiceCard from "@/components/dashboard/ResponsiveServiceCard";
+import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import ChatAssistant from "@/components/dashboard/ChatAssistant";
 import { Loader2, ShoppingBag, Mail, Phone, RefreshCw } from "lucide-react";
@@ -218,6 +220,7 @@ export default function ClientDashboard() {
   return (
     <DemoBookingProvider>
       <ChatAssistant />
+      <MobileBottomNav />
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 50%, #fdfbf8 100%)" }}>
         <Navbar />
 
@@ -251,14 +254,18 @@ export default function ClientDashboard() {
                       installStatus={activeServices[0].installStatus}
                     />
 
-                    {/* All service cards */}
+                    {/* Metrics Bar — Key Overview */}
+                    <DashboardMetricsBar activeServices={activeServices} project={project} />
+
+                    {/* All service cards — Responsive layout */}
                     <div style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 480px), 1fr))",
-                      gap: "20px",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
+                      gap: "16px",
+                      marginBottom: "80px",
                     }}>
                       {activeServices.map((service, idx) => (
-                        <ServiceCard key={idx} service={service} />
+                        <ResponsiveServiceCard key={idx} service={service} />
                       ))}
                     </div>
 
