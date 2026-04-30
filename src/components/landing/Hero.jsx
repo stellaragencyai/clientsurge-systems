@@ -398,6 +398,41 @@ export default function Hero() {
         }}
       >
         <div style={{ maxWidth: "540px" }}>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "10px 14px",
+              borderRadius: "9999px",
+              background: "rgba(255,255,255,0.78)",
+              border: "1px solid rgba(154,92,46,0.16)",
+              boxShadow: "0 10px 28px rgba(44,31,16,0.06)",
+              marginBottom: "18px",
+            }}
+          >
+            <span
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "9999px",
+                background: "#22c55e",
+                boxShadow: "0 0 0 6px rgba(34,197,94,0.12)",
+              }}
+            />
+            <span
+              style={{
+                fontSize: "12px",
+                fontWeight: "700",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#7a4825",
+              }}
+            >
+              Done-for-you AI lead conversion systems
+            </span>
+          </div>
+
           <h1
             style={{
               fontFamily: "var(--font-display)",
@@ -420,19 +455,19 @@ export default function Hero() {
             >
               Booked Appointment
             </span>
-            {" "}— Automatically
+            {" "}Automatically
           </h1>
 
           <p style={{ fontSize: "1.1rem", color: "rgba(26,18,9,0.58)", lineHeight: 1.75, marginBottom: "28px" }}>
-            We build AI-powered systems that respond in seconds, nurture leads for 14 days, and fill your calendar — without you lifting a finger.
+            We build AI-powered systems that respond in seconds, nurture leads for 14 days, and fill your calendar without you lifting a finger.
           </p>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "11px", marginBottom: "36px" }}>
             {[
               "Instant SMS response to every new lead",
               "14-day automated follow-up sequence",
-              "Missed call text-back — 0 leads lost",
-              "Live in 5–7 business days, fully built for you",
+              "Missed call text-back - 0 leads lost",
+              "Live in 5-7 business days, fully built for you",
             ].map((pt) => (
               <div key={pt} style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <CheckCircle2 style={{ width: "17px", height: "17px", color: "#22c55e", flexShrink: 0 }} />
@@ -448,13 +483,10 @@ export default function Hero() {
                 borderRadius: "9999px",
                 padding: "2px",
                 background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                boxShadow: "0 6px 28px rgba(120,70,20,0.38)",
                 border: "none",
                 cursor: "pointer",
-                transition: "box-shadow 0.3s ease, transform 0.2s ease",
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 10px 44px rgba(120,70,20,0.55)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 6px 28px rgba(120,70,20,0.38)"; e.currentTarget.style.transform = "translateY(0)"; }}
+              className="hero-demo-cta"
             >
               <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "56px", padding: "0 38px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "1rem" }}>
                 Book Your Free Demo
@@ -464,13 +496,13 @@ export default function Hero() {
 
             <a
               href="#services"
-              style={{ display: "inline-flex", alignItems: "center", gap: "6px", height: "56px", padding: "0 26px", borderRadius: "9999px", border: "1.5px solid rgba(154,92,46,0.28)", color: "rgba(26,18,9,0.6)", fontSize: "14px", fontWeight: "600", textDecoration: "none", transition: "all 0.2s" }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.55)"; e.currentTarget.style.color = "#1a1209"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.28)"; e.currentTarget.style.color = "rgba(26,18,9,0.6)"; }}
+              style={{ display: "inline-flex", alignItems: "center", gap: "6px", height: "56px", padding: "0 26px", borderRadius: "9999px", border: "1.5px solid rgba(154,92,46,0.28)", color: "rgba(26,18,9,0.6)", fontSize: "14px", fontWeight: "600", textDecoration: "none" }}
+              className="hero-secondary-cta"
             >
               See how it works
             </a>
           </div>
+
 
           <p style={{ marginTop: "18px", fontSize: "11px", color: "rgba(26,18,9,0.3)", letterSpacing: "0.04em" }}>
             No contracts · Most clients see ROI within 30 days
@@ -484,7 +516,38 @@ export default function Hero() {
         @keyframes floatTablet { 0%,100%{transform: translateY(-48%) perspective(2500px) rotateY(-8deg) rotateX(5deg) rotateZ(1.5deg)} 50%{transform: translateY(-52%) perspective(2500px) rotateY(-8deg) rotateX(5deg) rotateZ(1.5deg)} }
         @keyframes glassShine { 0%,100%{opacity:0.4} 50%{opacity:0.8} }
 
-        @media (max-width: 1024px) {
+        .hero-demo-cta {
+          box-shadow: 0 6px 28px rgba(120,70,20,0.38);
+          transition: box-shadow 0.3s ease, transform 0.2s ease;
+        }
+
+        .hero-demo-cta:hover {
+          box-shadow: 0 10px 44px rgba(120,70,20,0.55);
+          transform: translateY(-1px);
+        }
+
+        .hero-secondary-cta {
+          transition: border-color 0.2s ease, color 0.2s ease;
+        }
+
+        .hero-secondary-cta:hover {
+          border-color: rgba(154,92,46,0.55);
+          color: #1a1209;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero-demo-cta,
+          .hero-demo-cta:hover,
+          .hero-secondary-cta,
+          .hero-secondary-cta:hover {
+            transition: none;
+            transform: none;
+          }
+
+          [style*="animation: haloglow"],
+          [style*="animation: glassShine"] {
+            animation: none !important;
+          }
         }
       `}</style>
     </section>

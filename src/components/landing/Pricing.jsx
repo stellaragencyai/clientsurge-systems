@@ -29,6 +29,7 @@ const plans = [
   {
     name: "Starter System",
     fit: "Best for businesses under 30 leads per month",
+    roiHint: "Often covered by one additional booking each month",
     subtitle: "For businesses just getting started with automation.",
     desc: "A simple automation system to respond faster and capture more opportunities without complexity.",
     setup: "$997 setup",
@@ -47,6 +48,7 @@ const plans = [
   {
     name: "Growth System",
     fit: "Best for most businesses already generating steady leads",
+    roiHint: "Most clients aim to recover this with 2-3 extra bookings",
     badge: "Most Popular",
     subtitle: "Best for businesses actively generating leads and wanting more bookings",
     desc: "The best option for businesses that want stronger follow-up, better lead conversion, and more automation built into the customer journey.",
@@ -68,6 +70,7 @@ const plans = [
   {
     name: "Pro System",
     fit: "Best for higher-volume teams that want deeper automation",
+    roiHint: "Built for teams that want faster payback from higher lead volume",
     subtitle: "Best for higher-volume businesses ready to scale and maximize conversions",
     desc: "Deeper automation, stronger reactivation, more optimization, and an advanced follow-up system for businesses serious about growth.",
     setup: "$3,500 setup",
@@ -102,6 +105,20 @@ export default function Pricing() {
           <p className="text-muted-foreground text-lg leading-relaxed">
             We install done-for-you systems that respond to leads instantly, automate follow-up, and help turn more inquiries into booked appointments.
           </p>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
+            {["Plans from $397/mo", "Setup from $997", "Month-to-month only"].map((item) => (
+              <span
+                key={item}
+                className="inline-flex rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-primary"
+                style={{
+                  background: "rgba(154,92,46,0.08)",
+                  borderColor: "rgba(154,92,46,0.16)",
+                }}
+              >
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
@@ -190,15 +207,10 @@ export default function Pricing() {
           height: 120px;
           border-radius: 50%;
           background: radial-gradient(circle, rgba(200,150,92,0.15) 0%, transparent 70%);
-          animation: drift 8s ease-in-out infinite;
           pointer-events: none;
           z-index: 0;
         }
-        .pricing-card:nth-child(2)::before {
-          animation-delay: -2s;
-        }
         .pricing-card:nth-child(3)::before {
-          animation-delay: -4s;
           top: auto;
           bottom: 5%;
           right: auto;
@@ -276,11 +288,21 @@ export default function Pricing() {
           0%, 100% { filter: drop-shadow(0 0 6px rgba(34,197,94,0.6)); }
           50% { filter: drop-shadow(0 0 12px rgba(34,197,94,0.9)); }
         }
-        @keyframes drift {
-          0%, 100% { transform: translateY(0px) translateX(0px); }
-          25% { transform: translateY(-20px) translateX(10px); }
-          50% { transform: translateY(-30px) translateX(-10px); }
-          75% { transform: translateY(-15px) translateX(15px); }
+        @media (prefers-reduced-motion: reduce) {
+          .pricing-card,
+          .pricing-card:hover,
+          .shiny-brown-btn,
+          .shiny-brown-btn:hover {
+            transition: none !important;
+            transform: none !important;
+          }
+
+          .shiny-brown-btn,
+          .shiny-brown-btn::after,
+          .pricing-card::before,
+          .w-4.h-4.flex-shrink-0.mt-0\.5 {
+            animation: none !important;
+          }
         }
       `}</style>
     </section>
@@ -358,6 +380,7 @@ function PricingCard({ plan, demoBooking }) {
             <span className="text-sm text-muted-foreground mb-2">/month</span>
           </div>
           <p className="text-xs text-muted-foreground mb-3">{plan.setup}</p>
+          <p className="text-xs font-semibold text-primary/80 mb-3">{plan.roiHint}</p>
           <p className="text-xs text-muted-foreground text-left">
             One-time setup fee plus monthly service. No long-term contracts. Cancel anytime.
           </p>

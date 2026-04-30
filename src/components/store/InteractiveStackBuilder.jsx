@@ -1,9 +1,16 @@
 import { Trash2, Package2 } from "lucide-react";
+import { useMemo } from "react";
 import { useCart } from "@/lib/cartContext";
 import { formatCurrency, getPackageDisplayLabel } from "@/lib/aiProducts";
 
 export default function InteractiveStackBuilder() {
   const { items, removeItem, pricingSummary } = useCart();
+  const reduceMotion = useMemo(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+      return false;
+    }
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
 
   return (
     <div
@@ -38,16 +45,18 @@ export default function InteractiveStackBuilder() {
               <div
                 key={item.product_id}
                 style={{
-                  transform: `rotateX(${index * 2}deg) scale(${1 - index * 0.02})`,
+                  transform: reduceMotion
+                    ? `translateY(${index * -2}px)`
+                    : `rotateX(${index * 2}deg) scale(${1 - index * 0.02})`,
                   transformOrigin: "bottom center",
-                  transformStyle: "preserve-3d",
+                  transformStyle: reduceMotion ? "flat" : "preserve-3d",
                   background: `linear-gradient(135deg, rgba(154,92,46,0.${15 + index * 8}), rgba(200,150,92,0.${8 + index * 6}))`,
                   borderRadius: "10px",
                   padding: "10px 16px",
                   border: "1px solid rgba(154,92,46,0.2)",
                   minWidth: "200px",
                   boxShadow: `0 ${4 + index * 2}px ${12 + index * 4}px rgba(0,0,0,0.${8 + index * 3})`,
-                  transition: "all 0.3s ease",
+                  transition: reduceMotion ? "none" : "all 0.3s ease",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

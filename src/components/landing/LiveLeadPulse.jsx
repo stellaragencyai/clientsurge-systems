@@ -1,30 +1,58 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapPin } from "lucide-react";
 
 const DEMO_LOCATIONS = [
-  "Phoenix, AZ", "San Diego, CA", "Denver, CO", "Austin, TX", "Miami, FL",
-  "Seattle, WA", "Nashville, TN", "Portland, OR", "Las Vegas, NV", "Chicago, IL"
+  "Phoenix, AZ",
+  "San Diego, CA",
+  "Denver, CO",
+  "Austin, TX",
+  "Miami, FL",
+  "Seattle, WA",
+  "Nashville, TN",
+  "Portland, OR",
+  "Las Vegas, NV",
+  "Chicago, IL",
 ];
 
 export default function LiveLeadPulse() {
   const [leadCount, setLeadCount] = useState(247);
   const [recentLeads, setRecentLeads] = useState([]);
   const [showFlash, setShowFlash] = useState(false);
+  const updateCountRef = useRef(0);
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const reduceMotion = typeof window.matchMedia === "function"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false;
+
+    if (reduceMotion) {
+      return undefined;
+    }
+
     const interval = setInterval(() => {
+      if (updateCountRef.current >= 3) {
+        clearInterval(interval);
+        return;
+      }
+
+      updateCountRef.current += 1;
       setLeadCount((prev) => prev + Math.floor(Math.random() * 3) + 1);
       setShowFlash(true);
-      
+
       const newLead = {
         id: Date.now(),
-        location: DEMO_LOCATIONS[Math.floor(Math.random() * DEMO_LOCATIONS.length)],
-        time: "now",
+        location:
+          DEMO_LOCATIONS[Math.floor(Math.random() * DEMO_LOCATIONS.length)],
+        time: "just now",
       };
-      
+
       setRecentLeads((prev) => [newLead, ...prev.slice(0, 2)]);
-      
-      setTimeout(() => setShowFlash(false), 600);
+
+      window.setTimeout(() => setShowFlash(false), 600);
     }, 4000);
 
     return () => clearInterval(interval);
@@ -45,7 +73,6 @@ export default function LiveLeadPulse() {
         pointerEvents: "none",
       }}
     >
-      {/* Main pulse card */}
       <div
         style={{
           background: "rgba(255,255,255,0.85)",
@@ -78,11 +105,38 @@ export default function LiveLeadPulse() {
         </span>
       </div>
 
-      {/* Location stickers removed */}
+      {recentLeads.slice(0, 2).map((lead, index) => (
+        <div
+          key={lead.id}
+          style={{
+            background: "rgba(255,255,255,0.72)",
+            backdropFilter: "blur(10px)",
+            borderRadius: "9999px",
+            border: "1px solid rgba(154,92,46,0.14)",
+            padding: "7px 12px",
+            boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
+            display: "flex",
+            alignItems: "center",
+            gap: "7px",
+            animation: `fadeIn 0.45s ease ${index * 0.05}s both`,
+          }}
+        >
+          <MapPin className="h-3.5 w-3.5" style={{ color: "#9a5c2e" }} />
+          <span style={{ fontSize: "11px", fontWeight: "600", color: "rgba(26,18,9,0.7)" }}>
+            {lead.location}
+          </span>
+        </div>
+      ))}
 
       <style>{`
         @keyframes hPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
         @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+        @media (prefers-reduced-motion: reduce) {
+          [style*="animation: hPulse"],
+          [style*="animation: fadeIn"] {
+            animation: none !important;
+          }
+        }
       `}</style>
     </div>
   );
