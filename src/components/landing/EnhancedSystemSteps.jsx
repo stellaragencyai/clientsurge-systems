@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   CalendarCheck,
@@ -26,6 +27,61 @@ const steps = [
   ["07", "Pipeline Control", LayoutDashboard, "Auto-manage the CRM and pipeline", "Statuses, handoffs, and visibility stay updated automatically so you know where each lead stands.", "Full visibility", ["Lead changes stage or replies", "Pipeline updates itself automatically", "Cleaner reporting and handoff visibility"]],
   ["08", "Ongoing Support", HeadphonesIcon, "Keep the system live, tuned, and improving", "This is not a static setup. We continue tuning the system so it stays aligned with your workflow.", "Priority support", ["Live system performance is reviewed", "Messaging and flow updates are applied", "The system improves instead of going stale"]],
 ];
+
+// Particle burst component for hover effect
+function ParticleBurst({ trigger }) {
+  return (
+    <AnimatePresence>
+      {trigger &&
+        [...Array(6)].map((_, i) => {
+          const angle = (i / 6) * Math.PI * 2;
+          const distance = 80;
+          const x = Math.cos(angle) * distance;
+          const y = Math.sin(angle) * distance;
+          return (
+            <motion.div
+              key={i}
+              initial={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+              animate={{ opacity: 0, x, y, scale: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="pointer-events-none absolute left-1/2 top-1/2 h-2 w-2 rounded-full -translate-x-1/2 -translate-y-1/2"
+              style={{ background: "linear-gradient(135deg,#f0cf9b,#b77b47)" }}
+            />
+          );
+        })}
+    </AnimatePresence>
+  );
+}
+
+// SVG connector with animated path
+function FlowConnector() {
+  return (
+    <svg
+      className="absolute left-1/2 w-full max-w-xs -translate-x-1/2"
+      style={{ height: "60px", top: "-30px", pointerEvents: "none" }}
+      viewBox="0 0 200 60"
+      preserveAspectRatio="none"
+    >
+      <motion.path
+        d="M 100 0 Q 100 30 100 60"
+        stroke="url(#gradient)"
+        strokeWidth="2"
+        fill="none"
+        initial={{ pathLength: 0 }}
+        whileInView={{ pathLength: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        viewport={{ once: true, amount: 0.5 }}
+      />
+      <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="rgba(240,207,155,0.6)" />
+          <stop offset="100%" stopColor="rgba(183,123,71,0.2)" />
+        </linearGradient>
+      </defs>
+    </svg>
+  );
+}
 
 function StepModal({ activeStep, onClose, onBook }) {
   const step = useMemo(() => steps.find((s) => s[0] === activeStep), [activeStep]);
@@ -96,6 +152,7 @@ function StepModal({ activeStep, onClose, onBook }) {
 export default function EnhancedSystemSteps() {
   const [activeStep, setActiveStep] = useState(null);
   const [showDemoModal, setShowDemoModal] = useState(false);
+  const [iconHovered, setIconHovered] = useState(null);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -156,9 +213,24 @@ export default function EnhancedSystemSteps() {
                       {lane}
                     </div>
                     <div className="mb-4 flex items-start gap-4">
-                      <div className="mt-1 flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-white/30 bg-white/20 backdrop-blur">
-                        <StepIcon className="h-6 w-6 text-amber-100" />
-                      </div>
+                      <motion.div
+                           className="relative mt-1 flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-white/30 bg-white/20 backdrop-blur"
+                           onHoverStart={() => setIconHovered(stepNum)}
+                           onHoverEnd={() => setIconHovered(null)}
+                           whileHover={{
+                             scale: 1.12,
+                             boxShadow: "0 0 20px rgba(240,207,155,0.4)",
+                           }}
+                           transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                         >
+                           <motion.div
+                             animate={iconHovered === stepNum ? { scale: [1, 1.3, 1] } : { scale: 1 }}
+                             transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 0.5 }}
+                           >
+                             <StepIcon className="h-6 w-6 text-amber-100" />
+                           </motion.div>
+                           <ParticleBurst trigger={iconHovered === stepNum} />
+                         </motion.div>
                       <div>
                         <h3 className="font-display text-2xl font-semibold leading-tight text-white md:text-[1.95rem]">{title}</h3>
                         <p className="mt-3 max-w-xl text-[15px] leading-7 text-amber-100/80">{desc}</p>
@@ -171,19 +243,27 @@ export default function EnhancedSystemSteps() {
                   </div>
                 </div>
 
-                <div className="rounded-[1.75rem] border border-white/70 bg-white/55 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur">
-                  <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8a684a]">What This Step Does</p>
-                  <div className="space-y-3">
-                    {diagram.map((item, pointIndex) => (
-                      <div key={item} className="flex items-start gap-3 rounded-2xl border border-[#e6d6c0] bg-[linear-gradient(180deg,rgba(255,255,255,0.85),rgba(255,250,243,0.92))] px-4 py-3 shadow-sm" style={{ animation: `slidePointIn 380ms ease ${(index * 90) + (pointIndex * 70)}ms both` }}>
-                        <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#f5e0c2] text-[#8a5a32]">
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                        </div>
-                        <p className="text-sm font-medium leading-6 text-slate-700">{item}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <div className="relative rounded-[1.75rem] border border-white/70 bg-white/55 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur">
+                   <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8a684a]">What This Step Does</p>
+                   <div className="space-y-3">
+                     {diagram.map((item, pointIndex) => (
+                       <motion.div
+                         key={item}
+                         className="relative flex items-start gap-3 rounded-2xl border border-[#e6d6c0] bg-[linear-gradient(180deg,rgba(255,255,255,0.85),rgba(255,250,243,0.92))] px-4 py-3 shadow-sm"
+                         initial={{ opacity: 0, x: -10 }}
+                         whileInView={{ opacity: 1, x: 0 }}
+                         transition={{ delay: (pointIndex * 0.1), duration: 0.4, ease: "easeOut" }}
+                         viewport={{ once: true, amount: 0.5 }}
+                       >
+                         {pointIndex < diagram.length - 1 && <FlowConnector />}
+                         <div className="mt-0.5 flex h-6 w-6 items-center justify-center rounded-full bg-[#f5e0c2] text-[#8a5a32]">
+                           <CheckCircle2 className="h-3.5 w-3.5" />
+                         </div>
+                         <p className="text-sm font-medium leading-6 text-slate-700">{item}</p>
+                       </motion.div>
+                     ))}
+                   </div>
+                 </div>
 
                 <div className="rounded-[1.75rem] border border-[#d6c2ab] bg-[linear-gradient(180deg,rgba(109,67,33,0.98),rgba(139,91,52,0.98))] p-5 text-amber-50 shadow-[0_24px_50px_rgba(107,63,31,0.22)]">
                   <div className="mb-4 flex items-center justify-between gap-3">
