@@ -46,7 +46,7 @@ function useScrollGradient() {
       };
       const [h1, s1, l1] = parse(a);
       const [h2, s2, l2] = parse(b);
-      return `hsl(${h1 + (h2 - h1) * t},${s1 + (s2 - s1) * t}%,${l1 + (l2 - l1) * t}%)`;
+      return `hsl(${h1 + (h2 - h1) * t}, ${s1 + (s2 - s1) * t}%, ${l1 + (l2 - l1) * t}%)`;
     };
 
     const onScroll = () => {
