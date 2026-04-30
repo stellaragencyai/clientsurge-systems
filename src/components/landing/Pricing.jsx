@@ -175,7 +175,7 @@ export default function Pricing() {
           )}
         </div>
 
-        <div className="text-center max-w-xl mx-auto border-t border-border pt-10">
+        <div className="text-center max-w-xl mx-auto border-t border-border pt-10 hidden">
           <p className="text-foreground font-semibold text-base mb-5 hidden">
             Not sure which system fits your business? We will recommend the best option based on your lead flow.
           </p>

@@ -1,6 +1,6 @@
 export default function SectionBreak() {
   return (
-    <div className="bg-[#973535] py-24 opacity-100 rounded-none relative md:py-40"
+    <div className="bg-[#973535] py-24 opacity-100 rounded-none relative md:py-40 hidden"
 
     style={{
       background: "linear-gradient(to bottom, transparent 0%, rgba(154,92,46,0.02) 20%, rgba(154,92,46,0.05) 50%, rgba(154,92,46,0.02) 80%, transparent 100%)"
