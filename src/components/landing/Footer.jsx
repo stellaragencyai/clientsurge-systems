@@ -197,9 +197,9 @@ export default function Footer() {
         </div>
         
         {/* Enhancement 2: Rich bottom strip with trust badges + security info */}
-        <div
-          className="border-t border-primary/10 px-4 md:px-6 py-6"
-          style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.06) 0%, rgba(200,150,92,0.03) 100%)" }}>
+        <div className="border-t border-primary/10 px-4 md:px-6 py-6 hidden"
+
+        style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.06) 0%, rgba(200,150,92,0.03) 100%)" }}>
           
           <div className="max-w-7xl mx-auto">
             {/* Trust badges row */}
