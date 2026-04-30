@@ -181,9 +181,9 @@ function StepRow({ step, idx }) {
       y: 0,
       transition: {
         type: "spring",
-        stiffness: 80,
-        damping: 16,
-        duration: 0.8,
+        stiffness: 40,
+        damping: 20,
+        duration: 1.4,
       }
     }
   };
@@ -392,26 +392,11 @@ function TimelineArrowCTA({ onBookDemo }) {
 export default function LaunchTimeline() {
   const [headerRef, headerVisible] = useInView(0.2);
   const [activeStep, setActiveStep] = useState(0);
-  const [lineHeight, setLineHeight] = useState(0);
   const stepRefs = useRef([]);
   const lineContainerRef = useRef(null);
   const { openDemoBooking } = useDemoBooking();
 
-  useEffect(() => {
-    const container = lineContainerRef.current;
-    if (!container) return;
-    const handleScroll = () => {
-      const rect = container.getBoundingClientRect();
-      const totalH = container.scrollHeight;
-      const viewportH = window.innerHeight;
-      const scrolled = Math.max(0, viewportH - rect.top);
-      const pct = Math.min(scrolled / totalH, 1);
-      setLineHeight(pct * 100);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+
 
   const handleTrackerClick = (idx) => {
     setActiveStep(idx);
@@ -472,13 +457,17 @@ export default function LaunchTimeline() {
                 onClick={() => handleTrackerClick(idx)}
                 className="flex flex-col items-center gap-3 border-none bg-transparent cursor-pointer group"
               >
-                <div
+                <motion.div
                   className="rounded-full flex items-center justify-center flex-shrink-0 relative"
+                  whileHover={{
+                    boxShadow: "0 0 0 3px rgba(0,0,0,0.08), 0 0 24px rgba(154,92,46,0.5), 0 0 40px rgba(154,92,46,0.3), inset 0 0 20px rgba(154,92,46,0.15)",
+                  }}
                   style={{
                     width: "70px", height: "70px",
                     background: isActive
                       ? "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)"
                       : "rgba(154,92,46,0.12)",
+                    border: "2px solid #000000",
                     boxShadow: isActive
                       ? "0 0 0 5px rgba(154,92,46,0.15), 0 4px 14px rgba(154,92,46,0.35)"
                       : "none",
@@ -488,11 +477,11 @@ export default function LaunchTimeline() {
                   <span className="font-black leading-none" style={{ fontSize: "28px", color: isActive ? "#fff" : "#9a5c2e" }}>{step.number}</span>
                   <div
                     className="absolute rounded-full flex items-center justify-center"
-                    style={{ width: "24px", height: "24px", bottom: "-3px", right: "-3px", background: "#f5e6d0", border: "2px solid rgba(154,92,46,0.25)" }}
+                    style={{ width: "24px", height: "24px", bottom: "-3px", right: "-3px", background: "#f5e6d0", border: "2px solid #000000" }}
                   >
                     <Icon style={{ width: "14px", height: "14px", color: "#9a5c2e" }} />
                   </div>
-                </div>
+                </motion.div>
                 <p className="text-xs font-semibold text-foreground text-center max-w-[90px] leading-tight">{step.title}</p>
                 <p className="text-[10px] text-muted-foreground text-center">{step.duration}</p>
               </button>
@@ -548,15 +537,12 @@ export default function LaunchTimeline() {
           className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block"
           style={{ background: "rgba(154,92,46,0.1)", transform: "translateX(-50%)" }}
         />
-        {/* Scroll-driven animated line */}
+        {/* Static line */}
         <div
-          className="absolute left-6 md:left-1/2 top-0 w-0.5 hidden md:block pointer-events-none"
+          className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block pointer-events-none"
           style={{
-            height: `${lineHeight}%`,
             background: "linear-gradient(180deg, #9a5c2e 0%, #c8965c 50%, rgba(200,150,92,0.6) 100%)",
             transform: "translateX(-50%)",
-            transition: "height 0.15s linear",
-            boxShadow: "0 0 8px rgba(200,150,92,0.3)",
           }}
         />
 
