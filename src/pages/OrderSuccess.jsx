@@ -51,7 +51,7 @@ export default function OrderSuccess() {
             className="font-display"
             style={{ fontSize: "2.2rem", fontWeight: "800", color: "#1a1209", marginBottom: "12px" }}
           >
-            You&apos;re All Set!
+            You're All Set!
           </h1>
           <p
             style={{
@@ -62,7 +62,7 @@ export default function OrderSuccess() {
             }}
           >
             Your payment was successful. Our team has been notified and will begin your setup review shortly.
-            You&apos;ll receive a confirmation email and can track progress in your client portal.
+            You'll receive a confirmation email and can track progress in your client portal.
           </p>
 
           <div
@@ -88,7 +88,7 @@ export default function OrderSuccess() {
               What Happens Next
             </p>
             {[
-              { step: "1", text: "You&apos;ll receive an order confirmation email within minutes." },
+              { step: "1", text: "You'll receive an order confirmation email within minutes." },
               { step: "2", text: "Our team reviews your paid order and starts the canonical setup workflow." },
               { step: "3", text: "Each purchased service moves through configuration, testing, and live review inside our admin workspace." },
               { step: "4", text: "Your client portal reflects the real paid-order setup status as services are verified." },
