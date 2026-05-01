@@ -9,6 +9,8 @@ import { SectionSkeleton, SmallSectionSkeleton, LargeSectionSkeleton } from "../
 
 // Lazy load below-the-fold sections
 const Industries = lazy(() => import("../components/landing/Industries"));
+const SystemFlowDiagram = lazy(() => import("../components/landing/SystemFlowDiagram"));
+const EnhancedSystemSteps = lazy(() => import("../components/landing/EnhancedSystemSteps"));
 const ProblemSolution = lazy(() => import("../components/landing/ProblemSolution.jsx"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const IntegrationPartners = lazy(() => import("../components/landing/IntegrationPartners"));
@@ -129,6 +131,10 @@ export default function Home() {
         <Suspense fallback={<LargeLoadingFallback />}>
           <SectionBreak />
           <LeadLeakage />
+          <SectionBreak />
+          <SystemFlowDiagram />
+          <SectionBreak />
+          <EnhancedSystemSteps />
           <SectionBreak />
           <CoreOffer />
           <SectionBreak />
