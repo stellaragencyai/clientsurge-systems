@@ -5,7 +5,7 @@ export default function ExpectationsChecklist() {
     {
       icon: Zap,
       title: 'Fast Deployment',
-      description: 'Most clients are live within 2–3 business days from submission.',
+      description: 'Most clients are live within 5–7 business days from submission.',
     },
     {
       icon: FileText,
@@ -62,7 +62,7 @@ export default function ExpectationsChecklist() {
             <p className="text-sm text-foreground">Admin review and AI message generation complete</p>
           </div>
           <div className="flex gap-4">
-            <div className="text-xs font-bold text-primary min-w-fit">2–3 days</div>
+            <div className="text-xs font-bold text-primary min-w-fit">5–7 days</div>
             <p className="text-sm text-foreground">System testing and final approval</p>
           </div>
           <div className="flex gap-4">
