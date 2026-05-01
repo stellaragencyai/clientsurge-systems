@@ -136,7 +136,7 @@ export default function Navbar() {
     if (!location.hash || !SAFE_SECTION_HASHES.has(location.hash)) return;
     const timer = window.setTimeout(() => {
       smoothScrollToHash(location.hash);
-    }, 250);
+    }, 900);
     return () => window.clearTimeout(timer);
   }, [location.hash]);
 
