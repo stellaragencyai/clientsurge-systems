@@ -53,6 +53,9 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
           mass: 0.9,
           opacity: { duration: 0.3, ease: "easeOut" },
         }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={product?.name ? `${product.name} details` : "Service details"}
         onClick={(e) => e.stopPropagation()}
         style={{
           position: "fixed", inset: 0, zIndex: 1001,
