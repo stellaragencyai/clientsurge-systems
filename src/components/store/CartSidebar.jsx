@@ -50,6 +50,14 @@ export default function CartSidebar() {
       });
 
       if (response.data?.url) {
+        // Save order summary so OrderSuccess can display what was purchased
+        try {
+          sessionStorage.setItem("clientsurge:last-order", JSON.stringify({
+            items: items.map(i => ({ icon: i.icon, name: i.name, setup_fee: i.setup_fee, monthly_fee: i.monthly_fee })),
+            totalSetup,
+            totalMonthly,
+          }));
+        } catch {}
         window.location.href = response.data.url;
         return;
       }
