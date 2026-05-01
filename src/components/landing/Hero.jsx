@@ -77,7 +77,7 @@ export default function Hero() {
           minHeight: "100svh"
         }}>
         
-        <div className="landing-hero__copy" style={{ gridColumn: "1 / -1", marginBottom: "-32px", textAlign: "center", maxWidth: "100%" }}>
+        <div className="landing-hero__copy" style={{ gridColumn: "1 / -1", marginBottom: "0px", textAlign: "center", maxWidth: "100%", position: "relative", zIndex: 10 }}>
 
 
           <h1
