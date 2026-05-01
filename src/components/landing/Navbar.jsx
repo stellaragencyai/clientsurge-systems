@@ -308,6 +308,8 @@ export default function Navbar() {
         <button
           className="md:hidden w-10 h-10 rounded-full border border-border bg-background/70 backdrop-blur flex items-center justify-center text-foreground shadow-sm"
           onClick={() => setOpen(!open)}
+            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={open}
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
         >
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
