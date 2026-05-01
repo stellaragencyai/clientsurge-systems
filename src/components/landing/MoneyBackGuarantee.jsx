@@ -15,7 +15,7 @@ export default function MoneyBackGuarantee() {
         }} />
       
 
-      <div className="relative z-10 px-6 md:px-10 py-8 flex items-start gap-6 hidden">
+      <div className="relative z-10 px-6 md:px-10 py-8 flex items-start gap-6">
         <div className="flex-shrink-0">
           <div className="flex items-center justify-center h-14 w-14 rounded-lg bg-primary/15">
             <Shield className="h-7 w-7 text-primary" />
