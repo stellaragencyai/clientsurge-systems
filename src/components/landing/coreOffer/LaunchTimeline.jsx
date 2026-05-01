@@ -86,13 +86,13 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
         transform: barVisible ? "translateY(0)" : "translateY(16px)"
       }}>
       
-      <div
-        className="rounded-2xl px-5 py-4"
-        style={{
-          background: "rgba(255,255,255,0.9)",
-          border: "1.5px solid rgba(154,92,46,0.32)",
-          boxShadow: "0 6px 20px rgba(111,67,31,0.07)"
-        }}>
+      <div className="px-5 py-4 opacity-100 rounded-2xl"
+
+      style={{
+        background: "rgba(255,255,255,0.9)",
+        border: "1.5px solid rgba(154,92,46,0.14)",
+        boxShadow: "0 6px 20px rgba(111,67,31,0.07)"
+      }}>
         
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs font-semibold text-foreground">Your estimated setup timeline</p>
