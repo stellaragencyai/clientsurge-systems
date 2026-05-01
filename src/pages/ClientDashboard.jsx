@@ -217,9 +217,24 @@ export default function ClientDashboard() {
     paymentStatus: order?.payment_status || "",
   }));
 
+  // Safety: if portalData fetch threw an unhandled error, show support card
+  if (!loading && !portalData && !error) {
+    return (
+      <DemoBookingProvider>
+        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#fdfbf8" }}>
+          <div style={{ textAlign: "center", padding: "48px 24px" }}>
+            <p style={{ fontSize: "20px", fontWeight: "700", color: "#1b140d", marginBottom: "8px" }}>Something went wrong</p>
+            <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.55)", marginBottom: "24px" }}>We could not load your dashboard. Please refresh or contact support.</p>
+            <a href="mailto:support@clientsurgesystems.com" style={{ color: "#9a5c2e", fontWeight: "600", fontSize: "14px" }}>support@clientsurgesystems.com</a>
+          </div>
+        </div>
+      </DemoBookingProvider>
+    );
+  }
+
   return (
     <DemoBookingProvider>
-      <ChatAssistant />
+      <ChatAssistant installStatus={activeServices[0]?.installStatus} services={activeServices} />
       <MobileBottomNav />
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 50%, #fdfbf8 100%)" }}>
         <Navbar />
