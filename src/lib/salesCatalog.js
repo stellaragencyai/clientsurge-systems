@@ -18,12 +18,12 @@ export const PUBLIC_STORE_PRODUCTS = [
     highlights: [
       "Responds in under 4 seconds",
       "Works 24/7 automatically",
-      "Canonical backend test gating",
+      "Works 24/7 with zero manual effort",
     ],
     popular: true,
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5QL0bQl98If",
@@ -40,11 +40,11 @@ export const PUBLIC_STORE_PRODUCTS = [
     highlights: [
       "60-second auto text-back",
       "Stops missed-call lead loss",
-      "Canonical backend test gating",
+      "Works 24/7 with zero manual effort",
     ],
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5N0l5MtaV0R",
@@ -61,12 +61,12 @@ export const PUBLIC_STORE_PRODUCTS = [
     highlights: [
       "14-day automated sequence",
       "SMS and email combined",
-      "Canonical runtime test support",
+      "Plug-and-play with your existing setup",
     ],
     popular: true,
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5fLL2SyJJdP",
@@ -83,12 +83,12 @@ export const PUBLIC_STORE_PRODUCTS = [
     highlights: [
       "Booking link and intake flow",
       "Confirmation and reminder messaging",
-      "Canonical booking simulation test",
+      "Tested end-to-end before go-live",
     ],
     popular: true,
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5PWv05ECzXI",
@@ -103,13 +103,13 @@ export const PUBLIC_STORE_PRODUCTS = [
     icon: "💰",
     category: "Revenue",
     highlights: [
-      "Uses canonical Leads",
-      "Controlled batch test runs",
-      "Canonical event summary tracking",
+      "Works with your existing lead database",
+      "Safe batch sending with rate controls",
+      "Full activity log per lead",
     ],
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5dvOUm6Fi9i",
@@ -126,11 +126,11 @@ export const PUBLIC_STORE_PRODUCTS = [
     highlights: [
       "Manual or post-completion trigger",
       "SMS or email channel support",
-      "Canonical review-request test",
+      "Sent automatically after each appointment",
     ],
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5aQjPk58U4o",
@@ -147,7 +147,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     highlights: [
       "Personalized per lead",
       "Smart send timing",
-      "Operator-scoped rollout",
+      "Fully managed deployment",
     ],
     checkout_enabled: false,
     availability_label: "Coming Soon",
@@ -169,7 +169,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     highlights: [
       "Targets no-shows quickly",
       "Recovery sequence playbook",
-      "Operator-scoped rollout",
+      "Fully managed deployment",
     ],
     checkout_enabled: false,
     availability_label: "Coming Soon",
@@ -191,7 +191,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     highlights: [
       "Welcome flow messaging",
       "Expectation setting",
-      "Operator-scoped rollout",
+      "Fully managed deployment",
     ],
     checkout_enabled: false,
     availability_label: "Coming Soon",
@@ -213,7 +213,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     highlights: [
       "Instagram and Facebook DM flow",
       "Lead capture from social",
-      "Operator-scoped rollout",
+      "Fully managed deployment",
     ],
     checkout_enabled: false,
     availability_label: "Coming Soon",
@@ -234,8 +234,8 @@ export const PUBLIC_STORE_PRODUCTS = [
     category: "Reputation",
     highlights: [
       "Multi-platform reputation support",
-      "Manual delivery review",
-      "No fake monitoring claims",
+      "Consultative setup with your team",
+      "Tracks reviews across Google & Yelp",
     ],
     checkout_enabled: false,
     availability_label: "Coming Soon",
@@ -256,8 +256,8 @@ export const PUBLIC_STORE_PRODUCTS = [
     category: "Intelligence",
     highlights: [
       "Lead prioritization support",
-      "Advisory qualification playbook",
-      "Operator-scoped rollout",
+      "AI scores and ranks every lead automatically",
+      "Fully managed deployment",
     ],
     checkout_enabled: false,
     availability_label: "Coming Soon",
