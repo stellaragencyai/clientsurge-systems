@@ -361,19 +361,19 @@ function TimelineArrowCTA({ onBookDemo }) {
       </motion.div>
 
       {/* CTA Card */}
-      <motion.div
-        className="mt-8 rounded-3xl px-8 py-8 text-center max-w-sm"
-        initial={{ opacity: 0, y: 20 }}
-        animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-        whileHover={{ boxShadow: "0 20px 60px rgba(111,67,31,0.18)" }}
-        style={{
-          background: "linear-gradient(135deg, rgba(154,92,46,0.09) 0%, rgba(200,150,92,0.06) 100%)",
-          border: "1.5px solid rgba(154,92,46,0.25)",
-          boxShadow: "0 12px 40px rgba(111,67,31,0.1)",
-          transition: "border-color 0.3s ease",
-          borderColor: isHovered ? "rgba(154,92,46,0.4)" : "rgba(154,92,46,0.25)"
-        }}>
+      <motion.div className="mt-8 rounded-3xl px-8 py-8 text-center max-w-sm hidden"
+
+      initial={{ opacity: 0, y: 20 }}
+      animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+      transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+      whileHover={{ boxShadow: "0 20px 60px rgba(111,67,31,0.18)" }}
+      style={{
+        background: "linear-gradient(135deg, rgba(154,92,46,0.09) 0%, rgba(200,150,92,0.06) 100%)",
+        border: "1.5px solid rgba(154,92,46,0.25)",
+        boxShadow: "0 12px 40px rgba(111,67,31,0.1)",
+        transition: "border-color 0.3s ease",
+        borderColor: isHovered ? "rgba(154,92,46,0.4)" : "rgba(154,92,46,0.25)"
+      }}>
         
         <p className="font-display text-2xl font-bold text-foreground mb-3 leading-snug">
           Ready to see which systems fit your business?
