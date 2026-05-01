@@ -17,9 +17,9 @@ const navColumns = [
   title: "Industries",
   links: [
   { label: "Med Spas & Aesthetic Clinics", href: "/med-spa" },
-  { label: "Dental & Orthodontics", href: "/industries#dental" },
-  { label: "Chiropractic & PT", href: "/industries#chiropractic" },
-  { label: "HVAC & Home Services", href: "/industries#hvac" },
+  { label: "Dental & Orthodontics", href: "/dental" },
+  { label: "Chiropractic & PT", href: "/chiropractic" },
+  { label: "HVAC & Home Services", href: "/hvac" },
   { label: "All Industries", href: "/industries" }]
 
 },
