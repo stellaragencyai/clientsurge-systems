@@ -7,8 +7,8 @@ export function getOrganizationSchema() {
     logo: 'https://media.base44.com/images/public/69d49a29c1974b32f46e8550/aaaacb19f_generated_image.png',
     description:
       'Done-for-you automation systems that help med spas and appointment-based businesses respond faster and book more appointments.',
-    email: 'system@clientsurgesystems.com',
-    telephone: '+1-602-587-4608',
+    email: 'nolan@clientsurgesystems.com',
+    telephone: '+1-602-584-3227',
     address: {
       '@type': 'PostalAddress',
       addressLocality: 'Phoenix',
@@ -33,7 +33,7 @@ export function getLocalBusinessSchema() {
       addressRegion: 'AZ',
       addressCountry: 'US',
     },
-    telephone: '+1-602-587-4608',
+    telephone: '+1-602-584-3227',
     priceRange: '$$'
   };
 }
