@@ -4,8 +4,12 @@ import { X, Check, Plus, CheckCircle2, Clock, Zap, ArrowRight } from "lucide-rea
 
 export default function ServiceDetailModal({ product, inCart, onToggle, onClose }) {
   useEffect(() => {
+    const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      // Always restore — even if unmounted via route change
+      document.body.style.overflow = prev || "";
+    };
   }, []);
 
   const handleToggle = () => {
