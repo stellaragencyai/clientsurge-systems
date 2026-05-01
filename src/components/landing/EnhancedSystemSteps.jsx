@@ -340,6 +340,7 @@ export default function EnhancedSystemSteps() {
         />
       )}
       {showDemoModal && <DemoBookingModal onClose={() => setShowDemoModal(false)} />}
-    </>
+    </div>
+    </section>
   );
 }
