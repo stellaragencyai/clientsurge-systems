@@ -35,7 +35,7 @@ const navColumns = [
 
 const trustBadges = [
   { icon: "🔒", text: "No long-term contracts" },
-  { icon: "⚡", text: "Live in 5–7 days" },
+  { icon: "⚡", text: "Live in 5–7 business days" },
   { icon: "💬", text: "SMS + Email included" },
   { icon: "🎯", text: "Done-for-you setup" },
 ];
