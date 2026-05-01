@@ -32,7 +32,7 @@ function CoreOfferHeader() {
       style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)" }}>
         How The{" "}
         <span style={{ color: "#9a5c2e", textShadow: "0 0 32px rgba(154,92,46,0.28)" }}>
-          8-System
+          6-System
         </span>{" "}
         Flow Works
       </h2>
@@ -185,7 +185,7 @@ function MobileSystemGroupList({ selectedSystemId, onSelect, showAll, onToggle, 
         onClick={onToggle}
         className="w-full inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-white/80">
         
-        {showAll ? "Show condensed view" : "See full 8-system flow"}
+        {showAll ? "Show condensed view" : "See full 6-system flow"}
         <ArrowRight className="w-4 h-4" />
       </button>
     </div>);
