@@ -5,7 +5,7 @@ export default function IndustryFAQ({ faqs }) {
   const [open, setOpen] = useState(null);
 
   return (
-    <section style={{ overflowX: "hidden" }} className="py-20 px-6" style={{ background: "linear-gradient(180deg, #f8f3eb 0%, #fdfbf8 100%)" }}>
+    <section className="py-20 px-6" style={{ overflowX: "hidden", background: "#ffffff" }}>
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary mb-3">FAQ</p>
