@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCart, Zap, Search, ArrowRight, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
@@ -27,6 +27,14 @@ const BundleSavingsToast = lazy(() => import("@/components/store/BundleSavingsTo
 function StoreInner() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const searchDebounce = useRef(null);
+
+  const handleSearchChange = useCallback((val) => {
+    setSearchInput(val);
+    clearTimeout(searchDebounce.current);
+    searchDebounce.current = setTimeout(() => setSearch(val), 280);
+  }, []);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [showComparison, setShowComparison] = useState(false);
   const [pathMode, setPathMode] = useState("guided");
@@ -528,7 +536,7 @@ function StoreInner() {
                 <input
                   type="text"
                   placeholder="Search services..."
-                  value={search}
+                  value={searchInput}
                   onChange={(event) => setSearch(event.target.value)}
                   style={{
                     width: "100%",
