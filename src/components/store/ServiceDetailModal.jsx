@@ -9,6 +9,11 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
   }, []);
 
   const handleToggle = () => {
+    // Guard: don't allow adding coming_soon or non-checkout items
+    if (product?.coming_soon || product?.checkout_enabled === false) {
+      onClose();
+      return;
+    }
     onToggle();
     onClose();
   };
@@ -215,6 +220,8 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
             {/* CTA */}
             <button
               onClick={handleToggle}
+              disabled={product?.coming_soon || product?.checkout_enabled === false}
+              style={(product?.coming_soon || product?.checkout_enabled === false) ? { opacity: 0.45, cursor: "not-allowed" } : {}}
               style={{
                 width: "100%", borderRadius: "9999px", padding: "2px",
                 background: inCart
