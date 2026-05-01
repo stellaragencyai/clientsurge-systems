@@ -90,7 +90,7 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
         className="rounded-2xl px-5 py-4"
         style={{
           background: "rgba(255,255,255,0.9)",
-          border: "1.5px solid rgba(154,92,46,0.14)",
+          border: "1.5px solid rgba(154,92,46,0.32)",
           boxShadow: "0 6px 20px rgba(111,67,31,0.07)"
         }}>
         
