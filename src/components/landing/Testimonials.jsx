@@ -18,7 +18,7 @@ const testimonials = [
     location: "Phoenix, AZ",
     before: "$4k/month ad spend with low conversion",
     after: "Close rate doubled",
-    result: "ROI in under 7 days",
+    result: "ROI within the first month",
     quote: "It paid for itself in the first week.",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=65&auto=format",
   },
