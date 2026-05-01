@@ -86,27 +86,7 @@ export default function Navbar() {
   // Track page views
   usePageViewTracking();
 
-  const smoothScrollToHash = (href) => {
-    const el = getSafeHashTarget(href);
-    if (!el) return false;
 
-    const start = window.scrollY;
-    const target = el.getBoundingClientRect().top + window.scrollY - 64;
-    const distance = target - start;
-    const duration = 900;
-    let startTime = null;
-    const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-
-    const step = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      window.scrollTo(0, start + distance * ease(progress));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-
-    requestAnimationFrame(step);
-    return true;
-  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -133,15 +113,7 @@ export default function Navbar() {
   const handleSectionNavigation = (e, href) => {
     e.preventDefault();
     trackCTA(`nav_${href.replace("#", "")}`, "navbar");
-    if (location.pathname !== "/") {
-      navigate(`/${href}`);
-      setOpen(false);
-      setIndustriesOpen(false);
-      return;
-    }
-
-    smoothScrollToHash(href);
-    window.history.replaceState({}, "", `/${href}`);
+    navigate(`/${href}`);
     setOpen(false);
     setIndustriesOpen(false);
   };
@@ -149,26 +121,7 @@ export default function Navbar() {
   const handleLogoClick = (e) => {
     e.preventDefault();
     trackCTA("nav_logo", "navbar");
-    if (location.pathname !== "/") {
-      navigate("/");
-      return;
-    }
-
-    // Always scroll to top smoothly
-    const start = window.scrollY;
-    const distance = -start;
-    const duration = 900;
-    let startTime = null;
-    const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-
-    const step = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      window.scrollTo(0, start + distance * ease(progress));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-
-    requestAnimationFrame(step);
+    navigate("/");
   };
 
   return (
