@@ -53,8 +53,8 @@ export function getServiceSchema() {
     offers: {
       '@type': 'Offer',
       priceCurrency: 'USD',
-      lowPrice: '397',
-      highPrice: '1500',
+      lowPrice: '497',
+      highPrice: '1997',
     },
     description:
       'Done-for-you systems for instant lead response, automated follow-up, missed-call recovery, and appointment booking.',
