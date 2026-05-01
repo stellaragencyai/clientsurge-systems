@@ -61,8 +61,9 @@ const items = [
     icon: Building2,
     label: "Average recovery window",
     display: "30-day ROI",
-    animatedValue: 30,
-    suffix: "-day ROI",
+    animatedValue: null,
+    suffix: "",
+    display: "30-day ROI",
     story:
       "A few additional booked appointments often cover the investment faster than teams expect.",
   },
