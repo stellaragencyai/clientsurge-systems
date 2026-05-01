@@ -71,7 +71,7 @@ function scoreAnswers(answers) {
 
   if (score <= 3) return "starter_system";
   if (score <= 6) return "growth_system";
-  return "pro_system";
+  return "elite_system";
 }
 
 function getRecommendationReason(answers) {
