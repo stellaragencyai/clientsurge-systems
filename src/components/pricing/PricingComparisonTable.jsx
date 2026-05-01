@@ -5,9 +5,9 @@ const PRICING_PLANS = [
   {
     name: "Starter",
     subtitle: "For getting started",
-    price: "$397",
+    price: "$497",
     billing: "/month",
-    setup: "$997 setup",
+    setup: "$797 setup",
     description: "Essential automation for small lead-driven businesses",
     features: [
       { name: "Instant SMS response to leads", included: true },
@@ -26,9 +26,9 @@ const PRICING_PLANS = [
   {
     name: "Growth",
     subtitle: "Most popular",
-    price: "$797",
+    price: "$997",
     billing: "/month",
-    setup: "$1,997 setup",
+    setup: "$1,297 setup",
     description: "Full automation for scaling revenue from existing demand",
     features: [
       { name: "Instant SMS response to leads", included: true },
@@ -47,9 +47,9 @@ const PRICING_PLANS = [
   {
     name: "Pro",
     subtitle: "For maximum revenue",
-    price: "$1,500",
+    price: "$1,997",
     billing: "/month",
-    setup: "$3,500 setup",
+    setup: "$2,497 setup",
     description: "The complete system with full revenue recovery engine",
     features: [
       { name: "Instant SMS response to leads", included: true },
