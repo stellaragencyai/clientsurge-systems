@@ -93,6 +93,7 @@ export default function Testimonials() {
               </div>
 
               <p className="text-sm text-foreground/75 leading-relaxed flex-1 min-h-[72px] mb-6">
+                <div className="flex gap-0.5 mb-2">{[1,2,3,4,5].map(i => <span key={i} style={{fontSize:"13px"}}>⭐</span>)}</div>
                 "{testimonial.quote}"
               </p>
 
