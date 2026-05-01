@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { ShoppingCart, Zap, Search, ArrowRight, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
 import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
@@ -373,9 +374,13 @@ function StoreInner() {
                 { label: "AI Services Available", val: "12", Icon: LayoutGrid },
                 { label: "Avg. Setup Time", val: "4–6 Hours", Icon: Clock },
                 { label: "Cancel Anytime", val: "No Contracts", Icon: BadgeCheck },
-              ].map(({ label, val, Icon }) => (
-                <div
+              ].map(({ label, val, Icon }, idx) => (
+                <motion.div
                  key={label}
+                 initial={{ opacity: 0, y: 28 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ type: "spring", stiffness: 300, damping: 28, delay: idx * 0.1 }}
+                 whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(154,92,46,0.13)" }}
                  style={{
                    display: "flex",
                    alignItems: "center",
@@ -385,6 +390,7 @@ function StoreInner() {
                    background: "#ffffff",
                    border: "1.5px solid rgba(0,0,0,0.1)",
                    boxShadow: "0 4px 14px rgba(0,0,0,0.07)",
+                   cursor: "default",
                  }}
                 >
                   <div style={{
@@ -408,7 +414,7 @@ function StoreInner() {
                       {label}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
@@ -538,9 +544,12 @@ function StoreInner() {
                 </span>
                 <div className="store-categories">
                   {CATEGORIES.map((category) => (
-                    <button
+                    <motion.button
                       key={category}
                       onClick={() => setActiveCategory(category)}
+                      whileHover={{ y: -1, scale: 1.03 }}
+                      whileTap={{ scale: 0.94 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
                       style={{
                         borderRadius: "9999px",
                         padding: "7px 16px",
@@ -559,7 +568,6 @@ function StoreInner() {
                           activeCategory === category
                             ? "#f5e6d0"
                             : "rgba(27,20,13,0.72)",
-                        transition: "all 0.2s",
                         boxShadow:
                           activeCategory === category
                             ? "0 4px 14px rgba(120,70,20,0.28)"
@@ -567,7 +575,7 @@ function StoreInner() {
                       }}
                     >
                       {category}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
               </div>

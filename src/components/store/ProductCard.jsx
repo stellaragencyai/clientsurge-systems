@@ -231,15 +231,17 @@ export default function ProductCard({ product }) {
         {/* Full-Width CTA Footer */}
         <div style={{ marginTop: "auto", paddingTop: "2px", display: "flex", flexDirection: "column", gap: "8px" }}>
           {!product.coming_soon && (
-            <button
+            <motion.button
               onClick={toggle}
+              whileTap={{ scale: 0.94, rotateY: 6, rotateX: -2 }}
+              whileHover={{ y: -2, boxShadow: inCart ? "0 8px 20px rgba(34,197,94,0.4)" : "0 8px 20px rgba(120,70,20,0.38)" }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
               style={{
                 width: "100%",
                 borderRadius: "9999px", padding: "1px",
                 background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
                 border: "none", cursor: "pointer",
                 boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 4px 12px rgba(120,70,20,0.25)",
-                transition: "all 0.2s",
               }}
             >
               <span style={{
@@ -248,10 +250,11 @@ export default function ProductCard({ product }) {
                 height: "36px", paddingLeft: "16px", paddingRight: "16px", borderRadius: "9999px",
                 background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
                 color: "#fff", fontWeight: "700", fontSize: "11px", whiteSpace: "nowrap",
+                pointerEvents: "none",
               }}>
                 {inCart ? <><Check style={{ width: "12px", height: "12px" }} /> Added to Cart</> : <><Plus style={{ width: "12px", height: "12px" }} /> Add to Cart</>}
               </span>
-            </button>
+            </motion.button>
           )}
 
           {product.coming_soon && (

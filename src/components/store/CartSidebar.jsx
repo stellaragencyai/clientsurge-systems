@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingCart, Trash2, ArrowRight, Lock } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
 import { base44 } from "@/api/base44Client";
@@ -62,11 +63,15 @@ export default function CartSidebar() {
     }
   };
 
-  if (!cartOpen) return null;
-
   return (
+    <AnimatePresence>
+      {cartOpen && (
     <>
-      <div
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
         onClick={() => setCartOpen(false)}
         style={{
           position: "fixed",
@@ -77,7 +82,11 @@ export default function CartSidebar() {
         }}
       />
 
-      <div
+      <motion.div
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ type: "spring", stiffness: 320, damping: 32 }}
         style={{
           position: "fixed",
           top: 0,
@@ -171,9 +180,15 @@ export default function CartSidebar() {
             </div>
           ) : step === "cart" ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {items.map((item) => (
-                <div
+              <AnimatePresence initial={false}>
+              {items.map((item, idx) => (
+                <motion.div
                   key={item.product_id}
+                  initial={{ opacity: 0, x: 40, scale: 0.96 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 40, scale: 0.92 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 30, delay: idx * 0.05 }}
+                  whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(154,92,46,0.13)" }}
                   style={{
                     background: "rgba(255,255,255,0.8)",
                     border: "1px solid rgba(154,92,46,0.1)",
@@ -210,7 +225,8 @@ export default function CartSidebar() {
                       ${item.setup_fee} setup - ${item.monthly_fee}/mo
                     </p>
                   </div>
-                  <button
+                  <motion.button
+                    whileTap={{ scale: 0.85 }}
                     onClick={() => removeItem(item.product_id)}
                     style={{
                       background: "none",
@@ -221,9 +237,10 @@ export default function CartSidebar() {
                     }}
                   >
                     <Trash2 style={{ width: "14px", height: "14px" }} />
-                  </button>
-                </div>
+                  </motion.button>
+                </motion.div>
               ))}
+              </AnimatePresence>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -473,7 +490,9 @@ export default function CartSidebar() {
             </p>
           </div>
         ) : null}
-      </div>
+      </motion.div>
     </>
+      )}
+    </AnimatePresence>
   );
 }
