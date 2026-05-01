@@ -18,7 +18,8 @@ Deno.serve(async (req) => {
     });
     const [hour, minute] = scheduled_time.split(':');
     const h = parseInt(hour, 10);
-    const formattedTime = `${h > 12 ? h - 12 : h}:${minute} ${h >= 12 ? 'PM' : 'AM'} (Arizona Time)`;
+    const displayHour = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    const formattedTime = `${displayHour}:${minute} ${h >= 12 ? 'PM' : 'AM'} (Arizona Time)`;
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
 
