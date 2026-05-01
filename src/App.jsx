@@ -73,10 +73,15 @@ const NOINDEX_PREFIXES = [
   "/admin",
   "/dashboard",
   "/client-portal",
+  "/client-dashboard",
   "/lead-intelligence",
   "/medspa-dashboard",
   "/sam",
   "/success",
+  "/setup",
+  "/onboarding",
+  "/order-success",
+  "/leads",
 ];
 
 const isPublicPath = (pathname) =>
