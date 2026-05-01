@@ -17,7 +17,6 @@ export const PUBLIC_STORE_PRODUCTS = [
     category: "Response",
     highlights: [
       "Responds in under 4 seconds",
-      "Works 24/7 automatically",
       "Works 24/7 with zero manual effort",
     ],
     popular: true,
