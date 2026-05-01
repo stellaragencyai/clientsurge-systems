@@ -9,7 +9,6 @@ import { SectionSkeleton, SmallSectionSkeleton, LargeSectionSkeleton } from "../
 
 // Lazy load below-the-fold sections
 const Industries = lazy(() => import("../components/landing/Industries"));
-const ProblemSolution = lazy(() => import("../components/landing/ProblemSolution.jsx"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const IntegrationPartners = lazy(() => import("../components/landing/IntegrationPartners"));
 const FAQ = lazy(() => import("../components/landing/FAQ"));
