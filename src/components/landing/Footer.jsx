@@ -9,7 +9,7 @@ const navColumns = [
       { label: "Our System", href: "/#services" },
       { label: "Pricing", href: "/#pricing" },
       { label: "FAQ", href: "/#faq" },
-      { label: "Demos & Setup", href: "/book" },
+      { label: "Book a Demo", href: "/book" },
     ],
   },
   {
