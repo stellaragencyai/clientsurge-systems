@@ -12,7 +12,7 @@ const stageExplanations = {
   },
   "Configuring": {
     title: "We're building your system",
-    body: "Your automation flows, message templates, and integrations are being configured right now. This typically takes 2–3 business days.",
+    body: "Your automation flows, message templates, and integrations are being configured right now. This typically takes 5–7 business days.",
     icon: "⚙️",
   },
   "Testing": {
