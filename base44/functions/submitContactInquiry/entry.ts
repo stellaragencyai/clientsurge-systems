@@ -347,6 +347,10 @@ Deno.serve(async (req) => {
     });
 
     const notification = await sendAdminNotification(contact);
+    // Fire SMS to Nolan's cell immediately — non-blocking
+    sendAdminSMS(contact).catch((err) =>
+      console.warn('[submitContactInquiry] SMS alert error (non-blocking):', err)
+    );
     const thankYouEmail = await sendUserThankYouEmail(contact);
 
     await logCommunicationEvent(base44, {
