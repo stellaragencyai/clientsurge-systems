@@ -32,7 +32,7 @@ function CoreOfferHeader() {
       style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)" }}>
         How The{" "}
         <span style={{ color: "#9a5c2e", textShadow: "0 0 32px rgba(154,92,46,0.28)" }}>
-          6-System
+          ClientSurge
         </span>{" "}
         Flow Works
       </h2>
