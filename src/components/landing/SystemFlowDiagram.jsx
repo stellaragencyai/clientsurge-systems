@@ -52,15 +52,18 @@ export default function SystemFlowDiagram() {
   }, [inView]);
 
   return (
+    <section id="system-overview" className="py-20 md:py-28 px-4 md:px-6" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(252,248,243,0.8) 100%)" }}>
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-3" style={{ color: "#9a5c2e" }}>The Full Pipeline</p>
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground tracking-tight mb-4">
+            How the ClientSurge System Works
+          </h2>
+          <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            One connected system. Eight automations. Every lead captured, followed up, and converted — without lifting a finger.
+          </p>
+        </div>
     <div ref={ref} className="mb-14">
-      {/* Label */}
-      <div className="flex items-center gap-3 mb-8">
-        <div className="flex-1 h-px bg-border" />
-        <span className="text-xs font-bold text-primary uppercase tracking-widest px-3 py-1.5 rounded-full border border-primary/20" style={{ background: "rgba(154,92,46,0.06)" }}>
-          How the 8-System Flow Works
-        </span>
-        <div className="flex-1 h-px bg-border" />
-      </div>
 
       {/* ─── DESKTOP: horizontal scroll row ─── */}
       <div className="hidden md:block">
@@ -239,5 +242,7 @@ export default function SystemFlowDiagram() {
         }
       `}</style>
     </div>
+      </div>
+    </section>
   );
 }
