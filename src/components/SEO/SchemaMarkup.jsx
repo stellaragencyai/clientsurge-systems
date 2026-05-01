@@ -7,7 +7,7 @@ export function getOrganizationSchema() {
     logo: 'https://media.base44.com/images/public/69d49a29c1974b32f46e8550/aaaacb19f_generated_image.png',
     description:
       'Done-for-you automation systems that help med spas and appointment-based businesses respond faster and book more appointments.',
-    email: 'nolan@clientsurgesystems.com',
+    email: 'support@clientsurgesystems.com',
     telephone: '+1-602-584-3227',
     address: {
       '@type': 'PostalAddress',
