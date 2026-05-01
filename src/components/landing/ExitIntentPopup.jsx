@@ -4,7 +4,7 @@ import { ArrowRight, CheckCircle2, Loader2, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { trackCTA } from "@/lib/analytics";
 
-const TARGET_PATHS = new Set(["/", "/med-spa", "/industries", "/contact", "/book"]);
+const TARGET_PATHS = new Set(["/", "/med-spa", "/industries", "/contact", "/book", "/store"]);
 const STORAGE_KEY = "clientsurge-exit-intent-dismissed";
 const SESSION_KEY = "clientsurge-exit-intent-session";
 const MANUAL_HASH = "#free-audit-popup";
