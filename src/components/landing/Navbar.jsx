@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion, useScroll, useMotionValueEvent, useTransform } from "framer-motion";
-import { ChevronDown, Menu, Moon, Sun, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
 import DemoBookingModal from "../forms/DemoBookingModal";
@@ -83,9 +82,6 @@ export default function Navbar() {
   const [industriesOpen, setIndustriesOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { scrollY } = useScroll();
-  const navOpacity = useTransform(scrollY, [0, 50], [0.15, 0.6]);
-  const navBlur = useTransform(scrollY, [0, 50], [8, 22]);
 
   // Track page views
   usePageViewTracking();
@@ -182,23 +178,15 @@ export default function Navbar() {
   };
 
   return (
-    <motion.nav
+    <nav
       className="sticky top-4 left-4 right-4 z-50 rounded-2xl border border-white/20"
       style={{
-        backgroundColor: navOpacity.get() > 0.4 ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.08)",
+        backgroundColor: scrolled ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.55)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         paddingTop: "env(safe-area-inset-top)",
         boxShadow: scrolled ? "0 20px 60px rgba(0,0,0,0.12)" : "0 8px 32px rgba(0,0,0,0.06)",
-        transition: "all 0.35s ease-out",
-      }}
-      onScroll={(scrollProgress) => {
-        const threshold = 50;
-        if (typeof window !== "undefined") {
-          const isBelowThreshold = window.scrollY > threshold;
-          if (isBelowThreshold && !scrolled) setScrolled(true);
-          if (!isBelowThreshold && scrolled) setScrolled(false);
-        }
+        transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out",
       }}
     >
       <div className="w-full h-14 md:h-16 flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
@@ -254,23 +242,31 @@ export default function Navbar() {
             </button>
 
             {industriesOpen && (
-              <div className="absolute top-full left-1/2 mt-3 w-60 -translate-x-1/2 rounded-2xl border border-border bg-background/95 backdrop-blur shadow-lg p-3">
-                <div className="space-y-1">
-                  {industryLinks.map((item) => (
-                    <button
-                      key={item.label}
-                      onClick={() => {
-                        trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
-                        navigate(item.href);
-                        setIndustriesOpen(false);
-                      }}
-                      className={`w-full text-left block rounded-xl px-3 py-2 text-sm transition-colors border-none bg-transparent cursor-pointer ${
-                        item.live ? "font-medium text-foreground hover:bg-muted" : "text-muted-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {item.label}
-                    </button>
-                  ))}
+              /* Invisible bridge so cursor can travel from button to menu without gap-close */
+              <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ zIndex: 200 }}>
+                <div
+                  className="w-60 rounded-2xl border border-border p-3 shadow-xl"
+                  style={{
+                    background: "rgba(255,255,255,0.98)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                  }}
+                >
+                  <div className="space-y-1">
+                    {industryLinks.map((item) => (
+                      <button
+                        key={item.label}
+                        onClick={() => {
+                          trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
+                          navigate(item.href);
+                          setIndustriesOpen(false);
+                        }}
+                        className="w-full text-left block rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/8 hover:text-primary transition-colors border-none bg-transparent cursor-pointer"
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -386,6 +382,6 @@ export default function Navbar() {
 
       {showLoginModal && <PortalLoginModal onClose={() => setShowLoginModal(false)} />}
       {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
-    </motion.nav>
+    </nav>
   );
 }
