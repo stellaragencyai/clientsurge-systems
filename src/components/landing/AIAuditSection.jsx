@@ -26,6 +26,13 @@ export default function AIAuditSection() {
   const [error, setError] = useState("");
 
   const handleGenerate = async () => {
+    // Client-side throttle: max 1 audit per 90 seconds
+    const lastRun = parseInt(sessionStorage.getItem("cs_audit_ts") || "0");
+    if (Date.now() - lastRun < 90000) {
+      setError("Please wait a moment before running another audit.");
+      return;
+    }
+    sessionStorage.setItem("cs_audit_ts", String(Date.now()));
     if (!form.website.trim()) {
       setError("Enter your website so the audit has context.");
       return;
