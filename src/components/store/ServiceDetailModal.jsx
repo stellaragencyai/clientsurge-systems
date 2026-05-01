@@ -6,11 +6,30 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => {
-      // Always restore — even if unmounted via route change
-      document.body.style.overflow = prev || "";
+
+    // Focus trap: keep focus within modal while open
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab") return;
+      const modal = document.querySelector('[role="dialog"]');
+      if (!modal) return;
+      const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
     };
-  }, []);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = prev || "";
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
 
   const handleToggle = () => {
     // Guard: don't allow adding coming_soon or non-checkout items
