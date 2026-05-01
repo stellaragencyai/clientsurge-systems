@@ -1,5 +1,7 @@
 import { CheckCircle2, Circle, Loader2 } from "lucide-react";
 
+const DEFAULT_STAGES = ["Order Confirmed", "System Setup", "Configuring", "Testing", "Live ✦"];
+
 const stageConfig = {
   instant_lead_response: ["Order Confirmed", "System Setup", "Integration", "Testing", "Live ✦"],
   missed_call_text_back: ["Order Confirmed", "System Setup", "Twilio Config", "Testing", "Live ✦"],
@@ -10,7 +12,9 @@ const stageConfig = {
 };
 
 export default function HorizontalStageTracker({ serviceKey, currentStage = 0, productName, installStatus }) {
-  const stages = stageConfig[serviceKey] || ["Order Confirmed", "Setup", "Testing", "Live ✦"];
+  // Always fall back to a valid 5-stage track — never renders empty
+  const stages = (serviceKey && stageConfig[serviceKey]) ? stageConfig[serviceKey] : DEFAULT_STAGES;
+  const safeStage = Math.min(Math.max(currentStage, 0), stages.length - 1);
 
   return (
     <div style={{
@@ -48,15 +52,15 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
             fontSize: "12px", fontWeight: "700",
             color: installStatus === "Live" ? "#4ade80" : installStatus === "Error" ? "#f87171" : "#fbbf24",
           }}>
-            {installStatus === "Live" ? "✦ Live" : installStatus === "Error" ? "⚠ Needs Attention" : `Step ${Math.min(currentStage + 1, stages.length)} of ${stages.length}`}
+            {installStatus === "Live" ? "✦ Live" : installStatus === "Error" ? "⚠ Needs Attention" : `Step ${Math.min(safeStage + 1, stages.length)} of ${stages.length}`}
           </div>
         </div>
 
         {/* Step indicators */}
         <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
           {stages.map((stage, idx) => {
-            const isComplete = idx < currentStage;
-            const isCurrent = idx === currentStage;
+            const isComplete = idx < safeStage;
+            const isCurrent = idx === safeStage;
             const isLast = idx === stages.length - 1;
             return (
               <div key={idx} style={{ display: "flex", alignItems: "center", flex: isLast ? "0 0 auto" : 1, minWidth: 0 }}>
@@ -91,7 +95,7 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
                 {!isLast && (
                   <div style={{
                     flex: 1, height: "2px", margin: "0 4px", marginBottom: "24px",
-                    background: idx < currentStage
+                    background: idx < safeStage
                       ? "linear-gradient(90deg,#22c55e,#16a34a)"
                       : "rgba(255,255,255,0.12)",
                     transition: "background 0.4s ease",
