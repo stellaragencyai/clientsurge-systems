@@ -5,6 +5,9 @@ import TrustBar from "../components/landing/TrustBar";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
 import ScrollProgressBar from "../components/landing/ScrollProgressBar";
+import CursorGlow from "../components/visual-effects/CursorGlow";
+import SocialProofTicker from "../components/landing/SocialProofTicker";
+import InteractiveJourneyMap from "../components/landing/InteractiveJourneyMap";
 import { SectionSkeleton, SmallSectionSkeleton, LargeSectionSkeleton } from "../components/landing/SkeletonLoader";
 
 // Lazy load below-the-fold sections
@@ -115,8 +118,10 @@ export default function Home() {
   return (
     <DemoBookingProvider>
       <div className="min-h-screen">
+        <CursorGlow />
         <ScrollProgressBar />
         <Navbar />
+        <SocialProofTicker />
         <Hero />
         <Suspense fallback={<LoadingFallback />}>
           <SectionBreak />
@@ -125,6 +130,9 @@ export default function Home() {
         </Suspense>
         <section aria-label="Proof and trust">
           <TrustBar />
+        </section>
+        <section aria-label="Interactive journey map">
+          <InteractiveJourneyMap />
         </section>
         <Suspense fallback={<LargeLoadingFallback />}>
           <SectionBreak />
