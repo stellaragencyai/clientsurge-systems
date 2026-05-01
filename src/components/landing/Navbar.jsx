@@ -167,9 +167,39 @@ export default function Navbar() {
                 key={link.href}
                 href={`/${link.href}`}
                 onClick={(e) => handleSectionNavigation(e, link.href)}
-                className="text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap"
+                className="text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap relative group"
+                style={{
+                  position: "relative",
+                  paddingBottom: "2px",
+                }}
               >
                 {link.label}
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: "-2px",
+                    left: 0,
+                    height: "2px",
+                    width: "100%",
+                    background: "linear-gradient(90deg, #c8965c, #f5d9a8, #c8965c)",
+                    borderRadius: "1px",
+                    transform: "scaleX(0)",
+                    transformOrigin: "left",
+                    transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  }}
+                  className="group-hover:scale-x-100"
+                  style={{
+                    transform: "scaleX(0)",
+                    transformOrigin: "left",
+                    transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scaleX(1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scaleX(0)";
+                  }}
+                />
               </a>
             )
           ))}

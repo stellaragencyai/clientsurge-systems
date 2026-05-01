@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
+import CascadingChecklistItem from "@/components/visual-effects/CascadingChecklistItem";
 import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
 
 
@@ -133,53 +134,10 @@ export default function Hero() {
             className="landing-hero__checklist"
             style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "32px", maxWidth: "100%", margin: "0 auto 32px" }}>
             
-            {checklist.map((item, i) =>
-            <div
-              key={item}
-              className="hero-check-item"
-              style={{
-                display: "inline-flex", alignItems: "center", gap: "10px",
-                padding: "7px 14px 7px 10px",
-                borderRadius: "9999px",
-                background: "rgba(255,255,255,0.72)",
-                border: "1px solid rgba(200,150,92,0.22)",
-                boxShadow: "0 2px 8px rgba(122,72,37,0.06)",
-                width: "fit-content",
-                opacity: 0,
-                transform: "translateX(-18px)",
-                animation: `heroCheckIn 0.55s cubic-bezier(0.22,1,0.36,1) ${0.35 + i * 0.13}s forwards`
-              }}>
-              
-                <div
-                className="hero-check-circle"
-                style={{
-                  width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0,
-                  background: "linear-gradient(135deg,#26b05f,#16a34a)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: "0 0 12px rgba(34,199,89,0.4), 0 2px 6px rgba(34,197,94,0.25)",
-                  animation: `heroCheckPop 0.4s cubic-bezier(0.34,1.56,0.64,1) ${0.55 + i * 0.13}s both`
-                }}>
-                
-                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                    <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <span style={{ fontSize: "12px", fontWeight: "600", color: "rgba(27,20,13,0.8)", lineHeight: 1.4 }}>
-                  {item}
-                </span>
-              </div>
-            )}
+            {checklist.map((item, i) => (
+              <CascadingChecklistItem key={item} item={item} index={i} />
+            ))}
           </div>
-          <style>{`
-            @keyframes heroCheckIn {
-              to { opacity: 1; transform: translateX(0); }
-            }
-            @keyframes heroCheckPop {
-              0% { transform: scale(0.4); }
-              70% { transform: scale(1.15); }
-              100% { transform: scale(1); }
-            }
-          `}</style>
 
           <div
             className="landing-hero__actions"
