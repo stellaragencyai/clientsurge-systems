@@ -261,8 +261,10 @@ export default function ProductCard({ product }) {
 
           {product.coming_soon && (
             <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(154,92,46,0.4)", background: "rgba(154,92,46,0.06)", padding: "8px 12px", borderRadius: "9999px", border: "1px solid rgba(154,92,46,0.12)", whiteSpace: "nowrap", textAlign: "center" }}>
+              <span style={{display:"inline-block",width:"7px",height:"7px",borderRadius:"50%",background:"#c8965c",marginRight:"5px",animation:"cs-pulse 1.4s ease-in-out infinite"}} />
               Coming Soon
             </span>
+            <style>{`@keyframes cs-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}`}</style>
           )}
         </div>
 
