@@ -123,6 +123,52 @@ function isRecentContactInquiry(existingLead: Record<string, unknown>, contact: 
   return isWithinWindow && sameName && sameInquiryType;
 }
 
+async function sendAdminSMS(contact: ReturnType<typeof normalizeContactInput>) {
+  const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
+  const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
+  const TWILIO_FROM = Deno.env.get('TWILIO_PHONE_NUMBER') || '+16025843227';
+  const NOLAN_CELL = '+16025874608'; // (602) 587-4608
+
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+    console.warn('[submitContactInquiry] Twilio not configured — skipping SMS alert');
+    return { sent: false, reason: 'missing_twilio_credentials' };
+  }
+
+  const body = `🔥 New Lead — ClientSurge
+Name: ${contact.full_name}
+Phone: ${contact.phone || 'N/A'}
+Email: ${contact.email}
+Biz: ${contact.business_type}
+Msg: ${contact.message.slice(0, 100)}${contact.message.length > 100 ? '...' : ''}`;
+
+  const params = new URLSearchParams({
+    To: NOLAN_CELL,
+    From: TWILIO_FROM,
+    Body: body,
+  });
+
+  const response = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.text();
+    console.warn('[submitContactInquiry] SMS alert failed:', err);
+    return { sent: false, reason: err };
+  }
+
+  console.info('[submitContactInquiry] SMS alert sent to Nolan');
+  return { sent: true };
+}
+
 async function sendAdminNotification(contact: ReturnType<typeof normalizeContactInput>) {
   const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
