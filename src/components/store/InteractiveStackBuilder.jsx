@@ -62,7 +62,7 @@ export default function InteractiveStackBuilder() {
               Add services from the catalog and we will build your stack preview here.
             </p>
           ) : (
-            items.map((item, index) => (
+            [...items].reverse().map((item, index) => (
               <div
                 key={item.product_id}
                 style={{
