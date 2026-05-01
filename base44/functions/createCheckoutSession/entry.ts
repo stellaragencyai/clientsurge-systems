@@ -4,6 +4,8 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ⚠️  SYNC RISK: This CANONICAL_PRODUCTS registry must match lib/salesCatalog.js
+// Run a diff before any price change. Mismatch = wrong prices at checkout.
 // IMPORTANT: TEMPORARY MIRROR OF lib/salesCatalog.js
 // Until Base44 supports reliable shared imports in Deno functions, update
 // Stripe price IDs in BOTH lib/salesCatalog.js AND this registry.
