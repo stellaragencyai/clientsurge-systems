@@ -68,18 +68,18 @@ export default function PortalLoginModal({ onClose }) {
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl">
           <div className="border-b border-border px-8 pb-5 pt-8">
-            <button
-              onClick={onClose} className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-muted transition-colors hover:bg-border hidden"
+            
 
-              type="button"
-              aria-label="Close dialog">
-              
-              <X className="lucide lucide-x h-4 w-4 text-muted-foreground hidden" />
-            </button>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 hidden">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              <span className="text-xs font-semibold uppercase tracking-wide text-primary hidden">Client Portal</span>
-            </div>
+
+
+
+
+
+            
+            
+
+
+            
             <h2 className="text-foreground px-2 font-display text-2xl font-semibold">
               {view === "login" ? "Welcome Back" : "Reset Your Password"}
             </h2>
