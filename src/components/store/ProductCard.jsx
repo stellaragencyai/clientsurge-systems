@@ -12,6 +12,8 @@ export default function ProductCard({ product }) {
 
   const toggle = (e) => {
     e.stopPropagation();
+    // Coming soon products cannot be added to cart
+    if (product.coming_soon || !product.checkout_enabled) return;
     if (inCart) removeItem(product.product_id);
     else addItem(product);
   };
