@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useState, useRef, useCallback } fro
 import { motion } from "framer-motion";
 import { ShoppingCart, Zap, Search, ArrowRight, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
-import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
+import { AI_PRODUCTS, CATEGORIES, CANONICAL_SERVICE_PRODUCTS } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
 import CartSidebar from "@/components/store/CartSidebar";
 import Navbar from "@/components/landing/Navbar";
@@ -566,7 +566,10 @@ function StoreInner() {
                   {resultLabel}
                 </span>
                 <div className="store-categories">
-                  {CATEGORIES.map((category) => (
+                  {CATEGORIES.filter((cat) => {
+                      if (cat === "All") return true;
+                      return CANONICAL_SERVICE_PRODUCTS.some(p => p.category === cat && p.checkout_enabled && !p.coming_soon);
+                    }).map((category) => (
                     <motion.button
                       key={category}
                       onClick={() => setActiveCategory(category)}
