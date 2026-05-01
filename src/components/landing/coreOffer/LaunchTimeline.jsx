@@ -220,18 +220,18 @@ function StepRow({ step, idx }) {
   return (
     <div ref={ref} className="relative" data-step-id={step.id}>
       {/* Center numbered dot — desktop only */}
-      <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-8 w-11 h-11 rounded-full items-center justify-center z-10 hidden hidden hidden"
+      
 
-      style={{
-        background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
-        boxShadow: "0 0 0 5px rgba(154,92,46,0.12), 0 4px 14px rgba(154,92,46,0.35)",
-        transition: `opacity 0.7s ease ${contentDelay}ms, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${contentDelay}ms`,
-        opacity: visible ? 1 : 0,
-        transform: visible ? "scale(1) translateX(-50%)" : "scale(0.3) translateX(-50%)"
-      }}>
-        
-        <span className="text-white font-black text-sm">{step.number}</span>
-      </div>
+
+
+
+
+
+
+
+
+
+      
 
       <div
         className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}
