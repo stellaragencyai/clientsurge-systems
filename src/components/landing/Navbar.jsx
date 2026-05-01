@@ -128,13 +128,7 @@ export default function Navbar() {
 
 
 
-  useEffect(() => {
-    if (!location.hash || !SAFE_SECTION_HASHES.has(location.hash)) return;
-    const timer = window.setTimeout(() => {
-      smoothScrollToHash(location.hash);
-    }, 900);
-    return () => window.clearTimeout(timer);
-  }, [location.hash]);
+
 
   const handleSectionNavigation = (e, href) => {
     e.preventDefault();
