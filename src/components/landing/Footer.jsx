@@ -135,7 +135,7 @@ export default function Footer() {
                 </span>
               </a>
               <a
-                href="mailto:nolan@clientsurgesystems.com"
+                href="mailto:support@clientsurgesystems.com"
                 className="flex items-center gap-3 group transition-colors"
                 style={{ color: "rgba(255,255,255,0.55)" }}
               >
@@ -149,7 +149,7 @@ export default function Footer() {
                   <Mail className="w-3.5 h-3.5" style={{ color: "#c8965c" }} />
                 </div>
                 <span className="text-xs font-medium group-hover:text-white transition-colors break-all">
-                  nolan@clientsurgesystems.com
+                  support@clientsurgesystems.com
                 </span>
               </a>
             </div>
