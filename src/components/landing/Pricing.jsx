@@ -32,8 +32,8 @@ const plans = [
   fit: "For businesses that need faster response and basic lead capture",
   subtitle: "For businesses that need faster response and basic lead capture.",
   desc: "An AI lead conversion system that ensures every new inquiry gets a fast response, enters a simple follow-up flow, and has a clear path to booking.",
-  setup: "$997 setup",
-  monthly: "$397",
+  setup: "$797 setup",
+  monthly: "$497",
   features: [
   "Instant SMS response to every new lead",
   "Basic email confirmation",
@@ -50,8 +50,8 @@ const plans = [
   badge: "Most Popular",
   subtitle: "For businesses already getting leads and losing revenue through slow response or weak follow-up.",
   desc: "A full missed-call recovery and automated follow-up system built for businesses that want to stop losing bookings they already earned.",
-  setup: "$1,997 setup",
-  monthly: "$797",
+  setup: "$1,297 setup",
+  monthly: "$997",
   features: [
   "Everything in Starter",
   "Missed call text-back system",
@@ -69,8 +69,8 @@ const plans = [
   fit: "For businesses that want the full revenue recovery engine",
   subtitle: "For businesses that want the full revenue recovery engine.",
   desc: "The complete AI-assisted booking automation and revenue recovery system — old leads reactivated, every inquiry tracked, and the full pipeline optimized.",
-  setup: "$3,500 setup",
-  monthly: "$1,500",
+  setup: "$2,497 setup",
+  monthly: "$1,997",
   features: [
   "Everything in Growth",
   "Old lead reactivation campaigns",
@@ -404,7 +404,7 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
         <div className="mb-5 text-xs text-muted-foreground leading-relaxed px-3 py-2 rounded-xl bg-primary/5 border border-primary/10">
           {plan.highlight ?
           "Most clients recover this cost with just 2–3 additional bookings per month." :
-          plan.monthly === "$397" ?
+          plan.monthly === "$497" ?
           "Even one extra booking per month typically covers the monthly fee." :
           "High-volume businesses often recover this within the first week of going live."}
         </div>
