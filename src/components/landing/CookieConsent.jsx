@@ -43,7 +43,7 @@ export default function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-sm">
+    <div className="fixed bottom-6 left-6 z-50 max-w-sm">
       <div 
         className="rounded-2xl shadow-lg border backdrop-blur-md p-5 space-y-4"
         style={{
