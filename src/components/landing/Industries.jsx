@@ -15,6 +15,62 @@ import {
   INDUSTRY_SELECTION_STORAGE_KEY } from
 "@/lib/industryRecommendations";
 
+// Unique SVG pattern per industry — lightweight, inline, no external deps
+const industryPatterns = {
+  "med-spa": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-medspa" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+        <circle cx="16" cy="16" r="10" fill="none" stroke="white" strokeWidth="1"/>
+        <circle cx="16" cy="16" r="4" fill="white"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-medspa)"/>
+    </svg>
+  ),
+  "dental": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-dental" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+        <line x1="0" y1="14" x2="28" y2="14" stroke="white" strokeWidth="1"/>
+        <line x1="14" y1="0" x2="14" y2="28" stroke="white" strokeWidth="1"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-dental)"/>
+    </svg>
+  ),
+  "chiro-pt": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-chiro" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+        <polygon points="20,4 36,36 4,36" fill="none" stroke="white" strokeWidth="1"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-chiro)"/>
+    </svg>
+  ),
+  "hvac": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-hvac" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+        <rect x="4" y="4" width="16" height="16" fill="none" stroke="white" strokeWidth="1"/>
+        <rect x="9" y="9" width="6" height="6" fill="white"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-hvac)"/>
+    </svg>
+  ),
+  "roofing": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-roofing" x="0" y="0" width="36" height="20" patternUnits="userSpaceOnUse">
+        <path d="M0,20 L18,0 L36,20" fill="none" stroke="white" strokeWidth="1"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-roofing)"/>
+    </svg>
+  ),
+  "contractors": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-contractors" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+        <line x1="0" y1="0" x2="30" y2="30" stroke="white" strokeWidth="1"/>
+        <line x1="30" y1="0" x2="0" y2="30" stroke="white" strokeWidth="1"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-contractors)"/>
+    </svg>
+  ),
+};
+
 const industries = [
 {
   id: "med-spa",
@@ -255,9 +311,10 @@ export default function Industries() {
         {industries.map((industry, index) => {
           const Icon = industry.icon;
           const highlighted = hoveredIndustryId === industry.id;
+          const isSelected = selectedIndustryId === industry.id;
 
           return (
-            <button
+            <motion.button
               key={industry.id}
               type="button"
               className="group relative block overflow-hidden h-[14rem] sm:h-[18rem] md:h-[27.6rem] text-left"
@@ -266,16 +323,18 @@ export default function Industries() {
               onMouseLeave={() => setHoveredIndustryId("")}
               onFocus={() => setHoveredIndustryId(industry.id)}
               onBlur={() => setHoveredIndustryId("")}
+              animate={isSelected ? { scale: [1, 1.04, 1.02], zIndex: 2 } : { scale: 1, zIndex: 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 18 }}
               style={{
                 opacity: sectionVisible ? 1 : 0,
                 transform: sectionVisible ? "translateY(0)" : "translateY(32px)",
                 transition: `opacity 600ms ease ${index * 100}ms, transform 600ms ease ${
                 index * 100}ms`,
-
                 border: "none",
                 padding: 0,
                 background: "transparent",
-                cursor: "pointer"
+                cursor: "pointer",
+                position: "relative",
               }}>
               
               <img
@@ -283,6 +342,9 @@ export default function Industries() {
                 alt={industry.name}
                 loading="lazy"
                 className="absolute inset-0 h-full w-full object-cover" />
+              
+              {/* Unique per-industry SVG texture pattern */}
+              {industryPatterns[industry.id]}
               
 
               <div
@@ -352,7 +414,7 @@ export default function Industries() {
                   "linear-gradient(to right, #c8965c, #f5d9a8, #c8965c)"
                 }} />
               
-            </button>);
+            </motion.button>);
 
         })}
       </div>
@@ -395,7 +457,7 @@ export default function Industries() {
                 <IndustryModal
                 recommendation={selectedRecommendation}
                 onClose={() => setModalOpen(false)}
-                onBookDemo={() => {setModalOpen(false);demoBooking?.openDemoBooking?.();}} />
+                onBookDemo={() => {setModalOpen(false);demoBooking?.openDemoBooking?.({ prefillIndustry: selectedRecommendation?.name || "" });}} />
               
               </div>
             </motion.div>

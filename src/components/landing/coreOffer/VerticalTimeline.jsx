@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
 import { systemsById, coreOfferSectionConfig, iconMap } from "./coreOfferData";
 import HighlightedText from "./HighlightedText";
+import { AI_PRODUCTS } from "@/lib/aiProducts";
 
 const orderedSystemIds = Object.keys(systemsById);
 
@@ -56,18 +57,22 @@ function StepDots({ currentId, onSelect }) {
 
 export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onBookDemo }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [spineProgress, setSpineProgress] = useState(0);
   const containerRef = useRef(null);
+
+
+
 
   useEffect(() => {
     const handleScroll = () => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
-      const progress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / window.innerHeight));
-      setScrollProgress(progress);
+      const progress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / (rect.height + window.innerHeight * 0.3)));
+      setSpineProgress(progress);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -76,6 +81,18 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
   const stepNumber = currentIndex + 1;
   const isFirst = currentIndex === 0;
   const isFeatured = isFirst;
+
+  // Find matching product in AI_PRODUCTS by service_key
+  const matchingProduct = AI_PRODUCTS.find(p => p.service_key === system?.service_key);
+
+  const handleAddToStack = (e) => {
+    e.stopPropagation();
+    // Navigate to store with the service pre-highlighted via sessionStorage
+    if (matchingProduct) {
+      sessionStorage.setItem("clientsurge:highlight-service", matchingProduct.product_id);
+    }
+    window.location.href = "/store";
+  };
 
   if (!system) return null;
 
@@ -92,12 +109,30 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
   return (
     <motion.div
       ref={containerRef}
-      style={{ marginTop: "48px", marginBottom: "48px" }}
+      style={{ marginTop: "48px", marginBottom: "48px", position: "relative" }}
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       viewport={{ once: true, margin: "-100px" }}
     >
+      {/* Scroll-driven spine line */}
+      <div style={{ position: "absolute", left: "-28px", top: 0, bottom: 0, width: "2px", background: "rgba(154,92,46,0.08)", borderRadius: "2px" }} className="hidden md:block">
+        <div style={{
+          position: "absolute", top: 0, left: 0, width: "100%",
+          height: `${spineProgress * 100}%`,
+          background: "linear-gradient(180deg, #9a5c2e 0%, #c8965c 60%, rgba(200,150,92,0.4) 100%)",
+          borderRadius: "2px",
+          transition: "height 0.1s linear",
+        }} />
+        <div style={{
+          position: "absolute", bottom: `${(1 - spineProgress) * 100}%`,
+          left: "50%", transform: "translateX(-50%)",
+          width: "8px", height: "8px", borderRadius: "50%",
+          background: "#c8965c",
+          boxShadow: "0 0 10px rgba(200,150,92,0.8)",
+          transition: "bottom 0.1s linear",
+        }} />
+      </div>
       {/* Step progress indicator */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
         <StepDots currentId={selectedSystemId} onSelect={onSystemSelect} />
@@ -134,6 +169,17 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
         }}
         transition={{ type: "spring", damping: 20, stiffness: 300 }}
       >
+        {/* Numbered watermark */}
+        <div style={{
+          position: "absolute", bottom: "-12px", right: "12px",
+          fontSize: "120px", fontWeight: "900", lineHeight: 1,
+          color: isFeatured ? "rgba(255,255,255,0.04)" : "rgba(15,23,42,0.04)",
+          pointerEvents: "none", userSelect: "none", fontFamily: "var(--font-titles)",
+          zIndex: 0,
+        }}>
+          {String(stepNumber).padStart(2, "0")}
+        </div>
+
         {/* Top accent line with shimmer */}
         <div style={{
           position: "absolute", top: 0, left: 0, right: 0, height: "3px",
@@ -208,6 +254,29 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
             }}>
               {system.badge}
             </div>
+
+            {/* Add to Stack button */}
+            {matchingProduct && (
+              <motion.button
+                type="button"
+                onClick={handleAddToStack}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                style={{
+                  marginTop: "16px",
+                  display: "inline-flex", alignItems: "center", gap: "6px",
+                  borderRadius: "9999px", padding: "8px 18px",
+                  fontSize: "12px", fontWeight: "700",
+                  background: isFeatured ? "rgba(255,255,255,0.1)" : "rgba(154,92,46,0.08)",
+                  border: isFeatured ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(154,92,46,0.2)",
+                  color: isFeatured ? "rgba(255,255,255,0.8)" : "#9a5c2e",
+                  cursor: "pointer", transition: "all 0.2s",
+                }}
+              >
+                <ShoppingCart style={{ width: "12px", height: "12px" }} />
+                Add to Stack
+              </motion.button>
+            )}
           </div>
 
           {/* Right panel — detail blocks */}
