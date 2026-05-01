@@ -32,10 +32,9 @@ export default function CartSidebar() {
     setStep("loading");
 
     if (window.self !== window.top) {
-      setError(
-        "Checkout is available on the live Base44 site. Open the published app to continue."
-      );
-      setStep("info");
+      // Silently redirect to the live site if inside iframe preview
+      window.open(window.location.href, "_blank");
+      setStep("cart");
       return;
     }
 
