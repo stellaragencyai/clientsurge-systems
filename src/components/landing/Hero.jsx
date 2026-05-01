@@ -22,7 +22,7 @@ export default function Hero() {
       className="landing-hero"
       style={{
         position: "relative",
-        overflow: "hidden",
+        overflow: "visible",
         background: "#ffffff",
         paddingBottom: "clamp(3rem, 6vw, 5rem)"
       }}>
@@ -236,7 +236,7 @@ export default function Hero() {
               letterSpacing: "0.04em"
             }} className=" hidden">
             
-            No contracts · Most clients go live in 2–3 business days
+            No contracts · Most clients go live in 5–7 business days
           </p>
         </div>
 
@@ -282,8 +282,8 @@ export default function Hero() {
               "0 44px 110px rgba(17,12,7,0.34), 0 18px 44px rgba(17,12,7,0.18), 0 0 60px rgba(200,150,92,0.18)",
               transform:
               "perspective(2400px) rotateY(-10deg) rotateX(4deg) rotateZ(1.4deg)",
-              marginLeft: "-35px",
-              marginRight: "-35px"
+              marginLeft: "0",
+              marginRight: "0"
             }}>
             
             <div style={{
