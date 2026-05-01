@@ -80,7 +80,7 @@ export default function PortalLoginModal({ onClose }) {
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               <span className="text-xs font-semibold uppercase tracking-wide text-primary hidden">Client Portal</span>
             </div>
-            <h2 className="text-foreground px-1 font-display text-2xl font-semibold">
+            <h2 className="text-foreground px-2 font-display text-2xl font-semibold">
               {view === "login" ? "Welcome Back" : "Reset Your Password"}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
