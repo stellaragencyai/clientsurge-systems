@@ -620,7 +620,7 @@ export default function HeroDashboardScreen() {
         borderRadius: "12px",
         display: "flex",
         flexDirection: "column",
-        fontFamily: "'Inter', sans-serif",
+        fontFamily: "-apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif",
         overflow: "hidden",
         position: "relative",
         WebkitFontSmoothing: "antialiased",

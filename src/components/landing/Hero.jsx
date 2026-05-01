@@ -265,6 +265,44 @@ export default function Hero() {
 
 
 
+          {/* Enhancement 2: Physical side buttons */}
+          {/* Power button — right side top */}
+          <div style={{
+            position: "absolute",
+            right: "-5px",
+            top: "18%",
+            width: "5px",
+            height: "38px",
+            borderRadius: "0 3px 3px 0",
+            background: "linear-gradient(to right, #8a6840, #b8914a)",
+            boxShadow: "2px 0 6px rgba(0,0,0,0.35), inset -1px 0 2px rgba(255,255,255,0.15)",
+            zIndex: 20,
+          }} />
+          {/* Volume up button — right side */}
+          <div style={{
+            position: "absolute",
+            right: "-5px",
+            top: "34%",
+            width: "5px",
+            height: "52px",
+            borderRadius: "0 3px 3px 0",
+            background: "linear-gradient(to right, #8a6840, #b8914a)",
+            boxShadow: "2px 0 6px rgba(0,0,0,0.35), inset -1px 0 2px rgba(255,255,255,0.15)",
+            zIndex: 20,
+          }} />
+          {/* Volume down button — right side */}
+          <div style={{
+            position: "absolute",
+            right: "-5px",
+            top: "49%",
+            width: "5px",
+            height: "52px",
+            borderRadius: "0 3px 3px 0",
+            background: "linear-gradient(to right, #8a6840, #b8914a)",
+            boxShadow: "2px 0 6px rgba(0,0,0,0.35), inset -1px 0 2px rgba(255,255,255,0.15)",
+            zIndex: 20,
+          }} />
+
           <div
             className="landing-hero__tablet"
             style={{
@@ -292,30 +330,51 @@ export default function Hero() {
               boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12)",
               overflow: "hidden"
             }}>
-            <div
-                style={{
-                  position: "absolute",
-                  top: "8px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  width: "88px",
-                  height: "4px",
-                  borderRadius: "999px",
-                  background: "rgba(255,255,255,0.14)"
+
+            {/* Enhancement 1: Realistic iPad front camera pill (TrueDepth) centered at top bezel */}
+            <div style={{
+              position: "absolute",
+              top: "6px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "5px",
+              zIndex: 10,
+            }}>
+              {/* Camera pill housing */}
+              <div style={{
+                width: "52px",
+                height: "8px",
+                borderRadius: "999px",
+                background: "linear-gradient(180deg, #1a1d28 0%, #0d0f16 100%)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "5px",
+                padding: "0 6px",
+              }}>
+                {/* Camera lens */}
+                <div style={{
+                  width: "6px",
+                  height: "6px",
+                  borderRadius: "50%",
+                  background: "radial-gradient(circle at 35% 35%, #2a3050, #0a0c14)",
+                  border: "1px solid rgba(80,100,160,0.4)",
+                  boxShadow: "0 0 3px rgba(60,80,140,0.6), inset 0 0 2px rgba(120,150,200,0.3)",
                 }} />
-              
-            <div
-                style={{
-                  position: "absolute",
-                  top: "9px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  width: "8px",
-                  height: "8px",
-                  borderRadius: "999px",
-                  background: "#22252f",
-                  border: "1px solid rgba(255,255,255,0.16)"
+                {/* Face ID dot */}
+                <div style={{
+                  width: "3px",
+                  height: "3px",
+                  borderRadius: "50%",
+                  background: "#1a1f2e",
+                  border: "1px solid rgba(255,255,255,0.1)",
                 }} />
+              </div>
+            </div>
               
 
             <div
