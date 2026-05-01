@@ -25,24 +25,26 @@ export default function FinalCTA() {
             Book a free 15-minute demo. We will map out exactly where your business is leaking bookings and show you what an AI lead conversion system would look like for your specific situation — no obligation.
           </p>
 
-          {/* Enhancement 1: Live social proof numbers */}
+          {/* Projection stats — clearly framed as targets not guarantees */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10">
             {[
-            { value: "2x", label: "avg. booking rate increase" },
-            { value: "90s", label: "first response time" },
-            { value: "30 days", label: "avg. time to ROI" }].
+            { value: "2x", label: "typical booking rate lift" },
+            { value: "< 90s", label: "target first response time" },
+            { value: "30 days", label: "typical time to see ROI" }].
             map((stat) =>
             <div key={stat.label} className="flex flex-col items-center">
                 <span
                 className="font-display text-3xl font-black"
                 style={{ color: "#9a5c2e" }}>
-                
                   {stat.value}
                 </span>
                 <span className="text-xs text-muted-foreground font-medium mt-0.5">{stat.label}</span>
               </div>
             )}
           </div>
+          <p className="mt-3 text-xs text-muted-foreground/60 italic">
+            Based on system capabilities — results vary by business volume and industry.
+          </p>
 
 
           {/* How the demo works — 3 steps */}
