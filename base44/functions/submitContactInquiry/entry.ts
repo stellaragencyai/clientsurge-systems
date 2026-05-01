@@ -149,7 +149,7 @@ async function sendAdminNotification(contact: ReturnType<typeof normalizeContact
     },
     body: JSON.stringify({
       from: 'ClientSurge Systems <system@clientsurgesystems.com>',
-      to: ['system@clientsurgesystems.com'],
+      to: ['nolan@clientsurgesystems.com'],
       reply_to: contact.email,
       subject: `New Contact: ${contact.full_name} - ${contact.business_type}`,
       html: emailBody,
