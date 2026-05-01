@@ -106,7 +106,7 @@ function SectionRedirect({ hash }) {
     const timer = window.setTimeout(() => {
       const element = document.querySelector(hash);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
+        element.scrollIntoView({ behavior: "auto", block: "start" });
       }
       window.history.replaceState({}, "", `/${hash}`);
     }, 450);
