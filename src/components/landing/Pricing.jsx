@@ -402,7 +402,7 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
         <div className="mb-5 text-xs text-muted-foreground leading-relaxed px-3 py-2 rounded-xl bg-primary/5 border border-primary/10">
           {plan.highlight ?
           "Most clients recover this cost with just 2–3 additional bookings per month." :
-          plan.monthly === "$497" ?
+          plan.name === "Starter System" ?
           "Even one extra booking per month typically covers the monthly fee." :
           "High-volume businesses often recover this within the first week of going live."}
         </div>
