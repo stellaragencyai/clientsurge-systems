@@ -145,7 +145,6 @@ export default function Pricing() {
           </div>
         </StaggeredFadeUp>
 
-        
         <MoneyBackGuarantee />
 
         <div className="max-w-2xl mb-6 mt-12">
