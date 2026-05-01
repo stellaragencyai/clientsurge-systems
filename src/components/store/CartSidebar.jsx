@@ -155,26 +155,40 @@ export default function CartSidebar() {
 
         <div style={{ flex: 1, overflowY: "auto", padding: "18px 20px" }}>
           {items.length === 0 ? (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "48px 0",
-                color: "rgba(26,18,9,0.46)",
-              }}
-            >
-              <ShoppingCart
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  margin: "0 auto 12px",
-                  opacity: 0.3,
-                }}
-              />
-              <p style={{ fontSize: "14px", fontWeight: "600" }}>
-                Your cart is empty
+            <div style={{ textAlign: "center", padding: "36px 16px 24px" }}>
+              <div style={{
+                width: "56px", height: "56px", borderRadius: "16px",
+                background: "linear-gradient(135deg, rgba(154,92,46,0.1), rgba(200,150,92,0.05))",
+                border: "1px solid rgba(154,92,46,0.14)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                margin: "0 auto 14px",
+              }}>
+                <ShoppingCart style={{ width: "26px", height: "26px", color: "#9a5c2e", opacity: 0.6 }} />
+              </div>
+              <p style={{ fontSize: "14px", fontWeight: "700", color: "#1a1209", margin: "0 0 6px" }}>
+                Your stack is empty
               </p>
-              <p style={{ fontSize: "12px", marginTop: "6px" }}>
-                Browse the store and add the services you want us to build.
+              <p style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)", marginBottom: "20px", lineHeight: 1.5 }}>
+                Add services from the catalog below to get started.
+              </p>
+              {/* Top 3 popular nudges */}
+              {[
+                { icon: "⚡", name: "Instant Lead Response", price: "$97/month" },
+                { icon: "📞", name: "Missed Call Text-Back", price: "$67/month" },
+                { icon: "📅", name: "AI Booking Agent", price: "$147/month" },
+              ].map((s) => (
+                <div key={s.name} style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "10px 12px", marginBottom: "6px", borderRadius: "12px",
+                  background: "rgba(255,255,255,0.7)", border: "1px solid rgba(154,92,46,0.1)",
+                  cursor: "pointer",
+                }} onClick={() => setCartOpen(false)}>
+                  <span style={{ fontSize: "13px" }}>{s.icon} {s.name}</span>
+                  <span style={{ fontSize: "11px", color: "#9a5c2e", fontWeight: "700" }}>{s.price}</span>
+                </div>
+              ))}
+              <p style={{ fontSize: "11px", color: "rgba(26,18,9,0.35)", marginTop: "10px" }}>
+                Click a service above to browse
               </p>
             </div>
           ) : step === "cart" ? (
