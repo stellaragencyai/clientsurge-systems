@@ -51,7 +51,7 @@ export default function Testimonials() {
           {testimonials.map((testimonial) => (
             <article
               key={testimonial.name}
-              className="flex flex-col rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1"
+              className="flex flex-col rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 active:-translate-y-1 focus:-translate-y-1"
               style={{
                 background: "linear-gradient(135deg, rgba(255,252,247,0.72) 0%, rgba(252,240,220,0.55) 100%)",
                 backdropFilter: "blur(18px)",
