@@ -64,9 +64,9 @@ const plans = [
   highlight: true
 },
 {
-  name: "Pro System",
-  fit: "For businesses that want the full revenue recovery engine",
-  subtitle: "For businesses that want the full revenue recovery engine.",
+  name: "Elite System",
+  fit: "For businesses that want the full revenue recovery engine — every tool, fully deployed",
+  subtitle: "For businesses that want the full revenue recovery engine — every tool, fully deployed.",
   desc: "The complete AI-assisted booking automation and revenue recovery system — old leads reactivated, every inquiry tracked, and the full pipeline optimized.",
   setup: "$2,497 setup",
   monthly: "$1,997",
