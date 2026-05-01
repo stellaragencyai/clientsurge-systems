@@ -25,6 +25,12 @@ function normalizeContactInput(payload: Record<string, unknown>) {
     message: sanitizeString(payload.message, MAX_MESSAGE_LENGTH),
     website_url: realWebsite,
     honeypot,
+    // UTM attribution
+    utm_source: sanitizeString(payload.utm_source),
+    utm_medium: sanitizeString(payload.utm_medium),
+    utm_campaign: sanitizeString(payload.utm_campaign),
+    utm_content: sanitizeString(payload.utm_content),
+    referrer: sanitizeString(payload.referrer),
   };
 }
 
@@ -77,6 +83,12 @@ function buildLeadPayload(contact: ReturnType<typeof normalizeContactInput>, sta
     source: LEAD_SOURCE,
     intake_type: INTAKE_TYPE,
     status,
+    // UTM attribution fields
+    utm_source: contact.utm_source || null,
+    utm_medium: contact.utm_medium || null,
+    utm_campaign: contact.utm_campaign || null,
+    utm_content: contact.utm_content || null,
+    referrer: contact.referrer || null,
   } as const;
 }
 
