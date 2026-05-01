@@ -1,4 +1,12 @@
 import { useEffect, useState, useRef } from "react";
+
+function timeAgo(ts) {
+  const secs = Math.floor((Date.now() - ts) / 1000);
+  if (secs < 10) return "just now";
+  if (secs < 60) return `${secs}s ago`;
+  const mins = Math.floor(secs / 60);
+  return `${mins}m ago`;
+}
 import { Zap, MessageSquare, PhoneCall, CalendarCheck, RefreshCw, Mail, ArrowRight } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
 
@@ -35,7 +43,7 @@ function FeedItem({ item, isNew }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <p className="text-sm font-semibold text-foreground leading-snug">{item.event}</p>
-          <span className="text-[10px] text-foreground/40 whitespace-nowrap flex-shrink-0 mt-0.5">{item.city}</span>
+          <span className="text-[10px] text-foreground/40 whitespace-nowrap flex-shrink-0 mt-0.5">{item.city} · {timeAgo(item.timestamp)}</span>
         </div>
         <p className="text-xs text-foreground/55 mt-0.5">{item.detail}</p>
       </div>
@@ -52,14 +60,14 @@ function FeedItem({ item, isNew }) {
 }
 
 export default function LiveAutomationFeed() {
-  const [feed, setFeed] = useState(() => Array.from({ length: 5 }, () => ({ ...randomEvent(), id: Math.random(), isNew: false })));
+  const [feed, setFeed] = useState(() => Array.from({ length: 5 }, () => ({ ...randomEvent(), id: Math.random(), isNew: false, timestamp: Date.now() - Math.floor(Math.random() * 120000) })));
   const [counter, setCounter] = useState({ leads: 847, bookings: 312, recovered: 94 });
   const [showDemoModal, setShowDemoModal] = useState(false);
   const timerRef = useRef(null);
 
   useEffect(() => {
     timerRef.current = setInterval(() => {
-      const newItem = { ...randomEvent(), id: Math.random(), isNew: true };
+      const newItem = { ...randomEvent(), id: Math.random(), isNew: true, timestamp: Date.now() };
       setFeed(prev => {
         const updated = [newItem, ...prev.slice(0, 4)].map((item, i) => ({ ...item, isNew: i === 0 }));
         return updated;
