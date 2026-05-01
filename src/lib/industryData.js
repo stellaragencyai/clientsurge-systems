@@ -504,7 +504,7 @@ export const INDUSTRIES = {
       quote: "During hail season, we get crushed with calls. Our AI answers every single one, qualifies them, and books the estimate. We closed 14 jobs that would have gone to competitors. Game changer.",
       name: "Rick Mitchell",
       business: "StormPro Roofing, Oklahoma City OK",
-      image: "https://images.unsplash.com/photo-1472099645785-0a1dd7228f2d?w=400&h=400&fit=crop",
+      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop",
     },
 
     faqs: [
@@ -608,7 +608,7 @@ export const INDUSTRIES = {
       quote: "As a contractor, being slow to respond kills deals. Now we answer every inquiry instantly, even when we're on job sites. Added 12 jobs last quarter just from faster response times.",
       name: "Mike Johnson",
       business: "BuildRight Contracting, Phoenix AZ",
-      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a-00dcc994a43e?w=400&h=400&fit=crop",
+      image: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=400&h=400&fit=crop",
     },
 
     faqs: [
