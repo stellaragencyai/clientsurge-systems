@@ -28,21 +28,61 @@ export default function LeadLeakage() {
         {/* --- High-review angle --- */}
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <div>
-            <p className="mt-5 text-muted-foreground text-base leading-relaxed">
-              A business with strong reviews already has trust. The opportunity is not getting more attention — it is capturing and converting the attention you already have.
+            {/* Hook stat */}
+            <p
+              className="font-titles text-lg font-bold mb-6"
+              style={{ color: "#9a5c2e" }}
+            >
+              78% of leads go cold in under an hour — most of yours already have.
             </p>
-            <p className="mt-4 text-muted-foreground text-base leading-relaxed">
-              When someone finds you on Google, checks your reviews, calls you, messages you, or clicks your page — that interest should enter a system automatically. Right now, most of it disappears.
-            </p>
+
+            {/* Structured points */}
+            <div className="flex flex-col gap-4">
+              {[
+                {
+                  label: "You already have trust.",
+                  body: "Strong reviews mean the hard part is done. The problem isn't getting attention — it's failing to capture it when it arrives.",
+                },
+                {
+                  label: "Interest disappears fast.",
+                  body: "Every Google search, missed call, and unread form sits outside a system. Without automation, that intent evaporates.",
+                },
+                {
+                  label: "The fix is a pipeline — not more ads.",
+                  body: "Routing existing interest into a response sequence is what turns reviews into revenue.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="flex gap-4"
+                  style={{ borderLeft: "2px solid rgba(154,92,46,0.25)", paddingLeft: "16px" }}
+                >
+                  <div>
+                    <p className="font-titles text-sm font-semibold text-foreground mb-1">
+                      {item.label}
+                    </p>
+                    <p className="font-titles text-sm leading-relaxed" style={{ color: "rgba(27,20,13,0.6)" }}>
+                      {item.body}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Also included callout */}
             <div
-              className="mt-6 rounded-2xl px-5 py-4 text-sm text-foreground/80 leading-relaxed"
+              className="mt-6 rounded-2xl px-5 py-4 leading-relaxed"
               style={{
                 background: "rgba(154,92,46,0.06)",
                 border: "1px solid rgba(154,92,46,0.14)",
               }}
             >
-              <span className="font-semibold text-foreground">On landing pages:</span>{" "}
-              If your website is missing, weak, or not converting, we can include a conversion-focused landing page as part of the full system — so every ad click and Google visit has somewhere to land and something to do.
+              <p className="font-titles text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5" style={{ color: "#9a5c2e" }}>
+                Also Included
+              </p>
+              <p className="font-titles text-sm" style={{ color: "rgba(27,20,13,0.72)" }}>
+                If your website is missing or not converting, we build a conversion-focused landing page as part of the full system — so every ad click and Google visit has somewhere to land.
+              </p>
             </div>
           </div>
 

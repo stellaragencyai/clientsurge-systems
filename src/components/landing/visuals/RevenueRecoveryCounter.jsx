@@ -62,21 +62,35 @@ export default function RevenueRecoveryCounter() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const [recoveredCount, setRecoveredCount] = useState(0);
+  const [replaying, setReplaying] = useState(false);
   const total = LEADS.slice(0, recoveredCount).reduce((s, l) => s + l.value, 0);
   const displayTotal = useCountUp(total, inView, 0.9);
 
-  useEffect(() => {
-    if (!inView) return;
+  const runSequence = () => {
     let i = 0;
     const tick = () => {
       if (i < LEADS.length) {
         i++;
         setRecoveredCount(i);
         setTimeout(tick, 680);
+      } else {
+        setReplaying(false);
       }
     };
     setTimeout(tick, 400);
+  };
+
+  useEffect(() => {
+    if (!inView) return;
+    runSequence();
   }, [inView]);
+
+  const handleReplay = () => {
+    if (replaying) return;
+    setReplaying(true);
+    setRecoveredCount(0);
+    setTimeout(runSequence, 200);
+  };
 
   return (
     <div
@@ -95,6 +109,17 @@ export default function RevenueRecoveryCounter() {
       }}
       aria-label="Revenue recovery visual"
     >
+      {/* Ambient screen glow — light bleeding outward from the screen surface */}
+      <div style={{
+        position: "absolute",
+        inset: "-24px",
+        borderRadius: "36px",
+        background: "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(200,150,92,0.18) 0%, rgba(245,180,80,0.08) 40%, transparent 70%)",
+        pointerEvents: "none",
+        zIndex: 0,
+        filter: "blur(12px)",
+      }} />
+
       {/* Screen reflection */}
       <div style={{
         position: "absolute", top: 0, left: "8%", right: "auto",
@@ -194,12 +219,32 @@ export default function RevenueRecoveryCounter() {
         <p className="text-[10px] font-semibold" style={{ color: "rgba(200,150,92,0.7)" }}>
           Automated by ClientSurge
         </p>
-        <motion.div
-          className="w-2 h-2 rounded-full"
-          style={{ background: "#c8965c" }}
-          animate={{ opacity: [1, 0.3, 1] }}
-          transition={{ duration: 1.4, repeat: Infinity }}
-        />
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <button
+            onClick={handleReplay}
+            disabled={replaying}
+            style={{
+              background: replaying ? "rgba(200,150,92,0.08)" : "rgba(200,150,92,0.15)",
+              border: "1px solid rgba(200,150,92,0.25)",
+              borderRadius: "6px",
+              padding: "2px 8px",
+              fontSize: "9px",
+              fontWeight: "700",
+              color: replaying ? "rgba(200,150,92,0.4)" : "rgba(200,150,92,0.9)",
+              cursor: replaying ? "not-allowed" : "pointer",
+              letterSpacing: "0.08em",
+              transition: "all 0.2s",
+            }}
+          >
+            {replaying ? "●●●" : "↺ Replay"}
+          </button>
+          <motion.div
+            className="w-2 h-2 rounded-full"
+            style={{ background: "#c8965c" }}
+            animate={{ opacity: [1, 0.3, 1] }}
+            transition={{ duration: 1.4, repeat: Infinity }}
+          />
+        </div>
       </div>
       </div>
 
