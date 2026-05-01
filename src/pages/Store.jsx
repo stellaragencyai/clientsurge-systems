@@ -627,6 +627,32 @@ function StoreInner() {
             <BundleSavingsToast />
           </Suspense>
            <CartSidebar />
+           {/* S25: Talk to a Human — escape valve for overwhelmed visitors */}
+           <div style={{
+             background: "linear-gradient(135deg, rgba(154,92,46,0.06), rgba(200,150,92,0.03))",
+             borderTop: "1px solid rgba(154,92,46,0.1)",
+             padding: "28px 24px",
+             textAlign: "center",
+           }}>
+             <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.6)", margin: "0 0 12px" }}>
+               Not sure what your business needs?
+             </p>
+             <a
+               href="/book"
+               style={{
+                 display: "inline-flex", alignItems: "center", gap: "6px",
+                 background: "linear-gradient(135deg, #7a4825, #c8965c)",
+                 color: "#fff8ee", fontWeight: "700", fontSize: "13px",
+                 padding: "10px 22px", borderRadius: "999px", textDecoration: "none",
+                 boxShadow: "0 4px 14px rgba(154,92,46,0.25)",
+               }}
+             >
+               📞 Book a free 15-min strategy call
+             </a>
+             <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.35)", marginTop: "10px" }}>
+               We'll tell you exactly which services will move the needle for your business.
+             </p>
+           </div>
            <Suspense fallback={null}>
              <Footer />
              <SocialProofTicker />
