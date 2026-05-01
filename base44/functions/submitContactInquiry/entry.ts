@@ -25,7 +25,7 @@ function normalizeContactInput(payload: Record<string, unknown>) {
     message: sanitizeString(payload.message, MAX_MESSAGE_LENGTH),
     website_url: realWebsite,
     honeypot,
-    // UTM attribution (note: referrer may be empty on SPA navigation — captured client-side before submit)
+    // UTM attribution (note: referrer may be empty on SPA navigation — captured client-side before submit) (note: referrer may be empty on SPA navigation — captured client-side before submit)
     utm_source: sanitizeString(payload.utm_source),
     utm_medium: sanitizeString(payload.utm_medium),
     utm_campaign: sanitizeString(payload.utm_campaign),
@@ -83,7 +83,7 @@ function buildLeadPayload(contact: ReturnType<typeof normalizeContactInput>, sta
     source: LEAD_SOURCE,
     intake_type: INTAKE_TYPE,
     status,
-    // UTM attribution (note: referrer may be empty on SPA navigation — captured client-side before submit) fields
+    // UTM attribution (note: referrer may be empty on SPA navigation — captured client-side before submit) (note: referrer may be empty on SPA navigation — captured client-side before submit) fields
     utm_source: contact.utm_source || null,
     utm_medium: contact.utm_medium || null,
     utm_campaign: contact.utm_campaign || null,
