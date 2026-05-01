@@ -8,8 +8,8 @@ const guarantees = [
   },
   {
     icon: Zap,
-    title: "Results or We Keep Working",
-    desc: "If your system isn't converting leads at the promised rate, we optimize and adjust at no extra cost until it does."
+    title: "We Optimize Until It Converts",
+    desc: "If your lead response and follow-up system isn't producing measurable booking improvements in 30 days, we keep optimizing at zero additional cost."
   },
   {
     icon: RotateCcw,
