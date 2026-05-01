@@ -8,6 +8,7 @@ import ScrollProgressBar from "../components/landing/ScrollProgressBar";
 import CursorGlow from "../components/visual-effects/CursorGlow";
 import SocialProofTicker from "../components/landing/SocialProofTicker";
 import InteractiveJourneyMap from "../components/landing/InteractiveJourneyMap";
+import FloatingNotificationToasts from "../components/visual-effects/FloatingNotificationToasts";
 import { SectionSkeleton, SmallSectionSkeleton, LargeSectionSkeleton } from "../components/landing/SkeletonLoader";
 
 // Lazy load below-the-fold sections
@@ -119,6 +120,7 @@ export default function Home() {
     <DemoBookingProvider>
       <div className="min-h-screen">
         <CursorGlow />
+        <FloatingNotificationToasts />
         <ScrollProgressBar />
         <Navbar />
         <SocialProofTicker />
