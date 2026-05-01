@@ -57,6 +57,7 @@ export default function ExitIntentPopup({ pathname }) {
   const openPopup = (source = "manual") => {
     setSubmitted(false);
     setError("");
+    setForm({ full_name: "", email: "", phone: "", business_type: "Med Spas & Aesthetic Clinics" });
     setOpen(true);
     trackCTA("exit_intent_opened", source);
   };
