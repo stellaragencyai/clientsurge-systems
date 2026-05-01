@@ -4,7 +4,7 @@ const STEPS = [
   {
     number: 1,
     title: "Pick Your Services",
-    description: "Choose from 12+ AI automations built for local service businesses",
+    description: "Choose from our AI automations purpose-built for local service businesses",
     icon: "🎯",
   },
   {
