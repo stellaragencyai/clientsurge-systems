@@ -139,8 +139,8 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">Email</p>
-                    <a href="mailto:nolan@clientsurgesystems.com" className="text-sm text-foreground hover:text-primary transition-colors">
-                      nolan@clientsurgesystems.com
+                    <a href="mailto:support@clientsurgesystems.com" className="text-sm text-foreground hover:text-primary transition-colors">
+                      support@clientsurgesystems.com
                     </a>
                   </div>
                 </div>
@@ -201,7 +201,7 @@ export default function Contact() {
                     Prefer to book a demo instead?
                   </button>
                   <a
-                    href="mailto:nolan@clientsurgesystems.com"
+                    href="mailto:support@clientsurgesystems.com"
                     className="inline-flex items-center justify-center rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
                   >
                     Email us directly
