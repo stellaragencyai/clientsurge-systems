@@ -8,9 +8,19 @@ import OrderTracker from "@/components/landing/OrderTracker";
 export default function OrderSuccess() {
   const [sessionId, setSessionId] = useState("");
 
+  const [orderSummary, setOrderSummary] = useState(null);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setSessionId(params.get("session_id") || "");
+    // Read pre-checkout summary saved to sessionStorage before Stripe redirect
+    try {
+      const raw = sessionStorage.getItem("clientsurge:last-order");
+      if (raw) {
+        setOrderSummary(JSON.parse(raw));
+        sessionStorage.removeItem("clientsurge:last-order");
+      }
+    } catch {}
   }, []);
 
   return (
@@ -123,6 +133,30 @@ export default function OrderSuccess() {
               </div>
             ))}
           </div>
+
+          {/* Order summary */}
+          {orderSummary && (
+            <div style={{
+              background: "rgba(255,255,255,0.8)", border: "1.5px solid rgba(154,92,46,0.15)",
+              borderRadius: "20px", padding: "20px 24px", marginBottom: "24px", textAlign: "left",
+            }}>
+              <p style={{ fontSize: "11px", fontWeight: "700", color: "#9a5c2e", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "12px" }}>
+                Your Order
+              </p>
+              {orderSummary.items?.map((item, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: i < orderSummary.items.length - 1 ? "1px solid rgba(154,92,46,0.08)" : "none" }}>
+                  <span style={{ fontSize: "13px", color: "#1a1209", fontWeight: "600" }}>{item.icon} {item.name}</span>
+                  <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.6)" }}>${item.setup_fee} + ${item.monthly_fee}/mo</span>
+                </div>
+              ))}
+              {orderSummary.totalSetup != null && (
+                <div style={{ marginTop: "12px", paddingTop: "10px", borderTop: "1.5px solid rgba(154,92,46,0.12)", display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209" }}>Total</span>
+                  <span style={{ fontSize: "13px", fontWeight: "700", color: "#9a5c2e" }}>${orderSummary.totalSetup} setup · ${orderSummary.totalMonthly}/mo</span>
+                </div>
+              )}
+            </div>
+          )}
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center" }}>
             <Link
