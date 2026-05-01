@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import { getSelectedIndustryRecommendation, INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
-import CustomerProofCards from "./CustomerProofCards";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import StaggeredFadeUp from "@/components/visual-effects/StaggeredFadeUp";
 
@@ -146,8 +145,7 @@ export default function Pricing() {
           </div>
         </StaggeredFadeUp>
 
-        <CustomerProofCards />
-
+        
         <MoneyBackGuarantee />
 
         <div className="max-w-2xl mb-6 mt-12">
