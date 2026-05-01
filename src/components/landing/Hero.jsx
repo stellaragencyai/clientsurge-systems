@@ -101,7 +101,7 @@ export default function Hero() {
                 display: "inline"
               }}>
               
-              AI Systems That Book 3x More Appointments
+              AI Systems That Convert 3x More Leads Into Bookings
             </span>
           </h1>
 
