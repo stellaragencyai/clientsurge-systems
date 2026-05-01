@@ -101,14 +101,17 @@ function StoreInner() {
       return leftRecommended ? -1 : 1;
     });
 
-    // In guided mode, show only recommended + featured services
-    if (pathMode === "guided" && selectedIndustry) {
-      const recommendedNames = new Set(
-        selectedIndustry?.recommendedServices?.map((s) => s.name) || []
-      );
-      results = results.filter(
-        (p) => recommendedNames.has(p.name)
-      ).slice(0, 6);
+    // In guided mode: show recommended services if industry selected, else show all purchasable
+    if (pathMode === "guided") {
+      if (selectedIndustry) {
+        const recommendedNames = new Set(
+          selectedIndustry?.recommendedServices?.map((s) => s.name) || []
+        );
+        results = results.filter((p) => recommendedNames.has(p.name)).slice(0, 6);
+      } else {
+        // No industry selected — show all checkout-enabled (non-coming-soon) products
+        results = results.filter((p) => p.checkout_enabled !== false && !p.coming_soon);
+      }
     }
 
     return results;
@@ -608,7 +611,9 @@ function StoreInner() {
                 }}
               >
                 <p style={{ fontSize: "16px", fontWeight: "600" }}>
-                  {pathMode === "guided" && selectedIndustry
+                  {pathMode === "guided" && !selectedIndustry
+                    ? "No services available — try 'Explore All'"
+                    : pathMode === "guided" && selectedIndustry
                     ? "Try switching to 'Explore All' to see more services"
                     : "No services match your search"}
                 </p>
