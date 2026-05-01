@@ -14,6 +14,7 @@ const IntegrationPartners = lazy(() => import("../components/landing/Integration
 const FAQ = lazy(() => import("../components/landing/FAQ"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
 const LeadLeakage = lazy(() => import("../components/landing/LeadLeakage"));
+const BeforeAfter = lazy(() => import("../components/landing/BeforeAfter"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 const Footer = lazy(() => import("../components/landing/Footer"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
@@ -128,6 +129,7 @@ export default function Home() {
         <Suspense fallback={<LargeLoadingFallback />}>
           <SectionBreak />
           <LeadLeakage />
+          <Suspense fallback={<SectionSkeleton />}><BeforeAfter /></Suspense>
           <SectionBreak />
           <CoreOffer />
           <SectionBreak />
