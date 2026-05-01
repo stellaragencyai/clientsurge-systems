@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowUp, Mail, Phone, Shield, Facebook, Instagram, Linkedin, Twitter, FileText, Lock, HelpCircle } from "lucide-react";
+import { ArrowUp, Mail, Phone, Shield, FileText, Lock, HelpCircle } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const navColumns = [
@@ -34,11 +34,6 @@ const navColumns = [
 }];
 
 
-const socialLinks = [
-{ icon: Facebook, href: "https://facebook.com/clientsurgesystems", label: "Facebook" },
-{ icon: Instagram, href: "https://instagram.com/clientsurgesystems", label: "Instagram" },
-{ icon: Linkedin, href: "https://linkedin.com/company/clientsurgesystems", label: "LinkedIn" },
-{ icon: Twitter, href: "https://twitter.com/clientsurge", label: "Twitter" }];
 
 
 export default function Footer() {
@@ -116,21 +111,6 @@ export default function Footer() {
 
         {/* Right: Social + Utility Icons */}
         <div className="flex items-center gap-2">
-          {socialLinks.map((social) => {
-            const Icon = social.icon;
-            return (
-              <a
-                key={social.label}
-                href={social.href}
-                aria-label={social.label}
-                title={social.label}
-                className="group w-7 h-7 rounded-lg border border-primary/15 flex items-center justify-center text-foreground/50 hover:text-primary hover:border-primary/40 transition-all">
-                
-                <Icon className="w-3 h-3 group-hover:scale-110 transition-transform" />
-              </a>);
-
-          })}
-          
           <button
             onClick={scrollTop}
             title="Back to top"
