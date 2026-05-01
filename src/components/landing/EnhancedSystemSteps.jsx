@@ -147,7 +147,17 @@ export default function EnhancedSystemSteps() {
   };
 
   return (
-    <>
+    <section id="how-it-works" className="py-20 md:py-28 px-4 md:px-6" style={{ background: "linear-gradient(180deg, rgba(248,250,255,0.6) 0%, rgba(255,255,255,0.98) 100%)" }}>
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-14">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-3" style={{ color: "#9a5c2e" }}>Each Automation Explained</p>
+          <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground tracking-tight mb-4">
+            Inside the 8-Step System
+          </h2>
+          <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Every automation runs on its own. Together they form a complete lead-to-booked pipeline — no manual effort required.
+          </p>
+        </div>
       <motion.div
         className="space-y-4"
         variants={containerVariants}
