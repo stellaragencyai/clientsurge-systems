@@ -164,7 +164,13 @@ Return a concise audit as JSON with:
               <div className="flex items-center justify-between gap-4 mb-5">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-2">Audit score</p>
-                  <p className="font-display text-5xl font-semibold text-foreground">{result.audit_score}<span className="text-lg text-muted-foreground">/100</span></p>
+                  <p className="font-display text-5xl font-semibold text-foreground"><span style={{
+              display:"inline-flex",alignItems:"center",justifyContent:"center",
+              width:"52px",height:"52px",borderRadius:"50%",fontWeight:"800",fontSize:"20px",
+              background: result.audit_score >= 70 ? "rgba(34,197,94,0.1)" : result.audit_score >= 40 ? "rgba(245,158,11,0.1)" : "rgba(239,68,68,0.1)",
+              border: `2px solid ${result.audit_score >= 70 ? "#22c55e" : result.audit_score >= 40 ? "#f59e0b" : "#ef4444"}`,
+              color: result.audit_score >= 70 ? "#16a34a" : result.audit_score >= 40 ? "#d97706" : "#dc2626",
+            }}>{result.audit_score}</span><span className="text-lg text-muted-foreground">/100</span></p>
                 </div>
                 {demoBooking ? (
                   <button
