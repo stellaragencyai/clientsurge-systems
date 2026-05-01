@@ -2,6 +2,7 @@ import { CheckCircle2, Plus, Check } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cartContext";
 import ServiceDetailModal from "@/components/store/ServiceDetailModal";
+import { motion } from "framer-motion";
 
 export default function ProductCard({ product }) {
   const { items, addItem, removeItem } = useCart();
@@ -157,9 +158,13 @@ export default function ProductCard({ product }) {
         }
       `}</style>
 
-      <div
+      <motion.div
         className={`pcard${inCart ? " in-cart" : ""}${product.coming_soon ? " coming-soon-card" : ""}`}
         onClick={() => !product.coming_soon && setModalOpen(true)}
+        initial={{ opacity: 0, y: 32 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-50px" }}
+        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
       >
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -270,7 +275,7 @@ export default function ProductCard({ product }) {
         )}
 
         {!product.coming_soon && <span className="pcard-click-hint">tap for details →</span>}
-      </div>
+      </motion.div>
 
       {modalOpen && (
         <ServiceDetailModal

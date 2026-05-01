@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Building2, CalendarCheck, ShieldCheck, TrendingUp, Zap } from "lucide-react";
 import FollowUpTimeline from "./visuals/FollowUpTimeline";
+import { motion } from "framer-motion";
 
 function useCountUp(value, inView, duration = 1400) {
   const [count, setCount] = useState(value);
@@ -84,8 +85,12 @@ function StatCard({ item, index, inView }) {
   const isHighlighted = index === 1; // 3x more bookings stat
   
   return (
-    <article
+    <motion.article
       className="relative rounded-2xl border border-border text-left shadow-sm"
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.55, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
       style={{
         background: isHighlighted 
           ? "linear-gradient(180deg, rgba(245,217,168,0.3) 0%, rgba(255,255,255,0.9) 100%)"
@@ -95,10 +100,7 @@ function StatCard({ item, index, inView }) {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        opacity: inView ? 1 : 0,
-        transform: inView ? "translateY(0)" : "translateY(16px)",
-        transition: `opacity 0.5s ease ${index * 0.08}s, transform 0.5s ease ${index * 0.08}s`,
-        boxShadow: isHighlighted && inView ? "0 0 20px rgba(245,217,168,0.4), 0 6px 22px rgba(0,0,0,0.06)" : "0 6px 22px rgba(0,0,0,0.06)",
+        boxShadow: isHighlighted ? "0 0 20px rgba(245,217,168,0.4), 0 6px 22px rgba(0,0,0,0.06)" : "0 6px 22px rgba(0,0,0,0.06)",
       }}
     >
       <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3" style={isHighlighted ? { boxShadow: "0 0 12px rgba(34,199,89,0.4)" } : {}}>
@@ -113,7 +115,7 @@ function StatCard({ item, index, inView }) {
         </p>
         <p className="text-xs text-foreground/60 leading-relaxed">{item.story}</p>
       </div>
-    </article>
+    </motion.article>
   );
 }
 
