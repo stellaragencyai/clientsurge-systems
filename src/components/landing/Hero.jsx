@@ -110,8 +110,10 @@ export default function Hero() {
             height: "2px",
             borderRadius: "999px",
             marginBottom: "22px",
-            background: "linear-gradient(90deg, transparent 0%, rgba(200,150,92,0.5) 30%, rgba(245,217,168,0.9) 50%, rgba(200,150,92,0.5) 70%, transparent 100%)"
+            background: "linear-gradient(90deg, transparent 0%, rgba(200,150,92,0.5) 30%, rgba(245,217,168,0.9) 50%, rgba(200,150,92,0.5) 70%, transparent 100%)",
+            animation: "shimmer-fadein 0.9s ease 0.3s both"
           }} />
+          <style>{`@keyframes shimmer-fadein{from{opacity:0;transform:scaleX(0.4)}to{opacity:1;transform:scaleX(1)}}`}</style>
 
           <p
             className="landing-hero__body"
