@@ -223,9 +223,9 @@ export default function ProductCard({ product }) {
         <div className="price-highlight-box">
           <div className="price-value">
             <span>💰</span>
-            ${product.monthly_fee}<span>/mo</span>
+            ${product.monthly_fee}<span>/month</span>
           </div>
-          <div className="setup-fee">+${product.setup_fee} setup</div>
+          <div className="setup-fee">${product.setup_fee} one-time setup</div>
         </div>
 
         {/* Full-Width CTA Footer */}
