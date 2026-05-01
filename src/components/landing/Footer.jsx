@@ -38,6 +38,7 @@ const trustBadges = [
   { icon: "⚡", text: "Live in 5–7 business days" },
   { icon: "💬", text: "SMS + Email included" },
   { icon: "🎯", text: "Done-for-you setup" },
+  { icon: "🛡️", text: "30-day money-back guarantee" },
 ];
 
 export default function Footer() {
