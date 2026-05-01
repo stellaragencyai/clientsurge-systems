@@ -112,7 +112,7 @@ function SupportCard() {
       <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
         {[
           { Icon: Mail, label: "Email Support", href: "mailto:support@clientsurgesystems.com" },
-          { Icon: Phone, label: "(602) 587-4608", href: "tel:+16025874608" },
+          { Icon: Phone, label: "(602) 584-3227", href: "tel:+16025843227" },
         ].map(({ Icon, label, href }) => (
           <a key={label} href={href} style={{
             display: "inline-flex", alignItems: "center", gap: "6px",
