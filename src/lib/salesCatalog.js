@@ -296,7 +296,7 @@ const PACKAGE_DEFINITIONS = [
     highlight: true,
   },
   {
-    package_key: "pro_system",
+    package_key: "elite_system",
     name: "Elite System",
     fit: "Best for teams that want the full response, reactivation, and review stack.",
     description: "The complete AI automation bundle — every service, fully managed.",
