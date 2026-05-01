@@ -122,7 +122,6 @@ function IndustryTemplateInner({ industrySlug }) {
         {/* Results/Metrics */}
         <IndustryResults
           metrics={industry.metrics}
-          testimonial={industry.testimonial}
           onBookDemo={() => demoBooking?.openDemoBooking?.()}
         />
 
