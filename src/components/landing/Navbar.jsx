@@ -275,6 +275,12 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
           <button
+            onClick={() => { trackCTA("client_dashboard", "navbar"); navigate("/client-dashboard"); }}
+            className="hidden lg:block text-xs font-semibold text-muted-foreground hover:text-primary border border-border hover:border-primary/40 bg-background/50 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-3 py-1.5 transition-colors"
+          >
+            Dashboard
+          </button>
+          <button
             onClick={() => {
               trackCTA("login", "navbar");
               setShowLoginModal(true);
