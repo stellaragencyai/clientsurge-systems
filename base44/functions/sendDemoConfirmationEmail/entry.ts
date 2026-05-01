@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
     </ul>
     <p>We'll send you a calendar invite and meeting link shortly.</p>
     <p style="margin-top: 24px;">Talk soon,<br/><strong>The ClientSurge Systems Team</strong></p>
-    <p style="font-size: 12px; color: #999; margin-top: 24px;">Need to reschedule? Reply to this email or call <a href="tel:+16025874608">(602) 587-4608</a></p>
+    <p style="font-size: 12px; color: #999; margin-top: 24px;">Need to reschedule? Reply to this email or call <a href="tel:+16025843227">(602) 584-3227</a></p>
   </div>
 </body>
 </html>`;
