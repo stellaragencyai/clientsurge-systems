@@ -184,11 +184,11 @@ export default function Footer() {
                     <span className="text-[12px] font-semibold group-hover:text-primary">(602) 587-4608</span>
                   </div>
                 </a>
-                <a href="mailto:system@clientsurgesystems.com" className="flex items-start gap-3 text-foreground/70 hover:text-foreground transition-colors group">
+                <a href="mailto:nolan@clientsurgesystems.com" className="flex items-start gap-3 text-foreground/70 hover:text-foreground transition-colors group">
                   <Mail className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[10px] text-primary/70 uppercase tracking-wider">Email</span>
-                    <span className="text-[11px] font-semibold group-hover:text-primary break-all">system@clientsurgesystems.com</span>
+                    <span className="text-[11px] font-semibold group-hover:text-primary break-all">nolan@clientsurgesystems.com</span>
                   </div>
                 </a>
               </div>
