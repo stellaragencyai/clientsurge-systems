@@ -12,6 +12,7 @@ import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { getRecommendedProducts } from "@/lib/productRecommendations";
 import StackValueCounter from "@/components/store/StackValueCounter";
+import { setPageMetadata } from "@/lib/seo";
 
 // Lazy load heavy store components
 const InteractiveStackBuilder = lazy(() =>
@@ -30,6 +31,17 @@ function StoreInner() {
   const [showComparison, setShowComparison] = useState(false);
   const [pathMode, setPathMode] = useState("guided");
   const { items, setCartOpen, totalSetup, totalMonthly } = useCart();
+
+  useEffect(() => {
+    const cleanupMeta = setPageMetadata({
+      title: "AI Automation Store | ClientSurge Systems",
+      description: "Build your custom AI automation stack for your local business. Instant lead response, missed call text-back, 14-day nurture sequences, and more. Start for $97/month.",
+      canonicalPath: "/store",
+      ogTitle: "AI Automation Store | ClientSurge Systems",
+      ogDescription: "Pick the AI automations your business needs. Done-for-you setup in 5–7 business days. No contracts.",
+    });
+    return cleanupMeta;
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") {
