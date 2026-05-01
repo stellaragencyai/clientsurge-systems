@@ -49,7 +49,7 @@ export default function BeforeAfter() {
             <button
               key={i}
               onClick={() => setActive(i)}
-              className="px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200"
+              className="px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 relative"
               style={{
                 background: active === i
                   ? "linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 100%)"
