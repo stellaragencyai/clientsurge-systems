@@ -5,6 +5,7 @@ import DemoBookingModal from '../forms/DemoBookingModal';
 export default function StickyCTA() {
   const [visible, setVisible] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,11 +20,11 @@ export default function StickyCTA() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  if (!visible) return null;
+  if (!visible || dismissed) return null;
 
   return (
     <>
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 animate-fade-in">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 animate-fade-in flex items-center gap-2">
         <button
           onClick={() => setShowModal(true)}
           style={{
@@ -52,6 +53,13 @@ export default function StickyCTA() {
             Book Your Free Demo
             <ArrowRight className="w-4 h-4" />
           </span>
+        </button>
+        <button
+          onClick={() => setDismissed(true)}
+          aria-label="Dismiss"
+          style={{ display:"flex",alignItems:"center",justifyContent:"center",width:"28px",height:"28px",borderRadius:"50%",background:"rgba(0,0,0,0.25)",border:"none",cursor:"pointer",color:"#fff",flexShrink:0 }}
+        >
+          ✕
         </button>
       </div>
       {showModal && <DemoBookingModal onClose={() => setShowModal(false)} />}
