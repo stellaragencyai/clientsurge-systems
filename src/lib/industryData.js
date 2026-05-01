@@ -214,7 +214,7 @@ export const INDUSTRIES = {
       },
       {
         q: "How much does it cost?",
-        a: "Starting at $297/month for up to 500 patient inquiries. Most dental offices see ROI within 2 weeks.",
+        a: "Starting at $497/month. Most dental offices see ROI within 2 weeks.",
       },
     ],
   },
