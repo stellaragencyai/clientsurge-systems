@@ -96,7 +96,7 @@ function detectPackageType(serviceKeys = []) {
     "review_request",
   ]);
   if (setsEqual(keySet, proSet)) {
-    return "pro_system";
+    return "elite_system";
   }
 
   // Growth System: EXACTLY these 4 services
