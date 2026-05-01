@@ -69,11 +69,7 @@ const PUBLIC_PATHS = [
   "/contact",
   "/leads/capture",
   "/onboarding",
-  "/test-option-1",
-  "/test-option-2",
-  "/test-option-3",
-  "/preview-idea-1",
-  "/preview-idea-2",
+  // test/preview routes removed
 ];
 
 const NOINDEX_PREFIXES = [
@@ -180,11 +176,6 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/test-option-1" element={<Navigate to="/" replace />} />
-      <Route path="/test-option-2" element={<Navigate to="/" replace />} />
-      <Route path="/test-option-3" element={<Navigate to="/" replace />} />
-      <Route path="/preview-idea-1" element={<Navigate to="/" replace />} />
-      <Route path="/preview-idea-2" element={<Navigate to="/" replace />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
