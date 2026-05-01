@@ -50,7 +50,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "Will this actually work for my specific business?",
-  a: "If you generate leads but lose conversions due to slow follow-up, the answer is almost always yes. We have worked across many appointment-based industries. On your demo call, we will identify the exact gaps and show you the specific solution. If we do not think we can help, we will tell you upfront.",
+  a: "If you generate leads but lose conversions due to slow follow-up, the answer is almost always yes. We specialize in appointment-based industries and tailor every system to your specific lead flow. On your demo call, we will identify the exact gaps and show you the specific solution. If we do not think we can help, we will tell you upfront.",
   category: "integration"
 },
 {
