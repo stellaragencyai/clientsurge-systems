@@ -172,10 +172,25 @@ export default function HeroSMSDemo() {
         </div>
       </div>
 
-      {/* Caption */}
-      <p style={{ textAlign: "center", fontSize: "11px", color: "rgba(27,20,13,0.42)", marginTop: "14px", letterSpacing: "0.04em" }}>
-        Lead to booked appointment \u2014 fully automated
-      </p>
+      {/* Caption + Replay */}
+      <div style={{ textAlign: "center", marginTop: "14px" }}>
+        <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.42)", letterSpacing: "0.04em", marginBottom: "6px" }}>
+          Lead to booked appointment — fully automated
+        </p>
+        {done && (
+          <button
+            onClick={runSequence}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: "5px",
+              fontSize: "11px", fontWeight: "700", color: "#9a5c2e",
+              background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.25)",
+              borderRadius: "20px", padding: "5px 14px", cursor: "pointer",
+            }}
+          >
+            ↺ Replay demo
+          </button>
+        )}
+      </div>
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes smsBubbleIn {
