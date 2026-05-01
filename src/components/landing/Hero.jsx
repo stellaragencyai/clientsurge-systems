@@ -96,13 +96,8 @@ export default function Hero() {
             Stop Losing Leads to Slow Response —{" "}
             <span
               style={{
-                background: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 52%, #9a5c2e 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                display: "inline",
                 color: "#c8965c",
-                paddingBottom: "0.05em"
+                display: "inline"
               }}>
               
               AI Systems That Book 3x More Appointments
