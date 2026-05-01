@@ -17,10 +17,7 @@ import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import PageNotFound from "./lib/PageNotFound";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
 
-// Initialize auto-tracking on app load
-if (typeof window !== "undefined") {
-  initializeAnalyticsObserver();
-}
+// Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
 import Onboarding from "./pages/Onboarding";
 import CaptureLeads from "./pages/CaptureLeads";
@@ -84,6 +81,16 @@ const NOINDEX_PREFIXES = [
 
 const isPublicPath = (pathname) =>
   PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+
+function AppInner() {
+  useEffect(() => {
+    // Initialize auto-tracking after React mounts — safe for SSR/pre-render
+    if (typeof window !== "undefined") {
+      initializeAnalyticsObserver();
+    }
+  }, []);
+  return null;
+}
 
 function SectionRedirect({ hash }) {
   const navigate = useNavigate();
