@@ -44,6 +44,22 @@ export default function FinalCTA() {
             )}
           </div>
 
+
+          {/* How the demo works — 3 steps */}
+          <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto text-left">
+            {[
+              { step: "01", title: "Book a 15-min slot", body: "Pick a time that works. No sales pressure, no fluff." },
+              { step: "02", title: "We map your lead flow", body: "We show you exactly where bookings are leaking in your current setup." },
+              { step: "03", title: "See your system live", body: "We demo the full AI system built for your industry — ready to launch." },
+            ].map((item) => (
+              <div key={item.step} className="flex flex-col gap-2">
+                <span className="font-display text-4xl font-black" style={{ color: "rgba(154,92,46,0.2)", lineHeight: 1 }}>{item.step}</span>
+                <p className="font-semibold text-foreground text-sm">{item.title}</p>
+                <p className="text-muted-foreground text-xs leading-relaxed">{item.body}</p>
+              </div>
+            ))}
+          </div>
+
           <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80 hidden"
 
           style={{
