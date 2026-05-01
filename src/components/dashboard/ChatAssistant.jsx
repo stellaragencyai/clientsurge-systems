@@ -164,10 +164,10 @@ Do NOT make up specific dates or promises about delivery times.`;
         </div>
       )}
 
-      <style>{\`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes typingDot { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-4px);opacity:1} }
         @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-      \`}</style>
+      ` }} />
     </>
   );
 }

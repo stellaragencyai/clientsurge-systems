@@ -177,7 +177,7 @@ export default function HeroSMSDemo() {
         Lead to booked appointment \u2014 fully automated
       </p>
 
-      <style>{\`
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes smsBubbleIn {
           0% { opacity: 0; transform: scale(0.82) translateY(8px); }
           100% { opacity: 1; transform: scale(1) translateY(0); }
@@ -186,7 +186,7 @@ export default function HeroSMSDemo() {
           0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
           30% { transform: translateY(-4px); opacity: 1; }
         }
-      \`}</style>
+      ` }} />
     </div>
   );
 }
