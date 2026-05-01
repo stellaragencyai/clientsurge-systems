@@ -27,7 +27,7 @@ export default function MoneyBackGuarantee() {
             30-Day Money-Back Guarantee
           </h3>
           <p className="text-muted-foreground mb-4">
-            If you don't see measurable results in your first 30 days — more leads captured, faster response times, or scheduled bookings — we refund your full setup fee. You only pay monthly if it's working.
+            If you don't see measurable results in your first 30 days — more leads captured, faster response times, or scheduled bookings — we refund your setup cost. No questions asked. You only pay monthly if it's working.
           </p>
 
           <div className="flex flex-wrap gap-3">
