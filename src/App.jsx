@@ -16,6 +16,7 @@ import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import PageNotFound from "./lib/PageNotFound";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
+import { scrollToTop } from "@/lib/scroll";
 
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
@@ -30,6 +31,8 @@ import Industries from "./pages/Industries";
 import OrderSuccess from "./pages/OrderSuccess";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
 import BusinessSetup from "./pages/BusinessSetup";
+import ThankYou from "./pages/ThankYou";
+
 
 const Store = lazy(() => import("./pages/Store"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -87,6 +90,18 @@ const NOINDEX_PREFIXES = [
 const isPublicPath = (pathname) =>
   PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
+// Fix 1: ScrollToTop — resets scroll position on every route change
+function ScrollToTop() {
+  const location = useLocation();
+  useEffect(() => {
+    // Don't scroll to top if navigating to a hash anchor
+    if (!location.hash) {
+      scrollToTop();
+    }
+  }, [location.pathname]);
+  return null;
+}
+
 function AppInner() {
   useEffect(() => {
     // Initialize auto-tracking after React mounts — safe for SSR/pre-render
@@ -97,21 +112,12 @@ function AppInner() {
   return null;
 }
 
+// SectionRedirect — just navigate to home, no auto-scroll
 function SectionRedirect({ hash }) {
   const navigate = useNavigate();
 
   useEffect(() => {
     navigate("/", { replace: true });
-
-    const timer = window.setTimeout(() => {
-      const element = document.querySelector(hash);
-      if (element) {
-        element.scrollIntoView({ behavior: "auto", block: "start" });
-      }
-      window.history.replaceState({}, "", `/${hash}`);
-    }, 450);
-
-    return () => window.clearTimeout(timer);
   }, [hash, navigate]);
 
   return null;
@@ -220,6 +226,7 @@ const AuthenticatedApp = () => {
       />
       <Route path="/order-success" element={<OrderSuccess />} />
       <Route path="/setup" element={<BusinessSetup />} />
+      <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/:slug" element={<IndustryTemplate />} />
 
       <Route
@@ -262,6 +269,7 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router style={{ overflowX: "hidden" }}>
+          <ScrollToTop />
           <AutoCTAAnalytics />
           <RouteIndexingGuard />
           <AuthenticatedApp />

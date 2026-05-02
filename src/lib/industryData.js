@@ -177,7 +177,7 @@ export const INDUSTRIES = {
     smsDemo: {
       businessName: "Bright Smile Dental",
       initialMessage: "Hi, I need an emergency appointment. My tooth is killing me.",
-      automatedResponse: "Hi! We're sorry to hear you're in pain. 😟 Bright Smile Dental can see you today. Our next emergency slot is 3 PM. Reply YES to confirm or call (602) 555-1234 for other times.",
+      automatedResponse: "Hi! We're sorry to hear you're in pain. 😟 Bright Smile Dental can see you today. Our next emergency slot is 3 PM. Reply YES to confirm or call (602) 584-3227 for other times.",
       leadReply: "YES - 3 PM works",
       confirmationMessage: "Perfect! You're confirmed for today at 3 PM. Please arrive 10 min early. Address: 123 Main St. See you soon! 🦷",
     },

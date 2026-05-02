@@ -6,6 +6,8 @@ import DemoBookingModal from "../forms/DemoBookingModal";
 import { trackCTA } from "@/lib/analytics";
 import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
+
 
 const sectionLinks = [
   { label: "How It Works", href: "#problem-solution" },
@@ -76,6 +78,14 @@ function getSafeHashTarget(hash) {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    return acquireBodyScrollLock("landing-mobile-nav");
+  }, [open]);
   const [scrolled, setScrolled] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
@@ -103,9 +113,18 @@ export default function Navbar() {
   const handleSectionNavigation = (e, href) => {
     e.preventDefault();
     trackCTA(`nav_${href.replace("#", "")}`, "navbar");
-    navigate(`/${href}`);
     setOpen(false);
     setIndustriesOpen(false);
+
+    if (location.pathname === "/") {
+      // Already on home — scroll directly
+      const id = href.startsWith("#") ? href.slice(1) : href;
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      // Navigate to home only — no auto-scroll
+      navigate("/");
+    }
   };
 
   const handleLogoClick = (e) => {
@@ -126,19 +145,19 @@ export default function Navbar() {
         transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out",
       }}
     >
-      <div className="w-full h-14 md:h-16 flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
+      <div className="w-full h-[110px] md:h-[116px] flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
         <button
           onClick={handleLogoClick}
           className="font-display font-bold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5 md:gap-2"
           style={{ fontSize: "1rem", minHeight: "unset", minWidth: "unset" }}
-        >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-            <span className="text-white font-black text-sm">CS</span>
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="font-black text-sm">ClientSurge</span>
-            <span className="text-primary text-xs font-bold">Systems</span>
-          </div>
+          >
+          <img
+          src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/6c47c2167_ChatGPTImageMay2202610_04_21AM.png"
+          alt="ClientSurge Systems"
+          fetchpriority="high"
+          decoding="async"
+          style={{ height: "104px", width: "auto", objectFit: "contain" }}
+          />
         </button>
 
         <div className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
@@ -158,13 +177,11 @@ export default function Navbar() {
                 href={`/${link.href}`}
                 onClick={(e) => handleSectionNavigation(e, link.href)}
                 className="text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap relative group"
-                style={{
-                  position: "relative",
-                  paddingBottom: "2px",
-                }}
+                style={{ position: "relative", paddingBottom: "2px" }}
               >
                 {link.label}
                 <span
+                  className="group-hover:[transform:scaleX(1)]"
                   style={{
                     position: "absolute",
                     bottom: "-2px",
@@ -176,18 +193,7 @@ export default function Navbar() {
                     transform: "scaleX(0)",
                     transformOrigin: "left",
                     transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                  }}
-                  className="group-hover:scale-x-100"
-                  style={{
-                    transform: "scaleX(0)",
-                    transformOrigin: "left",
-                    transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "scaleX(1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "scaleX(0)";
+                    display: "block",
                   }}
                 />
               </a>

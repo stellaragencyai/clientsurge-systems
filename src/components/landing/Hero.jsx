@@ -2,18 +2,17 @@ import { lazy, Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import CascadingChecklistItem from "@/components/visual-effects/CascadingChecklistItem";
-import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
+import { BUTTON_TEXT } from "@/lib/constants";
 
 
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
-const HeroSMSDemo = lazy(() => import("./HeroSMSDemo"));
 
 const checklist = [
 "Every lead hears from you within 60 seconds — even after hours",
 "Missed calls instantly turn into text conversations, not dead ends",
 "14 days of automated follow-up keeps leads warm without manual work",
 "Guided booking flow converts ready prospects into confirmed appointments",
-"Fully built and live in 5–7 business days — we handle everything"];
+"Fully built and live in 24–48 hours — we handle everything"];
 
 
 export default function Hero() {
@@ -168,17 +167,17 @@ export default function Hero() {
                 color: "#fff8ee",
                 fontSize: "1rem",
                 fontWeight: "700",
-                boxShadow: BUTTON_STYLES.BROWN_GRADIENT.boxShadow,
+                boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
                 cursor: "pointer",
                 transition: "all 0.3s ease"
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.boxShadow = BUTTON_STYLES.BROWN_GRADIENT_HOVER.boxShadow;
+                e.currentTarget.style.boxShadow = "0 8px 32px rgba(120,70,20,0.55)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = BUTTON_STYLES.BROWN_GRADIENT.boxShadow;
+                e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
               }}>
               
               {BUTTON_TEXT.BOOK_DEMO}
@@ -193,7 +192,7 @@ export default function Hero() {
               color: "rgba(27,20,13,0.48)",
               letterSpacing: "0.04em"
             }}>
-            No contracts · Most clients go live in 5–7 business days
+            No contracts · Most clients go live in 24–48 hours
           </p>
         </div>
 
@@ -225,139 +224,58 @@ export default function Hero() {
 
 
 
-          {/* SMS Demo — auto-playing phone animation */}
-          <div style={{ position: "relative", zIndex: 3, display: "flex", justifyContent: "center" }}>
-            <Suspense fallback={<div style={{ width: 300, height: 480 }} />}>
-              <HeroSMSDemo />
-            </Suspense>
-          </div>
-
-          {/* Enhancement 2: Physical side buttons */}
-          {/* Power button — right side top */}
-          <div style={{
-            position: "absolute",
-            right: "-5px",
-            top: "18%",
-            width: "5px",
-            height: "38px",
-            borderRadius: "0 3px 3px 0",
-            background: "linear-gradient(to right, #8a6840, #b8914a)",
-            boxShadow: "2px 0 6px rgba(0,0,0,0.35), inset -1px 0 2px rgba(255,255,255,0.15)",
-            zIndex: 20,
-          }} />
-          {/* Volume up button — right side */}
-          <div style={{
-            position: "absolute",
-            right: "-5px",
-            top: "34%",
-            width: "5px",
-            height: "52px",
-            borderRadius: "0 3px 3px 0",
-            background: "linear-gradient(to right, #8a6840, #b8914a)",
-            boxShadow: "2px 0 6px rgba(0,0,0,0.35), inset -1px 0 2px rgba(255,255,255,0.15)",
-            zIndex: 20,
-          }} />
-          {/* Volume down button — right side */}
-          <div style={{
-            position: "absolute",
-            right: "-5px",
-            top: "49%",
-            width: "5px",
-            height: "52px",
-            borderRadius: "0 3px 3px 0",
-            background: "linear-gradient(to right, #8a6840, #b8914a)",
-            boxShadow: "2px 0 6px rgba(0,0,0,0.35), inset -1px 0 2px rgba(255,255,255,0.15)",
-            zIndex: 20,
-          }} />
-
+          {/* iPad shell — Space Gray aluminum body */}
           <div
             className="landing-hero__tablet"
             style={{
               position: "relative",
               width: "min(100%, 930px)",
               aspectRatio: "1.15 / 1",
-              borderRadius: "34px",
-              padding: "3px",
-              background:
-              "linear-gradient(135deg, #a0714f 0%, #c8965c 25%, #f5d9a8 50%, #c8965c 75%, #7a4f2e 100%)",
+              borderRadius: "36px",
+              /* Space gray aluminum gradient */
+              background: "linear-gradient(160deg, #4a4a4c 0%, #3a3a3c 30%, #2c2c2e 60%, #1c1c1e 100%)",
               boxShadow:
-              "0 44px 110px rgba(17,12,7,0.34), 0 18px 44px rgba(17,12,7,0.18), 0 0 60px rgba(200,150,92,0.18)",
-              transform:
-              "perspective(2400px) rotateY(-10deg) rotateX(4deg) rotateZ(1.4deg)",
-              marginLeft: "0",
-              marginRight: "0"
-            }}>
-            
-            <div style={{
-              width: "100%",
-              height: "100%",
-              borderRadius: "32px",
-              padding: "13px",
-              background: "linear-gradient(160deg, #23263b 0%, #141722 58%, #0d0f16 100%)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12)",
-              overflow: "hidden"
+                "0 44px 110px rgba(0,0,0,0.55), 0 18px 44px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.4)",
+              transform: "perspective(2400px) rotateY(-10deg) rotateX(4deg) rotateZ(1.4deg)",
             }}>
 
-            {/* Enhancement 1: Realistic iPad front camera pill (TrueDepth) centered at top bezel */}
+            {/* Top edge highlight (aluminum sheen) */}
+            <div style={{
+              position: "absolute", top: 0, left: "8%", right: "8%", height: "1px",
+              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), rgba(255,255,255,0.5), rgba(255,255,255,0.35), transparent)",
+              borderRadius: "999px", zIndex: 10,
+            }} />
+
+            {/* Left side — volume buttons */}
+            <div style={{ position: "absolute", left: "-4px", top: "28%", width: "4px", height: "40px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to left, #3a3a3c, #5a5a5c)", boxShadow: "-2px 0 5px rgba(0,0,0,0.5), inset 1px 0 1px rgba(255,255,255,0.12)", zIndex: 20 }} />
+            <div style={{ position: "absolute", left: "-4px", top: "40%", width: "4px", height: "40px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to left, #3a3a3c, #5a5a5c)", boxShadow: "-2px 0 5px rgba(0,0,0,0.5), inset 1px 0 1px rgba(255,255,255,0.12)", zIndex: 20 }} />
+            {/* Right side — power/top button */}
+            <div style={{ position: "absolute", right: "-4px", top: "20%", width: "4px", height: "52px", borderRadius: "0 3px 3px 0", background: "linear-gradient(to right, #3a3a3c, #5a5a5c)", boxShadow: "2px 0 5px rgba(0,0,0,0.5), inset -1px 0 1px rgba(255,255,255,0.12)", zIndex: 20 }} />
+
+            {/* Screen area — inset with proper bezel */}
             <div style={{
               position: "absolute",
-              top: "6px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "5px",
-              zIndex: 10,
+              inset: "10px",
+              borderRadius: "28px",
+              background: "#000",
+              overflow: "hidden",
+              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 2px 8px rgba(0,0,0,0.8)",
             }}>
-              {/* Camera pill housing */}
+              {/* Front camera dot centered at top bezel */}
               <div style={{
-                width: "52px",
-                height: "8px",
-                borderRadius: "999px",
-                background: "linear-gradient(180deg, #1a1d28 0%, #0d0f16 100%)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "5px",
-                padding: "0 6px",
-              }}>
-                {/* Camera lens */}
-                <div style={{
-                  width: "6px",
-                  height: "6px",
-                  borderRadius: "50%",
-                  background: "radial-gradient(circle at 35% 35%, #2a3050, #0a0c14)",
-                  border: "1px solid rgba(80,100,160,0.4)",
-                  boxShadow: "0 0 3px rgba(60,80,140,0.6), inset 0 0 2px rgba(120,150,200,0.3)",
-                }} />
-                {/* Face ID dot */}
-                <div style={{
-                  width: "3px",
-                  height: "3px",
-                  borderRadius: "50%",
-                  background: "#1a1f2e",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }} />
-              </div>
-            </div>
-              
+                position: "absolute", top: "7px", left: "50%", transform: "translateX(-50%)",
+                width: "8px", height: "8px", borderRadius: "50%", zIndex: 10,
+                background: "radial-gradient(circle at 35% 35%, #1a2040, #05070f)",
+                border: "1px solid rgba(80,100,180,0.4)",
+                boxShadow: "0 0 4px rgba(60,80,160,0.5)",
+              }} />
 
-            <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: "20px",
-                  overflow: "hidden",
-                  background: "#f7f3ec",
-                  boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)"
-                }}>
-                
-              <Suspense fallback={<div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-100 animate-pulse" />}>
-                <HeroDashboardScreen />
-              </Suspense>
-            </div>
+              {/* The actual dashboard content */}
+              <div style={{ position: "absolute", inset: "22px 0 0 0", borderRadius: "0 0 26px 26px", overflow: "hidden" }}>
+                <Suspense fallback={<div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 animate-pulse" />}>
+                  <HeroDashboardScreen />
+                </Suspense>
+              </div>
             </div>
           </div>
         </div>

@@ -10,6 +10,15 @@ const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
 const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET") || "";
 const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
 
+// Startup mode check
+if (stripeSecretKey.startsWith("sk_test_")) {
+  console.warn("[STRIPE] Running in TEST MODE. Real payments will not be processed. Switch to sk_live_ before going live.");
+} else if (!stripeSecretKey) {
+  console.error("[STRIPE] STRIPE_SECRET_KEY is not set. Webhook processing will fail.");
+} else {
+  console.info("[STRIPE] Live mode key detected.");
+}
+
 function maskSecret(secret = "") {
   if (!secret) return "missing";
   if (secret.length <= 8) return `${secret.slice(0, 2)}***`;

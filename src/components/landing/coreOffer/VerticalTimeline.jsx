@@ -64,16 +64,7 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
 
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const progress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / (rect.height + window.innerHeight * 0.3)));
-      setSpineProgress(progress);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    setSpineProgress(1);
   }, []);
 
   const system = systemsById[selectedSystemId];
@@ -110,10 +101,7 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
     <motion.div
       ref={containerRef}
       style={{ marginTop: "48px", marginBottom: "48px", position: "relative" }}
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      viewport={{ once: true, margin: "-100px" }}
     >
       {/* Scroll-driven spine line */}
       <div style={{ position: "absolute", left: "-28px", top: 0, bottom: 0, width: "2px", background: "rgba(154,92,46,0.08)", borderRadius: "2px" }} className="hidden md:block">
@@ -158,14 +146,6 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
             : "0 8px 32px rgba(15,23,42,0.07)",
           position: "relative",
           cursor: "pointer",
-        }}
-        animate={{
-          scale: isExpanded ? 1.02 : 1,
-          boxShadow: isExpanded
-            ? "0 32px 80px rgba(15,23,42,0.5)"
-            : isFeatured
-            ? "0 24px 64px rgba(15,23,42,0.3)"
-            : "0 8px 32px rgba(15,23,42,0.07)",
         }}
         transition={{ type: "spring", damping: 20, stiffness: 300 }}
       >

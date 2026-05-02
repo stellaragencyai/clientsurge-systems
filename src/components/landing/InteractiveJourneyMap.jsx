@@ -81,8 +81,6 @@ export default function InteractiveJourneyMap() {
               key={step.id}
               type="button"
               onClick={() => setExpandedNode(expandedNode === step.id ? null : step.id)}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
               style={{
                 background: expandedNode === step.id ? "rgba(200,150,92,0.15)" : "transparent",

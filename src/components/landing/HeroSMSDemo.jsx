@@ -33,6 +33,7 @@ export default function HeroSMSDemo() {
   const [visible, setVisible] = useState([]);
   const [typing, setTyping] = useState(false);
   const [done, setDone] = useState(false);
+  const messagesRef = useRef(null);
   const bottomRef = useRef(null);
   const timeouts = useRef([]);
 
@@ -70,7 +71,17 @@ export default function HeroSMSDemo() {
   }, []);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Scrolling the page-level bottom marker was pulling the full homepage down
+    // toward this demo every time the message animation advanced. Only scroll
+    // the chat pane itself here so the demo stays animated without hijacking
+    // the document scroll position.
+    const messagesEl = messagesRef.current;
+    if (!messagesEl) return;
+
+    messagesEl.scrollTo({
+      top: messagesEl.scrollHeight,
+      behavior: "smooth",
+    });
   }, [visible, typing]);
 
   return (
@@ -110,7 +121,10 @@ export default function HeroSMSDemo() {
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, padding: "12px 8px", display: "flex", flexDirection: "column", gap: "4px", minHeight: "320px", maxHeight: "320px", overflowY: "auto" }}>
+          <div
+            ref={messagesRef}
+            style={{ flex: 1, padding: "12px 8px", display: "flex", flexDirection: "column", gap: "4px", minHeight: "320px", maxHeight: "320px", overflowY: "auto" }}
+          >
             {visible.map((msg, i) => (
               <div key={i}>
                 {msg.label && (

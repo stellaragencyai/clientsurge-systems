@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
+import { Suspense, lazy } from "react";
 import DemoBookingModal from "../forms/DemoBookingModal";
+const HeroSMSDemo = lazy(() => import("./HeroSMSDemo"));
 import {
   INDUSTRY_RECOMMENDATIONS_BY_ID,
   INDUSTRY_SELECTION_STORAGE_KEY } from
@@ -64,10 +66,7 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
       type="button"
       onClick={() => onSelect(system.id)}
       whileHover={{ y: -2 }}
-      initial={{ opacity: 0, x: -50 }}
-      whileInView={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      viewport={{ once: true, margin: "-50px" }}
       className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       style={{
         background: "rgba(255,255,255,0.82)",
@@ -117,10 +116,7 @@ function SystemGroupList({ selectedSystemId, onSelect, onAddToStack }) {
       {systemGroups.map((group) =>
       <motion.div
         key={group.id}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        viewport={{ once: true }}>
+        transition={{ duration: 0.5 }}>
         
           <div className="flex items-center gap-4 mb-4 md:mb-5">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
@@ -131,10 +127,7 @@ function SystemGroupList({ selectedSystemId, onSelect, onAddToStack }) {
             {group.systems.map((systemId, idx) =>
           <motion.div
             key={systemId}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: idx * 0.1 }}
-            viewport={{ once: true }}>
+            transition={{ duration: 0.4, delay: idx * 0.1 }}>
             
                 <SystemCard
               system={systemsById[systemId]}
@@ -312,8 +305,6 @@ export default function CoreOffer() {
         {/* Stack Builder Button */}
         <motion.div
           className="mt-8 flex justify-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
           transition={{ delay: 0.3 }}>
           
           <button
@@ -327,10 +318,20 @@ export default function CoreOffer() {
           </button>
         </motion.div>
 
-        <VerticalTimeline
-          selectedSystemId={selectedSystemId}
-          onSystemSelect={setSelectedSystemId}
-          onBookDemo={() => setShowBookingModal(true)} />
+        {/* 2-col layout: vertical timeline + iPhone SMS demo */}
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
+          <div className="flex-1 min-w-0">
+            <VerticalTimeline
+              selectedSystemId={selectedSystemId}
+              onSystemSelect={setSelectedSystemId}
+              onBookDemo={() => setShowBookingModal(true)} />
+          </div>
+          <div className="lg:sticky lg:top-28 flex-shrink-0 flex flex-col items-center self-start w-full lg:w-auto">
+            <Suspense fallback={<div style={{ width: 300, height: 560 }} />}>
+              <HeroSMSDemo />
+            </Suspense>
+          </div>
+        </div>
         
         <LaunchTimeline />
         <CoreOfferCTA onBookDemo={() => setShowBookingModal(true)} />

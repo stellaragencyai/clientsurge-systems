@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const stats = [
-  "4,200+ leads processed",
-  "3.2x average booking increase",
-  "87% client retention",
-  "24/7 automation running",
-  "5–7 day setup time",
-];
+"Under 60 sec lead response",
+"24–48 hr setup time",
+"100% done-for-you",
+"6 automations per client",
+"Serving Phoenix & Scottsdale"];
+
 
 export default function SocialProofTicker() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -33,18 +33,18 @@ export default function SocialProofTicker() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        gap: "24px",
-      }}
-    >
+        gap: "24px"
+      }}>
+      
       <div
         style={{
           width: "8px",
           height: "8px",
           borderRadius: "50%",
           background: "#c8965c",
-          animation: "pulse 2s ease-in-out infinite",
-        }}
-      />
+          animation: "pulse 2s ease-in-out infinite"
+        }} className=" hidden" />
+      
       <motion.p
         key={activeIndex}
         initial={{ opacity: 0, y: 8 }}
@@ -56,9 +56,9 @@ export default function SocialProofTicker() {
           fontWeight: "600",
           color: "#1b140d",
           margin: 0,
-          textAlign: "center",
-        }}
-      >
+          textAlign: "center"
+        }} className=" hidden hidden hidden hidden">
+        
         {stats[activeIndex]}
       </motion.p>
       <div
@@ -67,10 +67,10 @@ export default function SocialProofTicker() {
           height: "8px",
           borderRadius: "50%",
           background: "#c8965c",
-          animation: "pulse 2s ease-in-out infinite 0.3s",
-        }}
-      />
+          animation: "pulse 2s ease-in-out infinite 0.3s"
+        }} className=" hidden" />
+      
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
-    </div>
-  );
+    </div>);
+
 }

@@ -14,6 +14,7 @@ import {
   INDUSTRY_RECOMMENDATIONS_BY_ID,
   INDUSTRY_SELECTION_STORAGE_KEY } from
 "@/lib/industryRecommendations";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 // Unique SVG pattern per industry — lightweight, inline, no external deps
 const industryPatterns = {
@@ -120,10 +121,10 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
   useEffect(() => {
     const onKey = (e) => {if (e.key === "Escape") onClose();};
     document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
+    const releaseScrollLock = acquireBodyScrollLock("industry-recommendation-modal");
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      releaseScrollLock();
     };
   }, [onClose]);
 
@@ -341,6 +342,9 @@ export default function Industries() {
                 src={industry.image}
                 alt={industry.name}
                 loading="lazy"
+                decoding="async"
+                width="600"
+                height="442"
                 className="absolute inset-0 h-full w-full object-cover" />
               
               {/* Unique per-industry SVG texture pattern */}
@@ -399,7 +403,9 @@ export default function Industries() {
                     fontSize: "12px",
                     lineHeight: 1.6,
                     color: "rgba(255,255,255,0.74)",
-                    margin: "8px 0 0"
+                    margin: "8px 0 0",
+                    opacity: highlighted ? 1 : 0,
+                    transition: "opacity 0.3s ease",
                   }}>
                   
                   Click to see the recommended AI service stack for this niche.
