@@ -142,7 +142,7 @@ export default function Navbar() {
           style={{ fontSize: "1rem", minHeight: "unset", minWidth: "unset" }}
           >
           <img
-          src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/7de44f95a_10ca51c4-3ef9-4f87-979c-d48d7b2e0c6b.png"
+          src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/6c47c2167_ChatGPTImageMay2202610_04_21AM.png"
           alt="ClientSurge Systems"
           fetchpriority="high"
           decoding="async"
