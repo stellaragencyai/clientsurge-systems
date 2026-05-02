@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const stats = [
-"4,200+ leads processed",
-"3.2x average booking increase",
-"87% client retention",
-"24/7 automation running",
-"5–7 day setup time"];
+"Under 60 sec lead response",
+"24–48 hr setup time",
+"100% done-for-you",
+"6 automations per client",
+"Serving Phoenix & Scottsdale"];
 
 
 export default function SocialProofTicker() {
