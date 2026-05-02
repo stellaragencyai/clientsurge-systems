@@ -387,8 +387,6 @@ function TimelineArrowCTA({ onBookDemo }) {
 export default function LaunchTimeline() {
   const [headerRef, headerVisible] = useInView(0.2);
   const [activeStep, setActiveStep] = useState(0);
-  const [autoAdvanceTimer, setAutoAdvanceTimer] = useState(null);
-  const stepRefs = useRef([]);
   const lineContainerRef = useRef(null);
   const { openDemoBooking } = useDemoBooking();
 
@@ -398,53 +396,7 @@ export default function LaunchTimeline() {
     setActiveStep(idx);
   };
 
-  const clearAutoAdvanceTimer = () => {
-    if (autoAdvanceTimer) {
-      clearTimeout(autoAdvanceTimer);
-      setAutoAdvanceTimer(null);
-    }
-  };
 
-  const startAutoAdvanceTimer = () => {
-    clearAutoAdvanceTimer();
-    const timer = setTimeout(() => {
-      const nextIdx = (activeStep + 1) % launchTimelineSteps.length;
-      handleTrackerClick(nextIdx);
-    }, 3000);
-    setAutoAdvanceTimer(timer);
-  };
-
-
-
-  useEffect(() => {
-    const handleScroll = () => {
-      clearAutoAdvanceTimer();
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [activeStep]);
-
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
-        handleTrackerClick((activeStep + 1) % launchTimelineSteps.length);
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        handleTrackerClick((activeStep - 1 + launchTimelineSteps.length) % launchTimelineSteps.length);
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        const el = stepRefs.current[activeStep];
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeStep]);
 
   return (
     <div className="mt-16 md:mt-20">
@@ -503,7 +455,7 @@ export default function LaunchTimeline() {
                     transition: "all 0.3s ease",
                     outline: "none"
                   }}
-                  onFocus={() => handleTrackerClick(idx)}>
+                  >
                   
                   {/* Animated gradient pulse background on hover */}
                   <div
@@ -594,7 +546,7 @@ export default function LaunchTimeline() {
 
         <div className="space-y-10 md:space-y-20 relative z-10">
           {launchTimelineSteps.map((step, idx) =>
-          <div key={step.id} ref={(el) => stepRefs.current[idx] = el}>
+          <div key={step.id}>
               <StepRow step={step} idx={idx} />
             </div>
           )}
