@@ -188,8 +188,8 @@ export default function RevenueRecoveryCounter() {
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
         style={{
           position: "relative",
-          width: "400px",
-          borderRadius: "30px",
+          width: "480px",
+          borderRadius: "32px",
           background: "#000000",
           boxShadow: `
             0 50px 120px rgba(0,0,0,0.75),
@@ -272,16 +272,16 @@ export default function RevenueRecoveryCounter() {
             >
               <StatusBar />
 
-              <div style={{ padding: "12px 14px 14px" }}>
+              <div style={{ padding: "16px 18px 18px" }}>
                 {/* Header */}
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px" }}>
                   <div>
-                    <p style={{ fontSize: "9px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "3px", fontFamily: SF }}>Revenue Recovered</p>
-                    <motion.p style={{ fontFamily: SF, fontSize: "28px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em", margin: 0 }}>
+                    <p style={{ fontSize: "11px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "4px", fontFamily: SF }}>Revenue Recovered</p>
+                    <motion.p style={{ fontFamily: SF, fontSize: "34px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em", margin: 0 }}>
                       ${displayTotal.toLocaleString()}
                     </motion.p>
                   </div>
-                  <div style={{ borderRadius: "8px", padding: "3px 10px", fontSize: "10px", fontWeight: "800", background: "rgba(34,197,94,0.18)", color: "#4ade80", border: "1px solid rgba(34,197,94,0.3)", letterSpacing: "0.06em" }}>
+                  <div style={{ borderRadius: "8px", padding: "4px 12px", fontSize: "12px", fontWeight: "800", background: "rgba(34,197,94,0.18)", color: "#4ade80", border: "1px solid rgba(34,197,94,0.3)", letterSpacing: "0.06em" }}>
                     LIVE
                   </div>
                 </div>
@@ -295,7 +295,7 @@ export default function RevenueRecoveryCounter() {
                         key={lead.name}
                         style={{
                           display: "flex", alignItems: "center", gap: "10px",
-                          borderRadius: "9px", padding: "7px 10px", position: "relative", overflow: "hidden",
+                          borderRadius: "10px", padding: "10px 14px", position: "relative", overflow: "hidden",
                           background: recovered ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.04)",
                           border: recovered ? "1px solid rgba(34,197,94,0.25)" : "1px solid rgba(255,255,255,0.06)",
                           transition: "all 0.45s ease",
@@ -308,24 +308,24 @@ export default function RevenueRecoveryCounter() {
                           <motion.div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle, rgba(74,222,128,0.2) 0%, transparent 70%)", pointerEvents: "none" }}
                             animate={{ scale: [0.4, 2] }} transition={{ duration: 0.55 }} />
                         )}
-                        <div style={{ width: "22px", height: "22px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "700", background: recovered ? "rgba(34,197,94,0.22)" : "rgba(255,255,255,0.07)", color: recovered ? "#4ade80" : "rgba(255,255,255,0.3)", transition: "all 0.4s", fontFamily: SF }}>
+                        <div style={{ width: "28px", height: "28px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "700", background: recovered ? "rgba(34,197,94,0.22)" : "rgba(255,255,255,0.07)", color: recovered ? "#4ade80" : "rgba(255,255,255,0.3)", transition: "all 0.4s", fontFamily: SF }}>
                           {recovered ? "✓" : lead.name[0]}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: "11px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
-                          <p style={{ fontSize: "8px", color: "rgba(255,255,255,0.28)", margin: 0, fontFamily: SF }}>{lead.service}</p>
+                          <p style={{ fontSize: "13px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
+                          <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.28)", margin: 0, fontFamily: SF }}>{lead.service}</p>
                         </div>
-                        <span style={{ fontSize: "12px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#4ade80" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF, letterSpacing: "-0.01em" }}>${lead.value}</span>
+                        <span style={{ fontSize: "15px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#4ade80" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF, letterSpacing: "-0.01em" }}>${lead.value}</span>
                       </motion.div>
                     );
                   })}
                 </div>
 
                 {/* Footer */}
-                <div style={{ borderRadius: "9px", padding: "7px 11px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(200,150,92,0.1)", border: "1px solid rgba(200,150,92,0.18)" }}>
-                  <p style={{ fontSize: "8px", fontWeight: "700", color: "rgba(200,150,92,0.75)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
+                <div style={{ borderRadius: "10px", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(200,150,92,0.1)", border: "1px solid rgba(200,150,92,0.18)" }}>
+                  <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(200,150,92,0.75)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(200,150,92,0.06)" : "rgba(200,150,92,0.18)", border: "1px solid rgba(200,150,92,0.28)", borderRadius: "5px", padding: "2px 8px", fontSize: "9px", fontWeight: "800", color: replaying ? "rgba(200,150,92,0.35)" : "rgba(200,150,92,0.95)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.06em", transition: "all 0.2s" }}>
+                    <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(200,150,92,0.06)" : "rgba(200,150,92,0.18)", border: "1px solid rgba(200,150,92,0.28)", borderRadius: "5px", padding: "3px 10px", fontSize: "11px", fontWeight: "800", color: replaying ? "rgba(200,150,92,0.35)" : "rgba(200,150,92,0.95)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.06em", transition: "all 0.2s" }}>
                       {replaying ? "···" : "↺ Replay"}
                     </button>
                     <motion.div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#c8965c" }} animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
