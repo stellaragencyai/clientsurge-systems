@@ -1,5 +1,5 @@
 /**
- * handleNewLead
+ * handleNewLead — redeployed 2026-05-02
  * Entity automation: triggered on Leads create
  * Purpose: Send instant SMS to the new lead + notify admin
  */
@@ -19,11 +19,16 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
 
     // Support both entity automation payload and direct call
-    const lead_id = body?.event?.entity_id || body?.data?.id || body?.lead_id;
+    const lead_id =
+      body?.lead_id ||
+      body?.event?.entity_id ||
+      body?.data?.id ||
+      body?.id ||
+      body?.entity_id;
 
     if (!lead_id) {
       console.error("[handleNewLead] No lead_id found in payload:", JSON.stringify(body));
-      return Response.json({ error: "Lead data missing" }, { status: 400 });
+      return Response.json({ error: "Lead data missing — payload keys: " + Object.keys(body || {}).join(", ") }, { status: 400 });
     }
 
     // Fetch fresh lead data from DB
