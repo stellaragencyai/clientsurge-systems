@@ -3,7 +3,9 @@ import { base44 } from "@/api/base44Client";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import HorizontalStageTracker from "@/components/dashboard/HorizontalStageTracker";
-import ServiceCard from "@/components/dashboard/ServiceCard";
+import DashboardMetricsBar from "@/components/dashboard/DashboardMetricsBar";
+import ResponsiveServiceCard from "@/components/dashboard/ResponsiveServiceCard";
+import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import ChatAssistant from "@/components/dashboard/ChatAssistant";
 import { Loader2, ShoppingBag, Mail, Phone, RefreshCw } from "lucide-react";
@@ -110,7 +112,7 @@ function SupportCard() {
       <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
         {[
           { Icon: Mail, label: "Email Support", href: "mailto:support@clientsurgesystems.com" },
-          { Icon: Phone, label: "(602) 587-4608", href: "tel:+16025874608" },
+          { Icon: Phone, label: "(602) 584-3227", href: "tel:+16025843227" },
         ].map(({ Icon, label, href }) => (
           <a key={label} href={href} style={{
             display: "inline-flex", alignItems: "center", gap: "6px",
@@ -215,9 +217,25 @@ export default function ClientDashboard() {
     paymentStatus: order?.payment_status || "",
   }));
 
+  // Safety: if portalData fetch threw an unhandled error, show support card
+  if (!loading && !portalData && !error) {
+    return (
+      <DemoBookingProvider>
+        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#fdfbf8" }}>
+          <div style={{ textAlign: "center", padding: "48px 24px" }}>
+            <p style={{ fontSize: "20px", fontWeight: "700", color: "#1b140d", marginBottom: "8px" }}>Something went wrong</p>
+            <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.55)", marginBottom: "24px" }}>We could not load your dashboard. Please refresh or contact support.</p>
+            <a href="mailto:support@clientsurgesystems.com" style={{ color: "#9a5c2e", fontWeight: "600", fontSize: "14px" }}>support@clientsurgesystems.com</a>
+          </div>
+        </div>
+      </DemoBookingProvider>
+    );
+  }
+
   return (
     <DemoBookingProvider>
-      <ChatAssistant />
+      <ChatAssistant installStatus={activeServices[0]?.installStatus} services={activeServices} />
+      <MobileBottomNav />
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 50%, #fdfbf8 100%)" }}>
         <Navbar />
 
@@ -251,14 +269,18 @@ export default function ClientDashboard() {
                       installStatus={activeServices[0].installStatus}
                     />
 
-                    {/* All service cards */}
+                    {/* Metrics Bar — Key Overview */}
+                    <DashboardMetricsBar activeServices={activeServices} project={project} />
+
+                    {/* All service cards — Responsive layout */}
                     <div style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 480px), 1fr))",
-                      gap: "20px",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
+                      gap: "16px",
+                      marginBottom: "80px",
                     }}>
                       {activeServices.map((service, idx) => (
-                        <ServiceCard key={idx} service={service} />
+                        <ResponsiveServiceCard key={idx} service={service} />
                       ))}
                     </div>
 

@@ -1,9 +1,11 @@
 const tools = [
-  "Twilio",
-  "Google Calendar",
-  "Google",
-  "Resend",
-  "Base44",
+  { name: "Twilio", emoji: "📞" },
+  { name: "OpenAI", emoji: "🤖" },
+  { name: "Google Calendar", emoji: "📅" },
+  { name: "Resend", emoji: "📧" },
+  { name: "Stripe", emoji: "💳" },
+  { name: "Google Ads", emoji: "🎯" },
+  { name: "Meta Ads", emoji: "📱" },
 ];
 
 export default function ToolsStrip() {
@@ -21,10 +23,11 @@ export default function ToolsStrip() {
         <div className="flex flex-wrap items-center justify-center gap-3">
           {tools.map((tool) => (
             <span
-              key={tool}
-              className="inline-flex items-center rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground/80"
+              key={tool.name}
+              className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground/80"
             >
-              {tool}
+              <span>{tool.emoji}</span>
+              {tool.name}
             </span>
           ))}
         </div>

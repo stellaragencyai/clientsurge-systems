@@ -1,18 +1,19 @@
 import { useState, lazy, Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
+import CascadingChecklistItem from "@/components/visual-effects/CascadingChecklistItem";
 import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
 
 
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
 
 const checklist = [
-  "Every lead hears from you within 60 seconds — even after hours",
-  "Missed calls instantly turn into text conversations, not dead ends",
-  "14 days of automated follow-up keeps leads warm without manual work",
-  "Guided booking flow converts ready prospects into confirmed appointments",
-  "Fully built and live in 5–7 days — we handle everything",
-];
+"Every lead hears from you within 60 seconds — even after hours",
+"Missed calls instantly turn into text conversations, not dead ends",
+"14 days of automated follow-up keeps leads warm without manual work",
+"Guided booking flow converts ready prospects into confirmed appointments",
+"Fully built and live in 24–48 hours — we handle everything"];
+
 
 export default function Hero() {
   const demoBooking = useDemoBooking();
@@ -22,44 +23,44 @@ export default function Hero() {
       className="landing-hero"
       style={{
         position: "relative",
-        overflow: "hidden",
-        background:
-          "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 46%, #fcfaf6 100%)",
-      }}
-    >
+        overflow: "visible",
+        background: "#ffffff",
+        paddingBottom: "clamp(3rem, 6vw, 5rem)"
+      }}>
+      
       <div
         aria-hidden="true"
         className="landing-hero__ambient"
         style={{
           position: "absolute",
           inset: 0,
-          pointerEvents: "none",
-        }}
-      >
+          pointerEvents: "none"
+        }}>
+        
         <div
           style={{
             position: "absolute",
             inset: 0,
             background:
-              "radial-gradient(circle at 18% 20%, rgba(200,150,92,0.12) 0%, transparent 30%), radial-gradient(circle at 72% 22%, rgba(92,164,138,0.12) 0%, transparent 24%), radial-gradient(circle at 78% 56%, rgba(122,72,37,0.1) 0%, transparent 32%)",
-          }}
-        />
+            "radial-gradient(circle at 18% 20%, rgba(200,150,92,0.12) 0%, transparent 30%), radial-gradient(circle at 72% 22%, rgba(92,164,138,0.12) 0%, transparent 24%), radial-gradient(circle at 78% 56%, rgba(122,72,37,0.1) 0%, transparent 32%)"
+          }} />
+        
         <div
           style={{
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(to right, rgba(253,251,248,0.98) 0%, rgba(253,251,248,0.94) 40%, rgba(253,251,248,0.68) 60%, rgba(253,251,248,0.2) 100%)",
-          }}
-        />
+            "linear-gradient(to right, rgba(253,251,248,0.98) 0%, rgba(253,251,248,0.94) 40%, rgba(253,251,248,0.68) 60%, rgba(253,251,248,0.2) 100%)"
+          }} />
+        
         <div
           style={{
             position: "absolute",
             inset: 0,
             background:
-              "linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, transparent 28%, rgba(255,255,255,0.34) 100%)",
-          }}
-        />
+            "linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, transparent 28%, rgba(255,255,255,0.34) 100%)"
+          }} />
+        
       </div>
 
       <div
@@ -74,10 +75,10 @@ export default function Hero() {
           gridTemplateColumns: "1fr",
           gap: "clamp(24px, 4vw, 48px)",
           alignItems: "center",
-          minHeight: "100svh",
-        }}
-      >
-        <div className="landing-hero__copy" style={{ gridColumn: "1 / -1", marginBottom: "-32px", textAlign: "center", maxWidth: "100%" }}>
+          minHeight: "100svh"
+        }}>
+        
+        <div className="landing-hero__copy" style={{ gridColumn: "1 / -1", marginBottom: "0px", textAlign: "center", maxWidth: "100%", position: "relative", zIndex: 10 }}>
 
 
           <h1
@@ -90,20 +91,17 @@ export default function Hero() {
               letterSpacing: "-0.03em",
               color: "#1b140d",
               marginBottom: "16px",
-              gridColumn: "1 / -1",
-            }}
-          >
+              gridColumn: "1 / -1"
+            }}>
+            
             Stop Losing Leads to Slow Response —{" "}
             <span
               style={{
-                background:
-                  "linear-gradient(135deg, #7a3f1a 0%, #c8965c 52%, #9a5c2e 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              AI Systems That Book 3x More Appointments
+                color: "#c8965c",
+                display: "inline"
+              }}>
+              
+              AI Systems That Convert 3x More Leads Into Bookings
             </span>
           </h1>
 
@@ -113,7 +111,9 @@ export default function Hero() {
             borderRadius: "999px",
             marginBottom: "22px",
             background: "linear-gradient(90deg, transparent 0%, rgba(200,150,92,0.5) 30%, rgba(245,217,168,0.9) 50%, rgba(200,150,92,0.5) 70%, transparent 100%)",
+            animation: "shimmer-fadein 0.9s ease 0.3s both"
           }} />
+          <style>{`@keyframes shimmer-fadein{from{opacity:0;transform:scaleX(0.4)}to{opacity:1;transform:scaleX(1)}}`}</style>
 
           <p
             className="landing-hero__body"
@@ -123,63 +123,20 @@ export default function Hero() {
               lineHeight: 1.65,
               marginBottom: "18px",
               maxWidth: "600px",
-              margin: "0 auto 18px",
-            }}
-          >
+              margin: "0 auto 18px"
+            }}>
+            
             ClientSurge installs AI-powered conversion systems that capture leads, respond instantly, follow up automatically, and turn more of your existing demand into booked clients.
           </p>
 
           <div
-            className="landing-hero__checklist"
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "32px", maxWidth: "100%", margin: "0 auto 32px" }}
-          >
+            className="landing-hero__checklist hero-checklist"
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "32px", maxWidth: "100%", margin: "0 auto 32px" }}>
+            
             {checklist.map((item, i) => (
-              <div
-                key={item}
-                className="hero-check-item"
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: "10px",
-                  padding: "7px 14px 7px 10px",
-                  borderRadius: "9999px",
-                  background: "rgba(255,255,255,0.72)",
-                  border: "1px solid rgba(200,150,92,0.22)",
-                  boxShadow: "0 2px 8px rgba(122,72,37,0.06)",
-                  width: "fit-content",
-                  opacity: 0,
-                  transform: "translateX(-18px)",
-                  animation: `heroCheckIn 0.55s cubic-bezier(0.22,1,0.36,1) ${0.35 + i * 0.13}s forwards`,
-                }}
-              >
-                <div
-                  className="hero-check-circle"
-                  style={{
-                    width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0,
-                    background: "linear-gradient(135deg,#26b05f,#16a34a)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    boxShadow: "0 0 12px rgba(34,199,89,0.4), 0 2px 6px rgba(34,197,94,0.25)",
-                    animation: `heroCheckPop 0.4s cubic-bezier(0.34,1.56,0.64,1) ${0.55 + i * 0.13}s both`,
-                  }}
-                >
-                  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                    <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <span style={{ fontSize: "12px", fontWeight: "600", color: "rgba(27,20,13,0.8)", lineHeight: 1.4 }}>
-                  {item}
-                </span>
-              </div>
+              <CascadingChecklistItem key={item} item={item} index={i} />
             ))}
           </div>
-          <style>{`
-            @keyframes heroCheckIn {
-              to { opacity: 1; transform: translateX(0); }
-            }
-            @keyframes heroCheckPop {
-              0% { transform: scale(0.4); }
-              70% { transform: scale(1.15); }
-              100% { transform: scale(1); }
-            }
-          `}</style>
 
           <div
             className="landing-hero__actions"
@@ -190,9 +147,9 @@ export default function Hero() {
               alignItems: "center",
               justifyContent: "center",
               WebkitTapHighlightColor: "transparent",
-              marginTop: "32px",
-            }}
-          >
+              marginTop: "32px"
+            }}>
+            
             <button
               type="button"
               onClick={demoBooking?.openDemoBooking}
@@ -206,23 +163,23 @@ export default function Hero() {
                 borderRadius: "9999px",
                 border: "none",
                 background:
-                  "linear-gradient(135deg, #7a4825 0%, #9a5c2e 46%, #c8965c 100%)",
+                "linear-gradient(135deg, #7a4825 0%, #9a5c2e 46%, #c8965c 100%)",
                 color: "#fff8ee",
                 fontSize: "1rem",
                 fontWeight: "700",
-                boxShadow: BUTTON_STYLES.BROWN_GRADIENT.boxShadow,
+                boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
                 cursor: "pointer",
-                transition: "all 0.3s ease",
+                transition: "all 0.3s ease"
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.boxShadow = BUTTON_STYLES.BROWN_GRADIENT_HOVER.boxShadow;
+                e.currentTarget.style.boxShadow = "0 8px 32px rgba(120,70,20,0.55)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = BUTTON_STYLES.BROWN_GRADIENT.boxShadow;
-              }}
-            >
+                e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
+              }}>
+              
               {BUTTON_TEXT.BOOK_DEMO}
               <ArrowRight style={{ width: "18px", height: "18px" }} />
             </button>
@@ -233,10 +190,9 @@ export default function Hero() {
               marginTop: "18px",
               fontSize: "12px",
               color: "rgba(27,20,13,0.48)",
-              letterSpacing: "0.04em",
-            }}
-          >
-            No contracts · Most clients go live in 2–3 business days
+              letterSpacing: "0.04em"
+            }} style={{ marginTop: "18px", fontSize: "12px", color: "rgba(27,20,13,0.48)", letterSpacing: "0.04em" }}>
+            No contracts · Most clients go live in 24–48 hours
           </p>
         </div>
 
@@ -248,9 +204,9 @@ export default function Hero() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gridColumn: "1 / -1",
-          }}
-        >
+            gridColumn: "1 / -1"
+          }}>
+          
           <div
             aria-hidden="true"
             className="landing-hero__visualGlow"
@@ -260,81 +216,66 @@ export default function Hero() {
               height: "72%",
               borderRadius: "36px",
               background:
-                "radial-gradient(circle at center, rgba(200,150,92,0.22) 0%, rgba(154,92,46,0.1) 38%, transparent 72%)",
+              "radial-gradient(circle at center, rgba(200,150,92,0.22) 0%, rgba(154,92,46,0.1) 38%, transparent 72%)",
               filter: "blur(36px)",
-              transform: "translateY(6%)",
-            }}
-          />
+              transform: "translateY(6%)"
+            }} />
+          
 
 
 
+          {/* iPad shell — Space Gray aluminum body */}
           <div
             className="landing-hero__tablet"
             style={{
               position: "relative",
               width: "min(100%, 930px)",
               aspectRatio: "1.15 / 1",
-              borderRadius: "34px",
-              padding: "3px",
-              background:
-                "linear-gradient(135deg, #a0714f 0%, #c8965c 25%, #f5d9a8 50%, #c8965c 75%, #7a4f2e 100%)",
+              borderRadius: "36px",
+              /* Space gray aluminum gradient */
+              background: "linear-gradient(160deg, #4a4a4c 0%, #3a3a3c 30%, #2c2c2e 60%, #1c1c1e 100%)",
               boxShadow:
-                "0 44px 110px rgba(17,12,7,0.34), 0 18px 44px rgba(17,12,7,0.18), 0 0 60px rgba(200,150,92,0.18)",
-              transform:
-                "perspective(2400px) rotateY(-10deg) rotateX(4deg) rotateZ(1.4deg)",
-              marginLeft: "-35px",
-              marginRight: "-35px",
-            }}
-          >
-            <div style={{
-              width: "100%",
-              height: "100%",
-              borderRadius: "32px",
-              padding: "13px",
-              background: "linear-gradient(160deg, #23263b 0%, #141722 58%, #0d0f16 100%)",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12)",
-              overflow: "hidden",
+                "0 44px 110px rgba(0,0,0,0.55), 0 18px 44px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.4)",
+              transform: "perspective(2400px) rotateY(-10deg) rotateX(4deg) rotateZ(1.4deg)",
             }}>
-            <div
-              style={{
-                position: "absolute",
-                top: "8px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                width: "88px",
-                height: "4px",
-                borderRadius: "999px",
-                background: "rgba(255,255,255,0.14)",
-              }}
-            />
-            <div
-              style={{
-                position: "absolute",
-                top: "9px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                width: "8px",
-                height: "8px",
-                borderRadius: "999px",
-                background: "#22252f",
-                border: "1px solid rgba(255,255,255,0.16)",
-              }}
-            />
 
-            <div
-              style={{
-                width: "100%",
-                height: "100%",
-                borderRadius: "20px",
-                overflow: "hidden",
-                background: "#f7f3ec",
-                boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06)",
-              }}
-            >
-              <Suspense fallback={<div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-100 animate-pulse" />}>
-                <HeroDashboardScreen />
-              </Suspense>
-            </div>
+            {/* Top edge highlight (aluminum sheen) */}
+            <div style={{
+              position: "absolute", top: 0, left: "8%", right: "8%", height: "1px",
+              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), rgba(255,255,255,0.5), rgba(255,255,255,0.35), transparent)",
+              borderRadius: "999px", zIndex: 10,
+            }} />
+
+            {/* Left side — volume buttons */}
+            <div style={{ position: "absolute", left: "-4px", top: "28%", width: "4px", height: "40px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to left, #3a3a3c, #5a5a5c)", boxShadow: "-2px 0 5px rgba(0,0,0,0.5), inset 1px 0 1px rgba(255,255,255,0.12)", zIndex: 20 }} />
+            <div style={{ position: "absolute", left: "-4px", top: "40%", width: "4px", height: "40px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to left, #3a3a3c, #5a5a5c)", boxShadow: "-2px 0 5px rgba(0,0,0,0.5), inset 1px 0 1px rgba(255,255,255,0.12)", zIndex: 20 }} />
+            {/* Right side — power/top button */}
+            <div style={{ position: "absolute", right: "-4px", top: "20%", width: "4px", height: "52px", borderRadius: "0 3px 3px 0", background: "linear-gradient(to right, #3a3a3c, #5a5a5c)", boxShadow: "2px 0 5px rgba(0,0,0,0.5), inset -1px 0 1px rgba(255,255,255,0.12)", zIndex: 20 }} />
+
+            {/* Screen area — inset with proper bezel */}
+            <div style={{
+              position: "absolute",
+              inset: "10px",
+              borderRadius: "28px",
+              background: "#000",
+              overflow: "hidden",
+              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 2px 8px rgba(0,0,0,0.8)",
+            }}>
+              {/* Front camera dot centered at top bezel */}
+              <div style={{
+                position: "absolute", top: "7px", left: "50%", transform: "translateX(-50%)",
+                width: "8px", height: "8px", borderRadius: "50%", zIndex: 10,
+                background: "radial-gradient(circle at 35% 35%, #1a2040, #05070f)",
+                border: "1px solid rgba(80,100,180,0.4)",
+                boxShadow: "0 0 4px rgba(60,80,160,0.5)",
+              }} />
+
+              {/* The actual dashboard content */}
+              <div style={{ position: "absolute", inset: "22px 0 0 0", borderRadius: "0 0 26px 26px", overflow: "hidden" }}>
+                <Suspense fallback={<div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 animate-pulse" />}>
+                  <HeroDashboardScreen />
+                </Suspense>
+              </div>
             </div>
           </div>
         </div>
@@ -412,6 +353,6 @@ export default function Hero() {
           }
         }
       `}</style>
-    </section>
-  );
+    </section>);
+
 }

@@ -62,7 +62,7 @@ export default function InteractiveStackBuilder() {
               Add services from the catalog and we will build your stack preview here.
             </p>
           ) : (
-            items.map((item, index) => (
+            [...items].reverse().map((item, index) => (
               <div
                 key={item.product_id}
                 style={{
@@ -112,8 +112,8 @@ export default function InteractiveStackBuilder() {
                     marginTop: "4px",
                   }}
                 >
-                  ${formatCurrency(item.setup_fee)} setup - $
-                  {formatCurrency(item.monthly_fee)}/mo
+                  ${formatCurrency(item.setup_fee)} one-time setup · $
+                  {formatCurrency(item.monthly_fee)}/month
                 </div>
               </div>
             ))

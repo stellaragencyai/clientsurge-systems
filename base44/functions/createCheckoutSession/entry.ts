@@ -11,7 +11,6 @@ function maskSecret(secret = "") {
   if (secret.length <= 8) return `${secret.slice(0, 2)}***`;
   return `${secret.slice(0, 7)}...${secret.slice(-4)}`;
 }
-
 async function resolveStripeAccountSummary() {
   if (!stripe) {
     return {

@@ -25,6 +25,12 @@ function normalizeContactInput(payload: Record<string, unknown>) {
     message: sanitizeString(payload.message, MAX_MESSAGE_LENGTH),
     website_url: realWebsite,
     honeypot,
+    // UTM attribution (note: referrer may be empty on SPA navigation — captured client-side before submit) (note: referrer may be empty on SPA navigation — captured client-side before submit)
+    utm_source: sanitizeString(payload.utm_source),
+    utm_medium: sanitizeString(payload.utm_medium),
+    utm_campaign: sanitizeString(payload.utm_campaign),
+    utm_content: sanitizeString(payload.utm_content),
+    referrer: sanitizeString(payload.referrer),
   };
 }
 
@@ -77,6 +83,12 @@ function buildLeadPayload(contact: ReturnType<typeof normalizeContactInput>, sta
     source: LEAD_SOURCE,
     intake_type: INTAKE_TYPE,
     status,
+    // UTM attribution (note: referrer may be empty on SPA navigation — captured client-side before submit) (note: referrer may be empty on SPA navigation — captured client-side before submit) fields
+    utm_source: contact.utm_source || null,
+    utm_medium: contact.utm_medium || null,
+    utm_campaign: contact.utm_campaign || null,
+    utm_content: contact.utm_content || null,
+    referrer: contact.referrer || null,
   } as const;
 }
 
@@ -123,6 +135,52 @@ function isRecentContactInquiry(existingLead: Record<string, unknown>, contact: 
   return isWithinWindow && sameName && sameInquiryType;
 }
 
+async function sendAdminSMS(contact: ReturnType<typeof normalizeContactInput>) {
+  const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
+  const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
+  const TWILIO_FROM = Deno.env.get('TWILIO_PHONE_NUMBER') || '+16025843227';
+  const NOLAN_CELL = '+16025874608'; // (602) 587-4608
+
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+    console.warn('[submitContactInquiry] Twilio not configured — skipping SMS alert');
+    return { sent: false, reason: 'missing_twilio_credentials' };
+  }
+
+  const body = `🔥 New Lead — ClientSurge
+Name: ${contact.full_name}
+Phone: ${contact.phone || 'N/A'}
+Email: ${contact.email}
+Biz: ${contact.business_type}
+Msg: ${contact.message.slice(0, 100)}${contact.message.length > 100 ? '...' : ''}`;
+
+  const params = new URLSearchParams({
+    To: NOLAN_CELL,
+    From: TWILIO_FROM,
+    Body: body,
+  });
+
+  const response = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.text();
+    console.warn('[submitContactInquiry] SMS alert failed:', err);
+    return { sent: false, reason: err };
+  }
+
+  console.info('[submitContactInquiry] SMS alert sent to Nolan');
+  return { sent: true };
+}
+
 async function sendAdminNotification(contact: ReturnType<typeof normalizeContactInput>) {
   const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
@@ -149,7 +207,7 @@ async function sendAdminNotification(contact: ReturnType<typeof normalizeContact
     },
     body: JSON.stringify({
       from: 'ClientSurge Systems <system@clientsurgesystems.com>',
-      to: ['system@clientsurgesystems.com'],
+      to: ['nolan@clientsurgesystems.com'],
       reply_to: contact.email,
       subject: `New Contact: ${contact.full_name} - ${contact.business_type}`,
       html: emailBody,
@@ -301,6 +359,10 @@ Deno.serve(async (req) => {
     });
 
     const notification = await sendAdminNotification(contact);
+    // Fire SMS to Nolan's cell immediately — non-blocking
+    sendAdminSMS(contact).catch((err) =>
+      console.warn('[submitContactInquiry] SMS alert error (non-blocking):', err)
+    );
     const thankYouEmail = await sendUserThankYouEmail(contact);
 
     await logCommunicationEvent(base44, {

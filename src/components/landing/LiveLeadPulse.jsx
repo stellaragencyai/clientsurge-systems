@@ -18,7 +18,7 @@ export default function LiveLeadPulse() {
           <style>{`
             @keyframes live-pulse {
               0%, 100% { opacity: 1; box-shadow: 0 20px 50px rgba(27,20,13,0.12), inset 0 1px 0 rgba(255,255,255,0.8); }
-              50% { opacity: 0.85; box-shadow: 0 24px 60px rgba(27,20,13,0.18), inset 0 1px 0 rgba(255,255,255,0.8); }
+              50% { opacity: 0.70; box-shadow: 0 24px 60px rgba(27,20,13,0.18), inset 0 1px 0 rgba(255,255,255,0.8); }
             }
           `}</style>
           <span className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">

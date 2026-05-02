@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowDown, CheckCircle2 } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { launchTimelineSteps, iconMap } from "./coreOfferData";
 import { useDemoBooking } from "@/components/landing/DemoBookingContext";
 
 const STEP_WEIGHTS = [1, 0.5, 0.5, 2.5, 0.5];
 const TOTAL_WEIGHT = STEP_WEIGHTS.reduce((a, b) => a + b, 0);
 
+/* ─── Simple opacity-only fade — NO transforms, NO layout changes ─── */
 function useInView(threshold = 0.15) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -22,39 +23,26 @@ function useInView(threshold = 0.15) {
 }
 
 function TimelineSummaryBar({ activeStep, onStepClick }) {
-  const [barRef, barVisible] = useInView(0.3);
-
   return (
-    <div
-      ref={barRef}
-      className="mb-4 mx-auto max-w-2xl"
-      style={{
-        transition: "opacity 0.6s ease, transform 0.6s ease",
-        opacity: barVisible ? 1 : 0,
-        transform: barVisible ? "translateY(0)" : "translateY(16px)",
-      }}
-    >
+    <div className="mb-4 mx-auto max-w-2xl">
       <div
-        className="rounded-2xl px-5 py-4"
+        className="px-5 py-4 rounded-2xl"
         style={{
           background: "rgba(255,255,255,0.9)",
           border: "1.5px solid rgba(154,92,46,0.14)",
-          boxShadow: "0 6px 20px rgba(111,67,31,0.07)",
+          boxShadow: "0 6px 20px rgba(111,67,31,0.07)"
         }}
       >
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs font-semibold text-foreground">Your estimated setup timeline</p>
-          <span
-            className="text-xs font-bold px-2.5 py-1 rounded-full"
-            style={{ background: "rgba(154,92,46,0.1)", color: "#9a5c2e" }}
-          >
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(154,92,46,0.1)", color: "#9a5c2e" }}>
             ~3–5 hours total
           </span>
         </div>
 
         <div className="flex gap-1 h-3 rounded-full overflow-hidden mb-3">
           {launchTimelineSteps.map((step, idx) => {
-            const widthPct = (STEP_WEIGHTS[idx] / TOTAL_WEIGHT) * 100;
+            const widthPct = STEP_WEIGHTS[idx] / TOTAL_WEIGHT * 100;
             const isActive = activeStep === idx;
             return (
               <button
@@ -64,14 +52,11 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
                 title={`${step.title} — ${step.duration}`}
                 style={{
                   width: `${widthPct}%`,
-                  background: isActive
-                    ? "linear-gradient(90deg, #9a5c2e, #c8965c)"
-                    : "rgba(154,92,46,0.18)",
-                  transition: "background 0.3s ease, transform 0.2s ease",
-                  transform: isActive ? "scaleY(1.3)" : "scaleY(1)",
+                  background: isActive ? "linear-gradient(90deg, #9a5c2e, #c8965c)" : "rgba(154,92,46,0.18)",
+                  transition: "background 0.3s ease",
                   borderRadius: "4px",
                   border: "none",
-                  cursor: "pointer",
+                  cursor: "pointer"
                 }}
               />
             );
@@ -80,7 +65,7 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
 
         <div className="flex">
           {launchTimelineSteps.map((step, idx) => {
-            const widthPct = (STEP_WEIGHTS[idx] / TOTAL_WEIGHT) * 100;
+            const widthPct = STEP_WEIGHTS[idx] / TOTAL_WEIGHT * 100;
             const isActive = activeStep === idx;
             return (
               <button
@@ -95,7 +80,7 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
                   style={{
                     color: isActive ? "#9a5c2e" : "rgba(30,20,10,0.4)",
                     fontWeight: isActive ? "700" : "500",
-                    transition: "color 0.25s ease",
+                    transition: "color 0.25s ease"
                   }}
                 >
                   {step.title}
@@ -112,84 +97,40 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
   );
 }
 
-/* ─── PREMIUM STEP ROW ──────────────────────────────────────────────────── */
+/* ─── Step Row — opacity only, zero transforms ─── */
 function StepRow({ step, idx }) {
   const isEven = idx % 2 === 0;
   const [ref, visible] = useInView(0.08);
 
-  const contentDelay = idx * 80;
-  const imageDelay   = idx * 80 + 120;
-
-  const contentFrom = `translateX(${isEven ? "-72px" : "72px"}) translateY(28px) scale(0.94)`;
-  const imageFrom   = `translateX(${isEven ? "72px" : "-72px"}) translateY(28px) scale(0.94)`;
-
-  const cardBg     = "rgba(255,255,255,0.95)";
-  const cardBorder  = "1.5px solid rgba(154,92,46,0.13)";
-  const cardShadow  = "0 10px 32px rgba(111,67,31,0.08)";
-  const accentBar   = "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)";
-  const stepLabelBg = "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)";
-  const stepLabelColor = "#ffffff";
-  const stepLabelBorder = "none";
-  const titleColor  = "hsl(var(--foreground))";
-  const bulletColor = "rgba(15,23,42,0.7)";
-  const checkColor  = "#22c55e";
-  const imgBorder   = "1.5px solid rgba(154,92,46,0.12)";
-  const imgShadow   = "0 8px 24px rgba(111,67,31,0.1)";
-
   return (
-    <div ref={ref} className="relative" data-step-id={step.id}>
-      {/* Center numbered dot — desktop only */}
-      <div
-        className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-8 w-11 h-11 rounded-full items-center justify-center z-10"
-        style={{
-          background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
-          boxShadow: "0 0 0 5px rgba(154,92,46,0.12), 0 4px 14px rgba(154,92,46,0.35)",
-          transition: `opacity 0.7s ease ${contentDelay}ms, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${contentDelay}ms`,
-          opacity: visible ? 1 : 0,
-          transform: visible ? "scale(1) translateX(-50%)" : "scale(0.3) translateX(-50%)",
-        }}
-      >
-        <span className="text-white font-black text-sm">{step.number}</span>
-      </div>
-
+    <div ref={ref} className="relative" style={{ opacity: visible ? 1 : 0, transition: "opacity 0.6s ease" }}>
       <div
         className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}
         style={{ alignItems: "stretch" }}
       >
-        {/* ── CONTENT CARD ── */}
-        <div
-          style={{
-            transition: `opacity 0.85s cubic-bezier(0.16,1,0.3,1) ${contentDelay}ms, transform 0.85s cubic-bezier(0.16,1,0.3,1) ${contentDelay}ms, filter 0.85s ease ${contentDelay}ms`,
-            opacity: visible ? 1 : 0,
-            transform: visible ? "translateX(0) translateY(0) scale(1)" : contentFrom,
-            filter: visible ? "blur(0px)" : "blur(3px)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
+        {/* Content Card */}
+        <div style={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
           <div
             className="rounded-2xl overflow-hidden h-full"
-            style={{ background: cardBg, border: cardBorder, boxShadow: cardShadow, position: "relative" }}
+            style={{
+              background: "rgba(255,255,255,0.95)",
+              border: "1.5px solid rgba(154,92,46,0.13)",
+              boxShadow: "0 10px 32px rgba(111,67,31,0.08)",
+              position: "relative"
+            }}
           >
-            {/* Top accent bar */}
-            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "4px", background: accentBar }} />
+            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "4px", background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)" }} />
 
-            {/* Step badge */}
             <div className="px-6 md:px-7 pt-6 pb-0">
               <div
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "6px",
-                  background: stepLabelBg,
-                  color: stepLabelColor,
-                  border: stepLabelBorder,
-                  padding: "4px 12px",
-                  borderRadius: "6px",
-                  fontSize: "11px",
-                  fontWeight: "800",
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  marginBottom: "12px",
+                  background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+                  color: "#ffffff", border: "none",
+                  padding: "4px 12px", borderRadius: "6px",
+                  fontSize: "11px", fontWeight: "800",
+                  letterSpacing: "0.08em", textTransform: "uppercase",
+                  marginBottom: "12px"
                 }}
               >
                 Step {step.number}
@@ -197,14 +138,14 @@ function StepRow({ step, idx }) {
             </div>
 
             <div className="px-6 md:px-7 pb-6 md:pb-7">
-              <h4 className="text-lg md:text-xl font-bold mb-4" style={{ color: titleColor }}>
+              <h4 className="text-lg md:text-xl font-bold mb-4" style={{ color: "hsl(var(--foreground))" }}>
                 {step.title}
               </h4>
               <ul className="space-y-2.5">
                 {step.bullets.map((bullet, i) => (
                   <li key={i} className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: checkColor }} />
-                    <span className="text-sm leading-relaxed" style={{ color: bulletColor }}>{bullet}</span>
+                    <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#22c55e" }} />
+                    <span className="text-sm leading-relaxed" style={{ color: "rgba(15,23,42,0.7)" }}>{bullet}</span>
                   </li>
                 ))}
               </ul>
@@ -212,20 +153,11 @@ function StepRow({ step, idx }) {
           </div>
         </div>
 
-        {/* ── IMAGE ── */}
-        <div
-          style={{
-            transition: `opacity 0.85s cubic-bezier(0.16,1,0.3,1) ${imageDelay}ms, transform 0.85s cubic-bezier(0.16,1,0.3,1) ${imageDelay}ms, filter 0.85s ease ${imageDelay}ms`,
-            opacity: visible ? 1 : 0,
-            transform: visible ? "translateX(0) translateY(0) scale(1)" : imageFrom,
-            filter: visible ? "blur(0px)" : "blur(3px)",
-            display: "flex",
-            alignItems: "stretch",
-          }}
-        >
+        {/* Image */}
+        <div style={{ display: "flex", alignItems: "stretch" }}>
           <div
             className="rounded-2xl overflow-hidden w-full"
-            style={{ border: imgBorder, boxShadow: imgShadow, minHeight: "360px" }}
+            style={{ border: "1.5px solid rgba(154,92,46,0.12)", boxShadow: "0 8px 24px rgba(111,67,31,0.1)", minHeight: "360px" }}
           >
             <img src={step.image} alt={step.title} className="w-full h-full object-cover" />
           </div>
@@ -235,147 +167,22 @@ function StepRow({ step, idx }) {
   );
 }
 
-function TimelineArrowCTA({ onBookDemo }) {
-  const [ref, visible] = useInView(0.2);
-
-  return (
-    <div
-      ref={ref}
-      className="hidden md:flex flex-col items-center"
-      style={{
-        transition: "opacity 0.8s ease, transform 0.8s ease",
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(30px)",
-      }}
-    >
-      <div style={{ width: "2px", height: "56px", background: "linear-gradient(180deg, rgba(154,92,46,0.4) 0%, #c8965c 100%)" }} />
-      <div
-        style={{
-          width: "36px", height: "36px", borderRadius: "50%",
-          background: "linear-gradient(135deg, #9a5c2e, #c8965c)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          boxShadow: "0 0 0 8px rgba(154,92,46,0.1), 0 8px 24px rgba(154,92,46,0.3)",
-          animation: visible ? "ctaPulse 2s ease-in-out infinite" : "none",
-        }}
-      >
-        <ArrowDown style={{ width: "18px", height: "18px", color: "#fff" }} />
-      </div>
-
-      <div
-        className="mt-5 rounded-3xl px-8 py-7 text-center max-w-sm"
-        style={{
-          background: "linear-gradient(135deg, rgba(154,92,46,0.07) 0%, rgba(200,150,92,0.05) 100%)",
-          border: "1.5px solid rgba(154,92,46,0.2)",
-          boxShadow: "0 12px 40px rgba(111,67,31,0.1)",
-        }}
-      >
-        <p className="font-display text-xl font-bold text-foreground mb-2 leading-snug">
-          Ready to see which systems fit your business?
-        </p>
-        <p className="text-sm text-muted-foreground mb-5">
-          We'll show you the right setup based on your lead flow and goals.
-        </p>
-        <button
-          type="button"
-          onClick={onBookDemo}
-          style={{
-            borderRadius: "9999px", padding: "2px",
-            background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-            boxShadow: "0 4px 18px rgba(120,70,20,0.3)",
-            border: "none", cursor: "pointer", width: "100%",
-          }}
-        >
-          <span style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
-            height: "44px", padding: "0 24px", borderRadius: "9999px",
-            background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-            color: "#f5e6d0", fontWeight: "700", fontSize: "0.9rem",
-          }}>
-            Book a Free Demo
-          </span>
-        </button>
-      </div>
-
-      <style>{`
-        @keyframes ctaPulse {
-          0%, 100% { box-shadow: 0 0 0 8px rgba(154,92,46,0.1), 0 8px 24px rgba(154,92,46,0.3); }
-          50%       { box-shadow: 0 0 0 14px rgba(154,92,46,0.06), 0 8px 32px rgba(154,92,46,0.4); }
-        }
-      `}</style>
-    </div>
-  );
-}
-
 export default function LaunchTimeline() {
-  const [headerRef, headerVisible] = useInView(0.2);
   const [activeStep, setActiveStep] = useState(0);
-  const [lineHeight, setLineHeight] = useState(0);
-  const stepRefs = useRef([]);
-  const lineContainerRef = useRef(null);
   const { openDemoBooking } = useDemoBooking();
-
-  useEffect(() => {
-    const container = lineContainerRef.current;
-    if (!container) return;
-    const handleScroll = () => {
-      const rect = container.getBoundingClientRect();
-      const totalH = container.scrollHeight;
-      const viewportH = window.innerHeight;
-      const scrolled = Math.max(0, viewportH - rect.top);
-      const pct = Math.min(scrolled / totalH, 1);
-      setLineHeight(pct * 100);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const handleTrackerClick = (idx) => {
-    setActiveStep(idx);
-    const el = stepRefs.current[idx];
-    if (el) {
-      setTimeout(() => {
-        const targetTop = el.getBoundingClientRect().top + window.scrollY - window.innerHeight / 2;
-        const startTop = window.scrollY;
-        const distance = targetTop - startTop;
-        const duration = 2400;
-        let startTime = null;
-        const ease = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-        const scroll = (currentTime) => {
-          if (!startTime) startTime = currentTime;
-          const elapsed = currentTime - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          window.scrollTo(0, startTop + distance * ease(progress));
-          if (progress < 1) requestAnimationFrame(scroll);
-        };
-        requestAnimationFrame(scroll);
-      }, 100);
-    }
-  };
 
   return (
     <div className="mt-16 md:mt-20">
-      {/* Section Header */}
-      <div ref={headerRef}>
-        <p
-          className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3"
-          style={{ transition: "opacity 0.5s ease, transform 0.5s ease", opacity: headerVisible ? 1 : 0, transform: headerVisible ? "translateY(0)" : "translateY(12px)" }}
-        >
-          Get Live In 3–5 Hours
-        </p>
-        <h3
-          className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2"
-          style={{ transition: "opacity 0.5s ease 80ms, transform 0.5s ease 80ms", opacity: headerVisible ? 1 : 0, transform: headerVisible ? "translateY(0)" : "translateY(12px)" }}
-        >
-          Our Process — Start To Launch
-        </h3>
-        <p
-          className="text-center text-sm text-muted-foreground mb-10"
-          style={{ transition: "opacity 0.5s ease 160ms, transform 0.5s ease 160ms", opacity: headerVisible ? 1 : 0, transform: headerVisible ? "translateY(0)" : "translateY(12px)" }}
-        >
-          From first contact to fully live in 5 clear steps — most setups complete in 3–5 hours.
-        </p>
-      </div>
+      {/* Section Header — static, no animation */}
+      <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3">
+        Get Live In 3–5 Hours
+      </p>
+      <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
+        Our Process — Start To Launch
+      </h3>
+      <p className="text-center text-sm text-muted-foreground mb-10">
+        From first contact to fully live in 5 clear steps — most setups complete in 3–5 hours.
+      </p>
 
       {/* Desktop horizontal tracker */}
       <div className="hidden sm:flex justify-center items-start gap-7 md:gap-10 px-4 mb-6">
@@ -386,8 +193,8 @@ export default function LaunchTimeline() {
             <div key={step.id} className="flex items-start gap-7 md:gap-10">
               <button
                 type="button"
-                onClick={() => handleTrackerClick(idx)}
-                className="flex flex-col items-center gap-3 border-none bg-transparent cursor-pointer group"
+                onClick={() => setActiveStep(idx)}
+                className="flex flex-col items-center gap-3 border-none bg-transparent cursor-pointer"
               >
                 <div
                   className="rounded-full flex items-center justify-center flex-shrink-0 relative"
@@ -396,16 +203,17 @@ export default function LaunchTimeline() {
                     background: isActive
                       ? "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)"
                       : "rgba(154,92,46,0.12)",
-                    boxShadow: isActive
-                      ? "0 0 0 5px rgba(154,92,46,0.15), 0 4px 14px rgba(154,92,46,0.35)"
-                      : "none",
-                    transition: "all 0.3s ease",
+                    border: "2px solid #000000",
+                    boxShadow: isActive ? "0 0 0 5px rgba(154,92,46,0.15), 0 4px 14px rgba(154,92,46,0.35)" : "none",
+                    transition: "background 0.3s ease, box-shadow 0.3s ease",
                   }}
                 >
-                  <span className="font-black leading-none" style={{ fontSize: "28px", color: isActive ? "#fff" : "#9a5c2e" }}>{step.number}</span>
+                  <span className="font-black leading-none relative z-10" style={{ fontSize: "28px", color: isActive ? "#fff" : "#9a5c2e" }}>
+                    {step.number}
+                  </span>
                   <div
                     className="absolute rounded-full flex items-center justify-center"
-                    style={{ width: "24px", height: "24px", bottom: "-3px", right: "-3px", background: "#f5e6d0", border: "2px solid rgba(154,92,46,0.25)" }}
+                    style={{ width: "24px", height: "24px", bottom: "-3px", right: "-3px", background: "#f5e6d0", border: "2px solid #000000", zIndex: 20 }}
                   >
                     <Icon style={{ width: "14px", height: "14px", color: "#9a5c2e" }} />
                   </div>
@@ -421,12 +229,11 @@ export default function LaunchTimeline() {
         })}
       </div>
 
-      {/* Summary bar — pushed further down with extra top margin */}
-      <div style={{ marginTop: "32px" }}>
-        <TimelineSummaryBar activeStep={activeStep} onStepClick={handleTrackerClick} />
+      {/* Summary bar */}
+      <div style={{ marginTop: "24px" }}>
+        <TimelineSummaryBar activeStep={activeStep} onStepClick={setActiveStep} />
       </div>
 
-      {/* Extra breathing room before detail cards */}
       <div style={{ marginBottom: "64px" }} />
 
       {/* Mobile stepper */}
@@ -455,36 +262,44 @@ export default function LaunchTimeline() {
         </div>
       </div>
 
-      {/* Detailed vertical timeline with scroll-driven center line */}
-      <div ref={lineContainerRef} className="relative">
-        {/* Background static line */}
+      {/* Detailed vertical timeline */}
+      <div className="relative">
         <div
-          className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block"
-          style={{ background: "rgba(154,92,46,0.1)", transform: "translateX(-50%)" }}
-        />
-        {/* Scroll-driven animated line */}
-        <div
-          className="absolute left-6 md:left-1/2 top-0 w-0.5 hidden md:block pointer-events-none"
-          style={{
-            height: `${lineHeight}%`,
-            background: "linear-gradient(180deg, #9a5c2e 0%, #c8965c 50%, rgba(200,150,92,0.6) 100%)",
-            transform: "translateX(-50%)",
-            transition: "height 0.15s linear",
-            boxShadow: "0 0 8px rgba(200,150,92,0.3)",
-          }}
+          className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block pointer-events-none"
+          style={{ background: "linear-gradient(180deg, #9a5c2e 0%, #c8965c 50%, rgba(200,150,92,0.6) 100%)", transform: "translateX(-50%)" }}
         />
 
-        <div className="space-y-10 md:space-y-20">
+        <div className="space-y-10 md:space-y-20 relative z-10">
           {launchTimelineSteps.map((step, idx) => (
-            <div key={step.id} ref={(el) => (stepRefs.current[idx] = el)}>
-              <StepRow step={step} idx={idx} />
-            </div>
+            <StepRow key={step.id} step={step} idx={idx} />
           ))}
         </div>
       </div>
 
-      <div className="mt-6">
-        <TimelineArrowCTA onBookDemo={openDemoBooking} />
+      {/* Bottom CTA */}
+      <div className="hidden md:flex flex-col items-center mt-6">
+        <div style={{ width: "2px", height: "56px", background: "linear-gradient(180deg, rgba(154,92,46,0.4) 0%, #c8965c 100%)" }} />
+        <button
+          type="button"
+          onClick={openDemoBooking}
+          style={{
+            marginTop: "24px",
+            borderRadius: "9999px", padding: "2px",
+            background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+            boxShadow: "0 4px 18px rgba(120,70,20,0.3)",
+            border: "none", cursor: "pointer"
+          }}
+        >
+          <span style={{
+            display: "flex", alignItems: "center", gap: "8px",
+            height: "48px", padding: "0 28px", borderRadius: "9999px",
+            background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+            color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem"
+          }}>
+            Book Your Free Demo
+            <ArrowRight className="w-4 h-4" />
+          </span>
+        </button>
       </div>
     </div>
   );

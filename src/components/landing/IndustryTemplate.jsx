@@ -46,7 +46,7 @@ function IndustryTemplateInner({ industrySlug }) {
         <IndustryPainBar stats={industry.painStats} />
 
         {/* Problem/Solution Section (industry-tailored) */}
-        <section className="py-16 md:py-24 px-4 md:px-6" style={{ background: "linear-gradient(to bottom, #f8f3eb 0%, #fcfaf6 100%)" }}>
+        <section className="py-16 md:py-24 px-4 md:px-6" style={{ background: "#ffffff" }}>
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
               <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
@@ -122,7 +122,6 @@ function IndustryTemplateInner({ industrySlug }) {
         {/* Results/Metrics */}
         <IndustryResults
           metrics={industry.metrics}
-          testimonial={industry.testimonial}
           onBookDemo={() => demoBooking?.openDemoBooking?.()}
         />
 

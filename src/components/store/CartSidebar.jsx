@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingCart, Trash2, ArrowRight, Lock } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
 import { base44 } from "@/api/base44Client";
@@ -31,10 +32,9 @@ export default function CartSidebar() {
     setStep("loading");
 
     if (window.self !== window.top) {
-      setError(
-        "Checkout is available on the live Base44 site. Open the published app to continue."
-      );
-      setStep("info");
+      // Silently redirect to the live site if inside iframe preview
+      window.open(window.location.href, "_blank");
+      setStep("cart");
       return;
     }
 
@@ -50,6 +50,14 @@ export default function CartSidebar() {
       });
 
       if (response.data?.url) {
+        // Save order summary so OrderSuccess can display what was purchased
+        try {
+          sessionStorage.setItem("clientsurge:last-order", JSON.stringify({
+            items: items.map(i => ({ icon: i.icon, name: i.name, setup_fee: i.setup_fee, monthly_fee: i.monthly_fee })),
+            totalSetup,
+            totalMonthly,
+          }));
+        } catch {}
         window.location.href = response.data.url;
         return;
       }
@@ -62,11 +70,15 @@ export default function CartSidebar() {
     }
   };
 
-  if (!cartOpen) return null;
-
   return (
+    <AnimatePresence>
+      {cartOpen && (
     <>
-      <div
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.25 }}
         onClick={() => setCartOpen(false)}
         style={{
           position: "fixed",
@@ -77,7 +89,11 @@ export default function CartSidebar() {
         }}
       />
 
-      <div
+      <motion.div
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ type: "spring", stiffness: 320, damping: 32 }}
         style={{
           position: "fixed",
           top: 0,
@@ -147,33 +163,53 @@ export default function CartSidebar() {
 
         <div style={{ flex: 1, overflowY: "auto", padding: "18px 20px" }}>
           {items.length === 0 ? (
-            <div
-              style={{
-                textAlign: "center",
-                padding: "48px 0",
-                color: "rgba(26,18,9,0.46)",
-              }}
-            >
-              <ShoppingCart
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  margin: "0 auto 12px",
-                  opacity: 0.3,
-                }}
-              />
-              <p style={{ fontSize: "14px", fontWeight: "600" }}>
-                Your cart is empty
+            <div style={{ textAlign: "center", padding: "36px 16px 24px" }}>
+              <div style={{
+                width: "56px", height: "56px", borderRadius: "16px",
+                background: "linear-gradient(135deg, rgba(154,92,46,0.1), rgba(200,150,92,0.05))",
+                border: "1px solid rgba(154,92,46,0.14)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                margin: "0 auto 14px",
+              }}>
+                <ShoppingCart style={{ width: "26px", height: "26px", color: "#9a5c2e", opacity: 0.6 }} />
+              </div>
+              <p style={{ fontSize: "14px", fontWeight: "700", color: "#1a1209", margin: "0 0 6px" }}>
+                Your stack is empty
               </p>
-              <p style={{ fontSize: "12px", marginTop: "6px" }}>
-                Browse the store and add the services you want us to build.
+              <p style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)", marginBottom: "20px", lineHeight: 1.5 }}>
+                Add services from the catalog below to get started.
+              </p>
+              {/* Top 3 popular nudges */}
+              {[
+                { icon: "⚡", name: "Instant Lead Response", price: "$97/month" },
+                { icon: "📞", name: "Missed Call Text-Back", price: "$67/month" },
+                { icon: "📅", name: "AI Booking Agent", price: "$147/month" },
+              ].map((s) => (
+                <div key={s.name} style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "10px 12px", marginBottom: "6px", borderRadius: "12px",
+                  background: "rgba(255,255,255,0.7)", border: "1px solid rgba(154,92,46,0.1)",
+                  cursor: "pointer",
+                }} onClick={() => setCartOpen(false)}>
+                  <span style={{ fontSize: "13px" }}>{s.icon} {s.name}</span>
+                  <span style={{ fontSize: "11px", color: "#9a5c2e", fontWeight: "700" }}>{s.price}</span>
+                </div>
+              ))}
+              <p style={{ fontSize: "11px", color: "rgba(26,18,9,0.35)", marginTop: "10px" }}>
+                Click a service above to browse
               </p>
             </div>
           ) : step === "cart" ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {items.map((item) => (
-                <div
+              <AnimatePresence initial={false}>
+              {items.map((item, idx) => (
+                <motion.div
                   key={item.product_id}
+                  initial={{ opacity: 0, x: 40, scale: 0.96 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 40, scale: 0.92 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 30, delay: idx * 0.05 }}
+                  whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(154,92,46,0.13)" }}
                   style={{
                     background: "rgba(255,255,255,0.8)",
                     border: "1px solid rgba(154,92,46,0.1)",
@@ -210,7 +246,8 @@ export default function CartSidebar() {
                       ${item.setup_fee} setup - ${item.monthly_fee}/mo
                     </p>
                   </div>
-                  <button
+                  <motion.button
+                    whileTap={{ scale: 0.85 }}
                     onClick={() => removeItem(item.product_id)}
                     style={{
                       background: "none",
@@ -221,9 +258,10 @@ export default function CartSidebar() {
                     }}
                   >
                     <Trash2 style={{ width: "14px", height: "14px" }} />
-                  </button>
-                </div>
+                  </motion.button>
+                </motion.div>
               ))}
+              </AnimatePresence>
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -473,7 +511,9 @@ export default function CartSidebar() {
             </p>
           </div>
         ) : null}
-      </div>
+      </motion.div>
     </>
+      )}
+    </AnimatePresence>
   );
 }

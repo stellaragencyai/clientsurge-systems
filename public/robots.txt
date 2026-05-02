@@ -1,17 +1,30 @@
 User-agent: *
 Allow: /
+
+# Admin & authenticated pages
 Disallow: /admin
 Disallow: /admin/
 Disallow: /dashboard
 Disallow: /dashboard/
 Disallow: /client-portal
 Disallow: /client-portal/
+Disallow: /client-dashboard
+Disallow: /client-dashboard/
 Disallow: /lead-intelligence
 Disallow: /medspa-dashboard
 Disallow: /sam
+Disallow: /admin-settings
+
+# Dev/test/internal pages
 Disallow: /test-option-1
 Disallow: /test-option-2
 Disallow: /test-option-3
+Disallow: /HomeTestOption1
+Disallow: /BusinessSetup
+Disallow: /CaptureLeads
+Disallow: /setup
+Disallow: /onboarding
+Disallow: /order-success
 Disallow: /success
 
 Sitemap: https://clientsurgesystems.com/sitemap.xml

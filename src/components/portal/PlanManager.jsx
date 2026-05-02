@@ -15,7 +15,7 @@ const PLANS = [
     features: ["Starter + missed-call text-back", "14-day nurture sequence"],
   },
   {
-    name: "Pro System",
+    name: "Elite System",
     monthly: "$469/mo",
     features: ["Growth + lead reactivation", "Review request automation"],
   },
@@ -24,7 +24,7 @@ const PLANS = [
 const PLAN_RANK = {
   "Starter System": 1,
   "Growth System": 2,
-  "Pro System": 3,
+  "Elite System": 3,
 };
 
 function formatDate(value) {

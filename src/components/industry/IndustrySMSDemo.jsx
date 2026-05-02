@@ -72,7 +72,7 @@ export default function IndustrySMSDemo({
   useEffect(() => () => timeouts.current.forEach(clearTimeout), []);
 
   return (
-    <section id="demo-flow" className="py-16 md:py-20 px-4 md:px-6" style={{ background: "linear-gradient(180deg, #fdfbf8 0%, #f5ede0 100%)" }}>
+    <section id="demo-flow" className="py-16 md:py-20 px-4 md:px-6" style={{ background: "#ffffff" }}>
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary mb-3">

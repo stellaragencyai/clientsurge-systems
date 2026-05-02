@@ -10,14 +10,18 @@ const QUICK_QUESTIONS = [
   "How long does setup take?",
 ];
 
-const WELCOME_MESSAGE = {
-  role: "assistant",
-  content: "👋 Hey! I'm the ClientSurge AI assistant. Ask me anything about how we help businesses automate their lead follow-up — or I can get you set up with a free demo!",
-};
+function getWelcomeMessage() {
+  const path = typeof window !== "undefined" ? window.location.pathname : "/";
+  if (path.includes("med-spa")) return "👋 Hey! Curious how ClientSurge works for med spas? I can walk you through exactly what we build — or set you up with a free demo!";
+  if (path.includes("dental")) return "👋 Hey! I can show you how we help dental practices book more consults on autopilot. Ask me anything!";
+  if (path.includes("store")) return "👋 Hey! Need help picking the right services for your business? I can help you build the right stack.";
+  if (path.includes("pricing")) return "👋 Hey! Questions about pricing? I can break down which plan fits your situation best.";
+  return "👋 Hey! I'm the ClientSurge AI assistant. Ask me anything about automating your lead follow-up — or I can get you set up with a free demo!";
+}
 
 export default function ChatBubble() {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState([WELCOME_MESSAGE]);
+  const [messages, setMessages] = useState([{ role: "assistant", content: getWelcomeMessage() }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);

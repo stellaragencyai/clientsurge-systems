@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "ClientSurge Systems <onboarding@resend.dev>",
+        from: "ClientSurge Systems <system@clientsurgesystems.com>",
         to: ["system@clientsurgesystems.com"],
         reply_to: email,
         subject: `New Contact: ${full_name} — ${business_type || "General Inquiry"}`,

@@ -424,7 +424,7 @@ function OverviewDashboard({ onNavigate }) {
             {[
               { key: 'starter_system', label: 'Starter', helper: 'Response + booking fit' },
               { key: 'growth_system', label: 'Growth', helper: 'Response + nurture fit' },
-              { key: 'pro_system', label: 'Pro', helper: 'Full-stack fit' },
+              { key: 'elite_system', label: 'Elite', helper: 'Full-stack fit' },
               { key: 'single_service', label: 'Single Service', helper: 'One clear first-service fit' },
             ].map(({ key, label, helper }) => (
               <button

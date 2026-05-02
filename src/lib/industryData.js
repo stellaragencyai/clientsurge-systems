@@ -177,7 +177,7 @@ export const INDUSTRIES = {
     smsDemo: {
       businessName: "Bright Smile Dental",
       initialMessage: "Hi, I need an emergency appointment. My tooth is killing me.",
-      automatedResponse: "Hi! We're sorry to hear you're in pain. 😟 Bright Smile Dental can see you today. Our next emergency slot is 3 PM. Reply YES to confirm or call (602) 555-1234 for other times.",
+      automatedResponse: "Hi! We're sorry to hear you're in pain. 😟 Bright Smile Dental can see you today. Our next emergency slot is 3 PM. Reply YES to confirm or call (602) 584-3227 for other times.",
       leadReply: "YES - 3 PM works",
       confirmationMessage: "Perfect! You're confirmed for today at 3 PM. Please arrive 10 min early. Address: 123 Main St. See you soon! 🦷",
     },
@@ -214,7 +214,7 @@ export const INDUSTRIES = {
       },
       {
         q: "How much does it cost?",
-        a: "Starting at $297/month for up to 500 patient inquiries. Most dental offices see ROI within 2 weeks.",
+        a: "Starting at $497/month. Most dental offices see ROI within 2 weeks.",
       },
     ],
   },
@@ -504,7 +504,7 @@ export const INDUSTRIES = {
       quote: "During hail season, we get crushed with calls. Our AI answers every single one, qualifies them, and books the estimate. We closed 14 jobs that would have gone to competitors. Game changer.",
       name: "Rick Mitchell",
       business: "StormPro Roofing, Oklahoma City OK",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop",
     },
 
     faqs: [
@@ -608,7 +608,7 @@ export const INDUSTRIES = {
       quote: "As a contractor, being slow to respond kills deals. Now we answer every inquiry instantly, even when we're on job sites. Added 12 jobs last quarter just from faster response times.",
       name: "Mike Johnson",
       business: "BuildRight Contracting, Phoenix AZ",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+      image: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=400&h=400&fit=crop",
     },
 
     faqs: [

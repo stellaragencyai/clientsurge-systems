@@ -1,19 +1,23 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
-import TrustBar from "../components/landing/TrustBar";
-import Industries from "../components/landing/Industries";
-import ProblemSolution from "../components/landing/ProblemSolution.jsx";
-import CoreOffer from "../components/landing/CoreOffer";
-import IntegrationPartners from "../components/landing/IntegrationPartners";
-import FAQ from "../components/landing/FAQ";
-import Pricing from "../components/landing/Pricing";
-import LeadLeakage from "../components/landing/LeadLeakage";
-import FinalCTA from "../components/landing/FinalCTA";
-import Footer from "../components/landing/Footer";
-import SectionBreak from "../components/landing/SectionBreak";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
+import { SectionSkeleton, LargeSectionSkeleton } from "../components/landing/SkeletonLoader";
+
+// Lazy load ALL below-the-fold sections individually for independent rendering
+const TrustBar = lazy(() => import("../components/landing/TrustBar"));
+const InteractiveJourneyMap = lazy(() => import("../components/landing/InteractiveJourneyMap"));
+const Industries = lazy(() => import("../components/landing/Industries"));
+const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
+const IntegrationPartners = lazy(() => import("../components/landing/IntegrationPartners"));
+const FAQ = lazy(() => import("../components/landing/FAQ"));
+const Pricing = lazy(() => import("../components/landing/Pricing"));
+const LeadLeakage = lazy(() => import("../components/landing/LeadLeakage"));
+const BeforeAfter = lazy(() => import("../components/landing/BeforeAfter"));
+const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
+const Footer = lazy(() => import("../components/landing/Footer"));
+const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
 import { FAQ_ITEMS } from "../components/landing/FAQ";
 
 import {
@@ -42,28 +46,40 @@ function useScrollGradient() {
       };
       const [h1, s1, l1] = parse(a);
       const [h2, s2, l2] = parse(b);
-      return `hsl(${h1 + (h2 - h1) * t},${s1 + (s2 - s1) * t}%,${l1 + (l2 - l1) * t}%)`;
+      return `hsl(${h1 + (h2 - h1) * t}, ${s1 + (s2 - s1) * t}%, ${l1 + (l2 - l1) * t}%)`;
     };
 
+    // RAF-throttled scroll handler — runs at max 60fps, no duplicate frames
+    let rafId = null;
+    let lastScrollY = -1;
     const onScroll = () => {
-      const progress = Math.min(
-        window.scrollY / (document.body.scrollHeight - window.innerHeight),
-        1
-      );
-      let i = 0;
-      for (let j = 0; j < stops.length - 1; j += 1) {
-        if (progress >= stops[j].scroll) i = j;
-      }
-      const seg = stops[i];
-      const next = stops[Math.min(i + 1, stops.length - 1)];
-      const t = seg.scroll === next.scroll ? 0 : (progress - seg.scroll) / (next.scroll - seg.scroll);
-      document.documentElement.style.setProperty("--scroll-bg-from", lerp(seg.from, next.from, t));
-      document.documentElement.style.setProperty("--scroll-bg-to", lerp(seg.to, next.to, t));
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (window.scrollY === lastScrollY) return;
+        lastScrollY = window.scrollY;
+        const progress = Math.min(
+          window.scrollY / (document.body.scrollHeight - window.innerHeight),
+          1
+        );
+        let i = 0;
+        for (let j = 0; j < stops.length - 1; j += 1) {
+          if (progress >= stops[j].scroll) i = j;
+        }
+        const seg = stops[i];
+        const next = stops[Math.min(i + 1, stops.length - 1)];
+        const t = seg.scroll === next.scroll ? 0 : (progress - seg.scroll) / (next.scroll - seg.scroll);
+        document.documentElement.style.setProperty("--scroll-bg-from", lerp(seg.from, next.from, t));
+        document.documentElement.style.setProperty("--scroll-bg-to", lerp(seg.to, next.to, t));
+      });
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 }
 
@@ -109,25 +125,47 @@ export default function Home() {
       <div className="min-h-screen">
         <Navbar />
         <Hero />
-        <SectionBreak />
-        <Industries />
-        <SectionBreak />
-        <section aria-label="Proof and trust">
+        <Suspense fallback={<SectionSkeleton />}>
+          <SectionBreak />
+          <Industries />
+          <SectionBreak />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
           <TrustBar />
-        </section>
-        <SectionBreak />
-        <LeadLeakage />
-        <SectionBreak />
-        <CoreOffer />
-        <SectionBreak />
-        <IntegrationPartners />
-        <SectionBreak />
-        <Pricing />
-        <SectionBreak />
-        <FAQ />
-        <SectionBreak />
-        <FinalCTA />
-        <Footer />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <InteractiveJourneyMap />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <SectionBreak />
+          <LeadLeakage />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <BeforeAfter />
+        </Suspense>
+        <Suspense fallback={<LargeSectionSkeleton />}>
+          <SectionBreak />
+          <CoreOffer />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <SectionBreak />
+          <IntegrationPartners />
+        </Suspense>
+        <Suspense fallback={<LargeSectionSkeleton />}>
+          <SectionBreak />
+          <Pricing />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <SectionBreak />
+          <FAQ />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <SectionBreak />
+          <FinalCTA />
+        </Suspense>
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
         <ChatBubble />
       </div>
     </DemoBookingProvider>

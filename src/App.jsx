@@ -16,32 +16,32 @@ import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import PageNotFound from "./lib/PageNotFound";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
+import { scrollToTop } from "@/lib/scroll";
 
-// Initialize auto-tracking on app load
-if (typeof window !== "undefined") {
-  initializeAnalyticsObserver();
-}
+// Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
 import Onboarding from "./pages/Onboarding";
 import CaptureLeads from "./pages/CaptureLeads";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminLeads from "./pages/AdminLeads";
-import AdminLeadDetail from "./pages/AdminLeadDetail";
 import Start from "./pages/Start";
-import ClientPortal from "./pages/ClientPortal";
 import Book from "./pages/Book";
 import Success from "./pages/Success";
 import LegalPage from "./pages/LegalPage";
 import Contact from "./pages/Contact";
-import AdminOnboarding from "./pages/AdminOnboarding";
 import Industries from "./pages/Industries";
 import OrderSuccess from "./pages/OrderSuccess";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
 import BusinessSetup from "./pages/BusinessSetup";
-import AdminAutomation from "./pages/AdminAutomation";
-import ClientDashboard from "./pages/ClientDashboard";
+import ThankYou from "./pages/ThankYou";
+
 
 const Store = lazy(() => import("./pages/Store"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminLeads = lazy(() => import("./pages/AdminLeads"));
+const AdminLeadDetail = lazy(() => import("./pages/AdminLeadDetail"));
+const AdminAutomation = lazy(() => import("./pages/AdminAutomation"));
+const AdminOnboarding = lazy(() => import("./pages/AdminOnboarding"));
+const ClientPortal = lazy(() => import("./pages/ClientPortal"));
+const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
 
 const PUBLIC_PATHS = [
   "/",
@@ -69,41 +69,55 @@ const PUBLIC_PATHS = [
   "/contact",
   "/leads/capture",
   "/onboarding",
-  "/test-option-1",
-  "/test-option-2",
-  "/test-option-3",
-  "/preview-idea-1",
-  "/preview-idea-2",
+  // test/preview routes removed
 ];
 
 const NOINDEX_PREFIXES = [
   "/admin",
   "/dashboard",
   "/client-portal",
+  "/client-dashboard",
   "/lead-intelligence",
   "/medspa-dashboard",
   "/sam",
   "/success",
+  "/setup",
+  "/onboarding",
+  "/order-success",
+  "/leads",
 ];
 
 const isPublicPath = (pathname) =>
   PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
+// Fix 1: ScrollToTop — resets scroll position on every route change
+function ScrollToTop() {
+  const location = useLocation();
+  useEffect(() => {
+    // Don't scroll to top if navigating to a hash anchor
+    if (!location.hash) {
+      scrollToTop();
+    }
+  }, [location.pathname]);
+  return null;
+}
+
+function AppInner() {
+  useEffect(() => {
+    // Initialize auto-tracking after React mounts — safe for SSR/pre-render
+    if (typeof window !== "undefined") {
+      initializeAnalyticsObserver();
+    }
+  }, []);
+  return null;
+}
+
+// SectionRedirect — just navigate to home, no auto-scroll
 function SectionRedirect({ hash }) {
   const navigate = useNavigate();
 
   useEffect(() => {
     navigate("/", { replace: true });
-
-    const timer = window.setTimeout(() => {
-      const element = document.querySelector(hash);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-      window.history.replaceState({}, "", `/${hash}`);
-    }, 450);
-
-    return () => window.clearTimeout(timer);
   }, [hash, navigate]);
 
   return null;
@@ -180,11 +194,6 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/test-option-1" element={<Navigate to="/" replace />} />
-      <Route path="/test-option-2" element={<Navigate to="/" replace />} />
-      <Route path="/test-option-3" element={<Navigate to="/" replace />} />
-      <Route path="/preview-idea-1" element={<Navigate to="/" replace />} />
-      <Route path="/preview-idea-2" element={<Navigate to="/" replace />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
@@ -217,6 +226,7 @@ const AuthenticatedApp = () => {
       />
       <Route path="/order-success" element={<OrderSuccess />} />
       <Route path="/setup" element={<BusinessSetup />} />
+      <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/:slug" element={<IndustryTemplate />} />
 
       <Route
@@ -224,8 +234,8 @@ const AuthenticatedApp = () => {
           <ProtectedRoute unauthenticatedElement={<AuthRedirectFallback />} />
         }
       >
-        <Route path="/client-portal" element={<ClientPortal />} />
-        <Route path="/client-dashboard" element={<ClientDashboard />} />
+        <Route path="/client-portal" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><ClientPortal /></Suspense>} />
+        <Route path="/client-dashboard" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><ClientDashboard /></Suspense>} />
       </Route>
 
       <Route
@@ -239,14 +249,14 @@ const AuthenticatedApp = () => {
       >
         <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
         <Route path="/admin-settings" element={<Navigate to="/admin" replace />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/leads" element={<AdminLeads />} />
-        <Route path="/admin/leads/:leadId" element={<AdminLeadDetail />} />
-        <Route path="/admin/automations" element={<AdminAutomation />} />
+        <Route path="/admin" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminDashboard /></Suspense>} />
+        <Route path="/admin/leads" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminLeads /></Suspense>} />
+        <Route path="/admin/leads/:leadId" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminLeadDetail /></Suspense>} />
+        <Route path="/admin/automations" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminAutomation /></Suspense>} />
         <Route path="/lead-intelligence" element={<Navigate to="/admin" replace />} />
         <Route path="/sam" element={<Navigate to="/admin" replace />} />
         <Route path="/medspa-dashboard" element={<Navigate to="/admin" replace />} />
-        <Route path="/admin/onboarding" element={<AdminOnboarding />} />
+        <Route path="/admin/onboarding" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminOnboarding /></Suspense>} />
       </Route>
 
       <Route path="*" element={<PageNotFound />} />
@@ -258,7 +268,8 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
+        <Router style={{ overflowX: "hidden" }}>
+          <ScrollToTop />
           <AutoCTAAnalytics />
           <RouteIndexingGuard />
           <AuthenticatedApp />

@@ -1,7 +1,18 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import Stripe from 'npm:stripe@14.21.0';
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), { apiVersion: '2024-06-20' });
+const STRIPE_KEY = Deno.env.get('STRIPE_SECRET_KEY') || "";
+const stripe = new Stripe(STRIPE_KEY, { apiVersion: '2024-06-20' });
+
+// ── Startup mode check ──────────────────────────────────────────────────────
+if (STRIPE_KEY.startsWith("sk_test_")) {
+  console.warn("⚠️  [STRIPE] Running in TEST MODE — real payments will NOT be processed. Switch to sk_live_ key before going live.");
+} else if (!STRIPE_KEY) {
+  console.error("🚨 [STRIPE] STRIPE_SECRET_KEY is not set — all webhook processing will fail.");
+} else {
+  console.info("✅ [STRIPE] Live mode key detected.");
+}
+// ────────────────────────────────────────────────────────────────────────────
 
 Deno.serve(async (req) => {
   const body = await req.text();

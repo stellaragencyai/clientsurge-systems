@@ -40,7 +40,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "How much does it cost?",
-  a: "Plans start at $397/month with a one-time setup fee. We have three tiers - Starter, Growth, and Pro - depending on your lead volume and goals. See our Pricing section for full details, and we will confirm the best fit on your demo call.",
+  a: "Plans start at $497/month with a one-time setup fee. We have three tiers - Starter, Growth, and Elite - depending on your lead volume and goals. See our Pricing section for full details, and we will confirm the best fit on your demo call.",
   category: "pricing"
 },
 {
@@ -50,7 +50,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "Will this actually work for my specific business?",
-  a: "If you generate leads but lose conversions due to slow follow-up, the answer is almost always yes. We have worked across many appointment-based industries. On your demo call, we will identify the exact gaps and show you the specific solution. If we do not think we can help, we will tell you upfront.",
+  a: "If you generate leads but lose conversions due to slow follow-up, the answer is almost always yes. We specialize in appointment-based industries and tailor every system to your specific lead flow. On your demo call, we will identify the exact gaps and show you the specific solution. If we do not think we can help, we will tell you upfront.",
   category: "integration"
 },
 {

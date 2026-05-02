@@ -1,6 +1,6 @@
 export default function IndustryPainBar({ stats }) {
   return (
-    <section className="py-10 md:py-14 px-4 md:px-6" style={{ background: "rgba(253,251,248,0.98)" }}>
+    <section className="py-10 md:py-14 px-4 md:px-6" style={{ background: "#ffffff" }}>
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {stats.map((stat, i) => (
@@ -8,9 +8,9 @@ export default function IndustryPainBar({ stats }) {
               key={i}
               className="rounded-2xl px-6 py-6 text-center"
               style={{
-                background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,245,238,0.95) 100%)",
-                border: "1.5px solid rgba(212,184,142,0.38)",
-                boxShadow: "0 4px 18px rgba(111,67,31,0.07)",
+                background: "#ffffff",
+                border: "1.5px solid rgba(0,0,0,0.08)",
+                boxShadow: "0 4px 18px rgba(0,0,0,0.06)",
               }}
             >
               <div className="text-3xl mb-2">{stat.icon}</div>

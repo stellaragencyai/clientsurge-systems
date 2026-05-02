@@ -1,45 +1,36 @@
-import { useState } from "react";
-import { ArrowUp, Mail, Phone, Shield, Facebook, Instagram, Linkedin, Twitter, FileText, Lock, HelpCircle } from "lucide-react";
+import { ArrowUp, Mail, Phone, Shield } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const navColumns = [
-  {
-    title: "Platform",
-    links: [
-      { label: "How It Works", href: "/#problem-solution" },
-      { label: "Our System", href: "/#services" },
-      { label: "Pricing", href: "/#pricing" },
-      { label: "FAQ", href: "/#faq" },
-      { label: "Demos & Setup", href: "/book" },
-    ],
-  },
-  {
-    title: "Industries",
-    links: [
-      { label: "Med Spas & Aesthetic Clinics", href: "/med-spa" },
-      { label: "Dental & Orthodontics", href: "/industries#dental" },
-      { label: "Chiropractic & PT", href: "/industries#chiropractic" },
-      { label: "HVAC & Home Services", href: "/industries#hvac" },
-      { label: "All Industries", href: "/industries" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { label: "Contact Us", href: "/contact" },
-      { label: "Login", href: "/client-portal" },
-      { label: "Privacy Policy", href: "/legal/privacy" },
-      { label: "Terms of Service", href: "/legal/terms" },
-    ],
-  },
-];
+{
+  title: "Platform",
+  links: [
+  { label: "How It Works", href: "/#problem-solution" },
+  { label: "Our System", href: "/#services" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "FAQ", href: "/#faq" },
+  { label: "Get Your Free Audit", href: "/contact" }]
 
-const socialLinks = [
-  { icon: Facebook, href: "https://facebook.com/clientsurgesystems", label: "Facebook" },
-  { icon: Instagram, href: "https://instagram.com/clientsurgesystems", label: "Instagram" },
-  { icon: Linkedin, href: "https://linkedin.com/company/clientsurgesystems", label: "LinkedIn" },
-  { icon: Twitter, href: "https://twitter.com/clientsurge", label: "Twitter" },
-];
+},
+{
+  title: "Industries",
+  links: [
+  { label: "Med Spas & Aesthetics", href: "/med-spa" },
+  { label: "Dental & Orthodontics", href: "/dental" },
+  { label: "Chiropractic & PT", href: "/chiropractic" },
+  { label: "HVAC & Home Services", href: "/hvac" },
+  { label: "All Industries", href: "/industries" }]
+
+},
+{
+  title: "Company",
+  links: [
+  { label: "Contact Us", href: "/contact" },
+  { label: "Privacy Policy", href: "/legal/privacy" },
+  { label: "Terms of Service", href: "/legal/terms" }]
+
+}];
+
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -64,155 +55,181 @@ export default function Footer() {
 
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  const navLinks = [
-    { icon: HelpCircle, label: "How It Works", href: "/#problem-solution" },
-    { icon: FileText, label: "Pricing", href: "/#pricing" },
-    { icon: Lock, label: "Privacy", href: "/legal/privacy" },
-  ];
-
   return (
     <footer
-      className="relative bg-background/98 backdrop-blur-md border-t border-primary/10"
-      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
-    >
-      {/* Enhancement 1: Gradient top accent bar */}
+      className="relative"
+      style={{
+        background: "linear-gradient(180deg, #0A1628 0%, #050d1a 100%)",
+        paddingBottom: "env(safe-area-inset-bottom)"
+      }}>
+      
+      {/* Top gradient accent */}
       <div
-        className="absolute inset-x-0 top-0 h-0.5 pointer-events-none"
-        style={{ background: "linear-gradient(90deg, transparent 0%, #9a5c2e 25%, #c8965c 50%, #9a5c2e 75%, transparent 100%)" }}
-      />
+        className="absolute inset-x-0 top-0 h-px pointer-events-none"
+        style={{
+          background:
+          "linear-gradient(90deg, transparent 0%, #9a5c2e 25%, #c8965c 50%, #9a5c2e 75%, transparent 100%)"
+        }} />
+      
 
-      {/* Main Footer Bar */}
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
-        
-        {/* Left: Logo */}
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-            <span className="text-white font-black text-xs">CS</span>
-          </div>
-          <span className="font-display font-bold text-xs hidden sm:inline">ClientSurge</span>
-        </div>
-
-        {/* Center: Icon Navigation (Progressive Disclosure) */}
-        <div className="flex items-center gap-2">
-          {navLinks.map((link) => {
-            const Icon = link.icon;
-            return (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                title={link.label}
-                className="group relative w-8 h-8 rounded-lg border border-primary/15 flex items-center justify-center text-foreground/50 hover:text-primary hover:border-primary/40 transition-all"
-              >
-                <Icon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-                {/* Tooltip on hover */}
-                <span className="absolute bottom-full mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-foreground text-background text-[10px] px-2 py-1 rounded whitespace-nowrap pointer-events-none">
-                  {link.label}
+      {/* Main footer body */}
+      <div className="max-w-7xl mx-auto px-6 md:px-8 pt-16 pb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 md:gap-12">
+          {/* Brand column */}
+          <div className="lg:col-span-1 flex flex-col gap-6">
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{
+                  background:
+                  "linear-gradient(135deg, #9a5c2e 0%, #c8965c 100%)"
+                }}>
+                
+                <span className="text-white font-black text-sm">CS</span>
+              </div>
+              <div className="flex flex-col leading-tight">
+                <span className="font-display font-bold text-white text-base">
+                  ClientSurge
                 </span>
-              </a>
-            );
-          })}
-        </div>
-
-        {/* Right: Social + Utility Icons */}
-        <div className="flex items-center gap-2">
-          {socialLinks.map((social) => {
-            const Icon = social.icon;
-            return (
-              <a
-                key={social.label}
-                href={social.href}
-                aria-label={social.label}
-                title={social.label}
-                className="group w-7 h-7 rounded-lg border border-primary/15 flex items-center justify-center text-foreground/50 hover:text-primary hover:border-primary/40 transition-all"
-              >
-                <Icon className="w-3 h-3 group-hover:scale-110 transition-transform" />
-              </a>
-            );
-          })}
-          
-          <button
-            onClick={scrollTop}
-            title="Back to top"
-            className="group w-7 h-7 rounded-lg border border-primary/15 flex items-center justify-center text-foreground/50 hover:text-primary hover:border-primary/40 transition-all ml-1"
-          >
-            <ArrowUp className="w-3 h-3 group-hover:scale-110 transition-transform" />
-          </button>
-        </div>
-      </div>
-
-      {/* Expanded Menu (Always Visible) */}
-      <div className="border-t border-primary/10 bg-background/98 backdrop-blur-md animate-in fade-in duration-200">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 text-xs">
-          {navColumns.map((col) => (
-            <div key={col.title} className="flex flex-col gap-2">
-              <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">{col.title}</h4>
-              <div className="flex flex-col gap-1.5">
-                {col.links.map((link) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    onClick={(e) => handleNavClick(e, link.href)}
-                    className="text-foreground/60 hover:text-foreground transition-colors text-[11px]"
-                  >
-                    {link.label}
-                  </a>
-                ))}
+                <span
+                  className="text-xs font-semibold"
+                  style={{ color: "#c8965c" }}>
+                  
+                  Systems
+                </span>
               </div>
             </div>
-          ))}
-          
-          {/* Contact Column */}
-          <div className="flex flex-col gap-2">
-            <h4 className="font-bold uppercase tracking-widest text-primary text-[10px]">Contact</h4>
-            <a href="tel:+16025874608" className="text-foreground/60 hover:text-foreground text-[11px] flex items-center gap-1.5">
-              <Phone className="w-3 h-3 text-primary" />
-              (602) 587-4608
-            </a>
-            <a href="mailto:system@clientsurgesystems.com" className="text-foreground/60 hover:text-foreground text-[11px] flex items-center gap-1.5">
-              <Mail className="w-3 h-3 text-primary" />
-              system@clientsurgesystems.com
-            </a>
+
+            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
+              Done-for-you AI automation that turns missed leads into booked
+              appointments — built for service businesses.
+            </p>
+
+            {/* Contact */}
+            <div className="flex flex-col gap-3">
+              <a
+                href="tel:+16025843227"
+                className="flex items-center gap-3 group transition-colors"
+                style={{ color: "rgba(255,255,255,0.55)" }}>
+                
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors group-hover:bg-primary/30"
+                  style={{
+                    background: "rgba(154,92,46,0.15)",
+                    border: "1px solid rgba(154,92,46,0.25)"
+                  }}>
+                  
+                  <Phone className="w-3.5 h-3.5" style={{ color: "#c8965c" }} />
+                </div>
+                <span className="text-sm font-medium group-hover:text-white transition-colors">
+                  (602) 584-3227
+                </span>
+              </a>
+              <a
+                href="mailto:support@clientsurgesystems.com"
+                className="flex items-center gap-3 group transition-colors"
+                style={{ color: "rgba(255,255,255,0.55)" }}>
+                
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors group-hover:bg-primary/30"
+                  style={{
+                    background: "rgba(154,92,46,0.15)",
+                    border: "1px solid rgba(154,92,46,0.25)"
+                  }}>
+                  
+                  <Mail className="w-3.5 h-3.5" style={{ color: "#c8965c" }} />
+                </div>
+                <span className="text-xs font-medium group-hover:text-white transition-colors break-all">
+                  support@clientsurgesystems.com
+                </span>
+              </a>
+            </div>
+          </div>
+
+          {/* Nav columns */}
+          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {navColumns.map((col) =>
+            <div key={col.title} className="flex flex-col gap-4">
+                <h4
+                className="text-[10px] font-bold uppercase tracking-[0.22em]"
+                style={{ color: "#c8965c" }}>
+                
+                  {col.title}
+                </h4>
+                <div className="flex flex-col gap-2.5">
+                  {col.links.map((link) =>
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className="text-sm transition-colors hover:translate-x-0.5 duration-150"
+                  style={{ color: "rgba(255,255,255,0.5)" }}
+                  onMouseEnter={(e) =>
+                  e.currentTarget.style.color = "rgba(255,255,255,0.9)"
+                  }
+                  onMouseLeave={(e) =>
+                  e.currentTarget.style.color =
+                  "rgba(255,255,255,0.5)"
+                  }>
+                  
+                      {link.label}
+                    </a>
+                )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
-        
-        {/* Enhancement 2: Rich bottom strip with mini-CTA + trust badges */}
+
+        {/* Bottom bar */}
         <div
-          className="border-t border-primary/10 px-4 md:px-6 py-5"
-          style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.04) 0%, rgba(200,150,92,0.02) 100%)" }}
-        >
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-            {/* Trust badges row */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-              {[
-                "🔒 No long-term contracts",
-                "⚡ Live in 5–7 days",
-                "💬 SMS + Email included",
-              ].map((badge) => (
-                <span
-                  key={badge}
-                  className="text-[10px] font-semibold px-3 py-1.5 rounded-full"
-                  style={{
-                    background: "rgba(154,92,46,0.07)",
-                    border: "1px solid rgba(154,92,46,0.14)",
-                    color: "rgba(154,92,46,0.85)",
-                  }}
-                >
-                  {badge}
-                </span>
-              ))}
+          className="mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4"
+          style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+          
+          <div
+            className="flex items-center gap-4 text-xs"
+            style={{ color: "rgba(255,255,255,0.3)" }}>
+            
+            <span>© {new Date().getFullYear()} ClientSurge Systems</span>
+            <span className="hidden sm:inline">·</span>
+            <a
+              href="/legal/privacy" className="hidden sm:inline hover:text-white transition-colors hidden">
+              
+              
+              Privacy
+            </a>
+            <span className="hidden sm:inline">·</span>
+            <a
+              href="/legal/terms" className="hidden sm:inline hover:text-white transition-colors hidden">
+
+              
+              Terms
+            </a>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div
+              className="flex items-center gap-1.5 text-xs"
+              style={{ color: "rgba(255,255,255,0.3)" }}>
+              
+              <Shield className="w-3 h-3" style={{ color: "#c8965c" }} />
+              <span>SSL Encrypted</span>
             </div>
-            {/* Copyright */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 text-[9px] text-foreground/40">
-              <span>&copy; {new Date().getFullYear()} ClientSurge Systems</span>
-              <span className="text-foreground/20">·</span>
-              <a href="/legal/privacy" className="hover:text-foreground transition-colors">Privacy</a>
-              <span className="text-foreground/20">·</span>
-              <a href="/legal/terms" className="hover:text-foreground transition-colors">Terms</a>
-            </div>
+            <button
+              onClick={scrollTop}
+              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+              style={{
+                background: "rgba(154,92,46,0.2)",
+                border: "1px solid rgba(154,92,46,0.3)"
+              }}
+              title="Back to top">
+              
+              <ArrowUp className="w-3.5 h-3.5" style={{ color: "#c8965c" }} />
+            </button>
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>);
+
 }

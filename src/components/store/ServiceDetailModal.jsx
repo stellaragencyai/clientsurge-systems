@@ -4,11 +4,39 @@ import { X, Check, Plus, CheckCircle2, Clock, Zap, ArrowRight } from "lucide-rea
 
 export default function ServiceDetailModal({ product, inCart, onToggle, onClose }) {
   useEffect(() => {
+    const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = ""; };
-  }, []);
+
+    // Focus trap: keep focus within modal while open
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab") return;
+      const modal = document.querySelector('[role="dialog"]');
+      if (!modal) return;
+      const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = prev || "";
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
 
   const handleToggle = () => {
+    // Guard: don't allow adding coming_soon or non-checkout items
+    if (product?.coming_soon || product?.checkout_enabled === false) {
+      onClose();
+      return;
+    }
     onToggle();
     onClose();
   };
@@ -44,6 +72,9 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
           mass: 0.9,
           opacity: { duration: 0.3, ease: "easeOut" },
         }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={product?.name ? `${product.name} details` : "Service details"}
         onClick={(e) => e.stopPropagation()}
         style={{
           position: "fixed", inset: 0, zIndex: 1001,
@@ -215,6 +246,8 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
             {/* CTA */}
             <button
               onClick={handleToggle}
+              disabled={product?.coming_soon || product?.checkout_enabled === false}
+              style={(product?.coming_soon || product?.checkout_enabled === false) ? { opacity: 0.45, cursor: "not-allowed" } : {}}
               style={{
                 width: "100%", borderRadius: "9999px", padding: "2px",
                 background: inCart

@@ -30,7 +30,7 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
         <div
           className="absolute inset-x-0 bottom-0 h-48"
           style={{
-            background: "linear-gradient(to top, rgba(253,251,248,1) 0%, transparent 100%)",
+            background: "linear-gradient(to top, rgba(255,255,255,1) 0%, transparent 100%)",
           }}
         />
       </div>

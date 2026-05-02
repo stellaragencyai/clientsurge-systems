@@ -3,26 +3,26 @@ import { CheckCircle2, ArrowRight } from "lucide-react";
 const STEPS = [
   {
     number: 1,
-    title: "Select Services",
-    description: "Choose from 12+ AI-powered automations tailored to your business",
+    title: "Pick Your Services",
+    description: "Choose from our AI automations purpose-built for local service businesses",
     icon: "🎯",
   },
   {
     number: 2,
-    title: "Configure Settings",
-    description: "Customize messaging, workflows, and automation triggers",
-    icon: "⚙️",
+    title: "Complete Checkout",
+    description: "One-time setup fee + monthly — no contracts, cancel anytime",
+    icon: "🔒",
   },
   {
     number: 3,
-    title: "Review Stack",
-    description: "See your complete solution with setup costs and monthly fees",
-    icon: "✓",
+    title: "We Build Everything",
+    description: "Our team configures your entire system — messaging, triggers, workflows",
+    icon: "⚙️",
   },
   {
     number: 4,
-    title: "Launch",
-    description: "We handle full setup and deployment in 5-7 business days",
+    title: "Go Live in 5–7 Days",
+    description: "Your AI automation stack launches and starts capturing leads",
     icon: "🚀",
   },
 ];

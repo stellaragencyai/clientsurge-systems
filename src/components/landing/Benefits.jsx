@@ -63,7 +63,7 @@ function AnimatedText({ text }) {
     return () => clearInterval(interval);
   }, [isVisible, text]);
 
-  return <span ref={ref} className="inline">{displayedText}</span>;
+  return <span ref={ref} className="inline" style={{ minHeight: "1.2em", display: "inline-block" }}>{displayedText || " "}</span>;
 }
 
 function BenefitCard({ benefit, index, isVisible }) {

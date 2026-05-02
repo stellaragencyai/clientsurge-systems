@@ -37,11 +37,10 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, []);
+  }, []); // Modal mounts only when open — overflow restored on unmount
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -160,7 +159,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
           </button>
           <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-3 py-1 mb-3">
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            <span className="text-xs font-semibold text-primary uppercase tracking-wide">Free 15-Minute Demo</span>
+            <span className="text-xs font-semibold text-primary uppercase tracking-wide">Free Audit Call</span>
           </div>
           <h2 id="demo-booking-modal-title" className="font-display text-2xl font-semibold text-foreground">Tell us about your business</h2>
           <p className="text-sm text-muted-foreground mt-1">We'll tailor the demo to your exact situation.</p>

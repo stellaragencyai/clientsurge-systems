@@ -1,43 +1,71 @@
-// Enhancement 1: Estimated Go-Live Countdown
-const STAGE_DAYS_REMAINING = {
-  "Paid": 7,
-  "Ready for Install": 6,
-  "Configuring": 4,
-  "Testing": 2,
-  "Live": 0,
-  "Error": null,
-};
+import { useMemo } from "react";
+
+// Maximum business days from payment to go-live
+const TOTAL_BUSINESS_DAYS = 7;
+
+function addBusinessDays(startDate, days) {
+  const date = new Date(startDate);
+  let added = 0;
+  while (added < days) {
+    date.setDate(date.getDate() + 1);
+    const dow = date.getDay();
+    if (dow !== 0 && dow !== 6) added++; // skip weekends
+  }
+  return date;
+}
+
+function businessDaysBetween(start, end) {
+  let count = 0;
+  const cur = new Date(start);
+  cur.setHours(0,0,0,0);
+  const endD = new Date(end);
+  endD.setHours(0,0,0,0);
+  while (cur < endD) {
+    cur.setDate(cur.getDate() + 1);
+    const dow = cur.getDay();
+    if (dow !== 0 && dow !== 6) count++;
+  }
+  return count;
+}
 
 const STAGE_MESSAGE = {
-  "Paid": "We're getting your installer assigned.",
-  "Ready for Install": "Your installer is ready to begin.",
+  "Paid": "We\'re assigning your dedicated installer now.",
+  "Ready for Install": "Your installer is ready — build starts soon.",
   "Configuring": "Your automation flows are being built right now.",
-  "Testing": "Almost there — final tests running.",
-  "Live": "Your system is live and capturing leads.",
-  "Error": "Our team is working to resolve the issue.",
+  "Testing": "Almost there — final end-to-end tests running.",
+  "Live": "Your system is live and capturing leads 24/7.",
+  "Error": "Our team has been notified and is resolving the issue.",
 };
 
-export default function GoLiveCountdown({ installStatus }) {
+export default function GoLiveCountdown({ installStatus, createdDate }) {
+  const { daysRemaining, targetDate, overdue } = useMemo(() => {
+    if (!createdDate || installStatus === "Live" || installStatus === "Error") {
+      return { daysRemaining: null, targetDate: null, overdue: false };
+    }
+    const start = new Date(createdDate);
+    const target = addBusinessDays(start, TOTAL_BUSINESS_DAYS);
+    const today = new Date();
+    const remaining = businessDaysBetween(today, target);
+    return {
+      daysRemaining: Math.max(remaining, 0),
+      targetDate: target,
+      overdue: today > target,
+    };
+  }, [createdDate, installStatus]);
+
   if (installStatus === "Live") {
     return (
       <div style={{
         borderRadius: "14px",
-        background: "linear-gradient(135deg, rgba(34,197,94,0.08) 0%, rgba(34,197,94,0.04) 100%)",
+        background: "linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.04))",
         border: "1px solid rgba(34,197,94,0.2)",
-        padding: "18px 20px",
-        marginBottom: "20px",
+        padding: "18px 20px", marginBottom: "20px",
         display: "flex", alignItems: "center", gap: "14px",
       }}>
-        <div style={{
-          width: "44px", height: "44px", borderRadius: "12px", flexShrink: 0,
-          background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)",
-          display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px",
-        }}>🚀</div>
+        <div style={{ width:"44px",height:"44px",borderRadius:"12px",flexShrink:0,background:"rgba(34,197,94,0.15)",border:"1px solid rgba(34,197,94,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"22px" }}>🚀</div>
         <div>
-          <p style={{ fontSize: "14px", fontWeight: "800", color: "#16a34a", margin: "0 0 3px" }}>Your System is Live!</p>
-          <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.55)", margin: 0 }}>
-            Your automation is running and responding to leads 24/7.
-          </p>
+          <p style={{ fontSize:"14px",fontWeight:"800",color:"#16a34a",margin:"0 0 3px" }}>Your System is Live!</p>
+          <p style={{ fontSize:"12px",color:"rgba(27,20,13,0.55)",margin:0 }}>Your automation is running and responding to leads 24/7.</p>
         </div>
       </div>
     );
@@ -46,56 +74,56 @@ export default function GoLiveCountdown({ installStatus }) {
   if (installStatus === "Error") {
     return (
       <div style={{
-        borderRadius: "14px",
-        background: "rgba(239,68,68,0.05)",
+        borderRadius: "14px", background: "rgba(239,68,68,0.05)",
         border: "1px solid rgba(239,68,68,0.2)",
-        padding: "18px 20px",
-        marginBottom: "20px",
+        padding: "18px 20px", marginBottom: "20px",
         display: "flex", alignItems: "center", gap: "14px",
       }}>
-        <div style={{
-          width: "44px", height: "44px", borderRadius: "12px", flexShrink: 0,
-          background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.25)",
-          display: "flex", alignItems: "center", justifyContent: "center", fontSize: "22px",
-        }}>⚠️</div>
+        <div style={{ width:"44px",height:"44px",borderRadius:"12px",flexShrink:0,background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.25)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"22px" }}>⚠️</div>
         <div>
-          <p style={{ fontSize: "14px", fontWeight: "800", color: "#dc2626", margin: "0 0 3px" }}>Action Needed</p>
-          <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.55)", margin: 0 }}>
-            Our team has been notified and is working on a fix.
-          </p>
+          <p style={{ fontSize:"14px",fontWeight:"800",color:"#dc2626",margin:"0 0 3px" }}>Action Needed</p>
+          <p style={{ fontSize:"12px",color:"rgba(27,20,13,0.55)",margin:0 }}>Our team has been notified and is working on a fix. We\'ll update you shortly.</p>
         </div>
       </div>
     );
   }
 
-  const days = STAGE_DAYS_REMAINING[installStatus] ?? 7;
-  const message = STAGE_MESSAGE[installStatus] || "";
+  const message = STAGE_MESSAGE[installStatus] || "Your installation is in progress.";
+  const friendlyTarget = targetDate
+    ? targetDate.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
+    : null;
 
   return (
     <div style={{
       borderRadius: "14px",
-      background: "linear-gradient(135deg, rgba(154,92,46,0.07) 0%, rgba(200,150,92,0.04) 100%)",
-      border: "1px solid rgba(154,92,46,0.14)",
-      padding: "18px 20px",
-      marginBottom: "20px",
-      display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap",
+      background: overdue
+        ? "linear-gradient(135deg, rgba(239,68,68,0.06), rgba(239,68,68,0.03))"
+        : "linear-gradient(135deg, rgba(154,92,46,0.07), rgba(200,150,92,0.04))",
+      border: overdue ? "1px solid rgba(239,68,68,0.2)" : "1px solid rgba(154,92,46,0.14)",
+      padding: "18px 20px", marginBottom: "20px",
+      display: "flex", alignItems: "center", gap: "14px",
     }}>
-      {/* Big number */}
       <div style={{
-        width: "60px", height: "60px", borderRadius: "14px", flexShrink: 0,
-        background: "linear-gradient(135deg, rgba(154,92,46,0.12), rgba(200,150,92,0.08))",
-        border: "1px solid rgba(154,92,46,0.18)",
-        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        width:"44px",height:"44px",borderRadius:"12px",flexShrink:0,
+        background: overdue ? "rgba(239,68,68,0.1)" : "rgba(154,92,46,0.1)",
+        border: overdue ? "1px solid rgba(239,68,68,0.2)" : "1px solid rgba(154,92,46,0.15)",
+        display:"flex",alignItems:"center",justifyContent:"center",fontSize:"22px",
       }}>
-        <span style={{ fontSize: "22px", fontWeight: "900", color: "#9a5c2e", lineHeight: 1 }}>{days}</span>
-        <span style={{ fontSize: "9px", fontWeight: "700", color: "rgba(154,92,46,0.65)", textTransform: "uppercase", letterSpacing: "0.08em" }}>days</span>
+        {overdue ? "⏰" : "🔧"}
       </div>
-      <div>
-        <p style={{ fontSize: "13px", fontWeight: "800", color: "#1b140d", margin: "0 0 4px" }}>
-          Estimated Time to Live
+      <div style={{ flex: 1 }}>
+        <p style={{ fontSize:"14px",fontWeight:"800",color: overdue ? "#dc2626" : "#1b140d",margin:"0 0 3px" }}>
+          {overdue
+            ? "Checking in with your installer"
+            : daysRemaining === 0
+              ? "Going live today!"
+              : `${daysRemaining} business day${daysRemaining === 1 ? "" : "s"} remaining`}
         </p>
-        <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.55)", margin: 0, lineHeight: 1.5 }}>
+        <p style={{ fontSize:"12px",color:"rgba(27,20,13,0.55)",margin:0 }}>
           {message}
+          {friendlyTarget && !overdue && (
+            <span style={{ color:"rgba(27,20,13,0.4)" }}> · Target: {friendlyTarget}</span>
+          )}
         </p>
       </div>
     </div>

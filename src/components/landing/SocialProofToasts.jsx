@@ -54,7 +54,10 @@ export default function SocialProofToasts() {
           </p>
           <p className="text-xs text-muted-foreground">{current.action} - {current.location}</p>
         </div>
-        <p className="text-[10px] text-muted-foreground/60 flex-shrink-0">{current.ago}</p>
+        <div className="flex flex-col items-end flex-shrink-0">
+          <p className="text-[10px] text-muted-foreground/60">{current.ago}</p>
+          <p className="text-[9px] text-muted-foreground/40 italic">example</p>
+        </div>
       </div>
     </div>
   );

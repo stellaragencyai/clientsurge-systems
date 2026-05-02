@@ -1,15 +1,23 @@
 import { useEffect, useState, useRef } from "react";
+
+function timeAgo(ts) {
+  const secs = Math.floor((Date.now() - ts) / 1000);
+  if (secs < 10) return "just now";
+  if (secs < 60) return `${secs}s ago`;
+  const mins = Math.floor(secs / 60);
+  return `${mins}m ago`;
+}
 import { Zap, MessageSquare, PhoneCall, CalendarCheck, RefreshCw, Mail, ArrowRight } from "lucide-react";
 import DemoBookingModal from "../forms/DemoBookingModal";
 
 const EVENT_POOL = [
   { icon: Zap, color: "#16a34a", bg: "rgba(22,163,74,0.1)", city: "Scottsdale, AZ", event: "New lead captured from Google Ads", detail: "Responded in 12 seconds" },
   { icon: PhoneCall, color: "#dc2626", bg: "rgba(220,38,38,0.08)", city: "Phoenix, AZ", event: "Missed call received", detail: "Text-back sent in 8 seconds" },
-  { icon: CalendarCheck, color: "#9a5c2e", bg: "rgba(154,92,46,0.1)", city: "Tempe, AZ", event: "Consultation booked", detail: "Lead qualified via SMS in 4 min" },
-  { icon: MessageSquare, color: "#7c3aed", bg: "rgba(124,58,237,0.08)", city: "Chandler, AZ", event: "Follow-up sequence triggered", detail: "Day 3 of 14-day nurture" },
-  { icon: RefreshCw, color: "#0891b2", bg: "rgba(8,145,178,0.08)", city: "Glendale, AZ", event: "Dormant lead reactivated", detail: "Re-engagement sent after 21 days" },
-  { icon: Mail, color: "#9a5c2e", bg: "rgba(154,92,46,0.08)", city: "Mesa, AZ", event: "Booking confirmation sent", detail: "Email + SMS confirmed" },
-  { icon: Zap, color: "#16a34a", bg: "rgba(22,163,74,0.1)", city: "Gilbert, AZ", event: "Lead captured from Facebook form", detail: "Responded in 9 seconds" },
+  { icon: CalendarCheck, color: "#9a5c2e", bg: "rgba(154,92,46,0.1)", city: "Austin, TX", event: "Consultation booked", detail: "Lead qualified via SMS in 4 min" },
+  { icon: MessageSquare, color: "#7c3aed", bg: "rgba(124,58,237,0.08)", city: "Miami, FL", event: "Follow-up sequence triggered", detail: "Day 3 of 14-day nurture" },
+  { icon: RefreshCw, color: "#0891b2", bg: "rgba(8,145,178,0.08)", city: "Denver, CO", event: "Dormant lead reactivated", detail: "Re-engagement sent after 21 days" },
+  { icon: Mail, color: "#9a5c2e", bg: "rgba(154,92,46,0.08)", city: "Nashville, TN", event: "Booking confirmation sent", detail: "Email + SMS confirmed" },
+  { icon: Zap, color: "#16a34a", bg: "rgba(22,163,74,0.1)", city: "Dallas, TX", event: "Lead captured from Facebook form", detail: "Responded in 9 seconds" },
   { icon: CalendarCheck, color: "#9a5c2e", bg: "rgba(154,92,46,0.1)", city: "Scottsdale, AZ", event: "Appointment confirmed", detail: "No-show reminder scheduled" },
   { icon: PhoneCall, color: "#dc2626", bg: "rgba(220,38,38,0.08)", city: "Phoenix, AZ", event: "After-hours inquiry received", detail: "Instant response sent at 11:43 PM" },
   { icon: MessageSquare, color: "#7c3aed", bg: "rgba(124,58,237,0.08)", city: "Peoria, AZ", event: "Quote request follow-up", detail: "2nd touchpoint in sequence" },
@@ -35,7 +43,7 @@ function FeedItem({ item, isNew }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <p className="text-sm font-semibold text-foreground leading-snug">{item.event}</p>
-          <span className="text-[10px] text-foreground/40 whitespace-nowrap flex-shrink-0 mt-0.5">{item.city}</span>
+          <span className="text-[10px] text-foreground/40 whitespace-nowrap flex-shrink-0 mt-0.5">{item.city} · {timeAgo(item.timestamp)}</span>
         </div>
         <p className="text-xs text-foreground/55 mt-0.5">{item.detail}</p>
       </div>
@@ -52,14 +60,14 @@ function FeedItem({ item, isNew }) {
 }
 
 export default function LiveAutomationFeed() {
-  const [feed, setFeed] = useState(() => Array.from({ length: 5 }, () => ({ ...randomEvent(), id: Math.random(), isNew: false })));
+  const [feed, setFeed] = useState(() => Array.from({ length: 5 }, () => ({ ...randomEvent(), id: Math.random(), isNew: false, timestamp: Date.now() - Math.floor(Math.random() * 120000) })));
   const [counter, setCounter] = useState({ leads: 847, bookings: 312, recovered: 94 });
   const [showDemoModal, setShowDemoModal] = useState(false);
   const timerRef = useRef(null);
 
   useEffect(() => {
     timerRef.current = setInterval(() => {
-      const newItem = { ...randomEvent(), id: Math.random(), isNew: true };
+      const newItem = { ...randomEvent(), id: Math.random(), isNew: true, timestamp: Date.now() };
       setFeed(prev => {
         const updated = [newItem, ...prev.slice(0, 4)].map((item, i) => ({ ...item, isNew: i === 0 }));
         return updated;

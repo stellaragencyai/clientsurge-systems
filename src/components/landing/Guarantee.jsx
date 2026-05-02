@@ -8,8 +8,8 @@ const guarantees = [
   },
   {
     icon: Zap,
-    title: "Results or We Keep Working",
-    desc: "If your system isn't converting leads at the promised rate, we optimize and adjust at no extra cost until it does."
+    title: "We Optimize Until It Converts",
+    desc: "If your lead response and follow-up system isn't producing measurable booking improvements in 30 days, we keep optimizing at zero additional cost."
   },
   {
     icon: RotateCcw,
@@ -39,7 +39,7 @@ export default function Guarantee() {
         </div>
 
         {/* Guarantee Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {guarantees.map((g, i) => {
             const Icon = g.icon;
             return (
