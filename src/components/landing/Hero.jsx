@@ -12,7 +12,7 @@ const checklist = [
 "Missed calls instantly turn into text conversations, not dead ends",
 "14 days of automated follow-up keeps leads warm without manual work",
 "Guided booking flow converts ready prospects into confirmed appointments",
-"Fully built and live in 5–7 business days — we handle everything"];
+"Fully built and live in 24–48 hours — we handle everything"];
 
 
 export default function Hero() {
@@ -192,7 +192,7 @@ export default function Hero() {
               color: "rgba(27,20,13,0.48)",
               letterSpacing: "0.04em"
             }} style={{ marginTop: "18px", fontSize: "12px", color: "rgba(27,20,13,0.48)", letterSpacing: "0.04em" }}>
-            No contracts · Most clients go live in 5–7 business days
+            No contracts · Most clients go live in 24–48 hours
           </p>
         </div>
 
