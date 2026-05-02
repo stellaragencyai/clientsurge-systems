@@ -137,6 +137,7 @@ const DEMO_MODES = {
   },
 };
 
+// Enhancement 1: True iPadOS status bar with proper layout
 function StatusBar() {
   const [time, setTime] = useState("");
 
@@ -149,98 +150,61 @@ function StatusBar() {
       hours = hours % 12 || 12;
       return `${hours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
     };
-
     setTime(formatTime());
     const intervalId = setInterval(() => setTime(formatTime()), 1000);
     return () => clearInterval(intervalId);
   }, []);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "4px 14px 2px",
-        height: "20px",
-      }}
-    >
-      <span
-        style={{
-          fontSize: "10px",
-          fontWeight: "700",
-          color: "rgba(26,18,9,0.75)",
-          letterSpacing: "0.02em",
-        }}
-      >
+    <div style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "6px 16px 4px",
+      height: "28px",
+      position: "relative",
+    }}>
+      {/* Left: Time */}
+      <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(26,18,9,0.82)", letterSpacing: "-0.02em", minWidth: "48px" }}>
         {time}
       </span>
 
+      {/* Center: TrueDepth camera pill (iPadOS 16+) */}
+      <div style={{
+        position: "absolute", left: "50%", top: "5px", transform: "translateX(-50%)",
+        width: "56px", height: "14px", borderRadius: "999px",
+        background: "#0a0a0a",
+        display: "flex", alignItems: "center", justifyContent: "center", gap: "5px",
+        boxShadow: "0 0 0 1px rgba(0,0,0,0.2), inset 0 1px 2px rgba(0,0,0,0.5)",
+      }}>
+        {/* Dot camera */}
+        <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#1a1a2e", border: "1px solid rgba(60,80,160,0.5)", boxShadow: "0 0 3px rgba(60,80,160,0.6)" }} />
+        {/* FaceID sensor strip */}
+        <div style={{ width: "14px", height: "3px", borderRadius: "2px", background: "#1a1a2e", border: "1px solid rgba(255,255,255,0.06)" }} />
+      </div>
+
+      {/* Right: iOS-style system icons */}
       <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-        <svg width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
-          {[0, 1, 2, 3].map((index) => (
-            <rect
-              key={index}
-              x={index * 3.5}
-              y={10 - (index + 1) * 2.5}
-              width="2.5"
-              height={(index + 1) * 2.5}
-              rx="0.5"
-              fill="rgba(26,18,9,0.65)"
-            />
+        {/* Cellular bars */}
+        <svg width="13" height="10" viewBox="0 0 13 10" aria-hidden="true">
+          {[0,1,2,3].map(i => (
+            <rect key={i} x={i * 3.2} y={10 - (i+1)*2.4} width="2.4" height={(i+1)*2.4} rx="0.6"
+              fill={i < 3 ? "rgba(26,18,9,0.75)" : "rgba(26,18,9,0.2)"} />
           ))}
         </svg>
-        <svg width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
-          <path
-            d="M7 8.5 C7 8.5 7 8.5 7 8.5"
-            stroke="rgba(26,18,9,0.65)"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-          />
-          <path
-            d="M4.5 6.5 C5.2 5.8 5.9 5.5 7 5.5 C8.1 5.5 8.8 5.8 9.5 6.5"
-            stroke="rgba(26,18,9,0.65)"
-            strokeWidth="1.3"
-            fill="none"
-            strokeLinecap="round"
-          />
-          <path
-            d="M2.2 4.2 C3.5 2.9 5.1 2.2 7 2.2 C8.9 2.2 10.5 2.9 11.8 4.2"
-            stroke="rgba(26,18,9,0.65)"
-            strokeWidth="1.3"
-            fill="none"
-            strokeLinecap="round"
-          />
+        {/* WiFi */}
+        <svg width="13" height="10" viewBox="0 0 13 10" fill="none" aria-hidden="true">
+          <circle cx="6.5" cy="9" r="1.2" fill="rgba(26,18,9,0.75)" />
+          <path d="M3.8 6.8 C4.7 5.9 5.5 5.5 6.5 5.5 C7.5 5.5 8.3 5.9 9.2 6.8" stroke="rgba(26,18,9,0.75)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+          <path d="M1.5 4.5 C3.1 2.8 4.7 2 6.5 2 C8.3 2 9.9 2.8 11.5 4.5" stroke="rgba(26,18,9,0.5)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
         </svg>
+        {/* Battery — iPadOS style (wider) */}
         <div style={{ display: "flex", alignItems: "center", gap: "1px" }}>
-          <div
-            style={{
-              width: "18px",
-              height: "9px",
-              borderRadius: "2px",
-              border: "1px solid rgba(26,18,9,0.5)",
-              padding: "1px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <div
-              style={{
-                width: "75%",
-                height: "100%",
-                borderRadius: "1px",
-                background: "#22c55e",
-              }}
-            />
+          <div style={{ width: "22px", height: "10px", borderRadius: "3px", border: "1.5px solid rgba(26,18,9,0.5)", padding: "1.5px", display: "flex", alignItems: "center", position: "relative" }}>
+            <div style={{ width: "80%", height: "100%", borderRadius: "1.5px", background: "linear-gradient(90deg, #34d399, #22c55e)" }} />
+            <span style={{ position: "absolute", right: "2px", fontSize: "6px", fontWeight: "800", color: "rgba(26,18,9,0.6)" }}>80</span>
           </div>
-          <div
-            style={{
-              width: "2px",
-              height: "4px",
-              borderRadius: "0 1px 1px 0",
-              background: "rgba(26,18,9,0.4)",
-            }}
-          />
+          <div style={{ width: "2px", height: "5px", borderRadius: "0 1.5px 1.5px 0", background: "rgba(26,18,9,0.4)" }} />
         </div>
       </div>
     </div>
@@ -616,7 +580,6 @@ export default function HeroDashboardScreen() {
       style={{
         width: "100%",
         height: "100%",
-        background: "#f8f5f0",
         borderRadius: "12px",
         display: "flex",
         flexDirection: "column",
@@ -626,13 +589,26 @@ export default function HeroDashboardScreen() {
         WebkitFontSmoothing: "antialiased",
         MozOsxFontSmoothing: "grayscale",
         textRendering: "optimizeLegibility",
+        /* Enhancement 2: iPadOS wallpaper background */
+        background: "linear-gradient(160deg, #1a2a4a 0%, #0f1d35 18%, #1a3050 35%, #2d1a4a 55%, #1a2035 75%, #0d1525 100%)",
       }}
     >
+      {/* Enhancement 2: iPadOS blurred wallpaper layer — frosted glass effect */}
+      <div aria-hidden="true" style={{
+        position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none", borderRadius: "12px", overflow: "hidden",
+      }}>
+        {/* Glowing orbs like Apple wallpapers */}
+        <div style={{ position: "absolute", top: "-10%", left: "20%", width: "55%", height: "55%", borderRadius: "50%", background: "radial-gradient(circle, rgba(120,80,200,0.55) 0%, transparent 70%)", filter: "blur(28px)" }} />
+        <div style={{ position: "absolute", bottom: "5%", right: "5%", width: "45%", height: "45%", borderRadius: "50%", background: "radial-gradient(circle, rgba(40,120,220,0.45) 0%, transparent 70%)", filter: "blur(24px)" }} />
+        <div style={{ position: "absolute", top: "30%", left: "-5%", width: "40%", height: "40%", borderRadius: "50%", background: "radial-gradient(circle, rgba(200,80,120,0.3) 0%, transparent 70%)", filter: "blur(28px)" }} />
+        {/* Frosted glass overlay — the actual app UI sits on top of this */}
+        <div style={{ position: "absolute", inset: 0, background: "rgba(248,245,240,0.88)", backdropFilter: "blur(0px)" }} />
+      </div>
       {/* Enhancement 3: Glass glare sweep */}
       <div style={{
         position: "absolute",
         inset: 0,
-        zIndex: 50,
+        zIndex: 60,
         pointerEvents: "none",
         overflow: "hidden",
         borderRadius: "12px",
@@ -672,6 +648,8 @@ export default function HeroDashboardScreen() {
           gap: "10px",
           padding: "0 14px 0",
           overflow: "hidden",
+          position: "relative",
+          zIndex: 2,
         }}
       >
         <div
@@ -1136,23 +1114,64 @@ export default function HeroDashboardScreen() {
         </div>
       </div>
 
-      <div
-        style={{
+      {/* Enhancement 3: iPadOS Dock */}
+      <div style={{
+        flexShrink: 0,
+        padding: "6px 16px 8px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "6px",
+        position: "relative",
+        zIndex: 2,
+      }}>
+        {/* Dock bar — frosted glass */}
+        <div style={{
           display: "flex",
-          justifyContent: "center",
           alignItems: "center",
-          height: "20px",
-          flexShrink: 0,
-        }}
-      >
-        <div
-          style={{
-            width: "32%",
-            height: "4px",
-            borderRadius: "9999px",
-            background: "rgba(26,18,9,0.18)",
-          }}
-        />
+          justifyContent: "center",
+          gap: "10px",
+          background: "rgba(255,255,255,0.28)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderRadius: "18px",
+          padding: "7px 16px",
+          border: "1px solid rgba(255,255,255,0.45)",
+          boxShadow: "0 2px 16px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.5)",
+        }}>
+          {/* Safari */}
+          <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "linear-gradient(145deg, #007aff 0%, #00c4ff 100%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,122,255,0.4)" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1.5"/>
+              <line x1="12" y1="2" x2="12" y2="22" stroke="white" strokeWidth="1" opacity="0.5"/>
+              <line x1="2" y1="12" x2="22" y2="12" stroke="white" strokeWidth="1" opacity="0.5"/>
+              <polygon points="12,5 15,12 12,19 9,12" fill="none" stroke="white" strokeWidth="1.2"/>
+              <circle cx="12" cy="12" r="2" fill="white"/>
+              <line x1="14.1" y1="9.9" x2="9.9" y2="14.1" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </div>
+          {/* Messages */}
+          <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "linear-gradient(145deg, #34c759 0%, #30d158 100%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(52,199,89,0.4)" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+              <path d="M12 2C6.48 2 2 6.04 2 11c0 2.64 1.14 5.01 2.97 6.72L4 20l2.5-.83C7.9 19.67 9.9 20 12 20c5.52 0 10-4.04 10-9S17.52 2 12 2z"/>
+            </svg>
+          </div>
+          {/* Calendar */}
+          <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "linear-gradient(145deg, #fff 0%, #f5f5f5 100%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.15)", border: "1px solid rgba(0,0,0,0.08)" }}>
+            <div style={{ textAlign: "center", lineHeight: 1 }}>
+              <div style={{ fontSize: "5px", fontWeight: "800", color: "#ff3b30", textTransform: "uppercase", letterSpacing: "0.04em" }}>MAY</div>
+              <div style={{ fontSize: "11px", fontWeight: "700", color: "#1c1c1e" }}>{new Date().getDate()}</div>
+            </div>
+          </div>
+          {/* Settings */}
+          <div style={{ width: "32px", height: "32px", borderRadius: "8px", background: "linear-gradient(145deg, #8e8e93 0%, #636366 100%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(100,100,100,0.35)" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+              <path d="M12 15.5A3.5 3.5 0 018.5 12 3.5 3.5 0 0112 8.5a3.5 3.5 0 013.5 3.5 3.5 3.5 0 01-3.5 3.5m7.43-2.92c.04-.34.07-.68.07-1.08s-.03-.74-.07-1.08l2.3-1.82c.21-.16.27-.45.14-.68l-2.2-3.84c-.12-.22-.39-.3-.61-.22l-2.72 1.1c-.57-.44-1.18-.8-1.85-1.07L14.17 3c-.04-.24-.24-.42-.5-.42h-4.4c-.26 0-.46.18-.5.42l-.41 2.89c-.67.27-1.28.63-1.85 1.07l-2.72-1.1c-.23-.08-.5 0-.61.22L1.38 9.92c-.14.23-.08.52.14.68l2.3 1.82a7.6 7.6 0 000 2.16l-2.3 1.82c-.22.16-.28.45-.14.68l2.2 3.84c.12.22.39.3.61.22l2.72-1.1c.57.44 1.18.8 1.85 1.07l.41 2.89c.04.24.24.42.5.42h4.4c.26 0 .46-.18.5-.42l.41-2.89c.67-.27 1.28-.63 1.85-1.07l2.72 1.1c.23.08.5 0 .61-.22l2.2-3.84c.14-.23.08-.52-.14-.68l-2.3-1.82z"/>
+            </svg>
+          </div>
+        </div>
+        {/* Home indicator pill */}
+        <div style={{ width: "28%", height: "4px", borderRadius: "9999px", background: "rgba(26,18,9,0.2)" }} />
       </div>
 
       <style>{`
