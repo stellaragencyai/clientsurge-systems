@@ -4,23 +4,23 @@
  */
 
 export const BUTTON_TEXT = {
-  BOOK_DEMO: "Book Your Free Demo",
-  BOOK_DEMO_SHORT: "Book Demo",
+  BOOK_DEMO: "Get Your Free Audit",
+  BOOK_DEMO_SHORT: "Get Your Free Audit",
   GET_STARTED: "Get Started",
   VIEW_PRICING: "View Pricing",
-  SCHEDULE_DEMO: "Schedule Demo",
-  WATCH_DEMO: "Watch Demo",
+  SCHEDULE_DEMO: "Get Your Free Audit",
+  WATCH_DEMO: "See How It Works",
   SEE_IN_ACTION: "See this in action",
 };
 
 export const BUTTON_STYLES = {
-  BROWN_GRADIENT: {
-    background: "linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 40%, #7a4825 100%)",
+  PRIMARY_GRADIENT: {
+    background: "linear-gradient(135deg, #0055cc 0%, #00D4FF 100%)",
     borderRadius: "9999px",
-    boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+    boxShadow: "0 4px 18px rgba(0,100,220,0.35)",
   },
-  BROWN_GRADIENT_HOVER: {
-    boxShadow: "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)",
+  PRIMARY_GRADIENT_HOVER: {
+    boxShadow: "0 8px 40px rgba(0,180,255,0.5), 0 4px 18px rgba(0,100,220,0.35)",
   },
 };
 
