@@ -64,16 +64,7 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
 
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const progress = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / (rect.height + window.innerHeight * 0.3)));
-      setSpineProgress(progress);
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    setSpineProgress(1);
   }, []);
 
   const system = systemsById[selectedSystemId];

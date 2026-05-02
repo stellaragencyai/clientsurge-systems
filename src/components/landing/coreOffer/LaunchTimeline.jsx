@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react"; // useRef kept for useInView
 import { motion } from "framer-motion";
 import { ArrowDown, ArrowRight, CheckCircle2 } from "lucide-react";
 import { launchTimelineSteps, iconMap } from "./coreOfferData";
@@ -387,10 +387,7 @@ function TimelineArrowCTA({ onBookDemo }) {
 export default function LaunchTimeline() {
   const [headerRef, headerVisible] = useInView(0.2);
   const [activeStep, setActiveStep] = useState(0);
-  const lineContainerRef = useRef(null);
   const { openDemoBooking } = useDemoBooking();
-
-
 
   const handleTrackerClick = (idx) => {
     setActiveStep(idx);
@@ -529,7 +526,7 @@ export default function LaunchTimeline() {
       </div>
 
       {/* Detailed vertical timeline */}
-      <div ref={lineContainerRef} className="relative">
+      <div className="relative">
         {/* Background static line */}
         <div
           className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block"
