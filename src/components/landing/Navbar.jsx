@@ -126,7 +126,7 @@ export default function Navbar() {
         transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out",
       }}
     >
-      <div className="w-full h-14 md:h-16 flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
+      <div className="w-full h-[72px] md:h-[84px] flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
         <button
           onClick={handleLogoClick}
           className="font-display font-bold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5 md:gap-2"
@@ -137,7 +137,7 @@ export default function Navbar() {
             alt="ClientSurge Systems"
             fetchpriority="high"
             decoding="async"
-            style={{ height: "52px", width: "auto", objectFit: "contain" }}
+            style={{ height: "69px", width: "auto", objectFit: "contain" }}
           />
         </button>
 
