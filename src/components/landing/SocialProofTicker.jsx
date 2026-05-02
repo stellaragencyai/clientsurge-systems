@@ -57,7 +57,7 @@ export default function SocialProofTicker() {
           color: "#1b140d",
           margin: 0,
           textAlign: "center"
-        }} className=" hidden hidden">
+        }} className=" hidden hidden hidden hidden">
         
         {stats[activeIndex]}
       </motion.p>
@@ -68,7 +68,7 @@ export default function SocialProofTicker() {
           borderRadius: "50%",
           background: "#c8965c",
           animation: "pulse 2s ease-in-out infinite 0.3s"
-        }} />
+        }} className=" hidden" />
       
       <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}`}</style>
     </div>);
