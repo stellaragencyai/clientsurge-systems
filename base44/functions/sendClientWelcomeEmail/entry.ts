@@ -5,7 +5,10 @@ const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL");
 
 Deno.serve(async (req) => {
   try {
-    const { order_id } = await req.json();
+    const body = await req.json();
+
+    // Support both direct calls ({ order_id }) and entity automation payloads ({ event, data })
+    const order_id = body.order_id || body.event?.entity_id || body.data?.id;
 
     if (!order_id) {
       return Response.json({ error: "Missing order_id" }, { status: 400 });
