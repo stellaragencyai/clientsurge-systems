@@ -3,7 +3,8 @@ import { base44 } from "@/api/base44Client";
 import MetricsDashboard from "./MetricsDashboard";
 import AutomationRulesPanel from "./AutomationRulesPanel";
 import RevenueAttributionDashboard from "./RevenueAttributionDashboard";
-import { Settings, BarChart3, Zap, TrendingUp } from "lucide-react";
+import { Settings, BarChart3, Zap, TrendingUp, Webhook } from "lucide-react";
+import WebhookConfigPanel from "./webhook/WebhookConfigPanel";
 
 export default function AdminDashboardLayout() {
   const [projectId, setProjectId] = useState(null);
@@ -74,6 +75,12 @@ export default function AdminDashboardLayout() {
       label: "Revenue Attribution",
       icon: TrendingUp,
       component: <RevenueAttributionDashboard projectId={projectId} />,
+    },
+    {
+      id: "webhooks",
+      label: "Webhooks",
+      icon: Webhook,
+      component: <WebhookConfigPanel />,
     },
     {
       id: "settings",
