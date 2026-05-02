@@ -66,10 +66,7 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
       type="button"
       onClick={() => onSelect(system.id)}
       whileHover={{ y: -2 }}
-      initial={{ opacity: 0, x: -50 }}
-      whileInView={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      viewport={{ once: true, margin: "-50px" }}
       className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       style={{
         background: "rgba(255,255,255,0.82)",
@@ -119,10 +116,7 @@ function SystemGroupList({ selectedSystemId, onSelect, onAddToStack }) {
       {systemGroups.map((group) =>
       <motion.div
         key={group.id}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        viewport={{ once: true }}>
+        transition={{ duration: 0.5 }}>
         
           <div className="flex items-center gap-4 mb-4 md:mb-5">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
@@ -133,10 +127,7 @@ function SystemGroupList({ selectedSystemId, onSelect, onAddToStack }) {
             {group.systems.map((systemId, idx) =>
           <motion.div
             key={systemId}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.4, delay: idx * 0.1 }}
-            viewport={{ once: true }}>
+            transition={{ duration: 0.4, delay: idx * 0.1 }}>
             
                 <SystemCard
               system={systemsById[systemId]}
@@ -314,8 +305,6 @@ export default function CoreOffer() {
         {/* Stack Builder Button */}
         <motion.div
           className="mt-8 flex justify-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
           transition={{ delay: 0.3 }}>
           
           <button
