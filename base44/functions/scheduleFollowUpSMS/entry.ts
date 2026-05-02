@@ -1,5 +1,5 @@
 /**
- * scheduleFollowUpSMS
+ * scheduleFollowUpSMS — redeployed 2026-05-02
  * Scheduled: Every 15 minutes
  * Purpose: Send the initial 15-minute follow-up SMS to new CRM leads
  *          that have a phone number and haven't been contacted yet.
