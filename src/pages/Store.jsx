@@ -493,30 +493,30 @@ function StoreInner() {
 
 
             <div style={{ display: "flex", gap: "10px", marginBottom: "18px", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
-              <button
-                onClick={() => setShowComparison(true)}
-                style={{
-                  borderRadius: "9999px",
-                  padding: "8px 20px",
-                  fontSize: "12px",
-                  fontWeight: "600",
-                  border: "1.5px solid rgba(154,92,46,0.3)",
-                  background: "rgba(255,255,255,0.7)",
-                  color: "#9a5c2e",
-                  cursor: "pointer",
-                  transition: "all 0.2s"
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.9)";
-                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.5)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.7)";
-                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.3)";
-                }} className=" hidden">
-                
-                📊 Compare All Services
-              </button>
+              
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              
               <GuidedPathToggle mode={pathMode} onModeChange={setPathMode} />
             </div>
 
