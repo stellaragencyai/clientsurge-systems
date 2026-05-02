@@ -152,19 +152,20 @@ export default function Pricing() {
             { icon: "⚡", text: "Live in 5–7 business days" },
             { icon: "💬", text: "SMS + Email included" },
             { icon: "🎯", text: "Done-for-you setup" },
-            { icon: "🛡️", text: "30-day money-back guarantee" },
           ].map((badge) => (
             <div
               key={badge.text}
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold"
+              className="flex items-center gap-3 px-6 py-4 rounded-2xl font-semibold"
               style={{
                 background: "rgba(154,92,46,0.08)",
                 border: "1px solid rgba(154,92,46,0.18)",
                 color: "rgba(154,92,46,0.9)",
+                minWidth: "180px",
+                justifyContent: "center",
               }}
             >
-              <span>{badge.icon}</span>
-              <span>{badge.text}</span>
+              <span style={{ fontSize: "22px", lineHeight: 1 }}>{badge.icon}</span>
+              <span style={{ fontSize: "14px" }}>{badge.text}</span>
             </div>
           ))}
         </div>
