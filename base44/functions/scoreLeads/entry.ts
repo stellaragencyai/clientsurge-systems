@@ -1,5 +1,6 @@
 /**
- * scoreLeads — batch re-scores ALL Leads and persists lead_score + activation_priority.
+ * scoreLeads — redeployed 2026-05-02
+ * Batch re-scores ALL Leads and persists lead_score + activation_priority.
  * Admin-only. Called manually from Priority Queue "Re-Score" button or on a schedule.
  *
  * Scoring model (additive, capped at 100):

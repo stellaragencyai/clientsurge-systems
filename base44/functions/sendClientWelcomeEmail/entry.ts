@@ -5,13 +5,22 @@ const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL");
 
 Deno.serve(async (req) => {
   try {
-    const { order_id } = await req.json();
+    const base44 = createClientFromRequest(req);
+
+    const body = await req.json().catch(() => ({}));
+
+    // Support direct calls ({ order_id }), entity automation payloads ({ event: { entity_id }, data })
+    // and cases where the full entity is passed as the top-level body
+    const order_id =
+      body.order_id ||
+      body.event?.entity_id ||
+      body.data?.id ||
+      body.id;
 
     if (!order_id) {
+      console.error("[Welcome Email] No order_id found in payload:", JSON.stringify(body));
       return Response.json({ error: "Missing order_id" }, { status: 400 });
     }
-
-    const base44 = createClientFromRequest(req);
 
     // Fetch the order
     const order = await base44.asServiceRole.entities.Order.get(order_id);

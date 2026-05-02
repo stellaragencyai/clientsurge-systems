@@ -25,9 +25,61 @@ function SimpleCheck() {
 
 }
 
+const STRIPE_LINKS = {
+  starter: "https://buy.stripe.com/test_4gM14pfeU8uV3Sk7bYcfK09",
+  growth:  "https://buy.stripe.com/test_eVq14p8Qw7qR9cE2VIcfK0a",
+  elite:   "https://buy.stripe.com/test_00w8wR9UAfXn0G82VIcfK0b",
+};
+
+const ALA_CARTE = [
+  {
+    emoji: "💬",
+    name: "Instant Lead Response SMS",
+    desc: "Auto-text every new lead within 60 seconds of form submission.",
+    price: "$297 setup · $197/mo",
+    link: "https://buy.stripe.com/test_4gM14pfeU8uV3Sk7bYcfK09",
+  },
+  {
+    emoji: "📞",
+    name: "Missed Call Text-Back",
+    desc: "Recover missed calls automatically with a personalized SMS reply.",
+    price: "$297 setup · $197/mo",
+    link: "https://buy.stripe.com/test_4gM14pfeU8uV3Sk7bYcfK09",
+  },
+  {
+    emoji: "🔁",
+    name: "14-Day Nurture Sequence",
+    desc: "Multi-touch SMS + email follow-up to convert cold leads over time.",
+    price: "$497 setup · $297/mo",
+    link: "https://buy.stripe.com/test_eVq14p8Qw7qR9cE2VIcfK0a",
+  },
+  {
+    emoji: "🤖",
+    name: "AI Booking Agent",
+    desc: "Qualifies leads and books appointments automatically via SMS.",
+    price: "$697 setup · $397/mo",
+    link: "https://buy.stripe.com/test_eVq14p8Qw7qR9cE2VIcfK0a",
+  },
+  {
+    emoji: "🔥",
+    name: "Lead Reactivation Campaign",
+    desc: "Re-engage old or cold leads with a targeted win-back sequence.",
+    price: "$397 setup · $197/mo",
+    link: "https://buy.stripe.com/test_00w8wR9UAfXn0G82VIcfK0b",
+  },
+  {
+    emoji: "⭐",
+    name: "Review Request System",
+    desc: "Automatically request reviews after appointments to boost ratings.",
+    price: "$297 setup · $147/mo",
+    link: "https://buy.stripe.com/test_00w8wR9UAfXn0G82VIcfK0b",
+  },
+];
+
 const plans = [
 {
   name: "Starter System",
+  stripeKey: "starter",
   fit: "For businesses that need faster response and basic lead capture",
   subtitle: "For businesses that need faster response and basic lead capture.",
   desc: "An AI lead conversion system that ensures every new inquiry gets a fast response, enters a simple follow-up flow, and has a clear path to booking.",
@@ -45,6 +97,7 @@ const plans = [
 },
 {
   name: "Growth System",
+  stripeKey: "growth",
   fit: "For businesses already getting leads and losing revenue through slow response or weak follow-up",
   badge: "Most Popular",
   subtitle: "For businesses already getting leads and losing revenue through slow response or weak follow-up.",
@@ -65,6 +118,7 @@ const plans = [
 },
 {
   name: "Elite System",
+  stripeKey: "elite",
   fit: "For businesses that want the full revenue recovery engine — every tool, fully deployed",
   subtitle: "For businesses that want the full revenue recovery engine — every tool, fully deployed.",
   desc: "The complete AI-assisted booking automation and revenue recovery system — old leads reactivated, every inquiry tracked, and the full pipeline optimized.",
@@ -132,6 +186,23 @@ export default function Pricing() {
           </div> :
         null}
 
+        {/* Trust badge row — above plan cards */}
+        <div className="flex flex-wrap justify-center gap-3 mb-8">
+          {[
+            { icon: "🔒", text: "Secure Checkout via Stripe" },
+            { icon: "✅", text: "No Hidden Fees" },
+            { icon: "⚡️", text: "Live in 24–48 Hours" },
+          ].map((b) => (
+            <span
+              key={b.text}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full border"
+              style={{ background: "rgba(154,92,46,0.07)", borderColor: "rgba(154,92,46,0.2)", color: "rgba(100,60,20,0.85)" }}
+            >
+              {b.icon} {b.text}
+            </span>
+          ))}
+        </div>
+
         <StaggeredFadeUp staggerDelay={0.15}>
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-stretch">
             {plans.map((plan, i) =>
@@ -170,6 +241,36 @@ export default function Pricing() {
         </div>
 
         <MoneyBackGuarantee />
+
+        {/* À La Carte Section */}
+        <div className="mt-16">
+          <div className="text-center mb-8">
+            <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-2">À La Carte Add-Ons</h3>
+            <p className="text-sm text-muted-foreground">Need just one specific tool? Add any service individually.</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+            {ALA_CARTE.map((item) => (
+              <div
+                key={item.name}
+                className="flex flex-col rounded-2xl p-6 border"
+                style={{ background: "rgba(255,255,255,0.7)", borderColor: "rgba(154,92,46,0.15)", backdropFilter: "blur(12px)" }}
+              >
+                <div className="text-3xl mb-3">{item.emoji}</div>
+                <h4 className="font-semibold text-foreground text-sm mb-1">{item.name}</h4>
+                <p className="text-xs text-muted-foreground flex-1 mb-3 leading-relaxed">{item.desc}</p>
+                <p className="text-xs font-bold text-primary mb-4">{item.price}</p>
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-1.5 h-9 rounded-full border border-primary/30 bg-primary/5 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors"
+                >
+                  Add This <ArrowRight className="w-3 h-3" />
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="max-w-2xl mb-6 mt-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3 hidden">What&apos;s Included In Setup</p>
@@ -458,49 +559,50 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
           )}
         </ul>
 
-        {plan.highlight ?
-        <button
-          type="button"
-          onClick={() => {
-            if (demoBooking) {
-              demoBooking.openDemoBooking({
-                prefillIndustry: selectedIndustry?.name || ""
-              });
-              return;
-            }
-            window.location.href = "/book";
-          }}
-          className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none"
-          onMouseEnter={(event) => {
-            event.currentTarget.style.boxShadow = "0 8px 32px rgba(161,120,35,0.46), 0 4px 18px rgba(120,70,20,0.35)";
-          }}
-          onMouseLeave={(event) => {
-            event.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35), 0 1px 4px rgba(0,0,0,0.15)";
-          }}>
-          
-            <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
-              Book Your Free Demo
+        {plan.stripeKey === "elite" ? (
+          <div className="flex flex-col gap-1">
+            <a
+              href={STRIPE_LINKS.elite}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none"
+            >
+              <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
+                Get Started — $2,497 Today
+                <ArrowRight className="w-4 h-4" />
+              </span>
+            </a>
+            <p className="text-center text-[11px] text-muted-foreground mt-1">$1,997/mo begins 30 days after go-live</p>
+          </div>
+        ) : plan.highlight ? (
+          <div className="flex flex-col gap-1">
+            <a
+              href={STRIPE_LINKS.growth}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none"
+            >
+              <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
+                Get Started — $1,297 Today
+                <ArrowRight className="w-4 h-4" />
+              </span>
+            </a>
+            <p className="text-center text-[11px] text-muted-foreground mt-1">$997/mo begins 30 days after go-live</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1">
+            <a
+              href={STRIPE_LINKS.starter}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full border border-primary/25 bg-white/80 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
+            >
+              Get Started — $797 Today
               <ArrowRight className="w-4 h-4" />
-            </span>
-          </button> :
-
-        <button
-          type="button"
-          onClick={() => {
-            if (demoBooking) {
-              demoBooking.openDemoBooking({
-                prefillIndustry: selectedIndustry?.name || ""
-              });
-              return;
-            }
-            window.location.href = "/book";
-          }}
-          className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full border border-primary/25 bg-white/82 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors">
-          
-            Book Your Free Demo
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        }
+            </a>
+            <p className="text-center text-[11px] text-muted-foreground mt-1">$497/mo begins 30 days after go-live</p>
+          </div>
+        )}
       </div>
     </motion.div>);
 
