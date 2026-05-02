@@ -7,6 +7,8 @@
 import { motion, useInView, animate, useMotionValue, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
+const SF = "-apple-system,'SF Pro Display','SF Pro Text','Helvetica Neue',ui-sans-serif,sans-serif";
+
 const LEADS = [
   { name: "Sarah M.",  value: 480,  service: "Consultation" },
   { name: "James T.",  value: 720,  service: "Premium Package" },
@@ -192,15 +194,13 @@ export default function RevenueRecoveryCounter() {
           position: "relative",
           width: "320px",
           borderRadius: "26px",
-          // Aluminum Space Gray chassis
-          background: "linear-gradient(160deg, #5a5a5c 0%, #3a3a3c 25%, #2c2c2e 55%, #1c1c1e 100%)",
+          // Pure black chassis
+          background: "#000000",
           boxShadow: `
-            0 50px 120px rgba(0,0,0,0.7),
-            0 20px 50px rgba(0,0,0,0.4),
-            inset 0 1px 0 rgba(255,255,255,0.22),
-            inset 0 -1px 0 rgba(0,0,0,0.5),
-            inset 1px 0 0 rgba(255,255,255,0.08),
-            inset -1px 0 0 rgba(0,0,0,0.3)
+            0 50px 120px rgba(0,0,0,0.75),
+            0 20px 50px rgba(0,0,0,0.45),
+            inset 0 1px 0 rgba(255,255,255,0.06),
+            inset 0 -1px 0 rgba(0,0,0,0.6)
           `,
           transformStyle: "preserve-3d",
           perspective: "1200px",
@@ -208,15 +208,15 @@ export default function RevenueRecoveryCounter() {
           userSelect: "none",
         }}
       >
-        {/* Top edge chamfer highlight */}
-        <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.45), rgba(255,255,255,0.6), rgba(255,255,255,0.45), transparent)", borderRadius: "999px", zIndex: 15 }} />
+        {/* Subtle top edge */}
+        <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), rgba(255,255,255,0.08), rgba(255,255,255,0.06), transparent)", borderRadius: "999px", zIndex: 15 }} />
 
-        {/* Left edge — volume buttons */}
-        <div style={{ position: "absolute", left: "-5px", top: "80px", width: "5px", height: "36px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to left, #3a3a3c, #5c5c5e)", boxShadow: "-2px 0 5px rgba(0,0,0,0.6), inset 1px 0 1px rgba(255,255,255,0.15)", zIndex: 20 }} />
-        <div style={{ position: "absolute", left: "-5px", top: "126px", width: "5px", height: "36px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to left, #3a3a3c, #5c5c5e)", boxShadow: "-2px 0 5px rgba(0,0,0,0.6), inset 1px 0 1px rgba(255,255,255,0.15)", zIndex: 20 }} />
+        {/* Left edge — volume buttons — black */}
+        <div style={{ position: "absolute", left: "-5px", top: "80px", width: "5px", height: "36px", borderRadius: "3px 0 0 3px", background: "#1a1a1a", boxShadow: "-1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
+        <div style={{ position: "absolute", left: "-5px", top: "126px", width: "5px", height: "36px", borderRadius: "3px 0 0 3px", background: "#1a1a1a", boxShadow: "-1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
 
-        {/* Right edge — power button */}
-        <div style={{ position: "absolute", right: "-5px", top: "90px", width: "5px", height: "52px", borderRadius: "0 3px 3px 0", background: "linear-gradient(to right, #3a3a3c, #5c5c5e)", boxShadow: "2px 0 5px rgba(0,0,0,0.6), inset -1px 0 1px rgba(255,255,255,0.15)", zIndex: 20 }} />
+        {/* Right edge — power button — black */}
+        <div style={{ position: "absolute", right: "-5px", top: "90px", width: "5px", height: "52px", borderRadius: "0 3px 3px 0", background: "#1a1a1a", boxShadow: "1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
 
         {/* Top speaker grille */}
         <div style={{ position: "absolute", top: "12px", left: "50%", transform: "translateX(-50%)", zIndex: 20 }}>
@@ -282,8 +282,8 @@ export default function RevenueRecoveryCounter() {
                 {/* Header */}
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
                   <div>
-                    <p style={{ fontSize: "10px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.28em", color: "#c8965c", marginBottom: "3px" }}>Revenue Recovered</p>
-                    <motion.p style={{ fontFamily: "var(--font-display)", fontSize: "30px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1 }}>
+                    <p style={{ fontSize: "9px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.22em", color: "#c8965c", marginBottom: "3px", fontFamily: SF }}>Revenue Recovered</p>
+                    <motion.p style={{ fontFamily: SF, fontSize: "26px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em" }}>
                       ${displayTotal.toLocaleString()}
                     </motion.p>
                   </div>
@@ -314,14 +314,14 @@ export default function RevenueRecoveryCounter() {
                           <motion.div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle, rgba(74,222,128,0.25) 0%, transparent 70%)", pointerEvents: "none" }}
                             animate={{ scale: [0.4, 2] }} transition={{ duration: 0.55 }} />
                         )}
-                        <div style={{ width: "26px", height: "26px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: "700", background: recovered ? "rgba(34,197,94,0.22)" : "rgba(255,255,255,0.07)", color: recovered ? "#4ade80" : "rgba(255,255,255,0.3)", transition: "all 0.4s" }}>
-                          {recovered ? "✓" : lead.name[0]}
+                        <div style={{ width: "22px", height: "22px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "700", background: recovered ? "rgba(34,197,94,0.22)" : "rgba(255,255,255,0.07)", color: recovered ? "#4ade80" : "rgba(255,255,255,0.3)", transition: "all 0.4s", fontFamily: SF }}>
+                         {recovered ? "✓" : lead.name[0]}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: "11px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0 }}>{lead.name}</p>
-                          <p style={{ fontSize: "9px", color: "rgba(255,255,255,0.28)", margin: 0 }}>{lead.service}</p>
+                         <p style={{ fontSize: "10px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
+                         <p style={{ fontSize: "8px", color: "rgba(255,255,255,0.28)", margin: 0, fontFamily: SF }}>{lead.service}</p>
                         </div>
-                        <span style={{ fontSize: "13px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#4ade80" : "rgba(255,255,255,0.18)", transition: "color 0.4s" }}>${lead.value}</span>
+                        <span style={{ fontSize: "11px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#4ade80" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF, letterSpacing: "-0.01em" }}>${lead.value}</span>
                       </motion.div>
                     );
                   })}
@@ -329,7 +329,7 @@ export default function RevenueRecoveryCounter() {
 
                 {/* Footer */}
                 <div style={{ borderRadius: "10px", padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(200,150,92,0.1)", border: "1px solid rgba(200,150,92,0.18)" }}>
-                  <p style={{ fontSize: "9px", fontWeight: "700", color: "rgba(200,150,92,0.75)", margin: 0, letterSpacing: "0.06em" }}>Automated by ClientSurge</p>
+                  <p style={{ fontSize: "8px", fontWeight: "700", color: "rgba(200,150,92,0.75)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
                   <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                     <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(200,150,92,0.06)" : "rgba(200,150,92,0.18)", border: "1px solid rgba(200,150,92,0.28)", borderRadius: "6px", padding: "2px 9px", fontSize: "9px", fontWeight: "800", color: replaying ? "rgba(200,150,92,0.35)" : "rgba(200,150,92,0.95)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.08em", transition: "all 0.2s" }}>
                       {replaying ? "···" : "↺ Replay"}
@@ -346,22 +346,7 @@ export default function RevenueRecoveryCounter() {
             </motion.div>
           </div>
 
-          {/* Mouse-reactive glass reflection */}
-          <div style={{
-            position: "absolute", inset: 0, pointerEvents: "none", zIndex: 30, borderRadius: "18px", overflow: "hidden",
-          }}>
-            <div style={{
-              position: "absolute",
-              width: "200%", height: "200%",
-              left: `${glareX - 100}%`,
-              top: `${glareY - 100}%`,
-              background: "radial-gradient(circle at center, rgba(255,255,255,0.08) 0%, transparent 50%)",
-              transition: isHovered ? "left 0.1s, top 0.1s" : "left 0.6s ease, top 0.6s ease",
-              pointerEvents: "none",
-            }} />
-            {/* Static diagonal sheen */}
-            <div style={{ position: "absolute", top: "-30%", left: "-20%", width: "60%", height: "160%", background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.04) 50%, transparent 70%)", transform: "skewX(-15deg)", pointerEvents: "none" }} />
-          </div>
+  
         </div>
       </motion.div>
     </div>
