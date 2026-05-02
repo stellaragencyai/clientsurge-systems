@@ -399,7 +399,9 @@ export default function Industries() {
                     fontSize: "12px",
                     lineHeight: 1.6,
                     color: "rgba(255,255,255,0.74)",
-                    margin: "8px 0 0"
+                    margin: "8px 0 0",
+                    opacity: highlighted ? 1 : 0,
+                    transition: "opacity 0.3s ease",
                   }}>
                   
                   Click to see the recommended AI service stack for this niche.

@@ -158,13 +158,11 @@ export default function Navbar() {
                 href={`/${link.href}`}
                 onClick={(e) => handleSectionNavigation(e, link.href)}
                 className="text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap relative group"
-                style={{
-                  position: "relative",
-                  paddingBottom: "2px",
-                }}
+                style={{ position: "relative", paddingBottom: "2px" }}
               >
                 {link.label}
                 <span
+                  className="group-hover:[transform:scaleX(1)]"
                   style={{
                     position: "absolute",
                     bottom: "-2px",
@@ -176,18 +174,7 @@ export default function Navbar() {
                     transform: "scaleX(0)",
                     transformOrigin: "left",
                     transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                  }}
-                  className="group-hover:scale-x-100"
-                  style={{
-                    transform: "scaleX(0)",
-                    transformOrigin: "left",
-                    transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "scaleX(1)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "scaleX(0)";
+                    display: "block",
                   }}
                 />
               </a>
