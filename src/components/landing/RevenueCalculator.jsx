@@ -8,7 +8,8 @@ export default function RevenueCalculator() {
   const [convRate, setConvRate] = useState(15);
 
   const currentBookings = Math.round((leads * convRate) / 100);
-  const potentialBookings = Math.round((leads * 61) / 100);
+  const improvedRate = Math.min(convRate + Math.round(convRate * 0.65), 62); // realistic lift estimate
+  const potentialBookings = Math.round((leads * improvedRate) / 100);
   const currentRevenue = currentBookings * ticket;
   const potentialRevenue = potentialBookings * ticket;
   const monthlyLeak = potentialRevenue - currentRevenue;

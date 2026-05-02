@@ -597,7 +597,7 @@ function determineRecommendedServiceKeys(lead, segments) {
 
 function determineRecommendedPackage(serviceKeys, primaryServiceKey) {
   if (serviceKeys.includes("lead_reactivation")) {
-    return getPackageOffer("pro_system");
+    return getPackageOffer("elite_system");
   }
 
   if (
@@ -1017,7 +1017,7 @@ export function buildLeadPipelineSnapshot({
   const recommendedOfferCounts = {
     starter_system: 0,
     growth_system: 0,
-    pro_system: 0,
+    elite_system: 0,
     single_service: 0,
   };
 

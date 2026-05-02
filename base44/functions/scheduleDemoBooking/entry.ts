@@ -45,6 +45,16 @@ function validatePayload(payload: ReturnType<typeof normalizePayload>) {
   }
 
   if (!payload.scheduled_date || !/^\d{4}-\d{2}-\d{2}$/.test(payload.scheduled_date)) {
+    errors.push('Scheduled date is required (YYYY-MM-DD)');
+  } else {
+    const bookedDate = new Date(payload.scheduled_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (bookedDate < today) {
+      errors.push('Scheduled date must be in the future');
+    }
+  }
+  if (false && !payload.scheduled_date) { // suppress duplicate below
     errors.push('Scheduled date is required');
   }
 

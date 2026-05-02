@@ -14,7 +14,7 @@ const content = {
       { heading: "Information Sharing", text: "We do not sell, trade, or rent your personal information to third parties. We may share your information with trusted service providers who assist us in operating our platform." },
       { heading: "Data Security", text: "We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction." },
       { heading: "Cookies", text: "We use cookies and similar tracking technologies to improve your browsing experience and analyze site traffic. You can control cookies through your browser settings." },
-      { heading: "Contact Us", text: "If you have any questions about this Privacy Policy, please contact us at system@clientsurgesystems.com." },
+      { heading: "Contact Us", text: "If you have any questions about this Privacy Policy, please contact us at support@clientsurgesystems.com." },
     ],
   },
   terms: {
@@ -26,7 +26,7 @@ const content = {
       { heading: "Payment Terms", text: "Services require a one-time setup fee and monthly subscription. Payments are due as outlined in your service agreement. We reserve the right to suspend services for non-payment." },
       { heading: "Cancellation", text: "You may cancel your subscription at any time with 30 days written notice. Setup fees are non-refundable." },
       { heading: "Limitation of Liability", text: "ClientSurge Systems shall not be liable for any indirect, incidental, special, or consequential damages resulting from your use of our services." },
-      { heading: "Contact Us", text: "For questions about these Terms, contact us at system@clientsurgesystems.com." },
+      { heading: "Contact Us", text: "For questions about these Terms, contact us at support@clientsurgesystems.com." },
     ],
   },
   cookies: {
@@ -37,7 +37,7 @@ const content = {
       { heading: "Types of Cookies We Use", text: "We use essential cookies (required for the site to function), analytics cookies (to understand how visitors use our site), and marketing cookies (to show relevant advertisements)." },
       { heading: "Managing Cookies", text: "You can control and delete cookies through your browser settings. Note that disabling certain cookies may affect the functionality of our website." },
       { heading: "Third-Party Cookies", text: "We may use third-party services such as Google Analytics that set their own cookies. These are subject to the respective third party's privacy policies." },
-      { heading: "Contact Us", text: "For questions about our cookie use, contact us at system@clientsurgesystems.com." },
+      { heading: "Contact Us", text: "For questions about our cookie use, contact us at support@clientsurgesystems.com." },
     ],
   },
 };
@@ -74,16 +74,16 @@ export default function LegalPage() {
   ];
 
   const renderSectionText = (text) => {
-    if (!text.includes("system@clientsurgesystems.com")) {
+    if (!text.includes("support@clientsurgesystems.com")) {
       return text;
     }
 
-    const [before, after] = text.split("system@clientsurgesystems.com");
+    const [before, after] = text.split("support@clientsurgesystems.com");
     return (
       <>
         {before}
-        <a href="mailto:system@clientsurgesystems.com" className="text-primary font-medium hover:underline">
-          system@clientsurgesystems.com
+        <a href="mailto:support@clientsurgesystems.com" className="text-primary font-medium hover:underline">
+          support@clientsurgesystems.com
         </a>
         {after}
       </>

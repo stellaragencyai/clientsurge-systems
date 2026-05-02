@@ -2,6 +2,11 @@
   "name": "Subscription",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "client_id": {
       "type": "string",
       "title": "Client ID"
@@ -75,5 +80,6 @@
       "type": "string",
       "title": "Updated At"
     }
-  }
+  },
+  "required": []
 }

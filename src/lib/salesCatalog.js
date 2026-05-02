@@ -13,17 +13,16 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 97,
     setup_price_id: "price_1TOwfiB9GU5ysJqEcmQHl3gE",
     monthly_price_id: "price_1TOwfiB9GU5ysJqE20FYUfVc",
-    icon: "\u26A1",
+    icon: "⚡",
     category: "Response",
     highlights: [
       "Responds in under 4 seconds",
-      "Works 24/7 automatically",
-      "Canonical backend test gating",
+      "Works 24/7 with zero manual effort",
     ],
     popular: true,
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5QL0bQl98If",
@@ -35,16 +34,16 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 67,
     setup_price_id: "price_1TOwfiB9GU5ysJqEJuEDhpKS",
     monthly_price_id: "price_1TOwfiB9GU5ysJqE8knUfswZ",
-    icon: "\u260E",
+    icon: "📞",
     category: "Response",
     highlights: [
       "60-second auto text-back",
       "Stops missed-call lead loss",
-      "Canonical backend test gating",
+      "Works 24/7 with zero manual effort",
     ],
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5N0l5MtaV0R",
@@ -56,17 +55,17 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 127,
     setup_price_id: "price_1TOwfiB9GU5ysJqEtwQAmCuN",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEsoZmFl6D",
-    icon: "\u21BB",
+    icon: "🔄",
     category: "Follow-Up",
     highlights: [
       "14-day automated sequence",
       "SMS and email combined",
-      "Canonical runtime test support",
+      "Plug-and-play with your existing setup",
     ],
     popular: true,
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5fLL2SyJJdP",
@@ -78,17 +77,17 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 147,
     setup_price_id: "price_1TOwfiB9GU5ysJqEij8Qq9rd",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEKhYvS71r",
-    icon: "\u270D",
+    icon: "📅",
     category: "Booking",
     highlights: [
       "Booking link and intake flow",
       "Confirmation and reminder messaging",
-      "Canonical booking simulation test",
+      "Tested end-to-end before go-live",
     ],
     popular: true,
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5PWv05ECzXI",
@@ -100,16 +99,16 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 97,
     setup_price_id: "price_1TOwfiB9GU5ysJqExMxwfoFr",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEfsJEvPcI",
-    icon: "\u27F3",
+    icon: "💰",
     category: "Revenue",
     highlights: [
-      "Uses canonical Leads",
-      "Controlled batch test runs",
-      "Canonical event summary tracking",
+      "Works with your existing lead database",
+      "Safe batch sending with rate controls",
+      "Full activity log per lead",
     ],
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5dvOUm6Fi9i",
@@ -121,16 +120,16 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 67,
     setup_price_id: "price_1TOwfiB9GU5ysJqEO8byuwlT",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEryd66HuE",
-    icon: "\u2605",
+    icon: "⭐",
     category: "Reputation",
     highlights: [
       "Manual or post-completion trigger",
       "SMS or email channel support",
-      "Canonical review-request test",
+      "Sent automatically after each appointment",
     ],
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
-    fulfillment_label: "Canonical install flow",
+    fulfillment_label: "Done-for-you setup included",
   },
   {
     product_id: "prod_UNi5aQjPk58U4o",
@@ -142,16 +141,17 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 97,
     setup_price_id: "price_1TOwfiB9GU5ysJqEJcZwnVFL",
     monthly_price_id: "price_1TOwfiB9GU5ysJqExHsLIEtN",
-    icon: "\u2709",
+    icon: "📧",
     category: "Follow-Up",
     highlights: [
       "Personalized per lead",
       "Smart send timing",
-      "Operator-scoped rollout",
+      "Fully managed deployment",
     ],
     checkout_enabled: false,
-    availability_label: "Manual Review",
-    fulfillment_label: "Consultative setup only",
+    availability_label: "Coming Soon",
+    fulfillment_label: "Exclusive early access",
+    coming_soon: true,
   },
   {
     product_id: "prod_UNi5ybXQSG6QkX",
@@ -163,16 +163,17 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 77,
     setup_price_id: "price_1TOwfiB9GU5ysJqEO8w24UTX",
     monthly_price_id: "price_1TOwfiB9GU5ysJqE1M9PoI15",
-    icon: "\u21BA",
+    icon: "🗓️",
     category: "Booking",
     highlights: [
       "Targets no-shows quickly",
       "Recovery sequence playbook",
-      "Operator-scoped rollout",
+      "Fully managed deployment",
     ],
     checkout_enabled: false,
-    availability_label: "Manual Review",
-    fulfillment_label: "Consultative setup only",
+    availability_label: "Coming Soon",
+    fulfillment_label: "Exclusive early access",
+    coming_soon: true,
   },
   {
     product_id: "prod_UNi5Df5KWsS4lW",
@@ -184,16 +185,17 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 107,
     setup_price_id: "price_1TOwfiB9GU5ysJqEJ7XM5LB6",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEpL7Tbjzm",
-    icon: "\u2728",
+    icon: "🎉",
     category: "Retention",
     highlights: [
       "Welcome flow messaging",
       "Expectation setting",
-      "Operator-scoped rollout",
+      "Fully managed deployment",
     ],
     checkout_enabled: false,
-    availability_label: "Manual Review",
-    fulfillment_label: "Consultative setup only",
+    availability_label: "Coming Soon",
+    fulfillment_label: "Exclusive early access",
+    coming_soon: true,
   },
   {
     product_id: "prod_UNi53DY2nkRTuM",
@@ -201,20 +203,21 @@ export const PUBLIC_STORE_PRODUCTS = [
     name: "Social DM Auto-Responder",
     subtitle: "Instagram & Facebook",
     description: "Instant DM response flow for social inquiries that need a consultative integration review first.",
-    setup_fee: 397,
+    setup_fee: 497,
     monthly_fee: 127,
     setup_price_id: "price_1TOwfiB9GU5ysJqE3mAZpu43",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEfV7uVJLb",
-    icon: "\uD83D\uDCAC",
+    icon: "💬",
     category: "Social",
     highlights: [
       "Instagram and Facebook DM flow",
       "Lead capture from social",
-      "Operator-scoped rollout",
+      "Fully managed deployment",
     ],
     checkout_enabled: false,
-    availability_label: "Manual Review",
-    fulfillment_label: "Consultative setup only",
+    availability_label: "Coming Soon",
+    fulfillment_label: "Exclusive early access",
+    coming_soon: true,
   },
   {
     product_id: "prod_UNi5Li4ZFZGRIc",
@@ -226,16 +229,17 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 137,
     setup_price_id: "price_1TOwfiB9GU5ysJqEEvf0RdVG",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEkzPf9zrt",
-    icon: "\u26E8",
+    icon: "🛡️",
     category: "Reputation",
     highlights: [
       "Multi-platform reputation support",
-      "Manual delivery review",
-      "No fake monitoring claims",
+      "Consultative setup with your team",
+      "Tracks reviews across Google & Yelp",
     ],
     checkout_enabled: false,
-    availability_label: "Manual Review",
-    fulfillment_label: "Consultative setup only",
+    availability_label: "Coming Soon",
+    fulfillment_label: "Exclusive early access",
+    coming_soon: true,
   },
   {
     product_id: "prod_UNi5nfHZ3XKzzZ",
@@ -247,16 +251,17 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_fee: 167,
     setup_price_id: "price_1TOwfiB9GU5ysJqELMl0Jlbf",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEesWHeFVY",
-    icon: "\u25CE",
+    icon: "🧠",
     category: "Intelligence",
     highlights: [
       "Lead prioritization support",
-      "Advisory qualification playbook",
-      "Operator-scoped rollout",
+      "AI scores and ranks every lead automatically",
+      "Fully managed deployment",
     ],
     checkout_enabled: false,
-    availability_label: "Manual Review",
-    fulfillment_label: "Consultative setup only",
+    availability_label: "Coming Soon",
+    fulfillment_label: "Exclusive early access",
+    coming_soon: true,
   },
 ];
 
@@ -269,7 +274,7 @@ const PACKAGE_DEFINITIONS = [
     package_key: "starter_system",
     name: "Starter System",
     fit: "Best for businesses that need instant response and booking handoff first.",
-    description: "Start with immediate lead response plus a canonical booking handoff.",
+    description: "Start with immediate lead response plus a done-for-you booking handoff.",
     included_service_keys: ["instant_lead_response", "ai_booking_agent"],
     setup_total: 695,
     monthly_total: 197,
@@ -291,10 +296,10 @@ const PACKAGE_DEFINITIONS = [
     highlight: true,
   },
   {
-    package_key: "pro_system",
-    name: "Pro System",
-    fit: "Best for teams that want the full canonical response, reactivation, and review stack.",
-    description: "The complete tracked install bundle across all currently canonical self-serve services.",
+    package_key: "elite_system",
+    name: "Elite System",
+    fit: "Best for teams that want the full response, reactivation, and review stack.",
+    description: "The complete AI automation bundle — every service, fully managed.",
     included_service_keys: [
       "instant_lead_response",
       "missed_call_text_back",
@@ -494,6 +499,13 @@ function selectBestPackageOffer(products) {
   }
 
   return [...eligible].sort((left, right) => {
+    const packageSizeDifference =
+      right.included_service_keys.length - left.included_service_keys.length;
+
+    if (packageSizeDifference !== 0) {
+      return packageSizeDifference;
+    }
+
     const savingsDifference =
       (right.setup_savings + right.monthly_savings) -
       (left.setup_savings + left.monthly_savings);
@@ -502,7 +514,7 @@ function selectBestPackageOffer(products) {
       return savingsDifference;
     }
 
-    return right.included_service_keys.length - left.included_service_keys.length;
+    return right.setup_total - left.setup_total;
   })[0];
 }
 

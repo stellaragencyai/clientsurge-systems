@@ -1,3 +1,4 @@
+// TODO: Host OG image on a permanent CDN (e.g. clientsurgesystems.com/og-image.png) to avoid dependency on Base44 CDN
 const DEFAULT_OG_IMAGE =
   "https://media.base44.com/images/public/69d49a29c1974b32f46e8550/aaaacb19f_generated_image.png";
 
@@ -73,9 +74,13 @@ export function setPageMetadata({
 
   ensureMeta("property", "og:title").setAttribute("content", ogTitle || title);
   ensureMeta("property", "og:description").setAttribute("content", ogDescription || description);
+  ensureMeta("property", "og:type").setAttribute("content", "website");
   ensureMeta("property", "og:url").setAttribute("content", canonicalUrl);
   ensureMeta("property", "og:image").setAttribute("content", ogImage);
+  ensureMeta("property", "og:image:width").setAttribute("content", "1200");
+  ensureMeta("property", "og:image:height").setAttribute("content", "630");
 
+  ensureMeta("property", "twitter:card").setAttribute("content", "summary_large_image");
   ensureMeta("property", "twitter:title").setAttribute("content", ogTitle || title);
   ensureMeta("property", "twitter:description").setAttribute("content", ogDescription || description);
   ensureMeta("property", "twitter:image").setAttribute("content", ogImage);

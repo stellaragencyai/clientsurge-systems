@@ -17,7 +17,15 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Twilio credentials not configured' }, { status: 500 });
     }
 
-    const message = `Hi ${full_name || 'there'}! Your ClientSurge Systems demo is confirmed for ${scheduled_date} at ${scheduled_time}. We'll send you the meeting link shortly. Reply STOP to unsubscribe.`;
+    // Format date nicely e.g. "Monday, May 5"
+    let friendlyDate = scheduled_date;
+    try {
+      const d = new Date(`${scheduled_date}T${scheduled_time}:00`);
+      friendlyDate = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    } catch (_) {}
+
+    const firstName = (full_name || 'there').split(' ')[0];
+    const message = `Hi ${firstName}! ✅ Your ClientSurge demo is confirmed for ${friendlyDate} at ${scheduled_time} (AZ time). Nolan will call you directly at this number — keep it handy! Questions before then? Just reply here. Reply STOP to opt out.`;
 
     const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
       method: 'POST',

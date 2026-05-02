@@ -1,0 +1,187 @@
+{
+  "name": "NurtureCampaign",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "lead_name": {
+      "type": "string",
+      "title": "Lead Name"
+    },
+    "lead_email": {
+      "type": "string",
+      "title": "Lead Email"
+    },
+    "lead_business": {
+      "type": "string",
+      "title": "Lead Business"
+    },
+    "status": {
+      "type": "string",
+      "title": "Campaign Status",
+      "enum": [
+        "active",
+        "paused",
+        "completed",
+        "stopped"
+      ],
+      "default": "active"
+    },
+    "stop_reason": {
+      "type": "string",
+      "title": "Stop Reason",
+      "enum": [
+        "qualified",
+        "booked",
+        "closed",
+        "manual_pause",
+        "opted_out",
+        "completed_all_steps",
+        "manual_stop"
+      ]
+    },
+    "enrolled_at": {
+      "type": "string",
+      "title": "Enrolled At"
+    },
+    "last_step_run_at": {
+      "type": "string",
+      "title": "Last Step Run At"
+    },
+    "current_step": {
+      "type": "number",
+      "title": "Current Step (1-8)",
+      "default": 0
+    },
+    "step1_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "failed",
+        "skipped"
+      ],
+      "default": "pending",
+      "title": "Day 1 \u2014 Welcome"
+    },
+    "step2_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "failed",
+        "skipped"
+      ],
+      "default": "pending",
+      "title": "Day 3 \u2014 Case Study"
+    },
+    "step3_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "failed",
+        "skipped"
+      ],
+      "default": "pending",
+      "title": "Day 7 \u2014 Testimonial"
+    },
+    "step4_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "failed",
+        "skipped"
+      ],
+      "default": "pending",
+      "title": "Day 10 \u2014 Tip"
+    },
+    "step5_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "failed",
+        "skipped"
+      ],
+      "default": "pending",
+      "title": "Day 14 \u2014 Case Study 2"
+    },
+    "step6_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "failed",
+        "skipped"
+      ],
+      "default": "pending",
+      "title": "Day 18 \u2014 Testimonial 2"
+    },
+    "step7_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "failed",
+        "skipped"
+      ],
+      "default": "pending",
+      "title": "Day 23 \u2014 Tip + Offer"
+    },
+    "step8_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "sent",
+        "failed",
+        "skipped"
+      ],
+      "default": "pending",
+      "title": "Day 30 \u2014 Final CTA"
+    },
+    "step1_sent_at": {
+      "type": "string",
+      "title": "Day 1 Sent At"
+    },
+    "step2_sent_at": {
+      "type": "string",
+      "title": "Day 3 Sent At"
+    },
+    "step3_sent_at": {
+      "type": "string",
+      "title": "Day 7 Sent At"
+    },
+    "step4_sent_at": {
+      "type": "string",
+      "title": "Day 10 Sent At"
+    },
+    "step5_sent_at": {
+      "type": "string",
+      "title": "Day 14 Sent At"
+    },
+    "step6_sent_at": {
+      "type": "string",
+      "title": "Day 18 Sent At"
+    },
+    "step7_sent_at": {
+      "type": "string",
+      "title": "Day 23 Sent At"
+    },
+    "step8_sent_at": {
+      "type": "string",
+      "title": "Day 30 Sent At"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "lead_id",
+    "lead_email"
+  ]
+}

@@ -18,7 +18,7 @@ const testimonials = [
     location: "Phoenix, AZ",
     before: "$4k/month ad spend with low conversion",
     after: "Close rate doubled",
-    result: "ROI in under 7 days",
+    result: "ROI within the first month",
     quote: "It paid for itself in the first week.",
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=65&auto=format",
   },
@@ -51,7 +51,7 @@ export default function Testimonials() {
           {testimonials.map((testimonial) => (
             <article
               key={testimonial.name}
-              className="flex flex-col rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1"
+              className="flex flex-col rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 active:-translate-y-1 focus:-translate-y-1"
               style={{
                 background: "linear-gradient(135deg, rgba(255,252,247,0.72) 0%, rgba(252,240,220,0.55) 100%)",
                 backdropFilter: "blur(18px)",
@@ -93,6 +93,7 @@ export default function Testimonials() {
               </div>
 
               <p className="text-sm text-foreground/75 leading-relaxed flex-1 min-h-[72px] mb-6">
+                <div className="flex gap-0.5 mb-2">{[1,2,3,4,5].map(i => <span key={i} style={{fontSize:"13px"}}>⭐</span>)}</div>
                 "{testimonial.quote}"
               </p>
 

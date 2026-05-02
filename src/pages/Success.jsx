@@ -6,10 +6,10 @@ export default function Success() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Optional: redirect to home after 10 seconds
+    // Auto-redirect to home after 12 seconds
     const timer = setTimeout(() => {
-      // navigate('/');
-    }, 10000);
+      navigate('/');
+    }, 12000);
     return () => clearTimeout(timer);
   }, [navigate]);
 

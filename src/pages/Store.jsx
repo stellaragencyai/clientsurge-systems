@@ -1,378 +1,685 @@
-import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { ShoppingCart, Zap, Search, Sparkles, Package2 } from "lucide-react";
+import { lazy, Suspense, useEffect, useMemo, useState, useRef, useCallback } from "react";
+import { motion } from "framer-motion";
+import { ShoppingCart, Zap, Search, ArrowRight, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
-import {
-  AI_PRODUCTS,
-  CATEGORIES,
-  PACKAGE_OFFERS,
-  SELF_SERVE_PRODUCTS,
-  formatCurrency,
-  getPackageServices,
-} from "@/lib/aiProducts";
+import { AI_PRODUCTS, CATEGORIES, CANONICAL_SERVICE_PRODUCTS } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
 import CartSidebar from "@/components/store/CartSidebar";
-import InteractiveStackBuilder from "@/components/store/InteractiveStackBuilder";
 import Navbar from "@/components/landing/Navbar";
-import Footer from "@/components/landing/Footer";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
+import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
+import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
+import GuidedPathToggle from "@/components/store/GuidedPathToggle";
+import { getRecommendedProducts } from "@/lib/productRecommendations";
+import StackValueCounter from "@/components/store/StackValueCounter";
+import { setPageMetadata } from "@/lib/seo";
 
-function PackageOfferCard({ offer, onSelect }) {
-  return (
-    <div
-      style={{
-        borderRadius: "24px",
-        padding: "24px",
-        border: offer.highlight
-          ? "2px solid rgba(154,92,46,0.45)"
-          : "1.5px solid rgba(154,92,46,0.16)",
-        background: offer.highlight
-          ? "linear-gradient(135deg, rgba(255,248,235,0.98) 0%, rgba(252,239,216,0.94) 100%)"
-          : "linear-gradient(135deg, rgba(255,255,255,0.94) 0%, rgba(252,248,242,0.9) 100%)",
-        boxShadow: offer.highlight
-          ? "0 18px 48px rgba(154,92,46,0.14)"
-          : "0 8px 24px rgba(0,0,0,0.05)",
-        position: "relative",
-      }}
-    >
-      {offer.badge ? (
-        <div
-          style={{
-            position: "absolute",
-            top: "-12px",
-            left: "24px",
-            borderRadius: "9999px",
-            padding: "6px 14px",
-            fontSize: "11px",
-            fontWeight: "700",
-            color: "#fff",
-            background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-          }}
-        >
-          {offer.badge}
-        </div>
-      ) : null}
-
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px" }}>
-        <div>
-          <h3 className="font-display" style={{ fontSize: "1.45rem", fontWeight: "700", color: "#1a1209", margin: 0 }}>
-            {offer.name}
-          </h3>
-          <p style={{ fontSize: "13px", color: "rgba(26,18,9,0.58)", margin: "8px 0 0" }}>{offer.fit}</p>
-        </div>
-        <div
-          style={{
-            borderRadius: "16px",
-            padding: "10px 12px",
-            background: "rgba(154,92,46,0.08)",
-            border: "1px solid rgba(154,92,46,0.12)",
-            minWidth: "120px",
-            textAlign: "right",
-          }}
-        >
-          <p style={{ margin: 0, fontSize: "11px", color: "rgba(26,18,9,0.45)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: "700" }}>
-            Bundle Savings
-          </p>
-          <p style={{ margin: "4px 0 0", fontSize: "18px", fontWeight: "800", color: "#9a5c2e" }}>
-            ${formatCurrency(offer.setup_savings)} + ${formatCurrency(offer.monthly_savings)}/mo
-          </p>
-        </div>
-      </div>
-
-      <p style={{ fontSize: "13px", color: "rgba(26,18,9,0.6)", lineHeight: 1.65, margin: "16px 0 0" }}>
-        {offer.description}
-      </p>
-
-      <div style={{ display: "grid", gap: "12px", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", marginTop: "18px" }}>
-        <div
-          style={{
-            borderRadius: "14px",
-            background: "rgba(154,92,46,0.06)",
-            padding: "12px 14px",
-            textAlign: "center",
-          }}
-        >
-          <p style={{ margin: 0, fontSize: "10px", color: "rgba(26,18,9,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: "700" }}>
-            Setup
-          </p>
-          <p style={{ margin: "4px 0 0", fontSize: "26px", fontWeight: "800", color: "#1a1209" }}>
-            ${formatCurrency(offer.setup_total)}
-          </p>
-          <p style={{ margin: "4px 0 0", fontSize: "11px", color: "rgba(26,18,9,0.4)" }}>
-            vs ${formatCurrency(offer.compare_at_setup)} a la carte
-          </p>
-        </div>
-
-        <div
-          style={{
-            borderRadius: "14px",
-            background: "rgba(154,92,46,0.06)",
-            padding: "12px 14px",
-            textAlign: "center",
-          }}
-        >
-          <p style={{ margin: 0, fontSize: "10px", color: "rgba(26,18,9,0.4)", textTransform: "uppercase", letterSpacing: "0.08em", fontWeight: "700" }}>
-            Monthly
-          </p>
-          <p style={{ margin: "4px 0 0", fontSize: "26px", fontWeight: "800", color: "#9a5c2e" }}>
-            ${formatCurrency(offer.monthly_total)}
-          </p>
-          <p style={{ margin: "4px 0 0", fontSize: "11px", color: "rgba(26,18,9,0.4)" }}>
-            vs ${formatCurrency(offer.compare_at_monthly)}/mo a la carte
-          </p>
-        </div>
-      </div>
-
-      <div style={{ marginTop: "18px" }}>
-        <p style={{ margin: "0 0 10px", fontSize: "11px", fontWeight: "700", color: "rgba(26,18,9,0.45)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-          Canonical Install Services Included
-        </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-          {offer.included_services.map((service) => (
-            <span
-              key={service.service_key}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                borderRadius: "9999px",
-                padding: "6px 12px",
-                fontSize: "12px",
-                fontWeight: "600",
-                color: "#1a1209",
-                background: "rgba(255,255,255,0.82)",
-                border: "1px solid rgba(154,92,46,0.14)",
-              }}
-            >
-              <span>{service.icon}</span>
-              {service.name}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={() => onSelect(offer.package_key)}
-        style={{
-          width: "100%",
-          marginTop: "20px",
-          borderRadius: "9999px",
-          padding: "2px",
-          border: "none",
-          cursor: "pointer",
-          background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-          boxShadow: "0 6px 18px rgba(120,70,20,0.28)",
-        }}
-      >
-        <span
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "8px",
-            height: "46px",
-            borderRadius: "9999px",
-            background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-            color: "#f5e6d0",
-            fontWeight: "700",
-            fontSize: "13px",
-          }}
-        >
-          <Package2 style={{ width: "15px", height: "15px" }} />
-          Load This Bundle
-        </span>
-      </button>
-    </div>
-  );
-}
+// Lazy load heavy store components
+const InteractiveStackBuilder = lazy(() =>
+  import("@/components/store/InteractiveStackBuilder")
+);
+const SocialProofTicker = lazy(() => import("@/components/store/SocialProofTicker"));
+const ServiceComparisonModal = lazy(() => import("@/components/store/ServiceComparisonModal"));
+const Footer = lazy(() => import("@/components/landing/Footer"));
+const BuildYourStackFlow = lazy(() => import("@/components/store/BuildYourStackFlow"));
+const BundleSavingsToast = lazy(() => import("@/components/store/BundleSavingsToast"));
 
 function StoreInner() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { items, setCartOpen, replaceItems, pricingSummary } = useCart();
+  const [searchInput, setSearchInput] = useState("");
+  const searchDebounce = useRef(null);
 
-  const selectedPackageKey = searchParams.get("package");
+  const handleSearchChange = useCallback((val) => {
+    setSearchInput(val);
+    clearTimeout(searchDebounce.current);
+    searchDebounce.current = setTimeout(() => setSearch(val), 280);
+  }, []);
+  const [selectedIndustry, setSelectedIndustry] = useState(null);
+  const [showComparison, setShowComparison] = useState(false);
+  const [pathMode, setPathMode] = useState("guided");
+  const { items, setCartOpen, totalSetup, totalMonthly } = useCart();
 
   useEffect(() => {
-    if (!selectedPackageKey) {
-      return;
+    const cleanupMeta = setPageMetadata({
+      title: "AI Automation Store | ClientSurge Systems",
+      description: "Build your custom AI automation stack for your local business. Instant lead response, missed call text-back, 14-day nurture sequences, and more. Start for $97/month.",
+      canonicalPath: "/store",
+      ogTitle: "AI Automation Store | ClientSurge Systems",
+      ogDescription: "Pick the AI automations your business needs. Done-for-you setup in 5–7 business days. No contracts.",
+    });
+    return cleanupMeta;
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
     }
 
-    const packageServices = getPackageServices(selectedPackageKey);
-    if (!packageServices.length) {
-      return;
-    }
+    const syncIndustry = () => {
+      // Check if quiz routed here with a package key
+      const quizPackage = window.sessionStorage.getItem("clientsurge:quiz-package");
+      if (quizPackage) {
+        const pkg = PACKAGE_OFFERS.find((p) => p.package_key === quizPackage);
+        if (pkg) {
+          setSelectedIndustry({
+            shortName: pkg.name,
+            recommendedPackage: pkg,
+            recommendedServiceKeys: pkg.included_service_keys,
+            recommendedServices: pkg.included_services.map((s) => ({ ...s, whyThisMatters: s.description })),
+            whyItWorks: pkg.fit,
+          });
+          return;
+        }
+      }
+      setSelectedIndustry(getSelectedIndustryRecommendation());
+    };
 
-    replaceItems(packageServices);
-    setCartOpen(true);
-  }, [replaceItems, selectedPackageKey, setCartOpen]);
+    syncIndustry();
+    window.addEventListener("storage", syncIndustry);
+    window.addEventListener("clientsurge:industry-selected", syncIndustry);
+
+    return () => {
+      window.removeEventListener("storage", syncIndustry);
+      window.removeEventListener("clientsurge:industry-selected", syncIndustry);
+    };
+  }, []);
 
   const filtered = useMemo(() => {
-    return AI_PRODUCTS.filter((product) => {
-      const matchCat = activeCategory === "All" || product.category === activeCategory;
+    const recommendedKeys = new Set(
+      selectedIndustry?.recommendedServiceKeys || []
+    );
+
+    let results = AI_PRODUCTS.filter((product) => {
+      const matchCategory =
+        activeCategory === "All" || product.category === activeCategory;
       const matchSearch =
         !search ||
         product.name.toLowerCase().includes(search.toLowerCase()) ||
         product.description.toLowerCase().includes(search.toLowerCase());
-      return matchCat && matchSearch;
-    });
-  }, [activeCategory, search]);
+      return matchCategory && matchSearch;
+    }).sort((left, right) => {
+      const leftRecommended = recommendedKeys.has(left.service_key);
+      const rightRecommended = recommendedKeys.has(right.service_key);
 
-  const handleSelectPackage = (packageKey) => {
-    replaceItems(getPackageServices(packageKey));
-    setSearchParams((current) => {
-      const next = new URLSearchParams(current);
-      next.set("package", packageKey);
-      return next;
+      if (leftRecommended === rightRecommended) {
+        return 0;
+      }
+
+      return leftRecommended ? -1 : 1;
     });
-    setCartOpen(true);
-  };
+
+    // In guided mode: show recommended services if industry selected, else show all purchasable
+    if (pathMode === "guided") {
+      if (selectedIndustry) {
+        const recommendedNames = new Set(
+          selectedIndustry?.recommendedServices?.map((s) => s.name) || []
+        );
+        results = results.filter((p) => recommendedNames.has(p.name)).slice(0, 6);
+      } else {
+        // No industry selected — show all checkout-enabled (non-coming-soon) products
+        results = results.filter((p) => p.checkout_enabled !== false && !p.coming_soon);
+      }
+    }
+
+    return results;
+  }, [activeCategory, search, selectedIndustry, pathMode]);
+
+  const recommendedPreview = useMemo(
+    () => selectedIndustry?.recommendedServices?.slice(0, 4) || [],
+    [selectedIndustry]
+  );
+
+  const recommendedOverflow = Math.max(
+    (selectedIndustry?.recommendedServices?.length || 0) -
+      recommendedPreview.length,
+    0
+  );
+
+  const resultLabel = `${filtered.length} service${
+    filtered.length === 1 ? "" : "s"
+  }`;
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #fdfcfa 0%, #f8f4ee 40%, #faf7f2 100%)", fontFamily: "'Inter', sans-serif" }}>
-      <Navbar />
+    <div
+      style={{
+        minHeight: "100vh",
+        fontFamily: "'Inter', sans-serif",
+        position: "relative",
+      }}
+    >
+      
 
-      <div style={{ textAlign: "center", padding: "64px 24px 40px", position: "relative" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", borderRadius: "9999px", padding: "6px 16px", marginBottom: "20px", background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.2)" }}>
-          <Zap style={{ width: "12px", height: "12px", color: "#9a5c2e" }} />
-          <span style={{ fontSize: "11px", fontWeight: "700", color: "#9a5c2e", letterSpacing: "0.16em", textTransform: "uppercase" }}>AI Service Catalog</span>
-        </div>
-        <h1 className="font-display" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: "800", lineHeight: 1.08, letterSpacing: "-0.02em", color: "#1a1209", marginBottom: "16px" }}>
-          Buy the{" "}
-          <span style={{ background: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 50%, #9a5c2e 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-            exact services
-          </span>{" "}
-          we actually deploy
-        </h1>
-        <p style={{ fontSize: "1.1rem", color: "rgba(26,18,9,0.55)", lineHeight: 1.7, maxWidth: "760px", margin: "0 auto 28px" }}>
-          Browse all 12 offers in the AI catalog. Self-serve checkout is enabled only for the 6 services that already map directly into the canonical order-driven install queue, while the rest stay consultative until their delivery path is standardized.
-        </p>
+      <div style={{ position: "relative", zIndex: 2 }}>
+        <style>{`
+          .store-page nav {
+            background: rgba(253,251,248,0.85) !important;
+            border-bottom-color: rgba(154,92,46,0.14) !important;
+            backdrop-filter: blur(22px) !important;
+            -webkit-backdrop-filter: blur(22px) !important;
+          }
+          .store-page .store-hero {
+            text-align: center;
+            padding: 24px 24px 14px;
+            position: relative;
+          }
+          .store-page .store-hero-copy {
+            max-width: 640px;
+            margin: 0 auto;
+          }
+          .store-page .store-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            max-width: 760px;
+            margin: 0 auto;
+          }
+          .store-page .store-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+          }
+          .store-page .store-searchWrap {
+            position: relative;
+            flex: 1 1 320px;
+            max-width: 390px;
+          }
+          .store-page .store-filterMeta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            flex: 1 1 520px;
+          }
+          .store-page .store-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+          /* AI Module tab active glow */
+          .ai-module-btn {
+            position: relative;
+            overflow: hidden;
+          }
+          .ai-module-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            opacity: 0;
+            background: radial-gradient(ellipse at center, rgba(200,150,92,0.25) 0%, transparent 70%);
+            transition: opacity 0.3s ease;
+          }
+          .ai-module-btn:hover::after { opacity: 1; }
+          .ai-module-btn.active-module::after { opacity: 1; }
+          .store-page .store-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 28px;
+          }
+          .store-page .store-sticky-cart {
+            position: sticky;
+            top: 64px;
+            z-index: 50;
+            margin: 0 24px 20px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(65,35,15,0.94) 0%, rgba(108,65,30,0.94) 52%, rgba(76,43,19,0.96) 100%);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            cursor: pointer;
+            box-shadow: 0 10px 28px rgba(12,7,3,0.24);
+            border: 1px solid rgba(245,217,168,0.14);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+          }
+          .store-page .store-sticky-cart__meta {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+          }
+          .store-page .store-recommendation-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+          }
+          .store-page .store-summary-chip {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #f6ddb0;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(200,150,92,0.24);
+          }
+          @media (max-width: 1080px) {
+            .store-page .store-grid {
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 24px;
+            }
+          }
+          @media (max-width: 720px) {
+            .store-page .store-hero {
+              padding: 18px 16px 10px;
+            }
+            .store-page .store-stat-grid {
+              grid-template-columns: 1fr;
+              gap: 10px;
+              max-width: 100%;
+              padding: 0 4px;
+            }
+            .store-page .store-toolbar {
+              flex-direction: column;
+              align-items: stretch;
+            }
+            .store-page .store-searchWrap {
+              max-width: none;
+            }
+            .store-page .store-filterMeta {
+              justify-content: flex-start;
+              flex-direction: column;
+              align-items: stretch;
+            }
+            .store-page .store-grid {
+              grid-template-columns: 1fr;
+              gap: 20px;
+            }
+            .store-page .store-sticky-cart {
+              margin: 0 16px 18px;
+              align-items: stretch;
+              flex-direction: column;
+            }
+            .store-page .store-sticky-cart__meta {
+              width: 100%;
+              justify-content: space-between;
+            }
+          }
+        `}</style>
+        <div className="store-page">
+          <Navbar />
 
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "24px" }}>
-          {[
-            { label: "AI Services in Catalog", val: String(AI_PRODUCTS.length) },
-            { label: "Self-Serve Checkout", val: String(SELF_SERVE_PRODUCTS.length) },
-            { label: "Packaged Systems", val: String(PACKAGE_OFFERS.length) },
-            { label: "Avg. Setup Time", val: "5-7 days" },
-          ].map((stat) => (
-            <div key={stat.label} style={{ textAlign: "center" }}>
-              <p style={{ fontSize: "20px", fontWeight: "800", color: "#9a5c2e", margin: "0 0 2px" }}>{stat.val}</p>
-              <p style={{ fontSize: "11px", color: "rgba(26,18,9,0.4)", margin: 0, fontWeight: "600" }}>{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+          <div id="top" className="store-hero">
+            <div className="store-hero-copy">
 
-      {items.length > 0 && (
-        <div
-          onClick={() => setCartOpen(true)}
-          style={{ position: "sticky", top: "64px", zIndex: 50, margin: "0 24px 24px", borderRadius: "16px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", padding: "14px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", boxShadow: "0 8px 32px rgba(120,70,20,0.3)" }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <ShoppingCart style={{ width: "18px", height: "18px", color: "#f5e6d0" }} />
-            <div>
-              <span style={{ color: "#f5e6d0", fontWeight: "700", fontSize: "14px" }}>
-                {items.length} installable service{items.length > 1 ? "s" : ""} selected
-              </span>
-              <p style={{ margin: "4px 0 0", fontSize: "11px", color: "rgba(245,230,208,0.72)" }}>
-                {pricingSummary.package_offer
-                  ? `${pricingSummary.package_offer.name}${pricingSummary.add_on_service_keys.length ? " + add-ons" : ""}`
-                  : "Custom service bundle"}
-              </p>
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "16px", textAlign: "right" }}>
-            <div>
-              <span style={{ display: "block", fontSize: "12px", color: "rgba(245,230,208,0.7)" }}>
-                ${formatCurrency(pricingSummary.total_setup)} setup · ${formatCurrency(pricingSummary.total_monthly)}/mo
-              </span>
-              {pricingSummary.setup_discount_total > 0 || pricingSummary.monthly_discount_total > 0 ? (
-                <span style={{ display: "block", fontSize: "11px", color: "#f5d9a8" }}>
-                  Saves ${formatCurrency(pricingSummary.setup_discount_total)} + ${formatCurrency(pricingSummary.monthly_discount_total)}/mo
+
+              <h1
+               className="font-display"
+               style={{
+                 fontSize: "clamp(1.5rem, 4.5vw, 2.6rem)",
+                 fontWeight: "800",
+                 lineHeight: 1.08,
+                 letterSpacing: "-0.035em",
+                 color: "rgba(245,225,195,0.95)",
+                 marginBottom: "8px",
+               }}
+              >
+                Build Your{" "}
+                <span
+                  style={{
+                    background: "linear-gradient(135deg, #f5d9a8 0%, #c8965c 52%, #e8b87a 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    filter: "drop-shadow(0 0 18px rgba(200,150,92,0.5))",
+                  }}
+                >
+                  AI-Powered Business
                 </span>
-              ) : null}
-            </div>
-            <span style={{ background: "rgba(255,255,255,0.15)", color: "#f5e6d0", fontSize: "12px", fontWeight: "700", padding: "6px 16px", borderRadius: "9999px" }}>View Cart →</span>
-          </div>
-        </div>
-      )}
+              </h1>
 
-      <div style={{ maxWidth: "1300px", margin: "0 auto", padding: "0 24px 24px" }}>
-        <div style={{ marginBottom: "32px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "16px" }}>
-            <Sparkles style={{ width: "18px", height: "18px", color: "#9a5c2e" }} />
-            <h2 className="font-display" style={{ margin: 0, fontSize: "1.8rem", color: "#1a1209" }}>
-              Packaged Systems
-            </h2>
-          </div>
-          <p style={{ margin: "0 0 18px", fontSize: "14px", color: "rgba(26,18,9,0.58)", maxWidth: "760px", lineHeight: 1.65 }}>
-            These bundles are explicit pricing shortcuts for the same canonical install services you can buy individually. When a bundle matches your selected self-serve services, checkout and `/admin` both show the package and the actual included installable services.
-          </p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "20px" }}>
-            {PACKAGE_OFFERS.map((offer) => (
-              <PackageOfferCard key={offer.package_key} offer={offer} onSelect={handleSelectPackage} />
-            ))}
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center", marginBottom: "24px" }}>
-          <div style={{ position: "relative", flex: "1", minWidth: "200px", maxWidth: "320px" }}>
-            <Search style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", width: "14px", height: "14px", color: "rgba(154,92,46,0.5)" }} />
-            <input
-              type="text"
-              placeholder="Search canonical services..."
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              style={{ width: "100%", borderRadius: "9999px", border: "1.5px solid rgba(154,92,46,0.2)", padding: "9px 14px 9px 34px", fontSize: "13px", background: "rgba(255,255,255,0.8)", outline: "none", boxSizing: "border-box" }}
-            />
-          </div>
-
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-            {CATEGORIES.map((category) => (
-              <button
-                key={category}
-                type="button"
-                onClick={() => setActiveCategory(category)}
+              <p
                 style={{
-                  borderRadius: "9999px",
-                  padding: "7px 16px",
-                  fontSize: "12px",
-                  fontWeight: "600",
-                  border: "none",
-                  cursor: "pointer",
-                  background: activeCategory === category ? "linear-gradient(135deg,#6b3f1f,#9a5c2e)" : "rgba(154,92,46,0.07)",
-                  color: activeCategory === category ? "#f5e6d0" : "rgba(26,18,9,0.6)",
-                  transition: "all 0.2s",
-                  boxShadow: activeCategory === category ? "0 2px 8px rgba(120,70,20,0.25)" : "none",
+                  fontSize: "0.9rem",
+                  color: "rgba(220,190,150,0.65)",
+                  lineHeight: 1.6,
+                  maxWidth: "620px",
+                  margin: "0 auto 12px",
                 }}
               >
-                {category}
+                Pick the services you need, add them to your cart, and we handle
+                the setup. Your automations go live in 5 to 7 business days.
+              </p>
+            </div>
+
+            {selectedIndustry ? (
+              <div
+                style={{
+                  maxWidth: "760px",
+                  margin: "0 auto 10px",
+                  padding: "8px 12px",
+                  borderRadius: "12px",
+                  background: "rgba(255,255,255,0.4)",
+                  border: "none",
+                  borderBottom: "1px solid rgba(154,92,46,0.1)",
+                  boxShadow: "none",
+                  fontSize: "12px",
+                }}
+              >
+                <p
+                  style={{
+                    fontSize: "10px",
+                    fontWeight: "700",
+                    letterSpacing: "0.16em",
+                    textTransform: "uppercase",
+                    color: "#9a5c2e",
+                    margin: "0 0 4px",
+                  }}
+                >
+                  Personalized For {selectedIndustry.shortName}
+                </p>
+                <p
+                  style={{
+                    fontSize: "13px",
+                    color: "#1b140d",
+                    fontWeight: "600",
+                    margin: "0 0 2px",
+                    lineHeight: 1.4,
+                  }}
+                >
+                  Recommended: {selectedIndustry.recommendedPackage?.name}
+                </p>
+              </div>
+            ) : null}
+
+            <div className="store-stat-grid" style={{ marginBottom: "8px" }}>
+              {[
+                { label: "AI Services Available", val: "12", Icon: LayoutGrid },
+                { label: "Avg. Setup Time", val: "4–6 Hours", Icon: Clock },
+                { label: "Cancel Anytime", val: "No Contracts", Icon: BadgeCheck },
+              ].map(({ label, val, Icon }, idx) => (
+                <motion.div
+                 key={label}
+                 initial={{ opacity: 0, y: 28 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ type: "spring", stiffness: 300, damping: 28, delay: idx * 0.1 }}
+                 whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(154,92,46,0.13)" }}
+                 style={{
+                   display: "flex",
+                   alignItems: "center",
+                   gap: "14px",
+                   borderRadius: "14px",
+                   padding: "14px 18px",
+                   background: "#ffffff",
+                   border: "1.5px solid rgba(0,0,0,0.1)",
+                   boxShadow: "0 4px 14px rgba(0,0,0,0.07)",
+                   cursor: "default",
+                 }}
+                >
+                  <div style={{
+                    width: "42px",
+                    height: "42px",
+                    borderRadius: "12px",
+                    background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)",
+                    border: "1px solid rgba(154,92,46,0.18)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}>
+                    <Icon style={{ width: "18px", height: "18px", color: "#9a5c2e" }} />
+                  </div>
+                  <div style={{ textAlign: "left" }}>
+                    <p style={{ fontSize: "15px", fontWeight: "800", color: "#9a5c2e", margin: "0 0 2px" }}>
+                      {val}
+                    </p>
+                    <p style={{ fontSize: "10px", color: "rgba(27,20,13,0.6)", margin: 0, fontWeight: "600" }}>
+                      {label}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {items.length > 0 ? (
+            <div onClick={() => setCartOpen(true)} className="store-sticky-cart">
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <ShoppingCart
+                  style={{ width: "18px", height: "18px", color: "#f5e6d0" }}
+                />
+                <span
+                  style={{
+                    color: "#f5e6d0",
+                    fontWeight: "700",
+                    fontSize: "14px",
+                  }}
+                >
+                  {items.length} service{items.length > 1 ? "s" : ""} in cart
+                </span>
+              </div>
+              <div className="store-sticky-cart__meta">
+                <span
+                  style={{
+                    fontSize: "12px",
+                    color: "rgba(245,230,208,0.78)",
+                  }}
+                >
+                  ${totalSetup} setup - ${totalMonthly}/mo
+                </span>
+                <span
+                  style={{
+                    background: "rgba(255,255,255,0.15)",
+                    color: "#f5e6d0",
+                    fontSize: "12px",
+                    fontWeight: "700",
+                    padding: "6px 16px",
+                    borderRadius: "9999px",
+                  }}
+                >
+                  View Cart
+                </span>
+              </div>
+            </div>
+          ) : null}
+
+          <div
+            style={{
+              maxWidth: "1300px",
+              margin: "0 auto",
+              padding: "0 24px 24px",
+            }}
+          >
+
+
+            <div style={{ display: "flex", gap: "10px", marginBottom: "18px", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
+              <button
+                onClick={() => setShowComparison(true)}
+                style={{
+                  borderRadius: "9999px",
+                  padding: "8px 20px",
+                  fontSize: "12px",
+                  fontWeight: "600",
+                  border: "1.5px solid rgba(154,92,46,0.3)",
+                  background: "rgba(255,255,255,0.7)",
+                  color: "#9a5c2e",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.9)";
+                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.5)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.7)";
+                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.3)";
+                }}
+              >
+                📊 Compare All Services
               </button>
-            ))}
+              <GuidedPathToggle mode={pathMode} onModeChange={setPathMode} />
+            </div>
+
+            <div className="store-toolbar">
+              <div className="store-searchWrap">
+                <Search
+                  style={{
+                    position: "absolute",
+                    left: "14px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    width: "14px",
+                    height: "14px",
+                    color: "rgba(154,92,46,0.6)",
+                  }}
+                />
+                <input
+                  type="text"
+                  placeholder="Search services..."
+                  value={searchInput}
+                  onChange={(event) => setSearch(event.target.value)}
+                  style={{
+                    width: "100%",
+                    borderRadius: "9999px",
+                    border: "1.5px solid rgba(154,92,46,0.22)",
+                    padding: "11px 16px 11px 38px",
+                    fontSize: "13px",
+                    background: "rgba(255,255,255,0.85)",
+                    outline: "none",
+                    boxSizing: "border-box",
+                    color: "#1b140d",
+                    boxShadow: "0 2px 8px rgba(111,67,31,0.05)",
+                  }}
+                />
+              </div>
+
+              <div className="store-filterMeta">
+                <span
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: "700",
+                    color: "rgba(27,20,13,0.55)",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {resultLabel}
+                </span>
+                <div className="store-categories">
+                  {CATEGORIES.filter((cat) => {
+                      if (cat === "All") return true;
+                      return CANONICAL_SERVICE_PRODUCTS.some(p => p.category === cat && p.checkout_enabled && !p.coming_soon);
+                    }).map((category) => (
+                    <motion.button
+                      key={category}
+                      onClick={() => setActiveCategory(category)}
+                      whileHover={{ y: -1, scale: 1.03 }}
+                      whileTap={{ scale: 0.94 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      style={{
+                        borderRadius: "9999px",
+                        padding: "7px 16px",
+                        fontSize: "12px",
+                        fontWeight: "600",
+                        border:
+                          activeCategory === category
+                            ? "1.5px solid rgba(154,92,46,0.5)"
+                            : "1.5px solid rgba(154,92,46,0.18)",
+                        cursor: "pointer",
+                        background:
+                          activeCategory === category
+                            ? "linear-gradient(135deg,#6b3f1f,#9a5c2e)"
+                            : "rgba(255,255,255,0.75)",
+                        color:
+                          activeCategory === category
+                            ? "#f5e6d0"
+                            : "rgba(27,20,13,0.72)",
+                        boxShadow:
+                          activeCategory === category
+                            ? "0 4px 14px rgba(120,70,20,0.28)"
+                            : "0 1px 4px rgba(111,67,31,0.06)",
+                      }}
+                    >
+                      {category}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="store-grid">
+              {filtered.map((product) => (
+                <ProductCard key={product.product_id} product={product} />
+              ))}
+            </div>
+
+            {filtered.length === 0 ? (
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "48px",
+                  color: "rgba(27,20,13,0.45)",
+                }}
+              >
+                <p style={{ fontSize: "16px", fontWeight: "600" }}>
+                  {pathMode === "guided" && !selectedIndustry
+                    ? "No services available — try 'Explore All'"
+                    : pathMode === "guided" && selectedIndustry
+                    ? "Try switching to 'Explore All' to see more services"
+                    : "No services match your search"}
+                </p>
+              </div>
+            ) : null}
+
+            {items.length > 0 ? (
+              <Suspense fallback={null}>
+                <InteractiveStackBuilder />
+              </Suspense>
+            ) : null}
           </div>
+
+          <Suspense fallback={null}>
+            <BuildYourStackFlow />
+            <BundleSavingsToast />
+          </Suspense>
+           <CartSidebar />
+           {/* S25: Talk to a Human — escape valve for overwhelmed visitors */}
+           <div style={{
+             background: "linear-gradient(135deg, rgba(154,92,46,0.06), rgba(200,150,92,0.03))",
+             borderTop: "1px solid rgba(154,92,46,0.1)",
+             padding: "28px 24px",
+             textAlign: "center",
+           }}>
+             <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.6)", margin: "0 0 12px" }}>
+               Not sure what your business needs?
+             </p>
+             <a
+               href="/book"
+               style={{
+                 display: "inline-flex", alignItems: "center", gap: "6px",
+                 background: "linear-gradient(135deg, #7a4825, #c8965c)",
+                 color: "#fff8ee", fontWeight: "700", fontSize: "13px",
+                 padding: "10px 22px", borderRadius: "999px", textDecoration: "none",
+                 boxShadow: "0 4px 14px rgba(154,92,46,0.25)",
+               }}
+             >
+               📞 Book a free 15-min strategy call
+             </a>
+             <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.35)", marginTop: "10px" }}>
+               We'll tell you exactly which services will move the needle for your business.
+             </p>
+           </div>
+           <Suspense fallback={null}>
+             <Footer />
+             <SocialProofTicker />
+           </Suspense>
+           {showComparison && (
+             <Suspense fallback={null}>
+               <ServiceComparisonModal onClose={() => setShowComparison(false)} />
+             </Suspense>
+           )}
         </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "20px" }}>
-          {filtered.map((product) => (
-            <ProductCard key={product.product_id} product={product} />
-          ))}
-        </div>
-
-        {filtered.length === 0 && (
-          <div style={{ textAlign: "center", padding: "48px", color: "rgba(26,18,9,0.4)" }}>
-            <p style={{ fontSize: "16px", fontWeight: "600" }}>No canonical services match your search</p>
-          </div>
-        )}
-
-        <InteractiveStackBuilder />
       </div>
-
-      <CartSidebar />
-      <Footer />
     </div>
   );
 }

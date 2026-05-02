@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Loader2, Lock, MessageSquare, ChevronDown, ChevronUp, Send } from "lucide-react";
+import { Loader2, Lock, MessageSquare, ChevronDown, ChevronUp, Send, Search } from "lucide-react";
+
+function HealthDot({ project, unreadCount }) {
+  const isLive = project.step_live === "complete";
+  const hasUnread = unreadCount > 0;
+  if (isLive && !hasUnread) return <span title="Healthy" className="w-2.5 h-2.5 rounded-full bg-green-500 flex-shrink-0" />;
+  if (hasUnread) return <span title="Unread messages" className="w-2.5 h-2.5 rounded-full bg-amber-400 flex-shrink-0" />;
+  return <span title="In setup" className="w-2.5 h-2.5 rounded-full bg-blue-400 flex-shrink-0" />;
+}
 import InstallQueuePanel from "./InstallQueuePanel";
 
 const STEP_KEYS = [
@@ -47,6 +55,8 @@ export default function ClientProjectsPanel() {
   const [messages, setMessages] = useState({});
   const [replyInputs, setReplyInputs] = useState({});
   const [saving, setSaving] = useState({});
+  const [search, setSearch] = useState("");
+  const [planFilter, setPlanFilter] = useState("all");
 
   const loadProjects = async () => {
     const data = await base44.entities.ClientProject.list("-created_date", 50);
@@ -70,7 +80,10 @@ export default function ClientProjectsPanel() {
     }
 
     setExpanded(id);
-    loadMessages(id);
+    // Only fetch if not already loaded
+    if (!messages[id]) {
+      loadMessages(id);
+    }
   };
 
   const sendReply = async (project) => {
@@ -91,6 +104,14 @@ export default function ClientProjectsPanel() {
     setSaving((prev) => ({ ...prev, [`reply_${project.id}`]: false }));
   };
 
+  const allPlans = [...new Set(projects.map(p => p.plan).filter(Boolean))];
+
+  const filteredProjects = projects.filter(p => {
+    const matchSearch = !search || p.business_name?.toLowerCase().includes(search.toLowerCase()) || p.client_email?.toLowerCase().includes(search.toLowerCase());
+    const matchPlan = planFilter === "all" || p.plan === planFilter;
+    return matchSearch && matchPlan;
+  });
+
   if (loading) {
     return (
       <div className="flex justify-center py-12">
@@ -103,23 +124,39 @@ export default function ClientProjectsPanel() {
     <div className="space-y-4">
       <InstallQueuePanel />
 
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="font-display text-xl font-semibold text-foreground">Client Projects</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Client-facing progress remains a mirrored view. Install truth stays on the paid order workflow above.
+            {filteredProjects.length} of {projects.length} project{projects.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <span className="text-sm text-muted-foreground">
-          {projects.length} project{projects.length !== 1 ? "s" : ""}
-        </span>
+        <div className="flex flex-wrap gap-2 items-center">
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search projects..."
+              className="pl-8 pr-3 py-2 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary w-44"
+            />
+          </div>
+          <select
+            value={planFilter}
+            onChange={e => setPlanFilter(e.target.value)}
+            className="rounded-lg border border-border bg-background text-sm px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="all">All Plans</option>
+            {allPlans.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+        </div>
       </div>
 
-      {projects.length === 0 && (
-        <div className="py-12 text-center text-sm text-muted-foreground">No client projects yet.</div>
+      {filteredProjects.length === 0 && (
+        <div className="py-12 text-center text-sm text-muted-foreground">No projects match your search.</div>
       )}
 
-      {projects.map((project) => {
+      {filteredProjects.map((project) => {
         const completedSteps = STEP_KEYS.filter((key) => project[key] === "complete").length;
         const isExpanded = expanded === project.id;
         const projectMessages = messages[project.id] || [];
@@ -131,11 +168,12 @@ export default function ClientProjectsPanel() {
               onClick={() => toggleExpand(project.id)}
               className="flex w-full items-center justify-between px-6 py-5 text-left transition-colors hover:bg-muted/20"
             >
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <HealthDot project={project} unreadCount={unreadCount} />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{project.business_name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {project.client_email} - {project.plan}
+                    {project.client_email} · {project.plan}
                   </p>
                 </div>
                 {unreadCount > 0 && (

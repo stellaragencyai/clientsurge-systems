@@ -1,428 +1,347 @@
-import { useState } from 'react';
-import { ArrowRight, Zap, MessageSquare, PhoneCall, CalendarCheck, RotateCcw, LayoutDashboard, HeadphonesIcon, TrendingUp, CheckCircle2, Send, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, ShoppingCart } from "lucide-react";
+import { motion } from "framer-motion";
 import DemoBookingModal from "../forms/DemoBookingModal";
-import AutomationPipelineSection from "./AutomationPipelineSection";
+import {
+  INDUSTRY_RECOMMENDATIONS_BY_ID,
+  INDUSTRY_SELECTION_STORAGE_KEY } from
+"@/lib/industryRecommendations";
+import { systemsById, systemGroups, coreOfferSectionConfig, iconMap } from "./coreOffer/coreOfferData";
+import SystemMap from "./coreOffer/SystemMapSection";
+import VerticalTimeline from "./coreOffer/VerticalTimeline";
+import LaunchTimeline from "./coreOffer/LaunchTimeline";
+import StackBuilder from "./coreOffer/StackBuilder";
 
-const coreAutomation = [
-  { icon: Zap, step: "01", title: "Instantly respond to every lead", desc: "Before your competitors do - personalized replies within seconds.", tag: "Avg. 2x more bookings" },
-  { icon: MessageSquare, step: "02", title: "Turn inquiries into booked appointments", desc: "Guided booking flow that converts more leads into confirmed bookings.", tag: "Saves 3-5 hrs/week" },
-  { icon: PhoneCall, step: "03", title: "Recover bookings from missed calls", desc: "Every missed call gets an immediate text-back - zero leads disappear.", tag: "0 leads lost" },
-  { icon: Send, step: "04", title: "Automate follow-up so nothing slips through", desc: "Multi-step sequences keep leads warm and moving toward booking.", tag: "14-day nurture sequence" },
-  { icon: RotateCcw, step: "05", title: "Reactivate old leads into new revenue", desc: "Turn dormant contacts into fresh opportunities with proven campaigns.", tag: "Avg. $4k recovered/mo" },
-];
+const orderedSystemIds = Object.keys(systemsById);
+const mobileVisibleSystemIds = new Set(["02", "03", "04", "05"]);
 
-const doneForYou = [
-  { icon: CalendarCheck, step: "06", title: "Booking Flow", desc: "Leads guided directly to your calendar. No phone tag, no friction.", tag: "Zero manual scheduling" },
-  { icon: LayoutDashboard, step: "07", title: "CRM Pipeline Automation", desc: "Auto-tagging, status updates, and task creation - your pipeline runs itself.", tag: "Full visibility" },
-  { icon: HeadphonesIcon, step: "08", title: "Ongoing Support", desc: "Continuous optimization and priority support from our team post-launch.", tag: "Priority access" },
-];
-
-const aspects = {
-  "01": ["Responds instantly to all inquiries", "Personalized by lead details", "Works 24/7 - even at 2am"],
-  "02": ["Guides prospects directly to booking", "Eliminates phone tag friction", "Confirmation sent automatically"],
-  "03": ["SMS sent within 60 seconds of missed call", "Recovers leads before they dial a competitor", "Works while you're with other clients"],
-  "04": ["Multi-step SMS & email sequences", "Smart timing based on lead behaviour", "14-day automated nurture window"],
-  "05": ["Reactivates dormant leads", "Proven re-engagement sequences", "Turn old contacts into fresh revenue"],
-  "06": ["Zero manual scheduling", "Frictionless booking experience", "Direct calendar integration"],
-  "07": ["Auto-tagging & status updates", "Full visibility dashboard", "Task creation on autopilot"],
-  "08": ["Priority support access", "Continuous post-launch optimization", "Monthly performance reviews"],
-};
-
-const blueprints = {
-  "01": {
-    trigger: "A new lead submits a form, ad inquiry, or direct message.",
-    system: "The system sends a personalized first response in seconds based on lead source and context.",
-    visibleToLead: "They hear from you immediately instead of waiting for a callback.",
-    businessOutcome: "You win more conversations before competitors even respond.",
-  },
-  "02": {
-    trigger: "A prospect asks questions or shows interest but has not booked yet.",
-    system: "The automation answers, qualifies, and routes the conversation toward a booking decision.",
-    visibleToLead: "The interaction feels guided, helpful, and responsive.",
-    businessOutcome: "More warm inquiries turn into booked appointments.",
-  },
-  "03": {
-    trigger: "A call comes in and your team misses it while busy or after hours.",
-    system: "A text-back fires automatically and keeps the lead engaged while your team catches up.",
-    visibleToLead: "They still get an immediate response instead of feeling ignored.",
-    businessOutcome: "Missed calls stop turning into lost revenue.",
-  },
-  "04": {
-    trigger: "A lead goes quiet after the first touchpoint or does not book right away.",
-    system: "Timed SMS and email follow-up keeps the lead warm with the right spacing and next step.",
-    visibleToLead: "They experience steady follow-up without feeling chased.",
-    businessOutcome: "More leads come back and convert instead of dying silently.",
-  },
-  "05": {
-    trigger: "Your CRM already contains older leads that never converted.",
-    system: "Reactivation campaigns reopen dormant conversations with proven messaging.",
-    visibleToLead: "They receive a relevant reconnect message rather than being forgotten forever.",
-    businessOutcome: "Old contacts become fresh opportunities and recovered revenue.",
-  },
-  "06": {
-    trigger: "A lead is qualified and ready to move into scheduling.",
-    system: "The automation pushes them into a cleaner booking path with less back-and-forth.",
-    visibleToLead: "Scheduling feels easy, direct, and frictionless.",
-    businessOutcome: "More ready prospects actually complete the booking step.",
-  },
-  "07": {
-    trigger: "A lead replies, changes stage, or requires internal follow-through.",
-    system: "Statuses, tags, and pipeline actions update automatically behind the scenes.",
-    visibleToLead: "They experience a coordinated business that seems on top of everything.",
-    businessOutcome: "Your team gets cleaner visibility and fewer workflow gaps.",
-  },
-  "08": {
-    trigger: "The system is live and handling real lead flow.",
-    system: "We review results, tune messaging, and improve performance over time.",
-    visibleToLead: "They keep experiencing a polished follow-up flow instead of a stale setup.",
-    businessOutcome: "The automation gets stronger instead of degrading after launch.",
-  },
-};
-
-function FeatureCard({ item, onSelect }) {
-  const Icon = item.icon;
-  const stepNum = parseInt(item.step);
-  const [hovered, setHovered] = useState(false);
-
+function CoreOfferHeader() {
   return (
-    <div
-      className="relative cursor-pointer group"
-      onClick={() => onSelect(item.step)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <div
-        className="flex flex-col rounded-2xl overflow-hidden transition-all duration-300"
-        style={{
-          background: hovered ? "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,240,235,0.9) 100%)" : "linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(252,247,242,0.75) 100%)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-          border: hovered ? "1.5px solid rgba(154,92,46,0.6)" : "1.5px solid rgba(154,92,46,0.3)",
-          boxShadow: hovered ? "0 20px 50px rgba(154,92,46,0.25), 0 8px 16px rgba(0,0,0,0.1), inset 0 1px 2px rgba(255,255,255,0.6)" : "0 8px 24px rgba(154,92,46,0.12), 0 2px 8px rgba(0,0,0,0.05), inset 0 1px 2px rgba(255,255,255,0.5)",
-          transform: hovered ? "translateY(-4px) scale(1.02)" : "translateY(0)",
-          transition: "all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1)",
-        }}
-      >
-        {/* TOP */}
-        <div className="px-6 pt-7 pb-5" style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.08) 0%, rgba(154,92,46,0.04) 100%)" }}>
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: "rgba(80,40,10,0.9)" }}>
-              Step {stepNum < 10 ? `0${stepNum}` : stepNum}
-            </span>
-            <div className="flex items-center gap-2">
-              {/* Click hint */}
-              <span
-                className="text-[9px] font-semibold uppercase tracking-wider transition-all duration-200"
-                style={{
-                  color: "rgba(154,92,46,0.5)",
-                  opacity: hovered ? 1 : 0,
-                  transform: hovered ? "translateX(0)" : "translateX(4px)",
-                }}
-              >
-                <span className="sm:hidden">Tap to expand</span>
-                <span className="hidden sm:inline">Click to expand</span>
-              </span>
-              <div
-                className="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-300"
-                style={{
-                  backgroundColor: hovered ? "rgba(154,92,46,0.18)" : "rgba(154,92,46,0.1)",
-                  border: "1px solid rgba(154,92,46,0.2)",
-                  transform: hovered ? "scale(1.12)" : "scale(1)",
-                }}
-              >
-                <Icon className="w-4 h-4" style={{ color: "#9a5c2e" }} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div style={{ height: "1px", background: "linear-gradient(to right, transparent, rgba(154,92,46,0.2), transparent)" }} />
-
-        {/* BOTTOM - dark gradient with improved contrast */}
-        <div
-          className="px-6 py-8 flex flex-col gap-2 relative"
-          style={{ background: "linear-gradient(135deg,#5a3418 0%,#8a5229 40%,#6b4020 100%)" }}
-        >
-          <h3 className="text-sm font-semibold leading-snug" style={{ color: "#f5e6d0" }}>{item.title}</h3>
-          <p className="text-xs leading-relaxed" style={{ color: "rgba(245,230,208,0.65)" }}>{item.desc}</p>
-          <span
-            className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wide uppercase w-fit mt-1"
-            style={{
-              background: "rgba(245,230,208,0.12)",
-              color: "#f5d9a8",
-              border: "1px solid rgba(245,230,208,0.2)",
-            }}
-          >
-            {item.tag}
-          </span>
-        </div>
+    <div className="text-center mx-auto max-w-4xl">
+      {/* Eyebrow */}
+      <div className="inline-flex items-center gap-2 mb-5">
+        <div className="h-px w-8" style={{ background: "linear-gradient(to right, transparent, rgba(154,92,46,0.6))" }} />
+        <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-primary">
+          {coreOfferSectionConfig.eyebrow}
+        </p>
+        <div className="h-px w-8" style={{ background: "linear-gradient(to left, transparent, rgba(154,92,46,0.6))" }} />
       </div>
-    </div>
-  );
+
+      {/* Title — forced single line via whitespace-nowrap on desktop */}
+      <h2 className="font-display font-bold tracking-tight leading-none text-foreground"
+      style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)" }}>
+        How The{" "}
+        <span style={{ color: "#9a5c2e", textShadow: "0 0 32px rgba(154,92,46,0.28)" }}>
+          ClientSurge
+        </span>{" "}
+        Flow Works
+      </h2>
+
+      {/* Thin gold rule */}
+      <div className="flex items-center justify-center gap-3 mt-5 mb-6">
+        <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to right, transparent, rgba(154,92,46,0.45))" }} />
+        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#c8965c" }} />
+        <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to left, transparent, rgba(154,92,46,0.45))" }} />
+      </div>
+
+      {/* Subheadline — tighter, more editorial */}
+      <p className="text-base md:text-lg font-medium text-foreground/80 max-w-2xl mx-auto leading-relaxed">
+        {coreOfferSectionConfig.subheadline}
+      </p>
+      <p className="mt-3 text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
+        {coreOfferSectionConfig.helperLine}
+      </p>
+    </div>);
+
 }
 
-function StepModal({ stepId, onClose, onBookDemo }) {
-  const itemData = [...coreAutomation, ...doneForYou].find(i => i.step === stepId);
-  if (!itemData) return null;
-  const Icon = itemData.icon;
-  const cardAspects = aspects[stepId] || [];
-  const blueprint = blueprints[stepId];
+// CoreOfferHeader is already placed first inside the section — no change needed to section wrapper
 
+function SystemCard({ system, selected, onSelect, onAddToStack }) {
+  const Icon = iconMap[system.icon];
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40"
-        onClick={onClose}
-      />
-      {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
-        <div
-          className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl relative overflow-hidden"
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            animation: "coreModalIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
-            border: "2px solid rgba(200,150,92,0.4)",
-          }}
-        >
-          {/* Warm gradient header strip */}
-          <div
-            className="px-10 pt-8 pb-6"
-            style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}
-          >
-            <button
-              onClick={onClose}
-              className="absolute top-5 right-5 w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:bg-white/20"
-              style={{ background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.2)" }}
-              aria-label="Close"
-            >
-              <X className="w-4 h-4 text-white" />
-            </button>
-            <div className="flex items-center gap-4">
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)" }}
-              >
-                <Icon className="w-7 h-7 text-white" />
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "rgba(245,230,208,0.55)" }}>
-                  Step {itemData.step}
-                </p>
-                <h2 className="font-display text-xl font-bold leading-snug" style={{ color: "#f5e6d0" }}>
-                  {itemData.title}
-                </h2>
-              </div>
-            </div>
-          </div>
-
-          {/* Body */}
-          <div className="px-10 py-8">
-            <p className="text-foreground/70 mb-7 leading-relaxed">{itemData.desc}</p>
-
-            <div className="grid gap-3 mb-8 md:grid-cols-2">
-              {[
-                { label: "Trigger", value: blueprint?.trigger },
-                { label: "System Action", value: blueprint?.system },
-                { label: "Lead Experiences", value: blueprint?.visibleToLead },
-                { label: "Business Outcome", value: blueprint?.businessOutcome },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="rounded-2xl border border-[rgba(154,92,46,0.15)] bg-[rgba(154,92,46,0.05)] px-4 py-4"
-                >
-                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-primary mb-2">{item.label}</p>
-                  <p className="text-sm leading-6 text-foreground/80">{item.value}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Key points */}
-            <p className="text-[10px] font-bold uppercase tracking-widest text-primary mb-4">What This Includes</p>
-            <div className="space-y-3 mb-8">
-              {cardAspects.map((aspect, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center gap-3 p-3.5 rounded-xl"
-                  style={{
-                    background: "rgba(154,92,46,0.06)",
-                    border: "1px solid rgba(154,92,46,0.15)",
-                    animation: `slideInPoint 0.4s ease-out ${0.1 + idx * 0.1}s both`,
-                  }}
-                >
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" style={{ color: "#9a5c2e" }} />
-                  <span className="text-sm font-semibold text-foreground">{aspect}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Tag pill */}
-            <div className="mb-8 flex">
-              <span
-                className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full uppercase tracking-wide"
-                style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)", color: "#f5d9a8" }}
-              >
-                <TrendingUp className="w-3 h-3" />
-                {itemData.tag}
-              </span>
-            </div>
-
-            {/* CTA */}
-            <button
-              onClick={() => { onClose(); onBookDemo(); }}
-              style={{ display: "block", width: "100%", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.35)", border: "none", cursor: "pointer" }}
-              onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 32px rgba(161,120,35,0.6)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"; }}
-            >
-              <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "48px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }}>
-                Book Your Free Demo
-                <ArrowRight className="w-4 h-4" />
-              </span>
-            </button>
-          </div>
-
-          <style>{`
-            @keyframes coreModalIn {
-              from { transform: scale(0.85) translateY(16px); opacity: 0; }
-              to { transform: scale(1) translateY(0); opacity: 1; }
-            }
-            @keyframes slideInPoint {
-              from { opacity: 0; transform: translateX(-10px); }
-              to { opacity: 1; transform: translateX(0); }
-            }
-          `}</style>
+    <motion.button
+      type="button"
+      onClick={() => onSelect(system.id)}
+      whileHover={{ y: -2 }}
+      initial={{ opacity: 0, x: -50 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      viewport={{ once: true, margin: "-50px" }}
+      className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+      style={{
+        background: "rgba(255,255,255,0.82)",
+        border: selected ? "1.5px solid rgba(154,92,46,0.4)" : "1px solid rgba(148, 163, 184, 0.18)",
+        boxShadow: selected ?
+        "0 12px 32px rgba(154,92,46,0.15)" :
+        "0 8px 22px rgba(15, 23, 42, 0.05)"
+      }}>
+      
+      <div className="px-5 md:px-6 pt-5 pb-3 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.82)" }}>
+        <div className="flex-1 min-w-0">
+          <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(154,92,46,0.7)" }}>
+            Step {system.id}
+          </p>
+          <p className="mt-1 text-sm font-semibold text-foreground leading-snug">{system.title}</p>
         </div>
+        <motion.div
+          animate={selected ? { scale: 1.1 } : { scale: 1 }}
+          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)", boxShadow: "0 2px 8px rgba(154,92,46,0.3)" }}>
+          
+          <Icon className="w-4 h-4 text-white" />
+        </motion.div>
       </div>
-    </>
-  );
+      <div className="px-5 pb-3">
+        <p className="text-sm leading-relaxed text-foreground/75">{system.shortDescription}</p>
+      </div>
+      <div className="px-5 pb-5 flex gap-2">
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddToStack(system.id);
+          }}
+          className="flex-1 py-2 px-3 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-lg text-xs font-semibold text-primary hover:from-primary/15 hover:to-primary/10 transition flex items-center justify-center gap-1">
+          
+          <ShoppingCart className="w-3 h-3" /> Add
+        </button>
+      </div>
+    </motion.button>);
+
+}
+
+function SystemGroupList({ selectedSystemId, onSelect, onAddToStack }) {
+  return (
+    <div className="mt-12 md:mt-14 space-y-10 md:space-y-12">
+      {systemGroups.map((group) =>
+      <motion.div
+        key={group.id}
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        viewport={{ once: true }}>
+        
+          <div className="flex items-center gap-4 mb-4 md:mb-5">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
+            <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase whitespace-nowrap">{group.label}</p>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
+          </div>
+          <div className="grid grid-cols-1 gap-5">
+            {group.systems.map((systemId, idx) =>
+          <motion.div
+            key={systemId}
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: idx * 0.1 }}
+            viewport={{ once: true }}>
+            
+                <SystemCard
+              system={systemsById[systemId]}
+              selected={selectedSystemId === systemId}
+              onSelect={onSelect}
+              onAddToStack={onAddToStack} />
+            
+              </motion.div>
+          )}
+          </div>
+        </motion.div>
+      )}
+    </div>);
+
+}
+
+function MobileSystemGroupList({ selectedSystemId, onSelect, showAll, onToggle, onAddToStack }) {
+  return (
+    <div className="mt-12 space-y-8 md:hidden">
+      {systemGroups.map((group) => {
+        const visibleSystems = group.systems.filter(
+          (systemId) => showAll || mobileVisibleSystemIds.has(systemId)
+        );
+        if (!visibleSystems.length) return null;
+        return (
+          <div key={group.id}>
+            <div className="flex items-center gap-4 mb-4">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
+              <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase whitespace-nowrap">{group.label}</p>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
+            </div>
+            <div className="grid grid-cols-1 gap-4">
+              {visibleSystems.map((systemId) =>
+              <SystemCard
+                key={systemId}
+                system={systemsById[systemId]}
+                selected={selectedSystemId === systemId}
+                onSelect={onSelect}
+                onAddToStack={onAddToStack} />
+
+              )}
+            </div>
+          </div>);
+
+      })}
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-white/80">
+        
+        {showAll ? "Show condensed view" : "See full 6-system flow"}
+        <ArrowRight className="w-4 h-4" />
+      </button>
+    </div>);
+
+}
+
+function CoreOfferCTA({ onBookDemo }) {
+  return (
+    <div className="bg-[#fffaf0] mt-12 mx-auto pt-8 text-center md:pt-10 md:mt-14 border-t border-border max-w-3xl">
+      <p className="font-display text-2xl md:text-3xl font-semibold text-foreground leading-tight">
+        Ready to see which systems fit your business?
+      </p>
+      <p className="text-sm md:text-base text-muted-foreground mt-3 leading-relaxed max-w-2xl mx-auto">
+        We will show you the right setup based on your lead flow, booking process, and goals.
+      </p>
+      <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+        <a
+          href={coreOfferSectionConfig.primaryCta.href}
+          className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
+          
+          {coreOfferSectionConfig.primaryCta.label}
+          <ArrowRight className="w-4 h-4" />
+        </a>
+        <button
+          type="button"
+          onClick={onBookDemo}
+          style={{
+            borderRadius: "9999px",
+            padding: "2px",
+            background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+            boxShadow: "0 4px 18px rgba(120,70,20,0.3)",
+            border: "none",
+            cursor: "pointer"
+          }}>
+          
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              height: "44px",
+              padding: "0 24px",
+              borderRadius: "9999px",
+              background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+              color: "#f5e6d0",
+              fontWeight: "700",
+              fontSize: "0.95rem"
+            }}>
+            
+            {coreOfferSectionConfig.secondaryCta.label}
+            <ArrowRight className="w-4 h-4" />
+          </span>
+        </button>
+      </div>
+    </div>);
+
 }
 
 export default function CoreOffer() {
-  const [selectedStep, setSelectedStep] = useState(null);
+  const [selectedSystemId, setSelectedSystemId] = useState("02");
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedIndustryId, setSelectedIndustryId] = useState(null);
+  const [showAllMobileSystems, setShowAllMobileSystems] = useState(false);
+  const [stackBuilderOpen, setStackBuilderOpen] = useState(false);
+  const [stackItems, setStackItems] = useState({});
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const applyIndustrySelection = () => {
+      const storedIndustryId = window.sessionStorage.getItem(INDUSTRY_SELECTION_STORAGE_KEY);
+      const industryContext = storedIndustryId ? INDUSTRY_RECOMMENDATIONS_BY_ID[storedIndustryId] : null;
+      setSelectedIndustryId(industryContext?.id || null);
+
+      const priorityServiceKey = industryContext?.priorityServiceKeys?.[0];
+      const matchingSystem = Object.values(systemsById).find((s) => s.service_key === priorityServiceKey);
+      if (matchingSystem) setSelectedSystemId(matchingSystem.id);
+      setShowAllMobileSystems(false);
+    };
+
+    applyIndustrySelection();
+    window.addEventListener("storage", applyIndustrySelection);
+    window.addEventListener("clientsurge:industry-selected", applyIndustrySelection);
+    return () => {
+      window.removeEventListener("storage", applyIndustrySelection);
+      window.removeEventListener("clientsurge:industry-selected", applyIndustrySelection);
+    };
+  }, []);
+
+  const handleNextSystem = () => {
+    const currentIndex = orderedSystemIds.indexOf(selectedSystemId);
+    setSelectedSystemId(orderedSystemIds[(currentIndex + 1) % orderedSystemIds.length]);
+  };
+
+  const handlePreviousSystem = () => {
+    const currentIndex = orderedSystemIds.indexOf(selectedSystemId);
+    setSelectedSystemId(orderedSystemIds[(currentIndex - 1 + orderedSystemIds.length) % orderedSystemIds.length]);
+  };
+
+  const handleAddToStack = (systemId) => {
+    setStackItems((prev) => ({
+      ...prev,
+      [systemId]: (prev[systemId] || 0) + 1
+    }));
+    setStackBuilderOpen(true);
+  };
 
   return (
-    <section id="services" className="py-20 md:py-28 px-4 md:px-6 bg-gradient-to-b from-blue-50/30 via-slate-50 to-background relative overflow-hidden">
-      {/* Enhanced background with subtle radial gradient for contrast */}
-      <div aria-hidden="true" className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 80% 100% at 50% 0%, rgba(154,92,46,0.08) 0%, transparent 70%)" }} />
-      <div className="max-w-5xl mx-auto relative z-10">
+    <section
+      id="services"
+      className="pt-16 md:pt-28 pb-24 md:pb-32 px-4 md:px-6 bg-gradient-to-b from-card via-background via-70% to-slate-50/30 relative overflow-hidden"
+      style={{ overflowX: "hidden" }}>
+      
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse 80% 100% at 50% 0%, rgba(154,92,46,0.08) 0%, transparent 70%)" }} />
+      
 
-        {/* Header */}
-        <div className="text-center mb-14">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Package</p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-foreground">
-           How the{" "}
-           <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.35)" }}>8-System</span>
-           {" "}Flow Works
-          </h2>
-          {/* Gold accent divider */}
-          <div className="flex items-center justify-center gap-3 mt-5 mb-5">
-            <div style={{ height: "1px", width: "48px", background: "linear-gradient(to right, transparent, rgba(154,92,46,0.5))" }} />
-            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#9a5c2e" }} />
-            <div style={{ height: "1px", width: "48px", background: "linear-gradient(to left, transparent, rgba(154,92,46,0.5))" }} />
-          </div>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
-            Every system works together - capturing leads, responding instantly, following up automatically, and booking appointments without you lifting a finger.
-          </p>
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-            <span aria-hidden="true">↗</span>
-            Click any system card to open its automation blueprint
-          </div>
-        </div>
+      <div className="max-w-6xl mx-auto relative z-10 pt-10">
+        <CoreOfferHeader />
+        
+        {/* Stack Builder Button */}
+        <motion.div
+          className="mt-8 flex justify-center"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}>
+          
+          <button
+            onClick={() => setStackBuilderOpen(true)} className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 border border-primary/25 text-primary font-semibold text-sm hover:bg-primary/15 transition hidden">
 
-        {/* ROI Callout + Step count pill */}
-        <div className="mb-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full border border-primary/25 bg-primary/6">
-            <TrendingUp className="w-4 h-4 text-primary flex-shrink-0" />
-            <p className="text-sm font-semibold text-foreground">Most clients recover their investment within the first 30 days - often sooner.</p>
-          </div>
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)", boxShadow: "0 2px 10px rgba(120,70,20,0.3)" }}>
-            <span className="text-xs font-bold" style={{ color: "#f5d9a8" }}>8 systems included</span>
-          </div>
-        </div>
+            
+            <ShoppingCart className="w-4 h-4" />
+            {Object.keys(stackItems).length > 0 ?
+            `Build Stack (${Object.values(stackItems).reduce((a, b) => a + b, 0)} items)` :
+            "Build Your Ideal Stack"}
+          </button>
+        </motion.div>
 
-        {/* 8-Step Clickable Cards — with left rail timeline */}
-        <div className="mb-10">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-5 text-center">Core Automation — Steps 1–5</p>
-
-          <div className="flex flex-col gap-6">
-            {coreAutomation.map((item) => (
-              <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-6">
-            {doneForYou.map((item) => (
-              <FeatureCard key={item.step} item={item} onSelect={setSelectedStep} />
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-16 mb-16 pt-8 border-t border-border/30" />
-
-        <div className="pt-8">
-          <AutomationPipelineSection />
-        </div>
-
-        {/* 3-step timeline */}
-        <div className="mb-8 mt-12 rounded-2xl border border-primary/15 overflow-hidden">
-          <div className="grid grid-cols-3 bg-primary/5">
-            {[
-              { num: "1", label: "Onboarding Call", sub: "One 15-min call with our team" },
-              { num: "2", label: "We Build Everything", sub: "Full system built & tested for you" },
-              { num: "3", label: "You Go Live", sub: "Automated & running in 7 days" },
-            ].map((step, i) => (
-              <div key={i} className={`px-5 py-5 text-center relative ${i < 2 ? "border-r border-primary/15" : ""}`}>
-                {i < 2 && (
-                  <div className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-6 h-6 rounded-full bg-white border border-primary/20 items-center justify-center">
-                    <ArrowRight className="w-3 h-3 text-primary" />
-                  </div>
-                )}
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-black"
-                  style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)", color: "#f5e6d0" }}
-                >
-                  {step.num}
-                </div>
-                <p className="text-xs font-bold text-foreground mb-1">{step.label}</p>
-                <p className="text-xs text-muted-foreground leading-snug">{step.sub}</p>
-              </div>
-            ))}
-          </div>
-          <div className="px-6 py-5 text-center border-t border-primary/15" style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}>
-            <p className="text-xs font-bold text-amber-300/70 uppercase tracking-widest mb-1">The Complete System</p>
-            <p className="text-lg font-bold text-amber-100">Installed For You. Running in 7 Days.</p>
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="pt-6 border-t border-border text-center">
-          <p className="font-display text-2xl md:text-3xl font-semibold text-foreground mb-1">
-            The Complete System.{" "}
-            <span style={{ color: "#9a5c2e" }}>Installed For You.</span>{" "}
-            Running in 7 Days.
-          </p>
-          <p className="text-xs text-muted-foreground mb-3 mt-2">Click any card above to explore what each system does.</p>
-          <a
-            href="#pricing"
-            className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
-          >
-            See plans and pricing below
-            <ArrowRight className="w-4 h-4" />
-          </a>
-        </div>
-
+        <VerticalTimeline
+          selectedSystemId={selectedSystemId}
+          onSystemSelect={setSelectedSystemId}
+          onBookDemo={() => setShowBookingModal(true)} />
+        
+        <LaunchTimeline />
+        <CoreOfferCTA onBookDemo={() => setShowBookingModal(true)} />
       </div>
 
-      {selectedStep && (
-        <StepModal
-          stepId={selectedStep}
-          onClose={() => setSelectedStep(null)}
-          onBookDemo={() => setShowBookingModal(true)}
-        />
-      )}
+      <StackBuilder
+        isOpen={stackBuilderOpen}
+        onClose={() => setStackBuilderOpen(false)}
+        systems={systemsById} />
+      
       {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
-    </section>
-  );
+    </section>);
+
 }

@@ -1,0 +1,106 @@
+{
+  "name": "Invoice",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "title": "Project ID"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "invoice_number": {
+      "type": "string",
+      "title": "Invoice Number"
+    },
+    "amount": {
+      "type": "number",
+      "title": "Amount (USD)"
+    },
+    "amount_paid": {
+      "type": "number",
+      "title": "Amount Paid (USD)",
+      "default": 0
+    },
+    "amount_outstanding": {
+      "type": "number",
+      "title": "Amount Outstanding (USD)"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "issue_date": {
+      "type": "string",
+      "title": "Issue Date"
+    },
+    "due_date": {
+      "type": "string",
+      "title": "Due Date"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "draft",
+        "issued",
+        "partially_paid",
+        "paid",
+        "overdue",
+        "cancelled"
+      ],
+      "default": "issued"
+    },
+    "payment_status": {
+      "type": "string",
+      "title": "Payment Status",
+      "enum": [
+        "unpaid",
+        "partially_paid",
+        "paid"
+      ],
+      "default": "unpaid"
+    },
+    "stripe_invoice_id": {
+      "type": "string",
+      "title": "Stripe Invoice ID"
+    },
+    "stripe_payment_intent_id": {
+      "type": "string",
+      "title": "Stripe Payment Intent ID"
+    },
+    "pdf_url": {
+      "type": "string",
+      "title": "PDF Download URL"
+    },
+    "payment_link": {
+      "type": "string",
+      "title": "Stripe Payment Link"
+    },
+    "payment_method": {
+      "type": "string",
+      "title": "Payment Method",
+      "enum": [
+        "stripe_card",
+        "stripe_bank",
+        "manual",
+        "other"
+      ]
+    },
+    "paid_at": {
+      "type": "string",
+      "title": "Paid At"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "project_id",
+    "client_email",
+    "invoice_number",
+    "amount"
+  ]
+}

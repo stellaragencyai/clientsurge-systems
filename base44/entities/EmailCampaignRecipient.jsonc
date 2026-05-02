@@ -1,0 +1,89 @@
+{
+  "name": "EmailCampaignRecipient",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "campaign_id": {
+      "type": "string",
+      "title": "Campaign ID"
+    },
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email Address"
+    },
+    "lead_name": {
+      "type": "string",
+      "title": "Lead Name"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "pending",
+        "sent",
+        "delivered",
+        "opened",
+        "clicked",
+        "bounced",
+        "unsubscribed",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "sent_at": {
+      "type": "string",
+      "title": "Sent At"
+    },
+    "delivered_at": {
+      "type": "string",
+      "title": "Delivered At"
+    },
+    "opened_at": {
+      "type": "string",
+      "title": "Opened At"
+    },
+    "clicked_at": {
+      "type": "string",
+      "title": "Clicked At"
+    },
+    "unsubscribed_at": {
+      "type": "string",
+      "title": "Unsubscribed At"
+    },
+    "bounced_at": {
+      "type": "string",
+      "title": "Bounced At"
+    },
+    "resend_message_id": {
+      "type": "string",
+      "title": "Resend Message ID"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message"
+    },
+    "open_count": {
+      "type": "number",
+      "title": "Open Count",
+      "default": 0
+    },
+    "click_count": {
+      "type": "number",
+      "title": "Click Count",
+      "default": 0
+    }
+  },
+  "required": [
+    "campaign_id",
+    "lead_id",
+    "email"
+  ]
+}

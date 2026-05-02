@@ -1,0 +1,95 @@
+{
+  "name": "EmailCampaignTemplate",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "name": {
+      "type": "string",
+      "title": "Template Name",
+      "description": "e.g., 'Case Study Sequence', 'Pricing Uncertain Flow'"
+    },
+    "campaign_type": {
+      "type": "string",
+      "title": "Campaign Type",
+      "enum": [
+        "case_study",
+        "testimonial",
+        "pricing",
+        "feature_highlight",
+        "custom"
+      ]
+    },
+    "for_intent": {
+      "type": "string",
+      "title": "Best For Intent",
+      "enum": [
+        "asking_question",
+        "pricing_concern",
+        "uncertain",
+        "booking_ready"
+      ]
+    },
+    "for_industries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Industries",
+      "description": "e.g., ['med_spa', 'dental', 'all']"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "order": {
+            "type": "number"
+          },
+          "subject_template": {
+            "type": "string",
+            "description": "Subject with {{variables}}"
+          },
+          "body_template": {
+            "type": "string",
+            "description": "HTML body with {{variables}}"
+          },
+          "delay_hours": {
+            "type": "number",
+            "description": "Hours after previous step"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "main",
+              "followup"
+            ],
+            "description": "Main email or simple followup"
+          }
+        }
+      },
+      "title": "Email Steps"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "archived"
+      ],
+      "default": "active"
+    },
+    "created_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "campaign_type",
+    "for_intent",
+    "steps"
+  ]
+}

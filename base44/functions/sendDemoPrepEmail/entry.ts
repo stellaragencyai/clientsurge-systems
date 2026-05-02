@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     </div>
     <p>We will use that information to tailor the walkthrough, show the fastest automation wins, and make the demo as specific to your business as possible.</p>
     <p style="margin-top: 24px;">See you soon,<br/><strong>The ClientSurge Systems Team</strong></p>
-    <p style="font-size: 12px; color: #999; margin-top: 24px;">Need help before the call? Reply to this email or call <a href="tel:+16025874608">(602) 587-4608</a></p>
+    <p style="font-size: 12px; color: #999; margin-top: 24px;">Need help before the call? Reply to this email or call <a href="tel:+16025843227">(602) 584-3227</a></p>
   </div>
 </body>
 </html>`;

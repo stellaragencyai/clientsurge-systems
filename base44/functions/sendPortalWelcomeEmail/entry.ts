@@ -4,11 +4,44 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const ADMIN_EMAIL = "system@clientsurgesystems.com";
 const FROM_EMAIL = "ClientSurge Systems <system@clientsurgesystems.com>";
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 Deno.serve(async (req) => {
   try {
-    const { client_name, client_email, business_name } = await req.json();
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
 
-    const portalUrl = `https://apexflow.base44.app/client-portal`;
+    const base44 = createClientFromRequest(req);
+    let user = null;
+    try { user = await base44.auth.me(); } catch (_) {}
+    if (!user || user.role !== 'admin') {
+      return Response.json({ error: 'Forbidden: Admin only' }, { status: 403 });
+    }
+
+    if (!RESEND_API_KEY) {
+      return Response.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
+    }
+
+    const { client_name, client_email, business_name } = await req.json();
+    if (!client_name || !client_email || !business_name) {
+      return Response.json({ error: 'client_name, client_email, and business_name are required' }, { status: 400 });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(client_email)) {
+      return Response.json({ error: 'client_email must be valid' }, { status: 400 });
+    }
+    const safeClientName = escapeHtml(client_name);
+    const safeBusinessName = escapeHtml(business_name);
+    const safeClientEmail = escapeHtml(client_email);
+
+    const portalUrl = `https://clientsurgesystems.com/client-portal`;
 
     // Welcome email to the new client
     const clientHtml = `
@@ -18,9 +51,9 @@ Deno.serve(async (req) => {
           <p style="color: rgba(245,230,208,0.75); font-size: 15px; margin: 0;">Your automation system is being built</p>
         </div>
         <div style="padding: 40px;">
-          <p style="font-size: 16px; color: #1a1a1a; margin: 0 0 16px;">Hi ${client_name},</p>
+          <p style="font-size: 16px; color: #1a1a1a; margin: 0 0 16px;">Hi ${safeClientName},</p>
           <p style="font-size: 15px; color: #444; line-height: 1.7; margin: 0 0 24px;">
-            Thanks for creating your account for <strong>${business_name}</strong>. Our team has received your details and will be in touch within 24 hours to kick off your system setup.
+            Thanks for creating your account for <strong>${safeBusinessName}</strong>. Our team has received your details and will be in touch within 24 hours to kick off your system setup.
           </p>
           <p style="font-size: 15px; color: #444; line-height: 1.7; margin: 0 0 16px;">
             You'll receive a separate email with your activation link to access your Client Portal, where you can:
@@ -53,9 +86,9 @@ Deno.serve(async (req) => {
         </div>
         <div style="padding: 32px;">
           <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #333;">
-            <tr><td style="padding: 8px 0; font-weight: 600; width: 140px;">Name</td><td style="padding: 8px 0;">${client_name}</td></tr>
-            <tr><td style="padding: 8px 0; font-weight: 600;">Business</td><td style="padding: 8px 0;">${business_name}</td></tr>
-            <tr><td style="padding: 8px 0; font-weight: 600;">Email</td><td style="padding: 8px 0;"><a href="mailto:${client_email}" style="color: #9a5c2e;">${client_email}</a></td></tr>
+            <tr><td style="padding: 8px 0; font-weight: 600; width: 140px;">Name</td><td style="padding: 8px 0;">${safeClientName}</td></tr>
+            <tr><td style="padding: 8px 0; font-weight: 600;">Business</td><td style="padding: 8px 0;">${safeBusinessName}</td></tr>
+            <tr><td style="padding: 8px 0; font-weight: 600;">Email</td><td style="padding: 8px 0;"><a href="mailto:${safeClientEmail}" style="color: #9a5c2e;">${safeClientEmail}</a></td></tr>
             <tr><td style="padding: 8px 0; font-weight: 600;">Time</td><td style="padding: 8px 0;">${new Date().toLocaleString('en-US', { timeZone: 'America/Phoenix' })} (AZ)</td></tr>
           </table>
           <div style="margin-top: 24px; padding: 16px; background: #faf8f5; border-radius: 8px; border-left: 4px solid #9a5c2e;">
@@ -76,7 +109,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           from: FROM_EMAIL,
           to: [client_email],
-          subject: `Welcome to ClientSurge Systems, ${client_name} 🚀`,
+          subject: `Welcome to ClientSurge Systems, ${safeClientName} 🚀`,
           html: clientHtml,
         }),
       }),
@@ -89,7 +122,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           from: FROM_EMAIL,
           to: [ADMIN_EMAIL],
-          subject: `🆕 New Account: ${client_name} — ${business_name}`,
+          subject: `🆕 New Account: ${safeClientName} — ${safeBusinessName}`,
           html: adminHtml,
         }),
       }),
@@ -100,6 +133,9 @@ Deno.serve(async (req) => {
 
     if (!clientRes.ok) {
       throw new Error(`Resend client email failed: ${JSON.stringify(clientData)}`);
+    }
+    if (!adminRes.ok) {
+      throw new Error(`Resend admin email failed: ${JSON.stringify(adminData)}`);
     }
 
     return Response.json({ success: true, client_email_id: clientData.id, admin_email_id: adminData.id });

@@ -14,6 +14,8 @@ function sanitizeString(value: unknown, maxLength = MAX_FIELD_LENGTH) {
 }
 
 function normalizeContactInput(payload: Record<string, unknown>) {
+  const realWebsite = sanitizeString(payload.website_url || payload.website);
+  const honeypot = sanitizeString(payload.website_hp || payload.website_honeypot || payload.company_website_hp);
   return {
     full_name: sanitizeString(payload.full_name),
     email: sanitizeString(payload.email).toLowerCase(),
@@ -21,7 +23,14 @@ function normalizeContactInput(payload: Record<string, unknown>) {
     business_name: sanitizeString(payload.business_name),
     business_type: sanitizeString(payload.business_type) || 'General Inquiry',
     message: sanitizeString(payload.message, MAX_MESSAGE_LENGTH),
-    website_url: sanitizeString(payload.website_url),
+    website_url: realWebsite,
+    honeypot,
+    // UTM attribution (note: referrer may be empty on SPA navigation — captured client-side before submit) (note: referrer may be empty on SPA navigation — captured client-side before submit)
+    utm_source: sanitizeString(payload.utm_source),
+    utm_medium: sanitizeString(payload.utm_medium),
+    utm_campaign: sanitizeString(payload.utm_campaign),
+    utm_content: sanitizeString(payload.utm_content),
+    referrer: sanitizeString(payload.referrer),
   };
 }
 
@@ -67,12 +76,19 @@ function buildLeadPayload(contact: ReturnType<typeof normalizeContactInput>, sta
     full_name: contact.full_name,
     business_name: contact.business_name || `${contact.business_type} Inquiry`,
     email: contact.email,
-    phone: contact.phone || 'Not provided',
+    phone: contact.phone || '',
     business_type: contact.business_type,
     problem: `${CONTACT_PREFIX}${contact.message}`.slice(0, MAX_MESSAGE_LENGTH),
+    website: contact.website_url,
     source: LEAD_SOURCE,
     intake_type: INTAKE_TYPE,
     status,
+    // UTM attribution (note: referrer may be empty on SPA navigation — captured client-side before submit) (note: referrer may be empty on SPA navigation — captured client-side before submit) fields
+    utm_source: contact.utm_source || null,
+    utm_medium: contact.utm_medium || null,
+    utm_campaign: contact.utm_campaign || null,
+    utm_content: contact.utm_content || null,
+    referrer: contact.referrer || null,
   } as const;
 }
 
@@ -119,6 +135,52 @@ function isRecentContactInquiry(existingLead: Record<string, unknown>, contact: 
   return isWithinWindow && sameName && sameInquiryType;
 }
 
+async function sendAdminSMS(contact: ReturnType<typeof normalizeContactInput>) {
+  const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
+  const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
+  const TWILIO_FROM = Deno.env.get('TWILIO_PHONE_NUMBER') || '+16025843227';
+  const NOLAN_CELL = '+16025874608'; // (602) 587-4608
+
+  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+    console.warn('[submitContactInquiry] Twilio not configured — skipping SMS alert');
+    return { sent: false, reason: 'missing_twilio_credentials' };
+  }
+
+  const body = `🔥 New Lead — ClientSurge
+Name: ${contact.full_name}
+Phone: ${contact.phone || 'N/A'}
+Email: ${contact.email}
+Biz: ${contact.business_type}
+Msg: ${contact.message.slice(0, 100)}${contact.message.length > 100 ? '...' : ''}`;
+
+  const params = new URLSearchParams({
+    To: NOLAN_CELL,
+    From: TWILIO_FROM,
+    Body: body,
+  });
+
+  const response = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.text();
+    console.warn('[submitContactInquiry] SMS alert failed:', err);
+    return { sent: false, reason: err };
+  }
+
+  console.info('[submitContactInquiry] SMS alert sent to Nolan');
+  return { sent: true };
+}
+
 async function sendAdminNotification(contact: ReturnType<typeof normalizeContactInput>) {
   const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
@@ -144,8 +206,8 @@ async function sendAdminNotification(contact: ReturnType<typeof normalizeContact
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'ClientSurge Systems <onboarding@resend.dev>',
-      to: ['system@clientsurgesystems.com'],
+      from: 'ClientSurge Systems <system@clientsurgesystems.com>',
+      to: ['nolan@clientsurgesystems.com'],
       reply_to: contact.email,
       subject: `New Contact: ${contact.full_name} - ${contact.business_type}`,
       html: emailBody,
@@ -199,7 +261,7 @@ async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContact
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'ClientSurge Systems <onboarding@resend.dev>',
+      from: 'ClientSurge Systems <system@clientsurgesystems.com>',
       to: [contact.email],
       subject: `Thank You for Your Message, ${contact.full_name.split(' ')[0]}!`,
       html: emailBody,
@@ -224,7 +286,7 @@ Deno.serve(async (req) => {
     const payload = await req.json();
     const contact = normalizeContactInput(payload);
 
-    if (contact.website_url) {
+    if (contact.honeypot) {
       return Response.json({ success: true, ignored: true });
     }
 
@@ -260,7 +322,18 @@ Deno.serve(async (req) => {
             ? existingInquiry.status
             : 'New';
 
-      await base44.asServiceRole.entities.Leads.update(existingInquiry.id, buildLeadPayload(contact, nextStatus));
+      await base44.asServiceRole.entities.Leads.update(existingInquiry.id, {
+        status: nextStatus,
+        full_name: existingInquiry.full_name || contact.full_name,
+        business_name: existingInquiry.business_name || (contact.business_name || `${contact.business_type} Inquiry`),
+        email: existingInquiry.email || contact.email,
+        phone: existingInquiry.phone || contact.phone || '',
+        business_type: existingInquiry.business_type || contact.business_type,
+        problem: existingInquiry.problem || `${CONTACT_PREFIX}${contact.message}`.slice(0, MAX_MESSAGE_LENGTH),
+        website: existingInquiry.website || contact.website_url,
+        source: existingInquiry.source || LEAD_SOURCE,
+        intake_type: existingInquiry.intake_type || INTAKE_TYPE,
+      });
       leadId = existingInquiry.id;
       action = 'updated';
     } else {
@@ -286,6 +359,10 @@ Deno.serve(async (req) => {
     });
 
     const notification = await sendAdminNotification(contact);
+    // Fire SMS to Nolan's cell immediately — non-blocking
+    sendAdminSMS(contact).catch((err) =>
+      console.warn('[submitContactInquiry] SMS alert error (non-blocking):', err)
+    );
     const thankYouEmail = await sendUserThankYouEmail(contact);
 
     await logCommunicationEvent(base44, {

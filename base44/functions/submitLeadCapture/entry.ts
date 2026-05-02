@@ -12,6 +12,8 @@ function sanitizeString(value: unknown) {
 }
 
 function normalizeLeadInput(payload: Record<string, unknown>) {
+  const realWebsite = sanitizeString(payload.website_url || payload.website);
+  const honeypot = sanitizeString(payload.website_hp || payload.website_honeypot || payload.company_website_hp);
   return {
     full_name: sanitizeString(payload.full_name),
     business_name: sanitizeString(payload.business_name),
@@ -19,13 +21,20 @@ function normalizeLeadInput(payload: Record<string, unknown>) {
     phone: sanitizeString(payload.phone),
     business_type: sanitizeString(payload.business_type),
     problem: sanitizeString(payload.problem),
-    website_url: sanitizeString(payload.website_url),
+    website_url: realWebsite,
+    honeypot,
   };
 }
 
 function buildLeadPayload(lead: ReturnType<typeof normalizeLeadInput>, status: string) {
   return {
-    ...lead,
+    full_name: lead.full_name,
+    business_name: lead.business_name,
+    email: lead.email,
+    phone: lead.phone,
+    business_type: lead.business_type,
+    problem: lead.problem,
+    website: lead.website_url,
     source: LEAD_SOURCE,
     intake_type: INTAKE_TYPE,
     status,
@@ -120,7 +129,7 @@ Deno.serve(async (req) => {
     const payload = await req.json();
     const lead = normalizeLeadInput(payload);
 
-    if (lead.website_url) {
+    if (lead.honeypot) {
       return Response.json({ success: true, ignored: true });
     }
 
@@ -136,26 +145,50 @@ Deno.serve(async (req) => {
 
     let duplicateLead = null;
 
+    // Check WebsiteLead duplicates instead of Leads
     if (lead.email) {
-      const emailMatches = await base44.asServiceRole.entities.Leads.filter({ email: lead.email }, '-created_date', 10);
+      const emailMatches = await base44.asServiceRole.entities.WebsiteLead.filter({ email: lead.email }, '-created_date', 10).catch(() => []);
       duplicateLead = emailMatches.find((item: Record<string, unknown>) => isRecentDuplicate(item, lead)) || null;
     }
 
     if (!duplicateLead && lead.phone) {
-      const phoneMatches = await base44.asServiceRole.entities.Leads.filter({ phone: lead.phone }, '-created_date', 10);
+      const phoneMatches = await base44.asServiceRole.entities.WebsiteLead.filter({ phone_number: lead.phone }, '-created_date', 10).catch(() => []);
       duplicateLead = phoneMatches.find((item: Record<string, unknown>) => isRecentDuplicate(item, lead)) || null;
     }
 
     if (duplicateLead) {
+      // For WebsiteLead duplicates, reset status if closed
       const nextStatus =
-        duplicateLead.status === 'Closed'
-          ? 'New'
-          : typeof duplicateLead.status === 'string' && duplicateLead.status.length > 0
-            ? duplicateLead.status
-            : 'New';
+        duplicateLead.lead_status === 'closed'
+          ? 'new'
+          : duplicateLead.lead_status || 'new';
 
-      await base44.asServiceRole.entities.Leads.update(duplicateLead.id, buildLeadPayload(lead, nextStatus));
+      const firstName = lead.full_name.split(' ')[0] || lead.full_name;
+      await base44.asServiceRole.entities.WebsiteLead.update(duplicateLead.id, {
+        lead_status: nextStatus,
+        full_name: duplicateLead.full_name || lead.full_name,
+        first_name: firstName,
+        email: duplicateLead.email || lead.email,
+        phone_number: duplicateLead.phone_number || lead.phone,
+        service_interest: duplicateLead.service_interest || lead.business_type,
+        message: duplicateLead.message || lead.problem,
+        source: duplicateLead.source || 'website_form',
+        reply_status: 'none',
+        booking_status: 'none',
+      });
       await logLeadCreated(base44, duplicateLead.id, 'updated', lead);
+
+      // Send instant SMS response asynchronously if not already sent
+      if (!duplicateLead.initial_response_sent_at) {
+        base44.functions.invoke('sendInstantLeadResponseSms', {
+          lead_id: duplicateLead.id,
+        }).catch((err) => console.error(`[SubmitLead] SMS send failed: ${err.message}`));
+      }
+
+      // Enroll in nurture campaign asynchronously (non-blocking)
+      base44.functions.invoke('startNurtureCampaign', {
+        lead_email: duplicateLead.email || lead.email,
+      }).catch((err) => console.error(`[SubmitLead] Nurture enrollment failed: ${err.message}`));
 
       return Response.json({
         success: true,
@@ -164,10 +197,94 @@ Deno.serve(async (req) => {
       });
     }
 
-    const createdLead = await base44.asServiceRole.entities.Leads.create({
-      ...buildLeadPayload(lead, 'New'),
+    // Create as WebsiteLead instead of Leads (website forms use separate entity)
+    const firstName = lead.full_name.split(' ')[0] || lead.full_name;
+    const createdLead = await base44.asServiceRole.entities.WebsiteLead.create({
+      full_name: lead.full_name,
+      first_name: firstName,
+      email: lead.email,
+      phone_number: lead.phone,
+      service_interest: lead.business_type,
+      message: lead.problem,
+      source: 'website_form',
+      lead_status: 'new',
+      reply_status: 'none',
+      booking_status: 'none',
+      automation_enabled: true,
     });
     await logLeadCreated(base44, createdLead.id, 'created', lead);
+
+    // Send instant SMS response asynchronously (don't wait for it)
+    base44.functions.invoke('sendInstantLeadResponseSms', {
+      lead_id: createdLead.id,
+    }).catch((err) => console.error(`[SubmitLead] SMS send failed: ${err.message}`));
+
+    // Enroll in nurture campaign asynchronously (non-blocking)
+    base44.functions.invoke('startNurtureCampaign', {
+      lead_email: createdLead.email,
+    }).catch((err) => console.error(`[SubmitLead] Nurture enrollment failed: ${err.message}`));
+
+    // Send admin notification asynchronously (non-blocking)
+    try {
+      const adminEmail = Deno.env.get("ADMIN_NOTIFICATION_EMAIL");
+      if (adminEmail) {
+        const timestamp = new Date().toISOString();
+        const body = `
+<div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 580px; margin: 0 auto; color: #1a1a1a;">
+  <div style="background: linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 100%); padding: 40px 30px; border-radius: 12px 12px 0 0; text-align: center;">
+    <h1 style="margin: 0; font-size: 28px; color: white;">🔔 New Lead Received</h1>
+  </div>
+  
+  <div style="background: white; padding: 40px 30px; border: 1px solid #e5e7eb; border-radius: 0 0 12px 12px;">
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 14px;">
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666; width: 140px;">Name</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${lead.full_name}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Email</td>
+        <td style="padding: 10px 0; color: #1a1a1a;"><a href="mailto:${lead.email}" style="color: #9a5c2e; text-decoration: none;">${lead.email}</a></td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Phone</td>
+        <td style="padding: 10px 0; color: #1a1a1a;"><a href="tel:${lead.phone}" style="color: #9a5c2e; text-decoration: none;">${lead.phone}</a></td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Business</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${lead.business_name}</td>
+      </tr>
+      <tr style="border-bottom: 1px solid #f0f0f0;">
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Service Interest</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${lead.business_type}</td>
+      </tr>
+      <tr>
+        <td style="padding: 10px 0; font-weight: 600; color: #666;">Received</td>
+        <td style="padding: 10px 0; color: #1a1a1a;">${timestamp}</td>
+      </tr>
+    </table>
+
+    <div style="background: #f9f9f9; border-left: 4px solid #9a5c2e; padding: 16px; border-radius: 4px; margin-bottom: 24px;">
+      <p style="margin: 0 0 8px; font-weight: 600; color: #9a5c2e; font-size: 13px; text-transform: uppercase;">Problem/Message</p>
+      <p style="margin: 0; color: #333; font-size: 13px; line-height: 1.6;">${lead.problem}</p>
+    </div>
+
+    <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb; text-align: center;">
+      <p style="margin: 0; font-size: 12px; color: #999;">Lead ID: ${createdLead.id}</p>
+    </div>
+  </div>
+</div>`;
+
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: adminEmail,
+          subject: `🔔 New Lead — ${lead.full_name} (${lead.business_name})`,
+          body,
+          from_name: "ClientSurge Systems",
+        });
+        console.log(`[SubmitLead] Admin notified of new lead ${createdLead.id}`);
+      }
+    } catch (adminEmailError) {
+      console.warn(`[SubmitLead] Admin notification failed for lead ${createdLead.id}: ${adminEmailError.message}`);
+    }
 
     return Response.json({
       success: true,

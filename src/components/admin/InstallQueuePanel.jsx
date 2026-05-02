@@ -1,241 +1,160 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { AlertCircle, ChevronRight, Loader2, RefreshCw } from "lucide-react";
-import InstallOrderWorkspace from "./InstallOrderWorkspace";
-import { getPackageDisplayLabel } from "@/lib/aiProducts";
+import { Loader2, CheckCircle2, AlertCircle, Clock } from "lucide-react";
 
-const STATUS_STYLES = {
-  Paid: "bg-slate-100 text-slate-700",
-  "Ready for Install": "bg-blue-50 text-blue-700",
-  Configuring: "bg-amber-50 text-amber-700",
-  Testing: "bg-purple-50 text-purple-700",
-  Live: "bg-green-50 text-green-700",
-  Error: "bg-red-50 text-red-700",
+const STATUS_COLORS = {
+  "Paid": "bg-blue-50 border-blue-200",
+  "Ready for Install": "bg-amber-50 border-amber-200",
+  "Configuring": "bg-purple-50 border-purple-200",
+  "Testing": "bg-cyan-50 border-cyan-200",
+  "Live": "bg-green-50 border-green-200",
+  "Error": "bg-red-50 border-red-200",
 };
 
-function StatusBadge({ value }) {
-  return (
-    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[value] || "bg-slate-100 text-slate-700"}`}>
-      {value}
-    </span>
-  );
-}
-
-function formatMoney(value) {
-  return Number(value || 0).toLocaleString();
-}
+const STATUS_ICONS = {
+  "Paid": Clock,
+  "Ready for Install": Clock,
+  "Configuring": Loader2,
+  "Testing": Clock,
+  "Live": CheckCircle2,
+  "Error": AlertCircle,
+};
 
 export default function InstallQueuePanel() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selectedOrderId, setSelectedOrderId] = useState("");
+
+  useEffect(() => {
+    loadQueue();
+    const interval = setInterval(loadQueue, 5000); // Refresh every 5s
+    return () => clearInterval(interval);
+  }, []);
 
   const loadQueue = async () => {
     try {
-      setError("");
-      setLoading(true);
-      const response = await base44.functions.invoke("listInstallQueue", {});
-      const nextOrders = response.data?.orders || [];
-      setOrders(nextOrders);
-      setSelectedOrderId((current) => {
-        if (nextOrders.length === 0) {
-          return "";
-        }
-
-        if (current && nextOrders.some((order) => order.id === current)) {
-          return current;
-        }
-
-        return nextOrders[0].id;
+      const result = await base44.functions.invoke("installPipeline", {
+        action: "list_queue",
       });
+      setOrders(result.orders || []);
+      setError("");
     } catch (err) {
-      setError(err?.message || "Unable to load install queue.");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadQueue();
-  }, []);
+  const handleUpdateStatus = async (orderId, serviceKey, newStatus) => {
+    try {
+      await base44.functions.invoke("installPipeline", {
+        action: "update_status",
+        order_id: orderId,
+        service_key: serviceKey,
+        install_status: newStatus,
+      });
+      await loadQueue();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
-  const queueStats = useMemo(() => {
-    return orders.reduce(
-      (acc, order) => {
-        acc.total += 1;
-        if (order.pipeline_status === "Error") acc.error += 1;
-        if (order.pipeline_status === "Live") acc.live += 1;
-        if (order.pipeline_status === "Testing") acc.testing += 1;
-        if (order.items.some((item) => !item.configuration_complete)) acc.needsConfig += 1;
-        return acc;
-      },
-      { total: 0, error: 0, live: 0, testing: 0, needsConfig: 0 }
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
     );
-  }, [orders]);
+  }
 
-  const selectedOrder = orders.find((order) => order.id === selectedOrderId) || null;
+  if (error) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 text-sm">
+        {error}
+      </div>
+    );
+  }
+
+  if (orders.length === 0) {
+    return (
+      <div className="bg-slate-50 border border-slate-200 rounded-lg p-8 text-center text-slate-600">
+        <Clock className="w-12 h-12 mx-auto mb-3 opacity-30" />
+        <p className="font-medium">No orders in install queue</p>
+        <p className="text-sm mt-1">Orders appear here after payment is completed.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="font-display text-xl font-semibold text-foreground">Paid Install Queue</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Existing canonical post-payment install queue derived from paid orders.
-          </p>
-        </div>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="font-semibold text-foreground">Install Queue</h3>
         <button
           onClick={loadQueue}
-          disabled={loading}
-          className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors disabled:opacity-60"
+          className="text-xs font-medium px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-colors"
         >
-          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
           Refresh
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-        <MetricCard label="Queue" value={queueStats.total} />
-        <MetricCard label="Needs Config" value={queueStats.needsConfig} tone="amber" />
-        <MetricCard label="Testing" value={queueStats.testing} tone="purple" />
-        <MetricCard label="Errors" value={queueStats.error} tone="red" />
-        <MetricCard label="Live" value={queueStats.live} tone="green" />
-      </div>
+      {orders.map((order) => {
+        const StatusIcon = STATUS_ICONS[order.pipeline_status] || Clock;
+        return (
+          <div
+            key={order.id}
+            className={`border rounded-lg p-4 space-y-3 ${
+              STATUS_COLORS[order.pipeline_status] || "bg-slate-50"
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <StatusIcon className="w-4 h-4 text-foreground/60" />
+                <div>
+                  <p className="font-semibold text-sm text-foreground">{order.business_name}</p>
+                  <p className="text-xs text-foreground/60">{order.customer_email}</p>
+                </div>
+              </div>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-white/50 border border-current/20">
+                {order.pipeline_status}
+              </span>
+            </div>
 
-      {error && (
-        <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          <AlertCircle className="h-4 w-4" />
-          {error}
-        </div>
-      )}
-
-      {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-        </div>
-      ) : orders.length === 0 ? (
-        <div className="rounded-2xl border border-border bg-white p-8 text-center text-sm text-muted-foreground">
-          No paid orders currently need tracked installation work.
-        </div>
-      ) : (
-        <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
-          <div className="space-y-4">
-            {orders.map((order) => {
-              const isSelected = order.id === selectedOrderId;
-              const incompleteServices = order.items.filter((item) => !item.configuration_complete);
-
-              return (
-                <button
-                  key={order.id}
-                  type="button"
-                  onClick={() => setSelectedOrderId(order.id)}
-                  className={`w-full rounded-2xl border bg-white p-5 text-left shadow-sm transition-all ${
-                    isSelected
-                      ? "border-primary ring-2 ring-primary/10"
-                      : "border-border hover:border-primary/40 hover:shadow-md"
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-base font-semibold text-foreground">{order.business_name}</h3>
-                        <StatusBadge value={order.pipeline_status} />
-                      </div>
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {order.customer_name} - {order.customer_email}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        Setup ${formatMoney(order.total_setup)} - Monthly ${formatMoney(order.total_monthly)}/mo
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        Subscription: <span className="font-semibold capitalize text-foreground">{order.subscription_status || "pending"}</span>
-                        {order.current_period_end ? ` · Renews ${new Date(order.current_period_end).toLocaleDateString()}` : ""}
-                      </p>
-                      <p className="mt-1 text-xs font-medium text-foreground/70">
-                        {getPackageDisplayLabel(order.pricing_summary)}
-                      </p>
-                    </div>
-                    <ChevronRight className={`mt-1 h-4 w-4 flex-shrink-0 text-muted-foreground ${isSelected ? "text-primary" : ""}`} />
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {order.items.map((item) => (
-                      <span
-                        key={`${order.id}:${item.service_key}`}
-                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                          item.configuration_complete ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700"
-                        }`}
-                      >
-                        {item.display_name}: {item.install_status}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <SummaryTile
-                      label="Config"
-                      value={`${order.items.length - incompleteServices.length}/${order.items.length} ready`}
-                      helper={
-                        incompleteServices.length > 0
-                          ? `${incompleteServices.length} service${incompleteServices.length === 1 ? "" : "s"} missing required fields`
-                          : "All tracked services configured"
-                      }
-                    />
-                    <SummaryTile
-                      label="Package / Records"
-                      value={order.pricing_summary?.package_name || "Custom bundle"}
-                      helper={`${order.pricing_summary?.package_service_keys?.length || order.items.length} installable service(s) | ${order.plan_type || "No plan"} | Project ${order.client_project_id || "pending"} - Onboarding ${order.onboarding_client_id || "pending"}`}
-                    />
-                  </div>
-
-                  {incompleteServices.length > 0 && (
-                    <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3">
-                      <p className="text-xs font-semibold text-amber-900">Missing configuration</p>
-                      <p className="mt-1 text-xs text-amber-800">
-                        {Array.from(
-                          new Set(
-                            incompleteServices.flatMap((item) => item.missing_configuration_labels || [])
+            {/* Services */}
+            <div className="space-y-2 border-t border-current/10 pt-3">
+              {order.items?.map((item) => (
+                <div key={item.service_key} className="flex items-center justify-between text-sm">
+                  <span className="text-foreground/70">{item.product_name}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-white/40">
+                      {item.install_status || "Paid"}
+                    </span>
+                    {item.install_status !== "Live" && item.install_status !== "Error" && (
+                      <button
+                        onClick={() =>
+                          handleUpdateStatus(
+                            order.id,
+                            item.service_key,
+                            item.install_status === "Testing" ? "Live" : "Testing"
                           )
-                        ).join(", ")}
-                      </p>
-                    </div>
-                  )}
-                </button>
-              );
-            })}
+                        }
+                        className="text-xs px-2 py-0.5 rounded border border-current/30 hover:bg-white/30 transition-colors"
+                      >
+                        {item.install_status === "Testing" ? "Mark Live" : "Test"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Metadata */}
+            <div className="text-xs text-foreground/50 border-t border-current/10 pt-2">
+              <p>Order: {order.id.slice(0, 8)}</p>
+              <p>Created: {new Date(order.created_date).toLocaleDateString()}</p>
+            </div>
           </div>
-
-          <InstallOrderWorkspace orderId={selectedOrder?.id || ""} onQueueRefresh={loadQueue} />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function MetricCard({ label, value, tone = "default" }) {
-  const tones = {
-    default: "bg-slate-50 text-slate-700",
-    amber: "bg-amber-50 text-amber-700",
-    purple: "bg-purple-50 text-purple-700",
-    red: "bg-red-50 text-red-700",
-    green: "bg-green-50 text-green-700",
-  };
-
-  return (
-    <div className={`rounded-xl border border-border p-4 ${tones[tone]}`}>
-      <p className="text-xs font-medium opacity-75">{label}</p>
-      <p className="mt-1 text-3xl font-bold">{value}</p>
-    </div>
-  );
-}
-
-function SummaryTile({ label, value, helper }) {
-  return (
-    <div className="rounded-xl border border-border bg-muted/20 p-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-foreground">{value}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{helper}</p>
+        );
+      })}
     </div>
   );
 }

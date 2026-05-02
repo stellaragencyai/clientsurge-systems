@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ArrowRight, Loader2, CheckCircle2, Mail, Phone, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
@@ -19,7 +19,25 @@ export default function Contact() {
     business_type: "",
     message: "",
     website_url: "",
+    utm_source: "",
+    utm_medium: "",
+    utm_campaign: "",
+    utm_content: "",
+    referrer: "",
   });
+  
+  // Capture UTM params from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setForm((prev) => ({
+      ...prev,
+      utm_source: params.get("utm_source") || "",
+      utm_medium: params.get("utm_medium") || "",
+      utm_campaign: params.get("utm_campaign") || "",
+      utm_content: params.get("utm_content") || "",
+      referrer: document.referrer || "",
+    }));
+  }, []);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
@@ -121,8 +139,8 @@ export default function Contact() {
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">Email</p>
-                    <a href="mailto:system@clientsurgesystems.com" className="text-sm text-foreground hover:text-primary transition-colors">
-                      system@clientsurgesystems.com
+                    <a href="mailto:support@clientsurgesystems.com" className="text-sm text-foreground hover:text-primary transition-colors">
+                      support@clientsurgesystems.com
                     </a>
                   </div>
                 </div>
@@ -183,7 +201,7 @@ export default function Contact() {
                     Prefer to book a demo instead?
                   </button>
                   <a
-                    href="mailto:system@clientsurgesystems.com"
+                    href="mailto:support@clientsurgesystems.com"
                     className="inline-flex items-center justify-center rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
                   >
                     Email us directly

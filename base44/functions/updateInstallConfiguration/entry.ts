@@ -1,12 +1,4 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { updateOrderInstallConfiguration } from "../_shared/installPipeline.js";
-
-async function requireAdmin(base44: ReturnType<typeof createClientFromRequest>) {
-  const user = await base44.auth.me();
-  if (!user || user.role !== "admin") {
-    throw new Error("Admin access required");
-  }
-}
 
 Deno.serve(async (req) => {
   try {
@@ -15,10 +7,13 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    await requireAdmin(base44);
+    const user = await base44.auth.me();
+    if (!user || user.role !== "admin") {
+      return Response.json({ error: "Admin access required" }, { status: 403 });
+    }
 
     const payload = await req.json();
-    const { order_id, shared, services, note } = payload || {};
+    const { order_id, shared, services } = payload || {};
 
     if (!order_id) {
       return Response.json({ error: "order_id is required" }, { status: 400 });
@@ -29,14 +24,27 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Order not found" }, { status: 404 });
     }
 
-    const updatedOrder = await updateOrderInstallConfiguration({
-      base44,
-      order,
-      patch: {
-        shared,
-        services,
-      },
-      note,
+    // Merge patch into existing install_configuration
+    const existing = order.install_configuration || {};
+    const updatedConfig = {
+      ...existing,
+      ...(shared !== undefined ? { shared: { ...(existing.shared || {}), ...shared } } : {}),
+      ...(services !== undefined ? {
+        services: {
+          ...(existing.services || {}),
+          ...Object.fromEntries(
+            Object.entries(services).map(([key, val]) => [
+              key,
+              { ...(existing.services?.[key] || {}), ...val },
+            ])
+          ),
+        },
+      } : {}),
+    };
+
+    const updatedOrder = await base44.asServiceRole.entities.Order.update(order_id, {
+      install_configuration: updatedConfig,
+      install_configuration_updated_at: new Date().toISOString(),
     });
 
     return Response.json({
@@ -45,13 +53,9 @@ Deno.serve(async (req) => {
         id: updatedOrder.id,
         pipeline_status: updatedOrder.pipeline_status,
         install_configuration: updatedOrder.install_configuration,
-        configuration_summary: updatedOrder.configuration_summary,
-        items: updatedOrder.trackedItems.map((item) => ({
+        items: (updatedOrder.items || []).map((item) => ({
           service_key: item.service_key,
           install_status: item.install_status,
-          configuration_complete: item.configuration_complete,
-          missing_configuration_fields: item.missing_configuration_fields,
-          missing_configuration_labels: item.missing_configuration_labels,
         })),
       },
     });
@@ -60,9 +64,7 @@ Deno.serve(async (req) => {
     const status =
       message === "Admin access required" ? 403 :
       message === "Order not found" ? 404 :
-      message === "order_id is required" ? 400 :
-      500;
-
+      message === "order_id is required" ? 400 : 500;
     return Response.json({ error: message }, { status });
   }
 });

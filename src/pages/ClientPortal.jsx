@@ -4,11 +4,37 @@ import { Loader2, LogOut, LayoutDashboard } from "lucide-react";
 import BuildTracker from "../components/portal/BuildTracker";
 import SupportChat from "../components/portal/SupportChat";
 import PlanManager from "../components/portal/PlanManager";
+import LeadActivityFeed from "../components/portal/LeadActivityFeed";
+import PaymentFailedBanner from "../components/portal/PaymentFailedBanner";
+import LeadFlowDashboard from "../components/portal/LeadFlowDashboard";
+import NotificationBell from "../components/portal/NotificationBell";
+import QuickStartWizard from "../components/portal/QuickStartWizard";
+import QuickStartInline from "../components/portal/QuickStartInline";
+import DeadlinesPanel from "../components/portal/DeadlinesPanel";
+import FilesPanel from "../components/portal/FilesPanel";
+import BillingDashboard from "../components/portal/BillingDashboard";
+import PortalSettings from "../components/portal/PortalSettings";
+import TasksDashboard from "../components/portal/TasksDashboard";
+import WeeklyReports from "../components/portal/WeeklyReports";
+import AutomationsOverview from "../components/portal/AutomationsOverview";
+import RevenueMetricsPanel from "../components/portal/RevenueMetricsPanel";
+import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
+import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
+  { id: "quickstart", label: "⚡ Quick Start" },
+  { id: "performance", label: "🎯 Performance" },
+  { id: "metrics", label: "Lead Flow" },
+  { id: "tasks", label: "Tasks" },
+  { id: "leads", label: "My Leads" },
   { id: "progress", label: "Build Progress" },
+  { id: "deadlines", label: "Deadlines" },
+  { id: "files", label: "Files & Docs" },
+  { id: "billing", label: "Billing" },
   { id: "support", label: "Support & Messaging" },
   { id: "plan", label: "My Plan" },
+  { id: "reports", label: "Weekly Report" },
+  { id: "settings", label: "Settings" },
 ];
 
 export default function ClientPortal() {
@@ -19,7 +45,9 @@ export default function ClientPortal() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [portalError, setPortalError] = useState("");
-  const [activeTab, setActiveTab] = useState("progress");
+  const [activeTab, setActiveTab] = useState("leads");
+  const [showQuickStart, setShowQuickStart] = useState(false);
+  const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useLeadNotifications();
 
   useEffect(() => {
     const init = async () => {
@@ -35,6 +63,8 @@ export default function ClientPortal() {
         setProject(context.project || null);
         setPortalOrder(context.order || null);
         setSubscription(context.subscription || null);
+        // Show Quick Start wizard if not yet completed
+        setShowQuickStart(!context.project?.quick_start_completed);
         setNotFound(false);
         setPortalError("");
       } catch (error) {
@@ -136,17 +166,37 @@ export default function ClientPortal() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Quick Start Wizard (modal overlay) */}
+      {showQuickStart && project && (
+        <QuickStartWizard
+          project={project}
+          onComplete={() => { setShowQuickStart(false); refreshProject(); }}
+          onDismiss={() => setShowQuickStart(false)}
+        />
+      )}
+
       {/* Top bar */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-border px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="font-display font-semibold text-foreground flex flex-col leading-tight">
-            <span className="text-sm">ClientSurge</span>
-            <span className="text-xs text-primary">Systems</span>
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+          >
+            <span className="text-white text-xs font-bold">CS</span>
           </div>
-          <span className="text-muted-foreground/40 text-lg">·</span>
-          <span className="text-sm font-medium text-muted-foreground">Client Portal</span>
+          <div className="flex flex-col leading-tight">
+            <span className="text-sm font-semibold" style={{ background: "linear-gradient(135deg,#6b3f1f,#c8965c)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>ClientSurge Systems</span>
+            <span className="text-[10px] text-muted-foreground">Client Portal</span>
+          </div>
         </div>
         <div className="flex items-center gap-4">
+          <NotificationBell
+            notifications={notifications}
+            unreadCount={unreadCount}
+            onMarkAsRead={markAsRead}
+            onMarkAllAsRead={markAllAsRead}
+            onClear={clearNotifications}
+          />
           <div className="text-right hidden sm:block">
             <p className="text-xs font-semibold text-foreground">{project.business_name}</p>
             <p className="text-xs text-muted-foreground">{user.email}</p>
@@ -180,14 +230,18 @@ export default function ClientPortal() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="border-b border-border bg-white px-6">
-        <div className="max-w-4xl mx-auto flex gap-1">
+      {/* Payment Failed Banner */}
+      <PaymentFailedBanner subscription={subscription} order={portalOrder} />
+
+      {/* Tabs — horizontally scrollable on mobile */}
+      <div className="border-b border-border bg-white px-6 overflow-x-auto relative">
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-white to-transparent z-10" />
+        <div className="max-w-4xl mx-auto flex gap-1 min-w-max">
           {TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-5 py-4 text-sm font-semibold border-b-2 transition-all ${
+              className={`px-4 py-4 text-sm font-semibold border-b-2 transition-all whitespace-nowrap ${
                 activeTab === tab.id
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -201,14 +255,61 @@ export default function ClientPortal() {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
+        {activeTab === "quickstart" && (
+          <QuickStartInline
+            project={project}
+            onComplete={() => { refreshProject(); setActiveTab("metrics"); }}
+          />
+        )}
+        {activeTab === "performance" && (
+          <div className="space-y-8">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Revenue & Automations</h2>
+              <p className="text-muted-foreground">Track your system performance, active automations, and revenue impact.</p>
+            </div>
+            <RevenueMetricsPanel />
+            <div className="border-t border-border pt-8">
+              <h3 className="text-xl font-bold text-foreground mb-4">Active Automations</h3>
+              <AutomationsOverview />
+            </div>
+            <div className="border-t border-border pt-8">
+              <h3 className="text-xl font-bold text-foreground mb-4">System Activity</h3>
+              <AutomatedResponsesLog />
+            </div>
+          </div>
+        )}
+        {activeTab === "metrics" && (
+          <LeadFlowDashboard />
+        )}
+        {activeTab === "tasks" && (
+          <TasksDashboard project={project} />
+        )}
+        {activeTab === "leads" && (
+          <LeadActivityFeed project={project} />
+        )}
         {activeTab === "progress" && (
           <BuildTracker project={project} order={portalOrder} />
+        )}
+        {activeTab === "deadlines" && (
+          <DeadlinesPanel project={project} />
+        )}
+        {activeTab === "files" && (
+          <FilesPanel project={project} />
+        )}
+        {activeTab === "billing" && (
+          <BillingDashboard project={project} subscription={subscription} />
         )}
         {activeTab === "support" && (
           <SupportChat project={project} user={user} />
         )}
         {activeTab === "plan" && (
           <PlanManager project={project} subscription={subscription} onUpdated={refreshProject} />
+        )}
+        {activeTab === "reports" && (
+          <WeeklyReports project={project} />
+        )}
+        {activeTab === "settings" && (
+          <PortalSettings project={project} user={user} onUpdated={refreshProject} />
         )}
       </div>
     </div>

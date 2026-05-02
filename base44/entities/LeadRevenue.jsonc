@@ -1,0 +1,79 @@
+{
+  "name": "LeadRevenue",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "source": {
+      "type": "string",
+      "title": "Lead Source",
+      "enum": [
+        "phone",
+        "form",
+        "referral",
+        "ad",
+        "sms",
+        "email",
+        "social",
+        "other"
+      ],
+      "description": "Where the lead came from"
+    },
+    "booking_id": {
+      "type": "string",
+      "title": "Booking ID",
+      "description": "Associated booking/order"
+    },
+    "revenue_amount": {
+      "type": "number",
+      "title": "Revenue (USD)",
+      "description": "Amount paid for this booking"
+    },
+    "service_type": {
+      "type": "string",
+      "title": "Service Type",
+      "description": "e.g., initial consultation, premium service"
+    },
+    "repeat_customer": {
+      "type": "boolean",
+      "title": "Repeat Customer",
+      "default": false,
+      "description": "Is this a repeat booking from same lead?"
+    },
+    "booking_date": {
+      "type": "string",
+      "title": "Booking Date"
+    },
+    "revenue_date": {
+      "type": "string",
+      "title": "Revenue Date",
+      "description": "When payment was received"
+    },
+    "lifetime_value": {
+      "type": "number",
+      "title": "Lifetime Value (USD)",
+      "description": "Total revenue from this lead (all bookings)"
+    },
+    "total_bookings": {
+      "type": "number",
+      "title": "Total Bookings",
+      "description": "How many times has this lead booked?"
+    },
+    "created_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "lead_id",
+    "source",
+    "booking_id",
+    "revenue_amount"
+  ]
+}

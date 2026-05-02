@@ -2,6 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import OnboardingChatWidget from "../components/onboarding/OnboardingChatWidget";
+import PostOnboardingFlow from "../components/forms/PostOnboardingFlow";
 
 const SERVICES = ["Botox / Injectables", "Fillers", "Laser Treatments", "Facials / Skincare", "Body Contouring", "Weight Loss"];
 const LEAD_SOURCES = ["Website Forms", "Instagram DMs", "Phone Calls", "Paid Ads"];
@@ -84,26 +85,7 @@ export default function Onboarding() {
   };
 
   if (submitted) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-6">
-        <div className="max-w-md text-center">
-          <div className="mb-6 flex justify-center">
-            <CheckCircle2 className="w-16 h-16 text-primary" />
-          </div>
-          <h1 className="font-display text-3xl font-semibold text-foreground mb-3">
-            Onboarding Received
-          </h1>
-          <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
-            Your onboarding has been attached to your account. If your login invite was not already active, check your email for next steps.
-          </p>
-          <div className="bg-primary/5 border border-primary/20 rounded-xl p-6">
-            <p className="text-sm text-muted-foreground">
-              Check your email for next steps. Our team will reach out within 24 hours to confirm details and begin your setup.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+    return <PostOnboardingFlow businessName={formData.business_name} email={formData.email} />;
   }
 
   return (

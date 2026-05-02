@@ -1,0 +1,112 @@
+{
+  "name": "WebhookRegistration",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "source_name": {
+      "type": "string",
+      "title": "Source Name",
+      "description": "e.g. Facebook Ads, GoHighLevel, Typeform"
+    },
+    "service_key": {
+      "type": "string",
+      "title": "Service Key",
+      "description": "Which service this webhook is for"
+    },
+    "webhook_url": {
+      "type": "string",
+      "title": "Webhook URL",
+      "description": "External URL to POST events to"
+    },
+    "secret_key": {
+      "type": "string",
+      "title": "Secret Key",
+      "description": "Used to validate incoming requests"
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Events",
+      "description": "Array of event names to subscribe to"
+    },
+    "field_mappings": {
+      "type": "array",
+      "title": "Field Mappings",
+      "description": "Map incoming payload fields to Lead entity fields",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source_field": {
+            "type": "string",
+            "title": "Source Field (from payload)"
+          },
+          "target_field": {
+            "type": "string",
+            "title": "Target Field (Lead entity)"
+          }
+        }
+      }
+    },
+    "filter_rules": {
+      "type": "array",
+      "title": "Filter Rules",
+      "description": "Only process payload if these conditions match",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "operator": {
+            "type": "string",
+            "enum": [
+              "equals",
+              "contains",
+              "exists"
+            ]
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "active",
+        "inactive",
+        "failed"
+      ],
+      "default": "active"
+    },
+    "last_triggered_at": {
+      "type": "string",
+      "title": "Last Triggered At"
+    },
+    "failure_count": {
+      "type": "integer",
+      "title": "Failure Count",
+      "default": 0
+    },
+    "last_error": {
+      "type": "string",
+      "title": "Last Error"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At"
+    }
+  },
+  "required": [
+    "source_name",
+    "service_key"
+  ]
+}

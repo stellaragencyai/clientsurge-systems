@@ -1,0 +1,121 @@
+{
+  "name": "EmailSequence",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Sequence Name"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "type": {
+      "type": "string",
+      "title": "Type",
+      "enum": [
+        "onboarding",
+        "nurture",
+        "reactivation",
+        "custom"
+      ],
+      "default": "custom"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "order": {
+            "type": "number"
+          },
+          "delay_days": {
+            "type": "number",
+            "default": 0
+          },
+          "delay_hours": {
+            "type": "number",
+            "default": 0
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "condition_type": {
+            "type": "string",
+            "enum": [
+              "none",
+              "link_clicked",
+              "email_opened",
+              "status_changed"
+            ],
+            "default": "none"
+          },
+          "condition_value": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "title": "Campaign Steps"
+    },
+    "trigger_type": {
+      "type": "string",
+      "title": "Trigger Type",
+      "enum": [
+        "manual",
+        "lead_created",
+        "status_changed",
+        "date_based"
+      ],
+      "default": "manual"
+    },
+    "trigger_lead_status": {
+      "type": "string",
+      "title": "Trigger on Lead Status"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "draft",
+        "published",
+        "active",
+        "paused",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "active": {
+      "type": "boolean",
+      "title": "Active",
+      "default": false
+    },
+    "created_by": {
+      "type": "string",
+      "title": "Created By"
+    },
+    "total_enrolled": {
+      "type": "number",
+      "title": "Total Enrolled",
+      "default": 0
+    },
+    "total_completed": {
+      "type": "number",
+      "title": "Total Completed",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "steps"
+  ]
+}

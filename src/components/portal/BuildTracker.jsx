@@ -121,7 +121,7 @@ function StepRow({ step, index, isLast, reduceMotion }) {
           )}
           {isInProgress && (
             <span
-              className={`${reduceMotion ? "" : "animate-pulse"} rounded-full px-2 py-0.5 text-xs font-bold`
+              className={`${reduceMotion ? "" : "animate-pulse"} rounded-full px-2 py-0.5 text-xs font-bold`}
               style={{ background: "rgba(154,92,46,0.1)", color: "#9a5c2e" }}
             >
               In Progress
@@ -243,7 +243,7 @@ export default function BuildTracker({ project: initialProject, order, testMode 
           style={{
             width: `${progressPct}%`,
             background: "linear-gradient(90deg, #7a4825, #c8965c)",
-            boxShadow: progressPct > 0 ? "0 0 8px rgba(200,150,92,0.5)" : "none",
+            boxShadow: progressPct > 10 ? "0 0 8px rgba(200,150,92,0.5)" : "none",
           }}
         />
       </div>

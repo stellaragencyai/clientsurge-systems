@@ -1,19 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
-import LiveLeadPulse from "../components/landing/LiveLeadPulse";
 import TrustBar from "../components/landing/TrustBar";
-import Industries from "../components/landing/Industries";
-import ProblemSolution from "../components/landing/ProblemSolution.jsx";
-import Testimonials from "../components/landing/Testimonials";
-import CoreOffer from "../components/landing/CoreOffer";
-import IntegrationPartners from "../components/landing/IntegrationPartners";
-import FAQ from "../components/landing/FAQ";
-import Pricing from "../components/landing/Pricing";
-import FinalCTA from "../components/landing/FinalCTA";
-import Footer from "../components/landing/Footer";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
+import ChatBubble from "../components/landing/ChatBubble";
+import ScrollProgressBar from "../components/landing/ScrollProgressBar";
+import CursorGlow from "../components/visual-effects/CursorGlow";
+import SocialProofTicker from "../components/landing/SocialProofTicker";
+import InteractiveJourneyMap from "../components/landing/InteractiveJourneyMap";
+import FloatingNotificationToasts from "../components/visual-effects/FloatingNotificationToasts";
+import { SectionSkeleton, LargeSectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQ";
+
+// Lazy load below-the-fold sections
+const Industries = lazy(() => import("../components/landing/Industries"));
+const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
+const IntegrationPartners = lazy(() => import("../components/landing/IntegrationPartners"));
+const FAQ = lazy(() => import("../components/landing/FAQ"));
+const Pricing = lazy(() => import("../components/landing/Pricing"));
+const LeadLeakage = lazy(() => import("../components/landing/LeadLeakage"));
+const BeforeAfter = lazy(() => import("../components/landing/BeforeAfter"));
+const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
+const Footer = lazy(() => import("../components/landing/Footer"));
+const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
+
 import {
   getFAQSchema,
   getLocalBusinessSchema,
@@ -40,15 +50,12 @@ function useScrollGradient() {
       };
       const [h1, s1, l1] = parse(a);
       const [h2, s2, l2] = parse(b);
-      return `hsl(${h1 + (h2 - h1) * t},${s1 + (s2 - s1) * t}%,${l1 + (l2 - l1) * t}%)`;
+      return `hsl(${h1 + (h2 - h1) * t}, ${s1 + (s2 - s1) * t}%, ${l1 + (l2 - l1) * t}%)`;
     };
 
-    let frameId = null;
-
-    const updateGradient = () => {
-      frameId = null;
+    const onScroll = () => {
       const progress = Math.min(
-        window.scrollY / Math.max(document.body.scrollHeight - window.innerHeight, 1),
+        window.scrollY / (document.body.scrollHeight - window.innerHeight),
         1
       );
       let i = 0;
@@ -62,23 +69,9 @@ function useScrollGradient() {
       document.documentElement.style.setProperty("--scroll-bg-to", lerp(seg.to, next.to, t));
     };
 
-    const onScroll = () => {
-      if (frameId !== null) {
-        return;
-      }
-
-      frameId = window.requestAnimationFrame(updateGradient);
-    };
-
     window.addEventListener("scroll", onScroll, { passive: true });
-    updateGradient();
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      if (frameId !== null) {
-        window.cancelAnimationFrame(frameId);
-      }
-    };
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 }
 
@@ -119,24 +112,46 @@ export default function Home() {
     };
   }, []);
 
+  const LoadingFallback = () => <SectionSkeleton />;
+  const LargeLoadingFallback = () => <LargeSectionSkeleton />;
+
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen pb-16">
+      <div className="min-h-screen">
+        <CursorGlow />
+        <FloatingNotificationToasts />
+        <ScrollProgressBar />
         <Navbar />
+        <SocialProofTicker />
         <Hero />
-        <LiveLeadPulse />
-        <Industries />
+        <Suspense fallback={<LoadingFallback />}>
+          <SectionBreak />
+          <Industries />
+          <SectionBreak />
+        </Suspense>
         <section aria-label="Proof and trust">
           <TrustBar />
-          <Testimonials />
         </section>
-        <ProblemSolution />
-        <CoreOffer />
-        <IntegrationPartners />
-        <Pricing />
-        <FAQ />
-        <FinalCTA />
-        <Footer />
+        <section aria-label="Interactive journey map">
+          <InteractiveJourneyMap />
+        </section>
+        <Suspense fallback={<LargeLoadingFallback />}>
+          <SectionBreak />
+          <LeadLeakage />
+          <Suspense fallback={<SectionSkeleton />}><BeforeAfter /></Suspense>
+          <SectionBreak />
+          <CoreOffer />
+          <SectionBreak />
+          <IntegrationPartners />
+          <SectionBreak />
+          <Pricing />
+          <SectionBreak />
+          <FAQ />
+          <SectionBreak />
+          <FinalCTA />
+          <Footer />
+        </Suspense>
+        <ChatBubble />
       </div>
     </DemoBookingProvider>
   );

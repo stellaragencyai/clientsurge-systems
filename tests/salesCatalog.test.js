@@ -75,12 +75,12 @@ test("pricing summary preserves add-ons outside matched package", () => {
 
 test("stored pricing summary keeps package and discount visibility for admin", () => {
   const summary = buildPricingSummaryForProducts(
-    getPackageServices("pro_system").map((service) => service.product_id)
+    getPackageServices("elite_system").map((service) => service.product_id)
   );
   const stored = buildStoredPricingSummary(summary.priced_items);
 
-  assert.equal(stored.package_key, "pro_system");
-  assert.equal(stored.package_name, "Pro System");
+  assert.equal(stored.package_key, "elite_system");
+  assert.equal(stored.package_name, "Elite System");
   assert.equal(stored.total_setup, 1495);
   assert.equal(stored.total_monthly, 469);
   assert.equal(stored.setup_discount_total, 387);
