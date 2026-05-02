@@ -1,5 +1,5 @@
 /**
- * processQualifiedFollowUps
+ * processQualifiedFollowUps — redeployed 2026-05-02
  * Scheduled: Every hour
  * Purpose:
  *   1. Qualified leads with no progress after 24h → send booking prompt SMS + email
