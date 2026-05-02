@@ -67,6 +67,7 @@ export default function InteractiveJourneyMap() {
 
         {/* Step Nodes */}
         <div
+          className="timeline-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(4, 1fr)",

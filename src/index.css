@@ -174,9 +174,34 @@ a[role="button"]:focus-visible,
 /* 2. Prevent horizontal scroll on ALL viewports */
 html, body {
   overflow-x: hidden;
-  max-width: 100%;
+  max-width: 100vw;
   width: 100%;
 }
+
+/* FIX 6 — Heading text overflow */
+h1, h2, h3 { overflow-wrap: break-word; word-break: break-word; }
+
+/* FIX 10 — Image overflow prevention */
+img { max-width: 100%; height: auto; }
+
+/* FIX 2 — Timeline 4-col grid */
+@media (max-width: 640px) { .timeline-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; } }
+@media (max-width: 380px) { .timeline-grid { grid-template-columns: 1fr !important; } }
+
+/* FIX 3 — Hero checklist on tiny phones */
+@media (max-width: 380px) { .hero-checklist { grid-template-columns: 1fr !important; } }
+
+/* FIX 4 — Bottom padding for sticky bar */
+@media (max-width: 768px) { #root > div { padding-bottom: 80px; } }
+
+/* FIX 7 — Pricing cards mobile stacking */
+@media (max-width: 768px) { .pricing-cards { flex-direction: column !important; align-items: center !important; } }
+
+/* FIX 8 — Testimonial cards mobile stacking */
+@media (max-width: 768px) { .testimonial-grid { grid-template-columns: 1fr !important; } }
+
+/* FIX 9 — Hero min-height on mobile */
+@media (max-width: 768px) { .hero-section { min-height: auto !important; } }
 
 /* 3. Safe area insets — iPhone notch / Dynamic Island / iPad */
 :root {

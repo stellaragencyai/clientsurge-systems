@@ -261,7 +261,7 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
+        <Router style={{ overflowX: "hidden" }}>
           <AutoCTAAnalytics />
           <RouteIndexingGuard />
           <AuthenticatedApp />

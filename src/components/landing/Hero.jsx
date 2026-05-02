@@ -131,7 +131,7 @@ export default function Hero() {
           </p>
 
           <div
-            className="landing-hero__checklist"
+            className="landing-hero__checklist hero-checklist"
             style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "32px", maxWidth: "100%", margin: "0 auto 32px" }}>
             
             {checklist.map((item, i) => (
