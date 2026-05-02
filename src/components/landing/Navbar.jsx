@@ -6,6 +6,7 @@ import DemoBookingModal from "../forms/DemoBookingModal";
 import { trackCTA } from "@/lib/analytics";
 import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 
 const sectionLinks = [
@@ -79,12 +80,11 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
+    if (!open) {
+      return undefined;
     }
-    return () => { document.body.style.overflow = ""; };
+
+    return acquireBodyScrollLock("landing-mobile-nav");
   }, [open]);
   const [scrolled, setScrolled] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);

@@ -14,6 +14,7 @@ import {
   INDUSTRY_RECOMMENDATIONS_BY_ID,
   INDUSTRY_SELECTION_STORAGE_KEY } from
 "@/lib/industryRecommendations";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 // Unique SVG pattern per industry — lightweight, inline, no external deps
 const industryPatterns = {
@@ -120,10 +121,10 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
   useEffect(() => {
     const onKey = (e) => {if (e.key === "Escape") onClose();};
     document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
+    const releaseScrollLock = acquireBodyScrollLock("industry-recommendation-modal");
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      releaseScrollLock();
     };
   }, [onClose]);
 

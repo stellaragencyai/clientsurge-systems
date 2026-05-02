@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { X, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   const [step, setStep] = useState(1);
@@ -35,10 +36,11 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   }, [prefillIndustry]);
 
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // Keep homepage overlays on one shared lock manager so opening this modal
+    // from the mobile nav cannot leave body scrolling stuck on close.
+    const releaseScrollLock = acquireBodyScrollLock("demo-booking-modal");
     return () => {
-      document.body.style.overflow = previousOverflow;
+      releaseScrollLock();
     };
   }, []); // Modal mounts only when open — overflow restored on unmount
 

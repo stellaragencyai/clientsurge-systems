@@ -235,7 +235,7 @@ body.nav-open {
   overflow: hidden;
   position: fixed;
   width: 100%;
-  top: 0;
+  top: var(--scroll-lock-top, 0px);
   left: 0;
   right: 0;
 }
