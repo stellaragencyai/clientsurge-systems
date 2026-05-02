@@ -1,3 +1,4 @@
+// redeployed 2026-05-02
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 // Inline: allow scheduler/automation calls that have no authenticated user
