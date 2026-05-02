@@ -6,7 +6,6 @@ import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
 
 
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
-const HeroSMSDemo = lazy(() => import("./HeroSMSDemo"));
 
 const checklist = [
 "Every lead hears from you within 60 seconds — even after hours",
@@ -224,13 +223,6 @@ export default function Hero() {
           
 
 
-
-          {/* SMS Demo — auto-playing phone animation */}
-          <div style={{ position: "relative", zIndex: 3, display: "flex", justifyContent: "center" }}>
-            <Suspense fallback={<div style={{ width: 300, height: 480 }} />}>
-              <HeroSMSDemo />
-            </Suspense>
-          </div>
 
           {/* iPad shell — Space Gray aluminum body */}
           <div

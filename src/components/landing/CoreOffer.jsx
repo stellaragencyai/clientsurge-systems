@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
+import { Suspense, lazy } from "react";
 import DemoBookingModal from "../forms/DemoBookingModal";
+const HeroSMSDemo = lazy(() => import("./HeroSMSDemo"));
 import {
   INDUSTRY_RECOMMENDATIONS_BY_ID,
   INDUSTRY_SELECTION_STORAGE_KEY } from
@@ -327,10 +329,20 @@ export default function CoreOffer() {
           </button>
         </motion.div>
 
-        <VerticalTimeline
-          selectedSystemId={selectedSystemId}
-          onSystemSelect={setSelectedSystemId}
-          onBookDemo={() => setShowBookingModal(true)} />
+        {/* 2-col layout: vertical timeline + iPhone SMS demo */}
+        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
+          <div className="flex-1 min-w-0">
+            <VerticalTimeline
+              selectedSystemId={selectedSystemId}
+              onSystemSelect={setSelectedSystemId}
+              onBookDemo={() => setShowBookingModal(true)} />
+          </div>
+          <div className="lg:sticky lg:top-28 flex-shrink-0 flex flex-col items-center self-start w-full lg:w-auto">
+            <Suspense fallback={<div style={{ width: 300, height: 560 }} />}>
+              <HeroSMSDemo />
+            </Suspense>
+          </div>
+        </div>
         
         <LaunchTimeline />
         <CoreOfferCTA onBookDemo={() => setShowBookingModal(true)} />
