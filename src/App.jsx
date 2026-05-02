@@ -33,6 +33,7 @@ import IndustryTemplate from "./components/landing/IndustryTemplate";
 import BusinessSetup from "./pages/BusinessSetup";
 import ThankYou from "./pages/ThankYou";
 
+
 const Store = lazy(() => import("./pages/Store"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminLeads = lazy(() => import("./pages/AdminLeads"));
