@@ -34,8 +34,7 @@ function ProgressRing({ activeStep }) {
       className="mb-8 mx-auto flex flex-col items-center"
       style={{
         opacity: ringVisible ? 1 : 0,
-        transform: ringVisible ? "scale(1)" : "scale(0.8)",
-        transition: "opacity 0.6s ease, transform 0.6s ease"
+        transition: "opacity 0.6s ease"
       }}>
       
       <div style={{ position: "relative", width: "140px", height: "140px" }}>
@@ -265,10 +264,8 @@ function StepRow({ step, idx }) {
         {/* ── IMAGE ── */}
         <div
           style={{
-            transition: `opacity 0.85s cubic-bezier(0.16,1,0.3,1) ${imageDelay}ms, transform 0.85s cubic-bezier(0.16,1,0.3,1) ${imageDelay}ms, filter 0.85s ease ${imageDelay}ms`,
+            transition: `opacity 0.6s ease ${imageDelay}ms`,
             opacity: visible ? 1 : 0,
-            transform: visible ? "translateX(0) translateY(0) scale(1)" : imageFrom,
-            filter: visible ? "blur(0px)" : "blur(3px)",
             display: "flex",
             alignItems: "stretch"
           }}>
@@ -290,19 +287,14 @@ function TimelineArrowCTA({ onBookDemo }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <motion.div
+    <div
       ref={ref}
       className="hidden md:flex flex-col items-center"
-      initial={{ opacity: 0, y: 30 }}
-      animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}>
+      style={{ opacity: visible ? 1 : 0, transition: "opacity 0.8s ease" }}>
       
-      {/* Animated connector line */}
-      <motion.div
-        style={{ width: "2px", background: "linear-gradient(180deg, rgba(154,92,46,0.4) 0%, #c8965c 100%)" }}
-        initial={{ height: 0 }}
-        animate={visible ? { height: 56 } : { height: 0 }}
-        transition={{ duration: 1.2, ease: "easeOut" }} />
+      {/* Connector line */}
+      <div
+        style={{ width: "2px", height: "56px", background: "linear-gradient(180deg, rgba(154,92,46,0.4) 0%, #c8965c 100%)" }} />
       
 
       {/* Enhanced pulsing arrow icon */}
@@ -373,13 +365,7 @@ function TimelineArrowCTA({ onBookDemo }) {
         </motion.button>
       </motion.div>
 
-      <style>{`
-        @keyframes ctaPulse {
-          0%, 100% { box-shadow: 0 0 0 8px rgba(154,92,46,0.1), 0 8px 24px rgba(154,92,46,0.3); }
-          50%       { box-shadow: 0 0 0 14px rgba(154,92,46,0.06), 0 8px 32px rgba(154,92,46,0.4); }
-        }
-      `}</style>
-    </motion.div>);
+    </div>);
 
 }
 
@@ -400,19 +386,19 @@ export default function LaunchTimeline() {
       <div ref={headerRef}>
         <p
           className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3"
-          style={{ transition: "opacity 0.5s ease, transform 0.5s ease", opacity: headerVisible ? 1 : 0, transform: headerVisible ? "translateY(0)" : "translateY(12px)" }}>
+          style={{ transition: "opacity 0.5s ease", opacity: headerVisible ? 1 : 0 }}>
           
           Get Live In 3–5 Hours
         </p>
         <h3
           className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2"
-          style={{ transition: "opacity 0.5s ease 80ms, transform 0.5s ease 80ms", opacity: headerVisible ? 1 : 0, transform: headerVisible ? "translateY(0)" : "translateY(12px)" }}>
+          style={{ transition: "opacity 0.5s ease 80ms", opacity: headerVisible ? 1 : 0 }}>
           
           Our Process — Start To Launch
         </h3>
         <p
           className="text-center text-sm text-muted-foreground mb-10"
-          style={{ transition: "opacity 0.5s ease 160ms, transform 0.5s ease 160ms", opacity: headerVisible ? 1 : 0, transform: headerVisible ? "translateY(0)" : "translateY(12px)" }}>
+          style={{ transition: "opacity 0.5s ease 160ms", opacity: headerVisible ? 1 : 0 }}>
           
           From first contact to fully live in 5 clear steps — most setups complete in 3–5 hours.
         </p>
