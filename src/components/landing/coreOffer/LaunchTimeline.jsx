@@ -119,8 +119,7 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
                   background: isActive ?
                   "linear-gradient(90deg, #9a5c2e, #c8965c)" :
                   "rgba(154,92,46,0.18)",
-                  transition: "background 0.3s ease, transform 0.2s ease",
-                  transform: isActive ? "scaleY(1.3)" : "scaleY(1)",
+                  transition: "background 0.3s ease",
                   borderRadius: "4px",
                   border: "none",
                   cursor: "pointer"
@@ -488,11 +487,8 @@ export default function LaunchTimeline() {
         })}
       </div>
 
-      {/* Progress Ring */}
-      <ProgressRing activeStep={activeStep} />
-
-      {/* Summary bar — pushed further down with extra top margin */}
-      <div style={{ marginTop: "32px" }}>
+      {/* Summary bar */}
+      <div style={{ marginTop: "24px" }}>
         <TimelineSummaryBar activeStep={activeStep} onStepClick={handleTrackerClick} />
       </div>
 
