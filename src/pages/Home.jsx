@@ -1,17 +1,13 @@
 import { useEffect, lazy, Suspense } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
-import TrustBar from "../components/landing/TrustBar";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
-import ScrollProgressBar from "../components/landing/ScrollProgressBar";
-import CursorGlow from "../components/visual-effects/CursorGlow";
-import SocialProofTicker from "../components/landing/SocialProofTicker";
-import InteractiveJourneyMap from "../components/landing/InteractiveJourneyMap";
-import FloatingNotificationToasts from "../components/visual-effects/FloatingNotificationToasts";
-import { SectionSkeleton, SmallSectionSkeleton, LargeSectionSkeleton } from "../components/landing/SkeletonLoader";
+import { SectionSkeleton, LargeSectionSkeleton } from "../components/landing/SkeletonLoader";
 
-// Lazy load below-the-fold sections
+// Lazy load ALL below-the-fold sections individually for independent rendering
+const TrustBar = lazy(() => import("../components/landing/TrustBar"));
+const InteractiveJourneyMap = lazy(() => import("../components/landing/InteractiveJourneyMap"));
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const IntegrationPartners = lazy(() => import("../components/landing/IntegrationPartners"));
@@ -53,25 +49,37 @@ function useScrollGradient() {
       return `hsl(${h1 + (h2 - h1) * t}, ${s1 + (s2 - s1) * t}%, ${l1 + (l2 - l1) * t}%)`;
     };
 
+    // RAF-throttled scroll handler — runs at max 60fps, no duplicate frames
+    let rafId = null;
+    let lastScrollY = -1;
     const onScroll = () => {
-      const progress = Math.min(
-        window.scrollY / (document.body.scrollHeight - window.innerHeight),
-        1
-      );
-      let i = 0;
-      for (let j = 0; j < stops.length - 1; j += 1) {
-        if (progress >= stops[j].scroll) i = j;
-      }
-      const seg = stops[i];
-      const next = stops[Math.min(i + 1, stops.length - 1)];
-      const t = seg.scroll === next.scroll ? 0 : (progress - seg.scroll) / (next.scroll - seg.scroll);
-      document.documentElement.style.setProperty("--scroll-bg-from", lerp(seg.from, next.from, t));
-      document.documentElement.style.setProperty("--scroll-bg-to", lerp(seg.to, next.to, t));
+      if (rafId) return;
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (window.scrollY === lastScrollY) return;
+        lastScrollY = window.scrollY;
+        const progress = Math.min(
+          window.scrollY / (document.body.scrollHeight - window.innerHeight),
+          1
+        );
+        let i = 0;
+        for (let j = 0; j < stops.length - 1; j += 1) {
+          if (progress >= stops[j].scroll) i = j;
+        }
+        const seg = stops[i];
+        const next = stops[Math.min(i + 1, stops.length - 1)];
+        const t = seg.scroll === next.scroll ? 0 : (progress - seg.scroll) / (next.scroll - seg.scroll);
+        document.documentElement.style.setProperty("--scroll-bg-from", lerp(seg.from, next.from, t));
+        document.documentElement.style.setProperty("--scroll-bg-to", lerp(seg.to, next.to, t));
+      });
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 }
 
@@ -112,44 +120,50 @@ export default function Home() {
     };
   }, []);
 
-  const LoadingFallback = () => <SectionSkeleton />;
-  const SmallLoadingFallback = () => <SmallSectionSkeleton />;
-  const LargeLoadingFallback = () => <LargeSectionSkeleton />;
-
   return (
     <DemoBookingProvider>
       <div className="min-h-screen">
-        <CursorGlow />
-        <FloatingNotificationToasts />
-        <ScrollProgressBar />
         <Navbar />
-        <SocialProofTicker />
         <Hero />
-        <Suspense fallback={<LoadingFallback />}>
+        <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
           <Industries />
           <SectionBreak />
         </Suspense>
-        <section aria-label="Proof and trust">
+        <Suspense fallback={<SectionSkeleton />}>
           <TrustBar />
-        </section>
-        <section aria-label="Interactive journey map">
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
           <InteractiveJourneyMap />
-        </section>
-        <Suspense fallback={<LargeLoadingFallback />}>
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
           <LeadLeakage />
-          <Suspense fallback={<SectionSkeleton />}><BeforeAfter /></Suspense>
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <BeforeAfter />
+        </Suspense>
+        <Suspense fallback={<LargeSectionSkeleton />}>
           <SectionBreak />
           <CoreOffer />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
           <IntegrationPartners />
+        </Suspense>
+        <Suspense fallback={<LargeSectionSkeleton />}>
           <SectionBreak />
           <Pricing />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
           <FAQ />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
           <FinalCTA />
+        </Suspense>
+        <Suspense fallback={null}>
           <Footer />
         </Suspense>
         <ChatBubble />

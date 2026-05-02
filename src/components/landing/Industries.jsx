@@ -341,6 +341,9 @@ export default function Industries() {
                 src={industry.image}
                 alt={industry.name}
                 loading="lazy"
+                decoding="async"
+                width="600"
+                height="442"
                 className="absolute inset-0 h-full w-full object-cover" />
               
               {/* Unique per-industry SVG texture pattern */}

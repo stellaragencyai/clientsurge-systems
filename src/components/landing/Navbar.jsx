@@ -135,6 +135,8 @@ export default function Navbar() {
           <img
             src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/7de44f95a_10ca51c4-3ef9-4f87-979c-d48d7b2e0c6b.png"
             alt="ClientSurge Systems"
+            fetchpriority="high"
+            decoding="async"
             style={{ height: "52px", width: "auto", objectFit: "contain" }}
           />
         </button>
