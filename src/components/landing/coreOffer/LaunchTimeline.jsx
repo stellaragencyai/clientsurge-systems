@@ -169,40 +169,11 @@ function StepRow({ step, idx }) {
   const isEven = idx % 2 === 0;
   const [ref, visible] = useInView(0.08);
 
-  const stepVariants = {
-    hidden: {
-      rotateY: -90,
-      opacity: 0,
-      y: 20
-    },
-    visible: {
-      rotateY: 0,
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 40,
-        damping: 20,
-        duration: 1.4
-      }
-    }
-  };
-
-  const contentVariants = {
-    hidden: { opacity: 0, y: 16, filter: "blur(8px)" },
-    visible: {
-      opacity: 1,
-      y: 0,
-      filter: "blur(0px)",
-      transition: { duration: 0.6, ease: "easeOut", delay: 0.2 }
-    }
-  };
-
   const contentDelay = idx * 80;
   const imageDelay = idx * 80 + 120;
 
-  const contentFrom = `translateX(${isEven ? "-72px" : "72px"}) translateY(28px) scale(0.94)`;
-  const imageFrom = `translateX(${isEven ? "72px" : "-72px"}) translateY(28px) scale(0.94)`;
+  const contentFrom = `translateX(${isEven ? "-40px" : "40px"}) translateY(20px) scale(0.96)`;
+  const imageFrom = `translateX(${isEven ? "40px" : "-40px"}) translateY(20px) scale(0.96)`;
 
   const cardBg = "rgba(255,255,255,0.95)";
   const cardBorder = "1.5px solid rgba(154,92,46,0.13)";
@@ -238,20 +209,17 @@ function StepRow({ step, idx }) {
         style={{ alignItems: "stretch", perspective: "1200px" }}>
         
         {/* ── CONTENT CARD ── */}
-        <motion.div
-          variants={stepVariants}
-          initial="hidden"
-          animate={visible ? "visible" : "hidden"}
+        <div
           style={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center"
+            justifyContent: "center",
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateX(0) translateY(0) scale(1)" : contentFrom,
+            transition: `opacity 0.75s cubic-bezier(0.16,1,0.3,1) ${contentDelay}ms, transform 0.75s cubic-bezier(0.16,1,0.3,1) ${contentDelay}ms`,
           }}>
           
-          <motion.div
-            variants={contentVariants}
-            initial="hidden"
-            animate={visible ? "visible" : "hidden"}
+          <div
             className="rounded-2xl overflow-hidden h-full"
             style={{ background: cardBg, border: cardBorder, boxShadow: cardShadow, position: "relative" }}>
             
@@ -292,8 +260,8 @@ function StepRow({ step, idx }) {
                 )}
               </ul>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* ── IMAGE ── */}
         <div
