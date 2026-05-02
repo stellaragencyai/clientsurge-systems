@@ -146,24 +146,25 @@ export default function Pricing() {
         </StaggeredFadeUp>
 
         {/* Trust badges — right below the pricing cards */}
-        <div className="grid grid-cols-4 gap-3 mt-8 mb-4 w-full">
+        <div className="grid grid-cols-5 gap-2 mt-8 mb-4 w-full">
           {[
             { icon: "🔒", text: "No long-term contracts" },
             { icon: "⚡", text: "Live in 5–7 business days" },
             { icon: "💬", text: "SMS + Email included" },
             { icon: "🎯", text: "Done-for-you setup" },
+            { icon: "🛡️", text: "30-day money-back guarantee" },
           ].map((badge) => (
             <div
               key={badge.text}
-              className="flex flex-col items-center justify-center gap-3 py-8 rounded-2xl font-semibold"
+              className="flex flex-col items-center justify-center gap-2 py-6 rounded-2xl font-semibold"
               style={{
                 background: "rgba(154,92,46,0.08)",
                 border: "1px solid rgba(154,92,46,0.18)",
                 color: "rgba(154,92,46,0.9)",
               }}
             >
-              <span style={{ fontSize: "28px", lineHeight: 1 }}>{badge.icon}</span>
-              <span style={{ fontSize: "14px", textAlign: "center", lineHeight: 1.3 }}>{badge.text}</span>
+              <span style={{ fontSize: "22px", lineHeight: 1 }}>{badge.icon}</span>
+              <span style={{ fontSize: "12px", textAlign: "center", lineHeight: 1.3, padding: "0 8px" }}>{badge.text}</span>
             </div>
           ))}
         </div>
