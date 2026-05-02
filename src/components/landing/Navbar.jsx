@@ -135,18 +135,18 @@ export default function Navbar() {
         transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out",
       }}
     >
-      <div className="w-full h-[72px] md:h-[84px] flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
+      <div className="w-full h-[110px] md:h-[116px] flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
         <button
           onClick={handleLogoClick}
           className="font-display font-bold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5 md:gap-2"
           style={{ fontSize: "1rem", minHeight: "unset", minWidth: "unset" }}
-        >
+          >
           <img
-            src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/7de44f95a_10ca51c4-3ef9-4f87-979c-d48d7b2e0c6b.png"
-            alt="ClientSurge Systems"
-            fetchpriority="high"
-            decoding="async"
-            style={{ height: "69px", width: "auto", objectFit: "contain" }}
+          src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/7de44f95a_10ca51c4-3ef9-4f87-979c-d48d7b2e0c6b.png"
+          alt="ClientSurge Systems"
+          fetchpriority="high"
+          decoding="async"
+          style={{ height: "104px", width: "auto", objectFit: "contain" }}
           />
         </button>
 
