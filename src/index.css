@@ -295,11 +295,11 @@ img {
   display: block;
 }
 
-/* 14. Smooth scrolling — disabled for reduced-motion users */
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
+/* 14. Smooth scrolling — handled entirely in JS via lib/scroll.js to avoid
+   conflicts between CSS scroll-behavior and programmatic scroll calls.
+   DO NOT re-enable scroll-behavior: smooth here. */
+html {
+  scroll-behavior: auto;
 }
 
 /* 15. Reduced motion — kill ALL animations/transitions for accessibility */

@@ -6,6 +6,7 @@ import DemoBookingModal from "../forms/DemoBookingModal";
 import { trackCTA } from "@/lib/analytics";
 import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
+import { scrollToSection } from "@/lib/scroll";
 
 const sectionLinks = [
   { label: "How It Works", href: "#problem-solution" },
@@ -103,9 +104,17 @@ export default function Navbar() {
   const handleSectionNavigation = (e, href) => {
     e.preventDefault();
     trackCTA(`nav_${href.replace("#", "")}`, "navbar");
-    navigate(`/${href}`);
     setOpen(false);
     setIndustriesOpen(false);
+
+    if (location.pathname === "/") {
+      // Already on home — scroll directly using the utility (no route change)
+      scrollToSection(href);
+    } else {
+      // Navigate to home first, then scroll after render
+      navigate("/");
+      scrollToSection(href, 500);
+    }
   };
 
   const handleLogoClick = (e) => {

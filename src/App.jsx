@@ -16,6 +16,7 @@ import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import PageNotFound from "./lib/PageNotFound";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
+import { scrollToSection, scrollToTop } from "@/lib/scroll";
 
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
@@ -88,6 +89,18 @@ const NOINDEX_PREFIXES = [
 const isPublicPath = (pathname) =>
   PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
+// Fix 1: ScrollToTop — resets scroll position on every route change
+function ScrollToTop() {
+  const location = useLocation();
+  useEffect(() => {
+    // Don't scroll to top if navigating to a hash anchor
+    if (!location.hash) {
+      scrollToTop();
+    }
+  }, [location.pathname]);
+  return null;
+}
+
 function AppInner() {
   useEffect(() => {
     // Initialize auto-tracking after React mounts — safe for SSR/pre-render
@@ -98,21 +111,14 @@ function AppInner() {
   return null;
 }
 
+// Fix 2: SectionRedirect uses centralized scroll utility — no more race conditions
 function SectionRedirect({ hash }) {
   const navigate = useNavigate();
 
   useEffect(() => {
     navigate("/", { replace: true });
-
-    const timer = window.setTimeout(() => {
-      const element = document.querySelector(hash);
-      if (element) {
-        element.scrollIntoView({ behavior: "auto", block: "start" });
-      }
-      window.history.replaceState({}, "", `/${hash}`);
-    }, 450);
-
-    return () => window.clearTimeout(timer);
+    // Wait for Home page to render before scrolling
+    scrollToSection(hash, 500);
   }, [hash, navigate]);
 
   return null;
@@ -264,6 +270,7 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router style={{ overflowX: "hidden" }}>
+          <ScrollToTop />
           <AutoCTAAnalytics />
           <RouteIndexingGuard />
           <AuthenticatedApp />
