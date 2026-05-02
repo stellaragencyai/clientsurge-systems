@@ -9,7 +9,6 @@ export default function ServiceCardActions({ serviceKey, orderId }) {
 
   const handleAction = (actionType) => {
     // Placeholder for actions — can integrate modals or navigation later
-    console.log(`Action: ${actionType} for ${serviceKey}`);
   };
 
   return (
