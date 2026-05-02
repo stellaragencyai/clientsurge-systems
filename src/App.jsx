@@ -30,6 +30,7 @@ import Industries from "./pages/Industries";
 import OrderSuccess from "./pages/OrderSuccess";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
 import BusinessSetup from "./pages/BusinessSetup";
+import ThankYou from "./pages/ThankYou";
 
 const Store = lazy(() => import("./pages/Store"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -220,6 +221,7 @@ const AuthenticatedApp = () => {
       />
       <Route path="/order-success" element={<OrderSuccess />} />
       <Route path="/setup" element={<BusinessSetup />} />
+      <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/:slug" element={<IndustryTemplate />} />
 
       <Route
