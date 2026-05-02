@@ -132,13 +132,11 @@ export default function Navbar() {
           className="font-display font-bold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5 md:gap-2"
           style={{ fontSize: "1rem", minHeight: "unset", minWidth: "unset" }}
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-            <span className="text-white font-black text-sm">CS</span>
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="font-black text-sm">ClientSurge</span>
-            <span className="text-primary text-xs font-bold">Systems</span>
-          </div>
+          <img
+            src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/7de44f95a_10ca51c4-3ef9-4f87-979c-d48d7b2e0c6b.png"
+            alt="ClientSurge Systems"
+            style={{ height: "36px", width: "auto", objectFit: "contain" }}
+          />
         </button>
 
         <div className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
