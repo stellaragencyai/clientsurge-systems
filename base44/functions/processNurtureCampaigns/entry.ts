@@ -1,5 +1,5 @@
 /**
- * processNurtureCampaigns — daily runner for the 30-day nurture email sequence.
+ * processNurtureCampaigns — daily runner for the 30-day nurture email sequence. (redeployed 2026-05-02)
  *
  * 8 steps over 30 days, each with a distinct content theme:
  *  Step 1 — Day 1  : Welcome + what to expect
