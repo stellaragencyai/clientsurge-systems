@@ -1,5 +1,5 @@
 /**
- * runWinBackSequence
+ * runWinBackSequence — redeployed 2026-05-02
  * Scheduled: Daily at 5pm
  * Purpose: Scan orders with canceled/past_due/failed payment status for 30+ days
  *          and send a 3-step win-back email sequence:
