@@ -167,17 +167,17 @@ export default function Hero() {
                 color: "#fff8ee",
                 fontSize: "1rem",
                 fontWeight: "700",
-                boxShadow: BUTTON_STYLES.BROWN_GRADIENT.boxShadow,
+                boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
                 cursor: "pointer",
                 transition: "all 0.3s ease"
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.boxShadow = BUTTON_STYLES.BROWN_GRADIENT_HOVER.boxShadow;
+                e.currentTarget.style.boxShadow = "0 8px 32px rgba(120,70,20,0.55)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = BUTTON_STYLES.BROWN_GRADIENT.boxShadow;
+                e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
               }}>
               
               {BUTTON_TEXT.BOOK_DEMO}
