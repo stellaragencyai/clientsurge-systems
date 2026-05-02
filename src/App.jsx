@@ -16,7 +16,7 @@ import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import PageNotFound from "./lib/PageNotFound";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
-import { scrollToSection, scrollToTop } from "@/lib/scroll";
+import { scrollToTop } from "@/lib/scroll";
 
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
@@ -112,14 +112,12 @@ function AppInner() {
   return null;
 }
 
-// Fix 2: SectionRedirect uses centralized scroll utility — no more race conditions
+// SectionRedirect — just navigate to home, no auto-scroll
 function SectionRedirect({ hash }) {
   const navigate = useNavigate();
 
   useEffect(() => {
     navigate("/", { replace: true });
-    // Wait for Home page to render before scrolling
-    scrollToSection(hash, 500);
   }, [hash, navigate]);
 
   return null;
