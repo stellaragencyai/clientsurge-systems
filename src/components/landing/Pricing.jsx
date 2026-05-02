@@ -145,6 +145,30 @@ export default function Pricing() {
           </div>
         </StaggeredFadeUp>
 
+        {/* Trust badges — right below the pricing cards */}
+        <div className="flex flex-wrap justify-center gap-3 mt-8 mb-4">
+          {[
+            { icon: "🔒", text: "No long-term contracts" },
+            { icon: "⚡", text: "Live in 5–7 business days" },
+            { icon: "💬", text: "SMS + Email included" },
+            { icon: "🎯", text: "Done-for-you setup" },
+            { icon: "🛡️", text: "30-day money-back guarantee" },
+          ].map((badge) => (
+            <div
+              key={badge.text}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold"
+              style={{
+                background: "rgba(154,92,46,0.08)",
+                border: "1px solid rgba(154,92,46,0.18)",
+                color: "rgba(154,92,46,0.9)",
+              }}
+            >
+              <span>{badge.icon}</span>
+              <span>{badge.text}</span>
+            </div>
+          ))}
+        </div>
+
         <MoneyBackGuarantee />
 
         <div className="max-w-2xl mb-6 mt-12">

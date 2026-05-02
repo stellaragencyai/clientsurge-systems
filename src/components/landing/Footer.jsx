@@ -33,14 +33,6 @@ const navColumns = [
   },
 ];
 
-const trustBadges = [
-  { icon: "🔒", text: "No long-term contracts" },
-  { icon: "⚡", text: "Live in 5–7 business days" },
-  { icon: "💬", text: "SMS + Email included" },
-  { icon: "🎯", text: "Done-for-you setup" },
-  { icon: "🛡️", text: "30-day money-back guarantee" },
-];
-
 export default function Footer() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -189,27 +181,6 @@ export default function Footer() {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Trust badges */}
-        <div
-          className="mt-12 pt-8 flex flex-wrap gap-3 justify-center"
-          style={{ borderTop: "1px solid rgba(154,92,46,0.15)" }}
-        >
-          {trustBadges.map((badge) => (
-            <div
-              key={badge.text}
-              className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold"
-              style={{
-                background: "rgba(154,92,46,0.1)",
-                border: "1px solid rgba(154,92,46,0.2)",
-                color: "rgba(200,150,92,0.9)",
-              }}
-            >
-              <span>{badge.icon}</span>
-              <span>{badge.text}</span>
-            </div>
-          ))}
         </div>
 
         {/* Bottom bar */}
