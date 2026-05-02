@@ -9,7 +9,7 @@ const navColumns = [
   { label: "Our System", href: "/#services" },
   { label: "Pricing", href: "/#pricing" },
   { label: "FAQ", href: "/#faq" },
-  { label: "Book a Demo", href: "/book" }]
+  { label: "Get Your Free Audit", href: "/contact" }]
 
 },
 {
@@ -26,7 +26,6 @@ const navColumns = [
   title: "Company",
   links: [
   { label: "Contact Us", href: "/contact" },
-  { label: "Client Portal", href: "/client-portal" },
   { label: "Privacy Policy", href: "/legal/privacy" },
   { label: "Terms of Service", href: "/legal/terms" }]
 
@@ -60,7 +59,7 @@ export default function Footer() {
     <footer
       className="relative"
       style={{
-        background: "linear-gradient(180deg, #1a0f05 0%, #0f0905 100%)",
+        background: "linear-gradient(180deg, #0A1628 0%, #050d1a 100%)",
         paddingBottom: "env(safe-area-inset-bottom)"
       }}>
       
