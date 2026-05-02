@@ -136,12 +136,30 @@ Deno.serve(async (req) => {
 
     console.log(`[sendDailyDigest] Preparing digest — total leads: ${allLeads.length}, new today: ${newToday}, hot: ${hotLeads.length}, overdue: ${overdueFollowUp.length}, replied: ${replied.length}`);
 
+    const resendKey = Deno.env.get('RESEND_API_KEY');
+    if (!resendKey) {
+      return Response.json({ error: 'RESEND_API_KEY not set' }, { status: 500 });
+    }
+    const fromEmail = settings?.resend_from_email || Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@clientsurgesystems.com';
+
     try {
-      await base44.asServiceRole.integrations.Core.SendEmail({
-        to: notificationEmail,
-        subject: `Daily Lead Digest — ${newToday} new, ${hotLeads.length} hot, ${overdueFollowUp.length} overdue`,
-        body,
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${resendKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: fromEmail,
+          to: notificationEmail,
+          subject: `Daily Lead Digest — ${newToday} new, ${hotLeads.length} hot, ${overdueFollowUp.length} overdue`,
+          html: body,
+        }),
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.message || `Resend error ${res.status}`);
+      }
       console.log(`[sendDailyDigest] ✓ Digest sent successfully to ${notificationEmail}`);
     } catch (emailError) {
       console.error(`[sendDailyDigest] ✗ SendEmail failed: ${emailError.message}`);
