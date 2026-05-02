@@ -153,9 +153,9 @@ export default function IntegrationPartners() {
                   e.currentTarget.style.filter = "contrast(1.05) saturate(1.05)";
                 }} />
               
-                <span className="mt-2 text-[10px] font-semibold text-primary/60 group-hover:text-primary transition-colors uppercase tracking-widest hidden">
-                  {integration.name}
-                </span>
+                
+
+              
               </a>
             )}
           </div>
