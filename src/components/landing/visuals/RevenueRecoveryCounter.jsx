@@ -157,29 +157,25 @@ export default function RevenueRecoveryCounter() {
   };
 
   return (
-    <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "20px" }}>
+    <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "16px" }}>
 
       {/* Apple Pencil */}
       <div style={{
         position: "absolute",
-        right: "-32px",
+        right: "-22px",
         top: "50%",
         transform: "translateY(-50%) rotate(8deg)",
         zIndex: 20,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        filter: "drop-shadow(2px 4px 8px rgba(0,0,0,0.4))",
+        filter: "drop-shadow(2px 4px 6px rgba(0,0,0,0.4))",
       }}>
-        {/* Cap */}
-        <div style={{ width: "10px", height: "18px", borderRadius: "3px 3px 0 0", background: "linear-gradient(to right, #e8e8e8, #f5f5f5, #d0d0d0)", boxShadow: "inset -1px 0 2px rgba(0,0,0,0.15)" }} />
-        {/* Body */}
-        <div style={{ width: "10px", height: "180px", background: "linear-gradient(to right, #d8d8d8 0%, #f8f8f8 30%, #ffffff 50%, #e8e8e8 70%, #c8c8c8 100%)", boxShadow: "inset -2px 0 4px rgba(0,0,0,0.12), 1px 0 3px rgba(0,0,0,0.08)" }}>
-          {/* Logo area */}
-          <div style={{ marginTop: "60px", textAlign: "center", fontSize: "6px", color: "rgba(120,120,120,0.5)", fontWeight: "300", letterSpacing: "0.08em", transform: "rotate(180deg)", writingMode: "vertical-lr" }}>Apple Pencil</div>
+        <div style={{ width: "7px", height: "13px", borderRadius: "2px 2px 0 0", background: "linear-gradient(to right, #e8e8e8, #f5f5f5, #d0d0d0)", boxShadow: "inset -1px 0 2px rgba(0,0,0,0.15)" }} />
+        <div style={{ width: "7px", height: "130px", background: "linear-gradient(to right, #d8d8d8 0%, #f8f8f8 30%, #ffffff 50%, #e8e8e8 70%, #c8c8c8 100%)", boxShadow: "inset -2px 0 4px rgba(0,0,0,0.12), 1px 0 3px rgba(0,0,0,0.08)" }}>
+          <div style={{ marginTop: "42px", textAlign: "center", fontSize: "4px", color: "rgba(120,120,120,0.5)", fontWeight: "300", letterSpacing: "0.08em", transform: "rotate(180deg)", writingMode: "vertical-lr" }}>Apple Pencil</div>
         </div>
-        {/* Tip */}
-        <div style={{ width: "10px", height: "22px", background: "linear-gradient(to bottom, #d0d0d0, #a8a8a8)", clipPath: "polygon(0 0, 100% 0, 60% 100%, 40% 100%)" }} />
+        <div style={{ width: "7px", height: "16px", background: "linear-gradient(to bottom, #d0d0d0, #a8a8a8)", clipPath: "polygon(0 0, 100% 0, 60% 100%, 40% 100%)" }} />
       </div>
 
       {/* iPad body */}
@@ -192,13 +188,12 @@ export default function RevenueRecoveryCounter() {
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
         style={{
           position: "relative",
-          width: "320px",
-          borderRadius: "26px",
-          // Pure black chassis
+          width: "240px",
+          borderRadius: "20px",
           background: "#000000",
           boxShadow: `
-            0 50px 120px rgba(0,0,0,0.75),
-            0 20px 50px rgba(0,0,0,0.45),
+            0 36px 90px rgba(0,0,0,0.75),
+            0 14px 36px rgba(0,0,0,0.45),
             inset 0 1px 0 rgba(255,255,255,0.06),
             inset 0 -1px 0 rgba(0,0,0,0.6)
           `,
@@ -212,32 +207,32 @@ export default function RevenueRecoveryCounter() {
         <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), rgba(255,255,255,0.08), rgba(255,255,255,0.06), transparent)", borderRadius: "999px", zIndex: 15 }} />
 
         {/* Left edge — volume buttons — black */}
-        <div style={{ position: "absolute", left: "-5px", top: "80px", width: "5px", height: "36px", borderRadius: "3px 0 0 3px", background: "#1a1a1a", boxShadow: "-1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
-        <div style={{ position: "absolute", left: "-5px", top: "126px", width: "5px", height: "36px", borderRadius: "3px 0 0 3px", background: "#1a1a1a", boxShadow: "-1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
+        <div style={{ position: "absolute", left: "-4px", top: "58px", width: "4px", height: "26px", borderRadius: "3px 0 0 3px", background: "#1a1a1a", boxShadow: "-1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
+        <div style={{ position: "absolute", left: "-4px", top: "92px", width: "4px", height: "26px", borderRadius: "3px 0 0 3px", background: "#1a1a1a", boxShadow: "-1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
 
         {/* Right edge — power button — black */}
-        <div style={{ position: "absolute", right: "-5px", top: "90px", width: "5px", height: "52px", borderRadius: "0 3px 3px 0", background: "#1a1a1a", boxShadow: "1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
+        <div style={{ position: "absolute", right: "-4px", top: "68px", width: "4px", height: "38px", borderRadius: "0 3px 3px 0", background: "#1a1a1a", boxShadow: "1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
 
         {/* Top speaker grille */}
-        <div style={{ position: "absolute", top: "12px", left: "50%", transform: "translateX(-50%)", zIndex: 20 }}>
-          <SpeakerGrille count={10} />
+        <div style={{ position: "absolute", top: "8px", left: "50%", transform: "translateX(-50%)", zIndex: 20 }}>
+          <SpeakerGrille count={8} />
         </div>
 
         {/* Bottom speaker grille */}
-        <div style={{ position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", zIndex: 20 }}>
-          <SpeakerGrille count={10} />
+        <div style={{ position: "absolute", bottom: "8px", left: "50%", transform: "translateX(-50%)", zIndex: 20 }}>
+          <SpeakerGrille count={8} />
         </div>
 
         {/* Screen inset with deep bezel */}
         <div style={{
-          margin: "12px",
-          borderRadius: "18px",
+          margin: "9px",
+          borderRadius: "14px",
           overflow: "hidden",
           background: "#000",
-          boxShadow: "inset 0 0 0 1.5px rgba(255,255,255,0.05), inset 0 2px 12px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.6)",
+          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.04), inset 0 2px 10px rgba(0,0,0,0.9)",
           position: "relative",
         }}>
-          {/* Boot/wake: wallpaper that fades to app content */}
+          {/* Boot/wake overlay */}
           <motion.div
             initial={{ opacity: 1 }}
             animate={{ opacity: awake ? 0 : 1 }}
@@ -251,22 +246,20 @@ export default function RevenueRecoveryCounter() {
             <motion.div
               animate={{ opacity: awake ? 0 : [0, 1, 1, 0] }}
               transition={{ duration: 1.2, times: [0, 0.2, 0.8, 1] }}
-              style={{ fontSize: "28px", color: "rgba(255,255,255,0.9)" }}
             >
-              {/* Apple logo */}
-              <svg width="28" height="34" viewBox="0 0 814 1000" fill="rgba(255,255,255,0.85)">
+              <svg width="20" height="24" viewBox="0 0 814 1000" fill="rgba(255,255,255,0.85)">
                 <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-57.8-155.5-127.4C46 376.7 0 249.4 0 128.3 0 57.3 17.5-.4 52.9-32.4c35.4-32 82.3-51.2 127.3-51.2 49.2 0 91.4 20.7 121.5 53.9 30.1 33.2 53.3 84.1 53.3 143.6 0 2.6 0 5.2-.1 7.8 53.7-26.2 101.5-69.7 132.7-126.5C521.6-58.4 528-65.4 552-79.5c24-14.1 51.5-21.1 79.7-21.1 28.7 0 56.9 7.6 80.7 21.8 23.8 14.2 44.6 35.4 59.5 62.7 14.9 27.3 22.4 58.1 22.4 89.2-.1 0-.1 268.5-.1 268.5z"/>
               </svg>
             </motion.div>
           </motion.div>
 
-          {/* Wallpaper layer (blurred gradient behind content) */}
+          {/* Wallpaper layer */}
           <div style={{
             position: "absolute", inset: 0, zIndex: 0,
             background: "linear-gradient(145deg, #0f1520 0%, #1a0a2e 35%, #0a1525 65%, #151020 100%)",
           }}>
-            <div style={{ position: "absolute", top: "-10%", left: "20%", width: "60%", height: "60%", borderRadius: "50%", background: "radial-gradient(circle, rgba(100,60,180,0.5) 0%, transparent 70%)", filter: "blur(30px)" }} />
-            <div style={{ position: "absolute", bottom: "0%", right: "5%", width: "50%", height: "50%", borderRadius: "50%", background: "radial-gradient(circle, rgba(30,100,200,0.4) 0%, transparent 70%)", filter: "blur(25px)" }} />
+            <div style={{ position: "absolute", top: "-10%", left: "20%", width: "60%", height: "60%", borderRadius: "50%", background: "radial-gradient(circle, rgba(100,60,180,0.5) 0%, transparent 70%)", filter: "blur(22px)" }} />
+            <div style={{ position: "absolute", bottom: "0%", right: "5%", width: "50%", height: "50%", borderRadius: "50%", background: "radial-gradient(circle, rgba(30,100,200,0.4) 0%, transparent 70%)", filter: "blur(18px)" }} />
           </div>
 
           {/* Content */}
@@ -278,75 +271,73 @@ export default function RevenueRecoveryCounter() {
             >
               <StatusBar />
 
-              <div style={{ padding: "14px 16px 16px" }}>
+              <div style={{ padding: "8px 10px 10px" }}>
                 {/* Header */}
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "14px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "8px" }}>
                   <div>
-                    <p style={{ fontSize: "9px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.22em", color: "#c8965c", marginBottom: "3px", fontFamily: SF }}>Revenue Recovered</p>
-                    <motion.p style={{ fontFamily: SF, fontSize: "26px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em" }}>
+                    <p style={{ fontSize: "7px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "2px", fontFamily: SF }}>Revenue Recovered</p>
+                    <motion.p style={{ fontFamily: SF, fontSize: "20px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em", margin: 0 }}>
                       ${displayTotal.toLocaleString()}
                     </motion.p>
                   </div>
-                  <div style={{ borderRadius: "10px", padding: "4px 10px", fontSize: "10px", fontWeight: "800", background: "rgba(34,197,94,0.18)", color: "#4ade80", border: "1px solid rgba(34,197,94,0.3)", letterSpacing: "0.06em" }}>
+                  <div style={{ borderRadius: "6px", padding: "2px 7px", fontSize: "8px", fontWeight: "800", background: "rgba(34,197,94,0.18)", color: "#4ade80", border: "1px solid rgba(34,197,94,0.3)", letterSpacing: "0.06em" }}>
                     LIVE
                   </div>
                 </div>
 
                 {/* Lead rows */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "7px", marginBottom: "12px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "8px" }}>
                   {LEADS.map((lead, i) => {
                     const recovered = i < recoveredCount;
                     return (
                       <motion.div
                         key={lead.name}
                         style={{
-                          display: "flex", alignItems: "center", gap: "10px",
-                          borderRadius: "10px", padding: "8px 10px", position: "relative", overflow: "hidden",
+                          display: "flex", alignItems: "center", gap: "7px",
+                          borderRadius: "7px", padding: "5px 7px", position: "relative", overflow: "hidden",
                           background: recovered ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.04)",
                           border: recovered ? "1px solid rgba(34,197,94,0.25)" : "1px solid rgba(255,255,255,0.06)",
                           transition: "all 0.45s ease",
                         }}
-                        initial={{ opacity: 0, y: 6 }}
+                        initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.07 }}
                       >
                         {recovered && (
-                          <motion.div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle, rgba(74,222,128,0.25) 0%, transparent 70%)", pointerEvents: "none" }}
+                          <motion.div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle, rgba(74,222,128,0.2) 0%, transparent 70%)", pointerEvents: "none" }}
                             animate={{ scale: [0.4, 2] }} transition={{ duration: 0.55 }} />
                         )}
-                        <div style={{ width: "22px", height: "22px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px", fontWeight: "700", background: recovered ? "rgba(34,197,94,0.22)" : "rgba(255,255,255,0.07)", color: recovered ? "#4ade80" : "rgba(255,255,255,0.3)", transition: "all 0.4s", fontFamily: SF }}>
-                         {recovered ? "✓" : lead.name[0]}
+                        <div style={{ width: "16px", height: "16px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "8px", fontWeight: "700", background: recovered ? "rgba(34,197,94,0.22)" : "rgba(255,255,255,0.07)", color: recovered ? "#4ade80" : "rgba(255,255,255,0.3)", transition: "all 0.4s", fontFamily: SF }}>
+                          {recovered ? "✓" : lead.name[0]}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                         <p style={{ fontSize: "10px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
-                         <p style={{ fontSize: "8px", color: "rgba(255,255,255,0.28)", margin: 0, fontFamily: SF }}>{lead.service}</p>
+                          <p style={{ fontSize: "8px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
+                          <p style={{ fontSize: "6px", color: "rgba(255,255,255,0.28)", margin: 0, fontFamily: SF }}>{lead.service}</p>
                         </div>
-                        <span style={{ fontSize: "11px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#4ade80" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF, letterSpacing: "-0.01em" }}>${lead.value}</span>
+                        <span style={{ fontSize: "9px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#4ade80" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF, letterSpacing: "-0.01em" }}>${lead.value}</span>
                       </motion.div>
                     );
                   })}
                 </div>
 
                 {/* Footer */}
-                <div style={{ borderRadius: "10px", padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(200,150,92,0.1)", border: "1px solid rgba(200,150,92,0.18)" }}>
-                  <p style={{ fontSize: "8px", fontWeight: "700", color: "rgba(200,150,92,0.75)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(200,150,92,0.06)" : "rgba(200,150,92,0.18)", border: "1px solid rgba(200,150,92,0.28)", borderRadius: "6px", padding: "2px 9px", fontSize: "9px", fontWeight: "800", color: replaying ? "rgba(200,150,92,0.35)" : "rgba(200,150,92,0.95)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.08em", transition: "all 0.2s" }}>
+                <div style={{ borderRadius: "7px", padding: "5px 8px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(200,150,92,0.1)", border: "1px solid rgba(200,150,92,0.18)" }}>
+                  <p style={{ fontSize: "6px", fontWeight: "700", color: "rgba(200,150,92,0.75)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(200,150,92,0.06)" : "rgba(200,150,92,0.18)", border: "1px solid rgba(200,150,92,0.28)", borderRadius: "4px", padding: "1px 6px", fontSize: "7px", fontWeight: "800", color: replaying ? "rgba(200,150,92,0.35)" : "rgba(200,150,92,0.95)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.06em", transition: "all 0.2s" }}>
                       {replaying ? "···" : "↺ Replay"}
                     </button>
-                    <motion.div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#c8965c" }} animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
+                    <motion.div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#c8965c" }} animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
                   </div>
                 </div>
               </div>
 
               {/* Home indicator */}
-              <div style={{ height: "22px", background: "rgba(0,0,0,0.25)", display: "flex", alignItems: "center", justifyContent: "center", borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-                <div style={{ width: "110px", height: "4px", borderRadius: "2px", background: "rgba(255,255,255,0.22)" }} />
+              <div style={{ height: "16px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: "80px", height: "3px", borderRadius: "2px", background: "rgba(255,255,255,0.2)" }} />
               </div>
             </motion.div>
           </div>
-
-  
         </div>
       </motion.div>
     </div>
