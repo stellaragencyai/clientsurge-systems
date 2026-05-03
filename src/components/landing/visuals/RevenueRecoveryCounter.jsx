@@ -202,7 +202,7 @@ export default function RevenueRecoveryCounter() {
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
         style={{
           position: "relative",
-          width: "425px",
+          width: "340px",
           borderRadius: "64px",
           /* Enhancement 1: Titanium chassis — warm brushed titanium finish */
           background: "linear-gradient(160deg, #3a3733 0%, #2c2926 30%, #232120 60%, #1e1c1a 100%)",
