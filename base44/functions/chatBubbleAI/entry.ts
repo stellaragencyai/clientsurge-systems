@@ -82,7 +82,14 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'messages array required' }, { status: 400 });
     }
 
-    const trimmedMessages = messages.slice(-MAX_MESSAGE_HISTORY);
+    // Prompt injection guard — strip script tags and reject obvious injection attempts
+    const sanitizedMessages = messages.map((m: any) => ({
+      ...m,
+      content: typeof m.content === "string"
+        ? m.content.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "").slice(0, 2000)
+        : "",
+    }));
+    const trimmedMessages = sanitizedMessages.slice(-MAX_MESSAGE_HISTORY);
 
     // Determine which system prompt to use
     // If installStatus or services are passed, this is a support chat (client dashboard)

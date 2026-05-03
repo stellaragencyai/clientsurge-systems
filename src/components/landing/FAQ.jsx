@@ -112,6 +112,10 @@ export default function FAQ() {
             placeholder="Search FAQs..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck="false"
             className="w-full px-4 py-2.5 rounded-lg border border-border bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm"
           />
         </div>

@@ -68,6 +68,15 @@ Deno.serve(async (req) => {
           continue;
         }
 
+        // Business hours check — only send between 8am and 8pm (America/Phoenix)
+        const nowPhoenix = new Date().toLocaleString("en-US", { timeZone: "America/Phoenix" });
+        const currentHour = new Date(nowPhoenix).getHours();
+        if (currentHour < 8 || currentHour >= 20) {
+          console.log(`[scheduleFollowUpSMS] Outside business hours (hour=${currentHour}) — skipping lead ${lead.id}`);
+          results.skipped++;
+          continue;
+        }
+
         if (!lead.phone) {
           results.skipped++;
           continue;

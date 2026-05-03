@@ -151,7 +151,8 @@ export default function IntegrationPartners() {
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = "scale(1) translateY(0)";
                   e.currentTarget.style.filter = "contrast(1.05) saturate(1.05)";
-                }} />
+                }}
+                onError={(e) => { e.currentTarget.style.display = "none"; }} />
               
                 
 

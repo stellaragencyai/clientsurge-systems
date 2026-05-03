@@ -9,6 +9,23 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid event' }, { status: 400 });
     }
 
+    // Deduplication — skip if same email/phone submitted within last 60 minutes
+    if (data.email || data.phone) {
+      const sixtyMinutesAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const existing = await base44.asServiceRole.entities.Leads.filter(
+        { email: data.email },
+        "-created_date",
+        5
+      ).catch(() => []);
+      const duplicate = (existing || []).find(
+        (l) => l.id !== data.id && new Date(l.created_date) > new Date(sixtyMinutesAgo)
+      );
+      if (duplicate) {
+        console.log(`[onLeadCreated] Duplicate detected for ${data.email} — skipping dispatch`);
+        return Response.json({ success: true, skipped: true, reason: "duplicate_within_60min" });
+      }
+    }
+
     // Prepare structured webhook payload
     const payload = {
       event: 'lead_created',
