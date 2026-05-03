@@ -240,16 +240,16 @@ export default function ProductCard({ product }) {
               style={{
                 width: "100%",
                 borderRadius: "9999px", padding: "1px",
-                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#f5c518 0%,#ffd700 30%,#ffe566 50%,#ffd700 70%,#c9a800 100%)",
                 border: "none", cursor: "pointer",
-                boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 4px 12px rgba(120,70,20,0.25)",
+                boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 4px 12px rgba(200,165,0,0.35)",
               }}
             >
               <span style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
                 width: "100%",
                 height: "36px", paddingLeft: "16px", paddingRight: "16px", borderRadius: "9999px",
-                background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#b8860b 0%,#d4a017 40%,#b8860b 100%)",
                 color: "#fff", fontWeight: "700", fontSize: "11px", whiteSpace: "nowrap",
                 pointerEvents: "none",
               }}>
