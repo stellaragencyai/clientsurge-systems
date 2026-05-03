@@ -16,6 +16,11 @@ export default function BundleSavingsToast() {
 
     if (!added || count === 0) return;
 
+    // Only show once per session
+    try {
+      if (sessionStorage.getItem("cs:bundle-toast-shown")) return;
+    } catch (_) {}
+
     const serviceKeys = new Set(items.map((i) => i.service_key));
 
     // Find a bundle that's close to being unlocked (1-2 services away)
@@ -35,6 +40,7 @@ export default function BundleSavingsToast() {
       savings,
     });
 
+    try { sessionStorage.setItem("cs:bundle-toast-shown", "1"); } catch (_) {}
     setVisible(true);
     clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setVisible(false), 5000);

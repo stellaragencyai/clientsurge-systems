@@ -16,6 +16,7 @@ const FAQ = lazy(() => import("../components/landing/FAQ"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
 const LeadLeakage = lazy(() => import("../components/landing/LeadLeakage"));
 const BeforeAfter = lazy(() => import("../components/landing/BeforeAfter"));
+const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 const Footer = lazy(() => import("../components/landing/Footer"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
@@ -26,6 +27,7 @@ import {
   getOrganizationSchema,
   getServiceSchema,
 } from "../components/SEO/SchemaMarkup";
+import CookieConsent from "../components/landing/CookieConsent";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
 
 function useHomepageWhiteCanvas() {
@@ -124,12 +126,17 @@ export default function Home() {
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
+          <Testimonials />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <SectionBreak />
           <FinalCTA />
         </Suspense>
         <Suspense fallback={null}>
           <Footer />
         </Suspense>
         <ChatBubble />
+        <CookieConsent />
       </div>
     </DemoBookingProvider>
   );

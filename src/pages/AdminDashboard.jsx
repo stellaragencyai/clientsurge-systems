@@ -33,6 +33,7 @@ import CommunicationLogsPanel from '../components/admin/CommunicationLogsPanel';
 import AutomationInstallChecklist from '../components/admin/AutomationInstallChecklist';
 import ReviewRequestPanel from '../components/admin/ReviewRequestPanel';
 import LeadReactivationPanel from '../components/admin/LeadReactivationPanel';
+import TaskBoardPanel from '../components/admin/TaskBoardPanel';
 
 const NAV_GROUPS = [
   {
@@ -73,6 +74,7 @@ const NAV_GROUPS = [
   {
     group: 'System',
     items: [
+      { id: 'task-board', label: 'Task Board', icon: ClipboardList },
       { id: 'health', label: 'Integration Health', icon: Activity },
       { id: 'logs', label: 'Communication Logs', icon: MessageSquare },
       { id: 'templates', label: 'Templates', icon: MessageSquare },
@@ -173,6 +175,7 @@ export default function AdminDashboard() {
       case 'cadence': return <DynamicCadencePanel />;
       case 'reactivation': return <LeadReactivationPanel />;
       case 'review-request': return <ReviewRequestPanel />;
+      case 'task-board': return <TaskBoardPanel />;
       case 'qa': return (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">QA Tools</h2>

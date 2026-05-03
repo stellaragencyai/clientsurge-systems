@@ -20,6 +20,7 @@ export default function CartSidebar() {
     phone: "",
     business: "",
   });
+  const [smsConsent, setSmsConsent] = useState(false);
   const [error, setError] = useState("");
 
   const handleCheckout = async () => {
@@ -28,8 +29,19 @@ export default function CartSidebar() {
       return;
     }
 
+    if (form.phone && !smsConsent) {
+      setError("Please check the SMS consent box to continue, or remove your phone number.");
+      return;
+    }
+
     setError("");
     setStep("loading");
+
+    // Timeout fallback — reset if Stripe redirect takes too long
+    const timeoutId = setTimeout(() => {
+      setStep("info");
+      setError("Checkout timed out. Please try again.");
+    }, 12000);
 
     if (window.self !== window.top) {
       // Silently redirect to the live site if inside iframe preview
@@ -50,6 +62,7 @@ export default function CartSidebar() {
       });
 
       if (response.data?.url) {
+        clearTimeout(timeoutId);
         // Save order summary so OrderSuccess can display what was purchased
         try {
           sessionStorage.setItem("clientsurge:last-order", JSON.stringify({
@@ -62,9 +75,11 @@ export default function CartSidebar() {
         return;
       }
 
+      clearTimeout(timeoutId);
       setError("Could not start checkout. Please try again.");
       setStep("info");
     } catch (e) {
+      clearTimeout(timeoutId);
       setError(e.message || "Checkout failed.");
       setStep("info");
     }
@@ -243,7 +258,7 @@ export default function CartSidebar() {
                         margin: 0,
                       }}
                     >
-                      ${item.setup_fee} setup - ${item.monthly_fee}/mo
+                      {item.setup_fee === 0 ? "No setup fee" : `$${item.setup_fee} setup`} — ${item.monthly_fee}/mo
                     </p>
                   </div>
                   <motion.button
@@ -338,6 +353,22 @@ export default function CartSidebar() {
                   />
                 </div>
               ))}
+              {/* SMS Consent — only shown when phone is entered */}
+              {form.phone && (
+                <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={smsConsent}
+                    onChange={(e) => setSmsConsent(e.target.checked)}
+                    style={{ marginTop: "2px", flexShrink: 0, accentColor: "#9a5c2e", width: "14px", height: "14px" }}
+                  />
+                  <span style={{ fontSize: "11px", color: "rgba(26,18,9,0.6)", lineHeight: 1.5 }}>
+                    I agree to receive SMS messages from ClientSurge Systems about my order and service updates. Message & data rates may apply. Reply STOP to unsubscribe at any time.{" "}
+                    <a href="/legal/privacy" target="_blank" style={{ color: "#9a5c2e", fontWeight: "600" }}>Privacy Policy</a>
+                  </span>
+                </label>
+              )}
+
               {error ? (
                 <p
                   style={{
@@ -507,7 +538,10 @@ export default function CartSidebar() {
                 marginTop: "10px",
               }}
             >
-              Secured by Stripe - Cancel anytime
+              Secured by Stripe · Cancel anytime ·{" "}
+              <a href="/legal/terms" target="_blank" style={{ color: "rgba(26,18,9,0.45)", textDecoration: "underline" }}>
+                Refund Policy
+              </a>
             </p>
           </div>
         ) : null}

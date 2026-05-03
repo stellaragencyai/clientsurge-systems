@@ -4,6 +4,7 @@ import { X, Check, Plus, CheckCircle2, Clock, Zap, ArrowRight } from "lucide-rea
 
 export default function ServiceDetailModal({ product, inCart, onToggle, onClose }) {
   const isManualReview = product?.checkout_enabled === false;
+  const isComingSoon = product?.coming_soon === true;
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -35,6 +36,10 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
   }, [onClose]);
 
   const handleToggle = () => {
+    if (isComingSoon) {
+      return;
+    }
+
     if (isManualReview) {
       window.location.assign("/book");
       return;
@@ -263,6 +268,7 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
             {/* CTA */}
             <button
               onClick={handleToggle}
+              disabled={isComingSoon}
               style={{
                 width: "100%", borderRadius: "9999px", padding: "2px",
                 background: isManualReview
@@ -270,7 +276,9 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
                   : inCart
                   ? "linear-gradient(135deg,#22c55e,#16a34a)"
                   : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                border: "none", cursor: "pointer",
+                border: "none",
+                cursor: isComingSoon ? "not-allowed" : "pointer",
+                opacity: isComingSoon ? 0.45 : 1,
                 boxShadow: isManualReview
                   ? "0 6px 22px rgba(120,70,20,0.26)"
                   : inCart
@@ -297,7 +305,11 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
             </button>
 
             <p style={{ textAlign: "center", fontSize: "10px", color: "rgba(27,20,13,0.35)", marginTop: "8px" }}>
-              {isManualReview ? "Manual review required before checkout" : "Secured by Stripe · Cancel anytime"}
+              {isComingSoon
+                ? "This service is not available for checkout yet"
+                : isManualReview
+                ? "Manual review required before checkout"
+                : "Secured by Stripe · Cancel anytime"}
             </p>
           </div>
         </div>

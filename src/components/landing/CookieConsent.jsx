@@ -43,7 +43,7 @@ export default function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 max-w-sm">
+    <div className="fixed bottom-6 sm:bottom-6 left-6 z-50 max-w-sm" style={{ bottom: typeof window !== "undefined" && window.innerWidth < 640 ? "80px" : undefined }}>
       <div 
         className="rounded-2xl shadow-lg border backdrop-blur-md p-5 space-y-4"
         style={{
@@ -95,14 +95,14 @@ export default function CookieConsent() {
             onClick={handleAccept}
             className="flex-1 px-4 py-2 text-xs font-medium text-white rounded-lg transition-all"
             style={{
-              background: 'linear-gradient(135deg,#9a5c2e 0%,#c8965c 50%,#7a4825 100%)',
-              boxShadow: '0 4px 12px rgba(154,92,46,0.25)'
+              background: 'linear-gradient(135deg,#0a1628 0%,#00aaff 100%)',
+              boxShadow: '0 4px 12px rgba(0,170,255,0.25)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 6px 20px rgba(154,92,46,0.35)';
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,170,255,0.35)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(154,92,46,0.25)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,170,255,0.25)';
             }}
           >
             Accept

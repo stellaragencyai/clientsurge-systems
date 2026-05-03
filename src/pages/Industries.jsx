@@ -18,37 +18,42 @@ const industries = [
   {
     id: "dental",
     title: "Dental & Orthodontics",
-    status: "Industry track",
+    status: "Live",
     description:
       "Best for practices that need faster response to new patient inquiries, missed-call text-back, and more booked consults.",
+    href: "/dental",
   },
   {
     id: "chiropractic",
     title: "Chiropractic & Physical Therapy",
-    status: "Industry track",
+    status: "Live",
     description:
       "Built for practices that need more evaluations booked, cleaner follow-up, and less admin drag after the first inquiry.",
+    href: "/chiropractic",
   },
   {
     id: "hvac",
     title: "HVAC, Plumbing & Home Services",
-    status: "Industry track",
+    status: "Live",
     description:
       "Ideal for service businesses losing jobs to missed calls, slow follow-up, and manual lead management.",
+    href: "/hvac",
   },
   {
     id: "roofing",
     title: "Roofing & Restoration",
-    status: "Industry track",
+    status: "Live",
     description:
       "Designed for teams that need faster estimate response, better urgency handling, and more booked inspections.",
+    href: "/roofing",
   },
   {
     id: "contractors",
     title: "Contractors & Trades",
-    status: "Industry track",
+    status: "Live",
     description:
       "Great for teams that need to respond quickly, follow up on quote requests, and convert more web leads into booked jobs.",
+    href: "/contractors",
   },
 ];
 

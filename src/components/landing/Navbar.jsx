@@ -135,14 +135,14 @@ export default function Navbar() {
 
   return (
     <nav
-      className="sticky top-4 left-4 right-4 z-50 rounded-[28px] border"
+      className="fixed top-4 left-4 right-4 z-50 rounded-[28px] border"
       style={{
-        borderColor: scrolled ? "rgba(0,174,239,0.2)" : "rgba(0,174,239,0.12)",
-        backgroundColor: scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.93)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
+        borderColor: scrolled ? "rgba(0,174,239,0.2)" : "rgba(0,174,239,0)",
+        backgroundColor: scrolled ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0)",
+        backdropFilter: scrolled ? "blur(20px)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
         paddingTop: "env(safe-area-inset-top)",
-        boxShadow: scrolled ? "0 20px 60px rgba(0,100,200,0.1)" : "0 12px 34px rgba(0,100,200,0.06)",
+        boxShadow: scrolled ? "0 20px 60px rgba(0,100,200,0.1)" : "none",
         transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out, border-color 0.35s ease-out"
       }}>
       
@@ -157,7 +157,7 @@ export default function Navbar() {
             fetchPriority="high"
             decoding="async"
             style={{
-              height: "clamp(52px, 6vw, 70px)",
+              height: "clamp(80px, 10vw, 110px)",
               width: "auto",
               objectFit: "contain",
               mixBlendMode: "multiply",
@@ -221,17 +221,16 @@ export default function Navbar() {
             </button>
 
             {industriesOpen && (
-            /* Invisible bridge so cursor can travel from button to menu without gap-close */
             <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ zIndex: 200 }}>
                 <div
-                className="w-60 rounded-2xl border border-border p-3 shadow-xl"
+                className="rounded-2xl border border-border p-4 shadow-xl"
                 style={{
                   background: "rgba(255,255,255,0.98)",
                   backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)"
+                  WebkitBackdropFilter: "blur(20px)",
+                  width: "460px"
                 }}>
-                
-                  <div className="space-y-1">
+                  <div className="grid grid-cols-2 gap-1">
                     {industryLinks.map((item) =>
                   <button
                     key={item.label}
@@ -241,7 +240,6 @@ export default function Navbar() {
                       setIndustriesOpen(false);
                     }}
                     className="w-full text-left block rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/8 hover:text-primary transition-colors border-none bg-transparent cursor-pointer">
-                    
                         {item.label}
                       </button>
                   )}

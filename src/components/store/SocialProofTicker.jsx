@@ -1,29 +1,50 @@
 import { useEffect, useState } from "react";
 import { ShoppingCart, X } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
-const mockPurchases = [
-  { name: "John's Roofing", service: "Instant Lead Response", time: "2 mins ago" },
-  { name: "Green HVAC Co", service: "14-Day Nurture Sequence", time: "8 mins ago" },
-  { name: "Elite Dental", service: "AI Booking Agent", time: "15 mins ago" },
-  { name: "Med Spa Luxe", service: "Missed Call Text-Back", time: "22 mins ago" },
-  { name: "Pro Contractors", service: "Instant Lead Response", time: "28 mins ago" },
-];
+function timeAgo(isoDate) {
+  const diff = Math.floor((Date.now() - new Date(isoDate).getTime()) / 60000);
+  if (diff < 1) return "just now";
+  if (diff < 60) return `${diff} min${diff > 1 ? "s" : ""} ago`;
+  const hrs = Math.floor(diff / 60);
+  if (hrs < 24) return `${hrs} hr${hrs > 1 ? "s" : ""} ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
 
 export default function SocialProofTicker() {
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [purchases, setPurchases] = useState([]);
 
   useEffect(() => {
-    setVisible(true);
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % mockPurchases.length);
-    }, 6000);
-    return () => clearInterval(interval);
+    base44.entities.Order.filter({ payment_status: "paid" }, "-created_date", 10)
+      .then((orders) => {
+        const mapped = (orders || [])
+          .filter((o) => o.business_name && o.items?.length)
+          .map((o) => ({
+            name: o.business_name,
+            service: o.items[0]?.product_name || "AI Automation",
+            time: timeAgo(o.created_date),
+          }));
+        if (mapped.length > 0) {
+          setPurchases(mapped);
+          setVisible(true);
+        }
+      })
+      .catch(() => {});
   }, []);
 
-  if (!visible) return null;
+  useEffect(() => {
+    if (!purchases.length) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % purchases.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [purchases.length]);
 
-  const purchase = mockPurchases[currentIndex];
+  if (!visible || !purchases.length) return null;
+
+  const purchase = purchases[currentIndex];
 
   return (
     <div

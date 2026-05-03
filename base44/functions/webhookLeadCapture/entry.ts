@@ -16,6 +16,13 @@ Deno.serve(async (req) => {
     return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
+  // #86: Webhook secret validation — must pass X-Webhook-Secret header
+  const webhookSecret = req.headers.get("x-webhook-secret") || req.headers.get("X-Webhook-Secret");
+  const configuredSecret = Deno.env.get("WEBHOOK_SECRET");
+  if (configuredSecret && webhookSecret !== configuredSecret) {
+    return Response.json({ error: "Unauthorized — invalid webhook secret" }, { status: 401 });
+  }
+
   try {
     const base44 = createClientFromRequest(req);
     const payload = await req.json().catch(() => ({}));

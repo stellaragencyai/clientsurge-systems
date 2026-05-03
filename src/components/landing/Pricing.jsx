@@ -229,9 +229,9 @@ export default function Pricing() {
               key={badge.text}
               className="flex flex-col items-center justify-center gap-2 py-6 rounded-2xl font-semibold"
               style={{
-                background: "rgba(0,174,239,0.07)",
-                border: "1px solid rgba(0,174,239,0.18)",
-                color: "rgba(0,100,180,0.9)",
+                background: "#ffffff",
+                border: "1px solid rgba(0,0,0,0.85)",
+                color: "rgba(0,0,0,0.75)",
               }}
             >
               <span style={{ fontSize: "22px", lineHeight: 1 }}>{badge.icon}</span>
@@ -253,17 +253,17 @@ export default function Pricing() {
               <div
                 key={item.name}
                 className="flex flex-col rounded-2xl p-6 border"
-                style={{ background: "rgba(255,255,255,0.7)", borderColor: "rgba(154,92,46,0.15)", backdropFilter: "blur(12px)" }}
+                style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(0,0,0,0.5)", backdropFilter: "blur(12px)" }}
               >
                 <div className="text-3xl mb-3">{item.emoji}</div>
                 <h4 className="font-semibold text-foreground text-sm mb-1">{item.name}</h4>
                 <p className="text-xs text-muted-foreground flex-1 mb-3 leading-relaxed">{item.desc}</p>
-                <p className="text-xs font-bold text-primary mb-4">{item.price}</p>
+                <p className="text-xs font-bold text-foreground mb-4">{item.price}</p>
                 <a
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-1.5 h-9 rounded-full border border-primary/30 bg-primary/5 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors hover:shadow-[0_0_12px_rgba(0,174,239,0.3)]"
+                  className="inline-flex items-center justify-center gap-1.5 h-9 rounded-full border border-primary/30 bg-primary/5 text-xs font-semibold text-black hover:bg-primary/10 transition-colors hover:shadow-[0_0_12px_rgba(0,174,239,0.3)]"
                 >
                   Add This <ArrowRight className="w-3 h-3" />
                 </a>
@@ -313,13 +313,13 @@ export default function Pricing() {
               style={{
                 borderRadius: "9999px",
                 padding: "2px",
-                background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+                boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
                 border: "none",
                 cursor: "pointer"
               }}>
               
-                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }} className=" hidden hidden">
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.95rem" }} className=" hidden hidden">
                   Book Your Free Demo <ArrowRight className="w-4 h-4" />
                 </span>
               </button> :
@@ -329,12 +329,12 @@ export default function Pricing() {
               style={{
                 borderRadius: "9999px",
                 padding: "2px",
-                background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+                boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
                 display: "inline-block"
               }}>
               
-                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.95rem" }}>
                   Book Your Free Demo <ArrowRight className="w-4 h-4" />
                 </span>
               </a>
@@ -396,6 +396,18 @@ export default function Pricing() {
           transform: translateX(-50%);
           z-index: 20;
           white-space: nowrap;
+        }
+        /* M16: iPhone 12/15 — badge overflows card top; collapse to relative on small screens */
+        @media (max-width: 640px) {
+          .pricing-badge-float {
+            position: relative;
+            top: 0;
+            left: 0;
+            transform: none;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 8px;
+          }
         }
         
         .shiny-brown-btn {

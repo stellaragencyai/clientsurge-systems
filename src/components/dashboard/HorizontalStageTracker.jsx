@@ -1,14 +1,15 @@
 import { CheckCircle2, Loader2 } from "lucide-react";
 
-const DEFAULT_STAGES = ["Order Confirmed", "System Setup", "Configuring", "Testing", "Live ✦"];
+// Plain-English stage labels — no technical terms visible to clients
+const DEFAULT_STAGES = ["Payment Confirmed", "Queued for Setup", "Being Configured", "Being Tested", "You're Live! ✦"];
 
 const stageConfig = {
-  instant_lead_response: ["Order Confirmed", "System Setup", "Integration", "Testing", "Live ✦"],
-  missed_call_text_back: ["Order Confirmed", "System Setup", "Twilio Config", "Testing", "Live ✦"],
-  nurture_sequence_14d:  ["Order Confirmed", "System Setup", "Templates", "Testing", "Live ✦"],
-  ai_booking_agent:      ["Order Confirmed", "System Setup", "Calendar Link", "Testing", "Live ✦"],
-  lead_reactivation:     ["Order Confirmed", "System Setup", "List Import", "Testing", "Live ✦"],
-  review_request:        ["Order Confirmed", "System Setup", "Link Config", "Testing", "Live ✦"],
+  instant_lead_response: ["Payment Confirmed", "Queued for Setup", "Connecting Lead Forms", "Being Tested", "You're Live! ✦"],
+  missed_call_text_back: ["Payment Confirmed", "Queued for Setup", "Setting Up Your Number", "Being Tested", "You're Live! ✦"],
+  nurture_sequence_14d:  ["Payment Confirmed", "Queued for Setup", "Writing Your Messages", "Being Tested", "You're Live! ✦"],
+  ai_booking_agent:      ["Payment Confirmed", "Queued for Setup", "Connecting Your Calendar", "Being Tested", "You're Live! ✦"],
+  lead_reactivation:     ["Payment Confirmed", "Queued for Setup", "Importing Your Leads", "Being Tested", "You're Live! ✦"],
+  review_request:        ["Payment Confirmed", "Queued for Setup", "Setting Up Review Link", "Being Tested", "You're Live! ✦"],
 };
 
 export default function HorizontalStageTracker({ serviceKey, currentStage = 0, productName, installStatus }) {

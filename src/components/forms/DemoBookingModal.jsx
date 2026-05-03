@@ -228,7 +228,8 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   onChange={handleChange}
                   autoComplete="name"
                   placeholder="Jane Smith"
-                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.full_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                  style={{ fontSize: "16px" }}
+                  className={`w-full h-11 rounded-xl border px-4 text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.full_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
                 {errors.full_name && <p className="text-red-600 text-xs mt-1">Error: {errors.full_name}</p>}
               </div>
@@ -240,7 +241,8 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   onChange={handleChange}
                   autoComplete="organization"
                   placeholder="My Business"
-                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.business_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                  style={{ fontSize: "16px" }}
+                  className={`w-full h-11 rounded-xl border px-4 text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.business_name ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
                 {errors.business_name && <p className="text-red-600 text-xs mt-1">Error: {errors.business_name}</p>}
               </div>
@@ -256,7 +258,8 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   onChange={handleChange}
                   autoComplete="email"
                   placeholder="jane@business.com"
-                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.email ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                  style={{ fontSize: "16px" }}
+                  className={`w-full h-11 rounded-xl border px-4 text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.email ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
                 {errors.email && <p className="text-red-600 text-xs mt-1">Error: {errors.email}</p>}
               </div>
@@ -270,7 +273,8 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                   autoComplete="tel"
                   inputMode="tel"
                   placeholder="(555) 000-0000"
-                  className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.phone ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                  style={{ fontSize: "16px" }}
+                  className={`w-full h-11 rounded-xl border px-4 text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.phone ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
                 />
                 {errors.phone && <p className="text-red-600 text-xs mt-1">Error: {errors.phone}</p>}
               </div>
@@ -306,16 +310,19 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
 
             <button
               type="submit"
-              style={{background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}
-              className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 focus:ring-2 focus:ring-primary focus:outline-none"
-              onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)"}
-              onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"}
+              style={{background:"linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(0,174,239,0.4)"}}
+              className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-white transition hover:opacity-90 focus:ring-2 focus:ring-primary focus:outline-none"
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 40px rgba(0,174,239,0.6), 0 4px 18px rgba(0,174,239,0.4)"}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,174,239,0.4)"}
             >
               Next: Choose Time <ArrowRight className="w-4 h-4" />
             </button>
 
             <p className="text-center text-xs text-muted-foreground">No commitment. Free 15-minute call. Live in 5-7 days.</p>
-            <p className="text-center text-xs text-muted-foreground/80">No spam. No pressure. Just a tailored walkthrough of your business.</p>
+            <p className="text-center text-xs text-muted-foreground/60">
+              By submitting, you agree to receive SMS follow-up messages from ClientSurge Systems. Reply STOP at any time to opt out. See our{" "}
+              <a href="/legal/privacy" className="underline hover:text-primary">Privacy Policy</a>.
+            </p>
           </form>
         )}
 
@@ -336,7 +343,8 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                 value={scheduling.date}
                 min={new Date().toISOString().split('T')[0]}
                 onChange={handleSchedulingChange}
-                className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                style={{ fontSize: "16px", minHeight: "48px" }}
+                className={`w-full rounded-xl border px-4 text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
               />
             </div>
 
@@ -350,7 +358,8 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
                 value={scheduling.time}
                 onChange={handleSchedulingChange}
                 disabled={!scheduling.date || loadingSlots}
-                className={`w-full h-11 rounded-xl border px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition disabled:opacity-50 disabled:cursor-not-allowed ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
+                style={{ fontSize: "16px", minHeight: "48px" }}
+                className={`w-full rounded-xl border px-4 text-foreground focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:border-primary transition disabled:opacity-50 disabled:cursor-not-allowed ${errors.scheduling ? 'border-red-500 bg-red-50' : 'border-input bg-background'}`}
               >
                 <option value="">{!scheduling.date ? 'Select a date first...' : 'Choose a time...'}</option>
                 {[
@@ -394,10 +403,10 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
               <button
                 type="submit"
                 disabled={saving || (Date.now() - lastSubmitTime < 3000 && lastSubmitTime > 0)}
-                style={{background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}
-                className="flex-1 h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-60 focus:ring-2 focus:ring-primary focus:outline-none"
-                onMouseEnter={(e) => !saving && (e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)")}
-                onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"}
+                style={{background:"linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(0,174,239,0.4)"}}
+                className="flex-1 h-12 flex items-center justify-center gap-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60 focus:ring-2 focus:ring-primary focus:outline-none"
+                onMouseEnter={(e) => !saving && (e.currentTarget.style.boxShadow = "0 8px 40px rgba(0,174,239,0.6), 0 4px 18px rgba(0,174,239,0.4)")}
+                onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,174,239,0.4)"}
               >
                 {saving ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</>

@@ -36,7 +36,7 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
       >
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs font-semibold text-foreground">Your estimated setup timeline</p>
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(154,92,46,0.1)", color: "#9a5c2e" }}>
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(0,0,0,0.07)", color: "#1b140d" }}>
             ~3–5 hours total
           </span>
         </div>
@@ -266,8 +266,8 @@ export default function LaunchTimeline() {
       {/* Detailed vertical timeline */}
       <div className="relative">
         <div
-          className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block pointer-events-none"
-          style={{ background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 50%, rgba(0,174,239,0.6) 100%)", transform: "translateX(-50%)" }}
+          className="absolute left-6 md:left-1/2 top-0 w-0.5 hidden md:block pointer-events-none"
+          style={{ bottom: "-120px", background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 50%, rgba(0,174,239,0.6) 100%)", transform: "translateX(-50%)" }}
         />
 
         <div className="space-y-10 md:space-y-20 relative z-10">
@@ -277,31 +277,7 @@ export default function LaunchTimeline() {
         </div>
       </div>
 
-      {/* Bottom CTA */}
-      <div className="hidden md:flex flex-col items-center mt-6">
-        <div style={{ width: "2px", height: "56px", background: "linear-gradient(180deg, rgba(0,174,239,0.4) 0%, #00AEEF 100%)" }} />
-        <button
-          type="button"
-          onClick={openDemoBooking}
-          style={{
-            marginTop: "24px",
-            borderRadius: "9999px", padding: "2px",
-            background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
-            boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
-            border: "none", cursor: "pointer"
-          }}
-        >
-          <span style={{
-            display: "flex", alignItems: "center", gap: "8px",
-            height: "48px", padding: "0 28px", borderRadius: "9999px",
-            background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
-            color: "#ffffff", fontWeight: "700", fontSize: "0.95rem"
-          }}>
-            Book Your Free Demo
-            <ArrowRight className="w-4 h-4" />
-          </span>
-        </button>
-      </div>
+
     </div>
   );
 }

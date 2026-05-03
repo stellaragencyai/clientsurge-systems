@@ -266,6 +266,17 @@ Deno.serve(async (req) => {
           continue;
         }
 
+        // #95: TCPA — skip if lead has opted out via SMS STOP keyword
+        if (lead.automation_enabled === false || lead.cadence_paused === true) {
+          await base44.asServiceRole.entities.NurtureCampaign.update(campaign.id, {
+            status: "stopped",
+            stop_reason: "opted_out",
+            notes: "Lead opted out via SMS STOP or cadence manually paused."
+          });
+          results.stopped++;
+          continue;
+        }
+
         const daysSinceEnroll = daysSince(campaign.enrolled_at);
         let updates = { last_step_run_at: new Date().toISOString() };
         let allDone = true;

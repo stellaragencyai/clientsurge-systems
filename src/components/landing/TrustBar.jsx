@@ -92,9 +92,7 @@ function StatCard({ item, index, inView }) {
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.55, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        background: isHighlighted 
-          ? "linear-gradient(180deg, rgba(245,217,168,0.3) 0%, rgba(255,255,255,0.9) 100%)"
-          : "rgba(255,255,255,0.82)",
+        background: "#ffffff",
         minHeight: "clamp(140px, 20vw, 190px)",
         padding: "clamp(14px, 3vw, 20px)",
         display: "flex",

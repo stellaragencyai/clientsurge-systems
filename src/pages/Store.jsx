@@ -322,7 +322,7 @@ function StoreInner() {
                   fontWeight: "800",
                   lineHeight: 1.08,
                   letterSpacing: "-0.035em",
-                  color: "rgba(245,225,195,0.95)",
+                  color: "#1b140d",
                   marginBottom: "8px"
                 }}>
                 
@@ -343,7 +343,7 @@ function StoreInner() {
               <p
                 style={{
                   fontSize: "0.9rem",
-                  color: "rgba(220,190,150,0.65)",
+                  color: "rgba(27,20,13,0.72)",
                   lineHeight: 1.6,
                   maxWidth: "620px",
                   margin: "0 auto 12px"
@@ -432,7 +432,7 @@ function StoreInner() {
                     <Icon style={{ width: "18px", height: "18px", color: "#9a5c2e" }} />
                   </div>
                   <div style={{ textAlign: "left" }}>
-                    <p style={{ fontSize: "15px", fontWeight: "800", color: "#9a5c2e", margin: "0 0 2px" }}>
+                    <p style={{ fontSize: "15px", fontWeight: "800", color: "#000000", margin: "0 0 2px" }}>
                       {val}
                     </p>
                     <p style={{ fontSize: "10px", color: "rgba(27,20,13,0.6)", margin: 0, fontWeight: "600" }}>
@@ -585,20 +585,20 @@ function StoreInner() {
                       fontWeight: "600",
                       border:
                       activeCategory === category ?
-                      "1.5px solid rgba(154,92,46,0.5)" :
+                      "1.5px solid rgba(0,136,204,0.6)" :
                       "1.5px solid rgba(154,92,46,0.18)",
                       cursor: "pointer",
                       background:
                       activeCategory === category ?
-                      "linear-gradient(135deg,#6b3f1f,#9a5c2e)" :
+                      "linear-gradient(135deg,#0088CC,#00AEEF)" :
                       "rgba(255,255,255,0.75)",
                       color:
                       activeCategory === category ?
-                      "#f5e6d0" :
+                      "#ffffff" :
                       "rgba(27,20,13,0.72)",
                       boxShadow:
                       activeCategory === category ?
-                      "0 4px 14px rgba(120,70,20,0.28)" :
+                      "0 4px 14px rgba(0,174,239,0.35)" :
                       "0 1px 4px rgba(111,67,31,0.06)"
                     }}>
                     
@@ -659,10 +659,10 @@ function StoreInner() {
               href="/book"
               style={{
                 display: "inline-flex", alignItems: "center", gap: "6px",
-                background: "linear-gradient(135deg, #7a4825, #c8965c)",
-                color: "#fff8ee", fontWeight: "700", fontSize: "13px",
+                background: "linear-gradient(135deg, #0088CC, #00AEEF)",
+                color: "#ffffff", fontWeight: "700", fontSize: "13px",
                 padding: "10px 22px", borderRadius: "999px", textDecoration: "none",
-                boxShadow: "0 4px 14px rgba(154,92,46,0.25)"
+                boxShadow: "0 4px 14px rgba(0,174,239,0.35)"
               }}>
               
                📞 Book a free 15-min strategy call

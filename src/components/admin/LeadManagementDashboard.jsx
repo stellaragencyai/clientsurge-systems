@@ -661,9 +661,9 @@ export default function LeadManagementDashboard() {
             </div>
           ) : null}
         </div>
-      ) : null}
+        ) : null}
 
-      <div className="rounded-xl border border-border bg-white p-4 space-y-4">
+        <div className="rounded-xl border border-border bg-white p-4 space-y-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h3 className="text-lg font-semibold text-foreground">Actionable Customer Lead Queue</h3>

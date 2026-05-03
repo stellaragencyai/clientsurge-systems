@@ -77,19 +77,19 @@ export default function Testimonials() {
               key={testimonial.name}
               className="flex flex-col rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 active:-translate-y-1 focus:-translate-y-1"
               style={{
-                background: "linear-gradient(135deg, rgba(255,252,247,0.72) 0%, rgba(252,240,220,0.55) 100%)",
+                background: "linear-gradient(135deg, rgba(240,249,255,0.72) 0%, rgba(224,242,254,0.55) 100%)",
                 backdropFilter: "blur(18px)",
                 WebkitBackdropFilter: "blur(18px)",
-                border: "1.5px solid rgba(200,150,92,0.22)",
-                boxShadow: "0 4px 24px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.75)",
+                border: "1.5px solid rgba(0,174,239,0.22)",
+                boxShadow: "0 4px 24px rgba(0,174,239,0.07), inset 0 1px 0 rgba(255,255,255,0.75)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.border = "1.5px solid rgba(200,150,92,0.5)";
-                e.currentTarget.style.boxShadow = "0 18px 48px rgba(154,92,46,0.16), 0 0 0 1px rgba(200,150,92,0.18), inset 0 1px 0 rgba(255,255,255,0.9)";
+                e.currentTarget.style.border = "1.5px solid rgba(0,174,239,0.5)";
+                e.currentTarget.style.boxShadow = "0 18px 48px rgba(0,174,239,0.16), 0 0 0 1px rgba(0,174,239,0.18), inset 0 1px 0 rgba(255,255,255,0.9)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.border = "1.5px solid rgba(200,150,92,0.22)";
-                e.currentTarget.style.boxShadow = "0 4px 24px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.75)";
+                e.currentTarget.style.border = "1.5px solid rgba(0,174,239,0.22)";
+                e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,174,239,0.07), inset 0 1px 0 rgba(255,255,255,0.75)";
               }}
             >
               <div className="mb-4 flex items-center justify-between gap-3">
@@ -111,7 +111,7 @@ export default function Testimonials() {
               </div>
 
               <div className="mb-5 mt-5">
-                <span className="inline-flex items-center text-sm font-bold text-white px-4 py-2 rounded-full bg-gradient-to-r from-amber-800 to-amber-700">
+                <span className="inline-flex items-center text-sm font-bold text-white px-4 py-2 rounded-full bg-gradient-to-r from-[#0088CC] to-[#00AEEF]">
                   {testimonial.result}
                 </span>
               </div>

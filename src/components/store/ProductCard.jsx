@@ -33,16 +33,16 @@ export default function ProductCard({ product }) {
           flex-direction: column;
           gap: 12px;
           background: rgba(255,255,255,0.93);
-          border: 2px solid rgba(154,92,46,0.4);
-          box-shadow: 0 4px 18px rgba(111,67,31,0.07), inset 0 1px 0 rgba(255,255,255,0.3);
+          border: 2px solid rgba(0,0,0,0.85);
+          box-shadow: 0 4px 18px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3);
           cursor: pointer;
           transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
           min-height: 340px;
           overflow: visible;
         }
         .pcard:hover {
-          border-color: rgba(200,150,92,0.7);
-          box-shadow: 0 8px 28px rgba(111,67,31,0.15), inset 0 1px 0 rgba(255,255,255,0.4);
+          border-color: rgba(0,0,0,1);
+          box-shadow: 0 8px 28px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.4);
           transform: translateY(-3px);
         }
         .pcard.in-cart {
@@ -142,7 +142,7 @@ export default function ProductCard({ product }) {
           gap: 4px;
           font-size: 24px;
           font-weight: 900;
-          color: #9a5c2e;
+          color: #000000;
           line-height: 1;
           margin-bottom: 4px;
         }
@@ -239,17 +239,17 @@ export default function ProductCard({ product }) {
               style={{
                 width: "100%",
                 borderRadius: "9999px", padding: "1px",
-                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                border: "none", cursor: "pointer",
-                boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 4px 12px rgba(120,70,20,0.25)",
+                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "#ffffff",
+                border: inCart ? "none" : "1.5px solid rgba(0,0,0,0.12)", cursor: "pointer",
+                boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 2px 8px rgba(0,0,0,0.08)",
               }}
             >
               <span style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
                 width: "100%",
                 height: "36px", paddingLeft: "16px", paddingRight: "16px", borderRadius: "9999px",
-                background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                color: "#fff", fontWeight: "700", fontSize: "11px", whiteSpace: "nowrap",
+                background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "#ffffff",
+                color: inCart ? "#fff" : "#111", fontWeight: "700", fontSize: "11px", whiteSpace: "nowrap",
                 pointerEvents: "none",
               }}>
                 {inCart ? <><Check style={{ width: "12px", height: "12px" }} /> Added to Cart</> : <><Plus style={{ width: "12px", height: "12px" }} /> Add to Cart</>}
@@ -299,12 +299,12 @@ export default function ProductCard({ product }) {
 
         {product.popular && !isManualReview && (
           <div style={{
-            position: "absolute", top: "12px", right: "12px",
-            background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
+            position: "absolute", top: "-10px", right: "10px", zIndex: 10,
+            background: "linear-gradient(135deg,#0088CC,#00AEEF)",
             color: "#fff", fontSize: "8px", fontWeight: "700",
             padding: "4px 10px", borderRadius: "18px",
             letterSpacing: "0.08em", textTransform: "uppercase",
-            boxShadow: "0 2px 8px rgba(120,70,20,0.3)",
+            boxShadow: "0 2px 8px rgba(0,174,239,0.35)",
           }}>
             Popular
           </div>

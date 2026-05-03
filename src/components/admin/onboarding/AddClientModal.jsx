@@ -52,9 +52,17 @@ export default function AddClientModal({ onClose, onSaved }) {
   );
   const selectedOrder = attachableOrders.find((order) => order.id === form.order_id) || null;
 
+  const US_PHONE_REGEX = /^\+?1?\s*[\(\-\.]?\d{3}[\)\-\.\s]?\s*\d{3}[\-\.\s]?\d{4}$/;
+
   const handleSave = async (e) => {
     e.preventDefault();
     setError("");
+
+    if (selectedOrder?.customer_phone && !US_PHONE_REGEX.test(selectedOrder.customer_phone.replace(/\s/g, ""))) {
+      setError("Customer phone number appears to be invalid. Please verify it before continuing.");
+      return;
+    }
+
     setSaving(true);
     try {
       await base44.functions.invoke("attachAdminOnboardingOrder", form);

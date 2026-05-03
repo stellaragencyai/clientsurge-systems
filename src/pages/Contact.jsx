@@ -172,9 +172,9 @@ export default function Contact() {
               <button
                 type="button"
                 onClick={() => setShowBookingModal(true)}
-                style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.3)", border: "none", cursor: "pointer", textDecoration: "none" }}
+                style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", boxShadow: "0 4px 14px rgba(0,174,239,0.4)", border: "none", cursor: "pointer", textDecoration: "none" }}
               >
-                <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 20px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.8rem" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 20px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.8rem" }}>
                   Book Your Free Demo <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </button>
@@ -322,14 +322,18 @@ export default function Contact() {
                 <button
                   type="submit"
                   disabled={loading}
-                  style={{ borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.35)", border: "none", cursor: "pointer", width: "100%" }}
+                  style={{ borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)", border: "none", cursor: "pointer", width: "100%" }}
                 >
-                  <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "48px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem", opacity: loading ? 0.7 : 1 }}>
+                  <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "48px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.95rem", opacity: loading ? 0.7 : 1 }}>
                     {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</> : <>Send Message <ArrowRight className="w-4 h-4" /></>}
                   </span>
                 </button>
                 <p className="text-center text-xs text-muted-foreground">
                   No spam. No pressure. Just a thoughtful reply from our team.
+                </p>
+                <p className="text-center text-xs text-muted-foreground mt-1">
+                  We respect your privacy. See our{" "}
+                  <a href="/legal/privacy" className="underline hover:text-foreground transition-colors">Privacy Policy</a>.
                 </p>
               </form>
             )}

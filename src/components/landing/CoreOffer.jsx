@@ -186,7 +186,7 @@ function MobileSystemGroupList({ selectedSystemId, onSelect, showAll, onToggle, 
 
 function CoreOfferCTA({ onBookDemo }) {
   return (
-    <div className="bg-[#f0f9ff] mt-12 mx-auto pt-8 text-center md:pt-10 md:mt-14 border-t border-border max-w-3xl">
+    <div className="bg-[#f0f9ff] mt-24 mx-auto pt-8 text-center md:pt-10 md:mt-28 border-t border-border max-w-3xl flex flex-col items-center">
       <p className="font-display text-2xl md:text-3xl font-semibold text-foreground leading-tight">
         Ready to see which systems fit your business?
       </p>

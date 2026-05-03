@@ -160,14 +160,14 @@ export default function ProblemSolution() {
                       aria-hidden="true"
                       className="absolute left-0 top-0 h-full w-1"
                       style={{
-                        background: "linear-gradient(to bottom, #9a5c2e, rgba(154,92,46,0))",
+                        background: "linear-gradient(to bottom, #0088CC, rgba(0,136,204,0))",
                         animation: `progressFill 0.8s ease-out ${0.25 + i * 0.15}s both`,
                       }}
                     />
                     <div
                       aria-hidden="true"
                       className="absolute inset-x-0 top-0 h-px"
-                      style={{ background: "linear-gradient(90deg, transparent, rgba(154,92,46,0.25), transparent)" }}
+                      style={{ background: "linear-gradient(90deg, transparent, rgba(0,174,239,0.25), transparent)" }}
                     />
                     <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
