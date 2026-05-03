@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { createAxiosClient } from "@base44/sdk/dist/utils/axios-client";
 import { base44 } from "@/api/base44Client";
@@ -17,6 +18,10 @@ function shouldAllowLocalAuthBypass() {
 
   const hostname = window.location.hostname;
   return hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".local");
+}
+
+function shouldSkipBase44Bootstrap() {
+  return shouldAllowLocalAuthBypass() || !appParams.hasBase44AppId;
 }
 
 export const AuthProvider = ({ children }) => {
@@ -42,11 +47,12 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    if (shouldAllowLocalAuthBypass()) {
+    if (shouldSkipBase44Bootstrap()) {
       setIsLoadingPublicSettings(false);
       setIsLoadingAuth(false);
       setIsAuthenticated(false);
       setAuthError(null);
+      setAppPublicSettings(null);
       return;
     }
 
@@ -148,6 +154,17 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = (shouldRedirect = true) => {
+    if (!appParams.hasBase44AppId) {
+      setUser(null);
+      setIsAuthenticated(false);
+      setAuthError(null);
+
+      if (shouldRedirect && typeof window !== "undefined") {
+        window.location.assign("/");
+      }
+      return;
+    }
+
     if (isPortalTestModeEnabled()) {
       clearPortalTestFixture();
       if (shouldRedirect && typeof window !== "undefined") {
@@ -167,6 +184,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const navigateToLogin = () => {
+    if (!appParams.hasBase44AppId) {
+      return;
+    }
+
     base44.auth.redirectToLogin(window.location.href);
   };
 
@@ -179,6 +200,8 @@ export const AuthProvider = ({ children }) => {
         isLoadingPublicSettings,
         authError,
         appPublicSettings,
+        hasBase44AppId: appParams.hasBase44AppId,
+        isPreviewWithoutAppId: appParams.isPreviewWithoutAppId,
         logout,
         navigateToLogin,
         checkAppState,

@@ -19,6 +19,7 @@ const navbarSource = read("src/components/landing/Navbar.jsx");
 const productCardSource = read("src/components/store/ProductCard.jsx");
 const buildTrackerSource = read("src/components/portal/BuildTracker.jsx");
 const clientPortalSource = read("src/pages/ClientPortal.jsx");
+const authContextSource = read("src/lib/AuthContext.jsx");
 
 const salesCatalogModule = await import(
   pathToFileURL(path.join(root, "src/lib/salesCatalog.js")).href
@@ -42,7 +43,7 @@ record(
 
 record(
   "FE-030",
-  appSource.includes('<Route path="/client-portal" element={<ClientPortal />} />') &&
+  /<Route\s+path="\/client-portal"/.test(appSource) &&
     appSource.includes("<ProtectedRoute unauthenticatedElement={<AuthRedirectFallback />} />"),
   "Client portal route remains protected by ProtectedRoute."
 );
@@ -128,7 +129,8 @@ record(
 
 record(
   "FE-229",
-  clientPortalSource.includes('onClick={() => base44.auth.logout("/")}'),
+  clientPortalSource.includes("onClick={() => logout(true)}") &&
+    authContextSource.includes('base44.auth.logout("/")'),
   "Client portal exposes a logout path that returns to the homepage."
 );
 

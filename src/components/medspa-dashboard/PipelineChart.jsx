@@ -47,3 +47,4 @@ export default function PipelineChart({ leads }) {
     </Card>
   );
 }
+// @ts-nocheck

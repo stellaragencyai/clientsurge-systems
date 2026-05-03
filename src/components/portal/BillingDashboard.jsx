@@ -39,7 +39,7 @@ function StatusBadge({ status }) {
   );
 }
 
-function SummaryCard({ label, value, sub, accent }) {
+function SummaryCard({ label, value, sub = null, accent = false }) {
   return (
     <div className={`rounded-2xl border p-5 ${accent ? 'border-primary/30 bg-primary/5' : 'border-border bg-white'}`}>
       <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-1">{label}</p>

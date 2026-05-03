@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ToggleLeft, ToggleRight, CheckCircle2, AlertCircle, Clock, Zap } from "lucide-react";
+import { ToggleLeft, ToggleRight, CheckCircle2, Clock, Zap } from "lucide-react";
 
 const SAMPLE_AUTOMATIONS = [
   {

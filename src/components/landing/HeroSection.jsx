@@ -1,25 +1,23 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export default function HeroSection({
-  badge,
-  title,
-  titleHighlight,
-  subtitle,
-  description,
-  primaryCTA,
-  secondaryCTA,
-  trustBadges,
-  stats,
+  badge = "",
+  title = "",
+  titleHighlight = "",
+  subtitle = "",
+  description = "",
+  primaryCTA = null,
+  secondaryCTA = null,
+  trustBadges = null,
+  stats = null,
   backgroundType = "gradient", // "gradient" or "image"
-  backgroundImage,
-  backgroundImageAlt,
-  backgroundGradient,
-  children, // for extra content like ticker or stats
-  videoUrl,
+  backgroundImage = "",
+  backgroundImageAlt = "",
+  backgroundGradient = "",
+  children = null, // for extra content like ticker or stats
+  videoUrl = "",
 }) {
-  const [showModal, setShowModal] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const sectionRef = useRef(null);
 
@@ -154,10 +152,14 @@ export default function HeroSection({
             )}
 
             {secondaryCTA && (
-              <Button size="lg" variant="outline" onClick={secondaryCTA.onClick} className="rounded-full px-8 h-[52px] text-base font-semibold gap-2">
+              <button
+                type="button"
+                onClick={secondaryCTA.onClick}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-input bg-transparent px-8 h-[52px] text-base font-semibold shadow-sm hover:bg-accent hover:text-accent-foreground"
+              >
                 {secondaryCTA.label}
                 {secondaryCTA.icon && <secondaryCTA.icon className="w-4 h-4" />}
-              </Button>
+              </button>
             )}
           </div>
 

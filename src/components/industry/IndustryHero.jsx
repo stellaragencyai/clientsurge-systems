@@ -15,7 +15,7 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
           alt={eyebrow}
           className="w-full h-full object-cover object-center"
           loading="eager"
-          fetchpriority="high"
+          fetchPriority="high"
           decoding="async"
         />
         {/* Dark gradient overlay for readability */}

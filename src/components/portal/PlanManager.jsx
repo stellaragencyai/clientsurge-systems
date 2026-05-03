@@ -13,7 +13,7 @@ const PLANS = PACKAGE_OFFERS.map((offer) => ({
 const PLAN_RANK = {
   "Starter System": 1,
   "Growth System": 2,
-  "Pro System": 3,
+  "Elite System": 3,
 };
 
 const BILLING_STATUS_LABELS = {

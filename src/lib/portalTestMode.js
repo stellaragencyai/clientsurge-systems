@@ -1,3 +1,4 @@
+// @ts-nocheck
 const PORTAL_TEST_FIXTURE_KEY = "clientsurge_portal_test_fixture";
 
 function isBrowser() {

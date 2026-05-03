@@ -1,4 +1,4 @@
-import { CheckCircle2, Plus, Check } from "lucide-react";
+import { CheckCircle2, Plus, Check, ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cartContext";
 import ServiceDetailModal from "@/components/store/ServiceDetailModal";
@@ -8,19 +8,18 @@ export default function ProductCard({ product }) {
   const { items, addItem, removeItem } = useCart();
   const inCart = items.some((item) => item.product_id === product.product_id);
   const [modalOpen, setModalOpen] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const isManualReview = product.checkout_enabled === false;
 
   const toggle = (e) => {
     e.stopPropagation();
-    // Coming soon products cannot be added to cart
-    if (product.coming_soon || !product.checkout_enabled) return;
+    if (isManualReview) return;
     if (inCart) removeItem(product.product_id);
     else addItem(product);
   };
 
-  const handleExpandToggle = (e) => {
+  const handleScopeDemo = (e) => {
     e.stopPropagation();
-    setExpanded(!expanded);
+    window.location.assign("/book");
   };
 
   return (
@@ -50,9 +49,9 @@ export default function ProductCard({ product }) {
           border-color: #22c55e;
           box-shadow: 0 8px 28px rgba(34,197,94,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
         }
-        .pcard.coming-soon-card {
-          cursor: default;
-          opacity: 0.62;
+        .pcard.manual-review-card {
+          border-color: rgba(154,92,46,0.28);
+          background: rgba(255,252,248,0.96);
         }
         .pcard-click-hint {
           position: absolute;
@@ -160,8 +159,8 @@ export default function ProductCard({ product }) {
       `}</style>
 
       <motion.div
-        className={`pcard${inCart ? " in-cart" : ""}${product.coming_soon ? " coming-soon-card" : ""}`}
-        onClick={() => !product.coming_soon && setModalOpen(true)}
+        className={`pcard${inCart ? " in-cart" : ""}${isManualReview ? " manual-review-card" : ""}`}
+        onClick={() => setModalOpen(true)}
         initial={{ opacity: 0, y: 32 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
@@ -231,7 +230,7 @@ export default function ProductCard({ product }) {
 
         {/* Full-Width CTA Footer */}
         <div style={{ marginTop: "auto", paddingTop: "2px", display: "flex", flexDirection: "column", gap: "8px" }}>
-          {!product.coming_soon && (
+          {!isManualReview && (
             <motion.button
               onClick={toggle}
               whileTap={{ scale: 0.94, rotateY: 6, rotateX: -2 }}
@@ -258,18 +257,47 @@ export default function ProductCard({ product }) {
             </motion.button>
           )}
 
-          {product.coming_soon && (
+          {isManualReview && (
             <>
-              <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(154,92,46,0.4)", background: "rgba(154,92,46,0.06)", padding: "8px 12px", borderRadius: "9999px", border: "1px solid rgba(154,92,46,0.12)", whiteSpace: "nowrap", textAlign: "center" }}>
+              <span style={{ fontSize: "11px", fontWeight: "700", color: "#9a5c2e", background: "rgba(154,92,46,0.08)", padding: "8px 12px", borderRadius: "9999px", border: "1px solid rgba(154,92,46,0.16)", whiteSpace: "nowrap", textAlign: "center" }}>
                 <span style={{display:"inline-block",width:"7px",height:"7px",borderRadius:"50%",background:"#c8965c",marginRight:"5px",animation:"cs-pulse 1.4s ease-in-out infinite"}} />
-                Coming Soon
+                Manual Review
               </span>
+              <motion.button
+                onClick={handleScopeDemo}
+                whileTap={{ scale: 0.97 }}
+                whileHover={{ y: -2, boxShadow: "0 8px 20px rgba(120,70,20,0.24)" }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                style={{
+                  width: "100%",
+                  borderRadius: "9999px",
+                  padding: "1px",
+                  background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                  border: "none",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 12px rgba(120,70,20,0.22)",
+                }}
+              >
+                <span style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                  width: "100%",
+                  height: "36px", paddingLeft: "16px", paddingRight: "16px", borderRadius: "9999px",
+                  background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                  color: "#fff", fontWeight: "700", fontSize: "11px", whiteSpace: "nowrap",
+                  pointerEvents: "none",
+                }}>
+                  <ArrowRight style={{ width: "12px", height: "12px" }} /> Book Demo to Scope
+                </span>
+              </motion.button>
+              <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.48)", margin: 0, textAlign: "center", lineHeight: 1.5 }}>
+                Requires scoped delivery with our team before activation.
+              </p>
               <style>{`@keyframes cs-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}`}</style>
             </>
           )}
         </div>
 
-        {product.popular && !product.coming_soon && (
+        {product.popular && !isManualReview && (
           <div style={{
             position: "absolute", top: "12px", right: "12px",
             background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
@@ -282,7 +310,7 @@ export default function ProductCard({ product }) {
           </div>
         )}
 
-        {!product.coming_soon && <span className="pcard-click-hint">tap for details →</span>}
+        <span className="pcard-click-hint">tap for details →</span>
       </motion.div>
 
       {modalOpen && (

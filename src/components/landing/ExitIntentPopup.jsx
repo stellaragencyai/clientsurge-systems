@@ -49,6 +49,7 @@ export default function ExitIntentPopup({ pathname }) {
   const [form, setForm] = useState({
     full_name: "",
     email: "",
+    phone: "",
     business_type: "Med Spas & Aesthetic Clinics",
   });
 
@@ -118,8 +119,9 @@ export default function ExitIntentPopup({ pathname }) {
     window.addEventListener("clientsurge:open-audit-popup", handleManualOpen);
     handleHashOpen();
 
-    window.clientsurgePreview = {
-      ...(window.clientsurgePreview || {}),
+    const previewHelpers = /** @type {any} */ (window).clientsurgePreview || {};
+    /** @type {any} */ (window).clientsurgePreview = {
+      ...previewHelpers,
       openAuditPopup: () => {
         if (window.location.hash !== MANUAL_HASH) {
           window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}${MANUAL_HASH}`);
@@ -133,10 +135,10 @@ export default function ExitIntentPopup({ pathname }) {
     return () => {
       window.removeEventListener("clientsurge:open-audit-popup", handleManualOpen);
       window.removeEventListener("hashchange", handleHashOpen);
-      if (window.clientsurgePreview?.openAuditPopup) {
-        const nextHelpers = { ...(window.clientsurgePreview || {}) };
+      const nextHelpers = { ...((/** @type {any} */ (window).clientsurgePreview) || {}) };
+      if (nextHelpers.openAuditPopup) {
         delete nextHelpers.openAuditPopup;
-        window.clientsurgePreview = nextHelpers;
+        /** @type {any} */ (window).clientsurgePreview = nextHelpers;
       }
     };
   }, [isActivePath]);

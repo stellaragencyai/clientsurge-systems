@@ -381,7 +381,7 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
   );
 }
 
-function InfoItem({ icon: Icon, label, value, link, wide }) {
+function InfoItem({ icon: Icon, label, value, link = false, wide = false }) {
   if (!value) return null;
 
   return (

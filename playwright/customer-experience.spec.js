@@ -4,11 +4,9 @@ test("[FE-001 FE-003 FE-005 FE-018 FE-041 FE-042 FE-043] Home page shell and her
   page,
 }) => {
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", { name: /Turn Every Lead Into a Booked Appointment/i })
-  ).toBeVisible();
-  await expect(page.getByRole("button", { name: /^AI Store$/i })).toBeVisible();
-  await expect(page.getByRole("button", { name: /Book Your Free Demo/i }).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Stop Losing Leads to Slow Response/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /AI Store/i })).toBeVisible();
+  await expect(page.getByRole("navigation").getByRole("button", { name: /Get Your Free Audit/i })).toBeVisible();
   await expect(page.locator("footer")).toBeVisible();
 });
 
@@ -25,9 +23,9 @@ test("[FE-035 FE-036 FE-207] Portal login modal opens and closes from the navbar
 
 test("[FE-010 FE-138] AI Store link opens the store page", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: /^AI Store$/i }).click();
+  await page.getByRole("link", { name: /AI Store/i }).click();
   await expect(page).toHaveURL(/\/store$/);
-  await expect(page.getByText("AI Service Catalog")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Build Your AI-Powered Business/i })).toBeVisible();
 });
 
 test("[FE-131 FE-132 FE-133 FE-134 FE-137] Pricing section shows the three package cards", async ({
@@ -36,12 +34,13 @@ test("[FE-131 FE-132 FE-133 FE-134 FE-137] Pricing section shows the three packa
   await page.goto("/");
   const pricingSection = page.locator("#pricing");
   await pricingSection.scrollIntoViewIfNeeded();
+  await expect(
+    pricingSection.getByRole("heading", { name: /Stop Losing Leads\. Start Running a Real System\./i })
+  ).toBeVisible();
   await expect(pricingSection.getByText("Starter System")).toBeVisible();
   await expect(pricingSection.getByText("Growth System")).toBeVisible();
-  await expect(pricingSection.getByText("Pro System")).toBeVisible();
-  await expect(
-    pricingSection.getByText("We handle the implementation work, not just the strategy")
-  ).toBeVisible();
+  await expect(pricingSection.getByText("Elite System")).toBeVisible();
+  await expect(pricingSection.getByText("Secure Checkout via Stripe")).toBeVisible();
 });
 
 test("[FE-136] Pricing section CTA opens the canonical store", async ({ page }) => {
@@ -55,11 +54,12 @@ test("[FE-139 FE-140 FE-141 FE-142 FE-145 FE-146 FE-147] Store page renders cata
   page,
 }) => {
   await page.goto("/store");
-  await expect(page.getByText("AI Services in Catalog", { exact: true })).toBeVisible();
-  await expect(page.getByText("Self-Serve Checkout", { exact: true }).first()).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Packaged Systems/i })).toBeVisible();
-  await expect(page.getByPlaceholder("Search canonical services...")).toBeVisible();
-  await expect(page.getByRole("button", { name: "All" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Build Your AI-Powered Business/i })).toBeVisible();
+  await expect(page.getByText("AI Services Available", { exact: true })).toBeVisible();
+  await expect(page.getByPlaceholder("Search services...")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Guided Path/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Explore All/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: "All", exact: true })).toBeVisible();
 });
 
 test("[FE-148 FE-154 FE-155 FE-156 FE-166 FE-167] Cart and builder activate when a self-serve service is selected", async ({
@@ -68,31 +68,39 @@ test("[FE-148 FE-154 FE-155 FE-156 FE-166 FE-167] Cart and builder activate when
   await page.goto("/store");
   await expect(page.getByText("Bundle Pricing Summary")).not.toBeVisible();
   await page.getByRole("button", { name: /Add to Cart/i }).first().click();
-  await expect(page.getByText(/installable service selected/i)).toBeVisible();
-  await expect(page.getByText("Bundle Pricing Summary")).toBeVisible();
-  await expect(page.getByText("Canonical Service Bundle")).toBeVisible();
+  await expect(page.getByText("Your AI Stack")).toBeVisible();
+  await expect(page.getByText(/1 service in cart/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: /Continue to Checkout/i })).toBeVisible();
   await page.mouse.click(10, 10);
-  await expect(page.getByText("Canonical Service Bundle")).not.toBeVisible();
-  await page.getByText(/installable service selected/i).click({ force: true });
-  await expect(page.getByText("Canonical Service Bundle")).toBeVisible();
+  await expect(page.getByText("Bundle Pricing Summary")).toBeVisible();
+  await expect(page.getByText("Custom Service Bundle")).toBeVisible();
 });
 
 test("[FE-143 FE-144 FE-165] Loading a package populates the bundle and savings summary", async ({
   page,
 }) => {
   await page.goto("/store");
-  await page.getByRole("button", { name: /Load This Bundle/i }).first().click();
-  await expect(page.getByText("Canonical Service Bundle")).toBeVisible();
-  await expect(page.getByText(/Bundle Savings/i).first()).toBeVisible();
+  for (let index = 0; index < 4; index += 1) {
+    await page.getByRole("button", { name: /Add to Cart/i }).first().click();
+    await expect(page.getByText("Your AI Stack")).toBeVisible();
+    await page.mouse.click(10, 10);
+  }
+
+  await page.getByText("Bundle Pricing Summary").scrollIntoViewIfNeeded();
+  await expect(page.getByText("Custom Service Bundle")).toBeVisible();
+  await expect(page.getByText(/4 services matched to an explicit package price\./i)).toBeVisible();
+  await expect(page.getByText(/Explicit Bundle Discount/i)).toBeVisible();
 });
 
 test("[FE-149 FE-150] Manual-review offers stay consultative and route to demo scoping", async ({
   page,
 }) => {
   await page.goto("/store");
-  await page.getByPlaceholder("Search canonical services...").fill("AI Email Follow-Up");
-  await expect(page.getByText("Manual Review")).toBeVisible();
-  await page.getByRole("button", { name: /Book Demo to Scope/i }).click();
+  await page.getByRole("button", { name: /Explore All/i }).click();
+  await page.getByPlaceholder("Search services...").fill("AI Email Follow-Up");
+  await page.waitForTimeout(400);
+  await expect(page.getByText("Manual Review").first()).toBeVisible();
+  await page.getByRole("button", { name: /Book Demo to Scope/i }).first().click();
   await expect(page).toHaveURL(/\/book$/);
   await expect(page.getByRole("heading", { name: /Book Your Free Demo/i })).toBeVisible();
 });
@@ -106,7 +114,8 @@ test("[FE-176 FE-178] Book page and demo booking modal render correctly", async 
 test("[FE-183 FE-186] Contact page renders and can open the demo booking modal", async ({ page }) => {
   await page.goto("/contact");
   await expect(page.getByRole("heading", { name: /Let's Talk About Your Business/i })).toBeVisible();
-  await page.getByRole("button", { name: /Book Your Free Demo/i }).nth(1).click();
+  await page.getByText(/Prefer a live walkthrough/i).scrollIntoViewIfNeeded();
+  await page.getByRole("button", { name: /Book Your Free Demo/i }).click();
   await expect(page.getByText("Tell us about your business")).toBeVisible();
 });
 

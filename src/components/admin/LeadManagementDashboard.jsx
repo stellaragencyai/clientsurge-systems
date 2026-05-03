@@ -122,7 +122,7 @@ function parseImportRows(rawValue) {
   throw new Error("Paste a JSON array of lead objects or an object with rows/leads.");
 }
 
-function SummaryCard({ label, value, helper, tone = "default" }) {
+function SummaryCard({ label, value, helper = null, tone = "default" }) {
   const tones = {
     default: "bg-white text-foreground",
     blue: "bg-blue-50 text-blue-900",

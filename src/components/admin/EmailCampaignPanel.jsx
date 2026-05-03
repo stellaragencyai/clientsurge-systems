@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import {
   AlertCircle, CheckCircle2, Loader2, Mail, Plus, RefreshCw, Send,
-  Trash2, Eye, TrendingUp, Users, MousePointerClick, UserMinus,
+  Trash2, Eye, TrendingUp, Users, MousePointerClick,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import CampaignStatusBadge from "./email-campaigns/CampaignStatusBadge";

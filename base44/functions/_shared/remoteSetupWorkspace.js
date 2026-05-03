@@ -176,7 +176,7 @@ export const SERVICE_INSTALL_PLAYBOOKS = {
     live_checks: [
       "A successful booking-agent test exists in CommunicationEvent",
       "Booking link remains valid",
-      "No external calendar sync is implied yet; this stays an honest placeholder runtime until real booking creation is implemented",
+      "A live calendar proof event is recorded after a real external calendar booking is verified",
       "No remaining booking blockers are present",
     ],
   },
@@ -248,7 +248,7 @@ export const SERVICE_INSTALL_PLAYBOOKS = {
       "A successful review-request test exists in CommunicationEvent",
       "Selected channel has supporting provider readiness when applicable",
       "No remaining review-request blockers are present",
-      "Any delayed-send behavior remains a placeholder until a canonical trigger scheduler is added",
+      "A live completion-trigger proof event is recorded after a real appointment or order completion",
     ],
   },
 };
@@ -1455,19 +1455,27 @@ function deriveServiceRequiredActions({
       title:
         serviceState.service_key === "instant_lead_response"
           ? "Run live SMS proof"
-          : serviceState.service_key === "missed_call_text_back"
+        : serviceState.service_key === "missed_call_text_back"
           ? "Capture canonical missed-call webhook proof"
-          : serviceState.service_key === "lead_reactivation"
+        : serviceState.service_key === "ai_booking_agent"
+          ? "Record live calendar proof"
+        : serviceState.service_key === "lead_reactivation"
           ? "Run canonical reactivation batch proof"
-          : "Record provider proof",
+        : serviceState.service_key === "review_request"
+          ? "Record live completion-trigger proof"
+        : "Record provider proof",
       detail:
         serviceState.service_key === "instant_lead_response"
           ? "A successful test exists, but the canonical live SMS proof event has not been recorded yet."
-          : serviceState.service_key === "missed_call_text_back"
+        : serviceState.service_key === "missed_call_text_back"
           ? "A successful test exists, but the canonical Twilio missed-call webhook proof has not been recorded yet."
-          : serviceState.service_key === "lead_reactivation"
+        : serviceState.service_key === "ai_booking_agent"
+          ? "A successful booking simulation exists, but no operator-confirmed live external calendar proof has been recorded yet."
+        : serviceState.service_key === "lead_reactivation"
           ? "A successful reactivation batch proof has not been recorded yet."
-          : "A canonical provider proof event has not been recorded yet.",
+        : serviceState.service_key === "review_request"
+          ? "A successful review-request test exists, but no operator-confirmed live completion-trigger proof has been recorded yet."
+        : "A canonical provider proof event has not been recorded yet.",
       level: "blocker",
       blocks_testing: false,
       blocks_live: true,

@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-05-03T21:20:31.113Z",
+  "checks": {
+    "FE-010": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Navbar includes an AI Store route entry that points to /store."
+    },
+    "FE-030": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Client portal route remains protected by ProtectedRoute."
+    },
+    "FE-031": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Admin access is guarded both at the route layer and inside AdminDashboard."
+    },
+    "FE-033": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Admin logout redirects to the main page as a logged-out visitor."
+    },
+    "FE-034": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Admin routes remain protected after logout because /admin is route-guarded and logout sends the user to /."
+    },
+    "FE-139": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Public store catalog count is 12."
+    },
+    "FE-140": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Self-serve product count is 6."
+    },
+    "FE-141": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Package offer count is 3."
+    },
+    "FE-148": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Product cards expose an Add to Cart state for checkout-enabled products."
+    },
+    "FE-149": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Manual-review products visibly use consultative wording."
+    },
+    "FE-150": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Six public store offers are explicitly excluded from self-serve checkout."
+    },
+    "FE-163": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Unsupported public offers do not map into canonical service_key checkout items."
+    },
+    "FE-215": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Portal build tracker uses the current honest labels."
+    },
+    "FE-216": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Portal build tracker no longer claims the system is 'fully live and running'."
+    },
+    "FE-229": {
+      "status": "passed",
+      "source": "code-audit",
+      "note": "Client portal exposes a logout path that returns to the homepage."
+    }
+  }
+}

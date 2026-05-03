@@ -21,7 +21,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   });
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState(/** @type {Record<string, string | undefined>} */ ({}));
   const [submitWarnings, setSubmitWarnings] = useState([]);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
@@ -72,7 +72,7 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   const handleStep1Submit = (e) => {
     e.preventDefault();
     setSubmitAttempted(true);
-    const newErrors = {};
+    const newErrors = /** @type {Record<string, string | undefined>} */ ({});
     
     if (!form.full_name.trim()) newErrors.full_name = "Name is required";
     if (!form.business_name.trim()) newErrors.business_name = "Business name is required";

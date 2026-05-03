@@ -9,6 +9,23 @@ const DefaultFallback = () => (
   </div>
 );
 
+const PreviewFallback = ({ embedded }) => (
+  <div className="min-h-screen flex items-center justify-center px-6">
+    <div className="max-w-lg rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+      <h1 className="text-2xl font-semibold text-slate-900">Preview Needs Base44 App Context</h1>
+      <p className="mt-3 text-sm leading-6 text-slate-600">
+        This protected page cannot load without a real Base44 app id, so the preview is falling back
+        safely instead of getting stuck on refresh.
+      </p>
+      <p className="mt-3 text-xs text-slate-500">
+        {embedded
+          ? "Open a public route for visual editing, or launch this view from a live app context."
+          : "Open this route from a live app context to preview authenticated data."}
+      </p>
+    </div>
+  </div>
+);
+
 function LoginRedirect({ navigateToLogin, fallback }) {
   useEffect(() => {
     navigateToLogin();
@@ -29,6 +46,8 @@ export default function ProtectedRoute({
     isLoadingAuth,
     isLoadingPublicSettings,
     authError,
+    hasBase44AppId,
+    isPreviewWithoutAppId,
     navigateToLogin,
   } = useAuth();
 
@@ -38,6 +57,10 @@ export default function ProtectedRoute({
 
   if (authError?.type === "user_not_registered") {
     return <UserNotRegisteredError />;
+  }
+
+  if (!hasBase44AppId && !isAuthenticated) {
+    return <PreviewFallback embedded={isPreviewWithoutAppId} />;
   }
 
   if (!isAuthenticated) {

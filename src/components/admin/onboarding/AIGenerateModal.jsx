@@ -38,7 +38,7 @@ export default function AIGenerateModal({ stepKey, client, onClose }) {
     if (!promptFn) { setLoading(false); return; }
     const prompt = promptFn(client);
     const res = await base44.integrations.Core.InvokeLLM({ prompt });
-    setContent(res);
+    setContent(typeof res === "string" ? res : JSON.stringify(res, null, 2));
     setLoading(false);
   };
 

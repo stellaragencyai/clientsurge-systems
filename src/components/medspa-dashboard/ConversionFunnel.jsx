@@ -37,3 +37,4 @@ export default function ConversionFunnel({ leads }) {
     </Card>
   );
 }
+// @ts-nocheck

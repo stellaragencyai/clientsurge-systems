@@ -553,7 +553,7 @@ test("remote setup workspace derives review request blockers from canonical conf
   assert.equal(service.go_live_readiness.provider_ready, true);
 });
 
-test("remote setup workspace keeps placeholder review-request readiness aligned with backend Live gating", async () => {
+test("remote setup workspace keeps review-request Live blocked until explicit live trigger proof exists", async () => {
   const order = {
     id: "order_6",
     created_date: "2026-04-22T12:00:00.000Z",
@@ -578,7 +578,7 @@ test("remote setup workspace keeps placeholder review-request readiness aligned 
       services: {
         review_request: {
           review_link: "https://reviews.example.com/signal-med-spa",
-          trigger_event: "manual_trigger",
+          trigger_event: "appointment_completed",
           message_template: "Leave a review here: {{review_link}}",
           channel: "email",
           send_delay_minutes: 15,
@@ -620,7 +620,11 @@ test("remote setup workspace keeps placeholder review-request readiness aligned 
   const service = workspace.services[0];
   assert.equal(service.go_live_readiness.tested, true);
   assert.equal(service.go_live_readiness.provider_ready, true);
-  assert.equal(service.go_live_readiness.can_move_to_live, true);
+  assert.equal(service.go_live_readiness.can_move_to_live, false);
+  assert.equal(service.go_live_readiness.provider_verified, false);
+  assert.ok(
+    service.required_actions.some((action) => action.code === "proof:provider_verification_required")
+  );
 });
 
 test("remote setup workspace derives an operator focus summary and shared config blockers from backend state", async () => {
@@ -912,7 +916,7 @@ test("remote setup workspace derives command view ordering and service filter co
         },
         review_request: {
           review_link: "https://reviews.example.com/signal-med-spa",
-          trigger_event: "manual_trigger",
+          trigger_event: "appointment_completed",
           message_template: "Please leave a review at {{review_link}}",
           channel: "email",
           send_delay_minutes: 0,
@@ -920,7 +924,7 @@ test("remote setup workspace derives command view ordering and service filter co
         },
         ai_booking_agent: {
           booking_link: "https://bookings.example.com/demo",
-          booking_mode: "internal_placeholder",
+          booking_mode: "external_link",
           confirmation_template: "Your booking request is confirmed.",
           reminder_enabled: false,
           reminder_template: "",
@@ -939,6 +943,21 @@ test("remote setup workspace derives command view ordering and service filter co
       event_type: "provider_send_succeeded",
       provider: "internal",
       status: "processed",
+    },
+    {
+      id: "booking_proof",
+      created_date: "2026-04-22T12:16:00.000Z",
+      order_id: "order_11",
+      service_key: "ai_booking_agent",
+      event_type: "status_update",
+      provider: "internal",
+      status: "processed",
+      context_type: "provider_proof",
+      metadata_json: JSON.stringify({
+        context_type: "provider_proof",
+        proof_kind: "live_booking_calendar_sync",
+        proof_mode: "LIVE_PROVIDER_PROOF",
+      }),
     },
   ];
 

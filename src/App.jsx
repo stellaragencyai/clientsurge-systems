@@ -16,6 +16,7 @@ import { queryClientInstance } from "@/lib/query-client";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
 import { scrollToTop } from "@/lib/scroll";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
+import ErrorBoundary from "./components/ErrorBoundary";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
 import PageNotFound from "./lib/PageNotFound";
 import Home from "./pages/Home";
@@ -46,6 +47,11 @@ const PUBLIC_PATHS = [
   "/store",
   "/order-success",
   "/med-spa",
+  "/dental",
+  "/hvac",
+  "/roofing",
+  "/contractors",
+  "/chiropractic",
   "/start",
   "/book",
   "/book-demo",
@@ -330,18 +336,20 @@ const AuthenticatedApp = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router style={{ overflowX: "hidden" }}>
-          <ScrollToTop />
-          <AppInner />
-          <AutoCTAAnalytics />
-          <RouteIndexingGuard />
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router style={{ overflowX: "hidden" }}>
+            <ScrollToTop />
+            <AppInner />
+            <AutoCTAAnalytics />
+            <RouteIndexingGuard />
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

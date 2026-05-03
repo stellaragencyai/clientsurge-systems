@@ -36,7 +36,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
   const [scheduling, setScheduling] = useState({ date: "", time: "" });
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState(/** @type {Record<string, string | undefined>} */ ({}));
   const [submitWarnings, setSubmitWarnings] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
@@ -48,7 +48,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
 
   const handleStep1 = (e) => {
     e.preventDefault();
-    const errs = {};
+    const errs = /** @type {Record<string, string | undefined>} */ ({});
     if (!form.first_name.trim()) errs.first_name = "Required";
     if (!form.last_name.trim()) errs.last_name = "Required";
     if (!form.business_name.trim()) errs.business_name = "Required";

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { ChevronDown, Check, AlertCircle, Loader2 } from "lucide-react";
-import { CHECKLIST_STEPS_BY_SERVICE } from "@/lib/automationChecklistSteps";
 
 const SERVICE_LABELS = {
   instant_lead_response: "Instant Lead Response",

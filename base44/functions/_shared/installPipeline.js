@@ -540,15 +540,84 @@ function createTransitionValidation(serviceKey, entries = []) {
   };
 }
 
-function withAdditionalValidationEntries(validation, entries = []) {
-  const filteredEntries = entries.filter((entry) => entry?.field && entry?.label);
+function withValidationEntry(validation, entry, enabled) {
+  if (!entry?.field || !entry?.label) {
+    return validation;
+  }
 
-  return {
-    valid: validation.valid && filteredEntries.length === 0,
-    missing_fields: [...validation.missing_fields, ...filteredEntries.map((entry) => entry.field)],
-    missing_labels: [...validation.missing_labels, ...filteredEntries.map((entry) => entry.label)],
-    service_key: validation.service_key,
-  };
+  const entries = validation.missing_fields
+    .map((field, index) => ({
+      field,
+      label: validation.missing_labels[index],
+    }))
+    .filter((current) => current.field !== entry.field);
+
+  if (enabled) {
+    entries.push(entry);
+  }
+
+  return createTransitionValidation(validation.service_key, entries);
+}
+
+function withoutValidationEntry(validation, { field = "", label = "" } = {}) {
+  const entries = validation.missing_fields
+    .map((currentField, index) => ({
+      field: currentField,
+      label: validation.missing_labels[index],
+    }))
+    .filter((entry) => {
+      if (field && entry.field === field) {
+        return false;
+      }
+      if (label && entry.label === label) {
+        return false;
+      }
+      return true;
+    });
+
+  return createTransitionValidation(validation.service_key, entries);
+}
+
+function reconcileActivationGateValidation(validation, activationGate) {
+  if (!validation || !activationGate) {
+    return validation;
+  }
+
+  let nextValidation = validation;
+
+  if (activationGate.successful_test_exists) {
+    nextValidation = withoutValidationEntry(nextValidation, {
+      field: "service_test.successful_runtime",
+      label: "Successful remote test",
+    });
+  }
+
+  if (activationGate.provider_verified) {
+    nextValidation = withoutValidationEntry(nextValidation, {
+      field: "provider_verification.verified",
+      label: "Verified provider execution",
+    });
+  }
+
+  if (!activationGate.blocking_errors?.install_error) {
+    nextValidation = withoutValidationEntry(nextValidation, {
+      field: "blocking_errors.install_error",
+    });
+  }
+
+  if (!activationGate.blocking_errors?.pipeline_error) {
+    nextValidation = withoutValidationEntry(nextValidation, {
+      field: "blocking_errors.pipeline_error",
+    });
+  }
+
+  if (!activationGate.blocking_errors?.latest_failure_event_id) {
+    nextValidation = withoutValidationEntry(nextValidation, {
+      field: "blocking_errors.latest_failure",
+    });
+  }
+
+  return nextValidation;
 }
 
 function toTimestamp(value) {
@@ -618,8 +687,20 @@ function isProviderVerifiedEvent(event, serviceKey) {
     return ["twilio", "resend", "gmail"].includes(event.provider);
   }
 
+  if (serviceKey === "ai_booking_agent") {
+    return (
+      event.event_type === "status_update" &&
+      contextType === "provider_proof" &&
+      proofKind === "live_booking_calendar_sync"
+    );
+  }
+
   if (serviceKey === "review_request") {
-    return true;
+    return (
+      event.event_type === "status_update" &&
+      contextType === "provider_proof" &&
+      proofKind === "live_review_request_trigger"
+    );
   }
 
   return true;
@@ -644,63 +725,70 @@ export function deriveServiceActivationGateFromEvents({
     serviceEvents,
     (event) => isBlockingLifecycleEvent(event)
   );
+  const latestClearSignalTimestamp = Math.max(
+    toTimestamp(latestSuccessfulRuntime?.created_date),
+    toTimestamp(latestProviderVerifiedEvent?.created_date)
+  );
+  const latestBlockingEventAfterClearSignal =
+    latestBlockingEvent &&
+    latestClearSignalTimestamp > 0 &&
+    toTimestamp(latestBlockingEvent.created_date) > latestClearSignalTimestamp
+      ? latestBlockingEvent
+      : null;
 
   const blockingInstallError = cleanString(serviceState?.install_error || "");
   const blockingPipelineError = cleanString(order.pipeline_error || "");
-  const hasBlockingEventAfterSuccess =
-    latestBlockingEvent &&
-    (!latestSuccessfulRuntime ||
-      toTimestamp(latestBlockingEvent.created_date) > toTimestamp(latestSuccessfulRuntime.created_date));
+  const hasBlockingEventAfterClearSignal = Boolean(latestBlockingEventAfterClearSignal);
 
   let validation = baseValidation || createTransitionValidation(serviceKey);
 
-  if (!latestSuccessfulRuntime) {
-    validation = withAdditionalValidationEntries(validation, [
-      {
-        field: "service_test.successful_runtime",
-        label: "Successful remote test",
-      },
-    ]);
-  }
+  validation = withValidationEntry(
+    validation,
+    {
+      field: "service_test.successful_runtime",
+      label: "Successful remote test",
+    },
+    !latestSuccessfulRuntime
+  );
 
-  if (!latestProviderVerifiedEvent) {
-    validation = withAdditionalValidationEntries(validation, [
-      {
-        field: "provider_verification.verified",
-        label: "Verified provider execution",
-      },
-    ]);
-  }
+  validation = withValidationEntry(
+    validation,
+    {
+      field: "provider_verification.verified",
+      label: "Verified provider execution",
+    },
+    !latestProviderVerifiedEvent
+  );
 
-  if (blockingInstallError) {
-    validation = withAdditionalValidationEntries(validation, [
-      {
-        field: "blocking_errors.install_error",
-        label: `Clear service install error: ${blockingInstallError}`,
-      },
-    ]);
-  }
+  validation = withValidationEntry(
+    validation,
+    {
+      field: "blocking_errors.install_error",
+      label: `Clear service install error: ${blockingInstallError}`,
+    },
+    Boolean(blockingInstallError)
+  );
 
-  if (blockingPipelineError) {
-    validation = withAdditionalValidationEntries(validation, [
-      {
-        field: "blocking_errors.pipeline_error",
-        label: `Clear order pipeline error: ${blockingPipelineError}`,
-      },
-    ]);
-  }
+  validation = withValidationEntry(
+    validation,
+    {
+      field: "blocking_errors.pipeline_error",
+      label: `Clear order pipeline error: ${blockingPipelineError}`,
+    },
+    Boolean(blockingPipelineError)
+  );
 
-  if (hasBlockingEventAfterSuccess) {
-    validation = withAdditionalValidationEntries(validation, [
-      {
-        field: "blocking_errors.latest_failure",
-        label:
-          latestBlockingEvent?.error_message ||
-          latestBlockingEvent?.message_body ||
-          "Resolve the latest blocking runtime or provider failure",
-      },
-    ]);
-  }
+  validation = withValidationEntry(
+    validation,
+    {
+      field: "blocking_errors.latest_failure",
+      label:
+        latestBlockingEventAfterClearSignal?.error_message ||
+        latestBlockingEventAfterClearSignal?.message_body ||
+        "Resolve the latest blocking runtime or provider failure",
+    },
+    hasBlockingEventAfterClearSignal
+  );
 
   return {
     validation,
@@ -710,13 +798,13 @@ export function deriveServiceActivationGateFromEvents({
       blocking_errors: {
         install_error: blockingInstallError || null,
         pipeline_error: blockingPipelineError || null,
-        latest_failure_event_id: latestBlockingEvent?.id || null,
-        latest_failure_event_type: latestBlockingEvent?.event_type || null,
+        latest_failure_event_id: latestBlockingEventAfterClearSignal?.id || null,
+        latest_failure_event_type: latestBlockingEventAfterClearSignal?.event_type || null,
         latest_failure_message:
-          latestBlockingEvent?.error_message ||
-          latestBlockingEvent?.message_body ||
+          latestBlockingEventAfterClearSignal?.error_message ||
+          latestBlockingEventAfterClearSignal?.message_body ||
           null,
-        present: Boolean(blockingInstallError || blockingPipelineError || hasBlockingEventAfterSuccess),
+        present: Boolean(blockingInstallError || blockingPipelineError || hasBlockingEventAfterClearSignal),
       },
       latest_success_event_id: latestSuccessfulRuntime?.id || null,
       latest_provider_verified_event_id: latestProviderVerifiedEvent?.id || null,
@@ -1040,6 +1128,7 @@ export function mapPipelineStatusToOrderStatus({
 
 export function buildCommunicationEvent({
   order,
+  created_date,
   channel = "internal",
   direction = "system",
   event_type,
@@ -1056,6 +1145,7 @@ export function buildCommunicationEvent({
   context_id,
 }) {
   return {
+    created_date: created_date || undefined,
     channel,
     direction,
     event_type,
@@ -1081,9 +1171,10 @@ function eventNoteSuffix(note) {
   return note ? ` Note: ${note}` : "";
 }
 
-export function buildOrderStatusEvent({ order, previousStatus, nextStatus, note, provider = "internal" }) {
+export function buildOrderStatusEvent({ order, previousStatus, nextStatus, note, provider = "internal", now }) {
   return buildCommunicationEvent({
     order,
+    created_date: now,
     provider,
     event_type:
       previousStatus === "Paid" && nextStatus === "Ready for Install" ? "install_initialized" : "status_update",
@@ -1098,9 +1189,10 @@ export function buildOrderStatusEvent({ order, previousStatus, nextStatus, note,
   });
 }
 
-export function buildServiceStatusEvent({ order, serviceKey, previousStatus, nextStatus, note }) {
+export function buildServiceStatusEvent({ order, serviceKey, previousStatus, nextStatus, note, now }) {
   return buildCommunicationEvent({
     order,
+    created_date: now,
     event_type: "service_status_changed",
     subject: `${serviceKey} install status: ${nextStatus}`,
     message_body: `${serviceKey} moved from ${previousStatus || "Unknown"} to ${nextStatus}.${eventNoteSuffix(note)}`,
@@ -1115,10 +1207,11 @@ export function buildServiceStatusEvent({ order, serviceKey, previousStatus, nex
   });
 }
 
-export function buildServiceTransitionAttemptEvent({ order, serviceKey, currentStatus, requestedStatus, note }) {
+export function buildServiceTransitionAttemptEvent({ order, serviceKey, currentStatus, requestedStatus, note, now }) {
   const isActivationAttempt = requestedStatus === "Live";
   return buildCommunicationEvent({
     order,
+    created_date: now,
     event_type: "status_update",
     subject: isActivationAttempt
       ? `${serviceKey} activation attempt`
@@ -1160,9 +1253,11 @@ export function buildServiceTransitionBlockedEvent({
   reason,
   validation,
   note,
+  now,
 }) {
   return buildCommunicationEvent({
     order,
+    created_date: now,
     event_type: "service_transition_blocked",
     status: "failed",
     subject: `${serviceKey} transition blocked`,
@@ -1738,6 +1833,7 @@ export async function initializePaidOrderInstallPipeline({
         order: updatedOrder,
         previousStatus: order.pipeline_status || "Paid",
         nextStatus: pipelineStatus,
+        now,
       })
     );
   }
@@ -1897,6 +1993,7 @@ export async function updateTrackedServiceInstallStatus({
         currentStatus: previousServiceStatus,
         requestedStatus: nextStatus,
         note,
+        now,
       })
     );
   }
@@ -1919,6 +2016,7 @@ export async function updateTrackedServiceInstallStatus({
     });
     validation = activationGateResult.validation;
     activationGate = activationGateResult.activation_gate;
+    validation = reconcileActivationGateValidation(validation, activationGate);
   }
 
   if (!allowedNextStatuses.includes(nextStatus) || (validation && !validation.valid)) {
@@ -1942,6 +2040,7 @@ export async function updateTrackedServiceInstallStatus({
         reason,
         validation,
         note,
+        now,
       })
     );
 
@@ -2014,6 +2113,7 @@ export async function updateTrackedServiceInstallStatus({
       previousStatus: previousServiceStatus,
       nextStatus,
       note,
+      now,
     })
   );
 
@@ -2026,6 +2126,7 @@ export async function updateTrackedServiceInstallStatus({
         previousStatus: previousPipelineStatus,
         nextStatus: nextPipelineStatus,
         note,
+        now,
       })
     );
   }

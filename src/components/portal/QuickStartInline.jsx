@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import {
   ArrowRight, ArrowLeft, CheckCircle2, Loader2,
-  Building2, MessageSquare, Mail, Calendar, Rocket, Sparkles, X,
+  Building2, MessageSquare, Mail, Calendar, Rocket, Sparkles,
 } from 'lucide-react';
 
 // ── shared helpers ────────────────────────────────────────────────────────────

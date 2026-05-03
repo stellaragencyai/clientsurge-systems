@@ -226,7 +226,7 @@ export default function AdminLeadDetail() {
       <AILeadInsightPanel lead={lead} onLeadUpdated={loadLead} />
 
       {/* Timeline with AI Classification */}
-      <LeadTimeline leadId={leadId} lead={lead} />
+      <LeadTimeline leadId={leadId} />
 
       {/* Panels Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

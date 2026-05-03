@@ -35,6 +35,10 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function cleanString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
@@ -72,9 +76,12 @@ Deno.serve(async (req) => {
       return Response.json({ skipped: true, reason: 'Resend is disabled in AdminSettings' });
     }
 
-    const toEmail = settings.lead_notification_email;
+    const toEmail =
+      settings.lead_notification_email ||
+      Deno.env.get("ADMIN_NOTIFICATION_EMAIL") ||
+      Deno.env.get("ADMIN_EMAIL");
     if (!toEmail) {
-      console.warn('No lead_notification_email configured in AdminSettings — skipping notification.');
+      console.warn("No lead_notification_email configured in AdminSettings or env — skipping notification.");
       return Response.json({ skipped: true, reason: 'No notification email configured' });
     }
 
@@ -82,6 +89,11 @@ Deno.serve(async (req) => {
     if (!resendKey) {
       return Response.json({ error: 'RESEND_API_KEY not set' }, { status: 500 });
     }
+    const appUrl = (cleanString(Deno.env.get("APP_URL")) || "https://clientsurgesystems.com").replace(/\/+$/, "");
+    const fromEmail =
+      settings.resend_from_email ||
+      Deno.env.get("RESEND_FROM_EMAIL") ||
+      "notifications@clientsurgesystems.com";
 
     const submittedAt = new Date(lead.created_date).toLocaleString('en-US', {
       timeZone: 'America/Phoenix',
@@ -117,7 +129,7 @@ Deno.serve(async (req) => {
         <tr style="background:#fafafa;"><td style="padding:8px 6px;color:#888;vertical-align:top;font-weight:600;">Submitted</td><td style="padding:8px 6px;color:#888;font-size:12px;">${submittedAt}</td></tr>
       </table>
       <div style="margin-top:24px;">
-        <a href="https://clientsurge.base44.app/admin/leads/${lead.id}" style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
+        <a href="${appUrl}/admin/leads/${lead.id}" style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
           View Lead in Dashboard →
         </a>
       </div>
@@ -125,6 +137,21 @@ Deno.serve(async (req) => {
   </div>
 </body>
 </html>`;
+    const textBody = [
+      "ClientSurge Systems",
+      "",
+      "New Lead Submitted",
+      `Name: ${lead.full_name || "—"}`,
+      `Business: ${lead.business_name || "—"}`,
+      `Email: ${lead.email || "—"}`,
+      `Phone: ${lead.phone || "—"}`,
+      `Business Type: ${lead.business_type || "—"}`,
+      `Source: ${lead.source || "—"}`,
+      `Problem: ${lead.problem || "—"}`,
+      `Submitted: ${submittedAt}`,
+      "",
+      `View Lead: ${appUrl}/admin/leads/${lead.id}`,
+    ].join("\n");
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -133,10 +160,11 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: settings.resend_from_email || 'notifications@clientsurge.com',
+        from: `ClientSurge Systems <${fromEmail}>`,
         to: toEmail,
         subject: `🎯 New Lead: ${lead.full_name} — ${lead.business_name || lead.business_type || 'Unknown'}`,
         html: htmlBody,
+        text: textBody,
       }),
     });
 

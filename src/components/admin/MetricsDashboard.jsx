@@ -2,14 +2,11 @@ import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   TrendingUp,
-  TrendingDown,
   AlertCircle,
   AlertTriangle,
   CheckCircle,
   Phone,
   Calendar,
-  Users,
-  Zap,
 } from "lucide-react";
 
 export default function MetricsDashboard({ projectId }) {

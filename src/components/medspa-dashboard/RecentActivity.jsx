@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 
 const statusColors = {
@@ -14,7 +13,7 @@ const statusColors = {
 
 export default function RecentActivity({ leads }) {
   const recent = [...leads]
-    .sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date))
+    .sort((a, b) => new Date(b.updated_date).getTime() - new Date(a.updated_date).getTime())
     .slice(0, 8);
 
   return (

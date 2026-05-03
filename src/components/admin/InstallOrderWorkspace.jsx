@@ -3,6 +3,9 @@ import { base44 } from "@/api/base44Client";
 import { formatCurrency, getPackageDisplayLabel } from "@/lib/aiProducts";
 import ServiceConfigEditor from "@/components/admin/install/ServiceConfigEditor";
 import DeploymentSummaryPanel from "@/components/admin/install/DeploymentSummaryPanel";
+import LaunchReadinessPanel from "@/components/admin/install/LaunchReadinessPanel";
+import LeadIngestionSetupPanel from "@/components/admin/install/LeadIngestionSetupPanel";
+import ProviderProofPanel from "@/components/admin/install/ProviderProofPanel";
 import { CheckCircle2, Clock3, Loader2, Save, ShieldAlert, Sparkles, TestTube2, TriangleAlert, Wrench } from "lucide-react";
 
 const STATUS_STYLES = {
@@ -168,7 +171,7 @@ function MirrorStatusBadge({ value }) {
   );
 }
 
-function InfoTile({ label, value, helper }) {
+function InfoTile({ label, value, helper = null }) {
   return (
     <div className="rounded-xl border border-border bg-muted/20 px-4 py-3">
       <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
@@ -178,7 +181,7 @@ function InfoTile({ label, value, helper }) {
   );
 }
 
-function LabeledField({ label, children, helper }) {
+function LabeledField({ label, children, helper = null }) {
   return (
     <div className="space-y-1.5">
       <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -781,6 +784,11 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
   const [runtimeTargetEmail, setRuntimeTargetEmail] = useState("");
   const [runtimeFeedback, setRuntimeFeedback] = useState({});
   const [runtimeSavingKey, setRuntimeSavingKey] = useState("");
+  const [providerProofFeedback, setProviderProofFeedback] = useState({ tone: "", message: "" });
+  const [providerProofSavingKey, setProviderProofSavingKey] = useState("");
+  const [leadIngestionFeedback, setLeadIngestionFeedback] = useState({ tone: "", message: "" });
+  const [leadIngestionSavingKey, setLeadIngestionSavingKey] = useState("");
+  const [revealedLeadCredentials, setRevealedLeadCredentials] = useState(null);
   const [serviceFilter, setServiceFilter] = useState("all");
 
   const loadDetail = async ({ preserveFeedback = true } = {}) => {
@@ -811,6 +819,9 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
         setConfigFeedback("");
         setServiceFeedback({});
         setRuntimeFeedback({});
+        setProviderProofFeedback({ tone: "", message: "" });
+        setLeadIngestionFeedback({ tone: "", message: "" });
+        setRevealedLeadCredentials(null);
       }
     } catch (err) {
       setError(getErrorMessage(err, "Unable to load install detail."));
@@ -824,6 +835,9 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
     setTransitionNotes({});
     setServiceFeedback({});
     setRuntimeFeedback({});
+    setProviderProofFeedback({ tone: "", message: "" });
+    setLeadIngestionFeedback({ tone: "", message: "" });
+    setRevealedLeadCredentials(null);
     setRuntimeTargetPhone("");
     setRuntimeTargetEmail("");
     setServiceFilter("all");
@@ -841,6 +855,8 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
   const totalBlockers = detail?.required_actions?.total_blockers || 0;
   const workspaceSummary = detail?.workspace_summary || null;
   const sharedConfigurationSummary = workspaceSummary?.shared_configuration || null;
+  const launchReadiness = detail?.launch_readiness || null;
+  const leadIngestionSetup = detail?.lead_ingestion_setup || null;
   const visibleServices = useMemo(
     () => (detail?.services || []).filter((service) => matchesServiceFilter(service, serviceFilter)),
     [detail?.services, serviceFilter]
@@ -1264,6 +1280,153 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
     }
   };
 
+  const handleProviderProof = async (proofType) => {
+    if (!detail) return;
+
+    if (hasUnsavedConfigChanges) {
+      setProviderProofFeedback({
+        tone: "error",
+        message: "Save install configuration before running live provider proof. The proof flow only uses saved canonical config.",
+      });
+      return;
+    }
+
+    const targetPhone = runtimeTargetPhone || detail.customer_phone || "";
+    const targetEmail = runtimeTargetEmail || detail.customer_email || "";
+
+    if (proofType === "live_sms_instant_lead_response" && !targetPhone) {
+      setProviderProofFeedback({
+        tone: "error",
+        message: "Set a runtime test phone before running live SMS proof.",
+      });
+      return;
+    }
+
+    if (proofType === "live_email" && !targetEmail) {
+      setProviderProofFeedback({
+        tone: "error",
+        message: "Set a runtime test email before running live email proof.",
+      });
+      return;
+    }
+
+    if (
+      ["live_booking_calendar_sync", "live_review_request_trigger"].includes(proofType) &&
+      !window.confirm("Record this as real-world live proof only if you already verified the external production behavior outside the simulation path.")
+    ) {
+      return;
+    }
+
+    try {
+      setProviderProofSavingKey(proofType);
+      setProviderProofFeedback({ tone: "", message: "" });
+
+      const payload = {
+        order_id: detail.id,
+        proof_type: proofType,
+      };
+
+      if (proofType === "live_sms_instant_lead_response") {
+        payload.target_phone = targetPhone;
+      }
+
+      if (proofType === "live_email") {
+        payload.target_email = targetEmail;
+      }
+
+      if (["live_booking_calendar_sync", "live_review_request_trigger"].includes(proofType)) {
+        payload.confirmed = true;
+      }
+
+      const response = await base44.functions.invoke("runOrderProviderProof", payload);
+      const result = response.data?.result || response.result || null;
+      const providerMessageId = result?.provider_message_id || result?.email_id || null;
+
+      const message =
+        proofType === "lead_ingestion_webhook"
+          ? `Lead ingestion webhook proof succeeded${result?.lead_id ? ` and created proof lead ${result.lead_id}` : ""}.`
+          : proofType === "live_sms_instant_lead_response"
+          ? `Live SMS proof sent to ${targetPhone}${providerMessageId ? ` with provider message ${providerMessageId}` : ""}. Wait for the Twilio delivery callback to complete proof.`
+          : proofType === "live_booking_calendar_sync"
+          ? "Live calendar proof recorded. AI Booking Agent can move Live once the successful test and remaining blockers are clear."
+          : proofType === "live_review_request_trigger"
+          ? "Live completion-trigger proof recorded. Review Request Automation can move Live once the successful test and remaining blockers are clear."
+          : `Live email proof sent to ${targetEmail}${providerMessageId ? ` with provider message ${providerMessageId}` : ""}. Wait for the email callback to complete proof.`;
+
+      setProviderProofFeedback({
+        tone: "success",
+        message,
+      });
+      await loadDetail();
+      await onQueueRefresh?.();
+    } catch (err) {
+      setProviderProofFeedback({
+        tone: "error",
+        message: getErrorMessage(err, "Provider proof failed."),
+      });
+      await loadDetail();
+      await onQueueRefresh?.();
+    } finally {
+      setProviderProofSavingKey("");
+    }
+  };
+
+  const handleLeadIngestionAction = async (actionKey) => {
+    if (!detail?.id) return;
+
+    const endpointByAction = {
+      issue: "issueLeadIngestionCredentials",
+      rotate: "rotateLeadIngestionCredentials",
+      revoke: "revokeLeadIngestionCredentials",
+      test: "runLeadIngestionSetupTest",
+    };
+
+    const endpoint = endpointByAction[actionKey];
+    if (!endpoint) {
+      return;
+    }
+
+    try {
+      setLeadIngestionSavingKey(actionKey);
+      setLeadIngestionFeedback({ tone: "", message: "" });
+
+      const response = await base44.functions.invoke(endpoint, {
+        order_id: detail.id,
+      });
+      const payload = response.data || response || {};
+      const revealFromSetup = payload?.setup?.reveal_once_credentials || payload?.reveal_once_credentials || null;
+      const revealFromCredentials = payload?.credentials
+        ? {
+            api_key: payload.credentials.api_key,
+            webhook_secret: payload.credentials.webhook_secret,
+            webhook_url: payload?.setup?.webhook_url || leadIngestionSetup?.webhook_url || "",
+            example_curl: revealFromSetup?.example_curl || "",
+          }
+        : null;
+
+      setRevealedLeadCredentials(revealFromSetup || revealFromCredentials || null);
+      setLeadIngestionFeedback({
+        tone: "success",
+        message:
+          payload?.message ||
+          (actionKey === "test"
+            ? "Lead ingestion test completed successfully."
+            : "Lead ingestion settings updated."),
+      });
+
+      await loadDetail({ preserveFeedback: true });
+      await onQueueRefresh?.();
+    } catch (err) {
+      setLeadIngestionFeedback({
+        tone: "error",
+        message: getErrorMessage(err, "Unable to update lead ingestion setup."),
+      });
+      await loadDetail({ preserveFeedback: true });
+    } finally {
+      setLeadIngestionSavingKey("");
+    }
+  };
+
   if (!orderId) {
     return (
       <div className="rounded-2xl border border-dashed border-border bg-white p-8 text-center text-sm text-muted-foreground">
@@ -1422,6 +1585,23 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
         onClearProposal={handleClearPreparedSetup}
         onRunSequence={handleRunSetupSequence}
       />
+      <ProviderProofPanel
+        proof={detail.provider_proof}
+        runtimeTargetPhone={runtimeTargetPhone || detail.customer_phone || ""}
+        runtimeTargetEmail={runtimeTargetEmail || detail.customer_email || ""}
+        savingKey={providerProofSavingKey}
+        feedback={providerProofFeedback}
+        hasUnsavedConfigChanges={hasUnsavedConfigChanges}
+        onRunProof={handleProviderProof}
+      />
+      <LeadIngestionSetupPanel
+        setup={leadIngestionSetup}
+        savingKey={leadIngestionSavingKey}
+        feedback={leadIngestionFeedback}
+        revealedCredentials={revealedLeadCredentials}
+        onAction={handleLeadIngestionAction}
+      />
+      <LaunchReadinessPanel audit={launchReadiness} />
       <CommandViewPanel workspaceSummary={workspaceSummary} />
       <ServiceNavigation
         services={detail.services || []}

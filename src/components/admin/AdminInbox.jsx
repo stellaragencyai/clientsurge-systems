@@ -17,6 +17,10 @@ function timeAgo(iso) {
   return `${Math.floor(h / 24)}d ago`;
 }
 
+function toTimestamp(value) {
+  return value ? new Date(value).getTime() : 0;
+}
+
 export default function AdminInbox() {
   const [projects, setProjects] = useState([]);
   const [messages, setMessages] = useState({});
@@ -39,7 +43,7 @@ export default function AdminInbox() {
       });
       // Sort each project's messages oldest-first
       Object.keys(byProject).forEach(pid => {
-        byProject[pid].sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+        byProject[pid].sort((a, b) => toTimestamp(a.created_date) - toTimestamp(b.created_date));
       });
       setMessages(byProject);
       // Sort projects: unread first, then by latest message
@@ -49,7 +53,7 @@ export default function AdminInbox() {
         if (bUnread !== aUnread) return bUnread - aUnread;
         const aLast = byProject[a.id]?.at(-1)?.created_date || a.created_date;
         const bLast = byProject[b.id]?.at(-1)?.created_date || b.created_date;
-        return new Date(bLast) - new Date(aLast);
+        return toTimestamp(bLast) - toTimestamp(aLast);
       });
       setProjects(sorted);
       if (!selectedId && sorted.length > 0) setSelectedId(sorted[0].id);

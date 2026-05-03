@@ -7,8 +7,8 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import {
-  AlertCircle, CheckCircle2, Clock, Loader2, RefreshCw,
-  Send, Users, Zap, XCircle, ChevronDown, ChevronUp,
+  AlertCircle, CheckCircle2, Loader2, RefreshCw,
+  Send, Users, Zap, ChevronDown, ChevronUp,
 } from "lucide-react";
 
 const STATUS_COLORS = {

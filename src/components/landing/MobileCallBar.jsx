@@ -37,7 +37,7 @@ export default function MobileCallBar() {
         </div>
       </div>
       {showModal && (
-        <DemoBookingModal isOpen={showModal} onClose={() => setShowModal(false)} />
+        <DemoBookingModal onClose={() => setShowModal(false)} />
       )}
     </>
   );

@@ -65,7 +65,7 @@ function formatTimeAgo(iso) {
   return `${days}d ago`;
 }
 
-function MetricCard({ icon: Icon, label, value, sub, color = "blue", trend }) {
+function MetricCard({ icon: Icon, label, value, sub = "", color = "blue", trend = null }) {
   const colors = {
     blue: "bg-blue-50 text-blue-700 border-blue-100",
     green: "bg-green-50 text-green-700 border-green-100",

@@ -5,10 +5,9 @@
 
 import { useEffect, useState } from "react";
 import {
-  MessageSquare, Mail, Phone, Loader2, RefreshCw,
+  MessageSquare, Mail, Loader2, RefreshCw,
   StickyNote, ArrowUpCircle, Zap, CheckCircle2,
-  AlertCircle, MessageCircle, Globe, ArrowDownLeft,
-  ArrowUpRight, Activity, Info, ChevronDown, ChevronUp,
+  AlertCircle, MessageCircle, Globe, ArrowDownLeft, Activity, Info, ChevronDown, ChevronUp,
   ThumbsUp, ThumbsDown, Minus, ListChecks, Mic,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -178,7 +177,7 @@ function formatTs(iso) {
   if (!iso) return "";
   const d = new Date(iso);
   const now = new Date();
-  const diffMs = now - d;
+  const diffMs = now.getTime() - d.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   if (diffMins < 1) return "just now";
   if (diffMins < 60) return `${diffMins}m ago`;
@@ -192,6 +191,10 @@ function formatTs(iso) {
 function formatFull(iso) {
   if (!iso) return "";
   return new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+function toTimestamp(value) {
+  return value ? new Date(value).getTime() : 0;
 }
 
 // ── Timeline Item ─────────────────────────────────────────────────────────────
@@ -349,7 +352,7 @@ export default function ActivityTimeline({ leadId }) {
 
       // Merge & sort newest first
       const merged = [...commItems, ...eventItems].sort(
-        (a, b) => new Date(b.created_date) - new Date(a.created_date)
+        (a, b) => toTimestamp(b.created_date) - toTimestamp(a.created_date)
       );
 
       setItems(merged);

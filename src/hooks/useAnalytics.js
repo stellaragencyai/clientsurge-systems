@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import { appParams } from "@/lib/app-params";
 
 /**
  * useAnalytics - Hook for manual event tracking
@@ -18,6 +19,10 @@ export function useAnalytics(section) {
     (component, action = "click") => {
       if (!section) {
         console.warn("useAnalytics: section prop is required");
+        return;
+      }
+
+      if (!appParams.hasBase44AppId) {
         return;
       }
 

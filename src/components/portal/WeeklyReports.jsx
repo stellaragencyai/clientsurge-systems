@@ -4,7 +4,7 @@ import {
   BarChart3, Mail, RefreshCw, Loader2, CheckCircle2,
   TrendingUp, Users, Calendar, Zap, AlertCircle,
 } from "lucide-react";
-import { RadialBarChart, RadialBar, ResponsiveContainer, Cell, Tooltip } from "recharts";
+import { RadialBarChart, RadialBar, ResponsiveContainer } from "recharts";
 
 const BUILD_STEPS = [
   { key: "step_onboarding", label: "Onboarding Form" },

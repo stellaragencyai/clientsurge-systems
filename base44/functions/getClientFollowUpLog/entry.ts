@@ -3,6 +3,7 @@
  * Returns real CommunicationEvent records for the authenticated client's portal.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
 
 Deno.serve(async (req) => {
   try {
@@ -12,35 +13,26 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const email = user.email.toLowerCase().trim();
+    const access = await resolveClientPortalAccess({
+      base44,
+      userEmail: user.email,
+    });
 
-    // Find the client's project
-    let projects = await base44.asServiceRole.entities.ClientProject.filter(
-      { client_email: email }, "-created_date", 1
-    );
-    if (!projects?.length) {
-      projects = await base44.asServiceRole.entities.ClientProject.filter(
-        { contact_email: email }, "-created_date", 1
-      );
+    if (access.status === "ambiguous") {
+      return Response.json({ error: "Multiple client portal projects matched this account." }, { status: 409 });
     }
-    const project = projects?.[0];
 
-    // Find associated order
-    let order = null;
-    if (project?.id) {
-      const orders = await base44.asServiceRole.entities.Order.filter(
-        { client_project_id: project.id }, "-created_date", 1
-      );
+    if (access.status !== "resolved" || !access.project) {
+      return Response.json({ error: "No linked client portal project found." }, { status: 404 });
+    }
+
+    const project = access.project;
+    let order = access.order || null;
+    if (!order && project?.id) {
+      const orders = await base44.asServiceRole.entities.Order.filter({ client_project_id: project.id }, "-created_date", 1);
       order = orders?.[0] || null;
     }
-    if (!order) {
-      const ordersByEmail = await base44.asServiceRole.entities.Order.filter(
-        { customer_email: email }, "-created_date", 1
-      );
-      order = ordersByEmail?.[0] || null;
-    }
 
-    // Fetch communication events for this project/order
     let events = [];
     if (order?.id) {
       events = await base44.asServiceRole.entities.CommunicationEvent.filter(
@@ -50,12 +42,6 @@ Deno.serve(async (req) => {
       events = await base44.asServiceRole.entities.CommunicationEvent.filter(
         { client_project_id: project.id }, "-created_date", 200
       );
-    }
-
-    // Also fetch by lead_ids tied to this project if we have leads
-    if ((!events || events.length === 0) && (project || order)) {
-      // Fall back: get all events (admin gets all, regular users see limited)
-      events = await base44.asServiceRole.entities.CommunicationEvent.list("-created_date", 200);
     }
 
     return Response.json({ success: true, events: events || [] });

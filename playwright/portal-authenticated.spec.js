@@ -116,7 +116,5 @@ test("[FE-218 FE-219] Authenticated portal logout returns to the homepage", asyn
 
   await page.getByRole("button", { name: /Sign out/i }).click();
   await expect(page).toHaveURL(/\/$/);
-  await expect(
-    page.getByRole("heading", { name: /Turn Every Lead Into a Booked Appointment/i })
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Stop Losing Leads to Slow Response/i })).toBeVisible();
 });

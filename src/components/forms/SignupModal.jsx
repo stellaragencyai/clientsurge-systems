@@ -14,7 +14,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState(/** @type {Record<string, string | undefined>} */ ({}));
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
   }, [onClose]);
 
   const validate = () => {
-    const e = {};
+    const e = /** @type {Record<string, string | undefined>} */ ({});
     if (!form.full_name.trim()) e.full_name = "Required";
     if (!form.business_name.trim()) e.business_name = "Required";
     if (!form.email.trim()) e.email = "Required";
@@ -186,7 +186,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
   );
 }
 
-function Field({ label, name, type = "text", value, onChange, placeholder, error, required }) {
+function Field({ label, name, type = "text", value, onChange, placeholder, error = "", required = false }) {
   return (
     <div>
       <label className="block text-xs font-semibold text-foreground mb-1.5">

@@ -2,15 +2,17 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Plus, Trash2, Save, Loader2, ChevronRight, Mail, Eye } from 'lucide-react';
 
+const EMPTY_CAMPAIGN = {
+  name: '',
+  description: '',
+  type: 'custom',
+  trigger_type: 'manual',
+  steps: [],
+  status: 'draft',
+};
+
 export default function CampaignBuilder({ sequenceId = null, onClose }) {
-  const [campaign, setCampaign] = useState({
-    name: '',
-    description: '',
-    type: 'custom',
-    trigger_type: 'manual',
-    steps: [],
-    status: 'draft',
-  });
+  const [campaign, setCampaign] = useState(EMPTY_CAMPAIGN);
   const [selectedStep, setSelectedStep] = useState(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -25,10 +27,15 @@ export default function CampaignBuilder({ sequenceId = null, onClose }) {
 
   const loadSequence = async () => {
     try {
-      const sequences = await base44.entities.EmailSequence.list('', 1, { id: sequenceId });
-      if (sequences?.[0]) {
-        setCampaign(sequences[0]);
-        setSelectedStep(sequences[0].steps?.[0] || null);
+      const sequence = await base44.entities.EmailSequence.get(sequenceId);
+      if (sequence) {
+        const nextCampaign = {
+          ...EMPTY_CAMPAIGN,
+          ...sequence,
+          steps: Array.isArray(sequence.steps) ? sequence.steps : [],
+        };
+        setCampaign(nextCampaign);
+        setSelectedStep(nextCampaign.steps[0] || null);
       }
     } catch (err) {
       setError('Failed to load sequence');
@@ -65,7 +72,7 @@ export default function CampaignBuilder({ sequenceId = null, onClose }) {
       ...campaign,
       steps: campaign.steps.map(s => s.id === stepId ? { ...s, ...updates } : s),
     });
-    setSelectedStep({ ...selectedStep, ...updates });
+    setSelectedStep(selectedStep ? { ...selectedStep, ...updates } : null);
   };
 
   const saveCampaign = async () => {

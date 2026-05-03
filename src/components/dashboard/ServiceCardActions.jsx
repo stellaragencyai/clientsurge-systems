@@ -1,4 +1,4 @@
-import { FileText, Headphones, Eye, Download, MessageCircle } from "lucide-react";
+import { Headphones, Eye, Download } from "lucide-react";
 
 export default function ServiceCardActions({ serviceKey, orderId }) {
   const actions = [

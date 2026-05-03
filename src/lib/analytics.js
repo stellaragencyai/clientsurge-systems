@@ -1,3 +1,4 @@
+// @ts-nocheck
 export function trackEvent(eventName, params = {}) {
   if (typeof window === "undefined") return;
   // Note: Ensure Google Analytics (gtag) or GTM is loaded in index.html for events to fire

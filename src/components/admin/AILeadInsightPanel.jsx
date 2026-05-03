@@ -13,8 +13,8 @@
 import { useState } from "react";
 import {
   AlertCircle, BrainCircuit, CheckCircle2, ChevronDown, ChevronUp,
-  Clock, Flame, Loader2, Mail, Phone, RefreshCw, Send, Sparkles,
-  Tag, TrendingUp, Zap,
+  Clock, Loader2, Mail, Phone, Send, Sparkles,
+  Tag,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
 

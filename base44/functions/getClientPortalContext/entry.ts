@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
 
 const SERVICE_DISPLAY_NAMES = {
   instant_lead_response: "Instant Lead Response",
@@ -36,53 +37,45 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Authentication required", code: "portal_auth_required" }, { status: 401 });
     }
 
-    const email = user.email.toLowerCase().trim();
+    const access = await resolveClientPortalAccess({
+      base44,
+      userEmail: user.email,
+    });
 
-    // Find matching project by client_email
-    const projects = await base44.asServiceRole.entities.ClientProject.filter(
-      { client_email: email },
-      "-created_date",
-      5
-    );
-
-    let project = projects?.[0] || null;
-
-    // If no project found by client_email, try contact_email
-    if (!project) {
-      const byContact = await base44.asServiceRole.entities.ClientProject.filter(
-        { contact_email: email },
-        "-created_date",
-        1
-      );
-      project = byContact?.[0] || null;
+    if (access.status === "ambiguous") {
+      return Response.json({
+        error: "Multiple paid portal projects matched this account. Manual review is required.",
+        code: access.code || "portal_project_ambiguous",
+      }, { status: 409 });
     }
 
-    if (!project) {
+    if (access.status === "not_found" && access.code === "portal_project_not_found") {
+      return Response.json({
+        success: true,
+        project: null,
+        order: null,
+        empty_state: true,
+        code: access.code,
+        message: "Your services are being set up. You'll receive an email within 24 hours.",
+      });
+    }
+
+    if (access.status !== "resolved" || !access.project) {
       return Response.json({
         error: "No portal project is linked to this account yet.",
-        code: "portal_project_not_found",
+        code: access.code || "portal_project_not_found",
       }, { status: 404 });
     }
 
-    // Find associated order
-    let order = null;
-    if (project.id) {
+    const project = access.project;
+    let order = access.order || null;
+    if (!order && project.id) {
       const orders = await base44.asServiceRole.entities.Order.filter(
         { client_project_id: project.id },
         "-created_date",
         1
       );
       order = orders?.[0] || null;
-    }
-
-    // Also try by customer_email if no order found
-    if (!order) {
-      const ordersByEmail = await base44.asServiceRole.entities.Order.filter(
-        { customer_email: email },
-        "-created_date",
-        1
-      );
-      order = ordersByEmail?.[0] || null;
     }
 
     const orderSummary = order

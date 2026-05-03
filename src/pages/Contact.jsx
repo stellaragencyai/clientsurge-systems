@@ -1,6 +1,5 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Loader2, CheckCircle2, Mail, Phone, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -40,7 +39,7 @@ export default function Contact() {
   }, []);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState(/** @type {Record<string, string | undefined>} */ ({}));
   const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
@@ -55,7 +54,7 @@ export default function Contact() {
   }, []);
 
   const validate = () => {
-    const nextErrors = {};
+    const nextErrors = /** @type {Record<string, string | undefined>} */ ({});
 
     if (!form.full_name.trim()) {
       nextErrors.full_name = 'Required';

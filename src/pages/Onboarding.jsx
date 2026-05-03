@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { CheckCircle2, AlertCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import OnboardingChatWidget from "../components/onboarding/OnboardingChatWidget";
 import PostOnboardingFlow from "../components/forms/PostOnboardingFlow";
 
@@ -459,7 +459,7 @@ export default function Onboarding() {
   );
 }
 
-function InputField({ label, required, type = "text", value, onChange, placeholder }) {
+function InputField({ label, required = false, type = "text", value, onChange, placeholder }) {
   return (
     <div>
       <label className="block text-sm font-medium text-foreground mb-2">

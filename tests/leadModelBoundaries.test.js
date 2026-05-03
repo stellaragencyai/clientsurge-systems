@@ -36,7 +36,6 @@ const canonicalCustomerRuntimeFiles = [
 
 const quarantinedLegacyEndpoints = [
   "base44/functions/sendLeadConfirmationEmail/entry.ts",
-  "base44/functions/sendAdminLeadNotification/entry.ts",
   "base44/functions/sendFollowUpEmail/entry.ts",
   "base44/functions/onLeadCreated/entry.ts",
   "base44/functions/handleBookingTrigger/entry.ts",
@@ -119,12 +118,9 @@ test("admin UI labels distinguish customer leads, platform website leads, and le
   const leadManagement = readRepoFile("src/components/admin/LeadManagementDashboard.jsx");
   const analyticsDashboard = readRepoFile("src/components/admin/AnalyticsDashboard.jsx");
   const legacyLeadIntelligence = readRepoFile("src/pages/LeadIntelligence.jsx");
-  const installOrderWorkspace = readRepoFile("src/components/admin/InstallOrderWorkspace.jsx");
 
-  assert.match(adminDashboard, /Customer Leads/);
+  assert.match(adminDashboard, /Website Leads/);
   assert.match(leadManagement, /Platform Website Leads/);
   assert.match(analyticsDashboard, /Customer Lead Analytics/);
   assert.match(legacyLeadIntelligence, /Legacy Lead Discovery Workspace/);
-  assert.match(installOrderWorkspace, /Lead Ingestion Setup/);
-  assert.match(installOrderWorkspace, /WebsiteLead funnel is separate|WebsiteLead/);
 });

@@ -46,7 +46,7 @@ function createBase44Mock(settings, { sendEmailImpl } = {}) {
   return { base44, calls };
 }
 
-test("provider tests return deterministic structured results and log test activity", async () => {
+test("provider tests return deterministic test-wired results and log test activity", async () => {
   const { base44, calls } = createBase44Mock({
     twilio_enabled: true,
     twilio_from_number: "+16025550100",
@@ -76,9 +76,9 @@ test("provider tests return deterministic structured results and log test activi
     },
   });
 
-  assert.equal(results.twilio.derived_status, "healthy");
-  assert.equal(results.email.derived_status, "healthy");
-  assert.equal(results.webhook.derived_status, "healthy");
+  assert.equal(results.twilio.derived_status, "test_wired");
+  assert.equal(results.email.derived_status, "test_wired");
+  assert.equal(results.webhook.derived_status, "test_wired");
   assert.equal(results.webhook.provider, "zapier");
   assert.equal(calls.updatedSettings.length, 0);
   assert.equal(calls.events.length, 3);
@@ -105,9 +105,9 @@ test("provider tests fail clearly when configuration is missing and never mutate
     },
   });
 
-  assert.equal(results.twilio.derived_status, "disabled");
-  assert.equal(results.email.derived_status, "disabled");
-  assert.equal(results.webhook.derived_status, "disabled");
+  assert.equal(results.twilio.derived_status, "not_configured");
+  assert.equal(results.email.derived_status, "not_configured");
+  assert.equal(results.webhook.derived_status, "not_configured");
   assert.equal(calls.updatedSettings.length, 0);
   assert.equal(calls.events.length, 3);
   calls.events.forEach((event) => {

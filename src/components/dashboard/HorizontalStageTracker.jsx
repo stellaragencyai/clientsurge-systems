@@ -1,4 +1,4 @@
-import { CheckCircle2, Circle, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 
 const DEFAULT_STAGES = ["Order Confirmed", "System Setup", "Configuring", "Testing", "Live ✦"];
 

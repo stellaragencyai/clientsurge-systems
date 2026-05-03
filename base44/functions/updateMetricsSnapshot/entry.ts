@@ -4,10 +4,20 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me().catch(() => null);
+    if ((!user || user.role !== "admin") && !allowAnonymousAutomation(req)) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { project_id, period = "today" } = await req.json();
 
     if (!project_id) {
@@ -18,16 +28,18 @@ Deno.serve(async (req) => {
 
     const { startDate, endDate } = getPeriodRange(period);
 
-    // Get all leads in period
-    const leads = await base44.asServiceRole.entities.Leads.filter({}, "-created_date", 5000);
+    const leads = await base44.asServiceRole.entities.Leads.filter(
+      { client_project_id: project_id },
+      "-created_date",
+      5000
+    );
     const leadsInPeriod = leads.filter((l) => {
       const created = new Date(l.created_date);
       return created >= startDate && created <= endDate;
     });
 
-    // Get all events for these leads
     const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
-      {},
+      { client_project_id: project_id },
       "-created_date",
       10000
     );
@@ -68,13 +80,7 @@ Deno.serve(async (req) => {
     // Generate alerts
     const alerts = generateAlerts(metrics);
 
-    // Find top closer
-    const closers = await base44.asServiceRole.entities.Leads.filter(
-      { status: "Booked" },
-      "-created_date",
-      5000
-    );
-    const topCloser = getTopCloser(closers.filter((l) => leadIds.has(l.id)));
+    const topCloser = getTopCloser(leadsInPeriod.filter((l) => l.status === "Booked"));
 
     // Save snapshot
     await base44.asServiceRole.entities.MetricsSnapshot.create({

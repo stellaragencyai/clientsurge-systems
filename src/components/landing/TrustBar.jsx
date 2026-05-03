@@ -63,7 +63,6 @@ const items = [
     display: "30-day ROI",
     animatedValue: null,
     suffix: "",
-    display: "30-day ROI",
     story:
       "A few additional booked appointments often cover the investment faster than teams expect.",
   },

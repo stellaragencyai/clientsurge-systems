@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  CheckCircle2, Clock, Settings, FlaskConical, Radio,
-  AlertTriangle, XCircle, UserX, CreditCard, Code2, KeyRound,
+  CheckCircle2, Clock, Settings, FlaskConical, Radio, XCircle, UserX, CreditCard, Code2, KeyRound,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 

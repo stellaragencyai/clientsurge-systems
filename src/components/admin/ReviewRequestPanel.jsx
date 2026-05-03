@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Send, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const LEGACY_REVIEW_REQUEST_DISABLED_MESSAGE =
   "Legacy direct-send review requests have been quarantined. Use the Install Order Workspace review-request test until a production runtime is promoted.";
@@ -168,13 +167,13 @@ export default function ReviewRequestPanel() {
         )}
 
         {/* Submit Button */}
-        <Button
+        <button
           type="submit"
           disabled
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium gap-2"
+          className="w-full inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-primary-foreground font-medium shadow disabled:opacity-50"
         >
           <><Send className="w-4 h-4" />Quarantined</>
-        </Button>
+        </button>
       </form>
 
       {/* Info Box */}

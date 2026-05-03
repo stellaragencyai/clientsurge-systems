@@ -32,7 +32,7 @@ const allProblems = [
   { id: "form-leads", problem: "Form leads followed up too late", stat: "Odds of qualifying a lead drop 21× after 5 minutes", solution: "Instant automated response within seconds of every form submission", result: "Under 60 sec response", recommendedPackage: "Starter System" },
   { id: "no-nurture", problem: "No automated SMS or email nurture", stat: "80% of sales require 5+ follow-up touchpoints", solution: "14-day automated nurture sequence keeps every lead warm without manual effort", result: "14-day nurture", recommendedPackage: "Growth System" },
   { id: "no-tracking", problem: "No CRM pipeline tracking every opportunity", stat: "Companies lose 20–30% of revenue to poor pipeline visibility", solution: "Every lead is tracked from first contact to booked appointment automatically", result: "Full pipeline visibility", recommendedPackage: "Growth System" },
-  { id: "old-leads", problem: "Old leads sit with no reactivation", stat: "56% of old leads convert when properly re-engaged", solution: "Reactivation campaigns re-engage dormant contacts and recover lost revenue", result: "Old leads re-engaged", recommendedPackage: "Pro System" },
+  { id: "old-leads", problem: "Old leads sit with no reactivation", stat: "56% of old leads convert when properly re-engaged", solution: "Reactivation campaigns re-engage dormant contacts and recover lost revenue", result: "Old leads re-engaged", recommendedPackage: "Elite System" },
   { id: "no-booking", problem: "Interested people never get pushed to book", stat: "Guided booking increases conversions by up to 3×", solution: "Guided booking flow converts warm inquiries into confirmed appointments", result: "Cleaner path to booking", recommendedPackage: "Growth System" },
 ];
 

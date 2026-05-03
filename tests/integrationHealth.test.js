@@ -38,9 +38,9 @@ test("integration health derives provider summaries from canonical settings and 
   const resend = snapshot.integrations.find((integration) => integration.id === "resend");
   const webhook = snapshot.integrations.find((integration) => integration.id === "webhook");
 
-  assert.equal(twilio.derived_status, "error");
+  assert.equal(twilio.derived_status, "failed");
   assert.equal(twilio.recent_failure_count, 1);
-  assert.equal(resend.derived_status, "healthy");
+  assert.equal(resend.derived_status, "configured");
   assert.equal(resend.recent_activity_count, 1);
   assert.equal(webhook.derived_status, "configured");
   assert.equal(snapshot.system.messages_tracked, 2);
@@ -48,7 +48,7 @@ test("integration health derives provider summaries from canonical settings and 
   assert.equal(snapshot.system.uptime.available, false);
 });
 
-test("integration health marks unconfigured providers as disabled instead of guessing health", () => {
+test("integration health marks unconfigured providers as not configured instead of guessing health", () => {
   const snapshot = deriveIntegrationHealth({
     settings: {
       twilio_enabled: false,
@@ -59,7 +59,7 @@ test("integration health marks unconfigured providers as disabled instead of gue
   });
 
   snapshot.integrations.forEach((integration) => {
-    assert.equal(integration.derived_status, "disabled");
+    assert.equal(integration.derived_status, "not_configured");
     assert.ok(integration.missing_configuration.length > 0);
   });
 

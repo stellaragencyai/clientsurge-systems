@@ -269,6 +269,8 @@ test("buildProviderProofWorkspaceData distinguishes configured, test-wired, and 
   assert.equal(proof.resend.derived_status, PROVIDER_DEPLOYMENT_STATUS.TEST_WIRED);
   assert.equal(proof.twilio.last_delivery_callback.provider_message_id, "SM_live_1");
   assert.equal(proof.webhook.url.includes("webhookLeadCapture"), true);
+  assert.equal(proof.twilio.status_callback_url.includes("receiveTwilioStatusWebhook"), true);
+  assert.equal(proof.twilio.missed_call_callback_url.includes("receiveTwilioMissedCallWebhook"), true);
   assert.equal(
     proof.missing_live_proof_items.includes("Resend/Gmail outbound email has not been live-proven for this order."),
     true
@@ -372,6 +374,103 @@ test("runOrderProviderProof creates order-scoped live email proof events", async
         event.order_id === "order_1"
     ),
     true
+  );
+});
+
+test("runOrderProviderProof records manual live calendar proof for AI Booking Agent", async () => {
+  const { base44, entities } = createFakeBase44({
+    orders: [
+      buildRuntimeReadyOrder({
+        items: [
+          buildTrackedItem("prod_UNi5fLL2SyJJdP", "AI Booking Agent", "ai_booking_agent", "Testing"),
+        ],
+        install_configuration: {
+          shared: {},
+          services: {
+            ai_booking_agent: {
+              booking_link: "https://calendar.example.com/signal-med-spa",
+              booking_mode: "external_link",
+              business_hours: "Mon-Fri 8am-5pm",
+              confirmation_template: "Thanks {{first_name}}. Book here: {{booking_link}}",
+              reminder_enabled: false,
+              reminder_template: "",
+              intake_fields: ["lead_name", "lead_email"],
+            },
+          },
+        },
+      }),
+    ],
+  });
+
+  const result = await runOrderProviderProof({
+    base44,
+    actor: { email: "ops@example.com" },
+    orderId: "order_1",
+    proofType: "live_booking_calendar_sync",
+    payload: {
+      confirmed: true,
+      note: "Verified against external production calendar",
+    },
+    requestUrl: "https://apexflow.base44.app/functions/v1/runOrderProviderProof",
+    now: "2026-04-29T13:10:00.000Z",
+  });
+
+  assert.equal(result.proof_type, "live_booking_calendar_sync");
+  assert.equal(
+    entities.CommunicationEvent.records.some((event) => {
+      const metadata = event.metadata_json ? JSON.parse(event.metadata_json) : {};
+      return (
+        event.subject === "AI Booking Agent live calendar proof recorded" &&
+        metadata.proof_kind === "live_booking_calendar_sync" &&
+        event.order_id === "order_1"
+      );
+    }),
+    true
+  );
+});
+
+test("runOrderProviderProof blocks live review-request trigger proof when service still uses manual trigger", async () => {
+  const { base44 } = createFakeBase44({
+    orders: [
+      buildRuntimeReadyOrder({
+        items: [
+          buildTrackedItem("prod_UNi5dvOUm6Fi9i", "Review Request Automation", "review_request", "Testing"),
+        ],
+        install_configuration: {
+          shared: {},
+          services: {
+            review_request: {
+              review_link: "https://reviews.example.com/signal-med-spa",
+              trigger_event: "manual_trigger",
+              message_template: "Hi {{first_name}}, leave a review here: {{review_link}}",
+              channel: "email",
+              send_delay_minutes: 15,
+              fallback_internal_feedback_enabled: true,
+            },
+          },
+        },
+      }),
+    ],
+  });
+
+  await assert.rejects(
+    () =>
+      runOrderProviderProof({
+        base44,
+        actor: { email: "ops@example.com" },
+        orderId: "order_1",
+        proofType: "live_review_request_trigger",
+        payload: {
+          confirmed: true,
+        },
+        requestUrl: "https://apexflow.base44.app/functions/v1/runOrderProviderProof",
+        now: "2026-04-29T13:15:00.000Z",
+      }),
+    (error) => {
+      assert.equal(error instanceof ProviderProofError, true);
+      assert.equal(error.code, "provider_proof_review_request_trigger_required");
+      return true;
+    }
   );
 });
 

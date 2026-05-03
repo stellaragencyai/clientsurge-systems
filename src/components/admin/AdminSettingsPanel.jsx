@@ -13,7 +13,7 @@ const TABS = [
   { id: "nurture", label: "Nurture Emails" },
 ];
 
-function Field({ label, helper, children }) {
+function Field({ label, helper = null, children }) {
   return (
     <div>
       <label className="block text-sm font-medium text-foreground mb-1.5">{label}</label>
@@ -50,7 +50,7 @@ function TextArea({ value, onChange, placeholder, rows = 3 }) {
 const VAR_HINT = "Variables: {name}, {business_name}, {booking_link}, {date}";
 
 export default function AdminSettingsPanel() {
-  const [settings, setSettings] = useState({});
+  const [settings, setSettings] = useState(/** @type {Record<string, any>} */ ({}));
   const [loading, setLoading] = useState(true);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ShoppingCart, Zap, Search, ArrowRight, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
+import { ShoppingCart, Search, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
 import { AI_PRODUCTS, CATEGORIES, CANONICAL_SERVICE_PRODUCTS } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
@@ -10,8 +10,6 @@ import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
 import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
-import { getRecommendedProducts } from "@/lib/productRecommendations";
-import StackValueCounter from "@/components/store/StackValueCounter";
 import { setPageMetadata } from "@/lib/seo";
 
 // Lazy load heavy store components
@@ -34,6 +32,10 @@ function StoreInner() {
     setSearchInput(val);
     clearTimeout(searchDebounce.current);
     searchDebounce.current = setTimeout(() => setSearch(val), 280);
+  }, []);
+
+  useEffect(() => {
+    return () => clearTimeout(searchDebounce.current);
   }, []);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [showComparison, setShowComparison] = useState(false);
@@ -537,7 +539,7 @@ function StoreInner() {
                   type="text"
                   placeholder="Search services..."
                   value={searchInput}
-                  onChange={(event) => setSearch(event.target.value)}
+                  onChange={(event) => handleSearchChange(event.target.value)}
                   style={{
                     width: "100%",
                     borderRadius: "9999px",

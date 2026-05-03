@@ -5,7 +5,7 @@ import PortalLoginModal from "../forms/PortalLoginModal";
 import DemoBookingModal from "../forms/DemoBookingModal";
 import { trackCTA } from "@/lib/analytics";
 import { usePageViewTracking } from "../../hooks/usePageViewTracking";
-import { BUTTON_TEXT, BUTTON_STYLES } from "@/lib/constants";
+import { BUTTON_TEXT } from "@/lib/constants";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 
@@ -154,7 +154,7 @@ export default function Navbar() {
           <img
             src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
             alt="ClientSurge Systems"
-            fetchpriority="high"
+            fetchPriority="high"
             decoding="async"
             style={{
               height: "clamp(52px, 6vw, 70px)",

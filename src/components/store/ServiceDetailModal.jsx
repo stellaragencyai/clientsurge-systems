@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Plus, CheckCircle2, Clock, Zap, ArrowRight } from "lucide-react";
 
 export default function ServiceDetailModal({ product, inCart, onToggle, onClose }) {
+  const isManualReview = product?.checkout_enabled === false;
+
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -15,8 +17,9 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
       if (!modal) return;
       const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
       if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
+      const first = /** @type {HTMLElement | undefined} */ (focusable[0]);
+      const last = /** @type {HTMLElement | undefined} */ (focusable[focusable.length - 1]);
+      if (!first || !last) return;
       if (e.shiftKey) {
         if (document.activeElement === first) { e.preventDefault(); last.focus(); }
       } else {
@@ -32,9 +35,8 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
   }, [onClose]);
 
   const handleToggle = () => {
-    // Guard: don't allow adding coming_soon or non-checkout items
-    if (product?.coming_soon || product?.checkout_enabled === false) {
-      onClose();
+    if (isManualReview) {
+      window.location.assign("/book");
       return;
     }
     onToggle();
@@ -141,6 +143,19 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
                     color: "rgba(154,92,46,0.7)", background: "rgba(154,92,46,0.07)",
                     padding: "3px 9px", borderRadius: "999px", border: "1px solid rgba(154,92,46,0.14)",
                   }}>{product.category}</span>
+                  {product.availability_label && (
+                    <span style={{
+                      fontSize: "8px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.12em",
+                      color: isManualReview ? "#9a5c2e" : "#fff",
+                      background: isManualReview
+                        ? "rgba(154,92,46,0.08)"
+                        : "linear-gradient(135deg,#9a5c2e,#c8965c)",
+                      padding: "3px 9px", borderRadius: "999px",
+                      border: isManualReview ? "1px solid rgba(154,92,46,0.16)" : "none",
+                    }}>
+                      {product.availability_label}
+                    </span>
+                  )}
                   {product.popular && (
                     <span style={{
                       fontSize: "8px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.12em",
@@ -238,7 +253,9 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
               <div style={{ flex: 1, minWidth: "120px" }}>
                 <p style={{ fontSize: "8px", fontWeight: "800", color: "rgba(154,92,46,0.5)", textTransform: "uppercase", letterSpacing: "0.16em", margin: "0 0 4px" }}>Includes</p>
                 <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.6)", lineHeight: 1.5, margin: 0, fontWeight: "500" }}>
-                  Full setup, config, testing & ongoing management.
+                  {isManualReview
+                    ? "Scoped with our team before activation so we can confirm fit, setup path, and provider requirements."
+                    : "Full setup, config, testing & ongoing management."}
                 </p>
               </div>
             </div>
@@ -246,33 +263,41 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
             {/* CTA */}
             <button
               onClick={handleToggle}
-              disabled={product?.coming_soon || product?.checkout_enabled === false}
-              style={(product?.coming_soon || product?.checkout_enabled === false) ? { opacity: 0.45, cursor: "not-allowed" } : {}}
               style={{
                 width: "100%", borderRadius: "9999px", padding: "2px",
-                background: inCart
+                background: isManualReview
+                  ? "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)"
+                  : inCart
                   ? "linear-gradient(135deg,#22c55e,#16a34a)"
                   : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
                 border: "none", cursor: "pointer",
-                boxShadow: inCart ? "0 6px 20px rgba(34,197,94,0.35)" : "0 6px 22px rgba(120,70,20,0.35)",
+                boxShadow: isManualReview
+                  ? "0 6px 22px rgba(120,70,20,0.26)"
+                  : inCart
+                  ? "0 6px 20px rgba(34,197,94,0.35)"
+                  : "0 6px 22px rgba(120,70,20,0.35)",
               }}
             >
               <span style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "7px",
                 height: "46px", borderRadius: "9999px",
-                background: inCart
+                background: isManualReview
+                  ? "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)"
+                  : inCart
                   ? "linear-gradient(135deg,#16a34a,#15803d)"
                   : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
                 color: "#fff", fontWeight: "700", fontSize: "14px",
               }}>
-                {inCart
+                {isManualReview
+                  ? <><ArrowRight style={{ width: "14px", height: "14px" }} /> Book Demo to Scope</>
+                  : inCart
                   ? <><Check style={{ width: "14px", height: "14px" }} /> Remove from Cart</>
                   : <><Plus style={{ width: "14px", height: "14px" }} /> Add to Cart — ${product.monthly_fee}/mo</>}
               </span>
             </button>
 
             <p style={{ textAlign: "center", fontSize: "10px", color: "rgba(27,20,13,0.35)", marginTop: "8px" }}>
-              Secured by Stripe · Cancel anytime
+              {isManualReview ? "Manual review required before checkout" : "Secured by Stripe · Cancel anytime"}
             </p>
           </div>
         </div>

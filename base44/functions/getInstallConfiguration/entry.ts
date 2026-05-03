@@ -5,6 +5,8 @@ import {
   mapPipelineStatusToOrderStatus,
 } from "../_shared/installPipeline.js";
 import { buildAssistedDeploymentOverview } from "../_shared/assistedDeployment.js";
+import { getLeadIngestionSetupData } from "../_shared/leadIngestionAdmin.js";
+import { buildLaunchReadinessAudit } from "../_shared/launchReadiness.js";
 import { buildRemoteSetupWorkspace } from "../_shared/remoteSetupWorkspace.js";
 import { buildProviderProofWorkspaceData } from "../_shared/providerProof.js";
 import { buildSubscriptionSummary } from "../_shared/subscriptionSync.js";
@@ -31,6 +33,43 @@ async function safeGetEntity(
   } catch {
     return null;
   }
+}
+
+function buildUnavailableLeadIngestionSetup(order: Record<string, unknown>) {
+  return {
+    order_id: order.id,
+    client_project_id: order.client_project_id || "",
+    webhook_url: "",
+    credential_status: "not_issued",
+    credentials: {
+      has_api_key: Boolean(order.lead_ingestion_api_key),
+      has_webhook_secret: Boolean(order.lead_ingestion_webhook_secret),
+      masked_api_key: "",
+      masked_webhook_secret: "",
+      issued_at: order.lead_ingestion_credentials_issued_at || null,
+      rotated_at: order.lead_ingestion_credentials_rotated_at || null,
+      revoked_at: order.lead_ingestion_credentials_revoked_at || null,
+      last_used_at: order.lead_ingestion_last_used_at || null,
+    },
+    identity_modes: [],
+    automation_readiness: [],
+    setup_instructions: [
+      "Link ClientProject ownership on the paid order before issuing order-backed lead ingestion credentials.",
+    ],
+    setup_locations: [],
+    warning:
+      "Lead ingestion setup is unavailable until the paid order is linked to a client project.",
+    idempotency_guidance: "",
+    example_payload: null,
+    example_curl: "",
+    alternate_examples: {},
+    actions: {
+      can_issue: false,
+      can_rotate: false,
+      can_revoke: false,
+      can_test: false,
+    },
+  };
 }
 
 Deno.serve(async (req) => {
@@ -82,6 +121,31 @@ Deno.serve(async (req) => {
       orderEvents: events || [],
       providerReadiness: remoteSetupWorkspace.provider_readiness,
       requestUrl: req.url,
+    });
+    const [leadIngestionSetup, orderLeads, projectLeads] = await Promise.all([
+      getLeadIngestionSetupData({
+        base44,
+        orderId: order.id,
+        requestUrl: req.url,
+      }).catch(() => buildUnavailableLeadIngestionSetup(order)),
+      base44.asServiceRole.entities.Leads.filter({ order_id: order.id }, "-created_date", 500),
+      order.client_project_id
+        ? base44.asServiceRole.entities.Leads.filter(
+            { client_project_id: order.client_project_id },
+            "-created_date",
+            500
+          )
+        : Promise.resolve([]),
+    ]);
+    const launchReadiness = buildLaunchReadinessAudit({
+      order,
+      subscription: linkedSubscription,
+      leadIngestionSetup,
+      providerProof,
+      workspaceSummary: remoteSetupWorkspace.workspace_summary,
+      orderLeads: orderLeads || [],
+      projectLeads: projectLeads || [],
+      orderEvents: events || [],
     });
 
     return Response.json({
@@ -191,6 +255,8 @@ Deno.serve(async (req) => {
         })),
         provider_readiness: remoteSetupWorkspace.provider_readiness,
         provider_proof: providerProof,
+        lead_ingestion_setup: leadIngestionSetup,
+        launch_readiness: launchReadiness,
         integration_health_summary: remoteSetupWorkspace.integration_health_summary,
         latest_provider_tests: remoteSetupWorkspace.latest_provider_tests,
         subscription: buildSubscriptionSummary(linkedSubscription) || (order.subscription_id || order.stripe_subscription_id

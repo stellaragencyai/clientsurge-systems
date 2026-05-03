@@ -7,7 +7,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import {
-  Users, TrendingUp, CheckCircle2, Clock, MessageSquare,
+  Users, TrendingUp, CheckCircle2, MessageSquare,
   Loader2, RefreshCw, AlertCircle, Zap, PhoneCall,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";

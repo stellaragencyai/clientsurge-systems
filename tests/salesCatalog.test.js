@@ -27,7 +27,7 @@ test("public store catalog exposes all 12 offers while checkout stays canonical"
   );
   assert.equal(
     AI_PRODUCTS.filter((product) => product.checkout_enabled === false).length,
-    9
+    6
   );
 });
 
@@ -40,10 +40,12 @@ test("package offers map directly to canonical service bundles", () => {
     [
       "instant_lead_response",
       "missed_call_text_back",
+      "nurture_sequence_14d",
+      "ai_booking_agent",
     ]
   );
-  assert.equal(growth.setup_total, 494);
-  assert.equal(growth.monthly_total, 164);
+  assert.equal(growth.setup_total, 1195);
+  assert.equal(growth.monthly_total, 349);
 });
 
 test("pricing summary matches best package when selected services align", () => {
@@ -52,11 +54,11 @@ test("pricing summary matches best package when selected services align", () => 
   );
 
   assert.equal(summary.package_offer?.package_key, "growth_system");
-  assert.equal(summary.priced_items.length, 2);
-  assert.equal(summary.total_setup, 494);
-  assert.equal(summary.total_monthly, 164);
-  assert.equal(summary.setup_discount_total, 0);
-  assert.equal(summary.monthly_discount_total, 0);
+  assert.equal(summary.priced_items.length, 4);
+  assert.equal(summary.total_setup, 1195);
+  assert.equal(summary.total_monthly, 349);
+  assert.equal(summary.setup_discount_total, 193);
+  assert.equal(summary.monthly_discount_total, 89);
 });
 
 test("pricing summary preserves add-ons outside matched package", () => {
@@ -67,8 +69,8 @@ test("pricing summary preserves add-ons outside matched package", () => {
 
   assert.equal(summary.package_offer?.package_key, "starter_system");
   assert.deepEqual(summary.add_on_service_keys, ["lead_reactivation"]);
-  assert.equal(summary.total_setup, 594);
-  assert.equal(summary.total_monthly, 194);
+  assert.equal(summary.total_setup, 992);
+  assert.equal(summary.total_monthly, 294);
 });
 
 test("stored pricing summary keeps package and discount visibility for admin", () => {

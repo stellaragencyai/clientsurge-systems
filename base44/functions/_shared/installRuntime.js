@@ -306,10 +306,12 @@ function buildRuntimeStartedEvent({
   sharedConfig,
   runtimeData,
   leadId,
+  now,
 }) {
   const displayName = getTrackedServiceByKey(serviceKey)?.display_name || serviceKey;
   return buildCommunicationEvent({
     order,
+    created_date: now,
     lead_id: leadId,
     event_type: "runtime_attempt_started",
     subject: `${displayName} runtime started`,
@@ -373,10 +375,12 @@ function buildProviderSendAttemptedEvent({
   channel = "sms",
   provider = "twilio",
   leadId,
+  now,
 }) {
   const displayName = getTrackedServiceByKey(serviceKey)?.display_name || serviceKey;
   return buildCommunicationEvent({
     order,
+    created_date: now,
     lead_id: leadId,
     channel,
     direction: "outbound",
@@ -410,10 +414,12 @@ function buildProviderSendSucceededEvent({
   provider = "twilio",
   status = "sent",
   leadId,
+  now,
 }) {
   const displayName = getTrackedServiceByKey(serviceKey)?.display_name || serviceKey;
   return buildCommunicationEvent({
     order,
+    created_date: now,
     lead_id: leadId,
     channel,
     direction: "outbound",
@@ -447,10 +453,12 @@ function buildProviderSendFailedEvent({
   channel = "sms",
   provider = "twilio",
   leadId,
+  now,
 }) {
   const displayName = getTrackedServiceByKey(serviceKey)?.display_name || serviceKey;
   return buildCommunicationEvent({
     order,
+    created_date: now,
     lead_id: leadId,
     channel,
     direction: "outbound",
@@ -654,16 +662,40 @@ function buildReviewRequestTriggerSimulatedEvent({
   sharedConfig,
   runtimeData,
   serviceConfig,
+  now,
+}) {
+  return buildReviewRequestTriggerEvent({
+    order,
+    runtimeType,
+    sharedConfig,
+    runtimeData,
+    serviceConfig,
+    now,
+    simulated: true,
+  });
+}
+
+function buildReviewRequestTriggerEvent({
+  order,
+  runtimeType,
+  sharedConfig,
+  runtimeData,
+  serviceConfig,
+  now,
+  simulated = false,
 }) {
   return buildCommunicationEvent({
     order,
+    created_date: now,
     channel: "internal",
     direction: "system",
-    event_type: "review_request_trigger_simulated",
+    event_type: simulated ? "review_request_trigger_simulated" : "review_request_trigger_received",
     provider: "internal",
     status: "processed",
-    subject: "Review request trigger simulated",
-    message_body: `Review request trigger simulated for ${order.business_name}.`,
+    subject: simulated ? "Review request trigger simulated" : "Review request completion trigger received",
+    message_body: simulated
+      ? `Review request trigger simulated for ${order.business_name}.`
+      : `Review request ${runtimeData.trigger_event || "completion"} trigger received for ${order.business_name}.`,
     service_key: "review_request",
     metadata: {
       ...createBaseRuntimeMetadata({
@@ -679,6 +711,57 @@ function buildReviewRequestTriggerSimulatedEvent({
       channel: serviceConfig.channel,
       send_delay_minutes: serviceConfig.send_delay_minutes,
       fallback_internal_feedback_enabled: Boolean(serviceConfig.fallback_internal_feedback_enabled),
+      trigger_source: runtimeData.trigger_source || (simulated ? "admin_test" : "automation_webhook"),
+      completion_id: runtimeData.completion_id || null,
+      occurred_at: runtimeData.occurred_at || null,
+      proof_mode: simulated ? "SIMULATION_OR_LOCAL_TEST" : "LIVE_PROVIDER_PROOF",
+    },
+  });
+}
+
+function buildReviewRequestLiveProofEvent({
+  order,
+  runtimeType,
+  sharedConfig,
+  runtimeData,
+  serviceConfig,
+  now,
+  provider,
+  providerMessageId,
+  leadId = null,
+}) {
+  return buildCommunicationEvent({
+    order,
+    created_date: now,
+    lead_id: leadId,
+    channel: serviceConfig.channel || "internal",
+    direction: "system",
+    event_type: "status_update",
+    provider,
+    status: "processed",
+    subject: "Review Request Automation live trigger proof recorded",
+    message_body: "A real completion trigger produced the canonical review-request runtime for this paid order.",
+    service_key: "review_request",
+    provider_message_id: providerMessageId || null,
+    context_type: "provider_proof",
+    context_id: `${order.id}:live_review_request_trigger:${runtimeData.completion_id || Date.parse(now)}`,
+    metadata: {
+      ...createBaseRuntimeMetadata({
+        order,
+        serviceKey: "review_request",
+        runtimeType,
+        recipientPhone: runtimeData.recipient_phone,
+        sharedConfig,
+        runtimeData,
+      }),
+      proof_kind: "live_review_request_trigger",
+      proof_mode: "LIVE_PROVIDER_PROOF",
+      trigger_event: runtimeData.trigger_event,
+      channel: serviceConfig.channel,
+      send_delay_minutes: serviceConfig.send_delay_minutes,
+      trigger_source: runtimeData.trigger_source || "automation_webhook",
+      completion_id: runtimeData.completion_id || null,
+      occurred_at: runtimeData.occurred_at || now,
     },
   });
 }
@@ -941,7 +1024,7 @@ export async function executeLeadReactivationTest({
   };
 }
 
-export async function executeReviewRequestTest({
+async function executeReviewRequestFlow({
   base44,
   order,
   runtimeType = "run_review_request_test",
@@ -950,6 +1033,13 @@ export async function executeReviewRequestTest({
   customerName,
   triggerEvent,
   now = new Date().toISOString(),
+  sendSms = sendTwilioSms,
+  sendEmail = sendEmailMessage,
+  liveProviderSend = false,
+  triggerSource = "admin_test",
+  completionId = "",
+  occurredAt = "",
+  leadId = null,
 }) {
   const { snapshot, serviceState, sharedConfig, serviceConfig } = getRuntimeContextForService({
     order,
@@ -981,6 +1071,9 @@ export async function executeReviewRequestTest({
     recipient_email: normalizedRecipientEmail,
     recipient_phone: runtimeRecipientPhone,
     customer_name: cleanString(customerName) || cleanString(order.customer_name),
+    trigger_source: cleanString(triggerSource) || (liveProviderSend ? "automation_webhook" : "admin_test"),
+    completion_id: cleanString(completionId),
+    occurred_at: cleanString(occurredAt) || now,
   };
 
   const recipientValidationErrors = [];
@@ -1002,6 +1095,12 @@ export async function executeReviewRequestTest({
       label: "Provide test email",
     });
   }
+  if (liveProviderSend && Number(serviceConfig.send_delay_minutes || 0) > 0) {
+    recipientValidationErrors.push({
+      field: "services.review_request.send_delay_minutes",
+      label: "Set review delay to 0 minutes for live completion automation",
+    });
+  }
 
   const combinedValidation = recipientValidationErrors.length > validation.missing_fields.length
     ? {
@@ -1012,7 +1111,7 @@ export async function executeReviewRequestTest({
       }
     : validation;
 
-  if (!validation.valid || recipientValidationErrors.some((entry) => entry.field.startsWith("runtime."))) {
+  if (!combinedValidation.valid) {
     const reason = `Required configuration is incomplete: ${combinedValidation.missing_labels.join(", ")}`;
     const blockedEvent = await createCommunicationEvent(
       base44,
@@ -1104,6 +1203,8 @@ export async function executeReviewRequestTest({
         recipientPhone: runtimeRecipientPhone,
         sharedConfig,
         runtimeData,
+        leadId,
+        now,
       })
     )
   );
@@ -1111,15 +1212,84 @@ export async function executeReviewRequestTest({
   createdEvents.push(
     await createCommunicationEvent(
       base44,
-      buildReviewRequestTriggerSimulatedEvent({
+      buildReviewRequestTriggerEvent({
         order: hydratedOrder,
         runtimeType,
         sharedConfig,
         runtimeData,
         serviceConfig,
+        now,
+        simulated: !liveProviderSend,
       })
     )
   );
+
+  if (!liveProviderSend) {
+    createdEvents.push(
+      await createCommunicationEvent(
+        base44,
+        buildProviderSendAttemptedEvent({
+          order: hydratedOrder,
+          serviceKey: "review_request",
+          runtimeType,
+          recipientPhone: runtimeRecipientPhone,
+          sharedConfig,
+          runtimeData,
+          messageBody,
+          channel: REVIEW_REQUEST_CHANNELS.includes(resolvedChannel) ? resolvedChannel : "internal",
+          provider: "internal",
+          leadId,
+          now,
+        })
+      )
+    );
+
+    createdEvents.push(
+      await createCommunicationEvent(
+        base44,
+        buildProviderSendSucceededEvent({
+          order: hydratedOrder,
+          serviceKey: "review_request",
+          runtimeType,
+          recipientPhone: runtimeRecipientPhone,
+          sharedConfig,
+          runtimeData,
+          messageBody,
+          providerMessageId: `review-request:${order.id}:${Date.parse(now)}`,
+          channel: REVIEW_REQUEST_CHANNELS.includes(resolvedChannel) ? resolvedChannel : "internal",
+          provider: "internal",
+          status: "processed",
+          leadId,
+          now,
+        })
+      )
+    );
+
+    await touchOrderLastInstallEvent(base44, order.id, now);
+
+    return {
+      success: true,
+      order_id: order.id,
+      service_key: "review_request",
+      runtime_type: runtimeType,
+      install_status: serviceState.install_status,
+      configuration_complete: validation.valid,
+      trigger_event: resolvedTriggerEvent,
+      channel: resolvedChannel,
+      review_link: serviceConfig.review_link,
+      send_delay_minutes: serviceConfig.send_delay_minutes,
+      fallback_internal_feedback_enabled: Boolean(serviceConfig.fallback_internal_feedback_enabled),
+      recipient_phone: runtimeRecipientPhone || null,
+      recipient_email: resolvedChannel === "email" ? normalizedRecipientEmail : null,
+      message_template: serviceConfig.message_template,
+      message_preview: messageBody,
+      placeholder_runtime: true,
+      created_event_ids: createdEvents.map((event) => event.id),
+    };
+  }
+
+  const liveProvider = resolvedChannel === "email" ? "resend" : "twilio";
+  const liveSubject = `${order.business_name || "ClientSurge"} review request`;
 
   createdEvents.push(
     await createCommunicationEvent(
@@ -1132,16 +1302,103 @@ export async function executeReviewRequestTest({
         sharedConfig,
         runtimeData,
         messageBody,
-        channel: REVIEW_REQUEST_CHANNELS.includes(resolvedChannel) ? resolvedChannel : "internal",
-        provider: "internal",
+        channel: resolvedChannel,
+        provider: liveProvider,
+        leadId,
+        now,
       })
     )
   );
 
-  createdEvents.push(
-    await createCommunicationEvent(
+  try {
+    const sendResult = resolvedChannel === "email"
+      ? await sendEmail({
+          base44,
+          to: normalizedRecipientEmail,
+          subject: liveSubject,
+          body: messageBody,
+        })
+      : await sendSms({
+          to: runtimeRecipientPhone,
+          from: sharedConfig.twilio_business_phone,
+          body: messageBody,
+          serviceKey: "review_request",
+          orderId: order.id,
+          runtimeType,
+        });
+
+    createdEvents.push(
+      await createCommunicationEvent(
+        base44,
+        buildProviderSendSucceededEvent({
+          order: hydratedOrder,
+          serviceKey: "review_request",
+          runtimeType,
+          recipientPhone: runtimeRecipientPhone,
+          sharedConfig,
+          runtimeData,
+          messageBody,
+          providerMessageId: sendResult.provider_message_id,
+          channel: resolvedChannel,
+          provider: liveProvider,
+          status: sendResult.provider_status || (resolvedChannel === "email" ? "processed" : "sent"),
+          leadId,
+          now,
+        })
+      )
+    );
+
+    const proofEvent = await createCommunicationEvent(
       base44,
-      buildProviderSendSucceededEvent({
+      buildReviewRequestLiveProofEvent({
+        order: hydratedOrder,
+        runtimeType,
+        sharedConfig,
+        runtimeData,
+        serviceConfig,
+        now,
+        provider: liveProvider,
+        providerMessageId: sendResult.provider_message_id,
+        leadId,
+      })
+    );
+    createdEvents.push(proofEvent);
+
+    await touchOrderLastInstallEvent(base44, order.id, now);
+
+    return {
+      success: true,
+      order_id: order.id,
+      service_key: "review_request",
+      runtime_type: runtimeType,
+      install_status: serviceState.install_status,
+      configuration_complete: validation.valid,
+      trigger_event: resolvedTriggerEvent,
+      channel: resolvedChannel,
+      review_link: serviceConfig.review_link,
+      send_delay_minutes: serviceConfig.send_delay_minutes,
+      fallback_internal_feedback_enabled: Boolean(serviceConfig.fallback_internal_feedback_enabled),
+      recipient_phone: runtimeRecipientPhone || null,
+      recipient_email: resolvedChannel === "email" ? normalizedRecipientEmail : null,
+      message_template: serviceConfig.message_template,
+      message_preview: messageBody,
+      placeholder_runtime: false,
+      provider_message_id: sendResult.provider_message_id,
+      provider_status: sendResult.provider_status || (resolvedChannel === "email" ? "processed" : "sent"),
+      proof_event_id: proofEvent.id,
+      created_event_ids: createdEvents.map((event) => event.id),
+    };
+  } catch (error) {
+    const runtimeError = error instanceof RuntimeExecutionError
+      ? error
+      : new RuntimeExecutionError(error instanceof Error ? error.message : "Review request send failed", {
+          status: 502,
+          code: "provider_send_failed",
+        });
+
+    const failedEvent = await createCommunicationEvent(
+      base44,
+      buildProviderSendFailedEvent({
         order: hydratedOrder,
         serviceKey: "review_request",
         runtimeType,
@@ -1149,35 +1406,90 @@ export async function executeReviewRequestTest({
         sharedConfig,
         runtimeData,
         messageBody,
-        providerMessageId: `review-request:${order.id}:${Date.parse(now)}`,
-        channel: REVIEW_REQUEST_CHANNELS.includes(resolvedChannel) ? resolvedChannel : "internal",
-        provider: "internal",
-        status: "processed",
+        errorMessage: runtimeError.message,
+        channel: resolvedChannel,
+        provider: liveProvider,
+        leadId,
+        now,
       })
-    )
-  );
+    );
 
-  await touchOrderLastInstallEvent(base44, order.id, now);
+    await touchOrderLastInstallEvent(base44, order.id, now);
 
-  return {
-    success: true,
-    order_id: order.id,
-    service_key: "review_request",
-    runtime_type: runtimeType,
-    install_status: serviceState.install_status,
-    configuration_complete: validation.valid,
-    trigger_event: resolvedTriggerEvent,
-    channel: resolvedChannel,
-    review_link: serviceConfig.review_link,
-    send_delay_minutes: serviceConfig.send_delay_minutes,
-    fallback_internal_feedback_enabled: Boolean(serviceConfig.fallback_internal_feedback_enabled),
-    recipient_phone: runtimeRecipientPhone || null,
-    recipient_email: resolvedChannel === "email" ? normalizedRecipientEmail : null,
-    message_template: serviceConfig.message_template,
-    message_preview: messageBody,
-    placeholder_runtime: true,
-    created_event_ids: createdEvents.map((event) => event.id),
-  };
+    throw new RuntimeExecutionError(runtimeError.message, {
+      status: runtimeError.status || 502,
+      code: runtimeError.code || "provider_send_failed",
+      details: {
+        ...(runtimeError.details || {}),
+        order_id: order.id,
+        service_key: "review_request",
+        failed_event_id: failedEvent.id,
+      },
+    });
+  }
+}
+
+export async function executeReviewRequestTest({
+  base44,
+  order,
+  runtimeType = "run_review_request_test",
+  recipientPhone,
+  recipientEmail,
+  customerName,
+  triggerEvent,
+  now = new Date().toISOString(),
+  sendSms = sendTwilioSms,
+  sendEmail = sendEmailMessage,
+}) {
+  return executeReviewRequestFlow({
+    base44,
+    order,
+    runtimeType,
+    recipientPhone,
+    recipientEmail,
+    customerName,
+    triggerEvent,
+    now,
+    sendSms,
+    sendEmail,
+    liveProviderSend: false,
+    triggerSource: "admin_test",
+  });
+}
+
+export async function executeLiveReviewRequestTrigger({
+  base44,
+  order,
+  recipientPhone,
+  recipientEmail,
+  customerName,
+  triggerEvent,
+  completionId,
+  occurredAt,
+  triggerSource = "automation_webhook",
+  leadId = null,
+  runtimeType = "review_request_live_trigger",
+  now = new Date().toISOString(),
+  sendSms = sendTwilioSms,
+  sendEmail = sendEmailMessage,
+}) {
+  return executeReviewRequestFlow({
+    base44,
+    order,
+    runtimeType,
+    recipientPhone,
+    recipientEmail,
+    customerName,
+    triggerEvent,
+    now,
+    sendSms,
+    sendEmail,
+    liveProviderSend: true,
+    triggerSource,
+    completionId,
+    occurredAt,
+    leadId,
+  });
 }
 
 function buildBookingCreatedEvent({
@@ -1187,9 +1499,11 @@ function buildBookingCreatedEvent({
   bookingLink,
   bookingMode,
   confirmationMessage,
+  now,
 }) {
   return buildCommunicationEvent({
     order,
+    created_date: now,
     channel: "internal",
     direction: "system",
     event_type: "booking_simulation_created",
@@ -1366,6 +1680,7 @@ export async function executeBookingSimulation({
         recipientPhone: normalizedRecipientPhone,
         sharedConfig,
         runtimeData,
+        now,
       })
     )
   );
@@ -1380,6 +1695,7 @@ export async function executeBookingSimulation({
         bookingLink: serviceConfig.booking_link,
         bookingMode: serviceConfig.booking_mode,
         confirmationMessage,
+        now,
       })
     )
   );
@@ -1397,6 +1713,7 @@ export async function executeBookingSimulation({
         messageBody: confirmationMessage,
         channel: "internal",
         provider: "internal",
+        now,
       })
     )
   );
@@ -1411,10 +1728,11 @@ export async function executeBookingSimulation({
       sharedConfig,
       runtimeData,
       messageBody: confirmationMessage,
-      providerMessageId: `booking-test:${order.id}:${Date.now()}`,
+      providerMessageId: `booking-test:${order.id}:${Date.parse(now)}`,
       channel: "internal",
       provider: "internal",
       status: "processed",
+      now,
     })
   );
   createdEvents.push(confirmationEvent);
@@ -1434,6 +1752,7 @@ export async function executeBookingSimulation({
           messageBody: reminderMessage,
           channel: "internal",
           provider: "internal",
+          now,
         })
       )
     );
@@ -1448,10 +1767,11 @@ export async function executeBookingSimulation({
         sharedConfig,
         runtimeData,
         messageBody: reminderMessage,
-        providerMessageId: `booking-reminder:${order.id}:${Date.now()}`,
+        providerMessageId: `booking-reminder:${order.id}:${Date.parse(now)}`,
         channel: "internal",
         provider: "internal",
         status: "processed",
+        now,
       })
     );
     createdEvents.push(reminderEvent);

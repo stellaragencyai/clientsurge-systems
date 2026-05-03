@@ -40,7 +40,7 @@ const REVIEW_REQUEST_CHANNEL_OPTIONS = [
   { value: "email", label: "Email" },
 ];
 
-function LabeledField({ label, children, helper }) {
+function LabeledField({ label, children, helper = null }) {
   return (
     <div className="space-y-1.5">
       <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">

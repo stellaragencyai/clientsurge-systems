@@ -12,7 +12,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 
-function StatCard({ label, value, sub, icon: Icon, color = "blue", onClick }) {
+function StatCard({ label, value, sub = null, icon: Icon, color = "blue", onClick = null }) {
   const colors = {
     blue: "bg-blue-50 text-blue-700 border-blue-100",
     green: "bg-green-50 text-green-700 border-green-100",
@@ -44,6 +44,10 @@ function fmt(cents) {
 function fmtDate(iso) {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function toTimestamp(value) {
+  return value ? new Date(value).getTime() : 0;
 }
 
 export default function RevenueDashboard() {
@@ -101,7 +105,7 @@ export default function RevenueDashboard() {
     if (!s.current_period_end) return false;
     const t = new Date(s.current_period_end).getTime();
     return t > now && t < in30;
-  }).sort((a, b) => new Date(a.current_period_end) - new Date(b.current_period_end));
+  }).sort((a, b) => toTimestamp(a.current_period_end) - toTimestamp(b.current_period_end));
 
   // Revenue by month (last 6 months from paid invoices)
   const monthlyMap = {};

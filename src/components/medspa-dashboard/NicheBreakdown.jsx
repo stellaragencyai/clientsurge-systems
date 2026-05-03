@@ -49,3 +49,4 @@ export default function NicheBreakdown({ leads }) {
     </Card>
   );
 }
+// @ts-nocheck

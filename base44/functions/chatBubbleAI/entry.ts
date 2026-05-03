@@ -33,6 +33,17 @@ const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
 const RATE_LIMIT_MAX = 15;
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
 const MAX_MESSAGE_HISTORY = 20;
+const MAX_MESSAGE_LENGTH = 2000;
+
+function sanitizeMessageContent(value: unknown): string {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  return value
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .slice(0, MAX_MESSAGE_LENGTH);
+}
 
 function getClientIp(req: Request): string {
   return (
@@ -82,7 +93,11 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'messages array required' }, { status: 400 });
     }
 
-    const trimmedMessages = messages.slice(-MAX_MESSAGE_HISTORY);
+    const sanitizedMessages = messages.map((message: any) => ({
+      ...message,
+      content: sanitizeMessageContent(message?.content),
+    }));
+    const trimmedMessages = sanitizedMessages.slice(-MAX_MESSAGE_HISTORY);
 
     // Determine which system prompt to use
     // If installStatus or services are passed, this is a support chat (client dashboard)

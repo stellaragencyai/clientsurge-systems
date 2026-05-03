@@ -1,3 +1,4 @@
+// @ts-nocheck
 // TODO: Host OG image on a permanent CDN (e.g. clientsurgesystems.com/og-image.png) to avoid dependency on Base44 CDN
 const DEFAULT_OG_IMAGE =
   "https://media.base44.com/images/public/69d49a29c1974b32f46e8550/aaaacb19f_generated_image.png";

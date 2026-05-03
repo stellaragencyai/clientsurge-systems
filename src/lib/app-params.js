@@ -1,7 +1,12 @@
+// @ts-nocheck
 const isBrowser = typeof window !== "undefined";
 const memoryStorage = new Map();
 
 const toSnakeCase = (str) => str.replace(/([A-Z])/g, "_$1").toLowerCase();
+const hasValue = (value) =>
+	typeof value === "string"
+		? value.trim() !== "" && value !== "null" && value !== "undefined"
+		: value !== undefined && value !== null;
 
 const canUseBrowserStorage = () => {
 	if (!isBrowser) {
@@ -84,6 +89,18 @@ const safeReplaceUrl = (nextUrl) => {
 	}
 };
 
+const isEmbeddedFrame = () => {
+	if (!isBrowser) {
+		return false;
+	}
+
+	try {
+		return window.self !== window.top;
+	} catch {
+		return true;
+	}
+};
+
 const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl = false } = {}) => {
 	if (!isBrowser) {
 		return defaultValue ?? null;
@@ -136,5 +153,15 @@ const getAppParams = () => {
 };
 
 export const appParams = {
-	...getAppParams(),
+	...(() => {
+		const params = getAppParams();
+		const hasBase44AppId = hasValue(params.appId);
+
+		return {
+			...params,
+			hasBase44AppId,
+			isEmbeddedPreview: isEmbeddedFrame(),
+			isPreviewWithoutAppId: isEmbeddedFrame() && !hasBase44AppId,
+		};
+	})(),
 };

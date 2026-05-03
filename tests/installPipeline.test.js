@@ -315,6 +315,30 @@ async function recordCanonicalProviderProof(base44, order, serviceKey, now = new
         selected_lead_count: 2,
       }),
     },
+    ai_booking_agent: {
+      event_type: "status_update",
+      provider: "internal",
+      status: "processed",
+      subject: "AI Booking Agent live calendar proof recorded",
+      context_type: "provider_proof",
+      metadata_json: JSON.stringify({
+        context_type: "provider_proof",
+        proof_kind: "live_booking_calendar_sync",
+        proof_mode: "LIVE_PROVIDER_PROOF",
+      }),
+    },
+    review_request: {
+      event_type: "status_update",
+      provider: "internal",
+      status: "processed",
+      subject: "Review Request Automation live trigger proof recorded",
+      context_type: "provider_proof",
+      metadata_json: JSON.stringify({
+        context_type: "provider_proof",
+        proof_kind: "live_review_request_trigger",
+        proof_mode: "LIVE_PROVIDER_PROOF",
+      }),
+    },
   };
 
   const proof = proofByService[serviceKey];
@@ -850,7 +874,7 @@ test("booking agent config validation blocks Testing until canonical booking con
   );
 });
 
-test("booking agent Live stays blocked until a successful booking-agent test exists", async () => {
+test("booking agent Live stays blocked until a successful booking-agent test and live calendar proof exist", { concurrency: false }, async () => {
   const { base44, entities } = createFakeBase44({
     items: [
       buildTrackedItem("prod_UNi5fLL2SyJJdP", "AI Booking Agent"),
@@ -922,14 +946,33 @@ test("booking agent Live stays blocked until a successful booking-agent test exi
     leadEmail: "proof@example.com",
     leadPhone: "+16025550088",
     scheduledAt: "2026-04-23T17:00:00.000Z",
+    now: "2026-04-22T12:15:00.000Z",
   });
+
+  await assert.rejects(
+    updateTrackedServiceInstallStatus({
+      base44,
+      order: currentOrder,
+      serviceKey: "ai_booking_agent",
+      nextStatus: "Live",
+      now: "2026-04-22T12:16:00.000Z",
+    }),
+    (error) => {
+      assert.ok(error instanceof InstallTransitionError);
+      assert.ok(error.details?.validation?.missing_fields?.includes("provider_verification.verified"));
+      return true;
+    }
+  );
+
+  await recordCanonicalProviderProof(base44, currentOrder, "ai_booking_agent", "2026-04-22T12:17:00.000Z");
+  currentOrder = await entities.Order.get("order_1");
 
   currentOrder = await updateTrackedServiceInstallStatus({
     base44,
     order: currentOrder,
     serviceKey: "ai_booking_agent",
     nextStatus: "Live",
-    now: "2026-04-22T12:16:00.000Z",
+    now: "2026-04-22T12:18:00.000Z",
   });
 
   assert.equal(
@@ -1092,7 +1135,7 @@ test("review request config validation blocks Testing until canonical review-req
   );
 });
 
-test("review request Live stays blocked until a successful review-request test exists", async () => {
+test("review request Live stays blocked until a successful review-request test and live trigger proof exist", { concurrency: false }, async () => {
   const { base44, entities } = createFakeBase44(buildReviewRequestOrderOverride());
   const order = await entities.Order.get("order_1");
 
@@ -1111,7 +1154,7 @@ test("review request Live stays blocked until a successful review-request test e
       services: {
         review_request: {
           review_link: "https://reviews.example.com/signal-med-spa",
-          trigger_event: "manual_trigger",
+          trigger_event: "appointment_completed",
           message_template: "Hi {{first_name}}, review us here: {{review_link}}",
           channel: "email",
           send_delay_minutes: 15,
@@ -1157,16 +1200,34 @@ test("review request Live stays blocked until a successful review-request test e
     order: currentOrder,
     recipientEmail: "reviewer@example.com",
     customerName: "Proof Customer",
-    triggerEvent: "manual_trigger",
+    triggerEvent: "appointment_completed",
     now: "2026-04-22T12:15:00.000Z",
   });
+
+  await assert.rejects(
+    updateTrackedServiceInstallStatus({
+      base44,
+      order: currentOrder,
+      serviceKey: "review_request",
+      nextStatus: "Live",
+      now: "2026-04-22T12:16:00.000Z",
+    }),
+    (error) => {
+      assert.ok(error instanceof InstallTransitionError);
+      assert.ok(error.details?.validation?.missing_fields?.includes("provider_verification.verified"));
+      return true;
+    }
+  );
+
+  await recordCanonicalProviderProof(base44, currentOrder, "review_request", "2026-04-22T12:17:00.000Z");
+  currentOrder = await entities.Order.get("order_1");
 
   currentOrder = await updateTrackedServiceInstallStatus({
     base44,
     order: currentOrder,
     serviceKey: "review_request",
     nextStatus: "Live",
-    now: "2026-04-22T12:16:00.000Z",
+    now: "2026-04-22T12:18:00.000Z",
   });
 
   assert.equal(

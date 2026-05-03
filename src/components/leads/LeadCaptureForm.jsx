@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function LeadCaptureForm() {
@@ -54,6 +53,7 @@ export default function LeadCaptureForm() {
         phone: "",
         business_type: "",
         problem: "",
+        website_url: "",
       });
 
       setTimeout(() => setSuccess(false), 5000);
@@ -198,13 +198,13 @@ export default function LeadCaptureForm() {
       </div>
 
       {/* Submit */}
-      <Button
+      <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg h-11 text-base font-semibold"
+        className="w-full rounded-lg h-11 text-base font-semibold inline-flex items-center justify-center bg-primary text-primary-foreground shadow hover:bg-primary/90 disabled:opacity-50"
       >
         {loading ? "Submitting..." : "Submit"}
-      </Button>
+      </button>
 
       <p className="text-xs text-muted-foreground text-center">
         No spam. No pressure. We&apos;ll respond within the next few hours.

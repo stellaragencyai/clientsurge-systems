@@ -1,4 +1,4 @@
-import { buildCommunicationEvent, buildInstallSnapshot } from "./installPipeline.js";
+import { buildCommunicationEvent, buildInstallSnapshot, validateServiceConfiguration } from "./installPipeline.js";
 import { executeOrderServiceRuntime, RuntimeExecutionError, sendEmailMessage } from "./installRuntime.js";
 import { loadAdminSettings } from "./adminSettings.js";
 
@@ -22,6 +22,8 @@ export const PROVIDER_PROOF_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 const LIVE_SMS_PROOF_TYPE = "live_sms_instant_lead_response";
 const LIVE_EMAIL_PROOF_TYPE = "live_email";
 const LEAD_INGESTION_WEBHOOK_PROOF_TYPE = "lead_ingestion_webhook";
+const LIVE_BOOKING_CALENDAR_PROOF_TYPE = "live_booking_calendar_sync";
+const LIVE_REVIEW_REQUEST_TRIGGER_PROOF_TYPE = "live_review_request_trigger";
 const DEFAULT_EMAIL_SUBJECT = "ClientSurge provider proof email";
 
 function cleanString(value) {
@@ -231,6 +233,7 @@ function buildProofUrls(requestUrl) {
   return {
     webhook_lead_capture_url: requestUrl ? buildFunctionUrl(requestUrl, "webhookLeadCapture") : "",
     twilio_status_webhook_url: requestUrl ? buildFunctionUrl(requestUrl, "receiveTwilioStatusWebhook") : "",
+    twilio_missed_call_webhook_url: requestUrl ? buildFunctionUrl(requestUrl, "receiveTwilioMissedCallWebhook") : "",
     resend_webhook_url: requestUrl ? buildFunctionUrl(requestUrl, "receiveResendWebhook") : "",
   };
 }
@@ -247,8 +250,9 @@ function buildLeadIngestionInstructions({ order, urls }) {
 function buildTwilioInstructions({ order, urls }) {
   const businessPhone = cleanString(buildInstallSnapshot(order).installConfiguration?.shared?.twilio_business_phone);
   return [
-    `In Twilio, point the voice status callback / missed-call webhook for ${businessPhone || "the configured Twilio number"} to ${urls.twilio_status_webhook_url}.`,
-    "A real missed call must produce a CommunicationEvent callback entry and then the canonical missed_call_text_back runtime trail.",
+    `Point SMS delivery/status callbacks for ${businessPhone || "the configured Twilio number"} to ${urls.twilio_status_webhook_url}.`,
+    `Point the missed-call / voice status callback for ${businessPhone || "the configured Twilio number"} to ${urls.twilio_missed_call_webhook_url || urls.twilio_status_webhook_url}.`,
+    "A real missed call must create a provider_callback CommunicationEvent before the canonical missed_call_text_back runtime trail continues.",
     "Delivery proof requires a Twilio status callback on the same provider_message_id that was returned from the live send event.",
   ];
 }
@@ -261,11 +265,29 @@ function buildResendInstructions({ urls }) {
   ];
 }
 
+function buildBookingCalendarInstructions({ booking }) {
+  return [
+    "Set booking mode to External Booking Link before recording live calendar proof.",
+    `Verify the booking handoff uses ${booking.booking_link || "the saved booking link"} and that a real appointment lands in the external calendar.`,
+    "Only record live calendar proof after confirming the booking exists outside the internal simulation path.",
+  ];
+}
+
+function buildReviewRequestInstructions({ review }) {
+  return [
+    "Set trigger event to appointment_completed or order_completed before recording live trigger proof.",
+    `Current selected channel is ${review.channel || "not set"} and current trigger is ${review.trigger_event || "not set"}.`,
+    "Only record live trigger proof after a real completion event produces the selected-channel review request in production.",
+  ];
+}
+
 function buildUnprovableNotes() {
   return [
     "A local simulation can prove runtime wiring, but it cannot prove external provider callback delivery.",
     "Missed-call live proof requires a real Twilio webhook request to the canonical receiveTwilioStatusWebhook endpoint.",
     "Resend callback proof requires an actual Resend webhook event, not just a successful outbound send.",
+    "AI Booking Agent live proof requires a real booking to appear in the external calendar, not just the internal booking simulation.",
+    "Review Request Automation live proof requires a real appointment_completed or order_completed trigger, not the simulation button.",
   ];
 }
 
@@ -378,7 +400,7 @@ async function loadPaidLinkedOrder(base44, orderId) {
   return order;
 }
 
-function buildMissingProofItems({ webhook, twilio, resend }) {
+function buildMissingProofItems({ webhook, twilio, resend, booking, review }) {
   const missing = [];
 
   if (webhook.derived_status !== PROVIDER_DEPLOYMENT_STATUS.LIVE_PROVIDER_PROOFED) {
@@ -398,6 +420,16 @@ function buildMissingProofItems({ webhook, twilio, resend }) {
   }
   if (resend.configured && !resend.last_callback) {
     missing.push("Resend delivery/open/bounce callback has not yet been observed for this order.");
+  }
+  if (booking?.enabled && booking.booking_mode !== "external_link") {
+    missing.push("AI Booking Agent is still configured as an internal placeholder; switch to External Booking Link before recording live calendar proof.");
+  } else if (booking?.enabled && booking.derived_status !== PROVIDER_DEPLOYMENT_STATUS.LIVE_PROVIDER_PROOFED) {
+    missing.push("AI Booking Agent has not been live-proven against a real external calendar flow.");
+  }
+  if (review?.enabled && !["appointment_completed", "order_completed"].includes(review.trigger_event)) {
+    missing.push("Review Request Automation is still configured for manual trigger; switch to appointment_completed or order_completed before recording live trigger proof.");
+  } else if (review?.enabled && review.derived_status !== PROVIDER_DEPLOYMENT_STATUS.LIVE_PROVIDER_PROOFED) {
+    missing.push("Review Request Automation has not been live-proven from a real completion trigger.");
   }
 
   return missing;
@@ -422,6 +454,31 @@ export function deriveOrderProviderProof({
 }) {
   const events = sortByCreatedDate(orderEvents.filter((event) => event.order_id === order.id));
   const urls = buildProofUrls(requestUrl);
+  const snapshot = buildInstallSnapshot(order);
+  const orderLike = {
+    ...order,
+    items: snapshot.normalizedItems,
+    install_configuration: snapshot.installConfiguration,
+  };
+  const hasService = (serviceKey) => snapshot.normalizedItems.some((item) => item.tracking_enabled && item.service_key === serviceKey);
+  const bookingEnabled = hasService("ai_booking_agent");
+  const reviewEnabled = hasService("review_request");
+  const bookingConfig = orderLike.install_configuration?.services?.ai_booking_agent || {};
+  const reviewConfig = orderLike.install_configuration?.services?.review_request || {};
+  const bookingValidation = bookingEnabled
+    ? validateServiceConfiguration({ orderLike, serviceKey: "ai_booking_agent" })
+    : null;
+  const reviewValidation = reviewEnabled
+    ? validateServiceConfiguration({ orderLike, serviceKey: "review_request" })
+    : null;
+  const bookingProofReady =
+    bookingEnabled &&
+    bookingValidation?.valid &&
+    cleanString(bookingConfig.booking_mode) === "external_link";
+  const reviewProofReady =
+    reviewEnabled &&
+    reviewValidation?.valid &&
+    ["appointment_completed", "order_completed"].includes(cleanString(reviewConfig.trigger_event));
 
   const latestLeadIngestionProof = getLatestMatchingEvent(events, (event) => isProofEvent(event, LEAD_INGESTION_WEBHOOK_PROOF_TYPE));
   const latestLeadIngestionTest = getLatestMatchingEvent(
@@ -506,6 +563,36 @@ export function deriveOrderProviderProof({
     latestLiveProof: latestEmailLiveProof,
     now,
   });
+  const latestBookingSimulation = getLatestMatchingEvent(
+    events,
+    (event) => event.service_key === "ai_booking_agent" && event.event_type === "booking_simulation_created"
+  );
+  const latestBookingLiveProof = getLatestMatchingEvent(
+    events,
+    (event) => isProofEvent(event, LIVE_BOOKING_CALENDAR_PROOF_TYPE)
+  );
+  const latestReviewSimulation = getLatestMatchingEvent(
+    events,
+    (event) => event.service_key === "review_request" && event.event_type === "review_request_trigger_simulated"
+  );
+  const latestReviewLiveProof = getLatestMatchingEvent(
+    events,
+    (event) => isProofEvent(event, LIVE_REVIEW_REQUEST_TRIGGER_PROOF_TYPE)
+  );
+  const bookingStatus = buildStatusSummary({
+    configured: bookingProofReady,
+    latestFailure: latestBookingLiveProof?.status === "failed" ? latestBookingLiveProof : null,
+    latestTest: latestBookingSimulation,
+    latestLiveProof: latestBookingLiveProof?.status !== "failed" ? latestBookingLiveProof : null,
+    now,
+  });
+  const reviewStatus = buildStatusSummary({
+    configured: reviewProofReady,
+    latestFailure: latestReviewLiveProof?.status === "failed" ? latestReviewLiveProof : null,
+    latestTest: latestReviewSimulation,
+    latestLiveProof: latestReviewLiveProof?.status !== "failed" ? latestReviewLiveProof : null,
+    now,
+  });
 
   const webhook = {
     ...webhookStatus,
@@ -524,6 +611,8 @@ export function deriveOrderProviderProof({
     ...twilioStatus,
     configured: twilioConfigured,
     callback_url: urls.twilio_status_webhook_url,
+    status_callback_url: urls.twilio_status_webhook_url,
+    missed_call_callback_url: urls.twilio_missed_call_webhook_url,
     order_business_phone: providerReadiness?.twilio?.order_business_phone || "",
     last_real_provider_send_attempt: toEventSummary(latestTwilioSendAttempt),
     last_live_sms_proof: toEventSummary(latestTwilioLiveProof),
@@ -543,21 +632,65 @@ export function deriveOrderProviderProof({
     last_opened_callback: toEventSummary(latestEmailOpened),
     last_bounced_callback: toEventSummary(latestEmailBounced),
   };
+  const booking = {
+    ...bookingStatus,
+    enabled: bookingEnabled,
+    configured: bookingProofReady,
+    booking_mode: cleanString(bookingConfig.booking_mode),
+    booking_link: cleanString(bookingConfig.booking_link),
+    proof_ready: bookingProofReady,
+    proof_prereq_reason:
+      !bookingEnabled
+        ? "AI Booking Agent is not part of this paid order."
+        : bookingValidation && !bookingValidation.valid
+        ? `Complete booking config first: ${bookingValidation.missing_labels.join(", ")}.`
+        : cleanString(bookingConfig.booking_mode) !== "external_link"
+        ? "Switch booking mode to External Booking Link before recording live calendar proof."
+        : "Booking proof can be recorded after a real external calendar booking is verified.",
+    last_booking_simulation: toEventSummary(latestBookingSimulation),
+    last_live_calendar_proof: toEventSummary(latestBookingLiveProof),
+  };
+  const review = {
+    ...reviewStatus,
+    enabled: reviewEnabled,
+    configured: reviewProofReady,
+    trigger_event: cleanString(reviewConfig.trigger_event),
+    channel: cleanString(reviewConfig.channel),
+    send_delay_minutes:
+      reviewConfig.send_delay_minutes == null ? null : Number(reviewConfig.send_delay_minutes),
+    proof_ready: reviewProofReady,
+    proof_prereq_reason:
+      !reviewEnabled
+        ? "Review Request Automation is not part of this paid order."
+        : reviewValidation && !reviewValidation.valid
+        ? `Complete review-request config first: ${reviewValidation.missing_labels.join(", ")}.`
+        : !["appointment_completed", "order_completed"].includes(cleanString(reviewConfig.trigger_event))
+        ? "Choose appointment_completed or order_completed before recording live trigger proof."
+        : "Review-request trigger proof can be recorded after a real completion event is verified.",
+    last_review_trigger_simulation: toEventSummary(latestReviewSimulation),
+    last_live_trigger_proof: toEventSummary(latestReviewLiveProof),
+  };
 
   return {
     webhook,
     twilio,
     resend,
+    booking,
+    review,
     instructions: {
       webhook_lead_capture: buildLeadIngestionInstructions({ order, urls }),
       twilio_missed_call: buildTwilioInstructions({ order, urls }),
       resend_webhook: buildResendInstructions({ urls }),
+      booking_calendar_sync: buildBookingCalendarInstructions({ booking }),
+      review_request_trigger: buildReviewRequestInstructions({ review }),
       cannot_be_proven_locally: buildUnprovableNotes(),
     },
     missing_live_proof_items: buildMissingProofItems({
       webhook,
       twilio,
       resend,
+      booking,
+      review,
     }),
   };
 }
@@ -576,6 +709,13 @@ export async function runOrderProviderProof({
 }) {
   const order = await loadPaidLinkedOrder(base44, orderId);
   const { settings } = await loadAdminSettings(base44);
+  const snapshot = buildInstallSnapshot(order);
+  const orderLike = {
+    ...order,
+    items: snapshot.normalizedItems,
+    install_configuration: snapshot.installConfiguration,
+  };
+  const hasTrackedService = (serviceKey) => snapshot.normalizedItems.some((item) => item.tracking_enabled && item.service_key === serviceKey);
 
   if (proofType === LEAD_INGESTION_WEBHOOK_PROOF_TYPE) {
     if (!cleanString(order.lead_ingestion_api_key) || !cleanString(order.lead_ingestion_webhook_secret)) {
@@ -833,6 +973,138 @@ export async function runOrderProviderProof({
         },
       });
     }
+  }
+
+  if (proofType === LIVE_BOOKING_CALENDAR_PROOF_TYPE) {
+    if (!payload?.confirmed) {
+      throw new ProviderProofError("Manual confirmation is required before recording live booking calendar proof", {
+        status: 409,
+        code: "provider_proof_confirmation_required",
+      });
+    }
+
+    if (!hasTrackedService("ai_booking_agent")) {
+      throw new ProviderProofError("AI Booking Agent is not included on this paid order", {
+        status: 409,
+        code: "provider_proof_booking_not_purchased",
+      });
+    }
+
+    const validation = validateServiceConfiguration({ orderLike, serviceKey: "ai_booking_agent" });
+    if (!validation.valid) {
+      throw new ProviderProofError("Complete AI Booking Agent configuration before recording live booking calendar proof", {
+        status: 409,
+        code: "provider_proof_booking_config_required",
+        details: { validation },
+      });
+    }
+
+    const bookingConfig = orderLike.install_configuration?.services?.ai_booking_agent || {};
+    if (cleanString(bookingConfig.booking_mode) !== "external_link") {
+      throw new ProviderProofError("AI Booking Agent must use External Booking Link mode before recording live calendar proof", {
+        status: 409,
+        code: "provider_proof_booking_external_mode_required",
+      });
+    }
+
+    const proofEvent = await createProofEvent({
+      base44,
+      order,
+      provider: "internal",
+      channel: "internal",
+      status: "processed",
+      subject: "AI Booking Agent live calendar proof recorded",
+      messageBody: "Operator confirmed a real external calendar booking for this paid order.",
+      proofKind: LIVE_BOOKING_CALENDAR_PROOF_TYPE,
+      proofMode: PROVIDER_PROOF_MODE.LIVE,
+      now,
+      serviceKey: "ai_booking_agent",
+      metadata: {
+        actor_email: actor?.email || null,
+        booking_link: cleanString(bookingConfig.booking_link),
+        booking_mode: cleanString(bookingConfig.booking_mode),
+        note: cleanString(payload.note) || null,
+      },
+    });
+
+    return {
+      proof_type: proofType,
+      mode: PROVIDER_PROOF_MODE.LIVE,
+      proof_event_id: proofEvent.id,
+      result: {
+        service_key: "ai_booking_agent",
+        booking_link: cleanString(bookingConfig.booking_link),
+        booking_mode: cleanString(bookingConfig.booking_mode),
+        recorded_manually: true,
+      },
+    };
+  }
+
+  if (proofType === LIVE_REVIEW_REQUEST_TRIGGER_PROOF_TYPE) {
+    if (!payload?.confirmed) {
+      throw new ProviderProofError("Manual confirmation is required before recording live review-request trigger proof", {
+        status: 409,
+        code: "provider_proof_confirmation_required",
+      });
+    }
+
+    if (!hasTrackedService("review_request")) {
+      throw new ProviderProofError("Review Request Automation is not included on this paid order", {
+        status: 409,
+        code: "provider_proof_review_request_not_purchased",
+      });
+    }
+
+    const validation = validateServiceConfiguration({ orderLike, serviceKey: "review_request" });
+    if (!validation.valid) {
+      throw new ProviderProofError("Complete Review Request Automation configuration before recording live trigger proof", {
+        status: 409,
+        code: "provider_proof_review_request_config_required",
+        details: { validation },
+      });
+    }
+
+    const reviewConfig = orderLike.install_configuration?.services?.review_request || {};
+    const triggerEvent = cleanString(reviewConfig.trigger_event);
+    if (!["appointment_completed", "order_completed"].includes(triggerEvent)) {
+      throw new ProviderProofError("Review Request Automation must use appointment_completed or order_completed before recording live trigger proof", {
+        status: 409,
+        code: "provider_proof_review_request_trigger_required",
+      });
+    }
+
+    const proofEvent = await createProofEvent({
+      base44,
+      order,
+      provider: "internal",
+      channel: cleanString(reviewConfig.channel) || "internal",
+      status: "processed",
+      subject: "Review Request Automation live trigger proof recorded",
+      messageBody: "Operator confirmed a real completion trigger produced the review-request flow for this paid order.",
+      proofKind: LIVE_REVIEW_REQUEST_TRIGGER_PROOF_TYPE,
+      proofMode: PROVIDER_PROOF_MODE.LIVE,
+      now,
+      serviceKey: "review_request",
+      metadata: {
+        actor_email: actor?.email || null,
+        trigger_event: triggerEvent,
+        channel: cleanString(reviewConfig.channel),
+        send_delay_minutes: reviewConfig.send_delay_minutes == null ? null : Number(reviewConfig.send_delay_minutes),
+        note: cleanString(payload.note) || null,
+      },
+    });
+
+    return {
+      proof_type: proofType,
+      mode: PROVIDER_PROOF_MODE.LIVE,
+      proof_event_id: proofEvent.id,
+      result: {
+        service_key: "review_request",
+        trigger_event: triggerEvent,
+        channel: cleanString(reviewConfig.channel),
+        recorded_manually: true,
+      },
+    };
   }
 
   throw new ProviderProofError("Unsupported provider proof type", {

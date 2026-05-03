@@ -12,30 +12,32 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    let access = null;
 
     if (!user) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (user.role !== 'admin') {
-      access = await resolveClientPortalAccess({
-        base44,
-        userEmail: user.email,
-      });
-      if (access.status !== 'resolved') {
-        return Response.json({ error: 'Forbidden' }, { status: 403 });
-      }
+    const access = await resolveClientPortalAccess({
+      base44,
+      userEmail: user.email,
+    });
+    if (access.status === 'ambiguous') {
+      return Response.json({ error: 'Multiple client portal projects matched this account.' }, { status: 409 });
+    }
+    if (access.status !== 'resolved' || !access.project) {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Fetch all leads created by or assigned to this user
-    const leads = await base44.asServiceRole.entities.Leads.list('-created_date', MAX_LEADS);
+    const leads = await base44.asServiceRole.entities.Leads.filter(
+      { client_project_id: access.project.id },
+      '-created_date',
+      MAX_LEADS
+    );
 
     if (!leads) {
       return Response.json({ active_leads: 0, appointments_booked: 0, missed_calls_recovered: 0 });
     }
 
-    // Filter leads - for now, show all leads (not filtered by user since we don't have user assignment)
     const activeLeads = leads.filter(
       (lead) => !['Booked', 'Closed'].includes(lead.status)
     );
@@ -44,8 +46,11 @@ Deno.serve(async (req) => {
       (lead) => lead.status === 'Booked'
     );
 
+    const missedCallEventQuery = access.order?.id
+      ? { order_id: access.order.id, service_key: 'missed_call_text_back', event_type: 'provider_send_succeeded' }
+      : { client_project_id: access.project.id, service_key: 'missed_call_text_back', event_type: 'provider_send_succeeded' };
     const missedCallEvents = await base44.asServiceRole.entities.CommunicationEvent.filter(
-      { service_key: 'missed_call_text_back', event_type: 'provider_send_succeeded' },
+      missedCallEventQuery,
       '-created_date',
       MAX_EVENTS
     );
@@ -55,10 +60,10 @@ Deno.serve(async (req) => {
       if (!Number.isFinite(createdAt) || createdAt < sevenDaysAgo) {
         return false;
       }
-      if (user.role === 'admin') {
-        return true;
+      if (access.order?.id) {
+        return event.order_id === access.order.id;
       }
-      return !!(access?.order?.id && event.order_id === access.order.id);
+      return event.client_project_id === access.project.id;
     }).length;
 
     return Response.json({

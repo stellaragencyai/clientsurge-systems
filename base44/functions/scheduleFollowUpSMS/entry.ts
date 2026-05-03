@@ -12,6 +12,17 @@ function minutesSince(isoDate) {
   return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60);
 }
 
+function getPhoenixHour(reference = new Date()) {
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Phoenix",
+      hour: "2-digit",
+      hour12: false,
+    }).format(reference)
+  );
+  return Number.isFinite(hour) ? hour : 0;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -68,6 +79,13 @@ Deno.serve(async (req) => {
           continue;
         }
 
+        const currentHour = getPhoenixHour();
+        if (currentHour < 8 || currentHour >= 20) {
+          console.log(`[scheduleFollowUpSMS] Outside business hours (hour=${currentHour}) — skipping lead ${lead.id}`);
+          results.skipped++;
+          continue;
+        }
+
         if (!lead.phone) {
           results.skipped++;
           continue;
@@ -92,10 +110,13 @@ Deno.serve(async (req) => {
 
         // Render message
         const businessName = settings.default_business_name || Deno.env.get("DEFAULT_BUSINESS_NAME") || "us";
-        const messageBody = smsTemplate
+        let messageBody = smsTemplate
           .replace(/{name}/g, lead.full_name || "there")
           .replace(/{business_name}/g, businessName)
           .replace(/{booking_link}/g, bookingLink);
+        if (!/\bstop\b/i.test(messageBody)) {
+          messageBody += "\n\nReply STOP to unsubscribe.";
+        }
 
         // Send via Twilio
         const params = { To: lead.phone, From: fromNumber, Body: messageBody };

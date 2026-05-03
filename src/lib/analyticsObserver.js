@@ -1,4 +1,5 @@
 import { base44 } from "@/api/base44Client";
+import { appParams } from "@/lib/app-params";
 
 /**
  * Initialize auto-tracking via data-track attributes
@@ -12,6 +13,10 @@ import { base44 } from "@/api/base44Client";
  */
 export function initializeAnalyticsObserver() {
   if (typeof window === "undefined" || typeof document === "undefined") {
+    return;
+  }
+
+  if (!appParams.hasBase44AppId) {
     return;
   }
 
@@ -85,6 +90,10 @@ export function initializeAnalyticsObserver() {
  * trackEvent("navbar", "book-demo", "click")
  */
 export function trackEvent(section, component, action = "click") {
+  if (!appParams.hasBase44AppId) {
+    return;
+  }
+
   const eventName = `${section}-${component}-${action}`;
 
   try {

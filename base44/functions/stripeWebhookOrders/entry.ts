@@ -25,6 +25,103 @@ function maskSecret(secret = "") {
   return `${secret.slice(0, 7)}...${secret.slice(-4)}`;
 }
 
+function cleanString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function parseMetadata(event) {
+  if (!event?.metadata_json) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(event.metadata_json);
+  } catch {
+    return {};
+  }
+}
+
+async function hasOrderNotificationBeenSent(base44, orderId, target) {
+  if (!orderId) {
+    return false;
+  }
+
+  const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
+    {
+      order_id: orderId,
+      channel: "email",
+      event_type: "email_sent",
+    },
+    "-created_date",
+    25
+  ).catch(() => []);
+
+  return events.some((event) => parseMetadata(event).target === target);
+}
+
+function buildCheckoutNotificationPayload(order = {}) {
+  const items = Array.isArray(order.items) ? order.items : [];
+  return {
+    order_id: order.id,
+    customer_name: order.customer_name || "",
+    customer_email: order.customer_email || "",
+    customer_phone: order.customer_phone || "",
+    business_name: order.business_name || "",
+    items: items.map((item) => ({
+      icon: item?.icon || "",
+      product_name: item?.product_name || item?.name || item?.service_key || item?.product_id || "Service",
+      name: item?.name || item?.product_name || item?.service_key || item?.product_id || "Service",
+      setup_fee: Number(item?.setup_fee || 0),
+      monthly_fee: Number(item?.monthly_fee || 0),
+    })),
+    total_setup: Number(order.total_setup || 0),
+    total_monthly: Number(order.total_monthly || 0),
+  };
+}
+
+async function dispatchCheckoutNotifications({ base44, order, requestId, eventId }) {
+  if (!order?.id) {
+    return;
+  }
+
+  const payload = buildCheckoutNotificationPayload(order);
+  const [customerConfirmationSent, adminPurchaseSent] = await Promise.all([
+    payload.customer_email
+      ? hasOrderNotificationBeenSent(base44, order.id, "order_confirmation")
+      : Promise.resolve(true),
+    hasOrderNotificationBeenSent(base44, order.id, "admin_purchase_notification"),
+  ]);
+
+  const notifications = [
+    !customerConfirmationSent && payload.customer_email
+      ? { functionName: "sendOrderConfirmationEmail", name: "order_confirmation" }
+      : null,
+    !adminPurchaseSent
+      ? { functionName: "sendAdminPurchaseNotification", name: "admin_purchase_notification" }
+      : null,
+  ].filter(Boolean);
+
+  for (const notification of notifications) {
+    try {
+      await base44.functions.invoke(notification.functionName, payload);
+      console.log("[stripeWebhookOrders] checkout notification dispatched", {
+        requestId,
+        eventId,
+        orderId: order.id,
+        notification: notification.name,
+      });
+    } catch (error) {
+      console.warn("[stripeWebhookOrders] checkout notification failed", {
+        requestId,
+        eventId,
+        orderId: order.id,
+        notification: notification.name,
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+}
+
 async function resolveStripeAccountSummary() {
   if (!stripe) {
     return {
@@ -134,12 +231,14 @@ Deno.serve(async (req) => {
 
     if (orders && orders.length > 0) {
       const order = orders[0];
+      let notificationOrder = order;
       try {
         const initialized = await initializePaidOrderInstallPipeline({
           base44,
           order,
           stripeCustomerId: customerId,
         });
+        notificationOrder = initialized.order;
         if (subscriptionId) {
           const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
             expand: ["items.data.price"],
@@ -170,6 +269,13 @@ Deno.serve(async (req) => {
           throw error;
         }
       }
+
+      await dispatchCheckoutNotifications({
+        base44,
+        order: notificationOrder,
+        requestId,
+        eventId: event.id,
+      });
     } else {
       console.warn("[stripeWebhookOrders] no order matched checkout.session.completed", {
         requestId,
