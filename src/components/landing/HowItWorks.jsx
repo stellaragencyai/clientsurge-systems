@@ -54,7 +54,7 @@ export default function HowItWorks() {
     >
       <div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse, rgba(161,120,35,0.12) 0%, transparent 70%)' }}
+        style={{ background: 'radial-gradient(ellipse, rgba(0,174,239,0.10) 0%, transparent 70%)' }}
       />
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -84,7 +84,7 @@ export default function HowItWorks() {
                         transition: `opacity 0.4s ease ${i * 0.15}s, transform 0.4s ease ${i * 0.15}s`,
                       }}
                     >
-                      <Icon className="w-6 h-6" strokeWidth={1.5} style={{ color: "#9a5c2e" }} />
+                      <Icon className="w-6 h-6" strokeWidth={1.5} style={{ color: "#0088CC" }} />
                     </div>
                   </div>
                 );
@@ -110,10 +110,10 @@ export default function HowItWorks() {
                   key={i}
                   className="flex gap-4 p-4 rounded-2xl"
                   style={{
-                    background: "linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,248,235,0.38) 100%)",
+                    background: "linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(240,249,255,0.38) 100%)",
                     backdropFilter: "blur(14px)",
                     WebkitBackdropFilter: "blur(14px)",
-                    border: "1px solid rgba(154,92,46,0.18)",
+                    border: "1px solid rgba(0,174,239,0.18)",
                     boxShadow: "0 4px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
                   }}
                 >

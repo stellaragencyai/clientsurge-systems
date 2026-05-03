@@ -306,10 +306,10 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
 
             <button
               type="submit"
-              style={{background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}
-              className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 focus:ring-2 focus:ring-primary focus:outline-none"
-              onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)"}
-              onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"}
+              style={{background:"linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(0,174,239,0.4)"}}
+              className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-white transition hover:opacity-90 focus:ring-2 focus:ring-primary focus:outline-none"
+              onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 40px rgba(0,174,239,0.6), 0 4px 18px rgba(0,174,239,0.4)"}
+              onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,174,239,0.4)"}
             >
               Next: Choose Time <ArrowRight className="w-4 h-4" />
             </button>
@@ -394,10 +394,10 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
               <button
                 type="submit"
                 disabled={saving || (Date.now() - lastSubmitTime < 3000 && lastSubmitTime > 0)}
-                style={{background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}
-                className="flex-1 h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-60 focus:ring-2 focus:ring-primary focus:outline-none"
-                onMouseEnter={(e) => !saving && (e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)")}
-                onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"}
+                style={{background:"linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(0,174,239,0.4)"}}
+                className="flex-1 h-12 flex items-center justify-center gap-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60 focus:ring-2 focus:ring-primary focus:outline-none"
+                onMouseEnter={(e) => !saving && (e.currentTarget.style.boxShadow = "0 8px 40px rgba(0,174,239,0.6), 0 4px 18px rgba(0,174,239,0.4)")}
+                onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,174,239,0.4)"}
               >
                 {saving ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</>
