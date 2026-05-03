@@ -839,12 +839,14 @@
 
 ---
 
-# 🧠 AI BRAIN EXPANSION — Tasks #401–#425
-### Added by Sam | 2026-05-03 | AI-Native Purchase → Provisioning → Website Generation Pipeline
 
-> These tasks define the complete autonomous AI loop:
-> Payment detected → Package identified → Services activated → Credentials collected → Website built → Client goes live
-> All tasks below are ⏳ Pending unless noted.
+---
+
+---
+
+# 🧠 AI PIPELINE — FULL EXPANSION — Tasks #401–#475
+### Sam | 2026-05-03 | Original 25 broken into sub-tasks + 50 new omissions filled
+### Sources: stripeWebhookOrders (295 lines), configureService (669 lines), installPipeline (288 lines + 1778-line shared lib), initializeInstallOS (263 lines), Order entity (537 lines), ClientInstallationOS schema, BusinessConfigTemplate schema
 
 ---
 
@@ -852,62 +854,196 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 401 | ⏳ | stripeWebhookOrders: after checkout.session.completed, auto-detect package tier by reading items[].source_package_key and write to Order.package_key — currently the field exists but is never auto-set by the webhook | CRITICAL |
-| 402 | ⏳ | Build AI package classifier: when an Order has no package_key (à la carte purchase), AI reads selected_service_keys array and infers the closest tier (starter/growth/elite) and writes it to Order.package_type — so the install pipeline always knows what tier to provision | HIGH |
-| 403 | ⏳ | stripeWebhookOrders: after setting package_key, immediately invoke initializeInstallOS — right now these two functions are disconnected and initializeInstallOS requires a manual trigger | CRITICAL |
-| 404 | ⏳ | sendOrderConfirmationEmail: make it package-aware — Starter clients get a "2 services activating" message, Growth gets "4 services", Elite gets "all 6 + bonus website" — currently sends a generic confirmation regardless of tier | HIGH |
-| 405 | ⏳ | After payment confirmed, fire sendAdminPurchaseNotification with full package details + client business name to Nolan's Telegram immediately — currently this function is deployed but not guaranteed to fire on every checkout.session.completed event | HIGH |
+| 401 | ⏳ | stripeWebhookOrders: on checkout.session.completed, read metadata.package_key from Stripe session and write to Order.package_key — field exists in schema but is NEVER auto-set by the webhook — entire downstream pipeline is blind without it | CRITICAL |
+| 401a | ⏳ | Sub-task: verify metadata.package_key is attached to the Stripe checkout session at the moment of creation in createCheckoutSession | CRITICAL |
+| 401b | ⏳ | Sub-task: add fallback — if metadata.package_key is missing, derive package_key from line items by matching price IDs against salesCatalog | HIGH |
+| 401c | ⏳ | Sub-task: write test case — create a mock checkout.session.completed event and assert Order.package_key is correctly set | HIGH |
+| 402 | ⏳ | Build classifyPurchasedPackage function — AI reads selected_service_keys[] on à la carte orders and maps to nearest tier: 2 services = starter, 4 = growth, 6 = elite. Write result to Order.package_type | HIGH |
+| 402a | ⏳ | Sub-task: define TIER_SERVICE_MAP constant with canonical service_key lists per tier | HIGH |
+| 402b | ⏳ | Sub-task: handle edge cases — client buys 3 services (map to Growth), 5 services (map to Elite minus 1, flag for admin review) | MEDIUM |
+| 402c | ⏳ | Sub-task: log classification decision with reasoning to AgentLog | MEDIUM |
+| 403 | ⏳ | stripeWebhookOrders: immediately after setting package_key, invoke initializeInstallOS — currently fully disconnected and requires manual trigger | CRITICAL |
+| 403a | ⏳ | Sub-task: wrap initializeInstallOS call in try/catch so a failure does NOT return 500 to Stripe (Stripe would retry infinitely) | CRITICAL |
+| 403b | ⏳ | Sub-task: log initializeInstallOS failure to AgentLog and fire Telegram alert to Nolan | HIGH |
+| 403c | ⏳ | Sub-task: add idempotency check — if ClientInstallationOS already exists for this order_id, skip creation silently | HIGH |
+| 404 | ⏳ | sendOrderConfirmationEmail: make email body package-aware — Starter = "2 AI systems activating", Growth = "4 systems", Elite = "all 6 + custom website being built" — currently sends generic confirmation | HIGH |
+| 404a | ⏳ | Sub-task: build 3 HTML email templates (one per tier) with service checklist rendered from Order.package_service_keys | HIGH |
+| 404b | ⏳ | Sub-task: build à la carte fallback template that lists individual services from Order.items[] | MEDIUM |
+| 404c | ⏳ | Sub-task: test all 4 variants (3 tiers + à la carte) with real order_id before going live | HIGH |
+| 405 | ⏳ | sendAdminPurchaseNotification: guarantee it fires on EVERY checkout.session.completed — add explicit call with tier, business name, total revenue, and deep link to admin order view | HIGH |
+| 405a | ⏳ | Sub-task: wire Telegram message — format: "💳 New Payment: [Business] — [Tier] — $[Setup] + $[Monthly]/mo" | HIGH |
+| 405b | ⏳ | Sub-task: wire backup email to nolan@clientsurgesystems.com in case Telegram fails | MEDIUM |
+| 426 | ⏳ | validateStripeWebhookSignature: confirm stripeWebhookOrders uses stripe.webhooks.constructEvent() with STRIPE_WEBHOOK_SECRET — if env var is missing, return 500 immediately not a silent pass | CRITICAL |
+| 427 | ⏳ | Add stripe_event_id idempotency check to stripeWebhookOrders — before processing any event, query Orders for existing stripe_event_id. If found, return 200 immediately — without this Stripe retries double-process payments | CRITICAL |
+| 428 | ⏳ | Handle checkout.session.expired in stripeWebhookOrders — set Order.payment_status = "expired" and send recovery email with a fresh checkout link | HIGH |
+| 429 | ⏳ | Handle customer.subscription.deleted in stripeWebhookOrders — set Order.status = "cancelled", billing_status = "cancelled", invoke runWinBackSequence, Telegram Nolan with MRR lost | HIGH |
+| 430 | ⏳ | Handle invoice.payment_failed properly — currently sets billing_status = "past_due" but does NOT send recovery email with Stripe hosted invoice URL — add sendMissedCallRecoveryEmail call with invoice link | HIGH |
 
 ---
 
-## SECTION T: CREDENTIALS INTAKE — The Missing Bridge Between Payment and Activation
+## SECTION T: CREDENTIALS INTAKE FORM
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 406 | ⏳ | Build a post-purchase credentials intake form at /setup/credentials — after payment, client is redirected here to provide: business phone number, booking platform URL, marketing platform (GHL/HubSpot/etc), existing website URL, Google Business Profile link, and preferred tone of voice | CRITICAL |
-| 407 | ⏳ | Credentials intake form must be package-aware — Starter clients see a 3-field short form; Growth clients see 6 fields; Elite clients see a full 10-field onboarding wizard with logo upload, brand colors, and target audience | HIGH |
-| 408 | ⏳ | On credentials form submission, write all fields into Order.install_configuration — this is the single source of truth that configureService reads from when activating each automation | CRITICAL |
-| 409 | ⏳ | Add a "Missing Credentials" alert in admin panel — if an Order is in status "Ready for Install" but install_configuration fields are incomplete after 24 hours, auto-send a reminder email + Telegram alert to Nolan | HIGH |
-| 410 | ⏳ | Build saveClientCredentials backend function — validates required fields per package tier, writes to Order.install_configuration, triggers installPipeline to advance from "intake_received" to "Ready for Install" | CRITICAL |
+| 406 | ⏳ | Build /setup/credentials page — post-purchase landing. Reads order_id from URL, confirms Order.payment_status = "paid", renders intake form. If order not found or unpaid, redirect to /pricing | CRITICAL |
+| 406a | ⏳ | Sub-task: build the /setup/credentials route in App.jsx | CRITICAL |
+| 406b | ⏳ | Sub-task: add order validation hook on page load — fetch Order, verify payment_status | HIGH |
+| 406c | ⏳ | Sub-task: add loading skeleton for the 200ms fetch delay before form renders | MEDIUM |
+| 407 | ⏳ | Build tiered credentials intake form — Starter: 3 fields (business phone, business name, booking link). Growth: 6 fields (add marketing platform, Google Business Profile URL, existing website). Elite: 10 fields (add logo upload, brand primary/secondary color, target audience, AI tone selector) | CRITICAL |
+| 407a | ⏳ | Sub-task: build the Starter 3-field form variant | HIGH |
+| 407b | ⏳ | Sub-task: build the Growth 6-field form variant | HIGH |
+| 407c | ⏳ | Sub-task: build Elite 10-field wizard with logo upload (Base44 private storage), hex color pickers with live swatch preview, and AI tone radio buttons (Professional / Warm / Energetic) | HIGH |
+| 407d | ⏳ | Sub-task: add sessionStorage persistence between wizard steps so page refresh doesn't lose data | MEDIUM |
+| 408 | ⏳ | On credentials submit, call saveClientCredentials which writes all fields into Order.install_configuration in the exact nested structure configureService expects | CRITICAL |
+| 408a | ⏳ | Sub-task: map business_phone → install_configuration.twilio_business_phone | CRITICAL |
+| 408b | ⏳ | Sub-task: map booking_link → install_configuration.booking.booking_link | CRITICAL |
+| 408c | ⏳ | Sub-task: map logo_url → install_configuration.brand.logo_url, primary_color → install_configuration.brand.primary_color | HIGH |
+| 408d | ⏳ | Sub-task: advance ClientInstallationOS.workflow_stage to "Ready for Install" after successful write | CRITICAL |
+| 409 | ⏳ | Build "Missing Credentials" daily automation — 9am MST. Queries Orders: payment_status=paid AND workflow_stage=intake_received AND created_date > 24h ago. Sends reminder email + Telegram per stalled client | HIGH |
+| 409a | ⏳ | Sub-task: write the reminder email template — warm, not alarming: "We're ready to activate your systems — we just need a few details" | HIGH |
+| 409b | ⏳ | Sub-task: create the Base44 scheduled automation triggering this check daily | HIGH |
+| 410 | ⏳ | Build saveClientCredentials backend function — validates required fields per tier with field-specific error messages, writes to Order.install_configuration, invokes installPipeline action=advance | CRITICAL |
+| 410a | ⏳ | Sub-task: define REQUIRED_FIELDS_BY_TIER constant — Starter: [business_phone, business_name, booking_link], Growth: +3, Elite: +4 | HIGH |
+| 410b | ⏳ | Sub-task: return structured validation errors: { field: "business_phone", message: "Required for Twilio SMS setup" } — not just a generic 400 | HIGH |
+| 410c | ⏳ | Sub-task: add admin_bypass flag — if caller is admin role, skip validation and write whatever is provided | MEDIUM |
+| 431 | ⏳ | Add multi-step progress bar to Elite intake form — "Step 1: Business Info → Step 2: Brand Assets → Step 3: Review & Confirm" — with sessionStorage persistence | MEDIUM |
+| 432 | ⏳ | Add hex color picker with live preview swatch to Elite form — brand.primary_color and brand.secondary_color stored in Order.install_configuration | MEDIUM |
+| 433 | ⏳ | Add Google Business Profile URL validator in intake form — must match google.com/maps or g.page pattern — used by generateClientWebsite to pull real business data | MEDIUM |
+| 434 | ⏳ | After credentials submission: redirect to /setup/status/[order_id] AND immediately send "We got your info — activating now" Resend confirmation email | HIGH |
 
 ---
 
-## SECTION U: SERVICE ACTIVATION ENGINE — AI-Driven Per-Package Provisioning
+## SECTION U: SERVICE ACTIVATION ENGINE
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 411 | ⏳ | installPipeline: add package-tier-aware activation map — when package_key = "starter_system", only activate instant_lead_response and missed_call_text_back; "growth_system" activates 4; "elite_system" activates all 6 — currently the pipeline activates whatever is in items[] with no tier gate | CRITICAL |
-| 412 | ⏳ | configureService: after successfully configuring each service, update the corresponding AutomationChecklistStep to status="complete" and fire a Telegram alert to Nolan — currently completes silently with no notification | HIGH |
-| 413 | ⏳ | Build AI service configuration generator: for each service being activated, AI reads the client's industry + business name + tone_of_voice from Order.install_configuration and auto-generates personalized SMS templates, email subject lines, and booking confirmation messages — writes them back into Order.install_configuration before configureService runs | CRITICAL |
-| 414 | ⏳ | autoProvisionTwilioNumber: wire it to fire automatically during installPipeline when twilio_business_phone is not yet set in install_configuration — currently it requires admin to manually trigger it | HIGH |
-| 415 | ⏳ | Build activateAllServices function — takes order_id, reads package_service_keys, calls configureService for each one in sequence with error handling and rollback — this is the "one-click activate all" function the Elite tier needs for full autonomous provisioning | CRITICAL |
+| 411 | ⏳ | installPipeline: add TIER_SERVICE_MAP gate — starter activates [instant_lead_response, missed_call_text_back]; growth adds [appointment_booking_ai, follow_up_sequences]; elite adds [review_request_automation, ai_receptionist] — currently no tier gate exists | CRITICAL |
+| 411a | ⏳ | Sub-task: define TIER_SERVICE_MAP as a shared constant accessible by both installPipeline and activateAllServices | HIGH |
+| 411b | ⏳ | Sub-task: add admin override — if admin manually triggers a service outside client's tier, log a warning but allow it | MEDIUM |
+| 412 | ⏳ | configureService: after each successful config, update AutomationChecklistStep.status = "complete" + completed_at timestamp + Telegram Nolan "Service configured for [Business]" | HIGH |
+| 412a | ⏳ | Sub-task: query AutomationChecklistStep by order_id + service_key to find the right record | HIGH |
+| 412b | ⏳ | Sub-task: handle gracefully if AutomationChecklistStep record doesn't exist — create it rather than failing | MEDIUM |
+| 413 | ⏳ | Build generateServiceTemplates function — AI personalization layer. Reads industry + business_name + tone_of_voice from Order.install_configuration. Generates personalized: instant SMS, missed call SMS, nurture Day 1 email, review request SMS. Writes to install_configuration | CRITICAL |
+| 413a | ⏳ | Sub-task: build OpenAI prompt for each of the 4 template types with tone + industry context | HIGH |
+| 413b | ⏳ | Sub-task: enforce 160-char hard limit on all SMS output with retry if exceeded | HIGH |
+| 413c | ⏳ | Sub-task: add character count validation and rejection before writing to install_configuration | MEDIUM |
+| 413d | ⏳ | Sub-task: add static fallback templates per industry if OpenAI call fails | HIGH |
+| 414 | ⏳ | autoProvisionTwilioNumber: trigger automatically in installPipeline when install_configuration.twilio_business_phone is empty — store provisioned number in Order + Telegram Nolan | HIGH |
+| 415 | ⏳ | Build activateAllServices function — reads package_service_keys, calls generateServiceTemplates first, then configureService for each service in sequence with per-service error handling and no full-halt on individual failure | CRITICAL |
+| 415a | ⏳ | Sub-task: sequential execution with individual try/catch per service | HIGH |
+| 415b | ⏳ | Sub-task: track partial success — write { service_key, status, error } array to Order.activation_errors | HIGH |
+| 415c | ⏳ | Sub-task: on full completion (all services attempted), call sendGoLiveNotification | HIGH |
+| 435 | ⏳ | Build sendGoLiveNotification function — fires when all package services confirmed active. Client email: "Your systems are live" + service list + portal login link. Telegram Nolan: "[Business] is LIVE — $[MRR]/mo active" | HIGH |
+| 436 | ⏳ | Add service activation retry logic — if configureService fails, wait 5min and retry once. If fails twice: mark error, create AgentLog entry, Telegram Nolan. Do not block other services | HIGH |
+| 437 | ⏳ | Build getActivationProgress function — returns { total_services, configured, live, errored, percent_complete } — used by admin install workspace AND client activation status page | HIGH |
+| 438 | ⏳ | Add activation_started_at and activation_completed_at timestamp fields to Order — currently install_initialized_at exists but no completion timestamp exists | MEDIUM |
 
 ---
 
-## SECTION V: WEBSITE GENERATION ENGINE — Package-Tier Website Builder
+## SECTION V: WEBSITE GENERATION ENGINE
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 416 | ⏳ | Build generateClientWebsite backend function — takes order_id, reads package_key + industry + install_configuration, and generates a structured website spec object: Starter = 1-page landing, Growth = 3-page site, Elite = 5-page interactive site with leads dashboard | CRITICAL |
-| 417 | ⏳ | Define the 3 website tiers as JSON templates per industry in BusinessConfigTemplate entity — Starter template: hero + CTA + contact form + 2 automation feature blocks; Growth template: + services page + about page + booking page; Elite template: + leads page + portal login + 6 automation showcases + ROI calculator | CRITICAL |
-| 418 | ⏳ | generateClientWebsite: for Elite tier, AI reads the client's business name, industry, and tone_of_voice and writes personalized hero headline, subheading, CTA text, and 3 proof points using LLM — all other copy can be templated | HIGH |
-| 419 | ⏳ | Add website_status field tracking to ClientInstallationOS — workflow_stage already has website_building/website_review/website_live enum values but nothing updates them automatically as the build progresses | HIGH |
-| 420 | ⏳ | Build client website preview page at /setup/preview/[order_id] — shows the AI-generated website spec with section layout, copy, and service feature list before the actual site is built — client can approve or request one revision | HIGH |
+| 416 | ⏳ | Build generateClientWebsite backend function — takes order_id, reads package_key + industry + install_configuration, returns structured WebsiteSpec object. Starter = 1-page, Growth = 3-page, Elite = 5-page interactive. Writes spec to WebsiteSpec entity | CRITICAL |
+| 416a | ⏳ | Sub-task: define WebsiteSpec JSON schema — pages array with sections, copy blocks, brand object | HIGH |
+| 416b | ⏳ | Sub-task: build the Starter 1-page spec generator (Hero + Problem + Solution + 2 Automation blocks + CTA + Footer) | HIGH |
+| 416c | ⏳ | Sub-task: build Growth 3-page spec (Home + Services + Book Now) | HIGH |
+| 416d | ⏳ | Sub-task: build Elite 5-page spec (Home + Services + Industry Landing + Client Portal Login + Lead Intelligence Dashboard) | HIGH |
+| 417 | ⏳ | Define 3 website tier templates per industry in BusinessConfigTemplate — 6 industries x 3 tiers = 18 template records. Seed via seedWebsiteTemplates function | CRITICAL |
+| 417a | ⏳ | Sub-task: write Starter template JSON for all 6 industries (med_spa, dental, hvac, chiropractic, roofing, contractors) | HIGH |
+| 417b | ⏳ | Sub-task: write Growth template JSON for all 6 industries | HIGH |
+| 417c | ⏳ | Sub-task: write Elite template JSON for all 6 industries | HIGH |
+| 417d | ⏳ | Sub-task: build seedWebsiteTemplates admin function with idempotency check | HIGH |
+| 418 | ⏳ | generateClientWebsite — Elite tier: call OpenAI to write hero headline, subheading, 3 proof points, primary CTA using { business_name, industry, tone_of_voice, target_audience } — store in WebsiteSpec.pages[0].copy | HIGH |
+| 419 | ⏳ | Auto-update ClientInstallationOS.workflow_stage as website build progresses through: intake_received → credentials_complete → templates_generating → website_building → website_review → website_approved → website_live — each transition writes a _at timestamp | HIGH |
+| 420 | ⏳ | Build /setup/preview/[order_id] page — shows AI-generated WebsiteSpec as visual mockup with section list, copy blocks, automation feature cards. Has Approve button and one-time Revision Request form | HIGH |
+| 420a | ⏳ | Sub-task: build the approve handler — sets WebsiteSpec.status = "approved", advances workflow_stage, Telegrams Nolan | HIGH |
+| 420b | ⏳ | Sub-task: build the revision request handler — saves revision_notes, marks revision_requested = true, disables the button after one use | MEDIUM |
+| 439 | ⏳ | Create WebsiteSpec entity schema — fields: order_id, package_key, industry, pages (array), brand (object with logo_url/primary_color/secondary_color/fonts), status enum (draft/approved/building/live), revision_requested (bool), revision_notes, approved_at, built_at | CRITICAL |
+| 440 | ⏳ | After client approves WebsiteSpec, auto-Telegram Nolan with spec summary and deep link to admin order view — Nolan clicks "Start Build" in admin to begin construction | HIGH |
+| 441 | ⏳ | Build applyWebsiteSpec admin function — converts WebsiteSpec JSON into a structured, pasteable Base44 editor prompt with exact component names, copy, brand colors, section order — writes to AgentLog | HIGH |
+| 442 | ⏳ | Build AI website copy finalizer — if client submitted revision_notes, AI regenerates only the affected sections, re-saves to WebsiteSpec, marks status = "approved" | MEDIUM |
 
 ---
 
-## SECTION W: ELITE TIER — PERKS + FULL AUTOMATION LOOP
+## SECTION W: ELITE TIER PERKS
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 421 | ⏳ | Elite tier perk #1 — AI-Written Lead Magnets: after activation, AI generates 3 industry-specific lead magnet PDFs (e.g. "The Med Spa Owner's Guide to Automating Client Re-engagement") and delivers them to client via portal — build generateLeadMagnet function | HIGH |
-| 422 | ⏳ | Elite tier perk #2 — Monthly AI Performance Report: build generateMonthlyPerformanceReport function — runs on 1st of month, pulls CommunicationEvent data, summarizes leads contacted, response rate, bookings created, revenue attributed, and emails + portals it to the client | HIGH |
-| 423 | ⏳ | Elite tier perk #3 — AI Receptionist Voice Clone Setup: after Elite payment confirmed, send client a Retell AI voice clone intake form requesting a 2-minute audio sample — store recording URL in Order.install_configuration.voice_sample_url and create a task for Nolan to complete the clone setup | HIGH |
-| 424 | ⏳ | Build the full AI activation status dashboard in ClientPortal — shows a live stepper: Payment Confirmed → Credentials Received → Services Configuring → Website Building → All Systems Live — each step reads from real ClientInstallationOS.workflow_stage field | CRITICAL |
-| 425 | ⏳ | Build end-to-end integration test for the full AI pipeline: payment event → package detection → initializeInstallOS → credentials intake → configureService × N → generateClientWebsite → sendPortalWelcomeEmail → client portal loads with live data — run this test for each of the 3 tiers separately and log results to AgentLog | CRITICAL |
+| 421 | ⏳ | Build generateLeadMagnet function — Elite perk #1. OpenAI generates 600-800 word industry lead magnet in markdown, converts to PDF, uploads to private storage, creates Files entity record, sends portal notification | HIGH |
+| 421a | ⏳ | Sub-task: generate 3 lead magnets (one per major pain point per industry) not just 1 | HIGH |
+| 421b | ⏳ | Sub-task: convert markdown to PDF and upload to Base44 private storage | HIGH |
+| 421c | ⏳ | Sub-task: create Files entity record linked to order_id and notify client via portal | MEDIUM |
+| 422 | ⏳ | Build generateMonthlyPerformanceReport function — Elite perk #2. Runs 1st of month. Queries CommunicationEvent + Lead + Order for client's project. Calculates: leads responded, response rate, bookings, revenue attributed, avg response time. Renders HTML report, emails client, saves to Reports entity | HIGH |
+| 422a | ⏳ | Sub-task: build the data queries per metric | HIGH |
+| 422b | ⏳ | Sub-task: build HTML report template with metric cards | HIGH |
+| 422c | ⏳ | Sub-task: create Reports entity and save report record | MEDIUM |
+| 422d | ⏳ | Sub-task: create monthly 1st-of-month scheduled automation | HIGH |
+| 423 | ⏳ | Build Elite voice clone intake flow — perk #3. After Elite payment, email client a Retell AI recording link. On receipt, store voice_sample_url in Order.install_configuration, create AutomationChecklistStep "Voice Clone Pending", Telegram Nolan | HIGH |
+| 424 | ⏳ | Build /setup/status/[order_id] activation tracker — polls ClientInstallationOS.workflow_stage every 30 seconds. Shows vertical stepper: Payment Confirmed → Credentials Received → Systems Configuring → Website Building → All Live. Shows timestamps per step. Shows spinner on current step. Error state shows support CTA | CRITICAL |
+| 424a | ⏳ | Sub-task: build 30-second polling with useInterval hook | HIGH |
+| 424b | ⏳ | Sub-task: build the stepper component with 5 stages reading real workflow_stage field | HIGH |
+| 424c | ⏳ | Sub-task: build error state with "Contact Support" button that opens SupportChat | MEDIUM |
+| 425 | ⏳ | Build runFullPipelineTest admin function — simulates complete purchase for each of 3 tiers using QA fixture client. Tests: webhook → package_key set → initializeInstallOS → credentials write → generateServiceTemplates → configureService x N → generateClientWebsite → sendGoLiveNotification. Logs to AgentLog. Telegrams Nolan with pass/fail per step | CRITICAL |
+| 425a | ⏳ | Sub-task: build Starter tier test fixture and assertion set | HIGH |
+| 425b | ⏳ | Sub-task: build Growth tier test fixture | HIGH |
+| 425c | ⏳ | Sub-task: build Elite tier test fixture including website generation step | HIGH |
+| 443 | ⏳ | Elite perk #4 — generateCompetitorAudit: AI fetches top 3 local competitors via Google Places API, analyzes reviews + response speed, generates "Your Competitive Advantage" PDF report, delivers to client portal within 48h of go-live | HIGH |
+| 444 | ⏳ | Elite perk #5 — generateSocialStarterPack: AI generates 10 ready-to-post social captions in client's tone (5 lead gen + 5 social proof), formats as PDF, delivers to portal | MEDIUM |
+| 445 | ⏳ | Elite perk #6 — wire autoSchedule30DayCheckin to fire automatically for Elite clients at day 30 — process recording, generate AI summary of "what's working / what to optimize", deliver to portal | HIGH |
 
 ---
 
-*AI Brain Expansion added by Sam (AI Agent) — 2026-05-03.*
-*Sources: Order.jsonc (537 lines), initializeInstallOS, configureService, installPipeline (1778 lines), stripeWebhookOrders, BusinessConfigTemplate, ClientInstallationOS schemas.*
-*These 25 tasks define the autonomous client activation pipeline that transforms ClientSurge from a manual agency into a self-provisioning AI platform.*
+## SECTION X: AI INTELLIGENCE LOOP
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 446 | ⏳ | Build detectPackageUpgradeOpportunity — weekly check. Growth clients with >20 leads/week for 2+ weeks get an AI-written Elite upgrade pitch. Starter clients at >80% utilization get a Growth pitch | HIGH |
+| 447 | ⏳ | Build predictOptimalSendTime — AI analyzes CommunicationEvent reply rates by hour-of-day per client's lead base. Writes optimal_send_hour to ClientProject. Used by follow-up scheduler instead of fixed 10am | HIGH |
+| 448 | ⏳ | Build generatePersonalizedFollowUp — replaces static Day 3/Day 7 templates. AI reads lead interaction history + email open status + page visited + lead score and writes a unique follow-up email per lead | HIGH |
+| 449 | ⏳ | Build analyzeClientLeadQuality — monthly per client. Score distribution, industry breakdown, conversion rate, days to book. Identifies dead segments. Recommends re-engagement. Writes to LeadAnalytics entity | MEDIUM |
+| 450 | ⏳ | Build autoOptimizeSMSTemplates — A/B test engine. Maintains 2 SMS template variants per service. After 50 sends each, picks winner by reply rate. Writes winning variant as active template in Order.install_configuration | MEDIUM |
+| 451 | ⏳ | Build detectLeadGhostingPattern — identifies leads who opened Day 1 but never replied. After Day 7 silence, sends AI-generated "pattern break" message (different tone, shorter). If still no reply by Day 14, archives lead | HIGH |
+| 452 | ⏳ | Wire processCallRecording output to automationOrchestrator — when Twilio call AI extracts buying signals + action items, orchestrator decides next action automatically (book / follow up / qualify / archive) | HIGH |
+| 453 | ⏳ | Build clientHealthScore function — composite score: automation uptime + lead response rate + booking conversion + payment health + portal engagement. 0-100. Runs weekly. Writes to ClientProject.health_score. Clients below 60 trigger proactive outreach | HIGH |
+| 454 | ⏳ | Build generateAIOnboardingBriefing — fires when workflow_stage advances to activation_ready. AI generates "Nolan's Briefing" doc: who the client is, what's set up, what's pending, suggested go-live call talking points. Delivered to Telegram + AgentLog | HIGH |
+| 455 | ⏳ | Upgrade intelligentLeadRouting — replace simple rules in routeLead with AI: reads lead industry, message tone, urgency signals, business size. Routes to correct AutomationWorkflowPreset (hot_lead_express / nurture_and_qualify / win_back / standard) | MEDIUM |
+
+---
+
+## SECTION Y: ADMIN AI TOOLS
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 456 | ⏳ | Build admin "AI Audit" button per order in InstallOrderWorkspace — calls getActivationProgress + checks template registration + verifies Twilio number + checks last SMS/email sent. Returns full health report in a modal | HIGH |
+| 457 | ⏳ | AILeadInsightPanel: verify it calls scoreLeadIntelligence and predictLeadOutcome with real data — if using mock data, wire to real functions | HIGH |
+| 458 | ⏳ | Add "Next Best Action" card to admin lead detail — shows decideNextAction recommendation with reasoning + one-click Execute button that fires the recommended action | HIGH |
+| 459 | ⏳ | Build adminAICommandBar — natural language command input in admin panel. Nolan types "rescore all med spa leads" or "send win-back to churned clients" and AI calls the appropriate backend function | MEDIUM |
+| 460 | ⏳ | Build AI anomaly detection in getAdminAnalytics — auto-flag: lead volume drop >30% WoW, client reply rate below 10%, any automation with 0 triggers in 48h. Telegram Nolan specific anomalies, not just raw numbers | HIGH |
+
+---
+
+## SECTION Z: MISSING INFRASTRUCTURE
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 461 | ⏳ | Create WebsiteSpec entity schema — order_id, package_key, industry, pages (array), brand (object), status enum (draft/approved/building/live), revision_requested (bool), revision_notes, approved_at, built_at | CRITICAL |
+| 462 | ⏳ | Create Reports entity schema — order_id, client_email, report_month, leads_contacted, response_rate, bookings_created, revenue_attributed, avg_response_time_minutes, report_html, delivered_at | MEDIUM |
+| 463 | ⏳ | Add health_score field (numeric 0-100) to ClientProject entity — populated weekly by clientHealthScore | MEDIUM |
+| 464 | ⏳ | Add voice_sample_url + voice_clone_status enum to Order.install_configuration schema — status: not_started / recording_requested / recording_received / clone_in_progress / clone_live | HIGH |
+| 465 | ⏳ | Add optimal_send_hour field (integer 0-23) to ClientProject — populated by predictOptimalSendTime — used to schedule Day 3 and Day 7 at each client's best time | MEDIUM |
+| 466 | ⏳ | Add ab_test_variant field to MessageTemplate entity — tracks A or B variant for autoOptimizeSMSTemplates | MEDIUM |
+| 467 | ⏳ | Add website_spec_id field to ClientInstallationOS — links to WebsiteSpec record for one-lookup access from admin and portal | HIGH |
+| 468 | ⏳ | Build seedWebsiteTemplates admin function — populates BusinessConfigTemplate with all 18 website tier records. Idempotent: skips if record already exists for industry+tier combo | HIGH |
+| 469 | ⏳ | Add pipeline_version field to ClientInstallationOS — tracks which version of install pipeline was used. Prevents in-progress installs from breaking when pipeline is updated | MEDIUM |
+| 470 | ⏳ | Build migrateInstallOS admin function — when pipeline templates are updated, backfills new checklist steps to all active ClientInstallationOS records without disturbing completed steps | MEDIUM |
+| 471 | ⏳ | Add activation_errors array field to Order — stores { service_key, error_message, failed_at, retry_count } per failed service. Surfaces in admin install workspace | HIGH |
+| 472 | ⏳ | Build getSystemHealthDashboard admin function — single call returns: Stripe webhook last received, Twilio last SMS sent, Resend last email sent, active automation count, orders in progress count, clients live count | HIGH |
+| 473 | ⏳ | Wire healthCheck function to 6-hour scheduled automation — compares to last run, Telegrams Nolan on degradation, writes results to AgentLog | HIGH |
+| 474 | ⏳ | Build clientOffboardingAI — on subscription.deleted: generates personalized 3-email win-back sequence, schedules via Resend, creates LeadReactivation record for 30-day re-entry into pipeline | HIGH |
+| 475 | ⏳ | Build generatePackageComparisonEmail — triggered at day 60 for Starter and Growth clients. AI generates personalized upgrade email with real account metrics showing what they're missing. Drives organic tier upgrades | HIGH |
+
+---
+
+*AI Pipeline Full Expansion — Tasks #401–#475 (75 tasks + 30 sub-tasks)*
+*Added by Sam (AI Agent) — 2026-05-03*
