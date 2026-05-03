@@ -219,6 +219,37 @@
       "title": "Max Follow-Up Attempts",
       "default": 6,
       "description": "Stop automation after N total attempts"
+    },
+    "voice_calls_enabled": {
+      "type": "boolean",
+      "title": "AI Voice Calls Enabled",
+      "default": false,
+      "description": "When true, HOT leads (score \u226575) receive an ElevenLabs outbound voice call within 5 minutes"
+    },
+    "elevenlabs_agent_ids": {
+      "type": "object",
+      "title": "ElevenLabs Agent IDs (per industry)",
+      "description": "Maps industry_key \u2192 ElevenLabs agent_id. Set by createElevenLabsAgent admin function.",
+      "properties": {
+        "med_spa": {
+          "type": "string"
+        },
+        "dental": {
+          "type": "string"
+        },
+        "chiropractic": {
+          "type": "string"
+        },
+        "hvac": {
+          "type": "string"
+        },
+        "roofing": {
+          "type": "string"
+        },
+        "contractors": {
+          "type": "string"
+        }
+      }
     }
   },
   "required": []
