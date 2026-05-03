@@ -143,7 +143,7 @@ export default function ProductCard({ product }) {
           gap: 4px;
           font-size: 24px;
           font-weight: 900;
-          color: #9a5c2e;
+          color: #000000;
           line-height: 1;
           margin-bottom: 4px;
         }
