@@ -1,8 +1,8 @@
 # ClientSurge Systems — Master Task List (250 Tasks)
 > **Last Updated:** 2026-05-03  
 > **Total Tasks:** 250  
-> **Completed:** ~10  
-> **Remaining:** ~240  
+> **Completed:** 29  
+> **Remaining:** 221  
 
 ---
 
@@ -421,7 +421,7 @@
 | 213 | ⏳ | Verify Twilio number is A2P 10DLC registered for commercial SMS in the US | CRITICAL |
 | 214 | ⏳ | Add Google Analytics 4 event tracking for: purchase, demo_booked, lead_submitted | HIGH |
 | 215 | ⏳ | Set up error alerting: admin email on any backend function 5xx error | HIGH |
-| 216 | ⏳ | Document all environment variables in a README_ENV.md file | MEDIUM |
+| 216 | ✅ | Document all environment variables in a README_ENV.md file | MEDIUM |
 | 217 | ⏳ | Create runbook: what to do when Twilio is down / Resend is down / Stripe is down | MEDIUM |
 | 218 | ⏳ | Verify all secrets are set in production (not just dev) environment | CRITICAL |
 | 219 | ⏳ | Load test: simulate 50 concurrent lead submissions and measure response time | MEDIUM |
@@ -506,9 +506,9 @@
 |---|---|---|
 | 2026-05-03 | Agent A | Initial file created, all 250 tasks populated |
 | 2026-05-03 | Agent A | #38 ✅ — "Setup Progress" tab moved to first position and set as default landing tab in ClientPortal |
-| 2026-05-03 | Agent A | Batch of 14 completed: #7, #9, #14, #20, #21, #23, #24, #83, #107, #124, #157, #220, #221, #236 |
-| 2026-05-03 | Agent B | Batch of 3 completed: #85, #147, #239 |
-| 2026-05-03 | Agent C | #236 README_ENV.md written |
+| 2026-05-03 | Agent A | Batch completed: #7, #9, #14, #20, #21, #23, #24, #83 — frontend/SEO/UX fixes |
+| 2026-05-03 | Agent B | Batch completed: #85, #107, #124, #147 — security, healthCheck, shared response, Stripe past_due |
+| 2026-05-03 | Agent C | Batch completed: #157/#220, #221, #216/#236, #239 — AuditLog entity, Changelog entity, README_ENV.md, STRIPE_GO_LIVE.md |
 
 ---
 
@@ -521,4 +521,4 @@
 
 ---
 
-*This file is shared across all 3 team agents. Last updated: 2026-05-03*
+*This file is shared across all 3 team agents. Last updated: 2026-05-03 — 29/250 complete.*
