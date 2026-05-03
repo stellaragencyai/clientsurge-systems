@@ -37,6 +37,12 @@ export default function CartSidebar() {
     setError("");
     setStep("loading");
 
+    // Timeout fallback — reset if Stripe redirect takes too long
+    const timeoutId = setTimeout(() => {
+      setStep("info");
+      setError("Checkout timed out. Please try again.");
+    }, 12000);
+
     if (window.self !== window.top) {
       // Silently redirect to the live site if inside iframe preview
       window.open(window.location.href, "_blank");
@@ -56,6 +62,7 @@ export default function CartSidebar() {
       });
 
       if (response.data?.url) {
+        clearTimeout(timeoutId);
         // Save order summary so OrderSuccess can display what was purchased
         try {
           sessionStorage.setItem("clientsurge:last-order", JSON.stringify({
@@ -68,9 +75,11 @@ export default function CartSidebar() {
         return;
       }
 
+      clearTimeout(timeoutId);
       setError("Could not start checkout. Please try again.");
       setStep("info");
     } catch (e) {
+      clearTimeout(timeoutId);
       setError(e.message || "Checkout failed.");
       setStep("info");
     }

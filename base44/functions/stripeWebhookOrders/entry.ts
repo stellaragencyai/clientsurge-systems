@@ -197,6 +197,27 @@ Deno.serve(async (req) => {
           });
         }
 
+        // ── Admin notification on new purchase ────────────────────────────────
+        try {
+          await base44.asServiceRole.functions.invoke("sendAdminLeadNotification", {
+            lead: {
+              full_name: session.metadata?.customer_name || order.customer_name,
+              email: session.customer_details?.email || order.customer_email,
+              phone: order.customer_phone || "",
+              business_name: session.metadata?.business_name || order.business_name,
+              source: "Stripe Checkout",
+            },
+            subject: `💰 New Purchase: ${session.metadata?.business_name || order.business_name}`,
+            extra_context: `Order ID: ${order.id} | Setup: $${order.total_setup} | Monthly: $${order.total_monthly}/mo | Services: ${(order.items || []).map((i) => i.product_name).join(", ")}`,
+          });
+          console.log("[stripeWebhookOrders] admin notification sent", { orderId: order.id });
+        } catch (adminErr) {
+          console.error("[stripeWebhookOrders] admin notification failed", {
+            orderId: order.id,
+            error: adminErr instanceof Error ? adminErr.message : String(adminErr),
+          });
+        }
+
       } catch (error) {
         console.error("[stripeWebhookOrders] pipeline init failed", {
           requestId, eventId: event.id, orderId: order.id,

@@ -320,7 +320,7 @@ function StoreInner() {
                   fontWeight: "800",
                   lineHeight: 1.08,
                   letterSpacing: "-0.035em",
-                  color: "rgba(245,225,195,0.95)",
+                  color: "#1b140d",
                   marginBottom: "8px"
                 }}>
                 
@@ -341,7 +341,7 @@ function StoreInner() {
               <p
                 style={{
                   fontSize: "0.9rem",
-                  color: "rgba(220,190,150,0.65)",
+                  color: "rgba(27,20,13,0.72)",
                   lineHeight: 1.6,
                   maxWidth: "620px",
                   margin: "0 auto 12px"
@@ -537,7 +537,7 @@ function StoreInner() {
                   type="text"
                   placeholder="Search services..."
                   value={searchInput}
-                  onChange={(event) => setSearch(event.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   style={{
                     width: "100%",
                     borderRadius: "9999px",

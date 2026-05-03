@@ -247,13 +247,14 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
             <button
               onClick={handleToggle}
               disabled={product?.coming_soon || product?.checkout_enabled === false}
-              style={(product?.coming_soon || product?.checkout_enabled === false) ? { opacity: 0.45, cursor: "not-allowed" } : {}}
               style={{
                 width: "100%", borderRadius: "9999px", padding: "2px",
                 background: inCart
                   ? "linear-gradient(135deg,#22c55e,#16a34a)"
                   : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                border: "none", cursor: "pointer",
+                border: "none",
+                cursor: (product?.coming_soon || product?.checkout_enabled === false) ? "not-allowed" : "pointer",
+                opacity: (product?.coming_soon || product?.checkout_enabled === false) ? 0.45 : 1,
                 boxShadow: inCart ? "0 6px 20px rgba(34,197,94,0.35)" : "0 6px 22px rgba(120,70,20,0.35)",
               }}
             >
