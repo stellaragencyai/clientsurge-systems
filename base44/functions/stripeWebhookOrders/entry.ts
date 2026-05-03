@@ -180,7 +180,7 @@ Deno.serve(async (req) => {
 
         // ── Customer confirmation email ────────────────────────────────────────
         try {
-          await base44.asServiceRole.functions.invoke("sendLeadConfirmationEmail", {
+          await base44.asServiceRole.functions.invoke("sendOrderConfirmationEmail", {
             customer_email: session.customer_details?.email || order.customer_email,
             customer_name: session.metadata?.customer_name || order.customer_name,
             business_name: session.metadata?.business_name || order.business_name,
@@ -189,30 +189,29 @@ Deno.serve(async (req) => {
             total_setup: order.total_setup,
             total_monthly: order.total_monthly,
           });
-          console.log("[stripeWebhookOrders] confirmation email sent", { orderId: order.id });
+          console.log("[stripeWebhookOrders] customer confirmation email sent", { orderId: order.id });
         } catch (emailError) {
-          console.error("[stripeWebhookOrders] confirmation email failed", {
+          console.error("[stripeWebhookOrders] customer confirmation email failed", {
             orderId: order.id,
             error: emailError instanceof Error ? emailError.message : String(emailError),
           });
         }
 
-        // ── Admin notification on new purchase ────────────────────────────────
+        // ── Admin purchase notification ────────────────────────────────────────
         try {
-          await base44.asServiceRole.functions.invoke("sendAdminLeadNotification", {
-            lead: {
-              full_name: session.metadata?.customer_name || order.customer_name,
-              email: session.customer_details?.email || order.customer_email,
-              phone: order.customer_phone || "",
-              business_name: session.metadata?.business_name || order.business_name,
-              source: "Stripe Checkout",
-            },
-            subject: `💰 New Purchase: ${session.metadata?.business_name || order.business_name}`,
-            extra_context: `Order ID: ${order.id} | Setup: $${order.total_setup} | Monthly: $${order.total_monthly}/mo | Services: ${(order.items || []).map((i) => i.product_name).join(", ")}`,
+          await base44.asServiceRole.functions.invoke("sendAdminPurchaseNotification", {
+            customer_name: session.metadata?.customer_name || order.customer_name,
+            customer_email: session.customer_details?.email || order.customer_email,
+            customer_phone: order.customer_phone || "",
+            business_name: session.metadata?.business_name || order.business_name,
+            order_id: order.id,
+            items: order.items || [],
+            total_setup: order.total_setup,
+            total_monthly: order.total_monthly,
           });
-          console.log("[stripeWebhookOrders] admin notification sent", { orderId: order.id });
+          console.log("[stripeWebhookOrders] admin purchase notification sent", { orderId: order.id });
         } catch (adminErr) {
-          console.error("[stripeWebhookOrders] admin notification failed", {
+          console.error("[stripeWebhookOrders] admin purchase notification failed", {
             orderId: order.id,
             error: adminErr instanceof Error ? adminErr.message : String(adminErr),
           });
