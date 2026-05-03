@@ -657,10 +657,10 @@ function StoreInner() {
               href="/book"
               style={{
                 display: "inline-flex", alignItems: "center", gap: "6px",
-                background: "linear-gradient(135deg, #7a4825, #c8965c)",
-                color: "#fff8ee", fontWeight: "700", fontSize: "13px",
+                background: "linear-gradient(135deg, #0088CC, #00AEEF)",
+                color: "#ffffff", fontWeight: "700", fontSize: "13px",
                 padding: "10px 22px", borderRadius: "999px", textDecoration: "none",
-                boxShadow: "0 4px 14px rgba(154,92,46,0.25)"
+                boxShadow: "0 4px 14px rgba(0,174,239,0.35)"
               }}>
               
                📞 Book a free 15-min strategy call
