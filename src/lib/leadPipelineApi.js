@@ -17,12 +17,6 @@ export async function fetchLeadPipelineSummary(filters = {}) {
   if (Array.isArray(data.leads)) {
     data.leads = [...data.leads].sort((a, b) => (b.lead_score ?? 0) - (a.lead_score ?? 0));
   }
-  if (Array.isArray(data.summary?.priority_queue)) {
-    data.summary.priority_queue = [...data.summary.priority_queue].sort(
-      (a, b) => (b.lead_score ?? 0) - (a.lead_score ?? 0)
-    );
-  }
-
   return data;
 }
 

@@ -32,3 +32,28 @@ export async function requireAdminUser(base44) {
 
   return user;
 }
+
+export async function requireAdminUserOrAutomation(base44) {
+  let user = null;
+
+  try {
+    user = await base44.auth.me();
+  } catch (_) {
+    user = null;
+  }
+
+  // Base44 scheduled/entity automation calls currently arrive without a user.
+  // Allow those through, but fail closed for any authenticated non-admin caller.
+  if (!user) {
+    return null;
+  }
+
+  if (user.role !== "admin") {
+    throw new AuthGuardError("Admin access required", {
+      status: 403,
+      code: "admin_access_required",
+    });
+  }
+
+  return user;
+}

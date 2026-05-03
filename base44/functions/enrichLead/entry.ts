@@ -15,10 +15,43 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { AuthGuardError, requireAdminUserOrAutomation } from "../_shared/authGuards.js";
+
+function normalizeUrl(value) {
+  if (!value || typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+
+  try {
+    const parsed = new URL(withProtocol);
+    return ["http:", "https:"].includes(parsed.protocol) ? parsed.toString() : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function normalizeSocialProfiles(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+
+  const normalized = {};
+  for (const [key, rawUrl] of Object.entries(value)) {
+    const safeUrl = normalizeUrl(rawUrl);
+    if (safeUrl) {
+      normalized[key] = safeUrl;
+    }
+  }
+
+  return Object.keys(normalized).length ? normalized : null;
+}
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    await requireAdminUserOrAutomation(base44);
     const body = await req.json().catch(() => ({}));
 
     // Support automation payload shape AND direct { lead_id } call
@@ -105,13 +138,15 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
       update.industry_tags = enriched.industry_tags.slice(0, 8); // cap at 8 tags
     }
 
-    if (enriched.social_profiles && typeof enriched.social_profiles === "object") {
-      update.social_profiles = enriched.social_profiles;
+    const socialProfiles = normalizeSocialProfiles(enriched.social_profiles);
+    if (socialProfiles) {
+      update.social_profiles = socialProfiles;
     }
 
     // Only update website if we don't already have one and the LLM found one
-    if (!lead.website && enriched.website) {
-      update.website = enriched.website;
+    const normalizedWebsite = normalizeUrl(enriched.website);
+    if (!lead.website && normalizedWebsite) {
+      update.website = normalizedWebsite;
     }
 
     await base44.asServiceRole.entities.Leads.update(leadId, update);
@@ -137,6 +172,9 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
 
   } catch (error) {
     console.error("enrichLead error:", error);
+    if (error instanceof AuthGuardError) {
+      return Response.json({ error: error.message, code: error.code }, { status: error.status });
+    }
     return Response.json({ error: error.message || "Enrichment failed" }, { status: 500 });
   }
 });

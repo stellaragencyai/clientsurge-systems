@@ -24,6 +24,9 @@ const SEGMENT_FILTERS = [
   { key: "low_priority",  label: "Low priority" },
 ];
 
+const LEGACY_REACTIVATION_DISABLED_MESSAGE =
+  "Legacy reactivation job delivery has been quarantined. Use the Install Order Workspace reactivation test instead of the old AutomationJob runner.";
+
 // ─── Job Status Row ────────────────────────────────────────────
 function JobRow({ job }) {
   const colorClass = STATUS_COLORS[job.status] || "bg-gray-100 text-gray-600";
@@ -157,6 +160,8 @@ export default function LeadReactivationPanel() {
 
   const handleTrigger = async () => {
     if (!selected.size) return;
+    setError(LEGACY_REACTIVATION_DISABLED_MESSAGE);
+    return;
     setTriggering(true);
     setResults(null);
     setError("");
@@ -214,8 +219,16 @@ export default function LeadReactivationPanel() {
       <div>
         <h2 className="text-2xl font-semibold text-foreground">Lead Reactivation</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Select dormant leads, trigger outreach, and monitor delivery jobs. Jobs are sent by <strong>processAutomationJobs</strong> (runs every 5 min).
+          This legacy panel is retained for reference only. Direct AutomationJob delivery is no longer an approved launch path.
         </p>
+      </div>
+
+      <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+        <div>
+          <p className="font-semibold">Legacy Job Runner Quarantined</p>
+          <p className="mt-1">{LEGACY_REACTIVATION_DISABLED_MESSAGE}</p>
+        </div>
       </div>
 
       {/* Segment Selector */}
@@ -257,7 +270,7 @@ export default function LeadReactivationPanel() {
                 {results.errors.map((e, i) => <li key={i}>{e}</li>)}
               </ul>
             )}
-            <p className="text-xs mt-1 opacity-75">Jobs will be processed within 5 minutes by processAutomationJobs.</p>
+            <p className="text-xs mt-1 opacity-75">Legacy AutomationJob delivery is quarantined and should not be used for live outreach.</p>
           </div>
         </div>
       )}
@@ -297,7 +310,7 @@ export default function LeadReactivationPanel() {
               className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
             >
               {triggering ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
-              {triggering ? "Queuing…" : `Trigger Outreach (${selected.size})`}
+              {triggering ? "Queuing…" : "Quarantined"}
             </button>
           </div>
         </div>
@@ -373,11 +386,11 @@ export default function LeadReactivationPanel() {
           How reactivation works
         </div>
         <ul className="list-disc list-inside text-xs text-foreground/75 space-y-1">
-          <li>Select leads from the segment above and click <strong>Trigger Outreach</strong></li>
+          <li>Select leads from the segment above and use the Install Order Workspace reactivation test instead of this legacy queue</li>
           <li>A <strong>LeadReactivation</strong> record is created (or reused) for each lead</li>
           <li><strong>Attempt 1</strong>: 20% off offer via SMS + email</li>
           <li><strong>Attempt 2</strong>: 25% off final offer — lead is archived after this</li>
-          <li>Jobs are sent by <strong>processAutomationJobs</strong> which runs every 5 minutes</li>
+          <li>Legacy AutomationJob delivery is quarantined and should not be used for live outreach</li>
           <li>Check the Job Queue below to monitor delivery status</li>
         </ul>
       </div>

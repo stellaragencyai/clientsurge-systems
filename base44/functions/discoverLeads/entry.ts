@@ -1,4 +1,9 @@
 // redeployed 2026-05-02
+/**
+ * LEGACY
+ * This discovery workflow intentionally writes to the deprecated Lead entity.
+ * It is a research surface, not a canonical paid-customer CRM/runtime intake path.
+ */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 Deno.serve(async (req) => {

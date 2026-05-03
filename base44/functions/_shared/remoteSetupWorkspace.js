@@ -1,7 +1,16 @@
 import { loadAdminSettings } from "./adminSettings.js";
 import { deriveIntegrationHealth } from "./integrationHealth.js";
-import { buildInstallSnapshot, LEAD_REACTIVATION_SEGMENTS } from "./installPipeline.js";
+import { buildInstallSnapshot, deriveServiceActivationGateFromEvents, LEAD_REACTIVATION_SEGMENTS } from "./installPipeline.js";
 import { buildNurtureSequenceSchedulePreview, listLeadReactivationTargets } from "./installRuntime.js";
+import { PROVIDER_DEPLOYMENT_STATUS } from "./providerProof.js";
+
+function providerIsReady(status) {
+  return [
+    PROVIDER_DEPLOYMENT_STATUS.CONFIGURED,
+    PROVIDER_DEPLOYMENT_STATUS.TEST_WIRED,
+    PROVIDER_DEPLOYMENT_STATUS.LIVE_PROVIDER_PROOFED,
+  ].includes(status);
+}
 
 export const REMOTE_SETUP_SEQUENCE = [
   { step: 1, title: "Open paid order", detail: "Start in the paid install queue and open the selected order in the canonical install workspace." },
@@ -47,7 +56,7 @@ export const SERVICE_INSTALL_PLAYBOOKS = {
     ],
     testing_checks: [
       "Shared configuration is complete",
-      "Twilio provider readiness is not disabled or errored",
+      "Twilio provider readiness is configured, test-wired, or live-provider-proofed",
       "Service status is Testing",
       "Remote Send Test Lead action produces a successful provider_send_succeeded event",
     ],
@@ -85,7 +94,7 @@ export const SERVICE_INSTALL_PLAYBOOKS = {
     ],
     testing_checks: [
       "Shared configuration is complete",
-      "Twilio provider readiness is not disabled or errored",
+      "Twilio provider readiness is configured, test-wired, or live-provider-proofed",
       "Service status is Testing",
       "Simulate Missed Call produces a successful provider_send_succeeded event",
     ],
@@ -124,8 +133,8 @@ export const SERVICE_INSTALL_PLAYBOOKS = {
       "At least one channel is enabled",
       "At least 3 valid steps are saved",
       "The first configured step can be executed by Run Nurture Sequence Test",
-      "If the first step is SMS, Twilio readiness is healthy enough for testing",
-      "If the first step is Email, email provider readiness is healthy enough for testing",
+      "If the first step is SMS, Twilio readiness is configured, test-wired, or live-provider-proofed",
+      "If the first step is Email, email provider readiness is configured, test-wired, or live-provider-proofed",
     ],
     live_checks: [
       "Sequence definition is complete",
@@ -393,8 +402,8 @@ function buildConfigSuggestions(order, serviceState, { providerReadiness, reacti
   if (serviceState.service_key === "nurture_sequence_14d") {
     const smsReady =
       providerReadiness.twilio.order_business_phone_present &&
-      !["disabled", "error", "unavailable"].includes(providerReadiness.twilio.derived_status);
-    const emailReady = !["disabled", "error", "unavailable"].includes(providerReadiness.resend.derived_status);
+      providerIsReady(providerReadiness.twilio.derived_status);
+    const emailReady = providerIsReady(providerReadiness.resend.derived_status);
     const starterSteps = smsReady && emailReady
       ? [
           { day: 1, channel: "sms", message_template: `Hi {{lead_name}}, this is ${businessName}. Checking in after your recent inquiry.` },
@@ -537,9 +546,9 @@ function buildConfigSuggestions(order, serviceState, { providerReadiness, reacti
   if (serviceState.service_key === "review_request") {
     const channelSuggestion =
       providerReadiness.twilio.order_business_phone_present &&
-      !["disabled", "error", "unavailable"].includes(providerReadiness.twilio.derived_status)
+      providerIsReady(providerReadiness.twilio.derived_status)
         ? "sms"
-        : !["disabled", "error", "unavailable"].includes(providerReadiness.resend.derived_status)
+        : providerIsReady(providerReadiness.resend.derived_status)
         ? "email"
         : "";
 
@@ -630,10 +639,12 @@ function deriveStripeReadiness(order) {
   return {
     id: "stripe",
     name: "Stripe Payment",
-    derived_status: paid ? "healthy" : "error",
-    status_label: paid ? "Healthy" : "Blocked",
+    derived_status: paid
+      ? PROVIDER_DEPLOYMENT_STATUS.LIVE_PROVIDER_PROOFED
+      : PROVIDER_DEPLOYMENT_STATUS.FAILED,
+    status_label: paid ? "Live Provider Proofed" : "Failed",
     status_reason: paid
-      ? "Paid order confirmed and ready for remote setup."
+      ? "A paid order already exists, so Stripe has live deployment proof for this install."
       : "Order is not marked paid, so remote setup should not proceed.",
     configured: Boolean(order.stripe_session_id || order.stripe_customer_id || paid),
     latest_activity_at: order.created_date || null,
@@ -661,6 +672,8 @@ function buildProviderSnapshot({ integration, latestProviderTest, extra = {} }) 
     latest_activity_at: integration.latest_activity_at,
     latest_success_at: integration.latest_success_at,
     latest_failure_at: integration.latest_failure_at,
+    latest_live_proof_at: integration.latest_live_proof_at || null,
+    latest_callback_at: integration.latest_callback_at || null,
     recent_activity_count: integration.recent_activity_count,
     recent_failure_count: integration.recent_failure_count,
     latest_test_at: latestProviderTest?.created_date || null,
@@ -707,10 +720,10 @@ function buildProviderReadiness({ order, snapshot, integrationHealth, latestProv
         order_business_phone_present: Boolean(orderBusinessPhone),
         ready_for_testing:
           Boolean(orderBusinessPhone) &&
-          !["disabled", "error", "unavailable"].includes(integrations.twilio?.derived_status || "unavailable"),
+          providerIsReady(integrations.twilio?.derived_status || PROVIDER_DEPLOYMENT_STATUS.UNAVAILABLE),
         ready_for_live:
           Boolean(orderBusinessPhone) &&
-          !["disabled", "error", "unavailable"].includes(integrations.twilio?.derived_status || "unavailable"),
+          providerIsReady(integrations.twilio?.derived_status || PROVIDER_DEPLOYMENT_STATUS.UNAVAILABLE),
       },
     }),
     resend: buildProviderSnapshot({
@@ -842,7 +855,7 @@ function buildProviderActions(serviceState, providerReadiness) {
     if (
       configuration.sms_enabled &&
       (!providerReadiness.twilio.order_business_phone_present ||
-        ["disabled", "error", "unavailable"].includes(providerReadiness.twilio.derived_status))
+        !providerIsReady(providerReadiness.twilio.derived_status))
     ) {
       actions.push({
         code: "provider:nurture_twilio_not_ready",
@@ -858,7 +871,7 @@ function buildProviderActions(serviceState, providerReadiness) {
 
     if (
       configuration.email_enabled &&
-      ["disabled", "error", "unavailable"].includes(providerReadiness.resend.derived_status)
+      !providerIsReady(providerReadiness.resend.derived_status)
     ) {
       actions.push({
         code: "provider:nurture_email_not_ready",
@@ -894,7 +907,7 @@ function buildProviderActions(serviceState, providerReadiness) {
         });
       }
 
-      if (["disabled", "error", "unavailable"].includes(providerReadiness.twilio.derived_status)) {
+      if (!providerIsReady(providerReadiness.twilio.derived_status)) {
         actions.push({
           code: "provider:review_request_twilio_not_ready",
           title: "Review SMS provider readiness",
@@ -909,7 +922,7 @@ function buildProviderActions(serviceState, providerReadiness) {
     }
 
     if (serviceState.configuration?.channel === "email" &&
-      ["disabled", "error", "unavailable"].includes(providerReadiness.resend.derived_status)) {
+      !providerIsReady(providerReadiness.resend.derived_status)) {
       actions.push({
         code: "provider:review_request_email_not_ready",
         title: "Review email provider readiness",
@@ -938,7 +951,7 @@ function buildProviderActions(serviceState, providerReadiness) {
     });
   }
 
-  if (["disabled", "error", "unavailable"].includes(providerReadiness.twilio.derived_status)) {
+  if (!providerIsReady(providerReadiness.twilio.derived_status)) {
     actions.push({
       code: "provider:twilio_not_ready",
       title: "Resolve Twilio readiness",
@@ -1376,6 +1389,7 @@ function deriveServiceRequiredActions({
   serviceState,
   providerReadiness,
   runtimeSummary,
+  activationGate,
 }) {
   const actions = [
     ...buildProviderActions(serviceState, providerReadiness),
@@ -1435,10 +1449,54 @@ function deriveServiceRequiredActions({
     });
   }
 
+  if (!activationGate.provider_verified) {
+    actions.push({
+      code: "proof:provider_verification_required",
+      title:
+        serviceState.service_key === "instant_lead_response"
+          ? "Run live SMS proof"
+          : serviceState.service_key === "missed_call_text_back"
+          ? "Capture canonical missed-call webhook proof"
+          : serviceState.service_key === "lead_reactivation"
+          ? "Run canonical reactivation batch proof"
+          : "Record provider proof",
+      detail:
+        serviceState.service_key === "instant_lead_response"
+          ? "A successful test exists, but the canonical live SMS proof event has not been recorded yet."
+          : serviceState.service_key === "missed_call_text_back"
+          ? "A successful test exists, but the canonical Twilio missed-call webhook proof has not been recorded yet."
+          : serviceState.service_key === "lead_reactivation"
+          ? "A successful reactivation batch proof has not been recorded yet."
+          : "A canonical provider proof event has not been recorded yet.",
+      level: "blocker",
+      blocks_testing: false,
+      blocks_live: true,
+      step: "provider_proof",
+    });
+  }
+
+  if (activationGate.blocking_errors.present) {
+    actions.push({
+      code: "proof:blocking_error_present",
+      title: "Resolve blocking install or runtime error",
+      detail:
+        activationGate.blocking_errors.latest_failure_message ||
+        activationGate.blocking_errors.pipeline_error ||
+        activationGate.blocking_errors.install_error ||
+        "A blocking install or runtime error exists after the last successful validation.",
+      level: "blocker",
+      blocks_testing: false,
+      blocks_live: true,
+      step: "manual_repair",
+    });
+  }
+
   if (
     serviceState.install_status === "Testing" &&
     runtimeSummary.successful_test_exists &&
-    serviceState.configuration_complete
+    serviceState.configuration_complete &&
+    activationGate.provider_verified &&
+    !activationGate.blocking_errors.present
   ) {
     actions.push({
       code: "next:move_to_live",
@@ -1470,7 +1528,10 @@ function deriveServiceRequiredActions({
   const canMoveToTesting =
     serviceState.allowed_next_statuses.includes("Testing") && blockingTesting.length === 0;
   const canMoveToLive =
-    serviceState.allowed_next_statuses.includes("Live") && blockingLive.length === 0;
+    serviceState.allowed_next_statuses.includes("Live") &&
+    blockingLive.length === 0 &&
+    activationGate.provider_verified &&
+    !activationGate.blocking_errors.present;
 
   return {
     actions: dedupedActions,
@@ -1481,10 +1542,10 @@ function deriveServiceRequiredActions({
           ? (
               (serviceState.configuration?.sms_enabled
                 ? providerReadiness.twilio.order_business_phone_present &&
-                  !["disabled", "error", "unavailable"].includes(providerReadiness.twilio.derived_status)
+                  providerIsReady(providerReadiness.twilio.derived_status)
                 : true) &&
               (serviceState.configuration?.email_enabled
-                ? !["disabled", "error", "unavailable"].includes(providerReadiness.resend.derived_status)
+                ? providerIsReady(providerReadiness.resend.derived_status)
                 : true)
             )
           : serviceState.service_key === "ai_booking_agent"
@@ -1493,13 +1554,15 @@ function deriveServiceRequiredActions({
           ? true
           : (
               providerReadiness.twilio.order_business_phone_present &&
-              !["disabled", "error", "unavailable"].includes(providerReadiness.twilio.derived_status)
+              providerIsReady(providerReadiness.twilio.derived_status)
             ),
       tested: runtimeSummary.successful_test_exists,
+      provider_verified: activationGate.provider_verified,
       blocked: blockingLive.length > 0,
       blocking_items: blockingLive.map((action) => action.title),
       can_move_to_testing: canMoveToTesting,
       can_move_to_live: canMoveToLive,
+      activation_gate: activationGate,
       recommended_next_action:
         dedupedActions.find((action) => action.level === "blocker")?.title ||
         dedupedActions.find((action) => action.level === "next")?.title ||
@@ -1528,10 +1591,19 @@ export async function buildRemoteSetupWorkspace({ base44, order, orderEvents = [
 
   const services = await Promise.all(snapshot.serviceStates.map(async (serviceState) => {
     const runtimeSummary = deriveServiceRuntimeSummary(orderEvents, order.id, serviceState.service_key);
+    const activationGate = deriveServiceActivationGateFromEvents({
+      order,
+      serviceKey: serviceState.service_key,
+      serviceState,
+      serviceEvents: orderEvents.filter(
+        (event) => event.order_id === order.id && event.service_key === serviceState.service_key
+      ),
+    }).activation_gate;
     const requiredActionSummary = deriveServiceRequiredActions({
       serviceState,
       providerReadiness,
       runtimeSummary,
+      activationGate,
     });
     const targetLeads = serviceState.service_key === "lead_reactivation"
       ? await listLeadReactivationTargets({

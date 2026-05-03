@@ -1,3 +1,7 @@
+// LEGACY
+// Deprecated discovery-era lead model.
+// Do not use this entity for launch-critical paid-customer CRM, automation, or runtime.
+// Keep only for quarantined legacy discovery/analytics surfaces until a later archive phase.
 {
   "name": "Lead",
   "type": "object",

@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { base44 } from '@/api/base44Client';
-import { Send, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { Send, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+const LEGACY_REVIEW_REQUEST_DISABLED_MESSAGE =
+  "Legacy direct-send review requests have been quarantined. Use the Install Order Workspace review-request test until a production runtime is promoted.";
 
 export default function ReviewRequestPanel() {
   const [formData, setFormData] = useState({
@@ -24,38 +26,9 @@ export default function ReviewRequestPanel() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(null);
+    setError(LEGACY_REVIEW_REQUEST_DISABLED_MESSAGE);
     setResult(null);
-
-    try {
-      const response = await base44.functions.invoke('sendReviewRequest', formData);
-
-      if (response.data?.success) {
-        setResult({
-          success: true,
-          sms_sent: response.data.sms_sent,
-          email_sent: response.data.email_sent,
-          sms_id: response.data.sms_id,
-          email_id: response.data.email_id,
-        });
-        setFormData({
-          customer_name: '',
-          customer_phone: '',
-          customer_email: '',
-          business_name: '',
-          google_review_link: '',
-          yelp_review_link: '',
-          preferred_channel: 'both',
-        });
-      } else {
-        setError(response.data?.error || 'Failed to send review request');
-      }
-    } catch (err) {
-      setError(err.message || 'An error occurred while sending the review request');
-    } finally {
-      setLoading(false);
-    }
+    setLoading(false);
   };
 
   return (
@@ -63,8 +36,16 @@ export default function ReviewRequestPanel() {
       <div>
         <h2 className="text-2xl font-semibold text-foreground">Send Review Request</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Manually send review requests to customers via SMS and/or email.
+          Legacy direct-send review requests are no longer an approved launch path.
         </p>
+      </div>
+
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 flex gap-3">
+        <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="font-medium text-amber-900">Legacy Flow Quarantined</p>
+          <p className="text-sm text-amber-800 mt-0.5">{LEGACY_REVIEW_REQUEST_DISABLED_MESSAGE}</p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-border p-6 space-y-5">
@@ -189,20 +170,10 @@ export default function ReviewRequestPanel() {
         {/* Submit Button */}
         <Button
           type="submit"
-          disabled={loading}
+          disabled
           className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium gap-2"
         >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Sending...
-            </>
-          ) : (
-            <>
-              <Send className="w-4 h-4" />
-              Send Review Request
-            </>
-          )}
+          <><Send className="w-4 h-4" />Quarantined</>
         </Button>
       </form>
 

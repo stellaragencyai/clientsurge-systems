@@ -46,7 +46,9 @@ export default function Footer() {
       }
       const el = document.querySelector(anchor);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-      window.history.replaceState({}, "", `/${anchor}`);
+      // Do not persist homepage section hashes here. Embedded browsers can
+      // restore those hashes on refresh and reopen the page mid-scroll.
+      window.history.replaceState({}, "", "/");
     } else {
       window.scrollTo({ top: 0, behavior: "auto" });
       navigate(href);

@@ -56,7 +56,7 @@ export default function AdminLeads() {
               onClick={() => setSidebarOpen(false)}
               className="w-full text-left px-4 py-3 rounded-lg bg-primary text-primary-foreground font-medium"
             >
-              Leads
+              Customer Leads
             </button>
           </nav>
 
@@ -80,7 +80,7 @@ export default function AdminLeads() {
         {/* Top Bar */}
         <div className="bg-white border-b border-border p-6 flex items-center justify-between lg:justify-end sticky top-0 z-10">
           <h2 className="text-xl font-semibold text-foreground hidden sm:block">
-            Leads
+            Customer Leads
           </h2>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}

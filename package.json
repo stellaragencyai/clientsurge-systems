@@ -10,6 +10,15 @@
     "lint:fix": "eslint . --fix",
     "test": "node --test",
     "openclaw:validate-install": "node scripts/openclaw/run-install-validation.mjs",
+    "openclaw:validate-production": "node scripts/openclaw/run-production-validation.mjs",
+    "qa:customer:code": "node scripts/qa/run-customer-experience-code-audit.mjs",
+    "qa:customer:change-aware": "node scripts/qa/generate-change-aware-customer-checks.mjs",
+    "qa:customer:e2e": "playwright test -c playwright.customer-experience.config.mjs",
+    "qa:customer:extract": "node scripts/qa/extract-customer-experience-playwright-status.mjs",
+    "qa:customer:live": "node scripts/qa/generate-customer-experience-live-report.mjs",
+    "qa:customer": "node scripts/qa/run-customer-experience-suite.mjs",
+    "qa:customer:watch": "node scripts/qa/watch-customer-experience-live.mjs",
+    "qa:customer:watch:browser": "node scripts/qa/watch-customer-experience-live.mjs --browser",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview"
   },
@@ -82,6 +91,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
+    "@playwright/test": "^1.59.1",
     "@types/node": "^22.13.5",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",

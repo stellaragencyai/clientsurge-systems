@@ -102,6 +102,7 @@ function createFakeBase44({ adminSettings = [], events = [] } = {}) {
 function buildOrder({
   installStatus = "Testing",
   withSuccessEvent = false,
+  withProviderProofEvent = false,
 } = {}) {
   const order = {
     id: "order_1",
@@ -138,8 +139,9 @@ function buildOrder({
     },
   };
 
-  const orderEvents = withSuccessEvent
-    ? [
+  const orderEvents = [
+    ...(withSuccessEvent
+      ? [
         {
           id: "event_success",
           created_date: "2026-04-22T12:15:00.000Z",
@@ -150,7 +152,27 @@ function buildOrder({
           status: "sent",
         },
       ]
-    : [];
+      : []),
+    ...(withProviderProofEvent
+      ? [
+        {
+          id: "event_proof",
+          created_date: "2026-04-22T12:16:00.000Z",
+          order_id: "order_1",
+          service_key: "instant_lead_response",
+          event_type: "status_update",
+          provider: "twilio",
+          status: "processed",
+          context_type: "provider_proof",
+          metadata_json: JSON.stringify({
+            context_type: "provider_proof",
+            proof_kind: "live_sms_instant_lead_response",
+            proof_mode: "LIVE_PROVIDER_PROOF",
+          }),
+        },
+      ]
+      : []),
+  ];
 
   return { order, orderEvents };
 }
@@ -198,10 +220,10 @@ test("remote setup workspace derives required actions and keeps Live blocked bef
   assert.ok(
     service.required_actions.some((action) => action.code === "test:successful_runtime_required")
   );
-  assert.equal(workspace.provider_readiness.twilio.derived_status, "healthy");
+  assert.equal(workspace.provider_readiness.twilio.derived_status, "test_wired");
 });
 
-test("remote setup workspace unlocks Live after a successful runtime event exists", async () => {
+test("remote setup workspace keeps Live blocked until explicit provider proof exists", async () => {
   const { order, orderEvents } = buildOrder({ installStatus: "Testing", withSuccessEvent: true });
   const { base44 } = createFakeBase44({
     adminSettings: [
@@ -236,6 +258,53 @@ test("remote setup workspace unlocks Live after a successful runtime event exist
 
   const service = workspace.services[0];
   assert.equal(service.go_live_readiness.tested, true);
+  assert.equal(service.go_live_readiness.provider_verified, false);
+  assert.equal(service.go_live_readiness.can_move_to_live, false);
+  assert.ok(
+    service.required_actions.some((action) => action.code === "proof:provider_verification_required")
+  );
+});
+
+test("remote setup workspace unlocks Live after a successful runtime event and explicit proof exist", async () => {
+  const { order, orderEvents } = buildOrder({
+    installStatus: "Testing",
+    withSuccessEvent: true,
+    withProviderProofEvent: true,
+  });
+  const { base44 } = createFakeBase44({
+    adminSettings: [
+      {
+        id: "settings_1",
+        twilio_enabled: true,
+        twilio_from_number: "+16025550000",
+      },
+    ],
+    events: [
+      {
+        id: "provider_test_twilio",
+        created_date: "2026-04-22T12:05:00.000Z",
+        event_type: "status_update",
+        provider: "twilio",
+        status: "processed",
+        message_body: "Twilio credentials validated successfully.",
+        metadata_json: JSON.stringify({
+          context_type: "provider_test",
+          integration_id: "twilio",
+        }),
+      },
+      ...orderEvents,
+    ],
+  });
+
+  const workspace = await buildRemoteSetupWorkspace({
+    base44,
+    order,
+    orderEvents,
+  });
+
+  const service = workspace.services[0];
+  assert.equal(service.go_live_readiness.tested, true);
+  assert.equal(service.go_live_readiness.provider_verified, true);
   assert.equal(service.go_live_readiness.can_move_to_live, true);
   assert.ok(
     service.required_actions.some((action) => action.code === "next:move_to_live")

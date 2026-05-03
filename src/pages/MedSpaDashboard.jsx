@@ -65,8 +65,8 @@ export default function MedSpaDashboard() {
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-1">Lead Overview</h1>
-          <p className="text-muted-foreground">Track performance, conversions, and pipeline health.</p>
+          <h1 className="text-3xl font-bold text-foreground mb-1">Legacy Lead Discovery Overview</h1>
+          <p className="text-muted-foreground">Legacy `Lead` analytics only. Not the canonical paid-customer CRM.</p>
         </div>
 
         {loading ? (

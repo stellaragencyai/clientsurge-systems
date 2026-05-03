@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { CalendarCheck, HeadphonesIcon, LayoutDashboard, MessageSquare, PhoneCall, RotateCcw, Send, Zap } from "lucide-react";
 
 const stages = [
@@ -7,7 +7,7 @@ const stages = [
     icon: Zap,
     eyebrow: "Trigger",
     title: "Lead comes in",
-    copy: "A call, form, ad lead, or direct inquiry enters the system and gets captured immediately — nothing slips through the cracks.",
+    copy: "A call, form, ad lead, or direct inquiry enters the system and gets captured quickly so your team can respond first.",
   },
   {
     id: "instant-response",
@@ -35,7 +35,7 @@ const stages = [
     icon: CalendarCheck,
     eyebrow: "Conversion",
     title: "Booking handoff",
-    copy: "Ready leads move into a frictionless booking path — fewer drop-offs, more confirmed appointments.",
+    copy: "Ready leads move into a cleaner booking path so fewer prospects stall before scheduling.",
   },
   {
     id: "crm",
@@ -49,7 +49,7 @@ const stages = [
     icon: RotateCcw,
     eyebrow: "Recovery",
     title: "Old leads return",
-    copy: "Dormant contacts get reactivated with proven campaigns — turning forgotten leads into fresh revenue.",
+    copy: "Dormant contacts can be re-engaged with a measured reactivation flow that brings older opportunities back into the pipeline.",
   },
   {
     id: "optimization",
@@ -61,7 +61,7 @@ const stages = [
 ];
 
 const STAGE_DURATION = 3200;
-// Fade duration for content panel (ms) — slow enough to see
+// Fade duration for content panel (ms) â€” slow enough to see
 const FADE_DURATION = 600;
 
 export default function AutomationPipelineSection() {
@@ -117,7 +117,7 @@ export default function AutomationPipelineSection() {
   const active = stages[activeStage];
   const ActiveIcon = active.icon;
 
-  // Node size: 0.67× of 125px = ~84px
+  // Node size: about two-thirds of 125px = ~84px
   const NODE_SIZE = 84;
   const ICON_SIZE = 31;
 
@@ -138,17 +138,17 @@ export default function AutomationPipelineSection() {
           {" "}in Motion
         </h2>
         <p className="mt-5 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
-          Every step fires automatically. Watch the engine move from first lead to booked appointment.
+          This walkthrough shows the intended flow from first lead to booked appointment across the services we currently support.
         </p>
       </div>
 
-      {/* ── Desktop pipeline (lg+) ── */}
+      {/* â”€â”€ Desktop pipeline (lg+) â”€â”€ */}
       <div className="hidden lg:block">
 
         {/* Node row */}
         <div className="relative" style={{ paddingTop: "20px", paddingBottom: "8px" }}>
 
-          {/* Connector line — sits above the nodes, not through them */}
+          {/* Connector line â€” sits above the nodes, not through them */}
           <div
             className="absolute left-0 right-0"
             style={{ top: "0px", height: "2px" }}
@@ -177,7 +177,7 @@ export default function AutomationPipelineSection() {
             />
           </div>
 
-          {/* Stage nodes — 2× spacing via gap */}
+          {/* Stage nodes â€” extra spacing via gap */}
           <div className="grid grid-cols-8 gap-x-8">
             {stages.map((stage, index) => {
               const Icon = stage.icon;
@@ -193,7 +193,7 @@ export default function AutomationPipelineSection() {
                     transition: `opacity 600ms ease ${index * 80}ms, transform 600ms ease ${index * 80}ms`,
                   }}
                 >
-                  {/* Circle node — 1.5× size */}
+                  {/* Circle node - larger emphasis */}
                   <div
                     className="relative z-10 flex items-center justify-center transition-all duration-500"
                     style={{
@@ -241,7 +241,7 @@ export default function AutomationPipelineSection() {
           </div>
         </div>
 
-        {/* ── Always-visible detail panel — metallic silver ── */}
+        {/* â”€â”€ Always-visible detail panel â€” metallic silver â”€â”€ */}
         <div
           className="mt-10 rounded-2xl px-10 py-8 flex gap-8 items-start pipeline-panel-pulse"
           style={{
@@ -252,7 +252,7 @@ export default function AutomationPipelineSection() {
           }}
           key={`panel-${contentKey}`}
         >
-          {/* Icon — fades with content */}
+          {/* Icon â€” fades with content */}
           <div
             key={`icon-${contentKey}`}
             style={{
@@ -272,7 +272,7 @@ export default function AutomationPipelineSection() {
             </div>
           </div>
 
-          {/* Text — fades with content */}
+          {/* Text â€” fades with content */}
           <div
             key={`text-${contentKey}`}
             className="flex-1"
@@ -306,7 +306,7 @@ export default function AutomationPipelineSection() {
         </div>
       </div>
 
-      {/* ── Mobile pipeline (< lg) ── */}
+      {/* â”€â”€ Mobile pipeline (< lg) â”€â”€ */}
       <div className="lg:hidden space-y-0">
         {stages.map((stage, index) => {
           const Icon = stage.icon;
@@ -376,3 +376,4 @@ export default function AutomationPipelineSection() {
     </section>
   );
 }
+

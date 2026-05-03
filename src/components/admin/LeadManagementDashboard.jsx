@@ -26,7 +26,6 @@ import {
 } from "@/lib/leadPipelineApi";
 import LeadCRMDrawer from "./LeadCRMDrawer";
 import LeadScoreBadge from "./LeadScoreBadge";
-import BulkActionToolbar from "./BulkActionToolbar";
 
 const intakeTypeLabels = {
   lead_capture: "Lead Capture",
@@ -185,7 +184,6 @@ export default function LeadManagementDashboard() {
     intake_type: "all",
     stage_group: "all",
     segment: "all",
-    priority: "all",
   });
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -193,7 +191,6 @@ export default function LeadManagementDashboard() {
   const [error, setError] = useState("");
   const [importOpen, setImportOpen] = useState(false);
   const [drawerLead, setDrawerLead] = useState(null);
-  const [selectedIds, setSelectedIds] = useState(new Set());
   const [importSource, setImportSource] = useState("manual_import");
   const [importRaw, setImportRaw] = useState("");
   const [importPreview, setImportPreview] = useState(null);
@@ -324,24 +321,6 @@ export default function LeadManagementDashboard() {
 
   const sourceOptions = useMemo(() => snapshot.filter_options?.sources || [], [snapshot.filter_options]);
   const leads = snapshot.leads || [];
-
-  const toggleSelect = (id) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.size === leads.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(leads.map((l) => l.id)));
-    }
-  };
-
-  const clearSelection = () => setSelectedIds(new Set());
   const activationQueue = snapshot.summary.priority_queue || [];
   const activationSegments = snapshot.summary.activation_segments || [];
   const offerMix = snapshot.summary.recommended_offer_counts || {};
@@ -350,9 +329,9 @@ export default function LeadManagementDashboard() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-foreground">Lead Pipeline</h2>
+          <h2 className="text-2xl font-semibold text-foreground">Customer Leads</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Canonical Leads pipeline for import, dedupe, segmentation, and daily operator follow-up.
+            Canonical paid-customer CRM pipeline for import, dedupe, segmentation, and daily operator follow-up.
           </p>
           {snapshot.generated_at ? (
             <p className="mt-2 text-xs text-muted-foreground">
@@ -389,6 +368,13 @@ export default function LeadManagementDashboard() {
         </div>
       </div>
 
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        <p className="font-semibold">Lead model boundaries</p>
+        <p className="mt-1">
+          Customer Leads live here. Platform Website Leads from ClientSurge&apos;s own site are stored separately, and legacy `Lead` discovery records are not canonical CRM.
+        </p>
+      </div>
+
       {error ? (
         <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           <AlertCircle className="h-5 w-5" />
@@ -398,9 +384,9 @@ export default function LeadManagementDashboard() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6">
         <SummaryCard
-          label="Total Leads"
+          label="Customer Leads"
           value={snapshot.summary.total_leads}
-          helper="All canonical Leads records available for daily operator work."
+          helper="All canonical paid-customer Leads records available for daily operator work."
           tone="blue"
         />
         <SummaryCard
@@ -678,16 +664,11 @@ export default function LeadManagementDashboard() {
       ) : null}
 
       <div className="rounded-xl border border-border bg-white p-4 space-y-4">
-          <BulkActionToolbar
-            selectedIds={Array.from(selectedIds)}
-            onClearSelection={clearSelection}
-            onActionComplete={() => loadSnapshot({ append: false, nextOffset: 0 })}
-          />
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Actionable Lead Queue</h3>
+              <h3 className="text-lg font-semibold text-foreground">Actionable Customer Lead Queue</h3>
               <p className="text-sm text-muted-foreground">
-                Search, filter, and work canonical Leads without leaving the admin control surface.
+                Search, filter, and work canonical Customer Leads without leaving the admin control surface.
               </p>
             </div>
             <div className="text-sm text-muted-foreground">
@@ -793,18 +774,6 @@ export default function LeadManagementDashboard() {
                 </option>
               ))}
             </select>
-
-            <select
-              value={filters.priority}
-              onChange={(event) => handleFilterChange("priority", event.target.value)}
-              className="rounded-lg border border-border bg-background px-4 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="all">All Priorities</option>
-              <option value="Hot">🔥 Hot</option>
-              <option value="High">High</option>
-              <option value="Medium">Medium</option>
-              <option value="Low">Low</option>
-            </select>
           </div>
 
           <div className="overflow-hidden rounded-xl border border-border">
@@ -812,15 +781,8 @@ export default function LeadManagementDashboard() {
               <table className="w-full min-w-[900px] text-sm">
                 <thead className="bg-muted/50">
                   <tr>
-                    <th className="px-4 py-3 w-10">
-                      <input
-                        type="checkbox"
-                        checked={leads.length > 0 && selectedIds.size === leads.length}
-                        onChange={toggleSelectAll}
-                        className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
-                      />
-                    </th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Lead</th>
+                    <th className="px-4 py-3 text-left font-semibold text-foreground">Score</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Why Now</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Next Action</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Recommended Offer</th>
@@ -843,15 +805,7 @@ export default function LeadManagementDashboard() {
                     </tr>
                   ) : (
                     leads.map((lead) => (
-                      <tr key={lead.id} className={`hover:bg-muted/20 transition-colors ${selectedIds.has(lead.id) ? "bg-primary/5" : ""}`}>
-                        <td className="px-4 py-4 w-10">
-                          <input
-                            type="checkbox"
-                            checked={selectedIds.has(lead.id)}
-                            onChange={() => toggleSelect(lead.id)}
-                            className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
-                          />
-                        </td>
+                      <tr key={lead.id} className="hover:bg-muted/20">
                         <td className="px-4 py-4">
                           <div>
                             <div className="flex flex-wrap items-center gap-2">
@@ -865,25 +819,6 @@ export default function LeadManagementDashboard() {
                               {lead.lead_score != null && (
                                 <LeadScoreBadge score={lead.lead_score} />
                               )}
-                              {lead.activation_priority && lead.activation_priority !== 'Low' && (
-                                <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${
-                                  lead.activation_priority === 'Hot' ? 'bg-red-100 text-red-700' :
-                                  lead.activation_priority === 'High' ? 'bg-orange-100 text-orange-700' :
-                                  'bg-amber-100 text-amber-700'
-                                }`}>
-                                  {lead.activation_priority === 'Hot' ? '🔥' : ''} {lead.activation_priority}
-                                </span>
-                              )}
-                              {(() => {
-                                const isStale = ["New","Contacted"].includes(lead.status) &&
-                                  (!lead.last_contacted_at ||
-                                    (Date.now() - new Date(lead.last_contacted_at).getTime()) > 7 * 86400000);
-                                return isStale ? (
-                                  <span className="rounded-full bg-red-100 text-red-700 px-2 py-1 text-[10px] font-bold">
-                                    Stale
-                                  </span>
-                                ) : null;
-                              })()}
                             </div>
                             <p className="mt-1 text-xs text-muted-foreground">{lead.business_name}</p>
                             <p className="mt-1 text-xs text-muted-foreground">
@@ -892,6 +827,15 @@ export default function LeadManagementDashboard() {
                             <p className="mt-2 text-[11px] text-muted-foreground">
                               {lead.source || "unknown"} • {intakeTypeLabels[lead.intake_type] || lead.intake_type || "Legacy"}
                             </p>
+                          </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <div className="flex flex-col items-start gap-1">
+                            {lead.lead_score != null ? (
+                              <LeadScoreBadge score={lead.lead_score} size="lg" />
+                            ) : (
+                              <span className="text-xs text-muted-foreground">—</span>
+                            )}
                           </div>
                         </td>
                         <td className="px-4 py-4">

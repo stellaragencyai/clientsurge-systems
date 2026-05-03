@@ -276,6 +276,61 @@ async function recordSuccessfulRuntimeTest(base44, order, serviceKey, recipientP
   });
 }
 
+async function recordCanonicalProviderProof(base44, order, serviceKey, now = new Date().toISOString()) {
+  const proofByService = {
+    instant_lead_response: {
+      event_type: "status_update",
+      provider: "twilio",
+      status: "processed",
+      subject: "Twilio live SMS proof succeeded",
+      context_type: "provider_proof",
+      metadata_json: JSON.stringify({
+        context_type: "provider_proof",
+        proof_kind: "live_sms_instant_lead_response",
+        proof_mode: "LIVE_PROVIDER_PROOF",
+      }),
+    },
+    missed_call_text_back: {
+      event_type: "status_update",
+      provider: "twilio",
+      status: "processed",
+      subject: "Twilio missed-call webhook received",
+      context_type: "provider_callback",
+      metadata_json: JSON.stringify({
+        context_type: "provider_callback",
+        callback_provider: "twilio",
+        callback_type: "missed_call_status",
+        proof_kind: "twilio_missed_call_webhook",
+        proof_mode: "LIVE_PROVIDER_PROOF",
+      }),
+    },
+    lead_reactivation: {
+      event_type: "lead_reactivation_batch_completed",
+      provider: "internal",
+      status: "processed",
+      subject: "Lead reactivation batch completed",
+      context_type: "order_service_install",
+      metadata_json: JSON.stringify({
+        runtime_type: "run_reactivation_test",
+        selected_lead_count: 2,
+      }),
+    },
+  };
+
+  const proof = proofByService[serviceKey];
+  if (!proof) {
+    throw new Error(`No provider proof helper exists for ${serviceKey}`);
+  }
+
+  return base44.asServiceRole.entities.CommunicationEvent.create({
+    id: `proof_${serviceKey}`,
+    created_date: now,
+    order_id: order.id,
+    service_key: serviceKey,
+    ...proof,
+  });
+}
+
 test("paid order initializes canonical install pipeline and links existing structures", async () => {
   const { base44, entities } = createFakeBase44();
   const order = await entities.Order.get("order_1");
@@ -512,6 +567,8 @@ test("mirror records resync from order truth instead of preserving drift", async
     now: "2026-04-22T12:12:00.000Z",
   });
   await recordSuccessfulRuntimeTest(base44, currentOrder, "instant_lead_response");
+  await recordCanonicalProviderProof(base44, currentOrder, "instant_lead_response");
+  currentOrder = await entities.Order.get("order_1");
   currentOrder = await updateTrackedServiceInstallStatus({
     base44,
     order: currentOrder,
@@ -638,6 +695,7 @@ test("config-backed transitions stay per-service and successful updates are logg
     now: "2026-04-22T12:12:00.000Z",
   });
   await recordSuccessfulRuntimeTest(base44, currentOrder, "instant_lead_response");
+  await recordCanonicalProviderProof(base44, currentOrder, "instant_lead_response");
   currentOrder = await updateTrackedServiceInstallStatus({
     base44,
     order: currentOrder,
@@ -718,12 +776,30 @@ test("live transition stays blocked until a successful remote test exists", asyn
 
   await recordSuccessfulRuntimeTest(base44, currentOrder, "instant_lead_response");
 
+  await assert.rejects(
+    updateTrackedServiceInstallStatus({
+      base44,
+      order: currentOrder,
+      serviceKey: "instant_lead_response",
+      nextStatus: "Live",
+      now: "2026-04-22T12:15:00.000Z",
+    }),
+    (error) => {
+      assert.ok(error instanceof InstallTransitionError);
+      assert.ok(error.details?.validation?.missing_fields?.includes("provider_verification.verified"));
+      return true;
+    }
+  );
+
+  await recordCanonicalProviderProof(base44, currentOrder, "instant_lead_response");
+  currentOrder = await entities.Order.get("order_1");
+
   currentOrder = await updateTrackedServiceInstallStatus({
     base44,
     order: currentOrder,
     serviceKey: "instant_lead_response",
     nextStatus: "Live",
-    now: "2026-04-22T12:16:00.000Z",
+    now: "2026-04-22T12:17:00.000Z",
   });
 
   assert.equal(

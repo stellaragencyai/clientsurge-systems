@@ -1,5 +1,18 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+import { ALLOWED_RUNTIME_INSTALL_STATUSES } from "../_shared/installRuntime.js";
+import {
+  buildInstallSnapshot,
+  updateOrderInstallConfiguration,
+} from "../_shared/installPipeline.js";
+
+function getStatusCode(message) {
+  if (message === "Admin access required") return 403;
+  if (message === "Order not found") return 404;
+  if (message === "order_id is required") return 400;
+  return 500;
+}
+
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
@@ -9,43 +22,32 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== "admin") {
-      return Response.json({ error: "Admin access required" }, { status: 403 });
+      throw new Error("Admin access required");
     }
 
-    const payload = await req.json();
-    const { order_id, shared, services } = payload || {};
+    const payload = await req.json().catch(() => ({}));
+    const { order_id, shared, services, note } = payload || {};
 
     if (!order_id) {
-      return Response.json({ error: "order_id is required" }, { status: 400 });
+      throw new Error("order_id is required");
     }
 
-    const order = await base44.asServiceRole.entities.Order.get(order_id);
+    const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      throw new Error("Order not found");
     }
 
-    // Merge patch into existing install_configuration
-    const existing = order.install_configuration || {};
-    const updatedConfig = {
-      ...existing,
-      ...(shared !== undefined ? { shared: { ...(existing.shared || {}), ...shared } } : {}),
-      ...(services !== undefined ? {
-        services: {
-          ...(existing.services || {}),
-          ...Object.fromEntries(
-            Object.entries(services).map(([key, val]) => [
-              key,
-              { ...(existing.services?.[key] || {}), ...val },
-            ])
-          ),
-        },
-      } : {}),
-    };
-
-    const updatedOrder = await base44.asServiceRole.entities.Order.update(order_id, {
-      install_configuration: updatedConfig,
-      install_configuration_updated_at: new Date().toISOString(),
+    const updatedOrder = await updateOrderInstallConfiguration({
+      base44,
+      order,
+      patch: {
+        ...(shared !== undefined ? { shared } : {}),
+        ...(services !== undefined ? { services } : {}),
+      },
+      note,
     });
+
+    const snapshot = buildInstallSnapshot(updatedOrder);
 
     return Response.json({
       success: true,
@@ -53,18 +55,19 @@ Deno.serve(async (req) => {
         id: updatedOrder.id,
         pipeline_status: updatedOrder.pipeline_status,
         install_configuration: updatedOrder.install_configuration,
-        items: (updatedOrder.items || []).map((item) => ({
+        items: snapshot.serviceStates.map((item) => ({
           service_key: item.service_key,
           install_status: item.install_status,
+          configuration_complete: item.configuration_complete,
+          missing_configuration_fields: item.missing_configuration_fields,
+          allowed_next_statuses: item.allowed_next_statuses,
+          runtime_ready: ALLOWED_RUNTIME_INSTALL_STATUSES.includes(item.install_status),
         })),
       },
+      configuration_summary: updatedOrder.configuration_summary,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update install configuration";
-    const status =
-      message === "Admin access required" ? 403 :
-      message === "Order not found" ? 404 :
-      message === "order_id is required" ? 400 : 500;
-    return Response.json({ error: message }, { status });
+    return Response.json({ error: message }, { status: getStatusCode(message) });
   }
 });

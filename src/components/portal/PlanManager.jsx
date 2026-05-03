@@ -1,30 +1,30 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { CheckCircle2, ArrowRight, Loader2, CircleAlert } from "lucide-react";
+import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 
-const PLANS = [
-  {
-    name: "Starter System",
-    monthly: "$197/mo",
-    features: ["Instant lead response", "AI booking handoff"],
-  },
-  {
-    name: "Growth System",
-    monthly: "$349/mo",
-    badge: "Most Popular",
-    features: ["Starter + missed-call text-back", "14-day nurture sequence"],
-  },
-  {
-    name: "Elite System",
-    monthly: "$469/mo",
-    features: ["Growth + lead reactivation", "Review request automation"],
-  },
-];
+const PLANS = PACKAGE_OFFERS.map((offer) => ({
+  name: offer.name,
+  monthly: `$${offer.monthly_total}/mo`,
+  badge: offer.badge,
+  features: offer.included_services.map((service) => service.name),
+}));
 
 const PLAN_RANK = {
   "Starter System": 1,
   "Growth System": 2,
-  "Elite System": 3,
+  "Pro System": 3,
+};
+
+const BILLING_STATUS_LABELS = {
+  active: "Active",
+  past_due: "Payment issue",
+  canceled: "Canceled",
+};
+
+const CHANGE_REQUEST_LABELS = {
+  pending_review: "Pending review",
+  none: "None",
 };
 
 function formatDate(value) {
@@ -32,9 +32,20 @@ function formatDate(value) {
   return new Date(value).toLocaleDateString();
 }
 
-export default function PlanManager({ project, subscription, onUpdated }) {
+function getBillingStatusLabel(value) {
+  if (!value) return "Unavailable";
+  return BILLING_STATUS_LABELS[value] || value.replace(/_/g, " ");
+}
+
+function getChangeRequestLabel(value) {
+  if (!value) return "None";
+  return CHANGE_REQUEST_LABELS[value] || value.replace(/_/g, " ");
+}
+
+export default function PlanManager({ project, subscription, onUpdated, testMode = false }) {
   const currentPlan = subscription?.plan_type || project.plan;
   const [selected, setSelected] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -45,11 +56,26 @@ export default function PlanManager({ project, subscription, onUpdated }) {
     setError("");
 
     try {
+      if (testMode) {
+        setSelected(null);
+        setConfirmAction(null);
+        setSuccess(
+          requestType === "cancel"
+            ? "Cancellation request submitted for operator review."
+            : `Plan change request to ${requestedPlanType} submitted for operator review.`
+        );
+        onUpdated?.();
+        setTimeout(() => setSuccess(""), 4000);
+        return;
+      }
+
       await base44.functions.invoke("requestSubscriptionChange", {
         request_type: requestType,
         requested_plan_type: requestedPlanType,
       });
+
       setSelected(null);
+      setConfirmAction(null);
       setSuccess(
         requestType === "cancel"
           ? "Cancellation request submitted for operator review."
@@ -58,7 +84,11 @@ export default function PlanManager({ project, subscription, onUpdated }) {
       onUpdated?.();
       setTimeout(() => setSuccess(""), 4000);
     } catch (requestError) {
-      setError(requestError?.data?.error || requestError?.message || "Unable to submit subscription request.");
+      setError(
+        requestError?.data?.error ||
+          requestError?.message ||
+          "Unable to submit subscription request."
+      );
     } finally {
       setSaving(false);
     }
@@ -66,29 +96,37 @@ export default function PlanManager({ project, subscription, onUpdated }) {
 
   return (
     <div className="bg-white rounded-2xl border border-border shadow-sm p-8">
-      <h2 className="font-display text-xl font-semibold text-foreground mb-1">Subscription & Plan</h2>
+      <h2 className="font-display text-xl font-semibold text-foreground mb-1">
+        Subscription & Plan
+      </h2>
       <p className="text-xs text-muted-foreground mb-6">
-        Current plan: <span className="font-bold text-foreground">{currentPlan || project.plan}</span>
+        Current plan:{" "}
+        <span className="font-bold text-foreground">{currentPlan || project.plan}</span>
         {subscription?.change_request_status === "pending_review" && (
           <span className="ml-2 text-primary font-semibold">
-            · {subscription.change_request_type === "cancel"
+            /{" "}
+            {subscription.change_request_type === "cancel"
               ? "Cancellation pending review"
-              : `Change to ${subscription.requested_plan_type || "requested plan"} pending review`}
+              : `Plan change to ${subscription.requested_plan_type || "your requested plan"} pending review`}
           </span>
         )}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <SummaryCard label="Billing Status" value={subscription?.status || "Unavailable"} />
+        <SummaryCard label="Billing Status" value={getBillingStatusLabel(subscription?.status)} />
         <SummaryCard label="Renews" value={formatDate(subscription?.current_period_end)} />
-        <SummaryCard label="Services Included" value={String(subscription?.services_included?.length || 0)} />
-        <SummaryCard label="Plan Requests" value={subscription?.change_request_status || "None"} />
+        <SummaryCard
+          label="Services Included"
+          value={String(subscription?.services_included?.length || 0)}
+        />
+        <SummaryCard label="Plan Requests" value={getChangeRequestLabel(subscription?.change_request_status)} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {PLANS.map((plan) => {
           const isCurrent = plan.name === currentPlan;
           const isSelected = plan.name === selected;
+
           return (
             <button
               key={plan.name}
@@ -98,14 +136,22 @@ export default function PlanManager({ project, subscription, onUpdated }) {
                 isCurrent
                   ? "border-green-400 bg-green-50 cursor-default"
                   : isSelected
-                  ? "border-primary bg-primary/5"
-                  : "border-border hover:border-primary/40 hover:bg-muted/30"
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/40 hover:bg-muted/30"
               }`}
             >
               <div className="flex items-center justify-between mb-1">
                 <p className="text-sm font-bold text-foreground">{plan.name}</p>
-                {isCurrent && <span className="text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Current</span>}
-                {plan.badge && !isCurrent && <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">{plan.badge}</span>}
+                {isCurrent && (
+                  <span className="text-xs font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                    Current
+                  </span>
+                )}
+                {plan.badge && !isCurrent && (
+                  <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                    {plan.badge}
+                  </span>
+                )}
               </div>
               <p className="text-sm font-semibold text-primary mb-3">{plan.monthly}</p>
               <ul className="space-y-1.5">
@@ -128,16 +174,18 @@ export default function PlanManager({ project, subscription, onUpdated }) {
               Request plan change to <span className="text-primary">{selected}</span>
             </p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              This only creates an operator-reviewed request. Billing changes stay manual until approved.
+              This only creates an operator-reviewed request. Billing changes stay manual until
+              approved.
             </p>
           </div>
           <button
-            onClick={() =>
-              submitRequest(
-                (PLAN_RANK[selected] || 0) > (PLAN_RANK[currentPlan] || 0) ? "upgrade" : "downgrade",
-                selected
-              )
-            }
+            onClick={() => {
+              const requestType =
+                (PLAN_RANK[selected] || 0) > (PLAN_RANK[currentPlan] || 0)
+                  ? "upgrade"
+                  : "downgrade";
+              setConfirmAction({ type: requestType, requestedPlanType: selected });
+            }}
             disabled={saving}
             className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-50"
             style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
@@ -148,6 +196,48 @@ export default function PlanManager({ project, subscription, onUpdated }) {
         </div>
       )}
 
+      {confirmAction && (
+        <div className="rounded-xl border border-primary/20 bg-white p-4 mb-4">
+          <p className="text-sm font-semibold text-foreground">
+            Confirm{" "}
+            {confirmAction.type === "cancel"
+              ? "cancellation"
+              : confirmAction.type === "upgrade"
+                ? "upgrade"
+                : "downgrade"}{" "}
+            request
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {confirmAction.type === "cancel" ? (
+              <>This sends a cancellation request for operator review. Billing will not change automatically.</>
+            ) : (
+              <>
+                This sends an operator review request for{" "}
+                <span className="font-semibold text-foreground">{confirmAction.requestedPlanType}</span>. Billing will not change automatically.
+              </>
+            )}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              onClick={() => submitRequest(confirmAction.type, confirmAction.requestedPlanType)}
+              disabled={saving}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white disabled:opacity-50"
+              style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+            >
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              Confirm request
+            </button>
+            <button
+              onClick={() => setConfirmAction(null)}
+              disabled={saving}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-border text-sm font-semibold text-foreground hover:bg-muted disabled:opacity-50"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
         <div className="flex items-start gap-3">
           <CircleAlert className="w-4 h-4 text-amber-700 mt-0.5" />
@@ -155,11 +245,12 @@ export default function PlanManager({ project, subscription, onUpdated }) {
             <div>
               <p className="text-sm font-semibold text-amber-900">Cancellation</p>
               <p className="text-xs text-amber-800 mt-1">
-                Cancellation requests are reviewed manually. Data is preserved and services are disabled safely after the billing change is confirmed.
+                Cancellation requests are reviewed manually. Data is preserved and services are
+                disabled safely after the billing change is confirmed.
               </p>
             </div>
             <button
-              onClick={() => submitRequest("cancel")}
+              onClick={() => setConfirmAction({ type: "cancel", requestedPlanType: "" })}
               disabled={saving || subscription?.change_request_type === "cancel"}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-300 text-sm font-semibold text-amber-900 hover:bg-amber-100 disabled:opacity-50"
             >
@@ -189,7 +280,9 @@ export default function PlanManager({ project, subscription, onUpdated }) {
 function SummaryCard({ label, value }) {
   return (
     <div className="rounded-xl border border-border bg-muted/20 p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
       <p className="mt-1 text-sm font-semibold text-foreground capitalize">{value}</p>
     </div>
   );

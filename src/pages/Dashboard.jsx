@@ -89,7 +89,7 @@ export default function Dashboard() {
       <div className="border-b border-border bg-white sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="font-display text-2xl font-semibold text-foreground">
-            Admin Dashboard
+            Legacy Admin Dashboard
           </h1>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">

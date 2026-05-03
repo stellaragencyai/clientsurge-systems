@@ -2,28 +2,80 @@ import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { Send, Loader2 } from "lucide-react";
 
-export default function SupportChat({ project, user }) {
-  const [messages, setMessages] = useState([]);
+export default function SupportChat({ project, user, testMode = false, fixtureMessages = [] }) {
+  const [messages, setMessages] = useState(fixtureMessages);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
   const bottomRef = useRef(null);
 
   const loadMessages = async () => {
-    const msgs = await base44.entities.SupportMessage.filter({ project_id: project.id }, "created_date", 100);
-    setMessages(msgs);
-    setLoading(false);
+    if (testMode) {
+      setMessages((current) => (current.length > 0 ? current : fixtureMessages));
+      setLastUpdatedAt(new Date());
+      setLoading(false);
+      return;
+    }
 
-    msgs
-      .filter((m) => m.role === "admin" && !m.read)
-      .forEach((m) => base44.entities.SupportMessage.update(m.id, { read: true }));
+    try {
+      const msgs = await base44.entities.SupportMessage.filter(
+        { project_id: project.id },
+        "created_date",
+        100
+      );
+      setMessages(msgs);
+      setError("");
+      setLastUpdatedAt(new Date());
+
+      msgs
+        .filter((m) => m.role === "admin" && !m.read)
+        .forEach((m) => base44.entities.SupportMessage.update(m.id, { read: true }));
+    } catch (loadError) {
+      setError(loadError?.message || "Unable to load support messages right now.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
+    let intervalId = null;
+
+    const startPolling = () => {
+      if (intervalId || document.hidden) {
+        return;
+      }
+
+      intervalId = setInterval(loadMessages, 10000);
+    };
+
+    const stopPolling = () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopPolling();
+        return;
+      }
+
+      loadMessages();
+      startPolling();
+    };
+
     loadMessages();
-    const interval = setInterval(loadMessages, 6000);
-    return () => clearInterval(interval);
-  }, [project.id]);
+    startPolling();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [fixtureMessages, project.id, testMode]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -47,20 +99,49 @@ export default function SupportChat({ project, user }) {
     if (!input.trim() || sending) return;
 
     const text = input.trim();
+    const optimisticId = `pending-${Date.now()}`;
     setInput("");
     setSending(true);
+    setError("");
 
-    await base44.entities.SupportMessage.create({
-      project_id: project.id,
-      sender_email: user.email,
-      sender_name: user.full_name || user.email,
-      role: "client",
-      message: text,
-      read: false,
-    });
+    try {
+      const optimisticMessage = {
+        id: optimisticId,
+        role: "client",
+        message: text,
+        read: false,
+        pending: true,
+      };
 
-    setSending(false);
-    loadMessages();
+      setMessages((current) => [...current, optimisticMessage]);
+
+      if (testMode) {
+        setMessages((current) =>
+          current.map((message) =>
+            message.id === optimisticId ? { ...message, pending: false } : message
+          )
+        );
+        setLastUpdatedAt(new Date());
+        return;
+      }
+
+      await base44.entities.SupportMessage.create({
+        project_id: project.id,
+        sender_email: user.email,
+        sender_name: user.full_name || user.email,
+        role: "client",
+        message: text,
+        read: false,
+      });
+
+      await loadMessages();
+    } catch (sendError) {
+      setError(sendError?.message || "Unable to send your message right now.");
+      setMessages((current) => current.filter((message) => message.id !== optimisticId));
+      setInput(text);
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -77,9 +158,20 @@ export default function SupportChat({ project, user }) {
         <p className="text-xs text-muted-foreground mt-0.5">
           Message the ClientSurge Systems team directly. We reply within a few hours.
         </p>
+        <p className="text-[11px] text-muted-foreground mt-2">
+          {lastUpdatedAt
+            ? `Last updated ${lastUpdatedAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`
+            : "Waiting for the latest conversation sync"}
+        </p>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-3">
+        {error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
         {loading && (
           <div className="flex justify-center items-center h-full">
             <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
@@ -96,7 +188,7 @@ export default function SupportChat({ project, user }) {
         )}
 
         {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === "client" ? "justify-end" : "justify-start"}`}>
+          <div key={msg.id || `${msg.role}-${i}`} className={`flex ${msg.role === "client" ? "justify-end" : "justify-start"}`}>
             <div
               className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                 msg.role === "client"
@@ -113,6 +205,9 @@ export default function SupportChat({ project, user }) {
                 <p className="text-xs font-bold mb-1 opacity-60">ClientSurge Systems</p>
               )}
               {msg.message}
+              {msg.pending && (
+                <p className="mt-1 text-[11px] opacity-70">Sending…</p>
+              )}
             </div>
           </div>
         ))}
@@ -144,6 +239,7 @@ export default function SupportChat({ project, user }) {
         <button
           onClick={sendMessage}
           disabled={!input.trim() || sending}
+          aria-label="Send message"
           className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 disabled:opacity-40 transition-opacity"
           style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
         >

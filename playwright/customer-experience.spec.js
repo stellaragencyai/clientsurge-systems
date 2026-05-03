@@ -34,12 +34,13 @@ test("[FE-131 FE-132 FE-133 FE-134 FE-137] Pricing section shows the three packa
   page,
 }) => {
   await page.goto("/");
-  await page.locator("#pricing").scrollIntoViewIfNeeded();
-  await expect(page.getByText("Starter System")).toBeVisible();
-  await expect(page.getByText("Growth System")).toBeVisible();
-  await expect(page.getByText("Pro System")).toBeVisible();
+  const pricingSection = page.locator("#pricing");
+  await pricingSection.scrollIntoViewIfNeeded();
+  await expect(pricingSection.getByText("Starter System")).toBeVisible();
+  await expect(pricingSection.getByText("Growth System")).toBeVisible();
+  await expect(pricingSection.getByText("Pro System")).toBeVisible();
   await expect(
-    page.getByText("We handle the implementation work, not just the strategy")
+    pricingSection.getByText("We handle the implementation work, not just the strategy")
   ).toBeVisible();
 });
 

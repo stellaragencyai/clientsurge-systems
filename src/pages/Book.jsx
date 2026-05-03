@@ -42,14 +42,14 @@ export default function Book() {
             Book Your Free Demo
           </h1>
           <p className="text-muted-foreground text-lg">Free 15 minutes. No commitment. Same guided booking flow as the rest of the site.</p>
-          <a
-            href="/#services"
+          <Link
+            to="/#services"
             onClick={() => trackCTA('review_8_system_flow', 'book_page_header')}
             className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
           >
             Review the 8-step system
             <ArrowRight className="w-4 h-4" />
-          </a>
+          </Link>
         </div>
 
         <div className="mt-10 rounded-2xl border border-border bg-card/80 p-6 md:p-8">
@@ -104,7 +104,7 @@ export default function Book() {
               onClick={() => trackCTA('book_your_free_demo', 'book_page')}
               className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              Booking modal is open above
+              Complete your booking above
             </button>
             <Link
               to="/contact"

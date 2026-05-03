@@ -20,7 +20,7 @@ function buildResult({
     derived_status: derivedStatus,
     status_label: statusLabel,
     status_reason: statusReason,
-    connected: derivedStatus === "healthy",
+    connected: derivedStatus === "live_provider_proofed" || derivedStatus === "test_wired",
     status: statusLabel,
     message: statusReason,
     tested_at: testedAt,
@@ -49,7 +49,7 @@ async function logProviderTestOutcome({
   provider,
   result,
 }) {
-  const status = result.derived_status === "error" ? "failed" : "processed";
+  const status = result.derived_status === "failed" ? "failed" : "processed";
 
   await base44.asServiceRole.entities.CommunicationEvent.create({
     channel: "internal",
@@ -85,8 +85,8 @@ async function testTwilio({ settings, fetchImpl, env, testedAt }) {
     return buildResult({
       integrationId: "twilio",
       name: "Twilio SMS",
-      derivedStatus: "disabled",
-      statusLabel: "Disabled",
+      derivedStatus: "not_configured",
+      statusLabel: "Not Configured",
       statusReason: missingConfiguration.join(". "),
       configured: false,
       missingConfiguration,
@@ -102,8 +102,8 @@ async function testTwilio({ settings, fetchImpl, env, testedAt }) {
     return buildResult({
       integrationId: "twilio",
       name: "Twilio SMS",
-      derivedStatus: "error",
-      statusLabel: "Error",
+      derivedStatus: "failed",
+      statusLabel: "Failed",
       statusReason: "Twilio credentials missing from environment.",
       configured: true,
       missingConfiguration: [],
@@ -126,8 +126,8 @@ async function testTwilio({ settings, fetchImpl, env, testedAt }) {
       return buildResult({
         integrationId: "twilio",
         name: "Twilio SMS",
-        derivedStatus: "error",
-        statusLabel: "Error",
+        derivedStatus: "failed",
+        statusLabel: "Failed",
         statusReason: `Twilio account check failed with HTTP ${response.status}.`,
         configured: true,
         missingConfiguration: [],
@@ -139,9 +139,9 @@ async function testTwilio({ settings, fetchImpl, env, testedAt }) {
     return buildResult({
       integrationId: "twilio",
       name: "Twilio SMS",
-      derivedStatus: "healthy",
-      statusLabel: "Healthy",
-      statusReason: "Twilio credentials validated successfully.",
+      derivedStatus: "test_wired",
+      statusLabel: "Test Wired",
+      statusReason: "Twilio credentials validated successfully, but no order-scoped live provider proof is implied.",
       configured: true,
       missingConfiguration: [],
       provider: "twilio",
@@ -151,8 +151,8 @@ async function testTwilio({ settings, fetchImpl, env, testedAt }) {
     return buildResult({
       integrationId: "twilio",
       name: "Twilio SMS",
-      derivedStatus: "error",
-      statusLabel: "Error",
+      derivedStatus: "failed",
+      statusLabel: "Failed",
       statusReason: error instanceof Error ? error.message : "Twilio test failed.",
       configured: true,
       missingConfiguration: [],
@@ -183,8 +183,8 @@ async function testEmail({ base44, actor, settings, testedAt }) {
     return buildResult({
       integrationId: "email",
       name: "Resend Email",
-      derivedStatus: "disabled",
-      statusLabel: "Disabled",
+      derivedStatus: "not_configured",
+      statusLabel: "Not Configured",
       statusReason: missingConfiguration.join(". "),
       configured: false,
       missingConfiguration,
@@ -203,9 +203,9 @@ async function testEmail({ base44, actor, settings, testedAt }) {
     return buildResult({
       integrationId: "email",
       name: "Resend Email",
-      derivedStatus: "healthy",
-      statusLabel: "Healthy",
-      statusReason: "Test email sent successfully.",
+      derivedStatus: "test_wired",
+      statusLabel: "Test Wired",
+      statusReason: "A provider test email sent successfully, but no order-scoped live provider proof is implied.",
       configured: true,
       missingConfiguration: [],
       provider,
@@ -215,8 +215,8 @@ async function testEmail({ base44, actor, settings, testedAt }) {
     return buildResult({
       integrationId: "email",
       name: "Resend Email",
-      derivedStatus: "error",
-      statusLabel: "Error",
+      derivedStatus: "failed",
+      statusLabel: "Failed",
       statusReason: error instanceof Error ? error.message : "Email provider test failed.",
       configured: true,
       missingConfiguration: [],
@@ -241,8 +241,8 @@ async function testWebhook({ settings, fetchImpl, testedAt }) {
     return buildResult({
       integrationId: "webhook",
       name: "Webhook Delivery",
-      derivedStatus: "disabled",
-      statusLabel: "Disabled",
+      derivedStatus: "not_configured",
+      statusLabel: "Not Configured",
       statusReason: missingConfiguration.join(". "),
       configured: false,
       missingConfiguration,
@@ -266,8 +266,8 @@ async function testWebhook({ settings, fetchImpl, testedAt }) {
       return buildResult({
         integrationId: "webhook",
         name: "Webhook Delivery",
-        derivedStatus: "error",
-        statusLabel: "Error",
+        derivedStatus: "failed",
+        statusLabel: "Failed",
         statusReason: `Webhook responded with HTTP ${response.status}.`,
         configured: true,
         missingConfiguration: [],
@@ -279,9 +279,9 @@ async function testWebhook({ settings, fetchImpl, testedAt }) {
     return buildResult({
       integrationId: "webhook",
       name: "Webhook Delivery",
-      derivedStatus: "healthy",
-      statusLabel: "Healthy",
-      statusReason: "Webhook responded successfully.",
+      derivedStatus: "test_wired",
+      statusLabel: "Test Wired",
+      statusReason: "A webhook wiring test succeeded, but no order-scoped live provider proof is implied.",
       configured: true,
       missingConfiguration: [],
       provider,
@@ -291,8 +291,8 @@ async function testWebhook({ settings, fetchImpl, testedAt }) {
     return buildResult({
       integrationId: "webhook",
       name: "Webhook Delivery",
-      derivedStatus: "error",
-      statusLabel: "Error",
+      derivedStatus: "failed",
+      statusLabel: "Failed",
       statusReason: error instanceof Error ? error.message : "Webhook test failed.",
       configured: true,
       missingConfiguration: [],

@@ -29,6 +29,9 @@ const SEQUENCES = [
   { key: "reactivation", label: "Reactivation", icon: RotateCcw, color: "text-rose-600 bg-rose-50 border-rose-200", desc: "Dormant lead reactivation SMS" },
 ];
 
+const LEGACY_SEQUENCE_DISABLED_MESSAGE =
+  "Legacy manual follow-up sends have been quarantined. Use the order-backed install workspace tests instead of the old lead-level sender.";
+
 function Toast({ message, type }) {
   return (
     <div className={`fixed bottom-6 right-6 z-[9999] flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl border text-sm font-medium animate-fade-in ${
@@ -138,20 +141,7 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
   // ── Sequences ────────────────────────────────────────────────────────────────
 
   const handleTriggerSequence = async (sequenceKey) => {
-    if (triggerLoading) return;
-    setTriggerLoading(sequenceKey);
-    try {
-      const res = await base44.functions.invoke("triggerFollowUpSequence", {
-        lead_id: lead.id,
-        sequence_type: sequenceKey,
-      });
-      showToast(res.data?.message || "Sequence triggered");
-      onLeadUpdated?.({ ...lead, last_contacted_at: new Date().toISOString() });
-    } catch (err) {
-      showToast(err?.response?.data?.error || "Failed to trigger sequence", "error");
-    } finally {
-      setTriggerLoading(null);
-    }
+    showToast(LEGACY_SEQUENCE_DISABLED_MESSAGE, "error");
   };
 
   const formatDate = (d) => d ? new Date(d).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "";
@@ -281,7 +271,7 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
             <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Manually Trigger a Sequence</p>
               <p className="text-xs text-muted-foreground">
-                Each button fires the matching SMS template from your settings. If Twilio is configured, the SMS is sent immediately. If not, the event is logged for tracking.
+                Legacy lead-level direct sends are quarantined. Use the order-backed install workspace tests for runtime verification.
               </p>
               <div className="space-y-2 pt-1">
                 {SEQUENCES.map((seq) => {
@@ -291,7 +281,7 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
                     <button
                       key={seq.key}
                       onClick={() => handleTriggerSequence(seq.key)}
-                      disabled={!!triggerLoading}
+                      disabled
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all hover:shadow-sm disabled:opacity-50 ${seq.color}`}
                     >
                       <div className="flex-shrink-0">

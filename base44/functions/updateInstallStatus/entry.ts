@@ -1,22 +1,22 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
-const VALID_TRANSITIONS = {
-  "Paid": ["Ready for Install"],
-  "Ready for Install": ["Configuring"],
-  "Configuring": ["Testing"],
-  "Testing": ["Live", "Error"],
-  "Live": ["Live"],
-  "Error": ["Ready for Install", "Configuring"],
-};
+import { ALLOWED_RUNTIME_INSTALL_STATUSES } from "../_shared/installRuntime.js";
+import {
+  InstallTransitionError,
+  buildInstallSnapshot,
+  updateTrackedServiceInstallStatus,
+} from "../_shared/installPipeline.js";
 
-function calculatePipelineStatus(items) {
-  const statuses = items.map((i) => i.install_status || "Paid");
-  if (statuses.every((s) => s === "Live")) return "Live";
-  if (statuses.some((s) => s === "Error")) return "Error";
-  if (statuses.some((s) => s === "Testing")) return "Testing";
-  if (statuses.some((s) => s === "Configuring")) return "Configuring";
-  if (statuses.some((s) => s === "Ready for Install")) return "Ready for Install";
-  return "Paid";
+function getStatusCode(error) {
+  if (error instanceof InstallTransitionError) {
+    return error.code === "install_transition_not_allowed" ? 409 : 422;
+  }
+
+  const message = error instanceof Error ? error.message : "";
+  if (message === "Admin access required") return 403;
+  if (message === "Order not found" || message === "Tracked service not found on order") return 404;
+  if (message === "order_id, service_key, and install_status are required" || message === "Invalid install status") return 400;
+  return 500;
 }
 
 Deno.serve(async (req) => {
@@ -28,51 +28,31 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== "admin") {
-      return Response.json({ error: "Admin access required" }, { status: 403 });
+      throw new Error("Admin access required");
     }
 
     const payload = await req.json().catch(() => ({}));
     const { order_id, service_key, install_status, note } = payload || {};
 
     if (!order_id || !service_key || !install_status) {
-      return Response.json({ error: "order_id, service_key, and install_status are required" }, { status: 400 });
+      throw new Error("order_id, service_key, and install_status are required");
     }
 
-    const order = await base44.asServiceRole.entities.Order.get(order_id);
+    const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      throw new Error("Order not found");
     }
 
-    const item = order.items?.find((i) => i.service_key === service_key);
-    if (!item) {
-      return Response.json({ error: "Service not found on order" }, { status: 404 });
-    }
-
-    const currentStatus = item.install_status || "Paid";
-    if (!VALID_TRANSITIONS[currentStatus]?.includes(install_status)) {
-      return Response.json({
-        error: `Invalid transition: ${currentStatus} → ${install_status}`,
-        valid_transitions: VALID_TRANSITIONS[currentStatus] || [],
-      }, { status: 409 });
-    }
-
-    const timestamp = new Date().toISOString();
-    const updatedItems = order.items.map((i) => {
-      if (i.service_key !== service_key) return i;
-      const updates = { ...i, install_status };
-      if (install_status === "Configuring" && !i.install_started_at) updates.install_started_at = timestamp;
-      if (install_status === "Live") updates.install_completed_at = timestamp;
-      if (install_status === "Error") updates.install_error = note || "";
-      return updates;
+    const updatedOrder = await updateTrackedServiceInstallStatus({
+      base44,
+      order,
+      serviceKey: service_key,
+      nextStatus: install_status,
+      note,
     });
 
-    const newPipelineStatus = calculatePipelineStatus(updatedItems);
-    const updatedOrder = await base44.asServiceRole.entities.Order.update(order_id, {
-      items: updatedItems,
-      pipeline_status: newPipelineStatus,
-      last_install_event_at: timestamp,
-      ...(updatedItems.every((i) => i.install_status === "Live") ? { order_status: "fully_live" } : {}),
-    });
+    const snapshot = buildInstallSnapshot(updatedOrder);
+    const trackedService = snapshot.serviceStates.find((item) => item.service_key === service_key);
 
     return Response.json({
       success: true,
@@ -81,9 +61,30 @@ Deno.serve(async (req) => {
         pipeline_status: updatedOrder.pipeline_status,
         items: updatedOrder.items,
       },
+      service: trackedService
+        ? {
+            service_key: trackedService.service_key,
+            install_status: trackedService.install_status,
+            configuration_complete: trackedService.configuration_complete,
+            allowed_next_statuses: trackedService.allowed_next_statuses,
+            runtime_ready: ALLOWED_RUNTIME_INSTALL_STATUSES.includes(trackedService.install_status),
+          }
+        : null,
+      activation_gate: updatedOrder.activation_gate || null,
+      activation_attempt_event_id: updatedOrder.activation_attempt_event_id || null,
     });
   } catch (error) {
-    console.error("[updateInstallStatus] Error:", error.message);
-    return Response.json({ error: error.message || "Failed to update install status" }, { status: 500 });
+    const status = getStatusCode(error);
+    const message = error instanceof Error ? error.message : "Failed to update install status";
+    const details = error instanceof InstallTransitionError ? error.details : undefined;
+
+    return Response.json(
+      {
+        error: message,
+        code: error instanceof InstallTransitionError ? error.code : undefined,
+        details,
+      },
+      { status }
+    );
   }
 });

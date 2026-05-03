@@ -2,11 +2,6 @@
   "name": "AdminSettings",
   "type": "object",
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
     "twilio_enabled": {
       "type": "boolean",
       "title": "Twilio Enabled",
@@ -25,16 +20,6 @@
       "type": "boolean",
       "title": "Twilio Auth Token Present",
       "default": false
-    },
-    "whatsapp_enabled": {
-      "type": "boolean",
-      "title": "WhatsApp Enabled",
-      "default": false
-    },
-    "whatsapp_from_number": {
-      "type": "string",
-      "title": "WhatsApp From Number (Twilio)",
-      "description": "Format: whatsapp:+1XXXXXXXXXX"
     },
     "resend_enabled": {
       "type": "boolean",
@@ -81,103 +66,23 @@
     },
     "missed_call_sms_template": {
       "type": "string",
-      "title": "Missed Call SMS Template (Initial)"
+      "title": "Missed Call SMS Template"
     },
     "follow_up_day1_sms": {
       "type": "string",
-      "title": "Follow-Up SMS #2 (2 min after initial) \u2014 Light Nudge"
+      "title": "Follow-Up Day 1 SMS"
     },
     "follow_up_day3_sms": {
       "type": "string",
-      "title": "Follow-Up SMS #3 (1 hour) \u2014 Urgency Trigger"
+      "title": "Follow-Up Day 3 SMS"
     },
     "follow_up_day7_sms": {
       "type": "string",
-      "title": "Follow-Up SMS #4 (24 hours) \u2014 Clean Exit"
-    },
-    "missed_call_followup_email_1": {
-      "type": "string",
-      "title": "Follow-Up Email #2 (10 min) \u2014 Reduce Friction"
-    },
-    "missed_call_followup_email_2": {
-      "type": "string",
-      "title": "Follow-Up Email #3 (24 hours) \u2014 Final CTA"
-    },
-    "follow_up_booking_prompt_sms": {
-      "type": "string",
-      "title": "Qualified \u2192 Booking Prompt SMS (24h)"
-    },
-    "follow_up_booking_prompt_email": {
-      "type": "string",
-      "title": "Qualified \u2192 Booking Prompt Email Body (24h)"
+      "title": "Follow-Up Day 7 SMS"
     },
     "admin_notification_template": {
       "type": "string",
       "title": "Admin Notification Email Template"
-    },
-    "nurture_step1_subject": {
-      "type": "string",
-      "title": "Nurture Step 1 Subject (Day 0 \u2014 Welcome)"
-    },
-    "nurture_step1_body": {
-      "type": "string",
-      "title": "Nurture Step 1 Body (Day 0 \u2014 Welcome)"
-    },
-    "nurture_step2_subject": {
-      "type": "string",
-      "title": "Nurture Step 2 Subject (Day 3 \u2014 Case Study)"
-    },
-    "nurture_step2_body": {
-      "type": "string",
-      "title": "Nurture Step 2 Body (Day 3 \u2014 Case Study)"
-    },
-    "nurture_step3_subject": {
-      "type": "string",
-      "title": "Nurture Step 3 Subject (Day 7 \u2014 Testimonial)"
-    },
-    "nurture_step3_body": {
-      "type": "string",
-      "title": "Nurture Step 3 Body (Day 7 \u2014 Testimonial)"
-    },
-    "nurture_step4_subject": {
-      "type": "string",
-      "title": "Nurture Step 4 Subject (Day 10 \u2014 Tip)"
-    },
-    "nurture_step4_body": {
-      "type": "string",
-      "title": "Nurture Step 4 Body (Day 10 \u2014 Tip)"
-    },
-    "nurture_step5_subject": {
-      "type": "string",
-      "title": "Nurture Step 5 Subject (Day 14 \u2014 Case Study 2)"
-    },
-    "nurture_step5_body": {
-      "type": "string",
-      "title": "Nurture Step 5 Body (Day 14 \u2014 Case Study 2)"
-    },
-    "nurture_step6_subject": {
-      "type": "string",
-      "title": "Nurture Step 6 Subject (Day 18 \u2014 Testimonial 2)"
-    },
-    "nurture_step6_body": {
-      "type": "string",
-      "title": "Nurture Step 6 Body (Day 18 \u2014 Testimonial 2)"
-    },
-    "nurture_step7_subject": {
-      "type": "string",
-      "title": "Nurture Step 7 Subject (Day 23 \u2014 Tip + Offer)"
-    },
-    "nurture_step7_body": {
-      "type": "string",
-      "title": "Nurture Step 7 Body (Day 23 \u2014 Tip + Offer)"
-    },
-    "nurture_step8_subject": {
-      "type": "string",
-      "title": "Nurture Step 8 Subject (Day 30 \u2014 Final CTA)"
-    },
-    "nurture_step8_body": {
-      "type": "string",
-      "title": "Nurture Step 8 Body (Day 30 \u2014 Final CTA)"
     },
     "last_webhook_test_result": {
       "type": "string",
@@ -186,39 +91,6 @@
     "last_webhook_test_at": {
       "type": "string",
       "title": "Last Webhook Test At"
-    },
-    "cadence_default_mode": {
-      "type": "string",
-      "title": "Default Cadence Mode",
-      "enum": [
-        "auto",
-        "sms_first",
-        "email_first"
-      ],
-      "default": "auto"
-    },
-    "cadence_switch_attempts": {
-      "type": "integer",
-      "title": "Switch Channel After N Attempts",
-      "default": 3,
-      "description": "After 3 attempts with no response, switch to alternate channel"
-    },
-    "cadence_pause_on_reply": {
-      "type": "boolean",
-      "title": "Pause Sequence on Lead Reply",
-      "default": true
-    },
-    "cadence_engagement_threshold": {
-      "type": "number",
-      "title": "Engagement Score Threshold (0-100)",
-      "default": 50,
-      "description": "Increase follow-up frequency if lead engagement > threshold"
-    },
-    "cadence_max_attempts": {
-      "type": "integer",
-      "title": "Max Follow-Up Attempts",
-      "default": 6,
-      "description": "Stop automation after N total attempts"
     }
   },
   "required": []

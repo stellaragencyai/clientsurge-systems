@@ -253,6 +253,11 @@ test("canonical runtime and message-status behavior still works for trusted Twil
   const { base44, entities } = createFakeBase44({}, [
     {
       id: "event_1",
+      order_id: "order_1",
+      client_id: "client_1",
+      client_project_id: "project_1",
+      onboarding_client_id: "onboarding_1",
+      service_key: "instant_lead_response",
       provider_message_id: "SM_status",
       provider: "twilio",
       channel: "sms",
@@ -302,6 +307,14 @@ test("canonical runtime and message-status behavior still works for trusted Twil
   });
   assert.equal(statusResult.status, "delivered");
   assert.equal((await entities.CommunicationEvent.get("event_1")).status, "delivered");
+  assert.ok(
+    entities.CommunicationEvent.records.some(
+      (event) =>
+        event.subject === "Twilio delivery callback: delivered" &&
+        event.order_id === "order_1" &&
+        event.provider_message_id === "SM_status"
+    )
+  );
 
   const runtimeEventsBefore = entities.CommunicationEvent.records.length;
   const callStatusData = new FormData();
@@ -362,12 +375,24 @@ test("canonical runtime and message-status behavior still works for trusted Twil
       (event) => event.event_type === "provider_send_succeeded" && event.service_key === "missed_call_text_back"
     )
   );
+  assert.ok(
+    entities.CommunicationEvent.records.some(
+      (event) =>
+        event.subject === "Twilio missed-call webhook received" &&
+        event.order_id === "order_1" &&
+        event.service_key === "missed_call_text_back"
+    )
+  );
 });
 
 test("trusted Resend webhook still updates canonical CommunicationEvent status", async () => {
   const { base44, entities } = createFakeBase44({}, [
     {
       id: "event_email",
+      order_id: "order_1",
+      client_id: "client_1",
+      client_project_id: "project_1",
+      onboarding_client_id: "onboarding_1",
       provider_message_id: "email_123",
       provider: "resend",
       channel: "email",
@@ -390,4 +415,12 @@ test("trusted Resend webhook still updates canonical CommunicationEvent status",
   assert.equal(result.success, true);
   assert.equal(result.status, "delivered");
   assert.equal((await entities.CommunicationEvent.get("event_email")).status, "delivered");
+  assert.ok(
+    entities.CommunicationEvent.records.some(
+      (event) =>
+        event.subject === "Resend webhook: email.delivered" &&
+        event.order_id === "order_1" &&
+        event.provider_message_id === "email_123"
+    )
+  );
 });

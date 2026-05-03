@@ -92,8 +92,12 @@ export default function LeadIntelligence() {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-4xl font-bold text-foreground mb-2">Lead Intelligence Dashboard</h1>
-          <p className="text-muted-foreground">Discover, enrich, score, and manage high-quality leads</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Legacy Lead Discovery Workspace</h1>
+          <p className="text-muted-foreground">Legacy discovery-only `Lead` records for research and analytics. This is not the canonical customer CRM.</p>
+        </div>
+
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          This workspace uses the legacy `Lead` model. Use the admin Customer Leads workspace for launch-critical paid-customer CRM and runtime work.
         </div>
 
         {/* Metrics */}

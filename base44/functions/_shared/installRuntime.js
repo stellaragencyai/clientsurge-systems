@@ -305,10 +305,12 @@ function buildRuntimeStartedEvent({
   recipientPhone,
   sharedConfig,
   runtimeData,
+  leadId,
 }) {
   const displayName = getTrackedServiceByKey(serviceKey)?.display_name || serviceKey;
   return buildCommunicationEvent({
     order,
+    lead_id: leadId,
     event_type: "runtime_attempt_started",
     subject: `${displayName} runtime started`,
     message_body: `${displayName} runtime started for ${runtimeType}.`,
@@ -334,10 +336,12 @@ function buildRuntimeBlockedEvent({
   validation,
   reason,
   code,
+  leadId,
 }) {
   const displayName = getTrackedServiceByKey(serviceKey)?.display_name || serviceKey;
   return buildCommunicationEvent({
     order,
+    lead_id: leadId,
     event_type: "runtime_attempt_blocked",
     status: "failed",
     subject: `${displayName} runtime blocked`,
@@ -368,10 +372,12 @@ function buildProviderSendAttemptedEvent({
   messageBody,
   channel = "sms",
   provider = "twilio",
+  leadId,
 }) {
   const displayName = getTrackedServiceByKey(serviceKey)?.display_name || serviceKey;
   return buildCommunicationEvent({
     order,
+    lead_id: leadId,
     channel,
     direction: "outbound",
     event_type: "provider_send_attempted",
@@ -403,10 +409,12 @@ function buildProviderSendSucceededEvent({
   channel = "sms",
   provider = "twilio",
   status = "sent",
+  leadId,
 }) {
   const displayName = getTrackedServiceByKey(serviceKey)?.display_name || serviceKey;
   return buildCommunicationEvent({
     order,
+    lead_id: leadId,
     channel,
     direction: "outbound",
     event_type: "provider_send_succeeded",
@@ -438,10 +446,12 @@ function buildProviderSendFailedEvent({
   errorMessage,
   channel = "sms",
   provider = "twilio",
+  leadId,
 }) {
   const displayName = getTrackedServiceByKey(serviceKey)?.display_name || serviceKey;
   return buildCommunicationEvent({
     order,
+    lead_id: leadId,
     channel,
     direction: "outbound",
     event_type: "provider_send_failed",
@@ -1480,6 +1490,7 @@ export async function executeOrderServiceRuntime({
   serviceKey,
   runtimeType,
   recipientPhone,
+  leadId = null,
   runtimeData = {},
   businessIsOpen = true,
   consentGranted = true,
@@ -1527,6 +1538,7 @@ export async function executeOrderServiceRuntime({
         validation,
         reason: runtimeAccess.reason,
         code: runtimeAccess.code,
+        leadId,
       })
     );
 
@@ -1573,6 +1585,7 @@ export async function executeOrderServiceRuntime({
         recipientPhone: normalizedRecipientPhone,
         sharedConfig,
         runtimeData,
+        leadId,
       })
     )
   );
@@ -1588,6 +1601,7 @@ export async function executeOrderServiceRuntime({
         sharedConfig,
         runtimeData,
         messageBody,
+        leadId,
       })
     )
   );
@@ -1614,6 +1628,7 @@ export async function executeOrderServiceRuntime({
           runtimeData,
           messageBody,
           providerMessageId: sendResult.provider_message_id,
+          leadId,
         })
       )
     );
@@ -1653,6 +1668,7 @@ export async function executeOrderServiceRuntime({
         runtimeData,
         messageBody,
         errorMessage: runtimeError.message,
+        leadId,
       })
     );
 

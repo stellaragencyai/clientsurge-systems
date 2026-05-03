@@ -141,24 +141,9 @@ export default function AnalyticsDashboard() {
     setError("");
     try {
       const res = await base44.functions.invoke("getAdminAnalytics", {});
-      setData(res?.data || {
-        users: 0,
-        leads: { total: 0, new_last_30_days: 0, status_counts: {}, high_intent_count: 0 },
-        last30Days: [],
-        recent_activity: [],
-        avg_time_to_contact_hours: null,
-        top_sources: []
-      });
+      setData(res.data);
     } catch (err) {
-      setError("Analytics data unavailable. Build is in progress.");
-      setData({
-        users: 0,
-        leads: { total: 0, new_last_30_days: 0, status_counts: {}, high_intent_count: 0 },
-        last30Days: [],
-        recent_activity: [],
-        avg_time_to_contact_hours: null,
-        top_sources: []
-      });
+      setError(err?.response?.data?.error || err?.message || "Failed to load analytics.");
     } finally {
       setLoading(false);
     }
@@ -182,7 +167,7 @@ export default function AnalyticsDashboard() {
     );
   }
 
-  const { users, leads, last30Days, recent_activity, avg_time_to_contact_hours, top_sources, funnel } = data || {};
+  const { users, leads, last30Days, recent_activity } = data || {};
 
   const pipelineData = Object.entries(leads?.status_counts || {}).map(([name, value]) => ({
     name,
@@ -197,9 +182,9 @@ export default function AnalyticsDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-foreground">Analytics Dashboard</h2>
+          <h2 className="text-2xl font-semibold text-foreground">Customer Lead Analytics</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Key performance metrics, user activity, and 30-day lead volume.
+            Key performance metrics, customer lead activity, and 30-day customer lead volume.
           </p>
         </div>
         <button
@@ -214,32 +199,37 @@ export default function AnalyticsDashboard() {
       {/* ── KPI Row ──────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          icon={TrendingUp}
-          label="Leads This Month"
-          value={leads?.new_last_30_days ?? 0}
-          sub={`${leads?.total ?? 0} all-time leads`}
+          icon={Users}
+          label="Active Users"
+          value={users?.active ?? 0}
+          sub={`${users?.admins ?? 0} admin · ${users?.total ?? 0} total registered`}
           color="blue"
         />
         <MetricCard
-          icon={Target}
-          label="Conversion Rate"
-          value={`${leads?.total > 0 ? Math.round((((leads?.status_counts?.Booked ?? 0) + (leads?.status_counts?.Closed ?? 0)) / leads.total) * 100) : 0}%`}
-          sub={`${(leads?.status_counts?.Booked ?? 0) + (leads?.status_counts?.Closed ?? 0)} booked / ${leads?.total ?? 0} total`}
+          icon={TrendingUp}
+          label="Customer Leads This Month"
+          value={leads?.new_last_30_days ?? 0}
+          sub={`${leads?.total ?? 0} all-time customer leads in pipeline`}
+          trend={leads?.new_last_30_days ?? 0}
           color="green"
         />
         <MetricCard
-          icon={Activity}
-          label="Avg Response Time"
-          value={avg_time_to_contact_hours != null ? `${avg_time_to_contact_hours} hrs` : "N/A"}
-          sub="Create to first contact"
+          icon={Star}
+          label="Avg Lead Score"
+          value={leads?.avg_score ?? 0}
+          sub={`${leads?.high_intent_count ?? 0} high-intent (score ≥ 60)`}
           color="amber"
         />
         <MetricCard
-          icon={Star}
-          label="Top Lead Source"
-          value={top_sources?.[0]?.source || "N/A"}
-          sub={top_sources?.[0] ? `${top_sources[0].count} leads` : "No data"}
-          color="purple"
+          icon={Flame}
+          label="Booked"
+          value={leads?.status_counts?.Booked ?? 0}
+          sub={`${leads?.status_counts?.Qualified ?? 0} qualified · ${
+            leads?.total > 0
+              ? Math.round(((leads?.status_counts?.Booked ?? 0) / leads.total) * 100)
+              : 0
+          }% book rate`}
+          color="emerald"
         />
       </div>
 
@@ -247,9 +237,9 @@ export default function AnalyticsDashboard() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.6fr,1fr]">
         {/* 30-Day Lead Volume */}
         <div className="rounded-xl border border-border bg-white p-6">
-          <h3 className="mb-1 font-semibold text-foreground">Lead Volume — Last 30 Days</h3>
+          <h3 className="mb-1 font-semibold text-foreground">Customer Lead Volume — Last 30 Days</h3>
           <p className="mb-4 text-xs text-muted-foreground">
-            {leads?.new_last_30_days ?? 0} new leads captured over the past 30 days
+            {leads?.new_last_30_days ?? 0} new customer leads captured over the past 30 days
           </p>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={last30Days || []} barSize={10}>
@@ -278,8 +268,8 @@ export default function AnalyticsDashboard() {
 
         {/* Pipeline Status Donut */}
         <div className="rounded-xl border border-border bg-white p-6">
-          <h3 className="mb-1 font-semibold text-foreground">Pipeline Status</h3>
-          <p className="mb-4 text-xs text-muted-foreground">{totalPipeline} total leads across all stages</p>
+          <h3 className="mb-1 font-semibold text-foreground">Customer Lead Pipeline Status</h3>
+          <p className="mb-4 text-xs text-muted-foreground">{totalPipeline} total customer leads across all stages</p>
           <ResponsiveContainer width="100%" height={160}>
             <PieChart>
               <Pie
@@ -324,8 +314,8 @@ export default function AnalyticsDashboard() {
       <div className="rounded-xl border border-border bg-white p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="font-semibold text-foreground">Recent Activity Log</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">Latest 30 communication events across all leads</p>
+            <h3 className="font-semibold text-foreground">Customer Lead Activity Log</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Latest 30 communication events tied to canonical customer leads</p>
           </div>
           <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground">
             {recent_activity?.length ?? 0} events

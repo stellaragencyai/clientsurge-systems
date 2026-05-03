@@ -4,7 +4,11 @@
   "properties": {
     "lead_id": {
       "type": "string",
-      "title": "Lead ID"
+      "title": "Canonical Customer Lead ID (legacy compatibility)"
+    },
+    "website_lead_id": {
+      "type": "string",
+      "title": "Platform Website Lead ID"
     },
     "scheduled_date": {
       "type": "string",
@@ -32,7 +36,6 @@
     }
   },
   "required": [
-    "lead_id",
     "status"
   ]
 }

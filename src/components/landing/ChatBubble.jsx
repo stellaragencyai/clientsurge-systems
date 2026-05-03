@@ -27,6 +27,7 @@ export default function ChatBubble() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
   const [pulsed, setPulsed] = useState(false);
+  const messagesContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -44,7 +45,18 @@ export default function ChatBubble() {
   }, [open]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = messagesContainerRef.current;
+    if (!container) {
+      return;
+    }
+
+    // Keep the chat scrolled internally without asking the browser to scroll
+    // the page toward a fixed overlay. Some embedded browsers treat element
+    // scrollIntoView on floating UI as a page scroll hint.
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: "smooth",
+    });
   }, [messages, loading]);
 
   const sendMessage = async (text) => {
@@ -134,7 +146,11 @@ export default function ChatBubble() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ background: "hsl(40,30%,98%)" }}>
+          <div
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
+            style={{ background: "hsl(40,30%,98%)" }}
+          >
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 {msg.role === "assistant" && (

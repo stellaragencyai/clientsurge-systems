@@ -1,3 +1,8 @@
+/**
+ * LEGACY
+ * Lead analytics here are discovery-only and read the deprecated Lead entity.
+ * Do not treat this endpoint as canonical paid-customer CRM analytics.
+ */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
 

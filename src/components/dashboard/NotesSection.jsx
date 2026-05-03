@@ -14,14 +14,11 @@ export default function NotesSection({ leadId }) {
 
   const loadNotes = async () => {
     try {
-      // For now, we'll store notes in the lead's problem field or a custom field
-      // This is a simple implementation using the Events entity for notes
-      const data = await base44.entities.Events.filter(
-        { lead_id: leadId, event_type: "note" },
-        "-created_date",
-        100
-      );
-      setNotes(data);
+      const res = await base44.functions.invoke("manageLeadNotes", {
+        action: "list",
+        lead_id: leadId,
+      });
+      setNotes(res.data?.notes || []);
     } catch (err) {
       console.error("Error loading notes:", err);
     } finally {
@@ -35,11 +32,12 @@ export default function NotesSection({ leadId }) {
 
     setSaving(true);
     try {
-      const note = await base44.entities.Events.create({
+      const res = await base44.functions.invoke("manageLeadNotes", {
+        action: "create",
         lead_id: leadId,
-        event_type: "note",
-        data: { text: newNote, created_by: "admin" },
+        text: newNote,
       });
+      const note = res.data?.note;
 
       setNotes((prev) => [note, ...prev]);
       setNewNote("");
@@ -52,7 +50,10 @@ export default function NotesSection({ leadId }) {
 
   const handleDeleteNote = async (noteId) => {
     try {
-      await base44.entities.Events.delete(noteId);
+      await base44.functions.invoke("manageLeadNotes", {
+        action: "delete",
+        note_id: noteId,
+      });
       setNotes((prev) => prev.filter((n) => n.id !== noteId));
     } catch (err) {
       console.error("Error deleting note:", err);
@@ -112,7 +113,7 @@ export default function NotesSection({ leadId }) {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <p className="text-sm text-foreground">
-                    {note.data?.text}
+                    {note.text}
                   </p>
                   <p className="text-xs text-muted-foreground mt-2">
                     {formatDate(note.created_date)}

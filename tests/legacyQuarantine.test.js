@@ -24,3 +24,11 @@ test("legacy endpoint response returns HTTP 410 with structured body", async () 
   assert.equal(body.endpoint, "createLeadAndDispatch");
   assert.ok(body.replacement.includes("submitLeadCapture"));
 });
+
+test("quarantined auto-live scheduler points admins back to guarded install workflow", () => {
+  const payload = getLegacyEndpointQuarantine("autoAdvanceInstallPipeline");
+
+  assert.equal(payload.endpoint, "autoAdvanceInstallPipeline");
+  assert.ok(payload.reason.includes("auto-live scheduler"));
+  assert.ok(payload.replacement.includes("InstallOrderWorkspace"));
+});

@@ -57,6 +57,7 @@ Deno.serve(async (req) => {
       customer_email,
       customer_phone,
       business_name,
+      accepted_legal,
       success_url,
       cancel_url,
     } = await req.json();
@@ -77,6 +78,16 @@ Deno.serve(async (req) => {
 
     if (!requestedProductIds.length || !customer_email) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    if (accepted_legal !== true) {
+      return Response.json(
+        {
+          error: "Terms and privacy acceptance is required before checkout",
+          request_id: requestId,
+        },
+        { status: 400 }
+      );
     }
 
     const pricingSummary = buildPricingSummaryForProducts(requestedProductIds);
@@ -114,11 +125,16 @@ Deno.serve(async (req) => {
       service_access_status: "active",
     }));
 
+    const acceptedAt = new Date().toISOString();
     const order = await base44.asServiceRole.entities.Order.create({
       customer_email,
       customer_name,
       customer_phone: customer_phone || "",
       business_name,
+      legal_accepted_at: acceptedAt,
+      terms_accepted_at: acceptedAt,
+      privacy_accepted_at: acceptedAt,
+      legal_acceptance_version: "checkout_v1",
       items: orderItems,
       total_setup: pricingSummary.total_setup,
       total_monthly: pricingSummary.total_monthly,
@@ -146,6 +162,7 @@ Deno.serve(async (req) => {
       customer_name,
       customer_phone: customer_phone || "",
       business_name,
+      legal_acceptance_version: "checkout_v1",
       items_json: JSON.stringify(
         pricingSummary.priced_items.map((item) => ({
           product_id: item.product_id,
@@ -174,6 +191,7 @@ Deno.serve(async (req) => {
               service_key: item.service_key,
             }))
           ),
+          legal_acceptance_version: "checkout_v1",
           request_id: requestId,
         },
       },

@@ -175,7 +175,10 @@ Deno.serve(async (req) => {
       .slice(0, 5);
 
     // ── Recent activity log ───────────────────────────────────────────────────
-    const recentActivity = (events || []).slice(0, 30).map((ev) => ({
+    const recentActivity = (events || [])
+      .filter((ev) => Boolean(ev.lead_id))
+      .slice(0, 30)
+      .map((ev) => ({
       id: ev.id,
       lead_id: ev.lead_id,
       channel: ev.channel,
@@ -186,7 +189,7 @@ Deno.serve(async (req) => {
       subject: ev.subject,
       message_body: ev.message_body,
       created_date: ev.created_date,
-    }));
+      }));
 
     const truncation = {
       users_capped: allUsers.length >= USER_LIMIT,

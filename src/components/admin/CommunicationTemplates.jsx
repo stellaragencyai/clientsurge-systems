@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  MessageSquare, Mail, Phone, Send, Bell, Zap, BookOpen,
+  MessageSquare, Mail, Phone, Send, Bell, Zap,
   Eye, Save, X, AlertCircle, CheckCircle, ChevronDown, ChevronUp,
   Lightbulb, Copy, Check
 } from "lucide-react";
@@ -19,6 +19,7 @@ const TEMPLATE_GROUPS = [
         key: "sms_template",
         label: "Lead Response SMS",
         type: "sms",
+        usedBy: ["Instant Lead Response", "Manual Instant Response trigger"],
         rows: 4,
         placeholder: "Hi {name}! Thanks for reaching out to {business_name}. We'd love to help — here's your booking link: {booking_link}",
         variables: ["{name}", "{business_name}", "{booking_link}", "{date}"],
@@ -28,6 +29,7 @@ const TEMPLATE_GROUPS = [
         key: "email_confirmation_template",
         label: "Lead Response Email",
         type: "email",
+        usedBy: ["Instant Lead Response email confirmation"],
         rows: 7,
         placeholder: "Hi {name},\n\nThanks for reaching out! We're excited to help you.\n\nClick here to book: {booking_link}\n\nQuestions? Reply to this email.\n\nBest,\n{business_name}",
         variables: ["{name}", "{business_name}", "{booking_link}", "{date}"],
@@ -45,6 +47,7 @@ const TEMPLATE_GROUPS = [
         key: "missed_call_sms_template",
         label: "Missed Call SMS",
         type: "sms",
+        usedBy: ["Missed Call Recovery", "Manual missed-call trigger"],
         rows: 4,
         placeholder: "Hey {name}, sorry we missed your call! We'd love to connect — you can book a time here: {booking_link}",
         variables: ["{name}", "{business_name}", "{booking_link}"],
@@ -62,6 +65,7 @@ const TEMPLATE_GROUPS = [
         key: "follow_up_day1_sms",
         label: "Day 1 Follow-Up SMS",
         type: "sms",
+        usedBy: ["Drip Campaign Day 1", "Manual Day 1 trigger"],
         rows: 4,
         placeholder: "Hi {name}, just following up on your inquiry. Still interested? Book here: {booking_link}",
         variables: ["{name}", "{booking_link}"],
@@ -71,6 +75,7 @@ const TEMPLATE_GROUPS = [
         key: "follow_up_day3_sms",
         label: "Day 3 Follow-Up SMS",
         type: "sms",
+        usedBy: ["Drip Campaign Day 3", "Manual Day 3 trigger"],
         rows: 4,
         placeholder: "Hey {name} — we still have availability this week. Grab a slot before it's gone: {booking_link}",
         variables: ["{name}", "{booking_link}"],
@@ -80,61 +85,12 @@ const TEMPLATE_GROUPS = [
         key: "follow_up_day7_sms",
         label: "Day 7 Follow-Up SMS",
         type: "sms",
+        usedBy: ["Drip Campaign Day 7", "Manual Day 7 trigger"],
         rows: 4,
         placeholder: "Hi {name}, we haven't heard back — no worries! Whenever you're ready, your link is here: {booking_link}",
         variables: ["{name}", "{booking_link}"],
         tip: "Softer tone — many leads convert on this message.",
       },
-    ],
-  },
-  {
-    id: "qualified_followup",
-    label: "Qualified → Booking Prompt (24h)",
-    icon: Zap,
-    description: "Sent automatically 24h after a lead reaches Qualified status, if they haven't booked yet.",
-    templates: [
-      {
-        key: "follow_up_booking_prompt_sms",
-        label: "Qualified Booking Prompt SMS",
-        type: "sms",
-        rows: 4,
-        placeholder: "Hi {name}! You're all set — here's your link to book your free consultation: {booking_link}. We'd love to connect!",
-        variables: ["{name}", "{business_name}", "{booking_link}"],
-        tip: "This fires 24h after a lead reaches Qualified with no booking. Keep it warm and action-oriented.",
-      },
-      {
-        key: "follow_up_booking_prompt_email",
-        label: "Qualified Booking Prompt Email",
-        type: "email",
-        rows: 6,
-        placeholder: "Hi {name},\n\nGreat news — you're qualified and ready to take the next step!\n\nBook your free consultation here: {booking_link}\n\nLooking forward to speaking with you!\n\nBest,\n{business_name}",
-        variables: ["{name}", "{business_name}", "{booking_link}"],
-        tip: "Sent alongside the SMS. Reinforces the booking CTA with a more detailed message.",
-      },
-    ],
-  },
-  {
-    id: "nurture",
-    label: "30-Day Nurture Email Sequence",
-    icon: Mail,
-    description: "8-step email sequence sent automatically to leads over 30 days. Leave subject/body blank to use the built-in defaults.",
-    templates: [
-      { key: "nurture_step1_subject", label: "Step 1 Subject (Day 0 — Welcome)", type: "email", rows: 1, placeholder: "Welcome, {name} — here's what's coming your way", variables: ["{name}", "{business_name}"], tip: "Day 0: sent immediately on enrollment." },
-      { key: "nurture_step1_body",    label: "Step 1 Body (Day 0 — Welcome)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nWelcome! Over the next 30 days...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Introduce your value prop and set expectations." },
-      { key: "nurture_step2_subject", label: "Step 2 Subject (Day 3 — Case Study)", type: "email", rows: 1, placeholder: "{name}, how a med spa went from 14% to 61% lead conversion", variables: ["{name}", "{business_name}"], tip: "Day 3: lead a case study." },
-      { key: "nurture_step2_body",    label: "Step 2 Body (Day 3 — Case Study)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nA real result worth sharing...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Share a concrete before/after story." },
-      { key: "nurture_step3_subject", label: "Step 3 Subject (Day 7 — Testimonial)", type: "email", rows: 1, placeholder: '"I didn\'t realize how many leads I was losing" — {name}, read this', variables: ["{name}"], tip: "Day 7: social proof." },
-      { key: "nurture_step3_body",    label: "Step 3 Body (Day 7 — Testimonial)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nA client said it best...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Use a direct quote from a real or representative client." },
-      { key: "nurture_step4_subject", label: "Step 4 Subject (Day 10 — Tip)", type: "email", rows: 1, placeholder: "The 5-minute rule that recovers 30% more leads — for {name}", variables: ["{name}"], tip: "Day 10: actionable tip." },
-      { key: "nurture_step4_body",    label: "Step 4 Body (Day 10 — Tip)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nQuick tip for {business_name}...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Give one concrete, easy-to-digest tip." },
-      { key: "nurture_step5_subject", label: "Step 5 Subject (Day 14 — Case Study 2)", type: "email", rows: 1, placeholder: "{name} — how a home service company recovered $12k in lost leads", variables: ["{name}"], tip: "Day 14: second case study, different industry." },
-      { key: "nurture_step5_body",    label: "Step 5 Body (Day 14 — Case Study 2)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nAnother result worth sharing...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Vary the industry to broaden relevance." },
-      { key: "nurture_step6_subject", label: "Step 6 Subject (Day 18 — Testimonial 2)", type: "email", rows: 1, placeholder: '{name}, this is what "set it and forget it" actually looks like', variables: ["{name}"], tip: "Day 18: second testimonial." },
-      { key: "nurture_step6_body",    label: "Step 6 Body (Day 18 — Testimonial 2)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nAnother client story...", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Focus on ease-of-use and trust." },
-      { key: "nurture_step7_subject", label: "Step 7 Subject (Day 23 — Tip + Offer)", type: "email", rows: 1, placeholder: "{name} — 3 follow-up mistakes that kill conversions (+ a free offer)", variables: ["{name}"], tip: "Day 23: tips + soft offer." },
-      { key: "nurture_step7_body",    label: "Step 7 Body (Day 23 — Tip + Offer)",   type: "email", rows: 8, placeholder: "Hi {name},\n\n3 mistakes we see constantly...\n\nFree offer: {booking_link}", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Combine value with a clear CTA." },
-      { key: "nurture_step8_subject", label: "Step 8 Subject (Day 30 — Final CTA)", type: "email", rows: 1, placeholder: "{name} — last message from us (your call)", variables: ["{name}"], tip: "Day 30: final, respectful send." },
-      { key: "nurture_step8_body",    label: "Step 8 Body (Day 30 — Final CTA)",   type: "email", rows: 8, placeholder: "Hi {name},\n\nThis is our last scheduled email...\n\nBook here: {booking_link}", variables: ["{name}", "{business_name}", "{booking_link}"], tip: "Give a clear final CTA and an opt-out path." },
     ],
   },
   {
@@ -147,6 +103,7 @@ const TEMPLATE_GROUPS = [
         key: "admin_notification_template",
         label: "New Lead Notification",
         type: "email",
+        usedBy: ["Admin new lead alert"],
         rows: 5,
         placeholder: "New lead received!\n\nName: {name}\nPhone: {phone}\nEmail: {email}\nSource: {source}\n\nLog in to review: {dashboard_link}",
         variables: ["{name}", "{phone}", "{email}", "{source}", "{dashboard_link}"],
@@ -223,6 +180,11 @@ function TemplateEditor({ template, value, onChange, onPreview }) {
             {template.type}
           </span>
         </div>
+        {template.usedBy?.length ? (
+          <span className="text-[11px] text-muted-foreground">
+            Used by: {template.usedBy.join(" · ")}
+          </span>
+        ) : null}
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowTip((v) => !v)}

@@ -18,6 +18,22 @@
       "type": "string",
       "title": "Business Name"
     },
+    "legal_accepted_at": {
+      "type": "string",
+      "title": "Legal Accepted At"
+    },
+    "terms_accepted_at": {
+      "type": "string",
+      "title": "Terms Accepted At"
+    },
+    "privacy_accepted_at": {
+      "type": "string",
+      "title": "Privacy Accepted At"
+    },
+    "legal_acceptance_version": {
+      "type": "string",
+      "title": "Legal Acceptance Version"
+    },
     "items": {
       "type": "array",
       "title": "Ordered Services",
@@ -519,6 +535,30 @@
     "install_configuration_updated_at": {
       "type": "string",
       "title": "Install Configuration Updated At"
+    },
+    "lead_ingestion_api_key": {
+      "type": "string",
+      "title": "Lead Ingestion API Key"
+    },
+    "lead_ingestion_webhook_secret": {
+      "type": "string",
+      "title": "Lead Ingestion Webhook Secret"
+    },
+    "lead_ingestion_last_used_at": {
+      "type": "string",
+      "title": "Lead Ingestion Last Used At"
+    },
+    "lead_ingestion_credentials_issued_at": {
+      "type": "string",
+      "title": "Lead Ingestion Credentials Issued At"
+    },
+    "lead_ingestion_credentials_rotated_at": {
+      "type": "string",
+      "title": "Lead Ingestion Credentials Rotated At"
+    },
+    "lead_ingestion_credentials_revoked_at": {
+      "type": "string",
+      "title": "Lead Ingestion Credentials Revoked At"
     },
     "pipeline_error": {
       "type": "string",

@@ -34,6 +34,12 @@ const testimonials = [
   },
 ];
 
+const testimonialHighlights = [
+  "5x booking increase",
+  "ROI in under 7 days",
+  "Same-day consult response",
+];
+
 export default function Testimonials() {
   const demoBooking = useDemoBooking();
   return (
@@ -45,6 +51,24 @@ export default function Testimonials() {
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
            Real Results From Businesses Using Our System
           </h2>
+          <p className="mt-5 text-muted-foreground text-lg leading-relaxed">
+            A quick snapshot of what changes when fast response and follow-up stop
+            depending on manual effort.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-2">
+            {testimonialHighlights.map((item) => (
+              <span
+                key={item}
+                className="inline-flex rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-primary"
+                style={{
+                  background: "rgba(154,92,46,0.08)",
+                  borderColor: "rgba(154,92,46,0.16)",
+                }}
+              >
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -121,14 +145,14 @@ export default function Testimonials() {
             <button
               type="button"
               onClick={demoBooking.openDemoBooking}
-              className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center justify-center rounded-full border border-primary/18 bg-primary/6 px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
             >
               Book Your Free Demo
             </button>
           ) : (
             <a
               href="/book"
-              className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center justify-center rounded-full border border-primary/18 bg-primary/6 px-6 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
             >
               Book Your Free Demo
             </a>

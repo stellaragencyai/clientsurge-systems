@@ -4,6 +4,11 @@ import {
   MISSED_CALL_TRIGGER_STATUSES,
   RuntimeExecutionError,
 } from "./installRuntime.js";
+import { buildProviderCallbackEvent, PROVIDER_PROOF_MODE } from "./providerProof.js";
+
+async function createCallbackEvent(base44, event) {
+  return base44.asServiceRole.entities.CommunicationEvent.create(event);
+}
 
 export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
   const messageId = formData.get("MessageSid");
@@ -37,6 +42,23 @@ export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
     await base44.entities.CommunicationEvent.update(event.id, {
       status: mappedStatus,
     });
+
+    await createCallbackEvent(
+      base44,
+      buildProviderCallbackEvent({
+        sourceEvent: event,
+        status: mappedStatus,
+        provider: "twilio",
+        callbackType: "message_status",
+        subject: `Twilio delivery callback: ${mappedStatus}`,
+        messageBody: `Twilio updated provider message ${messageId} to ${mappedStatus}.`,
+        metadata: {
+          raw_status: String(messageStatus),
+          provider_message_id: messageId,
+          proof_mode: PROVIDER_PROOF_MODE.LIVE,
+        },
+      })
+    );
 
     return {
       success: true,
@@ -82,6 +104,53 @@ export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
       handled_as: "call_status",
     };
   }
+
+  const duplicateContextId = `${order.id}:twilio:missed_call_status:${callSid}`;
+  const existingCallbacks = await base44.asServiceRole.entities.CommunicationEvent.filter({
+    order_id: order.id,
+    context_type: "provider_callback",
+    context_id: duplicateContextId,
+  });
+
+  if (existingCallbacks.length > 0) {
+    return {
+      success: true,
+      duplicate_suppressed: true,
+      order_id: order.id,
+      call_sid: callSid,
+      handled_as: "call_status",
+    };
+  }
+
+  await createCallbackEvent(
+    base44,
+    buildProviderCallbackEvent({
+      sourceEvent: {
+        id: `twilio-call-${callSid}`,
+        order_id: order.id,
+        client_id: order.client_id,
+        client_project_id: order.client_project_id,
+        onboarding_client_id: order.onboarding_client_id,
+        service_key: "missed_call_text_back",
+        channel: "webhook",
+        provider_message_id: callSid,
+      },
+      status: "processed",
+      provider: "twilio",
+      callbackType: "missed_call_status",
+      subject: "Twilio missed-call webhook received",
+      messageBody: `Twilio reported ${callStatus} for a missed-call candidate on ${toPhone}.`,
+      metadata: {
+        call_sid: callSid,
+        call_status: callStatus,
+        caller_phone: fromPhone,
+        caller_name: callerName,
+        business_phone: toPhone,
+        proof_kind: "twilio_missed_call_webhook",
+        proof_mode: PROVIDER_PROOF_MODE.LIVE,
+      },
+    })
+  );
 
   try {
     const result = await executeOrderServiceRuntime({
@@ -149,6 +218,23 @@ export async function handleTrustedResendWebhook({ base44, payload }) {
     await base44.entities.CommunicationEvent.update(events[0].id, {
       status,
     });
+
+    await createCallbackEvent(
+      base44,
+      buildProviderCallbackEvent({
+        sourceEvent: events[0],
+        status,
+        provider: "resend",
+        callbackType: type,
+        subject: `Resend webhook: ${type}`,
+        messageBody: `Resend reported ${type} for provider message ${email_id}.`,
+        metadata: {
+          provider_message_id: email_id,
+          resend_type: type,
+          proof_mode: PROVIDER_PROOF_MODE.LIVE,
+        },
+      })
+    );
   }
 
   return {

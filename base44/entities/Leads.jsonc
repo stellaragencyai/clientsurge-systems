@@ -1,12 +1,10 @@
+// CUSTOMER-CANONICAL
+// This is the canonical paid-customer CRM / automation lead model.
+// Launch-critical customer runtime must use Leads, not Lead or WebsiteLead.
 {
   "name": "Leads",
   "type": "object",
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
     "full_name": {
       "type": "string",
       "title": "Full Name"
@@ -22,6 +20,22 @@
     "phone": {
       "type": "string",
       "title": "Phone Number"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Paid Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Linked Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Linked Client Project ID"
+    },
+    "onboarding_client_id": {
+      "type": "string",
+      "title": "Linked Onboarding Client ID"
     },
     "business_type": {
       "type": "string",
@@ -58,17 +72,6 @@
       "title": "Lead Score (0-100)",
       "default": 0
     },
-    "activation_priority": {
-      "type": "string",
-      "title": "Activation Priority",
-      "enum": [
-        "Hot",
-        "High",
-        "Medium",
-        "Low"
-      ],
-      "default": "Low"
-    },
     "lead_category": {
       "type": "string",
       "title": "Lead Category",
@@ -102,24 +105,9 @@
       "type": "string",
       "title": "Booked At"
     },
-    "reply_sentiment": {
+    "last_activity_at": {
       "type": "string",
-      "title": "Reply Sentiment (AI)",
-      "enum": [
-        "Positive",
-        "Neutral",
-        "Negative",
-        "Unknown"
-      ],
-      "default": "Unknown"
-    },
-    "reply_sentiment_reason": {
-      "type": "string",
-      "title": "Sentiment Reason (AI)"
-    },
-    "reply_sentiment_analyzed_at": {
-      "type": "string",
-      "title": "Sentiment Last Analyzed At"
+      "title": "Last Activity At"
     },
     "ai_intent": {
       "type": "string",
@@ -148,6 +136,34 @@
     "website": {
       "type": "string",
       "title": "Business Website URL"
+    },
+    "normalized_email": {
+      "type": "string",
+      "title": "Normalized Email"
+    },
+    "normalized_phone": {
+      "type": "string",
+      "title": "Normalized Phone"
+    },
+    "normalized_business_name": {
+      "type": "string",
+      "title": "Normalized Business Name"
+    },
+    "dedupe_key": {
+      "type": "string",
+      "title": "Dedupe Key"
+    },
+    "automation_context_json": {
+      "type": "string",
+      "title": "Automation Context JSON"
+    },
+    "import_source": {
+      "type": "string",
+      "title": "Import Source"
+    },
+    "import_batch_id": {
+      "type": "string",
+      "title": "Import Batch ID"
     },
     "industry_tags": {
       "type": "array",
@@ -196,21 +212,6 @@
     "enriched_at": {
       "type": "string",
       "title": "Last Enriched At"
-    },
-    "missed_call_step_sent": {
-      "type": "integer",
-      "title": "Missed-Call Follow-Up Step (1-4)",
-      "default": 0,
-      "description": "Highest follow-up step sent (0=none, 1=2min SMS, 2=10min email, 3=1hr SMS, 4=24hr email)"
-    },
-    "missed_call_last_step_at": {
-      "type": "string",
-      "title": "Missed-Call Last Step Sent At"
-    },
-    "missed_call_sequence_complete": {
-      "type": "boolean",
-      "title": "Missed-Call Sequence Complete",
-      "default": false
     }
   },
   "required": [

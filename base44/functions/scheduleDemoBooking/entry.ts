@@ -1,9 +1,15 @@
+/**
+ * PLATFORM-WEBSITE-ONLY
+ * ClientSurge's own website demo-booking funnel writes to WebsiteLead and DemoRequest.website_lead_id.
+ * Do not use this endpoint for paid-customer CRM/runtime lead intake.
+ */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { buildPlatformWebsiteLeadMetadata } from "../_shared/leadModel.js";
 
 const MAX_FIELD_LENGTH = 500;
 const DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const LEAD_SOURCE = 'website';
+const LEAD_SOURCE = 'clientsurge_website';
 const INTAKE_TYPE = 'demo_booking';
 
 function sanitizeString(value: unknown, fallback = '') {
@@ -69,7 +75,7 @@ async function isRateLimited(
   base44: ReturnType<typeof createClientFromRequest>,
   payload: ReturnType<typeof normalizePayload>
 ) {
-  const emailMatches = await base44.asServiceRole.entities.Leads.filter({ email: payload.email }, '-created_date', 5);
+  const emailMatches = await base44.asServiceRole.entities.WebsiteLead.filter({ email: payload.email }, '-created_date', 5);
   const now = Date.now();
 
   return emailMatches.some((existingLead: Record<string, unknown>) => {
@@ -107,29 +113,44 @@ function isRecentDuplicate(existingLead: Record<string, unknown>, payload: Retur
 }
 
 function buildLeadPayload(payload: ReturnType<typeof normalizePayload>) {
+  const normalizedEmail = payload.email.toLowerCase();
+  const normalizedPhone = payload.phone.replace(/\D/g, '');
+  const normalizedBusinessName = payload.business_name.trim().toLowerCase();
   return {
     full_name: payload.full_name,
     business_name: payload.business_name,
-    email: payload.email,
+    email: normalizedEmail,
     phone: payload.phone,
     business_type: payload.industry,
-    problem: payload.biggest_issue || payload.monthly_leads || 'Scheduling demo',
+    message: payload.biggest_issue || payload.monthly_leads || 'Scheduling demo',
     source: LEAD_SOURCE,
     intake_type: INTAKE_TYPE,
-    status: 'Booked',
-    booking_link_sent_at: new Date().toISOString(),
+    normalized_email: normalizedEmail,
+    normalized_phone: normalizedPhone,
+    normalized_business_name: normalizedBusinessName,
+    dedupe_key: normalizedEmail ? `email:${normalizedEmail}` : normalizedPhone ? `phone:${normalizedPhone}` : '',
+    funnel_context_json: JSON.stringify(
+      buildPlatformWebsiteLeadMetadata({
+        monthly_leads: payload.monthly_leads,
+        biggest_issue: payload.biggest_issue,
+        website_function: 'scheduleDemoBooking',
+      })
+    ),
+    status: 'booked',
+    scheduled_date: payload.scheduled_date,
+    scheduled_time: payload.scheduled_time,
     booked_at: new Date().toISOString(),
   };
 }
 
 async function ensureDemoRequest(
   base44: ReturnType<typeof createClientFromRequest>,
-  leadId: string,
+  websiteLeadId: string,
   payload: ReturnType<typeof normalizePayload>
 ) {
   const existingRequests = await base44.asServiceRole.entities.DemoRequest.filter(
     {
-      lead_id: leadId,
+      website_lead_id: websiteLeadId,
       scheduled_date: payload.scheduled_date,
       scheduled_time: payload.scheduled_time,
     },
@@ -146,7 +167,7 @@ async function ensureDemoRequest(
   }
 
   return base44.asServiceRole.entities.DemoRequest.create({
-    lead_id: leadId,
+    website_lead_id: websiteLeadId,
     scheduled_date: payload.scheduled_date,
     scheduled_time: payload.scheduled_time,
     status: 'scheduled',
@@ -157,7 +178,7 @@ async function ensureDemoRequest(
 async function logCommunicationEvent(
   base44: ReturnType<typeof createClientFromRequest>,
   payload: {
-    lead_id: string;
+    website_lead_id: string;
     channel: 'sms' | 'email' | 'webhook' | 'internal';
     direction: 'outbound' | 'inbound' | 'system';
     event_type: 'lead_created' | 'sms_sent' | 'sms_failed' | 'sms_received' | 'sms_delivered' | 'email_sent' | 'email_failed' | 'webhook_sent' | 'workflow_triggered' | 'status_update';
@@ -170,7 +191,7 @@ async function logCommunicationEvent(
   }
 ) {
   await base44.asServiceRole.entities.CommunicationEvent.create({
-    lead_id: payload.lead_id,
+    website_lead_id: payload.website_lead_id,
     channel: payload.channel,
     direction: payload.direction,
     event_type: payload.event_type,
@@ -179,7 +200,7 @@ async function logCommunicationEvent(
     subject: payload.subject,
     message_body: payload.message_body,
     error_message: payload.error_message,
-    metadata_json: payload.metadata ? JSON.stringify(payload.metadata) : undefined,
+    metadata_json: payload.metadata ? JSON.stringify(buildPlatformWebsiteLeadMetadata(payload.metadata)) : undefined,
   });
 }
 
@@ -210,11 +231,11 @@ Deno.serve(async (req) => {
     const bookingDateTime = parseBookingDateTime(payload.scheduled_date, payload.scheduled_time);
     let existingLead = null;
 
-    const emailMatches = await base44.asServiceRole.entities.Leads.filter({ email: payload.email }, '-created_date', 10);
+    const emailMatches = await base44.asServiceRole.entities.WebsiteLead.filter({ email: payload.email }, '-created_date', 10);
     existingLead = emailMatches.find((item: Record<string, unknown>) => isRecentDuplicate(item, payload)) || null;
 
     if (!existingLead) {
-      const phoneMatches = await base44.asServiceRole.entities.Leads.filter({ phone: payload.phone }, '-created_date', 10);
+      const phoneMatches = await base44.asServiceRole.entities.WebsiteLead.filter({ phone: payload.phone }, '-created_date', 10);
       existingLead = phoneMatches.find((item: Record<string, unknown>) => isRecentDuplicate(item, payload)) || null;
     }
 
@@ -222,13 +243,13 @@ Deno.serve(async (req) => {
     let lead;
 
     if (existingLead) {
-      lead = await base44.asServiceRole.entities.Leads.update(existingLead.id, leadPayload);
+      lead = await base44.asServiceRole.entities.WebsiteLead.update(existingLead.id, leadPayload);
     } else {
-      lead = await base44.asServiceRole.entities.Leads.create(leadPayload);
+      lead = await base44.asServiceRole.entities.WebsiteLead.create(leadPayload);
     }
 
     await logCommunicationEvent(base44, {
-      lead_id: lead.id,
+      website_lead_id: lead.id,
       channel: 'internal',
       direction: 'system',
       event_type: 'lead_created',
@@ -331,7 +352,7 @@ Deno.serve(async (req) => {
         message: `Calendar event scheduled for ${payload.scheduled_date} ${payload.scheduled_time}`,
         run: () =>
           base44.functions.invoke('createDemoCalendarEvent', {
-            lead_id: lead.id,
+            website_lead_id: lead.id,
             title: `Demo: ${payload.business_name} - ${payload.full_name}`,
             description: `Demo Booking\n\nBusiness: ${payload.business_name}\nIndustry: ${payload.industry}\nContact: ${payload.full_name}\nEmail: ${payload.email}\nPhone: ${payload.phone}\nMonthly Leads: ${payload.monthly_leads}\nChallenge: ${payload.biggest_issue}`,
             start_time: bookingDateTime,
@@ -344,7 +365,7 @@ Deno.serve(async (req) => {
       try {
         await effect.run();
         await logCommunicationEvent(base44, {
-          lead_id: lead.id,
+          website_lead_id: lead.id,
           channel: effect.channel,
           direction: effect.channel === 'internal' ? 'system' : 'outbound',
           event_type: effect.eventTypeSuccess,
@@ -362,7 +383,7 @@ Deno.serve(async (req) => {
         const message = error instanceof Error ? error.message : 'failed';
         warnings.push(`${effect.name}:${message}`);
         await logCommunicationEvent(base44, {
-          lead_id: lead.id,
+          website_lead_id: lead.id,
           channel: effect.channel,
           direction: effect.channel === 'internal' ? 'system' : 'outbound',
           event_type: effect.eventTypeFailure,
@@ -382,9 +403,10 @@ Deno.serve(async (req) => {
 
     return Response.json({
       success: true,
-      lead_id: lead.id,
+      website_lead_id: lead.id,
       message: 'Demo scheduled successfully',
       warnings,
+      scope: 'platform_website_only',
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to schedule demo';

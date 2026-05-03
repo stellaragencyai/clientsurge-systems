@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { X, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -15,6 +15,22 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    modalRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        onClose?.();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [onClose]);
 
   const validate = () => {
     const e = {};
@@ -60,7 +76,14 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
       {/* Centering wrapper */}
       <div className="flex min-h-full items-center justify-center p-4">
       {/* Modal */}
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl z-10 animate-in fade-in zoom-in duration-300">
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="signup-modal-title"
+        tabIndex={-1}
+        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl z-10 animate-in fade-in zoom-in duration-300"
+      >
         {/* Header */}
         <div className="px-8 pt-8 pb-5 border-b border-border">
           <button
@@ -74,7 +97,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             <span className="text-xs font-semibold text-primary uppercase tracking-wide">Create Account</span>
           </div>
-          <h2 className="font-display text-2xl font-semibold text-foreground">Start Your Onboarding</h2>
+          <h2 id="signup-modal-title" className="font-display text-2xl font-semibold text-foreground">Start Your Onboarding</h2>
           <p className="text-sm text-muted-foreground mt-1">Enter your details and we'll get your account set up.</p>
         </div>
 
@@ -84,7 +107,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-5">
               <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">Account Linked!</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-2">Request received</h3>
             <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
               If this email was not already registered, check your inbox for an activation link. Once your account is active you can log in to your client portal and track your system setup.
             </p>

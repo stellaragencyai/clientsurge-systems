@@ -1,3 +1,9 @@
+import {
+  PROVIDER_DEPLOYMENT_STATUS,
+  PROVIDER_PROOF_MODE,
+  PROVIDER_PROOF_WINDOW_MS,
+} from "./providerProof.js";
+
 const SUCCESS_STATUSES = new Set(["sent", "delivered", "processed", "opened", "received"]);
 
 export const PROVIDER_DEFINITIONS = [
@@ -80,7 +86,11 @@ function eventMatchesDefinition(event, definition) {
   }
 
   const metadata = parseMetadataJson(event.metadata_json);
-  return metadata?.context_type === "provider_test" && metadata?.integration_id === definition.id;
+  return (
+    metadata?.context_type === "provider_test" &&
+    (metadata?.integration_id === definition.id ||
+      (definition.id === "resend" && metadata?.integration_id === "email"))
+  );
 }
 
 function isHealthRelevantEvent(event) {
@@ -106,28 +116,69 @@ function summarizeProvider(definition, settings, events) {
   const latestEvent = providerEvents[0] || null;
   const latestSuccess = providerEvents.find((event) => isSuccessStatus(event.status)) || null;
   const latestFailure = providerEvents.find((event) => event.status === "failed") || null;
+  const latestProviderTest = providerEvents.find((event) => {
+    const metadata = parseMetadataJson(event.metadata_json);
+    return (
+      metadata?.context_type === "provider_test" &&
+      (metadata?.integration_id === definition.id ||
+        (definition.id === "resend" && metadata?.integration_id === "email"))
+    );
+  }) || null;
+  const latestLiveProof = providerEvents.find((event) => {
+    const metadata = parseMetadataJson(event.metadata_json);
+    const withinWindow = event.created_date
+      ? Date.now() - new Date(event.created_date).getTime() <= PROVIDER_PROOF_WINDOW_MS
+      : false;
+    if (!withinWindow) {
+      return false;
+    }
+
+    if (metadata?.context_type === "provider_callback" && metadata?.callback_provider === definition.id) {
+      return true;
+    }
+
+    if (metadata?.context_type === "provider_proof" && metadata?.proof_mode === PROVIDER_PROOF_MODE.LIVE) {
+      if (definition.id === "webhook" && metadata?.proof_kind === "lead_ingestion_webhook") {
+        return true;
+      }
+      return definition.providers.includes(event.provider);
+    }
+
+    const runtimeType = typeof metadata?.runtime_type === "string" ? metadata.runtime_type : "";
+    return definition.providers.includes(event.provider) && runtimeType.startsWith("live_provider_proof");
+  }) || null;
+  const latestCallback = providerEvents.find((event) => {
+    const metadata = parseMetadataJson(event.metadata_json);
+    return metadata?.context_type === "provider_callback" && metadata?.callback_provider === definition.id;
+  }) || null;
   const configured = definition.isConfigured(settings);
 
-  let derivedStatus = "unavailable";
+  let derivedStatus = PROVIDER_DEPLOYMENT_STATUS.UNAVAILABLE;
   let statusLabel = "Unavailable";
   let statusReason = "No trustworthy health signal is currently available.";
 
   if (!configured) {
-    derivedStatus = "disabled";
-    statusLabel = "Disabled";
+    derivedStatus = PROVIDER_DEPLOYMENT_STATUS.NOT_CONFIGURED;
+    statusLabel = "Not Configured";
     statusReason = definition.missingConfiguration(settings).join(". ");
-  } else if (latestEvent?.status === "failed") {
-    derivedStatus = "error";
-    statusLabel = "Error";
-    statusReason = latestEvent.error_message || "Most recent tracked activity failed.";
-  } else if (latestEvent) {
-    derivedStatus = "healthy";
-    statusLabel = "Healthy";
-    statusReason = "Most recent tracked activity succeeded.";
+  } else if (latestFailure && (!latestLiveProof || toIsoOrNull(latestFailure.created_date) >= toIsoOrNull(latestLiveProof.created_date))) {
+    derivedStatus = PROVIDER_DEPLOYMENT_STATUS.FAILED;
+    statusLabel = "Failed";
+    statusReason = latestFailure.error_message || "Most recent tracked proof activity failed.";
+  } else if (latestLiveProof) {
+    derivedStatus = PROVIDER_DEPLOYMENT_STATUS.LIVE_PROVIDER_PROOFED;
+    statusLabel = "Live Provider Proofed";
+    statusReason = latestCallback
+      ? "A recent real provider proof and callback activity were recorded."
+      : "A recent real provider proof event was recorded.";
+  } else if (latestProviderTest && isSuccessStatus(latestProviderTest.status)) {
+    derivedStatus = PROVIDER_DEPLOYMENT_STATUS.TEST_WIRED;
+    statusLabel = "Test Wired";
+    statusReason = "A provider wiring test exists, but no recent live provider proof is recorded.";
   } else {
-    derivedStatus = "configured";
+    derivedStatus = PROVIDER_DEPLOYMENT_STATUS.CONFIGURED;
     statusLabel = "Configured";
-    statusReason = "Configured with no recent tracked delivery activity.";
+    statusReason = "Configured with no recent live provider proof.";
   }
 
   return {
@@ -141,6 +192,9 @@ function summarizeProvider(definition, settings, events) {
     latest_activity_at: toIsoOrNull(latestEvent?.created_date),
     latest_success_at: toIsoOrNull(latestSuccess?.created_date),
     latest_failure_at: toIsoOrNull(latestFailure?.created_date),
+    latest_test_wired_at: toIsoOrNull(latestProviderTest?.created_date),
+    latest_live_proof_at: toIsoOrNull(latestLiveProof?.created_date),
+    latest_callback_at: toIsoOrNull(latestCallback?.created_date),
     recent_activity_count: providerEvents.length,
     recent_failure_count: providerEvents.filter((event) => event.status === "failed").length,
   };

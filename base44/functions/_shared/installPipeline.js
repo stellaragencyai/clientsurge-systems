@@ -551,19 +551,202 @@ function withAdditionalValidationEntries(validation, entries = []) {
   };
 }
 
-async function hasSuccessfulRuntimeTest({ base44, orderId, serviceKey }) {
-  const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
+function toTimestamp(value) {
+  if (!value) {
+    return 0;
+  }
+
+  const timestamp = new Date(value).getTime();
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function getLatestMatchingServiceEvent(events = [], predicate) {
+  return [...events]
+    .sort((a, b) => toTimestamp(b.created_date) - toTimestamp(a.created_date))
+    .find(predicate) || null;
+}
+
+function parseEventMetadata(event) {
+  if (!event?.metadata_json || typeof event.metadata_json !== "string") {
+    return {};
+  }
+
+  try {
+    return JSON.parse(event.metadata_json);
+  } catch {
+    return {};
+  }
+}
+
+function isBlockingLifecycleEvent(event) {
+  return (
+    event?.status === "failed" ||
+    ["provider_send_failed", "runtime_attempt_blocked", "service_transition_blocked"].includes(event?.event_type)
+  );
+}
+
+function isProviderVerifiedEvent(event, serviceKey) {
+  if (!event || event.status === "failed") {
+    return false;
+  }
+
+  const metadata = parseEventMetadata(event);
+  const contextType = event.context_type || metadata.context_type;
+  const proofKind = metadata.proof_kind;
+
+  if (serviceKey === "lead_reactivation") {
+    return event.event_type === "lead_reactivation_batch_completed";
+  }
+
+  if (serviceKey === "instant_lead_response") {
+    return (
+      event.event_type === "status_update" &&
+      contextType === "provider_proof" &&
+      proofKind === "live_sms_instant_lead_response"
+    );
+  }
+
+  if (serviceKey === "missed_call_text_back") {
+    return (
+      event.event_type === "status_update" &&
+      contextType === "provider_callback" &&
+      proofKind === "twilio_missed_call_webhook"
+    );
+  }
+
+  if (serviceKey === "nurture_sequence_14d") {
+    return ["twilio", "resend", "gmail"].includes(event.provider);
+  }
+
+  if (serviceKey === "review_request") {
+    return true;
+  }
+
+  return true;
+}
+
+export function deriveServiceActivationGateFromEvents({
+  order,
+  serviceKey,
+  baseValidation,
+  serviceState,
+  serviceEvents = [],
+}) {
+  const latestSuccessfulRuntime = getLatestMatchingServiceEvent(
+    serviceEvents,
+    (event) => event.event_type === "provider_send_succeeded" && event.status !== "failed"
+  );
+  const latestProviderVerifiedEvent = getLatestMatchingServiceEvent(
+    serviceEvents,
+    (event) => isProviderVerifiedEvent(event, serviceKey)
+  );
+  const latestBlockingEvent = getLatestMatchingServiceEvent(
+    serviceEvents,
+    (event) => isBlockingLifecycleEvent(event)
+  );
+
+  const blockingInstallError = cleanString(serviceState?.install_error || "");
+  const blockingPipelineError = cleanString(order.pipeline_error || "");
+  const hasBlockingEventAfterSuccess =
+    latestBlockingEvent &&
+    (!latestSuccessfulRuntime ||
+      toTimestamp(latestBlockingEvent.created_date) > toTimestamp(latestSuccessfulRuntime.created_date));
+
+  let validation = baseValidation || createTransitionValidation(serviceKey);
+
+  if (!latestSuccessfulRuntime) {
+    validation = withAdditionalValidationEntries(validation, [
+      {
+        field: "service_test.successful_runtime",
+        label: "Successful remote test",
+      },
+    ]);
+  }
+
+  if (!latestProviderVerifiedEvent) {
+    validation = withAdditionalValidationEntries(validation, [
+      {
+        field: "provider_verification.verified",
+        label: "Verified provider execution",
+      },
+    ]);
+  }
+
+  if (blockingInstallError) {
+    validation = withAdditionalValidationEntries(validation, [
+      {
+        field: "blocking_errors.install_error",
+        label: `Clear service install error: ${blockingInstallError}`,
+      },
+    ]);
+  }
+
+  if (blockingPipelineError) {
+    validation = withAdditionalValidationEntries(validation, [
+      {
+        field: "blocking_errors.pipeline_error",
+        label: `Clear order pipeline error: ${blockingPipelineError}`,
+      },
+    ]);
+  }
+
+  if (hasBlockingEventAfterSuccess) {
+    validation = withAdditionalValidationEntries(validation, [
+      {
+        field: "blocking_errors.latest_failure",
+        label:
+          latestBlockingEvent?.error_message ||
+          latestBlockingEvent?.message_body ||
+          "Resolve the latest blocking runtime or provider failure",
+      },
+    ]);
+  }
+
+  return {
+    validation,
+    activation_gate: {
+      successful_test_exists: Boolean(latestSuccessfulRuntime),
+      provider_verified: Boolean(latestProviderVerifiedEvent),
+      blocking_errors: {
+        install_error: blockingInstallError || null,
+        pipeline_error: blockingPipelineError || null,
+        latest_failure_event_id: latestBlockingEvent?.id || null,
+        latest_failure_event_type: latestBlockingEvent?.event_type || null,
+        latest_failure_message:
+          latestBlockingEvent?.error_message ||
+          latestBlockingEvent?.message_body ||
+          null,
+        present: Boolean(blockingInstallError || blockingPipelineError || hasBlockingEventAfterSuccess),
+      },
+      latest_success_event_id: latestSuccessfulRuntime?.id || null,
+      latest_provider_verified_event_id: latestProviderVerifiedEvent?.id || null,
+    },
+  };
+}
+
+async function buildServiceActivationGate({
+  base44,
+  order,
+  serviceKey,
+  baseValidation,
+  serviceState,
+}) {
+  const serviceEvents = await base44.asServiceRole.entities.CommunicationEvent.filter(
     {
-      order_id: orderId,
+      order_id: order.id,
       service_key: serviceKey,
     },
     "-created_date",
-    100
+    250
   );
 
-  return (events || []).some(
-    (event) => event.event_type === "provider_send_succeeded" && event.status !== "failed"
-  );
+  return deriveServiceActivationGateFromEvents({
+    order,
+    serviceKey,
+    baseValidation,
+    serviceState,
+    serviceEvents,
+  });
 }
 
 export class InstallTransitionError extends Error {
@@ -593,8 +776,38 @@ export function getTrackedServiceByKey(serviceKey) {
   return TRACKED_INSTALL_SERVICES_BY_KEY[serviceKey] || null;
 }
 
-export function normalizeOrderItems(items = [], defaultStatus = "Ready for Install") {
-  return items.map((item) => {
+function buildSyntheticTrackedItems(orderLike = {}, defaultStatus = "Ready for Install") {
+  const configuredServiceKeys = getConfiguredServiceKeys(orderLike.install_configuration || {});
+  const pricingServiceKeys = Array.isArray(orderLike.pricing_summary?.selected_service_keys)
+    ? orderLike.pricing_summary.selected_service_keys.filter((serviceKey) => getTrackedServiceByKey(serviceKey))
+    : [];
+  const fallbackServiceKeys = [...new Set([...configuredServiceKeys, ...pricingServiceKeys])];
+
+  if (!fallbackServiceKeys.length) {
+    return [];
+  }
+
+  return fallbackServiceKeys.map((serviceKey) => {
+    const service = getTrackedServiceByKey(serviceKey);
+    const fallbackInstallStatus = normalizeInstallStatus(orderLike.pipeline_status, defaultStatus);
+    return {
+      product_id: serviceKey,
+      product_name: service?.display_name || serviceKey,
+      service_key: serviceKey,
+      tracking_enabled: true,
+      service_access_status: "active",
+      install_status: fallbackInstallStatus,
+      status: STATUS_TO_LEGACY_ITEM_STATUS[fallbackInstallStatus] || "pending",
+      install_started_at: orderLike.install_initialized_at || undefined,
+      install_completed_at: orderLike.pipeline_status === "Live" ? (orderLike.last_install_event_at || orderLike.updated_date || undefined) : undefined,
+      install_error: orderLike.pipeline_status === "Error" ? orderLike.pipeline_error || undefined : undefined,
+      synthetic_tracking_item: true,
+    };
+  });
+}
+
+export function normalizeOrderItems(items = [], defaultStatus = "Ready for Install", orderLike = null) {
+  const normalizedItems = items.map((item) => {
     const config = getTrackedServiceConfig(item.product_id);
     const trackingEnabled =
       typeof item.tracking_enabled === "boolean" ? item.tracking_enabled : Boolean(config);
@@ -615,6 +828,12 @@ export function normalizeOrderItems(items = [], defaultStatus = "Ready for Insta
           : item.status,
     };
   });
+
+  if (normalizedItems.length > 0) {
+    return normalizedItems;
+  }
+
+  return orderLike ? buildSyntheticTrackedItems(orderLike, defaultStatus) : normalizedItems;
 }
 
 export function getTrackedInstallItems(items = []) {
@@ -623,7 +842,7 @@ export function getTrackedInstallItems(items = []) {
 
 export function normalizeInstallConfiguration(config = {}, items = []) {
   const trackedServiceKeys = new Set([
-    ...getTrackedServiceKeys(normalizeOrderItems(items)),
+    ...getTrackedServiceKeys(normalizeOrderItems(items, "Ready for Install", { items, install_configuration: config })),
     ...getConfiguredServiceKeys(config),
   ]);
 
@@ -765,7 +984,7 @@ export function mergeInstallConfiguration(currentConfig = {}, patch = {}, items 
 
 export function derivePipelineStatus(orderLike) {
   const defaultStatus = defaultInstallStatusForOrder(orderLike);
-  const trackedItems = getTrackedInstallItems(normalizeOrderItems(orderLike.items || [], defaultStatus));
+  const trackedItems = getTrackedInstallItems(normalizeOrderItems(orderLike.items || [], defaultStatus, orderLike));
   const statuses = trackedItems.map((item) => getTrackedItemStatus(item, defaultStatus));
 
   if (trackedItems.length === 0) {
@@ -832,6 +1051,9 @@ export function buildCommunicationEvent({
   service_key,
   provider_message_id,
   error_message,
+  lead_id,
+  context_type,
+  context_id,
 }) {
   return {
     channel,
@@ -843,14 +1065,15 @@ export function buildCommunicationEvent({
     message_body,
     provider_message_id,
     error_message,
+    lead_id,
     metadata_json: metadata ? JSON.stringify(metadata) : undefined,
     order_id: order.id,
     client_id: order.client_id,
     client_project_id: order.client_project_id,
     onboarding_client_id: order.onboarding_client_id,
     service_key,
-    context_type: service_key ? "order_service_install" : "order_install",
-    context_id: service_key ? `${order.id}:${service_key}` : order.id,
+    context_type: context_type || (service_key ? "order_service_install" : "order_install"),
+    context_id: context_id || (service_key ? `${order.id}:${service_key}` : order.id),
   };
 }
 
@@ -887,6 +1110,29 @@ export function buildServiceStatusEvent({ order, serviceKey, previousStatus, nex
       service_key: serviceKey,
       previous_status: previousStatus,
       next_status: nextStatus,
+      note,
+    },
+  });
+}
+
+export function buildServiceTransitionAttemptEvent({ order, serviceKey, currentStatus, requestedStatus, note }) {
+  const isActivationAttempt = requestedStatus === "Live";
+  return buildCommunicationEvent({
+    order,
+    event_type: "status_update",
+    subject: isActivationAttempt
+      ? `${serviceKey} activation attempt`
+      : `${serviceKey} transition attempt`,
+    message_body: isActivationAttempt
+      ? `${serviceKey} requested Live activation from ${currentStatus}.${eventNoteSuffix(note)}`
+      : `${serviceKey} requested transition from ${currentStatus} to ${requestedStatus}.${eventNoteSuffix(note)}`,
+    service_key: serviceKey,
+    metadata: {
+      order_id: order.id,
+      service_key: serviceKey,
+      current_status: currentStatus,
+      requested_status: requestedStatus,
+      attempt_kind: isActivationAttempt ? "activation" : "transition",
       note,
     },
   });
@@ -1359,7 +1605,7 @@ export async function initializePaidOrderInstallPipeline({
 }) {
   const hadPaidStatus = order.payment_status === "paid";
   const alreadyInitialized = Boolean(order.install_initialized_at);
-  const initializedItems = normalizeOrderItems(order.items || [], "Ready for Install");
+  const initializedItems = normalizeOrderItems(order.items || [], "Ready for Install", order);
   const installConfiguration = normalizeInstallConfiguration(order.install_configuration, initializedItems);
   const provisionalOrder = {
     ...order,
@@ -1635,31 +1881,44 @@ export async function updateTrackedServiceInstallStatus({
 
   const allowedNextStatuses = getAllowedNextStatuses(previousServiceStatus);
   let validation = null;
+  let activationGate = null;
+  let transitionAttemptEvent = null;
+
+  if (nextStatus === "Live") {
+    transitionAttemptEvent = await createCommunicationEvent(
+      base44,
+      buildServiceTransitionAttemptEvent({
+        order: {
+          ...order,
+          items: snapshot.normalizedItems,
+          install_configuration: snapshot.installConfiguration,
+        },
+        serviceKey,
+        currentStatus: previousServiceStatus,
+        requestedStatus: nextStatus,
+        note,
+      })
+    );
+  }
 
   if (["Testing", "Live"].includes(nextStatus)) {
     validation = validateServiceConfigurationFromSnapshot(snapshot, serviceKey);
   }
 
   if (nextStatus === "Live") {
-    const hasSuccessfulTest = await hasSuccessfulRuntimeTest({
+    const activationGateResult = await buildServiceActivationGate({
       base44,
-      orderId: order.id,
+      order: {
+        ...order,
+        items: snapshot.normalizedItems,
+        install_configuration: snapshot.installConfiguration,
+      },
       serviceKey,
+      baseValidation: validation || createTransitionValidation(serviceKey),
+      serviceState: targetItem,
     });
-
-    if (!hasSuccessfulTest) {
-      validation = withAdditionalValidationEntries(validation || {
-        valid: true,
-        missing_fields: [],
-        missing_labels: [],
-        service_key: serviceKey,
-      }, [
-        {
-          field: "service_test.successful_runtime",
-          label: "Successful remote test",
-        },
-      ]);
-    }
+    validation = activationGateResult.validation;
+    activationGate = activationGateResult.activation_gate;
   }
 
   if (!allowedNextStatuses.includes(nextStatus) || (validation && !validation.valid)) {
@@ -1696,6 +1955,8 @@ export async function updateTrackedServiceInstallStatus({
         requested_status: nextStatus,
         validation,
         blocked_event_id: blockedEvent.id,
+        activation_attempt_event_id: transitionAttemptEvent?.id || null,
+        activation_gate: activationGate,
       },
     });
   }
@@ -1774,5 +2035,7 @@ export async function updateTrackedServiceInstallStatus({
     items: updatedItems,
     install_configuration: snapshot.installConfiguration,
     pipeline_status: nextPipelineStatus,
+    activation_gate: activationGate,
+    activation_attempt_event_id: transitionAttemptEvent?.id || null,
   };
 }

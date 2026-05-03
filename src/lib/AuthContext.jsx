@@ -2,6 +2,11 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { createAxiosClient } from "@base44/sdk/dist/utils/axios-client";
 import { base44 } from "@/api/base44Client";
 import { appParams } from "@/lib/app-params";
+import {
+  clearPortalTestFixture,
+  isPortalTestModeEnabled,
+  readPortalTestFixture,
+} from "@/lib/portalTestMode";
 
 const AuthContext = createContext();
 
@@ -27,6 +32,16 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAppState = async () => {
+    const portalTestFixture = readPortalTestFixture();
+    if (portalTestFixture?.user && isPortalTestModeEnabled()) {
+      setUser(portalTestFixture.user);
+      setIsAuthenticated(true);
+      setIsLoadingPublicSettings(false);
+      setIsLoadingAuth(false);
+      setAuthError(null);
+      return;
+    }
+
     if (shouldAllowLocalAuthBypass()) {
       setIsLoadingPublicSettings(false);
       setIsLoadingAuth(false);
@@ -50,7 +65,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("timeout")), 5000)
+          setTimeout(() => reject(new Error("timeout")), 1500)
         );
 
         const publicSettings = await Promise.race([
@@ -133,11 +148,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = (shouldRedirect = true) => {
+    if (isPortalTestModeEnabled()) {
+      clearPortalTestFixture();
+      if (shouldRedirect && typeof window !== "undefined") {
+        window.location.assign("/");
+      }
+      return;
+    }
+
     setUser(null);
     setIsAuthenticated(false);
 
     if (shouldRedirect) {
-      base44.auth.logout(window.location.href);
+      base44.auth.logout("/");
     } else {
       base44.auth.logout();
     }

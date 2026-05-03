@@ -7,20 +7,21 @@ import OrderTracker from "@/components/landing/OrderTracker";
 
 export default function OrderSuccess() {
   const [sessionId, setSessionId] = useState("");
-
   const [orderSummary, setOrderSummary] = useState(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setSessionId(params.get("session_id") || "");
-    // Read pre-checkout summary saved to sessionStorage before Stripe redirect
+
     try {
       const raw = sessionStorage.getItem("clientsurge:last-order");
       if (raw) {
         setOrderSummary(JSON.parse(raw));
         sessionStorage.removeItem("clientsurge:last-order");
       }
-    } catch {}
+    } catch {
+      // Ignore malformed session state and fall back to the live tracker below.
+    }
   }, []);
 
   return (
@@ -71,8 +72,7 @@ export default function OrderSuccess() {
               marginBottom: "32px",
             }}
           >
-            Your payment was successful. Our team has been notified and will begin your setup review shortly.
-            You'll receive a confirmation email and can track progress in your client portal.
+            Your payment was successful. We are confirming your order details now, and our team will begin the setup review shortly. You will receive a confirmation email and can track progress in your client portal.
           </p>
 
           <div
@@ -98,8 +98,8 @@ export default function OrderSuccess() {
               What Happens Next
             </p>
             {[
-              { step: "1", text: "You'll receive an order confirmation email within minutes." },
-              { step: "2", text: "Our team reviews your paid order and starts the canonical setup workflow." },
+              { step: "1", text: "You will receive an order confirmation email within minutes." },
+              { step: "2", text: "Our team confirms your payment status, selected services, and starts the canonical setup workflow." },
               { step: "3", text: "Each purchased service moves through configuration, testing, and live review inside our admin workspace." },
               { step: "4", text: "Your client portal reflects the real paid-order setup status as services are verified." },
             ].map((entry) => (
@@ -134,25 +134,65 @@ export default function OrderSuccess() {
             ))}
           </div>
 
-          {/* Order summary */}
           {orderSummary && (
-            <div style={{
-              background: "rgba(255,255,255,0.8)", border: "1.5px solid rgba(154,92,46,0.15)",
-              borderRadius: "20px", padding: "20px 24px", marginBottom: "24px", textAlign: "left",
-            }}>
-              <p style={{ fontSize: "11px", fontWeight: "700", color: "#9a5c2e", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "12px" }}>
+            <div
+              style={{
+                background: "rgba(255,255,255,0.8)",
+                border: "1.5px solid rgba(154,92,46,0.15)",
+                borderRadius: "20px",
+                padding: "20px 24px",
+                marginBottom: "24px",
+                textAlign: "left",
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "11px",
+                  fontWeight: "700",
+                  color: "#9a5c2e",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.12em",
+                  marginBottom: "12px",
+                }}
+              >
                 Your Order
               </p>
-              {orderSummary.items?.map((item, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: i < orderSummary.items.length - 1 ? "1px solid rgba(154,92,46,0.08)" : "none" }}>
-                  <span style={{ fontSize: "13px", color: "#1a1209", fontWeight: "600" }}>{item.icon} {item.name}</span>
-                  <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.6)" }}>${item.setup_fee} + ${item.monthly_fee}/mo</span>
+              {orderSummary.items?.map((item, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "8px 0",
+                    borderBottom:
+                      index < orderSummary.items.length - 1
+                        ? "1px solid rgba(154,92,46,0.08)"
+                        : "none",
+                  }}
+                >
+                  <span style={{ fontSize: "13px", color: "#1a1209", fontWeight: "600" }}>
+                    {item.icon} {item.name}
+                  </span>
+                  <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.6)" }}>
+                    ${item.setup_fee} + ${item.monthly_fee}/mo
+                  </span>
                 </div>
               ))}
               {orderSummary.totalSetup != null && (
-                <div style={{ marginTop: "12px", paddingTop: "10px", borderTop: "1.5px solid rgba(154,92,46,0.12)", display: "flex", justifyContent: "space-between" }}>
+                <div
+                  style={{
+                    marginTop: "12px",
+                    paddingTop: "10px",
+                    borderTop: "1.5px solid rgba(154,92,46,0.12)",
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
+                >
                   <span style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209" }}>Total</span>
-                  <span style={{ fontSize: "13px", fontWeight: "700", color: "#9a5c2e" }}>${orderSummary.totalSetup} setup · ${orderSummary.totalMonthly}/mo</span>
+                  <span style={{ fontSize: "13px", fontWeight: "700", color: "#9a5c2e" }}>
+                    ${orderSummary.totalSetup} setup / ${orderSummary.totalMonthly}/mo
+                  </span>
                 </div>
               )}
             </div>

@@ -118,6 +118,7 @@ export default function AdminLeadDetail() {
             {lead.full_name}
           </h1>
           <p className="text-muted-foreground">{lead.business_name}</p>
+          <p className="text-xs text-muted-foreground mt-1">Canonical Customer Lead record</p>
         </div>
       </div>
 
