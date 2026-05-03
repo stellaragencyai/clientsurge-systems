@@ -31,7 +31,7 @@ function useCountUp(target, trigger, duration = 1.2) {
   return val;
 }
 
-// iPadOS status bar
+// iPhone-style status bar with Dynamic Island
 function StatusBar() {
   const [time, setTime] = useState("");
   useEffect(() => {
@@ -39,8 +39,7 @@ function StatusBar() {
       const d = new Date();
       let h = d.getHours() % 12 || 12;
       const m = d.getMinutes().toString().padStart(2, "0");
-      const ap = d.getHours() >= 12 ? "PM" : "AM";
-      return `${h}:${m} ${ap}`;
+      return `${h}:${m}`;
     };
     setTime(fmt());
     const t = setInterval(() => setTime(fmt()), 1000);
@@ -48,39 +47,50 @@ function StatusBar() {
   }, []);
 
   return (
-    <div style={{
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "6px 18px 4px", height: "30px", position: "relative", flexShrink: 0,
-    }}>
-      <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(255,255,255,0.85)", letterSpacing: "-0.02em", minWidth: "52px" }}>
-        {time}
-      </span>
-      {/* Pill camera — centered */}
+    <div style={{ position: "relative", flexShrink: 0 }}>
+      {/* Dynamic Island */}
       <div style={{
-        position: "absolute", left: "50%", top: "6px", transform: "translateX(-50%)",
-        width: "62px", height: "16px", borderRadius: "999px", background: "#000",
-        display: "flex", alignItems: "center", justifyContent: "center", gap: "5px",
-        boxShadow: "0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 2px rgba(0,0,0,0.8)",
-        zIndex: 10,
+        position: "absolute", left: "50%", top: "10px", transform: "translateX(-50%)",
+        width: "90px", height: "28px", borderRadius: "999px", background: "#000",
+        boxShadow: "0 0 0 1.5px rgba(255,255,255,0.07), inset 0 1px 3px rgba(0,0,0,0.9)",
+        zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
       }}>
-        <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#0d1020", border: "1px solid rgba(80,100,180,0.6)", boxShadow: "0 0 4px rgba(60,80,160,0.7)" }} />
-        <div style={{ width: "16px", height: "3px", borderRadius: "2px", background: "#111", border: "1px solid rgba(255,255,255,0.05)" }} />
+        {/* FaceID dot */}
+        <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#1a1a2e", border: "1px solid rgba(80,100,200,0.5)", boxShadow: "0 0 5px rgba(60,80,200,0.6)" }} />
+        {/* Camera */}
+        <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#0d0d1a", border: "1.5px solid rgba(255,255,255,0.08)" }} />
       </div>
-      {/* System icons */}
-      <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-        <svg width="13" height="10" viewBox="0 0 13 10">
-          {[0,1,2,3].map(i => <rect key={i} x={i*3.2} y={10-(i+1)*2.4} width="2.4" height={(i+1)*2.4} rx="0.6" fill={i<3?"rgba(255,255,255,0.8)":"rgba(255,255,255,0.2)"} />)}
-        </svg>
-        <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
-          <circle cx="6.5" cy="9" r="1.2" fill="rgba(255,255,255,0.8)" />
-          <path d="M3.8 6.8C4.7 5.9 5.5 5.5 6.5 5.5C7.5 5.5 8.3 5.9 9.2 6.8" stroke="rgba(255,255,255,0.8)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
-          <path d="M1.5 4.5C3.1 2.8 4.7 2 6.5 2C8.3 2 9.9 2.8 11.5 4.5" stroke="rgba(255,255,255,0.45)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
-        </svg>
-        <div style={{ display: "flex", alignItems: "center", gap: "1px" }}>
-          <div style={{ width: "22px", height: "10px", borderRadius: "3px", border: "1.5px solid rgba(255,255,255,0.5)", padding: "1.5px", display: "flex", alignItems: "center" }}>
-            <div style={{ width: "75%", height: "100%", borderRadius: "1.5px", background: "linear-gradient(90deg,#4ade80,#22c55e)" }} />
+
+      {/* Status bar row */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "10px 22px 6px", height: "46px",
+      }}>
+        <span style={{ fontSize: "15px", fontWeight: "700", color: "rgba(255,255,255,0.9)", letterSpacing: "-0.03em", fontFamily: SF }}>
+          {time}
+        </span>
+        {/* Right: signal + wifi + battery */}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          {/* Signal bars */}
+          <svg width="16" height="12" viewBox="0 0 16 12">
+            {[0,1,2,3].map(i => (
+              <rect key={i} x={i*4} y={12-(i+1)*3} width="3" height={(i+1)*3} rx="0.8"
+                fill={i < 3 ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.2)"} />
+            ))}
+          </svg>
+          {/* Wifi */}
+          <svg width="14" height="11" viewBox="0 0 14 11" fill="none">
+            <circle cx="7" cy="10" r="1.3" fill="rgba(255,255,255,0.85)" />
+            <path d="M4.2 7.5C5.2 6.5 6 6.1 7 6.1C8 6.1 8.8 6.5 9.8 7.5" stroke="rgba(255,255,255,0.85)" strokeWidth="1.3" strokeLinecap="round" fill="none"/>
+            <path d="M1.8 5C3.6 3.1 5.2 2.2 7 2.2C8.8 2.2 10.4 3.1 12.2 5" stroke="rgba(255,255,255,0.4)" strokeWidth="1.3" strokeLinecap="round" fill="none"/>
+          </svg>
+          {/* Battery */}
+          <div style={{ display: "flex", alignItems: "center", gap: "1px" }}>
+            <div style={{ width: "24px", height: "12px", borderRadius: "3.5px", border: "1.5px solid rgba(255,255,255,0.5)", padding: "2px", display: "flex", alignItems: "center" }}>
+              <div style={{ width: "72%", height: "100%", borderRadius: "1.5px", background: "linear-gradient(90deg,#4ade80,#22c55e)" }} />
+            </div>
+            <div style={{ width: "2px", height: "6px", borderRadius: "0 1.5px 1.5px 0", background: "rgba(255,255,255,0.4)" }} />
           </div>
-          <div style={{ width: "2px", height: "5px", borderRadius: "0 1.5px 1.5px 0", background: "rgba(255,255,255,0.4)" }} />
         </div>
       </div>
     </div>
@@ -188,8 +198,8 @@ export default function RevenueRecoveryCounter() {
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
         style={{
           position: "relative",
-          width: "480px",
-          borderRadius: "32px",
+          width: "310px",
+          borderRadius: "50px",
           background: "#000000",
           boxShadow: `
             0 50px 120px rgba(0,0,0,0.75),
@@ -206,27 +216,18 @@ export default function RevenueRecoveryCounter() {
         {/* Subtle top edge */}
         <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), rgba(255,255,255,0.08), rgba(255,255,255,0.06), transparent)", borderRadius: "999px", zIndex: 15 }} />
 
-        {/* Left edge — volume buttons — black */}
-        <div style={{ position: "absolute", left: "-5px", top: "100px", width: "5px", height: "44px", borderRadius: "3px 0 0 3px", background: "#1a1a1a", boxShadow: "-1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
-        <div style={{ position: "absolute", left: "-5px", top: "156px", width: "5px", height: "44px", borderRadius: "3px 0 0 3px", background: "#1a1a1a", boxShadow: "-1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
+        {/* Left edge — silent switch + volume buttons */}
+        <div style={{ position: "absolute", left: "-4px", top: "120px", width: "4px", height: "32px", borderRadius: "3px 0 0 3px", background: "#1c1c1e", boxShadow: "-1px 0 2px rgba(0,0,0,0.8)", zIndex: 20 }} />
+        <div style={{ position: "absolute", left: "-4px", top: "170px", width: "4px", height: "52px", borderRadius: "3px 0 0 3px", background: "#1c1c1e", boxShadow: "-1px 0 2px rgba(0,0,0,0.8)", zIndex: 20 }} />
+        <div style={{ position: "absolute", left: "-4px", top: "234px", width: "4px", height: "52px", borderRadius: "3px 0 0 3px", background: "#1c1c1e", boxShadow: "-1px 0 2px rgba(0,0,0,0.8)", zIndex: 20 }} />
 
-        {/* Right edge — power button — black */}
-        <div style={{ position: "absolute", right: "-5px", top: "112px", width: "5px", height: "64px", borderRadius: "0 3px 3px 0", background: "#1a1a1a", boxShadow: "1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
-
-        {/* Top speaker grille */}
-        <div style={{ position: "absolute", top: "12px", left: "50%", transform: "translateX(-50%)", zIndex: 20 }}>
-          <SpeakerGrille count={10} />
-        </div>
-
-        {/* Bottom speaker grille */}
-        <div style={{ position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", zIndex: 20 }}>
-          <SpeakerGrille count={10} />
-        </div>
+        {/* Right edge — power/side button */}
+        <div style={{ position: "absolute", right: "-4px", top: "180px", width: "4px", height: "72px", borderRadius: "0 3px 3px 0", background: "#1c1c1e", boxShadow: "1px 0 2px rgba(0,0,0,0.8)", zIndex: 20 }} />
 
         {/* Screen inset with deep bezel */}
         <div style={{
-          margin: "14px",
-          borderRadius: "22px",
+          margin: "10px",
+          borderRadius: "42px",
           overflow: "hidden",
           background: "#000",
           boxShadow: "inset 0 0 0 1.5px rgba(255,255,255,0.05), inset 0 2px 12px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.6)",
@@ -333,9 +334,9 @@ export default function RevenueRecoveryCounter() {
                 </div>
               </div>
 
-              {/* Home indicator */}
-              <div style={{ height: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <div style={{ width: "100px", height: "3px", borderRadius: "2px", background: "rgba(255,255,255,0.2)" }} />
+              {/* iPhone home indicator — shorter & thicker */}
+              <div style={{ height: "28px", display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: "6px" }}>
+                <div style={{ width: "120px", height: "5px", borderRadius: "3px", background: "rgba(255,255,255,0.28)" }} />
               </div>
             </motion.div>
           </div>
