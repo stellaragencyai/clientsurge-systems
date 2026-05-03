@@ -29,8 +29,8 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
         className="px-5 py-4 rounded-2xl"
         style={{
           background: "rgba(255,255,255,0.9)",
-          border: "1.5px solid rgba(154,92,46,0.14)",
-          boxShadow: "0 6px 20px rgba(111,67,31,0.07)"
+          border: "1.5px solid rgba(0,174,239,0.14)",
+          boxShadow: "0 6px 20px rgba(0,120,200,0.07)"
         }}
       >
         <div className="flex items-center justify-between mb-3">
@@ -52,7 +52,7 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
                 title={`${step.title} — ${step.duration}`}
                 style={{
                   width: `${widthPct}%`,
-                  background: isActive ? "linear-gradient(90deg, #9a5c2e, #c8965c)" : "rgba(154,92,46,0.18)",
+                  background: isActive ? "linear-gradient(90deg, #0088CC, #00AEEF)" : "rgba(0,174,239,0.18)",
                   transition: "background 0.3s ease",
                   borderRadius: "4px",
                   border: "none",
@@ -78,14 +78,14 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
                 <p
                   className="text-[10px] leading-tight truncate"
                   style={{
-                    color: isActive ? "#9a5c2e" : "rgba(30,20,10,0.4)",
+                    color: isActive ? "#0088CC" : "rgba(30,20,10,0.4)",
                     fontWeight: isActive ? "700" : "500",
                     transition: "color 0.25s ease"
                   }}
                 >
                   {step.title}
                 </p>
-                <p className="text-[9px]" style={{ color: "rgba(154,92,46,0.55)" }}>
+                <p className="text-[9px]" style={{ color: "rgba(0,174,239,0.7)" }}>
                   {step.duration}
                 </p>
               </button>
@@ -114,18 +114,18 @@ function StepRow({ step, idx }) {
             className="rounded-2xl overflow-hidden h-full"
             style={{
               background: "rgba(255,255,255,0.95)",
-              border: "1.5px solid rgba(154,92,46,0.13)",
-              boxShadow: "0 10px 32px rgba(111,67,31,0.08)",
+              border: "1.5px solid rgba(0,174,239,0.13)",
+              boxShadow: "0 10px 32px rgba(0,120,200,0.08)",
               position: "relative"
             }}
           >
-            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "4px", background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)" }} />
+            <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "4px", background: "linear-gradient(90deg, #0088CC 0%, #00AEEF 60%, rgba(0,174,239,0.2) 100%)" }} />
 
             <div className="px-6 md:px-7 pt-6 pb-0">
               <div
                 style={{
                   display: "inline-flex", alignItems: "center", gap: "6px",
-                  background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+                  background: "linear-gradient(135deg, #0088CC 0%, #00AEEF 50%, #003B8F 100%)",
                   color: "#ffffff", border: "none",
                   padding: "4px 12px", borderRadius: "6px",
                   fontSize: "11px", fontWeight: "800",
@@ -157,7 +157,7 @@ function StepRow({ step, idx }) {
         <div style={{ display: "flex", alignItems: "stretch" }}>
           <div
             className="rounded-2xl overflow-hidden w-full"
-            style={{ border: "1.5px solid rgba(154,92,46,0.12)", boxShadow: "0 8px 24px rgba(111,67,31,0.1)", minHeight: "360px" }}
+            style={{ border: "1.5px solid rgba(0,174,239,0.12)", boxShadow: "0 8px 24px rgba(0,120,200,0.1)", minHeight: "360px" }}
           >
             <img src={step.image} alt={step.title} className="w-full h-full object-cover" />
           </div>
@@ -201,21 +201,21 @@ export default function LaunchTimeline() {
                   style={{
                     width: "70px", height: "70px",
                     background: isActive
-                      ? "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)"
-                      : "rgba(154,92,46,0.12)",
+                      ? "linear-gradient(135deg, #0088CC 0%, #00AEEF 50%, #003B8F 100%)"
+                      : "rgba(0,174,239,0.12)",
                     border: "2px solid #000000",
-                    boxShadow: isActive ? "0 0 0 5px rgba(154,92,46,0.15), 0 4px 14px rgba(154,92,46,0.35)" : "none",
+                    boxShadow: isActive ? "0 0 0 5px rgba(0,174,239,0.15), 0 4px 14px rgba(0,174,239,0.35)" : "none",
                     transition: "background 0.3s ease, box-shadow 0.3s ease",
                   }}
                 >
-                  <span className="font-black leading-none relative z-10" style={{ fontSize: "28px", color: isActive ? "#fff" : "#9a5c2e" }}>
+                  <span className="font-black leading-none relative z-10" style={{ fontSize: "28px", color: isActive ? "#fff" : "#0088CC" }}>
                     {step.number}
                   </span>
                   <div
                     className="absolute rounded-full flex items-center justify-center"
-                    style={{ width: "24px", height: "24px", bottom: "-3px", right: "-3px", background: "#f5e6d0", border: "2px solid #000000", zIndex: 20 }}
+                    style={{ width: "24px", height: "24px", bottom: "-3px", right: "-3px", background: "#e0f4fd", border: "2px solid #000000", zIndex: 20 }}
                   >
-                    <Icon style={{ width: "14px", height: "14px", color: "#9a5c2e" }} />
+                    <Icon style={{ width: "14px", height: "14px", color: "#0088CC" }} />
                   </div>
                 </div>
                 <p className="text-xs font-semibold text-foreground text-center max-w-[90px] leading-tight">{step.title}</p>
@@ -238,24 +238,24 @@ export default function LaunchTimeline() {
 
       {/* Mobile stepper */}
       <div className="sm:hidden relative pl-10 mb-12">
-        <div className="absolute left-4 top-3 bottom-3 w-0.5" style={{ background: "linear-gradient(180deg, #9a5c2e 0%, rgba(154,92,46,0.2) 100%)" }} />
+        <div className="absolute left-4 top-3 bottom-3 w-0.5" style={{ background: "linear-gradient(180deg, #0088CC 0%, rgba(0,174,239,0.2) 100%)" }} />
         <div className="space-y-6">
           {launchTimelineSteps.map((step) => (
             <div key={step.id} className="relative flex items-start gap-4">
               <div
                 className="absolute -left-10 w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 z-10"
-                style={{ background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)", boxShadow: "0 2px 8px rgba(154,92,46,0.4)" }}
+                style={{ background: "linear-gradient(135deg, #0088CC 0%, #00AEEF 50%, #003B8F 100%)", boxShadow: "0 2px 8px rgba(0,174,239,0.4)" }}
               >
                 <span className="font-black text-sm" style={{ color: "#fff" }}>{step.number}</span>
               </div>
               <div
                 className="rounded-xl px-4 py-3 flex-1 overflow-hidden relative"
-                style={{ background: "rgba(255,255,255,0.9)", border: "1px solid rgba(154,92,46,0.12)", boxShadow: "0 4px 12px rgba(111,67,31,0.06)" }}
+                style={{ background: "rgba(255,255,255,0.9)", border: "1px solid rgba(0,174,239,0.12)", boxShadow: "0 4px 12px rgba(0,120,200,0.06)" }}
               >
-                <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "3px", background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 60%, rgba(154,92,46,0.2) 100%)" }} />
+                <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "3px", background: "linear-gradient(90deg, #0088CC 0%, #00AEEF 60%, rgba(0,174,239,0.2) 100%)" }} />
                 <p className="text-[11px] font-semibold text-foreground mb-0.5 mt-1">Step {step.number}</p>
                 <p className="text-sm font-bold text-foreground">{step.title}</p>
-                <p className="text-xs mt-0.5" style={{ color: "rgba(154,92,46,0.8)" }}>{step.duration}</p>
+                <p className="text-xs mt-0.5" style={{ color: "rgba(0,174,239,0.9)" }}>{step.duration}</p>
               </div>
             </div>
           ))}
@@ -266,7 +266,7 @@ export default function LaunchTimeline() {
       <div className="relative">
         <div
           className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block pointer-events-none"
-          style={{ background: "linear-gradient(180deg, #9a5c2e 0%, #c8965c 50%, rgba(200,150,92,0.6) 100%)", transform: "translateX(-50%)" }}
+          style={{ background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 50%, rgba(0,174,239,0.6) 100%)", transform: "translateX(-50%)" }}
         />
 
         <div className="space-y-10 md:space-y-20 relative z-10">
@@ -278,23 +278,23 @@ export default function LaunchTimeline() {
 
       {/* Bottom CTA */}
       <div className="hidden md:flex flex-col items-center mt-6">
-        <div style={{ width: "2px", height: "56px", background: "linear-gradient(180deg, rgba(154,92,46,0.4) 0%, #c8965c 100%)" }} />
+        <div style={{ width: "2px", height: "56px", background: "linear-gradient(180deg, rgba(0,174,239,0.4) 0%, #00AEEF 100%)" }} />
         <button
           type="button"
           onClick={openDemoBooking}
           style={{
             marginTop: "24px",
             borderRadius: "9999px", padding: "2px",
-            background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-            boxShadow: "0 4px 18px rgba(120,70,20,0.3)",
+            background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+            boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
             border: "none", cursor: "pointer"
           }}
         >
           <span style={{
             display: "flex", alignItems: "center", gap: "8px",
             height: "48px", padding: "0 28px", borderRadius: "9999px",
-            background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-            color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem"
+            background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
+            color: "#ffffff", fontWeight: "700", fontSize: "0.95rem"
           }}>
             Book Your Free Demo
             <ArrowRight className="w-4 h-4" />
