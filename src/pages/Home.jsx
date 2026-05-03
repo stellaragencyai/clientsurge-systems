@@ -28,7 +28,6 @@ import {
   getServiceSchema,
 } from "../components/SEO/SchemaMarkup";
 import CookieConsent from "../components/landing/CookieConsent";
-import ExitIntentPopup from "../components/landing/ExitIntentPopup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
 
 function useHomepageWhiteCanvas() {
@@ -138,7 +137,6 @@ export default function Home() {
         </Suspense>
         <ChatBubble />
         <CookieConsent />
-        <ExitIntentPopup pathname="/" />
       </div>
     </DemoBookingProvider>
   );
