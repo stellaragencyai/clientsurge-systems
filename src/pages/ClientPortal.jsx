@@ -143,22 +143,28 @@ export default function ClientPortal() {
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <LayoutDashboard className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="font-display text-2xl font-semibold text-foreground mb-2">No Project Found</h1>
-          <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-            {portalError || (
-              <>
-                We couldn't find a project linked to <span className="font-semibold text-foreground">{user?.email}</span>.
-                If you've recently signed up, your project may still be getting set up. Please contact us.
-              </>
-            )}
+          <h1 className="font-display text-2xl font-semibold text-foreground mb-2">Setting Up Your System</h1>
+          <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+            Your services are being set up. You'll receive a confirmation email within 24 hours once your project is linked.
           </p>
-          <a
-            href="/"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
-            style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
-          >
-            Back to Home
-          </a>
+          <div className="rounded-xl border border-border bg-muted/30 p-4 text-left mb-6">
+            <p className="text-xs font-semibold text-foreground mb-2">What to expect:</p>
+            <ul className="text-xs text-muted-foreground space-y-1.5 list-disc list-inside">
+              <li>Our team reviews your order within 1 business day</li>
+              <li>You'll get an onboarding form to configure your system</li>
+              <li>Your portal will reflect live status within 24–48 hours</li>
+            </ul>
+          </div>
+          <div className="flex flex-col gap-3">
+            <a
+              href="mailto:support@clientsurgesystems.com"
+              className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
+              style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+            >
+              Contact Support
+            </a>
+            <a href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Back to Home</a>
+          </div>
         </div>
       </div>
     );

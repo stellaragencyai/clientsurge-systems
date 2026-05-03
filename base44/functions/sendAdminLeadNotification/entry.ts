@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: settings.resend_from_email || 'notifications@clientsurge.com',
+        from: `ClientSurge Systems <${settings.resend_from_email || 'notifications@clientsurgesystems.com'}>`,
         to: toEmail,
         subject: `🎯 New Lead: ${lead.full_name} — ${lead.business_name || lead.business_type || 'Unknown'}`,
         html: htmlBody,
