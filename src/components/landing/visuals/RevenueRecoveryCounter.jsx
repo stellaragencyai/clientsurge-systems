@@ -68,7 +68,7 @@ function StatusBar() {
       {/* Status bar row */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "6px 16px 4px", height: "34px",
+        padding: "30px 16px 4px", height: "52px",
       }}>
         <span style={{ fontSize: "12px", fontWeight: "800", color: "rgba(255,255,255,0.95)", letterSpacing: "-0.04em", fontFamily: SF, lineHeight: 1 }}>
           {time}
