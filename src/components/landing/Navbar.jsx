@@ -157,7 +157,7 @@ export default function Navbar() {
             fetchpriority="high"
             decoding="async"
             style={{
-              height: "clamp(64px, 8vw, 90px)",
+              height: "clamp(80px, 10vw, 110px)",
               width: "auto",
               objectFit: "contain",
               mixBlendMode: "multiply",
