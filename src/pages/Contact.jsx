@@ -332,6 +332,10 @@ export default function Contact() {
                 <p className="text-center text-xs text-muted-foreground">
                   No spam. No pressure. Just a thoughtful reply from our team.
                 </p>
+                <p className="text-center text-xs text-muted-foreground mt-1">
+                  We respect your privacy. See our{" "}
+                  <a href="/legal/privacy" className="underline hover:text-foreground transition-colors">Privacy Policy</a>.
+                </p>
               </form>
             )}
           </div>

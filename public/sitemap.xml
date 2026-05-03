@@ -16,6 +16,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://clientsurgesystems.com/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://clientsurgesystems.com/med-spa</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -44,11 +49,6 @@
     <loc>https://clientsurgesystems.com/contractors</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://clientsurgesystems.com/contact</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://clientsurgesystems.com/book</loc>

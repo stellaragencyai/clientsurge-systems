@@ -58,10 +58,14 @@ Deno.serve(async (req) => {
     }
 
     if (!project) {
+      // Return graceful empty state instead of 404 — portal renders a "setting up" message
       return Response.json({
-        error: "No portal project is linked to this account yet.",
-        code: "portal_project_not_found",
-      }, { status: 404 });
+        success: true,
+        project: null,
+        order: null,
+        empty_state: true,
+        message: "Your services are being set up. You'll receive an email within 24 hours.",
+      });
     }
 
     // Find associated order

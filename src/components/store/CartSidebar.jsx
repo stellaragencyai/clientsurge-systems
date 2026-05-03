@@ -258,7 +258,7 @@ export default function CartSidebar() {
                         margin: 0,
                       }}
                     >
-                      ${item.setup_fee} setup - ${item.monthly_fee}/mo
+                      {item.setup_fee === 0 ? "No setup fee" : `$${item.setup_fee} setup`} — ${item.monthly_fee}/mo
                     </p>
                   </div>
                   <motion.button

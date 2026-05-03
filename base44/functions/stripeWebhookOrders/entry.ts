@@ -197,6 +197,32 @@ Deno.serve(async (req) => {
           });
         }
 
+        // ── Customer SMS confirmation ──────────────────────────────────────────
+        if (order.customer_phone) {
+          try {
+            const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+            const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+            const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+            if (accountSid && authToken && fromNumber) {
+              const smsBody = `Hi ${order.customer_name || "there"}! Your ClientSurge order is confirmed. Our team will begin setup within 1 business day. Questions? Reply here or email support@clientsurgesystems.com. Reply STOP to unsubscribe.`;
+              await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
+                method: "POST",
+                headers: {
+                  Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({ To: order.customer_phone, From: fromNumber, Body: smsBody }),
+              });
+              console.log("[stripeWebhookOrders] order confirmation SMS sent", { orderId: order.id });
+            }
+          } catch (smsError) {
+            console.error("[stripeWebhookOrders] order confirmation SMS failed", {
+              orderId: order.id,
+              error: smsError instanceof Error ? smsError.message : String(smsError),
+            });
+          }
+        }
+
         // ── Admin purchase notification ────────────────────────────────────────
         try {
           await base44.asServiceRole.functions.invoke("sendAdminPurchaseNotification", {
