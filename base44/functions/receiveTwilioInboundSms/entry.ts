@@ -241,8 +241,78 @@ Deno.serve(async (req) => {
     }
 
     // ─────────────────────────────────────────────────────
-    // STEP 5b: Try to match to WebsiteLead
+    // STEP 5b: Try to match to Leads entity (AI Sales Rep pipeline)
+    //          then fall back to WebsiteLead
     // ─────────────────────────────────────────────────────
+    
+    // First: check Leads entity (AI Sales Rep pipeline)
+    let matchedLead = null;
+    try {
+      const leadMatches = await base44.asServiceRole.entities.Leads.filter(
+        { phone: smsEvent.from_number },
+        "-created_date",
+        3
+      );
+      if (leadMatches && leadMatches.length > 0) {
+        matchedLead = leadMatches[0];
+      }
+    } catch (err) {
+      console.log("[receiveTwilioInboundSms] Leads lookup failed:", err.message);
+    }
+
+    if (matchedLead) {
+      console.log("[receiveTwilioInboundSms] Matched Leads record:", matchedLead.id, "| Agent:", matchedLead.assigned_agent_name);
+
+      // Generate industry-aware AI reply
+      try {
+        const replyResult = await base44.asServiceRole.functions.invoke('industryAwareReply', {
+          lead_id: matchedLead.id,
+          inbound_message: smsEvent.body,
+        });
+
+        console.log(`[receiveTwilioInboundSms] AI reply generated | Intent: ${replyResult?.detected_intent}`);
+
+        // Send the AI reply via SMS
+        if (replyResult?.reply) {
+          await base44.asServiceRole.functions.invoke('sendSMS', {
+            to: smsEvent.from_number,
+            body: replyResult.reply,
+          });
+          console.log("[receiveTwilioInboundSms] AI reply sent to", smsEvent.from_number);
+        }
+
+        // If booking intent detected, also send booking link
+        if (replyResult?.action === 'send_booking_link') {
+          const bookingLink = Deno.env.get('DEFAULT_BOOKING_LINK');
+          if (bookingLink) {
+            await base44.asServiceRole.functions.invoke('sendSMS', {
+              to: smsEvent.from_number,
+              body: `Here's your scheduling link: ${bookingLink}`,
+            });
+          }
+        }
+      } catch (replyErr) {
+        console.error("[receiveTwilioInboundSms] industryAwareReply failed:", replyErr.message);
+        // Log inbound even if reply fails
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          lead_id: matchedLead.id,
+          channel: "sms",
+          direction: "inbound",
+          event_type: "sms_received",
+          provider: "twilio",
+          status: "received",
+          message_body: smsEvent.body,
+          provider_message_id: smsEvent.message_sid,
+        }).catch(() => {});
+      }
+
+      return Response.json(
+        { status: "ok_ai_replied", lead_id: matchedLead.id, message_sid: smsEvent.message_sid },
+        { status: 200 }
+      );
+    }
+
+    // Fallback: match to WebsiteLead
     const websiteLead = await findWebsiteLeadByPhone(base44, smsEvent.from_number);
 
     if (websiteLead) {
@@ -252,31 +322,19 @@ Deno.serve(async (req) => {
         "marking as responded"
       );
 
-      // ─────────────────────────────────────────────────────
-      // STEP 6: Update WebsiteLead to stop follow-ups
-      // ─────────────────────────────────────────────────────
       try {
         await base44.asServiceRole.entities.WebsiteLead.update(websiteLead.id, {
           reply_status: "responded",
           lead_status: "responded",
           last_message_sent: smsEvent.timestamp,
-          next_follow_up_at: null, // Clear future follow-ups
-          follow_up_step: 999, // Mark sequence as complete
-          automation_enabled: false, // Stop all automation for this lead
+          next_follow_up_at: null,
+          follow_up_step: 999,
+          automation_enabled: false,
         });
-
-        console.log("[receiveTwilioInboundSms] Updated WebsiteLead:", websiteLead.id);
       } catch (updateError) {
-        console.error(
-          "[receiveTwilioInboundSms] Failed to update WebsiteLead:",
-          updateError.message
-        );
-        // Continue to logging even if update fails
+        console.error("[receiveTwilioInboundSms] Failed to update WebsiteLead:", updateError.message);
       }
 
-      // ─────────────────────────────────────────────────────
-      // STEP 7: Log inbound SMS as matched
-      // ─────────────────────────────────────────────────────
       try {
         await base44.asServiceRole.entities.CommunicationEvent.create({
           context_type: "website_lead",
@@ -298,11 +356,8 @@ Deno.serve(async (req) => {
             automation_stopped: true,
           }),
         });
-
-        console.log("[receiveTwilioInboundSms] Logged inbound SMS for lead:", websiteLead.id);
       } catch (logError) {
         console.error("[receiveTwilioInboundSms] Failed to log event:", logError.message);
-        // Non-fatal; continue
       }
 
       return Response.json(

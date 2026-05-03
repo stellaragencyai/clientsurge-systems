@@ -26,6 +26,41 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ─────────────────────────────────────────────────────
+    // STEP A: Route lead to industry-specific AI agent
+    // ─────────────────────────────────────────────────────
+    let routingResult = null;
+    try {
+      routingResult = await base44.asServiceRole.functions.invoke('routeLeadToIndustryAgent', { lead_id: data.id });
+      console.log(`[onLeadCreated] Routed to agent: ${routingResult?.agent_name} (${routingResult?.industry_key})`);
+    } catch (routeErr) {
+      console.log('[onLeadCreated] Routing failed (non-blocking):', routeErr.message);
+    }
+
+    // ─────────────────────────────────────────────────────
+    // STEP B: Generate & send industry-personalized first SMS
+    // ─────────────────────────────────────────────────────
+    if (data.phone) {
+      try {
+        const smsResult = await base44.asServiceRole.functions.invoke('generateIndustryFirstSMS', {
+          lead_id: data.id,
+          industry_key: routingResult?.industry_key || 'general',
+        });
+        console.log(`[onLeadCreated] Industry first SMS generated (${smsResult?.char_count} chars)`);
+
+        // Send via Twilio
+        if (smsResult?.sms) {
+          await base44.asServiceRole.functions.invoke('sendSMS', {
+            to: data.phone,
+            body: smsResult.sms,
+          });
+          console.log(`[onLeadCreated] Industry first SMS sent to ${data.phone}`);
+        }
+      } catch (smsErr) {
+        console.log('[onLeadCreated] Industry SMS failed (non-blocking):', smsErr.message);
+      }
+    }
+
     // Prepare structured webhook payload
     const payload = {
       event: 'lead_created',
