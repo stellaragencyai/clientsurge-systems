@@ -49,18 +49,18 @@ function safeSetThemePreference(value) {
   } catch {
 
 
+
+
     // Ignore storage failures in embedded preview environments.
-  }}
-function safeApplyTheme(isDark) {
-  try {
+  }}function safeApplyTheme(isDark) {try {
     document.documentElement.classList.toggle("dark", isDark);
   } catch {
 
 
+
+
     // Ignore DOM theme failures in preview environments.
-  }}
-function getSafeHashTarget(hash) {
-  if (!hash || !SAFE_SECTION_HASHES.has(hash)) {
+  }}function getSafeHashTarget(hash) {if (!hash || !SAFE_SECTION_HASHES.has(hash)) {
     return null;
   }
 
@@ -179,21 +179,21 @@ export default function Navbar() {
                 boxShadow: "0 10px 24px rgba(200,150,92,0.16), inset 0 1px 0 rgba(255,255,255,0.9)"
               }}>
               
-              <span
-                style={{
-                  position: "absolute",
-                  inset: "-12px",
-                  borderRadius: "22px",
-                  background: "radial-gradient(circle, rgba(200,150,92,0.16) 0%, transparent 72%)",
-                  zIndex: 0
-                }} className=" hidden" />
               
-              <img
-                src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/7de44f95a_10ca51c4-3ef9-4f87-979c-d48d7b2e0c6b.png"
-                alt="ClientSurge Systems"
-                fetchpriority="high"
-                decoding="async"
-                style={{ position: "relative", zIndex: 1, height: "clamp(38px, 5vw, 48px)", width: "auto", objectFit: "contain" }} className=" hidden" />
+
+
+
+
+
+
+              
+              
+              
+
+
+
+
+              
               
             </span>
 
