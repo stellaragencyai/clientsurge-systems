@@ -50,8 +50,8 @@ function StatusBar() {
     <div style={{ position: "relative", flexShrink: 0 }}>
       {/* Dynamic Island */}
       <div style={{
-        position: "absolute", left: "50%", top: "10px", transform: "translateX(-50%)",
-        width: "90px", height: "28px", borderRadius: "999px", background: "#000",
+        position: "absolute", left: "50%", top: "6px", transform: "translateX(-50%)",
+        width: "66px", height: "20px", borderRadius: "999px", background: "#000",
         boxShadow: "0 0 0 1.5px rgba(255,255,255,0.07), inset 0 1px 3px rgba(0,0,0,0.9)",
         zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
       }}>
@@ -64,9 +64,9 @@ function StatusBar() {
       {/* Status bar row */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "10px 22px 6px", height: "46px",
+        padding: "6px 16px 4px", height: "34px",
       }}>
-        <span style={{ fontSize: "17px", fontWeight: "800", color: "rgba(255,255,255,0.95)", letterSpacing: "-0.04em", fontFamily: SF, lineHeight: 1 }}>
+        <span style={{ fontSize: "12px", fontWeight: "800", color: "rgba(255,255,255,0.95)", letterSpacing: "-0.04em", fontFamily: SF, lineHeight: 1 }}>
           {time}
         </span>
         {/* Right: signal + wifi + battery */}
@@ -295,7 +295,7 @@ export default function RevenueRecoveryCounter() {
           </div>
 
           {/* Content */}
-          <div style={{ position: "relative", zIndex: 2, transform: "scale(0.78)", transformOrigin: "top center", marginBottom: "-22%" }}>
+          <div style={{ position: "relative", zIndex: 2 }}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: awake ? 1 : 0 }}
@@ -303,18 +303,18 @@ export default function RevenueRecoveryCounter() {
             >
               <StatusBar />
 
-              <div style={{ padding: "16px 18px 18px" }}>
+              <div style={{ padding: "10px 12px 12px" }}>
                 {/* Header */}
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "8px" }}>
                   <div>
-                    <p style={{ fontSize: "11px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "4px", fontFamily: SF }}>Revenue Recovered</p>
-                    <motion.p style={{ fontFamily: SF, fontSize: "34px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em", margin: 0 }}>
+                    <p style={{ fontSize: "9px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "2px", fontFamily: SF }}>Revenue Recovered</p>
+                    <motion.p style={{ fontFamily: SF, fontSize: "24px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em", margin: 0 }}>
                       ${displayTotal.toLocaleString()}
                     </motion.p>
                   </div>
                   {/* LIVE badge — iOS green with pulsing ring */}
-                  <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "5px", borderRadius: "20px", padding: "4px 10px 4px 8px", fontSize: "11px", fontWeight: "800", background: "rgba(48,209,88,0.15)", border: "1px solid rgba(48,209,88,0.28)", letterSpacing: "0.08em", color: "#30D158" }}>
-                    <div style={{ position: "relative", width: "7px", height: "7px", flexShrink: 0 }}>
+                  <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "4px", borderRadius: "20px", padding: "3px 8px 3px 6px", fontSize: "9px", fontWeight: "800", background: "rgba(48,209,88,0.15)", border: "1px solid rgba(48,209,88,0.28)", letterSpacing: "0.08em", color: "#30D158" }}>
+                    <div style={{ position: "relative", width: "5px", height: "5px", flexShrink: 0 }}>
                       <motion.div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#30D158" }} animate={{ scale: [1, 1.9, 1], opacity: [0.9, 0, 0.9] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }} />
                       <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#30D158" }} />
                     </div>
@@ -323,15 +323,15 @@ export default function RevenueRecoveryCounter() {
                 </div>
 
                 {/* Lead rows */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "12px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "8px" }}>
                   {LEADS.map((lead, i) => {
                     const recovered = i < recoveredCount;
                     return (
                       <motion.div
                         key={lead.name}
                         style={{
-                          display: "flex", alignItems: "center", gap: "10px",
-                          borderRadius: "14px", padding: "10px 14px", position: "relative", overflow: "hidden",
+                          display: "flex", alignItems: "center", gap: "8px",
+                          borderRadius: "10px", padding: "7px 10px", position: "relative", overflow: "hidden",
                           background: recovered ? "rgba(48,209,88,0.1)" : "rgba(255,255,255,0.04)",
                           boxShadow: recovered ? "inset 0 0 0 1px rgba(48,209,88,0.22)" : "inset 0 0 0 1px rgba(255,255,255,0.06)",
                           transition: "all 0.45s ease",
@@ -346,40 +346,40 @@ export default function RevenueRecoveryCounter() {
                             animate={{ scale: [0.4, 2] }} transition={{ duration: 0.55 }} />
                         )}
                         {/* iOS green filled circle checkmark badge */}
-                        <div style={{ width: "28px", height: "28px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "700", background: recovered ? "#30D158" : "rgba(255,255,255,0.07)", color: recovered ? "#fff" : "rgba(255,255,255,0.3)", transition: "all 0.4s", fontFamily: SF, boxShadow: recovered ? "0 2px 8px rgba(48,209,88,0.4)" : "none" }}>
+                        <div style={{ width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", fontWeight: "700", background: recovered ? "#30D158" : "rgba(255,255,255,0.07)", color: recovered ? "#fff" : "rgba(255,255,255,0.3)", transition: "all 0.4s", fontFamily: SF, boxShadow: recovered ? "0 2px 6px rgba(48,209,88,0.4)" : "none" }}>
                           {recovered ? (
-                            <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
+                            <svg width="9" height="7" viewBox="0 0 13 10" fill="none">
                               <path d="M1.5 5L5 8.5L11.5 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                           ) : lead.name[0]}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: "13px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
-                          <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.28)", margin: 0, fontFamily: SF }}>{lead.service}</p>
+                          <p style={{ fontSize: "10px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
+                          <p style={{ fontSize: "8px", color: "rgba(255,255,255,0.28)", margin: 0, fontFamily: SF }}>{lead.service}</p>
                         </div>
-                        <span style={{ fontSize: "15px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#30D158" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF, letterSpacing: "-0.01em" }}>${lead.value}</span>
+                        <span style={{ fontSize: "11px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#30D158" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF, letterSpacing: "-0.01em" }}>${lead.value}</span>
                       </motion.div>
                     );
                   })}
                 </div>
 
                 {/* Footer — frosted glass iOS widget */}
-                <div style={{ borderRadius: "16px", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.14)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <div style={{ width: "18px", height: "18px", borderRadius: "5px", background: "linear-gradient(135deg, #9a5c2e, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L4 7.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <div style={{ borderRadius: "10px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.14)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                    <div style={{ width: "13px", height: "13px", borderRadius: "4px", background: "linear-gradient(135deg, #9a5c2e, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <svg width="7" height="7" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L4 7.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
-                    <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(255,255,255,0.5)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
+                    <p style={{ fontSize: "8px", fontWeight: "700", color: "rgba(255,255,255,0.5)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
                   </div>
-                  <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.1)", border: "none", borderRadius: "8px", padding: "4px 10px", fontSize: "11px", fontWeight: "700", color: replaying ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.7)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.04em", transition: "all 0.2s", fontFamily: SF }}>
+                  <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.1)", border: "none", borderRadius: "6px", padding: "3px 8px", fontSize: "9px", fontWeight: "700", color: replaying ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.7)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.04em", transition: "all 0.2s", fontFamily: SF }}>
                     {replaying ? "···" : "↺ Replay"}
                   </button>
                 </div>
               </div>
 
-              {/* iPhone home indicator — shorter & thicker */}
-              <div style={{ height: "28px", display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: "6px" }}>
-                <div style={{ width: "120px", height: "5px", borderRadius: "3px", background: "rgba(255,255,255,0.28)" }} />
+              {/* iPhone home indicator */}
+              <div style={{ height: "18px", display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: "4px" }}>
+                <div style={{ width: "80px", height: "4px", borderRadius: "2px", background: "rgba(255,255,255,0.28)" }} />
               </div>
             </motion.div>
           </div>
