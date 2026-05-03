@@ -66,16 +66,16 @@ function StatusBar() {
         display: "flex", alignItems: "center", justifyContent: "space-between",
         padding: "10px 22px 6px", height: "46px",
       }}>
-        <span style={{ fontSize: "15px", fontWeight: "700", color: "rgba(255,255,255,0.9)", letterSpacing: "-0.03em", fontFamily: SF }}>
+        <span style={{ fontSize: "17px", fontWeight: "800", color: "rgba(255,255,255,0.95)", letterSpacing: "-0.04em", fontFamily: SF, lineHeight: 1 }}>
           {time}
         </span>
         {/* Right: signal + wifi + battery */}
         <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-          {/* Signal bars */}
-          <svg width="16" height="12" viewBox="0 0 16 12">
+          {/* Signal bars — iOS proportions, 4th bar at 0.25 opacity */}
+          <svg width="17" height="12" viewBox="0 0 17 12">
             {[0,1,2,3].map(i => (
-              <rect key={i} x={i*4} y={12-(i+1)*3} width="3" height={(i+1)*3} rx="0.8"
-                fill={i < 3 ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.2)"} />
+              <rect key={i} x={i*4.5} y={12-(i+1)*3} width="3.2" height={(i+1)*3} rx="1"
+                fill={i < 3 ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.25)"} />
             ))}
           </svg>
           {/* Wifi */}
@@ -255,13 +255,14 @@ export default function RevenueRecoveryCounter() {
             </motion.div>
           </motion.div>
 
-          {/* Wallpaper layer */}
+          {/* Wallpaper layer — true OLED black with iOS 17-style aurora */}
           <div style={{
             position: "absolute", inset: 0, zIndex: 0,
-            background: "linear-gradient(145deg, #0f1520 0%, #1a0a2e 35%, #0a1525 65%, #151020 100%)",
+            background: "#000000",
           }}>
-            <div style={{ position: "absolute", top: "-10%", left: "20%", width: "60%", height: "60%", borderRadius: "50%", background: "radial-gradient(circle, rgba(100,60,180,0.5) 0%, transparent 70%)", filter: "blur(30px)" }} />
-            <div style={{ position: "absolute", bottom: "0%", right: "5%", width: "50%", height: "50%", borderRadius: "50%", background: "radial-gradient(circle, rgba(30,100,200,0.4) 0%, transparent 70%)", filter: "blur(25px)" }} />
+            <div style={{ position: "absolute", top: "-20%", left: "10%", width: "70%", height: "65%", borderRadius: "50%", background: "radial-gradient(circle, rgba(88,54,170,0.55) 0%, rgba(50,30,120,0.25) 50%, transparent 75%)", filter: "blur(38px)" }} />
+            <div style={{ position: "absolute", bottom: "-10%", right: "-5%", width: "60%", height: "55%", borderRadius: "50%", background: "radial-gradient(circle, rgba(20,80,200,0.45) 0%, rgba(10,40,120,0.2) 50%, transparent 75%)", filter: "blur(32px)" }} />
+            <div style={{ position: "absolute", top: "40%", left: "-10%", width: "50%", height: "40%", borderRadius: "50%", background: "radial-gradient(circle, rgba(140,60,200,0.2) 0%, transparent 70%)", filter: "blur(28px)" }} />
           </div>
 
           {/* Content */}
@@ -296,27 +297,33 @@ export default function RevenueRecoveryCounter() {
                         key={lead.name}
                         style={{
                           display: "flex", alignItems: "center", gap: "10px",
-                          borderRadius: "10px", padding: "10px 14px", position: "relative", overflow: "hidden",
-                          background: recovered ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.04)",
-                          border: recovered ? "1px solid rgba(34,197,94,0.25)" : "1px solid rgba(255,255,255,0.06)",
+                          borderRadius: "14px", padding: "10px 14px", position: "relative", overflow: "hidden",
+                          background: recovered ? "rgba(48,209,88,0.1)" : "rgba(255,255,255,0.04)",
+                          boxShadow: recovered ? "inset 0 0 0 1px rgba(48,209,88,0.22)" : "inset 0 0 0 1px rgba(255,255,255,0.06)",
                           transition: "all 0.45s ease",
                         }}
                         initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.07 }}
+                        whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 500, damping: 30 } }}
                       >
                         {recovered && (
-                          <motion.div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle, rgba(74,222,128,0.2) 0%, transparent 70%)", pointerEvents: "none" }}
+                          <motion.div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle, rgba(48,209,88,0.18) 0%, transparent 70%)", pointerEvents: "none" }}
                             animate={{ scale: [0.4, 2] }} transition={{ duration: 0.55 }} />
                         )}
-                        <div style={{ width: "28px", height: "28px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "700", background: recovered ? "rgba(34,197,94,0.22)" : "rgba(255,255,255,0.07)", color: recovered ? "#4ade80" : "rgba(255,255,255,0.3)", transition: "all 0.4s", fontFamily: SF }}>
-                          {recovered ? "✓" : lead.name[0]}
+                        {/* iOS green filled circle checkmark badge */}
+                        <div style={{ width: "28px", height: "28px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "700", background: recovered ? "#30D158" : "rgba(255,255,255,0.07)", color: recovered ? "#fff" : "rgba(255,255,255,0.3)", transition: "all 0.4s", fontFamily: SF, boxShadow: recovered ? "0 2px 8px rgba(48,209,88,0.4)" : "none" }}>
+                          {recovered ? (
+                            <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
+                              <path d="M1.5 5L5 8.5L11.5 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          ) : lead.name[0]}
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: "13px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
+                          <p style={{ fontSize: "13px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
                           <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.28)", margin: 0, fontFamily: SF }}>{lead.service}</p>
                         </div>
-                        <span style={{ fontSize: "15px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#4ade80" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF, letterSpacing: "-0.01em" }}>${lead.value}</span>
+                        <span style={{ fontSize: "15px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#30D158" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF, letterSpacing: "-0.01em" }}>${lead.value}</span>
                       </motion.div>
                     );
                   })}
