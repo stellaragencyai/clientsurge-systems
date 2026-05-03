@@ -35,7 +35,7 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
       >
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs font-semibold text-foreground">Your estimated setup timeline</p>
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(154,92,46,0.1)", color: "#9a5c2e" }}>
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(0,0,0,0.07)", color: "#1b140d" }}>
             ~3–5 hours total
           </span>
         </div>
