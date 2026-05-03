@@ -265,8 +265,8 @@ export default function LaunchTimeline() {
       {/* Detailed vertical timeline */}
       <div className="relative">
         <div
-          className="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 hidden md:block pointer-events-none"
-          style={{ background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 50%, rgba(0,174,239,0.6) 100%)", transform: "translateX(-50%)" }}
+          className="absolute left-6 md:left-1/2 top-0 w-0.5 hidden md:block pointer-events-none"
+          style={{ bottom: "-56px", background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 50%, rgba(0,174,239,0.6) 100%)", transform: "translateX(-50%)" }}
         />
 
         <div className="space-y-10 md:space-y-20 relative z-10">
@@ -277,13 +277,13 @@ export default function LaunchTimeline() {
       </div>
 
       {/* Bottom CTA */}
-      <div className="hidden md:flex flex-col items-center mt-6">
-        <div style={{ width: "2px", height: "56px", background: "linear-gradient(180deg, rgba(0,174,239,0.4) 0%, #00AEEF 100%)" }} />
+      <div className="hidden md:flex flex-col items-center mt-0">
+        <div style={{ width: "2px", height: "56px", background: "linear-gradient(180deg, #00AEEF 0%, rgba(0,174,239,0.4) 100%)" }} />
         <button
           type="button"
           onClick={openDemoBooking}
           style={{
-            marginTop: "24px",
+            marginTop: "0px",
             borderRadius: "9999px", padding: "2px",
             background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
             boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
