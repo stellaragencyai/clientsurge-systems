@@ -105,19 +105,19 @@ export default function FinalCTA() {
                 borderRadius: "9999px",
                 padding: "2px",
                 background:
-                "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+                boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
                 border: "none",
                 cursor: "pointer",
                 textDecoration: "none"
               }}
               onMouseEnter={(event) => {
                 event.currentTarget.style.boxShadow =
-                "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+                "0 8px 40px rgba(0,174,239,0.6), 0 4px 18px rgba(0,174,239,0.4)";
               }}
               onMouseLeave={(event) => {
                 event.currentTarget.style.boxShadow =
-                "0 4px 18px rgba(120,70,20,0.35)";
+                "0 4px 18px rgba(0,174,239,0.4)";
               }}>
               
               <span
@@ -128,11 +128,11 @@ export default function FinalCTA() {
                   height: "56px",
                   padding: "0 40px",
                   borderRadius: "9999px",
-                  background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                  color: "#f5e6d0",
+                  background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
+                  color: "#ffffff",
                   fontWeight: "700",
                   fontSize: "1rem",
-                  textShadow: "0 1px 2px rgba(0,0,0,0.3)"
+                  textShadow: "0 1px 2px rgba(0,0,0,0.2)"
                 }}>
                 
                 Book Your Free Demo
