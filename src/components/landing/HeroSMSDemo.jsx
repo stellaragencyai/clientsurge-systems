@@ -115,7 +115,7 @@ export default function HeroSMSDemo() {
 
           {/* iMessage nav bar */}
           <div style={{ background: "#ffffff", borderBottom: "0.5px solid #e5e5ea", padding: "6px 12px 10px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "linear-gradient(135deg, #7a4825, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: "800", color: "#fff8ee", marginBottom: "4px", boxShadow: "0 2px 8px rgba(120,70,20,0.35)" }}>G</div>
+            <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "linear-gradient(135deg, #0088CC, #00AEEF)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: "800", color: "#ffffff", marginBottom: "4px", boxShadow: "0 2px 8px rgba(0,174,239,0.35)" }}>G</div>
             <p style={{ fontSize: "13px", fontWeight: "600", color: "#1c1c1e", margin: 0 }}>Glow Med Spa</p>
             <p style={{ fontSize: "11px", color: "#8e8e93", margin: 0 }}>iMessage</p>
           </div>
