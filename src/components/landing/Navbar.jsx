@@ -139,10 +139,10 @@ export default function Navbar() {
       style={{
         borderColor: scrolled ? "rgba(0,174,239,0.2)" : "rgba(0,174,239,0)",
         backgroundColor: scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
+        backdropFilter: scrolled ? "blur(20px)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
         paddingTop: "env(safe-area-inset-top)",
-        boxShadow: scrolled ? "0 20px 60px rgba(0,100,200,0.1)" : "0 12px 34px rgba(0,100,200,0.06)",
+        boxShadow: scrolled ? "0 20px 60px rgba(0,100,200,0.1)" : "none",
         transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out, border-color 0.35s ease-out"
       }}>
       
