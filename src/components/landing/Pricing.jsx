@@ -258,7 +258,7 @@ export default function Pricing() {
                 <div className="text-3xl mb-3">{item.emoji}</div>
                 <h4 className="font-semibold text-foreground text-sm mb-1">{item.name}</h4>
                 <p className="text-xs text-muted-foreground flex-1 mb-3 leading-relaxed">{item.desc}</p>
-                <p className="text-xs font-bold text-primary mb-4">{item.price}</p>
+                <p className="text-xs font-bold text-foreground mb-4">{item.price}</p>
                 <a
                   href={item.link}
                   target="_blank"
