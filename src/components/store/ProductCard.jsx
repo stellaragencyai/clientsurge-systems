@@ -34,16 +34,16 @@ export default function ProductCard({ product }) {
           flex-direction: column;
           gap: 12px;
           background: rgba(255,255,255,0.93);
-          border: 2px solid rgba(154,92,46,0.4);
-          box-shadow: 0 4px 18px rgba(111,67,31,0.07), inset 0 1px 0 rgba(255,255,255,0.3);
+          border: 2px solid rgba(0,0,0,0.85);
+          box-shadow: 0 4px 18px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3);
           cursor: pointer;
           transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
           min-height: 340px;
           overflow: visible;
         }
         .pcard:hover {
-          border-color: rgba(200,150,92,0.7);
-          box-shadow: 0 8px 28px rgba(111,67,31,0.15), inset 0 1px 0 rgba(255,255,255,0.4);
+          border-color: rgba(0,0,0,1);
+          box-shadow: 0 8px 28px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.4);
           transform: translateY(-3px);
         }
         .pcard.in-cart {
