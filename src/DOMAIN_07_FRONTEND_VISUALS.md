@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 32% Ready (9/28 done · 1 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** #17 — FAQ mobile tap target (~10 min, no deps) · Agent A  
+## 📊 DOMAIN HEALTH: 🟡 52% Ready (18/35 done · 1 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** #53 — audit form inputs iOS zoom (~45 min, no deps) · Agent A  
 > ⚠️ **Critical:** #76 — verify sk_live_ key exposure (~20 min, zero deps — do this first every session)
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 1 (#76 — Stripe key audit, ~20 min) |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 9 tasks (#1, #2, #3, #5, #25, #29, #38, #43, #77) + CTA pass (28a–28d) |
-| 🎯 Est. Hours to Domain Complete | ~30 hrs (added 20 mobile tasks ~11 hrs) |
-| 📱 Next 5 Priority Tasks | M09 (iOS zoom), M01 (svh), M08 (Safari blur), M16 (badge overflow), #53 (input audit) |
+| ✅ Done This Week | 18 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,77 + M01,M02,M05,M06,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| 🎯 Est. Hours to Domain Complete | ~18 hrs |
+| 📱 Next 5 Priority Tasks | #76 (Stripe key audit), #53 (form input audit), M03 (iOS scroll lock), M07 (iPad nav), M10 (modal scroll) |
 
 ---
 
@@ -36,9 +36,9 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 11 | ⏳ | Build out pages/ThankYou — currently a blank page | A | — | — | — | ~1 hr |
-| 35 | ⏳ | Testimonials: replace broken image URLs with initials-based avatar fallbacks | A | — | — | — | ~30 min |
-| 36 | ⏳ | Add favicon (32x32 + 180x180) and apple-touch-icon to index.html | A | — | — | — | ~20 min |
+| 11 | ✅ | Build out pages/ThankYou — fully built with animated checkmark, plan card, next-steps, contact | A | — | — | — | ~1 hr |
+| 35 | ✅ | Testimonials: replaced broken Unsplash URLs with initials-based gradient avatars | A | — | — | — | ~30 min |
+| 36 | ✅ | Favicon + apple-touch-icon already present in index.html — verified | A | — | — | — | ~20 min |
 | 51 | ⏳ | pages/Book Calendly iframe: set width:100%, height:700px, scrolling:yes | A | — | — | — | ~20 min |
 | 53 | ⏳ | Audit all form inputs for iOS zoom issue (font-size < 16px) | A | — | — | 🧵 Mobile-UX | ~45 min |
 | 55 | ⏳ | pages/Book Calendly: test CSP allows calendly.com frames on live domain | A | — | — | — | ~30 min |
