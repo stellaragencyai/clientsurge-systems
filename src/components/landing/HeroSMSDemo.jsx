@@ -138,8 +138,8 @@ export default function HeroSMSDemo() {
                     maxWidth: "82%",
                     padding: "8px 12px",
                     borderRadius: msg.from === "lead" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                    background: msg.from === "lead" ? "linear-gradient(135deg, #7a4825 0%, #c8965c 100%)" : "#ffffff",
-                    color: msg.from === "lead" ? "#fff8ee" : "#1c1c1e",
+                    background: msg.from === "lead" ? "linear-gradient(135deg, #0088CC 0%, #00AEEF 100%)" : "#ffffff",
+                    color: msg.from === "lead" ? "#ffffff" : "#1c1c1e",
                     fontSize: "12.5px",
                     lineHeight: "1.4",
                     boxShadow: msg.from === "system" ? "0 1px 3px rgba(0,0,0,0.08)" : "none",
@@ -177,7 +177,7 @@ export default function HeroSMSDemo() {
           {/* iMessage input bar */}
           <div style={{ background: "#ffffff", borderTop: "0.5px solid #e5e5ea", padding: "8px 10px", display: "flex", alignItems: "center", gap: "6px" }}>
             <div style={{ flex: 1, background: "#f2f2f7", borderRadius: "18px", padding: "7px 12px", fontSize: "12px", color: "#8e8e93" }}>iMessage</div>
-            <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #7a4825, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #0088CC, #00AEEF)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M2 6h8M7 3l3 3-3 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
