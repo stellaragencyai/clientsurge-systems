@@ -72,9 +72,9 @@ Deno.serve(async (req) => {
       return Response.json({ skipped: true, reason: 'Resend is disabled in AdminSettings' });
     }
 
-    const toEmail = settings.lead_notification_email;
+    const toEmail = settings.lead_notification_email || Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || Deno.env.get('ADMIN_EMAIL');
     if (!toEmail) {
-      console.warn('No lead_notification_email configured in AdminSettings — skipping notification.');
+      console.warn('No lead_notification_email configured in AdminSettings or env — skipping notification.');
       return Response.json({ skipped: true, reason: 'No notification email configured' });
     }
 
@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
         <tr style="background:#fafafa;"><td style="padding:8px 6px;color:#888;vertical-align:top;font-weight:600;">Submitted</td><td style="padding:8px 6px;color:#888;font-size:12px;">${submittedAt}</td></tr>
       </table>
       <div style="margin-top:24px;">
-        <a href="https://clientsurge.base44.app/admin/leads/${lead.id}" style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
+        <a href="https://clientsurgesystems.com/admin/leads/${lead.id}" style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
           View Lead in Dashboard →
         </a>
       </div>

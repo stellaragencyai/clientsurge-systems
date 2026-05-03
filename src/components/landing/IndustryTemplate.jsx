@@ -10,11 +10,23 @@ import IndustrySMSDemo from "../industry/IndustrySMSDemo";
 import IndustryResults from "../industry/IndustryResults";
 import IndustryFAQ from "../industry/IndustryFAQ";
 import { INDUSTRIES, getIndustryBySlug } from "@/lib/industryData";
+import { setPageMetadata } from "@/lib/seo";
 
 function IndustryTemplateInner({ industrySlug }) {
   const industry = getIndustryBySlug(industrySlug);
   const demoBooking = useDemoBooking();
   const [notFound, setNotFound] = useState(!industry);
+
+  useEffect(() => {
+    if (!industry) return;
+    return setPageMetadata({
+      title: `${industry.name} AI Automation | ClientSurge Systems`,
+      description: industry.hero?.subheadline || `Done-for-you AI lead response and booking automation for ${industry.name}.`,
+      canonicalPath: `/${industrySlug}`,
+      ogTitle: `${industry.name} AI Automation | ClientSurge Systems`,
+      ogDescription: industry.hero?.subheadline || `AI automation built specifically for ${industry.name}.`,
+    });
+  }, [industry, industrySlug]);
 
   if (notFound || !industry) {
     return (

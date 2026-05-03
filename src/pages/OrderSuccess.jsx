@@ -5,6 +5,10 @@ import Navbar from "@/components/landing/Navbar";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import OrderTracker from "@/components/landing/OrderTracker";
 
+// Prevent search engines from indexing the order success page
+const noIndexMeta = document.querySelector('meta[name="robots"]');
+if (noIndexMeta) noIndexMeta.setAttribute("content", "noindex,nofollow");
+
 export default function OrderSuccess() {
   const [sessionId, setSessionId] = useState("");
 
