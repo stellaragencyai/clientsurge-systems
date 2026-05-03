@@ -194,7 +194,54 @@ Deno.serve(async (req) => {
     }
 
     // ─────────────────────────────────────────────────────
-    // STEP 5: Try to match to WebsiteLead
+    // STEP 5: Handle STOP / UNSTOP / HELP keywords (TCPA)
+    // ─────────────────────────────────────────────────────
+    const bodyUpper = smsEvent.body.trim().toUpperCase();
+    const stopKeywords = ["STOP", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT"];
+    const startKeywords = ["START", "UNSTOP", "YES"];
+
+    if (stopKeywords.includes(bodyUpper)) {
+      console.log("[receiveTwilioInboundSms] STOP received from", smsEvent.from_number);
+      // Find any active leads and disable automation
+      const stopMatches = await base44.asServiceRole.entities.WebsiteLead.filter(
+        { phone_number: smsEvent.from_number },
+        "-created_date",
+        10
+      ).catch(() => []);
+      for (const lead of (stopMatches || [])) {
+        await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
+          automation_enabled: false,
+          cadence_paused: true,
+          follow_up_step: 999,
+          next_follow_up_at: null,
+        }).catch(() => {});
+      }
+      await base44.asServiceRole.entities.CommunicationEvent.create({
+        context_type: "sms_opt_out",
+        channel: "sms",
+        direction: "inbound",
+        event_type: "sms_received",
+        provider: "twilio",
+        status: "received",
+        subject: `[STOP] Opt-out from ${smsEvent.from_number}`,
+        message_body: smsEvent.body,
+        provider_message_id: smsEvent.message_sid,
+        metadata_json: JSON.stringify({ from: smsEvent.from_number, keyword: bodyUpper, leads_updated: (stopMatches || []).length }),
+      }).catch(() => {});
+      return new Response(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, {
+        headers: { "Content-Type": "text/xml" },
+      });
+    }
+
+    if (startKeywords.includes(bodyUpper)) {
+      console.log("[receiveTwilioInboundSms] START/UNSTOP received from", smsEvent.from_number);
+      return new Response(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, {
+        headers: { "Content-Type": "text/xml" },
+      });
+    }
+
+    // ─────────────────────────────────────────────────────
+    // STEP 5b: Try to match to WebsiteLead
     // ─────────────────────────────────────────────────────
     const websiteLead = await findWebsiteLeadByPhone(base44, smsEvent.from_number);
 

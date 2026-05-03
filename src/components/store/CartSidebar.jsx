@@ -20,11 +20,17 @@ export default function CartSidebar() {
     phone: "",
     business: "",
   });
+  const [smsConsent, setSmsConsent] = useState(false);
   const [error, setError] = useState("");
 
   const handleCheckout = async () => {
     if (!form.name || !form.email || !form.business) {
       setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (form.phone && !smsConsent) {
+      setError("Please check the SMS consent box to continue, or remove your phone number.");
       return;
     }
 
@@ -338,6 +344,22 @@ export default function CartSidebar() {
                   />
                 </div>
               ))}
+              {/* SMS Consent — only shown when phone is entered */}
+              {form.phone && (
+                <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={smsConsent}
+                    onChange={(e) => setSmsConsent(e.target.checked)}
+                    style={{ marginTop: "2px", flexShrink: 0, accentColor: "#9a5c2e", width: "14px", height: "14px" }}
+                  />
+                  <span style={{ fontSize: "11px", color: "rgba(26,18,9,0.6)", lineHeight: 1.5 }}>
+                    I agree to receive SMS messages from ClientSurge Systems about my order and service updates. Message & data rates may apply. Reply STOP to unsubscribe at any time.{" "}
+                    <a href="/legal/privacy" target="_blank" style={{ color: "#9a5c2e", fontWeight: "600" }}>Privacy Policy</a>
+                  </span>
+                </label>
+              )}
+
               {error ? (
                 <p
                   style={{
