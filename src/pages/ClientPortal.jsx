@@ -22,12 +22,12 @@ import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 
 const TABS = [
+  { id: "progress", label: "🚀 Setup Progress" },
   { id: "quickstart", label: "⚡ Quick Start" },
   { id: "performance", label: "🎯 Performance" },
   { id: "metrics", label: "Lead Flow" },
   { id: "tasks", label: "Tasks" },
   { id: "leads", label: "My Leads" },
-  { id: "progress", label: "Build Progress" },
   { id: "deadlines", label: "Deadlines" },
   { id: "files", label: "Files & Docs" },
   { id: "billing", label: "Billing" },
@@ -45,7 +45,7 @@ export default function ClientPortal() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [portalError, setPortalError] = useState("");
-  const [activeTab, setActiveTab] = useState("leads");
+  const [activeTab, setActiveTab] = useState("progress");
   const [showQuickStart, setShowQuickStart] = useState(false);
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useLeadNotifications();
 
