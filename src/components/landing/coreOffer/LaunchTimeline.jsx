@@ -203,7 +203,7 @@ export default function LaunchTimeline() {
                     background: isActive
                       ? "linear-gradient(135deg, #0088CC 0%, #00AEEF 50%, #003B8F 100%)"
                       : "rgba(0,174,239,0.12)",
-                    border: "2px solid #000000",
+                    border: isActive ? "2px solid #0088CC" : "2px solid rgba(0,174,239,0.3)",
                     boxShadow: isActive ? "0 0 0 5px rgba(0,174,239,0.15), 0 4px 14px rgba(0,174,239,0.35)" : "none",
                     transition: "background 0.3s ease, box-shadow 0.3s ease",
                   }}
@@ -213,7 +213,7 @@ export default function LaunchTimeline() {
                   </span>
                   <div
                     className="absolute rounded-full flex items-center justify-center"
-                    style={{ width: "24px", height: "24px", bottom: "-3px", right: "-3px", background: "#e0f4fd", border: "2px solid #000000", zIndex: 20 }}
+                    style={{ width: "24px", height: "24px", bottom: "-3px", right: "-3px", background: "#e0f4fd", border: "2px solid rgba(0,174,239,0.4)", zIndex: 20 }}
                   >
                     <Icon style={{ width: "14px", height: "14px", color: "#0088CC" }} />
                   </div>
