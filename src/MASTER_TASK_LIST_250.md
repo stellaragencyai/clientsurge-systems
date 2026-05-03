@@ -833,3 +833,81 @@
 
 *Expansion Pack 2 added by Sam (AI Agent) — 2026-05-03. Tasks #301–#400.*
 *Sources: live bundle analysis, 370 JSX component scan, 160 backend function inventory, 42 entity schemas, 15 shared lib files.*
+
+
+---
+
+---
+
+# 🧠 AI BRAIN EXPANSION — Tasks #401–#425
+### Added by Sam | 2026-05-03 | AI-Native Purchase → Provisioning → Website Generation Pipeline
+
+> These tasks define the complete autonomous AI loop:
+> Payment detected → Package identified → Services activated → Credentials collected → Website built → Client goes live
+> All tasks below are ⏳ Pending unless noted.
+
+---
+
+## SECTION S: PAYMENT DETECTION + PACKAGE INTELLIGENCE
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 401 | ⏳ | stripeWebhookOrders: after checkout.session.completed, auto-detect package tier by reading items[].source_package_key and write to Order.package_key — currently the field exists but is never auto-set by the webhook | CRITICAL |
+| 402 | ⏳ | Build AI package classifier: when an Order has no package_key (à la carte purchase), AI reads selected_service_keys array and infers the closest tier (starter/growth/elite) and writes it to Order.package_type — so the install pipeline always knows what tier to provision | HIGH |
+| 403 | ⏳ | stripeWebhookOrders: after setting package_key, immediately invoke initializeInstallOS — right now these two functions are disconnected and initializeInstallOS requires a manual trigger | CRITICAL |
+| 404 | ⏳ | sendOrderConfirmationEmail: make it package-aware — Starter clients get a "2 services activating" message, Growth gets "4 services", Elite gets "all 6 + bonus website" — currently sends a generic confirmation regardless of tier | HIGH |
+| 405 | ⏳ | After payment confirmed, fire sendAdminPurchaseNotification with full package details + client business name to Nolan's Telegram immediately — currently this function is deployed but not guaranteed to fire on every checkout.session.completed event | HIGH |
+
+---
+
+## SECTION T: CREDENTIALS INTAKE — The Missing Bridge Between Payment and Activation
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 406 | ⏳ | Build a post-purchase credentials intake form at /setup/credentials — after payment, client is redirected here to provide: business phone number, booking platform URL, marketing platform (GHL/HubSpot/etc), existing website URL, Google Business Profile link, and preferred tone of voice | CRITICAL |
+| 407 | ⏳ | Credentials intake form must be package-aware — Starter clients see a 3-field short form; Growth clients see 6 fields; Elite clients see a full 10-field onboarding wizard with logo upload, brand colors, and target audience | HIGH |
+| 408 | ⏳ | On credentials form submission, write all fields into Order.install_configuration — this is the single source of truth that configureService reads from when activating each automation | CRITICAL |
+| 409 | ⏳ | Add a "Missing Credentials" alert in admin panel — if an Order is in status "Ready for Install" but install_configuration fields are incomplete after 24 hours, auto-send a reminder email + Telegram alert to Nolan | HIGH |
+| 410 | ⏳ | Build saveClientCredentials backend function — validates required fields per package tier, writes to Order.install_configuration, triggers installPipeline to advance from "intake_received" to "Ready for Install" | CRITICAL |
+
+---
+
+## SECTION U: SERVICE ACTIVATION ENGINE — AI-Driven Per-Package Provisioning
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 411 | ⏳ | installPipeline: add package-tier-aware activation map — when package_key = "starter_system", only activate instant_lead_response and missed_call_text_back; "growth_system" activates 4; "elite_system" activates all 6 — currently the pipeline activates whatever is in items[] with no tier gate | CRITICAL |
+| 412 | ⏳ | configureService: after successfully configuring each service, update the corresponding AutomationChecklistStep to status="complete" and fire a Telegram alert to Nolan — currently completes silently with no notification | HIGH |
+| 413 | ⏳ | Build AI service configuration generator: for each service being activated, AI reads the client's industry + business name + tone_of_voice from Order.install_configuration and auto-generates personalized SMS templates, email subject lines, and booking confirmation messages — writes them back into Order.install_configuration before configureService runs | CRITICAL |
+| 414 | ⏳ | autoProvisionTwilioNumber: wire it to fire automatically during installPipeline when twilio_business_phone is not yet set in install_configuration — currently it requires admin to manually trigger it | HIGH |
+| 415 | ⏳ | Build activateAllServices function — takes order_id, reads package_service_keys, calls configureService for each one in sequence with error handling and rollback — this is the "one-click activate all" function the Elite tier needs for full autonomous provisioning | CRITICAL |
+
+---
+
+## SECTION V: WEBSITE GENERATION ENGINE — Package-Tier Website Builder
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 416 | ⏳ | Build generateClientWebsite backend function — takes order_id, reads package_key + industry + install_configuration, and generates a structured website spec object: Starter = 1-page landing, Growth = 3-page site, Elite = 5-page interactive site with leads dashboard | CRITICAL |
+| 417 | ⏳ | Define the 3 website tiers as JSON templates per industry in BusinessConfigTemplate entity — Starter template: hero + CTA + contact form + 2 automation feature blocks; Growth template: + services page + about page + booking page; Elite template: + leads page + portal login + 6 automation showcases + ROI calculator | CRITICAL |
+| 418 | ⏳ | generateClientWebsite: for Elite tier, AI reads the client's business name, industry, and tone_of_voice and writes personalized hero headline, subheading, CTA text, and 3 proof points using LLM — all other copy can be templated | HIGH |
+| 419 | ⏳ | Add website_status field tracking to ClientInstallationOS — workflow_stage already has website_building/website_review/website_live enum values but nothing updates them automatically as the build progresses | HIGH |
+| 420 | ⏳ | Build client website preview page at /setup/preview/[order_id] — shows the AI-generated website spec with section layout, copy, and service feature list before the actual site is built — client can approve or request one revision | HIGH |
+
+---
+
+## SECTION W: ELITE TIER — PERKS + FULL AUTOMATION LOOP
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 421 | ⏳ | Elite tier perk #1 — AI-Written Lead Magnets: after activation, AI generates 3 industry-specific lead magnet PDFs (e.g. "The Med Spa Owner's Guide to Automating Client Re-engagement") and delivers them to client via portal — build generateLeadMagnet function | HIGH |
+| 422 | ⏳ | Elite tier perk #2 — Monthly AI Performance Report: build generateMonthlyPerformanceReport function — runs on 1st of month, pulls CommunicationEvent data, summarizes leads contacted, response rate, bookings created, revenue attributed, and emails + portals it to the client | HIGH |
+| 423 | ⏳ | Elite tier perk #3 — AI Receptionist Voice Clone Setup: after Elite payment confirmed, send client a Retell AI voice clone intake form requesting a 2-minute audio sample — store recording URL in Order.install_configuration.voice_sample_url and create a task for Nolan to complete the clone setup | HIGH |
+| 424 | ⏳ | Build the full AI activation status dashboard in ClientPortal — shows a live stepper: Payment Confirmed → Credentials Received → Services Configuring → Website Building → All Systems Live — each step reads from real ClientInstallationOS.workflow_stage field | CRITICAL |
+| 425 | ⏳ | Build end-to-end integration test for the full AI pipeline: payment event → package detection → initializeInstallOS → credentials intake → configureService × N → generateClientWebsite → sendPortalWelcomeEmail → client portal loads with live data — run this test for each of the 3 tiers separately and log results to AgentLog | CRITICAL |
+
+---
+
+*AI Brain Expansion added by Sam (AI Agent) — 2026-05-03.*
+*Sources: Order.jsonc (537 lines), initializeInstallOS, configureService, installPipeline (1778 lines), stripeWebhookOrders, BusinessConfigTemplate, ClientInstallationOS schemas.*
+*These 25 tasks define the autonomous client activation pipeline that transforms ClientSurge from a manual agency into a self-provisioning AI platform.*
