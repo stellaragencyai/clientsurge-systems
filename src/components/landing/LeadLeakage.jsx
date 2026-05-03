@@ -15,7 +15,7 @@ export default function LeadLeakage() {
       <div className="max-w-5xl mx-auto">
         <div className="text-center pt-10 pb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">Revenue You're Missing</p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight" style={{ color: "#000000" }}>
             Already Have Great Reviews?{" "}
             <span style={{ background: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 52%, #9a5c2e 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
               You're Sitting on Untapped Revenue.
