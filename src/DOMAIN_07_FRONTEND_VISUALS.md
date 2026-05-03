@@ -55,7 +55,11 @@
 | 15 | ⏳ 🟢 | DemoBookingModal time slot grid: force 2-col on viewports < 480px | A | — | — | 🧵 Mobile-UX | ~20 min |
 | 26 | ⏳ | Add dark mode ☀️/🌙 toggle to Navbar desktop + mobile menu | A | #27 | — | 🧵 Dark-Mode | ~30 min |
 | 27 | 🔄 | Implement ThemeProvider from next-themes so dark mode class is applied | A | — | → A (#26 toggle) | 🧵 Dark-Mode | ~45 min |
-| 28 | 🔄 | Standardize primary CTAs to blue gradient; gold = store/checkout only | A | — | — | 🧵 CTA-Standards | ~1 hr |
+| 28 | ✅ | Standardize primary CTAs to blue gradient; gold = store/checkout only | A | — | — | 🧵 CTA-Standards | ~1 hr |
+| 28a | ✅ | StickyCTA: replace brown gradient "Book Your Free Demo" with blue | A | — | — | 🧵 CTA-Standards | ~10 min |
+| 28b | ✅ | MobileCallBar: replace brown "Book Free Demo" button with blue gradient | A | — | — | 🧵 CTA-Standards | ~10 min |
+| 28c | ✅ | MobileCallBar: replace brown tint on "Call Now" button with blue tint | A | — | — | 🧵 CTA-Standards | ~5 min |
+| 28d | ✅ | Pricing: replace hidden brown demo button at bottom with blue gradient | A | — | — | 🧵 CTA-Standards | ~5 min |
 | 31 | ⏳ | pages/Industries: add gradient hero section with industry grid icons | A | — | — | — | ~1 hr |
 | 33 | ⏳ | Mobile sticky cart bar: add padding-top: 72px to main content when visible | A | — | — | 🧵 Mobile-UX | ~20 min |
 | 34 | ⏳ | AdminDashboard sidebar: add active-state highlight on current route | A | — | — | — | ~20 min |

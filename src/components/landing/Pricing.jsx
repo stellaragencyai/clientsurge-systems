@@ -313,13 +313,13 @@ export default function Pricing() {
               style={{
                 borderRadius: "9999px",
                 padding: "2px",
-                background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+                boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
                 border: "none",
                 cursor: "pointer"
               }}>
               
-                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }} className=" hidden hidden">
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.95rem" }} className=" hidden hidden">
                   Book Your Free Demo <ArrowRight className="w-4 h-4" />
                 </span>
               </button> :
@@ -329,12 +329,12 @@ export default function Pricing() {
               style={{
                 borderRadius: "9999px",
                 padding: "2px",
-                background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+                boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
                 display: "inline-block"
               }}>
               
-                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.95rem" }}>
                   Book Your Free Demo <ArrowRight className="w-4 h-4" />
                 </span>
               </a>

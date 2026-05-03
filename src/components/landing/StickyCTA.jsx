@@ -31,8 +31,8 @@ export default function StickyCTA() {
             display: "inline-block",
             borderRadius: "9999px",
             padding: "2px",
-            background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-            boxShadow: "0 8px 32px rgba(120,70,20,0.45)",
+            background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+            boxShadow: "0 8px 32px rgba(0,174,239,0.5)",
             border: "none",
             cursor: "pointer",
           }}
@@ -44,11 +44,11 @@ export default function StickyCTA() {
             height: "48px",
             padding: "0 28px",
             borderRadius: "9999px",
-            background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-            color: "#f5e6d0",
+            background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
+            color: "#ffffff",
             fontWeight: "700",
             fontSize: "0.9rem",
-            textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+            textShadow: "0 1px 2px rgba(0,0,0,0.2)",
           }}>
             Book Your Free Demo
             <ArrowRight className="w-4 h-4" />
