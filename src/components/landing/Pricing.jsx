@@ -397,6 +397,18 @@ export default function Pricing() {
           z-index: 20;
           white-space: nowrap;
         }
+        /* M16: iPhone 12/15 — badge overflows card top; collapse to relative on small screens */
+        @media (max-width: 640px) {
+          .pricing-badge-float {
+            position: relative;
+            top: 0;
+            left: 0;
+            transform: none;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 8px;
+          }
+        }
         
         .shiny-brown-btn {
           display: inline-block;

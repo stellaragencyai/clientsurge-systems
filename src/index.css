@@ -252,6 +252,27 @@ body.nav-open {
   }
 }
 
+/* M01: Replace 100vh with svh on all hero/full-height containers (Dynamic Island safe) */
+@supports (height: 100svh) {
+  .min-h-screen,
+  [class*="min-h-screen"] {
+    /* svh accounts for Dynamic Island + browser chrome on iPhone 15/17 */
+    min-height: 100svh;
+  }
+  .h-screen {
+    height: 100svh;
+  }
+}
+
+/* M08: Safari 17 backdrop-filter flicker fix — force GPU compositing on Navbar */
+nav {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
 /* 8. Prevent iOS font-size bump on landscape rotate */
 @media screen and (orientation: landscape) {
   html {

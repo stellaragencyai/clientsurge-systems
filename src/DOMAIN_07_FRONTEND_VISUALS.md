@@ -1,7 +1,8 @@
 # 🎨 DOMAIN 07 — Frontend, Visuals & UI/UX
 > **Business Area:** UI consistency, dark mode, CTA standards, mobile UX, store UX, animations, industry pages, testimonials, forms  
-> **~28 tasks** | Last updated: 2026-05-03  
+> **~48 tasks** (incl. 20 new 📱 Mobile/Device tasks) | Last updated: 2026-05-03  
 > **Agents who touch this:** Agent A (all frontend)
+> **📱 Device targets:** iPhone 12 (375px) · iPhone 15 (393px) · iPhone 17 Pro Max (430px) · iPad (768/1024px) · Safari 16/17
 
 ---
 
@@ -15,10 +16,11 @@
 | Metric | Value |
 |---|---|
 | 🔴 Unblocked Critical | 1 (#76 — Stripe key audit, ~20 min) |
-| 🟠 Fastest Win (< 30 min, no deps) | #17 FAQ tap target (10 min), #16 CookieConsent offset (10 min), #42 font size (10 min) |
+| 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 9 tasks (#1, #2, #3, #5, #25, #29, #38, #43, #77) |
-| 🎯 Est. Hours to Domain Complete | ~19 hrs |
+| ✅ Done This Week | 9 tasks (#1, #2, #3, #5, #25, #29, #38, #43, #77) + CTA pass (28a–28d) |
+| 🎯 Est. Hours to Domain Complete | ~30 hrs (added 20 mobile tasks ~11 hrs) |
+| 📱 Next 5 Priority Tasks | M09 (iOS zoom), M01 (svh), M08 (Safari blur), M16 (badge overflow), #53 (input audit) |
 
 ---
 
@@ -73,6 +75,35 @@
 | 73 | ⏳ | chatBubbleAI: add typing indicator ("...") while LLM processes response | A | — | — | — | ~20 min |
 | 74 | ⏳ | chatBubbleAI: add sessionStorage counter, block after 10 messages per session | A | — | — | — | ~30 min |
 | 79 | ⏳ | pages/Success: verify content is correct and not stale | A | — | — | — | ~15 min |
+
+---
+
+## 📱 MOBILE / DEVICE-SPECIFIC (iPhone 12 · iPhone 15 · iPhone 17 Pro Max · iPad · Safari)
+
+> These tasks ensure pixel-perfect rendering and interaction on all target Apple devices.
+
+| # | Status | Task | Agent | Device Target | Thread | Est. Time |
+|---|---|---|---|---|---|---|
+| M01 | ✅ | iOS Safari: audit all `min-height: 100vh` — replace with `100svh` (Dynamic Island safe) | A | iPhone 15, 17 Pro Max | 🧵 Mobile-UX | ~20 min |
+| M02 | ⏳ | iPhone notch/Dynamic Island: verify `padding-top: env(safe-area-inset-top)` on Navbar | A | iPhone 15, 17 Pro Max | 🧵 Mobile-UX | ~15 min |
+| M03 | ⏳ | iOS Safari: test body scroll lock — `position: fixed` + `top: -scrollY` pattern (current `acquireBodyScrollLock` may not work on Safari 17) | A | All iPhone / Safari | 🧵 Mobile-UX | ~30 min |
+| M04 | ⏳ | iPhone 12 (375px): audit Hero headline — ensure `clamp()` font doesn't overflow or wrap awkwardly at 375px | A | iPhone 12 | 🧵 Mobile-UX | ~20 min |
+| M05 | ⏳ | iPhone 17 Pro Max (430px): confirm MobileCallBar safe-area bottom padding clears home indicator | A | iPhone 17 Pro Max | 🧵 Mobile-UX | ~15 min |
+| M06 | ⏳ | iPad (768px / 1024px): pricing cards grid — currently 1-col on md; should be 2-col on iPad portrait | A | iPad | 🧵 Mobile-UX | ~20 min |
+| M07 | ⏳ | iPad landscape (1024px): Navbar desktop links too cramped — audit at 1024px breakpoint | A | iPad landscape | 🧵 Mobile-UX | ~20 min |
+| M08 | ✅ | Safari 17: `backdrop-filter` with `blur()` causes flicker on scroll — add `transform: translateZ(0)` to Navbar | A | Safari / iPhone | 🧵 Mobile-UX | ~15 min |
+| M09 | ✅ | iOS input zoom: ALL text inputs must be `font-size: 16px` min — audit DemoBookingModal (all inputs fixed with style={{ fontSize:"16px" }}) | A | All iPhone | 🧵 Mobile-UX | ~30 min |
+| M10 | ⏳ | iPhone 12/15: DemoBookingModal scrollable inside fixed overlay — test that form is reachable without browser chrome interfering | A | iPhone 12, 15 | 🧵 Mobile-UX | ~25 min |
+| M11 | ⏳ | Safari: `position: sticky` navbar — verify `-webkit-sticky` is applied (already in CSS but confirm renders correctly on all devices) | A | All Safari | 🧵 Mobile-UX | ~10 min |
+| M12 | ⏳ | iPhone 12 (375px): Store page product grid — confirm single-column layout and no horizontal scroll leakage | A | iPhone 12 | 🧵 Mobile-UX | ~20 min |
+| M13 | ⏳ | iPhone 17 Pro Max (430px): Hero CTA buttons — confirm min 44×44px touch target and no overlap with visual glow decorations | A | iPhone 17 Pro Max | 🧵 Mobile-UX | ~15 min |
+| M14 | ⏳ | Safari: test `createPortal` DemoBookingModal renders correctly in Safari 16/17 (known z-index stacking context bugs) | A | Safari / iPhone | 🧵 Mobile-UX | ~20 min |
+| M15 | ⏳ | iPad: Footer 4-col grid — verify nav columns don't collapse to 1-col on iPad portrait (should be 2-col min) | A | iPad | 🧵 Mobile-UX | ~15 min |
+| M16 | ✅ | iPhone: Pricing "Most Popular" badge overflows card top on 375px — badge needs `position: relative` fallback at mobile | A | iPhone 12, 15 | 🧵 Mobile-UX | ~15 min |
+| M17 | ✅ | iOS Safari: `<input type="date">` — `minHeight: 48px` + `fontSize: 16px` applied to date/time inputs in DemoBookingModal | A | All iPhone | 🧵 Mobile-UX | ~20 min |
+| M18 | ⏳ | iPhone: Navbar mobile menu — verify `acquireBodyScrollLock` fully prevents background page scroll on all iPhone models | A | All iPhone | 🧵 Mobile-UX | ~20 min |
+| M19 | ⏳ | iPhone landscape: Hero section `min-height: auto` override — confirm hero doesn't get cropped on landscape rotate | A | iPhone 12, 15, 17 | 🧵 Mobile-UX | ~15 min |
+| M20 | ⏳ | Full device test pass: manually test on iPhone 12 (375px), iPhone 15 (393px), iPhone 17 Pro Max (430px), iPad (768px) — document any layout breaks | A | All Apple devices | 🧵 Mobile-UX | ~2 hrs |
 
 ---
 
