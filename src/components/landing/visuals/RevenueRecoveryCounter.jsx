@@ -295,7 +295,7 @@ export default function RevenueRecoveryCounter() {
           </div>
 
           {/* Content */}
-          <div style={{ position: "relative", zIndex: 2 }}>
+          <div style={{ position: "relative", zIndex: 2, transform: "scale(0.78)", transformOrigin: "top center", marginBottom: "-22%" }}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: awake ? 1 : 0 }}
