@@ -48,7 +48,7 @@
 |---|---|---|---|
 | 1 | ✅ | Finalize store UI product cards with correct pricing display | HIGH |
 | 2 | ✅ | Fix cart sidebar body scroll lock on mobile | HIGH |
-| 3 | ✅ | Add "No setup fee" label instead of "$0 setup" | MEDIUM |
+| 3 | ⏳ | Add "No setup fee" label instead of "$0 setup" | MEDIUM |
 | 4 | ✅ | Add search debounce (280ms) to store search input | MEDIUM |
 | 5 | ✅ | Add SMS consent checkbox in CartSidebar when phone is entered | HIGH |
 | 6 | ⏳ | Add `loading="lazy"` + explicit width/height to all below-fold images | HIGH |
@@ -157,9 +157,9 @@
 | 67 | ⏳ | ClientPortal: add "Get Help" tab with support ticket form → SupportMessage entity | HIGH |
 | 68 | ⏳ | ClientPortal: add "What's New" section reading from Changelog entity | LOW |
 | 69 | ⏳ | ClientPortal: add "Refer a Business" section with unique referral link | MEDIUM |
-| 70 | 🔄 | BillingDashboard: add "Cancel Subscription" → getStripeCustomerPortalUrl redirect | HIGH |
+| 70 | ✅ | BillingDashboard: add "Cancel Subscription" → getStripeCustomerPortalUrl redirect | HIGH |
 | 71 | ⏳ | BillingDashboard: add "Download Invoice PDF" using Stripe invoice_pdf URL | MEDIUM |
-| 72 | 🔄 | ClientPortal: show "payment failed" banner when billing_status === "past_due" | HIGH |
+| 72 | ✅ | ClientPortal: show "payment failed" banner when billing_status === "past_due" | HIGH |
 
 ---
 
@@ -176,7 +176,6 @@
 | 79 | ⏳ | pages/Success: verify content is correct and not stale | MEDIUM |
 | 80 | ⏳ | Onboarding page: ensure form validates all required fields before submit | MEDIUM |
 | 81 | ⏳ | All pages: verify meta description is unique (not default fallback) | MEDIUM |
-| 82 | ✅ | sitemap.xml updated with industry pages | DONE |
 | 83 | ⏳ | pages/Industries: verify all 6 industry cards link to correct routes | MEDIUM |
 
 ---
@@ -279,7 +278,6 @@
 | 133 | ⏳ | sendClientWelcomeEmail: ensure it links to correct client portal URL | HIGH |
 | 134 | ⏳ | receiveResendWebhook: on email bounce, update CommunicationEvent status to "failed" | MEDIUM |
 | 135 | ⏳ | receiveResendWebhook: on email open, update lead.last_engagement_at | LOW |
-| 136 | ✅ | Sitemap updated with all industry pages | DONE |
 
 ---
 
@@ -304,7 +302,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 146 | 🔄 | createCheckoutSession: add subscription_data.metadata.order_id for subscription event matching | CRITICAL |
-| 147 | 🔄 | stripeWebhookOrders: on invoice.payment_failed, set Order billing_status: "past_due" | CRITICAL |
+| 147 | ✅ | stripeWebhookOrders: on invoice.payment_failed, set Order billing_status: "past_due" | CRITICAL |
 | 148 | 🔄 | stripeWebhookOrders: on payment_failed, send recovery email with Stripe payment update link | HIGH |
 | 149 | ⏳ | requestSubscriptionChange: use proration_behavior: "create_prorations" in Stripe call | MEDIUM |
 | 150 | ⏳ | Extract Stripe init + signature validation into _shared/stripeInit.js | LOW |
@@ -392,9 +390,6 @@
 |---|---|---|---|
 | 191 | ⏳ | ClientPortal: add "Get Help" support ticket tab → SupportMessage entity | HIGH |
 | 192 | ⏳ | ClientPortal: add "What's New" changelog section from Changelog entity | LOW |
-| 193 | ⏳ | ClientPortal: add "Refer a Business" section with unique ?ref=clientID link | MEDIUM |
-| 194 | 🔄 | ClientPortal: show PaymentFailedBanner when billing_status === "past_due" | CRITICAL |
-| 195 | 🔄 | BillingDashboard: "Cancel Subscription" → getStripeCustomerPortalUrl redirect | HIGH |
 | 196 | ⏳ | BillingDashboard: "Download Invoice PDF" using Stripe invoice_pdf URL | MEDIUM |
 | 197 | ⏳ | ClientPortal: add NPS score display after it's collected | LOW |
 | 198 | ⏳ | QuickStartWizard: ensure all onboarding steps link to correct help resources | MEDIUM |
@@ -427,7 +422,7 @@
 | 211 | ⏳ | Configure custom domain DNS (if not already done) and verify SSL cert | CRITICAL |
 | 212 | ⏳ | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | HIGH |
 | 213 | ⏳ | Configure Resend domain authentication (SPF, DKIM, DMARC) for deliverability | CRITICAL |
-| 213 | ⏳ | Verify Twilio number is A2P 10DLC registered for commercial SMS in the US | CRITICAL |
+| 213b | ⏳ | Verify Twilio number is A2P 10DLC registered for commercial SMS in the US | CRITICAL |
 | 214 | ⏳ | Add Google Analytics 4 event tracking for: purchase, demo_booked, lead_submitted | HIGH |
 | 215 | ⏳ | Set up error alerting: admin email on any backend function 5xx error | HIGH |
 | 216 | ⏳ | Document all environment variables in a README_ENV.md file | MEDIUM |
@@ -445,7 +440,6 @@
 | 221 | ⏳ | Create Changelog entity (title, description, date, is_published) for client portal | LOW |
 | 222 | ⏳ | Create Referral entity (referrer_client_id, referred_email, status, credit_amount) | LOW |
 | 223 | ⏳ | Add nps_score + nps_responded_at fields to ClientProject entity | MEDIUM |
-| 224 | ⏳ | Add consent_given_at + consent_ip fields to WebsiteLead entity | HIGH |
 | 225 | ⏳ | Add consent_given_at + consent_ip fields to Leads entity | HIGH |
 | 226 | ⏳ | Verify all entity RLS rules are correct — Client entity has correct read/write rules | HIGH |
 | 227 | ⏳ | Add max_active_onboarding field to AdminSettings entity | MEDIUM |
@@ -576,7 +570,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 268 | ⏳ | AdminDashboard: build MRR metric card — sum total_monthly from all Orders with payment_status=paid | CRITICAL |
+| 268 | ✅ | AdminDashboard: build MRR metric card — sum total_monthly from all Orders with payment_status=paid | CRITICAL |
 | 269 | ⏳ | AdminDashboard: build LTV card — total revenue per client over their lifetime | HIGH |
 | 270 | ⏳ | AdminDashboard: build Churn Risk panel — list clients with predictChurnRisk score > 70 | HIGH |
 | 271 | ⏳ | AdminDashboard: wire AdminGlobalSearch to all entity types (Lead, Client, Order, SupportMessage) | MEDIUM |
@@ -606,8 +600,8 @@
 |---|---|---|---|
 | 282 | ⏳ | Add LocalBusiness + Service JSON-LD schema to all 6 industry pages | HIGH |
 | 283 | ⏳ | Add BreadcrumbList JSON-LD schema to all inner pages | MEDIUM |
-| 284 | ⏳ | Add setPageMetadata() utility — dynamic title + description + og:image per route | HIGH |
-| 285 | ⏳ | Add preconnect links for fonts.googleapis.com, stripe.com, resend.com in index.html | MEDIUM |
+| 284 | ✅ | Add setPageMetadata() utility — dynamic title + description + og:image per route | HIGH |
+| 285 | ✅ | Add preconnect links for fonts.googleapis.com, stripe.com, resend.com in index.html | MEDIUM |
 | 286 | ⏳ | Industry pages: include Phoenix/Scottsdale city name in H1 and meta title for local SEO | HIGH |
 | 287 | ⏳ | Create /blog with 3 pillar posts: AI Automation for Med Spas, Missed Call Text-Back Guide, How AI Books Appointments | MEDIUM |
 | 288 | ⏳ | Add twitter:card meta tags to all pages (currently only on homepage) | LOW |
@@ -630,7 +624,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 294 | ⏳ | Connect GA4 property — add G- tracking ID to index.html gtag snippet | HIGH |
+| 294 | ✅ | Connect GA4 property — add G- tracking ID to index.html gtag snippet | HIGH |
 | 295 | ⏳ | Track checkout button clicks as GA4 conversion events | HIGH |
 | 296 | ⏳ | Track form submissions (lead capture, contact, onboarding) as GA4 events | HIGH |
 | 297 | ⏳ | Add UTM parameter persistence — store utm_source and utm_medium on lead record at capture | MEDIUM |
@@ -688,7 +682,7 @@
 | 314 | ⏳ | RevenueMetricsPanel.jsx: verify it reads from real Order entities not mock data — add fallback empty state if no paid orders exist yet | HIGH |
 | 315 | ⏳ | TasksDashboard.jsx: confirm getClientTaskJobs function returns real data — add empty state for new clients with zero tasks | MEDIUM |
 | 316 | ⏳ | ClientPortal.jsx: getClientPortalContext is invoked — verify it returns project, order, AND subscription in a single call, not just project | HIGH |
-| 317 | ⏳ | PaymentFailedBanner component is imported in ClientPortal but never conditionally rendered — add billing_status === "past_due" check to show it | CRITICAL |
+| 317 | ✅ | PaymentFailedBanner component is imported in ClientPortal but never conditionally rendered — add billing_status === "past_due" check to show it | CRITICAL |
 | 318 | ⏳ | Portal tab "Automations" shows AutomationsOverview with fake data — replace with real getAutomationStatus function call | HIGH |
 | 319 | ⏳ | Portal WeeklyReports tab: wire generateWeeklyReport backend function to "Generate Report" button | MEDIUM |
 | 320 | ⏳ | Portal NotificationBell: verify it polls real entity for unread notifications — add badge count from real data | MEDIUM |
@@ -699,7 +693,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 321 | ⏳ | Wire getAdminAnalytics to AdminDashboard/RevenueDashboard — function is deployed but never invoked from frontend | CRITICAL |
+| 321 | ✅ | Wire getAdminAnalytics to AdminDashboard/RevenueDashboard — function is deployed but never invoked from frontend | CRITICAL |
 | 322 | ⏳ | Wire getLeadPipelineSummary to LeadManagementDashboard — deployed but disconnected | HIGH |
 | 323 | ⏳ | Wire deduplicateLeads to a "Clean Duplicates" button in admin leads panel | HIGH |
 | 324 | ⏳ | Wire stalledOnboardingAlert to a cron automation — currently deployed but no scheduler triggers it | HIGH |
@@ -873,10 +867,10 @@
 | 405 | ⏳ | sendAdminPurchaseNotification: guarantee it fires on EVERY checkout.session.completed — add explicit call with tier, business name, total revenue, and deep link to admin order view | HIGH |
 | 405a | ⏳ | Sub-task: wire Telegram message — format: "💳 New Payment: [Business] — [Tier] — $[Setup] + $[Monthly]/mo" | HIGH |
 | 405b | ⏳ | Sub-task: wire backup email to nolan@clientsurgesystems.com in case Telegram fails | MEDIUM |
-| 426 | ⏳ | validateStripeWebhookSignature: confirm stripeWebhookOrders uses stripe.webhooks.constructEvent() with STRIPE_WEBHOOK_SECRET — if env var is missing, return 500 immediately not a silent pass | CRITICAL |
+| 426 | ✅ | validateStripeWebhookSignature: confirm stripeWebhookOrders uses stripe.webhooks.constructEvent() with STRIPE_WEBHOOK_SECRET — if env var is missing, return 500 immediately not a silent pass | CRITICAL |
 | 427 | ⏳ | Add stripe_event_id idempotency check to stripeWebhookOrders — before processing any event, query Orders for existing stripe_event_id. If found, return 200 immediately — without this Stripe retries double-process payments | CRITICAL |
 | 428 | ⏳ | Handle checkout.session.expired in stripeWebhookOrders — set Order.payment_status = "expired" and send recovery email with a fresh checkout link | HIGH |
-| 429 | ⏳ | Handle customer.subscription.deleted in stripeWebhookOrders — set Order.status = "cancelled", billing_status = "cancelled", invoke runWinBackSequence, Telegram Nolan with MRR lost | HIGH |
+| 429 | ✅ | Handle customer.subscription.deleted in stripeWebhookOrders — set Order.status = "cancelled", billing_status = "cancelled", invoke runWinBackSequence, Telegram Nolan with MRR lost | HIGH |
 | 430 | ⏳ | Handle invoice.payment_failed properly — currently sets billing_status = "past_due" but does NOT send recovery email with Stripe hosted invoice URL — add sendMissedCallRecoveryEmail call with invoice link | HIGH |
 
 ---
@@ -1047,3 +1041,77 @@
 
 *AI Pipeline Full Expansion — Tasks #401–#475 (75 tasks + 30 sub-tasks)*
 *Added by Sam (AI Agent) — 2026-05-03*
+
+
+---
+
+---
+
+# 🧠 AI PIPELINE — EXPANSION 3 — Tasks #476–#500
+### Sam | 2026-05-03 | Post-audit additions — gaps missed in previous 75 AI tasks
+### Covers: AI quality gates, client communication AI, real-time triggers, safety rails, self-healing loop
+
+---
+
+## SECTION AA: AI QUALITY GATES
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 476 | ⏳ | Build validateAIOutputs function — every AI-generated string passes through this before being written anywhere. Rules: no unfilled {{placeholders}}, no profanity, no competitor names, no pricing contradicting salesCatalog, SMS under 160 chars. Reject + log to AgentLog on failure | CRITICAL |
+| 477 | ⏳ | Add AI hallucination guard to generateServiceTemplates — after OpenAI returns copy, re-prompt: "Does this contain unverified claims about response times or guarantees?" If yes, strip the claim and regenerate that sentence only | HIGH |
+| 478 | ⏳ | Build AI output audit log — every LLM call writes to AgentLog: function_name, input_context_hash, output_preview (100 chars), model, tokens used, generated_at. Full traceability for every message a client receives | HIGH |
+| 479 | ⏳ | Add package tier validation gate in activateAllServices — before configureService is called, confirm service_key is in TIER_SERVICE_MAP AND required credentials exist in install_configuration. Reject with specific field-level error if either fails | CRITICAL |
+| 480 | ⏳ | Build credentialsCompletionCheck function — returns per-service readiness: { instant_lead_response: { ready: true/false, missing_fields: [] }, ... }. Used by admin and portal to show exactly what is blocking each service | HIGH |
+
+---
+
+## SECTION AB: CLIENT-FACING AI COMMUNICATION
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 481 | ⏳ | Verify OnboardingChatWidget.jsx calls a real AI function — if responses are static/hardcoded, wire to generateAIReply with system prompt: "You are the ClientSurge onboarding assistant. Help this client complete their setup." | HIGH |
+| 482 | ⏳ | Build clientPortalAIAssistant — persistent AI chat in client portal sidebar. Client asks "Why no leads today?" and AI reads CommunicationEvent data + automation status and returns a plain-English answer via getClientAnalytics + getAutomationStatus | HIGH |
+| 483 | ⏳ | Build AI-generated go-live checklist — when workflow_stage = "activation_ready", AI reads package + credentials and generates a personalized "Before You Go Live" checklist (e.g. "Confirm booking link accepts appointments", "Test your Twilio number"). Saved to AutomationChecklist | HIGH |
+| 484 | ⏳ | Build proactiveClientAlert function — runs daily per active client. If no new leads in 3 days, booking rate dropped 50%, or any automation had 0 triggers in 48h → sends plain-English alert email: "We noticed your lead volume dropped — here's what we recommend" | HIGH |
+| 485 | ⏳ | Add AI Suggest Reply button to AdminInbox.jsx — reads inbound message + lead context + CommunicationEvent history, calls generateAIReply, drafts response. Admin sends or edits. Build the button + draft display in AdminInbox | MEDIUM |
+
+---
+
+## SECTION AC: REAL-TIME AI TRIGGERS
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 486 | ⏳ | Create entity automation on WebsiteLead "create" — immediately invoke automationOrchestrator with trigger_event="new_website_lead". Verify onLeadCreated is actually wired as an entity automation in Base44, not just deployed as a function | CRITICAL |
+| 487 | ⏳ | Create entity automation on Order "create" — fires all 4 actions: (1) initializeInstallOS, (2) sendClientWelcomeEmail, (3) sendAdminPurchaseNotification, (4) advance workflow_stage to intake_received. All 4 must fire reliably on every new Order | CRITICAL |
+| 488 | ⏳ | Create entity automation on ClientInstallationOS "update" — on workflow_stage change: if credentials_complete → invoke activateAllServices; if website_approved → Telegram Nolan + applyWebsiteSpec; if activated → sendGoLiveNotification | CRITICAL |
+| 489 | ⏳ | Create entity automation on Order "update" for billing_status — when billing_status changes to "past_due": show PaymentFailedBanner (already built) AND send recovery SMS via Twilio. SMS recovery has higher open rate than email alone | HIGH |
+| 490 | ⏳ | Build real-time lead re-scoring trigger — when a Lead receives a new CommunicationEvent (inbound SMS or email reply), immediately re-run scoreLeadIntelligence and update lead.score. Lead replying "I'm ready to book" should instantly jump to Hot status | HIGH |
+
+---
+
+## SECTION AD: AI SAFETY RAILS
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 491 | ⏳ | Build SMS compliance filter middleware — before ANY Twilio SMS send: (1) check lead has not texted STOP, (2) verify consent was collected at opt-in, (3) check message for prohibited content categories (loans, cannabis, adult). Sits as shared middleware called by ALL SMS-sending functions | CRITICAL |
+| 492 | ⏳ | Build quiet hours enforcement — all outbound SMS must respect 8am–9pm recipient local time. Build getLocalTimeZone(phone_number) via area code lookup. If outside window, queue message in DelayedMessage entity. Scheduler processes queue at 8am daily | HIGH |
+| 493 | ⏳ | Build AI contact frequency limiter — no single lead receives more than 3 AI-generated messages per 24-hour window across all channels combined. Build checkContactFrequency(lead_id) that counts CommunicationEvents in last 24h. All message-sending functions must call this first | HIGH |
+| 494 | ⏳ | Build AI content approval workflow for Elite clients — before any AI-generated SMS template is written to install_configuration, create AdminApproval entity record. Nolan reviews in admin panel within 4 hours. If not reviewed in 4h, auto-approve with log entry | MEDIUM |
+| 495 | ⏳ | Add PII scrubbing to AgentLog — no full phone numbers or email addresses stored in plaintext in any log. Build maskPII(string) utility: phone → (***) ***-1234, email → j***@g***.com. Required for all AgentLog writes | HIGH |
+
+---
+
+## SECTION AE: AI SELF-HEALING LOOP
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 496 | ⏳ | Build selfHealingMonitor function — runs every 6 hours. Checks: (1) Order in Configuring >4h → re-invoke activateAllServices for stuck services; (2) AutomationChecklistStep in_progress >2h → reset to pending and retry; (3) ClientInstallationOS in same workflow_stage >24h → Telegram Nolan with specific block identified | CRITICAL |
+| 497 | ⏳ | Build AI error classifier — when any function logs to AgentLog, classifyInstallError reads the error and categorizes: twilio_credentials_invalid / booking_link_unreachable / openai_rate_limit / network_timeout / data_missing. Each category has a defined resolution path | HIGH |
+| 498 | ⏳ | Build autoResolveInstallError function — reads AgentLog entries with requires_nolan=false and acts on category: openai_rate_limit → wait 60s + retry; network_timeout → retry immediately; data_missing → Telegram Nolan with exact field missing. Reduces manual intervention | HIGH |
+| 499 | ⏳ | Build AI pipeline version control — before any activateAllServices run, write pipeline_version + timestamp + package_key + service_list to ClientInstallationOS. If pipeline updated mid-run, apply only delta changes rather than full restart | MEDIUM |
+| 500 | ⏳ | Build /admin/ai-status dashboard page — shows: all AI functions with last invocation time + success/fail status, total tokens consumed this month from AgentLog, active entity automations and health, self-healing events in last 24h, and Run Full Pipeline Test button | HIGH |
+
+---
+
+*Expansion 3 — Tasks #476–#500 (25 tasks) | Added by Sam — 2026-05-03*
+*Quality gates, client-facing AI, real-time event triggers, TCPA compliance, self-healing loop*
