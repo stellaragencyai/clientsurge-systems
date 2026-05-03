@@ -189,11 +189,11 @@ export default function Navbar() {
                 }}
               />
               <img
-                src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/7de44f95a_10ca51c4-3ef9-4f87-979c-d48d7b2e0c6b.png"
+                src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/f4735bbdc_download.png"
                 alt="ClientSurge Systems"
                 fetchpriority="high"
                 decoding="async"
-                style={{ position: "relative", zIndex: 1, height: "clamp(38px, 5vw, 48px)", width: "auto", objectFit: "contain" }}
+                style={{ position: "relative", zIndex: 1, height: "clamp(32px, 4vw, 42px)", width: "auto", objectFit: "contain", filter: "brightness(0) saturate(100%) invert(52%) sepia(40%) saturate(600%) hue-rotate(10deg) brightness(90%)" }}
               />
             </span>
 
