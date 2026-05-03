@@ -25,6 +25,7 @@ const navColumns = [
 {
   title: "Company",
   links: [
+  { label: "About Us", href: "/about" },
   { label: "Contact Us", href: "/contact" },
   { label: "Privacy Policy", href: "/legal/privacy" },
   { label: "Terms of Service", href: "/legal/terms" }]
