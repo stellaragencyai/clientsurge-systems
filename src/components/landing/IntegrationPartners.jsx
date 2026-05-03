@@ -88,7 +88,7 @@ export default function IntegrationPartners() {
           </p>
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
             Works With{" "}
-            <span style={{ color: "#9a5c2e", textShadow: "0 0 28px rgba(154,92,46,0.35)" }}>
+            <span style={{ color: "#00AEEF", textShadow: "0 0 28px rgba(0,174,239,0.35)" }}>
               50+ Tools
             </span>
           </h2>
