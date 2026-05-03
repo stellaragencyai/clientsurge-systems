@@ -131,7 +131,7 @@ export default function Footer() {
             <div key={col.title} className="flex flex-col gap-4">
                 <h4
                 className="text-[10px] font-bold uppercase tracking-[0.22em]"
-                style={{ color: "#c8965c" }}>
+                style={{ color: "#ffffff" }}>
                 
                   {col.title}
                 </h4>
