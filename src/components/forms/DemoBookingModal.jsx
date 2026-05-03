@@ -315,7 +315,10 @@ export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
             </button>
 
             <p className="text-center text-xs text-muted-foreground">No commitment. Free 15-minute call. Live in 5-7 days.</p>
-            <p className="text-center text-xs text-muted-foreground/80">No spam. No pressure. Just a tailored walkthrough of your business.</p>
+            <p className="text-center text-xs text-muted-foreground/60">
+              By submitting, you agree to receive SMS follow-up messages from ClientSurge Systems. Reply STOP at any time to opt out. See our{" "}
+              <a href="/legal/privacy" className="underline hover:text-primary">Privacy Policy</a>.
+            </p>
           </form>
         )}
 

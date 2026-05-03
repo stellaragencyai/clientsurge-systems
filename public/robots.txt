@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 
+# Internal / private routes — do not index
 Disallow: /admin
 Disallow: /admin/
 Disallow: /client-portal
@@ -10,9 +11,8 @@ Disallow: /client-dashboard/
 Disallow: /order-success
 Disallow: /setup
 Disallow: /onboarding
+Disallow: /leads/
 Disallow: /dashboard
-Disallow: /lead-intelligence
-Disallow: /sam
-Disallow: /medspa-dashboard
+Disallow: /thank-you
 
 Sitemap: https://clientsurgesystems.com/sitemap.xml

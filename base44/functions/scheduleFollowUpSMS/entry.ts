@@ -101,10 +101,15 @@ Deno.serve(async (req) => {
 
         // Render message
         const businessName = settings.default_business_name || Deno.env.get("DEFAULT_BUSINESS_NAME") || "us";
-        const messageBody = smsTemplate
+        let messageBody = smsTemplate
           .replace(/{name}/g, lead.full_name || "there")
           .replace(/{business_name}/g, businessName)
           .replace(/{booking_link}/g, bookingLink);
+
+        // TCPA compliance — always append opt-out language
+        if (!messageBody.includes("STOP")) {
+          messageBody += "\n\nReply STOP to unsubscribe.";
+        }
 
         // Send via Twilio
         const params = { To: lead.phone, From: fromNumber, Body: messageBody };
