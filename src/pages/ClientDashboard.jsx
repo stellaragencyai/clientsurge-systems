@@ -10,6 +10,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import ChatAssistant from "@/components/dashboard/ChatAssistant";
 import { Loader2, ShoppingBag, Mail, Phone, RefreshCw } from "lucide-react";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
+import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
 
 // Map real install_status → numeric stage index (0–4)
 export const STAGE_MAP = {
@@ -167,6 +168,7 @@ export default function ClientDashboard() {
   const [userEmail, setUserEmail] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [portalUser, setPortalUser] = useState(null);
 
   const fetchPortal = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -176,6 +178,7 @@ export default function ClientDashboard() {
       const user = await base44.auth.me();
       if (!user) { setError("Please log in to view your dashboard."); return; }
       setUserEmail(user.email);
+      setPortalUser(user);
       const res = await base44.functions.invoke("getClientPortalContext", {});
       if (res.data?.success) {
         setPortalData(res.data);
@@ -217,6 +220,8 @@ export default function ClientDashboard() {
   const services = portalData?.order?.services || [];
   const project = portalData?.project;
   const order = portalData?.order;
+  const user = portalData?.user || null;
+  const hasSetupInfo = !!(order?.install_configuration?.brand?.business_name || order?.install_configuration?.shared?.twilio_business_phone);
 
   // Build activeServices in the shape the sub-components expect
   const activeServices = services.map(svc => ({
@@ -256,8 +261,13 @@ export default function ClientDashboard() {
 
             {loading ? <LoadingState /> : error ? <ErrorState message={error} onRetry={() => fetchPortal(false)} /> : (
               <>
+                <WelcomeBanner
+                  user={portalUser || { email: userEmail }}
+                  order={order}
+                  hasSetupInfo={hasSetupInfo}
+                />
+
                 <DashboardHeader
-                  userEmail={userEmail}
                   activeServices={activeServices}
                   project={project}
                   order={order}
