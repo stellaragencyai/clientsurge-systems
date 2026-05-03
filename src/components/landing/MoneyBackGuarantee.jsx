@@ -11,7 +11,7 @@ export default function MoneyBackGuarantee() {
       <div
         className="absolute inset-0"
         style={{
-          background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)"
+          background: "#ffffff"
         }} />
       
 
