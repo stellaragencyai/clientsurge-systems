@@ -583,20 +583,20 @@ function StoreInner() {
                       fontWeight: "600",
                       border:
                       activeCategory === category ?
-                      "1.5px solid rgba(154,92,46,0.5)" :
+                      "1.5px solid rgba(0,136,204,0.6)" :
                       "1.5px solid rgba(154,92,46,0.18)",
                       cursor: "pointer",
                       background:
                       activeCategory === category ?
-                      "linear-gradient(135deg,#6b3f1f,#9a5c2e)" :
+                      "linear-gradient(135deg,#0088CC,#00AEEF)" :
                       "rgba(255,255,255,0.75)",
                       color:
                       activeCategory === category ?
-                      "#f5e6d0" :
+                      "#ffffff" :
                       "rgba(27,20,13,0.72)",
                       boxShadow:
                       activeCategory === category ?
-                      "0 4px 14px rgba(120,70,20,0.28)" :
+                      "0 4px 14px rgba(0,174,239,0.35)" :
                       "0 1px 4px rgba(111,67,31,0.06)"
                     }}>
                     
