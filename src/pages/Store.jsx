@@ -430,7 +430,7 @@ function StoreInner() {
                     <Icon style={{ width: "18px", height: "18px", color: "#9a5c2e" }} />
                   </div>
                   <div style={{ textAlign: "left" }}>
-                    <p style={{ fontSize: "15px", fontWeight: "800", color: "#9a5c2e", margin: "0 0 2px" }}>
+                    <p style={{ fontSize: "15px", fontWeight: "800", color: "#000000", margin: "0 0 2px" }}>
                       {val}
                     </p>
                     <p style={{ fontSize: "10px", color: "rgba(27,20,13,0.6)", margin: 0, fontWeight: "600" }}>
