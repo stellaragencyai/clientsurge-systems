@@ -10,7 +10,7 @@
 
 > 🤖 **Sam (AI Agent)** is currently working the **Store / Pricing / Checkout / Stripe** workstream.  
 > **Started:** 2026-05-03 12:41 MST  
-> **Tasks locked:** #27, #28, #43, #47, #70, #72, #146, #147, #148, #194, #195, #201, #202, #203, #206, #87, #84, #86, #92, #95, #127  
+> **Tasks locked:** #27, #28, #43, #47, #70, #72, #146, #147, #148, #194, #195, #201, #202, #203, #206  
 > Do NOT attempt these tasks until status changes from 🔄 to ✅.
 
 ---
@@ -191,15 +191,15 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 84 | 🔄 | Add Origin header validation to submitLeadCapture + submitContactInquiry | HIGH |
+| 84 | ✅ | Add Origin header validation to submitLeadCapture + submitContactInquiry | HIGH |
 | 85 | ✅ | autoEndToEndTest: add admin role check (return 403 if not admin) | CRITICAL |
-| 86 | 🔄 | Move webhookLeadCapture secret from URL param to X-Webhook-Secret header | HIGH |
-| 87 | 🔄 | submitLeadCapture: normalize phone to E.164 (+1 prefix, reject < 10 digits) | HIGH |
+| 86 | ✅ | Move webhookLeadCapture secret from URL param to X-Webhook-Secret header | HIGH |
+| 87 | ✅ | submitLeadCapture: normalize phone to E.164 (+1 prefix, reject < 10 digits) | HIGH |
 | 88 | ⏳ | Add consent_given_at + consent_ip fields to WebsiteLead/Leads entities | HIGH |
 | 89 | ⏳ | Capture X-Forwarded-For IP in submitLeadCapture and store as consent_ip | HIGH |
 | 90 | ⏳ | Add IP allowlist option in AdminSettings for admin panel access | MEDIUM |
 | 91 | ⏳ | Create autoArchiveOldLeads: anonymize WebsiteLead records > 365 days old | MEDIUM |
-| 92 | 🔄 | Ensure honeypot website_url field is in ALL public forms (LeadCaptureForm, CaptureLeads) | HIGH |
+| 92 | ✅ | Ensure honeypot website_url field is in ALL public forms (LeadCaptureForm, CaptureLeads) | HIGH |
 | 93 | ⏳ | Add X-Frame-Options: DENY header to all backend function responses | MEDIUM |
 | 94 | ✅ | Privacy link on contact form and checkout | DONE |
 
@@ -209,7 +209,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 95 | 🔄 | processNurtureCampaigns: check CommunicationEvent for STOP keyword before each send | CRITICAL |
+| 95 | ✅ | processNurtureCampaigns: check CommunicationEvent for STOP keyword before each send | CRITICAL |
 | 96 | ⏳ | processDripCampaigns: skip leads with status "Booked" before sending each step | HIGH |
 | 97 | ⏳ | processNurtureCampaigns: add idempotency guard (check for duplicate send within 23hr) | HIGH |
 | 98 | ⏳ | processWebsiteLeadFollowUps: add cadence_paused: true skip guard | HIGH |
@@ -262,7 +262,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 126 | ⏳ | scheduleFollowUpSMS: verify business hours check uses Phoenix timezone correctly | HIGH |
-| 127 | 🔄 | receiveTwilioInboundSms: verify STOP handling immediately pauses all sequences for that lead | CRITICAL |
+| 127 | ✅ | receiveTwilioInboundSms: verify STOP handling immediately pauses all sequences for that lead | CRITICAL |
 | 128 | ⏳ | All SMS sends: verify opt-out language "Reply STOP to unsubscribe" is appended | HIGH |
 | 129 | ⏳ | processMissedCallFollowUps: verify missed_call_step_sent increment is idempotent | HIGH |
 | 130 | ⏳ | Twilio number: add auto-provision flow for new clients in autoProvisionTwilioNumber | MEDIUM |
