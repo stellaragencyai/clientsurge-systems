@@ -271,7 +271,7 @@ export default function ProductCard({ product }) {
 
         {product.popular && !product.coming_soon && (
           <div style={{
-            position: "absolute", top: "12px", right: "12px",
+            position: "absolute", top: "-10px", right: "10px", zIndex: 10,
             background: "linear-gradient(135deg,#0088CC,#00AEEF)",
             color: "#fff", fontSize: "8px", fontWeight: "700",
             padding: "4px 10px", borderRadius: "18px",

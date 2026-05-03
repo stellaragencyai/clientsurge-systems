@@ -538,7 +538,10 @@ export default function CartSidebar() {
                 marginTop: "10px",
               }}
             >
-              Secured by Stripe - Cancel anytime
+              Secured by Stripe · Cancel anytime ·{" "}
+              <a href="/legal/terms" target="_blank" style={{ color: "rgba(26,18,9,0.45)", textDecoration: "underline" }}>
+                Refund Policy
+              </a>
             </p>
           </div>
         ) : null}
