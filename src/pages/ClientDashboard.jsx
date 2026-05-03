@@ -180,12 +180,24 @@ export default function ClientDashboard() {
       if (res.data?.success) {
         setPortalData(res.data);
         setLastUpdated(new Date());
+      } else if (res.data?.code === "portal_project_not_found") {
+        // No project linked yet — show empty state, not an error
+        setPortalData({ success: true, project: null, order: null });
+        setLastUpdated(new Date());
       } else {
         setError(res.data?.error || "Unable to load your portal data.");
       }
     } catch (err) {
       console.error("Portal fetch error:", err);
-      setError("Unable to load dashboard. Please try again.");
+      // Check if it's a 404 (no project linked yet)
+      const status = err?.response?.status || err?.status;
+      const code = err?.response?.data?.code || err?.data?.code;
+      if (status === 404 || code === "portal_project_not_found") {
+        setPortalData({ success: true, project: null, order: null });
+        setLastUpdated(new Date());
+      } else {
+        setError("Unable to load dashboard. Please try again.");
+      }
     } finally {
       setLoading(false);
       setIsRefreshing(false);
