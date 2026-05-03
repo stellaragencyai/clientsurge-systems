@@ -10,7 +10,7 @@
 
 > 🤖 **Sam (AI Agent)** is currently working the **Store / Pricing / Checkout / Stripe** workstream.  
 > **Started:** 2026-05-03 12:41 MST  
-> **Tasks locked:** #27, #28, #43, #47, #70, #72, #146, #147, #148, #194, #195, #201, #202, #203, #206  
+> **Tasks locked:** #27, #28, #43, #47, #70, #72, #146, #147, #148, #194, #195, #201, #202, #203, #206, #76, #85, #107, #36, #17, #16, #87, #84, #86, #92, #95, #127  
 > Do NOT attempt these tasks until status changes from 🔄 to ✅.
 
 ---
@@ -61,8 +61,8 @@
 | 13 | ⏳ | Standardize all form inputs to rounded-xl (12px) globally | LOW |
 | 14 | ⏳ | ClientPortal loading state: replace raw spinner with branded skeleton | MEDIUM |
 | 15 | ⏳ | DemoBookingModal time slot grid: force 2-col on viewports < 480px | MEDIUM |
-| 16 | ⏳ | CookieConsent banner: add bottom: 80px on mobile to avoid MobileCallBar overlap | LOW |
-| 17 | ⏳ | FAQ accordion items: add border-bottom tap target on mobile | LOW |
+| 16 | 🔄 | CookieConsent banner: add bottom: 80px on mobile to avoid MobileCallBar overlap | LOW |
+| 17 | 🔄 | FAQ accordion items: add border-bottom tap target on mobile | LOW |
 | 18 | ⏳ | Industry sub-pages: ensure hero headline renders as semantic `<h1>` tag | HIGH |
 | 19 | ⏳ | Add descriptive alt text to all hero, testimonial, and TrustBar images | MEDIUM |
 | 20 | ⏳ | Fix robots.txt: change Disallow: /leads/ to Disallow: /leads/admin | MEDIUM |
@@ -88,7 +88,7 @@
 | 33 | ⏳ | Mobile sticky cart bar: add padding-top: 72px to main content when visible | MEDIUM |
 | 34 | ⏳ | AdminDashboard sidebar: add active-state highlight on current route | MEDIUM |
 | 35 | ⏳ | Testimonials: replace broken image URLs with initials-based avatar fallbacks | HIGH |
-| 36 | ⏳ | Add favicon (32x32 + 180x180) and apple-touch-icon to index.html | HIGH |
+| 36 | 🔄 | Add favicon (32x32 + 180x180) and apple-touch-icon to index.html | HIGH |
 | 37 | ⏳ | GuidedPathToggle: add Tooltip explaining Guided vs Explore All modes | LOW |
 | 38 | ✅ | ClientPortal tabs: "Setup Progress" is now first tab and default landing tab on login | DONE |
 | 39 | ⏳ | Industry pages CTAs: use industry-specific headline copy from industryData.js | MEDIUM |
@@ -170,7 +170,7 @@
 | 73 | ⏳ | chatBubbleAI: add typing indicator ("...") while LLM processes response | MEDIUM |
 | 74 | ⏳ | chatBubbleAI: add sessionStorage counter, block after 10 messages per session | HIGH |
 | 75 | ⏳ | Add session timeout warning modal after 30min admin inactivity | MEDIUM |
-| 76 | ⏳ | Verify Stripe publishable key is ONLY in frontend (not sk_live_ anywhere) | CRITICAL |
+| 76 | 🔄 | Verify Stripe publishable key is ONLY in frontend (not sk_live_ anywhere) | CRITICAL |
 | 77 | ✅ | Portal graceful empty state — no navigation errors on null project | DONE |
 | 78 | ⏳ | Add cookie consent to all public lead capture forms | HIGH |
 | 79 | ⏳ | pages/Success: verify content is correct and not stale | MEDIUM |
@@ -191,15 +191,15 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 84 | ⏳ | Add Origin header validation to submitLeadCapture + submitContactInquiry | HIGH |
-| 85 | ⏳ | autoEndToEndTest: add admin role check (return 403 if not admin) | CRITICAL |
-| 86 | ⏳ | Move webhookLeadCapture secret from URL param to X-Webhook-Secret header | HIGH |
-| 87 | ⏳ | submitLeadCapture: normalize phone to E.164 (+1 prefix, reject < 10 digits) | HIGH |
+| 84 | 🔄 | Add Origin header validation to submitLeadCapture + submitContactInquiry | HIGH |
+| 85 | 🔄 | autoEndToEndTest: add admin role check (return 403 if not admin) | CRITICAL |
+| 86 | 🔄 | Move webhookLeadCapture secret from URL param to X-Webhook-Secret header | HIGH |
+| 87 | 🔄 | submitLeadCapture: normalize phone to E.164 (+1 prefix, reject < 10 digits) | HIGH |
 | 88 | ⏳ | Add consent_given_at + consent_ip fields to WebsiteLead/Leads entities | HIGH |
 | 89 | ⏳ | Capture X-Forwarded-For IP in submitLeadCapture and store as consent_ip | HIGH |
 | 90 | ⏳ | Add IP allowlist option in AdminSettings for admin panel access | MEDIUM |
 | 91 | ⏳ | Create autoArchiveOldLeads: anonymize WebsiteLead records > 365 days old | MEDIUM |
-| 92 | ⏳ | Ensure honeypot website_url field is in ALL public forms (LeadCaptureForm, CaptureLeads) | HIGH |
+| 92 | 🔄 | Ensure honeypot website_url field is in ALL public forms (LeadCaptureForm, CaptureLeads) | HIGH |
 | 93 | ⏳ | Add X-Frame-Options: DENY header to all backend function responses | MEDIUM |
 | 94 | ✅ | Privacy link on contact form and checkout | DONE |
 
@@ -209,7 +209,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 95 | ⏳ | processNurtureCampaigns: check CommunicationEvent for STOP keyword before each send | CRITICAL |
+| 95 | 🔄 | processNurtureCampaigns: check CommunicationEvent for STOP keyword before each send | CRITICAL |
 | 96 | ⏳ | processDripCampaigns: skip leads with status "Booked" before sending each step | HIGH |
 | 97 | ⏳ | processNurtureCampaigns: add idempotency guard (check for duplicate send within 23hr) | HIGH |
 | 98 | ⏳ | processWebsiteLeadFollowUps: add cadence_paused: true skip guard | HIGH |
@@ -228,7 +228,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 107 | ⏳ | Create healthCheck function: returns {status:"ok", timestamp, version} — no auth | HIGH |
+| 107 | 🔄 | Create healthCheck function: returns {status:"ok", timestamp, version} — no auth | HIGH |
 | 108 | ⏳ | Create autoCloseStaleLeads: daily scheduled function, closes leads with no contact > 30 days | MEDIUM |
 | 109 | ✅ | OrderSuccess: add noindex meta tag | DONE |
 | 110 | ⏳ | Create exportLeadsCSV: query Leads with filters, return CSV with Content-Disposition header | MEDIUM |
@@ -262,7 +262,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 126 | ⏳ | scheduleFollowUpSMS: verify business hours check uses Phoenix timezone correctly | HIGH |
-| 127 | ⏳ | receiveTwilioInboundSms: verify STOP handling immediately pauses all sequences for that lead | CRITICAL |
+| 127 | 🔄 | receiveTwilioInboundSms: verify STOP handling immediately pauses all sequences for that lead | CRITICAL |
 | 128 | ⏳ | All SMS sends: verify opt-out language "Reply STOP to unsubscribe" is appended | HIGH |
 | 129 | ⏳ | processMissedCallFollowUps: verify missed_call_step_sent increment is idempotent | HIGH |
 | 130 | ⏳ | Twilio number: add auto-provision flow for new clients in autoProvisionTwilioNumber | MEDIUM |
