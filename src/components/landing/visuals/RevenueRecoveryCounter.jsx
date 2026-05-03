@@ -338,42 +338,65 @@ export default function RevenueRecoveryCounter() {
                   </div>
                 </div>
 
-                {/* Lead rows */}
+                {/* Lead rows — real-time notification stack */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "8px" }}>
                   {LEADS.map((lead, i) => {
                     const recovered = i < recoveredCount;
+                    const justArrived = i === recoveredCount - 1;
                     return (
                       <motion.div
                         key={lead.name}
+                        initial={{ opacity: 0, y: -28, scaleX: 0.88 }}
+                        animate={recovered
+                          ? { opacity: 1, y: 0, scaleX: 1 }
+                          : { opacity: 0, y: -28, scaleX: 0.88 }}
+                        transition={recovered
+                          ? { type: "spring", stiffness: 420, damping: 28, mass: 0.8 }
+                          : { duration: 0 }}
                         style={{
                           display: "flex", alignItems: "center", gap: "8px",
                           borderRadius: "10px", padding: "7px 10px", position: "relative", overflow: "hidden",
-                          background: recovered ? "rgba(48,209,88,0.1)" : "rgba(255,255,255,0.04)",
-                          boxShadow: recovered ? "inset 0 0 0 1px rgba(48,209,88,0.22)" : "inset 0 0 0 1px rgba(255,255,255,0.06)",
-                          transition: "all 0.45s ease",
+                          background: "rgba(48,209,88,0.1)",
+                          boxShadow: justArrived
+                            ? "inset 0 0 0 1px rgba(48,209,88,0.45), 0 0 12px rgba(48,209,88,0.25)"
+                            : "inset 0 0 0 1px rgba(48,209,88,0.22)",
+                          originX: 0.5, originY: 0,
+                          transformOrigin: "top center",
                         }}
-                        initial={{ opacity: 0, y: 4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.07 }}
                         whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 500, damping: 30 } }}
                       >
-                        {recovered && (
-                          <motion.div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle, rgba(48,209,88,0.18) 0%, transparent 70%)", pointerEvents: "none" }}
-                            animate={{ scale: [0.4, 2] }} transition={{ duration: 0.55 }} />
+                        {/* Flash on arrival */}
+                        {justArrived && (
+                          <motion.div
+                            style={{ position: "absolute", inset: 0, background: "rgba(48,209,88,0.22)", pointerEvents: "none", borderRadius: "10px" }}
+                            initial={{ opacity: 1 }}
+                            animate={{ opacity: 0 }}
+                            transition={{ duration: 0.6, ease: "easeOut" }}
+                          />
                         )}
-                        {/* iOS green filled circle checkmark badge */}
-                        <div style={{ width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", fontWeight: "700", background: recovered ? "#30D158" : "rgba(255,255,255,0.07)", color: recovered ? "#fff" : "rgba(255,255,255,0.3)", transition: "all 0.4s", fontFamily: SF, boxShadow: recovered ? "0 2px 6px rgba(48,209,88,0.4)" : "none" }}>
-                          {recovered ? (
-                            <svg width="9" height="7" viewBox="0 0 13 10" fill="none">
-                              <path d="M1.5 5L5 8.5L11.5 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                          ) : lead.name[0]}
-                        </div>
+                        {/* iOS green checkmark badge */}
+                        <motion.div
+                          initial={recovered ? { scale: 0 } : { scale: 1 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 22, delay: 0.1 }}
+                          style={{ width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "#30D158", boxShadow: "0 2px 6px rgba(48,209,88,0.45)" }}
+                        >
+                          <svg width="9" height="7" viewBox="0 0 13 10" fill="none">
+                            <path d="M1.5 5L5 8.5L11.5 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </motion.div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: "10px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
-                          <p style={{ fontSize: "8px", color: "rgba(255,255,255,0.28)", margin: 0, fontFamily: SF }}>{lead.service}</p>
+                          <p style={{ fontSize: "10px", fontWeight: "600", color: "rgba(255,255,255,0.95)", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
+                          <p style={{ fontSize: "8px", color: "rgba(255,255,255,0.45)", margin: 0, fontFamily: SF }}>{lead.service}</p>
                         </div>
-                        <span style={{ fontSize: "11px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#30D158" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF_ROUNDED, letterSpacing: "-0.02em" }}>${lead.value}</span>
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.15 }}
+                          style={{ fontSize: "11px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: "#30D158", fontFamily: SF_ROUNDED, letterSpacing: "-0.02em" }}
+                        >
+                          +${lead.value}
+                        </motion.span>
                       </motion.div>
                     );
                   })}
