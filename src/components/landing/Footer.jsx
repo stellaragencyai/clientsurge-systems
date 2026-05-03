@@ -127,7 +127,7 @@ export default function Footer() {
           </div>
 
           {/* Nav columns */}
-          <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8">
+          <div className="footer-nav-grid lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8">
             {navColumns.map((col) =>
             <div key={col.title} className="flex flex-col gap-4">
                 <h4

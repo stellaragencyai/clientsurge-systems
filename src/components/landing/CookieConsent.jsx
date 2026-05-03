@@ -43,7 +43,7 @@ export default function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-6 sm:bottom-6 left-6 z-50 max-w-sm" style={{ bottom: typeof window !== "undefined" && window.innerWidth < 640 ? "80px" : undefined }}>
+    <div className="fixed left-6 z-50 max-w-sm" style={{ bottom: "max(80px, calc(80px + env(safe-area-inset-bottom, 0px)))" }} aria-live="polite" role="dialog" aria-label="Cookie preferences">
       <div 
         className="rounded-2xl shadow-lg border backdrop-blur-md p-5 space-y-4"
         style={{

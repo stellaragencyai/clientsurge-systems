@@ -10,7 +10,8 @@ const testimonials = [
     after: "10+ consults/week",
     result: "5x booking increase",
     quote: "The system just runs. I do not have to touch it.",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=65&auto=format",
+    initials: "JM",
+    color: "#00AEEF",
   },
   {
     name: "Carlos R.",
@@ -20,7 +21,8 @@ const testimonials = [
     after: "Close rate doubled",
     result: "ROI within the first month",
     quote: "It paid for itself in the first week.",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=65&auto=format",
+    initials: "CR",
+    color: "#003B8F",
   },
   {
     name: "Amanda T.",
@@ -30,7 +32,8 @@ const testimonials = [
     after: "Consult requests answered same day",
     result: "Team freed for growth",
     quote: "Our front desk has breathing room again, and consults are getting booked faster.",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&q=65&auto=format",
+    initials: "AT",
+    color: "#009DFF",
   },
 ];
 
@@ -98,12 +101,13 @@ export default function Testimonials() {
               </p>
 
               <div className="flex items-center gap-4">
-                <img
-                  src={testimonial.avatar}
-                  alt={`${testimonial.name}, ${testimonial.businessType} client testimonial`}
-                  loading="lazy"
-                  className="w-14 h-14 rounded-full object-cover ring-2 ring-primary/20 shadow-md"
-                />
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-primary/20 shadow-md text-white text-sm font-bold"
+                  style={{ background: `linear-gradient(135deg, ${testimonial.color} 0%, ${testimonial.color}cc 100%)` }}
+                  aria-label={testimonial.name}
+                >
+                  {testimonial.initials}
+                </div>
                 <div>
                   <p className="text-sm font-bold text-foreground">{testimonial.name}</p>
                   <p className="text-xs text-muted-foreground">{testimonial.location}</p>
