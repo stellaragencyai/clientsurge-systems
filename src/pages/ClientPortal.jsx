@@ -21,9 +21,11 @@ import RevenueMetricsPanel from "../components/portal/RevenueMetricsPanel";
 import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
+import PortalTimeline from "../components/portal/PortalTimeline";
 
 const TABS = [
   { id: "progress", label: "🚀 Setup Progress" },
+  { id: "timeline", label: "📍 Timeline" },
   { id: "quickstart", label: "⚡ Quick Start" },
   { id: "performance", label: "🎯 Performance" },
   { id: "metrics", label: "Lead Flow" },
@@ -292,6 +294,9 @@ export default function ClientPortal() {
         )}
         {activeTab === "progress" && (
           <BuildTracker project={project} order={portalOrder} />
+        )}
+        {activeTab === "timeline" && (
+          <PortalTimeline order={portalOrder} project={project} />
         )}
         {activeTab === "deadlines" && (
           <DeadlinesPanel project={project} />
