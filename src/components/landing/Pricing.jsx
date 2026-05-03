@@ -263,7 +263,7 @@ export default function Pricing() {
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-1.5 h-9 rounded-full border border-primary/30 bg-primary/5 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors hover:shadow-[0_0_12px_rgba(0,174,239,0.3)]"
+                  className="inline-flex items-center justify-center gap-1.5 h-9 rounded-full border border-primary/30 bg-primary/5 text-xs font-semibold text-black hover:bg-primary/10 transition-colors hover:shadow-[0_0_12px_rgba(0,174,239,0.3)]"
                 >
                   Add This <ArrowRight className="w-3 h-3" />
                 </a>
