@@ -85,9 +85,9 @@ function EmptyState() {
       <a href="/store" style={{
         display: "inline-flex", alignItems: "center", gap: "8px",
         padding: "12px 28px", borderRadius: "9999px",
-        background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)",
-        color: "#f5e6d0", fontWeight: "700", fontSize: "14px",
-        textDecoration: "none", boxShadow: "0 4px 18px rgba(120,70,20,0.28)",
+        background: "linear-gradient(135deg,#00AEEF,#003B8F)",
+        color: "#ffffff", fontWeight: "700", fontSize: "14px",
+        textDecoration: "none", boxShadow: "0 4px 18px rgba(0,174,239,0.35)",
       }}>
         Browse the AI Store →
       </a>
