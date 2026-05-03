@@ -59,7 +59,7 @@ export default function Footer() {
     <footer
       className="relative"
       style={{
-        background: "linear-gradient(180deg, #0A1628 0%, #050d1a 100%)",
+        background: "#ffffff",
         paddingBottom: "env(safe-area-inset-bottom)"
       }}>
       
