@@ -10,30 +10,30 @@ import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 
 const sectionLinks = [
-  { label: "How It Works", href: "#problem-solution" },
-  { label: "AI Store", href: "/store", isPage: true },
-  { label: "Pricing", href: "#pricing" },
-  { label: "FAQ", href: "#faq" },
-];
+{ label: "How It Works", href: "#problem-solution" },
+{ label: "AI Store", href: "/store", isPage: true },
+{ label: "Pricing", href: "#pricing" },
+{ label: "FAQ", href: "#faq" }];
+
 
 const industryLinks = [
-  { label: "Med Spas & Aesthetic Clinics", href: "/med-spa", live: true },
-  { label: "Dental & Orthodontics", href: "/dental", live: true },
-  { label: "Chiropractic & Physical Therapy", href: "/chiropractic", live: true },
-  { label: "HVAC, Plumbing & Home Services", href: "/hvac", live: true },
-  { label: "Roofing & Restoration", href: "/roofing", live: true },
-  { label: "Contractors & Trades", href: "/contractors", live: true },
-];
+{ label: "Med Spas & Aesthetic Clinics", href: "/med-spa", live: true },
+{ label: "Dental & Orthodontics", href: "/dental", live: true },
+{ label: "Chiropractic & Physical Therapy", href: "/chiropractic", live: true },
+{ label: "HVAC, Plumbing & Home Services", href: "/hvac", live: true },
+{ label: "Roofing & Restoration", href: "/roofing", live: true },
+{ label: "Contractors & Trades", href: "/contractors", live: true }];
+
 
 const SAFE_SECTION_HASHES = new Set([
-  "#problem-solution",
-  "#services",
-  "#pricing",
-  "#faq",
-  "#testimonials",
-  "#industries",
-  "#book-demo",
-]);
+"#problem-solution",
+"#services",
+"#pricing",
+"#faq",
+"#testimonials",
+"#industries",
+"#book-demo"]
+);
 
 function safeGetThemePreference() {
   try {
@@ -47,18 +47,18 @@ function safeSetThemePreference(value) {
   try {
     window.localStorage.setItem("theme-preference", value);
   } catch {
-    // Ignore storage failures in embedded preview environments.
-  }
-}
 
+
+    // Ignore storage failures in embedded preview environments.
+  }}
 function safeApplyTheme(isDark) {
   try {
     document.documentElement.classList.toggle("dark", isDark);
   } catch {
-    // Ignore DOM theme failures in preview environments.
-  }
-}
 
+
+    // Ignore DOM theme failures in preview environments.
+  }}
 function getSafeHashTarget(hash) {
   if (!hash || !SAFE_SECTION_HASHES.has(hash)) {
     return null;
@@ -143,15 +143,15 @@ export default function Navbar() {
         WebkitBackdropFilter: "blur(20px)",
         paddingTop: "env(safe-area-inset-top)",
         boxShadow: scrolled ? "0 20px 60px rgba(31,21,11,0.1)" : "0 12px 34px rgba(31,21,11,0.06)",
-        transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out, border-color 0.35s ease-out",
-      }}
-    >
+        transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out, border-color 0.35s ease-out"
+      }}>
+      
       <div className="w-full h-[94px] md:h-[102px] flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
         <button
           onClick={handleLogoClick}
           className="font-display font-bold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer transition-transform duration-300 hover:-translate-y-0.5 flex items-center"
-          style={{ fontSize: "1rem", minHeight: "unset", minWidth: "unset" }}
-        >
+          style={{ fontSize: "1rem", minHeight: "unset", minWidth: "unset" }}>
+          
           <span
             style={{
               display: "inline-flex",
@@ -161,11 +161,11 @@ export default function Navbar() {
               borderRadius: "9999px",
               background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(249,244,238,0.94) 100%)",
               border: "1px solid rgba(200,150,92,0.22)",
-              boxShadow: scrolled
-                ? "0 16px 34px rgba(48,31,16,0.08), inset 0 1px 0 rgba(255,255,255,0.92)"
-                : "0 10px 24px rgba(48,31,16,0.05), inset 0 1px 0 rgba(255,255,255,0.92)",
-            }}
-          >
+              boxShadow: scrolled ?
+              "0 16px 34px rgba(48,31,16,0.08), inset 0 1px 0 rgba(255,255,255,0.92)" :
+              "0 10px 24px rgba(48,31,16,0.05), inset 0 1px 0 rgba(255,255,255,0.92)"
+            }}>
+            
             <span
               aria-hidden="true"
               style={{
@@ -176,25 +176,25 @@ export default function Navbar() {
                 padding: "10px 16px 10px 14px",
                 borderRadius: "22px",
                 background: "radial-gradient(circle at 24% 24%, rgba(255,255,255,1) 0%, rgba(244,233,219,0.9) 100%)",
-                boxShadow: "0 10px 24px rgba(200,150,92,0.16), inset 0 1px 0 rgba(255,255,255,0.9)",
-              }}
-            >
+                boxShadow: "0 10px 24px rgba(200,150,92,0.16), inset 0 1px 0 rgba(255,255,255,0.9)"
+              }}>
+              
               <span
                 style={{
                   position: "absolute",
                   inset: "-12px",
                   borderRadius: "22px",
                   background: "radial-gradient(circle, rgba(200,150,92,0.16) 0%, transparent 72%)",
-                  zIndex: 0,
-                }}
-              />
+                  zIndex: 0
+                }} className=" hidden" />
+              
               <img
-                src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/f4735bbdc_download.png"
+                src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/7de44f95a_10ca51c4-3ef9-4f87-979c-d48d7b2e0c6b.png"
                 alt="ClientSurge Systems"
                 fetchpriority="high"
                 decoding="async"
-                style={{ position: "relative", zIndex: 1, height: "clamp(32px, 4vw, 42px)", width: "auto", objectFit: "contain", filter: "brightness(0) saturate(100%) invert(52%) sepia(40%) saturate(600%) hue-rotate(10deg) brightness(90%)" }}
-              />
+                style={{ position: "relative", zIndex: 1, height: "clamp(38px, 5vw, 48px)", width: "auto", objectFit: "contain" }} className=" hidden" />
+              
             </span>
 
             <span className="hidden xl:flex flex-col items-start" style={{ lineHeight: 1.08 }}>
@@ -204,18 +204,18 @@ export default function Navbar() {
                   fontWeight: "700",
                   letterSpacing: "0.16em",
                   textTransform: "uppercase",
-                  color: "rgba(154,92,46,0.78)",
-                }}
-              >
+                  color: "rgba(154,92,46,0.78)"
+                }}>
+                
                 Lead Response
               </span>
               <span
                 style={{
                   fontSize: "0.82rem",
                   fontWeight: "600",
-                  color: "rgba(27,20,13,0.72)",
-                }}
-              >
+                  color: "rgba(27,20,13,0.72)"
+                }}>
+                
                 Built to book faster
               </span>
             </span>
@@ -223,96 +223,96 @@ export default function Navbar() {
         </button>
 
         <div className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
-          {sectionLinks.map((link) => (
-            link.isPage ? (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => { trackCTA("ai_store", "navbar"); }}
-                className="text-xs lg:text-sm font-semibold text-primary hover:text-primary/80 transition-colors border border-primary/25 px-2 lg:px-3 py-1 rounded-full hover:bg-primary/5 whitespace-nowrap"
-              >
+          {sectionLinks.map((link) =>
+          link.isPage ?
+          <a
+            key={link.href}
+            href={link.href}
+            onClick={() => {trackCTA("ai_store", "navbar");}}
+            className="text-xs lg:text-sm font-semibold text-primary hover:text-primary/80 transition-colors border border-primary/25 px-2 lg:px-3 py-1 rounded-full hover:bg-primary/5 whitespace-nowrap">
+            
                 {link.label} ✦
-              </a>
-            ) : (
-              <a
-                key={link.href}
-                href={`/${link.href}`}
-                onClick={(e) => handleSectionNavigation(e, link.href)}
-                className="text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap relative group"
-                style={{ position: "relative", paddingBottom: "2px" }}
-              >
+              </a> :
+
+          <a
+            key={link.href}
+            href={`/${link.href}`}
+            onClick={(e) => handleSectionNavigation(e, link.href)}
+            className="text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap relative group"
+            style={{ position: "relative", paddingBottom: "2px" }}>
+            
                 {link.label}
                 <span
-                  className="group-hover:[transform:scaleX(1)]"
-                  style={{
-                    position: "absolute",
-                    bottom: "-2px",
-                    left: 0,
-                    height: "2px",
-                    width: "100%",
-                    background: "linear-gradient(90deg, #c8965c, #f5d9a8, #c8965c)",
-                    borderRadius: "1px",
-                    transform: "scaleX(0)",
-                    transformOrigin: "left",
-                    transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                    display: "block",
-                  }}
-                />
+              className="group-hover:[transform:scaleX(1)]"
+              style={{
+                position: "absolute",
+                bottom: "-2px",
+                left: 0,
+                height: "2px",
+                width: "100%",
+                background: "linear-gradient(90deg, #c8965c, #f5d9a8, #c8965c)",
+                borderRadius: "1px",
+                transform: "scaleX(0)",
+                transformOrigin: "left",
+                transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                display: "block"
+              }} />
+            
               </a>
-            )
-          ))}
+
+          )}
 
           <div
             className="relative"
             onMouseEnter={() => setIndustriesOpen(true)}
             onMouseLeave={() => setIndustriesOpen(false)}
-            onKeyDown={(e) => { if (e.key === "Escape") setIndustriesOpen(false); }}
-          >
+            onKeyDown={(e) => {if (e.key === "Escape") setIndustriesOpen(false);}}>
+            
             <button
               onClick={() => setIndustriesOpen((prev) => !prev)}
-              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap"
-            >
+              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap">
+              
               Industries
               <ChevronDown className={`w-4 h-4 transition-transform ${industriesOpen ? "rotate-180" : ""}`} />
             </button>
 
             {industriesOpen && (
-              /* Invisible bridge so cursor can travel from button to menu without gap-close */
-              <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ zIndex: 200 }}>
+            /* Invisible bridge so cursor can travel from button to menu without gap-close */
+            <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ zIndex: 200 }}>
                 <div
-                  className="w-60 rounded-2xl border border-border p-3 shadow-xl"
-                  style={{
-                    background: "rgba(255,255,255,0.98)",
-                    backdropFilter: "blur(20px)",
-                    WebkitBackdropFilter: "blur(20px)",
-                  }}
-                >
+                className="w-60 rounded-2xl border border-border p-3 shadow-xl"
+                style={{
+                  background: "rgba(255,255,255,0.98)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)"
+                }}>
+                
                   <div className="space-y-1">
-                    {industryLinks.map((item) => (
-                      <button
-                        key={item.label}
-                        onClick={() => {
-                          trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
-                          navigate(item.href);
-                          setIndustriesOpen(false);
-                        }}
-                        className="w-full text-left block rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/8 hover:text-primary transition-colors border-none bg-transparent cursor-pointer"
-                      >
+                    {industryLinks.map((item) =>
+                  <button
+                    key={item.label}
+                    onClick={() => {
+                      trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
+                      navigate(item.href);
+                      setIndustriesOpen(false);
+                    }}
+                    className="w-full text-left block rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/8 hover:text-primary transition-colors border-none bg-transparent cursor-pointer">
+                    
                         {item.label}
                       </button>
-                    ))}
+                  )}
                   </div>
                 </div>
-              </div>
-            )}
+              </div>)
+            }
           </div>
         </div>
 
         <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
           <button
-            onClick={() => { trackCTA("client_dashboard", "navbar"); navigate("/client-dashboard"); }}
-            className="hidden lg:block text-xs font-semibold text-muted-foreground hover:text-primary border border-border hover:border-primary/40 bg-background/50 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-3 py-1.5 transition-colors"
-          >
+            onClick={() => {trackCTA("client_dashboard", "navbar");navigate("/client-dashboard");}}
+            className="hidden lg:block text-xs font-semibold text-muted-foreground hover:text-primary border border-border hover:border-primary/40 bg-background/50 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-3 py-1.5 transition-colors">
+            
             Dashboard
           </button>
           <button
@@ -320,8 +320,8 @@ export default function Navbar() {
               trackCTA("login", "navbar");
               setShowLoginModal(true);
             }}
-            className="hidden lg:block text-sm font-semibold text-foreground hover:text-primary border border-border hover:border-primary/40 bg-background/50 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-4 py-1.5 transition-colors"
-          >
+            className="hidden lg:block text-sm font-semibold text-foreground hover:text-primary border border-border hover:border-primary/40 bg-background/50 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-4 py-1.5 transition-colors">
+            
             Login
           </button>
           <button
@@ -330,10 +330,10 @@ export default function Navbar() {
               setShowBookingModal(true);
             }}
             style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(90deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", backgroundSize: "200% 100%", animation: "rotateBorderGlow 4s ease-in-out infinite", boxShadow: "0 4px 14px rgba(120,70,20,0.35)", transition: "box-shadow 0.3s ease, transform 0.3s ease", border: "none", cursor: "pointer" }}
-            onMouseEnter={(e) => (e.currentTarget.style.boxShadow = BUTTON_STYLES?.BROWN_GRADIENT_HOVER?.boxShadow ?? "0 8px 28px rgba(120,70,20,0.5)")}
-            onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "0 4px 14px rgba(120,70,20,0.35)")}
-            className="hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded"
-          >
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = BUTTON_STYLES.BROWN_GRADIENT_HOVER.boxShadow}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 14px rgba(120,70,20,0.35)"}
+            className="hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded">
+            
             <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 16px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "600", fontSize: "0.75rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
               {BUTTON_TEXT.BOOK_DEMO_SHORT}
             </span>
@@ -345,63 +345,63 @@ export default function Navbar() {
           onClick={() => setOpen(!open)}
           style={{ borderColor: "rgba(200,150,92,0.2)" }}
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={open}
-        >
+          aria-expanded={open}>
+          
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
-      {open && (
-        <>
+      {open &&
+      <>
           <div className="fixed inset-0 z-40 md:hidden" onClick={() => setOpen(false)} />
         <div className="md:hidden bg-background border-b border-border px-5 pb-safe-bottom pb-6 pt-2 space-y-1 relative z-50" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
-          {sectionLinks.map((link) => (
-            link.isPage ? (
-              <a
-                key={link.href}
-                href={link.href}
-                className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-muted/50"
-                style={{ minHeight: "44px" }}
-                onClick={() => {
-                  trackCTA("ai_store", "mobile_nav");
-                  setOpen(false);
-                }}
-              >
+          {sectionLinks.map((link) =>
+          link.isPage ?
+          <a
+            key={link.href}
+            href={link.href}
+            className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-muted/50"
+            style={{ minHeight: "44px" }}
+            onClick={() => {
+              trackCTA("ai_store", "mobile_nav");
+              setOpen(false);
+            }}>
+            
+                {link.label}
+              </a> :
+
+          <a
+            key={link.href}
+            href={`/${link.href}`}
+            className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-muted/50"
+            style={{ minHeight: "44px" }}
+            onClick={(e) => {
+              handleSectionNavigation(e, link.href);
+              setOpen(false);
+            }}>
+            
                 {link.label}
               </a>
-            ) : (
-              <a
-                key={link.href}
-                href={`/${link.href}`}
-                className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-muted/50"
-                style={{ minHeight: "44px" }}
-                onClick={(e) => {
-                  handleSectionNavigation(e, link.href);
-                  setOpen(false);
-                }}
-              >
-                {link.label}
-              </a>
-            )
-          ))}
+
+          )}
 
           <div className="pt-2 border-t border-border">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-primary mb-2">Industries</p>
             <div className="space-y-1">
-              {industryLinks.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => {
-                    trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
-                    navigate(item.href);
-                    setOpen(false);
-                  }}
-                  className="w-full text-left flex items-center rounded-xl px-3 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
-                  style={{ minHeight: "44px" }}
-                >
+              {industryLinks.map((item) =>
+              <button
+                key={item.label}
+                onClick={() => {
+                  trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
+                  navigate(item.href);
+                  setOpen(false);
+                }}
+                className="w-full text-left flex items-center rounded-xl px-3 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
+                style={{ minHeight: "44px" }}>
+                
                   {item.label}
                 </button>
-              ))}
+              )}
             </div>
           </div>
 
@@ -413,18 +413,18 @@ export default function Navbar() {
               setOpen(false);
               setShowBookingModal(true);
             }}
-            style={{ display: "block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.35)", border: "none", cursor: "pointer", width: "100%" }}
-          >
+            style={{ display: "block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.35)", border: "none", cursor: "pointer", width: "100%" }}>
+            
             <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "600", fontSize: "0.875rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
               {BUTTON_TEXT.BOOK_DEMO}
             </span>
           </button>
         </div>
         </>
-      )}
+      }
 
       {showLoginModal && <PortalLoginModal onClose={() => setShowLoginModal(false)} />}
       {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
-    </nav>
-  );
+    </nav>);
+
 }
