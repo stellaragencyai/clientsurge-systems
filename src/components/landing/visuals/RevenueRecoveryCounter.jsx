@@ -324,7 +324,7 @@ export default function RevenueRecoveryCounter() {
                   <div>
                     <p style={{ fontSize: "9px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "2px", fontFamily: SF }}>Revenue Recovered</p>
                     {/* Enhancement 3: SF Pro Rounded for numerics — matches iOS Lock Screen/Live Activity */}
-                    <motion.p style={{ fontFamily: SF_ROUNDED, fontSize: "26px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.04em", margin: 0, textShadow: "0 0 20px rgba(245,217,168,0.3)" }}>
+                    <motion.p style={{ fontFamily: SF_ROUNDED, fontSize: "19px", fontWeight: "700", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em", margin: 0, textShadow: "0 0 14px rgba(245,217,168,0.25)" }}>
                       ${displayTotal.toLocaleString()}
                     </motion.p>
                   </div>
