@@ -81,7 +81,7 @@
 | 35 | ⏳ | Testimonials: replace broken image URLs with initials-based avatar fallbacks | HIGH |
 | 36 | ⏳ | Add favicon (32x32 + 180x180) and apple-touch-icon to index.html | HIGH |
 | 37 | ⏳ | GuidedPathToggle: add Tooltip explaining Guided vs Explore All modes | LOW |
-| 38 | ⏳ | ClientPortal tabs: sync active tab to URL query param (?tab=billing) | MEDIUM |
+| 38 | ✅ | ClientPortal tabs: "Setup Progress" is now first tab and default landing tab on login | DONE |
 | 39 | ⏳ | Industry pages CTAs: use industry-specific headline copy from industryData.js | MEDIUM |
 | 40 | ⏳ | Mobile nav: show logged-in user name/role after nav links | LOW |
 
@@ -493,10 +493,10 @@
 
 | Agent | Total Tasks | Complete | In Progress | Remaining |
 |---|---|---|---|---|
-| Agent A (Frontend/UI/SEO) | 83 | 8 | 0 | 75 |
+| Agent A (Frontend/UI/SEO) | 83 | 9 | 0 | 74 |
 | Agent B (Backend/Security) | 84 | 6 | 0 | 78 |
 | Agent C (Admin/Stripe/Ops) | 83 | 0 | 0 | 83 |
-| **TOTAL** | **250** | **14** | **0** | **236** |
+| **TOTAL** | **250** | **15** | **0** | **235** |
 
 ---
 
@@ -505,6 +505,7 @@
 | Date | Agent | Change |
 |---|---|---|
 | 2026-05-03 | Agent A | Initial file created, all 250 tasks populated |
+| 2026-05-03 | Agent A | #38 ✅ — "Setup Progress" tab moved to first position and set as default landing tab in ClientPortal |
 
 ---
 
