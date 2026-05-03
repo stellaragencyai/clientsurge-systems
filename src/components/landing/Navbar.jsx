@@ -152,12 +152,12 @@ export default function Navbar() {
           className="shrink-0 bg-none border-none cursor-pointer transition-transform duration-300 hover:-translate-y-0.5"
           style={{ minHeight: "unset", minWidth: "unset", background: "none", padding: 0 }}>
           <img
-            src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/b1f001a72_ChatGPTImageMay2202610_04_21AM.png"
+            src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
             alt="ClientSurge Systems"
             fetchpriority="high"
             decoding="async"
             style={{
-              height: "clamp(64px, 8vw, 86px)",
+              height: "clamp(52px, 6vw, 70px)",
               width: "auto",
               objectFit: "contain",
               mixBlendMode: "multiply",
