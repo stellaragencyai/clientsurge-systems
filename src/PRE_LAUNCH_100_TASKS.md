@@ -339,12 +339,46 @@
 
 ---
 
+## 🔴 CRITICAL — NEXT 10 TASKS (Do These Now)
+
+101. **`sendLeadConfirmationEmail` — confirm the email template actually renders correctly**
+     → Fix: Test by triggering a dummy checkout in test mode. Read `functions/sendLeadConfirmationEmail` and verify all variables (`customer_name`, `business_name`, `items`, totals) are substituted before sending. If any are undefined, the email sends with blank fields.
+
+102. **Admin notification on new purchase is NOT wired up in `stripeWebhookOrders`**
+     → Fix: After the customer confirmation email succeeds in `stripeWebhookOrders`, add a second call to `sendAdminLeadNotification` with order details so you get notified of every new sale immediately.
+
+103. **`CartSidebar` checkout timeout missing — hangs on failed Stripe redirect**
+     → Fix: In `CartSidebar` `handleCheckout`, add `setTimeout(() => { if (step === "loading") { setStep("info"); setError("Checkout timed out. Please try again."); } }, 12000)` immediately after setting step to "loading".
+
+104. **`ServiceDetailModal` has two conflicting `style={}` props on the CTA button (JSX syntax error)**
+     → Fix: In `components/store/ServiceDetailModal`, the Add to Cart `<button>` has a `style={{opacity...cursor...}}` and then immediately a second `style={{width...}}` — the second overwrites the first. Merge both into a single `style` object.
+
+105. **Store search debounce is wired to raw `setSearch` instead of `handleSearchChange`**
+     → Fix: In `pages/Store`, the search `<input>` `onChange` calls `setSearch(event.target.value)` directly. Change it to `onChange={(e) => handleSearchChange(e.target.value)}` to use the 280ms debounce properly.
+
+106. **`robots.txt` does NOT block admin/portal routes from being indexed by Google**
+     → Fix: Open `public/robots.txt` and add: `Disallow: /admin`, `Disallow: /client-portal`, `Disallow: /client-dashboard`, `Disallow: /order-success`, `Disallow: /setup`, `Disallow: /onboarding` under the `User-agent: *` block.
+
+107. **`CookieConsent` component exists but is NOT wired into the homepage**
+     → Fix: In `pages/Home.jsx`, import `CookieConsent` from `components/landing/CookieConsent` and render it at the bottom of the return block (after `<Footer />`). It only shows once per user via localStorage.
+
+108. **`ExitIntentPopup` component exists but is NOT wired into the homepage**
+     → Fix: Import and render `ExitIntentPopup` in `pages/Home.jsx`. It captures abandoning visitors and should show a lead magnet or demo offer. This is one of the highest-ROI conversion tools available.
+
+109. **Order Success page (`/order-success`) is indexable by Google — exposes purchase data**
+     → Fix: In `App.jsx`, the `RouteIndexingGuard` already has `/order-success` in `NOINDEX_PREFIXES` — verify it's there. Also add `<meta name="robots" content="noindex">` directly in `pages/OrderSuccess.jsx` as a safety net.
+
+110. **`Store` page hero `h1` and subtitle text colors are nearly invisible on light backgrounds**
+     → Fix: In `pages/Store`, change the `h1` color from `rgba(245,225,195,0.95)` to `#1b140d`, and the subtitle `p` color from `rgba(220,190,150,0.65)` to `rgba(27,20,13,0.72)`. These are the two most visible text bugs on the entire site.
+
+---
+
 ## Priority Order (Do These First)
-1. Items #1–3 (visible text bugs on Store)
-2. Items #21–22 (Stripe live keys + order confirmation)
-3. Items #25–26 (checkout UX + customer email)
-4. Items #63–65 (TCPA SMS compliance)
-5. Items #91–94 (legal compliance)
-6. Items #81–82 (robots.txt + sitemap)
-7. Items #32 (Stripe metadata)
-8. Items #71–72 (automation integrity)
+1. Items #105, #110 (visible text + search bugs on Store — first impressions)
+2. Items #101–102 (Stripe webhook email chain — revenue critical)
+3. Items #103–104 (cart UX bugs — blocks conversions)
+4. Items #107–108 (cookie consent + exit popup — legal + leads)
+5. Items #106, #109 (SEO/indexing — protects privacy + search ranking)
+6. Items #21 (Stripe live keys — must flip before launch)
+7. Items #63–65 (TCPA SMS compliance — already done ✅)
+8. Items #91–94 (legal pages — already done ✅)
