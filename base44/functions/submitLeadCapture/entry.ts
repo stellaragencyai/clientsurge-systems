@@ -132,6 +132,17 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Method not allowed' }, { status: 405 });
     }
 
+    // #84: Origin header validation — only accept requests from our domain
+    const origin = req.headers.get('origin') || '';
+    const allowedOrigins = [
+      'https://clientsurgesystems.com',
+      'https://www.clientsurgesystems.com',
+      'https://grinning-apex-flow-growth.base44.app',
+    ];
+    if (origin && !allowedOrigins.includes(origin)) {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const base44 = createClientFromRequest(req);
     const payload = await req.json();
     const lead = normalizeLeadInput(payload);
