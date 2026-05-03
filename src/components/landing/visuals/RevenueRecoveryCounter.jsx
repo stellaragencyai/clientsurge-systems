@@ -202,8 +202,8 @@ export default function RevenueRecoveryCounter() {
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
         style={{
           position: "relative",
-          width: "310px",
-          borderRadius: "50px",
+          width: "340px",
+          borderRadius: "54px",
           /* Enhancement 1: Titanium chassis — warm brushed titanium finish */
           background: "linear-gradient(160deg, #3a3733 0%, #2c2926 30%, #232120 60%, #1e1c1a 100%)",
           boxShadow: `
@@ -318,7 +318,7 @@ export default function RevenueRecoveryCounter() {
             >
               <StatusBar />
 
-              <div style={{ padding: "10px 12px 12px" }}>
+              <div style={{ padding: "14px 14px 16px" }}>
                 {/* Header */}
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "8px" }}>
                   <div>
@@ -339,7 +339,7 @@ export default function RevenueRecoveryCounter() {
                 </div>
 
                 {/* Lead rows — real-time notification stack */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginBottom: "8px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "10px" }}>
                   {LEADS.map((lead, i) => {
                     const recovered = i < recoveredCount;
                     const justArrived = i === recoveredCount - 1;
@@ -355,7 +355,7 @@ export default function RevenueRecoveryCounter() {
                           : { duration: 0 }}
                         style={{
                           display: "flex", alignItems: "center", gap: "8px",
-                          borderRadius: "10px", padding: "7px 10px", position: "relative", overflow: "hidden",
+                          borderRadius: "10px", padding: "9px 12px", position: "relative", overflow: "hidden",
                           background: "rgba(48,209,88,0.1)",
                           boxShadow: justArrived
                             ? "inset 0 0 0 1px rgba(48,209,88,0.45), 0 0 12px rgba(48,209,88,0.25)"
@@ -403,7 +403,7 @@ export default function RevenueRecoveryCounter() {
                 </div>
 
                 {/* Footer — frosted glass iOS widget */}
-                <div style={{ borderRadius: "10px", padding: "7px 10px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.14)" }}>
+                <div style={{ borderRadius: "10px", padding: "9px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.14)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
                     <div style={{ width: "13px", height: "13px", borderRadius: "4px", background: "linear-gradient(135deg, #9a5c2e, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <svg width="7" height="7" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L4 7.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
@@ -417,7 +417,7 @@ export default function RevenueRecoveryCounter() {
               </div>
 
               {/* iPhone home indicator */}
-              <div style={{ height: "18px", display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: "4px" }}>
+              <div style={{ height: "26px", display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: "6px" }}>
                 <div style={{ width: "80px", height: "4px", borderRadius: "2px", background: "rgba(255,255,255,0.28)" }} />
               </div>
             </motion.div>
