@@ -135,29 +135,91 @@ export default function Navbar() {
 
   return (
     <nav
-      className="sticky top-4 left-4 right-4 z-50 rounded-2xl border border-white/20"
+      className="sticky top-4 left-4 right-4 z-50 rounded-[28px] border"
       style={{
-        backgroundColor: scrolled ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.55)",
+        borderColor: scrolled ? "rgba(200,150,92,0.2)" : "rgba(200,150,92,0.14)",
+        backgroundColor: scrolled ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.92)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         paddingTop: "env(safe-area-inset-top)",
-        boxShadow: scrolled ? "0 20px 60px rgba(0,0,0,0.12)" : "0 8px 32px rgba(0,0,0,0.06)",
-        transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out",
+        boxShadow: scrolled ? "0 20px 60px rgba(31,21,11,0.1)" : "0 12px 34px rgba(31,21,11,0.06)",
+        transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out, border-color 0.35s ease-out",
       }}
     >
-      <div className="w-full h-[110px] md:h-[116px] flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
+      <div className="w-full h-[94px] md:h-[102px] flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
         <button
           onClick={handleLogoClick}
-          className="font-display font-bold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer hover:opacity-80 transition-opacity flex items-center gap-1.5 md:gap-2"
+          className="font-display font-bold tracking-tight text-foreground shrink-0 bg-none border-none cursor-pointer transition-transform duration-300 hover:-translate-y-0.5 flex items-center"
           style={{ fontSize: "1rem", minHeight: "unset", minWidth: "unset" }}
+        >
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "14px",
+              padding: "8px 16px 8px 8px",
+              borderRadius: "9999px",
+              background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(249,244,238,0.94) 100%)",
+              border: "1px solid rgba(200,150,92,0.22)",
+              boxShadow: scrolled
+                ? "0 16px 34px rgba(48,31,16,0.08), inset 0 1px 0 rgba(255,255,255,0.92)"
+                : "0 10px 24px rgba(48,31,16,0.05), inset 0 1px 0 rgba(255,255,255,0.92)",
+            }}
           >
-          <img
-          src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/6c47c2167_ChatGPTImageMay2202610_04_21AM.png"
-          alt="ClientSurge Systems"
-          fetchpriority="high"
-          decoding="async"
-          style={{ height: "104px", width: "auto", objectFit: "contain" }}
-          />
+            <span
+              aria-hidden="true"
+              style={{
+                position: "relative",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "10px 16px 10px 14px",
+                borderRadius: "22px",
+                background: "radial-gradient(circle at 24% 24%, rgba(255,255,255,1) 0%, rgba(244,233,219,0.9) 100%)",
+                boxShadow: "0 10px 24px rgba(200,150,92,0.16), inset 0 1px 0 rgba(255,255,255,0.9)",
+              }}
+            >
+              <span
+                style={{
+                  position: "absolute",
+                  inset: "-12px",
+                  borderRadius: "22px",
+                  background: "radial-gradient(circle, rgba(200,150,92,0.16) 0%, transparent 72%)",
+                  zIndex: 0,
+                }}
+              />
+              <img
+                src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/7de44f95a_10ca51c4-3ef9-4f87-979c-d48d7b2e0c6b.png"
+                alt="ClientSurge Systems"
+                fetchpriority="high"
+                decoding="async"
+                style={{ position: "relative", zIndex: 1, height: "clamp(38px, 5vw, 48px)", width: "auto", objectFit: "contain" }}
+              />
+            </span>
+
+            <span className="hidden xl:flex flex-col items-start" style={{ lineHeight: 1.08 }}>
+              <span
+                style={{
+                  fontSize: "0.68rem",
+                  fontWeight: "700",
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: "rgba(154,92,46,0.78)",
+                }}
+              >
+                Lead Response
+              </span>
+              <span
+                style={{
+                  fontSize: "0.82rem",
+                  fontWeight: "600",
+                  color: "rgba(27,20,13,0.72)",
+                }}
+              >
+                Built to book faster
+              </span>
+            </span>
+          </span>
         </button>
 
         <div className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
@@ -279,11 +341,11 @@ export default function Navbar() {
         </div>
 
         <button
-          className="md:hidden w-10 h-10 rounded-full border border-border bg-background/70 backdrop-blur flex items-center justify-center text-foreground shadow-sm"
+          className="md:hidden w-10 h-10 rounded-full border bg-background/90 backdrop-blur flex items-center justify-center text-foreground shadow-sm"
           onClick={() => setOpen(!open)}
-            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
-            aria-expanded={open}
+          style={{ borderColor: "rgba(200,150,92,0.2)" }}
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={open}
         >
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
