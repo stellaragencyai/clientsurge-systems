@@ -29,7 +29,7 @@ export default function InteractiveJourneyMap() {
           style={{
             fontSize: "11px",
             fontWeight: "700",
-            color: "#c8965c",
+            color: "#00AEEF",
             textTransform: "uppercase",
             letterSpacing: "0.2em",
             marginBottom: "8px",
@@ -72,12 +72,12 @@ export default function InteractiveJourneyMap() {
                 transition: "all 0.3s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "rgba(200,150,92,0.6)";
-                e.currentTarget.style.background = "rgba(200,150,92,0.1)";
+                e.currentTarget.style.borderColor = "rgba(0,174,239,0.55)";
+                e.currentTarget.style.background = "rgba(0,174,239,0.1)";
               }}
               onMouseLeave={(e) => {
                 if (expandedNode !== step.id) {
-                  e.currentTarget.style.borderColor = "rgba(200,150,92,0.3)";
+                  e.currentTarget.style.borderColor = "rgba(0,174,239,0.25)";
                   e.currentTarget.style.background = "transparent";
                 }
               }}
@@ -88,7 +88,7 @@ export default function InteractiveJourneyMap() {
                   width: "40px",
                   height: "40px",
                   borderRadius: "50%",
-                  background: "linear-gradient(135deg, #9a5c2e, #c8965c)",
+                  background: "linear-gradient(135deg, #0088CC, #00AEEF)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -96,13 +96,13 @@ export default function InteractiveJourneyMap() {
                   fontWeight: "700",
                   fontSize: "14px",
                   margin: "0 auto 12px",
-                  boxShadow: "0 4px 12px rgba(154,92,46,0.3)",
+                  boxShadow: "0 4px 12px rgba(0,174,239,0.35)",
                 }}
               >
                 {step.id}
               </div>
 
-              <p style={{ fontSize: "11px", fontWeight: "700", color: "#c8965c", margin: "0 0 4px" }}>
+              <p style={{ fontSize: "11px", fontWeight: "700", color: "#00AEEF", margin: "0 0 4px" }}>
                 {step.day}
               </p>
               <p style={{ fontSize: "13px", fontWeight: "600", color: "#1b140d", margin: 0 }}>
@@ -115,7 +115,7 @@ export default function InteractiveJourneyMap() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid rgba(200,150,92,0.2)" }}
+                  style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid rgba(0,174,239,0.2)" }}
                 >
                   <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.7)", margin: 0 }}>
                     {step.description}
@@ -132,13 +132,13 @@ export default function InteractiveJourneyMap() {
           viewBox="0 0 800 24"
           preserveAspectRatio="none"
         >
-          <line x1="0" y1="12" x2="800" y2="12" stroke="rgba(200,150,92,0.25)" strokeWidth="2" />
+          <line x1="0" y1="12" x2="800" y2="12" stroke="rgba(0,174,239,0.25)" strokeWidth="2" />
           <motion.circle
             cx={`${dotPosition * 8}`}
             cy="12"
             r="6"
-            fill="#c8965c"
-            style={{ filter: "drop-shadow(0 0 8px rgba(200,150,92,0.5))" }}
+            fill="#00AEEF"
+            style={{ filter: "drop-shadow(0 0 8px rgba(0,174,239,0.5))" }}
           />
         </svg>
       </div>
@@ -156,9 +156,9 @@ export default function InteractiveJourneyMap() {
             gap: "8px",
             padding: "12px 24px",
             borderRadius: "9999px",
-            background: "rgba(154,92,46,0.1)",
-            border: "1px solid rgba(154,92,46,0.25)",
-            color: "#9a5c2e",
+            background: "rgba(0,174,239,0.08)",
+            border: "1px solid rgba(0,174,239,0.25)",
+            color: "#0088CC",
             fontWeight: "600",
             fontSize: "13px",
             textDecoration: "none",
@@ -166,12 +166,12 @@ export default function InteractiveJourneyMap() {
             transition: "all 0.3s ease",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(154,92,46,0.2)";
-            e.currentTarget.style.borderColor = "rgba(154,92,46,0.4)";
+            e.currentTarget.style.background = "rgba(0,174,239,0.15)";
+            e.currentTarget.style.borderColor = "rgba(0,174,239,0.45)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = "rgba(154,92,46,0.1)";
-            e.currentTarget.style.borderColor = "rgba(154,92,46,0.25)";
+            e.currentTarget.style.background = "rgba(0,174,239,0.08)";
+            e.currentTarget.style.borderColor = "rgba(0,174,239,0.25)";
           }}
         >
           See Pricing <ChevronRight style={{ width: "14px", height: "14px" }} />
