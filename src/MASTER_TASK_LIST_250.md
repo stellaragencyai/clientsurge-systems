@@ -22,18 +22,20 @@
 
 ## 🗂️ DOMAIN INDEX — ALL TASKS LIVE HERE
 
-| # | File | Domain | ~Tasks | Critical Open | Status |
-|---|---|---|---|---|---|
-| 01 | `DOMAIN_01_STRIPE_PAYMENTS.md` | 💳 Stripe & Billing | 18 | #201, #202, #203 | 🔄 Active |
-| 02 | `DOMAIN_02_LEAD_PIPELINE.md` | 🎯 Lead Tracking & CRM | 22 | #127 | ⏳ Pending |
-| 03 | `DOMAIN_03_AUTOMATION.md` | 🤖 Automation Engine | 22 | #95, #127 | ⏳ Pending |
-| 04 | `DOMAIN_04_SECURITY_LEGAL.md` | 🔒 Security & Legal | 18 | #85, #248 | ⏳ Pending |
-| 05 | `DOMAIN_05_SEO_MARKETING.md` | 📈 SEO & Marketing | 14 | — | ⏳ Pending |
-| 06 | `DOMAIN_06_PERFORMANCE_SPEED.md` | ⚡ Speed & Performance | 12 | — | ⏳ Pending |
-| 07 | `DOMAIN_07_FRONTEND_VISUALS.md` | 🎨 Frontend & Visuals | 28 | #76 | 🔄 Active |
-| 08 | `DOMAIN_08_CLIENT_PORTAL_ADMIN.md` | 🏠 Client Portal & Admin | 28 | — | 🔄 Active |
-| 09 | `DOMAIN_09_DEVOPS_MONITORING.md` | 🛠️ DevOps & Monitoring | 16 | #211, #213 | ⏳ Pending |
-| 10 | `DOMAIN_10_LAUNCH_CHECKLIST.md` | 🚀 Final Launch | 10 | #248, #249, #250 | ⏳ Blocked (pending 01–09) |
+> **Health Score Legend:** 🟢 80%+ done · 🟡 30–79% done · 🔴 <30% done
+
+| # | File | Domain | ~Tasks | Health | Done | Critical Open | Fastest Win | Status |
+|---|---|---|---|---|---|---|---|---|
+| 01 | `DOMAIN_01_STRIPE_PAYMENTS.md` | 💳 Stripe & Billing | 18 | 🟡 22% | 4 | #201→#203 chain | #208 (~20 min) | 🔄 Active |
+| 02 | `DOMAIN_02_LEAD_PIPELINE.md` | 🎯 Lead Tracking & CRM | 22 | 🔴 5% | 1 | #127 STOP handling | #137 (~30 min) | ⏳ Pending |
+| 03 | `DOMAIN_03_AUTOMATION.md` | 🤖 Automation Engine | 22 | 🔴 0% | 0 | #95, #127 | #113 (~20 min) | ⏳ Pending |
+| 04 | `DOMAIN_04_SECURITY_LEGAL.md` | 🔒 Security & Legal | 18 | 🔴 17% | 3 | #85, #248 | #85 (~30 min) | ⏳ Pending |
+| 05 | `DOMAIN_05_SEO_MARKETING.md` | 📈 SEO & Marketing | 14 | 🟡 29% | 4 | None | #21 (~10 min) | ⏳ Pending |
+| 06 | `DOMAIN_06_PERFORMANCE_SPEED.md` | ⚡ Speed & Performance | 12 | 🟡 42% | 5 | None | #116 (~20 min) | ⏳ Pending |
+| 07 | `DOMAIN_07_FRONTEND_VISUALS.md` | 🎨 Frontend & Visuals | 28 | 🟡 32% | 9 | #76 key audit | #17 (~10 min) | 🔄 Active |
+| 08 | `DOMAIN_08_CLIENT_PORTAL_ADMIN.md` | 🏠 Client Portal & Admin | 28 | 🔴 11% | 3 | None | #185 (~30 min) | 🔄 Active |
+| 09 | `DOMAIN_09_DEVOPS_MONITORING.md` | 🛠️ DevOps & Monitoring | 16 | 🔴 6% | 1 | #211, #213a/b | #107 (~20 min) | ⏳ Pending |
+| 10 | `DOMAIN_10_LAUNCH_CHECKLIST.md` | 🚀 Final Launch | 10 | 🔴 0% | 0 | All (D01–09 gate) | None yet | ⛔ Blocked |
 
 ---
 
