@@ -648,3 +648,188 @@
 ---
 
 *Expansion added by Sam (AI Agent) — 2026-05-03. Tasks #251–#300.*
+
+
+---
+
+---
+
+# 🆕 EXPANSION PACK 2 — Tasks #301–#400
+### Added by Sam | 2026-05-03 | Deep repo + bundle + component audit
+
+> All tasks below are ⏳ Pending unless noted.
+
+---
+
+## SECTION I: STRIPE / PAYMENTS — Critical Revenue Gaps
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 301 | ⏳ | Pricing.jsx: replace all 6 test Stripe links (buy.stripe.com/test_*) with live payment links — currently LIVE SITE IS TAKING TEST PAYMENTS | CRITICAL |
+| 302 | ⏳ | salesCatalog.js: audit all setup_fee and monthly_fee values — store products show $97/mo and $297 setup but tier pages show $497/mo — must be ONE source of truth | CRITICAL |
+| 303 | ⏳ | CartSidebar handleCheckout: wire to createCheckoutSession backend function — currently unclear what endpoint it calls | HIGH |
+| 304 | ⏳ | createCheckoutSession: verify it uses sk_live_ not sk_test_ — check STRIPE_SECRET_KEY env var is set to live key | CRITICAL |
+| 305 | ⏳ | Add Stripe Customer Portal link to BillingDashboard — getStripeCustomerPortalUrl is deployed but never called | HIGH |
+| 306 | ⏳ | getClientInvoices function is deployed — wire it to BillingDashboard so real invoice history shows (currently blank) | HIGH |
+| 307 | ⏳ | requestSubscriptionChange function is deployed — wire "Upgrade/Downgrade" button in BillingDashboard to call it | MEDIUM |
+| 308 | ⏳ | stripeWebhookOrders: add handling for customer.subscription.deleted to set Order status = cancelled and notify Nolan | HIGH |
+| 309 | ⏳ | Add post-checkout redirect from Stripe back to /client-portal with session_id param so portal auto-loads after purchase | HIGH |
+| 310 | ⏳ | Add Stripe test mode warning banner in Admin panel — show red "TEST MODE ACTIVE" badge if STRIPE_SECRET_KEY starts with sk_test_ | HIGH |
+
+---
+
+## SECTION J: PORTAL — Components Exist But Are Using SAMPLE / MOCK Data
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 311 | ⏳ | AutomationsOverview.jsx: replace SAMPLE_AUTOMATIONS hardcoded array with real AutomationChecklist entity reads | CRITICAL |
+| 312 | ⏳ | SocialProofTicker.jsx: currently shows only static stats strings — wire to real Order entity count for "X businesses automated" | MEDIUM |
+| 313 | ⏳ | WeeklyReports.jsx: verify BUILD_STEPS keys match actual ClientInstallationOS entity fields — step_onboarding, step_sms etc. may be wrong field names | HIGH |
+| 314 | ⏳ | RevenueMetricsPanel.jsx: verify it reads from real Order entities not mock data — add fallback empty state if no paid orders exist yet | HIGH |
+| 315 | ⏳ | TasksDashboard.jsx: confirm getClientTaskJobs function returns real data — add empty state for new clients with zero tasks | MEDIUM |
+| 316 | ⏳ | ClientPortal.jsx: getClientPortalContext is invoked — verify it returns project, order, AND subscription in a single call, not just project | HIGH |
+| 317 | ⏳ | PaymentFailedBanner component is imported in ClientPortal but never conditionally rendered — add billing_status === "past_due" check to show it | CRITICAL |
+| 318 | ⏳ | Portal tab "Automations" shows AutomationsOverview with fake data — replace with real getAutomationStatus function call | HIGH |
+| 319 | ⏳ | Portal WeeklyReports tab: wire generateWeeklyReport backend function to "Generate Report" button | MEDIUM |
+| 320 | ⏳ | Portal NotificationBell: verify it polls real entity for unread notifications — add badge count from real data | MEDIUM |
+
+---
+
+## SECTION K: ADMIN PANEL — Deployed Functions Never Called From UI
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 321 | ⏳ | Wire getAdminAnalytics to AdminDashboard/RevenueDashboard — function is deployed but never invoked from frontend | CRITICAL |
+| 322 | ⏳ | Wire getLeadPipelineSummary to LeadManagementDashboard — deployed but disconnected | HIGH |
+| 323 | ⏳ | Wire deduplicateLeads to a "Clean Duplicates" button in admin leads panel | HIGH |
+| 324 | ⏳ | Wire stalledOnboardingAlert to a cron automation — currently deployed but no scheduler triggers it | HIGH |
+| 325 | ⏳ | Wire monthlyClientReport to send on 1st of each month — function exists, no automation created for it | HIGH |
+| 326 | ⏳ | Wire autoSchedule30DayCheckin — deployed but no trigger exists to schedule 30-day follow-up with clients | MEDIUM |
+| 327 | ⏳ | Wire sendDailyDigest to a daily 8am MST automation — deployed but never scheduled | HIGH |
+| 328 | ⏳ | Wire runWinBackSequence — deployed but no UI button or automation triggers it for churned clients | MEDIUM |
+| 329 | ⏳ | Wire reactivateLeadOutreach — deployed but no UI or automation triggers lead reactivation flow | MEDIUM |
+| 330 | ⏳ | Admin IntegrationHealth.jsx: call getIntegrationHealth on load — component exists but verify it's wired to the right function | HIGH |
+
+---
+
+## SECTION L: LEAD MANAGEMENT — Gaps Between Functions and UI
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 331 | ⏳ | bulkLeadAction function is deployed — wire it to BulkActionToolbar.jsx which currently has no backend connection | HIGH |
+| 332 | ⏳ | importLeads function is deployed — build a CSV import UI in admin leads panel that calls it | MEDIUM |
+| 333 | ⏳ | dispatchLeadWebhook is deployed — add webhook test button in admin that fires a sample lead payload | MEDIUM |
+| 334 | ⏳ | routeLead function deployed — verify LeadRoutingPanel.jsx actually calls it and doesn't just show static routing rules | HIGH |
+| 335 | ⏳ | LeadCRMDrawer.jsx: verify it calls enrichLeadWithAI on open — should auto-enrich lead if AI fields are empty | MEDIUM |
+| 336 | ⏳ | onLeadCreated function: verify it fires for EVERY new WebsiteLead — check entity automation exists and is active | CRITICAL |
+| 337 | ⏳ | processWebsiteLeadFollowUps automation: verify it is ACTIVE and scheduled — this is the core follow-up engine | CRITICAL |
+| 338 | ⏳ | processMissedCallFollowUps automation: verify ACTIVE and Twilio webhook is configured to hit receiveTwilioMissedCallWebhook | CRITICAL |
+| 339 | ⏳ | processNurtureCampaigns: verify STOP keyword check is in place BEFORE every SMS send — TCPA requirement | CRITICAL |
+| 340 | ⏳ | LeadSourceAttribution.jsx: wire to real CommunicationEvent entity reads filtered by source — currently unclear if it shows live data | MEDIUM |
+
+---
+
+## SECTION M: SEO — Deep Technical Gaps Found in index.html + Pages
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 341 | ⏳ | seo.js: DEFAULT_OG_IMAGE points to base44.com CDN — host og-image.png at clientsurgesystems.com/og-image.png and update | HIGH |
+| 342 | ⏳ | index.html: missing viewport-fit=cover in meta viewport tag — needed for iPhone notch safe area | MEDIUM |
+| 343 | ⏳ | index.html: Space Grotesk font loaded but rarely used — remove to save 60KB on initial load | MEDIUM |
+| 344 | ⏳ | Add canonical tag to every industry page using setPageMetadata — currently setJsonLd is called but canonical may be missing | HIGH |
+| 345 | ⏳ | MedSpa.jsx calls setPageMetadata — verify Dental, Chiro, HVAC, Roofing, Contractors pages also call it (IndustryTemplate may not) | HIGH |
+| 346 | ⏳ | SchemaMarkup.jsx getFAQSchema is used on MedSpa only — add FAQ schema to all 6 industry pages | MEDIUM |
+| 347 | ⏳ | Footer: "Tanning Salons" industry missing from footer nav links — only 5 industries listed, should be 6 | MEDIUM |
+| 348 | ⏳ | Footer: Roofing and Contractors pages missing from footer nav — add all active industry routes | MEDIUM |
+| 349 | ⏳ | Add /sitemap.xml route that reads from AdminSettings or returns hardcoded XML including all industry pages | MEDIUM |
+| 350 | ⏳ | Add robots.txt with correct Disallow: /admin Disallow: /client-portal Allow: / | HIGH |
+
+---
+
+## SECTION N: FRONTEND QUALITY — Real Bugs Found in Component Audit
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 351 | ⏳ | Testimonials.jsx: all 3 testimonials use Unsplash stock photos of strangers — replace with generated avatars or initials | HIGH |
+| 352 | ⏳ | Testimonials.jsx: Jessica M. is in "Miami, FL" — change all testimonial locations to Phoenix/Scottsdale, AZ for local credibility | HIGH |
+| 353 | ⏳ | SocialProofTicker says "6 automations per client" — Starter gets 2, Growth 4, Elite 6 — change to "Up to 6 automations" | HIGH |
+| 354 | ⏳ | constants.js BUTTON_TEXT.BOOK_DEMO = "Get Your Free Audit" — verify this replaces ALL former "Book Demo" references site-wide | MEDIUM |
+| 355 | ⏳ | ExitIntentPopup.jsx: verify it doesn't fire on /admin or /client-portal routes — admin should never see exit intent | MEDIUM |
+| 356 | ⏳ | CookieConsent.jsx: verify it persists dismissal in localStorage — if not, re-shows on every page visit | HIGH |
+| 357 | ⏳ | LeadCaptureForm: add honeypot hidden field website_url to block bots — confirmed missing from at least one form variant | HIGH |
+| 358 | ⏳ | MobileCallBar.jsx: hardcoded phone number — pull from AdminSettings.twilio_from_number instead | MEDIUM |
+| 359 | ⏳ | Hero.jsx checklist says "14 days of automated follow-up" — verify backend processDynamicFollowUps actually runs for 14 days | MEDIUM |
+| 360 | ⏳ | ScrollProgressBar.jsx: verify it only renders on long-scroll pages (homepage, industry pages) — not on /admin or portal | LOW |
+
+---
+
+## SECTION O: STORE PAGE — Specific Gaps Found
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 361 | ⏳ | Store salesCatalog.js: individual service setup_fee is $297 and monthly_fee is $97 — this conflicts with tier pricing ($497+) — document the pricing hierarchy clearly in salesCatalog comments | HIGH |
+| 362 | ⏳ | Store GuidedPathToggle: "Explore All" mode shows all products — add a "Most Popular" sort as default | LOW |
+| 363 | ⏳ | Store BuildYourStackFlow.jsx: lazy loaded — verify it actually renders on mobile without crashing | HIGH |
+| 364 | ⏳ | CartSidebar: after successful checkout, cart items should be cleared and success state shown — verify this happens | HIGH |
+| 365 | ⏳ | Store StackValueCounter: verify it reads from cart context in real time — if it uses static values, replace | MEDIUM |
+| 366 | ⏳ | Store page: CANONICAL_SERVICE_PRODUCTS and AI_PRODUCTS both imported from aiProducts — aiProducts.js is only 15 lines, verify it exports what Store expects | HIGH |
+| 367 | ⏳ | ProductCard.jsx: "Add to Cart" should be disabled for coming_soon products — verify checkout_enabled flag gates the button | MEDIUM |
+| 368 | ⏳ | Store ServiceComparisonModal: lazy loaded — add error boundary wrapper so the store doesn't crash if it fails to load | MEDIUM |
+| 369 | ⏳ | CartSidebar: smsConsent checkbox is present but is it validated before checkout proceeds? Block checkout if unchecked | CRITICAL |
+| 370 | ⏳ | Store page: setPageMetadata is imported from seo.js — verify it's actually called in StoreInner useEffect with store-specific title/description | MEDIUM |
+
+---
+
+## SECTION P: ONBOARDING + INSTALLATION FLOW
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 371 | ⏳ | initializeInstallOS function is deployed — verify it is called when a new Order is created, not just manually | HIGH |
+| 372 | ⏳ | installPipeline function: wire it to Admin InstallOrderWorkspace.jsx — verify the workspace actually calls the pipeline | HIGH |
+| 373 | ⏳ | autoProvisionTwilioNumber is deployed — add "Auto-Provision Number" button in admin install workspace | MEDIUM |
+| 374 | ⏳ | configureService function is deployed — wire to ServiceConfigEditor.jsx in admin install panel | HIGH |
+| 375 | ⏳ | getInstallConfiguration function deployed — verify InstallOrderWorkspace calls it on load to pre-populate fields | MEDIUM |
+| 376 | ⏳ | listInstallQueue function deployed — verify InstallQueuePanel.jsx calls it (not a static list) | HIGH |
+| 377 | ⏳ | sendClientWelcomeEmail deployed — verify it fires when Order goes to "paid_setup_in_progress" status, not manually | HIGH |
+| 378 | ⏳ | sendPortalWelcomeEmail deployed — verify it fires when client portal account is first created | HIGH |
+| 379 | ⏳ | stalledOnboardingAlert: create a daily 9am automation that calls this function and Telegrams Nolan if any client is stalled | HIGH |
+| 380 | ⏳ | Onboarding.jsx form: currently 531 lines with no field-level validation — add required field validation before submitClientOnboarding is called | HIGH |
+
+---
+
+## SECTION Q: SECURITY — Specific Gaps Found in Code
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 381 | ⏳ | autoEndToEndTest function: no auth guard found — anyone with the URL can trigger a full system test — add admin role check immediately | CRITICAL |
+| 382 | ⏳ | secureFormSubmission function exists but verify submitLeadCapture and submitContactInquiry actually call it (not duplicate logic) | HIGH |
+| 383 | ⏳ | authGuards.js shared lib exists — audit which functions import and use it vs which skip it entirely | HIGH |
+| 384 | ⏳ | webhookSecurity.js and webhookValidation shared libs exist — verify receiveTwilioInboundSms validates Twilio signature header | CRITICAL |
+| 385 | ⏳ | AuditLog entity exists in schema — verify admin actions (lead updates, order changes) actually write to it | MEDIUM |
+| 386 | ⏳ | legacyQuarantine.js shared lib exists — identify and remove all legacy function references it wraps | MEDIUM |
+| 387 | ⏳ | Base44 vite.config.js has legacySDKImports set to env var — ensure BASE44_LEGACY_SDK_IMPORTS=false in production | HIGH |
+| 388 | ⏳ | manageWebhookRegistration function deployed — ensure webhook secrets are stored encrypted, not in plain text in WebhookRegistration entity | HIGH |
+| 389 | ⏳ | sendTestLead function deployed and exposed — add admin-only guard so it cannot be called externally | HIGH |
+| 390 | ⏳ | simulateMissedCall function deployed — add admin-only guard, this function can trigger real SMS sends | CRITICAL |
+
+---
+
+## SECTION R: AUTOMATION HEALTH + SCHEDULING
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 391 | ⏳ | Create entity automation on Order for "create" event — triggers initializeInstallOS + sendClientWelcomeEmail automatically | CRITICAL |
+| 392 | ⏳ | Create entity automation on ClientInstallationOS for "update" event — fires stalledOnboardingAlert check when progress stalls | HIGH |
+| 393 | ⏳ | bookingConfirmationLoop: verify it is called after every scheduleDemoBooking — sends confirmation email + SMS + creates DemoRequest record | HIGH |
+| 394 | ⏳ | processQualifiedFollowUps: verify it runs on a schedule — add daily automation if missing | HIGH |
+| 395 | ⏳ | processDripCampaigns: create scheduled automation to run every 4 hours — currently may be manual only | HIGH |
+| 396 | ⏳ | processDynamicFollowUps: verify it runs every hour for active sequences — add automation if missing | HIGH |
+| 397 | ⏳ | autoSendWebhookInstructions: wire to fire when a new client Order is created — sends Twilio/webhook setup guide to client | MEDIUM |
+| 398 | ⏳ | generateWeeklyReport: create weekly Monday 8am MST automation — currently deployed but no schedule triggers it | HIGH |
+| 399 | ⏳ | sendDailyDigest: create daily 7am MST automation — deployed but unscheduled | HIGH |
+| 400 | ⏳ | Create a healthCheck automation that runs every 6 hours and posts results to AgentLog — function deployed, no trigger exists | HIGH |
+
+---
+
+*Expansion Pack 2 added by Sam (AI Agent) — 2026-05-03. Tasks #301–#400.*
+*Sources: live bundle analysis, 370 JSX component scan, 160 backend function inventory, 42 entity schemas, 15 shared lib files.*
