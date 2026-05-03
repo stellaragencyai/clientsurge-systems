@@ -8,6 +8,7 @@ import { motion, useInView, animate, useMotionValue, useTransform } from "framer
 import { useEffect, useRef, useState } from "react";
 
 const SF = "-apple-system,'SF Pro Display','SF Pro Text','Helvetica Neue',ui-sans-serif,sans-serif";
+const SF_ROUNDED = "ui-rounded,'SF Pro Rounded','SF Pro Display',-apple-system,'Helvetica Neue',sans-serif";
 
 const LEADS = [
   { name: "Sarah M.",  value: 480,  service: "Consultation" },
@@ -31,7 +32,7 @@ function useCountUp(target, trigger, duration = 1.2) {
   return val;
 }
 
-// iPadOS status bar
+// iPhone-style status bar with Dynamic Island
 function StatusBar() {
   const [time, setTime] = useState("");
   useEffect(() => {
@@ -39,8 +40,7 @@ function StatusBar() {
       const d = new Date();
       let h = d.getHours() % 12 || 12;
       const m = d.getMinutes().toString().padStart(2, "0");
-      const ap = d.getHours() >= 12 ? "PM" : "AM";
-      return `${h}:${m} ${ap}`;
+      return `${h}:${m}`;
     };
     setTime(fmt());
     const t = setInterval(() => setTime(fmt()), 1000);
@@ -48,39 +48,53 @@ function StatusBar() {
   }, []);
 
   return (
-    <div style={{
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "6px 18px 4px", height: "30px", position: "relative", flexShrink: 0,
-    }}>
-      <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(255,255,255,0.85)", letterSpacing: "-0.02em", minWidth: "52px" }}>
-        {time}
-      </span>
-      {/* Pill camera — centered */}
+    <div style={{ position: "relative", flexShrink: 0 }}>
+      {/* Dynamic Island — iPhone 17 Pro slimmer pill shape */}
       <div style={{
-        position: "absolute", left: "50%", top: "6px", transform: "translateX(-50%)",
-        width: "62px", height: "16px", borderRadius: "999px", background: "#000",
-        display: "flex", alignItems: "center", justifyContent: "center", gap: "5px",
-        boxShadow: "0 0 0 1px rgba(255,255,255,0.08), inset 0 1px 2px rgba(0,0,0,0.8)",
-        zIndex: 10,
+        position: "absolute", left: "50%", top: "7px", transform: "translateX(-50%)",
+        width: "72px", height: "19px", borderRadius: "999px", background: "#000",
+        boxShadow: "0 0 0 1px rgba(255,255,255,0.06), 0 2px 8px rgba(0,0,0,0.95), inset 0 1px 2px rgba(0,0,0,1)",
+        zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
       }}>
-        <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#0d1020", border: "1px solid rgba(80,100,180,0.6)", boxShadow: "0 0 4px rgba(60,80,160,0.7)" }} />
-        <div style={{ width: "16px", height: "3px", borderRadius: "2px", background: "#111", border: "1px solid rgba(255,255,255,0.05)" }} />
+        {/* Front camera — small circle on left */}
+        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#0a0a14", border: "1px solid rgba(255,255,255,0.07)", boxShadow: "inset 0 0 3px rgba(0,0,0,1), 0 0 4px rgba(60,80,200,0.35)" }} />
+        {/* Face ID sensor array — tiny dot cluster on right */}
+        <div style={{ display: "flex", gap: "2px", alignItems: "center" }}>
+          <div style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#111" }} />
+          <div style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#111" }} />
+        </div>
       </div>
-      {/* System icons */}
-      <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-        <svg width="13" height="10" viewBox="0 0 13 10">
-          {[0,1,2,3].map(i => <rect key={i} x={i*3.2} y={10-(i+1)*2.4} width="2.4" height={(i+1)*2.4} rx="0.6" fill={i<3?"rgba(255,255,255,0.8)":"rgba(255,255,255,0.2)"} />)}
-        </svg>
-        <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
-          <circle cx="6.5" cy="9" r="1.2" fill="rgba(255,255,255,0.8)" />
-          <path d="M3.8 6.8C4.7 5.9 5.5 5.5 6.5 5.5C7.5 5.5 8.3 5.9 9.2 6.8" stroke="rgba(255,255,255,0.8)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
-          <path d="M1.5 4.5C3.1 2.8 4.7 2 6.5 2C8.3 2 9.9 2.8 11.5 4.5" stroke="rgba(255,255,255,0.45)" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
-        </svg>
-        <div style={{ display: "flex", alignItems: "center", gap: "1px" }}>
-          <div style={{ width: "22px", height: "10px", borderRadius: "3px", border: "1.5px solid rgba(255,255,255,0.5)", padding: "1.5px", display: "flex", alignItems: "center" }}>
-            <div style={{ width: "75%", height: "100%", borderRadius: "1.5px", background: "linear-gradient(90deg,#4ade80,#22c55e)" }} />
+
+      {/* Status bar row */}
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "6px 16px 4px", height: "34px",
+      }}>
+        <span style={{ fontSize: "12px", fontWeight: "800", color: "rgba(255,255,255,0.95)", letterSpacing: "-0.04em", fontFamily: SF, lineHeight: 1 }}>
+          {time}
+        </span>
+        {/* Right: signal + wifi + battery */}
+        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+          {/* Signal bars — iOS proportions, 4th bar at 0.25 opacity */}
+          <svg width="17" height="12" viewBox="0 0 17 12">
+            {[0,1,2,3].map(i => (
+              <rect key={i} x={i*4.5} y={12-(i+1)*3} width="3.2" height={(i+1)*3} rx="1"
+                fill={i < 3 ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.25)"} />
+            ))}
+          </svg>
+          {/* Wifi */}
+          <svg width="14" height="11" viewBox="0 0 14 11" fill="none">
+            <circle cx="7" cy="10" r="1.3" fill="rgba(255,255,255,0.85)" />
+            <path d="M4.2 7.5C5.2 6.5 6 6.1 7 6.1C8 6.1 8.8 6.5 9.8 7.5" stroke="rgba(255,255,255,0.85)" strokeWidth="1.3" strokeLinecap="round" fill="none"/>
+            <path d="M1.8 5C3.6 3.1 5.2 2.2 7 2.2C8.8 2.2 10.4 3.1 12.2 5" stroke="rgba(255,255,255,0.4)" strokeWidth="1.3" strokeLinecap="round" fill="none"/>
+          </svg>
+          {/* Battery */}
+          <div style={{ display: "flex", alignItems: "center", gap: "1px" }}>
+            <div style={{ width: "24px", height: "12px", borderRadius: "3.5px", border: "1.5px solid rgba(255,255,255,0.5)", padding: "2px", display: "flex", alignItems: "center" }}>
+              <div style={{ width: "72%", height: "100%", borderRadius: "1.5px", background: "linear-gradient(90deg,#4ade80,#22c55e)" }} />
+            </div>
+            <div style={{ width: "2px", height: "6px", borderRadius: "0 1.5px 1.5px 0", background: "rgba(255,255,255,0.4)" }} />
           </div>
-          <div style={{ width: "2px", height: "5px", borderRadius: "0 1.5px 1.5px 0", background: "rgba(255,255,255,0.4)" }} />
         </div>
       </div>
     </div>
@@ -178,7 +192,7 @@ export default function RevenueRecoveryCounter() {
         <div style={{ width: "10px", height: "22px", background: "linear-gradient(to bottom, #d0d0d0, #a8a8a8)", clipPath: "polygon(0 0, 100% 0, 60% 100%, 40% 100%)" }} />
       </div>
 
-      {/* iPad body */}
+      {/* iPhone 17 Pro Max body */}
       <motion.div
         ref={ref}
         onMouseMove={handleMouseMove}
@@ -188,14 +202,17 @@ export default function RevenueRecoveryCounter() {
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
         style={{
           position: "relative",
-          width: "480px",
-          borderRadius: "32px",
-          background: "#000000",
+          width: "340px",
+          borderRadius: "64px",
+          /* Enhancement 1: Titanium chassis — warm brushed titanium finish */
+          background: "linear-gradient(160deg, #3a3733 0%, #2c2926 30%, #232120 60%, #1e1c1a 100%)",
           boxShadow: `
-            0 50px 120px rgba(0,0,0,0.75),
-            0 20px 50px rgba(0,0,0,0.45),
-            inset 0 1px 0 rgba(255,255,255,0.06),
-            inset 0 -1px 0 rgba(0,0,0,0.6)
+            0 50px 120px rgba(0,0,0,0.8),
+            0 20px 50px rgba(0,0,0,0.5),
+            inset 0 1px 0 rgba(210,195,175,0.18),
+            inset 0 -1px 0 rgba(0,0,0,0.7),
+            inset 1px 0 0 rgba(200,185,165,0.1),
+            inset -1px 0 0 rgba(200,185,165,0.1)
           `,
           transformStyle: "preserve-3d",
           perspective: "1200px",
@@ -203,30 +220,36 @@ export default function RevenueRecoveryCounter() {
           userSelect: "none",
         }}
       >
-        {/* Subtle top edge */}
-        <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), rgba(255,255,255,0.08), rgba(255,255,255,0.06), transparent)", borderRadius: "999px", zIndex: 15 }} />
+        {/* Titanium top edge highlight */}
+        <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(210,195,175,0.22), rgba(230,215,195,0.28), rgba(210,195,175,0.22), transparent)", borderRadius: "999px", zIndex: 15 }} />
 
-        {/* Left edge — volume buttons — black */}
-        <div style={{ position: "absolute", left: "-5px", top: "100px", width: "5px", height: "44px", borderRadius: "3px 0 0 3px", background: "#1a1a1a", boxShadow: "-1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
-        <div style={{ position: "absolute", left: "-5px", top: "156px", width: "5px", height: "44px", borderRadius: "3px 0 0 3px", background: "#1a1a1a", boxShadow: "-1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
+        {/* Left edge — Action button + volume buttons (titanium) */}
+        <div style={{ position: "absolute", left: "-4px", top: "110px", width: "4px", height: "28px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to right, #3a3530, #2a2520)", boxShadow: "-1px 0 3px rgba(0,0,0,0.9), inset 0 1px 0 rgba(210,195,175,0.15)", zIndex: 20 }} />
+        <div style={{ position: "absolute", left: "-4px", top: "158px", width: "4px", height: "46px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to right, #3a3530, #2a2520)", boxShadow: "-1px 0 3px rgba(0,0,0,0.9), inset 0 1px 0 rgba(210,195,175,0.15)", zIndex: 20 }} />
+        <div style={{ position: "absolute", left: "-4px", top: "216px", width: "4px", height: "46px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to right, #3a3530, #2a2520)", boxShadow: "-1px 0 3px rgba(0,0,0,0.9), inset 0 1px 0 rgba(210,195,175,0.15)", zIndex: 20 }} />
 
-        {/* Right edge — power button — black */}
-        <div style={{ position: "absolute", right: "-5px", top: "112px", width: "5px", height: "64px", borderRadius: "0 3px 3px 0", background: "#1a1a1a", boxShadow: "1px 0 3px rgba(0,0,0,0.7)", zIndex: 20 }} />
+        {/* Right edge — power button (titanium) */}
+        <div style={{ position: "absolute", right: "-4px", top: "170px", width: "4px", height: "66px", borderRadius: "0 3px 3px 0", background: "linear-gradient(to left, #3a3530, #2a2520)", boxShadow: "1px 0 3px rgba(0,0,0,0.9), inset 0 1px 0 rgba(210,195,175,0.15)", zIndex: 20 }} />
 
-        {/* Top speaker grille */}
-        <div style={{ position: "absolute", top: "12px", left: "50%", transform: "translateX(-50%)", zIndex: 20 }}>
-          <SpeakerGrille count={10} />
-        </div>
+        {/* Titanium chassis ring — warm metallic rim */}
+        <div style={{
+          position: "absolute", inset: "8px", borderRadius: "54px", zIndex: 1, pointerEvents: "none",
+          boxShadow: "inset 0 0 0 1px rgba(210,195,175,0.13), inset 0 1px 0 rgba(230,215,195,0.2), inset 0 -1px 0 rgba(0,0,0,0.5)",
+          background: "linear-gradient(160deg, rgba(210,195,175,0.08) 0%, transparent 40%, rgba(0,0,0,0.2) 100%)",
+        }} />
 
-        {/* Bottom speaker grille */}
-        <div style={{ position: "absolute", bottom: "12px", left: "50%", transform: "translateX(-50%)", zIndex: 20 }}>
-          <SpeakerGrille count={10} />
-        </div>
+        {/* Enhancement 2: ProMotion OLED bloom — ambient glow around screen edge */}
+        <div style={{
+          position: "absolute", inset: "9px", borderRadius: "53px", zIndex: 1, pointerEvents: "none",
+          boxShadow: `0 0 18px 2px rgba(88,54,170,0.18), 0 0 8px 1px rgba(20,80,200,0.12)`,
+          opacity: awake ? 1 : 0,
+          transition: "opacity 0.8s ease",
+        }} />
 
         {/* Screen inset with deep bezel */}
         <div style={{
-          margin: "14px",
-          borderRadius: "22px",
+          margin: "10px",
+          borderRadius: "52px",
           overflow: "hidden",
           background: "#000",
           boxShadow: "inset 0 0 0 1.5px rgba(255,255,255,0.05), inset 0 2px 12px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.6)",
@@ -254,13 +277,36 @@ export default function RevenueRecoveryCounter() {
             </motion.div>
           </motion.div>
 
-          {/* Wallpaper layer */}
+          {/* Mouse-reactive glare overlay — follows cursor across glass */}
+          <div style={{
+            position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none", borderRadius: "42px", overflow: "hidden",
+          }}>
+            <div style={{
+              position: "absolute",
+              left: `${glareX}%`, top: `${glareY}%`,
+              transform: "translate(-50%, -50%)",
+              width: "180px", height: "180px",
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)",
+              transition: "left 0.08s ease-out, top 0.08s ease-out",
+              pointerEvents: "none",
+            }} />
+            {/* Static top-left specular highlight */}
+            <div style={{
+              position: "absolute", top: 0, left: 0, right: 0, height: "35%",
+              background: "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%)",
+              pointerEvents: "none",
+            }} />
+          </div>
+
+          {/* Wallpaper layer — true OLED black with iOS 17-style aurora */}
           <div style={{
             position: "absolute", inset: 0, zIndex: 0,
-            background: "linear-gradient(145deg, #0f1520 0%, #1a0a2e 35%, #0a1525 65%, #151020 100%)",
+            background: "#000000",
           }}>
-            <div style={{ position: "absolute", top: "-10%", left: "20%", width: "60%", height: "60%", borderRadius: "50%", background: "radial-gradient(circle, rgba(100,60,180,0.5) 0%, transparent 70%)", filter: "blur(30px)" }} />
-            <div style={{ position: "absolute", bottom: "0%", right: "5%", width: "50%", height: "50%", borderRadius: "50%", background: "radial-gradient(circle, rgba(30,100,200,0.4) 0%, transparent 70%)", filter: "blur(25px)" }} />
+            <div style={{ position: "absolute", top: "-20%", left: "10%", width: "70%", height: "65%", borderRadius: "50%", background: "radial-gradient(circle, rgba(88,54,170,0.55) 0%, rgba(50,30,120,0.25) 50%, transparent 75%)", filter: "blur(38px)" }} />
+            <div style={{ position: "absolute", bottom: "-10%", right: "-5%", width: "60%", height: "55%", borderRadius: "50%", background: "radial-gradient(circle, rgba(20,80,200,0.45) 0%, rgba(10,40,120,0.2) 50%, transparent 75%)", filter: "blur(32px)" }} />
+            <div style={{ position: "absolute", top: "40%", left: "-10%", width: "50%", height: "40%", borderRadius: "50%", background: "radial-gradient(circle, rgba(140,60,200,0.2) 0%, transparent 70%)", filter: "blur(28px)" }} />
           </div>
 
           {/* Content */}
@@ -272,70 +318,107 @@ export default function RevenueRecoveryCounter() {
             >
               <StatusBar />
 
-              <div style={{ padding: "16px 18px 18px" }}>
+              <div style={{ padding: "18px 18px 20px" }}>
                 {/* Header */}
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
                   <div>
-                    <p style={{ fontSize: "11px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "4px", fontFamily: SF }}>Revenue Recovered</p>
-                    <motion.p style={{ fontFamily: SF, fontSize: "34px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em", margin: 0 }}>
+                    <p style={{ fontSize: "11px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "3px", fontFamily: SF }}>Revenue Recovered</p>
+                    {/* Enhancement 3: SF Pro Rounded for numerics — matches iOS Lock Screen/Live Activity */}
+                    <motion.p style={{ fontFamily: SF_ROUNDED, fontSize: "24px", fontWeight: "700", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em", margin: 0, textShadow: "0 0 14px rgba(245,217,168,0.25)" }}>
                       ${displayTotal.toLocaleString()}
                     </motion.p>
                   </div>
-                  <div style={{ borderRadius: "8px", padding: "4px 12px", fontSize: "12px", fontWeight: "800", background: "rgba(34,197,94,0.18)", color: "#4ade80", border: "1px solid rgba(34,197,94,0.3)", letterSpacing: "0.06em" }}>
+                  {/* LIVE badge — iOS green with pulsing ring */}
+                  <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "5px", borderRadius: "20px", padding: "4px 10px 4px 8px", fontSize: "11px", fontWeight: "800", background: "rgba(48,209,88,0.15)", border: "1px solid rgba(48,209,88,0.28)", letterSpacing: "0.08em", color: "#30D158" }}>
+                    <div style={{ position: "relative", width: "5px", height: "5px", flexShrink: 0 }}>
+                      <motion.div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#30D158" }} animate={{ scale: [1, 1.9, 1], opacity: [0.9, 0, 0.9] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }} />
+                      <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#30D158" }} />
+                    </div>
                     LIVE
                   </div>
                 </div>
 
-                {/* Lead rows */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "12px" }}>
+                {/* Lead rows — real-time notification stack */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "12px" }}>
                   {LEADS.map((lead, i) => {
                     const recovered = i < recoveredCount;
+                    const justArrived = i === recoveredCount - 1;
                     return (
                       <motion.div
                         key={lead.name}
+                        initial={{ opacity: 0, y: -28, scaleX: 0.88 }}
+                        animate={recovered
+                          ? { opacity: 1, y: 0, scaleX: 1 }
+                          : { opacity: 0, y: -28, scaleX: 0.88 }}
+                        transition={recovered
+                          ? { type: "spring", stiffness: 420, damping: 28, mass: 0.8 }
+                          : { duration: 0 }}
                         style={{
-                          display: "flex", alignItems: "center", gap: "10px",
-                          borderRadius: "10px", padding: "10px 14px", position: "relative", overflow: "hidden",
-                          background: recovered ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.04)",
-                          border: recovered ? "1px solid rgba(34,197,94,0.25)" : "1px solid rgba(255,255,255,0.06)",
-                          transition: "all 0.45s ease",
+                          display: "flex", alignItems: "center", gap: "8px",
+                          borderRadius: "12px", padding: "11px 15px", position: "relative", overflow: "hidden",
+                          background: "rgba(48,209,88,0.1)",
+                          boxShadow: justArrived
+                            ? "inset 0 0 0 1px rgba(48,209,88,0.45), 0 0 12px rgba(48,209,88,0.25)"
+                            : "inset 0 0 0 1px rgba(48,209,88,0.22)",
+                          originX: 0.5, originY: 0,
+                          transformOrigin: "top center",
                         }}
-                        initial={{ opacity: 0, y: 4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.07 }}
+                        whileTap={{ scale: 0.97, transition: { type: "spring", stiffness: 500, damping: 30 } }}
                       >
-                        {recovered && (
-                          <motion.div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle, rgba(74,222,128,0.2) 0%, transparent 70%)", pointerEvents: "none" }}
-                            animate={{ scale: [0.4, 2] }} transition={{ duration: 0.55 }} />
+                        {/* Flash on arrival */}
+                        {justArrived && (
+                          <motion.div
+                            style={{ position: "absolute", inset: 0, background: "rgba(48,209,88,0.22)", pointerEvents: "none", borderRadius: "10px" }}
+                            initial={{ opacity: 1 }}
+                            animate={{ opacity: 0 }}
+                            transition={{ duration: 0.6, ease: "easeOut" }}
+                          />
                         )}
-                        <div style={{ width: "28px", height: "28px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: "700", background: recovered ? "rgba(34,197,94,0.22)" : "rgba(255,255,255,0.07)", color: recovered ? "#4ade80" : "rgba(255,255,255,0.3)", transition: "all 0.4s", fontFamily: SF }}>
-                          {recovered ? "✓" : lead.name[0]}
-                        </div>
+                        {/* iOS green checkmark badge */}
+                        <motion.div
+                          initial={recovered ? { scale: 0 } : { scale: 1 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 22, delay: 0.1 }}
+                          style={{ width: "26px", height: "26px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "#30D158", boxShadow: "0 2px 6px rgba(48,209,88,0.45)" }}
+                        >
+                          <svg width="9" height="7" viewBox="0 0 13 10" fill="none">
+                            <path d="M1.5 5L5 8.5L11.5 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </motion.div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: "13px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
-                          <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.28)", margin: 0, fontFamily: SF }}>{lead.service}</p>
+                          <p style={{ fontSize: "13px", fontWeight: "600", color: "rgba(255,255,255,0.95)", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
+                          <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.45)", margin: 0, fontFamily: SF }}>{lead.service}</p>
                         </div>
-                        <span style={{ fontSize: "15px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#4ade80" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF, letterSpacing: "-0.01em" }}>${lead.value}</span>
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.15 }}
+                          style={{ fontSize: "14px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: "#30D158", fontFamily: SF_ROUNDED, letterSpacing: "-0.02em" }}
+                        >
+                          +${lead.value}
+                        </motion.span>
                       </motion.div>
                     );
                   })}
                 </div>
 
-                {/* Footer */}
-                <div style={{ borderRadius: "10px", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(200,150,92,0.1)", border: "1px solid rgba(200,150,92,0.18)" }}>
-                  <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(200,150,92,0.75)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(200,150,92,0.06)" : "rgba(200,150,92,0.18)", border: "1px solid rgba(200,150,92,0.28)", borderRadius: "5px", padding: "3px 10px", fontSize: "11px", fontWeight: "800", color: replaying ? "rgba(200,150,92,0.35)" : "rgba(200,150,92,0.95)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.06em", transition: "all 0.2s" }}>
-                      {replaying ? "···" : "↺ Replay"}
-                    </button>
-                    <motion.div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#c8965c" }} animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
+                {/* Footer — frosted glass iOS widget */}
+                <div style={{ borderRadius: "12px", padding: "11px 15px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.14)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div style={{ width: "16px", height: "16px", borderRadius: "5px", background: "linear-gradient(135deg, #9a5c2e, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L4 7.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </div>
+                    <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(255,255,255,0.5)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
                   </div>
+                  <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.1)", border: "none", borderRadius: "7px", padding: "4px 10px", fontSize: "11px", fontWeight: "700", color: replaying ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.7)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.04em", transition: "all 0.2s", fontFamily: SF }}>
+                    {replaying ? "···" : "↺ Replay"}
+                  </button>
                 </div>
               </div>
 
-              {/* Home indicator */}
-              <div style={{ height: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <div style={{ width: "100px", height: "3px", borderRadius: "2px", background: "rgba(255,255,255,0.2)" }} />
+              {/* iPhone home indicator */}
+              <div style={{ height: "26px", display: "flex", alignItems: "center", justifyContent: "center", paddingBottom: "6px" }}>
+                <div style={{ width: "80px", height: "4px", borderRadius: "2px", background: "rgba(255,255,255,0.28)" }} />
               </div>
             </motion.div>
           </div>

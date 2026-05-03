@@ -22,18 +22,18 @@ function CoreOfferHeader() {
     <div className="text-center mx-auto max-w-4xl">
       {/* Eyebrow */}
       <div className="inline-flex items-center gap-2 mb-5">
-        <div className="h-px w-8" style={{ background: "linear-gradient(to right, transparent, rgba(154,92,46,0.6))" }} />
+        <div className="h-px w-8" style={{ background: "linear-gradient(to right, transparent, rgba(0,174,239,0.6))" }} />
         <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-primary">
           {coreOfferSectionConfig.eyebrow}
         </p>
-        <div className="h-px w-8" style={{ background: "linear-gradient(to left, transparent, rgba(154,92,46,0.6))" }} />
+        <div className="h-px w-8" style={{ background: "linear-gradient(to left, transparent, rgba(0,174,239,0.6))" }} />
       </div>
 
       {/* Title — forced single line via whitespace-nowrap on desktop */}
       <h2 className="font-display font-bold tracking-tight leading-none text-foreground"
       style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)" }}>
         How The{" "}
-        <span style={{ color: "#9a5c2e", textShadow: "0 0 32px rgba(154,92,46,0.28)" }}>
+        <span style={{ color: "#00AEEF", textShadow: "0 0 32px rgba(0,174,239,0.28)" }}>
           ClientSurge
         </span>{" "}
         Flow Works
@@ -41,9 +41,9 @@ function CoreOfferHeader() {
 
       {/* Thin gold rule */}
       <div className="flex items-center justify-center gap-3 mt-5 mb-6">
-        <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to right, transparent, rgba(154,92,46,0.45))" }} />
-        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#c8965c" }} />
-        <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to left, transparent, rgba(154,92,46,0.45))" }} />
+        <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to right, transparent, rgba(0,174,239,0.45))" }} />
+        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#00AEEF" }} />
+        <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to left, transparent, rgba(0,174,239,0.45))" }} />
       </div>
 
       {/* Subheadline — tighter, more editorial */}
@@ -70,15 +70,15 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
       className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       style={{
         background: "rgba(255,255,255,0.82)",
-        border: selected ? "1.5px solid rgba(154,92,46,0.4)" : "1px solid rgba(148, 163, 184, 0.18)",
+        border: selected ? "1.5px solid rgba(0,174,239,0.4)" : "1px solid rgba(148, 163, 184, 0.18)",
         boxShadow: selected ?
-        "0 12px 32px rgba(154,92,46,0.15)" :
+        "0 12px 32px rgba(0,174,239,0.15)" :
         "0 8px 22px rgba(15, 23, 42, 0.05)"
       }}>
       
       <div className="px-5 md:px-6 pt-5 pb-3 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.82)" }}>
         <div className="flex-1 min-w-0">
-          <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(154,92,46,0.7)" }}>
+          <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(0,174,239,0.85)" }}>
             Step {system.id}
           </p>
           <p className="mt-1 text-sm font-semibold text-foreground leading-snug">{system.title}</p>
@@ -86,7 +86,7 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
         <motion.div
           animate={selected ? { scale: 1.1 } : { scale: 1 }}
           className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)", boxShadow: "0 2px 8px rgba(154,92,46,0.3)" }}>
+          style={{ background: "linear-gradient(135deg,#0088CC,#00AEEF)", boxShadow: "0 2px 8px rgba(0,174,239,0.3)" }}>
           
           <Icon className="w-4 h-4 text-white" />
         </motion.div>
@@ -187,7 +187,7 @@ function MobileSystemGroupList({ selectedSystemId, onSelect, showAll, onToggle, 
 
 function CoreOfferCTA({ onBookDemo }) {
   return (
-    <div className="bg-[#fffaf0] mt-12 mx-auto pt-8 text-center md:pt-10 md:mt-14 border-t border-border max-w-3xl">
+    <div className="bg-[#f0f9ff] mt-12 mx-auto pt-8 text-center md:pt-10 md:mt-14 border-t border-border max-w-3xl">
       <p className="font-display text-2xl md:text-3xl font-semibold text-foreground leading-tight">
         Ready to see which systems fit your business?
       </p>
@@ -208,8 +208,9 @@ function CoreOfferCTA({ onBookDemo }) {
           style={{
             borderRadius: "9999px",
             padding: "2px",
-            background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-            boxShadow: "0 4px 18px rgba(120,70,20,0.3)",
+            background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+            boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
+
             border: "none",
             cursor: "pointer"
           }}>
@@ -223,8 +224,8 @@ function CoreOfferCTA({ onBookDemo }) {
               height: "44px",
               padding: "0 24px",
               borderRadius: "9999px",
-              background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-              color: "#f5e6d0",
+              background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
+              color: "#ffffff",
               fontWeight: "700",
               fontSize: "0.95rem"
             }}>

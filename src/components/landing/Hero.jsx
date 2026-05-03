@@ -97,7 +97,7 @@ export default function Hero() {
             Stop Losing Leads to Slow Response —{" "}
             <span
               style={{
-                color: "#c8965c",
+                color: "#00AEEF",
                 display: "inline"
               }}>
               
@@ -110,7 +110,7 @@ export default function Hero() {
             height: "2px",
             borderRadius: "999px",
             marginBottom: "22px",
-            background: "linear-gradient(90deg, transparent 0%, rgba(200,150,92,0.5) 30%, rgba(245,217,168,0.9) 50%, rgba(200,150,92,0.5) 70%, transparent 100%)",
+            background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.4) 30%, rgba(0,200,255,0.8) 50%, rgba(0,174,239,0.4) 70%, transparent 100%)",
             animation: "shimmer-fadein 0.9s ease 0.3s both"
           }} />
           <style>{`@keyframes shimmer-fadein{from{opacity:0;transform:scaleX(0.4)}to{opacity:1;transform:scaleX(1)}}`}</style>
@@ -163,21 +163,21 @@ export default function Hero() {
                 borderRadius: "9999px",
                 border: "none",
                 background:
-                "linear-gradient(135deg, #7a4825 0%, #9a5c2e 46%, #c8965c 100%)",
-                color: "#fff8ee",
+                "linear-gradient(135deg, #0088CC 0%, #006BB0 46%, #00AEEF 100%)",
+                color: "#ffffff",
                 fontSize: "1rem",
                 fontWeight: "700",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+                boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
                 cursor: "pointer",
                 transition: "all 0.3s ease"
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.boxShadow = "0 8px 32px rgba(120,70,20,0.55)";
+                e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,174,239,0.6)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
+                e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,174,239,0.4)";
               }}>
               
               {BUTTON_TEXT.BOOK_DEMO}
@@ -216,7 +216,7 @@ export default function Hero() {
               height: "72%",
               borderRadius: "36px",
               background:
-              "radial-gradient(circle at center, rgba(200,150,92,0.22) 0%, rgba(154,92,46,0.1) 38%, transparent 72%)",
+              "radial-gradient(circle at center, rgba(0,174,239,0.18) 0%, rgba(0,157,255,0.08) 38%, transparent 72%)",
               filter: "blur(36px)",
               transform: "translateY(6%)"
             }} />
