@@ -202,8 +202,8 @@ export default function RevenueRecoveryCounter() {
         transition={{ type: "spring", stiffness: 200, damping: 25 }}
         style={{
           position: "relative",
-          width: "340px",
-          borderRadius: "54px",
+          width: "425px",
+          borderRadius: "64px",
           /* Enhancement 1: Titanium chassis — warm brushed titanium finish */
           background: "linear-gradient(160deg, #3a3733 0%, #2c2926 30%, #232120 60%, #1e1c1a 100%)",
           boxShadow: `
@@ -233,14 +233,14 @@ export default function RevenueRecoveryCounter() {
 
         {/* Titanium chassis ring — warm metallic rim */}
         <div style={{
-          position: "absolute", inset: "8px", borderRadius: "44px", zIndex: 1, pointerEvents: "none",
+          position: "absolute", inset: "8px", borderRadius: "54px", zIndex: 1, pointerEvents: "none",
           boxShadow: "inset 0 0 0 1px rgba(210,195,175,0.13), inset 0 1px 0 rgba(230,215,195,0.2), inset 0 -1px 0 rgba(0,0,0,0.5)",
           background: "linear-gradient(160deg, rgba(210,195,175,0.08) 0%, transparent 40%, rgba(0,0,0,0.2) 100%)",
         }} />
 
         {/* Enhancement 2: ProMotion OLED bloom — ambient glow around screen edge */}
         <div style={{
-          position: "absolute", inset: "9px", borderRadius: "43px", zIndex: 1, pointerEvents: "none",
+          position: "absolute", inset: "9px", borderRadius: "53px", zIndex: 1, pointerEvents: "none",
           boxShadow: `0 0 18px 2px rgba(88,54,170,0.18), 0 0 8px 1px rgba(20,80,200,0.12)`,
           opacity: awake ? 1 : 0,
           transition: "opacity 0.8s ease",
@@ -249,7 +249,7 @@ export default function RevenueRecoveryCounter() {
         {/* Screen inset with deep bezel */}
         <div style={{
           margin: "10px",
-          borderRadius: "42px",
+          borderRadius: "52px",
           overflow: "hidden",
           background: "#000",
           boxShadow: "inset 0 0 0 1.5px rgba(255,255,255,0.05), inset 0 2px 12px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,0,0,0.6)",
@@ -318,18 +318,18 @@ export default function RevenueRecoveryCounter() {
             >
               <StatusBar />
 
-              <div style={{ padding: "14px 14px 16px" }}>
+              <div style={{ padding: "18px 18px 20px" }}>
                 {/* Header */}
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "8px" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
                   <div>
-                    <p style={{ fontSize: "9px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "2px", fontFamily: SF }}>Revenue Recovered</p>
+                    <p style={{ fontSize: "11px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "3px", fontFamily: SF }}>Revenue Recovered</p>
                     {/* Enhancement 3: SF Pro Rounded for numerics — matches iOS Lock Screen/Live Activity */}
-                    <motion.p style={{ fontFamily: SF_ROUNDED, fontSize: "19px", fontWeight: "700", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em", margin: 0, textShadow: "0 0 14px rgba(245,217,168,0.25)" }}>
+                    <motion.p style={{ fontFamily: SF_ROUNDED, fontSize: "24px", fontWeight: "700", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em", margin: 0, textShadow: "0 0 14px rgba(245,217,168,0.25)" }}>
                       ${displayTotal.toLocaleString()}
                     </motion.p>
                   </div>
                   {/* LIVE badge — iOS green with pulsing ring */}
-                  <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "4px", borderRadius: "20px", padding: "3px 8px 3px 6px", fontSize: "9px", fontWeight: "800", background: "rgba(48,209,88,0.15)", border: "1px solid rgba(48,209,88,0.28)", letterSpacing: "0.08em", color: "#30D158" }}>
+                  <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "5px", borderRadius: "20px", padding: "4px 10px 4px 8px", fontSize: "11px", fontWeight: "800", background: "rgba(48,209,88,0.15)", border: "1px solid rgba(48,209,88,0.28)", letterSpacing: "0.08em", color: "#30D158" }}>
                     <div style={{ position: "relative", width: "5px", height: "5px", flexShrink: 0 }}>
                       <motion.div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#30D158" }} animate={{ scale: [1, 1.9, 1], opacity: [0.9, 0, 0.9] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }} />
                       <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#30D158" }} />
@@ -339,7 +339,7 @@ export default function RevenueRecoveryCounter() {
                 </div>
 
                 {/* Lead rows — real-time notification stack */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginBottom: "10px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "12px" }}>
                   {LEADS.map((lead, i) => {
                     const recovered = i < recoveredCount;
                     const justArrived = i === recoveredCount - 1;
@@ -355,7 +355,7 @@ export default function RevenueRecoveryCounter() {
                           : { duration: 0 }}
                         style={{
                           display: "flex", alignItems: "center", gap: "8px",
-                          borderRadius: "10px", padding: "9px 12px", position: "relative", overflow: "hidden",
+                          borderRadius: "12px", padding: "11px 15px", position: "relative", overflow: "hidden",
                           background: "rgba(48,209,88,0.1)",
                           boxShadow: justArrived
                             ? "inset 0 0 0 1px rgba(48,209,88,0.45), 0 0 12px rgba(48,209,88,0.25)"
@@ -379,21 +379,21 @@ export default function RevenueRecoveryCounter() {
                           initial={recovered ? { scale: 0 } : { scale: 1 }}
                           animate={{ scale: 1 }}
                           transition={{ type: "spring", stiffness: 500, damping: 22, delay: 0.1 }}
-                          style={{ width: "20px", height: "20px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "#30D158", boxShadow: "0 2px 6px rgba(48,209,88,0.45)" }}
+                          style={{ width: "26px", height: "26px", borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "#30D158", boxShadow: "0 2px 6px rgba(48,209,88,0.45)" }}
                         >
                           <svg width="9" height="7" viewBox="0 0 13 10" fill="none">
                             <path d="M1.5 5L5 8.5L11.5 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         </motion.div>
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontSize: "10px", fontWeight: "600", color: "rgba(255,255,255,0.95)", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
-                          <p style={{ fontSize: "8px", color: "rgba(255,255,255,0.45)", margin: 0, fontFamily: SF }}>{lead.service}</p>
+                          <p style={{ fontSize: "13px", fontWeight: "600", color: "rgba(255,255,255,0.95)", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
+                          <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.45)", margin: 0, fontFamily: SF }}>{lead.service}</p>
                         </div>
                         <motion.span
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.15 }}
-                          style={{ fontSize: "11px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: "#30D158", fontFamily: SF_ROUNDED, letterSpacing: "-0.02em" }}
+                          style={{ fontSize: "14px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: "#30D158", fontFamily: SF_ROUNDED, letterSpacing: "-0.02em" }}
                         >
                           +${lead.value}
                         </motion.span>
@@ -403,14 +403,14 @@ export default function RevenueRecoveryCounter() {
                 </div>
 
                 {/* Footer — frosted glass iOS widget */}
-                <div style={{ borderRadius: "10px", padding: "9px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.14)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                    <div style={{ width: "13px", height: "13px", borderRadius: "4px", background: "linear-gradient(135deg, #9a5c2e, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <svg width="7" height="7" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L4 7.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <div style={{ borderRadius: "12px", padding: "11px 15px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.14)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div style={{ width: "16px", height: "16px", borderRadius: "5px", background: "linear-gradient(135deg, #9a5c2e, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L4 7.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
-                    <p style={{ fontSize: "8px", fontWeight: "700", color: "rgba(255,255,255,0.5)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
+                    <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(255,255,255,0.5)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
                   </div>
-                  <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.1)", border: "none", borderRadius: "6px", padding: "3px 8px", fontSize: "9px", fontWeight: "700", color: replaying ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.7)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.04em", transition: "all 0.2s", fontFamily: SF }}>
+                  <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.1)", border: "none", borderRadius: "7px", padding: "4px 10px", fontSize: "11px", fontWeight: "700", color: replaying ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.7)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.04em", transition: "all 0.2s", fontFamily: SF }}>
                     {replaying ? "···" : "↺ Replay"}
                   </button>
                 </div>
