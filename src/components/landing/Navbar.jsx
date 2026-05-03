@@ -137,12 +137,12 @@ export default function Navbar() {
     <nav
       className="sticky top-4 left-4 right-4 z-50 rounded-[28px] border"
       style={{
-        borderColor: scrolled ? "rgba(200,150,92,0.2)" : "rgba(200,150,92,0.14)",
-        backgroundColor: scrolled ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.92)",
+        borderColor: scrolled ? "rgba(0,174,239,0.2)" : "rgba(0,174,239,0.12)",
+        backgroundColor: scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.93)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         paddingTop: "env(safe-area-inset-top)",
-        boxShadow: scrolled ? "0 20px 60px rgba(31,21,11,0.1)" : "0 12px 34px rgba(31,21,11,0.06)",
+        boxShadow: scrolled ? "0 20px 60px rgba(0,100,200,0.1)" : "0 12px 34px rgba(0,100,200,0.06)",
         transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out, border-color 0.35s ease-out"
       }}>
       
@@ -273,12 +273,12 @@ export default function Navbar() {
               trackCTA("book_demo", "navbar");
               setShowBookingModal(true);
             }}
-            style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(90deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", backgroundSize: "200% 100%", animation: "rotateBorderGlow 4s ease-in-out infinite", boxShadow: "0 4px 14px rgba(120,70,20,0.35)", transition: "box-shadow 0.3s ease, transform 0.3s ease", border: "none", cursor: "pointer" }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = BUTTON_STYLES?.BROWN_GRADIENT_HOVER?.boxShadow ?? "0 8px 28px rgba(120,70,20,0.5)"}
-            onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 14px rgba(120,70,20,0.35)"}
+            style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", backgroundSize: "200% 100%", animation: "rotateBorderGlow 4s ease-in-out infinite", boxShadow: "0 4px 14px rgba(0,174,239,0.4)", transition: "box-shadow 0.3s ease, transform 0.3s ease", border: "none", cursor: "pointer" }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,174,239,0.55)"}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,174,239,0.4)"}
             className="hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded">
             
-            <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 16px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "600", fontSize: "0.75rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 16px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "600", fontSize: "0.75rem", textShadow: "0 1px 2px rgba(0,0,0,0.2)" }}>
               {BUTTON_TEXT.BOOK_DEMO_SHORT}
             </span>
           </button>
@@ -330,7 +330,7 @@ export default function Navbar() {
           )}
 
           <div className="pt-2 border-t border-border">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-primary mb-2">Industries</p>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-primary mb-2" style={{ color: "#00AEEF" }}>Industries</p>
             <div className="space-y-1">
               {industryLinks.map((item) =>
               <button
@@ -357,9 +357,9 @@ export default function Navbar() {
               setOpen(false);
               setShowBookingModal(true);
             }}
-            style={{ display: "block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 14px rgba(120,70,20,0.35)", border: "none", cursor: "pointer", width: "100%" }}>
+            style={{ display: "block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", boxShadow: "0 4px 14px rgba(0,174,239,0.4)", border: "none", cursor: "pointer", width: "100%" }}>
             
-            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "600", fontSize: "0.875rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "600", fontSize: "0.875rem", textShadow: "0 1px 2px rgba(0,0,0,0.2)" }}>
               {BUTTON_TEXT.BOOK_DEMO}
             </span>
           </button>

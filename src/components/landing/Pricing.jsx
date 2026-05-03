@@ -167,7 +167,7 @@ export default function Pricing() {
     <section id="pricing" className="nebula-pricing pt-16 md:pt-28 pb-32 md:pb-40 px-6 overflow-visible">
       <div className="max-w-7xl mx-auto">
         <div className="max-w-3xl mx-auto text-center pt-10 mb-16">
-          <h2 className="text-[#a67d59] font-display text-4xl font-bold tracking-tight leading-tight md:text-5xl lg:text-6xl">Stop Losing Leads. Start Running a Real System.
+          <h2 className="text-[#001B44] font-display text-4xl font-bold tracking-tight leading-tight md:text-5xl lg:text-6xl">Stop Losing Leads. Start Running a Real System.
 
           </h2>
         </div>
@@ -196,7 +196,7 @@ export default function Pricing() {
             <span
               key={b.text}
               className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full border"
-              style={{ background: "rgba(154,92,46,0.07)", borderColor: "rgba(154,92,46,0.2)", color: "rgba(100,60,20,0.85)" }}
+              style={{ background: "rgba(0,174,239,0.07)", borderColor: "rgba(0,174,239,0.2)", color: "rgba(0,80,160,0.85)" }}
             >
               {b.icon} {b.text}
             </span>
@@ -229,9 +229,9 @@ export default function Pricing() {
               key={badge.text}
               className="flex flex-col items-center justify-center gap-2 py-6 rounded-2xl font-semibold"
               style={{
-                background: "rgba(154,92,46,0.08)",
-                border: "1px solid rgba(154,92,46,0.18)",
-                color: "rgba(154,92,46,0.9)",
+                background: "rgba(0,174,239,0.07)",
+                border: "1px solid rgba(0,174,239,0.18)",
+                color: "rgba(0,100,180,0.9)",
               }}
             >
               <span style={{ fontSize: "22px", lineHeight: 1 }}>{badge.icon}</span>
@@ -263,7 +263,7 @@ export default function Pricing() {
                   href={item.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-1.5 h-9 rounded-full border border-primary/30 bg-primary/5 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors"
+                  className="inline-flex items-center justify-center gap-1.5 h-9 rounded-full border border-primary/30 bg-primary/5 text-xs font-semibold text-primary hover:bg-primary/10 transition-colors hover:shadow-[0_0_12px_rgba(0,174,239,0.3)]"
                 >
                   Add This <ArrowRight className="w-3 h-3" />
                 </a>
@@ -402,8 +402,8 @@ export default function Pricing() {
           display: inline-block;
           border-radius: 9999px;
           padding: 2px;
-          background: linear-gradient(90deg, #a0714f 0%, #c8965c 30%, #f5d9a8 50%, #c8965c 70%, #7a4f2e 100%);
-          box-shadow: 0 4px 18px rgba(120, 70, 20, 0.35), 0 1px 4px rgba(0, 0, 0, 0.15);
+          background: linear-gradient(135deg, #00AEEF 0%, #009DFF 45%, #003B8F 100%);
+          box-shadow: 0 4px 18px rgba(0, 174, 239, 0.4), 0 1px 4px rgba(0, 0, 0, 0.1);
           transition: box-shadow 0.3s ease, transform 0.3s ease;
           cursor: pointer;
           border: none;
@@ -421,16 +421,16 @@ export default function Pricing() {
           pointer-events: none;
         }
         .shiny-brown-btn:hover {
-          box-shadow: 0 8px 32px rgba(120, 70, 20, 0.5), 0 2px 8px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 8px 32px rgba(0, 174, 239, 0.6), 0 2px 8px rgba(0, 0, 0, 0.15);
           transform: translateY(-2px);
         }
         .shiny-brown-inner {
-          background: linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 40%, #7a4825 100%);
+          background: linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%);
           border-radius: 9999px;
-          color: #f5e6d0;
+          color: #ffffff;
           font-weight: 700;
           letter-spacing: 0.01em;
-          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
           position: relative;
           z-index: 1;
         }
@@ -462,22 +462,22 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
       style={{
         overflow: "visible",
         background: isHovered ?
-        "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.88) 100%)" :
+        "linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(230,245,255,0.95) 100%)" :
         plan.highlight ?
-        "linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.84) 100%)" :
-        "linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.58) 100%)",
+        "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(240,250,255,0.92) 100%)" :
+        "linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(243,250,255,0.78) 100%)",
         backdropFilter: plan.highlight ? "blur(20px)" : "blur(14px)",
         WebkitBackdropFilter: plan.highlight ? "blur(20px)" : "blur(14px)",
         border: plan.highlight ?
-        isHovered ? "2px solid rgba(200,150,92,0.72)" : "2px solid rgba(200,150,92,0.4)" :
-        isHovered ? "2px solid rgba(200,150,92,0.45)" : "1.5px solid rgba(154,92,46,0.15)",
+        isHovered ? "2px solid rgba(0,174,239,0.7)" : "2px solid rgba(0,174,239,0.38)" :
+        isHovered ? "2px solid rgba(0,174,239,0.4)" : "1.5px solid rgba(0,174,239,0.15)",
         boxShadow: plan.highlight ?
         isHovered ?
-        "0 24px 64px rgba(160,90,20,0.28), inset 0 1px 0 rgba(255,255,255,0.9)" :
-        "0 12px 40px rgba(160,90,20,0.18), inset 0 1px 0 rgba(255,255,255,0.8)" :
+        "0 24px 64px rgba(0,174,239,0.22), 0 0 24px rgba(0,174,239,0.18), inset 0 1px 0 rgba(255,255,255,0.9)" :
+        "0 12px 40px rgba(0,174,239,0.14), inset 0 1px 0 rgba(255,255,255,0.8)" :
         isHovered ?
-        "0 14px 36px rgba(160,90,20,0.15), inset 0 1px 0 rgba(255,255,255,0.85)" :
-        "0 6px 22px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
+        "0 14px 36px rgba(0,174,239,0.12), inset 0 1px 0 rgba(255,255,255,0.85)" :
+        "0 6px 22px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.6)",
         perspective: "1200px"
       }}
       animate={isHovered ? { rotateY: 6, rotateX: -2, scale: 1.03 } : { rotateY: 0, rotateX: 0, scale: 1 }}
@@ -490,8 +490,8 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
         className="absolute inset-0 rounded-2xl pointer-events-none"
         style={{
           boxShadow: isHovered ?
-          "0 0 0 1px rgba(200,150,92,0.45), 0 0 48px rgba(200,150,92,0.16)" :
-          "0 0 0 1px rgba(200,150,92,0.28), 0 0 30px rgba(200,150,92,0.08)",
+          "0 0 0 1px rgba(0,174,239,0.45), 0 0 48px rgba(0,174,239,0.18)" :
+          "0 0 0 1px rgba(0,174,239,0.25), 0 0 30px rgba(0,174,239,0.08)",
           transition: "box-shadow 0.35s ease",
           borderRadius: "inherit"
         }} />
@@ -502,7 +502,7 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
       <div className="pricing-badge-float" style={{ zIndex: 30 }}>
           <span className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl hidden"
 
-        style={{ background: "linear-gradient(135deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)" }}>
+        style={{ background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 50%, #003B8F 100%)" }}>
           
             {isRecommended ?
           `Best fit for ${selectedIndustry.shortName}` :
