@@ -137,8 +137,8 @@ export default function Navbar() {
     <nav
       className="fixed top-4 left-4 right-4 z-50 rounded-[28px] border"
       style={{
-        borderColor: scrolled ? "rgba(0,174,239,0.2)" : "rgba(0,174,239,0.12)",
-        backgroundColor: scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.93)",
+        borderColor: scrolled ? "rgba(0,174,239,0.2)" : "rgba(0,174,239,0)",
+        backgroundColor: scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         paddingTop: "env(safe-area-inset-top)",
