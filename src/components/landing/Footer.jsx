@@ -77,29 +77,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 md:gap-12">
           {/* Brand column */}
           <div className="lg:col-span-1 flex flex-col gap-6">
-            {/* Logo */}
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{
-                  background:
-                  "linear-gradient(135deg, #9a5c2e 0%, #c8965c 100%)"
-                }}>
-                
-                <span className="text-white font-black text-sm">CS</span>
-              </div>
-              <div className="flex flex-col leading-tight">
-                <span className="font-display font-bold text-white text-base">
-                  ClientSurge
-                </span>
-                <span
-                  className="text-xs font-semibold"
-                  style={{ color: "#c8965c" }}>
-                  
-                  Systems
-                </span>
-              </div>
-            </div>
+
 
             <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
               Done-for-you AI automation that turns missed leads into booked
