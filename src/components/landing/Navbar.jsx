@@ -146,7 +146,7 @@ export default function Navbar() {
         transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out, border-color 0.35s ease-out"
       }}>
       
-      <div className="w-full h-[94px] md:h-[102px] flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
+      <div className="w-full h-[100px] md:h-[116px] flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
         <button
           onClick={handleLogoClick}
           className="shrink-0 bg-none border-none cursor-pointer transition-transform duration-300 hover:-translate-y-0.5"
@@ -157,7 +157,7 @@ export default function Navbar() {
             fetchpriority="high"
             decoding="async"
             style={{
-              height: "clamp(44px, 5.5vw, 58px)",
+              height: "clamp(64px, 8vw, 86px)",
               width: "auto",
               objectFit: "contain",
               mixBlendMode: "multiply",
