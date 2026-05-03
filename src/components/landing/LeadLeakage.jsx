@@ -31,7 +31,7 @@ export default function LeadLeakage() {
             {/* Hook stat */}
             <p
               className="font-titles text-lg font-bold mb-6"
-              style={{ color: "#9a5c2e" }}
+              style={{ color: "#0088CC" }}
             >
               78% of leads go cold in under an hour — most of yours already have.
             </p>
@@ -55,7 +55,7 @@ export default function LeadLeakage() {
                 <div
                   key={item.label}
                   className="flex gap-4"
-                  style={{ borderLeft: "2px solid rgba(154,92,46,0.25)", paddingLeft: "16px" }}
+                  style={{ borderLeft: "2px solid rgba(0,174,239,0.25)", paddingLeft: "16px" }}
                 >
                   <div>
                     <p className="font-titles text-sm font-semibold text-foreground mb-1">
@@ -73,11 +73,11 @@ export default function LeadLeakage() {
             <div
               className="mt-6 rounded-2xl px-5 py-4 leading-relaxed"
               style={{
-                background: "rgba(154,92,46,0.06)",
-                border: "1px solid rgba(154,92,46,0.14)",
+                background: "rgba(0,174,239,0.06)",
+                border: "1px solid rgba(0,174,239,0.14)",
               }}
             >
-              <p className="font-titles text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5" style={{ color: "#9a5c2e" }}>
+              <p className="font-titles text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5" style={{ color: "#0088CC" }}>
                 Also Included
               </p>
               <p className="font-titles text-sm" style={{ color: "rgba(27,20,13,0.72)" }}>
