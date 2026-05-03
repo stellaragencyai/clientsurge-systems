@@ -5,7 +5,7 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🔴 11% Ready (3/28 done · 0 critical open · 1 dep-blocked)
+## 📊 DOMAIN HEALTH: 🟡 25% Ready (7/28 done · 0 critical open · 1 dep-blocked)
 > ⚡ **Fastest win:** #185 — AdminOnboarding search/filter (~30 min, no deps) · Agent C  
 > ⚠️ **Blocked:** #178 (Export Logs) blocked on #110 · #197 (NPS display) blocked on #223
 
@@ -17,7 +17,7 @@
 | 🔴 Unblocked Critical | 0 — no critical tasks in this domain |
 | 🟠 Fastest Win (< 30 min, no deps) | #170 — est. completion date in Install Queue (~30 min) |
 | 🧱 Longest Blocked Chain | #110 → #178 (export logs), #223 → #197 (NPS display) |
-| ✅ Done This Week | 3 tasks (#38, #77, #194) |
+| ✅ Done This Week | 7 tasks (#38, #77, #194, #200, #201, #202, #203) |
 | 🎯 Est. Hours to Domain Complete | ~20 hrs |
 
 ---
@@ -75,3 +75,7 @@
 | 38 | ClientPortal: "Setup Progress" tab first + default on login | Agent A | 2026-05-03 | Changed `defaultTab` state to `"progress"` in `ClientPortal.jsx` |
 | 77 | Portal graceful empty state on null project | Agent A | 2026-05-03 | Added null-check + empty state UI when `project === null` in `ClientPortal.jsx` |
 | 194 | PaymentFailedBanner in ClientPortal on past_due | Agent C | 2026-05-03 | New `components/portal/PaymentFailedBanner.jsx`; shown when `billing_status === "past_due"` |
+| 200 | ClientDashboard: WelcomeBanner with personalized greeting + progress stages | Agent A | 2026-05-03 | New `components/dashboard/WelcomeBanner.jsx` — 4-stage tracker (Payment Confirmed → Setup Info → Configuring → Live), personalized name/business, context-aware CTA |
+| 201 | ClientDashboard: Setup info CTA routes to `/setup/credentials?order_id=` | Agent A | 2026-05-03 | WelcomeBanner renders "Submit Setup Info" button when stageIndex===0 and order exists |
+| 202 | ClientDashboard: EmptyState "Browse AI Store" button changed to blue | Agent A | 2026-05-03 | Updated gradient from gold to `#00AEEF → #003B8F` in `pages/ClientDashboard` |
+| 203 | CredentialsSetup page: 5-step intake wizard for new clients post-purchase | Agent A | 2026-05-03 | New `pages/CredentialsSetup.jsx` + `components/onboarding/CredentialsWizard.jsx` — validates order, collects business/brand/messaging/integrations data, saves to `Order.install_configuration` |
