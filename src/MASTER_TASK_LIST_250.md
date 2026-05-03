@@ -1,8 +1,17 @@
 # ClientSurge Systems — Master Task List (250 Tasks)
 > **Last Updated:** 2026-05-03  
 > **Total Tasks:** 250  
-> **Completed:** 29  
-> **Remaining:** 221  
+> **Completed:** ~27  
+> **Remaining:** ~235  
+
+---
+
+## ⚠️ ACTIVE WORK IN PROGRESS — DO NOT DUPLICATE
+
+> 🤖 **Sam (AI Agent)** is currently working the **Store / Pricing / Checkout / Stripe** workstream.  
+> **Started:** 2026-05-03 12:41 MST  
+> **Tasks locked:** #27, #28, #43, #47, #70, #72, #146, #147, #148, #194, #195, #201, #202, #203, #206  
+> Do NOT attempt these tasks until status changes from 🔄 to ✅.
 
 ---
 
@@ -43,24 +52,24 @@
 | 4 | ✅ | Add search debounce (280ms) to store search input | MEDIUM |
 | 5 | ✅ | Add SMS consent checkbox in CartSidebar when phone is entered | HIGH |
 | 6 | ⏳ | Add `loading="lazy"` + explicit width/height to all below-fold images | HIGH |
-| 7 | ✅ | Add `<link rel="preload">` for hero image in index.html | HIGH |
+| 7 | ⏳ | Add `<link rel="preload">` for hero image in index.html | HIGH |
 | 8 | ⏳ | Split recharts/framer-motion into separate Vite chunks via manualChunks | MEDIUM |
-| 9 | ✅ | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | MEDIUM |
+| 9 | ⏳ | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | MEDIUM |
 | 10 | ⏳ | Store page: implement intersection-observer lazy rendering for 8+ products | MEDIUM |
 | 11 | ⏳ | Build out pages/ThankYou — currently a blank page | HIGH |
 | 12 | ⏳ | Add Navbar to LegalPage — currently renders with no header/branding | MEDIUM |
 | 13 | ⏳ | Standardize all form inputs to rounded-xl (12px) globally | LOW |
-| 14 | ✅ | ClientPortal loading state: replace raw spinner with branded skeleton | MEDIUM |
+| 14 | ⏳ | ClientPortal loading state: replace raw spinner with branded skeleton | MEDIUM |
 | 15 | ⏳ | DemoBookingModal time slot grid: force 2-col on viewports < 480px | MEDIUM |
 | 16 | ⏳ | CookieConsent banner: add bottom: 80px on mobile to avoid MobileCallBar overlap | LOW |
 | 17 | ⏳ | FAQ accordion items: add border-bottom tap target on mobile | LOW |
 | 18 | ⏳ | Industry sub-pages: ensure hero headline renders as semantic `<h1>` tag | HIGH |
 | 19 | ⏳ | Add descriptive alt text to all hero, testimonial, and TrustBar images | MEDIUM |
-| 20 | ✅ | Fix robots.txt: change Disallow: /leads/ to Disallow: /leads/admin | MEDIUM |
-| 21 | ✅ | Add hreflang tag to index.html for future i18n readiness | LOW |
+| 20 | ⏳ | Fix robots.txt: change Disallow: /leads/ to Disallow: /leads/admin | MEDIUM |
+| 21 | ⏳ | Add hreflang tag to index.html for future i18n readiness | LOW |
 | 22 | ⏳ | Stub /blog route with 3 placeholder posts for organic SEO | MEDIUM |
-| 23 | ✅ | Add React ErrorBoundary in App.jsx wrapping all routes | CRITICAL |
-| 24 | ✅ | Set staleTime: 60_000 and retry: 1 in lib/query-client.js | MEDIUM |
+| 23 | ⏳ | Add React ErrorBoundary in App.jsx wrapping all routes | CRITICAL |
+| 24 | ⏳ | Set staleTime: 60_000 and retry: 1 in lib/query-client.js | MEDIUM |
 | 25 | ⏳ | Wrap App in React.StrictMode in main.jsx (dev only) | LOW |
 
 ---
@@ -70,8 +79,8 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 26 | ⏳ | Add dark mode ☀️/🌙 toggle to Navbar desktop + mobile menu | MEDIUM |
-| 27 | ⏳ | Implement ThemeProvider from next-themes so dark mode class is actually applied | HIGH |
-| 28 | ⏳ | Standardize primary CTAs to blue gradient; gold = store/checkout only | MEDIUM |
+| 27 | 🔄 | Implement ThemeProvider from next-themes so dark mode class is actually applied | HIGH |
+| 28 | 🔄 | Standardize primary CTAs to blue gradient; gold = store/checkout only | MEDIUM |
 | 29 | ⏳ | Redesign PageNotFound (404) with logo, links, search bar | MEDIUM |
 | 30 | ⏳ | Add framer-motion + canvas-confetti to Contact page success state | LOW |
 | 31 | ⏳ | pages/Industries: add gradient hero section with industry grid icons | MEDIUM |
@@ -93,11 +102,11 @@
 |---|---|---|---|
 | 41 | ⏳ | Store page initial load: show 6 ProductCard skeletons for 300ms then reveal | MEDIUM |
 | 42 | ⏳ | Store ProductCard on mobile (375px): reduce "Add to Cart" font to 10px | MEDIUM |
-| 43 | ⏳ | CartSidebar: apply acquireBodyScrollLock("cart-sidebar") on open, release on close | HIGH |
+| 43 | 🔄 | CartSidebar: apply acquireBodyScrollLock("cart-sidebar") on open, release on close | HIGH |
 | 44 | ⏳ | Mobile sticky cart bar: add circular badge with items.length count | LOW |
 | 45 | ⏳ | Store page: add "Talk to a Human" escape valve CTA below product grid | MEDIUM |
 | 46 | ⏳ | AdminDashboard sidebar: wire AdminGlobalSearch to all entity types | MEDIUM |
-| 47 | ⏳ | Store SocialProofTicker: verify data is from real Orders (not hardcoded) | MEDIUM |
+| 47 | 🔄 | Store SocialProofTicker: verify data is from real Orders (not hardcoded) | MEDIUM |
 | 48 | ⏳ | CartSidebar: show empty state with top 3 popular nudge tiles | LOW |
 | 49 | ⏳ | Store: Guided mode with no industry selected should show all non-coming-soon products | MEDIUM |
 | 50 | ⏳ | ProductCard "see more features" button should open ServiceDetailModal | LOW |
@@ -148,9 +157,9 @@
 | 67 | ⏳ | ClientPortal: add "Get Help" tab with support ticket form → SupportMessage entity | HIGH |
 | 68 | ⏳ | ClientPortal: add "What's New" section reading from Changelog entity | LOW |
 | 69 | ⏳ | ClientPortal: add "Refer a Business" section with unique referral link | MEDIUM |
-| 70 | ⏳ | BillingDashboard: add "Cancel Subscription" → getStripeCustomerPortalUrl redirect | HIGH |
+| 70 | 🔄 | BillingDashboard: add "Cancel Subscription" → getStripeCustomerPortalUrl redirect | HIGH |
 | 71 | ⏳ | BillingDashboard: add "Download Invoice PDF" using Stripe invoice_pdf URL | MEDIUM |
-| 72 | ⏳ | ClientPortal: show "payment failed" banner when billing_status === "past_due" | HIGH |
+| 72 | 🔄 | ClientPortal: show "payment failed" banner when billing_status === "past_due" | HIGH |
 
 ---
 
@@ -168,7 +177,7 @@
 | 80 | ⏳ | Onboarding page: ensure form validates all required fields before submit | MEDIUM |
 | 81 | ⏳ | All pages: verify meta description is unique (not default fallback) | MEDIUM |
 | 82 | ✅ | sitemap.xml updated with industry pages | DONE |
-| 83 | ✅ | pages/Industries: all 6 industry cards linked to correct live routes | MEDIUM |
+| 83 | ⏳ | pages/Industries: verify all 6 industry cards link to correct routes | MEDIUM |
 
 ---
 
@@ -184,7 +193,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 84 | ⏳ | Add Origin header validation to submitLeadCapture + submitContactInquiry | HIGH |
-| 85 | ✅ | autoEndToEndTest: add admin role check (return 403 if not admin) | CRITICAL |
+| 85 | ⏳ | autoEndToEndTest: add admin role check (return 403 if not admin) | CRITICAL |
 | 86 | ⏳ | Move webhookLeadCapture secret from URL param to X-Webhook-Secret header | HIGH |
 | 87 | ⏳ | submitLeadCapture: normalize phone to E.164 (+1 prefix, reject < 10 digits) | HIGH |
 | 88 | ⏳ | Add consent_given_at + consent_ip fields to WebsiteLead/Leads entities | HIGH |
@@ -220,7 +229,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 107 | ✅ | Create healthCheck function: returns {status:"ok", timestamp, version} — no auth | HIGH |
+| 107 | ⏳ | Create healthCheck function: returns {status:"ok", timestamp, version} — no auth | HIGH |
 | 108 | ⏳ | Create autoCloseStaleLeads: daily scheduled function, closes leads with no contact > 30 days | MEDIUM |
 | 109 | ✅ | OrderSuccess: add noindex meta tag | DONE |
 | 110 | ⏳ | Create exportLeadsCSV: query Leads with filters, return CSV with Content-Disposition header | MEDIUM |
@@ -244,7 +253,7 @@
 | 121 | ✅ | "$0 setup" renamed to "No setup fee" in store | DONE |
 | 122 | ⏳ | Create scheduled automation: autoArchiveOldLeads — runs monthly | LOW |
 | 123 | ⏳ | processAutomationJobs: add retry logic — up to 3 attempts with exponential backoff | HIGH |
-| 124 | ✅ | Create _shared/response.js: okJson() and errJson() for consistent response format | MEDIUM |
+| 124 | ⏳ | Create _shared/response.js: okJson() and errJson() for consistent response format | MEDIUM |
 | 125 | ⏳ | Create _shared/retryFetch.js: reusable retry wrapper for external API calls | MEDIUM |
 
 ---
@@ -294,9 +303,9 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 146 | ⏳ | createCheckoutSession: add subscription_data.metadata.order_id for subscription event matching | CRITICAL |
-| 147 | ✅ | stripeWebhookOrders: on invoice.payment_failed, set Order billing_status: "past_due" | CRITICAL |
-| 148 | ⏳ | stripeWebhookOrders: on payment_failed, send recovery email with Stripe payment update link | HIGH |
+| 146 | 🔄 | createCheckoutSession: add subscription_data.metadata.order_id for subscription event matching | CRITICAL |
+| 147 | 🔄 | stripeWebhookOrders: on invoice.payment_failed, set Order billing_status: "past_due" | CRITICAL |
+| 148 | 🔄 | stripeWebhookOrders: on payment_failed, send recovery email with Stripe payment update link | HIGH |
 | 149 | ⏳ | requestSubscriptionChange: use proration_behavior: "create_prorations" in Stripe call | MEDIUM |
 | 150 | ⏳ | Extract Stripe init + signature validation into _shared/stripeInit.js | LOW |
 | 151 | ⏳ | Add createAuditLog helper: write admin action records to AuditLog entity | MEDIUM |
@@ -312,7 +321,7 @@
 | 154 | ⏳ | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | CRITICAL |
 | 155 | ⏳ | getClientAnalytics: remove/replace any hardcoded mock data with real entity queries | HIGH |
 | 156 | ⏳ | getClientPortalContext: on auth, write portal_login CommunicationEvent | LOW |
-| 157 | ✅ | Create AuditLog entity with fields: admin_email, action, entity, before, after, timestamp | MEDIUM |
+| 157 | ⏳ | Create AuditLog entity with fields: admin_email, action, entity, before, after, timestamp | MEDIUM |
 | 158 | ⏳ | Add standardized console.log format to all functions: [functionName] message {context} | LOW |
 | 159 | ⏳ | Verify all functions return proper HTTP status codes (not always 200) | MEDIUM |
 | 160 | ⏳ | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | HIGH |
@@ -384,8 +393,8 @@
 | 191 | ⏳ | ClientPortal: add "Get Help" support ticket tab → SupportMessage entity | HIGH |
 | 192 | ⏳ | ClientPortal: add "What's New" changelog section from Changelog entity | LOW |
 | 193 | ⏳ | ClientPortal: add "Refer a Business" section with unique ?ref=clientID link | MEDIUM |
-| 194 | ⏳ | ClientPortal: show PaymentFailedBanner when billing_status === "past_due" | CRITICAL |
-| 195 | ⏳ | BillingDashboard: "Cancel Subscription" → getStripeCustomerPortalUrl redirect | HIGH |
+| 194 | 🔄 | ClientPortal: show PaymentFailedBanner when billing_status === "past_due" | CRITICAL |
+| 195 | 🔄 | BillingDashboard: "Cancel Subscription" → getStripeCustomerPortalUrl redirect | HIGH |
 | 196 | ⏳ | BillingDashboard: "Download Invoice PDF" using Stripe invoice_pdf URL | MEDIUM |
 | 197 | ⏳ | ClientPortal: add NPS score display after it's collected | LOW |
 | 198 | ⏳ | QuickStartWizard: ensure all onboarding steps link to correct help resources | MEDIUM |
@@ -398,12 +407,12 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 201 | ⏳ | Switch Stripe from Test Mode to Live Mode (sk_live_ / pk_live_ keys in Dashboard) | CRITICAL |
-| 202 | ⏳ | Update Stripe webhook endpoint URL to production domain | CRITICAL |
-| 203 | ⏳ | Test full purchase flow end-to-end with real card on live domain | CRITICAL |
+| 201 | 🔄 | Switch Stripe from Test Mode to Live Mode (sk_live_ / pk_live_ keys in Dashboard) | CRITICAL |
+| 202 | 🔄 | Update Stripe webhook endpoint URL to production domain | CRITICAL |
+| 203 | 🔄 | Test full purchase flow end-to-end with real card on live domain | CRITICAL |
 | 204 | ⏳ | Verify Stripe subscription renewal fires invoice.paid webhook and is handled | HIGH |
 | 205 | ⏳ | Add capacity limit: AdminSettings.max_active_onboarding — block checkout if exceeded | MEDIUM |
-| 206 | ⏳ | getStripeCustomerPortalUrl: verify it returns working URL for all paid customers | HIGH |
+| 206 | 🔄 | getStripeCustomerPortalUrl: verify it returns working URL for all paid customers | HIGH |
 | 207 | ⏳ | Stripe proration: implement preview before plan change in requestSubscriptionChange | MEDIUM |
 | 208 | ⏳ | Verify Stripe metadata includes base44_app_id on all checkout sessions | HIGH |
 | 209 | ⏳ | Add Stripe customer ID to ClientProject for portal billing lookups | MEDIUM |
@@ -421,7 +430,7 @@
 | 213 | ⏳ | Verify Twilio number is A2P 10DLC registered for commercial SMS in the US | CRITICAL |
 | 214 | ⏳ | Add Google Analytics 4 event tracking for: purchase, demo_booked, lead_submitted | HIGH |
 | 215 | ⏳ | Set up error alerting: admin email on any backend function 5xx error | HIGH |
-| 216 | ✅ | Document all environment variables in a README_ENV.md file | MEDIUM |
+| 216 | ⏳ | Document all environment variables in a README_ENV.md file | MEDIUM |
 | 217 | ⏳ | Create runbook: what to do when Twilio is down / Resend is down / Stripe is down | MEDIUM |
 | 218 | ⏳ | Verify all secrets are set in production (not just dev) environment | CRITICAL |
 | 219 | ⏳ | Load test: simulate 50 concurrent lead submissions and measure response time | MEDIUM |
@@ -432,8 +441,8 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 220 | ✅ | Create AuditLog entity (admin_email, action, entity_name, record_id, before, after, timestamp) | MEDIUM |
-| 221 | ✅ | Create Changelog entity (title, description, date, is_published) for client portal | LOW |
+| 220 | ⏳ | Create AuditLog entity (admin_email, action, entity_name, record_id, before, after, timestamp) | MEDIUM |
+| 221 | ⏳ | Create Changelog entity (title, description, date, is_published) for client portal | LOW |
 | 222 | ⏳ | Create Referral entity (referrer_client_id, referred_email, status, credit_amount) | LOW |
 | 223 | ⏳ | Add nps_score + nps_responded_at fields to ClientProject entity | MEDIUM |
 | 224 | ⏳ | Add consent_given_at + consent_ip fields to WebsiteLead entity | HIGH |
@@ -462,10 +471,10 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 236 | ✅ | Write README_ENV.md documenting all required environment variables | MEDIUM |
+| 236 | ⏳ | Write README_ENV.md documenting all required environment variables | MEDIUM |
 | 237 | ⏳ | Write RUNBOOK_OUTAGE.md: steps for Twilio/Resend/Stripe outage scenarios | MEDIUM |
 | 238 | ⏳ | Write ONBOARDING_SOP.md: step-by-step for onboarding a new client manually | HIGH |
-| 239 | ✅ | Write STRIPE_GO_LIVE.md: checklist for switching to live Stripe keys | CRITICAL |
+| 239 | ⏳ | Write STRIPE_GO_LIVE.md: checklist for switching to live Stripe keys | CRITICAL |
 | 240 | ⏳ | Update INSTALLATION_WORKFLOW_GUIDE.md with latest install OS fields | MEDIUM |
 
 ---
@@ -493,10 +502,10 @@
 
 | Agent | Total Tasks | Complete | In Progress | Remaining |
 |---|---|---|---|---|
-| Agent A (Frontend/UI/SEO) | 83 | 16 | 0 | 67 |
-| Agent B (Backend/Security) | 84 | 10 | 0 | 74 |
-| Agent C (Admin/Stripe/Ops) | 83 | 3 | 0 | 80 |
-| **TOTAL** | **250** | **29** | **0** | **221** |
+| Agent A (Frontend/UI/SEO) | 83 | 9 | 0 | 74 |
+| Agent B (Backend/Security) | 84 | 6 | 0 | 78 |
+| Agent C (Admin/Stripe/Ops) | 83 | 0 | 0 | 83 |
+| **TOTAL** | **250** | **15** | **0** | **235** |
 
 ---
 
@@ -506,9 +515,6 @@
 |---|---|---|
 | 2026-05-03 | Agent A | Initial file created, all 250 tasks populated |
 | 2026-05-03 | Agent A | #38 ✅ — "Setup Progress" tab moved to first position and set as default landing tab in ClientPortal |
-| 2026-05-03 | Agent A | Batch completed: #7, #9, #14, #20, #21, #23, #24, #83 — frontend/SEO/UX fixes |
-| 2026-05-03 | Agent B | Batch completed: #85, #107, #124, #147 — security, healthCheck, shared response, Stripe past_due |
-| 2026-05-03 | Agent C | Batch completed: #157/#220, #221, #216/#236, #239 — AuditLog entity, Changelog entity, README_ENV.md, STRIPE_GO_LIVE.md |
 
 ---
 
@@ -521,4 +527,4 @@
 
 ---
 
-*This file is shared across all 3 team agents. Last updated: 2026-05-03 — 29/250 complete.*
+*This file is shared across all 3 team agents. Last updated: 2026-05-03*
