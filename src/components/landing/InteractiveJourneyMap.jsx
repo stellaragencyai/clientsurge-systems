@@ -43,27 +43,7 @@ export default function InteractiveJourneyMap() {
       </div>
 
       {/* Timeline Container */}
-      <div style={{ position: "relative", padding: "40px 0" }}>
-        {/* Background Line */}
-        <svg
-          style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
-          viewBox="0 0 800 120"
-          preserveAspectRatio="none"
-        >
-          <line x1="0" y1="60" x2="800" y2="60" stroke="rgba(200,150,92,0.25)" strokeWidth="2" />
-
-          {/* Animated Dot */}
-          <motion.circle
-            cx={`${dotPosition * 8}`}
-            cy="60"
-            r="6"
-            fill="#c8965c"
-            style={{
-              boxShadow: "0 0 12px rgba(200,150,92,0.6)",
-              filter: "drop-shadow(0 0 8px rgba(200,150,92,0.5))",
-            }}
-          />
-        </svg>
+      <div style={{ position: "relative", padding: "20px 0 0" }}>
 
         {/* Step Nodes */}
         <div
@@ -145,6 +125,22 @@ export default function InteractiveJourneyMap() {
             </motion.button>
           ))}
         </div>
+
+        {/* Line + Animated Dot — below the cards */}
+        <svg
+          style={{ display: "block", width: "100%", height: "24px", marginTop: "12px" }}
+          viewBox="0 0 800 24"
+          preserveAspectRatio="none"
+        >
+          <line x1="0" y1="12" x2="800" y2="12" stroke="rgba(200,150,92,0.25)" strokeWidth="2" />
+          <motion.circle
+            cx={`${dotPosition * 8}`}
+            cy="12"
+            r="6"
+            fill="#c8965c"
+            style={{ filter: "drop-shadow(0 0 8px rgba(200,150,92,0.5))" }}
+          />
+        </svg>
       </div>
 
       {/* CTA */}
