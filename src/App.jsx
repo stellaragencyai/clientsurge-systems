@@ -14,6 +14,7 @@ import UserNotRegisteredError from "@/components/UserNotRegisteredError";
 import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
+import ErrorBoundary from "./components/ErrorBoundary";
 import PageNotFound from "./lib/PageNotFound";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
 import { scrollToTop } from "@/lib/scroll";
@@ -266,6 +267,7 @@ const AuthenticatedApp = () => {
 
 function App() {
   return (
+    <ErrorBoundary>
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router style={{ overflowX: "hidden" }}>
@@ -277,6 +279,7 @@ function App() {
         <Toaster />
       </QueryClientProvider>
     </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

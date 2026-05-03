@@ -43,24 +43,24 @@
 | 4 | ✅ | Add search debounce (280ms) to store search input | MEDIUM |
 | 5 | ✅ | Add SMS consent checkbox in CartSidebar when phone is entered | HIGH |
 | 6 | ⏳ | Add `loading="lazy"` + explicit width/height to all below-fold images | HIGH |
-| 7 | ⏳ | Add `<link rel="preload">` for hero image in index.html | HIGH |
+| 7 | ✅ | Add `<link rel="preload">` for hero image in index.html | HIGH |
 | 8 | ⏳ | Split recharts/framer-motion into separate Vite chunks via manualChunks | MEDIUM |
-| 9 | ⏳ | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | MEDIUM |
+| 9 | ✅ | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | MEDIUM |
 | 10 | ⏳ | Store page: implement intersection-observer lazy rendering for 8+ products | MEDIUM |
 | 11 | ⏳ | Build out pages/ThankYou — currently a blank page | HIGH |
 | 12 | ⏳ | Add Navbar to LegalPage — currently renders with no header/branding | MEDIUM |
 | 13 | ⏳ | Standardize all form inputs to rounded-xl (12px) globally | LOW |
-| 14 | ⏳ | ClientPortal loading state: replace raw spinner with branded skeleton | MEDIUM |
+| 14 | ✅ | ClientPortal loading state: replace raw spinner with branded skeleton | MEDIUM |
 | 15 | ⏳ | DemoBookingModal time slot grid: force 2-col on viewports < 480px | MEDIUM |
 | 16 | ⏳ | CookieConsent banner: add bottom: 80px on mobile to avoid MobileCallBar overlap | LOW |
 | 17 | ⏳ | FAQ accordion items: add border-bottom tap target on mobile | LOW |
 | 18 | ⏳ | Industry sub-pages: ensure hero headline renders as semantic `<h1>` tag | HIGH |
 | 19 | ⏳ | Add descriptive alt text to all hero, testimonial, and TrustBar images | MEDIUM |
-| 20 | ⏳ | Fix robots.txt: change Disallow: /leads/ to Disallow: /leads/admin | MEDIUM |
-| 21 | ⏳ | Add hreflang tag to index.html for future i18n readiness | LOW |
+| 20 | ✅ | Fix robots.txt: change Disallow: /leads/ to Disallow: /leads/admin | MEDIUM |
+| 21 | ✅ | Add hreflang tag to index.html for future i18n readiness | LOW |
 | 22 | ⏳ | Stub /blog route with 3 placeholder posts for organic SEO | MEDIUM |
-| 23 | ⏳ | Add React ErrorBoundary in App.jsx wrapping all routes | CRITICAL |
-| 24 | ⏳ | Set staleTime: 60_000 and retry: 1 in lib/query-client.js | MEDIUM |
+| 23 | ✅ | Add React ErrorBoundary in App.jsx wrapping all routes | CRITICAL |
+| 24 | ✅ | Set staleTime: 60_000 and retry: 1 in lib/query-client.js | MEDIUM |
 | 25 | ⏳ | Wrap App in React.StrictMode in main.jsx (dev only) | LOW |
 
 ---
@@ -168,7 +168,7 @@
 | 80 | ⏳ | Onboarding page: ensure form validates all required fields before submit | MEDIUM |
 | 81 | ⏳ | All pages: verify meta description is unique (not default fallback) | MEDIUM |
 | 82 | ✅ | sitemap.xml updated with industry pages | DONE |
-| 83 | ⏳ | pages/Industries: verify all 6 industry cards link to correct routes | MEDIUM |
+| 83 | ✅ | pages/Industries: all 6 industry cards linked to correct live routes | MEDIUM |
 
 ---
 
@@ -184,7 +184,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 84 | ⏳ | Add Origin header validation to submitLeadCapture + submitContactInquiry | HIGH |
-| 85 | ⏳ | autoEndToEndTest: add admin role check (return 403 if not admin) | CRITICAL |
+| 85 | ✅ | autoEndToEndTest: add admin role check (return 403 if not admin) | CRITICAL |
 | 86 | ⏳ | Move webhookLeadCapture secret from URL param to X-Webhook-Secret header | HIGH |
 | 87 | ⏳ | submitLeadCapture: normalize phone to E.164 (+1 prefix, reject < 10 digits) | HIGH |
 | 88 | ⏳ | Add consent_given_at + consent_ip fields to WebsiteLead/Leads entities | HIGH |
@@ -220,7 +220,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 107 | ⏳ | Create healthCheck function: returns {status:"ok", timestamp, version} — no auth | HIGH |
+| 107 | ✅ | Create healthCheck function: returns {status:"ok", timestamp, version} — no auth | HIGH |
 | 108 | ⏳ | Create autoCloseStaleLeads: daily scheduled function, closes leads with no contact > 30 days | MEDIUM |
 | 109 | ✅ | OrderSuccess: add noindex meta tag | DONE |
 | 110 | ⏳ | Create exportLeadsCSV: query Leads with filters, return CSV with Content-Disposition header | MEDIUM |
@@ -244,7 +244,7 @@
 | 121 | ✅ | "$0 setup" renamed to "No setup fee" in store | DONE |
 | 122 | ⏳ | Create scheduled automation: autoArchiveOldLeads — runs monthly | LOW |
 | 123 | ⏳ | processAutomationJobs: add retry logic — up to 3 attempts with exponential backoff | HIGH |
-| 124 | ⏳ | Create _shared/response.js: okJson() and errJson() for consistent response format | MEDIUM |
+| 124 | ✅ | Create _shared/response.js: okJson() and errJson() for consistent response format | MEDIUM |
 | 125 | ⏳ | Create _shared/retryFetch.js: reusable retry wrapper for external API calls | MEDIUM |
 
 ---
@@ -295,7 +295,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 146 | ⏳ | createCheckoutSession: add subscription_data.metadata.order_id for subscription event matching | CRITICAL |
-| 147 | ⏳ | stripeWebhookOrders: on invoice.payment_failed, set Order billing_status: "past_due" | CRITICAL |
+| 147 | ✅ | stripeWebhookOrders: on invoice.payment_failed, set Order billing_status: "past_due" | CRITICAL |
 | 148 | ⏳ | stripeWebhookOrders: on payment_failed, send recovery email with Stripe payment update link | HIGH |
 | 149 | ⏳ | requestSubscriptionChange: use proration_behavior: "create_prorations" in Stripe call | MEDIUM |
 | 150 | ⏳ | Extract Stripe init + signature validation into _shared/stripeInit.js | LOW |
@@ -312,7 +312,7 @@
 | 154 | ⏳ | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | CRITICAL |
 | 155 | ⏳ | getClientAnalytics: remove/replace any hardcoded mock data with real entity queries | HIGH |
 | 156 | ⏳ | getClientPortalContext: on auth, write portal_login CommunicationEvent | LOW |
-| 157 | ⏳ | Create AuditLog entity with fields: admin_email, action, entity, before, after, timestamp | MEDIUM |
+| 157 | ✅ | Create AuditLog entity with fields: admin_email, action, entity, before, after, timestamp | MEDIUM |
 | 158 | ⏳ | Add standardized console.log format to all functions: [functionName] message {context} | LOW |
 | 159 | ⏳ | Verify all functions return proper HTTP status codes (not always 200) | MEDIUM |
 | 160 | ⏳ | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | HIGH |
@@ -432,8 +432,8 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 220 | ⏳ | Create AuditLog entity (admin_email, action, entity_name, record_id, before, after, timestamp) | MEDIUM |
-| 221 | ⏳ | Create Changelog entity (title, description, date, is_published) for client portal | LOW |
+| 220 | ✅ | Create AuditLog entity (admin_email, action, entity_name, record_id, before, after, timestamp) | MEDIUM |
+| 221 | ✅ | Create Changelog entity (title, description, date, is_published) for client portal | LOW |
 | 222 | ⏳ | Create Referral entity (referrer_client_id, referred_email, status, credit_amount) | LOW |
 | 223 | ⏳ | Add nps_score + nps_responded_at fields to ClientProject entity | MEDIUM |
 | 224 | ⏳ | Add consent_given_at + consent_ip fields to WebsiteLead entity | HIGH |
@@ -462,10 +462,10 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 236 | ⏳ | Write README_ENV.md documenting all required environment variables | MEDIUM |
+| 236 | ✅ | Write README_ENV.md documenting all required environment variables | MEDIUM |
 | 237 | ⏳ | Write RUNBOOK_OUTAGE.md: steps for Twilio/Resend/Stripe outage scenarios | MEDIUM |
 | 238 | ⏳ | Write ONBOARDING_SOP.md: step-by-step for onboarding a new client manually | HIGH |
-| 239 | ⏳ | Write STRIPE_GO_LIVE.md: checklist for switching to live Stripe keys | CRITICAL |
+| 239 | ✅ | Write STRIPE_GO_LIVE.md: checklist for switching to live Stripe keys | CRITICAL |
 | 240 | ⏳ | Update INSTALLATION_WORKFLOW_GUIDE.md with latest install OS fields | MEDIUM |
 
 ---
@@ -493,10 +493,10 @@
 
 | Agent | Total Tasks | Complete | In Progress | Remaining |
 |---|---|---|---|---|
-| Agent A (Frontend/UI/SEO) | 83 | 9 | 0 | 74 |
-| Agent B (Backend/Security) | 84 | 6 | 0 | 78 |
-| Agent C (Admin/Stripe/Ops) | 83 | 0 | 0 | 83 |
-| **TOTAL** | **250** | **15** | **0** | **235** |
+| Agent A (Frontend/UI/SEO) | 83 | 16 | 0 | 67 |
+| Agent B (Backend/Security) | 84 | 10 | 0 | 74 |
+| Agent C (Admin/Stripe/Ops) | 83 | 3 | 0 | 80 |
+| **TOTAL** | **250** | **29** | **0** | **221** |
 
 ---
 
@@ -506,6 +506,9 @@
 |---|---|---|
 | 2026-05-03 | Agent A | Initial file created, all 250 tasks populated |
 | 2026-05-03 | Agent A | #38 ✅ — "Setup Progress" tab moved to first position and set as default landing tab in ClientPortal |
+| 2026-05-03 | Agent A | Batch of 14 completed: #7, #9, #14, #20, #21, #23, #24, #83, #107, #124, #157, #220, #221, #236 |
+| 2026-05-03 | Agent B | Batch of 3 completed: #85, #147, #239 |
+| 2026-05-03 | Agent C | #236 README_ENV.md written |
 
 ---
 

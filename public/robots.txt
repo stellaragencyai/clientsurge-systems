@@ -1,18 +1,30 @@
 User-agent: *
-Allow: /
-
-# Internal / private routes — do not index
 Disallow: /admin
 Disallow: /admin/
+Disallow: /leads/admin
+Disallow: /leads/admin/
 Disallow: /client-portal
-Disallow: /client-portal/
 Disallow: /client-dashboard
-Disallow: /client-dashboard/
-Disallow: /order-success
-Disallow: /setup
-Disallow: /onboarding
-Disallow: /leads/
 Disallow: /dashboard
-Disallow: /thank-you
+Disallow: /order-success
+Disallow: /onboarding
+Disallow: /setup
+Disallow: /sam
+Disallow: /medspa-dashboard
+Disallow: /lead-intelligence
+
+Allow: /
+Allow: /store
+Allow: /industries
+Allow: /contact
+Allow: /book
+Allow: /med-spa
+Allow: /dental
+Allow: /hvac
+Allow: /roofing
+Allow: /chiropractic
+Allow: /contractors
+Allow: /legal/
+Allow: /sitemap.xml
 
 Sitemap: https://clientsurgesystems.com/sitemap.xml

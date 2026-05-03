@@ -20,6 +20,7 @@ import AutomationsOverview from "../components/portal/AutomationsOverview";
 import RevenueMetricsPanel from "../components/portal/RevenueMetricsPanel";
 import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
+import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 
 const TABS = [
   { id: "progress", label: "🚀 Setup Progress" },
@@ -129,11 +130,7 @@ export default function ClientPortal() {
   }, [portalOrder?.id]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PortalLoadingSkeleton />;
   }
 
   if (notFound) {

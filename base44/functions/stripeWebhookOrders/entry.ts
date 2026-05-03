@@ -278,6 +278,17 @@ Deno.serve(async (req) => {
         fallbackOrderId: invoice.metadata?.order_id || "",
       });
     }
+
+    // ── Set billing_status: "past_due" on payment failure ─────────────────────
+    if (event.type === "invoice.payment_failed") {
+      const orderId = invoice.metadata?.order_id || invoice.subscription_details?.metadata?.order_id || "";
+      if (orderId) {
+        await base44.asServiceRole.entities.Order.update(orderId, {
+          billing_status: "past_due",
+        }).catch((err) => console.error("[stripeWebhookOrders] Failed to set past_due", { orderId, error: err.message }));
+        console.log("[stripeWebhookOrders] billing_status set to past_due", { orderId });
+      }
+    }
   }
 
   return Response.json({ received: true });
