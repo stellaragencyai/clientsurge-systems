@@ -224,6 +224,13 @@ export default function RevenueRecoveryCounter() {
         {/* Right edge — power/side button */}
         <div style={{ position: "absolute", right: "-4px", top: "180px", width: "4px", height: "72px", borderRadius: "0 3px 3px 0", background: "#1c1c1e", boxShadow: "1px 0 2px rgba(0,0,0,0.8)", zIndex: 20 }} />
 
+        {/* Aluminum chassis ring — thin metallic rim between body and glass */}
+        <div style={{
+          position: "absolute", inset: "8px", borderRadius: "44px", zIndex: 1, pointerEvents: "none",
+          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.09), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)",
+          background: "linear-gradient(160deg, rgba(255,255,255,0.06) 0%, transparent 40%, rgba(0,0,0,0.15) 100%)",
+        }} />
+
         {/* Screen inset with deep bezel */}
         <div style={{
           margin: "10px",
@@ -255,6 +262,28 @@ export default function RevenueRecoveryCounter() {
             </motion.div>
           </motion.div>
 
+          {/* Mouse-reactive glare overlay — follows cursor across glass */}
+          <div style={{
+            position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none", borderRadius: "42px", overflow: "hidden",
+          }}>
+            <div style={{
+              position: "absolute",
+              left: `${glareX}%`, top: `${glareY}%`,
+              transform: "translate(-50%, -50%)",
+              width: "180px", height: "180px",
+              borderRadius: "50%",
+              background: "radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%)",
+              transition: "left 0.08s ease-out, top 0.08s ease-out",
+              pointerEvents: "none",
+            }} />
+            {/* Static top-left specular highlight */}
+            <div style={{
+              position: "absolute", top: 0, left: 0, right: 0, height: "35%",
+              background: "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 100%)",
+              pointerEvents: "none",
+            }} />
+          </div>
+
           {/* Wallpaper layer — true OLED black with iOS 17-style aurora */}
           <div style={{
             position: "absolute", inset: 0, zIndex: 0,
@@ -283,7 +312,12 @@ export default function RevenueRecoveryCounter() {
                       ${displayTotal.toLocaleString()}
                     </motion.p>
                   </div>
-                  <div style={{ borderRadius: "8px", padding: "4px 12px", fontSize: "12px", fontWeight: "800", background: "rgba(34,197,94,0.18)", color: "#4ade80", border: "1px solid rgba(34,197,94,0.3)", letterSpacing: "0.06em" }}>
+                  {/* LIVE badge — iOS green with pulsing ring */}
+                  <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "5px", borderRadius: "20px", padding: "4px 10px 4px 8px", fontSize: "11px", fontWeight: "800", background: "rgba(48,209,88,0.15)", border: "1px solid rgba(48,209,88,0.28)", letterSpacing: "0.08em", color: "#30D158" }}>
+                    <div style={{ position: "relative", width: "7px", height: "7px", flexShrink: 0 }}>
+                      <motion.div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#30D158" }} animate={{ scale: [1, 1.9, 1], opacity: [0.9, 0, 0.9] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }} />
+                      <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "#30D158" }} />
+                    </div>
                     LIVE
                   </div>
                 </div>
@@ -329,15 +363,17 @@ export default function RevenueRecoveryCounter() {
                   })}
                 </div>
 
-                {/* Footer */}
-                <div style={{ borderRadius: "10px", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(200,150,92,0.1)", border: "1px solid rgba(200,150,92,0.18)" }}>
-                  <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(200,150,92,0.75)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(200,150,92,0.06)" : "rgba(200,150,92,0.18)", border: "1px solid rgba(200,150,92,0.28)", borderRadius: "5px", padding: "3px 10px", fontSize: "11px", fontWeight: "800", color: replaying ? "rgba(200,150,92,0.35)" : "rgba(200,150,92,0.95)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.06em", transition: "all 0.2s" }}>
-                      {replaying ? "···" : "↺ Replay"}
-                    </button>
-                    <motion.div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#c8965c" }} animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1.4, repeat: Infinity }} />
+                {/* Footer — frosted glass iOS widget */}
+                <div style={{ borderRadius: "16px", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.14)" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <div style={{ width: "18px", height: "18px", borderRadius: "5px", background: "linear-gradient(135deg, #9a5c2e, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L4 7.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </div>
+                    <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(255,255,255,0.5)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>
                   </div>
+                  <button onClick={handleReplay} disabled={replaying} style={{ background: replaying ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.1)", border: "none", borderRadius: "8px", padding: "4px 10px", fontSize: "11px", fontWeight: "700", color: replaying ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.7)", cursor: replaying ? "not-allowed" : "pointer", letterSpacing: "0.04em", transition: "all 0.2s", fontFamily: SF }}>
+                    {replaying ? "···" : "↺ Replay"}
+                  </button>
                 </div>
               </div>
 
