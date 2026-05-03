@@ -272,11 +272,11 @@ export default function ProductCard({ product }) {
         {product.popular && !product.coming_soon && (
           <div style={{
             position: "absolute", top: "12px", right: "12px",
-            background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
+            background: "linear-gradient(135deg,#0088CC,#00AEEF)",
             color: "#fff", fontSize: "8px", fontWeight: "700",
             padding: "4px 10px", borderRadius: "18px",
             letterSpacing: "0.08em", textTransform: "uppercase",
-            boxShadow: "0 2px 8px rgba(120,70,20,0.3)",
+            boxShadow: "0 2px 8px rgba(0,174,239,0.35)",
           }}>
             Popular
           </div>
