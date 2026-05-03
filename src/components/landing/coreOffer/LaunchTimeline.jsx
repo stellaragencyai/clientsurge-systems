@@ -266,7 +266,7 @@ export default function LaunchTimeline() {
       <div className="relative">
         <div
           className="absolute left-6 md:left-1/2 top-0 w-0.5 hidden md:block pointer-events-none"
-          style={{ bottom: "-56px", background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 50%, rgba(0,174,239,0.6) 100%)", transform: "translateX(-50%)" }}
+          style={{ bottom: "-120px", background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 50%, rgba(0,174,239,0.6) 100%)", transform: "translateX(-50%)" }}
         />
 
         <div className="space-y-10 md:space-y-20 relative z-10">
