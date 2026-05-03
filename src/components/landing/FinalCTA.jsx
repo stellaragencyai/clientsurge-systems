@@ -35,7 +35,7 @@ export default function FinalCTA() {
             <div key={stat.label} className="flex flex-col items-center">
                 <span
                 className="font-display text-3xl font-black"
-                style={{ color: "#9a5c2e" }}>
+                style={{ color: "#000000" }}>
                   {stat.value}
                 </span>
                 <span className="text-xs text-muted-foreground font-medium mt-0.5">{stat.label}</span>
