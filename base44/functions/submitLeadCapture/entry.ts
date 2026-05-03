@@ -11,6 +11,13 @@ function sanitizeString(value: unknown) {
   return value.replace(/[<>]/g, '').trim().slice(0, MAX_FIELD_LENGTH);
 }
 
+function normalizePhone(raw: string): string | null {
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  return null;
+}
+
 function normalizeLeadInput(payload: Record<string, unknown>) {
   const realWebsite = sanitizeString(payload.website_url || payload.website);
   const honeypot = sanitizeString(payload.website_hp || payload.website_honeypot || payload.company_website_hp);
@@ -18,7 +25,7 @@ function normalizeLeadInput(payload: Record<string, unknown>) {
     full_name: sanitizeString(payload.full_name),
     business_name: sanitizeString(payload.business_name),
     email: sanitizeString(payload.email).toLowerCase(),
-    phone: sanitizeString(payload.phone),
+    phone: normalizePhone(sanitizeString(payload.phone) as string) || sanitizeString(payload.phone),
     business_type: sanitizeString(payload.business_type),
     problem: sanitizeString(payload.problem),
     website_url: realWebsite,
