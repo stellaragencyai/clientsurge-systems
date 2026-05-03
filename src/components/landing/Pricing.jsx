@@ -253,7 +253,7 @@ export default function Pricing() {
               <div
                 key={item.name}
                 className="flex flex-col rounded-2xl p-6 border"
-                style={{ background: "rgba(255,255,255,0.7)", border: "2px solid rgba(0,0,0,0.85)", backdropFilter: "blur(12px)" }}
+                style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(0,0,0,0.5)", backdropFilter: "blur(12px)" }}
               >
                 <div className="text-3xl mb-3">{item.emoji}</div>
                 <h4 className="font-semibold text-foreground text-sm mb-1">{item.name}</h4>
