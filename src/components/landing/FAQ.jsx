@@ -25,7 +25,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "How fast can I get set up?",
-  a: "Most clients are fully live within 5-7 business days. We do the work. You just need to show up for one onboarding call.",
+  a: "Most clients are fully live within 24-48 hours. We do the work. You just need to show up for one onboarding call.",
   category: "setup"
 },
 {
@@ -40,7 +40,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "How much does it cost?",
-  a: "Plans start at $497/month with a one-time setup fee. We have three tiers - Starter, Growth, and Elite - depending on your lead volume and goals. See our Pricing section for full details, and we will confirm the best fit on your demo call.",
+  a: "Plans start at $497/month with a one-time setup fee. We have three tiers - Starter, Growth, and Elite - depending on your lead volume and goals. See our Pricing section for full details.",
   category: "pricing"
 },
 {
@@ -70,7 +70,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "How do I know if this is the right investment for my business?",
-  a: "That is what the demo is for. We will show you the specific system we would build, what it costs, and the projected ROI based on your current lead volume and conversion rate. You will have concrete numbers before deciding.",
+  a: "We will walk you through the specific system we would build, what it costs, and the projected ROI based on your current lead volume and conversion rate. You will have concrete numbers before deciding.",
   category: "support"
 }];
 
@@ -157,7 +157,7 @@ export default function FAQ() {
                     boxShadow: "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
                   }}
                 >
-                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
+                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded min-h-[48px] border-b border-border/20 last:border-b-0">
                     {faq.q}
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5 word-wrap break-words">
