@@ -528,3 +528,123 @@
 ---
 
 *This file is shared across all 3 team agents. Last updated: 2026-05-03*
+
+
+---
+
+---
+
+# 🆕 EXPANSION PACK — Tasks #251–#300
+### Added by Sam | 2026-05-03 | Based on live bundle gap analysis + repo audit
+
+> All tasks below are ⏳ Pending unless noted.
+
+---
+
+## SECTION A: AI BRAIN / LEAD INTELLIGENCE (Not wired to frontend at all)
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 251 | ⏳ | Wire scoreLeadIntelligence to fire on every new WebsiteLead creation — currently deployed but never called from frontend | CRITICAL |
+| 252 | ⏳ | Wire classifyLeadIntent on inbound SMS replies — currently deployed but disconnected | HIGH |
+| 253 | ⏳ | Wire predictChurnRisk to run weekly on all active Orders — alert Nolan if score > 70 | HIGH |
+| 254 | ⏳ | Wire automationOrchestrator to Admin dashboard so Nolan can trigger it manually | MEDIUM |
+| 255 | ⏳ | /lead-intelligence page: display lead_score and quality_label per lead in the UI | HIGH |
+| 256 | ⏳ | Lead Intelligence dashboard: add real LeadAnalytics entity reads — currently shows no data | HIGH |
+| 257 | ⏳ | Add "AI Re-Score" button in admin lead list — calls scoreLeadIntelligence for selected lead | MEDIUM |
+| 258 | ⏳ | predictLeadOutcome: surface prediction result in ClientPortal leads tab | LOW |
+
+---
+
+## SECTION B: CLIENT PORTAL — Completely missing key features
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 259 | ⏳ | ClientPortal: build "Get Help" tab with support ticket form → creates SupportMessage entity record | HIGH |
+| 260 | ⏳ | ClientPortal: build "Billing" tab — show current plan, next billing date, amount | CRITICAL |
+| 261 | ⏳ | ClientPortal: "Cancel Subscription" button → redirect to Stripe customer portal URL | HIGH |
+| 262 | ⏳ | ClientPortal: "Download Invoice" button → pull Stripe invoice_pdf URL and open in new tab | HIGH |
+| 263 | ⏳ | ClientPortal: show red PaymentFailedBanner when Order billing_status === "past_due" | CRITICAL |
+| 264 | ⏳ | ClientPortal: build "Refer a Business" tab with unique referral link generated per client | MEDIUM |
+| 265 | ⏳ | ClientPortal: AutomationChecklist — display live checklist progress pulled from AutomationChecklist entity | HIGH |
+| 266 | ⏳ | ClientPortal: show "Setup Progress" bar driven by real ClientInstallationOS fields (twilio_configured, etc.) | HIGH |
+| 267 | ⏳ | ClientPortal: add "What's New" tab reading from a Changelog entity or AdminSettings changelog field | LOW |
+
+---
+
+## SECTION C: ADMIN PANEL — Missing analytics + ops features
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 268 | ⏳ | AdminDashboard: build MRR metric card — sum total_monthly from all Orders with payment_status=paid | CRITICAL |
+| 269 | ⏳ | AdminDashboard: build LTV card — total revenue per client over their lifetime | HIGH |
+| 270 | ⏳ | AdminDashboard: build Churn Risk panel — list clients with predictChurnRisk score > 70 | HIGH |
+| 271 | ⏳ | AdminDashboard: wire AdminGlobalSearch to all entity types (Lead, Client, Order, SupportMessage) | MEDIUM |
+| 272 | ⏳ | AdminDashboard: add session inactivity timeout — show warning modal after 30min, logout after 45min | MEDIUM |
+| 273 | ⏳ | AdminDashboard: add "Install Status" table showing each client's onboarding step completion | HIGH |
+| 274 | ⏳ | AdminDashboard: add quick-action buttons — "Send Day 1 Email", "Trigger Follow-Up", "Mark Live" per client | HIGH |
+| 275 | ⏳ | Admin leads list: add bulk action — "Mark as contacted", "Export to CSV", "Rescore with AI" | MEDIUM |
+
+---
+
+## SECTION D: ONBOARDING FLOW — Entity fields exist but UI never reads them
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 276 | ⏳ | Build InstallChecklistPanel component — reads AutomationChecklist entity fields and renders live progress | CRITICAL |
+| 277 | ⏳ | Wire onboarding_complete, went_live, twilio_configured fields to admin UI — currently invisible | HIGH |
+| 278 | ⏳ | Auto-send "You're Live!" email via Resend when went_live is set to true on a ClientOnboarding record | HIGH |
+| 279 | ⏳ | Auto-send Telegram alert to Nolan when any onboarding step changes (twilio_configured, lead_sources_connected, etc.) | HIGH |
+| 280 | ⏳ | Build client-facing onboarding status page at /setup — shows their install progress without admin login | MEDIUM |
+| 281 | ⏳ | Onboarding form: validate all required fields before submit — currently submits with empty required fields | HIGH |
+
+---
+
+## SECTION E: SEO — Structural gaps
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 282 | ⏳ | Add LocalBusiness + Service JSON-LD schema to all 6 industry pages | HIGH |
+| 283 | ⏳ | Add BreadcrumbList JSON-LD schema to all inner pages | MEDIUM |
+| 284 | ⏳ | Add setPageMetadata() utility — dynamic title + description + og:image per route | HIGH |
+| 285 | ⏳ | Add preconnect links for fonts.googleapis.com, stripe.com, resend.com in index.html | MEDIUM |
+| 286 | ⏳ | Industry pages: include Phoenix/Scottsdale city name in H1 and meta title for local SEO | HIGH |
+| 287 | ⏳ | Create /blog with 3 pillar posts: AI Automation for Med Spas, Missed Call Text-Back Guide, How AI Books Appointments | MEDIUM |
+| 288 | ⏳ | Add twitter:card meta tags to all pages (currently only on homepage) | LOW |
+
+---
+
+## SECTION F: PERFORMANCE
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 289 | ⏳ | Add preconnect and dns-prefetch for Stripe, Twilio, Resend CDNs in index.html | MEDIUM |
+| 290 | ⏳ | Add manifest.json with name, icons, theme_color for PWA installability | LOW |
+| 291 | ⏳ | Add Vite manualChunks to split recharts, framer-motion, lucide into separate bundles | MEDIUM |
+| 292 | ⏳ | Add loading=lazy attribute to ALL below-fold images site-wide | HIGH |
+| 293 | ⏳ | Subset Google Fonts — load only Inter 400/500/600/700 + Playfair 400/600 instead of full family | MEDIUM |
+
+---
+
+## SECTION G: ANALYTICS + TRACKING
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 294 | ⏳ | Connect GA4 property — add G- tracking ID to index.html gtag snippet | HIGH |
+| 295 | ⏳ | Track checkout button clicks as GA4 conversion events | HIGH |
+| 296 | ⏳ | Track form submissions (lead capture, contact, onboarding) as GA4 events | HIGH |
+| 297 | ⏳ | Add UTM parameter persistence — store utm_source and utm_medium on lead record at capture | MEDIUM |
+| 298 | ⏳ | Build weekly analytics digest automation — email Nolan every Monday: new leads, MRR, conversion rate, churn risk | HIGH |
+
+---
+
+## SECTION H: ACCESSIBILITY + LEGAL
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 299 | ⏳ | Add skip-to-content link at top of every page for screen reader accessibility | MEDIUM |
+| 300 | ⏳ | Add TCPA-compliant SMS consent disclosure to ALL public lead capture forms — "By submitting, you consent to receive automated SMS. Reply STOP to opt out." | CRITICAL |
+
+---
+
+*Expansion added by Sam (AI Agent) — 2026-05-03. Tasks #251–#300.*
