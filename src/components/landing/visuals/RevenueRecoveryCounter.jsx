@@ -8,6 +8,7 @@ import { motion, useInView, animate, useMotionValue, useTransform } from "framer
 import { useEffect, useRef, useState } from "react";
 
 const SF = "-apple-system,'SF Pro Display','SF Pro Text','Helvetica Neue',ui-sans-serif,sans-serif";
+const SF_ROUNDED = "ui-rounded,'SF Pro Rounded','SF Pro Display',-apple-system,'Helvetica Neue',sans-serif";
 
 const LEADS = [
   { name: "Sarah M.",  value: 480,  service: "Consultation" },
@@ -48,17 +49,20 @@ function StatusBar() {
 
   return (
     <div style={{ position: "relative", flexShrink: 0 }}>
-      {/* Dynamic Island */}
+      {/* Dynamic Island — iPhone 17 Pro slimmer pill shape */}
       <div style={{
-        position: "absolute", left: "50%", top: "6px", transform: "translateX(-50%)",
-        width: "66px", height: "20px", borderRadius: "999px", background: "#000",
-        boxShadow: "0 0 0 1.5px rgba(255,255,255,0.07), inset 0 1px 3px rgba(0,0,0,0.9)",
-        zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+        position: "absolute", left: "50%", top: "7px", transform: "translateX(-50%)",
+        width: "72px", height: "19px", borderRadius: "999px", background: "#000",
+        boxShadow: "0 0 0 1px rgba(255,255,255,0.06), 0 2px 8px rgba(0,0,0,0.95), inset 0 1px 2px rgba(0,0,0,1)",
+        zIndex: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: "10px",
       }}>
-        {/* FaceID dot */}
-        <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#1a1a2e", border: "1px solid rgba(80,100,200,0.5)", boxShadow: "0 0 5px rgba(60,80,200,0.6)" }} />
-        {/* Camera */}
-        <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#0d0d1a", border: "1.5px solid rgba(255,255,255,0.08)" }} />
+        {/* Front camera — small circle on left */}
+        <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#0a0a14", border: "1px solid rgba(255,255,255,0.07)", boxShadow: "inset 0 0 3px rgba(0,0,0,1), 0 0 4px rgba(60,80,200,0.35)" }} />
+        {/* Face ID sensor array — tiny dot cluster on right */}
+        <div style={{ display: "flex", gap: "2px", alignItems: "center" }}>
+          <div style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#111" }} />
+          <div style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#111" }} />
+        </div>
       </div>
 
       {/* Status bar row */}
@@ -188,7 +192,7 @@ export default function RevenueRecoveryCounter() {
         <div style={{ width: "10px", height: "22px", background: "linear-gradient(to bottom, #d0d0d0, #a8a8a8)", clipPath: "polygon(0 0, 100% 0, 60% 100%, 40% 100%)" }} />
       </div>
 
-      {/* iPad body */}
+      {/* iPhone 17 Pro Max body */}
       <motion.div
         ref={ref}
         onMouseMove={handleMouseMove}
@@ -200,12 +204,15 @@ export default function RevenueRecoveryCounter() {
           position: "relative",
           width: "310px",
           borderRadius: "50px",
-          background: "#000000",
+          /* Enhancement 1: Titanium chassis — warm brushed titanium finish */
+          background: "linear-gradient(160deg, #3a3733 0%, #2c2926 30%, #232120 60%, #1e1c1a 100%)",
           boxShadow: `
-            0 50px 120px rgba(0,0,0,0.75),
-            0 20px 50px rgba(0,0,0,0.45),
-            inset 0 1px 0 rgba(255,255,255,0.06),
-            inset 0 -1px 0 rgba(0,0,0,0.6)
+            0 50px 120px rgba(0,0,0,0.8),
+            0 20px 50px rgba(0,0,0,0.5),
+            inset 0 1px 0 rgba(210,195,175,0.18),
+            inset 0 -1px 0 rgba(0,0,0,0.7),
+            inset 1px 0 0 rgba(200,185,165,0.1),
+            inset -1px 0 0 rgba(200,185,165,0.1)
           `,
           transformStyle: "preserve-3d",
           perspective: "1200px",
@@ -213,22 +220,30 @@ export default function RevenueRecoveryCounter() {
           userSelect: "none",
         }}
       >
-        {/* Subtle top edge */}
-        <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), rgba(255,255,255,0.08), rgba(255,255,255,0.06), transparent)", borderRadius: "999px", zIndex: 15 }} />
+        {/* Titanium top edge highlight */}
+        <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(210,195,175,0.22), rgba(230,215,195,0.28), rgba(210,195,175,0.22), transparent)", borderRadius: "999px", zIndex: 15 }} />
 
-        {/* Left edge — silent switch + volume buttons */}
-        <div style={{ position: "absolute", left: "-4px", top: "120px", width: "4px", height: "32px", borderRadius: "3px 0 0 3px", background: "#1c1c1e", boxShadow: "-1px 0 2px rgba(0,0,0,0.8)", zIndex: 20 }} />
-        <div style={{ position: "absolute", left: "-4px", top: "170px", width: "4px", height: "52px", borderRadius: "3px 0 0 3px", background: "#1c1c1e", boxShadow: "-1px 0 2px rgba(0,0,0,0.8)", zIndex: 20 }} />
-        <div style={{ position: "absolute", left: "-4px", top: "234px", width: "4px", height: "52px", borderRadius: "3px 0 0 3px", background: "#1c1c1e", boxShadow: "-1px 0 2px rgba(0,0,0,0.8)", zIndex: 20 }} />
+        {/* Left edge — Action button + volume buttons (titanium) */}
+        <div style={{ position: "absolute", left: "-4px", top: "110px", width: "4px", height: "28px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to right, #3a3530, #2a2520)", boxShadow: "-1px 0 3px rgba(0,0,0,0.9), inset 0 1px 0 rgba(210,195,175,0.15)", zIndex: 20 }} />
+        <div style={{ position: "absolute", left: "-4px", top: "158px", width: "4px", height: "46px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to right, #3a3530, #2a2520)", boxShadow: "-1px 0 3px rgba(0,0,0,0.9), inset 0 1px 0 rgba(210,195,175,0.15)", zIndex: 20 }} />
+        <div style={{ position: "absolute", left: "-4px", top: "216px", width: "4px", height: "46px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to right, #3a3530, #2a2520)", boxShadow: "-1px 0 3px rgba(0,0,0,0.9), inset 0 1px 0 rgba(210,195,175,0.15)", zIndex: 20 }} />
 
-        {/* Right edge — power/side button */}
-        <div style={{ position: "absolute", right: "-4px", top: "180px", width: "4px", height: "72px", borderRadius: "0 3px 3px 0", background: "#1c1c1e", boxShadow: "1px 0 2px rgba(0,0,0,0.8)", zIndex: 20 }} />
+        {/* Right edge — power button (titanium) */}
+        <div style={{ position: "absolute", right: "-4px", top: "170px", width: "4px", height: "66px", borderRadius: "0 3px 3px 0", background: "linear-gradient(to left, #3a3530, #2a2520)", boxShadow: "1px 0 3px rgba(0,0,0,0.9), inset 0 1px 0 rgba(210,195,175,0.15)", zIndex: 20 }} />
 
-        {/* Aluminum chassis ring — thin metallic rim between body and glass */}
+        {/* Titanium chassis ring — warm metallic rim */}
         <div style={{
           position: "absolute", inset: "8px", borderRadius: "44px", zIndex: 1, pointerEvents: "none",
-          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.09), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)",
-          background: "linear-gradient(160deg, rgba(255,255,255,0.06) 0%, transparent 40%, rgba(0,0,0,0.15) 100%)",
+          boxShadow: "inset 0 0 0 1px rgba(210,195,175,0.13), inset 0 1px 0 rgba(230,215,195,0.2), inset 0 -1px 0 rgba(0,0,0,0.5)",
+          background: "linear-gradient(160deg, rgba(210,195,175,0.08) 0%, transparent 40%, rgba(0,0,0,0.2) 100%)",
+        }} />
+
+        {/* Enhancement 2: ProMotion OLED bloom — ambient glow around screen edge */}
+        <div style={{
+          position: "absolute", inset: "9px", borderRadius: "43px", zIndex: 1, pointerEvents: "none",
+          boxShadow: `0 0 18px 2px rgba(88,54,170,0.18), 0 0 8px 1px rgba(20,80,200,0.12)`,
+          opacity: awake ? 1 : 0,
+          transition: "opacity 0.8s ease",
         }} />
 
         {/* Screen inset with deep bezel */}
@@ -308,7 +323,8 @@ export default function RevenueRecoveryCounter() {
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "8px" }}>
                   <div>
                     <p style={{ fontSize: "9px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "2px", fontFamily: SF }}>Revenue Recovered</p>
-                    <motion.p style={{ fontFamily: SF, fontSize: "24px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.03em", margin: 0 }}>
+                    {/* Enhancement 3: SF Pro Rounded for numerics — matches iOS Lock Screen/Live Activity */}
+                    <motion.p style={{ fontFamily: SF_ROUNDED, fontSize: "26px", fontWeight: "800", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.04em", margin: 0, textShadow: "0 0 20px rgba(245,217,168,0.3)" }}>
                       ${displayTotal.toLocaleString()}
                     </motion.p>
                   </div>
@@ -357,7 +373,7 @@ export default function RevenueRecoveryCounter() {
                           <p style={{ fontSize: "10px", fontWeight: "600", color: recovered ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.3)", transition: "color 0.4s", margin: 0, fontFamily: SF, letterSpacing: "-0.01em" }}>{lead.name}</p>
                           <p style={{ fontSize: "8px", color: "rgba(255,255,255,0.28)", margin: 0, fontFamily: SF }}>{lead.service}</p>
                         </div>
-                        <span style={{ fontSize: "11px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#30D158" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF, letterSpacing: "-0.01em" }}>${lead.value}</span>
+                        <span style={{ fontSize: "11px", fontWeight: "800", fontVariantNumeric: "tabular-nums", color: recovered ? "#30D158" : "rgba(255,255,255,0.18)", transition: "color 0.4s", fontFamily: SF_ROUNDED, letterSpacing: "-0.02em" }}>${lead.value}</span>
                       </motion.div>
                     );
                   })}
