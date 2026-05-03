@@ -229,9 +229,9 @@ export default function Pricing() {
               key={badge.text}
               className="flex flex-col items-center justify-center gap-2 py-6 rounded-2xl font-semibold"
               style={{
-                background: "rgba(0,174,239,0.07)",
-                border: "1px solid rgba(0,174,239,0.18)",
-                color: "rgba(0,100,180,0.9)",
+                background: "#ffffff",
+                border: "1px solid rgba(0,0,0,0.85)",
+                color: "rgba(0,0,0,0.75)",
               }}
             >
               <span style={{ fontSize: "22px", lineHeight: 1 }}>{badge.icon}</span>
