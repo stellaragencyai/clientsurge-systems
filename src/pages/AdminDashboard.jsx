@@ -5,7 +5,7 @@ import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw, Plus,
-  Server, RotateCcw,
+  Server, RotateCcw, BookOpen,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
@@ -82,6 +82,7 @@ const NAV_GROUPS = [
       { id: 'review-request', label: 'Review Requests', icon: Star },
       { id: 'settings', label: 'Settings', icon: Settings },
       { id: 'qa', label: 'QA Tools', icon: RefreshCw },
+      { id: 'install-guide', label: 'Install Guide', icon: BookOpen, external: true, externalPath: '/admin/install-guide' },
     ],
   },
 ];
@@ -141,9 +142,9 @@ export default function AdminDashboard() {
     base44.auth.logout('/');
   };
 
-  const handleTabChange = (tabId, external) => {
+  const handleTabChange = (tabId, external, externalPath) => {
     if (external) {
-      navigate('/admin/onboarding');
+      navigate(externalPath || '/admin/onboarding');
       return;
     }
     setActiveTab(tabId);
@@ -224,7 +225,7 @@ export default function AdminDashboard() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => handleTabChange(item.id, item.external)}
+                      onClick={() => handleTabChange(item.id, item.external, item.externalPath)}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors font-medium text-sm ${
                         isActive
                           ? 'bg-primary text-primary-foreground'
