@@ -35,6 +35,7 @@ import AutomationInstallChecklist from '../components/admin/AutomationInstallChe
 import ReviewRequestPanel from '../components/admin/ReviewRequestPanel';
 import LeadReactivationPanel from '../components/admin/LeadReactivationPanel';
 import TaskBoardPanel from '../components/admin/TaskBoardPanel';
+import AutomationAlertsPanel from '../components/admin/AutomationAlertsPanel';
 
 const NAV_GROUPS = [
   {
@@ -363,9 +364,12 @@ function OverviewDashboard({ onNavigate }) {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>
-        <p className="text-sm text-muted-foreground mt-1">Lead activation overview — click any card to drill in.</p>
+      <div className="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>
+          <p className="text-sm text-muted-foreground mt-1">Lead activation overview — click any card to drill in.</p>
+        </div>
+        <AutomationAlertsPanel compact onNavigate={onNavigate} />
       </div>
 
       {/* Stats Grid */}

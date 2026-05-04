@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { CheckCircle, AlertCircle, Clock, RefreshCw, Zap, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import AutomationAlertsPanel from "./AutomationAlertsPanel";
 
 export default function IntegrationHealth() {
   const [integrations, setIntegrations] = useState([]);
@@ -83,6 +84,11 @@ export default function IntegrationHealth() {
 
   return (
     <div className="space-y-6">
+      {/* Real-time automation alerts */}
+      <div className="bg-white rounded-xl border border-border p-6">
+        <AutomationAlertsPanel />
+      </div>
+
       <div className="flex items-center justify-between mb-8">
         <div>
           <h2 className="text-2xl font-semibold text-foreground">Integration Health</h2>
