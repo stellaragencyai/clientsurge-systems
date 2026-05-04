@@ -1,39 +1,46 @@
-import { ArrowUp, Mail, Phone, Shield } from "lucide-react";
+import { ArrowUp, Mail, Phone, Shield, Zap, MessageSquare, Calendar, RefreshCw } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+const AUTOMATIONS = [
+  { label: "Instant Lead Response", desc: "Reply to every lead in under 60 seconds.", href: "/store", icon: Zap },
+  { label: "Missed Call Text-Back", desc: "Recover missed calls automatically.", href: "/store", icon: Phone },
+  { label: "AI Booking Agent", desc: "Turns conversations into appointments.", href: "/store", icon: Calendar },
+  { label: "14-Day Nurture Sequence", desc: "Multi-touch follow-up on autopilot.", href: "/store", icon: MessageSquare },
+  { label: "Lead Reactivation", desc: "Wake up cold leads from up to 90 days.", href: "/store", icon: RefreshCw },
+];
+
 const navColumns = [
-{
-  title: "Platform",
-  links: [
-  { label: "How It Works", href: "/#problem-solution" },
-  { label: "Our System", href: "/#services" },
-  { label: "Pricing", href: "/#pricing" },
-  { label: "FAQ", href: "/#faq" },
-  { label: "Get Your Free Audit", href: "/contact" }]
-
-},
-{
-  title: "Industries",
-  links: [
-  { label: "Med Spas & Aesthetics", href: "/med-spa" },
-  { label: "Dental & Orthodontics", href: "/dental" },
-  { label: "Chiropractic & PT", href: "/chiropractic" },
-  { label: "HVAC & Home Services", href: "/hvac" },
-  { label: "Roofing & Restoration", href: "/roofing" },
-  { label: "Contractors & Trades", href: "/contractors" },
-  { label: "All Industries", href: "/industries" }]
-
-},
-{
-  title: "Company",
-  links: [
-  { label: "About Us", href: "/about" },
-  { label: "Contact Us", href: "/contact" },
-  { label: "Privacy Policy", href: "/legal/privacy" },
-  { label: "Terms of Service", href: "/legal/terms" }]
-
-}];
-
+  {
+    title: "Platform",
+    links: [
+      { label: "How It Works", href: "/#problem-solution" },
+      { label: "Our System", href: "/#services" },
+      { label: "Pricing", href: "/#pricing" },
+      { label: "FAQ", href: "/#faq" },
+      { label: "AI Store", href: "/store" },
+    ],
+  },
+  {
+    title: "Industries",
+    links: [
+      { label: "Med Spas & Aesthetics", href: "/med-spa" },
+      { label: "Dental & Orthodontics", href: "/dental" },
+      { label: "Chiropractic & PT", href: "/chiropractic" },
+      { label: "HVAC & Home Services", href: "/hvac" },
+      { label: "Roofing & Restoration", href: "/roofing" },
+      { label: "Contractors & Trades", href: "/contractors" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "About Us", href: "/about" },
+      { label: "Contact Us", href: "/contact" },
+      { label: "Privacy Policy", href: "/legal/privacy" },
+      { label: "Terms of Service", href: "/legal/terms" },
+    ],
+  },
+];
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -59,158 +66,163 @@ export default function Footer() {
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
-    <footer
-      className="relative"
-      style={{
-        background: "linear-gradient(180deg, #0A1628 0%, #050d1a 100%)",
-        paddingBottom: "env(safe-area-inset-bottom)"
-      }}>
-      
-      {/* Top gradient accent */}
-      <div
-        className="absolute inset-x-0 top-0 h-px pointer-events-none"
-        style={{
-          background:
-          "linear-gradient(90deg, transparent 0%, #9a5c2e 25%, #c8965c 50%, #9a5c2e 75%, transparent 100%)"
-        }} />
-      
+    <footer style={{ background: "#ffffff", borderTop: "1px solid rgba(0,174,239,0.12)" }}>
+
+      {/* Top accent line */}
+      <div style={{
+        height: "3px",
+        background: "linear-gradient(90deg, transparent 0%, #00AEEF 25%, #009DFF 50%, #003B8F 75%, transparent 100%)",
+      }} />
+
+      {/* Automation highlight strip */}
+      <div style={{ background: "linear-gradient(135deg, #003B8F 0%, #006BB0 50%, #00AEEF 100%)", padding: "40px 24px" }}>
+        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: "28px" }}>
+            <p style={{ fontSize: "10px", fontWeight: "800", color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 6px" }}>Our 6-System Stack</p>
+            <h3 style={{ fontSize: "clamp(18px,3vw,26px)", fontWeight: "800", color: "#ffffff", margin: 0, lineHeight: 1.2 }}>
+              Every automation you need to convert more leads — done for you.
+            </h3>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "center" }}>
+            {AUTOMATIONS.map(({ label, desc, href, icon: Icon }) => (
+              <a
+                key={label}
+                href={href}
+                onClick={(e) => handleNavClick(e, href)}
+                style={{
+                  display: "flex", alignItems: "flex-start", gap: "10px",
+                  padding: "14px 18px",
+                  borderRadius: "14px",
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  textDecoration: "none",
+                  transition: "all 0.2s",
+                  minWidth: "180px", flex: "1 1 180px", maxWidth: "240px",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+                }}
+              >
+                <div style={{ width: "28px", height: "28px", borderRadius: "8px", background: "rgba(255,255,255,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <Icon style={{ width: "14px", height: "14px", color: "#fff" }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: "12px", fontWeight: "700", color: "#ffffff", marginBottom: "2px" }}>{label}</div>
+                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", lineHeight: 1.3 }}>{desc}</div>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* Main footer body */}
-      <div className="max-w-7xl mx-auto px-6 md:px-8 pt-16 pb-10">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 md:gap-12">
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "64px 24px 40px" }}>
+        <div className="footer-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "40px" }}>
+
           {/* Brand column */}
-          <div className="lg:col-span-1 flex flex-col gap-6">
-
-
-            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.45)" }}>
-              Done-for-you AI automation that turns missed leads into booked
-              appointments — built for service businesses.
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <img
+              src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
+              alt="ClientSurge Systems"
+              style={{ height: "60px", width: "auto", objectFit: "contain", mixBlendMode: "multiply" }}
+            />
+            <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", lineHeight: 1.65, margin: 0 }}>
+              Done-for-you AI automation that turns missed leads into booked appointments — built for service businesses.
             </p>
-
-            {/* Contact */}
-            <div className="flex flex-col gap-3">
-              <a
-                href="tel:+16025843227"
-                className="flex items-center gap-3 group transition-colors"
-                style={{ color: "rgba(255,255,255,0.55)" }}>
-                
-                <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors group-hover:bg-primary/30"
-                  style={{
-                    background: "rgba(154,92,46,0.15)",
-                    border: "1px solid rgba(154,92,46,0.25)"
-                  }}>
-                  
-                  <Phone className="w-3.5 h-3.5" style={{ color: "#c8965c" }} />
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <a href="tel:+16025843227" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "rgba(10,22,40,0.6)", transition: "color 0.2s" }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.6)"}
+              >
+                <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(0,136,204,0.08)", border: "1px solid rgba(0,136,204,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <Phone style={{ width: "13px", height: "13px", color: "#0088CC" }} />
                 </div>
-                <span className="text-sm font-medium group-hover:text-white transition-colors">
-                  (602) 584-3227
-                </span>
+                <span style={{ fontSize: "13px", fontWeight: "600" }}>(602) 584-3227</span>
               </a>
-              <a
-                href="mailto:support@clientsurgesystems.com"
-                className="flex items-center gap-3 group transition-colors"
-                style={{ color: "rgba(255,255,255,0.55)" }}>
-                
-                <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors group-hover:bg-primary/30"
-                  style={{
-                    background: "rgba(154,92,46,0.15)",
-                    border: "1px solid rgba(154,92,46,0.25)"
-                  }}>
-                  
-                  <Mail className="w-3.5 h-3.5" style={{ color: "#c8965c" }} />
+              <a href="mailto:support@clientsurgesystems.com" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "rgba(10,22,40,0.6)", transition: "color 0.2s" }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.6)"}
+              >
+                <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(0,136,204,0.08)", border: "1px solid rgba(0,136,204,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <Mail style={{ width: "13px", height: "13px", color: "#0088CC" }} />
                 </div>
-                <span className="text-xs font-medium group-hover:text-white transition-colors break-all">
-                  support@clientsurgesystems.com
-                </span>
+                <span style={{ fontSize: "12px", fontWeight: "600" }}>support@clientsurgesystems.com</span>
               </a>
             </div>
           </div>
 
           {/* Nav columns */}
-          <div className="footer-nav-grid lg:col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-8">
-            {navColumns.map((col) =>
-            <div key={col.title} className="flex flex-col gap-4">
-                <h4
-                className="text-[10px] font-bold uppercase tracking-[0.22em]"
-                style={{ color: "#ffffff" }}>
-                
-                  {col.title}
-                </h4>
-                <div className="flex flex-col gap-2.5">
-                  {col.links.map((link) =>
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className="text-sm transition-colors hover:translate-x-0.5 duration-150"
-                  style={{ color: "rgba(255,255,255,0.5)" }}
-                  onMouseEnter={(e) =>
-                  e.currentTarget.style.color = "rgba(255,255,255,0.9)"
-                  }
-                  onMouseLeave={(e) =>
-                  e.currentTarget.style.color =
-                  "rgba(255,255,255,0.5)"
-                  }>
-                  
-                      {link.label}
-                    </a>
-                )}
-                </div>
+          {navColumns.map((col) => (
+            <div key={col.title} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <h4 style={{ fontSize: "10px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#0088CC", margin: 0 }}>
+                {col.title}
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {col.links.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", textDecoration: "none", fontWeight: "500", transition: "color 0.2s" }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
+                    onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.55)"}
+                  >
+                    {link.label}
+                  </a>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+          ))}
         </div>
 
         {/* Bottom bar */}
-        <div
-          className="mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          
-          <div
-            className="flex items-center gap-4 text-xs"
-            style={{ color: "rgba(255,255,255,0.3)" }}>
-            
-            <span>© {new Date().getFullYear()} ClientSurge Systems</span>
-            <span className="hidden sm:inline">·</span>
-            <a
-              href="/legal/privacy" className="hidden sm:inline hover:text-white transition-colors hidden">
-              
-              
+        <div style={{ marginTop: "48px", paddingTop: "24px", borderTop: "1px solid rgba(0,174,239,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.4)" }}>© {new Date().getFullYear()} ClientSurge Systems</span>
+            <a href="/legal/privacy" onClick={(e) => handleNavClick(e, "/legal/privacy")} style={{ fontSize: "12px", color: "rgba(10,22,40,0.4)", textDecoration: "none" }}
+              onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
+              onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.4)"}>
               Privacy
             </a>
-            <span className="hidden sm:inline">·</span>
-            <a
-              href="/legal/terms" className="hidden sm:inline hover:text-white transition-colors hidden">
-
-              
+            <a href="/legal/terms" onClick={(e) => handleNavClick(e, "/legal/terms")} style={{ fontSize: "12px", color: "rgba(10,22,40,0.4)", textDecoration: "none" }}
+              onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
+              onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.4)"}>
               Terms
             </a>
           </div>
-
-          <div className="flex items-center gap-3">
-            <div
-              className="flex items-center gap-1.5 text-xs"
-              style={{ color: "rgba(255,255,255,0.3)" }}>
-              
-              <Shield className="w-3 h-3" style={{ color: "#c8965c" }} />
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "rgba(10,22,40,0.4)" }}>
+              <Shield style={{ width: "13px", height: "13px", color: "#0088CC" }} />
               <span>SSL Encrypted</span>
             </div>
             <button
               onClick={scrollTop}
-              className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
-              style={{
-                background: "rgba(154,92,46,0.2)",
-                border: "1px solid rgba(154,92,46,0.3)"
-              }}
-              title="Back to top">
-              
-              <ArrowUp className="w-3.5 h-3.5" style={{ color: "#c8965c" }} />
+              style={{ width: "32px", height: "32px", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,136,204,0.08)", border: "1px solid rgba(0,136,204,0.2)", cursor: "pointer", transition: "all 0.2s" }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,136,204,0.15)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(0,136,204,0.08)"; e.currentTarget.style.transform = "translateY(0)"; }}
+              title="Back to top"
+            >
+              <ArrowUp style={{ width: "14px", height: "14px", color: "#0088CC" }} />
             </button>
           </div>
         </div>
       </div>
-    </footer>);
 
+      {/* Responsive styles */}
+      <style>{`
+        @media (max-width: 1024px) {
+          footer .footer-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 640px) {
+          footer .footer-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+    </footer>
+  );
 }

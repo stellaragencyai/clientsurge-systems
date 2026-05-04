@@ -24,6 +24,7 @@ const AutomationShowcase = lazy(() => import("../components/landing/AutomationSh
 const MissedCallAnimation = lazy(() => import("../components/landing/MissedCallAnimation"));
 const InstantLeadResponseAnimation = lazy(() => import("../components/landing/InstantLeadResponseAnimation"));
 const AIBookingAgentAnimation = lazy(() => import("../components/landing/AIBookingAgentAnimation"));
+const NurtureSequenceAnimation = lazy(() => import("../components/landing/NurtureSequenceAnimation"));
 const SystemDiagramSection = lazy(() => import("../components/landing/SystemDiagram"));
 
 import {
@@ -136,6 +137,10 @@ export default function Home() {
         <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
           <AIBookingAgentAnimation />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <SectionBreak />
+          <NurtureSequenceAnimation />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
