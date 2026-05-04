@@ -39,9 +39,7 @@ export default function DiagramNode({ node, isActive, isHighlighted, onClick, st
           alignItems: "center",
           justifyContent: "center",
           gap: "2px",
-          background: isActive
-            ? `radial-gradient(circle at 35% 35%, ${node.color}ff, ${node.color}bb)`
-            : `radial-gradient(circle at 35% 35%, ${node.color}22, ${node.color}11)`,
+          background: "#ffffff",
           border: `2.5px solid ${isActive ? node.color : node.color + "55"}`,
           boxShadow: isActive
             ? `0 0 0 6px ${node.color}22, 0 8px 24px ${node.color}44`
@@ -71,7 +69,7 @@ export default function DiagramNode({ node, isActive, isHighlighted, onClick, st
             style={{
               fontSize: "8px",
               fontWeight: "800",
-              color: isActive ? "rgba(255,255,255,0.9)" : node.color,
+              color: "#000000",
               letterSpacing: "0.04em",
               textTransform: "uppercase",
               textAlign: "center",
@@ -89,7 +87,7 @@ export default function DiagramNode({ node, isActive, isHighlighted, onClick, st
         style={{
           fontSize: "10px",
           fontWeight: "700",
-          color: isActive ? node.color : "rgba(15,20,40,0.75)",
+          color: "#000000",
           textAlign: "center",
           maxWidth: "80px",
           lineHeight: 1.3,
