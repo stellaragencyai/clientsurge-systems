@@ -2,8 +2,9 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   ArrowLeft, ArrowRight, Loader2, CheckCircle2,
-  Building2, Palette, MessageSquare, Globe, Rocket,
+  Building2, Palette, MessageSquare, Globe, Rocket, Plug,
 } from "lucide-react";
+import IntegrationStatusStep from "@/components/onboarding/IntegrationStatusStep";
 
 // ── Step definitions ─────────────────────────────────────────────────────────
 const STEPS = [
@@ -11,6 +12,7 @@ const STEPS = [
   { id: "brand",        icon: Palette,        title: "Brand & Design",      desc: "Colors and logo for your system" },
   { id: "messaging",    icon: MessageSquare,  title: "Messaging Setup",     desc: "Phone number, booking link & hours" },
   { id: "integrations", icon: Globe,          title: "Integrations",        desc: "Connect your lead sources" },
+  { id: "connection",   icon: Plug,           title: "Connection Check",    desc: "Verify your integrations are live" },
   { id: "review",       icon: Rocket,         title: "Review & Submit",     desc: "Confirm everything looks good" },
 ];
 
@@ -618,6 +620,7 @@ export default function CredentialsWizard({ order, onComplete }) {
           {step.id === "brand"        && <BrandStep data={data} onChange={onChange} onLogoUpload={handleLogoUpload} logoUploading={logoUploading} />}
           {step.id === "messaging"    && <MessagingStep data={data} onChange={onChange} />}
           {step.id === "integrations" && <IntegrationsStep data={data} onChange={onChange} />}
+          {step.id === "connection"   && <IntegrationStatusStep data={data} />}
           {step.id === "review"       && <ReviewStep data={data} order={order} />}
 
           {error && (
