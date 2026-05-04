@@ -85,7 +85,7 @@ export default function Hero() {
             className="landing-hero__headline"
             style={{
               fontFamily: "Montserrat, sans-serif",
-              fontSize: "clamp(2rem, 5.2vw, 3.8rem)",
+              fontSize: "clamp(1.6rem, 3.5vw, 2.6rem)",
               fontWeight: "700",
               lineHeight: 1.1,
               letterSpacing: "-0.03em",
