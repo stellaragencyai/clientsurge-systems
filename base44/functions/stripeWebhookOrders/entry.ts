@@ -223,6 +223,25 @@ Deno.serve(async (req) => {
           }
         }
 
+        // ── Initialize Install OS (checklists + steps per service) ────────────
+        try {
+          const installOSResult = await base44.asServiceRole.functions.invoke("initializeInstallOS", {
+            order_id: order.id,
+          });
+          console.log("[stripeWebhookOrders] initializeInstallOS complete", {
+            orderId: order.id,
+            install_os_id: installOSResult?.install_os_id,
+            checklist_ids: installOSResult?.checklist_ids,
+            steps_created: installOSResult?.steps_created,
+            already_initialized: installOSResult?.already_initialized,
+          });
+        } catch (installOSErr) {
+          console.error("[stripeWebhookOrders] initializeInstallOS failed (non-blocking)", {
+            orderId: order.id,
+            error: installOSErr instanceof Error ? installOSErr.message : String(installOSErr),
+          });
+        }
+
         // ── Admin purchase notification ────────────────────────────────────────
         try {
           await base44.asServiceRole.functions.invoke("sendAdminPurchaseNotification", {
