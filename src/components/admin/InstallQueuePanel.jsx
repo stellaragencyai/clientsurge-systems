@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { AlertCircle, ChevronRight, Loader2, RefreshCw } from "lucide-react";
+import { AlertCircle, ChevronRight, Loader2, RefreshCw, Rocket, TriangleAlert } from "lucide-react";
 import InstallOrderWorkspace from "./InstallOrderWorkspace";
 import { getPackageDisplayLabel } from "@/lib/aiProducts";
 
@@ -52,11 +52,33 @@ function formatSubscriptionStatus(value) {
   return SUBSCRIPTION_STATUS_LABELS[value] || value.replaceAll("_", " ");
 }
 
+function getHoursSince(value) {
+  if (!value) {
+    return 0;
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return 0;
+  }
+
+  return (Date.now() - parsed.getTime()) / (1000 * 60 * 60);
+}
+
+function getUninitializedPaidHours(order) {
+  if (!order || order.install_initialized_at || order.pipeline_status !== "Paid") {
+    return 0;
+  }
+
+  return getHoursSince(order.created_date || order.updated_date);
+}
+
 export default function InstallQueuePanel() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState("");
+  const [initializingOrderId, setInitializingOrderId] = useState("");
 
   const loadQueue = async () => {
     try {
@@ -87,6 +109,23 @@ export default function InstallQueuePanel() {
     loadQueue();
   }, []);
 
+  const handleInitializeOrder = async (orderId) => {
+    try {
+      setError("");
+      setInitializingOrderId(orderId);
+      await base44.functions.invoke("installPipeline", {
+        action: "initialize",
+        order_id: orderId,
+      });
+      await loadQueue();
+      setSelectedOrderId(orderId);
+    } catch (err) {
+      setError(err?.data?.error || err?.message || "Unable to initialize install workspace.");
+    } finally {
+      setInitializingOrderId("");
+    }
+  };
+
   const queueStats = useMemo(() => {
     return orders.reduce(
       (acc, order) => {
@@ -95,9 +134,10 @@ export default function InstallQueuePanel() {
         if (order.pipeline_status === "Live") acc.live += 1;
         if (order.pipeline_status === "Testing") acc.testing += 1;
         if (order.items.some((item) => !item.configuration_complete)) acc.needsConfig += 1;
+        if (getUninitializedPaidHours(order) >= 48) acc.stalled += 1;
         return acc;
       },
-      { total: 0, error: 0, live: 0, testing: 0, needsConfig: 0 }
+      { total: 0, error: 0, live: 0, testing: 0, needsConfig: 0, stalled: 0 }
     );
   }, [orders]);
 
@@ -122,10 +162,11 @@ export default function InstallQueuePanel() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-6">
         <MetricCard label="Queue" value={queueStats.total} />
         <MetricCard label="Needs Config" value={queueStats.needsConfig} tone="amber" />
         <MetricCard label="Testing" value={queueStats.testing} tone="purple" />
+        <MetricCard label="Stalled >48h" value={queueStats.stalled} tone="red" />
         <MetricCard label="Errors" value={queueStats.error} tone="red" />
         <MetricCard label="Live" value={queueStats.live} tone="green" />
       </div>
@@ -151,12 +192,22 @@ export default function InstallQueuePanel() {
             {orders.map((order) => {
               const isSelected = order.id === selectedOrderId;
               const incompleteServices = order.items.filter((item) => !item.configuration_complete);
+              const isUninitialized = !order.install_initialized_at;
+              const stalledPaidHours = getUninitializedPaidHours(order);
+              const showStalledWarning = stalledPaidHours >= 48;
 
               return (
-                <button
+                <div
                   key={order.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setSelectedOrderId(order.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setSelectedOrderId(order.id);
+                    }
+                  }}
                   className={`w-full rounded-2xl border bg-white p-5 text-left shadow-sm transition-all ${
                     isSelected
                       ? "border-primary ring-2 ring-primary/10"
@@ -168,6 +219,12 @@ export default function InstallQueuePanel() {
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="text-base font-semibold text-foreground">{order.business_name}</h3>
                         <StatusBadge value={order.pipeline_status} />
+                        {showStalledWarning ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700">
+                            <TriangleAlert className="h-3.5 w-3.5" />
+                            Paid {Math.floor(stalledPaidHours / 24)}d ago - not started
+                          </span>
+                        ) : null}
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">
                         {order.customer_name} | {order.customer_email}
@@ -188,11 +245,31 @@ export default function InstallQueuePanel() {
                         {getPackageDisplayLabel(order.pricing_summary)}
                       </p>
                     </div>
-                    <ChevronRight
-                      className={`mt-1 h-4 w-4 flex-shrink-0 text-muted-foreground ${
-                        isSelected ? "text-primary" : ""
-                      }`}
-                    />
+                    <div className="flex flex-col items-end gap-2">
+                      {isUninitialized ? (
+                        <button
+                          type="button"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleInitializeOrder(order.id);
+                          }}
+                          disabled={Boolean(initializingOrderId) && initializingOrderId !== order.id}
+                          className="inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          {initializingOrderId === order.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Rocket className="h-3.5 w-3.5" />
+                          )}
+                          {initializingOrderId === order.id ? "Initializing..." : "Initialize Install OS"}
+                        </button>
+                      ) : null}
+                      <ChevronRight
+                        className={`mt-1 h-4 w-4 flex-shrink-0 text-muted-foreground ${
+                          isSelected ? "text-primary" : ""
+                        }`}
+                      />
+                    </div>
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -254,7 +331,7 @@ export default function InstallQueuePanel() {
                       </p>
                     </div>
                   )}
-                </button>
+                </div>
               );
             })}
           </div>

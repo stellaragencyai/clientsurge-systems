@@ -57,6 +57,53 @@
 
 ---
 
+## 🧪 LAUNCH-IMPORTANT CHECKPOINT BOARD
+
+Use this board for the highest-signal launch tasks first. It separates backlog row status from actual execution truth so the agents can see what is built, what is tested, what is only proven in production, and what still blocks launch.
+
+Checkpoint legend:
+- `🟩` complete / proven
+- `🟨` partial / mixed / in progress
+- `🟥` missing / unproven / still blocking
+- `N/A` not applicable for that checkpoint
+
+Gate meaning:
+- `🟥` currently blocks a truthful launch
+- `🟨` important but not yet a hard blocker, or blocked only through another dependency
+- `🟩` no longer a current launch blocker
+
+| Task | Row | Impl | Test | Live | Gate | Current Truth |
+|---|---|---|---|---|---|---|
+| `#23` React `ErrorBoundary` wrapping app routes | `⏳` | 🟩 | 🟩 | N/A | 🟩 | Implemented in repo and verified with `build`, `lint`, and `typecheck`; backlog row is stale and should be promoted on next truth sync |
+| `#76` Stripe publishable key only in frontend | `⏳` | N/A | 🟥 | N/A | 🟥 | Still needs a dedicated verification pass to confirm no secret key leakage |
+| `#85` `autoEndToEndTest` admin-role gate | `⏳` | 🟥 | 🟥 | N/A | 🟨 | Security-hardening task still appears open in repo truth |
+| `#95` STOP guard before nurture sends | `⏳` | 🟥 | 🟥 | 🟥 | 🟥 | Compliance-critical send guard still needs canonical implementation and proof |
+| `#127` inbound STOP handling pauses all sequences | `⏳` | 🟥 | 🟥 | 🟥 | 🟥 | Still needs canonical STOP-handling proof on the live Twilio path |
+| `#146` Stripe subscription metadata `order_id` | `✅` | 🟩 | 🟨 | 🟥 | 🟨 | Repo-complete; still needs live Stripe proof before it can be treated as fully launch-ready |
+| `#147` Stripe `billing_status = past_due` on failure | `✅` | 🟩 | 🟨 | 🟥 | 🟨 | Repo-complete; launch truth still depends on real billing-failure proof |
+| `#154` admin analytics MRR fix | `⏳` | 🟥 | 🟥 | N/A | 🟨 | Critical analytics gap still open |
+| `#194` portal `PaymentFailedBanner` | `🔄` | 🟨 | 🟨 | 🟥 | 🟨 | Banner path exists, but portal truth and live billing validation are still under reconciliation |
+| `#201` switch Stripe to live keys | `🔄` | N/A | N/A | 🟥 | 🟥 | Environment-only launch gate; cannot turn green from repo alone |
+| `#202` update Stripe webhook URL to production | `🔄` | N/A | N/A | 🟥 | 🟥 | Production dashboard proof required |
+| `#203` real-card Stripe purchase test | `🔄` | N/A | 🟥 | 🟥 | 🟥 | Hard launch gate; real transaction proof still missing |
+| `#211` custom domain DNS + SSL | `⏳` | 🟨 | 🟨 | 🟨 | 🟨 | Production URLs suggest a domain exists, but this has not been re-verified in this audit pass |
+| `#213a` Resend SPF/DKIM/DMARC auth | `⏳` | N/A | N/A | 🟥 | 🟥 | External deliverability gate still needs production proof |
+| `#213b` Twilio A2P 10DLC registration | `⏳` | N/A | N/A | 🟥 | 🟥 | External compliance gate still needs production proof |
+| `#218` verify all production secrets are set | `⏳` | N/A | N/A | 🟥 | 🟥 | Environment-only launch gate still open |
+| `#239` write `STRIPE_GO_LIVE.md` | `⏳` | 🟩 | N/A | N/A | 🟩 | File now exists in repo; backlog row is stale and should be promoted on next truth sync |
+| `#245` final lead → SMS → follow-up → booking test | `⏳` | 🟨 | 🟥 | 🟥 | 🟥 | Underlying paths exist in part, but the end-to-end launch proof is still missing |
+| `#248` legal pages accuracy + TCPA review | `⏳` | 🟨 | 🟥 | N/A | 🟥 | Pages exist, but final legal/compliance review is still open |
+| `#249` final real-card purchase verification | `⏳` | 🟨 | 🟥 | 🟥 | 🟥 | Launch-critical purchase proof still missing |
+| `#250` team sign-off | `⏳` | N/A | N/A | 🟥 | 🟥 | Cannot complete until the launch-blocking rows above are genuinely green |
+| `#251` wire `scoreLeadIntelligence` on new lead creation | `⏳` | 🟨 | 🟥 | N/A | 🟨 | Intelligence function exists, but the trigger wiring is still missing |
+| `#260` portal billing tab | `✅` | 🟩 | 🟨 | 🟥 | 🟨 | Billing UI exists in repo, but real paid-customer validation is still missing |
+| `#263` red portal `PaymentFailedBanner` duplicate row | `⏳` | 🟨 | 🟨 | 🟥 | 🟨 | Same truth as `#194`; keep both rows aligned until duplicates are cleaned up |
+| `#268` admin dashboard MRR card | `⏳` | 🟥 | 🟥 | N/A | 🟨 | Launch-ops metric still open |
+| `#276` `InstallChecklistPanel` live progress panel | `⏳` | 🟨 | 🟥 | N/A | 🟨 | Component exists in repo, but wiring/verification are still incomplete |
+| `#300` TCPA consent disclosure on all public lead forms | `⏳` | 🟨 | 🟥 | N/A | 🟥 | Consent copy is present in some flows, but not yet consistently across all public lead-capture surfaces |
+
+---
+
 ---
 
 # 🟦 AGENT A — Frontend, UI/UX, Store, Mobile, SEO
@@ -559,6 +606,7 @@
 | 2026-05-03 | Codex | Corrected misleading row statuses: moved false greens `#2`, `#3`, `#5`, `#94`, `#101` back to pending and promoted stale/repo-complete rows `#11`, `#29`, `#67`, `#146`, `#147`, `#173`, `#255`, `#260`, `#284`, `#288` |
 | 2026-05-03 | Codex | Added an AI-agent coordination cross-check in `docs/agent-task-control-center.md` to mark which parts of the proposed multi-agent operating model are already present, partial, or still missing |
 | 2026-05-03 | Codex | Upgraded the control center with a unified AI-agent protocol, explicit lease/heartbeat rules, a structured request router, and a launch-system blueprint matrix |
+| 2026-05-03 | Codex | Added a launch-important checkpoint board so agents can track `Implemented`, `Tested`, `Live`, and `Gate` truth separately from the raw row status for the highest-signal launch tasks |
 
 ---
 
@@ -569,8 +617,9 @@
 3. Change the status emoji: `⏳` → `🔄` when starting, `🔄` → `✅` only after proof exists.
 4. Update `docs/agent-task-control-center.md` with locks, handoffs, blockers, or chat notes.
 5. Add a row to the **CHANGE LOG** with your date, agent name, and what changed.
-6. Regenerate `docs/task-authenticity-audit-2026-05-03.md` after meaningful status or scope changes.
-7. If a task is blocked, add a note in the control center and change the row to `❌`.
+6. Keep the **Launch-Important Checkpoint Board** aligned for any launch-critical row you touch.
+7. Regenerate `docs/task-authenticity-audit-2026-05-03.md` after meaningful status or scope changes.
+8. If a task is blocked, add a note in the control center and change the row to `❌`.
 
 ---
 

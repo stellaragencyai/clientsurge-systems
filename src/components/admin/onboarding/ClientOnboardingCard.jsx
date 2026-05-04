@@ -76,6 +76,24 @@ const STEPS = [
 
 const STEP_KEYS = STEPS.map((step) => step.key);
 
+function getPipelineStatusBadge(pipelineStatus) {
+  const normalized = (pipelineStatus || "Not Started").trim();
+  const styles = {
+    "Not Started": "bg-slate-100 text-slate-700 border-slate-200",
+    "Awaiting Kickoff": "bg-sky-50 text-sky-700 border-sky-200",
+    "In Progress": "bg-amber-50 text-amber-700 border-amber-200",
+    "Waiting on Client": "bg-violet-50 text-violet-700 border-violet-200",
+    "QA / Testing": "bg-cyan-50 text-cyan-700 border-cyan-200",
+    "Complete": "bg-green-50 text-green-700 border-green-200",
+    "Live": "bg-green-50 text-green-700 border-green-200",
+  };
+
+  return {
+    label: normalized,
+    className: styles[normalized] || "bg-primary/10 text-primary border-primary/20",
+  };
+}
+
 export default function ClientOnboardingCard({ client, onUpdate }) {
   const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState({});
@@ -85,6 +103,7 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
   const completedCount = STEP_KEYS.filter((key) => client[key]).length;
   const pct = Math.round((completedCount / STEP_KEYS.length) * 100);
   const isLive = !!client.step_live || client.status === "Live";
+  const pipelineBadge = getPipelineStatusBadge(client.pipeline_status);
 
   const toggleStep = async (step, current) => {
     if (step.mode !== "manual") {
@@ -147,11 +166,16 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
             {client.business_name?.[0]?.toUpperCase() || "C"}
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-foreground text-sm truncate">
-              {client.business_name}
-            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="font-semibold text-foreground text-sm truncate">
+                {client.business_name}
+              </p>
+              <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${pipelineBadge.className}`}>
+                Pipeline: {pipelineBadge.label}
+              </span>
+            </div>
             <p className="text-xs text-muted-foreground truncate">
-              {client.owner_name} · {client.industry || "-"}
+              {client.owner_name} • {client.industry || "-"}
             </p>
           </div>
           <span
@@ -407,3 +431,4 @@ function InfoItem({ icon: Icon, label, value, link = false, wide = false }) {
     </div>
   );
 }
+

@@ -54,13 +54,13 @@ This is the audit against the proposed multi-agent operating model for three AI 
 - 🟩 The old handoff queue is now upgraded into a structured request router for agent-to-agent coordination.
 - 🟩 Request type, expected deliverable, due-by priority, acknowledgement, and status fields now exist.
 
-### 4. Implementation vs Verification vs Launch Truth — 🟨 Partial
+### 4. Implementation vs Verification vs Launch Truth — 🟩 Implemented For Launch-Important Rows
 
 - 🟩 The truth audit file already exists and is linked from both coordination docs.
 - 🟩 The live-proof queue already distinguishes repo truth from production truth for critical launch tasks.
 - 🟩 The `🧪` proof-note concept already exists.
-- 🟥 The master task rows still do not have separate checkpoints for `Implemented`, `Tested`, `Live Verified`, and `Launch Blocking`.
-- 🟥 Important tasks still collapse too much truth into one status cell, which makes collaborative verification weaker than it should be.
+- 🟩 The master backlog now includes a launch-important checkpoint board that separates `Implemented`, `Tested`, `Live`, and `Gate` truth for the highest-signal launch tasks.
+- 🟨 The full 300-task backlog still does not expose this truth split row-by-row, so the new model is intentionally scoped to launch-important work first.
 
 ### 5. Launch System Blueprint For Business-Critical Workflows — 🟩 Implemented
 
@@ -73,7 +73,7 @@ This is the audit against the proposed multi-agent operating model for three AI 
 ## Summary
 
 - 🟩 Already strong: shared truth sources, status language, lock ownership, handoff/chat basics, proof mindset, unified protocol, explicit leases, structured request routing, and a launch blueprint matrix.
-- 🟨 Still partial: task rows do not yet split implementation, verification, and live-proof truth into separate per-row checkpoints.
+- 🟨 Still partial: the checkpoint split now exists for launch-important work, but not yet for the full backlog.
 - 🟨 Ongoing need: the launch blueprint is now present, but it must stay synced with real repo and live-state evidence.
 
 ## Current Snapshot

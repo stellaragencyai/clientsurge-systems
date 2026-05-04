@@ -14,3 +14,111 @@
 [2m2:27:00 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to load url /src/api/base44Client.js (resolved id: C:/Users/nolan/Desktop/clientsurge-systems/src/api/base44Client.js) in C:/Users/nolan/Desktop/clientsurge-systems/src/lib/analyticsObserver.js. Does the file exist?
 [2m2:27:00 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to load url /src/api/base44Client.js (resolved id: C:/Users/nolan/Desktop/clientsurge-systems/src/api/base44Client.js) in C:/Users/nolan/Desktop/clientsurge-systems/src/lib/analyticsObserver.js. Does the file exist?
 [2m2:27:00 PM[22m [31m[1m[vite][22m[39m [31m[2m(client)[22m[39m Pre-transform error: Failed to load url /src/api/base44Client.js (resolved id: C:/Users/nolan/Desktop/clientsurge-systems/src/api/base44Client.js) in C:/Users/nolan/Desktop/clientsurge-systems/src/lib/analyticsObserver.js. Does the file exist?
+[2m4:41:44 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: C:\Users\nolan\Desktop\clientsurge-systems\src\App.jsx: Unexpected token (16:1)
+
+[0m [90m 14 |[31m [36mimport[31m { [33mAuthProvider[31m[33m,[31m useAuth } [36mfrom[31m [32m"@/lib/AuthContext"[31m[33m;[31m
+ [90m 15 |[31m [36mimport[31m { queryClientInstance } [36mfrom[31m [32m"@/lib/query-client"[31m[33m;[31m
+[31m[1m>[22m[31m[90m 16 |[31m [33m<<[31m[33m<<[31m[33m<<[31m[33m<[31m [33mHEAD[31m
+ [90m    |[31m  [31m[1m^[22m[31m
+ [90m 17 |[31m [33m===[31m[33m===[31m[33m=[31m
+ [90m 18 |[31m [36mimport[31m [33mAutoCTAAnalytics[31m [36mfrom[31m [32m"./components/analytics/AutoCTAAnalytics"[31m[33m;[31m
+ [90m 19 |[31m [36mimport[31m [33mErrorBoundary[31m [36mfrom[31m [32m"./components/ErrorBoundary"[31m[33m;[31m[0m[39m
+  Plugin: [35mvite:react-babel[39m
+  File: [36mC:/Users/nolan/Desktop/clientsurge-systems/src/App.jsx[39m:16:1
+[33m  15 |  import { queryClientInstance } from "@/lib/query-client";
+  16 |  <<<<<<< HEAD
+  17 |  =======
+     |     ^
+  18 |  import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
+  19 |  import ErrorBoundary from "./components/ErrorBoundary";[39m
+      at constructor (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:365:19)
+      at JSXParserMixin.raise (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:6599:19)
+      at JSXParserMixin.unexpected (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:6619:16)
+      at JSXParserMixin.jsxParseIdentifier (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:4569:12)
+      at JSXParserMixin.jsxParseNamespacedName (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:4576:23)
+      at JSXParserMixin.jsxParseElementName (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:4585:21)
+      at JSXParserMixin.jsxParseOpeningElementAt (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:4661:22)
+      at JSXParserMixin.jsxParseElementAt (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:4686:33)
+      at JSXParserMixin.jsxParseElement (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:4749:17)
+      at JSXParserMixin.parseExprAtom (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:4759:19)
+      at JSXParserMixin.parseExprSubscripts (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:11081:23)
+      at JSXParserMixin.parseUpdate (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:11066:21)
+      at JSXParserMixin.parseMaybeUnary (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:11046:23)
+      at JSXParserMixin.parseMaybeUnaryOrPrivate (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:10899:61)
+      at JSXParserMixin.parseExprOps (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:10904:23)
+      at JSXParserMixin.parseMaybeConditional (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:10881:23)
+      at JSXParserMixin.parseMaybeAssign (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:10831:21)
+      at JSXParserMixin.parseExpressionBase (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:10784:23)
+      at C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:10780:39
+      at JSXParserMixin.allowInAnd (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:12421:16)
+      at JSXParserMixin.parseExpression (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:10780:17)
+      at JSXParserMixin.parseStatementContent (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:12895:23)
+      at JSXParserMixin.parseStatementLike (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:12767:17)
+      at JSXParserMixin.parseModuleItem (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:12744:17)
+      at JSXParserMixin.parseBlockOrModuleBlockBody (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:13316:36)
+      at JSXParserMixin.parseBlockBody (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:13309:10)
+      at JSXParserMixin.parseProgram (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:12622:10)
+      at JSXParserMixin.parseTopLevel (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:12612:25)
+      at JSXParserMixin.parse (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:14488:25)
+      at parse (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\parser\lib\index.js:14522:38)
+      at parser (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\core\lib\parser\index.js:41:34)
+      at parser.next (<anonymous>)
+      at normalizeFile (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\core\lib\transformation\normalize-file.js:64:37)
+      at normalizeFile.next (<anonymous>)
+      at run (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\core\lib\transformation\index.js:22:50)
+      at run.next (<anonymous>)
+      at transform (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\core\lib\transform.js:22:33)
+      at transform.next (<anonymous>)
+      at step (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\gensync\index.js:261:32)
+      at C:\Users\nolan\Desktop\clientsurge-systems\node_modules\gensync\index.js:273:13
+      at async.call.result.err.err (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\gensync\index.js:223:11)
+      at C:\Users\nolan\Desktop\clientsurge-systems\node_modules\gensync\index.js:189:28
+      at C:\Users\nolan\Desktop\clientsurge-systems\node_modules\@babel\core\lib\gensync-utils\async.js:67:7
+      at C:\Users\nolan\Desktop\clientsurge-systems\node_modules\gensync\index.js:113:33
+      at step (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\gensync\index.js:287:14)
+      at C:\Users\nolan\Desktop\clientsurge-systems\node_modules\gensync\index.js:273:13
+      at async.call.result.err.err (C:\Users\nolan\Desktop\clientsurge-systems\node_modules\gensync\index.js:223:11)
+[2m4:41:44 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Unable to parse HTML; parse5 error code invalid-first-character-of-tag-name
+ at C:/Users/nolan/Desktop/clientsurge-systems/index.html:45:2
+45 |  <<<<<<< HEAD
+46 |  =======
+47 |          <p>Visit <a href="https://www.enable-javascript.com">enable-javascript.com</a> for instructions.</p>
+   |                          ^
+48 |  >>>>>>> origin/main
+49 |        </div>[39m
+   at C:/Users/nolan/Desktop/clientsurge-systems/index.html:45:2
+      at handleParseError (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:36203:9)
+      at Parser.onParseError (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:36116:7)
+      at Tokenizer._err (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:1513:89)
+      at Tokenizer._stateTagOpen (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:2260:26)
+      at Tokenizer._callState (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:1837:22)
+      at Tokenizer._runParsingLoop (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:1537:22)
+      at Tokenizer.write (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:1562:14)
+      at Parser.parse (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:5086:26)
+      at parse (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:8215:19)
+      at traverseHtml (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:36111:15)
+      at async devHtmlHook (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:37503:3)
+      at async applyHtmlTransforms (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:36944:17)
+      at async viteIndexHtmlMiddleware (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:37679:20)
+[2m4:43:22 PM[22m [31m[1m[vite][22m[39m [31mInternal server error: Unable to parse HTML; parse5 error code invalid-first-character-of-tag-name
+ at C:/Users/nolan/Desktop/clientsurge-systems/index.html:45:2
+45 |  <<<<<<< HEAD
+46 |  =======
+47 |          <p>Visit <a href="https://www.enable-javascript.com">enable-javascript.com</a> for instructions.</p>
+   |                          ^
+48 |  >>>>>>> origin/main
+49 |        </div>[39m
+   at C:/Users/nolan/Desktop/clientsurge-systems/index.html:45:2
+      at handleParseError (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:36203:9)
+      at Parser.onParseError (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:36116:7)
+      at Tokenizer._err (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:1513:89)
+      at Tokenizer._stateTagOpen (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:2260:26)
+      at Tokenizer._callState (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:1837:22)
+      at Tokenizer._runParsingLoop (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:1537:22)
+      at Tokenizer.write (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:1562:14)
+      at Parser.parse (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:5086:26)
+      at parse (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-CvfTChi5.js:8215:19)
+      at traverseHtml (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:36111:15)
+      at async devHtmlHook (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:37503:3)
+      at async applyHtmlTransforms (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:36944:17)
+      at async viteIndexHtmlMiddleware (file:///C:/Users/nolan/Desktop/clientsurge-systems/node_modules/vite/dist/node/chunks/dep-Dq2t6Dq0.js:37679:20)

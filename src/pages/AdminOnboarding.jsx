@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
-import { Link2, Loader2, Users, ArrowLeft } from "lucide-react";
+import { Link2, Loader2, Users, ArrowLeft, Search } from "lucide-react";
 import ClientOnboardingCard from "@/components/admin/onboarding/ClientOnboardingCard";
 import AddClientModal from "@/components/admin/onboarding/AddClientModal";
 
@@ -13,6 +13,7 @@ export default function AdminOnboarding() {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const loadClients = async () => {
     const data = await base44.entities.OnboardingClient.list("-created_date", 100);
@@ -38,13 +39,22 @@ export default function AdminOnboarding() {
   const inSetupCount = clients.filter(c => c.status === "In Setup").length;
   const onboardingCount = clients.filter(c => c.status === "Onboarding" || !c.status).length;
 
-  const filtered = filter === "all" ? clients
+  const filteredByStatus = filter === "all" ? clients
     : clients.filter(c => {
         if (filter === "live") return c.status === "Live";
         if (filter === "setup") return c.status === "In Setup";
         if (filter === "onboarding") return c.status === "Onboarding" || !c.status;
         return true;
       });
+
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const filtered = normalizedSearch
+    ? filteredByStatus.filter((client) => {
+        const businessName = client.business_name?.toLowerCase() || "";
+        const email = client.email?.toLowerCase() || "";
+        return businessName.includes(normalizedSearch) || email.includes(normalizedSearch);
+      })
+    : filteredByStatus;
 
   if (loading) {
     return (
@@ -94,7 +104,18 @@ export default function AdminOnboarding() {
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="relative w-full md:max-w-sm">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by business name or email"
+              className="w-full rounded-full border border-border bg-background py-2 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
           {[
             { id: "all", label: "All" },
             { id: "onboarding", label: "Onboarding" },
@@ -113,6 +134,7 @@ export default function AdminOnboarding() {
               {f.label}
             </button>
           ))}
+          </div>
         </div>
 
         {/* Client Cards */}

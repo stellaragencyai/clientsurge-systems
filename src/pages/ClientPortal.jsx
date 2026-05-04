@@ -12,8 +12,8 @@ import BillingDashboard from "../components/portal/BillingDashboard";
 const TABS = [
   { id: "progress", label: "Build Progress" },
   { id: "support", label: "Support & Messaging" },
-  { id: "plan", label: "My Plan" },
   { id: "billing", label: "Billing" },
+  { id: "plan", label: "My Plan" },
 ];
 
 function formatPortalDate(value) {
@@ -288,18 +288,15 @@ export default function ClientPortal() {
             fixtureMessages={portalTestFixture?.support_messages || []}
           />
         )}
+        {activeTab === "billing" && (
+          <BillingDashboard currentUser={user} />
+        )}
         {activeTab === "plan" && (
           <PlanManager
             project={project}
             subscription={subscription}
             onUpdated={refreshProject}
             testMode={portalTestMode}
-          />
-        )}
-        {activeTab === "billing" && (
-          <BillingDashboard
-            project={project}
-            subscription={subscription}
           />
         )}
       </div>

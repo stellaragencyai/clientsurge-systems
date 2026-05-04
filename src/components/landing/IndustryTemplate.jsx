@@ -47,9 +47,9 @@ function IndustryTemplateInner({ industrySlug }) {
         <IndustryHero
           eyebrow={industry.hero.eyebrow}
           headline={industry.hero.headline}
-          subheadline={industry.hero.subheadline}
+          sub={industry.hero.subheadline}
           image={industry.hero.image || `https://via.placeholder.com/1200x600?text=${industry.name}`}
-          cta={industry.hero.cta}
+          ctaLabel={industry.hero.cta}
           onBookDemo={() => demoBooking?.openDemoBooking?.()}
         />
 

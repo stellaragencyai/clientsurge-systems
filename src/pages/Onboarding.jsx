@@ -10,6 +10,33 @@ const RESPONSE_OPTIONS = ["Immediately", "Within 1 hour", "Same day", "Longer"];
 const BRAND_VOICES = ["Professional", "Friendly", "Luxury", "Casual"];
 const YES_NO = ["Yes", "No"];
 
+const REQUIRED_FIELDS_BY_SECTION = {
+  1: ["full_name", "business_name", "email", "phone"],
+  2: ["services"],
+  3: ["lead_sources"],
+  5: ["response_speed"],
+  6: ["requires_consultation"],
+  7: ["brand_voice"],
+  9: ["business_hours"],
+  10: ["has_old_leads"],
+  12: ["goals"],
+};
+
+const FIELD_LABELS = {
+  full_name: "Full Name",
+  business_name: "Business Name",
+  email: "Email",
+  phone: "Phone Number",
+  services: "Services Offered",
+  lead_sources: "Lead Sources",
+  response_speed: "Response Speed",
+  requires_consultation: "Consultation Requirement",
+  brand_voice: "Brand Voice",
+  business_hours: "Business Hours",
+  has_old_leads: "Old Leads",
+  goals: "Your Goals",
+};
+
 const sections = [
   { id: 1, title: "Business Information" },
   { id: 2, title: "Services Offered" },
@@ -30,6 +57,7 @@ export default function Onboarding() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -55,6 +83,12 @@ export default function Onboarding() {
 
   const updateField = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
   };
 
   const toggleCheckbox = (field, value) => {
@@ -64,10 +98,89 @@ export default function Onboarding() {
         ? prev[field].filter((item) => item !== value)
         : [...prev[field], value],
     }));
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePhone = (phone) => /^[\d\s\-()]+$/.test(phone) && phone.replace(/\D/g, "").length >= 10;
+
+  const getFieldError = (field, value) => {
+    if (Array.isArray(value)) {
+      return value.length > 0 ? null : `Please select at least one option for ${FIELD_LABELS[field]}.`;
+    }
+
+    const normalized = typeof value === "string" ? value.trim() : value;
+
+    if (!normalized) {
+      return `${FIELD_LABELS[field]} is required.`;
+    }
+
+    if (field === "email" && !validateEmail(normalized)) {
+      return "Please enter a valid email address.";
+    }
+
+    if (field === "phone" && !validatePhone(normalized)) {
+      return "Please enter a valid phone number.";
+    }
+
+    return null;
+  };
+
+  const validateSections = (sectionIds) => {
+    const nextErrors = {};
+
+    sectionIds.forEach((sectionId) => {
+      const fields = REQUIRED_FIELDS_BY_SECTION[sectionId] || [];
+      fields.forEach((field) => {
+        const message = getFieldError(field, formData[field]);
+        if (message) {
+          nextErrors[field] = message;
+        }
+      });
+    });
+
+    return nextErrors;
+  };
+
+  const goToSection = (targetSection) => {
+    if (targetSection <= currentSection) {
+      setError(null);
+      setCurrentSection(targetSection);
+      return;
+    }
+
+    const nextErrors = validateSections([currentSection]);
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors((prev) => ({ ...prev, ...nextErrors }));
+      setError("Please complete the required fields in this section before continuing.");
+      return;
+    }
+
+    setError(null);
+    setCurrentSection(targetSection);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const allRequiredErrors = validateSections(Object.keys(REQUIRED_FIELDS_BY_SECTION).map(Number));
+    if (Object.keys(allRequiredErrors).length > 0) {
+      setFieldErrors(allRequiredErrors);
+      const firstInvalidSection = Object.entries(REQUIRED_FIELDS_BY_SECTION).find(([, fields]) =>
+        fields.some((field) => allRequiredErrors[field])
+      );
+      if (firstInvalidSection) {
+        setCurrentSection(Number(firstInvalidSection[0]));
+      }
+      setError("Please complete all required onboarding fields before submitting.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -91,7 +204,6 @@ export default function Onboarding() {
   return (
     <div className="min-h-screen bg-background py-12 px-6">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
         <div className="mb-12 text-center">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">
             Client Onboarding
@@ -104,7 +216,6 @@ export default function Onboarding() {
           </p>
         </div>
 
-        {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-medium text-foreground">
@@ -122,9 +233,7 @@ export default function Onboarding() {
           </div>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit}>
-          {/* Section 1 */}
           {currentSection === 1 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -136,6 +245,7 @@ export default function Onboarding() {
                 value={formData.full_name}
                 onChange={(e) => updateField("full_name", e.target.value)}
                 placeholder="Your full name"
+                error={fieldErrors.full_name}
               />
               <InputField
                 label="Business Name"
@@ -143,6 +253,7 @@ export default function Onboarding() {
                 value={formData.business_name}
                 onChange={(e) => updateField("business_name", e.target.value)}
                 placeholder="Your business name"
+                error={fieldErrors.business_name}
               />
               <InputField
                 label="Email"
@@ -151,6 +262,7 @@ export default function Onboarding() {
                 value={formData.email}
                 onChange={(e) => updateField("email", e.target.value)}
                 placeholder="your@email.com"
+                error={fieldErrors.email}
               />
               <InputField
                 label="Phone Number"
@@ -158,6 +270,7 @@ export default function Onboarding() {
                 value={formData.phone}
                 onChange={(e) => updateField("phone", e.target.value)}
                 placeholder="(555) 000-0000"
+                error={fieldErrors.phone}
               />
               <InputField
                 label="Website URL"
@@ -174,7 +287,6 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* Section 2 */}
           {currentSection === 2 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -191,6 +303,9 @@ export default function Onboarding() {
                   />
                 ))}
               </div>
+              {fieldErrors.services && (
+                <p className="text-sm text-destructive">{fieldErrors.services}</p>
+              )}
               <InputField
                 label="Other Services (if any)"
                 value={formData.services.find((s) => !SERVICES.includes(s)) || ""}
@@ -211,7 +326,6 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* Section 3 */}
           {currentSection === 3 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -228,6 +342,9 @@ export default function Onboarding() {
                   />
                 ))}
               </div>
+              {fieldErrors.lead_sources && (
+                <p className="text-sm text-destructive">{fieldErrors.lead_sources}</p>
+              )}
               <InputField
                 label="Other Sources (if any)"
                 value={formData.lead_sources.find((s) => !LEAD_SOURCES.includes(s)) || ""}
@@ -248,7 +365,6 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* Section 4 */}
           {currentSection === 4 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -263,7 +379,6 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* Section 5 */}
           {currentSection === 5 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -274,11 +389,12 @@ export default function Onboarding() {
                 value={formData.response_speed}
                 onChange={(e) => updateField("response_speed", e.target.value)}
                 options={RESPONSE_OPTIONS}
+                required
+                error={fieldErrors.response_speed}
               />
             </div>
           )}
 
-          {/* Section 6 */}
           {currentSection === 6 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -301,11 +417,12 @@ export default function Onboarding() {
                 value={formData.requires_consultation}
                 onChange={(e) => updateField("requires_consultation", e.target.value)}
                 options={YES_NO}
+                required
+                error={fieldErrors.requires_consultation}
               />
             </div>
           )}
 
-          {/* Section 7 */}
           {currentSection === 7 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -316,11 +433,12 @@ export default function Onboarding() {
                 value={formData.brand_voice}
                 onChange={(e) => updateField("brand_voice", e.target.value)}
                 options={BRAND_VOICES}
+                required
+                error={fieldErrors.brand_voice}
               />
             </div>
           )}
 
-          {/* Section 8 */}
           {currentSection === 8 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -335,7 +453,6 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* Section 9 */}
           {currentSection === 9 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -346,11 +463,12 @@ export default function Onboarding() {
                 value={formData.business_hours}
                 onChange={(e) => updateField("business_hours", e.target.value)}
                 placeholder="Monday-Friday: 9am-6pm\nSaturday: 10am-4pm\nClosed Sunday"
+                required
+                error={fieldErrors.business_hours}
               />
             </div>
           )}
 
-          {/* Section 10 */}
           {currentSection === 10 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -364,11 +482,12 @@ export default function Onboarding() {
                 value={formData.has_old_leads}
                 onChange={(e) => updateField("has_old_leads", e.target.value)}
                 options={YES_NO}
+                required
+                error={fieldErrors.has_old_leads}
               />
             </div>
           )}
 
-          {/* Section 11 */}
           {currentSection === 11 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -383,7 +502,6 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* Section 12 */}
           {currentSection === 12 && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-semibold text-foreground">
@@ -394,11 +512,12 @@ export default function Onboarding() {
                 value={formData.goals}
                 onChange={(e) => updateField("goals", e.target.value)}
                 placeholder="Describe your ideal outcome..."
+                required
+                error={fieldErrors.goals}
               />
             </div>
           )}
 
-          {/* Error Display */}
           {error && (
             <div className="mt-8 bg-destructive/10 border border-destructive/30 rounded-xl p-4 flex gap-3">
               <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
@@ -406,11 +525,13 @@ export default function Onboarding() {
             </div>
           )}
 
-          {/* Navigation */}
           <div className="mt-10 flex items-center justify-between gap-4">
             <button
               type="button"
-              onClick={() => setCurrentSection(Math.max(1, currentSection - 1))}
+              onClick={() => {
+                setError(null);
+                setCurrentSection(Math.max(1, currentSection - 1));
+              }}
               disabled={currentSection === 1}
               className="px-6 py-2.5 rounded-lg border border-border text-foreground font-medium hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
@@ -422,7 +543,7 @@ export default function Onboarding() {
                 <button
                   key={section.id}
                   type="button"
-                  onClick={() => setCurrentSection(section.id)}
+                  onClick={() => goToSection(section.id)}
                   className={`w-8 h-8 rounded-lg font-medium text-xs transition-colors ${
                     currentSection === section.id
                       ? "bg-primary text-primary-foreground"
@@ -445,7 +566,7 @@ export default function Onboarding() {
             ) : (
               <button
                 type="button"
-                onClick={() => setCurrentSection(Math.min(sections.length, currentSection + 1))}
+                onClick={() => goToSection(Math.min(sections.length, currentSection + 1))}
                 className="px-6 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors"
               >
                 Next
@@ -459,7 +580,7 @@ export default function Onboarding() {
   );
 }
 
-function InputField({ label, required = false, type = "text", value, onChange, placeholder }) {
+function InputField({ label, required = false, type = "text", value, onChange, placeholder, error }) {
   return (
     <div>
       <label className="block text-sm font-medium text-foreground mb-2">
@@ -471,39 +592,44 @@ function InputField({ label, required = false, type = "text", value, onChange, p
         onChange={onChange}
         placeholder={placeholder}
         required={required}
-        className="w-full px-4 py-2.5 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+        aria-invalid={Boolean(error)}
+        className={`w-full px-4 py-2.5 rounded-lg border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary ${error ? "border-destructive" : "border-border"}`}
       />
+      {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
     </div>
   );
 }
 
-function TextareaField({ label, value, onChange, placeholder }) {
+function TextareaField({ label, value, onChange, placeholder, required = false, error }) {
   return (
     <div>
       <label className="block text-sm font-medium text-foreground mb-2">
-        {label}
+        {label} {required && <span className="text-primary">*</span>}
       </label>
       <textarea
         value={value}
         onChange={onChange}
         placeholder={placeholder}
         rows={4}
-        className="w-full px-4 py-2.5 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+        aria-invalid={Boolean(error)}
+        className={`w-full px-4 py-2.5 rounded-lg border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none ${error ? "border-destructive" : "border-border"}`}
       />
+      {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
     </div>
   );
 }
 
-function SelectField({ label, value, onChange, options }) {
+function SelectField({ label, value, onChange, options, required = false, error }) {
   return (
     <div>
       <label className="block text-sm font-medium text-foreground mb-2">
-        {label}
+        {label} {required && <span className="text-primary">*</span>}
       </label>
       <select
         value={value}
         onChange={onChange}
-        className="w-full px-4 py-2.5 rounded-lg border border-border bg-white text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+        aria-invalid={Boolean(error)}
+        className={`w-full px-4 py-2.5 rounded-lg border bg-white text-foreground focus:outline-none focus:ring-1 focus:ring-primary ${error ? "border-destructive" : "border-border"}`}
       >
         <option value="">Select an option...</option>
         {options.map((option) => (
@@ -512,6 +638,7 @@ function SelectField({ label, value, onChange, options }) {
           </option>
         ))}
       </select>
+      {error && <p className="mt-2 text-sm text-destructive">{error}</p>}
     </div>
   );
 }

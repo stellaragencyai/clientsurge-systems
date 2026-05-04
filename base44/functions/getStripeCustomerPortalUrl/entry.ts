@@ -9,15 +9,15 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { return_url } = await req.json().catch(() => ({}));
+    const { customer_email, return_url } = await req.json().catch(() => ({}));
+    const customerEmail = customer_email || user.email;
 
-    // Find the client project for this user
-    const projects = await base44.asServiceRole.entities.ClientProject.filter({ client_email: user.email });
-    const project = projects?.[0];
-    if (!project) return Response.json({ error: 'No project found' }, { status: 404 });
+    if (customerEmail !== user.email) {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     // Get stripe customer ID from order
-    const orders = await base44.asServiceRole.entities.Order.filter({ customer_email: user.email });
+    const orders = await base44.asServiceRole.entities.Order.filter({ customer_email: customerEmail });
     const stripeCustomerId = orders?.[0]?.stripe_customer_id;
 
     if (!stripeCustomerId) {
@@ -29,7 +29,7 @@ Deno.serve(async (req) => {
       return_url: return_url || 'https://app.base44.com',
     });
 
-    return Response.json({ url: session.url });
+    return Response.json({ portal_url: session.url, url: session.url });
   } catch (error) {
     console.error('Stripe portal error:', error);
     return Response.json({ error: error.message }, { status: 500 });
