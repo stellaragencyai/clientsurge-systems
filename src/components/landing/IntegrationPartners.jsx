@@ -48,6 +48,12 @@ const INTEGRATIONS = [
   logo: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/eec622a96_effc8d6b-84de-4143-b7f8-fad489dba492.png",
   href: "https://gohighlevel.com",
   description: "CRM platform"
+},
+{
+  name: "ElevenLabs",
+  logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/ElevenLabs_logo.svg/2560px-ElevenLabs_logo.svg.png",
+  href: "https://elevenlabs.io",
+  description: "AI Voice"
 }];
 
 
