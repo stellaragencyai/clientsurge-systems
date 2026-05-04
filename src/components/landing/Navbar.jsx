@@ -143,15 +143,10 @@ export default function Navbar() {
 
   return (
     <nav
-      className="fixed top-4 left-4 right-4 z-50 rounded-[28px] border"
+      className="fixed top-0 left-0 right-0 z-50"
       style={{
-        borderColor: "rgba(0,174,239,0.2)",
-        backgroundColor: "rgba(255,255,255,0.85)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
         paddingTop: "env(safe-area-inset-top)",
-        boxShadow: scrolled ? "0 20px 60px rgba(0,100,200,0.1)" : "none",
-        transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out, border-color 0.35s ease-out"
+        background: "transparent",
       }}>
       
       <div className="w-full h-[68px] md:h-[76px] flex items-center justify-between px-4 md:px-6" style={{ paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
