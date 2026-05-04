@@ -219,7 +219,7 @@ export default function Pricing() {
         </StaggeredFadeUp>
 
         {/* Trust badges — right below the pricing cards */}
-        <div className="grid grid-cols-5 gap-2 mt-8 mb-4 w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mt-8 mb-4 w-full">
           {[
             { icon: "🔒", text: "No long-term contracts" },
             { icon: "⚡", text: "Live in 24–48 Hours" },

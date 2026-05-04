@@ -70,15 +70,15 @@ export default function Hero() {
           zIndex: 2,
           maxWidth: "1400px",
           margin: "0 auto",
-          padding: "clamp(8rem, 16vw, 11rem) clamp(1rem, 5vw, 3rem) clamp(3rem, 6vw, 5.5rem)",
+          padding: "clamp(7rem, 12vw, 10rem) clamp(1.5rem, 5vw, 4rem) clamp(3rem, 6vw, 5rem)",
           display: "grid",
-          gridTemplateColumns: "1fr",
-          gap: "clamp(24px, 4vw, 48px)",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "clamp(32px, 5vw, 64px)",
           alignItems: "center",
           minHeight: "100svh"
         }}>
         
-        <div className="landing-hero__copy" style={{ gridColumn: "1 / -1", marginBottom: "0px", textAlign: "center", maxWidth: "100%", position: "relative", zIndex: 10 }}>
+        <div className="landing-hero__copy" style={{ gridColumn: "1", marginBottom: "0px", textAlign: "left", maxWidth: "100%", position: "relative", zIndex: 10 }}>
 
 
           <h1
@@ -122,8 +122,8 @@ export default function Hero() {
               color: "rgba(27,20,13,0.74)",
               lineHeight: 1.65,
               marginBottom: "18px",
-              maxWidth: "600px",
-              margin: "0 auto 18px"
+              maxWidth: "560px",
+              margin: "0 0 18px"
             }}>
             
             ClientSurge installs AI-powered conversion systems that capture leads, respond instantly, follow up automatically, and turn more of your existing demand into booked clients.
@@ -131,7 +131,7 @@ export default function Hero() {
 
           <div
             className="landing-hero__checklist hero-checklist"
-            style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px", marginBottom: "32px", maxWidth: "640px", margin: "0 auto 32px" }}>
+            style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px", marginBottom: "32px", maxWidth: "640px", margin: "0 0 32px" }}>
             
             {checklist.map((item, i) => (
               <CascadingChecklistItem key={item} item={item} index={i} />
@@ -145,7 +145,7 @@ export default function Hero() {
               flexWrap: "wrap",
               gap: "12px",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "flex-start",
               WebkitTapHighlightColor: "transparent",
               marginTop: "32px"
             }}>
@@ -200,11 +200,11 @@ export default function Hero() {
           className="landing-hero__visualWrap"
           style={{
             position: "relative",
-            minHeight: "620px",
+            minHeight: "520px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gridColumn: "1 / -1"
+            gridColumn: "2"
           }}>
           
           <div
@@ -282,24 +282,37 @@ export default function Hero() {
       </div>
 
       <style>{`
-        /* Tablet and below — single column */
-        @media (max-width: 1100px) {
+        /* Tablet and below — single column, centered */
+        @media (max-width: 1024px) {
           .landing-hero__inner {
             grid-template-columns: 1fr !important;
-            gap: 24px !important;
+            gap: 32px !important;
             min-height: auto !important;
-            padding-top: clamp(4.5rem, 12vw, 6rem) !important;
+            padding-top: clamp(5rem, 12vw, 7rem) !important;
           }
           .landing-hero__visualWrap {
-            display: none !important;
+            display: flex !important;
+            grid-column: 1 !important;
+            min-height: 360px !important;
           }
           .landing-hero__copy {
             max-width: 100% !important;
+            text-align: center !important;
+            grid-column: 1 !important;
+          }
+          .landing-hero__checklist {
+            margin: 0 auto 32px !important;
+          }
+          .landing-hero__actions {
+            justify-content: center !important;
           }
         }
 
-        /* Mobile — tighten everything */
+        /* Hide tablet mock on small screens */
         @media (max-width: 720px) {
+          .landing-hero__visualWrap {
+            display: none !important;
+          }
           .landing-hero__headline {
             font-size: clamp(2rem, 8.5vw, 3.4rem) !important;
             line-height: 1.05 !important;
