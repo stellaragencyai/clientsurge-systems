@@ -22,6 +22,7 @@ const Footer = lazy(() => import("../components/landing/Footer"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
 const AutomationShowcase = lazy(() => import("../components/landing/AutomationShowcase"));
 const MissedCallAnimation = lazy(() => import("../components/landing/MissedCallAnimation"));
+const InstantLeadResponseAnimation = lazy(() => import("../components/landing/InstantLeadResponseAnimation"));
 const SystemDiagramSection = lazy(() => import("../components/landing/SystemDiagram"));
 
 import {
@@ -126,6 +127,10 @@ export default function Home() {
         <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
           <MissedCallAnimation />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
+          <SectionBreak />
+          <InstantLeadResponseAnimation />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
