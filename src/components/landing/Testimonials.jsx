@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { useDemoBooking } from "./DemoBookingContext";
 import StardustOverlay from "./StardustOverlay";
 
@@ -50,25 +51,32 @@ export default function Testimonials() {
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <motion.div
+          className="grid md:grid-cols-3 gap-6"
+          variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+        >
           {testimonials.map((testimonial) => (
-            <article
+            <motion.article
               key={testimonial.name}
-              className="flex flex-col rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 active:-translate-y-1 focus:-translate-y-1"
+              className="flex flex-col rounded-2xl p-6"
+              variants={{
+                hidden: { opacity: 0, y: 36 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+              }}
+              whileHover={{
+                y: -6,
+                boxShadow: "0 18px 48px rgba(0,174,239,0.18), 0 0 0 1.5px rgba(0,174,239,0.45), inset 0 1px 0 rgba(255,255,255,0.9)",
+              }}
+              transition={{ type: "spring", stiffness: 320, damping: 26 }}
               style={{
                 background: "linear-gradient(135deg, rgba(240,249,255,0.72) 0%, rgba(224,242,254,0.55) 100%)",
                 backdropFilter: "blur(18px)",
                 WebkitBackdropFilter: "blur(18px)",
                 border: "1.5px solid rgba(0,174,239,0.22)",
                 boxShadow: "0 4px 24px rgba(0,174,239,0.07), inset 0 1px 0 rgba(255,255,255,0.75)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.border = "1.5px solid rgba(0,174,239,0.5)";
-                e.currentTarget.style.boxShadow = "0 18px 48px rgba(0,174,239,0.16), 0 0 0 1px rgba(0,174,239,0.18), inset 0 1px 0 rgba(255,255,255,0.9)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.border = "1.5px solid rgba(0,174,239,0.22)";
-                e.currentTarget.style.boxShadow = "0 4px 24px rgba(0,174,239,0.07), inset 0 1px 0 rgba(255,255,255,0.75)";
               }}
             >
               <div className="mb-4 flex items-center justify-between gap-3">
@@ -113,9 +121,9 @@ export default function Testimonials() {
                   <p className="text-xs text-muted-foreground">{testimonial.location}</p>
                 </div>
               </div>
-            </article>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
 
         <div className="text-center mt-16 pt-10 border-t border-border">
           <p className="text-lg font-semibold text-foreground mb-4">

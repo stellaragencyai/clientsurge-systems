@@ -162,10 +162,12 @@ export default function ProductCard({ product }) {
       <motion.div
         className={`pcard${inCart ? " in-cart" : ""}${product.coming_soon ? " coming-soon-card" : ""}`}
         onClick={() => !product.coming_soon && setModalOpen(true)}
-        initial={{ opacity: 0, y: 32 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+        variants={{
+          hidden: { opacity: 0, y: 32 },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+        }}
+        whileHover={{ y: -5, boxShadow: inCart ? "0 14px 36px rgba(34,197,94,0.25)" : "0 14px 36px rgba(0,0,0,0.16)" }}
+        transition={{ type: "spring", stiffness: 340, damping: 28 }}
       >
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

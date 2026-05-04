@@ -602,11 +602,17 @@ function StoreInner() {
               </div>
             </div>
 
-            <div className="store-grid">
+            <motion.div
+              className="store-grid"
+              variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+              initial="hidden"
+              animate="visible"
+              key={activeCategory + search + pathMode}
+            >
               {filtered.map((product) =>
               <ProductCard key={product.product_id} product={product} />
               )}
-            </div>
+            </motion.div>
 
             {filtered.length === 0 ?
             <div
