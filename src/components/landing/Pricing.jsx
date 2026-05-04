@@ -169,7 +169,7 @@ export default function Pricing() {
     <section id="pricing" className="nebula-pricing pt-16 md:pt-28 pb-32 md:pb-40 px-6 overflow-visible">
       <div className="max-w-7xl mx-auto">
         <div className="max-w-3xl mx-auto text-center pt-10 mb-16">
-          <h2 className="text-[#001B44] font-display text-4xl font-bold tracking-tight leading-tight md:text-5xl lg:text-6xl">Stop Losing Leads. Start Running a Real System.
+          <h2 className="text-[#001B44] text-4xl font-bold tracking-tight leading-tight md:text-5xl lg:text-6xl" style={{ fontFamily: "Montserrat, sans-serif" }}>Stop Losing Leads. Start Running a Real System.
 
           </h2>
         </div>

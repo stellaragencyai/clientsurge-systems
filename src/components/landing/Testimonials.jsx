@@ -45,7 +45,7 @@ export default function Testimonials() {
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Proven Results</p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
            Real Results From Businesses Using Our System
           </h2>
         </div>

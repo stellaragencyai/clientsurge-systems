@@ -70,7 +70,7 @@ export default function Hero() {
           zIndex: 2,
           maxWidth: "1400px",
           margin: "0 auto",
-          padding: "clamp(5rem, 12vw, 7rem) clamp(1rem, 5vw, 3rem) clamp(3rem, 6vw, 5.5rem)",
+          padding: "clamp(8rem, 16vw, 11rem) clamp(1rem, 5vw, 3rem) clamp(3rem, 6vw, 5.5rem)",
           display: "grid",
           gridTemplateColumns: "1fr",
           gap: "clamp(24px, 4vw, 48px)",
@@ -84,7 +84,7 @@ export default function Hero() {
           <h1
             className="landing-hero__headline"
             style={{
-              fontFamily: "var(--font-display)",
+              fontFamily: "Montserrat, sans-serif",
               fontSize: "clamp(2rem, 5.2vw, 3.8rem)",
               fontWeight: "700",
               lineHeight: 1.1,

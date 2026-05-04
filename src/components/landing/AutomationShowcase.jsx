@@ -78,7 +78,7 @@ export default function AutomationShowcase() {
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-semibold px-4 py-2 rounded-full mb-4">
             ⚙️ All 6 Automation Systems
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif" }}>
             See Exactly How Each System Works
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">

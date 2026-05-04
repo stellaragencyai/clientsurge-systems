@@ -36,7 +36,7 @@ export default function BeforeAfter() {
           <p className="text-xs font-bold tracking-[0.3em] uppercase mb-4" style={{ color: "#00AEEF" }}>
             The Difference
           </p>
-          <h2 className="font-display font-bold tracking-tight text-foreground" style={{ fontSize: "clamp(1.75rem, 4vw, 3rem)" }}>
+          <h2 className="font-bold tracking-tight text-foreground" style={{ fontSize: "clamp(1.75rem, 4vw, 3rem)", fontFamily: "Montserrat, sans-serif" }}>
             What Changes When You Install ClientSurge
           </h2>
           <p className="mt-4 text-muted-foreground text-base max-w-2xl mx-auto">

@@ -37,7 +37,7 @@ export default function InteractiveJourneyMap() {
         >
           Your Lead Journey
         </p>
-        <h3 style={{ fontSize: "28px", fontWeight: "600", color: "#1b140d" }}>
+        <h3 style={{ fontSize: "28px", fontWeight: "700", color: "#1b140d", fontFamily: "Montserrat, sans-serif" }}>
           From First Contact to Booked Appointment
         </h3>
       </div>

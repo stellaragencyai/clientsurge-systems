@@ -92,7 +92,7 @@ export default function IntegrationPartners() {
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
             Integrations
           </p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
             Works With{" "}
             <span style={{ color: "#00AEEF", textShadow: "0 0 28px rgba(0,174,239,0.35)" }}>
               50+ Tools

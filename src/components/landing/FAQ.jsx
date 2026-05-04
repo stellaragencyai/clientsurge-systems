@@ -96,7 +96,7 @@ export default function FAQ() {
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="text-center pt-10 mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Questions</p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
            Frequently Asked Questions
           </h2>
           <p className="mt-4 text-muted-foreground text-base">

@@ -16,7 +16,7 @@ export default function FinalCTA() {
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">
             Ready to Start?
           </p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
             You&apos;re Already Getting Leads.
             <br />
             <span className="text-primary">Let&apos;s Make Sure You&apos;re Converting Them.</span>

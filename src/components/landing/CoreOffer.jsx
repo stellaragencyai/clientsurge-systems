@@ -30,8 +30,8 @@ function CoreOfferHeader() {
       </div>
 
       {/* Title — forced single line via whitespace-nowrap on desktop */}
-      <h2 className="font-display font-bold tracking-tight leading-none text-foreground"
-      style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)" }}>
+      <h2 className="font-bold tracking-tight leading-none text-foreground"
+      style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif" }}>
         How The{" "}
         <span style={{ color: "#00AEEF", textShadow: "0 0 32px rgba(0,174,239,0.28)" }}>
           ClientSurge
