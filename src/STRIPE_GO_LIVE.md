@@ -13,43 +13,39 @@ Complete every item before switching from test to live Stripe payments.
 
 ---
 
-## Step 1 — Swap API Keys
+## Step 1 — Swap API Keys ✅ DONE
 
-1. Go to **Dashboard → Settings → Environment Variables** in Base44
-2. Replace `STRIPE_SECRET_KEY` with your **live** key: `sk_live_...`
-3. Replace `STRIPE_PUBLISHABLE_KEY` with your **live** key: `pk_live_...`
-4. ⚠️ Never expose `STRIPE_SECRET_KEY` in frontend code
+1. ✅ `STRIPE_SECRET_KEY` → updated to `sk_live_...`
+2. ✅ `STRIPE_PUBLISHABLE_KEY` → updated to `pk_live_...`
+3. ✅ `STRIPE_WEBHOOK_SECRET` → live `whsec_...` already set
 
 ---
 
-## Step 2 — Update the Webhook Endpoint
+## Step 2 — Update the Webhook Endpoint ✅ DONE
 
-1. Go to [Stripe Dashboard → Webhooks](https://dashboard.stripe.com/webhooks)
-2. **Delete** or disable the test webhook endpoint
-3. Click **Add endpoint**
-4. Set URL to your live function endpoint (from Base44 Dashboard → Code → Functions → `stripeWebhookOrders`)
-5. Select these events:
+1. ✅ Live webhook endpoint added in Stripe Dashboard
+2. ✅ Pointed to `stripeWebhookOrders` function URL
+3. ✅ Events subscribed:
    - `checkout.session.completed`
    - `customer.subscription.created`
    - `customer.subscription.updated`
    - `customer.subscription.deleted`
    - `invoice.payment_succeeded`
    - `invoice.payment_failed`
-6. Copy the new **Signing secret** (`whsec_...`)
-7. Set `STRIPE_WEBHOOK_SECRET` in Base44 to this new value
+4. ✅ `STRIPE_WEBHOOK_SECRET` set to live signing secret
 
 ---
 
-## Step 3 — Live Stripe Price IDs
+## Step 3 — Live Stripe Price IDs ← NEXT
 
-- [ ] Update all `price_id` values in `lib/salesCatalog.js` or wherever product prices are defined to use **live** Stripe price IDs (format: `price_live_...`)
+- [ ] Confirm all `price_id` values in `lib/salesCatalog.js` use **live** Stripe price IDs (format: `price_live_...`)
 - [ ] Test cards will NOT work in live mode — use a real card for verification
 
 ---
 
 ## Step 4 — End-to-End Test with Real Card
 
-- [ ] Place a test order on the live domain with a real credit card (can be $1 if a test product exists)
+- [ ] Place a test order on the live domain with a real credit card
 - [ ] Confirm `checkout.session.completed` webhook fires and is logged
 - [ ] Confirm Order entity shows `payment_status: "paid"`
 - [ ] Confirm customer confirmation email is received
@@ -90,8 +86,8 @@ If something breaks in live mode:
 
 | Check | Person | Date |
 |---|---|---|
-| API keys swapped | | |
-| Webhook updated | | |
+| API keys swapped | ✅ | 2026-05-04 |
+| Webhook updated | ✅ | 2026-05-04 |
 | Price IDs updated | | |
 | End-to-end purchase tested | | |
 | Customer portal verified | | |
