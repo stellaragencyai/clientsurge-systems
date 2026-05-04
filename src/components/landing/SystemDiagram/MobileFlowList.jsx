@@ -16,7 +16,7 @@ export default function MobileFlowList() {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "0" }}>
       {ordered.map((node, i) => (
         <motion.div
           key={node.id}
@@ -24,6 +24,21 @@ export default function MobileFlowList() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.06 }}
         >
+          {/* Flow connector arrow between items */}
+          {i > 0 && (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                padding: "3px 0",
+                color: node.color,
+                fontSize: "14px",
+                opacity: 0.5,
+              }}
+            >
+              ↓
+            </div>
+          )}
           <button
             onClick={() => setExpanded(expanded === node.id ? null : node.id)}
             style={{

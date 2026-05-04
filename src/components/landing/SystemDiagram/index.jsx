@@ -12,7 +12,7 @@ export default function SystemDiagramSection() {
     <section
       id="system-diagram"
       style={{
-        padding: "80px 24px",
+        padding: "clamp(48px, 6vw, 80px) 24px",
         background: "linear-gradient(180deg, #ffffff 0%, #f0f7ff 50%, #ffffff 100%)",
         position: "relative",
         overflow: "hidden",
@@ -147,7 +147,7 @@ export default function SystemDiagramSection() {
           {SERVICE_NODES.map((node) => (
             <button
               key={node.id}
-              onClick={() => navigate(`/services/${node.slug}`)}
+              onClick={() => navigate(`/store`)}
               style={{
                 display: "flex",
                 alignItems: "center",

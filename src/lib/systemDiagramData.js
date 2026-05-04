@@ -1,4 +1,6 @@
 // Master system diagram data — defines the full lead journey and all 6 service nodes
+// Positions are percent-based (x, y) relative to the canvas container.
+// Layout: lead_in (top center) → ai_qualify (upper center) → 6 services (fan across middle) → outcomes (bottom)
 
 export const DIAGRAM_NODES = [
   {
@@ -9,8 +11,9 @@ export const DIAGRAM_NODES = [
     description: "A lead comes in via web form, missed call, Facebook Ad, or referral. The journey begins.",
     stat: "24/7 capture",
     color: "#00AEEF",
-    x: 50, // percent-based positioning
-    y: 10,
+    order: 0,
+    x: 50,
+    y: 8,
   },
   {
     id: "ai_qualify",
@@ -20,10 +23,11 @@ export const DIAGRAM_NODES = [
     description: "AI instantly scores the lead 0–100, classifies intent, and routes to the right automation track.",
     stat: "<2 sec routing",
     color: "#6366f1",
+    order: 1,
     x: 50,
-    y: 23,
+    y: 28,
   },
-  // 6 service nodes — fan out
+  // 6 service nodes — evenly fanned across x: 8% to 92%, fixed at y: 58%
   {
     id: "instant_lead_response",
     label: "Instant Lead Response",
@@ -34,8 +38,9 @@ export const DIAGRAM_NODES = [
     description: "A personalized SMS fires to the lead within 4 seconds of submission — before any competitor can respond.",
     stat: "<4 sec SMS",
     color: "#00AEEF",
+    order: 2,
     x: 8,
-    y: 45,
+    y: 58,
   },
   {
     id: "missed_call_text_back",
@@ -47,8 +52,9 @@ export const DIAGRAM_NODES = [
     description: "Every missed call triggers an automatic text-back within 60 seconds, recovering leads you'd otherwise lose.",
     stat: "60 sec recovery",
     color: "#f59e0b",
-    x: 22,
-    y: 45,
+    order: 3,
+    x: 24,
+    y: 58,
   },
   {
     id: "nurture_sequence",
@@ -60,8 +66,9 @@ export const DIAGRAM_NODES = [
     description: "An 8-step SMS + email sequence runs over 14 days to keep leads warm until they're ready to book.",
     stat: "8 touchpoints",
     color: "#10b981",
-    x: 36,
-    y: 45,
+    order: 4,
+    x: 40,
+    y: 58,
   },
   {
     id: "ai_booking_agent",
@@ -73,8 +80,9 @@ export const DIAGRAM_NODES = [
     description: "Guides warm leads through a structured booking flow with intake, confirmation, and reminders — fully automated.",
     stat: "Auto-confirmed",
     color: "#8b5cf6",
-    x: 50,
-    y: 45,
+    order: 5,
+    x: 56,
+    y: 58,
   },
   {
     id: "lead_reactivation",
@@ -86,8 +94,9 @@ export const DIAGRAM_NODES = [
     description: "Dormant leads from your database get re-engaged with targeted batch messaging to revive lost revenue.",
     stat: "Batch re-engage",
     color: "#ef4444",
-    x: 64,
-    y: 45,
+    order: 6,
+    x: 72,
+    y: 58,
   },
   {
     id: "review_request",
@@ -99,10 +108,11 @@ export const DIAGRAM_NODES = [
     description: "After each completed appointment, an automated review request fires to build your reputation on autopilot.",
     stat: "Post-visit auto",
     color: "#f97316",
-    x: 78,
-    y: 45,
+    order: 7,
+    x: 88,
+    y: 58,
   },
-  // Converge back to outcome
+  // Outcomes
   {
     id: "lead_booked",
     label: "Lead Booked",
@@ -111,8 +121,9 @@ export const DIAGRAM_NODES = [
     description: "The lead is converted into a confirmed, paid appointment. The system logs revenue and resets for the next lead.",
     stat: "Revenue captured",
     color: "#22c55e",
-    x: 50,
-    y: 78,
+    order: 8,
+    x: 38,
+    y: 85,
   },
   {
     id: "reputation_growth",
@@ -122,8 +133,9 @@ export const DIAGRAM_NODES = [
     description: "5-star reviews accumulate passively, driving organic discovery and trust for future leads.",
     stat: "Compounding ROI",
     color: "#eab308",
-    x: 78,
-    y: 78,
+    order: 9,
+    x: 74,
+    y: 85,
   },
 ];
 

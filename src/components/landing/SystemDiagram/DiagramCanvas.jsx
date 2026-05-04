@@ -1,90 +1,109 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { DIAGRAM_NODES, DIAGRAM_CONNECTIONS } from "@/lib/systemDiagramData";
 import DiagramNode from "./DiagramNode";
 import NodeDetailPanel from "./NodeDetailPanel";
 
-// Compute pixel position from percent-based x/y on the canvas
-function pxPos(node, width, height) {
+const CANVAS_W = 1000; // virtual coordinate space
+const CANVAS_H = 520;
+const NODE_RADIUS = 42; // half-width of node circle for hit testing
+
+function virtualToPercent(vx, vy) {
+  return { px: (vx / CANVAS_W) * 100, py: (vy / CANVAS_H) * 100 };
+}
+
+// Convert node's percent x/y to virtual canvas coords
+function nodeToVirtual(node) {
   return {
-    cx: (node.x / 100) * width,
-    cy: (node.y / 100) * height,
+    vx: (node.x / 100) * CANVAS_W,
+    vy: (node.y / 100) * CANVAS_H,
   };
 }
 
-function AnimatedConnector({ from, to, width, height, color, delay = 0 }) {
-  const { cx: x1, cy: y1 } = pxPos(from, width, height);
-  const { cx: x2, cy: y2 } = pxPos(to, width, height);
+function AnimatedConnector({ fromNode, toNode, isActive, dimmed }) {
+  const { vx: x1, vy: y1 } = nodeToVirtual(fromNode);
+  const { vx: x2, vy: y2 } = nodeToVirtual(toNode);
 
-  // Slightly curved path
-  const mx = (x1 + x2) / 2;
-  const my = (y1 + y2) / 2 - 12;
-  const d = `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`;
+  // Quadratic bezier control point — pull toward center for fan-out lines
+  const cpx = (x1 + x2) / 2;
+  const cpy = Math.min(y1, y2) - 20;
+  const d = `M ${x1} ${y1} Q ${cpx} ${cpy} ${x2} ${y2}`;
 
-  const pathId = `path-${from.id}-${to.id}`;
+  const color = dimmed ? "#d0d5e8" : fromNode.color;
+  const opacity = dimmed ? 0.3 : isActive ? 1 : 0.55;
+
+  // Approximate path length for dash animation
+  const pathLen = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) * 1.1;
 
   return (
-    <g>
-      {/* Base line */}
-      <path
-        d={d}
-        fill="none"
-        stroke={color + "30"}
-        strokeWidth="1.5"
-        strokeDasharray="5 4"
-      />
-      {/* Animated glow line */}
+    <g style={{ transition: "opacity 0.3s ease" }} opacity={opacity}>
+      {/* Base dashed track */}
       <path
         d={d}
         fill="none"
         stroke={color}
-        strokeWidth="1.5"
-        strokeDasharray="6 100"
+        strokeWidth={isActive ? 2 : 1.5}
+        strokeDasharray="5 6"
         strokeLinecap="round"
-        opacity="0.7"
-      >
-        <animate
-          attributeName="stroke-dashoffset"
-          from="106"
-          to="-106"
-          dur="2.2s"
-          begin={`${delay}s`}
+      />
+      {/* Traveling animated dot */}
+      <circle r="3.5" fill={color} opacity={isActive ? 1 : 0.7}>
+        <animateMotion
+          dur={`${1.8 + Math.random() * 0.8}s`}
           repeatCount="indefinite"
+          begin={`${Math.random() * 2}s`}
           calcMode="linear"
-        />
-      </path>
+        >
+          <mpath href={`#conn-path-${fromNode.id}-${toNode.id}`} />
+        </animateMotion>
+      </circle>
+      {/* Hidden path for animateMotion reference */}
+      <path
+        id={`conn-path-${fromNode.id}-${toNode.id}`}
+        d={d}
+        fill="none"
+        stroke="none"
+      />
     </g>
   );
 }
 
 export default function DiagramCanvas() {
   const containerRef = useRef(null);
-  const [dims, setDims] = useState({ width: 900, height: 500 });
+  const [containerW, setContainerW] = useState(900);
   const [activeNode, setActiveNode] = useState(null);
 
   useEffect(() => {
-    function measure() {
+    const measure = () => {
       if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        setDims({ width: rect.width, height: rect.height });
+        setContainerW(containerRef.current.getBoundingClientRect().width);
       }
-    }
+    };
     measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    const ro = new ResizeObserver(measure);
+    if (containerRef.current) ro.observe(containerRef.current);
+    return () => ro.disconnect();
   }, []);
 
   const nodeMap = Object.fromEntries(DIAGRAM_NODES.map((n) => [n.id, n]));
 
-  const getConnectedIds = (nodeId) => {
-    const ids = new Set();
-    DIAGRAM_CONNECTIONS.forEach((c) => {
-      if (c.from === nodeId) ids.add(c.to);
-      if (c.to === nodeId) ids.add(c.from);
-    });
-    return ids;
-  };
+  const connectedIds = useCallback(
+    (nodeId) => {
+      const ids = new Set();
+      DIAGRAM_CONNECTIONS.forEach((c) => {
+        if (c.from === nodeId) ids.add(c.to);
+        if (c.to === nodeId) ids.add(c.from);
+      });
+      return ids;
+    },
+    []
+  );
 
-  const connected = activeNode ? getConnectedIds(activeNode.id) : new Set();
+  const connected = activeNode ? connectedIds(activeNode.id) : new Set();
+
+  // Scale factor: virtual canvas → actual container
+  const scaleX = containerW / CANVAS_W;
+  // Keep aspect ratio for height
+  const canvasH = CANVAS_H * scaleX;
 
   return (
     <div
@@ -92,46 +111,59 @@ export default function DiagramCanvas() {
       style={{
         position: "relative",
         width: "100%",
-        height: "500px",
-        background: "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,174,239,0.04) 0%, transparent 70%), #f8faff",
+        height: `${canvasH}px`,
+        minHeight: "420px",
+        maxHeight: "580px",
+        background:
+          "radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0,174,239,0.05) 0%, transparent 70%), #f8faff",
         borderRadius: "24px",
         border: "1px solid rgba(0,174,239,0.12)",
         overflow: "hidden",
+        userSelect: "none",
       }}
     >
-      {/* SVG connector layer */}
+      {/* SVG connector layer — full virtual viewBox, scaled via CSS */}
       <svg
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 1, pointerEvents: "none" }}
-        viewBox={`0 0 ${dims.width} ${dims.height}`}
-        preserveAspectRatio="none"
+        viewBox={`0 0 ${CANVAS_W} ${CANVAS_H}`}
+        preserveAspectRatio="xMidYMid meet"
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
       >
-        {DIAGRAM_CONNECTIONS.map((conn, i) => {
+        {DIAGRAM_CONNECTIONS.map((conn) => {
           const fromNode = nodeMap[conn.from];
           const toNode = nodeMap[conn.to];
           if (!fromNode || !toNode) return null;
-          const isRelated =
-            !activeNode ||
-            conn.from === activeNode.id ||
-            conn.to === activeNode.id;
+          const isActiveConn =
+            activeNode &&
+            (conn.from === activeNode.id || conn.to === activeNode.id);
+          const dimmed = activeNode && !isActiveConn;
           return (
             <AnimatedConnector
               key={`${conn.from}-${conn.to}`}
-              from={fromNode}
-              to={toNode}
-              width={dims.width}
-              height={dims.height}
-              color={isRelated ? fromNode.color : "#ccc"}
-              delay={i * 0.18}
+              fromNode={fromNode}
+              toNode={toNode}
+              isActive={!!isActiveConn}
+              dimmed={!!dimmed}
             />
           );
         })}
       </svg>
 
-      {/* Node layer */}
+      {/* Node layer — CSS positioned using same percent coords as SVG viewBox */}
       {DIAGRAM_NODES.map((node) => {
-        const { cx, cy } = pxPos(node, dims.width, dims.height);
-        const nodeW = node.type === "service" ? 88 : 80;
-        const nodeH = node.type === "service" ? 110 : 100;
+        const nodeW = 90;
+        const nodeH = 115;
+        // Map virtual coords to percentage of container
+        const { vx, vy } = nodeToVirtual(node);
+        const leftPct = (vx / CANVAS_W) * 100;
+        const topPct = (vy / CANVAS_H) * 100;
+
         return (
           <DiagramNode
             key={node.id}
@@ -140,40 +172,43 @@ export default function DiagramCanvas() {
             isHighlighted={connected.has(node.id)}
             onClick={(n) => setActiveNode(activeNode?.id === n.id ? null : n)}
             style={{
-              left: `${cx - nodeW / 2}px`,
-              top: `${cy - nodeH / 2}px`,
+              left: `calc(${leftPct}% - ${nodeW / 2}px)`,
+              top: `calc(${topPct}% - ${nodeH / 2}px)`,
             }}
           />
         );
       })}
 
       {/* Detail panel */}
-      <NodeDetailPanel node={activeNode} onClose={() => setActiveNode(null)} />
+      {activeNode && (
+        <NodeDetailPanel node={activeNode} onClose={() => setActiveNode(null)} />
+      )}
 
-      {/* Click hint */}
+      {/* Hint */}
       {!activeNode && (
         <div
           style={{
             position: "absolute",
-            bottom: "14px",
+            bottom: "12px",
             left: "50%",
             transform: "translateX(-50%)",
             fontSize: "10px",
             fontWeight: "600",
-            color: "rgba(0,174,239,0.6)",
+            color: "rgba(0,174,239,0.55)",
             letterSpacing: "0.12em",
             textTransform: "uppercase",
             pointerEvents: "none",
+            whiteSpace: "nowrap",
           }}
         >
-          Click any node to explore
+          Click any node to explore ↑
         </div>
       )}
 
       <style>{`
         @keyframes diagramPulse {
-          0%, 100% { opacity: 0.4; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.06); }
+          0%, 100% { opacity: 0.35; transform: scale(1); }
+          50% { opacity: 0.75; transform: scale(1.08); }
         }
       `}</style>
     </div>
