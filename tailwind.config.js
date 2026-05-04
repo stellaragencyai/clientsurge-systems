@@ -9,7 +9,6 @@ module.exports = {
   			display: ['var(--font-display)'],
   			titles: ['var(--font-titles)'],
   			bebas: ['"Bebas Neue"', 'sans-serif'],
-  			raleway: ['Raleway', 'sans-serif'],
   			sans: ['var(--font-inter)'],
   		},
   		borderRadius: {
