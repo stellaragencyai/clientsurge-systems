@@ -172,8 +172,8 @@ export default function ProductCard({ product }) {
           <div style={{
             width: "48px", height: "48px", borderRadius: "14px",
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px",
-            background: "rgba(0,174,239,0.08)",
-            border: "1px solid rgba(0,174,239,0.16)",
+            background: "transparent",
+            border: "none",
           }}>
             {product.icon}
           </div>
