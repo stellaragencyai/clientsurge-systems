@@ -68,8 +68,8 @@ export default function ProductCard({ product }) {
         }
         .pcard:hover .pcard-click-hint { opacity: 1; }
         .price-chip-light {
-          background: linear-gradient(135deg, rgba(154,92,46,0.07), rgba(200,150,92,0.04));
-          border: 1.5px solid rgba(154,92,46,0.18);
+          background: linear-gradient(135deg, rgba(0,174,239,0.07), rgba(0,157,255,0.04));
+          border: 1.5px solid rgba(0,174,239,0.18);
           border-radius: 14px;
           padding: 8px 14px;
         }
@@ -84,8 +84,8 @@ export default function ProductCard({ product }) {
           gap: 5px;
           padding: 6px 10px;
           border-radius: 12px;
-          background: linear-gradient(135deg, rgba(154,92,46,0.08), rgba(200,150,92,0.04));
-          border: 1px solid rgba(154,92,46,0.15);
+          background: linear-gradient(135deg, rgba(0,174,239,0.08), rgba(0,157,255,0.04));
+          border: 1px solid rgba(0,174,239,0.15);
           font-size: 10px;
           font-weight: 600;
           color: rgba(27,20,13,0.72);
@@ -129,8 +129,8 @@ export default function ProductCard({ product }) {
           color: #c8965c;
         }
         .price-highlight-box {
-          background: linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%);
-          border: 1px solid rgba(154,92,46,0.22);
+          background: linear-gradient(135deg, rgba(0,174,239,0.10) 0%, rgba(0,59,143,0.06) 100%);
+          border: 1px solid rgba(0,174,239,0.22);
           border-radius: 14px;
           padding: 12px 14px;
           text-align: center;
@@ -150,11 +150,11 @@ export default function ProductCard({ product }) {
         .price-highlight-box .price-value span {
           font-size: 10px;
           font-weight: 600;
-          color: rgba(154,92,46,0.6);
+          color: rgba(0,174,239,0.7);
         }
         .price-highlight-box .setup-fee {
           font-size: 8px;
-          color: rgba(154,92,46,0.5);
+          color: rgba(0,59,143,0.5);
           font-weight: 600;
         }
       `}</style>
@@ -172,15 +172,15 @@ export default function ProductCard({ product }) {
           <div style={{
             width: "48px", height: "48px", borderRadius: "14px",
             display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px",
-            background: "rgba(154,92,46,0.08)",
-            border: "1px solid rgba(154,92,46,0.16)",
+            background: "rgba(0,174,239,0.08)",
+            border: "1px solid rgba(0,174,239,0.16)",
           }}>
             {product.icon}
           </div>
           <span style={{
             fontSize: "8px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.16em",
-            color: "rgba(154,92,46,0.7)", background: "rgba(154,92,46,0.07)",
-            padding: "4px 10px", borderRadius: "999px", border: "1px solid rgba(154,92,46,0.14)",
+            color: "rgba(0,174,239,0.9)", background: "rgba(0,174,239,0.07)",
+            padding: "4px 10px", borderRadius: "999px", border: "1px solid rgba(0,174,239,0.14)",
           }}>
             {product.category}
           </span>
@@ -191,7 +191,7 @@ export default function ProductCard({ product }) {
           <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#1b140d", margin: "0 0 3px", lineHeight: 1.2 }}>
             {product.name}
           </h3>
-          <p style={{ fontSize: "9px", color: "rgba(154,92,46,0.65)", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          <p style={{ fontSize: "9px", color: "rgba(0,174,239,0.8)", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
             {product.subtitle}
           </p>
         </div>
@@ -260,8 +260,8 @@ export default function ProductCard({ product }) {
 
           {product.coming_soon && (
             <>
-              <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(154,92,46,0.4)", background: "rgba(154,92,46,0.06)", padding: "8px 12px", borderRadius: "9999px", border: "1px solid rgba(154,92,46,0.12)", whiteSpace: "nowrap", textAlign: "center" }}>
-                <span style={{display:"inline-block",width:"7px",height:"7px",borderRadius:"50%",background:"#c8965c",marginRight:"5px",animation:"cs-pulse 1.4s ease-in-out infinite"}} />
+              <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(0,59,143,0.6)", background: "rgba(0,174,239,0.06)", padding: "8px 12px", borderRadius: "9999px", border: "1px solid rgba(0,174,239,0.15)", whiteSpace: "nowrap", textAlign: "center" }}>
+                <span style={{display:"inline-block",width:"7px",height:"7px",borderRadius:"50%",background:"#00AEEF",marginRight:"5px",animation:"cs-pulse 1.4s ease-in-out infinite"}} />
                 Coming Soon
               </span>
               <style>{`@keyframes cs-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}`}</style>
