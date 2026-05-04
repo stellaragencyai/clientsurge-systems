@@ -91,6 +91,70 @@
     "last_webhook_test_at": {
       "type": "string",
       "title": "Last Webhook Test At"
+    },
+    "cadence_default_mode": {
+      "type": "string",
+      "title": "Default Cadence Mode",
+      "enum": [
+        "auto",
+        "sms_first",
+        "email_first"
+      ],
+      "default": "auto"
+    },
+    "cadence_switch_attempts": {
+      "type": "integer",
+      "title": "Switch Channel After N Attempts",
+      "default": 3,
+      "description": "After 3 attempts with no response, switch to alternate channel"
+    },
+    "cadence_pause_on_reply": {
+      "type": "boolean",
+      "title": "Pause Sequence on Lead Reply",
+      "default": true
+    },
+    "cadence_engagement_threshold": {
+      "type": "number",
+      "title": "Engagement Score Threshold (0-100)",
+      "default": 50,
+      "description": "Increase follow-up frequency if lead engagement > threshold"
+    },
+    "cadence_max_attempts": {
+      "type": "integer",
+      "title": "Max Follow-Up Attempts",
+      "default": 6,
+      "description": "Stop automation after N total attempts"
+    },
+    "voice_calls_enabled": {
+      "type": "boolean",
+      "title": "AI Voice Calls Enabled",
+      "default": false,
+      "description": "When true, HOT leads (score \u226575) receive an ElevenLabs outbound voice call within 5 minutes"
+    },
+    "elevenlabs_agent_ids": {
+      "type": "object",
+      "title": "ElevenLabs Agent IDs (per industry)",
+      "description": "Maps industry_key \u2192 ElevenLabs agent_id. Set by createElevenLabsAgent admin function.",
+      "properties": {
+        "med_spa": {
+          "type": "string"
+        },
+        "dental": {
+          "type": "string"
+        },
+        "chiropractic": {
+          "type": "string"
+        },
+        "hvac": {
+          "type": "string"
+        },
+        "roofing": {
+          "type": "string"
+        },
+        "contractors": {
+          "type": "string"
+        }
+      }
     }
   },
   "required": []

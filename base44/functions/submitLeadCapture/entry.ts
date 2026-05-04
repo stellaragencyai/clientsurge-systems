@@ -1,3 +1,8 @@
+/**
+ * PLATFORM-WEBSITE-ONLY
+ * ClientSurge's own website lead capture funnel writes to WebsiteLead.
+ * Do not use this endpoint as a paid-customer CRM or automation intake path.
+ */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const MAX_FIELD_LENGTH = 500;

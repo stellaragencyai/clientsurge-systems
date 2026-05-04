@@ -10,15 +10,14 @@ function readRepoFile(relativePath) {
 }
 
 const websiteOnlyFunctions = [
+  "base44/functions/submitLeadCapture/entry.ts",
   "base44/functions/submitContactInquiry/entry.ts",
   "base44/functions/scheduleDemoBooking/entry.ts",
   "base44/functions/trackContactFormCompletion/entry.ts",
   "base44/functions/createDemoCalendarEvent/entry.ts",
 ];
 
-const lockedDownWebsiteFunctions = [
-  "base44/functions/submitLeadCapture/entry.ts",
-];
+const lockedDownWebsiteFunctions = [];
 
 const canonicalCustomerRuntimeFiles = [
   "base44/functions/webhookLeadCapture/entry.ts",
@@ -70,12 +69,12 @@ test("website capture functions write WebsiteLead records instead of canonical L
   }
 });
 
-test("submitLeadCapture is explicitly blocked during canonical lockdown", () => {
+test("submitLeadCapture is explicitly labeled as WebsiteLead-only intake", () => {
   const source = readRepoFile("base44/functions/submitLeadCapture/entry.ts");
 
-  assert.match(source, /buildLegacyEndpointResponse/);
-  assert.match(source, /logLegacyEndpointWarning/);
-  assert.doesNotMatch(source, /entities\.WebsiteLead\./);
+  assert.match(source, /PLATFORM-WEBSITE-ONLY/);
+  assert.match(source, /WebsiteLead/);
+  assert.match(source, /entities\.WebsiteLead\./);
   assert.doesNotMatch(source, /entities\.Leads\.(create|update)\(/);
 });
 

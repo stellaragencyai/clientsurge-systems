@@ -118,10 +118,8 @@ function StoreInner() {
           selectedIndustry?.recommendedServices?.map((s) => s.name) || []
         );
         results = results.filter((p) => recommendedNames.has(p.name)).slice(0, 6);
-      } else {
-        // No industry selected — show all checkout-enabled (non-coming-soon) products
-        results = results.filter((p) => p.checkout_enabled !== false && !p.coming_soon);
       }
+      // No industry selected in guided mode — show all 12 products (live + coming soon)
     }
 
     return results;
@@ -322,21 +320,21 @@ function StoreInner() {
                   fontWeight: "800",
                   lineHeight: 1.08,
                   letterSpacing: "-0.035em",
-                  color: "#1b140d",
+                  color: "hsl(var(--foreground))",
                   marginBottom: "8px"
                 }}>
                 
                 Build Your{" "}
                 <span
-                  style={{
-                    background: "linear-gradient(135deg, #f5d9a8 0%, #c8965c 52%, #e8b87a 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    filter: "drop-shadow(0 0 18px rgba(200,150,92,0.5))"
-                  }}>
-                  
-                  AI-Powered Business
+                style={{
+                  background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 52%, #003B8F 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  filter: "drop-shadow(0 0 18px rgba(0,174,239,0.4))"
+                }}>
+
+                AI-Powered Business
                 </span>
               </h1>
 
@@ -374,7 +372,7 @@ function StoreInner() {
                   fontWeight: "700",
                   letterSpacing: "0.16em",
                   textTransform: "uppercase",
-                  color: "#9a5c2e",
+                  color: "#00AEEF",
                   margin: "0 0 4px"
                 }}>
                 
@@ -422,14 +420,14 @@ function StoreInner() {
                   width: "42px",
                   height: "42px",
                   borderRadius: "12px",
-                  background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)",
-                  border: "1px solid rgba(154,92,46,0.18)",
+                  background: "linear-gradient(135deg, rgba(0,174,239,0.12) 0%, rgba(0,157,255,0.08) 100%)",
+                  border: "1px solid rgba(0,174,239,0.2)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   flexShrink: 0
                 }}>
-                    <Icon style={{ width: "18px", height: "18px", color: "#9a5c2e" }} />
+                    <Icon style={{ width: "18px", height: "18px", color: "#00AEEF" }} />
                   </div>
                   <div style={{ textAlign: "left" }}>
                     <p style={{ fontSize: "15px", fontWeight: "800", color: "#000000", margin: "0 0 2px" }}>
@@ -568,10 +566,7 @@ function StoreInner() {
                   {resultLabel}
                 </span>
                 <div className="store-categories">
-                  {CATEGORIES.filter((cat) => {
-                    if (cat === "All") return true;
-                    return CANONICAL_SERVICE_PRODUCTS.some((p) => p.category === cat && p.checkout_enabled && !p.coming_soon);
-                  }).map((category) =>
+                  {CATEGORIES.map((category) =>
                   <motion.button
                     key={category}
                     onClick={() => setActiveCategory(category)}

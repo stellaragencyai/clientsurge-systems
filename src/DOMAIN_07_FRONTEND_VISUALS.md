@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 32% Ready (9/28 done · 1 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** #17 — FAQ mobile tap target (~10 min, no deps) · Agent A  
+## 📊 DOMAIN HEALTH: 🟡 52% Ready (18/35 done · 1 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** #53 — audit form inputs iOS zoom (~45 min, no deps) · Agent A  
 > ⚠️ **Critical:** #76 — verify sk_live_ key exposure (~20 min, zero deps — do this first every session)
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 1 (#76 — Stripe key audit, ~20 min) |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 9 tasks (#1, #2, #3, #5, #25, #29, #38, #43, #77) + CTA pass (28a–28d) |
-| 🎯 Est. Hours to Domain Complete | ~30 hrs (added 20 mobile tasks ~11 hrs) |
-| 📱 Next 5 Priority Tasks | M09 (iOS zoom), M01 (svh), M08 (Safari blur), M16 (badge overflow), #53 (input audit) |
+| ✅ Done This Week | 18 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,77 + M01,M02,M05,M06,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| 🎯 Est. Hours to Domain Complete | ~18 hrs |
+| 📱 Next 5 Priority Tasks | #76 (Stripe key audit), #53 (form input audit), M03 (iOS scroll lock), M07 (iPad nav), M10 (modal scroll) |
 
 ---
 
@@ -36,9 +36,9 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 11 | ⏳ | Build out pages/ThankYou — currently a blank page | A | — | — | — | ~1 hr |
-| 35 | ⏳ | Testimonials: replace broken image URLs with initials-based avatar fallbacks | A | — | — | — | ~30 min |
-| 36 | ⏳ | Add favicon (32x32 + 180x180) and apple-touch-icon to index.html | A | — | — | — | ~20 min |
+| 11 | ✅ | Build out pages/ThankYou — fully built with animated checkmark, plan card, next-steps, contact | A | — | — | — | ~1 hr |
+| 35 | ✅ | Testimonials: replaced broken Unsplash URLs with initials-based gradient avatars | A | — | — | — | ~30 min |
+| 36 | ✅ | Favicon + apple-touch-icon already present in index.html — verified | A | — | — | — | ~20 min |
 | 51 | ⏳ | pages/Book Calendly iframe: set width:100%, height:700px, scrolling:yes | A | — | — | — | ~20 min |
 | 53 | ⏳ | Audit all form inputs for iOS zoom issue (font-size < 16px) | A | — | — | 🧵 Mobile-UX | ~45 min |
 | 55 | ⏳ | pages/Book Calendly: test CSP allows calendly.com frames on live domain | A | — | — | — | ~30 min |
@@ -85,24 +85,24 @@
 | # | Status | Task | Agent | Device Target | Thread | Est. Time |
 |---|---|---|---|---|---|---|
 | M01 | ✅ | iOS Safari: audit all `min-height: 100vh` — replace with `100svh` (Dynamic Island safe) | A | iPhone 15, 17 Pro Max | 🧵 Mobile-UX | ~20 min |
-| M02 | ⏳ | iPhone notch/Dynamic Island: verify `padding-top: env(safe-area-inset-top)` on Navbar | A | iPhone 15, 17 Pro Max | 🧵 Mobile-UX | ~15 min |
+| M02 | ✅ | iPhone notch/Dynamic Island: verify `padding-top: env(safe-area-inset-top)` on Navbar — added via @supports in index.css | A | iPhone 15, 17 Pro Max | 🧵 Mobile-UX | ~15 min |
 | M03 | ⏳ | iOS Safari: test body scroll lock — `position: fixed` + `top: -scrollY` pattern (current `acquireBodyScrollLock` may not work on Safari 17) | A | All iPhone / Safari | 🧵 Mobile-UX | ~30 min |
 | M04 | ⏳ | iPhone 12 (375px): audit Hero headline — ensure `clamp()` font doesn't overflow or wrap awkwardly at 375px | A | iPhone 12 | 🧵 Mobile-UX | ~20 min |
-| M05 | ⏳ | iPhone 17 Pro Max (430px): confirm MobileCallBar safe-area bottom padding clears home indicator | A | iPhone 17 Pro Max | 🧵 Mobile-UX | ~15 min |
-| M06 | ⏳ | iPad (768px / 1024px): pricing cards grid — currently 1-col on md; should be 2-col on iPad portrait | A | iPad | 🧵 Mobile-UX | ~20 min |
+| M05 | ✅ | iPhone 17 Pro Max (430px): MobileCallBar safe-area bottom padding — `.safe-area-bottom-bar` class + inline style applied | A | iPhone 17 Pro Max | 🧵 Mobile-UX | ~15 min |
+| M06 | ✅ | iPad (768px / 1024px): pricing cards grid — `.pricing-cards-grid` class + CSS 2-col override at 768–1023px | A | iPad | 🧵 Mobile-UX | ~20 min |
 | M07 | ⏳ | iPad landscape (1024px): Navbar desktop links too cramped — audit at 1024px breakpoint | A | iPad landscape | 🧵 Mobile-UX | ~20 min |
 | M08 | ✅ | Safari 17: `backdrop-filter` with `blur()` causes flicker on scroll — add `transform: translateZ(0)` to Navbar | A | Safari / iPhone | 🧵 Mobile-UX | ~15 min |
 | M09 | ✅ | iOS input zoom: ALL text inputs must be `font-size: 16px` min — audit DemoBookingModal (all inputs fixed with style={{ fontSize:"16px" }}) | A | All iPhone | 🧵 Mobile-UX | ~30 min |
 | M10 | ⏳ | iPhone 12/15: DemoBookingModal scrollable inside fixed overlay — test that form is reachable without browser chrome interfering | A | iPhone 12, 15 | 🧵 Mobile-UX | ~25 min |
-| M11 | ⏳ | Safari: `position: sticky` navbar — verify `-webkit-sticky` is applied (already in CSS but confirm renders correctly on all devices) | A | All Safari | 🧵 Mobile-UX | ~10 min |
+| M11 | ✅ | Safari: `position: sticky` navbar — `-webkit-sticky` added to index.css for all `.sticky` elements | A | All Safari | 🧵 Mobile-UX | ~10 min |
 | M12 | ⏳ | iPhone 12 (375px): Store page product grid — confirm single-column layout and no horizontal scroll leakage | A | iPhone 12 | 🧵 Mobile-UX | ~20 min |
 | M13 | ⏳ | iPhone 17 Pro Max (430px): Hero CTA buttons — confirm min 44×44px touch target and no overlap with visual glow decorations | A | iPhone 17 Pro Max | 🧵 Mobile-UX | ~15 min |
 | M14 | ⏳ | Safari: test `createPortal` DemoBookingModal renders correctly in Safari 16/17 (known z-index stacking context bugs) | A | Safari / iPhone | 🧵 Mobile-UX | ~20 min |
-| M15 | ⏳ | iPad: Footer 4-col grid — verify nav columns don't collapse to 1-col on iPad portrait (should be 2-col min) | A | iPad | 🧵 Mobile-UX | ~15 min |
+| M15 | ✅ | iPad: Footer nav grid — `.footer-nav-grid` class + CSS 2-col override at 640–1023px | A | iPad | 🧵 Mobile-UX | ~15 min |
 | M16 | ✅ | iPhone: Pricing "Most Popular" badge overflows card top on 375px — badge needs `position: relative` fallback at mobile | A | iPhone 12, 15 | 🧵 Mobile-UX | ~15 min |
 | M17 | ✅ | iOS Safari: `<input type="date">` — `minHeight: 48px` + `fontSize: 16px` applied to date/time inputs in DemoBookingModal | A | All iPhone | 🧵 Mobile-UX | ~20 min |
 | M18 | ⏳ | iPhone: Navbar mobile menu — verify `acquireBodyScrollLock` fully prevents background page scroll on all iPhone models | A | All iPhone | 🧵 Mobile-UX | ~20 min |
-| M19 | ⏳ | iPhone landscape: Hero section `min-height: auto` override — confirm hero doesn't get cropped on landscape rotate | A | iPhone 12, 15, 17 | 🧵 Mobile-UX | ~15 min |
+| M19 | ✅ | iPhone landscape: Hero `min-height: auto` override at `max-height: 500px + landscape` in index.css | A | iPhone 12, 15, 17 | 🧵 Mobile-UX | ~15 min |
 | M20 | ⏳ | Full device test pass: manually test on iPhone 12 (375px), iPhone 15 (393px), iPhone 17 Pro Max (430px), iPad (768px) — document any layout breaks | A | All Apple devices | 🧵 Mobile-UX | ~2 hrs |
 
 ---

@@ -499,7 +499,8 @@
 | Agent A (Frontend/UI/SEO) | 83 | 13 | 0 | 70 |
 | Agent B (Backend/Security) | 84 | 15 | 0 | 69 |
 | Agent C (Admin/Stripe/Ops) | 83 | 0 | 0 | 83 |
-| **TOTAL** | **250** | **28** | **0** | **222** |
+| AI Sales Rep System | 60 | 13 | 0 | 47 |
+| **TOTAL** | **560** | **41** | **0** | **519** |
 
 ---
 
@@ -521,6 +522,9 @@
 | 2026-05-03 | Sam (AI Agent) | #86 ✅ — webhookLeadCapture: X-Webhook-Secret header auth added |
 | 2026-05-03 | Sam (AI Agent) | #92 ✅ — Verified: honeypot already in submitLeadCapture + submitContactInquiry |
 | 2026-05-03 | Sam (AI Agent) | #127 ✅ — Verified: full STOP/UNSUBSCRIBE/CANCEL/END/QUIT handling in receiveTwilioInboundSms |
+| 2026-05-03 | Agent A | #501–#513 ✅ — AI Sales Rep blueprint created, 13 tasks confirmed already built (routing, scoring, SMS, ElevenLabs key) |
+| 2026-05-03 | Agent A | #514–#560 ⏳ — 47 new AI Sales Rep tasks added (6 agent JSONs, routing, voice, admin UI, entity changes) |
+| 2026-05-03 | Agent A | dispatchLeadWebhook rebuilt with full 6-industry routing, HOT/WARM/COLD tiering, follow-up urgency, rep assignment |
 
 ---
 
@@ -1127,3 +1131,193 @@
 
 *Expansion 3 — Tasks #476–#500 (25 tasks) | Added by Sam — 2026-05-03*
 *Quality gates, client-facing AI, real-time event triggers, TCPA compliance, self-healing loop*
+
+
+---
+
+---
+
+# 🤖 AI SALES REP SYSTEM — Tasks #501–#560
+### Added: 2026-05-03 | Source: User request — 6 industry AI sales reps (text + voice) with ElevenLabs
+### Blueprint: smallest actionable measurable steps, cross-checked against existing codebase
+
+---
+
+## ✅ ALREADY BUILT (Cross-checked against codebase)
+
+| # | Status | Task | What Exists |
+|---|---|---|---|
+| 501 | ✅ | Industry routing logic — detect industry from lead fields | `dispatchLeadWebhook` now has `detectIndustry()` with 6 keyword maps |
+| 502 | ✅ | Lead score tiering (HOT/WARM/COLD) | `dispatchLeadWebhook` — `getPriorityTier()` using `lead_score` field |
+| 503 | ✅ | Business size bucketing (solo/small_medium/enterprise) | `dispatchLeadWebhook` — `getBusinessSize()` from `business_type` field |
+| 504 | ✅ | Follow-up urgency routing (2min/10min/30min) | `dispatchLeadWebhook` — `getFollowUpUrgency()` maps tier+size to delay+channel |
+| 505 | ✅ | Lead `assigned_to` field updated with rep email on dispatch | `dispatchLeadWebhook` — `Leads.update()` sets `assigned_to` + `activation_priority` |
+| 506 | ✅ | `Leads` entity has `assigned_to` + `assigned_at` fields | Schema confirmed |
+| 507 | ✅ | `generateAIReply` backend function deployed | Exists in function list — generates AI responses |
+| 508 | ✅ | `analyzeReplySentiment` deployed | Exists — classifies inbound reply tone |
+| 509 | ✅ | `classifyLeadReply` deployed | Exists — intent classification on inbound SMS |
+| 510 | ✅ | `sendSMS` backend function deployed (Twilio) | Exists — used across pipeline |
+| 511 | ✅ | `sendEmail` backend function deployed (Resend) | Exists — used across pipeline |
+| 512 | ✅ | `receiveTwilioInboundSms` deployed with STOP handling | Confirmed — full opt-out flow |
+| 513 | ✅ | ELEVENLABS_API_KEY secret is set | Confirmed in secrets list |
+
+---
+
+## 🔴 SECTION AI-A: INDUSTRY AGENT DEFINITIONS (Text-Based)
+
+> One agent config per industry. Each has unique persona, system prompt, industry knowledge, objection handling.
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 514 | ⏳ | Create `agents/sales_rep_med_spa.json` — persona: "Sarah", system prompt with med spa pain points, objection scripts, demo CTA | CRITICAL |
+| 515 | ⏳ | Create `agents/sales_rep_dental.json` — persona: "Marcus", dental/ortho pain points, no-show reduction angle, insurance FAQ | CRITICAL |
+| 516 | ⏳ | Create `agents/sales_rep_chiropractic.json` — persona: "Jordan", PT/chiro lead leakage, missed call recovery focus | CRITICAL |
+| 517 | ⏳ | Create `agents/sales_rep_hvac.json` — persona: "Tyler", HVAC seasonal demand, emergency call-back urgency | CRITICAL |
+| 518 | ⏳ | Create `agents/sales_rep_roofing.json` — persona: "Derek", storm damage urgency, contractor follow-up speed | CRITICAL |
+| 519 | ⏳ | Create `agents/sales_rep_contractors.json` — persona: "Alex", contractor quote follow-up, remodel lead nurture | CRITICAL |
+| 520 | ⏳ | Grant each agent READ access to `Leads` entity so they can look up lead context during conversations | HIGH |
+| 521 | ⏳ | Grant each agent READ access to `CommunicationEvent` entity for conversation history | HIGH |
+| 522 | ⏳ | Grant each agent access to `generateAIReply` backend function | HIGH |
+| 523 | ⏳ | Grant each agent access to `scheduleDemoBooking` backend function so they can book demos directly | HIGH |
+
+---
+
+## 🔴 SECTION AI-B: INDUSTRY ROUTING TRIGGER
+
+> When a lead comes in → detect industry → assign correct AI agent → fire first outreach
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 524 | ⏳ | Build `routeLeadToIndustryAgent` backend function — reads `lead.business_type`, calls `detectIndustry()`, returns `{ agent_name, rep_name, industry_key }` | CRITICAL |
+| 525 | ⏳ | Wire `routeLeadToIndustryAgent` into `onLeadCreated` — after scoring, route lead to agent before first SMS fires | HIGH |
+| 526 | ⏳ | Store `agent_name` on the Lead record — add `assigned_agent_name` field to `Leads` entity | HIGH |
+| 527 | ⏳ | Update `dispatchLeadWebhook` payload to include `agent_name` field from routing result | MEDIUM |
+| 528 | ⏳ | Build `getAgentForLead(lead_id)` helper — reads `Leads.assigned_agent_name` and returns agent config | MEDIUM |
+
+---
+
+## 🔴 SECTION AI-C: AI REP — FIRST OUTREACH ENGINE
+
+> Each industry agent fires first contact within 2 min (HOT) or 10 min (WARM) after lead creation
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 529 | ⏳ | Build `generateIndustryFirstSMS` function — reads `industry_key` + `lead.full_name` + `lead.problem`, calls InvokeLLM with industry-specific system prompt, returns ≤160 char SMS | CRITICAL |
+| 530 | ⏳ | Wire `generateIndustryFirstSMS` into `sendInstantLeadResponseSms` — replace static template with AI-generated industry-aware SMS | HIGH |
+| 531 | ⏳ | Build industry prompt map — 6 system prompts (one per industry), stored in `lib/agentPrompts.js` | HIGH |
+| 532 | ⏳ | Add `industry_key` context to all AI prompts in `generateAIReply` — so all replies stay industry-aware | HIGH |
+| 533 | ⏳ | Add SMS character limit enforcement: if generated SMS > 160 chars, retry once with "shorten to under 160 chars" instruction | HIGH |
+| 534 | ⏳ | Log every AI-generated SMS to `CommunicationEvent` with `provider: "internal"`, `event_type: "ai_generated"` | MEDIUM |
+
+---
+
+## 🔴 SECTION AI-D: INBOUND REPLY HANDLING PER AGENT
+
+> When lead replies → classify intent → agent-specific response
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 535 | ⏳ | Update `receiveTwilioInboundSms` — after STOP check, look up `lead.assigned_agent_name`, load agent prompt, generate reply via InvokeLLM | CRITICAL |
+| 536 | ⏳ | Build `industryAwareReply` function — takes `{ lead_id, inbound_message }`, loads agent, conversation history from `CommunicationEvent`, generates contextual reply | CRITICAL |
+| 537 | ⏳ | Add conversation memory — `industryAwareReply` loads last 5 `CommunicationEvent` records for the lead to maintain conversation thread | HIGH |
+| 538 | ⏳ | Build booking intent detector — if AI classifies reply as `booking_ready`, automatically send booking link via `sendBookingLinkSMS` | HIGH |
+| 539 | ⏳ | Build objection handler — if AI detects `pricing_concern` intent, fire industry-specific pricing objection script | HIGH |
+| 540 | ⏳ | Build disqualification handler — if AI detects `not_interested`, stop all sequences, update `lead.status = "Closed"` | HIGH |
+
+---
+
+## 🔴 SECTION AI-E: ELEVENLABS VOICE AGENT (HOT LEADS ONLY)
+
+> ElevenLabs + Twilio outbound voice call for HOT leads (score ≥ 75) within 5 minutes
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 541 | ⏳ | Research ElevenLabs Conversational AI API (`/v1/convai/agents`) — confirm endpoint, auth, and Twilio integration method | CRITICAL |
+| 542 | ⏳ | Build `createElevenLabsAgent` admin function — creates one ElevenLabs agent per industry via API, stores `elevenlabs_agent_id` in AdminSettings | CRITICAL |
+| 543 | ⏳ | Build `triggerVoiceCallToLead` backend function — takes `lead_id`, fetches `assigned_agent_name`, retrieves `elevenlabs_agent_id`, initiates Twilio outbound call with ElevenLabs TwiML | CRITICAL |
+| 544 | ⏳ | Build Twilio TwiML handler for ElevenLabs — `<Connect>` verb pointing at ElevenLabs websocket stream with agent_id | HIGH |
+| 545 | ⏳ | Wire `triggerVoiceCallToLead` into HOT lead flow — fires when `priority_tier === "HOT"` AND `lead_score >= 75` | HIGH |
+| 546 | ⏳ | Add voice call attempt logging to `CommunicationEvent` — `channel: "sms"` → new `channel: "voice"`, `event_type: "voice_call_initiated"` | HIGH |
+| 547 | ⏳ | Handle no-answer — if Twilio call is not answered, fall back to SMS within 60 seconds | HIGH |
+| 548 | ⏳ | Handle call completion — after ElevenLabs call ends, Twilio webhook fires → extract call outcome → update `lead.status` | HIGH |
+| 549 | ⏳ | Add quiet hours guard to voice calls — no calls before 8am or after 8pm recipient local time | CRITICAL |
+| 550 | ⏳ | Build admin toggle — `AdminSettings.voice_calls_enabled` boolean — allows disabling voice calls without code change | MEDIUM |
+
+---
+
+## 🔴 SECTION AI-F: ADMIN UI FOR AI SALES REPS
+
+> Visibility into agent performance and conversation quality
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 551 | ⏳ | Add "AI Sales Reps" tab to AdminDashboard — shows each of 6 agents: name, industry, leads assigned this week, demos booked, conversion rate | HIGH |
+| 552 | ⏳ | Build `getAgentPerformanceMetrics` backend function — queries `Leads` filtered by `assigned_agent_name`, returns count by status | HIGH |
+| 553 | ⏳ | Build conversation viewer — admin can click any lead and see full AI conversation thread from `CommunicationEvent` | HIGH |
+| 554 | ⏳ | Add "Override Agent" dropdown in admin lead detail — allows manually reassigning lead to a different industry agent | MEDIUM |
+| 555 | ⏳ | Add "Trigger Voice Call Now" button in admin lead detail (HOT leads only) — calls `triggerVoiceCallToLead` | HIGH |
+| 556 | ⏳ | Add "AI Reply Sent" badge on lead list rows — shows when an agent has replied to this lead | MEDIUM |
+
+---
+
+## 🔴 SECTION AI-G: ENTITY + INFRASTRUCTURE
+
+> Schema and config changes needed to support the agent system
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 557 | ⏳ | Add `assigned_agent_name` field (string) to `Leads` entity | HIGH |
+| 558 | ⏳ | Add `voice_call_attempted` (boolean) + `voice_call_outcome` (string enum: answered/no_answer/busy/failed) to `Leads` entity | HIGH |
+| 559 | ⏳ | Add `voice_calls_enabled` + `elevenlabs_agent_ids` (object) fields to `AdminSettings` entity | HIGH |
+| 560 | ⏳ | Add `channel: "voice"` to `CommunicationEvent.channel` enum | HIGH |
+
+---
+
+## 📊 AI SALES REP PROGRESS TRACKER
+
+| Section | Tasks | Done | Remaining |
+|---|---|---|---|
+| Already Built | #501–#513 | 13 ✅ | 0 |
+| Agent Definitions | #514–#523 | 0 | 10 |
+| Routing Trigger | #524–#528 | 0 | 5 |
+| First Outreach Engine | #529–#534 | 0 | 6 |
+| Inbound Reply Handling | #535–#540 | 0 | 6 |
+| ElevenLabs Voice | #541–#550 | 0 | 10 |
+| Admin UI | #551–#556 | 0 | 6 |
+| Entity/Infrastructure | #557–#560 | 0 | 4 |
+| **TOTAL** | **60 tasks** | **13 ✅** | **47** |
+
+---
+
+## 🔢 EXECUTION ORDER (Follow this sequence exactly)
+
+```
+PHASE 1 — Foundation (do first, everything depends on these)
+  #557 → #558 → #559 → #560   (entity schema changes)
+  #526                          (add assigned_agent_name to Leads)
+
+PHASE 2 — Agent Configs (can be done in parallel)
+  #514, #515, #516, #517, #518, #519   (6 agent JSON files)
+  #531                                   (lib/agentPrompts.js)
+
+PHASE 3 — Routing + First Outreach
+  #524 → #525 → #527 → #528
+  #529 → #530 → #532 → #533 → #534
+
+PHASE 4 — Inbound Reply Loop
+  #535 → #536 → #537 → #538 → #539 → #540
+
+PHASE 5 — Agent Permissions
+  #520, #521, #522, #523
+
+PHASE 6 — Voice (ElevenLabs + Twilio)
+  #541 → #542 → #543 → #544 → #545 → #546 → #547 → #548 → #549 → #550
+
+PHASE 7 — Admin UI
+  #551 → #552 → #553 → #554 → #555 → #556
+```
+
+---
+
+*AI Sales Rep System — Tasks #501–#560 | Added 2026-05-03*
+*Cross-checked against: dispatchLeadWebhook (just rebuilt), all 160 backend functions, Leads entity schema, AdminSettings entity, ELEVENLABS_API_KEY confirmed set*

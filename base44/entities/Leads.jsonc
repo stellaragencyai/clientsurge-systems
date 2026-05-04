@@ -72,6 +72,17 @@
       "title": "Lead Score (0-100)",
       "default": 0
     },
+    "activation_priority": {
+      "type": "string",
+      "title": "Activation Priority",
+      "enum": [
+        "Hot",
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "default": "Low"
+    },
     "lead_category": {
       "type": "string",
       "title": "Lead Category",
@@ -88,6 +99,11 @@
     "assigned_at": {
       "type": "string",
       "title": "Assigned At"
+    },
+    "assigned_agent_name": {
+      "type": "string",
+      "title": "Assigned AI Agent Name",
+      "description": "Name of the industry-specific AI sales agent handling this lead (e.g. sales_rep_med_spa)"
     },
     "last_contacted_at": {
       "type": "string",
@@ -108,6 +124,25 @@
     "last_activity_at": {
       "type": "string",
       "title": "Last Activity At"
+    },
+    "reply_sentiment": {
+      "type": "string",
+      "title": "Reply Sentiment (AI)",
+      "enum": [
+        "Positive",
+        "Neutral",
+        "Negative",
+        "Unknown"
+      ],
+      "default": "Unknown"
+    },
+    "reply_sentiment_reason": {
+      "type": "string",
+      "title": "Sentiment Reason (AI)"
+    },
+    "reply_sentiment_analyzed_at": {
+      "type": "string",
+      "title": "Sentiment Last Analyzed At"
     },
     "ai_intent": {
       "type": "string",
@@ -212,6 +247,39 @@
     "enriched_at": {
       "type": "string",
       "title": "Last Enriched At"
+    },
+    "missed_call_step_sent": {
+      "type": "integer",
+      "title": "Missed-Call Follow-Up Step (1-4)",
+      "default": 0,
+      "description": "Highest follow-up step sent (0=none, 1=2min SMS, 2=10min email, 3=1hr SMS, 4=24hr email)"
+    },
+    "missed_call_last_step_at": {
+      "type": "string",
+      "title": "Missed-Call Last Step Sent At"
+    },
+    "missed_call_sequence_complete": {
+      "type": "boolean",
+      "title": "Missed-Call Sequence Complete",
+      "default": false
+    },
+    "voice_call_attempted": {
+      "type": "boolean",
+      "title": "Voice Call Attempted",
+      "default": false,
+      "description": "True if an ElevenLabs voice call was attempted for this lead"
+    },
+    "voice_call_outcome": {
+      "type": "string",
+      "title": "Voice Call Outcome",
+      "enum": [
+        "answered",
+        "no_answer",
+        "busy",
+        "failed",
+        "not_attempted"
+      ],
+      "default": "not_attempted"
     }
   },
   "required": [
