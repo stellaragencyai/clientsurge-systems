@@ -85,7 +85,7 @@ export default function Hero() {
             className="landing-hero__headline"
             style={{
               fontFamily: "Montserrat, sans-serif",
-              fontSize: "clamp(1.6rem, 3.5vw, 2.6rem)",
+              fontSize: "clamp(2rem, 5.2vw, 3.8rem)",
               fontWeight: "700",
               lineHeight: 1.1,
               letterSpacing: "-0.03em",
@@ -133,9 +133,9 @@ export default function Hero() {
             className="landing-hero__checklist hero-checklist"
             style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px", marginBottom: "32px", maxWidth: "640px", margin: "0 0 32px" }}>
             
-            {checklist.map((item, i) => (
-              <CascadingChecklistItem key={item} item={item} index={i} />
-            ))}
+            {checklist.map((item, i) =>
+            <CascadingChecklistItem key={item} item={item} index={i} />
+            )}
           </div>
 
           <div
@@ -225,25 +225,25 @@ export default function Hero() {
 
 
           {/* iPad shell — Space Gray aluminum body */}
-          <div
-            className="landing-hero__tablet"
-            style={{
-              position: "relative",
-              width: "min(100%, 930px)",
-              aspectRatio: "1.15 / 1",
-              borderRadius: "36px",
-              /* Space gray aluminum gradient */
-              background: "linear-gradient(160deg, #4a4a4c 0%, #3a3a3c 30%, #2c2c2e 60%, #1c1c1e 100%)",
-              boxShadow:
-                "0 44px 110px rgba(0,0,0,0.55), 0 18px 44px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.4)",
-              transform: "perspective(2400px) rotateY(-10deg) rotateX(4deg) rotateZ(1.4deg)",
-            }}>
+          <div className="landing-hero__tablet hidden"
+
+          style={{
+            position: "relative",
+            width: "min(100%, 930px)",
+            aspectRatio: "1.15 / 1",
+            borderRadius: "36px",
+            /* Space gray aluminum gradient */
+            background: "linear-gradient(160deg, #4a4a4c 0%, #3a3a3c 30%, #2c2c2e 60%, #1c1c1e 100%)",
+            boxShadow:
+            "0 44px 110px rgba(0,0,0,0.55), 0 18px 44px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.4)",
+            transform: "perspective(2400px) rotateY(-10deg) rotateX(4deg) rotateZ(1.4deg)"
+          }}>
 
             {/* Top edge highlight (aluminum sheen) */}
             <div style={{
               position: "absolute", top: 0, left: "8%", right: "8%", height: "1px",
               background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), rgba(255,255,255,0.5), rgba(255,255,255,0.35), transparent)",
-              borderRadius: "999px", zIndex: 10,
+              borderRadius: "999px", zIndex: 10
             }} />
 
             {/* Left side — volume buttons */}
@@ -259,7 +259,7 @@ export default function Hero() {
               borderRadius: "28px",
               background: "#000",
               overflow: "hidden",
-              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 2px 8px rgba(0,0,0,0.8)",
+              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 2px 8px rgba(0,0,0,0.8)"
             }}>
               {/* Front camera dot centered at top bezel */}
               <div style={{
@@ -267,7 +267,7 @@ export default function Hero() {
                 width: "8px", height: "8px", borderRadius: "50%", zIndex: 10,
                 background: "radial-gradient(circle at 35% 35%, #1a2040, #05070f)",
                 border: "1px solid rgba(80,100,180,0.4)",
-                boxShadow: "0 0 4px rgba(60,80,160,0.5)",
+                boxShadow: "0 0 4px rgba(60,80,160,0.5)"
               }} />
 
               {/* The actual dashboard content */}
