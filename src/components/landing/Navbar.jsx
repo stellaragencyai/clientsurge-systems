@@ -145,10 +145,10 @@ export default function Navbar() {
     <nav
       className="fixed top-4 left-4 right-4 z-50 rounded-[28px] border"
       style={{
-        borderColor: scrolled ? "rgba(0,174,239,0.2)" : "rgba(0,174,239,0)",
-        backgroundColor: scrolled ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0)",
-        backdropFilter: scrolled ? "blur(20px)" : "none",
-        WebkitBackdropFilter: scrolled ? "blur(20px)" : "none",
+        borderColor: "rgba(0,174,239,0.2)",
+        backgroundColor: "rgba(255,255,255,0.85)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
         paddingTop: "env(safe-area-inset-top)",
         boxShadow: scrolled ? "0 20px 60px rgba(0,100,200,0.1)" : "none",
         transition: "background-color 0.35s ease-out, box-shadow 0.35s ease-out, border-color 0.35s ease-out"
