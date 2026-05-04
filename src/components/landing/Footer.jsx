@@ -19,6 +19,8 @@ const navColumns = [
   { label: "Dental & Orthodontics", href: "/dental" },
   { label: "Chiropractic & PT", href: "/chiropractic" },
   { label: "HVAC & Home Services", href: "/hvac" },
+  { label: "Roofing & Restoration", href: "/roofing" },
+  { label: "Contractors & Trades", href: "/contractors" },
   { label: "All Industries", href: "/industries" }]
 
 },

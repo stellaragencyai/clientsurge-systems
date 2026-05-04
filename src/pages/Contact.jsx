@@ -117,7 +117,7 @@ export default function Contact() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <section className="py-20 px-6 text-center" style={{ background: "linear-gradient(to bottom, hsl(40,8%,88%), hsl(0,0%,100%))" }}>
+      <section className="py-20 px-6 text-center" style={{ background: "linear-gradient(to bottom, hsl(var(--muted)), hsl(var(--background)))" }}>
         <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Get In Touch</p>
         <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
           Let&apos;s Talk About Your Business
@@ -228,6 +228,7 @@ export default function Contact() {
                     autoComplete="off"
                     className="hidden"
                     aria-hidden="true"
+                    style={{ display: "none", position: "absolute", left: "-9999px" }}
                   />
                   <div>
                     <label htmlFor="contact-full-name" className="block text-xs font-semibold text-foreground mb-1.5">Full Name <span className="text-red-500">*</span></label>

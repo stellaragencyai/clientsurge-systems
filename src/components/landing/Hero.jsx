@@ -131,7 +131,7 @@ export default function Hero() {
 
           <div
             className="landing-hero__checklist hero-checklist"
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "32px", maxWidth: "100%", margin: "0 auto 32px" }}>
+            style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px", marginBottom: "32px", maxWidth: "640px", margin: "0 auto 32px" }}>
             
             {checklist.map((item, i) => (
               <CascadingChecklistItem key={item} item={item} index={i} />

@@ -25,10 +25,12 @@ function SimpleCheck() {
 
 }
 
+// TODO: Replace these with your live Stripe payment links from the Stripe Dashboard
+// Go to Stripe Dashboard → Payment Links → Create link for each plan
 const STRIPE_LINKS = {
-  starter: "https://buy.stripe.com/test_4gM14pfeU8uV3Sk7bYcfK09",
-  growth:  "https://buy.stripe.com/test_eVq14p8Qw7qR9cE2VIcfK0a",
-  elite:   "https://buy.stripe.com/test_00w8wR9UAfXn0G82VIcfK0b",
+  starter: "/store",
+  growth:  "/store",
+  elite:   "/store",
 };
 
 const ALA_CARTE = [
@@ -220,7 +222,7 @@ export default function Pricing() {
         <div className="grid grid-cols-5 gap-2 mt-8 mb-4 w-full">
           {[
             { icon: "🔒", text: "No long-term contracts" },
-            { icon: "⚡", text: "Live in 5–7 business days" },
+            { icon: "⚡", text: "Live in 24–48 Hours" },
             { icon: "💬", text: "SMS + Email included" },
             { icon: "🎯", text: "Done-for-you setup" },
             { icon: "🛡️", text: "30-day money-back guarantee" },
@@ -252,8 +254,8 @@ export default function Pricing() {
             {ALA_CARTE.map((item) => (
               <div
                 key={item.name}
-                className="flex flex-col rounded-2xl p-6 border"
-                style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(0,0,0,0.5)", backdropFilter: "blur(12px)" }}
+                className="flex flex-col rounded-2xl p-6"
+                style={{ background: "rgba(255,255,255,0.7)", border: "1px solid rgba(0,0,0,0.12)", backdropFilter: "blur(12px)" }}
               >
                 <div className="text-3xl mb-3">{item.emoji}</div>
                 <h4 className="font-semibold text-foreground text-sm mb-1">{item.name}</h4>
@@ -272,81 +274,7 @@ export default function Pricing() {
           </div>
         </div>
 
-        <div className="max-w-2xl mb-6 mt-12">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3 hidden">What&apos;s Included In Setup</p>
-          <h3 className="font-titles text-2xl md:text-3xl font-bold text-foreground hidden">
-            We build and install the system for you — not just the strategy
-          </h3>
-          <p className="mt-3 text-sm md:text-base text-muted-foreground hidden">
-            Your setup fee covers the full buildout of your AI lead conversion system — launch prep, messaging logic, booking flow, and handoff — done for you.
-          </p>
-        </div>
-        <div className="grid md:grid-cols-2 gap-x-6 gap-y-3 mb-14">
-          {[
-          "AI lead conversion system setup and message logic",
-          "Automated SMS and email follow-up sequence",
-          "Booking link or booking flow integration",
-          "Missed-call recovery system setup when included",
-          "Launch testing, polish, and go-live support",
-          "Onboarding call plus full implementation handoff"].
-          map((item) =>
-          <div key={item} className="flex items-start gap-3 py-1 hidden">
-              <SimpleCheck />
-              <p className="text-sm text-foreground/80">{item}</p>
-            </div>
-          )}
-        </div>
 
-        <div className="text-center max-w-xl mx-auto border-t border-border pt-10 hidden">
-          <p className="text-foreground font-semibold text-base mb-5 hidden">
-            Not sure which system fits your business? We will recommend the best option based on your lead flow.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            {demoBooking ?
-            <button
-              type="button"
-              onClick={() =>
-              demoBooking.openDemoBooking({
-                prefillIndustry: selectedIndustry?.name || ""
-              })
-              }
-              style={{
-                borderRadius: "9999px",
-                padding: "2px",
-                background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
-                boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
-                border: "none",
-                cursor: "pointer"
-              }}>
-              
-                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.95rem" }} className=" hidden hidden">
-                  Book Your Free Demo <ArrowRight className="w-4 h-4" />
-                </span>
-              </button> :
-
-            <a
-              href="/book"
-              style={{
-                borderRadius: "9999px",
-                padding: "2px",
-                background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
-                boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
-                display: "inline-block"
-              }}>
-              
-                <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.95rem" }}>
-                  Book Your Free Demo <ArrowRight className="w-4 h-4" />
-                </span>
-              </a>
-            }
-            <a
-              href="#lead-leakage"
-              className="inline-flex items-center justify-center gap-2 h-12 px-6 rounded-full border border-primary/30 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 transition-all duration-200">
-              
-              Get a Free Lead Leakage Audit
-            </a>
-          </div>
-        </div>
 
       </div>
 

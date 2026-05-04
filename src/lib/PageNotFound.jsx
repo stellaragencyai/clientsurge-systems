@@ -20,7 +20,7 @@ export default function PageNotFound() {
             style={{
               fontSize: "clamp(6rem, 20vw, 12rem)",
               lineHeight: 1,
-              background: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 52%, #9a5c2e 100%)",
+              background: "linear-gradient(135deg, #003B8F 0%, #006BB0 52%, #00AEEF 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -57,8 +57,8 @@ export default function PageNotFound() {
             onClick={() => setShowModal(true)}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-white"
             style={{
-              background: "linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 40%, #7a4825 100%)",
-              boxShadow: "0 4px 14px rgba(120,70,20,0.3)",
+              background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
+              boxShadow: "0 4px 14px rgba(0,174,239,0.35)",
             }}
           >
             <CalendarCheck className="w-4 h-4" />

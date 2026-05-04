@@ -62,8 +62,6 @@ const items = [
     label: "Average recovery window",
     display: "30-day ROI",
     animatedValue: null,
-    suffix: "",
-    display: "30-day ROI",
     story:
       "A few additional booked appointments often cover the investment faster than teams expect.",
   },
@@ -88,6 +86,7 @@ function StatCard({ item, index, inView }) {
   return (
     <motion.article
       className="relative rounded-2xl border border-border text-left shadow-sm"
+      aria-label={`${statText} — ${item.label}`}
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}

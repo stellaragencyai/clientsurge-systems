@@ -5,7 +5,7 @@ const testimonials = [
   {
     name: "Jessica M.",
     businessType: "Med Spa",
-    location: "Miami, FL",
+    location: "Scottsdale, AZ",
     before: "Booking 2 consults/week from online leads",
     after: "10+ consults/week",
     result: "5x booking increase",
@@ -27,7 +27,7 @@ const testimonials = [
   {
     name: "Amanda T.",
     businessType: "Dental & Orthodontics",
-    location: "Austin, TX",
+    location: "Tempe, AZ",
     before: "Manual follow-up draining team time",
     after: "Consult requests answered same day",
     result: "Team freed for growth",
@@ -125,14 +125,16 @@ export default function Testimonials() {
             <button
               type="button"
               onClick={demoBooking.openDemoBooking}
-              className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white"
+              style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
             >
               Book Your Free Demo
             </button>
           ) : (
             <a
               href="/book"
-              className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white"
+              style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
             >
               Book Your Free Demo
             </a>

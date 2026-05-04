@@ -62,34 +62,9 @@ export default function FinalCTA() {
             ))}
           </div>
 
-          <div className="mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-primary/80 hidden"
-
-          style={{
-            background: "rgba(154,92,46,0.08)",
-            border: "1px solid rgba(154,92,46,0.18)"
-          }}>
-            
-            Free 15-minute call · no commitment required · live in 5-7 days
-          </div>
-        </div>
-
-        {/* Enhancement 2: Urgency strip above buttons */}
-        <div className="max-w-xl mx-auto mt-8 mb-2 relative z-10">
-          <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold hidden"
-
-          style={{
-            background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)",
-            border: "1.5px solid rgba(154,92,46,0.22)"
-          }}>
-            
-            <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
-            </span>
-            <span style={{ color: "rgba(154,92,46,0.9)" }} className=" hidden">
-              Demo slots are limited — we only take on a few new clients each month
-            </span>
-          </div>
+          <p className="mt-6 text-xs text-muted-foreground/60">
+            Free 15-minute call · no commitment required · live in 24–48 hours
+          </p>
         </div>
 
         <div className="max-w-3xl mx-auto text-center mt-4 relative z-10">

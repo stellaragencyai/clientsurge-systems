@@ -5,7 +5,7 @@
 
 export const BUTTON_TEXT = {
   BOOK_DEMO: "Get Your Free Audit",
-  BOOK_DEMO_SHORT: "Get Your Free Audit",
+  BOOK_DEMO_SHORT: "Free Audit",
   GET_STARTED: "Get Started",
   VIEW_PRICING: "View Pricing",
   SCHEDULE_DEMO: "Get Your Free Audit",

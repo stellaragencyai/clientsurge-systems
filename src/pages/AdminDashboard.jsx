@@ -5,6 +5,7 @@ import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw, Plus,
+  Server, RotateCcw,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
@@ -50,7 +51,7 @@ const NAV_GROUPS = [
     group: 'Automation',
     items: [
       { id: 'website-leads', label: 'Website Leads', icon: Target },
-      { id: 'install-queue', label: 'Install Queue', icon: Zap },
+      { id: 'install-queue', label: 'Install Queue', icon: Server },
       { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
       { id: 'automations', label: 'Automation Status', icon: Zap },
       { id: 'drip', label: 'Drip Campaigns', icon: Send },
@@ -58,7 +59,7 @@ const NAV_GROUPS = [
       { id: 'cadence', label: 'Dynamic Cadence', icon: Settings },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Mail },
       { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
-      { id: 'reactivation', label: 'Lead Reactivation', icon: Zap },
+      { id: 'reactivation', label: 'Lead Reactivation', icon: RotateCcw },
       { id: 'routing', label: 'Lead Routing', icon: Target },
     ],
   },
@@ -268,7 +269,7 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <div className="bg-white border-b border-border px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+        <div className="bg-background border-b border-border px-6 py-3 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}

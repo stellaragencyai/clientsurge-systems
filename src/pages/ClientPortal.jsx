@@ -158,7 +158,7 @@ export default function ClientPortal() {
             <a
               href="mailto:support@clientsurgesystems.com"
               className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
-              style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+              style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}
             >
               Contact Support
             </a>
@@ -185,12 +185,12 @@ export default function ClientPortal() {
         <div className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+            style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}
           >
             <span className="text-white text-xs font-bold">CS</span>
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-sm font-semibold" style={{ background: "linear-gradient(135deg,#6b3f1f,#c8965c)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>ClientSurge Systems</span>
+            <span className="text-sm font-semibold" style={{ background: "linear-gradient(135deg,#0088CC,#00AEEF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>ClientSurge Systems</span>
             <span className="text-[10px] text-muted-foreground">Client Portal</span>
           </div>
         </div>
@@ -219,17 +219,17 @@ export default function ClientPortal() {
       {/* Hero greeting */}
       <div
         className="px-6 py-10"
-        style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 60%,#c8965c 100%)" }}
+        style={{ background: "linear-gradient(135deg,#003B8F 0%,#006BB0 60%,#00AEEF 100%)" }}
       >
         <div className="max-w-4xl mx-auto">
-          <p className="text-xs font-bold text-amber-300/70 uppercase tracking-widest mb-1">Welcome Back</p>
+          <p className="text-xs font-bold text-blue-200/70 uppercase tracking-widest mb-1">Welcome Back</p>
           <h1 className="font-display text-2xl md:text-3xl font-semibold text-white mb-1">
-            {project.business_name}
+            {project?.business_name}
           </h1>
-          <p className="text-amber-100/70 text-sm">
-            Plan: <span className="font-semibold text-amber-200">{project.plan}</span>
-            {project.go_live_date && (
-              <span className="ml-3">· Target go-live: <span className="font-semibold text-amber-200">{project.go_live_date}</span></span>
+          <p className="text-blue-100/70 text-sm">
+            Plan: <span className="font-semibold text-blue-200">{project?.plan}</span>
+            {project?.go_live_date && (
+              <span className="ml-3">· Target go-live: <span className="font-semibold text-blue-200">{project.go_live_date}</span></span>
             )}
           </p>
         </div>

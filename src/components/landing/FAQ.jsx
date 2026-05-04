@@ -78,7 +78,7 @@ export const FAQ_ITEMS = [
 export default function FAQ() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
-  const [expandedIndex, setExpandedIndex] = useState(0);
+  const [expandedIndex, setExpandedIndex] = useState(null);
 
   const categories = ["all", "setup", "pricing", "integration", "support"];
   const categoryLabels = { all: "All", setup: "Getting Started", pricing: "Pricing", integration: "Integrations", support: "Support" };
@@ -108,6 +108,7 @@ export default function FAQ() {
         {/* Search bar */}
         <div className="mb-6">
           <input
+            id="faq-search"
             type="text"
             placeholder="Search FAQs..."
             value={search}
@@ -116,6 +117,7 @@ export default function FAQ() {
             autoCorrect="off"
             autoCapitalize="off"
             spellCheck="false"
+            aria-label="Search FAQs"
             className="w-full px-4 py-2.5 rounded-lg border border-border bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm"
           />
         </div>
@@ -138,7 +140,7 @@ export default function FAQ() {
         </div>
 
         {filtered.length > 0 ? (
-          <Accordion type="single" collapsible value={`faq-${expandedIndex}`} onValueChange={(val) => setExpandedIndex(parseInt(val.split("-")[1]))} className="space-y-3">
+          <Accordion type="single" collapsible value={expandedIndex !== null ? `faq-${expandedIndex}` : ""} onValueChange={(val) => setExpandedIndex(val ? parseInt(val.split("-")[1]) : null)} className="space-y-3">
             {filtered.map((faq, idx) => (
               <motion.div
                 key={idx}
