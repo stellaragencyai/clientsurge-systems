@@ -1321,3 +1321,134 @@ PHASE 7 — Admin UI
 
 *AI Sales Rep System — Tasks #501–#560 | Added 2026-05-03*
 *Cross-checked against: dispatchLeadWebhook (just rebuilt), all 160 backend functions, Leads entity schema, AdminSettings entity, ELEVENLABS_API_KEY confirmed set*
+
+---
+
+# 🆕 TASK DATABASE EXTENSION — May 4, 2026
+> Tasks below are tracked in Base44 ProjectTask entity, not just this file.
+> API: GET https://base44.app/api/apps/69d49a29c1974b32f46e8550/entities/ProjectTask
+> Total DB tasks: **544** | Completed: **82**
+
+---
+
+## BATCH 1: PIPELINE & ACTIVATION (Tasks 445–469)
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 445 | ⏳ | Build activateAllServices — orchestrates configureService x N by tier | CRITICAL |
+| 446 | ⏳ | Wire stripePaymentWebhook → activateAllServices post-payment | CRITICAL |
+| 447 | ⏳ | Fix installPipeline — all actions return Invalid action | HIGH |
+| 448 | ⏳ | Unify service_key naming across both apps | HIGH |
+| 449 | ⏳ | E2E test real order 69f13b948861e8a032d10f2e | CRITICAL |
+| 450 | ✅ | /admin/pipeline-status page | HIGH |
+| 451 | ✅ | New paid order → Telegram alert | HIGH |
+| 452 | ✅ | /client-intake credential intake form | HIGH |
+| 453 | 🔄 | Client portal: services tab | HIGH |
+| 454 | ⏳ | Client portal: analytics tab | HIGH |
+| 455 | ⏳ | Client portal: order status tab | HIGH |
+| 456 | ⏳ | Client portal: billing tab (v1) | HIGH |
+| 457 | ✅ | /demo page built | CRITICAL |
+| 458 | ⏳ | Mobile audit at 375px viewport | HIGH |
+| 459 | ⏳ | Meta descriptions + OG tags on all public pages | MEDIUM |
+| 460 | 🔄 | /case-studies page (3 placeholder cards) | MEDIUM |
+| 461 | ⏳ | Live chat widget (Tawk.to) | MEDIUM |
+| 462 | ⏳ | Google Analytics 4 setup | HIGH |
+| 463 | ⏳ | Revenue dashboard: MRR trend chart | HIGH |
+| 464 | ⏳ | Revenue dashboard: churn rate tracker | HIGH |
+| 465 | ⏳ | Revenue dashboard: LTV per client | MEDIUM |
+| 466 | ⏳ | sendGoLiveNotification function | HIGH |
+| 467 | ⏳ | Admin order management page | HIGH |
+| 468 | ⏳ | Stripe webhook signature verification | CRITICAL |
+| 469 | ⏳ | runFullPipelineTest QA function | CRITICAL |
+
+---
+
+## BATCH 2: REVENUE + SECURITY + COMPLIANCE (Tasks 470–494)
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 470 | ⏳ | salesCatalog.js price audit — kill all $97/$297 wrong values | CRITICAL |
+| 471 | ⏳ | Verify sk_live_ in createCheckoutSession + stripePaymentWebhook | CRITICAL |
+| 472 | ⏳ | TCPA SMS consent on ALL public lead forms + SMS templates | CRITICAL |
+| 473 | ⏳ | Order create automation: chain initializeInstallOS + welcome email | CRITICAL |
+| 474 | ⏳ | Wire stripeWebhookOrders → initializeInstallOS immediately | CRITICAL |
+| 475 | ⏳ | InstallChecklistPanel: SVG progress ring, per-service bars | CRITICAL |
+| 476 | ⏳ | ClientPortal Billing Tab + global PaymentFailedBanner | CRITICAL |
+| 477 | ⏳ | Twilio sig validation + simulateMissedCall admin guard | CRITICAL |
+| 478 | ⏳ | Stripe webhook idempotency (stripe_event_id dedup) | CRITICAL |
+| 479b | ⏳ | Scan frontend for sk_live_ secret key exposure | CRITICAL |
+| 480 | ⏳ | Admin leads bulk status update toolbar | HIGH |
+| 481 | ⏳ | AdminSettings: Test Connection buttons (Twilio + Resend) | HIGH |
+| 482 | ⏳ | Admin lead detail: Send Manual SMS panel | HIGH |
+| 483 | ⏳ | generateClientWebsite function (Starter/Growth/Elite spec) | CRITICAL |
+| 484 | ⏳ | Admin: warning badge on orders paid 2+ days no install | HIGH |
+| 485 | ⏳ | Admin: one-click Initialize Install OS button | HIGH |
+| 486 | ⏳ | ClientPortal: What's New changelog tab | LOW |
+| 487 | ⏳ | Admin: conversion funnel chart | HIGH |
+| 488 | ⏳ | Admin: Demo Bookings tab | HIGH |
+| 489 | ⏳ | AdminLeads: lead_score column (color-coded, sortable) | HIGH |
+| 490 | ⏳ | Admin: Failed Jobs section + Retry button | HIGH |
+| 491 | ⏳ | processAutomationJobs: 3x retry exponential backoff | HIGH |
+| 492 | ⏳ | All Resend calls: retry on 429/5xx | HIGH |
+| 493 | ⏳ | receiveTwilioInboundSms: STOP → sms_opted_out + pause all sequences | CRITICAL |
+| 494 | ⏳ | Full E2E purchase test on live domain (must pass before June 2) | CRITICAL |
+
+---
+
+## BATCH 3: RELIABILITY + LEAD PIPELINE + ADMIN UX (Tasks 495–519)
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 495 | ⏳ | processNurtureCampaigns: skip if messaged in last 24h | HIGH |
+| 496 | ⏳ | processAutomationJobs: 3x retry with backoff | HIGH |
+| 497 | ⏳ | _shared/retryFetch.ts: retry on 429/5xx sitewide | HIGH |
+| 498 | ⏳ | scheduleFollowUpSMS: Phoenix timezone business hours gate | HIGH |
+| 499 | ⏳ | _shared/smsHelpers.ts: appendOptOut() — TCPA sitewide | HIGH |
+| 500 | ⏳ | processMissedCallFollowUps: idempotent step increment | HIGH |
+| 501 | ⏳ | sendOrderConfirmationEmail: human-readable service labels | HIGH |
+| 502 | ⏳ | sendClientWelcomeEmail: fix /client-portal link, Reply-To header | HIGH |
+| 503 | ⏳ | receiveResendWebhook: bounce/open/click handlers | MEDIUM |
+| 504 | ⏳ | submitLeadCapture: verify exactly 60-min dedup window | HIGH |
+| 505 | ⏳ | validateLeadQuality: disposable email domain blocklist | HIGH |
+| 506 | ⏳ | deduplicateLeads: phone normalization + phone hash dedup | MEDIUM |
+| 507 | ⏳ | Order: set client_id by User lookup post-payment | HIGH |
+| 508 | ⏳ | Create ClientProject on every paid order | HIGH |
+| 509 | ⏳ | CommunicationEvent: write on every SMS/email attempt | HIGH |
+| 510 | ⏳ | Admin leads: Lead.subscribe() real-time listener | HIGH |
+| 511 | ⏳ | Admin: CSS-only conversion funnel chart | HIGH |
+| 512 | ⏳ | AdminLeads: lead_score column (color pill, sortable) | HIGH |
+| 513 | ⏳ | AdminOnboarding: pipeline_status badge on client cards | HIGH |
+| 514 | ⏳ | AutomationInstallChecklist: progress bar X/N steps | MEDIUM |
+| 515 | ⏳ | Admin: one-click Initialize Install OS button | HIGH |
+| 516 | ⏳ | Admin: ⚠️ badge on orders paid 2+ days no install | HIGH |
+| 517 | ⏳ | Stripe: invoice.paid + invoice.payment_failed handlers | CRITICAL |
+| 518 | ⏳ | createCheckoutSession: capacity limit gate | MEDIUM |
+| 519 | ⏳ | getBookedDemoSlots: add date filter to query | HIGH |
+
+---
+
+## BATCH 4: CLEANUP + QA + LAUNCH READINESS (Tasks 520–544)
+| # | Status | Task | Priority |
+|---|---|---|---|
+| 520 | ⏳ | autoCloseStaleLeads function (30-day no-contact) | MEDIUM |
+| 521 | ⏳ | Daily 2am MST scheduler for autoCloseStaleLeads | MEDIUM |
+| 522 | ⏳ | exportLeadsCSV function with filters + CSV response | MEDIUM |
+| 523 | ⏳ | exportCommunicationLogs function | MEDIUM |
+| 524 | ⏳ | Admin: Export CSV + Export Logs buttons | MEDIUM |
+| 525 | ⏳ | autoEndToEndTest: extend to full lead→order→activate flow | HIGH |
+| 526 | ⏳ | monthlyClientReport: email personalized report to each client | MEDIUM |
+| 527 | ⏳ | requestSubscriptionChange: proration_behavior=create_prorations | MEDIUM |
+| 528 | ⏳ | cancelSubscription: cancel_at_period_end, notify client + Nolan | HIGH |
+| 529 | ⏳ | pauseSubscription + resumeSubscription functions | MEDIUM |
+| 530 | ⏳ | Admin: Website Leads tab with filters | HIGH |
+| 531 | ⏳ | Admin: Demo Bookings tab (complete/no-show/reschedule) | HIGH |
+| 532 | ⏳ | Admin: AuditLog viewer tab with resolve button | HIGH |
+| 533 | ⏳ | ClientPortal Billing: Download Invoice PDF | MEDIUM |
+| 534 | ⏳ | QuickStartWizard: fix broken help links | MEDIUM |
+| 535 | ⏳ | ClientDashboard: amber paused banner on cadence_paused=true | HIGH |
+| 536 | ⏳ | runLaunchReadinessCheck: 10-point system check | CRITICAL |
+| 537 | ⏳ | runFullLeadFlowTest: lead→SMS→missed call→follow-up→cleanup | CRITICAL |
+| 538 | ⏳ | Admin: Resend Welcome Email button in client detail | MEDIUM |
+| 539 | ⏳ | Admin: Enroll in Nurture button in lead detail | MEDIUM |
+| 540 | ⏳ | Admin: mask phone numbers for non-super-admin | MEDIUM |
+| 541 | ⏳ | _shared/response.ts: okJson() + errJson() helpers sitewide | MEDIUM |
+| 542 | ⏳ | All functions: correct HTTP status codes (400/404/500) | HIGH |
+| 543 | ⏳ | enrichLead: 10-second timeout on external API calls | MEDIUM |
+| 544 | ⏳ | scoreLeadIntelligence: skip if confidence < 0.6 | MEDIUM |
