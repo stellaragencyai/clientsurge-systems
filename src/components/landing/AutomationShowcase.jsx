@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Play, ArrowRight, Zap, Phone, Mail, Calendar, Star, RefreshCw } from "lucide-react";
+import { ArrowRight, Zap, Phone, Mail, Calendar, Star, RefreshCw } from "lucide-react";
+import AutomationFlowDiagram from "./AutomationFlowDiagram";
 
 const AUTOMATIONS = [
   {
@@ -10,8 +11,6 @@ const AUTOMATIONS = [
     tagline: "Reply to every new lead in under 60 seconds — automatically.",
     description:
       "The moment a lead fills out a form, calls, or submits online — your AI fires a personalized SMS and email within 60 seconds. No manual work. No missed opportunities.",
-    videoPlaceholder: "YOUR_LOOM_OR_YOUTUBE_URL",
-    diagramPlaceholder: true,
     stat: "5× more likely to convert",
   },
   {
@@ -22,8 +21,6 @@ const AUTOMATIONS = [
     tagline: "Every missed call gets an instant follow-up text.",
     description:
       "When a call goes unanswered, the system automatically texts the caller back within seconds. Your leads get a response even when you're on another job.",
-    videoPlaceholder: "YOUR_LOOM_OR_YOUTUBE_URL",
-    diagramPlaceholder: true,
     stat: "Recover 30–40% of missed calls",
   },
   {
@@ -34,8 +31,6 @@ const AUTOMATIONS = [
     tagline: "Automated follow-up that keeps leads warm for 2 weeks.",
     description:
       "A multi-touch SMS + email sequence that runs on autopilot for 14 days. Each message is personalized to the lead's industry and behavior — warming them until they're ready to book.",
-    videoPlaceholder: "YOUR_LOOM_OR_YOUTUBE_URL",
-    diagramPlaceholder: true,
     stat: "3× more booked appointments",
   },
   {
@@ -46,8 +41,6 @@ const AUTOMATIONS = [
     tagline: "Turns conversations into confirmed appointments.",
     description:
       "When a lead signals intent to book, the AI takes over — sends the booking link, follows up if they don't click, and confirms the appointment automatically.",
-    videoPlaceholder: "YOUR_LOOM_OR_YOUTUBE_URL",
-    diagramPlaceholder: true,
     stat: "40% more confirmed bookings",
   },
   {
@@ -58,8 +51,6 @@ const AUTOMATIONS = [
     tagline: "Automatically request 5-star reviews after every appointment.",
     description:
       "After a job is done, the system sends a perfectly-timed review request via SMS. Happy customers leave reviews. You build social proof on autopilot.",
-    videoPlaceholder: "YOUR_LOOM_OR_YOUTUBE_URL",
-    diagramPlaceholder: true,
     stat: "2–4× more Google reviews",
   },
   {
@@ -70,8 +61,6 @@ const AUTOMATIONS = [
     tagline: "Wake up cold leads and turn them into paying clients.",
     description:
       "Old leads who never booked get a targeted re-engagement campaign. A single reactivation blast can recover thousands in dormant revenue.",
-    videoPlaceholder: "YOUR_LOOM_OR_YOUTUBE_URL",
-    diagramPlaceholder: true,
     stat: "Recover leads up to 90 days old",
   },
 ];
@@ -87,14 +76,13 @@ export default function AutomationShowcase() {
         {/* Header */}
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-sm font-semibold px-4 py-2 rounded-full mb-4">
-            <Play className="w-4 h-4" />
-            See Every Automation In Action
+            ⚙️ All 6 Automation Systems
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Watch How Each System Works
+            See Exactly How Each System Works
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Click any automation below to see a short walkthrough and visual diagram of exactly how it works for your business.
+            Click any automation to see its step-by-step flow diagram and what it does for your business.
           </p>
         </div>
 
@@ -138,44 +126,29 @@ export default function AutomationShowcase() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Video placeholder */}
-              <div className="rounded-2xl border-2 border-dashed border-border bg-muted/30 flex flex-col items-center justify-center text-center p-8 min-h-[220px]">
-                <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Play className="w-6 h-6 text-primary ml-1" />
+              {/* Visual flow diagram */}
+              <AutomationFlowDiagram automationId={active.id} />
+
+              {/* Description + stat + CTA */}
+              <div className="rounded-2xl border border-border bg-white p-6 flex flex-col justify-between gap-4">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">What It Does</p>
+                  <p className="text-foreground text-sm leading-relaxed">{active.description}</p>
                 </div>
-                <p className="text-sm font-semibold text-foreground mb-1">Video Walkthrough</p>
-                <p className="text-xs text-muted-foreground">
-                  Drop your Loom / YouTube link here for <span className="font-medium">{active.title}</span>
-                </p>
-                <div className="mt-3 text-[10px] bg-muted px-3 py-1 rounded-full text-muted-foreground font-mono">
-                  {active.videoPlaceholder}
+                <div className="flex flex-col gap-3">
+                  <div className={`rounded-xl p-3 bg-gradient-to-br ${active.color} bg-opacity-10`}
+                    style={{ background: "hsl(var(--muted))" }}>
+                    <p className="text-xs text-muted-foreground font-medium mb-0.5">Key Result</p>
+                    <p className="text-sm font-bold text-foreground">{active.stat}</p>
+                  </div>
+                  <a
+                    href="/store"
+                    className="inline-flex items-center justify-center gap-2 bg-primary text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
+                  >
+                    Get This System <ArrowRight className="w-4 h-4" />
+                  </a>
                 </div>
               </div>
-
-              {/* Diagram placeholder */}
-              <div className="rounded-2xl border-2 border-dashed border-border bg-muted/30 flex flex-col items-center justify-center text-center p-8 min-h-[220px]">
-                <div className={`w-14 h-14 rounded-full bg-gradient-to-br ${active.color} flex items-center justify-center mb-4 opacity-30`}>
-                  <Icon className="w-6 h-6 text-white" />
-                </div>
-                <p className="text-sm font-semibold text-foreground mb-1">Visual Diagram</p>
-                <p className="text-xs text-muted-foreground">
-                  Your custom flow diagram for <span className="font-medium">{active.title}</span> goes here
-                </p>
-                <div className="mt-3 text-[10px] bg-muted px-3 py-1 rounded-full text-muted-foreground">
-                  Upload image or embed URL
-                </div>
-              </div>
-            </div>
-
-            {/* Description + CTA */}
-            <div className="rounded-2xl border border-border bg-white p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <p className="text-muted-foreground text-sm flex-1">{active.description}</p>
-              <a
-                href="/store"
-                className="flex-shrink-0 inline-flex items-center gap-2 bg-primary text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
-              >
-                Get This System <ArrowRight className="w-4 h-4" />
-              </a>
             </div>
           </div>
         </div>
