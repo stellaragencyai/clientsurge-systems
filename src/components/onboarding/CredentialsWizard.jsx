@@ -548,9 +548,10 @@ export default function CredentialsWizard({ order, onComplete }) {
         },
       };
 
-      await base44.entities.Order.update(order.id, {
+      // Use saveClientCredentials — handles intelligence check + auto-activation
+      await base44.functions.invoke("saveClientCredentials", {
+        order_id: order.id,
         install_configuration: installConfig,
-        install_configuration_updated_at: new Date().toISOString(),
       });
 
       onComplete?.();

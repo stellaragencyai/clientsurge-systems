@@ -242,6 +242,46 @@ Deno.serve(async (req) => {
           });
         }
 
+        // ── Credentials intake email (with setup link) ────────────────────────
+        try {
+          const appUrl = Deno.env.get("APP_URL") || "https://clientsurgesystems.com";
+          const credentialsUrl = `${appUrl}/setup/credentials?order_id=${order.id}`;
+          const customerName = session.metadata?.customer_name || order.customer_name || "there";
+          const businessName = session.metadata?.business_name || order.business_name || "your business";
+          await base44.asServiceRole.integrations.Core.SendEmail({
+            to: session.customer_details?.email || order.customer_email,
+            from_name: "ClientSurge Systems",
+            subject: "⚡ Action Required: Complete Your Setup (5 min)",
+            body: `
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;padding:40px 20px;">
+  <div style="text-align:center;margin-bottom:32px;">
+    <h1 style="color:#0A1628;font-size:26px;margin:0 0 8px;font-weight:800;">Payment Confirmed — One More Step!</h1>
+    <p style="color:#666;font-size:15px;margin:0;">Hi ${customerName}, your order for <strong>${businessName}</strong> is confirmed. We need a few details to start building your systems.</p>
+  </div>
+  <div style="background:linear-gradient(135deg,#0A1628 0%,#003B8F 100%);border-radius:12px;padding:28px;text-align:center;margin-bottom:28px;">
+    <p style="color:#fff;font-size:14px;margin:0 0 20px;line-height:1.6;">Click below to complete your 5-minute setup intake form. This is what our team needs to configure your automations.</p>
+    <a href="${credentialsUrl}" style="display:inline-block;background:linear-gradient(135deg,#00AEEF,#0077CC);color:#fff;padding:14px 36px;border-radius:9999px;text-decoration:none;font-weight:700;font-size:15px;">Complete My Setup →</a>
+  </div>
+  <div style="background:#f8f9fa;border-radius:12px;padding:20px;margin-bottom:24px;">
+    <p style="font-size:13px;font-weight:700;color:#333;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.08em;">What You'll Provide:</p>
+    <ul style="font-size:13px;color:#555;margin:0;padding-left:20px;line-height:1.8;">
+      <li>Business name, phone, and hours</li>
+      <li>Logo and brand colors</li>
+      <li>Booking link and notification email</li>
+      <li>Any existing lead sources or integrations</li>
+    </ul>
+  </div>
+  <p style="font-size:13px;color:#999;text-align:center;">Questions? Reply to this email or contact <a href="mailto:support@clientsurgesystems.com" style="color:#0077CC;">support@clientsurgesystems.com</a></p>
+</div>`,
+          });
+          console.log("[stripeWebhookOrders] credentials intake email sent", { orderId: order.id });
+        } catch (credEmailErr) {
+          console.error("[stripeWebhookOrders] credentials intake email failed", {
+            orderId: order.id,
+            error: credEmailErr instanceof Error ? credEmailErr.message : String(credEmailErr),
+          });
+        }
+
         // ── Admin purchase notification ────────────────────────────────────────
         try {
           await base44.asServiceRole.functions.invoke("sendAdminPurchaseNotification", {
