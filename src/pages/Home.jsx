@@ -21,10 +21,6 @@ const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 const Footer = lazy(() => import("../components/landing/Footer"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
 const AutomationShowcase = lazy(() => import("../components/landing/AutomationShowcase"));
-const MissedCallAnimation = lazy(() => import("../components/landing/MissedCallAnimation"));
-const InstantLeadResponseAnimation = lazy(() => import("../components/landing/InstantLeadResponseAnimation"));
-const AIBookingAgentAnimation = lazy(() => import("../components/landing/AIBookingAgentAnimation"));
-const NurtureSequenceAnimation = lazy(() => import("../components/landing/NurtureSequenceAnimation"));
 const SystemDiagramSection = lazy(() => import("../components/landing/SystemDiagram"));
 
 import {
@@ -125,22 +121,6 @@ export default function Home() {
         <Suspense fallback={<LargeSectionSkeleton />}>
           <SectionBreak />
           <AutomationShowcase />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <SectionBreak />
-          <MissedCallAnimation />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <SectionBreak />
-          <InstantLeadResponseAnimation />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <SectionBreak />
-          <AIBookingAgentAnimation />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <SectionBreak />
-          <NurtureSequenceAnimation />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
