@@ -3,7 +3,6 @@ import { ArrowRight } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import CascadingChecklistItem from "@/components/visual-effects/CascadingChecklistItem";
 import { BUTTON_TEXT } from "@/lib/constants";
-import HeroBackground from "./HeroBackground";
 
 
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
@@ -24,24 +23,45 @@ export default function Hero() {
       className="landing-hero"
       style={{
         position: "relative",
-        overflow: "hidden",
-        background: "#020818",
+        overflow: "visible",
+        background: "#ffffff",
         paddingBottom: "clamp(3rem, 6vw, 5rem)"
       }}>
 
-      <HeroBackground />
-
-      {/* Bottom fade into page */}
-      <div aria-hidden="true" style={{
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: "180px",
-        background: "linear-gradient(to bottom, transparent, #ffffff)",
-        zIndex: 1,
-        pointerEvents: "none",
-      }} />
+      <div
+        aria-hidden="true"
+        className="landing-hero__ambient"
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none"
+        }}>
+        
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+            "radial-gradient(circle at 18% 20%, rgba(0,174,239,0.08) 0%, transparent 30%), radial-gradient(circle at 72% 22%, rgba(0,157,255,0.08) 0%, transparent 24%), radial-gradient(circle at 78% 56%, rgba(0,59,143,0.06) 0%, transparent 32%)"
+          }} />
+        
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+            "linear-gradient(to right, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.94) 40%, rgba(255,255,255,0.68) 60%, rgba(255,255,255,0.2) 100%)"
+          }} />
+        
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+            "linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, transparent 28%, rgba(255,255,255,0.34) 100%)"
+          }} />
+        
+      </div>
 
       <div
         className="landing-hero__inner"
@@ -69,7 +89,7 @@ export default function Hero() {
               fontWeight: "700",
               lineHeight: 1.1,
               letterSpacing: "-0.03em",
-              color: "#ffffff",
+              color: "#1b140d",
               marginBottom: "16px",
               gridColumn: "1 / -1"
             }}>
@@ -99,7 +119,7 @@ export default function Hero() {
             className="landing-hero__body"
             style={{
               fontSize: "clamp(0.95rem, 2.2vw, 1.05rem)",
-              color: "rgba(200,220,255,0.82)",
+              color: "rgba(27,20,13,0.74)",
               lineHeight: 1.65,
               marginBottom: "18px",
               maxWidth: "600px",
@@ -169,7 +189,7 @@ export default function Hero() {
             style={{
               marginTop: "18px",
               fontSize: "12px",
-              color: "rgba(150,190,240,0.55)",
+              color: "rgba(27,20,13,0.48)",
               letterSpacing: "0.04em"
             }}>
             No contracts · Most clients go live in 24–48 hours
