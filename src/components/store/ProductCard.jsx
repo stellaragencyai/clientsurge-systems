@@ -129,8 +129,8 @@ export default function ProductCard({ product }) {
           color: #c8965c;
         }
         .price-highlight-box {
-          background: linear-gradient(135deg, rgba(0,174,239,0.10) 0%, rgba(0,59,143,0.06) 100%);
-          border: 1px solid rgba(0,174,239,0.22);
+          background: #ffffff;
+          border: 1px solid rgba(0,0,0,0.1);
           border-radius: 14px;
           padding: 12px 14px;
           text-align: center;
