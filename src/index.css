@@ -1,4 +1,3 @@
-/* Fonts loaded via <link> preload in index.html for faster FCP */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@700;800;900&display=swap');
 
 @tailwind base;
