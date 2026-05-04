@@ -17,9 +17,7 @@ export default function FinalCTA() {
             Ready to Start?
           </p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
-            You&apos;re Already Getting Leads.
-            <br />
-            <span className="text-primary">Let&apos;s Make Sure You&apos;re Converting Them.</span>
+            You&apos;re Already Getting Leads. <span className="text-primary">Let&apos;s Make Sure You&apos;re Converting Them.</span>
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
             Book a free 15-minute demo. We will map out exactly where your business is leaking bookings and show you what an AI lead conversion system would look like for your specific situation — no obligation.
@@ -28,14 +26,12 @@ export default function FinalCTA() {
           {/* Projection stats — clearly framed as targets not guarantees */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10">
             {[
-            { value: "2x", label: "typical booking rate lift" },
+            { value: "3x", label: "typical booking rate lift" },
             { value: "< 90s", label: "target first response time" },
             { value: "30 days", label: "typical time to see ROI" }].
             map((stat) =>
             <div key={stat.label} className="flex flex-col items-center">
-                <span
-                className="font-display text-3xl font-black"
-                style={{ color: "#000000" }}>
+                <span className="font-display text-3xl font-black text-foreground">
                   {stat.value}
                 </span>
                 <span className="text-xs text-muted-foreground font-medium mt-0.5">{stat.label}</span>
@@ -55,7 +51,7 @@ export default function FinalCTA() {
               { step: "03", title: "See your system live", body: "We demo the full AI system built for your industry — ready to launch." },
             ].map((item) => (
               <div key={item.step} className="flex flex-col gap-2">
-                <span className="font-display text-4xl font-black" style={{ color: "rgba(154,92,46,0.2)", lineHeight: 1 }}>{item.step}</span>
+                <span className="font-display text-4xl font-black" style={{ color: "rgba(0,174,239,0.25)", lineHeight: 1 }}>{item.step}</span>
                 <p className="font-semibold text-foreground text-sm">{item.title}</p>
                 <p className="text-muted-foreground text-xs leading-relaxed">{item.body}</p>
               </div>
@@ -75,7 +71,7 @@ export default function FinalCTA() {
                 trackCTA("book_your_free_demo", "final_cta");
                 setShowBookingModal(true);
               }}
-              className="inline-block focus:outline-none focus:ring-2 focus:ring-primary rounded-full"
+              className="focus:outline-none focus:ring-2 focus:ring-primary rounded-full"
               style={{
                 borderRadius: "9999px",
                 padding: "2px",
@@ -115,7 +111,7 @@ export default function FinalCTA() {
               </span>
             </button>
             <a
-              href="#lead-leakage"
+              href="/book"
               onClick={() => trackCTA("lead_leakage_audit", "final_cta")}
               className="inline-flex items-center justify-center h-14 px-6 rounded-full border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200">
               

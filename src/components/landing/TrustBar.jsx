@@ -98,10 +98,10 @@ function StatCard({ item, index, inView }) {
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        boxShadow: isHighlighted ? "0 0 20px rgba(245,217,168,0.4), 0 6px 22px rgba(0,0,0,0.06)" : "0 6px 22px rgba(0,0,0,0.06)",
+        boxShadow: isHighlighted ? "0 0 20px rgba(0,174,239,0.2), 0 6px 22px rgba(0,0,0,0.06)" : "0 6px 22px rgba(0,0,0,0.06)",
       }}
     >
-      <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3" style={isHighlighted ? { boxShadow: "0 0 12px rgba(34,199,89,0.4)" } : {}}>
+      <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3" style={isHighlighted ? { boxShadow: "0 0 12px rgba(0,174,239,0.3)" } : {}}>
         <Icon className="w-[17px] h-[17px] text-primary" />
       </div>
       <div>
@@ -147,7 +147,7 @@ export default function TrustBar() {
             What You Can Expect
           </h2>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-5">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
           {items.map((item, index) => (
             <StatCard key={item.label} item={item} index={index} inView={inView} />
           ))}

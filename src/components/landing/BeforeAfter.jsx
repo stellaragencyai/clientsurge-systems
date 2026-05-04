@@ -16,7 +16,7 @@ const scenarios = [
   {
     label: "Cold Lead",
     without: "You followed up once. No reply. You move on and forget about them.",
-    withCS: "System automatically sends Day 3, Day 7, and Day 14 messages. 30-40% of cold leads convert from follow-up alone.",
+    withCS: "System automatically sends Day 3, Day 7, and Day 14 messages. Many cold leads convert from follow-up alone.",
   },
   {
     label: "Busy Season",
@@ -30,7 +30,7 @@ export default function BeforeAfter() {
   const demoBooking = useDemoBooking();
 
   return (
-    <section className="py-20 md:py-28 px-6" style={{ background: "#f8fbff" }}>
+    <section className="py-20 md:py-28 px-6" style={{ background: "transparent" }}>
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-bold tracking-[0.3em] uppercase mb-4" style={{ color: "#00AEEF" }}>
@@ -49,7 +49,7 @@ export default function BeforeAfter() {
             <button
               key={i}
               onClick={() => setActive(i)}
-              className="px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 relative"
+              className="px-4 py-2 min-h-[44px] rounded-full text-sm font-semibold transition-all duration-200 relative"
               style={{
                 background: active === i
                   ? "linear-gradient(135deg, #0088CC 0%, #00AEEF 100%)"

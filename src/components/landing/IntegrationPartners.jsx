@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 const INTEGRATIONS = [
 {
@@ -57,17 +57,6 @@ const INTEGRATIONS = [
 }];
 
 
-// Track scroll position for dynamic enhancement
-const ScrollTrackIntegrationContext = ({ children }) => {
-  const [scrollY, setScrollY] = useState(0);
-  useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-  return children(scrollY);
-};
-
 // Double is enough — animation translates exactly one set width
 const DOUBLED = [...INTEGRATIONS, ...INTEGRATIONS];
 
@@ -88,7 +77,7 @@ export default function IntegrationPartners() {
 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center pt-10 mb-12">
+        <div className="text-center mb-12">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
             Integrations
           </p>
@@ -133,7 +122,15 @@ export default function IntegrationPartners() {
               rel="noopener noreferrer"
               title={integration.name}
               className="flex-shrink-0 group relative flex flex-col items-center focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
-              style={{ width: `${ITEM_WIDTH}px` }}>
+              style={{ width: `${ITEM_WIDTH}px` }}
+              onMouseEnter={(e) => {
+                const img = e.currentTarget.querySelector("img");
+                if (img) { img.style.transform = "scale(1.15) translateY(-6px)"; img.style.filter = "contrast(1.1) saturate(1.15) drop-shadow(0 8px 20px rgba(0,174,239,0.35))"; }
+              }}
+              onMouseLeave={(e) => {
+                const img = e.currentTarget.querySelector("img");
+                if (img) { img.style.transform = "scale(1) translateY(0)"; img.style.filter = "contrast(1.05) saturate(1.05)"; }
+              }}>
               
                 <img
                 src={integration.logo}
@@ -150,14 +147,7 @@ export default function IntegrationPartners() {
                   filter: "contrast(1.05) saturate(1.05)",
                   display: "block"
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "scale(1.15) translateY(-6px)";
-                  e.currentTarget.style.filter = "contrast(1.1) saturate(1.15) drop-shadow(0 8px 20px rgba(154,92,46,0.3))";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "scale(1) translateY(0)";
-                  e.currentTarget.style.filter = "contrast(1.05) saturate(1.05)";
-                }}
+
                 onError={(e) => { e.currentTarget.style.display = "none"; }} />
               
                 

@@ -78,12 +78,11 @@ export const FAQ_ITEMS = [
 export default function FAQ() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
-  const [expandedIndex, setExpandedIndex] = useState(null);
 
   const categories = ["all", "setup", "pricing", "integration", "support"];
   const categoryLabels = { all: "All", setup: "Getting Started", pricing: "Pricing", integration: "Integrations", support: "Support" };
 
-  const filtered = FAQ_ITEMS.filter((item, idx) => {
+  const filtered = FAQ_ITEMS.filter((item) => {
     const matchesSearch = item.q.toLowerCase().includes(search.toLowerCase()) || 
                          item.a.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = category === "all" || item.category === category;
@@ -130,7 +129,7 @@ export default function FAQ() {
               onClick={() => setCategory(cat)}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-all ${
                 category === cat
-                  ? "bg-foreground text-background"
+                  ? "bg-primary text-white"
                   : "bg-muted text-foreground hover:bg-muted/80"
               }`}
             >
@@ -140,7 +139,7 @@ export default function FAQ() {
         </div>
 
         {filtered.length > 0 ? (
-          <Accordion type="single" collapsible value={expandedIndex !== null ? `faq-${expandedIndex}` : ""} onValueChange={(val) => setExpandedIndex(val ? parseInt(val.split("-")[1]) : null)} className="space-y-3">
+          <Accordion type="single" collapsible className="space-y-3">
             {filtered.map((faq, idx) => (
               <motion.div
                 key={idx}

@@ -25,8 +25,6 @@ function SimpleCheck() {
 
 }
 
-// TODO: Replace these with your live Stripe payment links from the Stripe Dashboard
-// Go to Stripe Dashboard → Payment Links → Create link for each plan
 const STRIPE_LINKS = {
   starter: "/store",
   growth:  "/store",
@@ -39,42 +37,42 @@ const ALA_CARTE = [
     name: "Instant Lead Response SMS",
     desc: "Auto-text every new lead within 60 seconds of form submission.",
     price: "$297 setup · $197/mo",
-    link: "https://buy.stripe.com/test_4gM14pfeU8uV3Sk7bYcfK09",
+    link: "/store",
   },
   {
     emoji: "📞",
     name: "Missed Call Text-Back",
     desc: "Recover missed calls automatically with a personalized SMS reply.",
     price: "$297 setup · $197/mo",
-    link: "https://buy.stripe.com/test_4gM14pfeU8uV3Sk7bYcfK09",
+    link: "/store",
   },
   {
     emoji: "🔁",
     name: "14-Day Nurture Sequence",
     desc: "Multi-touch SMS + email follow-up to convert cold leads over time.",
     price: "$497 setup · $297/mo",
-    link: "https://buy.stripe.com/test_eVq14p8Qw7qR9cE2VIcfK0a",
+    link: "/store",
   },
   {
     emoji: "🤖",
     name: "AI Booking Agent",
     desc: "Qualifies leads and books appointments automatically via SMS.",
     price: "$697 setup · $397/mo",
-    link: "https://buy.stripe.com/test_eVq14p8Qw7qR9cE2VIcfK0a",
+    link: "/store",
   },
   {
     emoji: "🔥",
     name: "Lead Reactivation Campaign",
     desc: "Re-engage old or cold leads with a targeted win-back sequence.",
     price: "$397 setup · $197/mo",
-    link: "https://buy.stripe.com/test_00w8wR9UAfXn0G82VIcfK0b",
+    link: "/store",
   },
   {
     emoji: "⭐",
     name: "Review Request System",
     desc: "Automatically request reviews after appointments to boost ratings.",
     price: "$297 setup · $147/mo",
-    link: "https://buy.stripe.com/test_00w8wR9UAfXn0G82VIcfK0b",
+    link: "/store",
   },
 ];
 
@@ -206,7 +204,7 @@ export default function Pricing() {
         </div>
 
         <StaggeredFadeUp staggerDelay={0.15}>
-          <div className="pricing-cards-grid grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-stretch">
+          <div className="pricing-cards-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-stretch">
             {plans.map((plan, i) =>
             <PricingCard
               key={i}
@@ -219,7 +217,7 @@ export default function Pricing() {
         </StaggeredFadeUp>
 
         {/* Trust badges — right below the pricing cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 mt-8 mb-4 w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-8 mb-4 w-full">
           {[
             { icon: "🔒", text: "No long-term contracts" },
             { icon: "⚡", text: "Live in 24–48 Hours" },
@@ -232,11 +230,11 @@ export default function Pricing() {
               className="flex flex-col items-center justify-center gap-2 py-6 rounded-2xl font-semibold"
               style={{
                 background: "#ffffff",
-                border: "1px solid rgba(0,0,0,0.85)",
+                border: "1px solid rgba(0,174,239,0.18)",
                 color: "rgba(0,0,0,0.75)",
               }}
             >
-              <span style={{ fontSize: "22px", lineHeight: 1 }}>{badge.icon}</span>
+              <span style={{ fontSize: "18px", lineHeight: 1 }}>{badge.icon}</span>
               <span style={{ fontSize: "12px", textAlign: "center", lineHeight: 1.3, padding: "0 8px" }}>{badge.text}</span>
             </div>
           ))}
@@ -440,8 +438,7 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
 
       {(plan.badge || isRecommended) &&
       <div className="pricing-badge-float" style={{ zIndex: 30 }}>
-          <span className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl hidden"
-
+          <span className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl"
         style={{ background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 50%, #003B8F 100%)" }}>
           
             {isRecommended ?

@@ -15,11 +15,8 @@ export default function LeadLeakage() {
       <div className="max-w-5xl mx-auto">
         <div className="text-center pt-10 pb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">Revenue You're Missing</p>
-          <h2 className="font-montserrat text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-black" style={{ fontFamily: "Montserrat, sans-serif" }}>
-            Already Have Great Reviews?{" "}
-            <span style={{ color: "#000000" }}>
-              You're Sitting on Untapped Revenue.
-            </span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
+            Already Have Great Reviews? You're Sitting on Untapped Revenue.
           </h2>
         </div>
       </div>
@@ -87,7 +84,7 @@ export default function LeadLeakage() {
           </div>
 
           {/* Revenue Recovery Counter Visual */}
-          <div className="flex justify-center scale-[1.15] origin-center">
+          <div className="flex justify-center scale-[1.05] origin-center">
             <RevenueRecoveryCounter />
           </div>
         </div>
