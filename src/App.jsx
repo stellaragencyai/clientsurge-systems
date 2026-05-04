@@ -35,6 +35,7 @@ import BusinessSetup from "./pages/BusinessSetup";
 import ThankYou from "./pages/ThankYou";
 import About from "./pages/About";
 import CredentialsSetup from "./pages/CredentialsSetup";
+import AdminInstallGuide from "./pages/AdminInstallGuide";
 
 
 const Store = lazy(() => import("./pages/Store"));
@@ -262,6 +263,7 @@ const AuthenticatedApp = () => {
         <Route path="/sam" element={<Navigate to="/admin" replace />} />
         <Route path="/medspa-dashboard" element={<Navigate to="/admin" replace />} />
         <Route path="/admin/onboarding" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminOnboarding /></Suspense>} />
+        <Route path="/admin/install-guide" element={<AdminInstallGuide />} />
       </Route>
 
       <Route path="*" element={<PageNotFound />} />
