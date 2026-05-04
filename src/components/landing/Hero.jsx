@@ -225,59 +225,59 @@ export default function Hero() {
 
 
           {/* iPad shell — Space Gray aluminum body */}
-          <div className="landing-hero__tablet hidden"
+          
 
-          style={{
-            position: "relative",
-            width: "min(100%, 930px)",
-            aspectRatio: "1.15 / 1",
-            borderRadius: "36px",
-            /* Space gray aluminum gradient */
-            background: "linear-gradient(160deg, #4a4a4c 0%, #3a3a3c 30%, #2c2c2e 60%, #1c1c1e 100%)",
-            boxShadow:
-            "0 44px 110px rgba(0,0,0,0.55), 0 18px 44px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.4)",
-            transform: "perspective(2400px) rotateY(-10deg) rotateX(4deg) rotateZ(1.4deg)"
-          }}>
 
-            {/* Top edge highlight (aluminum sheen) */}
-            <div style={{
-              position: "absolute", top: 0, left: "8%", right: "8%", height: "1px",
-              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.35), rgba(255,255,255,0.5), rgba(255,255,255,0.35), transparent)",
-              borderRadius: "999px", zIndex: 10
-            }} />
 
-            {/* Left side — volume buttons */}
-            <div style={{ position: "absolute", left: "-4px", top: "28%", width: "4px", height: "40px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to left, #3a3a3c, #5a5a5c)", boxShadow: "-2px 0 5px rgba(0,0,0,0.5), inset 1px 0 1px rgba(255,255,255,0.12)", zIndex: 20 }} />
-            <div style={{ position: "absolute", left: "-4px", top: "40%", width: "4px", height: "40px", borderRadius: "3px 0 0 3px", background: "linear-gradient(to left, #3a3a3c, #5a5a5c)", boxShadow: "-2px 0 5px rgba(0,0,0,0.5), inset 1px 0 1px rgba(255,255,255,0.12)", zIndex: 20 }} />
-            {/* Right side — power/top button */}
-            <div style={{ position: "absolute", right: "-4px", top: "20%", width: "4px", height: "52px", borderRadius: "0 3px 3px 0", background: "linear-gradient(to right, #3a3a3c, #5a5a5c)", boxShadow: "2px 0 5px rgba(0,0,0,0.5), inset -1px 0 1px rgba(255,255,255,0.12)", zIndex: 20 }} />
 
-            {/* Screen area — inset with proper bezel */}
-            <div style={{
-              position: "absolute",
-              inset: "10px",
-              borderRadius: "28px",
-              background: "#000",
-              overflow: "hidden",
-              boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.06), inset 0 2px 8px rgba(0,0,0,0.8)"
-            }}>
-              {/* Front camera dot centered at top bezel */}
-              <div style={{
-                position: "absolute", top: "7px", left: "50%", transform: "translateX(-50%)",
-                width: "8px", height: "8px", borderRadius: "50%", zIndex: 10,
-                background: "radial-gradient(circle at 35% 35%, #1a2040, #05070f)",
-                border: "1px solid rgba(80,100,180,0.4)",
-                boxShadow: "0 0 4px rgba(60,80,160,0.5)"
-              }} />
 
-              {/* The actual dashboard content */}
-              <div style={{ position: "absolute", inset: "22px 0 0 0", borderRadius: "0 0 26px 26px", overflow: "hidden" }}>
-                <Suspense fallback={<div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 animate-pulse" />}>
-                  <HeroDashboardScreen />
-                </Suspense>
-              </div>
-            </div>
-          </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+          
         </div>
       </div>
 
