@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ChevronDown,
   ChevronUp,
@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import AIGenerateModal from "./AIGenerateModal";
+import PackageActivationPanel from "./PackageActivationPanel";
 
 const STEPS = [
   {
@@ -81,6 +82,13 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
   const [saving, setSaving] = useState({});
   const [aiStep, setAiStep] = useState(null);
   const [error, setError] = useState("");
+  const [order, setOrder] = useState(null);
+
+  useEffect(() => {
+    if (expanded && client.order_id && !order) {
+      base44.entities.Order.get(client.order_id).then(setOrder).catch(() => {});
+    }
+  }, [expanded, client.order_id]);
 
   const completedCount = STEP_KEYS.filter((key) => client[key]).length;
   const pct = Math.round((completedCount / STEP_KEYS.length) * 100);
@@ -276,6 +284,15 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
               />
             </div>
           </div>
+
+          {/* Package Activation Panel — wired to live order */}
+          {client.order_id && (
+            <PackageActivationPanel
+              client={client}
+              order={order}
+              onUpdate={onUpdate}
+            />
+          )}
 
           <div>
             <div className="flex items-center justify-between mb-4">

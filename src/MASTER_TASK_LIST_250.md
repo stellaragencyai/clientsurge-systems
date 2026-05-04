@@ -525,6 +525,12 @@
 | 2026-05-03 | Agent A | #501–#513 ✅ — AI Sales Rep blueprint created, 13 tasks confirmed already built (routing, scoring, SMS, ElevenLabs key) |
 | 2026-05-03 | Agent A | #514–#560 ⏳ — 47 new AI Sales Rep tasks added (6 agent JSONs, routing, voice, admin UI, entity changes) |
 | 2026-05-03 | Agent A | dispatchLeadWebhook rebuilt with full 6-industry routing, HOT/WARM/COLD tiering, follow-up urgency, rep assignment |
+| 2026-05-04 | Base44 AI | #485/#515 ✅ — PackageActivationPanel built: service status grid, AI pre-flight check button, Activate All Services button wired to aiPackageOrchestrator |
+| 2026-05-04 | Base44 AI | NEW — `functions/aiPackageOrchestrator` built: resolves package_key → service list → optimal sequence → configureService x N → partial success tracking → go-live email |
+| 2026-05-04 | Base44 AI | NEW — `functions/aiOnboardingIntelligence` built: per-service credential scan → auto-fills safe defaults → returns blockers/warnings/activation_sequence → sets ready_to_activate flag |
+| 2026-05-04 | Base44 AI | PackageActivationPanel wired into ClientOnboardingCard — loads live Order on expand, shows service install_status per service, runs AI pre-flight before unlock |
+| 2026-05-04 | Base44 AI | Activation sequence defined: instant_lead_response → missed_call_text_back → nurture_sequence_14d → ai_booking_agent → review_request → lead_reactivation (fastest wins first) |
+| 2026-05-04 | Base44 AI | TIER_SERVICE_MAP canonical: starter=[2 services], growth=[4 services], elite=[all 6] — enforced in both orchestrator and intelligence functions |
 
 ---
 
@@ -537,7 +543,7 @@
 
 ---
 
-*This file is shared across all 3 team agents. Last updated: 2026-05-03*
+*This file is shared across all 3 team agents. Last updated: 2026-05-04*
 
 
 ---
@@ -1380,7 +1386,7 @@ PHASE 7 — Admin UI
 | 482 | ⏳ | Admin lead detail: Send Manual SMS panel | HIGH |
 | 483 | ⏳ | generateClientWebsite function (Starter/Growth/Elite spec) | CRITICAL |
 | 484 | ⏳ | Admin: warning badge on orders paid 2+ days no install | HIGH |
-| 485 | ⏳ | Admin: one-click Initialize Install OS button | HIGH |
+| 485 | ✅ | Admin: one-click Initialize Install OS button | HIGH |
 | 486 | ⏳ | ClientPortal: What's New changelog tab | LOW |
 | 487 | ⏳ | Admin: conversion funnel chart | HIGH |
 | 488 | ⏳ | Admin: Demo Bookings tab | HIGH |
@@ -1416,7 +1422,7 @@ PHASE 7 — Admin UI
 | 512 | ⏳ | AdminLeads: lead_score column (color pill, sortable) | HIGH |
 | 513 | ⏳ | AdminOnboarding: pipeline_status badge on client cards | HIGH |
 | 514 | ⏳ | AutomationInstallChecklist: progress bar X/N steps | MEDIUM |
-| 515 | ⏳ | Admin: one-click Initialize Install OS button | HIGH |
+| 515 | ✅ | Admin: one-click Initialize Install OS button | HIGH |
 | 516 | ⏳ | Admin: ⚠️ badge on orders paid 2+ days no install | HIGH |
 | 517 | ⏳ | Stripe: invoice.paid + invoice.payment_failed handlers | CRITICAL |
 | 518 | ⏳ | createCheckoutSession: capacity limit gate | MEDIUM |
