@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Loader2, LogOut, LayoutDashboard } from "lucide-react";
 import BuildTracker from "../components/portal/BuildTracker";
+import SetupProgressHub from "../components/portal/SetupProgressHub";
 import SupportChat from "../components/portal/SupportChat";
 import PlanManager from "../components/portal/PlanManager";
 import LeadActivityFeed from "../components/portal/LeadActivityFeed";
@@ -293,7 +294,7 @@ export default function ClientPortal() {
           <LeadActivityFeed project={project} />
         )}
         {activeTab === "progress" && (
-          <BuildTracker project={project} order={portalOrder} />
+          <SetupProgressHub project={project} order={portalOrder} user={user} />
         )}
         {activeTab === "timeline" && (
           <PortalTimeline order={portalOrder} project={project} />
