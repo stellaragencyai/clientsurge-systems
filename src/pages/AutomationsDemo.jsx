@@ -1,129 +1,147 @@
 import { useState } from "react";
-import { ArrowRight, Zap, Phone, Mail, Calendar, Star, RefreshCw, Play, X } from "lucide-react";
+import { ArrowRight, Zap, Phone, Mail, Calendar, Star, RefreshCw, X, Play, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const SERVICES = [
   {
     id: "instant-lead-response",
     icon: Zap,
-    color: "#0088CC",
-    gradientFrom: "#00AEEF",
-    gradientTo: "#003B8F",
     emoji: "⚡",
     title: "Instant Lead Response",
-    tagline: "Reply to every new lead in under 60 seconds",
+    tagline: "Contact every inbound lead within 60 seconds — automatically.",
     description:
-      "The moment a lead submits a form, calls, or reaches out online — your AI fires a personalized SMS and email within 60 seconds. No manual work, no missed opportunities. Every lead hears from you first.",
+      "Research consistently shows that the probability of qualifying a lead drops by over 80% if contact is delayed beyond five minutes. Our Instant Lead Response system eliminates that risk entirely. The moment a lead submits a form, calls your number, or reaches out through any connected channel, a personalized SMS and email are dispatched within 60 seconds — without any manual intervention.",
     stats: [
-      { value: "60s", label: "Response time" },
-      { value: "5×", label: "More conversions" },
-      { value: "24/7", label: "Always on" },
+      { value: "78%", label: "of buyers choose the first responder", source: "Harvard Business Review" },
+      { value: "60s", label: "average response time with our system", source: "Typical result" },
+      { value: "5×", label: "higher conversion vs. 5-min response", source: "MIT / InsideSales study" },
     ],
-    videoUrl: null,
-    poster: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=600&q=80",
+    whatYouGet: [
+      "Personalized SMS sent within 60 seconds of lead submission",
+      "Branded email confirmation dispatched simultaneously",
+      "Works 24 hours a day, 7 days a week — including holidays",
+      "Integrates with your existing web forms and ad platforms",
+    ],
+    poster: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=800&q=80",
   },
   {
     id: "missed-call-textback",
     icon: Phone,
-    color: "#0088CC",
-    gradientFrom: "#00AEEF",
-    gradientTo: "#003B8F",
     emoji: "📞",
     title: "Missed Call Text-Back",
-    tagline: "Every missed call becomes a live conversation",
+    tagline: "Every unanswered call triggers an automatic, personalized follow-up.",
     description:
-      "When a call goes unanswered, the system automatically texts the caller back within seconds. Your leads get an instant response even when you're on another job, in a consultation, or after hours.",
+      "A missed call is not a lost lead — it is a lead in motion. When a prospect calls and no one answers, they rarely call back. Our Missed Call Text-Back system sends a professional, branded SMS to the caller within 30 seconds, opening a two-way conversation before they have a chance to reach a competitor. This system operates continuously, regardless of your business hours.",
     stats: [
-      { value: "40%", label: "Calls recovered" },
-      { value: "< 30s", label: "Text-back speed" },
-      { value: "0", label: "Missed leads" },
+      { value: "62%", label: "of callers won't call back if unanswered", source: "Invoca Call Intelligence" },
+      { value: "30s", label: "typical text-back delivery time", source: "Typical result" },
+      { value: "3 in 10", label: "missed-call leads recovered on average", source: "Industry benchmark" },
     ],
-    videoUrl: null,
-    poster: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80",
+    whatYouGet: [
+      "Automatic SMS reply within 30 seconds of a missed call",
+      "Two-way SMS conversation initiated from your business number",
+      "After-hours coverage with configurable messaging",
+      "Full conversation log in your dashboard",
+    ],
+    poster: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
   },
   {
     id: "nurture-sequence",
     icon: Mail,
-    color: "#0088CC",
-    gradientFrom: "#00AEEF",
-    gradientTo: "#003B8F",
     emoji: "📧",
     title: "14-Day Nurture Sequence",
-    tagline: "Automated follow-up that keeps leads warm for 2 weeks",
+    tagline: "A structured, multi-touch follow-up system that works while you focus on your business.",
     description:
-      "A multi-touch SMS + email sequence that runs on autopilot for 14 days. Each message is personalized to the lead's behavior — warming them up until they're ready to book, without any manual effort.",
+      "Most leads require between five and twelve touchpoints before making a buying decision. Our 14-Day Nurture Sequence delivers a precisely timed series of SMS and email messages that maintain professional contact over two weeks. Each message is contextually relevant, non-intrusive, and designed to move the lead toward a booking — without requiring any manual effort from your team.",
     stats: [
-      { value: "3×", label: "More bookings" },
-      { value: "14", label: "Days automated" },
-      { value: "8+", label: "Touchpoints" },
+      { value: "80%", label: "of sales require 5+ follow-up contacts", source: "Marketing Donut" },
+      { value: "14 days", label: "of automated, structured follow-up", source: "Our system" },
+      { value: "2–3×", label: "more booked appointments vs. no follow-up", source: "Industry benchmark" },
     ],
-    videoUrl: null,
-    poster: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&q=80",
+    whatYouGet: [
+      "8+ touchpoints across SMS and email over 14 days",
+      "Sequence pauses automatically when a lead replies or books",
+      "Messaging personalized to the lead's source and industry",
+      "Fully managed — no manual scheduling required",
+    ],
+    poster: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80",
   },
   {
     id: "ai-booking-agent",
     icon: Calendar,
-    color: "#0088CC",
-    gradientFrom: "#00AEEF",
-    gradientTo: "#003B8F",
     emoji: "🤖",
     title: "AI Booking Agent",
-    tagline: "Turns SMS conversations into confirmed appointments",
+    tagline: "Converts SMS conversations into confirmed appointments without staff involvement.",
     description:
-      "When a lead signals intent to book, the AI takes over — sends the booking link, follows up if they don't click, and confirms the appointment automatically. No staff needed, no back-and-forth.",
+      "When a lead signals readiness to book, our AI Booking Agent takes over the conversation. It sends the booking link, follows up if the link goes unclicked, confirms the appointment once scheduled, and sends a reminder before the appointment date. The entire booking workflow runs autonomously — your team is notified only when a confirmed appointment is on the calendar.",
     stats: [
-      { value: "40%", label: "More bookings" },
-      { value: "100%", label: "Automated" },
-      { value: "0", label: "No-shows reduced" },
+      { value: "40%", label: "increase in appointment conversion rates", source: "Industry benchmark" },
+      { value: "100%", label: "of booking follow-ups handled automatically", source: "Our system" },
+      { value: "30%", label: "reduction in no-show rates with reminders", source: "Acuity Scheduling data" },
     ],
-    videoUrl: null,
-    poster: "https://images.unsplash.com/photo-1633613286991-611fe299c4be?w=600&q=80",
+    whatYouGet: [
+      "Automated booking link delivery via SMS when lead intent is detected",
+      "Follow-up sent if link is not clicked within a set window",
+      "Appointment confirmation message sent immediately after booking",
+      "Pre-appointment reminder to reduce no-shows",
+    ],
+    poster: "https://images.unsplash.com/photo-1633613286991-611fe299c4be?w=800&q=80",
   },
   {
     id: "review-request",
     icon: Star,
-    color: "#0088CC",
-    gradientFrom: "#00AEEF",
-    gradientTo: "#003B8F",
     emoji: "⭐",
     title: "Review Request System",
-    tagline: "Automatically collect 5-star reviews after every appointment",
+    tagline: "Systematically build your online reputation after every completed appointment.",
     description:
-      "After a job is done, the system sends a perfectly-timed review request via SMS. Happy customers leave reviews on autopilot — building your Google reputation while you focus on delivering great service.",
+      "The optimal window for requesting a review is within two hours of a completed appointment, when client satisfaction is at its highest. Our Review Request System sends a professionally worded, perfectly timed SMS request to every client after their visit. This consistent, automated approach generates a steady stream of authentic reviews — the single most important driver of new patient and client acquisition in local service markets.",
     stats: [
-      { value: "4×", label: "More reviews" },
-      { value: "4.9★", label: "Avg rating" },
-      { value: "Auto", label: "Triggered" },
+      { value: "88%", label: "of consumers trust online reviews as much as personal referrals", source: "BrightLocal" },
+      { value: "3–4×", label: "more reviews generated vs. manual requests", source: "Industry benchmark" },
+      { value: "4.7+", label: "average star rating achieved by active users", source: "Typical result" },
     ],
-    videoUrl: null,
-    poster: "https://images.unsplash.com/photo-1531973576160-7125cd663d86?w=600&q=80",
+    whatYouGet: [
+      "Automated review request sent via SMS after each appointment",
+      "Timing optimized for maximum response rates",
+      "Direct link to your Google Business or preferred review platform",
+      "Works for any appointment type or service category",
+    ],
+    poster: "https://images.unsplash.com/photo-1531973576160-7125cd663d86?w=800&q=80",
   },
   {
     id: "lead-reactivation",
     icon: RefreshCw,
-    color: "#0088CC",
-    gradientFrom: "#00AEEF",
-    gradientTo: "#003B8F",
-    emoji: "🔥",
+    emoji: "🔁",
     title: "Lead Reactivation",
-    tagline: "Wake up cold leads and turn them into paying clients",
+    tagline: "Recover revenue from leads you've already acquired but never converted.",
     description:
-      "Old leads who never booked get a targeted re-engagement campaign. A single reactivation blast can recover thousands in dormant revenue from leads you've already paid to acquire.",
+      "Every business has a database of leads that expressed interest, engaged briefly, and then went quiet. These prospects represent paid acquisition costs with zero return. Our Lead Reactivation system deploys a targeted re-engagement campaign to dormant contacts, using proven messaging frameworks to revive interest. A single reactivation campaign regularly converts leads that went cold 30, 60, or even 90 days ago.",
     stats: [
-      { value: "90d", label: "Leads recovered" },
-      { value: "35%", label: "Reactivation rate" },
-      { value: "$$$", label: "Dormant revenue" },
+      { value: "20–35%", label: "of dormant leads can be reactivated with the right message", source: "Industry benchmark" },
+      { value: "90 days", label: "lookback window for reactivation campaigns", source: "Our system" },
+      { value: "$0", label: "additional acquisition cost — these leads are already yours", source: "Our system" },
     ],
-    videoUrl: null,
-    poster: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80",
+    whatYouGet: [
+      "Targeted SMS and email re-engagement sequence",
+      "Segmented by lead age, source, and previous interaction",
+      "A/B tested messaging frameworks for maximum reactivation rates",
+      "Can be run as a one-time campaign or on a recurring schedule",
+    ],
+    poster: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
   },
 ];
 
-function VideoModal({ service, onClose }) {
+const BRAND = {
+  color: "#0088CC",
+  gradientFrom: "#00AEEF",
+  gradientTo: "#003B8F",
+};
+
+function VideoPlaceholder({ service, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)" }}
+      style={{ background: "rgba(0,0,0,0.88)", backdropFilter: "blur(10px)" }}
       onClick={onClose}
     >
       <div
@@ -132,27 +150,34 @@ function VideoModal({ service, onClose }) {
       >
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 z-10 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
+          className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
-        <div className="aspect-video bg-slate-900 flex items-center justify-center">
+        <div className="aspect-video bg-slate-900 relative">
           <img
             src={service.poster}
             alt={service.title}
-            className="w-full h-full object-cover opacity-60"
+            className="w-full h-full object-cover opacity-30"
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-8">
-            <span className="text-5xl mb-4">{service.emoji}</span>
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
+              style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
+            >
+              <Play className="w-7 h-7 text-white ml-1" fill="white" />
+            </div>
             <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "Montserrat, sans-serif" }}>{service.title}</h3>
-            <p className="text-sm text-white/70 max-w-md">Demo video coming soon. Book a live demo to see this automation in action.</p>
+            <p className="text-sm text-white/60 max-w-md mb-6">
+              Full walkthrough video coming soon. Book a live demo to see this system in action with a real-world example from your industry.
+            </p>
             <Link
               to="/onboarding"
-              className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-white"
-              style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-white"
+              style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
               onClick={onClose}
             >
-              Start Onboarding <ArrowRight className="w-4 h-4" />
+              Book a Live Demo <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -162,109 +187,122 @@ function VideoModal({ service, onClose }) {
 }
 
 function ServiceCard({ service }) {
+  const [showVideo, setShowVideo] = useState(false);
   const [hovered, setHovered] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const Icon = service.icon;
 
   return (
     <>
       <div
-        className="group relative flex flex-col rounded-2xl overflow-hidden transition-all duration-300 cursor-pointer"
+        className="flex flex-col rounded-2xl overflow-hidden transition-all duration-300"
         style={{
-          background: "rgba(255,255,255,0.9)",
-          border: hovered ? `1.5px solid ${service.color}55` : "1.5px solid rgba(0,0,0,0.08)",
+          background: "white",
+          border: hovered ? `1.5px solid ${BRAND.color}44` : "1.5px solid rgba(0,0,0,0.07)",
           boxShadow: hovered
-            ? `0 20px 60px ${service.color}22, 0 4px 20px rgba(0,0,0,0.1)`
-            : "0 2px 16px rgba(0,0,0,0.06)",
-          transform: hovered ? "translateY(-4px)" : "translateY(0)",
+            ? `0 24px 64px rgba(0,136,204,0.14), 0 4px 20px rgba(0,0,0,0.08)`
+            : "0 2px 16px rgba(0,0,0,0.05)",
+          transform: hovered ? "translateY(-5px)" : "translateY(0)",
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {/* Video / Image Thumbnail */}
+        {/* Video thumbnail */}
         <div
-          className="relative overflow-hidden"
-          style={{ height: "200px" }}
-          onClick={() => setShowModal(true)}
+          className="relative overflow-hidden cursor-pointer"
+          style={{ height: "210px" }}
+          onClick={() => setShowVideo(true)}
         >
           <img
             src={service.poster}
             alt={service.title}
             className="w-full h-full object-cover transition-transform duration-500"
-            style={{ transform: hovered ? "scale(1.06)" : "scale(1)" }}
+            style={{ transform: hovered ? "scale(1.05)" : "scale(1)" }}
           />
-          {/* Gradient overlay */}
           <div
             className="absolute inset-0"
-            style={{
-              background: `linear-gradient(135deg, ${service.gradientFrom}99 0%, ${service.gradientTo}bb 100%)`,
-            }}
+            style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}aa, ${BRAND.gradientTo}cc)` }}
           />
           {/* Play button */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div
-              className="w-14 h-14 rounded-full flex items-center justify-center transition-transform duration-300"
+              className="flex items-center gap-3 px-5 py-3 rounded-full transition-all duration-300"
               style={{
-                background: "rgba(255,255,255,0.2)",
+                background: "rgba(255,255,255,0.18)",
                 backdropFilter: "blur(8px)",
-                border: "2px solid rgba(255,255,255,0.5)",
-                transform: hovered ? "scale(1.12)" : "scale(1)",
+                border: "1.5px solid rgba(255,255,255,0.45)",
+                transform: hovered ? "scale(1.06)" : "scale(1)",
               }}
             >
-              <Play className="w-6 h-6 text-white ml-0.5" fill="white" />
+              <Play className="w-5 h-5 text-white" fill="white" />
+              <span className="text-white text-sm font-semibold">Watch Demo</span>
             </div>
           </div>
-          {/* Icon badge */}
+          {/* Icon */}
           <div className="absolute top-3 left-3">
             <div
               className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.4)" }}
+              style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.35)" }}
             >
               <Icon className="w-4 h-4 text-white" />
             </div>
           </div>
         </div>
 
-        {/* Card Body */}
+        {/* Content */}
         <div className="p-6 flex flex-col flex-1">
-          <div className="mb-3">
-            <h3
-              className="text-lg font-bold text-slate-900 mb-1 leading-tight"
-              style={{ fontFamily: "Montserrat, sans-serif" }}
-            >
-              {service.title}
-            </h3>
-            <p className="text-xs font-semibold" style={{ color: service.color }}>
-              {service.tagline}
-            </p>
-          </div>
-
-          <p className="text-sm text-slate-600 leading-relaxed flex-1 mb-5">
+          <h3 className="text-lg font-bold text-slate-900 mb-1" style={{ fontFamily: "Montserrat, sans-serif" }}>
+            {service.title}
+          </h3>
+          <p className="text-xs font-semibold mb-3" style={{ color: BRAND.color }}>
+            {service.tagline}
+          </p>
+          <p className="text-sm text-slate-600 leading-relaxed mb-5">
             {service.description}
           </p>
 
-          {/* Stats row */}
-          <div className="flex items-center gap-3 mb-5 pb-5 border-b border-slate-100">
-            {service.stats.map((stat) => (
-              <div key={stat.label} className="flex-1 text-center">
-                <p className="text-lg font-black" style={{ color: service.color }}>{stat.value}</p>
-                <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wide leading-tight">{stat.label}</p>
-              </div>
-            ))}
+          {/* Stats */}
+          <div className="rounded-xl p-4 mb-5" style={{ background: "#f0f8ff", border: "1px solid rgba(0,136,204,0.12)" }}>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Industry Benchmarks</p>
+            <div className="space-y-3">
+              {service.stats.map((stat) => (
+                <div key={stat.label} className="flex items-start gap-3">
+                  <span className="text-base font-black flex-shrink-0" style={{ color: BRAND.color, minWidth: "56px" }}>
+                    {stat.value}
+                  </span>
+                  <div>
+                    <p className="text-xs text-slate-700 font-medium leading-tight">{stat.label}</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Source: {stat.source}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* What you get */}
+          <div className="mb-6 flex-1">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">What's included</p>
+            <ul className="space-y-2">
+              {service.whatYouGet.map((item) => (
+                <li key={item} className="flex items-start gap-2">
+                  <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: BRAND.color }} />
+                  <span className="text-xs text-slate-600 leading-snug">{item}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* CTA */}
           <Link
             to="/onboarding"
             className="w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-bold text-white transition-all duration-200 hover:opacity-90 active:scale-95"
-            style={{ background: `linear-gradient(135deg, ${service.gradientFrom}, ${service.gradientTo})` }}
+            style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
           >
-            Get Started <ArrowRight className="w-4 h-4" />
+            Get This System <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>
 
-      {showModal && <VideoModal service={service} onClose={() => setShowModal(false)} />}
+      {showVideo && <VideoPlaceholder service={service} onClose={() => setShowVideo(false)} />}
     </>
   );
 }
@@ -281,44 +319,48 @@ export default function AutomationsDemo() {
           <img
             src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
             alt="ClientSurge Systems"
-            style={{ height: "48px", width: "auto", objectFit: "contain", mixBlendMode: "luminosity", filter: "brightness(10)" }}
+            style={{ height: "48px", width: "auto", objectFit: "contain", filter: "brightness(10)" }}
           />
         </Link>
         <Link
           to="/onboarding"
-          className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold text-white"
-          style={{ background: "linear-gradient(135deg,#00AEEF,#0050A0)" }}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-white"
+          style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, #0050A0)` }}
         >
           Get Started <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
 
       {/* Hero */}
-      <div className="max-w-5xl mx-auto px-6 pt-16 pb-10 text-center">
-        <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest">
-          ⚙️ All 6 Core Automations
+      <div className="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center">
+        <div
+          className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest"
+          style={{ background: "rgba(0,136,204,0.08)", border: "1px solid rgba(0,136,204,0.2)", color: BRAND.color }}
+        >
+          6 Core Automation Systems
         </div>
         <h1
-          className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-5"
+          className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-5"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          Done-For-You AI Systems
+          The Complete Lead Conversion
           <br />
-          <span style={{ color: "#00AEEF" }}>That Run on Autopilot</span>
+          <span style={{ color: BRAND.color }}>Infrastructure for Service Businesses</span>
         </h1>
         <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed mb-8">
-          Every system below is fully built and live in 24–48 hours. Click the video preview to see each automation in action, then get started when you're ready.
+          Each system below addresses a specific, documented failure point in the lead-to-booking journey. Together, they form a fully automated revenue engine — installed and operational within 24 to 48 hours.
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+        <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
           {[
             { icon: "⚡", text: "Live in 24–48 hours" },
             { icon: "🔒", text: "No long-term contracts" },
-            { icon: "🎯", text: "Done-for-you setup" },
+            { icon: "🎯", text: "Fully done-for-you setup" },
+            { icon: "📊", text: "Results tracked in your dashboard" },
           ].map((b) => (
             <span
               key={b.text}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold"
-              style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.2)", color: "#0050A0" }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-xs"
+              style={{ background: "rgba(0,136,204,0.07)", border: "1px solid rgba(0,136,204,0.18)", color: "#0050A0" }}
             >
               {b.icon} {b.text}
             </span>
@@ -336,25 +378,34 @@ export default function AutomationsDemo() {
 
         {/* Bottom CTA */}
         <div
-          className="mt-16 rounded-3xl p-10 text-center"
-          style={{ background: "linear-gradient(135deg,#003B8F 0%,#0088CC 60%,#00AEEF 100%)" }}
+          className="mt-16 rounded-3xl p-10 md:p-14 text-center"
+          style={{ background: "linear-gradient(135deg,#003B8F 0%,#0070B8 60%,#00AEEF 100%)" }}
         >
+          <p className="text-xs font-bold text-blue-200/70 uppercase tracking-widest mb-3">Ready to Begin?</p>
           <h2
-            className="text-3xl md:text-4xl font-bold text-white mb-3"
+            className="text-3xl md:text-4xl font-bold text-white mb-4"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
-            Ready to Activate All 6 Systems?
+            Activate Your Systems in 24–48 Hours
           </h2>
-          <p className="text-blue-100 text-base max-w-xl mx-auto mb-8">
-            Start your onboarding today. We'll set up and go live with your chosen systems in 24–48 hours.
+          <p className="text-blue-100/80 text-base max-w-xl mx-auto mb-8 leading-relaxed">
+            Complete our onboarding form and our team will configure, test, and launch your selected automation systems — no technical knowledge required on your end.
           </p>
-          <Link
-            to="/onboarding"
-            className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-base font-bold text-slate-900 bg-white hover:bg-blue-50 transition-colors shadow-lg"
-          >
-            Start Your Free Setup <ArrowRight className="w-5 h-5" />
-          </Link>
-          <p className="mt-4 text-xs text-blue-200/60">No credit card required to get started</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              to="/onboarding"
+              className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-base font-bold text-slate-900 bg-white hover:bg-blue-50 transition-colors shadow-lg"
+            >
+              Start Onboarding <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link
+              to="/book"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-white border-2 border-white/30 hover:border-white/60 transition-colors"
+            >
+              Book a Live Demo
+            </Link>
+          </div>
+          <p className="mt-5 text-xs text-blue-200/50">No credit card required · Typical setup time: 24–48 hours</p>
         </div>
       </div>
     </div>
