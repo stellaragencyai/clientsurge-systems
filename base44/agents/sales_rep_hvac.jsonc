@@ -20,7 +20,7 @@
     },
     {
       "function_name": "scheduleDemoBooking",
-      "description": "Book a demo call for a lead"
+      "description": "Book a demo/appointment call for a lead"
     }
   ],
   "app_user_connector_configs": [],
