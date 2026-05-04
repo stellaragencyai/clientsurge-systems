@@ -8,6 +8,7 @@ module.exports = {
   			inter: ['var(--font-inter)'],
   			display: ['var(--font-display)'],
   			titles: ['var(--font-titles)'],
+  			bebas: ['"Bebas Neue"', 'sans-serif'],
   			sans: ['var(--font-inter)'],
   		},
   		borderRadius: {

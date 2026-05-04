@@ -1,4 +1,5 @@
 /* Fonts loaded via <link> preload in index.html for faster FCP */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,8 +8,8 @@
 @layer base {
   :root {
     --font-inter: 'Inter', sans-serif;
-    --font-display: 'Playfair Display', serif;
-    --font-titles: 'Space Grotesk', sans-serif;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-titles: 'Bebas Neue', sans-serif;
 
     /* ClientSurge Electric Blue Theme */
     --background: 210 100% 99%;
