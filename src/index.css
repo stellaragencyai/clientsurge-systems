@@ -8,8 +8,8 @@
 @layer base {
   :root {
     --font-inter: 'Inter', sans-serif;
-    --font-display: 'Raleway', sans-serif;
-    --font-titles: 'Raleway', sans-serif;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-titles: 'Bebas Neue', sans-serif;
 
     /* ClientSurge Electric Blue Theme */
     --background: 210 100% 99%;
