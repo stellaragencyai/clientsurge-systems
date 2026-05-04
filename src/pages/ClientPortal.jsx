@@ -81,8 +81,9 @@ export default function ClientPortal() {
           error?.message ||
           "No portal project is linked to this account yet."
         );
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     init();
   }, []);
@@ -136,7 +137,7 @@ export default function ClientPortal() {
     return <PortalLoadingSkeleton />;
   }
 
-  if (notFound) {
+  if (notFound || !project) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center px-6">
         <div className="max-w-md text-center">
@@ -204,8 +205,8 @@ export default function ClientPortal() {
             onClear={clearNotifications}
           />
           <div className="text-right hidden sm:block">
-            <p className="text-xs font-semibold text-foreground">{project.business_name}</p>
-            <p className="text-xs text-muted-foreground">{user.email}</p>
+            <p className="text-xs font-semibold text-foreground">{project?.business_name}</p>
+            <p className="text-xs text-muted-foreground">{user?.email}</p>
           </div>
           <button
             onClick={() => base44.auth.logout("/")}
