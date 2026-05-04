@@ -25,7 +25,7 @@ export default function Hero() {
         position: "relative",
         overflow: "visible",
         background: "#ffffff",
-        paddingBottom: "clamp(3rem, 6vw, 5rem)"
+        paddingBottom: "clamp(5rem, 8vw, 7rem)"
       }}>
 
       <div

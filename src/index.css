@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,9 +6,9 @@
 
 @layer base {
   :root {
-    --font-inter: 'Inter', sans-serif;
-    --font-display: 'Bebas Neue', sans-serif;
-    --font-titles: 'Montserrat', sans-serif;
+    --font-inter: 'Plus Jakarta Sans', sans-serif;
+    --font-display: 'Plus Jakarta Sans', sans-serif;
+    --font-titles: 'Plus Jakarta Sans', sans-serif;
 
     /* ClientSurge Electric Blue Theme */
     --background: 210 100% 99%;
@@ -731,6 +731,23 @@ body > * {
 .font-display {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   PREMIUM WHITESPACE — more breathing room
+   ============================================ */
+
+/* Desktop: generous top/bottom for every section */
+@media (min-width: 1025px) {
+  section {
+    padding-top: max(var(--section-pt, 0px), 0px);
+    padding-bottom: max(var(--section-pb, 0px), 0px);
+  }
+}
+
+/* Global section min-vertical-gap — adds 40px on top of whatever each section already declares */
+section + section {
+  margin-top: clamp(0px, 2vw, 24px);
 }
 
 /* Responsive section padding — consistent across all screen sizes */
