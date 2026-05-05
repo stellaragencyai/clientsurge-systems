@@ -225,15 +225,15 @@ function StoreInner() {
             z-index: 50;
             margin: 0 24px 20px;
             border-radius: 18px;
-            background: linear-gradient(135deg, rgba(65,35,15,0.94) 0%, rgba(108,65,30,0.94) 52%, rgba(76,43,19,0.96) 100%);
+            background: linear-gradient(135deg, rgba(0,80,160,0.95) 0%, rgba(0,136,204,0.95) 52%, rgba(0,59,143,0.97) 100%);
             padding: 12px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 14px;
             cursor: pointer;
-            box-shadow: 0 10px 28px rgba(12,7,3,0.24);
-            border: 1px solid rgba(245,217,168,0.14);
+            box-shadow: 0 10px 28px rgba(0,59,143,0.28);
+            border: 1px solid rgba(0,174,239,0.25);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
           }
@@ -257,9 +257,9 @@ function StoreInner() {
             padding: 7px 12px;
             font-size: 11px;
             font-weight: 700;
-            color: #f6ddb0;
+            color: #e0f4ff;
             background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(200,150,92,0.24);
+            border: 1px solid rgba(0,174,239,0.3);
           }
           @media (max-width: 1080px) {
             .store-page .store-grid {
@@ -401,7 +401,7 @@ function StoreInner() {
                 initial={{ opacity: 0, y: 28 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 28, delay: idx * 0.1 }}
-                whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(154,92,46,0.13)" }}
+                whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(0,136,204,0.13)" }}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -444,11 +444,11 @@ function StoreInner() {
           <div onClick={() => setCartOpen(true)} className="store-sticky-cart">
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <ShoppingCart
-                style={{ width: "18px", height: "18px", color: "#f5e6d0" }} />
+                style={{ width: "18px", height: "18px", color: "#e0f4ff" }} />
               
                 <span
                 style={{
-                  color: "#f5e6d0",
+                  color: "#e0f4ff",
                   fontWeight: "700",
                   fontSize: "14px"
                 }}>
@@ -460,7 +460,7 @@ function StoreInner() {
                 <span
                 style={{
                   fontSize: "12px",
-                  color: "rgba(245,230,208,0.78)"
+                  color: "rgba(200,235,255,0.85)"
                 }}>
                 
                   ${totalSetup} setup - ${totalMonthly}/mo
@@ -468,7 +468,7 @@ function StoreInner() {
                 <span
                 style={{
                   background: "rgba(255,255,255,0.15)",
-                  color: "#f5e6d0",
+                  color: "#e0f4ff",
                   fontSize: "12px",
                   fontWeight: "700",
                   padding: "6px 16px",
@@ -528,7 +528,7 @@ function StoreInner() {
                     transform: "translateY(-50%)",
                     width: "14px",
                     height: "14px",
-                    color: "rgba(154,92,46,0.6)"
+                    color: "rgba(0,136,204,0.6)"
                   }} />
                 
                 <input
@@ -539,14 +539,14 @@ function StoreInner() {
                   style={{
                     width: "100%",
                     borderRadius: "9999px",
-                    border: "1.5px solid rgba(154,92,46,0.22)",
+                    border: "1.5px solid rgba(0,136,204,0.22)",
                     padding: "11px 16px 11px 38px",
                     fontSize: "13px",
                     background: "rgba(255,255,255,0.85)",
                     outline: "none",
                     boxSizing: "border-box",
                     color: "#1b140d",
-                    boxShadow: "0 2px 8px rgba(111,67,31,0.05)"
+                    boxShadow: "0 2px 8px rgba(0,136,204,0.07)"
                   }} />
                 
               </div>
@@ -579,7 +579,7 @@ function StoreInner() {
                       border:
                       activeCategory === category ?
                       "1.5px solid rgba(0,136,204,0.6)" :
-                      "1.5px solid rgba(154,92,46,0.18)",
+                      "1.5px solid rgba(0,136,204,0.18)",
                       cursor: "pointer",
                       background:
                       activeCategory === category ?
@@ -592,7 +592,7 @@ function StoreInner() {
                       boxShadow:
                       activeCategory === category ?
                       "0 4px 14px rgba(0,174,239,0.35)" :
-                      "0 1px 4px rgba(111,67,31,0.06)"
+                      "0 1px 4px rgba(0,136,204,0.08)"
                     }}>
                     
                       {category}
@@ -646,8 +646,8 @@ function StoreInner() {
            <CartSidebar />
            {/* S25: Talk to a Human — escape valve for overwhelmed visitors */}
            <div style={{
-            background: "linear-gradient(135deg, rgba(154,92,46,0.06), rgba(200,150,92,0.03))",
-            borderTop: "1px solid rgba(154,92,46,0.1)",
+            background: "linear-gradient(135deg, rgba(0,174,239,0.06), rgba(0,136,204,0.03))",
+            borderTop: "1px solid rgba(0,174,239,0.12)",
             padding: "28px 24px",
             textAlign: "center"
           }}>
