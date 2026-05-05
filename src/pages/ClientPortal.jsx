@@ -23,6 +23,7 @@ import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalTimeline from "../components/portal/PortalTimeline";
+import SystemStatusBadge from "../components/portal/SystemStatusBadge";
 
 const TABS = [
   { id: "progress", label: "🚀 Setup Progress" },
@@ -234,6 +235,7 @@ export default function ClientPortal() {
               <span className="ml-3">· Target go-live: <span className="font-semibold text-blue-200">{project.go_live_date}</span></span>
             )}
           </p>
+          <SystemStatusBadge project={project} />
         </div>
       </div>
 
