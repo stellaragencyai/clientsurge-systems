@@ -126,10 +126,10 @@ export default function IndustrySMSDemo({
                 padding: "2px",
                 background: done
                   ? "linear-gradient(135deg,#22c55e,#16a34a)"
-                  : `linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)`,
+                  : "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
                 border: "none",
                 cursor: "pointer",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.28)",
+                boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
               }}
             >
               <span
@@ -142,7 +142,7 @@ export default function IndustrySMSDemo({
                   borderRadius: "9999px",
                   background: done
                     ? "linear-gradient(135deg,#16a34a,#15803d)"
-                    : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                    : "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
                   color: "#fff",
                   fontWeight: "700",
                   fontSize: "14px",
