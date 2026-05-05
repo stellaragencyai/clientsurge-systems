@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
@@ -45,7 +45,7 @@ const NAV_GROUPS = [
       { id: 'leads', label: 'Leads', icon: Users },
       { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
       { id: 'inbox', label: 'Inbox', icon: Inbox, badge: true },
-      { id: 'onboarding', label: 'Client Onboarding', icon: ClipboardList, external: true },
+      { id: 'onboarding', label: 'Client Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
     ],
   },
   {
@@ -54,7 +54,7 @@ const NAV_GROUPS = [
       { id: 'website-leads', label: 'Website Leads', icon: Target },
       { id: 'install-queue', label: 'Install Queue', icon: Server },
       { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
-      { id: 'automations', label: 'Automation Status', icon: Zap },
+      { id: 'automations', label: 'Automation Status', icon: Zap, external: true, externalPath: '/admin/automations' },
       { id: 'drip', label: 'Drip Campaigns', icon: Send },
       { id: 'nurture', label: 'Nurture Campaigns', icon: Flame },
       { id: 'cadence', label: 'Dynamic Cadence', icon: Settings },
@@ -100,10 +100,21 @@ const TAB_ACTIONS = {
 export default function AdminDashboard() {
   const { user, isLoadingAuth } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('tab') || 'overview';
+  });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
   const [inboxUnread, setInboxUnread] = useState(0);
+
+  // Sync tab from URL param (e.g. when navigating back from sub-pages)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab) setActiveTab(tab);
+  }, [location.search]);
 
   // Load unread message count for inbox badge
   useEffect(() => {

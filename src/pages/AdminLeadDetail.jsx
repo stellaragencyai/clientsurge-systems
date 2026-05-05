@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { AlertTriangle, ArrowLeft, Loader2, Mail, Zap } from "lucide-react";
+import AdminShell from "@/components/admin/AdminShell";
 import StatusControl from "../components/dashboard/StatusControl";
 import MessagingPanel from "../components/dashboard/MessagingPanel";
 import EmailHistoryPanel from "../components/dashboard/EmailHistoryPanel";
@@ -89,29 +90,34 @@ export default function AdminLeadDetail() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      <AdminShell title="Lead Detail" activeId="leads">
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </AdminShell>
     );
   }
 
   if (!lead) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Lead not found</p>
-      </div>
+      <AdminShell title="Lead Detail" activeId="leads">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Lead not found</p>
+        </div>
+      </AdminShell>
     );
   }
 
   return (
+    <AdminShell title={lead.full_name} activeId="leads">
     <div className="space-y-8">
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <button
           onClick={() => navigate("/admin/leads")}
-          className="p-2 hover:bg-muted rounded-lg transition-colors"
+          className="flex items-center gap-1.5 p-2 hover:bg-muted rounded-lg transition-colors text-sm text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+          <ArrowLeft className="w-4 h-4" /> Back to Leads
         </button>
         <div>
           <h1 className="text-3xl font-semibold text-foreground">
@@ -262,5 +268,6 @@ export default function AdminLeadDetail() {
       {/* Notes */}
       <NotesSection leadId={leadId} />
     </div>
+    </AdminShell>
   );
 }

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
-import { Link2, Loader2, Users, ArrowLeft } from "lucide-react";
+import { Link2, Loader2, Users } from "lucide-react";
 import ClientOnboardingCard from "@/components/admin/onboarding/ClientOnboardingCard";
 import AddClientModal from "@/components/admin/onboarding/AddClientModal";
+import AdminShell from "@/components/admin/AdminShell";
 
 export default function AdminOnboarding() {
   const { user } = useAuth();
@@ -25,12 +26,14 @@ export default function AdminOnboarding() {
   // Admin-only guard
   if (user && user.role !== "admin") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-foreground mb-2">Access Denied</h1>
-          <p className="text-muted-foreground">Admin access required.</p>
+      <AdminShell title="Access Denied" activeId="">
+        <div className="flex items-center justify-center py-24">
+          <div className="text-center">
+            <h1 className="text-2xl font-semibold text-foreground mb-2">Access Denied</h1>
+            <p className="text-muted-foreground">Admin access required.</p>
+          </div>
         </div>
-      </div>
+      </AdminShell>
     );
   }
 
@@ -48,43 +51,31 @@ export default function AdminOnboarding() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
-      </div>
+      <AdminShell title="Client Onboarding" activeId="onboarding">
+        <div className="flex items-center justify-center py-24">
+          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+        </div>
+      </AdminShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-border px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate("/admin")}
-              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" /> Admin
-            </button>
-            <div className="w-px h-5 bg-border" />
-            <div>
-              <h1 className="font-display text-xl font-semibold text-foreground leading-tight">
-                Client Onboarding
-              </h1>
-              <p className="text-xs text-muted-foreground">{clients.length} client{clients.length !== 1 ? "s" : ""} total</p>
-            </div>
+    <AdminShell title="Client Onboarding" activeId="onboarding">
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold text-foreground">Client Onboarding</h1>
+            <p className="text-sm text-muted-foreground mt-1">{clients.length} client{clients.length !== 1 ? "s" : ""} total</p>
           </div>
           <button
             onClick={() => setShowAdd(true)}
-            style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", borderRadius: "9999px" }}
-            className="flex items-center gap-2 px-5 h-10 text-sm font-bold text-amber-100 hover:opacity-90 transition-opacity"
+            className="flex items-center gap-2 px-5 h-10 text-sm font-bold text-white rounded-full hover:opacity-90 transition-opacity"
+            style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)" }}
           >
             <Link2 className="w-4 h-4" /> Attach Paid Order
           </button>
         </div>
-      </div>
-
-      <div className="max-w-6xl mx-auto px-6 py-8 space-y-6">
         {/* Stats Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StatCard label="Total Clients" value={clients.length} color="primary" />
@@ -141,7 +132,7 @@ export default function AdminOnboarding() {
           onSaved={loadClients}
         />
       )}
-    </div>
+    </AdminShell>
   );
 }
 
