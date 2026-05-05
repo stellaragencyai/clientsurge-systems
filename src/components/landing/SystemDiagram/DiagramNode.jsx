@@ -57,7 +57,7 @@ export default function DiagramNode({ node, isActive, isHighlighted, onClick, st
               position: "absolute",
               inset: "-8px",
               borderRadius: "50%",
-              border: `2px solid ${node.color}44`,
+              border: `2px solid ${node.color}`,
               animation: "diagramPulse 2s ease-in-out infinite",
             }}
           />
