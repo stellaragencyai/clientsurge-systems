@@ -23,7 +23,7 @@ export default function InteractiveJourneyMap() {
   }, []);
 
   return (
-    <div style={{ maxWidth: "800px", margin: "0 auto", padding: "40px 20px" }}>
+    <section aria-label="Lead journey map" style={{ maxWidth: "800px", margin: "0 auto", padding: "40px 20px" }}>
       <div style={{ textAlign: "center", marginBottom: "40px" }}>
         <p
           style={{
@@ -177,6 +177,6 @@ export default function InteractiveJourneyMap() {
           See Pricing <ChevronRight style={{ width: "14px", height: "14px" }} />
         </a>
       </div>
-    </div>
+    </section>
   );
 }

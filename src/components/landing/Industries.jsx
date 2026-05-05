@@ -321,6 +321,7 @@ export default function Industries() {
             key={industry.id}
             type="button"
             aria-label={industry.name}
+            aria-pressed={isSelected}
             className="group relative block overflow-hidden h-[14rem] sm:h-[18rem] md:h-[27.6rem] text-left"
             onClick={() => handleIndustrySelect(industry.id)}
             onMouseEnter={() => setHoveredIndustryId(industry.id)}
@@ -366,11 +367,18 @@ export default function Industries() {
               <div
                 className="absolute inset-0 border-2 transition-all duration-300"
                 style={{
-                  borderColor: highlighted ? "#c8965c" : "rgba(255,255,255,0.08)",
-                  boxShadow: highlighted ?
+                  borderColor: isSelected ? "#00AEEF" : highlighted ? "#c8965c" : "rgba(255,255,255,0.08)",
+                  boxShadow: isSelected ?
+                  "inset 0 0 0 1px rgba(0,174,239,0.4), inset 0 0 32px rgba(0,174,239,0.15), 0 0 0 2px rgba(0,174,239,0.5), 0 0 24px rgba(0,174,239,0.3)" :
+                  highlighted ?
                   "inset 0 0 0 1px rgba(245,217,168,0.26), inset 0 0 32px rgba(200,150,92,0.2), 0 0 0 2px rgba(200,150,92,0.34), 0 0 24px rgba(200,150,92,0.22)" :
                   "none"
                 }} />
+              {isSelected && (
+                <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-primary flex items-center justify-center shadow-lg z-20">
+                  <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4"><path d="M5 12l4 4 10-10" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+              )}
               
 
 

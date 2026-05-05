@@ -226,10 +226,6 @@ export default function Hero() {
           <Suspense fallback={null}>
             <HeroDashboardScreen />
           </Suspense>
-          
-
-
-
 
 
 

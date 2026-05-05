@@ -81,7 +81,6 @@ const plans = [
   name: "Starter System",
   stripeKey: "starter",
   fit: "For businesses that need faster response and basic lead capture",
-  subtitle: "For businesses that need faster response and basic lead capture.",
   desc: "An AI lead conversion system that ensures every new inquiry gets a fast response, enters a simple follow-up flow, and has a clear path to booking.",
   setup: "$797 setup",
   monthly: "$497",
@@ -100,7 +99,6 @@ const plans = [
   stripeKey: "growth",
   fit: "For businesses already getting leads and losing revenue through slow response or weak follow-up",
   badge: "Most Popular",
-  subtitle: "For businesses already getting leads and losing revenue through slow response or weak follow-up.",
   desc: "A full missed-call recovery and automated follow-up system built for businesses that want to stop losing bookings they already earned.",
   setup: "$1,297 setup",
   monthly: "$997",
@@ -120,7 +118,6 @@ const plans = [
   name: "Elite System",
   stripeKey: "elite",
   fit: "For businesses that want the full revenue recovery engine — every tool, fully deployed",
-  subtitle: "For businesses that want the full revenue recovery engine — every tool, fully deployed.",
   desc: "The complete AI-assisted booking automation and revenue recovery system — old leads reactivated, every inquiry tracked, and the full pipeline optimized.",
   setup: "$2,497 setup",
   monthly: "$1,997",
@@ -166,7 +163,7 @@ export default function Pricing() {
   return (
     <section id="pricing" className="nebula-pricing pt-16 md:pt-28 pb-32 md:pb-40 px-6 overflow-visible">
       <div className="max-w-7xl mx-auto">
-        <div className="max-w-3xl mx-auto text-center pt-10 mb-16">
+        <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-[#001B44] text-4xl font-bold tracking-tight leading-tight md:text-5xl lg:text-6xl" style={{ fontFamily: "Montserrat, sans-serif" }}>Stop Losing Leads. Start Running a Real System.
 
           </h2>
@@ -261,8 +258,6 @@ export default function Pricing() {
                 <p className="text-xs font-bold text-foreground mb-4">{item.price}</p>
                 <a
                   href={item.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-1.5 h-9 rounded-full border border-primary/30 bg-primary/5 text-xs font-semibold text-black hover:bg-primary/10 transition-colors hover:shadow-[0_0_12px_rgba(0,174,239,0.3)]"
                 >
                   Add This <ArrowRight className="w-3 h-3" />
@@ -336,7 +331,7 @@ export default function Pricing() {
           }
         }
         
-        .shiny-brown-btn {
+        .shiny-cta-btn {
           display: inline-block;
           border-radius: 9999px;
           padding: 2px;
@@ -347,7 +342,7 @@ export default function Pricing() {
           border: none;
           position: relative;
         }
-        .shiny-brown-btn::after {
+        .shiny-cta-btn::after {
           content: '';
           position: absolute;
           top: 0;
@@ -358,11 +353,11 @@ export default function Pricing() {
           border-radius: 9999px;
           pointer-events: none;
         }
-        .shiny-brown-btn:hover {
+        .shiny-cta-btn:hover {
           box-shadow: 0 8px 32px rgba(0, 174, 239, 0.6), 0 2px 8px rgba(0, 0, 0, 0.15);
           transform: translateY(-2px);
         }
-        .shiny-brown-inner {
+        .shiny-cta-inner {
           background: linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%);
           border-radius: 9999px;
           color: #ffffff;
@@ -500,11 +495,9 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
           <div className="flex flex-col gap-1">
             <a
               href={STRIPE_LINKS.elite}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none"
+              className="w-full shiny-cta-btn focus:ring-2 focus:ring-primary focus:outline-none"
             >
-              <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
+              <span className="shiny-cta-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
                 Get Started — $2,497 Today
                 <ArrowRight className="w-4 h-4" />
               </span>
@@ -515,11 +508,9 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
           <div className="flex flex-col gap-1">
             <a
               href={STRIPE_LINKS.growth}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full shiny-brown-btn focus:ring-2 focus:ring-primary focus:outline-none"
+              className="w-full shiny-cta-btn focus:ring-2 focus:ring-primary focus:outline-none"
             >
-              <span className="shiny-brown-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
+              <span className="shiny-cta-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
                 Get Started — $1,297 Today
                 <ArrowRight className="w-4 h-4" />
               </span>
@@ -530,8 +521,6 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
           <div className="flex flex-col gap-1">
             <a
               href={STRIPE_LINKS.starter}
-              target="_blank"
-              rel="noopener noreferrer"
               className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-full border border-primary/25 bg-white/80 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
             >
               Get Started — $797 Today

@@ -49,6 +49,7 @@ export default function BeforeAfter() {
             <button
               key={i}
               onClick={() => setActive(i)}
+              aria-pressed={active === i}
               className="px-4 py-2 min-h-[44px] rounded-full text-sm font-semibold transition-all duration-200 relative"
               style={{
                 background: active === i
@@ -89,6 +90,7 @@ export default function BeforeAfter() {
         <div className="text-center mt-12">
           <button
             onClick={() => demoBooking?.openDemoBooking?.()}
+            aria-label="See this system in action — book a free demo"
             className="inline-flex items-center gap-2 font-bold text-sm px-8 py-4 rounded-full text-white"
             style={{
               background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #00AEEF 100%)",
