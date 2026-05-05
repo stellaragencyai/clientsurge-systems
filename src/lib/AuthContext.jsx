@@ -1,7 +1,13 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+// @ts-nocheck
+import React, { createContext, useCallback, useContext, useState } from "react";
 import { createAxiosClient } from "@base44/sdk/dist/utils/axios-client";
 import { base44 } from "@/api/base44Client";
 import { appParams } from "@/lib/app-params";
+import {
+  clearPortalTestFixture,
+  isPortalTestModeEnabled,
+  readPortalTestFixture,
+} from "@/lib/portalTestMode";
 
 const AuthContext = createContext();
 
@@ -14,6 +20,10 @@ function shouldAllowLocalAuthBypass() {
   return hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".local");
 }
 
+function shouldSkipBase44Bootstrap() {
+  return shouldAllowLocalAuthBypass() || !appParams.hasBase44AppId;
+}
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -22,16 +32,48 @@ export const AuthProvider = ({ children }) => {
   const [authError, setAuthError] = useState(null);
   const [appPublicSettings, setAppPublicSettings] = useState(null);
 
-  useEffect(() => {
-    checkAppState();
+  const checkUserAuth = useCallback(async () => {
+    try {
+      setIsLoadingAuth(true);
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+      setIsAuthenticated(true);
+      setIsLoadingAuth(false);
+    } catch (error) {
+      if (error.status !== 401 && error.status !== 403) {
+        console.error("User auth check failed:", error);
+      }
+
+      setUser(null);
+      setIsLoadingAuth(false);
+      setIsAuthenticated(false);
+
+      if (error.status === 401 || error.status === 403) {
+        setAuthError({
+          type: "auth_required",
+          message: "Authentication required",
+        });
+      }
+    }
   }, []);
 
-  const checkAppState = async () => {
-    if (shouldAllowLocalAuthBypass()) {
+  const checkAppState = useCallback(async () => {
+    const portalTestFixture = readPortalTestFixture();
+    if (portalTestFixture?.user && isPortalTestModeEnabled()) {
+      setUser(portalTestFixture.user);
+      setIsAuthenticated(true);
+      setIsLoadingPublicSettings(false);
+      setIsLoadingAuth(false);
+      setAuthError(null);
+      return;
+    }
+
+    if (shouldSkipBase44Bootstrap()) {
       setIsLoadingPublicSettings(false);
       setIsLoadingAuth(false);
       setIsAuthenticated(false);
       setAuthError(null);
+      setAppPublicSettings(null);
       return;
     }
 
@@ -50,7 +92,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("timeout")), 5000)
+          setTimeout(() => reject(new Error("timeout")), 1500)
         );
 
         const publicSettings = await Promise.race([
@@ -65,6 +107,7 @@ export const AuthProvider = ({ children }) => {
         } else {
           setIsLoadingAuth(false);
           setIsAuthenticated(false);
+          setUser(null);
         }
 
         setIsLoadingPublicSettings(false);
@@ -109,43 +152,51 @@ export const AuthProvider = ({ children }) => {
       setIsLoadingPublicSettings(false);
       setIsLoadingAuth(false);
     }
-  };
+  }, [checkUserAuth]);
 
-  const checkUserAuth = async () => {
-    try {
-      setIsLoadingAuth(true);
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-      setIsAuthenticated(true);
-      setIsLoadingAuth(false);
-    } catch (error) {
-      console.error("User auth check failed:", error);
-      setIsLoadingAuth(false);
+  const preparePublicRoute = useCallback(() => {
+    setIsLoadingPublicSettings(false);
+    setIsLoadingAuth(false);
+    setAuthError(null);
+  }, []);
+
+  const logout = useCallback((shouldRedirect = true) => {
+    if (!appParams.hasBase44AppId) {
+      setUser(null);
       setIsAuthenticated(false);
+      setAuthError(null);
 
-      if (error.status === 401 || error.status === 403) {
-        setAuthError({
-          type: "auth_required",
-          message: "Authentication required",
-        });
+      if (shouldRedirect && typeof window !== "undefined") {
+        window.location.assign("/");
       }
+      return;
     }
-  };
 
-  const logout = (shouldRedirect = true) => {
+    if (isPortalTestModeEnabled()) {
+      clearPortalTestFixture();
+      if (shouldRedirect && typeof window !== "undefined") {
+        window.location.assign("/");
+      }
+      return;
+    }
+
     setUser(null);
     setIsAuthenticated(false);
 
     if (shouldRedirect) {
-      base44.auth.logout(window.location.href);
+      base44.auth.logout("/");
     } else {
       base44.auth.logout();
     }
-  };
+  }, []);
 
-  const navigateToLogin = () => {
+  const navigateToLogin = useCallback(() => {
+    if (!appParams.hasBase44AppId) {
+      return;
+    }
+
     base44.auth.redirectToLogin(window.location.href);
-  };
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -156,9 +207,12 @@ export const AuthProvider = ({ children }) => {
         isLoadingPublicSettings,
         authError,
         appPublicSettings,
+        hasBase44AppId: appParams.hasBase44AppId,
+        isPreviewWithoutAppId: appParams.isPreviewWithoutAppId,
         logout,
         navigateToLogin,
         checkAppState,
+        preparePublicRoute,
       }}
     >
       {children}

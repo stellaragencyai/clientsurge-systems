@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -27,7 +27,7 @@ const INDUSTRIES = [
   "Other",
 ];
 
-export default function DemoBookingInline({ prefillIndustry = "" }) {
+export default function DemoBookingInline({ prefillIndustry = "", redirectOnSuccess = "" }) {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     first_name: "", last_name: "", business_name: "", email: "",
@@ -40,6 +40,18 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
   const [submitWarnings, setSubmitWarnings] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
+
+  useEffect(() => {
+    if (!success || !redirectOnSuccess || typeof window === "undefined") {
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      window.location.assign(redirectOnSuccess);
+    }, 1800);
+
+    return () => window.clearTimeout(timer);
+  }, [redirectOnSuccess, success]);
 
   const set = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -119,6 +131,9 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           <p className="mt-3 text-xs text-amber-300 max-w-sm">
             Your booking was saved, but one or more follow-up actions still need review.
           </p>
+        )}
+        {redirectOnSuccess && (
+          <p className="mt-3 text-xs text-white/40">Redirecting to confirmation...</p>
         )}
       </div>
     );
@@ -245,5 +260,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
     </form>
   );
 }
+
+
 
 

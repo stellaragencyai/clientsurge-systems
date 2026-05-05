@@ -13,14 +13,14 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import UserNotRegisteredError from "@/components/UserNotRegisteredError";
 import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import { queryClientInstance } from "@/lib/query-client";
-import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
-import ErrorBoundary from "./components/ErrorBoundary";
-import PageNotFound from "./lib/PageNotFound";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
 import { scrollToTop } from "@/lib/scroll";
-
-// Analytics observer initialized inside AppInner useEffect — see below
+import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
+import ErrorBoundary from "./components/ErrorBoundary";
+import IndustryTemplate from "./components/landing/IndustryTemplate";
+import PageNotFound from "./lib/PageNotFound";
 import Home from "./pages/Home";
+import MedSpa from "./pages/MedSpa";
 import Onboarding from "./pages/Onboarding";
 import CaptureLeads from "./pages/CaptureLeads";
 import Start from "./pages/Start";
@@ -30,14 +30,12 @@ import LegalPage from "./pages/LegalPage";
 import Contact from "./pages/Contact";
 import Industries from "./pages/Industries";
 import OrderSuccess from "./pages/OrderSuccess";
-import IndustryTemplate from "./components/landing/IndustryTemplate";
 import BusinessSetup from "./pages/BusinessSetup";
 import ThankYou from "./pages/ThankYou";
 import About from "./pages/About";
 import CredentialsSetup from "./pages/CredentialsSetup";
 import AdminInstallGuide from "./pages/AdminInstallGuide";
 import AutomationsDemo from "./pages/AutomationsDemo";
-
 
 const Store = lazy(() => import("./pages/Store"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -74,7 +72,11 @@ const PUBLIC_PATHS = [
   "/contact",
   "/leads/capture",
   "/onboarding",
-  // test/preview routes removed
+  "/setup",
+  "/setup/credentials",
+  "/thank-you",
+  "/about",
+  "/automations",
 ];
 
 const NOINDEX_PREFIXES = [
@@ -95,34 +97,68 @@ const NOINDEX_PREFIXES = [
 const isPublicPath = (pathname) =>
   PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
-// Fix 1: ScrollToTop — resets scroll position on every route change
 function ScrollToTop() {
   const location = useLocation();
+
   useEffect(() => {
-    // Don't scroll to top if navigating to a hash anchor
+    const navigationEntry =
+      typeof window !== "undefined" && typeof window.performance?.getEntriesByType === "function"
+        ? window.performance.getEntriesByType("navigation")[0]
+        : null;
+    const isReload = navigationEntry?.type === "reload";
+
+    if (location.pathname === "/" && location.hash && isReload) {
+      window.history.replaceState({}, "", "/");
+      scrollToTop();
+      return;
+    }
+
     if (!location.hash) {
       scrollToTop();
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.hash]);
+
   return null;
 }
 
 function AppInner() {
   useEffect(() => {
-    // Initialize auto-tracking after React mounts — safe for SSR/pre-render
     if (typeof window !== "undefined") {
       initializeAnalyticsObserver();
     }
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !("scrollRestoration" in window.history)) {
+      return undefined;
+    }
+
+    const previousValue = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+
+    return () => {
+      window.history.scrollRestoration = previousValue;
+    };
+  }, []);
+
   return null;
 }
 
-// SectionRedirect — just navigate to home, no auto-scroll
 function SectionRedirect({ hash }) {
   const navigate = useNavigate();
 
   useEffect(() => {
     navigate("/", { replace: true });
+
+    const timer = window.setTimeout(() => {
+      const element = document.querySelector(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      window.history.replaceState({}, "", `/${hash}`);
+    }, 450);
+
+    return () => window.clearTimeout(timer);
   }, [hash, navigate]);
 
   return null;
@@ -179,10 +215,39 @@ function AccessDeniedPage() {
   );
 }
 
+function RouteLoadingScreen() {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-background/80">
+      <div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
+    </div>
+  );
+}
+
+const fullScreenLoader = (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
+  </div>
+);
+
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
+  const {
+    isLoadingAuth,
+    isLoadingPublicSettings,
+    authError,
+    checkAppState,
+    preparePublicRoute,
+  } = useAuth();
   const location = useLocation();
   const publicRoute = isPublicPath(location.pathname);
+
+  useEffect(() => {
+    if (publicRoute) {
+      preparePublicRoute();
+      return;
+    }
+
+    checkAppState();
+  }, [checkAppState, preparePublicRoute, publicRoute]);
 
   if ((isLoadingPublicSettings || isLoadingAuth) && !publicRoute) {
     return (
@@ -199,6 +264,7 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/med-spa" element={<MedSpa />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
@@ -218,13 +284,7 @@ const AuthenticatedApp = () => {
       <Route
         path="/store"
         element={
-          <Suspense
-            fallback={
-              <div className="fixed inset-0 flex items-center justify-center">
-                <div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
-              </div>
-            }
-          >
+          <Suspense fallback={<RouteLoadingScreen />}>
             <Store />
           </Suspense>
         }
@@ -243,8 +303,14 @@ const AuthenticatedApp = () => {
           <ProtectedRoute unauthenticatedElement={<AuthRedirectFallback />} />
         }
       >
-        <Route path="/client-portal" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><ClientPortal /></Suspense>} />
-        <Route path="/client-dashboard" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><ClientDashboard /></Suspense>} />
+        <Route
+          path="/client-portal"
+          element={<Suspense fallback={fullScreenLoader}><ClientPortal /></Suspense>}
+        />
+        <Route
+          path="/client-dashboard"
+          element={<Suspense fallback={fullScreenLoader}><ClientDashboard /></Suspense>}
+        />
       </Route>
 
       <Route
@@ -258,14 +324,29 @@ const AuthenticatedApp = () => {
       >
         <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
         <Route path="/admin-settings" element={<Navigate to="/admin" replace />} />
-        <Route path="/admin" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminDashboard /></Suspense>} />
-        <Route path="/admin/leads" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminLeads /></Suspense>} />
-        <Route path="/admin/leads/:leadId" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminLeadDetail /></Suspense>} />
-        <Route path="/admin/automations" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminAutomation /></Suspense>} />
+        <Route
+          path="/admin"
+          element={<Suspense fallback={fullScreenLoader}><AdminDashboard /></Suspense>}
+        />
+        <Route
+          path="/admin/leads"
+          element={<Suspense fallback={fullScreenLoader}><AdminLeads /></Suspense>}
+        />
+        <Route
+          path="/admin/leads/:leadId"
+          element={<Suspense fallback={fullScreenLoader}><AdminLeadDetail /></Suspense>}
+        />
+        <Route
+          path="/admin/automations"
+          element={<Suspense fallback={fullScreenLoader}><AdminAutomation /></Suspense>}
+        />
         <Route path="/lead-intelligence" element={<Navigate to="/admin" replace />} />
         <Route path="/sam" element={<Navigate to="/admin" replace />} />
         <Route path="/medspa-dashboard" element={<Navigate to="/admin" replace />} />
-        <Route path="/admin/onboarding" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminOnboarding /></Suspense>} />
+        <Route
+          path="/admin/onboarding"
+          element={<Suspense fallback={fullScreenLoader}><AdminOnboarding /></Suspense>}
+        />
         <Route path="/admin/install-guide" element={<AdminInstallGuide />} />
       </Route>
 
@@ -277,17 +358,18 @@ const AuthenticatedApp = () => {
 function App() {
   return (
     <ErrorBoundary>
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router style={{ overflowX: "hidden" }}>
-          <ScrollToTop />
-          <AutoCTAAnalytics />
-          <RouteIndexingGuard />
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router style={{ overflowX: "hidden" }}>
+            <ScrollToTop />
+            <AppInner />
+            <AutoCTAAnalytics />
+            <RouteIndexingGuard />
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
