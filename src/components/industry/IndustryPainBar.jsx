@@ -16,7 +16,7 @@ export default function IndustryPainBar({ stats }) {
               <div className="text-3xl mb-2">{stat.icon}</div>
               <p
                 className="font-bold mb-1"
-                style={{ fontSize: "2rem", color: "#9a5c2e", lineHeight: 1.1 }}
+                style={{ fontSize: "2rem", color: "#000000", lineHeight: 1.1, fontFamily: "var(--font-display)" }}
               >
                 {stat.value}
               </p>
