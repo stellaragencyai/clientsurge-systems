@@ -5,7 +5,7 @@ import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw, Plus,
-  Server, RotateCcw, BookOpen, Wand2, Sparkles, Crosshair,
+  Server, RotateCcw, BookOpen, Wand2, Sparkles, Crosshair, Trophy,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
@@ -81,6 +81,7 @@ const NAV_GROUPS = [
     items: [
       { id: 'sniper', label: '🎯 Lead Sniper', icon: Crosshair },
       { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
+      { id: 'performance-wars', label: '🏆 Performance Wars', icon: Trophy, external: true, externalPath: '/admin/performance-wars' },
       { id: 'social-engine', label: 'Social Media Engine', icon: Sparkles },
       { id: 'website-copy', label: 'Website Copy AI', icon: Wand2 },
       { id: 'task-board', label: 'Task Board', icon: ClipboardList },

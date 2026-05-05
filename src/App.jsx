@@ -37,6 +37,7 @@ import About from "./pages/About";
 import CredentialsSetup from "./pages/CredentialsSetup";
 import AdminInstallGuide from "./pages/AdminInstallGuide";
 import AISalesCommandCenter from "./pages/AISalesCommandCenter";
+import PerformanceWars from "./pages/PerformanceWars";
 import AutomationsDemo from "./pages/AutomationsDemo";
 
 
@@ -269,6 +270,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin/onboarding" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminOnboarding /></Suspense>} />
         <Route path="/admin/install-guide" element={<AdminInstallGuide />} />
         <Route path="/admin/ai-sales" element={<AISalesCommandCenter />} />
+        <Route path="/admin/performance-wars" element={<PerformanceWars />} />
       </Route>
 
       <Route path="*" element={<PageNotFound />} />
