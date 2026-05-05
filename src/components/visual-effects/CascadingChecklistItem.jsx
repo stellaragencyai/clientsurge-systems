@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const checkVariants = {
   hidden: { pathLength: 0, opacity: 0 },
-  visible: { pathLength: 1, opacity: 1 },
+  visible: { pathLength: 1, opacity: 1 }
 };
 
 export default function CascadingChecklistItem({ item, index }) {
@@ -14,7 +14,7 @@ export default function CascadingChecklistItem({ item, index }) {
       transition={{
         duration: 0.55,
         delay: index * 0.1,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1]
       }}
       viewport={{ once: true, margin: "-60px" }}
       style={{
@@ -29,9 +29,9 @@ export default function CascadingChecklistItem({ item, index }) {
         width: "fit-content",
         cursor: "default",
         backdropFilter: "blur(4px)",
-        WebkitBackdropFilter: "blur(4px)",
-      }}
-    >
+        WebkitBackdropFilter: "blur(4px)"
+      }} className=" hidden">
+      
       {/* Animated check circle */}
       <motion.div
         initial={{ scale: 0, rotate: -90 }}
@@ -40,7 +40,7 @@ export default function CascadingChecklistItem({ item, index }) {
           type: "spring",
           stiffness: 400,
           damping: 18,
-          delay: index * 0.1 + 0.25,
+          delay: index * 0.1 + 0.25
         }}
         viewport={{ once: true }}
         style={{
@@ -52,9 +52,9 @@ export default function CascadingChecklistItem({ item, index }) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: "0 0 14px rgba(34,199,89,0.45), 0 2px 6px rgba(34,197,94,0.25)",
-        }}
-      >
+          boxShadow: "0 0 14px rgba(34,199,89,0.45), 0 2px 6px rgba(34,197,94,0.25)"
+        }}>
+        
         <motion.svg
           width="10"
           height="8"
@@ -63,8 +63,8 @@ export default function CascadingChecklistItem({ item, index }) {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          transition={{ delay: index * 0.1 + 0.4 }}
-        >
+          transition={{ delay: index * 0.1 + 0.4 }}>
+          
           <motion.path
             d="M1 4L3.5 6.5L9 1"
             stroke="white"
@@ -72,8 +72,8 @@ export default function CascadingChecklistItem({ item, index }) {
             strokeLinecap="round"
             strokeLinejoin="round"
             variants={checkVariants}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-          />
+            transition={{ duration: 0.35, ease: "easeOut" }} />
+          
         </motion.svg>
       </motion.div>
 
@@ -83,10 +83,10 @@ export default function CascadingChecklistItem({ item, index }) {
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.4, delay: index * 0.1 + 0.3, ease: "easeOut" }}
         viewport={{ once: true }}
-        style={{ fontSize: "12px", fontWeight: "600", color: "rgba(27,20,13,0.8)", lineHeight: 1.4 }}
-      >
+        style={{ fontSize: "12px", fontWeight: "600", color: "rgba(27,20,13,0.8)", lineHeight: 1.4 }}>
+        
         {item}
       </motion.span>
-    </motion.div>
-  );
+    </motion.div>);
+
 }
