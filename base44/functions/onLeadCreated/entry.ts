@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
       timestamp: new Date().toISOString(),
       lead: {
         id: data.id,
-        name: data.name,
+        name: data.full_name || data.name,
         email: data.email,
         phone: data.phone,
         niche: data.niche,
