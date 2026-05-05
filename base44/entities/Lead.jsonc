@@ -90,10 +90,50 @@
         "high",
         "medium",
         "low",
+        "none",
         "unknown"
       ],
       "title": "Website Quality",
       "default": "unknown"
+    },
+    "website_age_estimate": {
+      "type": "string",
+      "title": "Website Age Estimate",
+      "description": "e.g. 'Very old (2008-era)', 'No website', 'Modern but basic'"
+    },
+    "website_issues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Website Problems Detected",
+      "description": "e.g. ['No mobile optimization', 'No SSL', 'No online booking', 'Broken links']"
+    },
+    "website_upgrade_pitch": {
+      "type": "string",
+      "title": "AI Website Upgrade Pitch",
+      "description": "Personalized pitch: what we'd fix/build for this business"
+    },
+    "review_count": {
+      "type": "number",
+      "title": "Total Reviews",
+      "default": 0
+    },
+    "review_rating": {
+      "type": "number",
+      "title": "Average Rating (0-5)",
+      "default": 0
+    },
+    "review_platform": {
+      "type": "string",
+      "title": "Review Platform",
+      "description": "e.g. Google, Yelp"
+    },
+    "sniper_score": {
+      "type": "number",
+      "title": "Sniper Score (0-100)",
+      "description": "High reviews + bad/no website = high score",
+      "default": 0
     },
     "lead_score": {
       "type": "number",
@@ -126,7 +166,7 @@
     "source": {
       "type": "string",
       "title": "Discovery Source",
-      "default": "agent"
+      "default": "sniper_agent"
     },
     "outreach_insight": {
       "type": "string",
