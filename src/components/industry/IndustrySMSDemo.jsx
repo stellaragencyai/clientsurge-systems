@@ -142,7 +142,7 @@ export default function IndustrySMSDemo({
                   borderRadius: "9999px",
                   background: done ?
                   "linear-gradient(135deg,#16a34a,#15803d)" :
-                  "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                  "linear-gradient(135deg,#0069C0 0%,#003B8F 40%,#002a6e 100%)",
                   color: "#fff",
                   fontWeight: "700",
                   fontSize: "14px"
