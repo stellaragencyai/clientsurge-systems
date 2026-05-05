@@ -7,8 +7,24 @@ import { base44 } from '@/api/base44Client';
 import {
   Target, Zap, Globe, Star, RefreshCw, Loader2, AlertCircle,
   CheckCircle2, XCircle, ExternalLink, ChevronDown, ChevronUp,
-  MapPin, Phone, Building2, TrendingUp, Eye, Filter, Play,
+  MapPin, Phone, Building2, TrendingUp, Eye, Filter, Play, Map, List,
 } from 'lucide-react';
+import SniperMap from './SniperMap';
+
+// Inject Leaflet CSS once
+if (typeof document !== 'undefined' && !document.getElementById('leaflet-css')) {
+  const link = document.createElement('link');
+  link.id = 'leaflet-css';
+  link.rel = 'stylesheet';
+  link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+  document.head.appendChild(link);
+}
+// Inject Leaflet JS once
+if (typeof window !== 'undefined' && !window.L) {
+  const script = document.createElement('script');
+  script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+  document.head.appendChild(script);
+}
 
 const NICHES = [
   { key: 'med_spa',      label: 'Med Spa',        color: 'bg-pink-100 text-pink-800' },
@@ -315,6 +331,8 @@ export default function SniperDashboard() {
   const [filterQuality, setFilterQuality] = useState('all');
   const [filterStatus, setFilterStatus] = useState('New');
   const [sortBy, setSortBy] = useState('sniper_score');
+  const [view, setView] = useState('map'); // 'map' | 'list'
+  const [mapFilteredLeads, setMapFilteredLeads] = useState(null); // set when clicking a city
 
   useEffect(() => { load(); }, []);
 
@@ -330,7 +348,9 @@ export default function SniperDashboard() {
     }
   };
 
-  const filtered = leads
+  const baseLeads = mapFilteredLeads || leads;
+
+  const filtered = baseLeads
     .filter(l => {
       if (filterNiche !== 'all' && l.niche !== filterNiche) return false;
       if (filterQuality !== 'all' && l.website_quality !== filterQuality) return false;
@@ -401,6 +421,22 @@ export default function SniperDashboard() {
         })}
       </div>
 
+      {/* View toggle */}
+      <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit">
+        <button
+          onClick={() => setView('map')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${view === 'map' ? 'bg-white text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <Map className="w-4 h-4" /> Map View
+        </button>
+        <button
+          onClick={() => setView('list')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${view === 'list' ? 'bg-white text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <List className="w-4 h-4" /> List View
+        </button>
+      </div>
+
       {/* How it works banner */}
       <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex items-start gap-3">
         <Zap className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
@@ -414,58 +450,93 @@ export default function SniperDashboard() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center">
-        <div className="flex items-center gap-1.5">
-          <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground font-medium">Filter:</span>
-        </div>
-        <select value={filterNiche} onChange={e => setFilterNiche(e.target.value)} className="text-xs rounded-lg border border-border px-2 py-1.5 bg-background focus:outline-none">
-          <option value="all">All Niches</option>
-          {NICHES.map(n => <option key={n.key} value={n.key}>{n.label}</option>)}
-        </select>
-        <select value={filterQuality} onChange={e => setFilterQuality(e.target.value)} className="text-xs rounded-lg border border-border px-2 py-1.5 bg-background focus:outline-none">
-          <option value="all">All Website Quality</option>
-          <option value="none">No Website</option>
-          <option value="low">Bad Website</option>
-          <option value="medium">Mediocre Website</option>
-        </select>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="text-xs rounded-lg border border-border px-2 py-1.5 bg-background focus:outline-none">
-          <option value="all">All Statuses</option>
-          <option value="New">New</option>
-          <option value="Contacted">Contacted</option>
-          <option value="Qualified">Qualified</option>
-          <option value="Responded">Responded</option>
-        </select>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="text-xs rounded-lg border border-border px-2 py-1.5 bg-background focus:outline-none">
-          <option value="sniper_score">Sort: Sniper Score</option>
-          <option value="reviews">Sort: Most Reviews</option>
-          <option value="newest">Sort: Newest</option>
-        </select>
-        <span className="text-xs text-muted-foreground ml-auto">{filtered.length} targets shown</span>
-      </div>
+      {/* Map View */}
+      {view === 'map' && (
+        loading ? (
+          <div className="flex items-center justify-center py-20 gap-2 text-muted-foreground text-sm">
+            <Loader2 className="w-5 h-5 animate-spin" /> Loading targets…
+          </div>
+        ) : leads.length === 0 ? (
+          <div className="text-center py-20">
+            <Map className="w-12 h-12 mx-auto text-muted-foreground/20 mb-3" />
+            <p className="font-semibold text-foreground">No targets to map yet</p>
+            <p className="text-sm text-muted-foreground mt-1">Run a sniper hunt to populate the map.</p>
+          </div>
+        ) : (
+          <SniperMap
+            leads={leads}
+            onSelectCity={(cityLeads) => {
+              setMapFilteredLeads(cityLeads);
+              setView('list');
+            }}
+          />
+        )
+      )}
 
-      {/* Lead list */}
-      {loading ? (
-        <div className="flex items-center justify-center py-20 gap-2 text-muted-foreground text-sm">
-          <Loader2 className="w-5 h-5 animate-spin" /> Loading targets…
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-20">
-          <Target className="w-12 h-12 mx-auto text-muted-foreground/20 mb-3" />
-          <p className="font-semibold text-foreground">No targets yet</p>
-          <p className="text-sm text-muted-foreground mt-1">Click "Run Sniper Hunt" to start finding hot prospects.</p>
-          <button
-            onClick={() => setShowHunt(true)}
-            className="mt-4 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors mx-auto"
-          >
-            <Play className="w-4 h-4" /> Launch First Hunt
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {filtered.map(lead => <LeadCard key={lead.id} lead={lead} />)}
-        </div>
+      {/* List View */}
+      {view === 'list' && (
+        <>
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3 items-center">
+            <div className="flex items-center gap-1.5">
+              <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-medium">Filter:</span>
+            </div>
+            {mapFilteredLeads && (
+              <button
+                onClick={() => setMapFilteredLeads(null)}
+                className="flex items-center gap-1 text-xs bg-primary/10 text-primary border border-primary/20 rounded-full px-2.5 py-1 font-semibold hover:bg-primary/20 transition-colors"
+              >
+                <MapPin className="w-3 h-3" /> City filter active × clear
+              </button>
+            )}
+            <select value={filterNiche} onChange={e => setFilterNiche(e.target.value)} className="text-xs rounded-lg border border-border px-2 py-1.5 bg-background focus:outline-none">
+              <option value="all">All Niches</option>
+              {NICHES.map(n => <option key={n.key} value={n.key}>{n.label}</option>)}
+            </select>
+            <select value={filterQuality} onChange={e => setFilterQuality(e.target.value)} className="text-xs rounded-lg border border-border px-2 py-1.5 bg-background focus:outline-none">
+              <option value="all">All Website Quality</option>
+              <option value="none">No Website</option>
+              <option value="low">Bad Website</option>
+              <option value="medium">Mediocre Website</option>
+            </select>
+            <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} className="text-xs rounded-lg border border-border px-2 py-1.5 bg-background focus:outline-none">
+              <option value="all">All Statuses</option>
+              <option value="New">New</option>
+              <option value="Contacted">Contacted</option>
+              <option value="Qualified">Qualified</option>
+              <option value="Responded">Responded</option>
+            </select>
+            <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="text-xs rounded-lg border border-border px-2 py-1.5 bg-background focus:outline-none">
+              <option value="sniper_score">Sort: Sniper Score</option>
+              <option value="reviews">Sort: Most Reviews</option>
+              <option value="newest">Sort: Newest</option>
+            </select>
+            <span className="text-xs text-muted-foreground ml-auto">{filtered.length} targets shown</span>
+          </div>
+
+          {loading ? (
+            <div className="flex items-center justify-center py-20 gap-2 text-muted-foreground text-sm">
+              <Loader2 className="w-5 h-5 animate-spin" /> Loading targets…
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="text-center py-20">
+              <Target className="w-12 h-12 mx-auto text-muted-foreground/20 mb-3" />
+              <p className="font-semibold text-foreground">No targets yet</p>
+              <p className="text-sm text-muted-foreground mt-1">Click "Run Sniper Hunt" to start finding hot prospects.</p>
+              <button
+                onClick={() => setShowHunt(true)}
+                className="mt-4 flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition-colors mx-auto"
+              >
+                <Play className="w-4 h-4" /> Launch First Hunt
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filtered.map(lead => <LeadCard key={lead.id} lead={lead} />)}
+            </div>
+          )}
+        </>
       )}
 
       {showHunt && (
