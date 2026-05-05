@@ -61,6 +61,19 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ─────────────────────────────────────────────────────
+    // STEP C: Trigger ElevenLabs voice call for HOT leads
+    // ─────────────────────────────────────────────────────
+    const isHot = (data.lead_score >= 75) || (data.activation_priority === 'Hot');
+    if (isHot && data.phone) {
+      try {
+        await base44.asServiceRole.functions.invoke('triggerVoiceCallToLead', { lead_id: data.id });
+        console.log(`[onLeadCreated] Voice call triggered for HOT lead ${data.id}`);
+      } catch (voiceErr) {
+        console.log('[onLeadCreated] Voice call failed (non-blocking):', voiceErr.message);
+      }
+    }
+
     // Prepare structured webhook payload
     const payload = {
       event: 'lead_created',

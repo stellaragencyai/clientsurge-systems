@@ -229,25 +229,66 @@
     "elevenlabs_agent_ids": {
       "type": "object",
       "title": "ElevenLabs Agent IDs (per industry)",
-      "description": "Maps industry_key \u2192 ElevenLabs agent_id. Set by createElevenLabsAgent admin function.",
+      "description": "Maps industry_key \u2192 ElevenLabs agent_id. Get from ElevenLabs dashboard \u2192 Agents.",
       "properties": {
         "med_spa": {
-          "type": "string"
+          "type": "string",
+          "title": "Med Spa Agent ID"
         },
         "dental": {
-          "type": "string"
+          "type": "string",
+          "title": "Dental Agent ID"
         },
         "chiropractic": {
-          "type": "string"
+          "type": "string",
+          "title": "Chiropractic Agent ID"
         },
         "hvac": {
-          "type": "string"
+          "type": "string",
+          "title": "HVAC Agent ID"
         },
         "roofing": {
-          "type": "string"
+          "type": "string",
+          "title": "Roofing Agent ID"
         },
         "contractors": {
-          "type": "string"
+          "type": "string",
+          "title": "Contractors Agent ID"
+        }
+      }
+    },
+    "elevenlabs_phone_number_ids": {
+      "type": "object",
+      "title": "ElevenLabs Phone Number IDs (per industry)",
+      "description": "Maps industry_key \u2192 ElevenLabs phone_number_id. Get from ElevenLabs dashboard \u2192 Phone Numbers after importing your Twilio number.",
+      "properties": {
+        "med_spa": {
+          "type": "string",
+          "title": "Med Spa Phone Number ID"
+        },
+        "dental": {
+          "type": "string",
+          "title": "Dental Phone Number ID"
+        },
+        "chiropractic": {
+          "type": "string",
+          "title": "Chiropractic Phone Number ID"
+        },
+        "hvac": {
+          "type": "string",
+          "title": "HVAC Phone Number ID"
+        },
+        "roofing": {
+          "type": "string",
+          "title": "Roofing Phone Number ID"
+        },
+        "contractors": {
+          "type": "string",
+          "title": "Contractors Phone Number ID"
+        },
+        "general": {
+          "type": "string",
+          "title": "General / Fallback Phone Number ID"
         }
       }
     }
