@@ -470,7 +470,7 @@ function PricingCard({ plan, demoBooking, selectedIndustry }) {
 
         <div className="mb-7 pb-7 border-b border-border">
           <div className="flex items-end gap-2 mb-1">
-            <span className="text-5xl font-bold text-foreground">{plan.monthly}</span>
+            <span className="text-4xl font-bold text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>{plan.monthly}</span>
             <span className="text-sm text-muted-foreground mb-2">/month</span>
           </div>
           <p className="text-xs text-muted-foreground mb-3">{plan.setup}</p>
