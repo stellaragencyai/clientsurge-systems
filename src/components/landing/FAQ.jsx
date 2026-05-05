@@ -99,7 +99,7 @@ export default function FAQ() {
            Frequently Asked Questions
           </h2>
           <p className="mt-4 text-muted-foreground text-base">
-            Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">See your specific gaps</a> or <a href="#pricing" className="text-primary font-semibold hover:underline">get your custom plan</a>
+            Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">See your specific gaps</a> or <a href="/#pricing" className="text-primary font-semibold hover:underline">get your custom plan</a>
           </p>
           <div className="mt-8 border-t border-border/40" />
         </div>
@@ -129,7 +129,7 @@ export default function FAQ() {
               onClick={() => setCategory(cat)}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-all ${
                 category === cat
-                  ? "bg-primary text-white"
+                  ? "bg-primary text-primary-foreground"
                   : "bg-muted text-foreground hover:bg-muted/80"
               }`}
             >

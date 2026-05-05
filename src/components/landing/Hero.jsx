@@ -90,8 +90,7 @@ export default function Hero() {
               lineHeight: 1.1,
               letterSpacing: "-0.03em",
               color: "#1b140d",
-              marginBottom: "16px",
-              gridColumn: "1 / -1"
+              marginBottom: "16px"
             }}>
             
             Stop Losing Leads to Slow Response —{" "}
@@ -121,7 +120,6 @@ export default function Hero() {
               fontSize: "clamp(0.95rem, 2.2vw, 1.05rem)",
               color: "rgba(27,20,13,0.74)",
               lineHeight: 1.65,
-              marginBottom: "18px",
               maxWidth: "560px",
               margin: "0 0 18px"
             }}>
@@ -131,7 +129,7 @@ export default function Hero() {
 
           <div
             className="landing-hero__checklist hero-checklist"
-            style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px", marginBottom: "32px", maxWidth: "640px", margin: "0 0 32px" }}>
+            style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px", maxWidth: "640px", margin: "0 0 32px" }}>
             
             {checklist.map((item, i) =>
             <CascadingChecklistItem key={item} item={item} index={i} />
@@ -224,7 +222,10 @@ export default function Hero() {
 
 
 
-          {/* iPad shell — Space Gray aluminum body */}
+          {/* Dashboard visual */}
+          <Suspense fallback={null}>
+            <HeroDashboardScreen />
+          </Suspense>
           
 
 

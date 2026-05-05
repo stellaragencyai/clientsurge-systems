@@ -52,10 +52,10 @@ const items = [
   {
     icon: CalendarCheck,
     label: "Average setup time",
-    display: "5-7 business days",
+    display: "24–48 hours",
     animatedValue: null,
     story:
-      "We handle the build, setup, and launch prep so your team is not stuck piecing together tools.",
+      "We handle the full build and launch prep. Most clients are live within 24–48 hours of onboarding.",
   },
   {
     icon: Building2,
@@ -147,7 +147,7 @@ export default function TrustBar() {
             What You Can Expect
           </h2>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
           {items.map((item, index) => (
             <StatCard key={item.label} item={item} index={index} inView={inView} />
           ))}

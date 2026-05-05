@@ -1,4 +1,5 @@
-import { ArrowUp, Mail, Phone, Shield, Zap, MessageSquare, Calendar, RefreshCw } from "lucide-react";
+import { ArrowUp, Mail, Phone, Shield, Zap, MessageSquare, Calendar, RefreshCw, Star } from "lucide-react";
+
 import { useLocation, useNavigate } from "react-router-dom";
 
 const AUTOMATIONS = [
@@ -7,6 +8,7 @@ const AUTOMATIONS = [
   { label: "AI Booking Agent", desc: "Turns conversations into appointments.", href: "/store", icon: Calendar },
   { label: "14-Day Nurture Sequence", desc: "Multi-touch follow-up on autopilot.", href: "/store", icon: MessageSquare },
   { label: "Lead Reactivation", desc: "Wake up cold leads from up to 90 days.", href: "/store", icon: RefreshCw },
+  { label: "Review Request System", desc: "Auto-request reviews after every appointment.", href: "/store", icon: Star },
 ];
 
 const navColumns = [
@@ -78,7 +80,7 @@ export default function Footer() {
       <div style={{ background: "linear-gradient(135deg, #003B8F 0%, #006BB0 50%, #00AEEF 100%)", padding: "40px 24px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "28px" }}>
-            <p style={{ fontSize: "10px", fontWeight: "800", color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 6px" }}>Our 6-System Stack</p>
+            <p style={{ fontSize: "10px", fontWeight: "800", color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 6px" }}>Our Full System Stack</p>
             <h3 style={{ fontSize: "clamp(18px,3vw,26px)", fontWeight: "800", color: "#ffffff", margin: 0, lineHeight: 1.2 }}>
               Every automation you need to convert more leads — done for you.
             </h3>

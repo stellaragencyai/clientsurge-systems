@@ -77,7 +77,7 @@ export default function InteractiveJourneyMap() {
               }}
               onMouseLeave={(e) => {
                 if (expandedNode !== step.id) {
-                  e.currentTarget.style.borderColor = "rgba(0,174,239,0.25)";
+                  e.currentTarget.style.borderColor = "rgba(200,150,92,0.3)";
                   e.currentTarget.style.background = "transparent";
                 }
               }}
@@ -134,7 +134,7 @@ export default function InteractiveJourneyMap() {
         >
           <line x1="0" y1="12" x2="800" y2="12" stroke="rgba(0,174,239,0.25)" strokeWidth="2" />
           <motion.circle
-            cx={`${dotPosition * 8}`}
+            cx={`${Math.min(dotPosition * 7.9, 792)}`}
             cy="12"
             r="6"
             fill="#00AEEF"

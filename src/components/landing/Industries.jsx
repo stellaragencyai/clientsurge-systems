@@ -6,7 +6,8 @@ import {
   Home,
   MapPin,
   Sparkles,
-  Wrench } from
+  Wrench,
+  X } from
 "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDemoBooking } from "./DemoBookingContext";
@@ -162,9 +163,10 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
           <button
           type="button"
           onClick={onClose}
-          className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-black/8 transition-colors text-xl font-light">
+          aria-label="Close"
+          className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-black/8 transition-colors">
           
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -371,20 +373,7 @@ export default function Industries() {
                 }} />
               
 
-              <div className="absolute top-5 left-5 right-5 flex items-start justify-between gap-3">
-                <div className="w-11 h-11 rounded-2xl flex items-center justify-center hidden"
 
-                style={{
-                  background: "rgba(255,255,255,0.16)",
-                  border: "1px solid rgba(255,255,255,0.18)",
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)"
-                }}>
-                  
-                  <Icon style={{ width: "18px", height: "18px", color: "#fff" }} />
-                </div>
-
-              </div>
 
               <div className="absolute bottom-0 inset-x-0 px-5 pb-5 pt-12">
                 <p

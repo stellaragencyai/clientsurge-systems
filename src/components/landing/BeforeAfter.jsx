@@ -30,7 +30,7 @@ export default function BeforeAfter() {
   const demoBooking = useDemoBooking();
 
   return (
-    <section className="py-20 md:py-28 px-6" style={{ background: "transparent" }}>
+    <section id="problem-solution" className="py-20 md:py-28 px-6" style={{ background: "transparent" }}>
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-bold tracking-[0.3em] uppercase mb-4" style={{ color: "#00AEEF" }}>
@@ -55,7 +55,7 @@ export default function BeforeAfter() {
                   ? "linear-gradient(135deg, #0088CC 0%, #00AEEF 100%)"
                   : "rgba(0,174,239,0.08)",
                 color: active === i ? "#ffffff" : "#0088CC",
-                border: active === i ? "none" : "1px solid rgba(0,174,239,0.2)",
+                border: active === i ? "1px solid transparent" : "1px solid rgba(0,174,239,0.2)",
                 boxShadow: active === i ? "0 4px 14px rgba(0,174,239,0.35)" : "none",
               }}
             >

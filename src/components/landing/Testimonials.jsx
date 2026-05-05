@@ -103,10 +103,10 @@ export default function Testimonials() {
                 </span>
               </div>
 
-              <p className="text-sm text-foreground/75 leading-relaxed flex-1 min-h-[72px] mb-6">
+              <div className="text-sm text-foreground/75 leading-relaxed flex-1 mb-6">
                 <div className="flex gap-0.5 mb-2">{[1,2,3,4,5].map(i => <span key={i} style={{fontSize:"13px"}}>⭐</span>)}</div>
                 "{testimonial.quote}"
-              </p>
+              </div>
 
               <div className="flex items-center gap-4">
                 <div
@@ -118,7 +118,7 @@ export default function Testimonials() {
                 </div>
                 <div>
                   <p className="text-sm font-bold text-foreground">{testimonial.name}</p>
-                  <p className="text-xs text-muted-foreground">{testimonial.location}</p>
+                  <p className="text-xs text-muted-foreground">{testimonial.businessType}</p>
                 </div>
               </div>
             </motion.article>

@@ -143,6 +143,7 @@ export default function Navbar() {
 
   return (
     <nav
+      aria-label="Main navigation"
       className="fixed top-0 left-0 right-0 z-50"
       style={{
         paddingTop: "env(safe-area-inset-top)",
@@ -299,7 +300,7 @@ export default function Navbar() {
 
       {open &&
       <>
-          <div className="fixed inset-0 z-40 md:hidden" onClick={() => setOpen(false)} />
+          <div className="fixed inset-0 z-40 md:hidden" aria-hidden="true" onClick={() => setOpen(false)} />
         <div className="md:hidden bg-background border-b border-border px-5 pb-safe-bottom pb-6 pt-2 space-y-1 relative z-50" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
           {sectionLinks.map((link) =>
           link.isPage ?

@@ -191,7 +191,7 @@ export default function Pricing() {
           {[
             { icon: "🔒", text: "Secure Checkout via Stripe" },
             { icon: "✅", text: "No Hidden Fees" },
-            { icon: "⚡️", text: "Live in 24–48 Hours" },
+            { icon: "🤝", text: "Month-to-Month Only" },
           ].map((b) => (
             <span
               key={b.text}
