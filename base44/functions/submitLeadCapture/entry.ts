@@ -30,6 +30,9 @@ function normalizeLeadInput(payload: Record<string, unknown>) {
     problem: sanitizeString(payload.problem),
     website_url: realWebsite,
     honeypot,
+    sms_consent: payload.sms_consent === true || payload.sms_consent === "true" || false,
+    consent_given_at: (payload.sms_consent === true || payload.sms_consent === "true") ? new Date().toISOString() : null,
+    consent_ip: sanitizeString(payload.consent_ip || payload.client_ip) || null,
   };
 }
 
@@ -45,6 +48,9 @@ function buildLeadPayload(lead: ReturnType<typeof normalizeLeadInput>, status: s
     source: LEAD_SOURCE,
     intake_type: INTAKE_TYPE,
     status,
+    sms_consent: lead.sms_consent || false,
+    consent_given_at: lead.consent_given_at || null,
+    consent_ip: lead.consent_ip || null,
   };
 }
 
@@ -314,3 +320,4 @@ Deno.serve(async (req) => {
     return Response.json({ error: message }, { status: 500 });
   }
 });
+
