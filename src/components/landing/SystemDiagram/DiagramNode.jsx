@@ -40,7 +40,7 @@ export default function DiagramNode({ node, isActive, isHighlighted, onClick, st
           justifyContent: "center",
           gap: "2px",
           background: "#ffffff",
-          border: `2.5px solid ${isActive ? node.color : node.color + "55"}`,
+          border: `2.5px solid ${node.color}`,
           boxShadow: isActive
             ? `0 0 0 6px ${node.color}22, 0 8px 24px ${node.color}44`
             : isHighlighted
