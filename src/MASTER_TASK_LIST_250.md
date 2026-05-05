@@ -1458,3 +1458,250 @@ PHASE 7 — Admin UI
 | 542 | ⏳ | All functions: correct HTTP status codes (400/404/500) | HIGH |
 | 543 | ⏳ | enrichLead: 10-second timeout on external API calls | MEDIUM |
 | 544 | ⏳ | scoreLeadIntelligence: skip if confidence < 0.6 | MEDIUM |
+
+---
+
+---
+
+# 📋 PRE-LAUNCH 100 TASKS (Merged from PRE_LAUNCH_100_TASKS.md)
+> Originally a separate file. Merged 2026-05-05. Cross-reference with master list above — items already completed above are marked ✅ here.
+
+## 🌐 FRONTEND — HOMEPAGE & LANDING
+
+| # | Status | Task | Fix |
+|---|---|---|---|
+| PL-1 | ✅ | Store hero h1 color invisible on white bg | Change to `#1b140d` |
+| PL-2 | ✅ | Store hero subtitle text barely visible | Change to `rgba(27,20,13,0.75)` |
+| PL-3 | ✅ | Store search debounce broken — uses raw setSearch | Use `handleSearchChange` in onChange |
+| PL-4 | ⏳ | Social Proof Ticker uses fake/mocked purchase data | Replace with real Order entity data |
+| PL-5 | ⏳ | Testimonials section has no real client photos | Add real or AI-generated avatars |
+| PL-6 | ⏳ | Homepage missing Testimonials section entirely | Add `<Testimonials />` between BeforeAfter and FinalCTA |
+| PL-7 | ⏳ | No "About Us" / founder story section | Add founder section before FAQ |
+| PL-8 | ⏳ | Pricing links to Stripe but in test mode | Switch to live Stripe keys before launch |
+| PL-9 | ✅ | No cookie consent / GDPR banner | Wire CookieConsent into pages/Home.jsx |
+| PL-10 | ✅ | No exit-intent popup | Wire ExitIntentPopup into pages/Home.jsx |
+| PL-11 | ⏳ | ChatBubble AI has no rate limiting on frontend | Debounce/disable send button for 2s |
+| PL-12 | ⏳ | Mobile: Navbar height 100px too tall | Reduce to 72px on mobile |
+| PL-13 | ⏳ | Store page background conflicts on scroll | Set consistent white/light background |
+| PL-14 | ⏳ | BeforeAfter component — verify renders on touch | Test slider on touch devices |
+| PL-15 | ⏳ | InteractiveJourneyMap — verify all steps clickable | Review each step copy, icon, click |
+| PL-16 | ⏳ | FAQ search filter loses focus on mobile | Add autoFocus=false, test iOS Safari |
+| PL-17 | ⏳ | IntegrationPartners logos not loading | Add onerror fallback to each img |
+| PL-18 | ⏳ | No noscript fallback for JS-disabled users | Add noscript tag to index.html |
+| PL-19 | ⏳ | All CTA buttons say "Book a Demo" — no variety | Add "See Pricing", "Get Started", "View Services" variants |
+| PL-20 | ⏳ | LeadLeakage stat numbers are hardcoded | Add CountUp animation on scroll entry |
+
+## 🛒 STORE & PRODUCT CHECKOUT
+
+| # | Status | Task | Fix |
+|---|---|---|---|
+| PL-21 | ⏳ | Stripe Checkout in test mode | Switch to live keys before launch |
+| PL-22 | ⏳ | Order success page shows generic message | Confirm sessionStorage order data reads correctly |
+| PL-23 | ⏳ | Cart items persist oddly across sessions | Verify sessionStorage clears correctly on new visit |
+| PL-24 | ⏳ | No upsell at checkout | Suggest 1 complementary add-on in CartSidebar |
+| PL-25 | ✅ | Cart shows "$0 setup" — confusing | Display "No setup fee" if setup_fee === 0 |
+| PL-26 | ⏳ | No email confirmation after checkout | Trigger sendLeadConfirmationEmail in stripeWebhookOrders |
+| PL-27 | ⏳ | No admin notification on new purchase | Add sendAdminLeadNotification in stripeWebhookOrders |
+| PL-28 | ⏳ | Stripe webhook not verified in prod | Verify STRIPE_WEBHOOK_SECRET + constructEventAsync |
+| PL-29 | ⏳ | ProductCard "Popular" badge overlaps on mobile | Position absolute top:-10px right:10px z-index:10 |
+| PL-30 | ⏳ | ServiceDetailModal CTA has duplicate style prop | Merge both style objects into one |
+| PL-31 | ✅ | CartSidebar "loading" hangs indefinitely on failure | Add 12s timeout fallback |
+| PL-32 | ⏳ | createCheckoutSession missing base44_app_id metadata | Add metadata.base44_app_id |
+| PL-33 | ⏳ | No quantity selector — document "1 license" clearly | Add "1 license per service" label in UI |
+| PL-34 | ⏳ | Bundle savings toast fires every add | Add sessionStorage flag to show once per session |
+| PL-35 | ⏳ | No refund/cancel policy before checkout | Add one-liner below Stripe button |
+
+## 🔐 AUTH & USER ACCOUNTS
+
+| # | Status | Task | Fix |
+|---|---|---|---|
+| PL-36 | ⏳ | Login modal — verify handles wrong credentials | Test bad login shows error |
+| PL-37 | ⏳ | No "Forgot Password" flow | Add link in PortalLoginModal |
+| PL-38 | ⏳ | ClientPortal unauthenticated — no redirect message | Confirm spinner shows before redirect |
+| PL-39 | ⏳ | No onboarding flow for newly registered clients | Detect onboarding_wizard_completed=false → redirect |
+| PL-40 | ⏳ | Admin panel has no 2FA or IP restriction | Add secondary password modal or domain restriction |
+| PL-41 | ⏳ | User invite shows no confirmation | Toast "Invite sent to [email]" after inviteUser() |
+| PL-42 | ⏳ | No session timeout | Implement 24hr auto-logout warning |
+| PL-43 | ✅ | Client portal shows no data for new unlinked users | Friendly empty state shown |
+| PL-44 | ⏳ | /client-dashboard and /client-portal both exist | Consolidate to /portal, redirect other |
+| PL-45 | ⏳ | No email verification before accessing portal | Add banner for unverified users |
+
+## 🛠️ ADMIN PANEL & DASHBOARD
+
+| # | Status | Task | Fix |
+|---|---|---|---|
+| PL-46 | ⏳ | Admin panel has no loading skeleton | Add Suspense fallback with AdminLoadingSkeleton |
+| PL-47 | ⏳ | AdminDashboard shows all leads regardless of role | Filter by assigned_to === user.email unless super-admin |
+| PL-48 | ⏳ | Install Queue panel has no Refresh button | Add refresh icon button |
+| PL-49 | ⏳ | No audit log for admin actions | Log key actions to CommunicationEvent entity |
+| PL-50 | ⏳ | Admin can delete orders with no confirmation | Add DeleteConfirmModal before destructive ops |
+| PL-51 | ⏳ | AutomationInstallChecklist steps have no timestamps | Add completed_at field + display in UI |
+| PL-52 | ⏳ | Admin onboarding form has no phone validation | Add US phone regex before form submit |
+| PL-53 | ⏳ | No search in Admin Leads table | Add search bar filtering by name/email/phone |
+| PL-54 | ⏳ | Leads table has no CSV export | Add Export CSV button |
+| PL-55 | ⏳ | CommunicationEvent logs not paginated | Add skip/limit pagination to CommunicationLogsPanel |
+| PL-56 | ⏳ | Admin settings panel has no Save confirmation | Add success toast after updateAdminSettings |
+| PL-57 | ⏳ | InstallOrderWorkspace has no "Live" visual indicator | Show green "Live" badge where install_status === "Live" |
+| PL-58 | ⏳ | No admin notification when client completes onboarding | Entity automation on OnboardingSubmission create |
+| PL-59 | ⏳ | Revenue dashboard shows $0 — Stripe data not flowing | Test stripeWebhookOrders end-to-end |
+| PL-60 | ⏳ | No way to resend welcome email from admin | Add "Resend Welcome Email" button → sendPortalWelcomeEmail |
+
+## 📧 EMAILS & COMMUNICATIONS
+
+| # | Status | Task | Fix |
+|---|---|---|---|
+| PL-61 | ⏳ | RESEND_FROM_EMAIL set but "From Name" not configured | Add from_name: "ClientSurge Systems" to all Resend calls |
+| PL-62 | ⏳ | Demo confirmation email has unresolved {{business_name}} | Audit sendDemoConfirmationEmail template variables |
+| PL-63 | ⏳ | No SMS confirmation sent to client after checkout | Trigger sendSMS to customer_phone in stripeWebhookOrders |
+| PL-64 | ⏳ | Twilio from number hardcoded in some functions | Audit all sendSMS calls — use Deno.env.get("TWILIO_PHONE_NUMBER") |
+| PL-65 | ✅ | No STOP unsubscribe in SMS sequences | "Reply STOP" appended + STOP handling in receiveTwilioInboundSms |
+| PL-66 | ⏳ | Email templates have no plain-text fallback | Add text: field to all Resend fetch calls |
+| PL-67 | ⏳ | Nurture emails don't respect client timezone | Store timezone in Client entity, offset processNurtureCampaigns |
+| PL-68 | ⏳ | No email preview for admin before campaigns | Add "Send Preview" button in email template editor |
+| PL-69 | ⏳ | AdminSettings.lead_notification_email may be empty | Fallback to ADMIN_EMAIL env var |
+| PL-70 | ⏳ | Drip campaign doesn't check if lead already booked | Check lead.status === "Booked" and skip in processDripCampaigns |
+
+## ⚙️ BACKEND FUNCTIONS & AUTOMATIONS
+
+| # | Status | Task | Fix |
+|---|---|---|---|
+| PL-71 | ⏳ | onLeadCreated may fire multiple times for duplicates | Dedup check via dedup_key before dispatching |
+| PL-72 | ⏳ | processWebsiteLeadFollowUps — verify it's running | Check automation list, confirm cron is active |
+| PL-73 | ⏳ | scheduleFollowUpSMS sends at any hour | Add business hours check before sending |
+| PL-74 | ⏳ | installPipeline has no timeout handling | Add 30s timeout with error logging |
+| PL-75 | ⏳ | discoverLeads Google Maps API key not set | Set key as secret, add error handling |
+| PL-76 | ✅ | autoEndToEndTest has no admin guard | Admin role check added |
+| PL-77 | ✅ | getClientPortalContext doesn't handle missing Order | Returns structured empty state |
+| PL-78 | ⏳ | No rate limiting on submitLeadCapture | Use rateLimit utility — 3/IP/hour |
+| PL-79 | ⏳ | chatBubbleAI has no content filtering | Add prompt-injection guard + sanitize input |
+| PL-80 | ⏳ | webhookLeadCapture has no signature verification | Validate X-Webhook-Secret header |
+
+## 🔍 SEO & PERFORMANCE
+
+| # | Status | Task | Fix |
+|---|---|---|---|
+| PL-81 | ✅ | robots.txt missing admin/portal blocks | Updated with Disallow rules |
+| PL-82 | ✅ | sitemap.xml missing industry pages | All 6 industry pages added |
+| PL-83 | ⏳ | OG image not set | Add og:image meta to index.html |
+| PL-84 | ⏳ | Page titles generic on industry sub-pages | Set unique title per industry via setPageMetadata() |
+| PL-85 | ⏳ | No canonical tag on redirect pages | Add canonical URLs in setPageMetadata() |
+| PL-86 | ⏳ | Images missing width/height — causes CLS | Add explicit width/height to all img tags |
+| PL-87 | ⏳ | Google Analytics not installed | Add GA4 tracking in index.html or main.jsx |
+| PL-88 | ⏳ | No structured data on industry pages | Add LocalBusiness JSON-LD schema |
+| PL-89 | ⏳ | Font loading via @import slows FCP | Move Google Fonts link to index.html head with preload |
+| PL-90 | ⏳ | Lazy-loaded sections have no min-height | Add min-height to Suspense skeletons |
+
+## 🔒 LEGAL & COMPLIANCE
+
+| # | Status | Task | Fix |
+|---|---|---|---|
+| PL-91 | ⏳ | Privacy Policy may not cover SMS/AI data usage | Legal review for Twilio SMS + AI processing coverage |
+| PL-92 | ⏳ | Terms don't mention subscription auto-renewal | Add recurring billing / cancellation section |
+| PL-93 | ⏳ | No consent checkbox on lead capture forms | Add SMS opt-in checkbox with Privacy Policy link (TCPA) |
+| PL-94 | ✅ | Contact form has no privacy disclaimer | Privacy link added |
+| PL-95 | ⏳ | No accessibility audit done | Run axe-core / Lighthouse — fix WCAG AA violations |
+
+## 🚀 DEPLOYMENT & OPS
+
+| # | Status | Task | Fix |
+|---|---|---|---|
+| PL-96 | ⏳ | No staging environment | Use Base44 Test Database for all pre-launch testing |
+| PL-97 | ⏳ | APP_URL secret may be set to localhost | Verify APP_URL = production domain |
+| PL-98 | ⏳ | No uptime monitoring | Set up UptimeRobot / Better Stack on healthCheck endpoint |
+| PL-99 | ⏳ | No backup strategy for entity data | Document Base44 backups + monthly export to Google Sheets |
+| PL-100 | ⏳ | No post-launch rollback plan | Create go-live runbook: Stripe live → test checkout → webhook → emails → monitor 24hr |
+
+---
+
+---
+
+# 📋 AUTOMATION COMPLETION CHECKLIST (Merged from PROJECT_COMPLETION_CHECKLIST.md)
+> Originally a separate file. Merged 2026-05-05. Focus: Twilio/SMS/Email integration testing.
+
+## PRIORITY 1: WEBHOOK & INTEGRATION SETUP (5 tasks) — CRITICAL PATH
+
+| # | Status | Task | Effort | Blocker |
+|---|---|---|---|---|
+| AC-1 | ⏳ | Configure Twilio Webhook for Inbound SMS Replies — set URL in Twilio console → Phone Numbers → Messaging → "A message comes in" | 15 min | Yes (#AC-3) |
+| AC-2 | ⏳ | Configure Twilio Webhook for Inbound Calls — set URL → Voice → "A call comes in" | 15 min | Yes (#AC-4) |
+| AC-3 | ⏳ | Test Live SMS Reply Capture — send SMS to Twilio number, verify WebsiteLead.reply_status="responded", automation_enabled=false, CommunicationEvent created | 30 min | Needs AC-1 |
+| AC-4 | ⏳ | Test Live Missed Call Recovery — simulate missed call, verify 2min SMS → 10min email → 1hr SMS → 24hr email sequence | 45 min | Needs AC-2 |
+| AC-5 | ⏳ | Validate Resend Email Delivery + Bounce Handling — send test emails, check Resend logs, verify bounce webhook logs email_failed | 30 min | No |
+
+## PRIORITY 2: COMMUNICATION LOGS & TROUBLESHOOTING (4 tasks)
+
+| # | Status | Task | Effort | Blocker |
+|---|---|---|---|---|
+| AC-6 | ⏳ | Test CommunicationLogsPanel with failed webhook events — filter by "failed", verify error messages display | 20 min | No |
+| AC-7 | ⏳ | Test manual lead reassignment from unmatched SMS modal | 25 min | Needs AC-6 |
+| AC-8 | ⏳ | Add filtering for email_sent/email_failed events in CommunicationLogsPanel | 15 min | Needs AC-6 |
+| AC-9 | ⏳ | Add Export/Download CSV functionality for communication logs | 30 min | Needs AC-8 |
+
+## PRIORITY 3: WEBSITE LEAD AUTOMATION (5 tasks)
+
+| # | Status | Task | Effort | Blocker |
+|---|---|---|---|---|
+| AC-10 | ⏳ | Test WebsiteLeadsDashboard with 50+ test leads — pagination, filtering, sorting | 20 min | No |
+| AC-11 | ⏳ | Verify immediate SMS + email sends on form submission within 60 sec | 25 min | No |
+| AC-12 | ⏳ | Verify 3-step follow-up sequence timing: 10min SMS, 1hr email, 24hr SMS | 120 min | No |
+| AC-13 | ⏳ | Test automation stop when lead replies by SMS | 30 min | Needs AC-11 |
+| AC-14 | ⏳ | Test automation stop when lead books appointment | 15 min | No |
+
+## PRIORITY 4: MISSED CALL RECOVERY (4 tasks)
+
+| # | Status | Task | Effort | Blocker |
+|---|---|---|---|---|
+| AC-15 | ⏳ | End-to-end test: missed call → instant SMS → full 4-step follow-up sequence | 90 min | Needs AC-2, AC-4 |
+| AC-16 | ⏳ | Verify old lead reactivation campaign logic | 45 min | No |
+| AC-17 | ⏳ | Test closed/booked lead protection — no reactivation | 20 min | No |
+| AC-18 | ⏳ | Verify duplicate call handling idempotency (same CallSid processed once) | 20 min | Needs AC-4 |
+
+## PRIORITY 5: ADMIN ENHANCEMENTS (3 tasks)
+
+| # | Status | Task | Effort | Blocker |
+|---|---|---|---|---|
+| AC-19 | ⏳ | Add unread webhook error badge to Communication Logs nav item | 20 min | Needs AC-8 |
+| AC-20 | ⏳ | Build Automation Health Check Dashboard — success/fail rates per automation type | 60 min | No |
+| AC-21 | ⏳ | Add drill-down analytics: SMS delivery rate, reply rate by lead source | 90 min | No |
+
+## PRIORITY 6: CLIENT PORTAL UX (4 tasks)
+
+| # | Status | Task | Effort | Blocker |
+|---|---|---|---|---|
+| AC-22 | ⏳ | Build Lead Dashboard Widget showing reply status breakdown (pie/bar chart) | 40 min | No |
+| AC-23 | ⏳ | Build live notification toast when inbound SMS/call received | 45 min | No |
+| AC-24 | ⏳ | Add "Pause Automation" toggle per lead in client portal | 20 min | No |
+| AC-25 | ⏳ | Build Custom Message Templates UI for clients (5 templates + variable insertion) | 90 min | No |
+
+## PRIORITY 7: BACKEND RELIABILITY (3 tasks)
+
+| # | Status | Task | Effort | Blocker |
+|---|---|---|---|---|
+| AC-26 | ⏳ | Add retry logic to failed SMS/email sends (exponential backoff: 1min, 5min, 30min) | 60 min | No |
+| AC-27 | ⏳ | Add dead-letter queue for failed webhook processing | 45 min | No |
+| AC-28 | ⏳ | Build health check endpoint returning last_run_at, success/fail counts per automation | 40 min | No |
+
+## PRIORITY 8: TESTING & QA (2 tasks)
+
+| # | Status | Task | Effort | Blocker |
+|---|---|---|---|---|
+| AC-29 | ⏳ | Load test: simulate 1000 SMS replies in 1 minute — p95 < 2s | 90 min | No |
+| AC-30 | ⏳ | Security audit: validate all webhook Twilio signatures + admin auth guards | 30 min | No |
+
+## PRIORITY 9: MONITORING (2 tasks)
+
+| # | Status | Task | Effort | Blocker |
+|---|---|---|---|---|
+| AC-31 | ⏳ | Set up automated alerts for webhook failures > 5% in 10min window | 45 min | No |
+| AC-32 | ⏳ | Build metrics dashboard: SMS sent/delivered/failed rates by day (30-day trend chart) | 60 min | No |
+
+## PRIORITY 10: DOCUMENTATION (1 task)
+
+| # | Status | Task | Effort | Blocker |
+|---|---|---|---|---|
+| AC-33 | ⏳ | Create comprehensive Admin Runbook + Troubleshooting Guide (ADMIN_RUNBOOK.md) | 120 min | No |
+
+---
+
+*Merged from PRE_LAUNCH_100_TASKS.md + PROJECT_COMPLETION_CHECKLIST.md — 2026-05-05*
+*Total merged tasks: 100 (PL) + 33 (AC) = 133 additional tasks appended to master list*
