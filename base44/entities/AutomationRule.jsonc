@@ -49,14 +49,12 @@
               "greater_than",
               "less_than",
               "contains",
-              "in_range"
+              "in_range",
+              "exists"
             ]
           },
           "value": {
-            "type": [
-              "string",
-              "number"
-            ]
+            "type": "string"
           }
         }
       },

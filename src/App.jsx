@@ -70,6 +70,10 @@ const PUBLIC_PATHS = [
   "/contact",
   "/leads/capture",
   "/onboarding",
+  "/setup",
+  "/setup/credentials",
+  "/thank-you",
+  "/about",
 ];
 
 const NOINDEX_PREFIXES = [
@@ -231,9 +235,24 @@ const fullScreenLoader = (
 );
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
+  const {
+    isLoadingAuth,
+    isLoadingPublicSettings,
+    authError,
+    checkAppState,
+    preparePublicRoute,
+  } = useAuth();
   const location = useLocation();
   const publicRoute = isPublicPath(location.pathname);
+
+  useEffect(() => {
+    if (publicRoute) {
+      preparePublicRoute();
+      return;
+    }
+
+    checkAppState();
+  }, [checkAppState, preparePublicRoute, publicRoute]);
 
   if ((isLoadingPublicSettings || isLoadingAuth) && !publicRoute) {
     return (
@@ -358,3 +377,5 @@ function App() {
 }
 
 export default App;
+
+

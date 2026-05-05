@@ -110,7 +110,7 @@ function generateRulesForMode(mode) {
         rule_name: "Route hot leads to sales",
         trigger_type: "lead_scored",
         conditions: [
-          { field: "lead_score", operator: "greater_than", value: 75 },
+          { field: "lead_score", operator: "greater_than", value: "75" },
         ],
         actions: [{ action_type: "invoke_function", params: { function: "routeToOptimalTeamMember" } }],
         priority: 8,
@@ -131,7 +131,7 @@ function generateRulesForMode(mode) {
       {
         rule_name: "Send instant response",
         trigger_type: "lead_created",
-        conditions: [{ field: "phone", operator: "exists", value: null }],
+        conditions: [{ field: "phone", operator: "exists", value: "true" }],
         actions: [{ action_type: "send_sms", params: { template: "instant_response" } }],
         priority: 8,
       },

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 import { createAxiosClient } from "@base44/sdk/dist/utils/axios-client";
 import { base44 } from "@/api/base44Client";
 import { appParams } from "@/lib/app-params";
@@ -32,11 +32,32 @@ export const AuthProvider = ({ children }) => {
   const [authError, setAuthError] = useState(null);
   const [appPublicSettings, setAppPublicSettings] = useState(null);
 
-  useEffect(() => {
-    checkAppState();
+  const checkUserAuth = useCallback(async () => {
+    try {
+      setIsLoadingAuth(true);
+      const currentUser = await base44.auth.me();
+      setUser(currentUser);
+      setIsAuthenticated(true);
+      setIsLoadingAuth(false);
+    } catch (error) {
+      if (error.status !== 401 && error.status !== 403) {
+        console.error("User auth check failed:", error);
+      }
+
+      setUser(null);
+      setIsLoadingAuth(false);
+      setIsAuthenticated(false);
+
+      if (error.status === 401 || error.status === 403) {
+        setAuthError({
+          type: "auth_required",
+          message: "Authentication required",
+        });
+      }
+    }
   }, []);
 
-  const checkAppState = async () => {
+  const checkAppState = useCallback(async () => {
     const portalTestFixture = readPortalTestFixture();
     if (portalTestFixture?.user && isPortalTestModeEnabled()) {
       setUser(portalTestFixture.user);
@@ -86,6 +107,7 @@ export const AuthProvider = ({ children }) => {
         } else {
           setIsLoadingAuth(false);
           setIsAuthenticated(false);
+          setUser(null);
         }
 
         setIsLoadingPublicSettings(false);
@@ -130,30 +152,15 @@ export const AuthProvider = ({ children }) => {
       setIsLoadingPublicSettings(false);
       setIsLoadingAuth(false);
     }
-  };
+  }, [checkUserAuth]);
 
-  const checkUserAuth = async () => {
-    try {
-      setIsLoadingAuth(true);
-      const currentUser = await base44.auth.me();
-      setUser(currentUser);
-      setIsAuthenticated(true);
-      setIsLoadingAuth(false);
-    } catch (error) {
-      console.error("User auth check failed:", error);
-      setIsLoadingAuth(false);
-      setIsAuthenticated(false);
+  const preparePublicRoute = useCallback(() => {
+    setIsLoadingPublicSettings(false);
+    setIsLoadingAuth(false);
+    setAuthError(null);
+  }, []);
 
-      if (error.status === 401 || error.status === 403) {
-        setAuthError({
-          type: "auth_required",
-          message: "Authentication required",
-        });
-      }
-    }
-  };
-
-  const logout = (shouldRedirect = true) => {
+  const logout = useCallback((shouldRedirect = true) => {
     if (!appParams.hasBase44AppId) {
       setUser(null);
       setIsAuthenticated(false);
@@ -181,15 +188,15 @@ export const AuthProvider = ({ children }) => {
     } else {
       base44.auth.logout();
     }
-  };
+  }, []);
 
-  const navigateToLogin = () => {
+  const navigateToLogin = useCallback(() => {
     if (!appParams.hasBase44AppId) {
       return;
     }
 
     base44.auth.redirectToLogin(window.location.href);
-  };
+  }, []);
 
   return (
     <AuthContext.Provider
@@ -205,6 +212,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         navigateToLogin,
         checkAppState,
+        preparePublicRoute,
       }}
     >
       {children}

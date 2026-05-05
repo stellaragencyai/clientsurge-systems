@@ -81,6 +81,45 @@ Deno.serve(async (req) => {
   }
 });
 
+function parseConditionValue(rawValue, leadValue, operator) {
+  if (operator === "in_range") {
+    if (Array.isArray(rawValue)) {
+      return rawValue.map((item) => Number(item));
+    }
+
+    if (typeof rawValue === "string") {
+      try {
+        const parsed = JSON.parse(rawValue);
+        if (Array.isArray(parsed)) {
+          return parsed.map((item) => Number(item));
+        }
+      } catch {
+        const parts = rawValue.split(",").map((item) => Number(item.trim()));
+        if (parts.length === 2 && parts.every((item) => !Number.isNaN(item))) {
+          return parts;
+        }
+      }
+    }
+
+    return [];
+  }
+
+  if (operator === "greater_than" || operator === "less_than") {
+    return Number(rawValue);
+  }
+
+  if (typeof leadValue === "number") {
+    const parsedNumber = Number(rawValue);
+    return Number.isNaN(parsedNumber) ? rawValue : parsedNumber;
+  }
+
+  if (typeof leadValue === "boolean") {
+    return String(rawValue).toLowerCase() === "true";
+  }
+
+  return rawValue;
+}
+
 function checkConditions(conditions, lead) {
   if (!conditions || conditions.length === 0) return true;
 
@@ -88,18 +127,19 @@ function checkConditions(conditions, lead) {
     if (!lead) return true;
 
     const value = lead[cond.field];
+    const expectedValue = parseConditionValue(cond.value, value, cond.operator);
 
     switch (cond.operator) {
       case "equals":
-        return value === cond.value;
+        return value === expectedValue;
       case "greater_than":
-        return value > cond.value;
+        return Number(value) > expectedValue;
       case "less_than":
-        return value < cond.value;
+        return Number(value) < expectedValue;
       case "contains":
-        return String(value).includes(String(cond.value));
+        return String(value).includes(String(expectedValue));
       case "in_range":
-        return value >= cond.value[0] && value <= cond.value[1];
+        return expectedValue.length === 2 && Number(value) >= expectedValue[0] && Number(value) <= expectedValue[1];
       case "exists":
         return value !== null && value !== undefined;
       default:

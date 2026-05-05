@@ -12,7 +12,8 @@ export default defineConfig({
       legacySDKImports: process.env.BASE44_LEGACY_SDK_IMPORTS === 'true',
       hmrNotifier: true,
       navigationNotifier: true,
-      analyticsTracker: true,
+      // Public marketing pages should not emit Base44 app-log requests when the endpoint is unavailable.
+      analyticsTracker: false,
       visualEditAgent: true
     }),
     react(),
