@@ -7,10 +7,11 @@ import { useState, useEffect, useCallback } from "react";
 import {
   CheckCircle2, XCircle, AlertTriangle, RefreshCw, Zap, Loader2,
   Clock, Activity, MessageSquare, Mail, CreditCard, ClipboardList,
-  ExternalLink, ChevronDown, ChevronUp, Shield
+  ExternalLink, ChevronDown, ChevronUp, Shield, AlertCircle
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import AutomationAlertsPanel from "./AutomationAlertsPanel";
+import FailedEventsPanel from "./FailedEventsPanel";
 
 const PROVIDER_ICONS = {
   twilio: MessageSquare,
@@ -183,20 +184,24 @@ export default function IntegrationHealthDashboard() {
   const [error, setError] = useState("");
   const [lastChecked, setLastChecked] = useState(null);
   const [checkResult, setCheckResult] = useState(null);
+  const [activeTab, setActiveTab] = useState("overview"); // "overview" | "failed"
+  const [failedCount, setFailedCount] = useState(0);
 
   const loadHealth = useCallback(async () => {
     try {
       setError("");
-      const [healthRes, tasksRes] = await Promise.all([
+      const [healthRes, tasksRes, failedEvts] = await Promise.all([
         base44.functions.invoke("getIntegrationHealth", {}),
         base44.entities.ProjectTask.filter(
           { domain: "D09_DevOps_Monitoring", status: "pending" },
           "-created_date",
           20
         ),
+        base44.entities.CommunicationEvent.filter({ status: "failed" }, "-created_date", 5),
       ]);
       setData(healthRes.data);
       setFixItTasks((tasksRes || []).filter(t => t.title?.includes("Integration Alert")));
+      setFailedCount((failedEvts || []).length);
       setLastChecked(new Date());
     } catch (err) {
       setError(err?.response?.data?.error || err?.message || "Failed to load health data");
@@ -269,6 +274,30 @@ export default function IntegrationHealthDashboard() {
         </div>
       </div>
 
+      {/* Tab switcher */}
+      <div className="flex gap-1 p-1 bg-muted rounded-xl w-fit">
+        <button
+          onClick={() => setActiveTab("overview")}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === "overview" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          <Activity className="w-4 h-4" /> Overview
+        </button>
+        <button
+          onClick={() => setActiveTab("failed")}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === "failed" ? "bg-white text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+        >
+          <AlertCircle className="w-4 h-4" /> Failed Events
+          {failedCount > 0 && (
+            <span className="rounded-full text-[10px] font-bold px-1.5 py-0.5 bg-red-100 text-red-700">
+              {failedCount}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {activeTab === "failed" && <FailedEventsPanel />}
+
+      {activeTab === "overview" && <>
       {/* Status Banner */}
       {!loading && (
         <div className={`rounded-xl border-2 p-4 flex items-center gap-3 ${
@@ -407,6 +436,7 @@ export default function IntegrationHealthDashboard() {
           <p>The system runs <code className="bg-muted px-1 rounded">runIntegrationHealthCheck</code> every hour. If Twilio, Resend, or Stripe fail 3+ times in 6 hours, a fix-it task is automatically created in the Task Board and deduplicated within 24 hours.</p>
         </div>
       </div>
+      </>}
     </div>
   );
 }
