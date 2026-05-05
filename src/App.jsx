@@ -235,6 +235,7 @@ const AuthenticatedApp = () => {
       <Route path="/about" element={<About />} />
       <Route path="/automations" element={<AutomationsDemo />} />
       <Route path="/setup/credentials" element={<CredentialsSetup />} />
+      <Route path="/services/:serviceSlug" element={<Navigate to="/store" replace />} />
       <Route path="/:slug" element={<IndustryTemplate />} />
 
       <Route
