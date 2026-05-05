@@ -4,6 +4,7 @@ import {
   CheckCircle2, Clock, Loader2, Zap, Upload, X, FileText,
   MessageCircle, Send, ImageIcon, Paperclip, ChevronDown, ChevronUp
 } from "lucide-react";
+import OnboardingTracker from "./OnboardingTracker";
 
 // ─── STEP CONFIG ────────────────────────────────────────────────────────────
 const STEPS = [
@@ -548,6 +549,7 @@ export default function SetupProgressHub({ project, order, user }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <OnboardingTracker project={projectState} order={order} />
       <ProgressSection project={projectState} />
       <AssetUploader project={projectState} onUploaded={() => {}} />
       <InlineChat project={projectState} user={user} />
