@@ -112,6 +112,11 @@ Runs after mirror update:
    - shared UI surfaces currently in flight
 4. Output `safe`, `review`, or `conflict`
 
+The current scripts now support this directly by passing an active branch reference into the mirror update cycle. The classifier report is written to:
+
+- `logs/base44-sync/<machine>/latest-overlap.json`
+- `logs/base44-sync/<machine>/latest-overlap.txt`
+
 ### Scheduler C: Optional reminder for Base44 publish
 
 This should be a reminder, not an automatic publish.
@@ -174,3 +179,13 @@ Classification meanings:
 - `safe`: no incoming overlap and no critical-path review signal
 - `review`: incoming changes need human review before ingestion
 - `conflict`: incoming changes overlap active work in critical files
+
+To install the scheduled task with overlap reports for an active branch:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\sync\install-base44-sync-task.ps1 `
+  -RepoPath "C:\path\to\repo" `
+  -MirrorPath "C:\path\to\mirror" `
+  -ActiveRef "codex/launch-main-clean" `
+  -IntervalMinutes 15
+```

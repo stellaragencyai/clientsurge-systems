@@ -3,7 +3,8 @@ param(
     [string]$MirrorPath,
     [string]$MirrorBranch = "codex/base44-main-mirror",
     [int]$IntervalMinutes = 15,
-    [string]$TaskName = "ClientSurge-Base44-SyncMirror"
+    [string]$TaskName = "ClientSurge-Base44-SyncMirror",
+    [string]$ActiveRef = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -36,13 +37,14 @@ $escapedScript = '"' + $scriptPath + '"'
 $escapedRepo = '"' + $repo + '"'
 $escapedMirror = '"' + $MirrorPath + '"'
 $escapedBranch = '"' + $MirrorBranch + '"'
+$escapedActiveRef = '"' + $ActiveRef + '"'
 
 $runnerDir = Join-Path $env:LOCALAPPDATA "ClientSurge"
 $runnerPath = Join-Path $runnerDir "base44-sync-runner.ps1"
 New-Item -ItemType Directory -Path $runnerDir -Force | Out-Null
 
 $runnerContent = @"
-& $escapedScript -RepoPath $escapedRepo -MirrorPath $escapedMirror -MirrorBranch $escapedBranch
+& $escapedScript -RepoPath $escapedRepo -MirrorPath $escapedMirror -MirrorBranch $escapedBranch$(if (-not [string]::IsNullOrWhiteSpace($ActiveRef)) { " -ActiveRef $escapedActiveRef" } else { "" })
 "@
 
 Set-Content -Path $runnerPath -Value $runnerContent -Encoding UTF8
