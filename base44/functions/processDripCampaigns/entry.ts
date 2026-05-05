@@ -128,6 +128,13 @@ Deno.serve(async (req) => {
           continue;
         }
 
+        // #29: Stop if lead opted out via STOP keyword
+        if (lead.sms_opted_out || lead.automation_enabled === false) {
+          await base44.asServiceRole.entities.DripCampaign.update(campaign.id, { status: "stopped", stop_reason: "sms_opt_out" });
+          results.stopped++;
+          continue;
+        }
+
         // Stop if lead reached a terminal status
         if (STOP_STATUSES.includes(lead.status)) {
           const stopReason = lead.status === "Qualified" ? "qualified"
@@ -262,3 +269,4 @@ Deno.serve(async (req) => {
     return Response.json({ error: error.message || "Failed to process drip campaigns" }, { status: 500 });
   }
 });
+
