@@ -1,14 +1,19 @@
 import { useState, useEffect, useRef } from "react";
-import { ArrowRight, Zap, Phone, Mail, Calendar, Star, RefreshCw } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowRight, Zap, PhoneMissed, MailCheck, CalendarCheck, Star, Repeat2,
+  FileInput, Brain, MessageSquare, Mail, Clock, CheckCircle, Phone,
+  Send, RotateCcw, BookOpen, AlertCircle, DollarSign
+} from "lucide-react";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
+
+const BRAND_COLOR = "#00AEEF";
+const BRAND_GRADIENT_FROM = "#0088CC";
+const BRAND_GRADIENT_TO = "#00AEEF";
 
 const AUTOMATIONS = [
   {
     id: "instant-lead-response",
     icon: Zap,
-    color: "#00AEEF",
-    gradientFrom: "#0088CC",
-    gradientTo: "#00AEEF",
     title: "Instant Lead Response",
     tagline: "Reply to every new lead in under 60 seconds — automatically.",
     description:
@@ -17,19 +22,16 @@ const AUTOMATIONS = [
     after: "Every lead hears from you before any competitor",
     stat: "5× more likely to convert when contacted in 60s",
     steps: [
-      { icon: "📥", label: "Lead submits form", sub: "Web, Facebook, or referral" },
-      { icon: "🧠", label: "AI scores & classifies", sub: "<2 sec routing" },
-      { icon: "⚡", label: "Personalized SMS fires", sub: "Within 60 seconds" },
-      { icon: "📧", label: "Confirmation email sent", sub: "With booking link" },
-      { icon: "✅", label: "Lead engaged", sub: "Before any competitor" },
+      { icon: FileInput, label: "Lead submits form", sub: "Web, Facebook, or referral" },
+      { icon: Brain, label: "AI scores & classifies", sub: "<2 sec routing" },
+      { icon: Zap, label: "Personalized SMS fires", sub: "Within 60 seconds" },
+      { icon: Mail, label: "Confirmation email sent", sub: "With booking link" },
+      { icon: CheckCircle, label: "Lead engaged", sub: "Before any competitor" },
     ],
   },
   {
     id: "missed-call-textback",
-    icon: Phone,
-    color: "#8b5cf6",
-    gradientFrom: "#7c3aed",
-    gradientTo: "#a78bfa",
+    icon: PhoneMissed,
     title: "Missed Call Text-Back",
     tagline: "Every missed call gets an instant follow-up text.",
     description:
@@ -38,19 +40,16 @@ const AUTOMATIONS = [
     after: "Every missed call gets a text back in under 60 seconds",
     stat: "Businesses recover 30–40% of calls they previously lost",
     steps: [
-      { icon: "📵", label: "Call goes unanswered", sub: "Any time, any day" },
-      { icon: "🔔", label: "System detects missed call", sub: "Webhook fires instantly" },
-      { icon: "💬", label: "Text-back sent in 60s", sub: "\"We missed you! Book here\"" },
-      { icon: "🔁", label: "Follow-up sequence starts", sub: "2 min → 1 hr → 24 hr" },
-      { icon: "📅", label: "Lead books appointment", sub: "Recovered revenue" },
+      { icon: PhoneMissed, label: "Call goes unanswered", sub: "Any time, any day" },
+      { icon: AlertCircle, label: "System detects missed call", sub: "Webhook fires instantly" },
+      { icon: MessageSquare, label: "Text-back sent in 60s", sub: "\"We missed you! Book here\"" },
+      { icon: RotateCcw, label: "Follow-up sequence starts", sub: "2 min → 1 hr → 24 hr" },
+      { icon: CalendarCheck, label: "Lead books appointment", sub: "Recovered revenue" },
     ],
   },
   {
     id: "nurture-sequence",
-    icon: Mail,
-    color: "#10b981",
-    gradientFrom: "#059669",
-    gradientTo: "#34d399",
+    icon: MailCheck,
     title: "14-Day Nurture Sequence",
     tagline: "Automated follow-up that keeps leads warm for 2 weeks.",
     description:
@@ -59,19 +58,16 @@ const AUTOMATIONS = [
     after: "14 days of automated touchpoints convert cold leads",
     stat: "3× more appointments booked vs. 1-touch follow-up",
     steps: [
-      { icon: "🆕", label: "New lead enters sequence", sub: "Day 0 — instant welcome" },
-      { icon: "📱", label: "Day 1 SMS touchpoint", sub: "Personalized to industry" },
-      { icon: "📧", label: "Day 3 email follow-up", sub: "Case study or testimonial" },
-      { icon: "🔄", label: "Days 5–14 — 6 more steps", sub: "SMS + email alternating" },
-      { icon: "📅", label: "Lead books or opts out", sub: "Sequence auto-stops on reply" },
+      { icon: FileInput, label: "New lead enters sequence", sub: "Day 0 — instant welcome" },
+      { icon: MessageSquare, label: "Day 1 SMS touchpoint", sub: "Personalized to industry" },
+      { icon: Mail, label: "Day 3 email follow-up", sub: "Case study or testimonial" },
+      { icon: RotateCcw, label: "Days 5–14 — 6 more steps", sub: "SMS + email alternating" },
+      { icon: CalendarCheck, label: "Lead books or opts out", sub: "Sequence auto-stops on reply" },
     ],
   },
   {
     id: "ai-booking-agent",
-    icon: Calendar,
-    color: "#f97316",
-    gradientFrom: "#ea580c",
-    gradientTo: "#fb923c",
+    icon: CalendarCheck,
     title: "AI Booking Agent",
     tagline: "Turns conversations into confirmed appointments.",
     description:
@@ -80,19 +76,16 @@ const AUTOMATIONS = [
     after: "AI detects booking intent and closes the appointment automatically",
     stat: "40% more confirmed bookings without lifting a finger",
     steps: [
-      { icon: "💬", label: "Lead signals booking intent", sub: "\"I want to book\" or similar" },
-      { icon: "🤖", label: "AI detects intent", sub: "Classification fires instantly" },
-      { icon: "🔗", label: "Booking link sent via SMS", sub: "Personalized CTA message" },
-      { icon: "⏰", label: "Reminder if no click in 2h", sub: "Automatic nudge" },
-      { icon: "✅", label: "Appointment confirmed", sub: "Confirmation + calendar invite" },
+      { icon: MessageSquare, label: "Lead signals booking intent", sub: "\"I want to book\" or similar" },
+      { icon: Brain, label: "AI detects intent", sub: "Classification fires instantly" },
+      { icon: Send, label: "Booking link sent via SMS", sub: "Personalized CTA message" },
+      { icon: Clock, label: "Reminder if no click in 2h", sub: "Automatic nudge" },
+      { icon: CheckCircle, label: "Appointment confirmed", sub: "Confirmation + calendar invite" },
     ],
   },
   {
     id: "review-request",
     icon: Star,
-    color: "#eab308",
-    gradientFrom: "#ca8a04",
-    gradientTo: "#facc15",
     title: "Review Request Automation",
     tagline: "Automatically request 5-star reviews after every appointment.",
     description:
@@ -101,19 +94,16 @@ const AUTOMATIONS = [
     after: "Every completed appointment triggers a perfectly-timed review ask",
     stat: "2–4× more Google reviews within the first 30 days",
     steps: [
-      { icon: "🏁", label: "Appointment marked complete", sub: "Trigger event fires" },
-      { icon: "⏱️", label: "Wait 30–60 minutes", sub: "Configurable delay" },
-      { icon: "⭐", label: "Review request SMS sent", sub: "Google or platform link" },
-      { icon: "📧", label: "Email follow-up at 24h", sub: "If SMS not clicked" },
-      { icon: "🏆", label: "5-star review received", sub: "Reputation grows passively" },
+      { icon: CheckCircle, label: "Appointment marked complete", sub: "Trigger event fires" },
+      { icon: Clock, label: "Wait 30–60 minutes", sub: "Configurable delay" },
+      { icon: Star, label: "Review request SMS sent", sub: "Google or platform link" },
+      { icon: Mail, label: "Email follow-up at 24h", sub: "If SMS not clicked" },
+      { icon: Star, label: "5-star review received", sub: "Reputation grows passively" },
     ],
   },
   {
     id: "lead-reactivation",
-    icon: RefreshCw,
-    color: "#ef4444",
-    gradientFrom: "#dc2626",
-    gradientTo: "#f87171",
+    icon: Repeat2,
     title: "Lead Reactivation",
     tagline: "Wake up cold leads and turn them into paying clients.",
     description:
@@ -122,167 +112,389 @@ const AUTOMATIONS = [
     after: "A targeted re-engagement campaign wakes up leads up to 90 days old",
     stat: "Many clients recover $3k–$10k from their first reactivation run",
     steps: [
-      { icon: "😴", label: "Lead dormant 14–60 days", sub: "Daily scan detects it" },
-      { icon: "🎯", label: "Reactivation tier assigned", sub: "14d / 30d / 60d offer" },
-      { icon: "💌", label: "Special offer SMS sent", sub: "\"20% off — limited time\"" },
-      { icon: "📧", label: "Email follow-up at 24h", sub: "If SMS unanswered" },
-      { icon: "💰", label: "Dormant revenue recovered", sub: "Up to 90 days back" },
+      { icon: Clock, label: "Lead dormant 14–60 days", sub: "Daily scan detects it" },
+      { icon: Brain, label: "Reactivation tier assigned", sub: "14d / 30d / 60d offer" },
+      { icon: MessageSquare, label: "Special offer SMS sent", sub: "\"20% off — limited time\"" },
+      { icon: Mail, label: "Email follow-up at 24h", sub: "If SMS unanswered" },
+      { icon: DollarSign, label: "Dormant revenue recovered", sub: "Up to 90 days back" },
     ],
   },
 ];
 
-// Pipeline connector — shows the 6 automations as one chain
+// Animated SVG pipeline with traveling data pulse
 function PipelineStrip({ activeId, onSelect }) {
+  const activeIndex = AUTOMATIONS.findIndex(a => a.id === activeId);
+  const [pulsePos, setPulsePos] = useState(0);
+  const animFrameRef = useRef(null);
+  const startTimeRef = useRef(null);
+  const DURATION = 3000;
+
+  useEffect(() => {
+    startTimeRef.current = null;
+    const animate = (ts) => {
+      if (!startTimeRef.current) startTimeRef.current = ts;
+      const elapsed = ts - startTimeRef.current;
+      const progress = (elapsed % DURATION) / DURATION;
+      setPulsePos(progress);
+      animFrameRef.current = requestAnimationFrame(animate);
+    };
+    animFrameRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animFrameRef.current);
+  }, []);
+
+  // Node positions — evenly spaced
+  const NODE_COUNT = AUTOMATIONS.length;
+  const SVG_W = 600;
+  const SVG_H = 56;
+  const NODE_Y = SVG_H / 2;
+  const PAD = 40;
+  const spacing = (SVG_W - PAD * 2) / (NODE_COUNT - 1);
+  const nodeXs = AUTOMATIONS.map((_, i) => PAD + i * spacing);
+
+  // Pulse x position along the line
+  const pulseX = PAD + pulsePos * (SVG_W - PAD * 2);
+
   return (
-    <div className="w-full overflow-x-auto pb-2 mb-10 md:mb-14">
-      <div className="flex items-center min-w-max mx-auto gap-0 px-2">
-        {AUTOMATIONS.map((a, i) => {
-          const isActive = a.id === activeId;
-          const Icon = a.icon;
-          return (
-            <div key={a.id} className="flex items-center">
-              <button
-                type="button"
-                onClick={() => onSelect(a.id)}
-                className="flex flex-col items-center gap-1.5 group focus:outline-none"
-                style={{ minWidth: 72 }}
-              >
-                <motion.div
-                  animate={isActive
-                    ? { scale: 1.15, boxShadow: `0 0 0 3px ${a.color}40, 0 0 18px ${a.color}50` }
-                    : { scale: 1, boxShadow: "none" }
-                  }
-                  transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                  className="w-11 h-11 rounded-2xl flex items-center justify-center relative"
-                  style={{
-                    background: isActive
-                      ? `linear-gradient(135deg, ${a.gradientFrom}, ${a.gradientTo})`
-                      : "rgba(0,0,0,0.04)",
-                    border: isActive ? "none" : "1.5px solid rgba(0,0,0,0.08)",
-                  }}
-                >
-                  <Icon
-                    className="w-5 h-5"
-                    style={{ color: isActive ? "#fff" : a.color }}
-                  />
+    <div className="w-full mb-10 md:mb-14">
+      {/* SVG pipeline line — desktop */}
+      <div className="hidden sm:flex justify-center">
+        <div style={{ position: "relative", width: "100%", maxWidth: 640 }}>
+          <svg
+            width="100%"
+            viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+            style={{ overflow: "visible", display: "block" }}
+          >
+            <defs>
+              <linearGradient id="pipelineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={BRAND_COLOR} stopOpacity="0.15" />
+                <stop offset="100%" stopColor={BRAND_COLOR} stopOpacity="0.35" />
+              </linearGradient>
+              <radialGradient id="pulseGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor={BRAND_COLOR} stopOpacity="0.9" />
+                <stop offset="100%" stopColor={BRAND_COLOR} stopOpacity="0" />
+              </radialGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                <feMerge>
+                  <feMergeNode in="coloredBlur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+
+            {/* Base pipeline track */}
+            <line
+              x1={PAD} y1={NODE_Y} x2={SVG_W - PAD} y2={NODE_Y}
+              stroke="rgba(0,174,239,0.15)"
+              strokeWidth="2"
+              strokeDasharray="6 4"
+            />
+
+            {/* Lit segment — up to active node */}
+            {activeIndex > 0 && (
+              <line
+                x1={nodeXs[0]} y1={NODE_Y}
+                x2={nodeXs[activeIndex]} y2={NODE_Y}
+                stroke={BRAND_COLOR}
+                strokeWidth="2"
+                strokeOpacity="0.45"
+              />
+            )}
+
+            {/* Traveling pulse dot */}
+            <circle
+              cx={pulseX}
+              cy={NODE_Y}
+              r="5"
+              fill={BRAND_COLOR}
+              filter="url(#glow)"
+              opacity="0.85"
+            />
+            <circle
+              cx={pulseX}
+              cy={NODE_Y}
+              r="10"
+              fill="url(#pulseGlow)"
+              opacity="0.4"
+            />
+
+            {/* Node circles (clickable via foreignObject overlay) */}
+            {AUTOMATIONS.map((a, i) => {
+              const isActive = a.id === activeId;
+              return (
+                <g key={a.id}>
                   {isActive && (
-                    <motion.div
-                      className="absolute inset-0 rounded-2xl"
-                      animate={{ opacity: [0.5, 0, 0.5] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      style={{ background: `${a.color}30` }}
+                    <circle
+                      cx={nodeXs[i]}
+                      cy={NODE_Y}
+                      r="24"
+                      fill={BRAND_COLOR}
+                      opacity="0.08"
                     />
                   )}
-                </motion.div>
+                  <circle
+                    cx={nodeXs[i]}
+                    cy={NODE_Y}
+                    r="18"
+                    fill={isActive ? BRAND_COLOR : "#fff"}
+                    stroke={isActive ? BRAND_COLOR : "rgba(0,174,239,0.25)"}
+                    strokeWidth={isActive ? "2" : "1.5"}
+                    filter={isActive ? "url(#glow)" : "none"}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => onSelect(a.id)}
+                  />
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* Icon + label overlays positioned over SVG nodes */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: SVG_H,
+              pointerEvents: "none",
+            }}
+          >
+            {AUTOMATIONS.map((a, i) => {
+              const isActive = a.id === activeId;
+              const Icon = a.icon;
+              const xPct = ((nodeXs[i] / SVG_W) * 100).toFixed(2);
+              return (
+                <button
+                  key={a.id}
+                  type="button"
+                  onClick={() => onSelect(a.id)}
+                  style={{
+                    position: "absolute",
+                    left: `${xPct}%`,
+                    top: "50%",
+                    transform: "translate(-50%, -50%)",
+                    pointerEvents: "auto",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 36,
+                    height: 36,
+                  }}
+                >
+                  <motion.div
+                    animate={isActive
+                      ? { scale: 1.2 }
+                      : { scale: 1 }
+                    }
+                    transition={{ type: "spring", stiffness: 320, damping: 22 }}
+                  >
+                    <Icon
+                      style={{
+                        width: 16,
+                        height: 16,
+                        color: isActive ? "#fff" : BRAND_COLOR,
+                        opacity: isActive ? 1 : 0.6,
+                      }}
+                    />
+                  </motion.div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Labels row */}
+      <div className="hidden sm:flex justify-center mt-3">
+        <div style={{ width: "100%", maxWidth: 640, display: "flex", justifyContent: "space-between", padding: `0 ${PAD - 20}px` }}>
+          {AUTOMATIONS.map((a) => {
+            const isActive = a.id === activeId;
+            return (
+              <button
+                key={a.id}
+                type="button"
+                onClick={() => onSelect(a.id)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  textAlign: "center",
+                  width: 72,
+                  marginLeft: -16,
+                  padding: 0,
+                }}
+              >
                 <span
-                  className="text-[10px] font-semibold text-center leading-tight max-w-[68px]"
-                  style={{ color: isActive ? a.color : "rgba(0,0,0,0.45)" }}
+                  style={{
+                    display: "block",
+                    fontSize: 10,
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? BRAND_COLOR : "rgba(0,0,0,0.4)",
+                    lineHeight: 1.3,
+                    transition: "color 0.2s ease",
+                  }}
                 >
                   {a.title.split(" ").slice(0, 2).join(" ")}
                 </span>
               </button>
-              {i < AUTOMATIONS.length - 1 && (
-                <div className="flex items-center mx-1 mb-5">
-                  <motion.div
-                    className="h-px w-8"
-                    style={{
-                      background: i < AUTOMATIONS.findIndex(x => x.id === activeId)
-                        ? `linear-gradient(to right, ${AUTOMATIONS[i].color}, ${AUTOMATIONS[i + 1].color})`
-                        : "rgba(0,0,0,0.1)",
-                    }}
-                  />
-                  <div
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{
-                      background: i < AUTOMATIONS.findIndex(x => x.id === activeId)
-                        ? AUTOMATIONS[i + 1].color
-                        : "rgba(0,0,0,0.15)",
-                    }}
-                  />
-                </div>
-              )}
-            </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Mobile horizontal scroll fallback */}
+      <div className="sm:hidden flex gap-3 overflow-x-auto pb-2 px-2">
+        {AUTOMATIONS.map((a) => {
+          const isActive = a.id === activeId;
+          const Icon = a.icon;
+          return (
+            <button
+              key={a.id}
+              type="button"
+              onClick={() => onSelect(a.id)}
+              className="flex flex-col items-center gap-1.5 flex-shrink-0 focus:outline-none"
+            >
+              <div
+                style={{
+                  width: 44, height: 44, borderRadius: 14,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  background: isActive ? BRAND_COLOR : "rgba(0,174,239,0.08)",
+                  border: isActive ? "none" : "1.5px solid rgba(0,174,239,0.2)",
+                  boxShadow: isActive ? `0 0 0 3px rgba(0,174,239,0.2), 0 0 18px rgba(0,174,239,0.35)` : "none",
+                  transition: "all 0.25s ease",
+                }}
+              >
+                <Icon style={{ width: 18, height: 18, color: isActive ? "#fff" : BRAND_COLOR }} />
+              </div>
+              <span style={{ fontSize: 10, fontWeight: isActive ? 700 : 500, color: isActive ? BRAND_COLOR : "rgba(0,0,0,0.4)", textAlign: "center", maxWidth: 60, lineHeight: 1.3 }}>
+                {a.title.split(" ").slice(0, 2).join(" ")}
+              </span>
+            </button>
           );
         })}
       </div>
-      <p className="text-center text-[11px] text-muted-foreground mt-3 tracking-wide">
+
+      <p className="text-center text-[11px] text-muted-foreground mt-4 tracking-wide">
         One connected pipeline — each system hands off to the next
       </p>
     </div>
   );
 }
 
-// Animated flow diagram with step-by-step reveal
+// Flow diagram with Lucide icons + line-draw connectors
 function AnimatedFlowDiagram({ automation }) {
-  const [visibleStep, setVisibleStep] = useState(0);
+  const [visibleStep, setVisibleStep] = useState(-1);
   const intervalRef = useRef(null);
 
   useEffect(() => {
-    setVisibleStep(0);
-    intervalRef.current = setInterval(() => {
-      setVisibleStep(prev => {
-        if (prev >= automation.steps.length - 1) {
-          clearInterval(intervalRef.current);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 700);
-    return () => clearInterval(intervalRef.current);
+    setVisibleStep(-1);
+    const startDelay = setTimeout(() => {
+      setVisibleStep(0);
+      intervalRef.current = setInterval(() => {
+        setVisibleStep(prev => {
+          if (prev >= automation.steps.length - 1) {
+            clearInterval(intervalRef.current);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 650);
+    }, 200);
+    return () => {
+      clearTimeout(startDelay);
+      clearInterval(intervalRef.current);
+    };
   }, [automation.id]);
 
   return (
     <div
       className="rounded-2xl border p-5 flex flex-col gap-3 h-full"
-      style={{ background: `${automation.color}08`, borderColor: `${automation.color}20` }}
+      style={{ background: `rgba(0,174,239,0.04)`, borderColor: `rgba(0,174,239,0.15)` }}
     >
-      <p className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: automation.color }}>
+      <p className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: BRAND_COLOR }}>
         Live Flow
       </p>
-      <div className="flex flex-col gap-0">
-        {automation.steps.map((step, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -12 }}
-            animate={i <= visibleStep ? { opacity: 1, x: 0 } : { opacity: 0.15, x: -8 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            className="flex items-stretch gap-3"
-          >
-            <div className="flex flex-col items-center" style={{ width: 36 }}>
-              <motion.div
-                animate={i === visibleStep ? {
-                  scale: [1, 1.15, 1],
-                  boxShadow: [`0 0 0px ${automation.color}00`, `0 0 12px ${automation.color}60`, `0 0 0px ${automation.color}00`]
-                } : {}}
-                transition={{ duration: 0.6 }}
-                className="w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0"
-                style={{
-                  background: i <= visibleStep ? `${automation.color}18` : "rgba(0,0,0,0.04)",
-                  border: `1.5px solid ${i <= visibleStep ? automation.color + "35" : "rgba(0,0,0,0.08)"}`,
-                }}
-              >
-                {step.icon}
-              </motion.div>
-              {i < automation.steps.length - 1 && (
+      <div className="flex flex-col gap-0" style={{ position: "relative" }}>
+        {automation.steps.map((step, i) => {
+          const Icon = step.icon;
+          const isVisible = i <= visibleStep;
+          const isActive = i === visibleStep;
+          const isLast = i === automation.steps.length - 1;
+
+          return (
+            <div key={i} className="flex items-stretch gap-3">
+              {/* Left column: icon + animated line */}
+              <div className="flex flex-col items-center" style={{ width: 36 }}>
                 <motion.div
-                  className="w-px flex-1 my-1"
-                  animate={i < visibleStep ? { opacity: 1 } : { opacity: 0.15 }}
-                  style={{ background: automation.color, minHeight: 16 }}
-                />
-              )}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={isVisible
+                    ? { scale: 1, opacity: 1 }
+                    : { scale: 0.6, opacity: 0.15 }
+                  }
+                  transition={{ type: "spring", stiffness: 400, damping: 22 }}
+                  style={{
+                    width: 36, height: 36, borderRadius: 10,
+                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                    background: isVisible ? `rgba(0,174,239,0.12)` : "rgba(0,0,0,0.04)",
+                    border: `1.5px solid ${isVisible ? "rgba(0,174,239,0.3)" : "rgba(0,0,0,0.08)"}`,
+                    boxShadow: isActive ? `0 0 12px rgba(0,174,239,0.4)` : "none",
+                    position: "relative",
+                  }}
+                >
+                  <Icon style={{ width: 16, height: 16, color: isVisible ? BRAND_COLOR : "rgba(0,0,0,0.25)" }} />
+                  {isActive && (
+                    <motion.div
+                      style={{
+                        position: "absolute", inset: -3, borderRadius: 13,
+                        border: `1.5px solid ${BRAND_COLOR}`,
+                        opacity: 0,
+                      }}
+                      animate={{ opacity: [0, 0.6, 0], scale: [0.9, 1.15, 0.9] }}
+                      transition={{ duration: 0.9, repeat: 2 }}
+                    />
+                  )}
+                </motion.div>
+
+                {/* Animated line-draw connector */}
+                {!isLast && (
+                  <div style={{ width: 2, flex: 1, minHeight: 18, position: "relative", margin: "3px 0", overflow: "hidden" }}>
+                    <motion.div
+                      style={{
+                        position: "absolute", top: 0, left: 0, right: 0,
+                        background: `linear-gradient(to bottom, ${BRAND_COLOR}, rgba(0,174,239,0.3))`,
+                        borderRadius: 2,
+                      }}
+                      initial={{ height: "0%" }}
+                      animate={i < visibleStep ? { height: "100%" } : { height: "0%" }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    />
+                    <div style={{ position: "absolute", inset: 0, background: "rgba(0,174,239,0.08)", borderRadius: 2 }} />
+                  </div>
+                )}
+              </div>
+
+              {/* Text */}
+              <motion.div
+                className="pb-3 pt-1"
+                initial={{ opacity: 0, x: -10 }}
+                animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0.15, x: -6 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+              >
+                <p className="text-sm font-semibold text-foreground leading-tight">{step.label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{step.sub}</p>
+              </motion.div>
             </div>
-            <div className="pb-3 pt-1">
-              <p className="text-sm font-semibold text-foreground leading-tight">{step.label}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{step.sub}</p>
-            </div>
-          </motion.div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 }
 
-// Before/After stat card with credible framing
+// Before/After card
 function BeforeAfterStat({ automation }) {
   return (
     <div className="rounded-2xl border border-border bg-white p-6 flex flex-col justify-between gap-5">
@@ -299,9 +511,9 @@ function BeforeAfterStat({ automation }) {
       <div>
         <div
           className="rounded-xl p-3.5 mb-4"
-          style={{ background: `${automation.color}0d`, border: `1px solid ${automation.color}25` }}
+          style={{ background: `rgba(0,174,239,0.06)`, border: `1px solid rgba(0,174,239,0.18)` }}
         >
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: automation.color }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: BRAND_COLOR }}>
             Typical Result
           </p>
           <p className="text-sm font-bold text-foreground">{automation.stat}</p>
@@ -310,7 +522,7 @@ function BeforeAfterStat({ automation }) {
         <a
           href="/store"
           className="w-full inline-flex items-center justify-center gap-2 text-white text-sm font-bold px-5 py-3 rounded-xl hover:opacity-90 transition-opacity"
-          style={{ background: `linear-gradient(135deg, ${automation.gradientFrom}, ${automation.gradientTo})` }}
+          style={{ background: `linear-gradient(135deg, ${BRAND_GRADIENT_FROM}, ${BRAND_GRADIENT_TO})` }}
         >
           Get This System <ArrowRight className="w-4 h-4" />
         </a>
@@ -319,16 +531,43 @@ function BeforeAfterStat({ automation }) {
   );
 }
 
+// Ripple effect component
+function RippleEffect({ color, onDone }) {
+  return (
+    <motion.div
+      style={{
+        position: "absolute",
+        inset: 0,
+        borderRadius: "inherit",
+        background: `radial-gradient(circle, ${color}40 0%, ${color}00 70%)`,
+        pointerEvents: "none",
+        zIndex: 10,
+      }}
+      initial={{ opacity: 1, scale: 0.5 }}
+      animate={{ opacity: 0, scale: 2.5 }}
+      transition={{ duration: 0.55, ease: "easeOut" }}
+      onAnimationComplete={onDone}
+    />
+  );
+}
+
 export default function AutomationShowcase() {
   const [activeId, setActiveId] = useState(AUTOMATIONS[0].id);
+  const [rippleKey, setRippleKey] = useState(null);
   const active = AUTOMATIONS.find((a) => a.id === activeId);
+
+  const handleSelect = (id) => {
+    if (id === activeId) return;
+    setRippleKey(id + Date.now());
+    setActiveId(id);
+  };
 
   return (
     <section className="py-20 md:py-28 bg-white overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-14">
-          <p className="text-xs font-bold tracking-[0.3em] uppercase mb-4" style={{ color: "#00AEEF" }}>
+          <p className="text-xs font-bold tracking-[0.3em] uppercase mb-4" style={{ color: BRAND_COLOR }}>
             The Complete System
           </p>
           <h2
@@ -336,7 +575,7 @@ export default function AutomationShowcase() {
             style={{ fontSize: "clamp(2rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif" }}
           >
             One System.{" "}
-            <span style={{ color: "#00AEEF", textShadow: "0 0 28px rgba(0,174,239,0.3)" }}>
+            <span style={{ color: BRAND_COLOR, textShadow: "0 0 28px rgba(0,174,239,0.3)" }}>
               Six Automations.
             </span>{" "}
             Zero Leads Lost.
@@ -346,8 +585,8 @@ export default function AutomationShowcase() {
           </p>
         </div>
 
-        {/* Pipeline Strip — visual continuity */}
-        <PipelineStrip activeId={activeId} onSelect={setActiveId} />
+        {/* Pipeline Strip */}
+        <PipelineStrip activeId={activeId} onSelect={handleSelect} />
 
         {/* Active automation detail */}
         <AnimatePresence mode="wait">
@@ -358,21 +597,39 @@ export default function AutomationShowcase() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
-            {/* Hero bar */}
+            {/* Hero bar with ripple */}
             <div
               className="rounded-2xl p-6 mb-6 flex items-center gap-4"
               style={{
-                background: `linear-gradient(135deg, ${active.gradientFrom}, ${active.gradientTo})`,
+                background: `linear-gradient(135deg, ${BRAND_GRADIENT_FROM}, ${BRAND_GRADIENT_TO})`,
+                position: "relative",
+                overflow: "hidden",
               }}
             >
-              <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
+              {rippleKey && (
+                <RippleEffect
+                  key={rippleKey}
+                  color="#ffffff"
+                  onDone={() => setRippleKey(null)}
+                />
+              )}
+
+              <motion.div
+                key={activeId + "-icon"}
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0"
+                style={{ position: "relative", zIndex: 2 }}
+              >
                 <active.icon className="w-6 h-6 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
+              </motion.div>
+
+              <div className="flex-1 min-w-0" style={{ position: "relative", zIndex: 2 }}>
                 <h3 className="text-xl md:text-2xl font-bold text-white leading-tight">{active.title}</h3>
                 <p className="text-white/85 text-sm mt-0.5">{active.tagline}</p>
               </div>
-              <div className="hidden sm:block text-right flex-shrink-0">
+              <div className="hidden sm:block text-right flex-shrink-0" style={{ position: "relative", zIndex: 2 }}>
                 <p className="text-white/60 text-[10px] uppercase tracking-widest mb-1">Pipeline Step</p>
                 <p className="text-white font-bold text-lg">{AUTOMATIONS.findIndex(a => a.id === activeId) + 1} of 6</p>
               </div>
