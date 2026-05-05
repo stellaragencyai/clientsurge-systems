@@ -234,6 +234,12 @@
         "not_attempted"
       ],
       "default": "not_attempted"
+    },
+    "voice_call_followup_sent": {
+      "type": "boolean",
+      "title": "Voice Call Follow-Up Sent",
+      "default": false,
+      "description": "True if the 24h post-call follow-up SMS/email has been sent (idempotency guard)"
     }
   },
   "required": [

@@ -346,6 +346,68 @@ Deno.serve(async (req) => {
           billing_status: "past_due",
         }).catch((err) => console.error("[stripeWebhookOrders] Failed to set past_due", { orderId, error: err.message }));
         console.log("[stripeWebhookOrders] billing_status set to past_due", { orderId });
+
+        // ── USE CASE #6: Trigger voice recovery call to client ─────────────
+        try {
+          const [settings] = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+          if (settings?.payment_recovery_voice_enabled) {
+            const order = await base44.asServiceRole.entities.Order.get(orderId).catch(() => null);
+            if (order?.customer_phone) {
+              const elevenLabsKey = Deno.env.get("ELEVENLABS_API_KEY");
+              const phoneNumberId = settings?.elevenlabs_phone_number_ids?.general
+                || settings?.elevenlabs_phone_number_ids?.med_spa;
+              // Use a dedicated payment recovery agent if configured, else fallback to general
+              const agentId = settings?.elevenlabs_agent_ids?.payment_recovery
+                || settings?.elevenlabs_agent_ids?.general;
+
+              if (elevenLabsKey && phoneNumberId && agentId) {
+                const firstName = (order.customer_name || "").split(" ")[0] || "there";
+                const callRes = await fetch("https://api.elevenlabs.io/v1/convai/twilio/outbound-call", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "xi-api-key": elevenLabsKey,
+                  },
+                  body: JSON.stringify({
+                    agent_id: agentId,
+                    agent_phone_number_id: phoneNumberId,
+                    to_number: order.customer_phone,
+                    conversation_initiation_client_data: {
+                      conversation_config_override: {
+                        agent: {
+                          first_message: `Hi ${firstName}, this is a quick heads-up from ClientSurge Systems. We noticed your subscription payment didn't go through and we want to make sure your automation systems stay running. I can help you sort this out right now — do you have 60 seconds?`,
+                        },
+                      },
+                    },
+                  }),
+                });
+
+                if (callRes.ok) {
+                  const callData = await callRes.json();
+                  await base44.asServiceRole.entities.CommunicationEvent.create({
+                    order_id: orderId,
+                    channel: "voice",
+                    direction: "outbound",
+                    event_type: "voice_call_initiated",
+                    provider: "elevenlabs",
+                    status: "sent",
+                    subject: "Payment Recovery Voice Call",
+                    metadata_json: JSON.stringify({ trigger: "payment_failed", conversation_id: callData?.conversation_id, order_id: orderId }),
+                  });
+                  console.log("[stripeWebhookOrders] Payment recovery voice call initiated", { orderId, conversation_id: callData?.conversation_id });
+                } else {
+                  const err = await callRes.json().catch(() => ({}));
+                  console.error("[stripeWebhookOrders] Payment recovery call failed", { orderId, error: err });
+                }
+              } else {
+                console.log("[stripeWebhookOrders] Payment recovery voice: missing agent/phone config — skipping");
+              }
+            }
+          }
+        } catch (voiceErr) {
+          console.error("[stripeWebhookOrders] Payment recovery voice call error (non-blocking)", { orderId, error: voiceErr.message });
+        }
+        // ──────────────────────────────────────────────────────────────────────
       }
     }
   }

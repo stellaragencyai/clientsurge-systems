@@ -200,8 +200,7 @@
     "cadence_switch_attempts": {
       "type": "integer",
       "title": "Switch Channel After N Attempts",
-      "default": 3,
-      "description": "After 3 attempts with no response, switch to alternate channel"
+      "default": 3
     },
     "cadence_pause_on_reply": {
       "type": "boolean",
@@ -211,25 +210,46 @@
     "cadence_engagement_threshold": {
       "type": "number",
       "title": "Engagement Score Threshold (0-100)",
-      "default": 50,
-      "description": "Increase follow-up frequency if lead engagement > threshold"
+      "default": 50
     },
     "cadence_max_attempts": {
       "type": "integer",
       "title": "Max Follow-Up Attempts",
-      "default": 6,
-      "description": "Stop automation after N total attempts"
+      "default": 6
     },
     "voice_calls_enabled": {
       "type": "boolean",
-      "title": "AI Voice Calls Enabled",
+      "title": "AI Voice Calls Enabled (HOT Leads)",
       "default": false,
       "description": "When true, HOT leads (score \u226575) receive an ElevenLabs outbound voice call within 5 minutes"
     },
+    "inbound_voice_enabled": {
+      "type": "boolean",
+      "title": "AI Inbound Call Handler Enabled",
+      "default": false,
+      "description": "When true, inbound calls to your Twilio number are answered by ElevenLabs AI receptionist"
+    },
+    "payment_recovery_voice_enabled": {
+      "type": "boolean",
+      "title": "Payment Recovery Voice Call Enabled",
+      "default": false,
+      "description": "When true, failed Stripe payments trigger an ElevenLabs outbound call to the client"
+    },
+    "voice_briefing_enabled": {
+      "type": "boolean",
+      "title": "Daily Voice Briefing Enabled (Nolan)",
+      "default": false,
+      "description": "When true, calls Nolan daily at 7am with AI-generated business briefing"
+    },
+    "voice_briefing_phone": {
+      "type": "string",
+      "title": "Voice Briefing Phone Number",
+      "description": "Phone number to call for daily briefing (defaults to ADMIN_NOTIFICATION_PHONE secret)"
+    },
     "elevenlabs_agent_ids": {
       "type": "object",
-      "title": "ElevenLabs Agent IDs (per industry)",
-      "description": "Maps industry_key \u2192 ElevenLabs agent_id. Get from ElevenLabs dashboard \u2192 Agents.",
+      "title": "ElevenLabs Agent IDs",
+      "description": "Maps role_key \u2192 ElevenLabs agent_id. Get from ElevenLabs dashboard \u2192 Agents.",
       "properties": {
         "med_spa": {
           "type": "string",
@@ -254,13 +274,29 @@
         "contractors": {
           "type": "string",
           "title": "Contractors Agent ID"
+        },
+        "receptionist": {
+          "type": "string",
+          "title": "Inbound Receptionist Agent ID"
+        },
+        "payment_recovery": {
+          "type": "string",
+          "title": "Payment Recovery Agent ID"
+        },
+        "briefing": {
+          "type": "string",
+          "title": "Daily Briefing Agent ID"
+        },
+        "general": {
+          "type": "string",
+          "title": "General / Fallback Agent ID"
         }
       }
     },
     "elevenlabs_phone_number_ids": {
       "type": "object",
-      "title": "ElevenLabs Phone Number IDs (per industry)",
-      "description": "Maps industry_key \u2192 ElevenLabs phone_number_id. Get from ElevenLabs dashboard \u2192 Phone Numbers after importing your Twilio number.",
+      "title": "ElevenLabs Phone Number IDs",
+      "description": "Maps role_key \u2192 ElevenLabs phone_number_id. Get from ElevenLabs dashboard \u2192 Phone Numbers.",
       "properties": {
         "med_spa": {
           "type": "string",
