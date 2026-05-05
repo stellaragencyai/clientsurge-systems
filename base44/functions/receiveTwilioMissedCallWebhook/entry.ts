@@ -174,6 +174,23 @@ Deno.serve(async (req) => {
       lead = null;
     }
 
+    // #11: Dedup — check if we already sent a text-back for this CallSid
+    if (callSid && lead) {
+      try {
+        const existingEvent = await base44.asServiceRole.entities.CommunicationEvent.filter(
+          { provider_message_id: callSid },
+          "-created_date",
+          1
+        );
+        if (existingEvent && existingEvent.length > 0) {
+          console.log(`[MissedCall] CallSid ${callSid} already processed — skipping duplicate`);
+          return Response.json({ message: "Already processed", callSid });
+        }
+      } catch (e) {
+        console.warn(`[MissedCall] Dedup check failed: ${e.message} — proceeding anyway`);
+      }
+    }
+
     // Get SMS template from settings
     let smsTemplate = DEFAULT_MISSED_CALL_SMS;
     try {
@@ -272,3 +289,4 @@ Deno.serve(async (req) => {
     return Response.json({ error: message }, { status: 500 });
   }
 });
+
