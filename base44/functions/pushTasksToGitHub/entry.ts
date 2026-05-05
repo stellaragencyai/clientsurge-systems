@@ -50,6 +50,27 @@ async function githubRequest(path, method = 'GET', body = null) {
   return data;
 }
 
+async function ensureRepoExists(owner, repo) {
+  try {
+    await githubRequest(`/repos/${owner}/${repo}`);
+    console.log(`[pushTasksToGitHub] Repo ${owner}/${repo} already exists.`);
+  } catch (e) {
+    if (e.message.includes('404')) {
+      console.log(`[pushTasksToGitHub] Repo not found — creating ${owner}/${repo}...`);
+      await githubRequest('/user/repos', 'POST', {
+        name: repo,
+        description: 'ClientSurge Systems — Master Task List (560 tasks)',
+        private: false,
+        has_issues: true,
+      });
+      console.log(`[pushTasksToGitHub] Repo created successfully. Waiting for GitHub to initialize...`);
+      await new Promise(r => setTimeout(r, 4000)); // wait for GitHub to initialize the repo
+    } else {
+      throw e;
+    }
+  }
+}
+
 async function ensureLabels(owner, repo, tasks) {
   const needed = new Set();
   tasks.forEach(t => {
@@ -262,6 +283,9 @@ Deno.serve(async (req) => {
       ...dbTasks.map(t => ({ ...t, priority: t.priority || 'medium' })),
       ...mdTasks,
     ];
+
+    console.log(`[pushTasksToGitHub] Ensuring repo exists...`);
+    await ensureRepoExists(owner, repo);
 
     console.log(`[pushTasksToGitHub] Creating labels for ${allTasks.length} tasks...`);
     await ensureLabels(owner, repo, allTasks);
