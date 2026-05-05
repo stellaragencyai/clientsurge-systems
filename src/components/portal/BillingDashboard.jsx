@@ -3,84 +3,189 @@ import { base44 } from '@/api/base44Client';
 import {
   CreditCard, Download, ExternalLink, Loader2, AlertCircle,
   CheckCircle2, Clock, RefreshCw, FileText, ShieldCheck, Zap,
+  XCircle, Calendar, ChevronDown, ChevronUp, BadgeCheck, AlertTriangle,
 } from 'lucide-react';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
-function formatDate(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+function fmtDate(unix) {
+  if (!unix) return '—';
+  const d = typeof unix === 'number' ? new Date(unix * 1000) : new Date(unix);
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-function formatCurrency(cents) {
+function fmtCents(cents, currency = 'usd') {
   if (cents == null) return '—';
-  return `$${(cents / 100).toFixed(2)}`;
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).format(cents / 100);
 }
 
-// ─── sub-components ──────────────────────────────────────────────────────────
+function fmtDollars(dollars) {
+  if (dollars == null) return '—';
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(dollars);
+}
 
-function StatusBadge({ status }) {
-  const map = {
-    active:          { cls: 'bg-green-100 border-green-300 text-green-800',  icon: CheckCircle2, label: 'Active' },
-    paid:            { cls: 'bg-green-100 border-green-300 text-green-800',  icon: CheckCircle2, label: 'Paid' },
-    partially_paid:  { cls: 'bg-amber-100 border-amber-300 text-amber-800',  icon: Clock,        label: 'Partially Paid' },
-    unpaid:          { cls: 'bg-red-100   border-red-300   text-red-800',    icon: AlertCircle,  label: 'Unpaid' },
-    overdue:         { cls: 'bg-red-100   border-red-300   text-red-800',    icon: AlertCircle,  label: 'Overdue' },
-    draft:           { cls: 'bg-gray-100  border-gray-300  text-gray-700',   icon: FileText,     label: 'Draft' },
-    cancelled:       { cls: 'bg-gray-100  border-gray-300  text-gray-700',   icon: FileText,     label: 'Cancelled' },
-  };
-  const cfg = map[status] || map.draft;
+// ─── status helpers ──────────────────────────────────────────────────────────
+
+const SUB_STATUS = {
+  active:            { cls: 'bg-green-100 border-green-300 text-green-800',  icon: CheckCircle2,  label: 'Active' },
+  trialing:          { cls: 'bg-blue-100 border-blue-300 text-blue-800',    icon: Clock,         label: 'Trial' },
+  past_due:          { cls: 'bg-red-100  border-red-300  text-red-800',     icon: AlertCircle,   label: 'Past Due' },
+  canceled:          { cls: 'bg-gray-100 border-gray-300 text-gray-700',    icon: XCircle,       label: 'Canceled' },
+  unpaid:            { cls: 'bg-red-100  border-red-300  text-red-800',     icon: AlertCircle,   label: 'Unpaid' },
+  incomplete:        { cls: 'bg-amber-100 border-amber-300 text-amber-800', icon: AlertTriangle, label: 'Incomplete' },
+  incomplete_expired:{ cls: 'bg-gray-100 border-gray-300 text-gray-700',    icon: XCircle,       label: 'Expired' },
+};
+
+const INV_STATUS = {
+  paid:    { cls: 'bg-green-100 border-green-300 text-green-800',  icon: CheckCircle2, label: 'Paid' },
+  open:    { cls: 'bg-amber-100 border-amber-300 text-amber-800',  icon: Clock,        label: 'Open' },
+  draft:   { cls: 'bg-gray-100  border-gray-300  text-gray-700',   icon: FileText,     label: 'Draft' },
+  void:    { cls: 'bg-gray-100  border-gray-300  text-gray-700',   icon: XCircle,      label: 'Void' },
+  uncollectible: { cls: 'bg-red-100 border-red-300 text-red-800',  icon: AlertCircle,  label: 'Uncollectible' },
+  // internal fallbacks
+  unpaid:  { cls: 'bg-amber-100 border-amber-300 text-amber-800',  icon: Clock,        label: 'Unpaid' },
+  overdue: { cls: 'bg-red-100   border-red-300   text-red-800',    icon: AlertCircle,  label: 'Overdue' },
+};
+
+function StatusPill({ status, map }) {
+  const cfg = map[status] || map.draft || { cls: 'bg-gray-100 border-gray-300 text-gray-700', icon: FileText, label: status };
   const Icon = cfg.icon;
   return (
-    <span className={`inline-flex items-center gap-1.5 border rounded-full px-3 py-1 text-xs font-bold ${cfg.cls}`}>
-      <Icon className="w-3.5 h-3.5" />
+    <span className={`inline-flex items-center gap-1.5 border rounded-full px-2.5 py-0.5 text-xs font-bold ${cfg.cls}`}>
+      <Icon className="w-3 h-3" />
       {cfg.label}
     </span>
   );
 }
 
+// ─── sub-components ──────────────────────────────────────────────────────────
+
 function SummaryCard({ label, value, sub, accent }) {
   return (
-    <div className={`rounded-2xl border p-5 ${accent ? 'border-primary/30 bg-primary/5' : 'border-border bg-white'}`}>
-      <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-1">{label}</p>
-      <p className={`text-2xl font-bold ${accent ? 'text-primary' : 'text-foreground'}`}>{value}</p>
-      {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
+    <div className={`rounded-xl border p-4 ${accent ? 'border-primary/30 bg-primary/5' : 'border-border bg-white'}`}>
+      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-1">{label}</p>
+      <p className={`text-xl font-bold ${accent ? 'text-primary' : 'text-foreground'}`}>{value}</p>
+      {sub && <p className="text-xs text-muted-foreground mt-0.5">{sub}</p>}
     </div>
   );
 }
 
-function InvoiceRow({ invoice, onPay, paying }) {
+function SubscriptionCard({ sub, onManage, managing }) {
+  const [expanded, setExpanded] = useState(false);
+  const cfg = SUB_STATUS[sub.status] || SUB_STATUS.active;
+  const Icon = cfg.icon;
+  const renewDate = sub.current_period_end ? fmtDate(sub.current_period_end) : '—';
+  const pm = sub.payment_method;
+
+  return (
+    <div className="rounded-xl border border-border bg-white overflow-hidden shadow-sm">
+      {/* Header */}
+      <div className="flex items-center gap-4 px-5 py-4">
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+          <CreditCard className="w-5 h-5 text-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-semibold text-foreground text-sm">{sub.plan_name}</p>
+            <StatusPill status={sub.status} map={SUB_STATUS} />
+            {sub.cancel_at_period_end && (
+              <span className="text-[10px] font-bold bg-orange-100 text-orange-700 border border-orange-200 rounded-full px-2 py-0.5">
+                Cancels {renewDate}
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {fmtCents(sub.amount, sub.currency)} / {sub.interval}
+            {!sub.cancel_at_period_end && sub.status === 'active' && (
+              <span className="ml-2">· Renews {renewDate}</span>
+            )}
+          </p>
+        </div>
+        <button onClick={() => setExpanded(e => !e)} className="p-1.5 hover:bg-muted rounded-lg transition-colors">
+          {expanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+        </button>
+      </div>
+
+      {/* Expanded details */}
+      {expanded && (
+        <div className="border-t border-border px-5 py-4 space-y-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">Current Period</p>
+              <p className="text-foreground text-xs">{fmtDate(sub.current_period_start)} – {fmtDate(sub.current_period_end)}</p>
+            </div>
+            {pm && (
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">Payment Method</p>
+                <p className="text-foreground text-xs capitalize">
+                  {pm.brand ? `${pm.brand} ····${pm.last4}` : pm.type || 'On file'}
+                  {pm.exp_month && ` (${pm.exp_month}/${pm.exp_year})`}
+                </p>
+              </div>
+            )}
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-0.5">Subscription ID</p>
+              <p className="text-foreground text-xs font-mono truncate">{sub.id}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InvoiceRow({ inv }) {
+  const isPaid = inv.status === 'paid';
+
   return (
     <tr className="border-b border-border hover:bg-muted/30 transition-colors">
       <td className="px-5 py-4">
-        <p className="text-sm font-semibold text-foreground">{invoice.invoice_number}</p>
-        {invoice.description && <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-xs">{invoice.description}</p>}
+        <p className="text-sm font-semibold text-foreground">{inv.number}</p>
+        {inv.description && (
+          <p className="text-xs text-muted-foreground mt-0.5 max-w-xs truncate">{inv.description}</p>
+        )}
+        {inv.period_start && inv.period_end && (
+          <p className="text-[11px] text-muted-foreground mt-0.5">
+            {fmtDate(inv.period_start)} – {fmtDate(inv.period_end)}
+          </p>
+        )}
       </td>
-      <td className="px-5 py-4 text-sm text-foreground">{formatDate(invoice.issue_date)}</td>
-      <td className="px-5 py-4 text-sm text-foreground">{formatDate(invoice.due_date)}</td>
-      <td className="px-5 py-4 text-sm font-semibold text-foreground">{formatCurrency((invoice.amount || 0) * 100)}</td>
-      <td className="px-5 py-4"><StatusBadge status={invoice.payment_status} /></td>
+      <td className="px-5 py-4 text-sm text-foreground whitespace-nowrap">{fmtDate(inv.created)}</td>
+      <td className="px-5 py-4 text-sm font-semibold text-foreground whitespace-nowrap">{fmtCents(inv.amount_due, inv.currency)}</td>
+      <td className="px-5 py-4"><StatusPill status={inv.status} map={INV_STATUS} /></td>
       <td className="px-5 py-4">
         <div className="flex items-center gap-2">
-          {invoice.pdf_url && (
+          {inv.invoice_pdf && (
             <a
-              href={invoice.pdf_url}
-              download
+              href={inv.invoice_pdf}
+              target="_blank"
+              rel="noopener noreferrer"
               className="p-2 rounded-lg hover:bg-muted transition-colors"
               title="Download PDF"
             >
               <Download className="w-4 h-4 text-muted-foreground hover:text-foreground" />
             </a>
           )}
-          {invoice.payment_status !== 'paid' && invoice.payment_status !== 'cancelled' && (
-            <button
-              onClick={() => onPay(invoice.id)}
-              disabled={paying}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-primary hover:bg-primary/90 disabled:opacity-60 transition-colors"
+          {inv.hosted_invoice_url && !isPaid && (
+            <a
+              href={inv.hosted_invoice_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-primary hover:bg-primary/90 transition-colors"
             >
-              {paying ? <Loader2 className="w-3 h-3 animate-spin" /> : <ExternalLink className="w-3 h-3" />}
-              Pay Now
-            </button>
+              <ExternalLink className="w-3 h-3" /> Pay Now
+            </a>
+          )}
+          {inv.hosted_invoice_url && isPaid && (
+            <a
+              href={inv.hosted_invoice_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg hover:bg-muted transition-colors"
+              title="View Invoice"
+            >
+              <ExternalLink className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+            </a>
           )}
         </div>
       </td>
@@ -91,194 +196,263 @@ function InvoiceRow({ invoice, onPay, paying }) {
 // ─── main component ───────────────────────────────────────────────────────────
 
 export default function BillingDashboard({ project, subscription }) {
-  const [invoices, setInvoices]     = useState([]);
-  const [summary, setSummary]       = useState(null);
-  const [loading, setLoading]       = useState(true);
-  const [error, setError]           = useState('');
-  const [payingId, setPayingId]     = useState(null);
-  const [portalLoading, setPortalLoading] = useState(false);
-  const [portalError, setPortalError]     = useState('');
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [managing, setManaging] = useState(false);
+  const [manageError, setManageError] = useState('');
+  const [invoiceFilter, setInvoiceFilter] = useState('all'); // all | unpaid | paid
 
-  useEffect(() => { loadInvoices(); }, [project?.id]);
+  useEffect(() => { load(); }, [project?.id]);
 
-  const loadInvoices = async () => {
+  const load = async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await base44.functions.invoke('getClientInvoices', { project_id: project.id });
-      setInvoices(res.data.invoices || []);
-      setSummary(res.data.summary || {});
+      const res = await base44.functions.invoke('getStripeBillingData', {});
+      setData(res.data);
     } catch (err) {
-      setError('Failed to load billing data.');
+      // Fallback: try legacy internal invoice endpoint
+      try {
+        const res2 = await base44.functions.invoke('getClientInvoices', { project_id: project?.id });
+        setData({
+          source: 'internal',
+          subscriptions: [],
+          invoices: (res2.data.invoices || []).map(inv => ({
+            id: inv.id,
+            number: inv.invoice_number || `INV-${inv.id.slice(-6).toUpperCase()}`,
+            description: inv.description,
+            amount_due: (inv.amount || 0) * 100,
+            currency: 'usd',
+            status: inv.payment_status || 'draft',
+            created: inv.issue_date ? Math.floor(new Date(inv.issue_date).getTime() / 1000) : null,
+            hosted_invoice_url: inv.payment_link || null,
+            invoice_pdf: inv.pdf_url || null,
+          })),
+          summary: res2.data.summary || {},
+        });
+      } catch {
+        setError('Unable to load billing data. Please try again or contact support.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePayInvoice = async (invoiceId) => {
-    setPayingId(invoiceId);
-    try {
-      const res = await base44.functions.invoke('createInvoicePaymentLink', { invoice_id: invoiceId });
-      if (res.data.payment_link) window.open(res.data.payment_link, '_blank');
-    } catch {
-      setError('Failed to create payment link.');
-    } finally {
-      setPayingId(null);
-    }
-  };
-
-  const handleUpdateCard = async () => {
-    setPortalLoading(true);
-    setPortalError('');
+  const handleManageBilling = async () => {
+    setManaging(true);
+    setManageError('');
     try {
       const res = await base44.functions.invoke('getStripeCustomerPortalUrl', {
         return_url: window.location.href,
       });
       if (res.data.url) window.open(res.data.url, '_blank');
     } catch (err) {
-      setPortalError(err?.data?.error || 'Unable to open billing portal. Please contact support.');
+      setManageError(err?.response?.data?.error || 'Unable to open billing portal. Please contact support.');
     } finally {
-      setPortalLoading(false);
+      setManaging(false);
     }
   };
 
-  // ── subscription status derived ──────────────────────────────────────────
-  const subStatus   = subscription?.status || 'unknown';
-  const renewsOn    = subscription?.current_period_end;
-  const currentPlan = subscription?.plan_type || project?.plan || '—';
+  const subscriptions = data?.subscriptions || [];
+  const allInvoices = data?.invoices || [];
+  const summary = data?.summary || {};
+  const hasStripe = data?.source === 'stripe';
+
+  const filteredInvoices = allInvoices.filter(inv => {
+    if (invoiceFilter === 'paid') return inv.status === 'paid';
+    if (invoiceFilter === 'unpaid') return inv.status !== 'paid' && inv.status !== 'void';
+    return true;
+  });
+
+  // Active subscription for header
+  const activeSub = subscriptions.find(s => s.status === 'active' || s.status === 'trialing') || subscriptions[0];
+  const subStatus = activeSub?.status || subscription?.status || 'unknown';
+  const planName = activeSub?.plan_name || subscription?.plan_type || project?.plan || '—';
+  const renewDate = activeSub?.current_period_end ? fmtDate(activeSub.current_period_end) : '—';
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20 gap-2 text-muted-foreground text-sm">
+        <Loader2 className="w-5 h-5 animate-spin" /> Loading billing data…
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
 
-      {/* ── Subscription Status Card ──────────────────────────── */}
+      {/* ── Subscription Header ─────────────────────────────────── */}
       <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
-        {/* gradient header */}
-        <div className="px-6 py-5" style={{ background: 'linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 60%,#c8965c 100%)' }}>
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div>
-              <p className="text-xs font-bold text-amber-300/70 uppercase tracking-widest mb-1">Your Subscription</p>
-              <h2 className="text-xl font-display font-semibold text-white">{currentPlan}</h2>
-            </div>
-            <StatusBadge status={subStatus} />
+        <div
+          className="px-6 py-5 flex items-start justify-between flex-wrap gap-4"
+          style={{ background: 'linear-gradient(135deg,#003B8F 0%,#006BB0 60%,#00AEEF 100%)' }}
+        >
+          <div>
+            <p className="text-xs font-bold text-blue-200/70 uppercase tracking-widest mb-1">Your Plan</p>
+            <h2 className="text-2xl font-bold text-white">{planName}</h2>
+            {activeSub && (
+              <p className="text-blue-100/80 text-sm mt-1">
+                {fmtCents(activeSub.amount, activeSub.currency)} / {activeSub.interval}
+                {!activeSub.cancel_at_period_end && ` · Renews ${renewDate}`}
+              </p>
+            )}
           </div>
+          <StatusPill status={subStatus} map={SUB_STATUS} />
         </div>
 
-        <div className="p-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <SummaryCard label="Status"     value={subStatus === 'active' ? 'Active' : subStatus} accent={subStatus === 'active'} />
-          <SummaryCard label="Next Renewal" value={renewsOn ? formatDate(renewsOn) : '—'} sub="Auto-renews" />
-          <SummaryCard label="Outstanding" value={summary ? `$${(summary.total_outstanding || 0).toFixed(2)}` : '—'} accent={summary?.total_outstanding > 0} />
-          <SummaryCard label="Invoices" value={summary?.total_invoices ?? '—'} sub={`${summary?.unpaid_count || 0} unpaid`} />
+        {/* KPI row */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5">
+          <SummaryCard
+            label="Status"
+            value={activeSub ? (SUB_STATUS[subStatus]?.label || subStatus) : (subscription?.status || '—')}
+            accent={subStatus === 'active'}
+          />
+          <SummaryCard label="Next Renewal" value={renewDate} sub={activeSub?.cancel_at_period_end ? 'Then cancels' : 'Auto-renews'} />
+          <SummaryCard
+            label="Outstanding"
+            value={fmtDollars(summary.total_outstanding || 0)}
+            accent={(summary.total_outstanding || 0) > 0}
+            sub={summary.unpaid_count ? `${summary.unpaid_count} unpaid` : 'All clear'}
+          />
+          <SummaryCard label="Total Invoices" value={summary.total_invoices ?? allInvoices.length} />
         </div>
 
-        {/* Update payment method CTA */}
-        <div className="px-6 pb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 border-t border-border pt-5">
+        {/* Manage billing CTA */}
+        <div className="px-5 pb-5 border-t border-border pt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex items-start gap-3 flex-1">
             <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
               <CreditCard className="w-4 h-4 text-primary" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">Update Payment Method</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Change your credit card or billing details securely via Stripe.</p>
+              <p className="text-sm font-semibold text-foreground">Manage Billing & Payment Method</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Update your card, view receipts, or cancel your subscription via the secure Stripe portal.
+              </p>
             </div>
           </div>
-          <div className="flex flex-col gap-1.5 items-start sm:items-end">
+          <div className="flex flex-col items-start sm:items-end gap-1.5">
             <button
-              onClick={handleUpdateCard}
-              disabled={portalLoading}
+              onClick={handleManageBilling}
+              disabled={managing}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-60"
-              style={{ background: 'linear-gradient(135deg,#6b3f1f,#9a5c2e)' }}
+              style={{ background: 'linear-gradient(135deg,#0088CC,#003B8F)' }}
             >
-              {portalLoading
-                ? <Loader2 className="w-4 h-4 animate-spin" />
-                : <CreditCard className="w-4 h-4" />}
-              {portalLoading ? 'Opening…' : 'Manage Payment'}
-              <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+              {managing ? <Loader2 className="w-4 h-4 animate-spin" /> : <ExternalLink className="w-4 h-4" />}
+              {managing ? 'Opening…' : 'Open Stripe Portal'}
             </button>
-            {portalError && (
+            {manageError && (
               <p className="text-xs text-red-600 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" /> {portalError}
+                <AlertCircle className="w-3 h-3" /> {manageError}
               </p>
             )}
           </div>
         </div>
       </div>
 
+      {/* ── Active Subscriptions ────────────────────────────────── */}
+      {subscriptions.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="font-semibold text-foreground flex items-center gap-2">
+            <BadgeCheck className="w-4 h-4 text-primary" />
+            Active Subscriptions
+          </h3>
+          {subscriptions.map(sub => (
+            <SubscriptionCard key={sub.id} sub={sub} onManage={handleManageBilling} managing={managing} />
+          ))}
+        </div>
+      )}
+
       {/* ── Security note ─────────────────────────────────────── */}
       <div className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
         <ShieldCheck className="w-4 h-4 flex-shrink-0 text-green-600" />
-        Payment details are managed securely by Stripe. We never store your full card number.
+        <span>Payment details are managed securely by <strong>Stripe</strong>. We never store your full card number.</span>
+        {hasStripe && (
+          <span className="ml-auto flex-shrink-0 text-xs font-bold bg-green-200 text-green-800 px-2 py-0.5 rounded-full">
+            Live Data
+          </span>
+        )}
       </div>
 
-      {/* ── Invoices ──────────────────────────────────────────── */}
+      {error && (
+        <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
+        </div>
+      )}
+
+      {/* ── Invoice History ────────────────────────────────────── */}
       <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border flex-wrap gap-3">
           <div className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-primary" />
             <h3 className="font-semibold text-foreground">Invoice History</h3>
+            {allInvoices.length > 0 && (
+              <span className="text-xs text-muted-foreground bg-muted rounded-full px-2 py-0.5">{allInvoices.length}</span>
+            )}
           </div>
-          <button
-            onClick={loadInvoices}
-            disabled={loading}
-            className="p-1.5 hover:bg-muted rounded-lg transition-colors"
-          >
-            <RefreshCw className={`w-4 h-4 text-muted-foreground ${loading ? 'animate-spin' : ''}`} />
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Filter tabs */}
+            <div className="flex gap-1 bg-muted rounded-lg p-1">
+              {[
+                { key: 'all', label: 'All' },
+                { key: 'unpaid', label: 'Unpaid' },
+                { key: 'paid', label: 'Paid' },
+              ].map(f => (
+                <button
+                  key={f.key}
+                  onClick={() => setInvoiceFilter(f.key)}
+                  className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-colors ${
+                    invoiceFilter === f.key ? 'bg-white text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+            <button onClick={load} disabled={loading} className="p-1.5 hover:bg-muted rounded-lg transition-colors">
+              <RefreshCw className={`w-4 h-4 text-muted-foreground ${loading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
         </div>
 
-        {error && (
-          <div className="mx-6 mt-4 flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
-          </div>
-        )}
-
-        {loading ? (
-          <div className="flex items-center justify-center py-16 gap-2 text-muted-foreground text-sm">
-            <Loader2 className="w-5 h-5 animate-spin" /> Loading invoices…
-          </div>
-        ) : invoices.length === 0 ? (
+        {filteredInvoices.length === 0 ? (
           <div className="py-16 text-center">
             <FileText className="w-12 h-12 mx-auto text-muted-foreground/20 mb-3" />
-            <p className="font-semibold text-foreground">No invoices yet</p>
-            <p className="text-sm text-muted-foreground mt-1">Invoices will appear here once billing begins.</p>
+            <p className="font-semibold text-foreground">
+              {invoiceFilter === 'all' ? 'No invoices yet' : `No ${invoiceFilter} invoices`}
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              {invoiceFilter === 'all' ? 'Invoices will appear here once billing begins.' : 'Try the "All" filter to see everything.'}
+            </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px]">
-              <thead className="bg-muted/40 border-b border-border text-xs font-semibold text-foreground uppercase tracking-wide">
+            <table className="w-full min-w-[560px]">
+              <thead className="bg-muted/40 border-b border-border">
                 <tr>
-                  <th className="px-5 py-3 text-left">Invoice</th>
-                  <th className="px-5 py-3 text-left">Issued</th>
-                  <th className="px-5 py-3 text-left">Due</th>
-                  <th className="px-5 py-3 text-left">Amount</th>
-                  <th className="px-5 py-3 text-left">Status</th>
-                  <th className="px-5 py-3 text-left">Actions</th>
+                  {['Invoice', 'Date', 'Amount', 'Status', 'Actions'].map(h => (
+                    <th key={h} className="px-5 py-3 text-left text-xs font-bold text-foreground uppercase tracking-wide">{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {invoices.map(inv => (
-                  <InvoiceRow
-                    key={inv.id}
-                    invoice={inv}
-                    onPay={handlePayInvoice}
-                    paying={payingId === inv.id}
-                  />
-                ))}
+                {filteredInvoices.map(inv => <InvoiceRow key={inv.id} inv={inv} />)}
               </tbody>
             </table>
           </div>
         )}
       </div>
 
-      {/* ── Payment instructions ──────────────────────────────── */}
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-2">
-        <p className="text-sm font-semibold text-amber-900 flex items-center gap-2">
-          <Zap className="w-4 h-4" /> Payment Information
+      {/* ── Help callout ──────────────────────────────────────── */}
+      <div className="rounded-xl border border-border bg-muted/30 p-5 space-y-2">
+        <p className="text-sm font-semibold text-foreground flex items-center gap-2">
+          <Zap className="w-4 h-4 text-primary" /> Billing Help
         </p>
-        <ul className="text-sm text-amber-800 space-y-1.5">
-          <li className="flex gap-2"><span>•</span><span>Click <strong>Pay Now</strong> to securely complete outstanding invoices via Stripe.</span></li>
-          <li className="flex gap-2"><span>•</span><span>Click <strong>Manage Payment</strong> above to update your card or view payment history in Stripe.</span></li>
-          <li className="flex gap-2"><span>•</span><span>PDF invoices can be downloaded using the <Download className="inline w-3 h-3" /> icon on each row.</span></li>
-          <li className="flex gap-2"><span>•</span><span>Payment receipts are automatically emailed to you after each successful charge.</span></li>
+        <ul className="text-sm text-muted-foreground space-y-1.5">
+          <li className="flex gap-2"><span>•</span><span>Click <strong>Open Stripe Portal</strong> to update your card, download receipts, or cancel.</span></li>
+          <li className="flex gap-2"><span>•</span><span>Click <strong>Pay Now</strong> on any open invoice to complete the payment securely via Stripe.</span></li>
+          <li className="flex gap-2"><span>•</span><span>Click the <Download className="inline w-3 h-3 mx-0.5" /> icon to download a PDF invoice for your records.</span></li>
+          <li className="flex gap-2"><span>•</span><span>Questions? Email <a href="mailto:billing@clientsurgesystems.com" className="text-primary underline">billing@clientsurgesystems.com</a></span></li>
         </ul>
       </div>
 
