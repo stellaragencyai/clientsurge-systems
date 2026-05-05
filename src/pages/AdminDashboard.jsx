@@ -80,6 +80,7 @@ const NAV_GROUPS = [
     group: 'System',
     items: [
       { id: 'sniper', label: '🎯 Lead Sniper', icon: Crosshair },
+      { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
       { id: 'social-engine', label: 'Social Media Engine', icon: Sparkles },
       { id: 'website-copy', label: 'Website Copy AI', icon: Wand2 },
       { id: 'task-board', label: 'Task Board', icon: ClipboardList },
