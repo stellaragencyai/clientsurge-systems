@@ -5,7 +5,7 @@ import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw, Plus,
-  Server, RotateCcw, BookOpen, Wand2,
+  Server, RotateCcw, BookOpen, Wand2, Sparkles,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
@@ -37,6 +37,7 @@ import LeadReactivationPanel from '../components/admin/LeadReactivationPanel';
 import TaskBoardPanel from '../components/admin/TaskBoardPanel';
 import AutomationAlertsPanel from '../components/admin/AutomationAlertsPanel';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
+import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 
 const NAV_GROUPS = [
   {
@@ -77,6 +78,7 @@ const NAV_GROUPS = [
   {
     group: 'System',
     items: [
+      { id: 'social-engine', label: 'Social Media Engine', icon: Sparkles },
       { id: 'website-copy', label: 'Website Copy AI', icon: Wand2 },
       { id: 'task-board', label: 'Task Board', icon: ClipboardList },
       { id: 'health', label: 'Integration Health', icon: Activity },
@@ -191,6 +193,7 @@ export default function AdminDashboard() {
       case 'cadence': return <DynamicCadencePanel />;
       case 'reactivation': return <LeadReactivationPanel />;
       case 'review-request': return <ReviewRequestPanel />;
+      case 'social-engine': return <SocialMediaEngine />;
       case 'website-copy': return <WebsiteCopyPanel />;
       case 'task-board': return <TaskBoardPanel />;
       case 'qa': return (
