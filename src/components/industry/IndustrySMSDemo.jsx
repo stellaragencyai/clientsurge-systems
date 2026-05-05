@@ -99,7 +99,7 @@ export default function IndustrySMSDemo({
             <div className="flex items-center gap-3 mb-5">
               <div
                 className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                style={{ background: "#000", border: "1px solid #333" }}
+                style={{ background: "#fff", border: "1px solid #e5e7eb" }}
               >
                 <Zap style={{ width: "18px", height: "18px", color: accentColor }} />
               </div>
