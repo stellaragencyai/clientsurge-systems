@@ -101,7 +101,7 @@ export default function IndustrySMSDemo({
                 className="w-10 h-10 rounded-2xl flex items-center justify-center"
                 style={{ background: `${accentColor}15`, border: `1px solid ${accentColor}30` }}>
                 
-                <Zap style={{ width: "18px", height: "18px", color: accentColor }} className="bg-[hsl(var(--background))] lucide lucide-zap" />
+                <Zap style={{ width: "18px", height: "18px", color: "#000" }} className="bg-[hsl(var(--background))] lucide lucide-zap" />
               </div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Automation Trigger</p>
