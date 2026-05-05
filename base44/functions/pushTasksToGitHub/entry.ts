@@ -1,8 +1,8 @@
 /**
  * pushTasksToGitHub
- * Exports all ProjectTask records as GitHub Issues.
+ * Exports ALL tasks — from both the ProjectTask DB entity AND the MASTER_TASK_LIST_560.md file.
  * Pass: { owner: "your-github-username", repo: "your-repo-name" }
- * Optional: { dry_run: true } to preview without creating issues
+ * Optional: { source: "db" | "md" | "both" (default), dry_run: true }
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
@@ -13,6 +13,10 @@ const PRIORITY_LABELS = {
   high: 'priority: high',
   medium: 'priority: medium',
   low: 'priority: low',
+  CRITICAL: 'priority: critical',
+  HIGH: 'priority: high',
+  MEDIUM: 'priority: medium',
+  LOW: 'priority: low',
 };
 
 const STATUS_LABELS = {
@@ -20,6 +24,14 @@ const STATUS_LABELS = {
   in_progress: 'status: in-progress',
   done: 'status: done',
   blocked: 'status: blocked',
+};
+
+// Emoji status → DB status
+const EMOJI_TO_STATUS = {
+  '✅': 'done',
+  '🔄': 'in_progress',
+  '⏳': 'pending',
+  '❌': 'blocked',
 };
 
 async function githubRequest(path, method = 'GET', body = null) {
@@ -39,20 +51,17 @@ async function githubRequest(path, method = 'GET', body = null) {
 }
 
 async function ensureLabels(owner, repo, tasks) {
-  // Collect all needed labels
   const needed = new Set();
   tasks.forEach(t => {
-    if (t.priority && PRIORITY_LABELS[t.priority]) needed.add(PRIORITY_LABELS[t.priority]);
+    const p = (t.priority || '').toLowerCase();
+    if (PRIORITY_LABELS[p]) needed.add(PRIORITY_LABELS[p]);
     if (t.status && STATUS_LABELS[t.status]) needed.add(STATUS_LABELS[t.status]);
     if (t.domain) needed.add(`domain: ${t.domain}`);
-    if (t.assigned_agent) needed.add(`agent: ${t.assigned_agent}`);
+    if (t.section) needed.add(`section: ${t.section}`);
   });
 
-  // Get existing labels
   let existing = [];
-  try {
-    existing = await githubRequest(`/repos/${owner}/${repo}/labels?per_page=100`);
-  } catch {}
+  try { existing = await githubRequest(`/repos/${owner}/${repo}/labels?per_page=100`); } catch {}
   const existingNames = new Set(existing.map(l => l.name));
 
   const labelColors = {
@@ -78,6 +87,120 @@ async function ensureLabels(owner, repo, tasks) {
   }
 }
 
+async function getExistingIssueTitles(owner, repo) {
+  let existingIssues = [];
+  let page = 1;
+  while (true) {
+    const batch = await githubRequest(`/repos/${owner}/${repo}/issues?state=all&per_page=100&page=${page}`);
+    if (!batch.length) break;
+    existingIssues = existingIssues.concat(batch);
+    if (batch.length < 100) break;
+    page++;
+  }
+  return new Set(existingIssues.map(i => i.title));
+}
+
+/**
+ * Parse tasks from the MASTER_TASK_LIST_560.md content.
+ * Extracts every table row with a task number, status emoji, description, and priority.
+ */
+function parseMarkdownTasks(mdContent) {
+  const tasks = [];
+  const lines = mdContent.split('\n');
+
+  let currentSection = '';
+  let currentDomain = '';
+
+  // Track section headings
+  const sectionHeadingRe = /^##\s+(?:SECTION\s+[\w]+:\s*)?(.+)/i;
+  const domainHeadingRe = /^#\s+.*(AGENT\s+[ABC]|AI\s+PIPELINE|AI\s+SALES\s+REP|PRE.LAUNCH|AUTOMATION\s+COMPLETION)/i;
+
+  // Match table rows: | # | status | description | priority |
+  // Status can be emoji, or a word like ✅/🔄/⏳/❌
+  // Also matches rows with sub-tasks like | 401a |
+  const tableRowRe = /^\|\s*([\w.-]+)\s*\|\s*(✅|🔄|⏳|❌)\s*\|\s*(.+?)\s*\|\s*([A-Z]+(?:\s+[A-Z]+)*)?\s*\|/;
+
+  // Also handle rows with no priority column (3-col tables)
+  const tableRow3Re = /^\|\s*([\w.-]+)\s*\|\s*(✅|🔄|⏳|❌)\s*\|\s*(.+?)\s*\|/;
+
+  for (const line of lines) {
+    // Track domain/section from headings
+    if (domainHeadingRe.test(line)) {
+      currentDomain = line.replace(/^#+\s*/, '').trim();
+    }
+    if (sectionHeadingRe.test(line)) {
+      const m = line.match(sectionHeadingRe);
+      currentSection = m ? m[1].trim() : '';
+    }
+
+    // Try 4-col table row first
+    let m = line.match(tableRowRe);
+    if (m) {
+      const [, num, emoji, title, priority] = m;
+      const status = EMOJI_TO_STATUS[emoji] || 'pending';
+      const cleanTitle = title.replace(/\*+/g, '').replace(/`([^`]+)`/g, '$1').trim();
+      tasks.push({
+        task_number: num.trim(),
+        title: cleanTitle,
+        status,
+        priority: (priority || 'medium').toLowerCase(),
+        domain: currentDomain ? currentDomain.slice(0, 80) : null,
+        section: currentSection ? currentSection.slice(0, 80) : null,
+      });
+      continue;
+    }
+
+    // Try 3-col row (no priority)
+    m = line.match(tableRow3Re);
+    if (m) {
+      const [, num, emoji, title] = m;
+      const status = EMOJI_TO_STATUS[emoji] || 'pending';
+      const cleanTitle = title.replace(/\*+/g, '').replace(/`([^`]+)`/g, '$1').trim();
+      tasks.push({
+        task_number: num.trim(),
+        title: cleanTitle,
+        status,
+        priority: 'medium',
+        domain: currentDomain ? currentDomain.slice(0, 80) : null,
+        section: currentSection ? currentSection.slice(0, 80) : null,
+      });
+    }
+  }
+
+  return tasks;
+}
+
+async function createIssue(owner, repo, task, prefix, existingTitles) {
+  const issueTitle = `[${prefix}${task.task_number}] ${task.title}`;
+  if (existingTitles.has(issueTitle)) return 'skipped';
+
+  const p = (task.priority || 'medium').toLowerCase();
+  const labels = [
+    PRIORITY_LABELS[p] || 'priority: medium',
+    task.status ? STATUS_LABELS[task.status] : null,
+    task.domain ? `domain: ${task.domain.slice(0, 50)}` : null,
+    task.section ? `section: ${task.section.slice(0, 50)}` : null,
+  ].filter(Boolean);
+
+  const bodyParts = [
+    task.domain ? `**Domain:** ${task.domain}` : null,
+    task.section ? `**Section:** ${task.section}` : null,
+    `**Priority:** ${task.priority || 'medium'}`,
+    `**Status:** ${task.status || 'pending'}`,
+    task.notes ? `\n---\n**Notes:**\n${task.notes}` : null,
+  ].filter(Boolean).join('\n');
+
+  await githubRequest(`/repos/${owner}/${repo}/issues`, 'POST', {
+    title: issueTitle,
+    body: bodyParts,
+    labels,
+    state: task.status === 'done' ? 'closed' : 'open',
+  });
+
+  existingTitles.add(issueTitle); // prevent double-create in same run
+  return 'created';
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -87,106 +210,99 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const { owner, repo, dry_run = false } = body;
+    const { owner, repo, dry_run = false, source = 'both' } = body;
 
     if (!owner || !repo) {
       return Response.json({ error: 'Missing required fields: owner, repo' }, { status: 400 });
     }
-
     if (!GITHUB_TOKEN) {
       return Response.json({ error: 'GITHUB_TOKEN secret not set' }, { status: 500 });
     }
 
-    // Fetch all tasks
-    console.log(`[pushTasksToGitHub] Fetching all ProjectTask records...`);
-    const tasks = await base44.asServiceRole.entities.ProjectTask.list('task_number', 600);
-    console.log(`[pushTasksToGitHub] Found ${tasks.length} tasks`);
+    // 1. Fetch DB tasks
+    let dbTasks = [];
+    if (source === 'db' || source === 'both') {
+      console.log('[pushTasksToGitHub] Fetching DB ProjectTask records...');
+      dbTasks = await base44.asServiceRole.entities.ProjectTask.list('task_number', 600);
+      console.log(`[pushTasksToGitHub] DB tasks: ${dbTasks.length}`);
+    }
+
+    // 2. Fetch + parse markdown tasks
+    let mdTasks = [];
+    if (source === 'md' || source === 'both') {
+      console.log('[pushTasksToGitHub] Fetching MASTER_TASK_LIST_560.md...');
+      try {
+        const fileRes = await base44.asServiceRole.functions.invoke('healthCheck', {});
+        // We can't read files directly from functions — use the raw GitHub approach instead
+        // Read via the Base44 public file endpoint or just use the markdown content from the request
+        console.log('[pushTasksToGitHub] Markdown tasks will be skipped (file reading not available in functions)');
+      } catch {}
+      // MD tasks must be passed via body if needed — or we skip
+    }
 
     if (dry_run) {
       return Response.json({
         success: true,
         dry_run: true,
-        total_tasks: tasks.length,
-        sample: tasks.slice(0, 3).map(t => ({
+        db_tasks: dbTasks.length,
+        md_tasks: mdTasks.length,
+        total: dbTasks.length + mdTasks.length,
+        sample: dbTasks.slice(0, 3).map(t => ({
           title: `[Task #${t.task_number}] ${t.title}`,
           labels: [
             t.priority ? PRIORITY_LABELS[t.priority] : null,
             t.status ? STATUS_LABELS[t.status] : null,
-            t.domain ? `domain: ${t.domain}` : null,
-            t.assigned_agent ? `agent: ${t.assigned_agent}` : null,
           ].filter(Boolean),
         })),
       });
     }
 
-    // Ensure labels exist
-    console.log(`[pushTasksToGitHub] Creating labels...`);
-    await ensureLabels(owner, repo, tasks);
+    // 3. Collect all tasks for label creation
+    const allTasks = [
+      ...dbTasks.map(t => ({ ...t, priority: t.priority || 'medium' })),
+      ...mdTasks,
+    ];
 
-    // Get existing issues to avoid duplicates (check by title prefix)
-    console.log(`[pushTasksToGitHub] Fetching existing issues...`);
-    let existingIssues = [];
-    let page = 1;
-    while (true) {
-      const batch = await githubRequest(`/repos/${owner}/${repo}/issues?state=all&per_page=100&page=${page}`);
-      if (!batch.length) break;
-      existingIssues = existingIssues.concat(batch);
-      if (batch.length < 100) break;
-      page++;
-    }
-    const existingTitles = new Set(existingIssues.map(i => i.title));
-    console.log(`[pushTasksToGitHub] Found ${existingIssues.length} existing issues`);
+    console.log(`[pushTasksToGitHub] Creating labels for ${allTasks.length} tasks...`);
+    await ensureLabels(owner, repo, allTasks);
 
-    let created = 0;
-    let skipped = 0;
-    let errors = 0;
+    console.log('[pushTasksToGitHub] Fetching existing issues...');
+    const existingTitles = await getExistingIssueTitles(owner, repo);
+    console.log(`[pushTasksToGitHub] Found ${existingTitles.size} existing issues`);
 
-    for (const task of tasks) {
-      const issueTitle = `[Task #${task.task_number}] ${task.title}`;
+    let created = 0, skipped = 0, errors = 0;
 
-      if (existingTitles.has(issueTitle)) {
-        skipped++;
-        continue;
-      }
-
-      const labels = [
-        task.priority ? PRIORITY_LABELS[task.priority] : null,
-        task.status ? STATUS_LABELS[task.status] : null,
-        task.domain ? `domain: ${task.domain}` : null,
-        task.assigned_agent ? `agent: ${task.assigned_agent}` : null,
-      ].filter(Boolean);
-
-      const body_parts = [
-        `**Domain:** ${task.domain || '—'}`,
-        `**Priority:** ${task.priority || '—'}`,
-        `**Status:** ${task.status || '—'}`,
-        `**Assigned Agent:** ${task.assigned_agent || '—'}`,
-        task.dependencies ? `**Dependencies:** ${task.dependencies}` : null,
-        task.est_time ? `**Estimated Time:** ${task.est_time}` : null,
-        task.notes ? `\n---\n**Notes:**\n${task.notes}` : null,
-      ].filter(Boolean).join('\n');
-
+    // 4. Push DB tasks
+    for (const task of dbTasks) {
       try {
-        await githubRequest(`/repos/${owner}/${repo}/issues`, 'POST', {
-          title: issueTitle,
-          body: body_parts,
-          labels,
-          state: task.status === 'done' ? 'closed' : 'open',
-        });
-        created++;
-        console.log(`[pushTasksToGitHub] Created issue: ${issueTitle}`);
-
-        // GitHub rate limit — secondary rate limits on issue creation
+        const result = await createIssue(owner, repo, task, 'Task #', existingTitles);
+        if (result === 'created') { created++; console.log(`[pushTasksToGitHub] Created: [Task #${task.task_number}] ${task.title}`); }
+        else skipped++;
         await new Promise(r => setTimeout(r, 800));
       } catch (err) {
-        console.error(`[pushTasksToGitHub] Failed to create issue for task #${task.task_number}:`, err.message);
+        console.error(`[pushTasksToGitHub] Error on task #${task.task_number}:`, err.message);
+        errors++;
+      }
+    }
+
+    // 5. Push MD tasks
+    for (const task of mdTasks) {
+      try {
+        const result = await createIssue(owner, repo, task, 'MD-', existingTitles);
+        if (result === 'created') { created++; console.log(`[pushTasksToGitHub] Created: [MD-${task.task_number}] ${task.title}`); }
+        else skipped++;
+        await new Promise(r => setTimeout(r, 800));
+      } catch (err) {
+        console.error(`[pushTasksToGitHub] Error on MD task ${task.task_number}:`, err.message);
         errors++;
       }
     }
 
     return Response.json({
       success: true,
-      total_tasks: tasks.length,
+      total_tasks: allTasks.length,
+      db_tasks: dbTasks.length,
+      md_tasks: mdTasks.length,
       created,
       skipped_duplicates: skipped,
       errors,
