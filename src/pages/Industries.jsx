@@ -75,7 +75,7 @@ export default function Industries() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <section className="text-center py-20 px-1" style={{ background: "linear-gradient(to bottom, hsl(40,8%,88%), hsl(0,0%,100%))" }}>
+      <section className="text-center pr-2 pl-2 pt-24" style={{ background: "linear-gradient(to bottom, hsl(40,8%,88%), hsl(0,0%,100%))" }}>
         <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Industries</p>
         <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
           Automation for Appointment-Based Businesses
