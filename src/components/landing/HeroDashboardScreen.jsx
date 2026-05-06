@@ -2,63 +2,63 @@ import { useEffect, useRef, useState, useCallback } from "react";
 
 // ─── Industry Data ─────────────────────────────────────────────────────────
 const INDUSTRIES = [
-  {
-    badge: "MED SPA",
-    accent: "Bookings.",
-    headline: "AI That Fills Your",
-    sub: "Respond to every lead in under 60 seconds — even after hours. Our system handles the follow-up so your staff can focus on patients.",
-    cardTitle: "Lead Conversion",
-    cardSub: "Glow Med Spa · 3 Locations",
-    metrics: [{ label: "LEADS TODAY", val: 24 }, { label: "RESPONDED", val: 24 }],
-    checks: ["Instant SMS sent", "Follow-up queued", "Booking link shared", "Reminder scheduled"],
-    footer: "Avg response: 38 seconds",
-    color: "#00AEEF",
-    notification: "🔔 New lead captured · Glow Med Spa",
-    navIcon: "💆",
-  },
-  {
-    badge: "DENTAL",
-    accent: "Appointments.",
-    headline: "AI That Books More",
-    sub: "Turn missed calls and web inquiries into confirmed appointments — automatically. No extra staff. No dropped leads.",
-    cardTitle: "Missed Call Recovery",
-    cardSub: "Summit Dental · 2 Offices",
-    metrics: [{ label: "MISSED CALLS", val: 11 }, { label: "RECOVERED", val: 10 }],
-    checks: ["Text-back sent in 60s", "Patient matched", "Booking link delivered", "Follow-up active"],
-    footer: "Recovery rate: 91%",
-    color: "#009DFF",
-    notification: "📅 Appointment booked · Summit Dental",
-    navIcon: "🦷",
-  },
-  {
-    badge: "HVAC",
-    accent: "Service Calls.",
-    headline: "AI That Wins More",
-    sub: "Beat the competition to every hot lead. Our AI responds instantly, qualifies the job, and books the appointment before they call someone else.",
-    cardTitle: "Speed-to-Lead",
-    cardSub: "CoolBreeze HVAC · Phoenix",
-    metrics: [{ label: "LEADS THIS WEEK", val: 47 }, { label: "BOOKED", val: 39 }],
-    checks: ["Lead captured", "Responded in 44s", "Job qualified by AI", "Tech dispatched"],
-    footer: "Booking rate: 83%",
-    color: "#0088CC",
-    notification: "⚡ Lead responded · CoolBreeze HVAC",
-    navIcon: "❄️",
-  },
-  {
-    badge: "ROOFING",
-    accent: "Estimates.",
-    headline: "AI That Schedules More",
-    sub: "Capture storm-season leads instantly and schedule estimates before your competitors even see the inquiry.",
-    cardTitle: "Storm Season Pipeline",
-    cardSub: "Peak Roofing · 5 Crews",
-    metrics: [{ label: "INQUIRIES", val: 63 }, { label: "ESTIMATES SET", val: 58 }],
-    checks: ["Inquiry captured", "Rapid SMS sent", "Estimate scheduled", "Crew notified"],
-    footer: "Avg booking time: 6 min",
-    color: "#003B8F",
-    notification: "🏠 Estimate scheduled · Peak Roofing",
-    navIcon: "🏗️",
-  },
-];
+{
+  badge: "MED SPA",
+  accent: "Bookings.",
+  headline: "AI That Fills Your",
+  sub: "Respond to every lead in under 60 seconds — even after hours. Our system handles the follow-up so your staff can focus on patients.",
+  cardTitle: "Lead Conversion",
+  cardSub: "Glow Med Spa · 3 Locations",
+  metrics: [{ label: "LEADS TODAY", val: 24 }, { label: "RESPONDED", val: 24 }],
+  checks: ["Instant SMS sent", "Follow-up queued", "Booking link shared", "Reminder scheduled"],
+  footer: "Avg response: 38 seconds",
+  color: "#00AEEF",
+  notification: "🔔 New lead captured · Glow Med Spa",
+  navIcon: "💆"
+},
+{
+  badge: "DENTAL",
+  accent: "Appointments.",
+  headline: "AI That Books More",
+  sub: "Turn missed calls and web inquiries into confirmed appointments — automatically. No extra staff. No dropped leads.",
+  cardTitle: "Missed Call Recovery",
+  cardSub: "Summit Dental · 2 Offices",
+  metrics: [{ label: "MISSED CALLS", val: 11 }, { label: "RECOVERED", val: 10 }],
+  checks: ["Text-back sent in 60s", "Patient matched", "Booking link delivered", "Follow-up active"],
+  footer: "Recovery rate: 91%",
+  color: "#009DFF",
+  notification: "📅 Appointment booked · Summit Dental",
+  navIcon: "🦷"
+},
+{
+  badge: "HVAC",
+  accent: "Service Calls.",
+  headline: "AI That Wins More",
+  sub: "Beat the competition to every hot lead. Our AI responds instantly, qualifies the job, and books the appointment before they call someone else.",
+  cardTitle: "Speed-to-Lead",
+  cardSub: "CoolBreeze HVAC · Phoenix",
+  metrics: [{ label: "LEADS THIS WEEK", val: 47 }, { label: "BOOKED", val: 39 }],
+  checks: ["Lead captured", "Responded in 44s", "Job qualified by AI", "Tech dispatched"],
+  footer: "Booking rate: 83%",
+  color: "#0088CC",
+  notification: "⚡ Lead responded · CoolBreeze HVAC",
+  navIcon: "❄️"
+},
+{
+  badge: "ROOFING",
+  accent: "Estimates.",
+  headline: "AI That Schedules More",
+  sub: "Capture storm-season leads instantly and schedule estimates before your competitors even see the inquiry.",
+  cardTitle: "Storm Season Pipeline",
+  cardSub: "Peak Roofing · 5 Crews",
+  metrics: [{ label: "INQUIRIES", val: 63 }, { label: "ESTIMATES SET", val: 58 }],
+  checks: ["Inquiry captured", "Rapid SMS sent", "Estimate scheduled", "Crew notified"],
+  footer: "Avg booking time: 6 min",
+  color: "#003B8F",
+  notification: "🏠 Estimate scheduled · Peak Roofing",
+  navIcon: "🏗️"
+}];
+
 
 const CYCLE_DURATION = 5000;
 
@@ -109,15 +109,15 @@ function StatusBar({ color }) {
       fontSize: "11px", fontWeight: "700",
       color: "rgba(255,255,255,0.92)",
       letterSpacing: "0.01em",
-      flexShrink: 0,
+      flexShrink: 0
     }}>
       <span style={{ fontVariantNumeric: "tabular-nums" }}>{time}</span>
       <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
         {/* Signal bars */}
         <div style={{ display: "flex", alignItems: "flex-end", gap: "2px" }}>
-          {[4, 6, 8, 10].map((h, i) => (
-            <div key={i} style={{ width: "3px", height: `${h}px`, background: i < 3 ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)", borderRadius: "1px" }} />
-          ))}
+          {[4, 6, 8, 10].map((h, i) =>
+          <div key={i} style={{ width: "3px", height: `${h}px`, background: i < 3 ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.35)", borderRadius: "1px" }} />
+          )}
         </div>
         {/* WiFi icon */}
         <svg width="13" height="10" viewBox="0 0 13 10" fill="none">
@@ -133,8 +133,8 @@ function StatusBar({ color }) {
           <div style={{ width: "2px", height: "5px", background: "rgba(255,255,255,0.5)", borderRadius: "0 1px 1px 0" }} />
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 // ─── Notification Banner ─────────────────────────────────────────────────
@@ -158,47 +158,47 @@ function NotificationBanner({ text, visible }) {
       boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
       whiteSpace: "nowrap",
       fontSize: "11px", fontWeight: "600",
-      color: "rgba(255,255,255,0.92)",
+      color: "rgba(255,255,255,0.92)"
     }}>
       <div style={{ width: "20px", height: "20px", borderRadius: "5px", background: "linear-gradient(135deg,#00AEEF,#003B8F)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "10px" }}>
         ⚡
       </div>
       <span>{text}</span>
-    </div>
-  );
+    </div>);
+
 }
 
 // ─── Progress Dots ───────────────────────────────────────────────────────
 function ProgressDots({ activeIdx, progress, onSelect }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "8px", justifyContent: "center", padding: "8px 0" }}>
-      {INDUSTRIES.map((_, i) => (
-        <button
-          key={i}
-          onClick={() => onSelect(i)}
-          style={{
-            width: i === activeIdx ? "24px" : "7px",
-            height: "7px",
-            borderRadius: "9999px",
-            background: i === activeIdx ? "linear-gradient(90deg,#00AEEF,#003B8F)" : "rgba(255,255,255,0.25)",
-            border: "none", cursor: "pointer", padding: 0,
-            transition: "width 0.35s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease",
-            position: "relative", overflow: "hidden",
-          }}
-        >
-          {i === activeIdx && (
-            <div style={{
-              position: "absolute", left: 0, top: 0, height: "100%",
-              width: `${progress}%`,
-              background: "rgba(255,255,255,0.45)",
-              borderRadius: "9999px",
-              transition: "width 0.1s linear",
-            }} />
-          )}
+      {INDUSTRIES.map((_, i) =>
+      <button
+        key={i}
+        onClick={() => onSelect(i)}
+        style={{
+          width: i === activeIdx ? "24px" : "7px",
+          height: "7px",
+          borderRadius: "9999px",
+          background: i === activeIdx ? "linear-gradient(90deg,#00AEEF,#003B8F)" : "rgba(255,255,255,0.25)",
+          border: "none", cursor: "pointer", padding: 0,
+          transition: "width 0.35s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease",
+          position: "relative", overflow: "hidden"
+        }}>
+        
+          {i === activeIdx &&
+        <div style={{
+          position: "absolute", left: 0, top: 0, height: "100%",
+          width: `${progress}%`,
+          background: "rgba(255,255,255,0.45)",
+          borderRadius: "9999px",
+          transition: "width 0.1s linear"
+        }} className="hidden" />
+        }
         </button>
-      ))}
-    </div>
-  );
+      )}
+    </div>);
+
 }
 
 // ─── Left Nav Sidebar ────────────────────────────────────────────────────
@@ -210,26 +210,26 @@ function NavSidebar({ activeIdx, onSelect, color }) {
       borderRight: "1px solid rgba(255,255,255,0.08)",
       display: "flex", flexDirection: "column", alignItems: "center",
       padding: "12px 0", gap: "4px",
-      flexShrink: 0,
-    }}>
-      {INDUSTRIES.map((ind, i) => (
-        <button
-          key={i}
-          onClick={() => onSelect(i)}
-          title={ind.badge}
-          style={{
-            width: "40px", height: "40px", borderRadius: "12px",
-            background: i === activeIdx ? `${color}25` : "transparent",
-            border: `1.5px solid ${i === activeIdx ? color : "transparent"}`,
-            cursor: "pointer", fontSize: "18px",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            transition: "all 0.25s ease",
-            transform: i === activeIdx ? "scale(1.1)" : "scale(1)",
-          }}
-        >
+      flexShrink: 0
+    }} className="hidden">
+      {INDUSTRIES.map((ind, i) =>
+      <button
+        key={i}
+        onClick={() => onSelect(i)}
+        title={ind.badge}
+        style={{
+          width: "40px", height: "40px", borderRadius: "12px",
+          background: i === activeIdx ? `${color}25` : "transparent",
+          border: `1.5px solid ${i === activeIdx ? color : "transparent"}`,
+          cursor: "pointer", fontSize: "18px",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          transition: "all 0.25s ease",
+          transform: i === activeIdx ? "scale(1.1)" : "scale(1)"
+        }}>
+        
           {ind.navIcon}
         </button>
-      ))}
+      )}
       {/* Divider */}
       <div style={{ width: "24px", height: "1px", background: "rgba(255,255,255,0.1)", margin: "8px 0" }} />
       {/* Settings icon */}
@@ -237,10 +237,10 @@ function NavSidebar({ activeIdx, onSelect, color }) {
         width: "40px", height: "40px", borderRadius: "12px",
         background: "transparent", border: "none", cursor: "pointer",
         fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center",
-        opacity: 0.4,
+        opacity: 0.4
       }}>⚙️</button>
-    </div>
-  );
+    </div>);
+
 }
 
 // ─── Dashboard Card (Glassmorphism) ─────────────────────────────────────
@@ -252,7 +252,7 @@ function DashboardCard({ industry, visible }) {
   useEffect(() => {
     setTick(0);
     let i = 0;
-    const interval = setInterval(() => { i++; setTick(i); }, 900);
+    const interval = setInterval(() => {i++;setTick(i);}, 900);
     return () => clearInterval(interval);
   }, [industry]);
 
@@ -275,7 +275,7 @@ function DashboardCard({ industry, visible }) {
       boxShadow: "0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.2)",
       border: "1px solid rgba(255,255,255,0.2)",
       padding: "14px",
-      zIndex: 10,
+      zIndex: 10
     }}>
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
         <div>
@@ -286,58 +286,58 @@ function DashboardCard({ industry, visible }) {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginBottom: "10px" }}>
-        {[{ label: industry.metrics[0].label, val: val0 }, { label: industry.metrics[1].label, val: val1 }].map((m) => (
-          <div key={m.label} style={{ background: "rgba(255,255,255,0.08)", borderRadius: "10px", padding: "7px", border: "1px solid rgba(255,255,255,0.1)" }}>
+        {[{ label: industry.metrics[0].label, val: val0 }, { label: industry.metrics[1].label, val: val1 }].map((m) =>
+        <div key={m.label} style={{ background: "rgba(255,255,255,0.08)", borderRadius: "10px", padding: "7px", border: "1px solid rgba(255,255,255,0.1)" }}>
             <p style={{ fontSize: "7px", fontWeight: "700", color: "rgba(255,255,255,0.45)", textTransform: "uppercase", letterSpacing: "0.06em", margin: "0 0 3px" }}>{m.label}</p>
             <p style={{ fontSize: "18px", fontWeight: "900", color: "#fff", margin: 0, letterSpacing: "-0.03em", lineHeight: 1 }}>{m.val}</p>
           </div>
-        ))}
+        )}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "5px", marginBottom: "8px" }}>
-        {industry.checks.map((check, i) => (
-          <div key={check} style={{
-            display: "flex", alignItems: "center", gap: "6px",
-            opacity: i < visibleChecks ? 1 : 0.2,
-            transform: i < visibleChecks ? "translateX(0)" : "translateX(-4px)",
-            transition: `opacity 0.3s ease ${i * 0.08}s, transform 0.3s ease ${i * 0.08}s`,
-          }}>
+        {industry.checks.map((check, i) =>
+        <div key={check} style={{
+          display: "flex", alignItems: "center", gap: "6px",
+          opacity: i < visibleChecks ? 1 : 0.2,
+          transform: i < visibleChecks ? "translateX(0)" : "translateX(-4px)",
+          transition: `opacity 0.3s ease ${i * 0.08}s, transform 0.3s ease ${i * 0.08}s`
+        }}>
             <div style={{
-              width: "13px", height: "13px", borderRadius: "50%", flexShrink: 0,
-              background: i < visibleChecks ? `linear-gradient(135deg,#00AEEF,#003B8F)` : "rgba(255,255,255,0.1)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              boxShadow: i < visibleChecks ? "0 2px 6px rgba(0,174,239,0.4)" : "none",
-            }}>
+            width: "13px", height: "13px", borderRadius: "50%", flexShrink: 0,
+            background: i < visibleChecks ? `linear-gradient(135deg,#00AEEF,#003B8F)` : "rgba(255,255,255,0.1)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: i < visibleChecks ? "0 2px 6px rgba(0,174,239,0.4)" : "none"
+          }}>
               {i < visibleChecks && <svg width="7" height="7" viewBox="0 0 10 10" fill="none"><polyline points="2,5 4,7.5 8,2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
             </div>
             <span style={{ fontSize: "9px", fontWeight: i < visibleChecks ? "700" : "500", color: i < visibleChecks ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.3)" }}>{check}</span>
           </div>
-        ))}
+        )}
       </div>
 
       <div style={{ paddingTop: "7px", borderTop: "1px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", gap: "5px" }}>
         <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 5px #4ade80", animation: "ipadPulse 2s infinite", flexShrink: 0 }} />
         <span style={{ fontSize: "8px", fontWeight: "700", color: "rgba(255,255,255,0.5)" }}>{industry.footer}</span>
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 // ─── App Dock ────────────────────────────────────────────────────────────
 function AppDock() {
   const apps = [
-    { icon: "💬", label: "Messages" },
-    { icon: "📅", label: "Calendar" },
-    { icon: "⚡", label: "ClientSurge" },
-    { icon: "⚙️", label: "Settings" },
-  ];
+  { icon: "💬", label: "Messages" },
+  { icon: "📅", label: "Calendar" },
+  { icon: "⚡", label: "ClientSurge" },
+  { icon: "⚙️", label: "Settings" }];
+
   return (
     <div style={{
       display: "flex", justifyContent: "center",
       padding: "6px 0 8px",
       background: "rgba(0,0,0,0.2)",
       borderTop: "1px solid rgba(255,255,255,0.08)",
-      flexShrink: 0,
+      flexShrink: 0
     }}>
       <div style={{
         display: "flex", gap: "14px", alignItems: "center",
@@ -346,26 +346,26 @@ function AppDock() {
         WebkitBackdropFilter: "blur(20px)",
         borderRadius: "18px",
         border: "1px solid rgba(255,255,255,0.15)",
-        padding: "6px 14px",
+        padding: "6px 14px"
       }}>
-        {apps.map((app) => (
-          <div key={app.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+        {apps.map((app) =>
+        <div key={app.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
             <div style={{
-              width: "32px", height: "32px", borderRadius: "8px",
-              background: "rgba(255,255,255,0.12)",
-              border: "1px solid rgba(255,255,255,0.15)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: "16px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-            }}>
+            width: "32px", height: "32px", borderRadius: "8px",
+            background: "rgba(255,255,255,0.12)",
+            border: "1px solid rgba(255,255,255,0.15)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "16px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.2)"
+          }}>
               {app.icon}
             </div>
             <span style={{ fontSize: "7px", color: "rgba(255,255,255,0.55)", fontWeight: "600" }}>{app.label}</span>
           </div>
-        ))}
+        )}
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 // ─── Main Screen Content ─────────────────────────────────────────────────
@@ -374,7 +374,7 @@ function ScreenContent({ industry, fading, cardVisible }) {
 
   return (
     <div style={{
-      flex: 1, display: "flex", overflow: "hidden", position: "relative",
+      flex: 1, display: "flex", overflow: "hidden", position: "relative"
     }}>
       {/* Grid background */}
       <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.04, pointerEvents: "none" }} xmlns="http://www.w3.org/2000/svg">
@@ -397,7 +397,7 @@ function ScreenContent({ industry, fading, cardVisible }) {
         position: "relative", zIndex: 2,
         opacity: fading ? 0 : 1,
         transform: fading ? "translateY(4px)" : "translateY(0)",
-        transition: "opacity 0.35s ease, transform 0.35s ease",
+        transition: "opacity 0.35s ease, transform 0.35s ease"
       }}>
         {/* Industry badge */}
         <span style={{
@@ -406,7 +406,7 @@ function ScreenContent({ industry, fading, cardVisible }) {
           borderRadius: "999px", padding: "3px 12px",
           fontSize: "9px", fontWeight: "800", color: "#00AEEF",
           letterSpacing: "0.12em", textTransform: "uppercase",
-          alignSelf: "flex-start",
+          alignSelf: "flex-start"
         }}>
           <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#00AEEF", display: "inline-block", animation: "ipadPulse 1.8s infinite" }} />
           {industry.badge}
@@ -417,7 +417,7 @@ function ScreenContent({ industry, fading, cardVisible }) {
           fontSize: "clamp(1.1rem, 2.8vw, 1.6rem)",
           fontWeight: "800", color: "#ffffff", lineHeight: 1.1,
           margin: 0, letterSpacing: "-0.03em",
-          fontFamily: "-apple-system,'SF Pro Display','Helvetica Neue',sans-serif",
+          fontFamily: "-apple-system,'SF Pro Display','Helvetica Neue',sans-serif"
         }}>
           {industry.headline}{" "}
           <span style={{ color: industry.color, filter: `drop-shadow(0 0 10px ${industry.color}80)` }}>
@@ -432,21 +432,21 @@ function ScreenContent({ industry, fading, cardVisible }) {
           fontSize: "11px", color: "rgba(255,255,255,0.62)", lineHeight: 1.6,
           maxWidth: "260px", margin: 0,
           fontFamily: "-apple-system,'SF Pro Text','Helvetica Neue',sans-serif",
-          fontWeight: "400",
+          fontWeight: "400"
         }}>
           {industry.sub}
         </p>
 
         {/* Trust pills */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
-          {PILLS.map((pill) => (
-            <span key={pill} style={{
-              display: "inline-flex", alignItems: "center",
-              background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)",
-              borderRadius: "999px", padding: "3px 9px",
-              fontSize: "9px", fontWeight: "700", color: "rgba(255,255,255,0.78)",
-            }}>{pill}</span>
-          ))}
+          {PILLS.map((pill) =>
+          <span key={pill} style={{
+            display: "inline-flex", alignItems: "center",
+            background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.13)",
+            borderRadius: "999px", padding: "3px 9px",
+            fontSize: "9px", fontWeight: "700", color: "rgba(255,255,255,0.78)"
+          }}>{pill}</span>
+          )}
         </div>
 
         {/* CTA */}
@@ -460,11 +460,11 @@ function ScreenContent({ industry, fading, cardVisible }) {
             padding: "8px 18px", borderRadius: "999px", border: "none", cursor: "pointer",
             boxShadow: "0 4px 14px rgba(0,174,239,0.45)",
             transition: "transform 0.2s, box-shadow 0.2s",
-            fontFamily: "-apple-system,'SF Pro Display','Helvetica Neue',sans-serif",
+            fontFamily: "-apple-system,'SF Pro Display','Helvetica Neue',sans-serif"
           }}
-          onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.05)"; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; }}
-        >
+          onMouseEnter={(e) => {e.currentTarget.style.transform = "scale(1.05)";}}
+          onMouseLeave={(e) => {e.currentTarget.style.transform = "scale(1)";}}>
+          
           Make the Leap
           <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
@@ -474,21 +474,21 @@ function ScreenContent({ industry, fading, cardVisible }) {
 
         {/* Stats ticker */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
-          {["Pay-as-you-go", "3x avg bookings", "Live in 24–48 hrs"].map((item) => (
-            <span key={item} style={{
-              display: "inline-flex", alignItems: "center",
-              background: "rgba(0,0,0,0.2)", borderRadius: "999px",
-              padding: "2px 8px", fontSize: "8px", fontWeight: "700",
-              color: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.07)",
-            }}>{item}</span>
-          ))}
+          {["Pay-as-you-go", "3x avg bookings", "Live in 24–48 hrs"].map((item) =>
+          <span key={item} style={{
+            display: "inline-flex", alignItems: "center",
+            background: "rgba(0,0,0,0.2)", borderRadius: "999px",
+            padding: "2px 8px", fontSize: "8px", fontWeight: "700",
+            color: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.07)"
+          }}>{item}</span>
+          )}
         </div>
       </div>
 
       {/* Floating Glassmorphism Card */}
       <DashboardCard industry={industry} visible={cardVisible} />
-    </div>
-  );
+    </div>);
+
 }
 
 // ─── iPad Chassis ────────────────────────────────────────────────────────
@@ -501,14 +501,14 @@ function iPadChassis({ children }) {
       borderRadius: "28px",
       padding: "14px",
       boxShadow: [
-        "0 0 0 1px rgba(255,255,255,0.06)",          // inner rim
-        "0 2px 0 1px rgba(255,255,255,0.12)",         // top highlight
-        "0 32px 80px rgba(0,0,0,0.6)",                // deep ambient shadow
-        "0 8px 24px rgba(0,0,0,0.4)",                 // mid shadow
-        "0 2px 6px rgba(0,0,0,0.3)",                  // close shadow
+      "0 0 0 1px rgba(255,255,255,0.06)", // inner rim
+      "0 2px 0 1px rgba(255,255,255,0.12)", // top highlight
+      "0 32px 80px rgba(0,0,0,0.6)", // deep ambient shadow
+      "0 8px 24px rgba(0,0,0,0.4)", // mid shadow
+      "0 2px 6px rgba(0,0,0,0.3)" // close shadow
       ].join(", "),
       // Enhancement #5: Depth highlight rim
-      outline: "1.5px solid rgba(255,255,255,0.05)",
+      outline: "1.5px solid rgba(255,255,255,0.05)"
     }}>
       {/* Enhancement #2: Sleep/wake button on right side */}
       <div style={{
@@ -516,7 +516,7 @@ function iPadChassis({ children }) {
         width: "4px", height: "36px",
         background: "linear-gradient(to right, #1c1c1f, #2a2a2e)",
         borderRadius: "0 3px 3px 0",
-        boxShadow: "2px 0 4px rgba(0,0,0,0.4)",
+        boxShadow: "2px 0 4px rgba(0,0,0,0.4)"
       }} />
       {/* Volume buttons on left */}
       <div style={{ position: "absolute", left: "-4px", top: "70px", width: "4px", height: "26px", background: "linear-gradient(to left,#1c1c1f,#2a2a2e)", borderRadius: "3px 0 0 3px", boxShadow: "-2px 0 4px rgba(0,0,0,0.3)" }} />
@@ -529,7 +529,7 @@ function iPadChassis({ children }) {
         width: "7px", height: "7px", borderRadius: "50%",
         background: "#0d0d0f",
         boxShadow: "inset 0 0 2px rgba(255,255,255,0.1), 0 0 3px rgba(0,174,239,0.15)",
-        border: "1px solid rgba(255,255,255,0.06)",
+        border: "1px solid rgba(255,255,255,0.06)"
       }} />
 
       {/* Screen bezel inset with subtle inner shadow */}
@@ -538,13 +538,13 @@ function iPadChassis({ children }) {
         overflow: "hidden",
         background: "#0A1628",
         boxShadow: "inset 0 0 0 1px rgba(0,0,0,0.5), inset 0 2px 8px rgba(0,0,0,0.4)",
-        position: "relative",
+        position: "relative"
       }}>
         {/* Enhancement #4: Screen glare overlay */}
         <div aria-hidden="true" style={{
           position: "absolute", inset: 0, zIndex: 50, pointerEvents: "none",
           borderRadius: "18px",
-          background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 25%, transparent 50%)",
+          background: "linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 25%, transparent 50%)"
         }} />
         {children}
       </div>
@@ -552,15 +552,15 @@ function iPadChassis({ children }) {
       {/* Enhancement #2: Home indicator bar at bottom */}
       <div style={{
         display: "flex", justifyContent: "center", alignItems: "center",
-        paddingTop: "8px",
+        paddingTop: "8px"
       }}>
         <div style={{
           width: "36px", height: "4px", borderRadius: "9999px",
-          background: "rgba(255,255,255,0.18)",
+          background: "rgba(255,255,255,0.18)"
         }} />
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 // ─── Main Export ─────────────────────────────────────────────────────────
@@ -592,7 +592,7 @@ export default function HeroDashboardScreen() {
   }, []);
 
   const advance = useCallback(() => {
-    setIdx(i => {
+    setIdx((i) => {
       const next = (i + 1) % INDUSTRIES.length;
       goToIndex(next);
       return i; // goToIndex handles the actual update
@@ -610,11 +610,11 @@ export default function HeroDashboardScreen() {
     const startTime = Date.now();
     progressRef.current = setInterval(() => {
       const elapsed = Date.now() - startTime;
-      setProgress(Math.min((elapsed / CYCLE_DURATION) * 100, 100));
+      setProgress(Math.min(elapsed / CYCLE_DURATION * 100, 100));
     }, 50);
 
     cycleRef.current = setTimeout(() => {
-      setIdx(i => {
+      setIdx((i) => {
         const next = (i + 1) % INDUSTRIES.length;
         goToIndex(next);
         return i;
@@ -637,14 +637,14 @@ export default function HeroDashboardScreen() {
   }, []);
 
   // Enhancement #7: Swipe gesture support
-  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchStart = (e) => {touchStartX.current = e.touches[0].clientX;};
   const handleTouchEnd = (e) => {
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 40) {
-      const next = diff > 0
-        ? (idx + 1) % INDUSTRIES.length
-        : (idx - 1 + INDUSTRIES.length) % INDUSTRIES.length;
+      const next = diff > 0 ?
+      (idx + 1) % INDUSTRIES.length :
+      (idx - 1 + INDUSTRIES.length) % INDUSTRIES.length;
       goToIndex(next);
     }
     touchStartX.current = null;
@@ -658,14 +658,14 @@ export default function HeroDashboardScreen() {
     <div
       style={{ width: "100%", fontFamily: "-apple-system,'SF Pro Display','Helvetica Neue',sans-serif" }}
       onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
+      onTouchEnd={handleTouchEnd}>
+      
       <ChassisEl>
         {/* Full screen layout */}
         <div style={{
           display: "flex", flexDirection: "column",
           background: "linear-gradient(135deg, #0A1628 0%, #0d2044 45%, #061230 100%)",
-          height: "480px",
+          height: "480px"
         }}>
           {/* Enhancement #6/#11: iOS Status Bar */}
           <StatusBar color={industry.color} />
@@ -696,6 +696,6 @@ export default function HeroDashboardScreen() {
           50% { opacity:0.4; transform:scale(0.85); }
         }
       `}</style>
-    </div>
-  );
+    </div>);
+
 }
