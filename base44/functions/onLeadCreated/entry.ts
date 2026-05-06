@@ -27,6 +27,18 @@ Deno.serve(async (req) => {
     }
 
     // ─────────────────────────────────────────────────────
+    // STEP 0: Score the lead immediately so downstream steps
+    //         have an accurate lead_score and activation_priority
+    // ─────────────────────────────────────────────────────
+    let scoreResult = null;
+    try {
+      scoreResult = await base44.asServiceRole.functions.invoke('calculateLeadScore', { lead_id: data.id });
+      console.log(`[onLeadCreated] Scored: score=${scoreResult?.score} priority=${scoreResult?.activation_priority}`);
+    } catch (scoreErr) {
+      console.log('[onLeadCreated] Scoring failed (non-blocking):', scoreErr.message);
+    }
+
+    // ─────────────────────────────────────────────────────
     // STEP A: Route lead to industry-specific AI agent
     // ─────────────────────────────────────────────────────
     let routingResult = null;
@@ -64,7 +76,8 @@ Deno.serve(async (req) => {
     // ─────────────────────────────────────────────────────
     // STEP C: Trigger ElevenLabs voice call for HOT leads
     // ─────────────────────────────────────────────────────
-    const isHot = (data.lead_score >= 75) || (data.activation_priority === 'Hot');
+    const isHot = (scoreResult?.score >= 75) || (scoreResult?.activation_priority === 'Hot') ||
+                  (data.lead_score >= 75) || (data.activation_priority === 'Hot');
     if (isHot && data.phone) {
       try {
         await base44.asServiceRole.functions.invoke('triggerVoiceCallToLead', { lead_id: data.id });
