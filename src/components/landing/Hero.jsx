@@ -105,14 +105,7 @@ export default function Hero() {
           </h1>
 
           {/* Visual enhancement: shimmer divider under headline */}
-          <div style={{
-            height: "2px",
-            borderRadius: "999px",
-            marginBottom: "22px",
-            background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.4) 30%, rgba(0,200,255,0.8) 50%, rgba(0,174,239,0.4) 70%, transparent 100%)",
-            animation: "shimmer-fadein 0.9s ease 0.3s both"
-          }} />
-          <style>{`@keyframes shimmer-fadein{from{opacity:0;transform:scaleX(0.4)}to{opacity:1;transform:scaleX(1)}}`}</style>
+
 
           <p
             className="landing-hero__body"
