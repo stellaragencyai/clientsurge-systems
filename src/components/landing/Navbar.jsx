@@ -257,32 +257,21 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
           <button
-            onClick={() => {trackCTA("client_login", "navbar");navigate("/client-portal");}}
-            className="hidden lg:block text-xs font-semibold text-muted-foreground hover:text-primary border border-border hover:border-primary/40 bg-background/50 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-3 py-1.5 transition-colors">
-            
-            Client Login
-          </button>
-          <button
             onClick={() => {
               trackCTA("login", "navbar");
               setShowLoginModal(true);
             }}
-            className="hidden lg:block text-sm font-semibold text-foreground hover:text-primary border border-border hover:border-primary/40 bg-background/50 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-4 py-1.5 transition-colors">
-            
+            className="hidden md:block text-sm font-semibold text-foreground hover:text-primary border border-border hover:border-primary/40 bg-background/50 focus:ring-2 focus:ring-primary focus:outline-none rounded-full px-4 py-1.5 transition-colors">
             Login
           </button>
           <button
-            onClick={() => {
-              trackCTA("book_demo", "navbar");
-              setShowBookingModal(true);
-            }}
+            onClick={() => {trackCTA("sign_up", "navbar");navigate("/client-portal");}}
             style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", backgroundSize: "200% 100%", animation: "rotateBorderGlow 4s ease-in-out infinite", boxShadow: "0 4px 14px rgba(0,174,239,0.4)", transition: "box-shadow 0.3s ease, transform 0.3s ease", border: "none", cursor: "pointer" }}
             onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,174,239,0.55)"}
             onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,174,239,0.4)"}
             className="hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded">
-            
             <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 16px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "600", fontSize: "0.75rem", textShadow: "0 1px 2px rgba(0,0,0,0.2)" }}>
-              {BUTTON_TEXT.BOOK_DEMO_SHORT}
+              Sign Up
             </span>
           </button>
         </div>
