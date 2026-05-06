@@ -182,11 +182,11 @@ export default function PortalLoginModal({ onClose }) {
               type="submit"
               disabled={loading}
               style={{
-                background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                borderRadius: "9999px",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+              background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
+              borderRadius: "9999px",
+              boxShadow: "0 4px 18px rgba(0,136,204,0.35)",
               }}
-              className="flex h-12 w-full items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-60"
+              className="flex h-12 w-full items-center justify-center gap-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60"
             >
               {loading ? (
                 <>
