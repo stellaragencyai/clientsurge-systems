@@ -599,7 +599,7 @@ export default function AutomationShowcase() {
             
             {/* Hero bar with ripple */}
             <div
-              className="rounded-2xl p-6 mb-6 flex items-center gap-4 bg-[hsl(var(--background))]"
+              className="rounded-2xl p-6 mb-6 flex items-center gap-4 bg-[hsl(var(--background))] opacity-60"
               style={{
                 background: `linear-gradient(135deg, ${BRAND_GRADIENT_FROM}, ${BRAND_GRADIENT_TO})`,
                 position: "relative",
