@@ -84,25 +84,28 @@ export default function Hero() {
           <h1
             className="landing-hero__headline"
             style={{
-              fontFamily: "Montserrat, sans-serif",
+              fontFamily: "'Playfair Display', Georgia, serif",
               fontSize: "clamp(2rem, 5.2vw, 3.8rem)",
-              fontWeight: "700",
+              fontWeight: "800",
               lineHeight: 1.1,
-              letterSpacing: "-0.03em",
-              color: "#1b140d",
+              letterSpacing: "-0.02em",
+              color: "#000000",
               marginBottom: "16px"
             }}>
-            
-            Stop Losing Leads to Slow Response —{" "}
+            <span style={{ display: "block" }}>Stop Losing Leads to Slow Response</span>
             <span
               style={{
+                display: "block",
                 color: "#00AEEF",
-                display: "inline"
+                textShadow: "0 0 32px rgba(0,174,239,0.55), 0 0 64px rgba(0,174,239,0.25)",
+                filter: "drop-shadow(0 0 12px rgba(0,174,239,0.5))",
               }}>
-              
-              AI Systems That Convert 3x More Leads Into Bookings
+              AI Systems That Convert 3× More Leads Into Bookings
             </span>
           </h1>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet" />
 
           {/* Visual enhancement: shimmer divider under headline */}
           <div style={{
