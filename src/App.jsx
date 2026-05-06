@@ -35,6 +35,7 @@ import BusinessSetup from "./pages/BusinessSetup";
 import ThankYou from "./pages/ThankYou";
 import About from "./pages/About";
 import CredentialsSetup from "./pages/CredentialsSetup";
+import SetupStatus from "./pages/SetupStatus";
 import AdminInstallGuide from "./pages/AdminInstallGuide";
 import AISalesCommandCenter from "./pages/AISalesCommandCenter";
 import PerformanceWars from "./pages/PerformanceWars";
@@ -237,6 +238,8 @@ const AuthenticatedApp = () => {
       <Route path="/about" element={<About />} />
       <Route path="/automations" element={<AutomationsDemo />} />
       <Route path="/setup/credentials" element={<CredentialsSetup />} />
+      <Route path="/setup/status/:orderId" element={<SetupStatus />} />
+      <Route path="/setup/status" element={<SetupStatus />} />
       <Route path="/services/:serviceSlug" element={<Navigate to="/store" replace />} />
       <Route path="/:slug" element={<IndustryTemplate />} />
 
