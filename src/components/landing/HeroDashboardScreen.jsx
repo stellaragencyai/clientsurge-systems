@@ -203,43 +203,43 @@ function ProgressDots({ activeIdx, progress, onSelect }) {
 
 // ─── Left Nav Sidebar ────────────────────────────────────────────────────
 function NavSidebar({ activeIdx, onSelect, color }) {
-  return (
-    <div style={{
-      width: "54px",
-      background: "rgba(0,0,0,0.25)",
-      borderRight: "1px solid rgba(255,255,255,0.08)",
-      display: "flex", flexDirection: "column", alignItems: "center",
-      padding: "12px 0", gap: "4px",
-      flexShrink: 0
-    }} className="hidden">
-      {INDUSTRIES.map((ind, i) =>
-      <button
-        key={i}
-        onClick={() => onSelect(i)}
-        title={ind.badge}
-        style={{
-          width: "40px", height: "40px", borderRadius: "12px",
-          background: i === activeIdx ? `${color}25` : "transparent",
-          border: `1.5px solid ${i === activeIdx ? color : "transparent"}`,
-          cursor: "pointer", fontSize: "18px",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          transition: "all 0.25s ease",
-          transform: i === activeIdx ? "scale(1.1)" : "scale(1)"
-        }}>
-        
-          {ind.navIcon}
-        </button>
-      )}
-      {/* Divider */}
-      <div style={{ width: "24px", height: "1px", background: "rgba(255,255,255,0.1)", margin: "8px 0" }} />
-      {/* Settings icon */}
-      <button style={{
-        width: "40px", height: "40px", borderRadius: "12px",
-        background: "transparent", border: "none", cursor: "pointer",
-        fontSize: "16px", display: "flex", alignItems: "center", justifyContent: "center",
-        opacity: 0.4
-      }}>⚙️</button>
-    </div>);
+  return null;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
 
