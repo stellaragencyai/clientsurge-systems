@@ -352,16 +352,16 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 168 | ⏳ | Add bulk status update to admin lead table (checkboxes + "Mark as Contacted" toolbar) | HIGH |
-| 169 | ⏳ | Wire Leads.subscribe() real-time listener to auto-refresh admin leads table | HIGH |
-| 170 | ⏳ | Install Queue panel: show estimated completion date (install_initialized_at + 6 days) | MEDIUM |
-| 171 | ⏳ | Add "Resend Welcome Email" button in client detail view → sendPortalWelcomeEmail | MEDIUM |
-| 172 | ⏳ | AdminSettings: add "Test Connection" buttons for Twilio + Resend → testProviderConnections | HIGH |
-| 173 | ⏳ | Add "Website Leads" tab in AdminDashboard showing WebsiteLead entity with filters | HIGH |
-| 174 | ⏳ | Add "Override & Mark Live" button with required reason field in AutomationInstallChecklist | MEDIUM |
-| 175 | ⏳ | AdminLeadDetail: add "Send Manual SMS" text area + button → sendSMS | HIGH |
-| 176 | ⏳ | AdminSettings: add "Preview Email Template" modal with sample variable substitution | MEDIUM |
-| 177 | ⏳ | Admin analytics: add conversion funnel chart (Lead→Contacted→Booked→Paid) | HIGH |
+| 168 | ⏳ | Add bulk status update to admin lead table (checkboxes + "Mark as Contacted" toolbar) — Claimed by Morpheus 2026-05-05 | HIGH |
+| 169 | ⏳ | Wire Leads.subscribe() real-time listener to auto-refresh admin leads table — Claimed by Morpheus 2026-05-05 | HIGH |
+| 170 | ⏳ | Install Queue panel: show estimated completion date (install_initialized_at + 6 days) — Claimed by Morpheus 2026-05-05 | MEDIUM |
+| 171 | ⏳ | Add "Resend Welcome Email" button in client detail view → sendPortalWelcomeEmail — Claimed by Morpheus 2026-05-05 | MEDIUM |
+| 172 | ⏳ | AdminSettings: add "Test Connection" buttons for Twilio + Resend → testProviderConnections — Claimed by Morpheus 2026-05-05 | HIGH |
+| 173 | ⏳ | Add "Website Leads" tab in AdminDashboard showing WebsiteLead entity with filters — Claimed by Morpheus 2026-05-05 | HIGH |
+| 174 | ⏳ | Add "Override & Mark Live" button with required reason field in AutomationInstallChecklist — Claimed by Morpheus 2026-05-05 | MEDIUM |
+| 175 | ⏳ | AdminLeadDetail: add "Send Manual SMS" text area + button → sendSMS — Claimed by Morpheus 2026-05-05 | HIGH |
+| 176 | ⏳ | AdminSettings: add "Preview Email Template" modal with sample variable substitution — Claimed by Morpheus 2026-05-05 | MEDIUM |
+| 177 | ⏳ | Admin analytics: add conversion funnel chart (Lead→Contacted→Booked→Paid) — Claimed by Morpheus 2026-05-05 | HIGH |
 | 178 | ⏳ | CommunicationLogsPanel: add "Export Logs" button → exportCommunicationLogs | MEDIUM |
 | 179 | ⏳ | AdminLeads table: add lead_score column (visible, sortable, color-coded) | HIGH |
 | 180 | ⏳ | Add "Demo Bookings" tab in AdminDashboard for DemoRequest management | HIGH |
@@ -537,6 +537,7 @@
 | 2026-05-05 | Base44 AI | 3 automations created: Voice Call Follow-Up Processor (hourly), Voice Bad Outcome→24h Follow-Up (entity), Daily Voice Briefing 7am MST (daily) |
 | 2026-05-05 | Morpheus | Governance note added: every agent must log completed tasks with date, agent, task number(s), verification evidence, and Base44/GitHub status updates before marking work done. |
 | 2026-05-05 | Morpheus | Claiming rule added: agents may claim a series/range of tasks, but must sign their agent name, mark the tasks pending/in-progress, and log every claim/status change before editing. |
+| 2026-05-05 | Morpheus | Claimed task series #168–#177 as pending/reserved: admin panel feature batch covering lead bulk actions, realtime refresh, install estimates, resend welcome email, provider tests, website leads tab, override/live flow, manual SMS, email preview, and conversion funnel. |
 
 ---
 
