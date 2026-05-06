@@ -536,16 +536,19 @@
 | 2026-05-05 | Base44 AI | Voice automation USE CASES #1-#7 built: triggerVoiceCallToLead, processVoiceCallFollowUps, receiveInboundVoiceCall, receiveElevenLabsPostCallWebhook, sendVoiceBriefing, payment recovery voice call in stripeWebhookOrders |
 | 2026-05-05 | Base44 AI | 3 automations created: Voice Call Follow-Up Processor (hourly), Voice Bad Outcome→24h Follow-Up (entity), Daily Voice Briefing 7am MST (daily) |
 | 2026-05-05 | Morpheus | Governance note added: every agent must log completed tasks with date, agent, task number(s), verification evidence, and Base44/GitHub status updates before marking work done. |
+| 2026-05-05 | Morpheus | Claiming rule added: agents may claim a series/range of tasks, but must sign their agent name, mark the tasks pending/in-progress, and log every claim/status change before editing. |
 
 ---
 
 ## 📝 HOW TO UPDATE THIS FILE
 
 1. Change the status emoji: `⏳` → `🔄` when starting, `🔄` → `✅` when done
-2. **Required completion log:** every agent who finishes any task must add a row to the **CHANGE LOG** before considering the task complete. The row must include the completion date, agent/person who finished it, task number(s), short description of what changed, and verification evidence (test/build/check/manual proof). If Base44 `ProjectTask` or GitHub status was updated, mention that too.
-3. Update the **PROGRESS TRACKER** counts at the bottom
-4. If a task is blocked, add a note in the task row and change to `❌`
-5. Do not mark a task `✅` unless the completion log exists and the work was verified.
+2. **Required claim log:** agents may claim a single task or a series/range of tasks. Before working, assign/sign the task(s) with the agent name, mark the task(s) `🔄` / `in_progress` when actively working, or `⏳` / `pending` when reserved but not started yet. Add a **CHANGE LOG** row with date, agent name, task number(s), status claimed, and intended scope.
+3. **Required completion log:** every agent who finishes any task must add a row to the **CHANGE LOG** before considering the task complete. The row must include the completion date, agent/person who finished it, task number(s), short description of what changed, and verification evidence (test/build/check/manual proof). If Base44 `ProjectTask` or GitHub status was updated, mention that too.
+4. Update the **PROGRESS TRACKER** counts at the bottom
+5. If a task is blocked, add a note in the task row and change to `❌`
+6. Do not mark a task `✅` unless the completion log exists and the work was verified.
+7. Every task claim, status change, and completion must be signed with the responsible agent/person name; anonymous updates are not acceptable.
 
 ---
 
