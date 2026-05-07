@@ -220,6 +220,10 @@
       "type": "string",
       "title": "Stripe Customer ID"
     },
+    "stripe_event_id": {
+      "type": "string",
+      "title": "Stripe Event ID (Idempotency Key)"
+    },
     "subscription_id": {
       "type": "string",
       "title": "Linked Subscription ID"
@@ -254,7 +258,7 @@
       "enum": [
         "starter_system",
         "growth_system",
-        "elite_system"
+        "pro_system"
       ],
       "description": "Package type selected by user from store/quiz (null if custom selection)"
     },
@@ -264,7 +268,7 @@
       "enum": [
         "starter_system",
         "growth_system",
-        "elite_system"
+        "pro_system"
       ],
       "description": "Auto-detected package type based on purchased services (null if individual services)"
     },

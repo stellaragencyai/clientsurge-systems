@@ -6,9 +6,9 @@ import {
 "lucide-react";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
 
-const BRAND_COLOR = "#00AEEF";
-const BRAND_GRADIENT_FROM = "#0088CC";
-const BRAND_GRADIENT_TO = "#00AEEF";
+const BRAND_COLOR = "#00D4FF";
+const BRAND_GRADIENT_FROM = "#003B8F";
+const BRAND_GRADIENT_TO = "#0066CC";
 
 const AUTOMATIONS = [
 {
@@ -185,7 +185,7 @@ function PipelineStrip({ activeId, onSelect }) {
             {/* Base pipeline track */}
             <line
               x1={PAD} y1={NODE_Y} x2={SVG_W - PAD} y2={NODE_Y}
-              stroke="rgba(0,174,239,0.15)"
+              stroke="rgba(0,212,255,0.12)"
               strokeWidth="2"
               strokeDasharray="6 4" />
             
@@ -233,15 +233,15 @@ function PipelineStrip({ activeId, onSelect }) {
 
                   }
                   <circle
-                    cx={nodeXs[i]}
-                    cy={NODE_Y}
-                    r="18"
-                    fill={isActive ? BRAND_COLOR : "#fff"}
-                    stroke={isActive ? BRAND_COLOR : "rgba(0,174,239,0.25)"}
-                    strokeWidth={isActive ? "2" : "1.5"}
-                    filter={isActive ? "url(#glow)" : "none"}
-                    style={{ cursor: "pointer" }}
-                    onClick={() => onSelect(a.id)} />
+                   cx={nodeXs[i]}
+                   cy={NODE_Y}
+                   r="18"
+                   fill={isActive ? BRAND_COLOR : "rgba(255,255,255,0.06)"}
+                   stroke={isActive ? BRAND_COLOR : "rgba(0,212,255,0.2)"}
+                   strokeWidth={isActive ? "2" : "1.5"}
+                   filter={isActive ? "url(#glow)" : "none"}
+                   style={{ cursor: "pointer" }}
+                   onClick={() => onSelect(a.id)} />
                   
                 </g>);
 
@@ -295,8 +295,8 @@ function PipelineStrip({ activeId, onSelect }) {
                       style={{
                         width: 16,
                         height: 16,
-                        color: isActive ? "#fff" : BRAND_COLOR,
-                        opacity: isActive ? 1 : 0.6
+                        color: isActive ? "#040d1a" : BRAND_COLOR,
+                        opacity: isActive ? 1 : 0.7
                       }} />
                     
                   </motion.div>
@@ -332,7 +332,7 @@ function PipelineStrip({ activeId, onSelect }) {
                     display: "block",
                     fontSize: 10,
                     fontWeight: isActive ? 700 : 500,
-                    color: isActive ? BRAND_COLOR : "rgba(0,0,0,0.4)",
+                    color: isActive ? BRAND_COLOR : "rgba(255,255,255,0.35)",
                     lineHeight: 1.3,
                     transition: "color 0.2s ease"
                   }}>
@@ -361,15 +361,15 @@ function PipelineStrip({ activeId, onSelect }) {
                 style={{
                   width: 44, height: 44, borderRadius: 14,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  background: isActive ? BRAND_COLOR : "rgba(0,174,239,0.08)",
-                  border: isActive ? "none" : "1.5px solid rgba(0,174,239,0.2)",
-                  boxShadow: isActive ? `0 0 0 3px rgba(0,174,239,0.2), 0 0 18px rgba(0,174,239,0.35)` : "none",
+                  background: isActive ? BRAND_COLOR : "rgba(0,212,255,0.07)",
+                  border: isActive ? "none" : "1.5px solid rgba(0,212,255,0.18)",
+                  boxShadow: isActive ? `0 0 0 3px rgba(0,212,255,0.2), 0 0 22px rgba(0,212,255,0.4)` : "none",
                   transition: "all 0.25s ease"
                 }}>
                 
-                <Icon style={{ width: 18, height: 18, color: isActive ? "#fff" : BRAND_COLOR }} />
+                <Icon style={{ width: 18, height: 18, color: isActive ? "#040d1a" : BRAND_COLOR }} />
               </div>
-              <span style={{ fontSize: 10, fontWeight: isActive ? 700 : 500, color: isActive ? BRAND_COLOR : "rgba(0,0,0,0.4)", textAlign: "center", maxWidth: 60, lineHeight: 1.3 }}>
+              <span style={{ fontSize: 10, fontWeight: isActive ? 700 : 500, color: isActive ? BRAND_COLOR : "rgba(255,255,255,0.35)", textAlign: "center", maxWidth: 60, lineHeight: 1.3 }}>
                 {a.title.split(" ").slice(0, 2).join(" ")}
               </span>
             </button>);
@@ -377,7 +377,7 @@ function PipelineStrip({ activeId, onSelect }) {
         })}
       </div>
 
-      <p className="text-center text-[11px] text-muted-foreground mt-4 tracking-wide">
+      <p className="text-center text-[11px] mt-4 tracking-wide" style={{ color: "rgba(255,255,255,0.3)" }}>
         One connected pipeline — each system hands off to the next
       </p>
     </div>);
@@ -387,6 +387,7 @@ function PipelineStrip({ activeId, onSelect }) {
 // Flow diagram with Lucide icons + line-draw connectors
 function AnimatedFlowDiagram({ automation }) {
   const [visibleStep, setVisibleStep] = useState(-1);
+  const [hovered, setHovered] = useState(false);
   const intervalRef = useRef(null);
 
   useEffect(() => {
@@ -411,8 +412,19 @@ function AnimatedFlowDiagram({ automation }) {
 
   return (
     <div
-      className="rounded-2xl border p-5 flex flex-col gap-3 h-full"
-      style={{ background: `rgba(0,174,239,0.04)`, borderColor: `rgba(0,174,239,0.15)` }}>
+      className="rounded-2xl p-5 flex flex-col gap-3 h-full"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: "rgba(255,255,255,0.03)",
+        border: "1px solid rgba(0,212,255,0.12)",
+        boxShadow: hovered
+          ? "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.2), inset 0 1px 0 rgba(255,255,255,0.06)"
+          : "0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)",
+        transform: hovered ? "translateY(-4px) scale(1.01)" : "translateY(0) scale(1)",
+        transition: "transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease",
+        backdropFilter: "blur(10px)",
+      }}>
       
       <p className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: BRAND_COLOR }}>
         Live Flow
@@ -438,13 +450,13 @@ function AnimatedFlowDiagram({ automation }) {
                   style={{
                     width: 36, height: 36, borderRadius: 10,
                     display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                    background: isVisible ? `rgba(0,174,239,0.12)` : "rgba(0,0,0,0.04)",
-                    border: `1.5px solid ${isVisible ? "rgba(0,174,239,0.3)" : "rgba(0,0,0,0.08)"}`,
-                    boxShadow: isActive ? `0 0 12px rgba(0,174,239,0.4)` : "none",
+                    background: isVisible ? `rgba(0,212,255,0.1)` : "rgba(255,255,255,0.03)",
+                    border: `1.5px solid ${isVisible ? "rgba(0,212,255,0.35)" : "rgba(255,255,255,0.06)"}`,
+                    boxShadow: isActive ? `0 0 16px rgba(0,212,255,0.45), 0 0 4px rgba(0,212,255,0.2)` : "none",
                     position: "relative"
                   }}>
                   
-                  <Icon style={{ width: 16, height: 16, color: isVisible ? BRAND_COLOR : "rgba(0,0,0,0.25)" }} />
+                  <Icon style={{ width: 16, height: 16, color: isVisible ? BRAND_COLOR : "rgba(255,255,255,0.2)" }} />
                   {isActive &&
                   <motion.div
                     style={{
@@ -483,8 +495,8 @@ function AnimatedFlowDiagram({ automation }) {
                 animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0.15, x: -6 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}>
                 
-                <p className="text-sm font-semibold text-foreground leading-tight">{step.label}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{step.sub}</p>
+                <p className="text-sm font-semibold leading-tight" style={{ color: "rgba(255,255,255,0.9)" }}>{step.label}</p>
+                <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{step.sub}</p>
               </motion.div>
             </div>);
 
@@ -496,33 +508,54 @@ function AnimatedFlowDiagram({ automation }) {
 
 // Before/After card
 function BeforeAfterStat({ automation }) {
+  const [hovered, setHovered] = useState(false);
   return (
-    <div className="rounded-2xl border border-border bg-white p-6 flex flex-col justify-between gap-5">
+    <div
+      className="rounded-2xl p-6 flex flex-col justify-between gap-5"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        background: "rgba(255,255,255,0.03)",
+        border: "1px solid rgba(0,212,255,0.12)",
+        boxShadow: hovered
+          ? "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.2), inset 0 1px 0 rgba(255,255,255,0.06)"
+          : "0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)",
+        transform: hovered ? "translateY(-4px) scale(1.01)" : "translateY(0) scale(1)",
+        transition: "transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease",
+        backdropFilter: "blur(10px)",
+      }}>
       <div className="space-y-3">
-        <div className="rounded-xl p-3.5" style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.12)" }}>
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-red-400 mb-1">Before</p>
-          <p className="text-sm text-foreground/75 leading-relaxed">{automation.before}</p>
+        <div className="rounded-xl p-3.5" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.18)" }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: "#f87171" }}>Before</p>
+          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{automation.before}</p>
         </div>
-        <div className="rounded-xl p-3.5" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.15)" }}>
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-emerald-600 mb-1">After</p>
-          <p className="text-sm text-foreground/80 font-medium leading-relaxed">{automation.after}</p>
+        <div className="rounded-xl p-3.5" style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)" }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: "#34d399" }}>After</p>
+          <p className="text-sm font-medium leading-relaxed" style={{ color: "rgba(255,255,255,0.85)" }}>{automation.after}</p>
         </div>
       </div>
       <div>
         <div
           className="rounded-xl p-3.5 mb-4"
-          style={{ background: `rgba(0,174,239,0.06)`, border: `1px solid rgba(0,174,239,0.18)` }}>
+          style={{ background: `rgba(0,212,255,0.07)`, border: `1px solid rgba(0,212,255,0.2)` }}>
           
           <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: BRAND_COLOR }}>
             Typical Result
           </p>
-          <p className="text-sm font-bold text-foreground">{automation.stat}</p>
-          <p className="text-[11px] text-muted-foreground mt-1">Based on system capabilities — individual results vary.</p>
+          <p className="text-sm font-bold" style={{ color: "#ffffff" }}>{automation.stat}</p>
+          <p className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>Based on system capabilities — individual results vary.</p>
         </div>
         <a
           href="/store"
-          className="w-full inline-flex items-center justify-center gap-2 text-white text-sm font-bold px-5 py-3 rounded-xl hover:opacity-90 transition-opacity"
-          style={{ background: `linear-gradient(135deg, ${BRAND_GRADIENT_FROM}, ${BRAND_GRADIENT_TO})` }}>
+          className="w-full inline-flex items-center justify-center gap-2 text-sm font-bold px-5 py-3 rounded-xl transition-all"
+          style={{
+            background: "linear-gradient(135deg, #003B8F 0%, #0055CC 50%, #0088CC 100%)",
+            color: "#ffffff",
+            border: "1px solid rgba(0,212,255,0.25)",
+            boxShadow: "0 4px 18px rgba(0,59,143,0.5)",
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,59,143,0.7)"; e.currentTarget.style.transform = "scale(1.02)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,59,143,0.5)"; e.currentTarget.style.transform = "scale(1)"; }}>
           
           Get This System <ArrowRight className="w-4 h-4" />
         </a>
@@ -563,24 +596,40 @@ export default function AutomationShowcase() {
   };
 
   return (
-    <section className="py-20 md:py-28 bg-white overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+    <section className="py-20 md:py-28 overflow-hidden" style={{
+      background: "linear-gradient(160deg, #040d1a 0%, #071428 40%, #050e20 70%, #020810 100%)",
+      position: "relative"
+    }}>
+      {/* Ambient background glows */}
+      <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: "-10%", left: "10%", width: "50%", height: "50%", borderRadius: "50%", background: "radial-gradient(circle, rgba(0,102,204,0.18) 0%, transparent 70%)", filter: "blur(60px)" }} />
+        <div style={{ position: "absolute", bottom: "0%", right: "5%", width: "45%", height: "50%", borderRadius: "50%", background: "radial-gradient(circle, rgba(0,59,143,0.22) 0%, transparent 70%)", filter: "blur(60px)" }} />
+        <div style={{ position: "absolute", top: "40%", left: "50%", width: "30%", height: "35%", borderRadius: "50%", background: "radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%)", filter: "blur(50px)" }} />
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6" style={{ position: "relative", zIndex: 1 }}>
         {/* Header */}
         <div className="text-center mb-14">
           <p className="text-xs font-bold tracking-[0.3em] uppercase mb-4" style={{ color: BRAND_COLOR }}>
             The Complete System
           </p>
           <h2
-            className="font-bold tracking-tight text-foreground leading-tight"
-            style={{ fontSize: "clamp(2rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif" }}>
+            className="font-bold tracking-tight leading-tight"
+            style={{ fontSize: "clamp(2rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif", color: "#ffffff" }}>
             
             One System.{" "}
-            <span style={{ color: BRAND_COLOR, textShadow: "0 0 28px rgba(0,174,239,0.3)" }}>
+            <span style={{ 
+              background: "linear-gradient(135deg, #00D4FF, #0088CC)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              filter: "drop-shadow(0 0 20px rgba(0,212,255,0.4))"
+            }}>
               Six Automations.
             </span>{" "}
-            Zero Leads Lost.
+            <span style={{ color: "#ffffff" }}>Zero Leads Lost.</span>
           </h2>
-          <p className="mt-4 text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="mt-4 text-base md:text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
             Click any automation to see exactly how it works and what it changes for your business.
           </p>
         </div>
@@ -599,9 +648,11 @@ export default function AutomationShowcase() {
             
             {/* Hero bar with ripple */}
             <div
-              className="rounded-2xl p-6 mb-6 flex items-center gap-4 bg-[hsl(var(--background))] opacity-60"
+              className="rounded-2xl p-6 mb-6 flex items-center gap-4"
               style={{
-                background: `linear-gradient(135deg, ${BRAND_GRADIENT_FROM}, ${BRAND_GRADIENT_TO})`,
+                background: `linear-gradient(135deg, #001f5c 0%, #003B8F 45%, #0055b3 100%)`,
+                border: "1px solid rgba(0,212,255,0.2)",
+                boxShadow: "0 8px 40px rgba(0,59,143,0.5), 0 0 0 1px rgba(0,212,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06)",
                 position: "relative",
                 overflow: "hidden"
               }}>

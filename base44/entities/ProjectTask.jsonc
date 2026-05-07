@@ -1,0 +1,97 @@
+{
+  "name": "ProjectTask",
+  "type": "object",
+  "properties": {
+    "task_number": {
+      "type": "integer",
+      "title": "Task #"
+    },
+    "title": {
+      "type": "string",
+      "title": "Task Title"
+    },
+    "domain": {
+      "type": "string",
+      "title": "Domain",
+      "enum": [
+        "D01_Stripe",
+        "D02_Lead_Pipeline",
+        "D03_Automation",
+        "D04_Security_Legal",
+        "D05_SEO_Marketing",
+        "D06_Performance",
+        "D07_Frontend_Visuals",
+        "D08_Client_Portal_Admin",
+        "D09_DevOps_Monitoring",
+        "D10_Launch_Checklist"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "pending",
+        "in_progress",
+        "done",
+        "blocked"
+      ],
+      "default": "pending"
+    },
+    "priority": {
+      "type": "string",
+      "title": "Priority",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    },
+    "assigned_agent": {
+      "type": "string",
+      "title": "Assigned Agent",
+      "enum": [
+        "Agent_A",
+        "Agent_B",
+        "Agent_C",
+        "Any"
+      ]
+    },
+    "dependencies": {
+      "type": "string",
+      "title": "Dependencies (task #s)"
+    },
+    "handoff_to": {
+      "type": "string",
+      "title": "Handoff To"
+    },
+    "thread": {
+      "type": "string",
+      "title": "Thread"
+    },
+    "est_time": {
+      "type": "string",
+      "title": "Estimated Time"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes / Change Log"
+    },
+    "completed_by": {
+      "type": "string",
+      "title": "Completed By"
+    },
+    "completed_date": {
+      "type": "string",
+      "title": "Completed Date"
+    }
+  },
+  "required": [
+    "task_number",
+    "title",
+    "domain",
+    "status",
+    "priority"
+  ]
+}

@@ -47,8 +47,6 @@ export default function AutomationsOverview() {
     );
   };
 
-  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading automations...</div>;
-
   const activeCount = useMemo(() => automations.filter((a) => a.status === "active").length, [automations]);
   const totalTriggers = useMemo(() => automations.reduce((sum, a) => sum + a.triggersPerDay, 0), [automations]);
   const avgSuccessRate = useMemo(() => {
@@ -57,6 +55,8 @@ export default function AutomationsOverview() {
       ? Math.round(activeAutomations.reduce((sum, a) => sum + a.successRate, 0) / activeAutomations.length)
       : 0;
   }, [automations]);
+
+  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading automations...</div>;
 
   return (
     <div className="space-y-6">
