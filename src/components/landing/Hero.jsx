@@ -5,7 +5,7 @@ import CascadingChecklistItem from "@/components/visual-effects/CascadingCheckli
 import { BUTTON_TEXT } from "@/lib/constants";
 
 
-const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
+const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen.jsx"));
 
 const checklist = [
 "Every lead hears from you within 60 seconds — even after hours",
