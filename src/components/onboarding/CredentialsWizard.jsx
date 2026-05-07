@@ -421,6 +421,14 @@ function StepIndicator({ steps, currentStep }) {
 
 // ── Main wizard ───────────────────────────────────────────────────────────────
 export default function CredentialsWizard({ order, onComplete }) {
+  // #407 — Determine tier from order.package_key
+  const packageKey = order?.package_key || "starter";
+  const tier = packageKey.toLowerCase().includes("elite")
+    ? "elite"
+    : packageKey.toLowerCase().includes("growth")
+    ? "growth"
+    : "starter";
+
   const [currentStep, setCurrentStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
@@ -477,8 +485,13 @@ export default function CredentialsWizard({ order, onComplete }) {
     }
   };
 
-  const step = STEPS[currentStep];
-  const isLast = currentStep === STEPS.length - 1;
+  // #407 — Filter steps by tier
+  const ACTIVE_STEPS = STEPS.filter((s) => {
+    if (tier === "starter") return !["integrations", "connection"].includes(s.id);
+    return true;
+  });
+  const step = ACTIVE_STEPS[currentStep];
+  const isLast = currentStep === ACTIVE_STEPS.length - 1;
 
   // Required field validation per step
   const validateStep = () => {
@@ -501,7 +514,7 @@ export default function CredentialsWizard({ order, onComplete }) {
     if (isLast) {
       await handleSubmit();
     } else {
-      setCurrentStep(s => s + 1);
+      setCurrentStep(s => Math.min(s + 1, ACTIVE_STEPS.length - 1));
     }
   };
 
@@ -556,6 +569,8 @@ export default function CredentialsWizard({ order, onComplete }) {
         install_configuration: installConfig,
       });
 
+      // #408d — Advance workflow_stage to "Ready for Install" via saveClientCredentials response
+      // saveClientCredentials already handles this internally — confirmed in backend function
       onComplete?.();
     } catch (err) {
       setError("Failed to save your information. Please try again.");
@@ -563,6 +578,9 @@ export default function CredentialsWizard({ order, onComplete }) {
       setSaving(false);
     }
   };
+
+  // #407 — Tier label for display
+  const tierLabel = tier === "elite" ? "Elite" : tier === "growth" ? "Growth" : "Starter";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -572,7 +590,7 @@ export default function CredentialsWizard({ order, onComplete }) {
         style={{ background: "linear-gradient(135deg,#0A1628 0%,#003B8F 100%)" }}
       >
         <div>
-          <p className="text-xs font-bold text-blue-300/70 uppercase tracking-widest">Setup Intake</p>
+          <p className="text-xs font-bold text-blue-300/70 uppercase tracking-widest">Setup Intake — {tierLabel} Plan</p>
           <p className="text-white font-semibold mt-0.5 text-lg">{order?.business_name || "Your Business"}</p>
         </div>
         <img
