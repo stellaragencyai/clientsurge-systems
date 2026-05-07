@@ -1,0 +1,30 @@
+{
+  "name": "WebsiteSpec",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "order_id": { "type": "string" },
+      "package_key": { "type": "string", "enum": ["starter", "growth", "elite"] },
+      "industry": { "type": "string" },
+      "pages": { "type": "array", "items": { "type": "object" } },
+      "brand": {
+        "type": "object",
+        "properties": {
+          "logo_url": { "type": "string" },
+          "primary_color": { "type": "string" },
+          "secondary_color": { "type": "string" },
+          "fonts": { "type": "object" }
+        }
+      },
+      "status": {
+        "type": "string",
+        "enum": ["draft", "approved", "building", "live"],
+        "default": "draft"
+      },
+      "revision_requested": { "type": "boolean", "default": false },
+      "revision_notes": { "type": "string" },
+      "approved_at": { "type": "string", "format": "date-time" },
+      "built_at": { "type": "string", "format": "date-time" }
+    }
+  }
+}
