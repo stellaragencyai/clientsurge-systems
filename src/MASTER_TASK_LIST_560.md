@@ -6,6 +6,13 @@
 > **Renamed from:** MASTER_TASK_LIST_250.md → MASTER_TASK_LIST_560.md (2026-05-05)
 
 
+
+## 🤖 AGENT SMITH — ACTIVE CLAIM BATCH 2 (May 6, 2026 — 18:24 MST)
+> Completed: #300, #304, #339, #23
+> In Progress: #301, #302, #336, #337, #338, #154
+> Workstream: TCPA compliance, Stripe live, Automation verification
+---
+
 ## 🤖 AGENT SMITH — COMPLETED BATCH (May 6, 2026 — 17:58 MST)
 > Tasks completed: #84, #85, #86, #87, #88, #89, #213, #213b, #218, #239
 > Workstream: Security + Backend hardening + Compliance
@@ -75,7 +82,7 @@
 | 20 | ⏳ | Fix robots.txt: change Disallow: /leads/ to Disallow: /leads/admin | MEDIUM |
 | 21 | ⏳ | Add hreflang tag to index.html for future i18n readiness | LOW |
 | 22 | ⏳ | Stub /blog route with 3 placeholder posts for organic SEO | MEDIUM |
-| 23 | ⏳ | Add React ErrorBoundary in App.jsx wrapping all routes | CRITICAL |
+| 23 | ✅ | Add React ErrorBoundary in App.jsx wrapping all routes | CRITICAL |
 | 24 | ⏳ | Set staleTime: 60_000 and retry: 1 in lib/query-client.js | MEDIUM |
 | 25 | ⏳ | Wrap App in React.StrictMode in main.jsx (dev only) | LOW |
 
@@ -323,7 +330,7 @@
 |---|---|---|---|
 | 152 | ⏳ | Register healthCheck function URL with UptimeRobot or Better Stack | HIGH |
 | 153 | ⏳ | Add Cache-Control: public, max-age=60 to read-only functions (getAdminSettings, etc.) | MEDIUM |
-| 154 | ⏳ | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | CRITICAL |
+| 154 | 🔄 | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | CRITICAL |
 | 155 | ⏳ | getClientAnalytics: remove/replace any hardcoded mock data with real entity queries | HIGH |
 | 156 | ⏳ | getClientPortalContext: on auth, write portal_login CommunicationEvent | LOW |
 | 157 | ⏳ | Create AuditLog entity with fields: admin_email, action, entity, before, after, timestamp | MEDIUM |
@@ -675,7 +682,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 299 | ⏳ | Add skip-to-content link at top of every page for screen reader accessibility | MEDIUM |
-| 300 | ⏳ | Add TCPA-compliant SMS consent disclosure to ALL public lead capture forms — "By submitting, you consent to receive automated SMS. Reply STOP to opt out." | CRITICAL |
+| 300 | ✅ | Add TCPA-compliant SMS consent disclosure to ALL public lead capture forms — "By submitting, you consent to receive automated SMS. Reply STOP to opt out." | CRITICAL |
 
 ---
 
@@ -697,10 +704,10 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 301 | ⏳ | Pricing.jsx: replace all 6 test Stripe links (buy.stripe.com/test_*) with live payment links — currently LIVE SITE IS TAKING TEST PAYMENTS | CRITICAL |
-| 302 | ⏳ | salesCatalog.js: audit all setup_fee and monthly_fee values — store products show $97/mo and $297 setup but tier pages show $497/mo — must be ONE source of truth | CRITICAL |
+| 301 | 🔄 | Pricing.jsx: replace all 6 test Stripe links (buy.stripe.com/test_*) with live payment links — currently LIVE SITE IS TAKING TEST PAYMENTS | CRITICAL |
+| 302 | 🔄 | salesCatalog.js: audit all setup_fee and monthly_fee values — store products show $97/mo and $297 setup but tier pages show $497/mo — must be ONE source of truth | CRITICAL |
 | 303 | ⏳ | CartSidebar handleCheckout: wire to createCheckoutSession backend function — currently unclear what endpoint it calls | HIGH |
-| 304 | ⏳ | createCheckoutSession: verify it uses sk_live_ not sk_test_ — check STRIPE_SECRET_KEY env var is set to live key | CRITICAL |
+| 304 | ✅ | createCheckoutSession: verify it uses sk_live_ not sk_test_ — check STRIPE_SECRET_KEY env var is set to live key | CRITICAL |
 | 305 | ⏳ | Add Stripe Customer Portal link to BillingDashboard — getStripeCustomerPortalUrl is deployed but never called | HIGH |
 | 306 | ⏳ | getClientInvoices function is deployed — wire it to BillingDashboard so real invoice history shows (currently blank) | HIGH |
 | 307 | ⏳ | requestSubscriptionChange function is deployed — wire "Upgrade/Downgrade" button in BillingDashboard to call it | MEDIUM |
@@ -753,10 +760,10 @@
 | 333 | ⏳ | dispatchLeadWebhook is deployed — add webhook test button in admin that fires a sample lead payload | MEDIUM |
 | 334 | ⏳ | routeLead function deployed — verify LeadRoutingPanel.jsx actually calls it and doesn't just show static routing rules | HIGH |
 | 335 | ⏳ | LeadCRMDrawer.jsx: verify it calls enrichLeadWithAI on open — should auto-enrich lead if AI fields are empty | MEDIUM |
-| 336 | ⏳ | onLeadCreated function: verify it fires for EVERY new WebsiteLead — check entity automation exists and is active | CRITICAL |
-| 337 | ⏳ | processWebsiteLeadFollowUps automation: verify it is ACTIVE and scheduled — this is the core follow-up engine | CRITICAL |
-| 338 | ⏳ | processMissedCallFollowUps automation: verify ACTIVE and Twilio webhook is configured to hit receiveTwilioMissedCallWebhook | CRITICAL |
-| 339 | ⏳ | processNurtureCampaigns: verify STOP keyword check is in place BEFORE every SMS send — TCPA requirement | CRITICAL |
+| 336 | 🔄 | onLeadCreated function: verify it fires for EVERY new WebsiteLead — check entity automation exists and is active | CRITICAL |
+| 337 | 🔄 | processWebsiteLeadFollowUps automation: verify it is ACTIVE and scheduled — this is the core follow-up engine | CRITICAL |
+| 338 | 🔄 | processMissedCallFollowUps automation: verify ACTIVE and Twilio webhook is configured to hit receiveTwilioMissedCallWebhook | CRITICAL |
+| 339 | ✅ | processNurtureCampaigns: verify STOP keyword check is in place BEFORE every SMS send — TCPA requirement | CRITICAL |
 | 340 | ⏳ | LeadSourceAttribution.jsx: wire to real CommunicationEvent entity reads filtered by source — currently unclear if it shows live data | MEDIUM |
 
 ---
