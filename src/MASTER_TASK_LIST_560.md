@@ -7,6 +7,13 @@
 
 
 
+
+## 🤖 AGENT SMITH — COMPLETED BATCH 3 (May 6, 2026 — 18:55 MST)
+> Completed: #211, #248, #251, #369, #381, #384, #390
+> Awaiting manual verification: #245 (E2E test), #249 (live card test), #250 (team sign-off)
+> Workstream: Security audit, DNS/SSL, AI scoring pipeline, legal compliance
+---
+
 ## 🤖 AGENT SMITH — COMPLETED BATCH 2 (May 6, 2026 — 18:45 MST)
 > Completed: #23, #300, #301, #302, #304, #336, #337, #338, #339
 > In Progress: #154 (MRR analytics — complex)
@@ -433,7 +440,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 211 | ⏳ | Configure custom domain DNS (if not already done) and verify SSL cert | CRITICAL |
+| 211 | ✅ | Configure custom domain DNS (if not already done) and verify SSL cert | CRITICAL |
 | 212 | ⏳ | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | HIGH |
 | 213 | ✅ | Configure Resend domain authentication (SPF, DKIM, DMARC) for deliverability | CRITICAL |
 | 213b | ✅ | Verify Twilio number is A2P 10DLC registered for commercial SMS in the US | CRITICAL |
@@ -495,12 +502,12 @@
 | 242 | ⏳ | Final: run axe or WAVE accessibility audit — fix all WCAG AA violations | HIGH |
 | 243 | ⏳ | Final: test all CTA buttons across mobile (375px, 390px, 414px) | HIGH |
 | 244 | ⏳ | Final: verify all email templates render correctly in Gmail, Outlook, Apple Mail | HIGH |
-| 245 | ⏳ | Final: test complete lead → SMS → follow-up → booking flow with test lead | CRITICAL |
+| 245 | 🔄 | Final: test complete lead → SMS → follow-up → booking flow with test lead | CRITICAL |
 | 246 | ⏳ | Final: verify admin panel loads in < 3 seconds with 100+ leads in database | MEDIUM |
 | 247 | ⏳ | Final: confirm robots.txt is correct and sitemap is submitted to Google Search Console | HIGH |
-| 248 | ⏳ | Final: review all legal pages (Privacy, Terms) for accuracy and TCPA compliance | CRITICAL |
-| 249 | ⏳ | Final: do a full purchase test with a real card → verify order, emails, SMS all fire | CRITICAL |
-| 250 | ⏳ | Final: team sign-off — all 3 agents mark their sections complete before go-live | CRITICAL |
+| 248 | ✅ | Final: review all legal pages (Privacy, Terms) for accuracy and TCPA compliance | CRITICAL |
+| 249 | 🔄 | Final: do a full purchase test with a real card → verify order, emails, SMS all fire | CRITICAL |
+| 250 | 🔄 | Final: team sign-off — all 3 agents mark their sections complete before go-live | CRITICAL |
 
 ---
 
@@ -584,7 +591,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 251 | ⏳ | Wire scoreLeadIntelligence to fire on every new WebsiteLead creation — currently deployed but never called from frontend | CRITICAL |
+| 251 | ✅ | Wire scoreLeadIntelligence to fire on every new WebsiteLead creation — currently deployed but never called from frontend | CRITICAL |
 | 252 | ⏳ | Wire classifyLeadIntent on inbound SMS replies — currently deployed but disconnected | HIGH |
 | 253 | ⏳ | Wire predictChurnRisk to run weekly on all active Orders — alert Nolan if score > 70 | HIGH |
 | 254 | ⏳ | Wire automationOrchestrator to Admin dashboard so Nolan can trigger it manually | MEDIUM |
@@ -814,7 +821,7 @@
 | 366 | ⏳ | Store page: CANONICAL_SERVICE_PRODUCTS and AI_PRODUCTS both imported from aiProducts — aiProducts.js is only 15 lines, verify it exports what Store expects | HIGH |
 | 367 | ⏳ | ProductCard.jsx: "Add to Cart" should be disabled for coming_soon products — verify checkout_enabled flag gates the button | MEDIUM |
 | 368 | ⏳ | Store ServiceComparisonModal: lazy loaded — add error boundary wrapper so the store doesn't crash if it fails to load | MEDIUM |
-| 369 | ⏳ | CartSidebar: smsConsent checkbox is present but is it validated before checkout proceeds? Block checkout if unchecked | CRITICAL |
+| 369 | ✅ | CartSidebar: smsConsent checkbox is present but is it validated before checkout proceeds? Block checkout if unchecked | CRITICAL |
 | 370 | ⏳ | Store page: setPageMetadata is imported from seo.js — verify it's actually called in StoreInner useEffect with store-specific title/description | MEDIUM |
 
 ---
@@ -840,16 +847,16 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 381 | ⏳ | autoEndToEndTest function: no auth guard found — anyone with the URL can trigger a full system test — add admin role check immediately | CRITICAL |
+| 381 | ✅ | autoEndToEndTest function: no auth guard found — anyone with the URL can trigger a full system test — add admin role check immediately | CRITICAL |
 | 382 | ⏳ | secureFormSubmission function exists but verify submitLeadCapture and submitContactInquiry actually call it (not duplicate logic) | HIGH |
 | 383 | ⏳ | authGuards.js shared lib exists — audit which functions import and use it vs which skip it entirely | HIGH |
-| 384 | ⏳ | webhookSecurity.js and webhookValidation shared libs exist — verify receiveTwilioInboundSms validates Twilio signature header | CRITICAL |
+| 384 | ✅ | webhookSecurity.js and webhookValidation shared libs exist — verify receiveTwilioInboundSms validates Twilio signature header | CRITICAL |
 | 385 | ⏳ | AuditLog entity exists in schema — verify admin actions (lead updates, order changes) actually write to it | MEDIUM |
 | 386 | ⏳ | legacyQuarantine.js shared lib exists — identify and remove all legacy function references it wraps | MEDIUM |
 | 387 | ⏳ | Base44 vite.config.js has legacySDKImports set to env var — ensure BASE44_LEGACY_SDK_IMPORTS=false in production | HIGH |
 | 388 | ⏳ | manageWebhookRegistration function deployed — ensure webhook secrets are stored encrypted, not in plain text in WebhookRegistration entity | HIGH |
 | 389 | ⏳ | sendTestLead function deployed and exposed — add admin-only guard so it cannot be called externally | HIGH |
-| 390 | ⏳ | simulateMissedCall function deployed — add admin-only guard, this function can trigger real SMS sends | CRITICAL |
+| 390 | ✅ | simulateMissedCall function deployed — add admin-only guard, this function can trigger real SMS sends | CRITICAL |
 
 ---
 
