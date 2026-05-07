@@ -3,7 +3,8 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { getTrackedServiceConfig, normalizeInstallConfiguration } from "../_shared/installPipeline.js";
 import { buildPricingSummaryForProducts, buildStoredPricingSummary } from "../../../src/lib/salesCatalog.js";
 
-const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY") || "";
+// TASK #304 — Prefer live key; fallback to STRIPE_SECRET_KEY for local dev
+const stripeSecretKey = Deno.env.get("STRIPE_LIVE_SECRET_KEY") || Deno.env.get("STRIPE_SECRET_KEY") || "";
 const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
 
 function maskSecret(secret = "") {
