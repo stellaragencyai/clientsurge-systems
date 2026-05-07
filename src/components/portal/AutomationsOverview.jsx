@@ -1,58 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { AutomationChecklist } from "@/api/entities";
 import { ToggleLeft, ToggleRight, CheckCircle2, AlertCircle, Clock, Zap } from "lucide-react";
 
-const SAMPLE_AUTOMATIONS = [
-  {
-    id: 1,
-    name: "Instant SMS Response",
-    type: "sms",
-    description: "Automatic text reply when leads call",
-    status: "active",
-    triggersPerDay: 24,
-    successRate: 98,
-    lastTriggered: "2 hours ago",
-  },
-  {
-    id: 2,
-    name: "Missed Call Recovery",
-    type: "sms",
-    description: "Follow-up text after missed calls",
-    status: "active",
-    triggersPerDay: 8,
-    successRate: 95,
-    lastTriggered: "45 minutes ago",
-  },
-  {
-    id: 3,
-    name: "Nurture Email Sequence",
-    type: "email",
-    description: "14-day email follow-up campaign",
-    status: "active",
-    triggersPerDay: 16,
-    successRate: 92,
-    lastTriggered: "1 hour ago",
-  },
-  {
-    id: 4,
-    name: "Booking Reminder",
-    type: "email",
-    description: "24-hour appointment confirmation",
-    status: "inactive",
-    triggersPerDay: 0,
-    successRate: 89,
-    lastTriggered: "3 days ago",
-  },
-  {
-    id: 5,
-    name: "Reactivation Campaign",
-    type: "sms",
-    description: "Win-back outreach for inactive leads",
-    status: "active",
-    triggersPerDay: 5,
-    successRate: 78,
-    lastTriggered: "12 hours ago",
-  },
-];
+// #311 — SAMPLE_AUTOMATIONS removed. Real data loaded from AutomationChecklist entity.
 
 const TYPE_CONFIG = {
   sms: { label: "SMS", color: "text-blue-600", bg: "bg-blue-50" },
@@ -60,7 +10,32 @@ const TYPE_CONFIG = {
 };
 
 export default function AutomationsOverview() {
-  const [automations, setAutomations] = useState(SAMPLE_AUTOMATIONS);
+  const [automations, setAutomations] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // #311 — Load real AutomationChecklist records from entity
+  useEffect(() => {
+    AutomationChecklist.list("-created_date", 50)
+      .then((records) => {
+        if (records && records.length > 0) {
+          // Normalize entity fields to component shape
+          setAutomations(
+            records.map((r) => ({
+              id: r.id,
+              name: r.checklist_name || r.service_key || "Automation",
+              type: r.service_key?.includes("email") || r.checklist_name?.toLowerCase().includes("email") ? "email" : "sms",
+              description: r.service_key || "",
+              status: r.status === "complete" || r.status === "active" ? "active" : "inactive",
+              triggersPerDay: r.steps_total || 0,
+              successRate: r.steps_total > 0 ? Math.round((r.steps_complete / r.steps_total) * 100) : 0,
+              lastTriggered: r.updated_date ? new Date(r.updated_date).toLocaleDateString() : "—",
+            }))
+          );
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const toggleAutomation = (id) => {
     setAutomations((prev) =>
@@ -71,6 +46,8 @@ export default function AutomationsOverview() {
       )
     );
   };
+
+  if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading automations...</div>;
 
   const activeCount = useMemo(() => automations.filter((a) => a.status === "active").length, [automations]);
   const totalTriggers = useMemo(() => automations.reduce((sum, a) => sum + a.triggersPerDay, 0), [automations]);
