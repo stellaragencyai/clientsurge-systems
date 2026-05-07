@@ -411,7 +411,7 @@ export default function HeroDashboardScreen() {
     <div style={{ width:"100%", fontFamily:"-apple-system,'SF Pro Display','Helvetica Neue',sans-serif" }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       <IPadChassis>
         {/* Enhancement 3: Aurora wallpaper */}
-        <div style={{ display:"flex", flexDirection:"column", background:"linear-gradient(150deg, #0d1f3c 0%, #0a2a5e 20%, #071535 40%, #0c1a3d 60%, #061028 80%, #0a1830 100%)", height:"480px", position:"relative", overflow:"hidden" }}>
+        <div style={{ display:"flex", flexDirection:"column", background:"linear-gradient(150deg, #0d1f3c 0%, #0a2a5e 20%, #071535 40%, #0c1a3d 60%, #061028 80%, #0a1830 100%)", height:"600px", position:"relative", overflow:"hidden" }}>
           {/* Aurora layers */}
           <div aria-hidden="true" style={{ position:"absolute", inset:0, pointerEvents:"none", zIndex:0 }}>
             <div style={{ position:"absolute", top:"-20%", left:"10%", width:"60%", height:"60%", borderRadius:"50%", background:"radial-gradient(ellipse, rgba(0,80,200,0.35) 0%, transparent 65%)", filter:"blur(40px)", animation:"auroraFloat 8s ease-in-out infinite" }}/>
