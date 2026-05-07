@@ -18,8 +18,8 @@ export default function CredentialsSetup() {
 
   useEffect(() => {
     if (!orderId) {
-      setError("No order ID found in the URL. Please use the link from your confirmation email.");
-      setLoading(false);
+      // #406 — no order_id in URL → redirect to /pricing
+      navigate("/pricing");
       return;
     }
     validateOrder();
@@ -34,7 +34,8 @@ export default function CredentialsSetup() {
         return;
       }
       if (found.payment_status !== "paid") {
-        setError("This order has not been paid yet. Please complete payment before submitting your setup details.");
+        // #406 — redirect to pricing if order not paid
+        navigate("/pricing");
         return;
       }
       setOrder(found);
