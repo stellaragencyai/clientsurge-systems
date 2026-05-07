@@ -8,6 +8,12 @@
 
 
 
+
+## 🤖 AGENT SMITH — COMPLETED BATCH 4 (May 6, 2026 — 19:40 MST)
+> Completed: #311, #401, #401a, #403, #403a, #427
+> Workstream: Stripe webhook hardening, idempotency, package_key pipeline, portal live data
+---
+
 ## 🤖 AGENT SMITH — COMPLETED BATCH 3 (May 6, 2026 — 18:55 MST)
 > Completed: #211, #248, #251, #369, #381, #384, #390
 > Awaiting manual verification: #245 (E2E test), #249 (live card test), #250 (team sign-off)
@@ -728,7 +734,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 311 | ⏳ | AutomationsOverview.jsx: replace SAMPLE_AUTOMATIONS hardcoded array with real AutomationChecklist entity reads | CRITICAL |
+| 311 | ✅ | AutomationsOverview.jsx: replace SAMPLE_AUTOMATIONS hardcoded array with real AutomationChecklist entity reads | CRITICAL |
 | 312 | ⏳ | SocialProofTicker.jsx: currently shows only static stats strings — wire to real Order entity count for "X businesses automated" | MEDIUM |
 | 313 | ⏳ | WeeklyReports.jsx: verify BUILD_STEPS keys match actual ClientInstallationOS entity fields — step_onboarding, step_sms etc. may be wrong field names | HIGH |
 | 314 | ⏳ | RevenueMetricsPanel.jsx: verify it reads from real Order entities not mock data — add fallback empty state if no paid orders exist yet | HIGH |
@@ -900,16 +906,16 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 401 | ⏳ | stripeWebhookOrders: on checkout.session.completed, read metadata.package_key from Stripe session and write to Order.package_key — field exists in schema but is NEVER auto-set by the webhook — entire downstream pipeline is blind without it | CRITICAL |
-| 401a | ⏳ | Sub-task: verify metadata.package_key is attached to the Stripe checkout session at the moment of creation in createCheckoutSession | CRITICAL |
+| 401 | ✅ | stripeWebhookOrders: on checkout.session.completed, read metadata.package_key from Stripe session and write to Order.package_key — field exists in schema but is NEVER auto-set by the webhook — entire downstream pipeline is blind without it | CRITICAL |
+| 401a | ✅ | Sub-task: verify metadata.package_key is attached to the Stripe checkout session at the moment of creation in createCheckoutSession | CRITICAL |
 | 401b | ⏳ | Sub-task: add fallback — if metadata.package_key is missing, derive package_key from line items by matching price IDs against salesCatalog | HIGH |
 | 401c | ⏳ | Sub-task: write test case — create a mock checkout.session.completed event and assert Order.package_key is correctly set | HIGH |
 | 402 | ⏳ | Build classifyPurchasedPackage function — AI reads selected_service_keys[] on à la carte orders and maps to nearest tier: 2 services = starter, 4 = growth, 6 = elite. Write result to Order.package_type | HIGH |
 | 402a | ⏳ | Sub-task: define TIER_SERVICE_MAP constant with canonical service_key lists per tier | HIGH |
 | 402b | ⏳ | Sub-task: handle edge cases — client buys 3 services (map to Growth), 5 services (map to Elite minus 1, flag for admin review) | MEDIUM |
 | 402c | ⏳ | Sub-task: log classification decision with reasoning to AgentLog | MEDIUM |
-| 403 | ⏳ | stripeWebhookOrders: immediately after setting package_key, invoke initializeInstallOS — currently fully disconnected and requires manual trigger | CRITICAL |
-| 403a | ⏳ | Sub-task: wrap initializeInstallOS call in try/catch so a failure does NOT return 500 to Stripe (Stripe would retry infinitely) | CRITICAL |
+| 403 | ✅ | stripeWebhookOrders: immediately after setting package_key, invoke initializeInstallOS — currently fully disconnected and requires manual trigger | CRITICAL |
+| 403a | ✅ | Sub-task: wrap initializeInstallOS call in try/catch so a failure does NOT return 500 to Stripe (Stripe would retry infinitely) | CRITICAL |
 | 403b | ⏳ | Sub-task: log initializeInstallOS failure to AgentLog and fire Telegram alert to Nolan | HIGH |
 | 403c | ⏳ | Sub-task: add idempotency check — if ClientInstallationOS already exists for this order_id, skip creation silently | HIGH |
 | 404 | ⏳ | sendOrderConfirmationEmail: make email body package-aware — Starter = "2 AI systems activating", Growth = "4 systems", Elite = "all 6 + custom website being built" — currently sends generic confirmation | HIGH |
@@ -920,7 +926,7 @@
 | 405a | ⏳ | Sub-task: wire Telegram message — format: "💳 New Payment: [Business] — [Tier] — $[Setup] + $[Monthly]/mo" | HIGH |
 | 405b | ⏳ | Sub-task: wire backup email to nolan@clientsurgesystems.com in case Telegram fails | MEDIUM |
 | 426 | ✅ | validateStripeWebhookSignature: confirm stripeWebhookOrders uses stripe.webhooks.constructEvent() with STRIPE_WEBHOOK_SECRET — if env var is missing, return 500 immediately not a silent pass | CRITICAL |
-| 427 | ⏳ | Add stripe_event_id idempotency check to stripeWebhookOrders — before processing any event, query Orders for existing stripe_event_id. If found, return 200 immediately — without this Stripe retries double-process payments | CRITICAL |
+| 427 | ✅ | Add stripe_event_id idempotency check to stripeWebhookOrders — before processing any event, query Orders for existing stripe_event_id. If found, return 200 immediately — without this Stripe retries double-process payments | CRITICAL |
 | 428 | ⏳ | Handle checkout.session.expired in stripeWebhookOrders — set Order.payment_status = "expired" and send recovery email with a fresh checkout link | HIGH |
 | 429 | ✅ | Handle customer.subscription.deleted in stripeWebhookOrders — set Order.status = "cancelled", billing_status = "cancelled", invoke runWinBackSequence, Telegram Nolan with MRR lost | HIGH |
 | 430 | ⏳ | Handle invoice.payment_failed properly — currently sets billing_status = "past_due" but does NOT send recovery email with Stripe hosted invoice URL — add sendMissedCallRecoveryEmail call with invoice link | HIGH |
