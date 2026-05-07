@@ -131,7 +131,21 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, payload });
+
+    // ─────────────────────────────────────────────────────
+    // STEP Z: #251 — Run AI scoreLeadIntelligence for full scoring
+    // Called after calculateLeadScore for deeper AI analysis
+    // ─────────────────────────────────────────────────────
+    try {
+      const intelligenceScore = await base44.asServiceRole.functions.invoke('scoreLeadIntelligence', {
+        lead_id: data.id,
+      });
+      console.log(`[onLeadCreated] AI intelligence score: ${intelligenceScore?.score} tier=${intelligenceScore?.tier}`);
+    } catch (intelligenceErr) {
+      console.log('[onLeadCreated] AI scoring failed (non-blocking):', intelligenceErr.message);
+    }
+
+        return Response.json({ success: true, payload });
   } catch (error) {
     console.error('Error:', error);
     return Response.json({ error: error.message }, { status: 500 });
