@@ -140,6 +140,24 @@ Deno.serve(async (req) => {
 
   const base44 = createClientFromRequest(req);
 
+  // ── #427 Idempotency — reject duplicate Stripe events ────────────────────────
+  try {
+    const existingWithEvent = await base44.asServiceRole.entities.Order.filter(
+      { stripe_event_id: event.id },
+      "-created_date",
+      1
+    ).catch(() => []);
+    if (existingWithEvent && existingWithEvent.length > 0) {
+      console.log("[stripeWebhookOrders] Duplicate event detected — skipping", { eventId: event.id });
+      return new Response(JSON.stringify({ received: true, duplicate: true }), {
+        status: 200, headers: { "Content-Type": "application/json" },
+      });
+    }
+  } catch (idempErr) {
+    console.warn("[stripeWebhookOrders] Idempotency check failed (non-blocking)", { error: idempErr?.message });
+  }
+
+
   // ── checkout.session.completed ───────────────────────────────────────────────
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
@@ -221,6 +239,24 @@ Deno.serve(async (req) => {
               error: smsError instanceof Error ? smsError.message : String(smsError),
             });
           }
+        }
+
+
+        // ── #401 Write package_key from Stripe session metadata to Order ───────
+        const packageKey = session.metadata?.package_key || null;
+        if (packageKey) {
+          try {
+            await base44.asServiceRole.entities.Order.update(order.id, {
+              package_key: packageKey,
+              stripe_event_id: event.id,
+            });
+            console.log("[stripeWebhookOrders] package_key written to Order", { orderId: order.id, packageKey });
+          } catch (pkErr) {
+            console.error("[stripeWebhookOrders] Failed to write package_key", { error: pkErr?.message });
+          }
+        } else {
+          // Still stamp the event id even if no package_key
+          await base44.asServiceRole.entities.Order.update(order.id, { stripe_event_id: event.id }).catch(() => {});
         }
 
         // ── Initialize Install OS (checklists + steps per service) ────────────
