@@ -332,7 +332,7 @@ function PipelineStrip({ activeId, onSelect }) {
                     display: "block",
                     fontSize: 10,
                     fontWeight: isActive ? 700 : 500,
-                    color: isActive ? BRAND_COLOR : "rgba(255,255,255,0.35)",
+                    color: isActive ? BRAND_COLOR : "rgba(0,0,0,0.4)",
                     lineHeight: 1.3,
                     transition: "color 0.2s ease"
                   }}>
@@ -361,15 +361,15 @@ function PipelineStrip({ activeId, onSelect }) {
                 style={{
                   width: 44, height: 44, borderRadius: 14,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  background: isActive ? BRAND_COLOR : "rgba(0,212,255,0.07)",
-                  border: isActive ? "none" : "1.5px solid rgba(0,212,255,0.18)",
-                  boxShadow: isActive ? `0 0 0 3px rgba(0,212,255,0.2), 0 0 22px rgba(0,212,255,0.4)` : "none",
+                  background: isActive ? BRAND_COLOR : "rgba(0,136,204,0.07)",
+                  border: isActive ? "none" : "1.5px solid rgba(0,136,204,0.18)",
+                  boxShadow: isActive ? `0 0 0 3px rgba(0,136,204,0.2), 0 0 22px rgba(0,136,204,0.35)` : "none",
                   transition: "all 0.25s ease"
                 }}>
                 
-                <Icon style={{ width: 18, height: 18, color: isActive ? "#040d1a" : BRAND_COLOR }} />
+                <Icon style={{ width: 18, height: 18, color: isActive ? "#ffffff" : BRAND_COLOR }} />
               </div>
-              <span style={{ fontSize: 10, fontWeight: isActive ? 700 : 500, color: isActive ? BRAND_COLOR : "rgba(255,255,255,0.35)", textAlign: "center", maxWidth: 60, lineHeight: 1.3 }}>
+              <span style={{ fontSize: 10, fontWeight: isActive ? 700 : 500, color: isActive ? BRAND_COLOR : "rgba(0,0,0,0.4)", textAlign: "center", maxWidth: 60, lineHeight: 1.3 }}>
                 {a.title.split(" ").slice(0, 2).join(" ")}
               </span>
             </button>);
@@ -377,7 +377,7 @@ function PipelineStrip({ activeId, onSelect }) {
         })}
       </div>
 
-      <p className="text-center text-[11px] mt-4 tracking-wide" style={{ color: "rgba(255,255,255,0.3)" }}>
+      <p className="text-center text-[11px] mt-4 tracking-wide text-muted-foreground">
         One connected pipeline — each system hands off to the next
       </p>
     </div>);
@@ -416,14 +416,13 @@ function AnimatedFlowDiagram({ automation }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(0,212,255,0.12)",
+        background: "hsl(var(--card))",
+        border: "1px solid hsl(var(--border))",
         boxShadow: hovered
-          ? "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.2), inset 0 1px 0 rgba(255,255,255,0.06)"
-          : "0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)",
+          ? "0 12px 40px rgba(0,136,204,0.15), 0 0 0 1px rgba(0,136,204,0.2)"
+          : "0 4px 16px rgba(0,0,0,0.08)",
         transform: hovered ? "translateY(-4px) scale(1.01)" : "translateY(0) scale(1)",
         transition: "transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease",
-        backdropFilter: "blur(10px)",
       }}>
       
       <p className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: BRAND_COLOR }}>
@@ -450,13 +449,13 @@ function AnimatedFlowDiagram({ automation }) {
                   style={{
                     width: 36, height: 36, borderRadius: 10,
                     display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                    background: isVisible ? `rgba(0,212,255,0.1)` : "rgba(255,255,255,0.03)",
-                    border: `1.5px solid ${isVisible ? "rgba(0,212,255,0.35)" : "rgba(255,255,255,0.06)"}`,
-                    boxShadow: isActive ? `0 0 16px rgba(0,212,255,0.45), 0 0 4px rgba(0,212,255,0.2)` : "none",
+                    background: isVisible ? `rgba(0,136,204,0.1)` : "rgba(0,0,0,0.03)",
+                    border: `1.5px solid ${isVisible ? "rgba(0,136,204,0.3)" : "rgba(0,0,0,0.08)"}`,
+                    boxShadow: isActive ? `0 0 14px rgba(0,136,204,0.35)` : "none",
                     position: "relative"
                   }}>
                   
-                  <Icon style={{ width: 16, height: 16, color: isVisible ? BRAND_COLOR : "rgba(255,255,255,0.2)" }} />
+                  <Icon style={{ width: 16, height: 16, color: isVisible ? BRAND_COLOR : "rgba(0,0,0,0.25)" }} />
                   {isActive &&
                   <motion.div
                     style={{
@@ -495,8 +494,8 @@ function AnimatedFlowDiagram({ automation }) {
                 animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0.15, x: -6 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}>
                 
-                <p className="text-sm font-semibold leading-tight" style={{ color: "rgba(255,255,255,0.9)" }}>{step.label}</p>
-                <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>{step.sub}</p>
+                <p className="text-sm font-semibold leading-tight text-foreground">{step.label}</p>
+                <p className="text-xs mt-0.5 text-muted-foreground">{step.sub}</p>
               </motion.div>
             </div>);
 
@@ -515,35 +514,34 @@ function BeforeAfterStat({ automation }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: "rgba(255,255,255,0.03)",
-        border: "1px solid rgba(0,212,255,0.12)",
+        background: "hsl(var(--card))",
+        border: "1px solid hsl(var(--border))",
         boxShadow: hovered
-          ? "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.2), inset 0 1px 0 rgba(255,255,255,0.06)"
-          : "0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)",
+          ? "0 12px 40px rgba(0,136,204,0.15), 0 0 0 1px rgba(0,136,204,0.2)"
+          : "0 4px 16px rgba(0,0,0,0.08)",
         transform: hovered ? "translateY(-4px) scale(1.01)" : "translateY(0) scale(1)",
         transition: "transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease",
-        backdropFilter: "blur(10px)",
       }}>
       <div className="space-y-3">
-        <div className="rounded-xl p-3.5" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.18)" }}>
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: "#f87171" }}>Before</p>
-          <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)" }}>{automation.before}</p>
+        <div className="rounded-xl p-3.5" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)" }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: "#dc2626" }}>Before</p>
+          <p className="text-sm leading-relaxed text-muted-foreground">{automation.before}</p>
         </div>
-        <div className="rounded-xl p-3.5" style={{ background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)" }}>
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: "#34d399" }}>After</p>
-          <p className="text-sm font-medium leading-relaxed" style={{ color: "rgba(255,255,255,0.85)" }}>{automation.after}</p>
+        <div className="rounded-xl p-3.5" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.18)" }}>
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: "#16a34a" }}>After</p>
+          <p className="text-sm font-medium leading-relaxed text-foreground">{automation.after}</p>
         </div>
       </div>
       <div>
         <div
           className="rounded-xl p-3.5 mb-4"
-          style={{ background: `rgba(0,212,255,0.07)`, border: `1px solid rgba(0,212,255,0.2)` }}>
+          style={{ background: `rgba(0,136,204,0.06)`, border: `1px solid rgba(0,136,204,0.18)` }}>
           
           <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: BRAND_COLOR }}>
             Typical Result
           </p>
-          <p className="text-sm font-bold" style={{ color: "#ffffff" }}>{automation.stat}</p>
-          <p className="text-[11px] mt-1" style={{ color: "rgba(255,255,255,0.35)" }}>Based on system capabilities — individual results vary.</p>
+          <p className="text-sm font-bold text-foreground">{automation.stat}</p>
+          <p className="text-[11px] mt-1 text-muted-foreground">Based on system capabilities — individual results vary.</p>
         </div>
         <a
           href="/store"
@@ -596,16 +594,7 @@ export default function AutomationShowcase() {
   };
 
   return (
-    <section className="py-20 md:py-28 overflow-hidden" style={{
-      background: "linear-gradient(160deg, #040d1a 0%, #071428 40%, #050e20 70%, #020810 100%)",
-      position: "relative"
-    }}>
-      {/* Ambient background glows */}
-      <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: "-10%", left: "10%", width: "50%", height: "50%", borderRadius: "50%", background: "radial-gradient(circle, rgba(0,102,204,0.18) 0%, transparent 70%)", filter: "blur(60px)" }} />
-        <div style={{ position: "absolute", bottom: "0%", right: "5%", width: "45%", height: "50%", borderRadius: "50%", background: "radial-gradient(circle, rgba(0,59,143,0.22) 0%, transparent 70%)", filter: "blur(60px)" }} />
-        <div style={{ position: "absolute", top: "40%", left: "50%", width: "30%", height: "35%", borderRadius: "50%", background: "radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%)", filter: "blur(50px)" }} />
-      </div>
+    <section className="py-20 md:py-28 overflow-hidden" style={{ position: "relative" }}>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6" style={{ position: "relative", zIndex: 1 }}>
         {/* Header */}
@@ -615,21 +604,20 @@ export default function AutomationShowcase() {
           </p>
           <h2
             className="font-bold tracking-tight leading-tight"
-            style={{ fontSize: "clamp(2rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif", color: "#ffffff" }}>
+            style={{ fontSize: "clamp(2rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif" }}>
             
             One System.{" "}
             <span style={{ 
-              background: "linear-gradient(135deg, #00D4FF, #0088CC)",
+              background: "linear-gradient(135deg, #0088CC, #003B8F)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-              filter: "drop-shadow(0 0 20px rgba(0,212,255,0.4))"
             }}>
               Six Automations.
             </span>{" "}
-            <span style={{ color: "#ffffff" }}>Zero Leads Lost.</span>
+            Zero Leads Lost.
           </h2>
-          <p className="mt-4 text-base md:text-lg max-w-2xl mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+          <p className="mt-4 text-base md:text-lg max-w-2xl mx-auto leading-relaxed text-muted-foreground">
             Click any automation to see exactly how it works and what it changes for your business.
           </p>
         </div>
