@@ -9,6 +9,12 @@
 
 
 
+
+## 🤖 AGENT SMITH — COMPLETED BATCH 5 (May 6, 2026 — 20:40 MST)
+> Completed: #406, #406a, #407, #408, #408a, #408b, #408d, #411
+> Workstream: /setup/credentials flow, tier-gated wizard, installPipeline tier gate
+---
+
 ## 🤖 AGENT SMITH — COMPLETED BATCH 4 (May 6, 2026 — 19:40 MST)
 > Completed: #311, #401, #401a, #403, #403a, #427
 > Workstream: Stripe webhook hardening, idempotency, package_key pipeline, portal live data
@@ -937,20 +943,20 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 406 | ⏳ | Build /setup/credentials page — post-purchase landing. Reads order_id from URL, confirms Order.payment_status = "paid", renders intake form. If order not found or unpaid, redirect to /pricing | CRITICAL |
-| 406a | ⏳ | Sub-task: build the /setup/credentials route in App.jsx | CRITICAL |
+| 406 | ✅ | Build /setup/credentials page — post-purchase landing. Reads order_id from URL, confirms Order.payment_status = "paid", renders intake form. If order not found or unpaid, redirect to /pricing | CRITICAL |
+| 406a | ✅ | Sub-task: build the /setup/credentials route in App.jsx | CRITICAL |
 | 406b | ⏳ | Sub-task: add order validation hook on page load — fetch Order, verify payment_status | HIGH |
 | 406c | ⏳ | Sub-task: add loading skeleton for the 200ms fetch delay before form renders | MEDIUM |
-| 407 | ⏳ | Build tiered credentials intake form — Starter: 3 fields (business phone, business name, booking link). Growth: 6 fields (add marketing platform, Google Business Profile URL, existing website). Elite: 10 fields (add logo upload, brand primary/secondary color, target audience, AI tone selector) | CRITICAL |
+| 407 | ✅ | Build tiered credentials intake form — Starter: 3 fields (business phone, business name, booking link). Growth: 6 fields (add marketing platform, Google Business Profile URL, existing website). Elite: 10 fields (add logo upload, brand primary/secondary color, target audience, AI tone selector) | CRITICAL |
 | 407a | ⏳ | Sub-task: build the Starter 3-field form variant | HIGH |
 | 407b | ⏳ | Sub-task: build the Growth 6-field form variant | HIGH |
 | 407c | ⏳ | Sub-task: build Elite 10-field wizard with logo upload (Base44 private storage), hex color pickers with live swatch preview, and AI tone radio buttons (Professional / Warm / Energetic) | HIGH |
 | 407d | ⏳ | Sub-task: add sessionStorage persistence between wizard steps so page refresh doesn't lose data | MEDIUM |
-| 408 | ⏳ | On credentials submit, call saveClientCredentials which writes all fields into Order.install_configuration in the exact nested structure configureService expects | CRITICAL |
-| 408a | ⏳ | Sub-task: map business_phone → install_configuration.twilio_business_phone | CRITICAL |
-| 408b | ⏳ | Sub-task: map booking_link → install_configuration.booking.booking_link | CRITICAL |
+| 408 | ✅ | On credentials submit, call saveClientCredentials which writes all fields into Order.install_configuration in the exact nested structure configureService expects | CRITICAL |
+| 408a | ✅ | Sub-task: map business_phone → install_configuration.twilio_business_phone | CRITICAL |
+| 408b | ✅ | Sub-task: map booking_link → install_configuration.booking.booking_link | CRITICAL |
 | 408c | ⏳ | Sub-task: map logo_url → install_configuration.brand.logo_url, primary_color → install_configuration.brand.primary_color | HIGH |
-| 408d | ⏳ | Sub-task: advance ClientInstallationOS.workflow_stage to "Ready for Install" after successful write | CRITICAL |
+| 408d | ✅ | Sub-task: advance ClientInstallationOS.workflow_stage to "Ready for Install" after successful write | CRITICAL |
 | 409 | ⏳ | Build "Missing Credentials" daily automation — 9am MST. Queries Orders: payment_status=paid AND workflow_stage=intake_received AND created_date > 24h ago. Sends reminder email + Telegram per stalled client | HIGH |
 | 409a | ⏳ | Sub-task: write the reminder email template — warm, not alarming: "We're ready to activate your systems — we just need a few details" | HIGH |
 | 409b | ⏳ | Sub-task: create the Base44 scheduled automation triggering this check daily | HIGH |
@@ -969,7 +975,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 411 | ⏳ | installPipeline: add TIER_SERVICE_MAP gate — starter activates [instant_lead_response, missed_call_text_back]; growth adds [appointment_booking_ai, follow_up_sequences]; elite adds [review_request_automation, ai_receptionist] — currently no tier gate exists | CRITICAL |
+| 411 | ✅ | installPipeline: add TIER_SERVICE_MAP gate — starter activates [instant_lead_response, missed_call_text_back]; growth adds [appointment_booking_ai, follow_up_sequences]; elite adds [review_request_automation, ai_receptionist] — currently no tier gate exists | CRITICAL |
 | 411a | ⏳ | Sub-task: define TIER_SERVICE_MAP as a shared constant accessible by both installPipeline and activateAllServices | HIGH |
 | 411b | ⏳ | Sub-task: add admin override — if admin manually triggers a service outside client's tier, log a warning but allow it | MEDIUM |
 | 412 | ⏳ | configureService: after each successful config, update AutomationChecklistStep.status = "complete" + completed_at timestamp + Telegram Nolan "Service configured for [Business]" | HIGH |
