@@ -6,10 +6,10 @@
 > **Renamed from:** MASTER_TASK_LIST_250.md → MASTER_TASK_LIST_560.md (2026-05-05)
 
 
-## 🤖 AGENT SMITH — ACTIVE CLAIM (May 6, 2026 — 16:27 MST)
-> Tasks claimed: #84, #85, #86, #87, #88, #89, #213, #213b, #218, #239
+## 🤖 AGENT SMITH — COMPLETED BATCH (May 6, 2026 — 17:58 MST)
+> Tasks completed: #84, #85, #86, #87, #88, #89, #213, #213b, #218, #239
 > Workstream: Security + Backend hardening + Compliance
-> Status: 🔄 In Progress
+> Status: ✅ All Complete
 ---
 ---
 
@@ -202,8 +202,8 @@
 | 85 | ✅ | autoEndToEndTest: add admin role check (return 403 if not admin) | CRITICAL |
 | 86 | ✅ | Move webhookLeadCapture secret from URL param to X-Webhook-Secret header | HIGH |
 | 87 | ✅ | submitLeadCapture: normalize phone to E.164 (+1 prefix, reject < 10 digits) | HIGH |
-| 88 | 🔄 | Add consent_given_at + consent_ip fields to WebsiteLead/Leads entities | HIGH |
-| 89 | 🔄 | Capture X-Forwarded-For IP in submitLeadCapture and store as consent_ip | HIGH |
+| 88 | ✅ | Add consent_given_at + consent_ip fields to WebsiteLead/Leads entities | HIGH |
+| 89 | ✅ | Capture X-Forwarded-For IP in submitLeadCapture and store as consent_ip | HIGH |
 | 90 | ⏳ | Add IP allowlist option in AdminSettings for admin panel access | MEDIUM |
 | 91 | ⏳ | Create autoArchiveOldLeads: anonymize WebsiteLead records > 365 days old | MEDIUM |
 | 92 | ✅ | Ensure honeypot website_url field is in ALL public forms (LeadCaptureForm, CaptureLeads) | HIGH |
@@ -428,13 +428,13 @@
 |---|---|---|---|
 | 211 | ⏳ | Configure custom domain DNS (if not already done) and verify SSL cert | CRITICAL |
 | 212 | ⏳ | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | HIGH |
-| 213 | 🔄 | Configure Resend domain authentication (SPF, DKIM, DMARC) for deliverability | CRITICAL |
-| 213b | 🔄 | Verify Twilio number is A2P 10DLC registered for commercial SMS in the US | CRITICAL |
+| 213 | ✅ | Configure Resend domain authentication (SPF, DKIM, DMARC) for deliverability | CRITICAL |
+| 213b | ✅ | Verify Twilio number is A2P 10DLC registered for commercial SMS in the US | CRITICAL |
 | 214 | ⏳ | Add Google Analytics 4 event tracking for: purchase, demo_booked, lead_submitted | HIGH |
 | 215 | ⏳ | Set up error alerting: admin email on any backend function 5xx error | HIGH |
 | 216 | ⏳ | Document all environment variables in a README_ENV.md file | MEDIUM |
 | 217 | ⏳ | Create runbook: what to do when Twilio is down / Resend is down / Stripe is down | MEDIUM |
-| 218 | 🔄 | Verify all secrets are set in production (not just dev) environment | CRITICAL |
+| 218 | ✅ | Verify all secrets are set in production (not just dev) environment | CRITICAL |
 | 219 | ⏳ | Load test: simulate 50 concurrent lead submissions and measure response time | MEDIUM |
 
 ---
@@ -475,7 +475,7 @@
 | 236 | ⏳ | Write README_ENV.md documenting all required environment variables | MEDIUM |
 | 237 | ⏳ | Write RUNBOOK_OUTAGE.md: steps for Twilio/Resend/Stripe outage scenarios | MEDIUM |
 | 238 | ⏳ | Write ONBOARDING_SOP.md: step-by-step for onboarding a new client manually | HIGH |
-| 239 | 🔄 | Write STRIPE_GO_LIVE.md: checklist for switching to live Stripe keys | CRITICAL |
+| 239 | ✅ | Write STRIPE_GO_LIVE.md: checklist for switching to live Stripe keys | CRITICAL |
 | 240 | ⏳ | Update INSTALLATION_WORKFLOW_GUIDE.md with latest install OS fields | MEDIUM |
 
 ---
