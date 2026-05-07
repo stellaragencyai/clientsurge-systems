@@ -40,6 +40,30 @@ const SERVICE_CONFIG = {
   review_request: { display_name: "Review Request", required_config: ["review_link"] },
 };
 
+// ─────────────────────────────────────────
+// #411 — TIER SERVICE MAP
+// Defines which services each package tier activates
+// ─────────────────────────────────────────
+
+const TIER_SERVICE_MAP = {
+  starter: ["instant_lead_response", "missed_call_text_back"],
+  growth:  ["instant_lead_response", "missed_call_text_back", "ai_booking_agent", "nurture_sequence_14d"],
+  elite:   ["instant_lead_response", "missed_call_text_back", "ai_booking_agent", "nurture_sequence_14d", "review_request", "lead_reactivation"],
+};
+
+function getTierFromPackageKey(packageKey = "") {
+  const key = packageKey.toLowerCase();
+  if (key.includes("elite")) return "elite";
+  if (key.includes("growth")) return "growth";
+  return "starter";
+}
+
+function filterServicesByTier(serviceKeys = [], packageKey = "") {
+  const tier = getTierFromPackageKey(packageKey);
+  const allowedServices = TIER_SERVICE_MAP[tier] || TIER_SERVICE_MAP.starter;
+  return serviceKeys.filter((k) => allowedServices.includes(k));
+}
+
 const VALID_TRANSITIONS = {
   "Paid": ["Ready for Install"],
   "Ready for Install": ["Configuring"],
@@ -96,6 +120,24 @@ Deno.serve(async (req) => {
 
 async function initializePaidOrderInstallPipeline(base44, order) {
   console.log(`[Pipeline] Initializing order ${order.id}`);
+
+  // #411 — Apply tier gate: only activate services allowed for this package
+  const packageKey = order.package_key || "";
+  const tier = getTierFromPackageKey(packageKey);
+  const allowedServiceKeys = TIER_SERVICE_MAP[tier] || TIER_SERVICE_MAP.starter;
+  console.log(`[Pipeline] Tier gate: ${tier} → allowed services: ${allowedServiceKeys.join(", ")}`);
+
+  // Filter order items to only include tier-allowed services
+  if (order.items && order.items.length > 0) {
+    const filteredItems = order.items.filter((item) =>
+      !item.service_key || allowedServiceKeys.includes(item.service_key)
+    );
+    if (filteredItems.length !== order.items.length) {
+      await base44.asServiceRole.entities.Order.update(order.id, { items: filteredItems });
+      console.log(`[Pipeline] Tier gate filtered items: ${order.items.length} → ${filteredItems.length}`);
+      order = { ...order, items: filteredItems };
+    }
+  }
 
   const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, {
     payment_status: "paid",
