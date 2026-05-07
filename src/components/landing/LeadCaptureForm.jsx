@@ -280,6 +280,9 @@ export default function LeadCaptureForm() {
           <p className="mt-4 text-xs text-muted-foreground text-center">
             No spam. No pressure. Just a tailored follow-up about your lead system.
           </p>
+          <p className="mt-2 text-xs text-muted-foreground text-center px-2">
+            By submitting, you consent to receive automated SMS &amp; email messages from ClientSurge Systems. Reply <strong>STOP</strong> to opt out at any time. Msg &amp; data rates may apply.
+          </p>
         </form>
       </div>
     </section>
@@ -326,3 +329,4 @@ function FormSelect({ label, required, value, onChange, options }) {
     </div>
   );
 }
+
