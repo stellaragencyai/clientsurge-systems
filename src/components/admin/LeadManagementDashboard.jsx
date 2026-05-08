@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import {
   executeLeadImport,
-  fetchLeadPipelineSummary,
+  fetchLeadPipelineSummary, // #322: wired — called on load via leadPipelineApi
   getLeadPipelineError,
   previewLeadImport,
   triggerLeadScoring,
