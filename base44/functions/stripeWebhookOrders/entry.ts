@@ -261,7 +261,9 @@ Deno.serve(async (req) => {
 
         // ── Initialize Install OS (checklists + steps per service) ────────────
         try {
-          const installOSResult = await base44.asServiceRole.functions.invoke("initializeInstallOS", {
+          const installOSResult = // #446: wire activateAllServices post-payment
+        base44.asServiceRole.functions.invoke("activateAllServices", { order_id: newOrder.id }).catch((e: any) => console.error('[stripeWebhook] activateAllServices failed:', e.message));
+        await base44.asServiceRole.functions.invoke("initializeInstallOS", {
             order_id: order.id,
           });
           console.log("[stripeWebhookOrders] initializeInstallOS complete", {
