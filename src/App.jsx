@@ -36,6 +36,7 @@ import ThankYou from "./pages/ThankYou";
 import About from "./pages/About";
 import CredentialsSetup from "./pages/CredentialsSetup";
 import SetupStatus from "./pages/SetupStatus";
+import WebsitePreview from "./pages/WebsitePreview";
 import AdminInstallGuide from "./pages/AdminInstallGuide";
 import AISalesCommandCenter from "./pages/AISalesCommandCenter";
 import PerformanceWars from "./pages/PerformanceWars";
@@ -77,6 +78,7 @@ const PUBLIC_PATHS = [
   "/contact",
   "/leads/capture",
   "/onboarding",
+  "/setup/preview",
   // test/preview routes removed
 ];
 
@@ -240,6 +242,8 @@ const AuthenticatedApp = () => {
       <Route path="/setup/credentials" element={<CredentialsSetup />} />
       <Route path="/setup/status/:orderId" element={<SetupStatus />} />
       <Route path="/setup/status" element={<SetupStatus />} />
+      <Route path="/setup/preview/:specId" element={<WebsitePreview />} />
+      <Route path="/setup/preview" element={<WebsitePreview />} />
       <Route path="/services/:serviceSlug" element={<Navigate to="/store" replace />} />
       <Route path="/:slug" element={<IndustryTemplate />} />
 

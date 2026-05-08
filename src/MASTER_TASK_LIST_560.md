@@ -1008,7 +1008,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 416 | ✅ | Build generateClientWebsite backend function — takes order_id, reads package_key + industry + install_configuration, returns structured WebsiteSpec object. Starter = 1-page, Growth = 3-page, Elite = 5-page interactive. Writes spec to WebsiteSpec entity | CRITICAL |
+| 416 | ✅ | Build generateClientWebsite backend function (AI-powered rewrite with InvokeLLM copy generation — 2026-05-08) — takes order_id, reads package_key + industry + install_configuration, returns structured WebsiteSpec object. Starter = 1-page, Growth = 3-page, Elite = 5-page interactive. Writes spec to WebsiteSpec entity | CRITICAL |
 | 416a | ⏳ | Sub-task: define WebsiteSpec JSON schema — pages array with sections, copy blocks, brand object | HIGH |
 | 416b | ⏳ | Sub-task: build the Starter 1-page spec generator (Hero + Problem + Solution + 2 Automation blocks + CTA + Footer) | HIGH |
 | 416c | ⏳ | Sub-task: build Growth 3-page spec (Home + Services + Book Now) | HIGH |
