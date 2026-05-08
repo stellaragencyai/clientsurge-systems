@@ -6,6 +6,9 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+// #144: normalize phone for robust dedup
+function normalizePhone(p = "") { return p.replace(/\D/g, "").slice(-10); }
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -38,6 +41,7 @@ Deno.serve(async (req) => {
         .trim();
 
     const primaryPhone = normalize(lead.phone || "");
+    const primaryPhoneNorm = normalizePhone(lead.phone || ""); // #144
     const primaryEmail = normalize(lead.email || "");
     const primaryName = normalize(lead.full_name || "");
 
@@ -59,7 +63,8 @@ Deno.serve(async (req) => {
         primaryName.substring(0, 3) === otherName.substring(0, 3) &&
         otherPhone === primaryPhone;
 
-      return phoneMatch || emailMatch || nameAndPhoneMatch;
+      const phoneNormMatch = primaryPhoneNorm.length >= 10 && normalizePhone(other.phone || "") === primaryPhoneNorm; // #144
+      return phoneMatch || phoneNormMatch || emailMatch || nameAndPhoneMatch;
     });
 
     // 4. Merge if duplicates found
