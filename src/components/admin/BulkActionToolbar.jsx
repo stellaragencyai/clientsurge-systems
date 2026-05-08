@@ -4,6 +4,17 @@
  */
 
 import { useState, useEffect } from "react";
+
+// #323: Clean Duplicates action
+async function handleDeduplicateSelected(selectedIds, base44Client) {
+  const results = await Promise.allSettled(
+    selectedIds.map(id => base44Client.functions.invoke("deduplicateLeads", { lead_id: id }))
+  );
+  const merged = results.filter(r => r.status === "fulfilled" && r.value?.duplicates_merged > 0).length;
+  return { merged, total: selectedIds.length };
+}
+
+
 import {
   X, ChevronDown, CheckCircle, Loader2, MessageSquare, StickyNote, Tag, AlertCircle, Sparkles,
   Download, Phone, BookOpen
