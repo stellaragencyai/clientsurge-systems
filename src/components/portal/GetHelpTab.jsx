@@ -1,102 +1,94 @@
 /**
- * GetHelpTab — #67
- * ClientPortal "Get Help" tab with support ticket form.
- * Writes to SupportMessage entity, Telegrams Nolan.
+ * GetHelpTab — #191 #259
+ * Client portal "Get Help" tab — support ticket form → creates SupportMessage entity.
  */
 import { useState } from "react";
 
-export default function GetHelpTab({ order }) {
-  const [form, setForm] = useState({ subject: "", message: "", priority: "normal" });
-  const [status, setStatus] = useState(null); // null | "sending" | "sent" | "error"
+const ISSUE_TYPES = [
+  "Automations not firing",
+  "SMS not sending",
+  "Lead not responding",
+  "Billing question",
+  "Need a change to my messaging",
+  "Other",
+];
+
+export default function GetHelpTab({ order_id, client_name }) {
+  const [form, setForm] = useState({ issue_type: "", subject: "", message: "" });
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus("sending");
+    if (!form.issue_type || !form.message) return;
+    setLoading(true); setError(null);
     try {
-      const res = await fetch("/api/functions/submitSupportTicket", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, order_id: order?.id, business_name: order?.business_name }),
+      const { SupportMessage } = await import("@/api/entities");
+      await SupportMessage.create({
+        order_id, client_name,
+        issue_type: form.issue_type,
+        subject: form.subject || form.issue_type,
+        message: form.message,
+        status: "open",
+        submitted_at: new Date().toISOString(),
       });
-      if (!res.ok) throw new Error("Failed to submit");
-      setStatus("sent");
-      setForm({ subject: "", message: "", priority: "normal" });
-    } catch {
-      setStatus("error");
+      setSubmitted(true);
+    } catch (e) {
+      setError("Failed to submit. Please email nolan@clientsurgesystems.com directly.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const inputStyle = {
-    width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: 10, padding: "12px 14px", color: "#fff", fontSize: 14,
-    outline: "none", boxSizing: "border-box",
-  };
+  if (submitted) return (
+    <div style={{ textAlign: "center", padding: "60px 20px" }}>
+      <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
+      <h3 style={{ color: "#00FFB3", fontSize: 20, fontWeight: 800, margin: "0 0 8px" }}>Ticket submitted!</h3>
+      <p style={{ color: "#9CA3AF", fontSize: 14 }}>Nolan will respond within a few hours. Check your email.</p>
+      <button onClick={() => { setSubmitted(false); setForm({ issue_type: "", subject: "", message: "" }); }}
+        style={{ marginTop: 20, background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "#9CA3AF", borderRadius: 9999, padding: "8px 20px", fontSize: 12, cursor: "pointer" }}>
+        Submit another
+      </button>
+    </div>
+  );
 
   return (
-    <div style={{ padding: "24px 0", maxWidth: 560 }}>
-      <h2 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 6 }}>Get Help</h2>
-      <p style={{ color: "#9CA3AF", fontSize: 14, marginBottom: 24 }}>Submit a support request and we'll respond within a few hours.</p>
-
-      {status === "sent" ? (
-        <div style={{ padding: 28, background: "rgba(0,255,179,0.06)", border: "1px solid rgba(0,255,179,0.2)", borderRadius: 16, textAlign: "center" }}>
-          <div style={{ fontSize: 36, marginBottom: 12 }}>✅</div>
-          <p style={{ color: "#00FFB3", fontWeight: 700, fontSize: 16, margin: "0 0 6px" }}>Ticket Submitted!</p>
-          <p style={{ color: "#9CA3AF", fontSize: 13, margin: 0 }}>Nolan will reach out to you directly. Usually within a few hours.</p>
-          <button onClick={() => setStatus(null)} style={{ marginTop: 16, background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "#9CA3AF", borderRadius: 9999, padding: "8px 20px", fontSize: 13, cursor: "pointer" }}>
-            Submit Another
-          </button>
+    <div style={{ maxWidth: 560, margin: "0 auto" }}>
+      <h2 style={{ color: "#fff", fontSize: 20, fontWeight: 800, margin: "0 0 6px" }}>Get Help</h2>
+      <p style={{ color: "#9CA3AF", fontSize: 14, margin: "0 0 28px" }}>
+        Tell us what's going on — we'll get back to you within a few hours.
+      </p>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <div>
+          <label style={{ color: "#9CA3AF", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Issue Type *</label>
+          <select value={form.issue_type} onChange={e => setForm(f => ({ ...f, issue_type: e.target.value }))} required
+            style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "#fff", borderRadius: 10, padding: "10px 14px", fontSize: 14 }}>
+            <option value="">Select an issue type...</option>
+            {ISSUE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
         </div>
-      ) : (
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <div>
-            <label style={{ color: "#9CA3AF", fontSize: 12, display: "block", marginBottom: 6 }}>Subject</label>
-            <input
-              style={inputStyle} required
-              placeholder="e.g. SMS not sending, need to update phone number..."
-              value={form.subject}
-              onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
-            />
-          </div>
-
-          <div>
-            <label style={{ color: "#9CA3AF", fontSize: 12, display: "block", marginBottom: 6 }}>Priority</label>
-            <select style={{ ...inputStyle, appearance: "none" }} value={form.priority} onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
-              <option value="low">Low — general question</option>
-              <option value="normal">Normal — something isn't working right</option>
-              <option value="high">High — system is down or leads are being missed</option>
-            </select>
-          </div>
-
-          <div>
-            <label style={{ color: "#9CA3AF", fontSize: 12, display: "block", marginBottom: 6 }}>Message</label>
-            <textarea
-              style={{ ...inputStyle, minHeight: 120, resize: "vertical" }} required
-              placeholder="Describe what's happening..."
-              value={form.message}
-              onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
-            />
-          </div>
-
-          {status === "error" && (
-            <p style={{ color: "#F87171", fontSize: 13, margin: 0 }}>⚠️ Something went wrong. Email nolan@clientsurgesystems.com directly.</p>
-          )}
-
-          <button type="submit" disabled={status === "sending"} style={{
-            background: "linear-gradient(135deg, #00D4FF, #00FFB3)", color: "#0A0F1E",
-            border: "none", borderRadius: 9999, padding: "14px", fontWeight: 800,
-            fontSize: 15, cursor: status === "sending" ? "not-allowed" : "pointer",
-            opacity: status === "sending" ? 0.7 : 1,
-          }}>
-            {status === "sending" ? "Submitting..." : "Submit Support Request →"}
-          </button>
-        </form>
-      )}
-
-      <div style={{ marginTop: 24, padding: 16, background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12 }}>
-        <p style={{ color: "#6B7280", fontSize: 13, margin: 0 }}>
-          📧 Or email directly: <a href="mailto:nolan@clientsurgesystems.com" style={{ color: "#00AEEF" }}>nolan@clientsurgesystems.com</a>
-        </p>
-      </div>
+        <div>
+          <label style={{ color: "#9CA3AF", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Subject (optional)</label>
+          <input value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} placeholder="Brief subject..."
+            style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "#fff", borderRadius: 10, padding: "10px 14px", fontSize: 14, boxSizing: "border-box" }} />
+        </div>
+        <div>
+          <label style={{ color: "#9CA3AF", fontSize: 12, fontWeight: 600, display: "block", marginBottom: 6 }}>Message *</label>
+          <textarea value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} required rows={5}
+            placeholder="Describe what's happening..."
+            style={{ width: "100%", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.12)", color: "#fff", borderRadius: 10, padding: "10px 14px", fontSize: 14, resize: "vertical", boxSizing: "border-box" }} />
+        </div>
+        {error && <p style={{ color: "#EF4444", fontSize: 13 }}>{error}</p>}
+        <button type="submit" disabled={loading || !form.issue_type || !form.message} style={{
+          background: "linear-gradient(135deg,#00D4FF,#00FFB3)", color: "#0A0F1E",
+          border: "none", borderRadius: 9999, padding: "12px 28px",
+          fontSize: 14, fontWeight: 800, cursor: loading ? "not-allowed" : "pointer",
+          opacity: loading ? 0.7 : 1, alignSelf: "flex-start",
+        }}>
+          {loading ? "Submitting..." : "Submit Ticket →"}
+        </button>
+      </form>
     </div>
   );
 }
