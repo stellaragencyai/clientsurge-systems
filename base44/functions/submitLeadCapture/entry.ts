@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const MAX_FIELD_LENGTH = 500;
-const DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+const DUPLICATE_WINDOW_MS = 60 * 60 * 1000; // #137: 60-minute dedup window (was 30 days)
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const LEAD_SOURCE = 'website';
 const INTAKE_TYPE = 'lead_capture';
