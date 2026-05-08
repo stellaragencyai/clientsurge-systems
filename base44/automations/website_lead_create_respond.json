@@ -1,0 +1,9 @@
+{
+  "id": "website_lead_create_respond",
+  "name": "WebsiteLead created → Instant AI Response",
+  "trigger": { "entity": "WebsiteLead", "event": "create" },
+  "task": "When a new WebsiteLead is created: (1) run SMS compliance check via smsCompliance middleware, (2) if allowed, invoke automationOrchestrator with lead_id + trigger=new_lead, (3) send instant SMS to lead.phone using the order's instant_lead_sms template, (4) log to AgentLog",
+  "task_refs": ["#486"],
+  "priority": "CRITICAL",
+  "active": true
+}
