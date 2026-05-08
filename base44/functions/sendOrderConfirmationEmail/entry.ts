@@ -36,6 +36,45 @@ function escapeHtml(value) {
     .replace(/'/g, "&#39;");
 }
 
+
+// #404a: Tier-specific email templates
+const TIER_EMAIL_CONTENT = {
+  starter: {
+    tagline: "Your 2 AI systems are being set up now.",
+    services: [
+      "✅ Instant Lead Response (under 60 sec)",
+      "✅ Missed Call Text-Back",
+    ],
+    next_steps: "We'll have your system live within 24–48 hours.",
+  },
+  growth: {
+    tagline: "Your 4 AI systems are being configured.",
+    services: [
+      "✅ Instant Lead Response",
+      "✅ Missed Call Text-Back",
+      "✅ Automated Follow-Up Sequences (Day 1, 3, 7)",
+      "✅ AI Appointment Booking",
+    ],
+    next_steps: "Expect your system live within 24–48 hours.",
+  },
+  elite: {
+    tagline: "Your full 6-system AI automation suite is being built.",
+    services: [
+      "✅ Instant Lead Response",
+      "✅ Missed Call Text-Back",
+      "✅ Automated Follow-Up Sequences",
+      "✅ AI Appointment Booking",
+      "✅ Review Request AI",
+      "✅ Reactivation Campaign",
+    ],
+    next_steps: "Your complete system will be live within 24–48 hours.",
+  },
+};
+
+function getTierContent(package_key) {
+  return TIER_EMAIL_CONTENT[package_key] || TIER_EMAIL_CONTENT.starter;
+}
+
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
