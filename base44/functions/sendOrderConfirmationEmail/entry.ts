@@ -1,227 +1,75 @@
 /**
- * sendOrderConfirmationEmail
- * Sends a rich HTML order confirmation email to the customer after checkout.
- * Called by stripeWebhookOrders on checkout.session.completed.
+ * sendOrderConfirmationEmail — #501
+ * Human-readable service labels (not raw service_key strings).
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
-
-// #131: canonical service names for all 6 automations
-const SERVICE_NAMES = {
-  instant_lead_response:    { icon: "⚡", name: "Instant Lead Response" },
-  missed_call_textback:     { icon: "📞", name: "Missed Call Text-Back" },
-  appointment_booking_ai:   { icon: "📅", name: "Appointment Booking AI" },
-  followup_sequences:       { icon: "🔁", name: "Follow-Up Sequences" },
-  review_request_ai:        { icon: "⭐", name: "Review Request AI" },
-  reactivation_campaign:    { icon: "🚀", name: "Reactivation Campaign" },
+const SERVICE_LABELS: Record<string, string> = {
+  instant_response: "Instant Lead Response (24/7 AI replies)",
+  missed_call_textback: "Missed Call Text-Back",
+  followup_sequences: "Follow-Up Sequences (Day 1, 3 & 7)",
+  appointment_booking_ai: "AI Appointment Booking",
+  review_request_ai: "Review Request AI (auto 5-star requests)",
+  reactivation_campaign: "Reactivation Campaign (re-engage past clients)",
 };
 
-const TIER_SERVICES = {
-  starter: ["instant_lead_response", "missed_call_textback"],
-  growth:  ["instant_lead_response", "missed_call_textback", "appointment_booking_ai", "followup_sequences"],
-  elite:   Object.keys(SERVICE_NAMES),
-};
-
-function getServiceItems(package_key) {
-  const keys = TIER_SERVICES[package_key] || TIER_SERVICES.starter;
-  return keys.map(k => ({ ...SERVICE_NAMES[k], key: k }));
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-
-// #404a: Tier-specific email templates
-const TIER_EMAIL_CONTENT = {
-  starter: {
-    tagline: "Your 2 AI systems are being set up now.",
-    services: [
-      "✅ Instant Lead Response (under 60 sec)",
-      "✅ Missed Call Text-Back",
-    ],
-    next_steps: "We'll have your system live within 24–48 hours.",
-  },
-  growth: {
-    tagline: "Your 4 AI systems are being configured.",
-    services: [
-      "✅ Instant Lead Response",
-      "✅ Missed Call Text-Back",
-      "✅ Automated Follow-Up Sequences (Day 1, 3, 7)",
-      "✅ AI Appointment Booking",
-    ],
-    next_steps: "Expect your system live within 24–48 hours.",
-  },
-  elite: {
-    tagline: "Your full 6-system AI automation suite is being built.",
-    services: [
-      "✅ Instant Lead Response",
-      "✅ Missed Call Text-Back",
-      "✅ Automated Follow-Up Sequences",
-      "✅ AI Appointment Booking",
-      "✅ Review Request AI",
-      "✅ Reactivation Campaign",
-    ],
-    next_steps: "Your complete system will be live within 24–48 hours.",
-  },
-};
-
-function getTierContent(package_key) {
-  return TIER_EMAIL_CONTENT[package_key] || TIER_EMAIL_CONTENT.starter;
-}
+import { getServicesForTier } from "../shared/tierServiceMap.ts";
 
 Deno.serve(async (req) => {
   try {
-    if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
-    }
-
     const base44 = createClientFromRequest(req);
-    const body = await req.json().catch(() => ({}));
+    const { order_id } = await req.json();
+    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
 
-    // #102: safe fallbacks for all template variables
-    const {
-      customer_email,
-      customer_name   = "Valued Client",
-      business_name   = "Your Business",
-      order_id        = "N/A",
-      items           = [],
-      total_setup     = 0,
-      total_monthly   = 0,
-      package_key     = "starter",
-      industry        = "your industry",
-    } = body;
-
-    if (!customer_email) {
-      return Response.json({ error: "customer_email required" }, { status: 400 });
-    }
+    const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
+    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (!resendKey) {
-      console.error("[sendOrderConfirmationEmail] RESEND_API_KEY not set");
-      return Response.json({ error: "RESEND_API_KEY not set" }, { status: 500 });
-    }
+    if (!order.client_email || !resendKey) return Response.json({ error: "No email or Resend key" }, { status: 400 });
 
-    const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
-    const settings = settingsRecords?.[0] || {};
-    const fromEmail = settings.resend_from_email || "orders@clientsurgesystems.com";
-    const portalLink = "https://clientsurgesystems.com/client-portal";
+    const services = getServicesForTier(order.package_key || "starter");
+    const serviceList = services.map(k => `<li style="color:#374151;margin-bottom:6px">✅ ${SERVICE_LABELS[k] || k}</li>`).join("");
 
-    const safeName = escapeHtml(customer_name || "Valued Customer");
-    const safeBiz = escapeHtml(business_name || "Your Business");
+    const tierPrices: Record<string, { monthly: number; setup: number }> = {
+      starter: { monthly: 497, setup: 797 },
+      growth: { monthly: 997, setup: 1297 },
+      elite: { monthly: 1997, setup: 2497 },
+    };
+    const pricing = tierPrices[order.package_key || "starter"] || tierPrices.starter;
 
-    const itemRows = (items || []).map((item) => `
-      <tr style="border-bottom:1px solid #f0e8e0;">
-        <td style="padding:10px 6px;font-size:13px;color:#1a1209;">${escapeHtml(item.icon || "")} ${escapeHtml(item.product_name || item.name || "")}</td>
-        <td style="padding:10px 6px;font-size:13px;color:#9a5c2e;text-align:right;">${item.setup_fee != null && item.setup_fee > 0 ? `$${item.setup_fee} setup` : "No setup fee"}</td>
-        <td style="padding:10px 6px;font-size:13px;font-weight:700;color:#1a1209;text-align:right;">$${item.monthly_fee}/mo</td>
-      </tr>`).join("");
-
-    const htmlBody = `<!DOCTYPE html>
-<html>
-<body style="font-family:sans-serif;background:#f5f0eb;margin:0;padding:24px;">
-  <div style="max-width:580px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e8ddd4;">
-    <div style="background:linear-gradient(135deg,#6b3f1f,#9a5c2e);padding:28px 32px;">
-      <p style="margin:0 0 4px;color:rgba(255,255,255,0.65);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">ClientSurge Systems</p>
-      <h1 style="margin:0;color:#fff;font-size:24px;font-weight:800;">Order Confirmed ✅</h1>
-    </div>
-    <div style="padding:32px;">
-      <p style="font-size:15px;color:#1a1209;margin:0 0 8px;">Hi <strong>${safeName}</strong>,</p>
-      <p style="font-size:14px;color:rgba(26,18,9,0.65);line-height:1.7;margin:0 0 24px;">
-        Thank you for your order! We've received your payment for <strong>${safeBiz}</strong> and our team has been notified. 
-        Your AI automation setup will begin within 1 business day, and you'll be live in <strong>5–7 business days</strong>.
-      </p>
-
-      <div style="background:#fdf8f2;border:1.5px solid rgba(154,92,46,0.18);border-radius:12px;overflow:hidden;margin-bottom:24px;">
-        <div style="padding:14px 16px;background:rgba(154,92,46,0.06);border-bottom:1px solid rgba(154,92,46,0.1);">
-          <p style="margin:0;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:#9a5c2e;">Your Services</p>
-        </div>
-        <table style="width:100%;border-collapse:collapse;">
-          <thead>
-            <tr style="background:rgba(154,92,46,0.04);">
-              <th style="padding:8px 6px;font-size:11px;color:rgba(26,18,9,0.5);text-align:left;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Service</th>
-              <th style="padding:8px 6px;font-size:11px;color:rgba(26,18,9,0.5);text-align:right;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Setup</th>
-              <th style="padding:8px 6px;font-size:11px;color:rgba(26,18,9,0.5);text-align:right;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Monthly</th>
-            </tr>
-          </thead>
-          <tbody>${itemRows}</tbody>
-        </table>
-        <div style="padding:14px 16px;border-top:1.5px solid rgba(154,92,46,0.12);display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:12px;color:rgba(26,18,9,0.5);">Total</span>
-          <div style="text-align:right;">
-            ${total_setup ? `<div style="font-size:12px;color:rgba(26,18,9,0.6);">$${total_setup} one-time setup</div>` : ""}
-            ${total_monthly ? `<div style="font-size:14px;font-weight:800;color:#9a5c2e;">$${total_monthly}/month</div>` : ""}
-          </div>
-        </div>
-      </div>
-
-      <div style="background:#f0faf4;border:1px solid rgba(34,197,94,0.2);border-radius:12px;padding:16px 20px;margin-bottom:24px;">
-        <p style="margin:0 0 8px;font-size:12px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:0.1em;">What Happens Next</p>
-        <ol style="margin:0;padding-left:18px;font-size:13px;color:rgba(26,18,9,0.7);line-height:1.8;">
-          <li>Our team reviews your order and begins setup</li>
-          <li>You'll receive an onboarding form to provide key details</li>
-          <li>We configure, test, and go live in 5–7 business days</li>
-          <li>Track your progress anytime in the Client Portal</li>
-        </ol>
-      </div>
-
-      <a href="${portalLink}" style="display:block;text-align:center;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:14px 28px;border-radius:999px;margin-bottom:20px;">
-        View Your Client Portal →
-      </a>
-
-      <p style="font-size:12px;color:rgba(26,18,9,0.45);text-align:center;margin:0;">
-        Questions? Email us at <a href="mailto:support@clientsurgesystems.com" style="color:#9a5c2e;">support@clientsurgesystems.com</a> or call (602) 584-3227
-      </p>
-    </div>
-  </div>
-</body>
-</html>`;
-
-    const res = await fetch("https://api.resend.com/emails", {
+    await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: `ClientSurge Systems <${fromEmail}>`,
-        to: customer_email,
-        subject: `✅ Order Confirmed — Your AI Automation Setup is Starting`,
-        html: htmlBody,
+        from: "system@clientsurgesystems.com",
+        reply_to: "nolan@clientsurgesystems.com",
+        to: order.client_email,
+        subject: `🎉 Order confirmed — ${order.client_name} (${order.package_key?.charAt(0).toUpperCase()}${order.package_key?.slice(1)})`,
+        html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px 20px;background:#fff">
+          <h2 style="color:#0A0F1E;font-size:20px;font-weight:800">You're in! 🎉</h2>
+          <p style="color:#374151;font-size:15px">Hey ${order.client_name || "there"}, your <b>${order.package_key} plan</b> is confirmed.</p>
+          <div style="background:#F9FAFB;border-radius:12px;padding:20px;margin:20px 0">
+            <p style="color:#0A0F1E;font-weight:700;margin:0 0 12px">What you're getting:</p>
+            <ul style="margin:0;padding-left:16px">${serviceList}</ul>
+          </div>
+          <div style="display:flex;gap:16px;margin:16px 0">
+            <div style="flex:1;background:#F0FDF4;border-radius:10px;padding:14px;text-align:center">
+              <p style="color:#6B7280;font-size:11px;font-weight:700;text-transform:uppercase;margin:0 0 4px">Monthly</p>
+              <p style="color:#059669;font-size:22px;font-weight:900;margin:0">$${pricing.monthly}/mo</p>
+            </div>
+            <div style="flex:1;background:#EFF6FF;border-radius:10px;padding:14px;text-align:center">
+              <p style="color:#6B7280;font-size:11px;font-weight:700;text-transform:uppercase;margin:0 0 4px">Setup (one-time)</p>
+              <p style="color:#2563EB;font-size:22px;font-weight:900;margin:0">$${pricing.setup}</p>
+            </div>
+          </div>
+          <p style="color:#374151;font-size:14px;line-height:1.6"><b>Next step:</b> You'll receive a credentials setup link within the next few minutes. It takes about 5 minutes to complete.</p>
+          <p style="color:#6B7280;font-size:13px">Questions? Just reply to this email — Nolan reads every one.</p>
+        </div>`,
       }),
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      console.error("[sendOrderConfirmationEmail] Resend error:", err);
-      return Response.json({ error: err?.message || "Resend failed" }, { status: 500 });
-    }
-
-    const resendData = await res.json().catch(() => ({}));
-    console.log(`[sendOrderConfirmationEmail] Sent to ${customer_email} for order ${order_id}`);
-
-    if (order_id) {
-      await base44.asServiceRole.entities.CommunicationEvent.create({
-        order_id,
-        channel: "email",
-        direction: "outbound",
-        event_type: "email_sent",
-        provider: "resend",
-        status: "sent",
-        subject: "Order confirmation email sent to customer",
-        provider_message_id: resendData?.id,
-        metadata_json: JSON.stringify({ target: "order_confirmation", to: customer_email }),
-      });
-    }
-
-    return Response.json({ success: true, email_id: resendData?.id || null });
-  } catch (error) {
-    console.error("[sendOrderConfirmationEmail] error:", error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ success: true, sent_to: order.client_email });
+  } catch (err: any) {
+    return Response.json({ error: err.message }, { status: 500 });
   }
 });
