@@ -134,28 +134,28 @@
 |---|---|---|---|
 | 1 | ✅ | Finalize store UI product cards with correct pricing display | HIGH |
 | 2 | ✅ | Fix cart sidebar body scroll lock on mobile | HIGH |
-| 3 | ⏳ | Add "No setup fee" label instead of "$0 setup" | MEDIUM |
+| 3 | 🔄 | Add "No setup fee" label instead of "$0 setup" | MEDIUM |
 | 4 | ✅ | Add search debounce (280ms) to store search input | MEDIUM |
 | 5 | ✅ | Add SMS consent checkbox in CartSidebar when phone is entered | HIGH |
 | 6 | ✅ | Add `loading="lazy"` + explicit width/height to all below-fold images | HIGH |
 | 7 | ✅ | Add `<link rel="preload">` for hero image in index.html | HIGH |
-| 8 | ⏳ | Split recharts/framer-motion into separate Vite chunks via manualChunks | MEDIUM |
-| 9 | ⏳ | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | MEDIUM |
+| 8 | 🔄 | Split recharts/framer-motion into separate Vite chunks via manualChunks | MEDIUM |
+| 9 | 🔄 | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | MEDIUM |
 | 10 | ⏳ | Store page: implement intersection-observer lazy rendering for 8+ products | MEDIUM |
 | 11 | ✅ | Build out pages/ThankYou — currently a blank page | HIGH |
-| 12 | ⏳ | Add Navbar to LegalPage — currently renders with no header/branding | MEDIUM |
+| 12 | 🔄 | Add Navbar to LegalPage — currently renders with no header/branding | MEDIUM |
 | 13 | ⏳ | Standardize all form inputs to rounded-xl (12px) globally | LOW |
-| 14 | ⏳ | ClientPortal loading state: replace raw spinner with branded skeleton | MEDIUM |
+| 14 | 🔄 | ClientPortal loading state: replace raw spinner with branded skeleton | MEDIUM |
 | 15 | ⏳ | DemoBookingModal time slot grid: force 2-col on viewports < 480px | MEDIUM |
 | 16 | ✅ | CookieConsent banner: add bottom: 80px on mobile to avoid MobileCallBar overlap | LOW |
 | 17 | ✅ | FAQ accordion items: add border-bottom tap target on mobile | LOW |
 | 18 | ✅ | Industry sub-pages: ensure hero headline renders as semantic `<h1>` tag | HIGH  Agent Smith |
 | 19 | ⏳ | Add descriptive alt text to all hero, testimonial, and TrustBar images | MEDIUM |
-| 20 | ⏳ | Fix robots.txt: change Disallow: /leads/ to Disallow: /leads/admin | MEDIUM |
+| 20 | 🔄 | Fix robots.txt: change Disallow: /leads/ to Disallow: /leads/admin | MEDIUM |
 | 21 | ⏳ | Add hreflang tag to index.html for future i18n readiness | LOW |
-| 22 | ⏳ | Stub /blog route with 3 placeholder posts for organic SEO | MEDIUM |
+| 22 | 🔄 | Stub /blog route with 3 placeholder posts for organic SEO | MEDIUM |
 | 23 | ✅ | Add React ErrorBoundary in App.jsx wrapping all routes | CRITICAL |
-| 24 | ⏳ | Set staleTime: 60_000 and retry: 1 in lib/query-client.js | MEDIUM |
+| 24 | 🔄 | Set staleTime: 60_000 and retry: 1 in lib/query-client.js | MEDIUM |
 | 25 | ⏳ | Wrap App in React.StrictMode in main.jsx (dev only) | LOW |
 
 ---
@@ -167,12 +167,12 @@
 | 26 | ⏳ | Add dark mode ☀️/🌙 toggle to Navbar desktop + mobile menu | MEDIUM |
 | 27 | 🔄 | Implement ThemeProvider from next-themes so dark mode class is actually applied | HIGH |
 | 28 | 🔄 | Standardize primary CTAs to blue gradient; gold = store/checkout only | MEDIUM |
-| 29 | ⏳ | Redesign PageNotFound (404) with logo, links, search bar | MEDIUM |
+| 29 | 🔄 | Redesign PageNotFound (404) with logo, links, search bar | MEDIUM |
 | 30 | ⏳ | Add framer-motion + canvas-confetti to Contact page success state | LOW |
 | 31 | ⏳ | pages/Industries: add gradient hero section with industry grid icons | MEDIUM |
 | 32 | ⏳ | Industry pages: give each card a unique accent color or icon style | LOW |
-| 33 | ⏳ | Mobile sticky cart bar: add padding-top: 72px to main content when visible | MEDIUM |
-| 34 | ⏳ | AdminDashboard sidebar: add active-state highlight on current route | MEDIUM |
+| 33 | 🔄 | Mobile sticky cart bar: add padding-top: 72px to main content when visible | MEDIUM |
+| 34 | 🔄 | AdminDashboard sidebar: add active-state highlight on current route | MEDIUM |
 | 35 | ✅ | Testimonials: replace broken image URLs with initials-based avatar fallbacks | HIGH |
 | 36 | ✅ | Add favicon (32x32 + 180x180) and apple-touch-icon to index.html | HIGH |
 | 37 | ⏳ | GuidedPathToggle: add Tooltip explaining Guided vs Explore All modes | LOW |
@@ -186,15 +186,15 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 41 | ⏳ | Store page initial load: show 6 ProductCard skeletons for 300ms then reveal | MEDIUM |
-| 42 | ⏳ | Store ProductCard on mobile (375px): reduce "Add to Cart" font to 10px | MEDIUM |
+| 41 | 🔄 | Store page initial load: show 6 ProductCard skeletons for 300ms then reveal | MEDIUM |
+| 42 | 🔄 | Store ProductCard on mobile (375px): reduce "Add to Cart" font to 10px | MEDIUM |
 | 43 | 🔄 | CartSidebar: apply acquireBodyScrollLock("cart-sidebar") on open, release on close | HIGH |
 | 44 | ⏳ | Mobile sticky cart bar: add circular badge with items.length count | LOW |
-| 45 | ⏳ | Store page: add "Talk to a Human" escape valve CTA below product grid | MEDIUM |
+| 45 | 🔄 | Store page: add "Talk to a Human" escape valve CTA below product grid | MEDIUM |
 | 46 | ⏳ | AdminDashboard sidebar: wire AdminGlobalSearch to all entity types | MEDIUM |
 | 47 | 🔄 | Store SocialProofTicker: verify data is from real Orders (not hardcoded) | MEDIUM |
 | 48 | ⏳ | CartSidebar: show empty state with top 3 popular nudge tiles | LOW |
-| 49 | ⏳ | Store: Guided mode with no industry selected should show all non-coming-soon products | MEDIUM |
+| 49 | 🔄 | Store: Guided mode with no industry selected should show all non-coming-soon products | MEDIUM |
 | 50 | ⏳ | ProductCard "see more features" button should open ServiceDetailModal | LOW |
 
 ---
@@ -204,7 +204,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 51 | 🔄 | pages/Book Calendly iframe: set width:100%, height:700px, scrolling:yes | HIGH |
-| 52 | ⏳ | MobileCallBar: pull phone number from AdminSettings instead of hardcoding | MEDIUM |
+| 52 | 🔄 | MobileCallBar: pull phone number from AdminSettings instead of hardcoding | MEDIUM |
 | 53 | 🔄 | Audit all form inputs for iOS zoom issue (font-size < 16px) | HIGH |
 | 54 | ⏳ | DemoBookingModal step 2: set min-height:48px on date/time inputs | MEDIUM |
 | 55 | 🔄 | pages/Book Calendly: test CSP allows calendly.com frames on live domain | HIGH |
@@ -217,8 +217,8 @@
 |---|---|---|---|
 | 56 | ✅ | Industry pages: inject LocalBusiness + Service JSON-LD schema markup | HIGH |
 | 57 | ✅ | Generate og:image (1200x630) and add to index.html + setPageMetadata | HIGH |
-| 58 | ⏳ | Industry page titles: include city/location for local SEO signals | MEDIUM |
-| 59 | ⏳ | Add internal linking: Footer cross-links industry pages; Store links to industry pages | MEDIUM |
+| 58 | 🔄 | Industry page titles: include city/location for local SEO signals | MEDIUM |
+| 59 | 🔄 | Add internal linking: Footer cross-links industry pages; Store links to industry pages | MEDIUM |
 | 60 | ✅ | sitemap.xml: add all industry pages and core routes | DONE |
 | 61 | ⏳ | Create generateSitemap backend function for dynamic sitemap at /sitemap.xml | LOW |
 
@@ -229,10 +229,10 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 62 | ⏳ | Add manifest.json + minimal service worker for PWA installability | LOW |
-| 63 | ⏳ | Move all Recharts imports inside lazy() components — audit AdminDashboard/Portal | MEDIUM |
+| 63 | 🔄 | Move all Recharts imports inside lazy() components — audit AdminDashboard/Portal | MEDIUM |
 | 64 | ⏳ | Add ?w=800&q=80 Unsplash query params + srcSet to all hero/industry images | MEDIUM |
 | 65 | 🔄 | Remove three.js from package.json if not actively used (saves ~600KB) | HIGH |
-| 66 | ⏳ | Subset Google Fonts: Inter 400/500/600/700 + Playfair 400/600/700 only | MEDIUM |
+| 66 | 🔄 | Subset Google Fonts: Inter 400/500/600/700 + Playfair 400/600/700 only | MEDIUM |
 
 ---
 
@@ -284,9 +284,9 @@
 | 88 | ✅ | Add consent_given_at + consent_ip fields to WebsiteLead/Leads entities | HIGH |
 | 89 | ✅ | Capture X-Forwarded-For IP in submitLeadCapture and store as consent_ip | HIGH |
 | 90 | ⏳ | Add IP allowlist option in AdminSettings for admin panel access | MEDIUM |
-| 91 | ⏳ | Create autoArchiveOldLeads: anonymize WebsiteLead records > 365 days old | MEDIUM |
+| 91 | 🔄 | Create autoArchiveOldLeads: anonymize WebsiteLead records > 365 days old | MEDIUM |
 | 92 | ✅ | Ensure honeypot website_url field is in ALL public forms (LeadCaptureForm, CaptureLeads) | HIGH |
-| 93 | ⏳ | Add X-Frame-Options: DENY header to all backend function responses | MEDIUM |
+| 93 | 🔄 | Add X-Frame-Options: DENY header to all backend function responses | MEDIUM |
 | 94 | ✅ | Privacy link on contact form and checkout | DONE |
 
 ---
@@ -300,11 +300,11 @@
 | 97 | ✅ | processNurtureCampaigns: add idempotency guard (check for duplicate send within 23hr) | HIGH |
 | 98 | ✅ | processWebsiteLeadFollowUps: add cadence_paused: true skip guard | HIGH |
 | 99 | ✅ | scheduleDemoBooking: add optimistic lock — re-fetch slots before confirming | HIGH | Agent Smith |
-| 100 | ⏳ | scheduleDemoBooking: reject weekend bookings (Sat/Sun) + blocked_dates in AdminSettings | MEDIUM |
+| 100 | 🔄 | scheduleDemoBooking: reject weekend bookings (Sat/Sun) + blocked_dates in AdminSettings | MEDIUM |
 | 101 | ✅ | CartSidebar: add 12-second timeout fallback for Stripe redirect | DONE |
 | 102 | ✅ | sendOrderConfirmationEmail: add fallback values for all template variables | HIGH |
-| 103 | ⏳ | discoverLeads: return 503 with clear error if Google Maps API key is missing | MEDIUM |
-| 104 | ⏳ | enrichLeadWithAI: skip enrichment if lead.enriched_at < 7 days ago | MEDIUM |
+| 103 | 🔄 | discoverLeads: return 503 with clear error if Google Maps API key is missing | MEDIUM |
+| 104 | 🔄 | enrichLeadWithAI: skip enrichment if lead.enriched_at < 7 days ago | MEDIUM |
 | 105 | ✅ | Store search debounce 280ms implemented | DONE |
 | 106 | ✅ | robots.txt updated with admin blocks | DONE |
 
@@ -315,16 +315,16 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 107 | ✅ | Create healthCheck function: returns {status:"ok", timestamp, version} — no auth | HIGH |
-| 108 | ⏳ | Create autoCloseStaleLeads: daily scheduled function, closes leads with no contact > 30 days | MEDIUM |
+| 108 | 🔄 | Create autoCloseStaleLeads: daily scheduled function, closes leads with no contact > 30 days | MEDIUM |
 | 109 | ✅ | OrderSuccess: add noindex meta tag | DONE |
-| 110 | ⏳ | Create exportLeadsCSV: query Leads with filters, return CSV with Content-Disposition header | MEDIUM |
-| 111 | ⏳ | Create exportCommunicationLogs: CSV export with date range filter | MEDIUM |
+| 110 | 🔄 | Create exportLeadsCSV: query Leads with filters, return CSV with Content-Disposition header | MEDIUM |
+| 111 | 🔄 | Create exportCommunicationLogs: CSV export with date range filter | MEDIUM |
 | 112 | ✅ | Extend autoEndToEndTest: full checkout → webhook → email → status flow with cleanup | HIGH  Agent Smith |
-| 113 | ⏳ | sendDailyDigest: add gate — skip send if leads_today === 0 AND orders_today === 0 | LOW |
+| 113 | 🔄 | sendDailyDigest: add gate — skip send if leads_today === 0 AND orders_today === 0 | LOW |
 | 114 | ✅ | All Resend fetch calls: add retry once on 429/5xx with 2-second delay | HIGH |
 | 115 | ⏳ | monthlyClientReport: after generating report, email it to the client | MEDIUM |
 | 116 | ✅ | getBookedDemoSlots: add {scheduled_date: selectedDate} filter — don't fetch all records | HIGH | Agent Smith |
-| 117 | ⏳ | Create sendNPSSurvey function: triggered 7 days after order_status = "fully_live" | MEDIUM |
+| 117 | 🔄 | Create sendNPSSurvey function: triggered 7 days after order_status = "fully_live" | MEDIUM |
 
 ---
 
@@ -333,13 +333,13 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 118 | ✅ | Create entity automation: ClientProject update → send milestone email when workflow_stage changes | HIGH | Agent Smith |
-| 119 | ⏳ | Create entity automation: Order update → trigger sendNPSSurvey when order_status = "fully_live" | MEDIUM |
-| 120 | ⏳ | Create scheduled automation: autoCloseStaleLeads — runs daily at 2am | MEDIUM |
+| 119 | 🔄 | Create entity automation: Order update → trigger sendNPSSurvey when order_status = "fully_live" | MEDIUM |
+| 120 | 🔄 | Create scheduled automation: autoCloseStaleLeads — runs daily at 2am | MEDIUM |
 | 121 | ✅ | "$0 setup" renamed to "No setup fee" in store | DONE |
-| 122 | ⏳ | Create scheduled automation: autoArchiveOldLeads — runs monthly | LOW |
+| 122 | 🔄 | Create scheduled automation: autoArchiveOldLeads — runs monthly | LOW |
 | 123 | ✅ | processAutomationJobs: add retry logic — up to 3 attempts with exponential backoff | HIGH |
-| 124 | ⏳ | Create _shared/response.js: okJson() and errJson() for consistent response format | MEDIUM |
-| 125 | ⏳ | Create _shared/retryFetch.js: reusable retry wrapper for external API calls | MEDIUM |
+| 124 | 🔄 | Create _shared/response.js: okJson() and errJson() for consistent response format | MEDIUM |
+| 125 | 🔄 | Create _shared/retryFetch.js: reusable retry wrapper for external API calls | MEDIUM |
 
 ---
 
@@ -351,7 +351,7 @@
 | 127 | ✅ | receiveTwilioInboundSms: verify STOP handling immediately pauses all sequences for that lead | CRITICAL |
 | 128 | ✅ | All SMS sends: verify opt-out language "Reply STOP to unsubscribe" is appended | HIGH |
 | 129 | ✅ | processMissedCallFollowUps: verify missed_call_step_sent increment is idempotent | HIGH |
-| 130 | ⏳ | Twilio number: add auto-provision flow for new clients in autoProvisionTwilioNumber | MEDIUM |
+| 130 | 🔄 | Twilio number: add auto-provision flow for new clients in autoProvisionTwilioNumber | MEDIUM |
 
 ---
 
@@ -360,9 +360,9 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 131 | ✅ | sendOrderConfirmationEmail: verify all 6 service names render correctly in email | HIGH | Agent Smith |
-| 132 | ⏳ | sendDemoConfirmationEmail: verify scheduled_date/time display correctly in all timezones | MEDIUM |
+| 132 | 🔄 | sendDemoConfirmationEmail: verify scheduled_date/time display correctly in all timezones | MEDIUM |
 | 133 | ✅ | sendClientWelcomeEmail: ensure it links to correct client portal URL | HIGH | Agent Smith |
-| 134 | ⏳ | receiveResendWebhook: on email bounce, update CommunicationEvent status to "failed" | MEDIUM |
+| 134 | 🔄 | receiveResendWebhook: on email bounce, update CommunicationEvent status to "failed" | MEDIUM |
 | 135 | ⏳ | receiveResendWebhook: on email open, update lead.last_engagement_at | LOW |
 
 ---
@@ -372,14 +372,14 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 137 | ✅ | submitLeadCapture: verify deduplication window is exactly 60 minutes | HIGH | Agent Smith |
-| 138 | ⏳ | onLeadCreated: verify webhook payload includes all required fields | MEDIUM |
-| 139 | ⏳ | scoreLeads: verify lead_score calculation accounts for all scoring factors | MEDIUM |
-| 140 | ⏳ | scoreLeadIntelligence: add confidence threshold — skip if AI confidence < 0.6 | MEDIUM |
-| 141 | ⏳ | routeLead: verify assigned_to field is populated correctly for all lead types | MEDIUM |
-| 142 | ⏳ | createLeadAndDispatch: add error recovery if CommunicationEvent creation fails | MEDIUM |
+| 138 | 🔄 | onLeadCreated: verify webhook payload includes all required fields | MEDIUM |
+| 139 | 🔄 | scoreLeads: verify lead_score calculation accounts for all scoring factors | MEDIUM |
+| 140 | 🔄 | scoreLeadIntelligence: add confidence threshold — skip if AI confidence < 0.6 | MEDIUM |
+| 141 | 🔄 | routeLead: verify assigned_to field is populated correctly for all lead types | MEDIUM |
+| 142 | 🔄 | createLeadAndDispatch: add error recovery if CommunicationEvent creation fails | MEDIUM |
 | 143 | ✅ | validateLeadQuality: add check for disposable email domains (mailinator, tempmail, etc.) | HIGH |
 | 144 | ✅ | deduplicateLeads: run dedup on phone hash as well as email | HIGH |
-| 145 | ⏳ | enrichLead: add timeout of 10 seconds max for external enrichment calls | MEDIUM |
+| 145 | 🔄 | enrichLead: add timeout of 10 seconds max for external enrichment calls | MEDIUM |
 
 ---
 
@@ -390,9 +390,9 @@
 | 146 | 🔄 | createCheckoutSession: add subscription_data.metadata.order_id for subscription event matching | CRITICAL |
 | 147 | ✅ | stripeWebhookOrders: on invoice.payment_failed, set Order billing_status: "past_due" | CRITICAL |
 | 148 | 🔄 | stripeWebhookOrders: on payment_failed, send recovery email with Stripe payment update link | HIGH |
-| 149 | ⏳ | requestSubscriptionChange: use proration_behavior: "create_prorations" in Stripe call | MEDIUM |
-| 150 | ⏳ | Extract Stripe init + signature validation into _shared/stripeInit.js | LOW |
-| 151 | ⏳ | Add createAuditLog helper: write admin action records to AuditLog entity | MEDIUM |
+| 149 | 🔄 | requestSubscriptionChange: use proration_behavior: "create_prorations" in Stripe call | MEDIUM |
+| 150 | 🔄 | Extract Stripe init + signature validation into _shared/stripeInit.js | LOW |
+| 151 | 🔄 | Add createAuditLog helper: write admin action records to AuditLog entity | MEDIUM |
 
 ---
 
@@ -401,13 +401,13 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 152 | ⏳ | Register healthCheck function URL with UptimeRobot or Better Stack | HIGH |
-| 153 | ⏳ | Add Cache-Control: public, max-age=60 to read-only functions (getAdminSettings, etc.) | MEDIUM |
+| 153 | 🔄 | Add Cache-Control: public, max-age=60 to read-only functions (getAdminSettings, etc.) | MEDIUM |
 | 154 | 🔄 | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | CRITICAL |
 | 155 | ✅ | getClientAnalytics: remove/replace any hardcoded mock data with real entity queries | HIGH  Agent Smith |
 | 156 | ⏳ | getClientPortalContext: on auth, write portal_login CommunicationEvent | LOW |
-| 157 | ⏳ | Create AuditLog entity with fields: admin_email, action, entity, before, after, timestamp | MEDIUM |
-| 158 | ⏳ | Add standardized console.log format to all functions: [functionName] message {context} | LOW |
-| 159 | ⏳ | Verify all functions return proper HTTP status codes (not always 200) | MEDIUM |
+| 157 | 🔄 | Create AuditLog entity with fields: admin_email, action, entity, before, after, timestamp | MEDIUM |
+| 158 | 🔄 | Add standardized console.log format to all functions: [functionName] message {context} | LOW |
+| 159 | 🔄 | Verify all functions return proper HTTP status codes (not always 200) | MEDIUM |
 | 160 | ✅ | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | HIGH | Agent Smith |
 
 ---
@@ -419,8 +419,8 @@
 | 161 | ✅ | Verify Order entity client_id is always set after checkout completes | HIGH |
 | 162 | ✅ | Verify ClientProject is always created when Order payment_status = "paid" | HIGH |
 | 163 | ✅ | Verify CommunicationEvent is created for every SMS/email send attempt | HIGH |
-| 164 | ⏳ | Add data validation: Order.total_monthly must equal sum of item monthly_fees | MEDIUM |
-| 165 | ⏳ | Ensure AutomationChecklist records are created for every paid service | MEDIUM |
+| 164 | 🔄 | Add data validation: Order.total_monthly must equal sum of item monthly_fees | MEDIUM |
+| 165 | 🔄 | Ensure AutomationChecklist records are created for every paid service | MEDIUM |
 | 166 | ✅ | Verify pipeline_status and order_status stay in sync after every transition | HIGH |
 | 167 | ⏳ | Run deduplicateLeads on all existing Leads records to clean up database | MEDIUM |
 
@@ -452,8 +452,8 @@
 | 180 | ✅ | Add "Demo Bookings" tab in AdminDashboard for DemoRequest management | HIGH |
 | 181 | ⏳ | AdminLeadDetail: add "Enroll in Nurture" button → startNurtureCampaign | MEDIUM |
 | 182 | ✅ | Add "Failed Jobs" section in AdminAutomation showing AutomationJob failures + Retry | HIGH |
-| 183 | ⏳ | AdminLeads: mask phone numbers as (602) ***-3227 for non-super-admin users | MEDIUM |
-| 184 | ⏳ | Create AuditLog viewer tab in AdminDashboard for tracking all admin actions | MEDIUM |
+| 183 | 🔄 | AdminLeads: mask phone numbers as (602) ***-3227 for non-super-admin users | MEDIUM |
+| 184 | 🔄 | Create AuditLog viewer tab in AdminDashboard for tracking all admin actions | MEDIUM |
 
 ---
 
@@ -461,10 +461,10 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 185 | ⏳ | AdminOnboarding: add client search/filter by business name or email | MEDIUM |
+| 185 | 🔄 | AdminOnboarding: add client search/filter by business name or email | MEDIUM |
 | 186 | ✅ | AdminOnboarding: show pipeline_status badge prominently on each client card | HIGH |
 | 187 | ⏳ | InstallQueuePanel: add "Assign to Admin" dropdown for each pending install | MEDIUM |
-| 188 | ⏳ | AutomationInstallChecklist: add progress bar showing % of checklist items complete | MEDIUM |
+| 188 | 🔄 | AutomationInstallChecklist: add progress bar showing % of checklist items complete | MEDIUM |
 | 189 | ✅ | Admin: add one-click "Initialize Install OS" button for newly paid orders | HIGH |
 | 190 | ✅ | Admin: show warning badge when order has been paid > 2 days with no install started | HIGH |
 
@@ -476,7 +476,7 @@
 |---|---|---|---|
 | 191 | ✅ | ClientPortal: add "Get Help" support ticket tab → SupportMessage entity | HIGH | Agent Smith |
 | 192 | ⏳ | ClientPortal: add "What's New" changelog section from Changelog entity | LOW |
-| 196 | ⏳ | BillingDashboard: "Download Invoice PDF" using Stripe invoice_pdf URL | MEDIUM |
+| 196 | 🔄 | BillingDashboard: "Download Invoice PDF" using Stripe invoice_pdf URL | MEDIUM |
 | 197 | ⏳ | ClientPortal: add NPS score display after it's collected | LOW |
 | 198 | ⏳ | QuickStartWizard: ensure all onboarding steps link to correct help resources | MEDIUM |
 | 199 | ✅ | ClientPortal: verify OrderTracker shows correct install stages for all service types | HIGH | Agent Smith |
@@ -492,7 +492,7 @@
 | 202 | 🔄 | Update Stripe webhook endpoint URL to production domain | CRITICAL |
 | 203 | 🔄 | Test full purchase flow end-to-end with real card on live domain | CRITICAL |
 | 204 | ✅ | Verify Stripe subscription renewal fires invoice.paid webhook and is handled | HIGH  Agent Smith |
-| 205 | ⏳ | Add capacity limit: AdminSettings.max_active_onboarding — block checkout if exceeded | MEDIUM |
+| 205 | 🔄 | Add capacity limit: AdminSettings.max_active_onboarding — block checkout if exceeded | MEDIUM |
 | 206 | 🔄 | getStripeCustomerPortalUrl: verify it returns working URL for all paid customers | HIGH |
 | 207 | ⏳ | Stripe proration: implement preview before plan change in requestSubscriptionChange | MEDIUM |
 | 208 | ✅ | Verify Stripe metadata includes base44_app_id on all checkout sessions | HIGH  Agent Smith |
