@@ -12,21 +12,6 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
-
-// #410a: REQUIRED_FIELDS_BY_TIER — validated on submit
-const REQUIRED_FIELDS_BY_TIER = {
-  starter: ["business_phone", "business_name", "booking_link"],
-  growth: ["business_phone", "business_name", "booking_link", "booking_platform", "services_offered", "tone_of_voice"],
-  elite: ["business_phone", "business_name", "booking_link", "booking_platform", "services_offered",
-          "tone_of_voice", "logo_url", "primary_color", "instagram_handle", "website"],
-};
-
-function validateCredentials(package_key, fields) {
-  const required = REQUIRED_FIELDS_BY_TIER[package_key] || REQUIRED_FIELDS_BY_TIER.starter;
-  const missing = required.filter(f => !fields[f] || String(fields[f]).trim() === "");
-  return { valid: missing.length === 0, missing };
-}
-
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
