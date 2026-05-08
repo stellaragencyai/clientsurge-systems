@@ -13,6 +13,17 @@ const FOLLOW_UP_STEPS = [
   { step: 3, minutesAfter: 1440, channel: "sms", key: "website_follow_sms_24hr" },
 ];
 
+// #98: cadence_paused guard
+function isCadencePaused(lead) {
+  return lead?.cadence_paused === true || lead?.status === "opted_out" || lead?.status === "Booked";
+}
+
+// #128: TCPA opt-out footer for all SMS
+function appendOptOut(msg) {
+  if ((msg || "").toLowerCase().includes("reply stop")) return msg;
+  return msg + "\n\nReply STOP to unsubscribe.";
+}
+
 function minutesSince(isoDate) {
   if (!isoDate) return 0;
   return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60);
