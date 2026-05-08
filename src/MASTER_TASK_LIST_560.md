@@ -98,8 +98,8 @@
 | 3 | ⏳ | Add "No setup fee" label instead of "$0 setup" | MEDIUM |
 | 4 | ✅ | Add search debounce (280ms) to store search input | MEDIUM |
 | 5 | ✅ | Add SMS consent checkbox in CartSidebar when phone is entered | HIGH |
-| 6 | ⏳ | Add `loading="lazy"` + explicit width/height to all below-fold images | HIGH |
-| 7 | ⏳ | Add `<link rel="preload">` for hero image in index.html | HIGH |
+| 6 | 🔄 | Add `loading="lazy"` + explicit width/height to all below-fold images | HIGH |
+| 7 | 🔄 | Add `<link rel="preload">` for hero image in index.html | HIGH |
 | 8 | ⏳ | Split recharts/framer-motion into separate Vite chunks via manualChunks | MEDIUM |
 | 9 | ⏳ | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | MEDIUM |
 | 10 | ⏳ | Store page: implement intersection-observer lazy rendering for 8+ products | MEDIUM |
@@ -257,13 +257,13 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 95 | ✅ | processNurtureCampaigns: check CommunicationEvent for STOP keyword before each send | CRITICAL |
-| 96 | ⏳ | processDripCampaigns: skip leads with status "Booked" before sending each step | HIGH |
-| 97 | ⏳ | processNurtureCampaigns: add idempotency guard (check for duplicate send within 23hr) | HIGH |
-| 98 | ⏳ | processWebsiteLeadFollowUps: add cadence_paused: true skip guard | HIGH |
+| 96 | 🔄 | processDripCampaigns: skip leads with status "Booked" before sending each step | HIGH |
+| 97 | 🔄 | processNurtureCampaigns: add idempotency guard (check for duplicate send within 23hr) | HIGH |
+| 98 | 🔄 | processWebsiteLeadFollowUps: add cadence_paused: true skip guard | HIGH |
 | 99 | ⏳ | scheduleDemoBooking: add optimistic lock — re-fetch slots before confirming | HIGH |
 | 100 | ⏳ | scheduleDemoBooking: reject weekend bookings (Sat/Sun) + blocked_dates in AdminSettings | MEDIUM |
 | 101 | ✅ | CartSidebar: add 12-second timeout fallback for Stripe redirect | DONE |
-| 102 | ⏳ | sendOrderConfirmationEmail: add fallback values for all template variables | HIGH |
+| 102 | 🔄 | sendOrderConfirmationEmail: add fallback values for all template variables | HIGH |
 | 103 | ⏳ | discoverLeads: return 503 with clear error if Google Maps API key is missing | MEDIUM |
 | 104 | ⏳ | enrichLeadWithAI: skip enrichment if lead.enriched_at < 7 days ago | MEDIUM |
 | 105 | ✅ | Store search debounce 280ms implemented | DONE |
@@ -282,7 +282,7 @@
 | 111 | ⏳ | Create exportCommunicationLogs: CSV export with date range filter | MEDIUM |
 | 112 | ⏳ | Extend autoEndToEndTest: full checkout → webhook → email → status flow with cleanup | HIGH |
 | 113 | ⏳ | sendDailyDigest: add gate — skip send if leads_today === 0 AND orders_today === 0 | LOW |
-| 114 | ⏳ | All Resend fetch calls: add retry once on 429/5xx with 2-second delay | HIGH |
+| 114 | 🔄 | All Resend fetch calls: add retry once on 429/5xx with 2-second delay | HIGH |
 | 115 | ⏳ | monthlyClientReport: after generating report, email it to the client | MEDIUM |
 | 116 | ⏳ | getBookedDemoSlots: add {scheduled_date: selectedDate} filter — don't fetch all records | HIGH |
 | 117 | ⏳ | Create sendNPSSurvey function: triggered 7 days after order_status = "fully_live" | MEDIUM |
@@ -298,7 +298,7 @@
 | 120 | ⏳ | Create scheduled automation: autoCloseStaleLeads — runs daily at 2am | MEDIUM |
 | 121 | ✅ | "$0 setup" renamed to "No setup fee" in store | DONE |
 | 122 | ⏳ | Create scheduled automation: autoArchiveOldLeads — runs monthly | LOW |
-| 123 | ⏳ | processAutomationJobs: add retry logic — up to 3 attempts with exponential backoff | HIGH |
+| 123 | 🔄 | processAutomationJobs: add retry logic — up to 3 attempts with exponential backoff | HIGH |
 | 124 | ⏳ | Create _shared/response.js: okJson() and errJson() for consistent response format | MEDIUM |
 | 125 | ⏳ | Create _shared/retryFetch.js: reusable retry wrapper for external API calls | MEDIUM |
 
@@ -308,10 +308,10 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 126 | ⏳ | scheduleFollowUpSMS: verify business hours check uses Phoenix timezone correctly | HIGH |
+| 126 | 🔄 | scheduleFollowUpSMS: verify business hours check uses Phoenix timezone correctly | HIGH |
 | 127 | ✅ | receiveTwilioInboundSms: verify STOP handling immediately pauses all sequences for that lead | CRITICAL |
-| 128 | ⏳ | All SMS sends: verify opt-out language "Reply STOP to unsubscribe" is appended | HIGH |
-| 129 | ⏳ | processMissedCallFollowUps: verify missed_call_step_sent increment is idempotent | HIGH |
+| 128 | 🔄 | All SMS sends: verify opt-out language "Reply STOP to unsubscribe" is appended | HIGH |
+| 129 | 🔄 | processMissedCallFollowUps: verify missed_call_step_sent increment is idempotent | HIGH |
 | 130 | ⏳ | Twilio number: add auto-provision flow for new clients in autoProvisionTwilioNumber | MEDIUM |
 
 ---
@@ -338,8 +338,8 @@
 | 140 | ⏳ | scoreLeadIntelligence: add confidence threshold — skip if AI confidence < 0.6 | MEDIUM |
 | 141 | ⏳ | routeLead: verify assigned_to field is populated correctly for all lead types | MEDIUM |
 | 142 | ⏳ | createLeadAndDispatch: add error recovery if CommunicationEvent creation fails | MEDIUM |
-| 143 | ⏳ | validateLeadQuality: add check for disposable email domains (mailinator, tempmail, etc.) | HIGH |
-| 144 | ⏳ | deduplicateLeads: run dedup on phone hash as well as email | HIGH |
+| 143 | 🔄 | validateLeadQuality: add check for disposable email domains (mailinator, tempmail, etc.) | HIGH |
+| 144 | 🔄 | deduplicateLeads: run dedup on phone hash as well as email | HIGH |
 | 145 | ⏳ | enrichLead: add timeout of 10 seconds max for external enrichment calls | MEDIUM |
 
 ---
@@ -377,12 +377,12 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 161 | ⏳ | Verify Order entity client_id is always set after checkout completes | HIGH |
-| 162 | ⏳ | Verify ClientProject is always created when Order payment_status = "paid" | HIGH |
-| 163 | ⏳ | Verify CommunicationEvent is created for every SMS/email send attempt | HIGH |
+| 161 | 🔄 | Verify Order entity client_id is always set after checkout completes | HIGH |
+| 162 | 🔄 | Verify ClientProject is always created when Order payment_status = "paid" | HIGH |
+| 163 | 🔄 | Verify CommunicationEvent is created for every SMS/email send attempt | HIGH |
 | 164 | ⏳ | Add data validation: Order.total_monthly must equal sum of item monthly_fees | MEDIUM |
 | 165 | ⏳ | Ensure AutomationChecklist records are created for every paid service | MEDIUM |
-| 166 | ⏳ | Verify pipeline_status and order_status stay in sync after every transition | HIGH |
+| 166 | 🔄 | Verify pipeline_status and order_status stay in sync after every transition | HIGH |
 | 167 | ⏳ | Run deduplicateLeads on all existing Leads records to clean up database | MEDIUM |
 
 ---
@@ -398,21 +398,21 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 168 | ⏳ | Add bulk status update to admin lead table (checkboxes + "Mark as Contacted" toolbar) — Claimed by Morpheus 2026-05-05 | HIGH |
+| 168 | 🔄 | Add bulk status update to admin lead table (checkboxes + "Mark as Contacted" toolbar) — Claimed by Morpheus 2026-05-05 | HIGH |
 | 169 | ⏳ | Wire Leads.subscribe() real-time listener to auto-refresh admin leads table — Claimed by Morpheus 2026-05-05 | HIGH |
 | 170 | ⏳ | Install Queue panel: show estimated completion date (install_initialized_at + 6 days) — Claimed by Morpheus 2026-05-05 | MEDIUM |
 | 171 | ⏳ | Add "Resend Welcome Email" button in client detail view → sendPortalWelcomeEmail — Claimed by Morpheus 2026-05-05 | MEDIUM |
-| 172 | ⏳ | AdminSettings: add "Test Connection" buttons for Twilio + Resend → testProviderConnections — Claimed by Morpheus 2026-05-05 | HIGH |
-| 173 | ⏳ | Add "Website Leads" tab in AdminDashboard showing WebsiteLead entity with filters — Claimed by Morpheus 2026-05-05 | HIGH |
+| 172 | 🔄 | AdminSettings: add "Test Connection" buttons for Twilio + Resend → testProviderConnections — Claimed by Morpheus 2026-05-05 | HIGH |
+| 173 | 🔄 | Add "Website Leads" tab in AdminDashboard showing WebsiteLead entity with filters — Claimed by Morpheus 2026-05-05 | HIGH |
 | 174 | ⏳ | Add "Override & Mark Live" button with required reason field in AutomationInstallChecklist — Claimed by Morpheus 2026-05-05 | MEDIUM |
 | 175 | ⏳ | AdminLeadDetail: add "Send Manual SMS" text area + button → sendSMS — Claimed by Morpheus 2026-05-05 | HIGH |
 | 176 | ⏳ | AdminSettings: add "Preview Email Template" modal with sample variable substitution — Claimed by Morpheus 2026-05-05 | MEDIUM |
 | 177 | ⏳ | Admin analytics: add conversion funnel chart (Lead→Contacted→Booked→Paid) — Claimed by Morpheus 2026-05-05 | HIGH |
 | 178 | ⏳ | CommunicationLogsPanel: add "Export Logs" button → exportCommunicationLogs | MEDIUM |
-| 179 | ⏳ | AdminLeads table: add lead_score column (visible, sortable, color-coded) | HIGH |
-| 180 | ⏳ | Add "Demo Bookings" tab in AdminDashboard for DemoRequest management | HIGH |
+| 179 | 🔄 | AdminLeads table: add lead_score column (visible, sortable, color-coded) | HIGH |
+| 180 | 🔄 | Add "Demo Bookings" tab in AdminDashboard for DemoRequest management | HIGH |
 | 181 | ⏳ | AdminLeadDetail: add "Enroll in Nurture" button → startNurtureCampaign | MEDIUM |
-| 182 | ⏳ | Add "Failed Jobs" section in AdminAutomation showing AutomationJob failures + Retry | HIGH |
+| 182 | 🔄 | Add "Failed Jobs" section in AdminAutomation showing AutomationJob failures + Retry | HIGH |
 | 183 | ⏳ | AdminLeads: mask phone numbers as (602) ***-3227 for non-super-admin users | MEDIUM |
 | 184 | ⏳ | Create AuditLog viewer tab in AdminDashboard for tracking all admin actions | MEDIUM |
 
@@ -423,11 +423,11 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 185 | ⏳ | AdminOnboarding: add client search/filter by business name or email | MEDIUM |
-| 186 | ⏳ | AdminOnboarding: show pipeline_status badge prominently on each client card | HIGH |
+| 186 | 🔄 | AdminOnboarding: show pipeline_status badge prominently on each client card | HIGH |
 | 187 | ⏳ | InstallQueuePanel: add "Assign to Admin" dropdown for each pending install | MEDIUM |
 | 188 | ⏳ | AutomationInstallChecklist: add progress bar showing % of checklist items complete | MEDIUM |
-| 189 | ⏳ | Admin: add one-click "Initialize Install OS" button for newly paid orders | HIGH |
-| 190 | ⏳ | Admin: show warning badge when order has been paid > 2 days with no install started | HIGH |
+| 189 | 🔄 | Admin: add one-click "Initialize Install OS" button for newly paid orders | HIGH |
+| 190 | 🔄 | Admin: show warning badge when order has been paid > 2 days with no install started | HIGH |
 
 ---
 
