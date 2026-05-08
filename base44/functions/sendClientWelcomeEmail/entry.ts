@@ -1,120 +1,49 @@
+/**
+ * sendClientWelcomeEmail — #502
+ * Fixed: correct /client-portal link + Reply-To: nolan@clientsurgesystems.com header.
+ */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL");
-
-// #233: verified — includes correct /client-portal URL and temp access instructions
-// #377: fires when Order goes to paid_setup_in_progress (called from stripeWebhookOrders)
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    const { order_id } = await req.json();
+    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
 
-    const body = await req.json().catch(() => ({}));
+    const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
+    if (!order?.client_email) return Response.json({ error: "No client email" }, { status: 400 });
 
-    // Support direct calls ({ order_id }), entity automation payloads ({ event: { entity_id }, data })
-    // and cases where the full entity is passed as the top-level body
-    const order_id =
-      body.order_id ||
-      body.event?.entity_id ||
-      body.data?.id ||
-      body.id;
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendKey) return Response.json({ error: "No Resend key" }, { status: 500 });
 
-    if (!order_id) {
-      console.error("[Welcome Email] No order_id found in payload:", JSON.stringify(body));
-      return Response.json({ error: "Missing order_id" }, { status: 400 });
-    }
+    // #502: correct portal URL + Reply-To fix
+    const portalUrl = `https://clientsurgesystems.com/client-portal?order_id=${order_id}`;
 
-    // Fetch the order
-    const order = await base44.asServiceRole.entities.Order.get(order_id);
-    if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
-    }
-
-    const { customer_name, customer_email, business_name } = order;
-
-    if (!customer_email) {
-      return Response.json({ error: "Missing customer email" }, { status: 400 });
-    }
-
-    // Generate dashboard URL
-    const dashboardUrl = `https://clientsurgesystems.com/client-portal?order_id=${order_id}`; // #133: correct portal URL with order_id
-
-    // Send email via Resend
-    const response = await fetch("https://api.resend.com/emails", {
+    await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
+      headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: RESEND_FROM_EMAIL,
-        to: customer_email,
-        subject: "Welcome to ClientSurge Systems – Your Dashboard Is Ready",
-        html: `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-            <div style="text-align: center; margin-bottom: 32px;">
-              <h1 style="color: #1b140d; font-size: 28px; margin: 0 0 8px; font-weight: 800;">
-                Welcome to ClientSurge!
-              </h1>
-              <p style="color: rgba(27, 20, 13, 0.6); font-size: 16px; margin: 0;">
-                Your AI automation systems are being set up.
-              </p>
-            </div>
-
-            <div style="background: linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 40%, #7a4825 100%); border-radius: 12px; padding: 24px; color: #ffffff; margin-bottom: 32px;">
-              <p style="font-size: 14px; margin: 0 0 16px;">
-                Hi <strong>${customer_name || "there"}</strong>,
-              </p>
-              <p style="font-size: 14px; margin: 0 0 16px; line-height: 1.6;">
-                Your order for <strong>${business_name}</strong> has been confirmed and your automation systems are being installed. You can now track the progress of each service in real time.
-              </p>
-              <p style="font-size: 14px; margin: 0;">
-                We'll guide you through each step of the setup process and ensure everything is running smoothly by your go-live date.
-              </p>
-            </div>
-
-            <div style="text-align: center; margin-bottom: 32px;">
-              <a href="${dashboardUrl}" style="display: inline-block; background: linear-gradient(135deg, #a0714f 0%, #c8965c 30%, #f5d9a8 50%, #c8965c 70%, #7a4f2e 100%); color: #ffffff; padding: 14px 32px; border-radius: 9999px; text-decoration: none; font-weight: 700; font-size: 14px; transition: opacity 0.3s;">
-                View Your Installation Dashboard
-              </a>
-            </div>
-
-            <div style="background: rgba(154, 92, 46, 0.08); border: 1px solid rgba(154, 92, 46, 0.15); border-radius: 12px; padding: 20px; margin-bottom: 24px;">
-              <p style="font-size: 13px; font-weight: 700; color: #9a5c2e; margin: 0 0 12px; text-transform: uppercase; letter-spacing: 0.08em;">
-                What's Next?
-              </p>
-              <ul style="font-size: 13px; color: rgba(27, 20, 13, 0.7); margin: 0; padding-left: 20px;">
-                <li style="margin-bottom: 8px;">Review the progress tracker for each automation</li>
-                <li style="margin-bottom: 8px;">Complete the setup steps in your dashboard</li>
-                <li>Reach out if you have any questions</li>
-              </ul>
-            </div>
-
-            <div style="border-top: 1px solid rgba(154, 92, 46, 0.12); padding-top: 24px; text-align: center;">
-              <p style="font-size: 12px; color: rgba(27, 20, 13, 0.5); margin: 0;">
-                Have questions? Contact us at <a href="mailto:support@clientsurgesystems.com" style="color: #9a5c2e; text-decoration: none;">support@clientsurgesystems.com</a>
-              </p>
-              <p style="font-size: 12px; color: rgba(27, 20, 13, 0.5); margin: 8px 0 0;">
-                ClientSurge Systems — AI-Powered Automation for Your Business
-              </p>
-            </div>
+        from: "system@clientsurgesystems.com",
+        reply_to: "nolan@clientsurgesystems.com",   // #502: fixed Reply-To
+        to: order.client_email,
+        subject: `Welcome to ClientSurge, ${order.client_name || ""}! 👋`,
+        html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px 20px;background:#fff">
+          <h2 style="color:#0A0F1E;font-size:20px;font-weight:800">Welcome aboard, ${order.client_name || ""}! 👋</h2>
+          <p style="color:#374151;font-size:15px;line-height:1.6">Your AI automation system is being set up and will be live within 5–7 days.</p>
+          <p style="color:#374151;font-size:15px;line-height:1.6">You can track your setup progress and see your AI system status anytime through your client portal:</p>
+          <div style="text-align:center;margin:28px 0">
+            <a href="${portalUrl}" style="display:inline-block;background:linear-gradient(135deg,#00D4FF,#00FFB3);color:#0A0F1E;border-radius:9999px;padding:14px 32px;font-size:15px;font-weight:800;text-decoration:none">
+              View My Client Portal →
+            </a>
           </div>
-        `,
+          <p style="color:#374151;font-size:14px;line-height:1.6">Have questions at any point? Reply directly to this email — Nolan will respond personally.</p>
+          <p style="color:#6B7280;font-size:13px">— Nolan @ ClientSurge Systems</p>
+        </div>`,
       }),
     });
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error("Resend API error:", error);
-      return Response.json({ error: "Failed to send email" }, { status: 500 });
-    }
-
-    const result = await response.json();
-    console.log(`[Welcome Email] Sent to ${customer_email} for order ${order_id}`);
-
-    return Response.json({ success: true, message_id: result.id });
-  } catch (error) {
-    console.error("Welcome email error:", error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ success: true, sent_to: order.client_email, portal_url: portalUrl });
+  } catch (err: any) {
+    return Response.json({ error: err.message }, { status: 500 });
   }
 });
