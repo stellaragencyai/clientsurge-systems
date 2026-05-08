@@ -1,84 +1,53 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+/**
+ * sendDemoConfirmationEmail — #132
+ * Formats scheduled_date/time in Arizona local time for all emails.
+ */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+
+function formatAZTime(isoStr: string): string {
+  if (!isoStr) return "TBD";
+  const d = new Date(isoStr);
+  return d.toLocaleString("en-US", {
+    timeZone: "America/Phoenix",
+    weekday: "long", year: "numeric", month: "long", day: "numeric",
+    hour: "numeric", minute: "2-digit", hour12: true,
+  }) + " (Arizona time)";
+}
 
 Deno.serve(async (req) => {
   try {
-    createClientFromRequest(req);
-    const { email, full_name, business_name, scheduled_date, scheduled_time } = await req.json();
+    const base44 = createClientFromRequest(req);
+    const { lead_id, scheduled_datetime, business_name, email } = await req.json();
+    if (!email) return Response.json({ error: "email required" }, { status: 400 });
 
-    if (!email || !full_name || !scheduled_date || !scheduled_time) {
-      return Response.json({ error: 'Missing required fields' }, { status: 400 });
-    }
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendKey) return Response.json({ error: "No Resend key" }, { status: 500 });
 
-    const dateObj = new Date(`${scheduled_date}T12:00:00`);
-    const formattedDate = dateObj.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-    const [hour, minute] = scheduled_time.split(':');
-    const h = parseInt(hour, 10);
-    const displayHour = h === 0 ? 12 : h > 12 ? h - 12 : h;
-    const formattedTime = `${displayHour}:${minute} ${h >= 12 ? 'PM' : 'AM'} (Arizona Time)`;
+    const formatted = formatAZTime(scheduled_datetime);
 
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-
-    if (!resendApiKey) {
-      return Response.json({ error: 'Resend credentials not configured' }, { status: 500 });
-    }
-
-    const emailBody = `<!DOCTYPE html>
-<html>
-<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-  <div style="background: linear-gradient(135deg, #6b3f1f, #9a5c2e); padding: 32px; border-radius: 12px 12px 0 0; text-align: center;">
-    <h1 style="color: #f5e6d0; margin: 0; font-size: 24px;">Demo Confirmed</h1>
-    <p style="color: rgba(245,230,208,0.75); margin: 8px 0 0;">ClientSurge Systems</p>
-  </div>
-  <div style="background: #fff; padding: 32px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-    <p style="font-size: 16px;">Hi <strong>${full_name}</strong>,</p>
-    <p>Your free 15-minute demo has been scheduled. Here are your details:</p>
-    <div style="background: #fdf8f0; border: 1px solid #c8965c; border-radius: 8px; padding: 20px; margin: 20px 0;">
-      <p style="margin: 0 0 8px;"><strong>Date:</strong> ${formattedDate}</p>
-      <p style="margin: 0 0 8px;"><strong>Time:</strong> ${formattedTime}</p>
-      <p style="margin: 0 0 8px;"><strong>Duration:</strong> 15 minutes</p>
-      <p style="margin: 0;"><strong>Business:</strong> ${business_name || 'Your business'}</p>
-    </div>
-    <p><strong>What to expect:</strong></p>
-    <ul style="color: #555; line-height: 1.8;">
-      <li>Live walkthrough of your automation system</li>
-      <li>Demo of instant lead response and follow-up</li>
-      <li>Your personalized booking timeline</li>
-      <li>Q&A about your specific challenges</li>
-    </ul>
-    <p>We'll send you a calendar invite and meeting link shortly.</p>
-    <p style="margin-top: 24px;">Talk soon,<br/><strong>The ClientSurge Systems Team</strong></p>
-    <p style="font-size: 12px; color: #999; margin-top: 24px;">Need to reschedule? Reply to this email or call <a href="tel:+16025843227">(602) 584-3227</a></p>
-  </div>
-</body>
-</html>`;
-
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: 'ClientSurge Systems <system@clientsurgesystems.com>',
-        to: [email],
-        subject: `Demo Confirmed - ${formattedDate} at ${formattedTime}`,
-        html: emailBody,
+        from: "system@clientsurgesystems.com",
+        reply_to: "nolan@clientsurgesystems.com",
+        to: email,
+        subject: `✅ Demo confirmed — ${formatted}`,
+        html: `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 20px;background:#fff">
+          <h2 style="color:#0A0F1E;font-size:18px;font-weight:800">Your demo is confirmed ✅</h2>
+          <p style="color:#374151">Hey ${business_name || "there"},</p>
+          <div style="background:#F0FDF4;border-radius:12px;padding:16px 20px;margin:20px 0;border-left:4px solid #00FFB3">
+            <p style="color:#065F46;font-weight:700;font-size:15px;margin:0">📅 ${formatted}</p>
+          </div>
+          <p style="color:#374151;font-size:14px">Nolan will call you at the number you provided. The call takes about 20 minutes — we'll walk through exactly how the system works for your business.</p>
+          <p style="color:#374151;font-size:14px">Need to reschedule? Just reply to this email.</p>
+          <p style="color:#6B7280;font-size:13px">— Nolan @ ClientSurge Systems</p>
+        </div>`,
       }),
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return Response.json({ error: data.message || 'Email send failed' }, { status: 500 });
-    }
-
-    return Response.json({ success: true, email_id: data.id });
-  } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json({ success: true, sent_to: email, formatted_time: formatted });
+  } catch (err: any) {
+    return Response.json({ error: err.message }, { status: 500 });
   }
 });
