@@ -278,7 +278,7 @@
 | 96 | ✅ | processDripCampaigns: skip leads with status "Booked" before sending each step | HIGH |
 | 97 | ✅ | processNurtureCampaigns: add idempotency guard (check for duplicate send within 23hr) | HIGH |
 | 98 | ✅ | processWebsiteLeadFollowUps: add cadence_paused: true skip guard | HIGH |
-| 99 | ✅ | scheduleDemoBooking: add optimistic lock — re-fetch slots before confirming | HIGH  Agent Smith |
+| 99 | ✅ | scheduleDemoBooking: add optimistic lock — re-fetch slots before confirming | HIGH | Agent Smith |
 | 100 | ⏳ | scheduleDemoBooking: reject weekend bookings (Sat/Sun) + blocked_dates in AdminSettings | MEDIUM |
 | 101 | ✅ | CartSidebar: add 12-second timeout fallback for Stripe redirect | DONE |
 | 102 | ✅ | sendOrderConfirmationEmail: add fallback values for all template variables | HIGH |
@@ -302,7 +302,7 @@
 | 113 | ⏳ | sendDailyDigest: add gate — skip send if leads_today === 0 AND orders_today === 0 | LOW |
 | 114 | ✅ | All Resend fetch calls: add retry once on 429/5xx with 2-second delay | HIGH |
 | 115 | ⏳ | monthlyClientReport: after generating report, email it to the client | MEDIUM |
-| 116 | ✅ | getBookedDemoSlots: add {scheduled_date: selectedDate} filter — don't fetch all records | HIGH  Agent Smith |
+| 116 | ✅ | getBookedDemoSlots: add {scheduled_date: selectedDate} filter — don't fetch all records | HIGH | Agent Smith |
 | 117 | ⏳ | Create sendNPSSurvey function: triggered 7 days after order_status = "fully_live" | MEDIUM |
 
 ---
@@ -311,7 +311,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 118 | ✅ | Create entity automation: ClientProject update → send milestone email when workflow_stage changes | HIGH  Agent Smith |
+| 118 | ✅ | Create entity automation: ClientProject update → send milestone email when workflow_stage changes | HIGH | Agent Smith |
 | 119 | ⏳ | Create entity automation: Order update → trigger sendNPSSurvey when order_status = "fully_live" | MEDIUM |
 | 120 | ⏳ | Create scheduled automation: autoCloseStaleLeads — runs daily at 2am | MEDIUM |
 | 121 | ✅ | "$0 setup" renamed to "No setup fee" in store | DONE |
@@ -338,9 +338,9 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 131 | ✅ | sendOrderConfirmationEmail: verify all 6 service names render correctly in email | HIGH  Agent Smith |
+| 131 | ✅ | sendOrderConfirmationEmail: verify all 6 service names render correctly in email | HIGH | Agent Smith |
 | 132 | ⏳ | sendDemoConfirmationEmail: verify scheduled_date/time display correctly in all timezones | MEDIUM |
-| 133 | ✅ | sendClientWelcomeEmail: ensure it links to correct client portal URL | HIGH  Agent Smith |
+| 133 | ✅ | sendClientWelcomeEmail: ensure it links to correct client portal URL | HIGH | Agent Smith |
 | 134 | ⏳ | receiveResendWebhook: on email bounce, update CommunicationEvent status to "failed" | MEDIUM |
 | 135 | ⏳ | receiveResendWebhook: on email open, update lead.last_engagement_at | LOW |
 
@@ -350,7 +350,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 137 | ✅ | submitLeadCapture: verify deduplication window is exactly 60 minutes | HIGH  Agent Smith |
+| 137 | ✅ | submitLeadCapture: verify deduplication window is exactly 60 minutes | HIGH | Agent Smith |
 | 138 | ⏳ | onLeadCreated: verify webhook payload includes all required fields | MEDIUM |
 | 139 | ⏳ | scoreLeads: verify lead_score calculation accounts for all scoring factors | MEDIUM |
 | 140 | ⏳ | scoreLeadIntelligence: add confidence threshold — skip if AI confidence < 0.6 | MEDIUM |
@@ -387,7 +387,7 @@
 | 157 | ⏳ | Create AuditLog entity with fields: admin_email, action, entity, before, after, timestamp | MEDIUM |
 | 158 | ⏳ | Add standardized console.log format to all functions: [functionName] message {context} | LOW |
 | 159 | ⏳ | Verify all functions return proper HTTP status codes (not always 200) | MEDIUM |
-| 160 | ✅ | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | HIGH  Agent Smith |
+| 160 | ✅ | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | HIGH | Agent Smith |
 
 ---
 
@@ -453,13 +453,13 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 191 | ✅ | ClientPortal: add "Get Help" support ticket tab → SupportMessage entity | HIGH  Agent Smith |
+| 191 | ✅ | ClientPortal: add "Get Help" support ticket tab → SupportMessage entity | HIGH | Agent Smith |
 | 192 | ⏳ | ClientPortal: add "What's New" changelog section from Changelog entity | LOW |
 | 196 | ⏳ | BillingDashboard: "Download Invoice PDF" using Stripe invoice_pdf URL | MEDIUM |
 | 197 | ⏳ | ClientPortal: add NPS score display after it's collected | LOW |
 | 198 | ⏳ | QuickStartWizard: ensure all onboarding steps link to correct help resources | MEDIUM |
-| 199 | ✅ | ClientPortal: verify OrderTracker shows correct install stages for all service types | HIGH  Agent Smith |
-| 200 | ✅ | ClientDashboard: add "Your Automation is Paused" warning when cadence_paused = true | HIGH  Agent Smith |
+| 199 | ✅ | ClientPortal: verify OrderTracker shows correct install stages for all service types | HIGH | Agent Smith |
+| 200 | ✅ | ClientDashboard: add "Your Automation is Paused" warning when cadence_paused = true | HIGH | Agent Smith |
 
 ---
 
@@ -485,11 +485,11 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 211 | ✅ | Configure custom domain DNS (if not already done) and verify SSL cert | CRITICAL |
-| 212 | ✅ | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | HIGH  Agent Smith |
+| 212 | ✅ | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | HIGH | Agent Smith |
 | 213 | ✅ | Configure Resend domain authentication (SPF, DKIM, DMARC) for deliverability | CRITICAL |
 | 213b | ✅ | Verify Twilio number is A2P 10DLC registered for commercial SMS in the US | CRITICAL |
 | 214 | ⏳ | Add Google Analytics 4 event tracking for: purchase, demo_booked, lead_submitted | HIGH |
-| 215 | ✅ | Set up error alerting: admin email on any backend function 5xx error | HIGH  Agent Smith |
+| 215 | ✅ | Set up error alerting: admin email on any backend function 5xx error | HIGH | Agent Smith |
 | 216 | ⏳ | Document all environment variables in a README_ENV.md file | MEDIUM |
 | 217 | ⏳ | Create runbook: what to do when Twilio is down / Resend is down / Stripe is down | MEDIUM |
 | 218 | ✅ | Verify all secrets are set in production (not just dev) environment | CRITICAL |
@@ -505,7 +505,7 @@
 | 221 | ⏳ | Create Changelog entity (title, description, date, is_published) for client portal | LOW |
 | 222 | ⏳ | Create Referral entity (referrer_client_id, referred_email, status, credit_amount) | LOW |
 | 223 | ⏳ | Add nps_score + nps_responded_at fields to ClientProject entity | MEDIUM |
-| 225 | ✅ | Add consent_given_at + consent_ip fields to Leads entity | HIGH  Agent Smith |
+| 225 | ✅ | Add consent_given_at + consent_ip fields to Leads entity | HIGH | Agent Smith |
 | 226 | ⏳ | Verify all entity RLS rules are correct — Client entity has correct read/write rules | HIGH |
 | 227 | ⏳ | Add max_active_onboarding field to AdminSettings entity | MEDIUM |
 | 228 | ⏳ | Add blocked_dates array field to AdminSettings for holiday/weekend booking blocks | MEDIUM |
@@ -518,7 +518,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 230 | ⏳ | Create sendNPSSurvey function — email 7 days after fully_live with 1-10 rating link | MEDIUM |
-| 231 | ✅ | Entity automation: ClientProject workflow_stage change → send milestone email | HIGH  Agent Smith |
+| 231 | ✅ | Entity automation: ClientProject workflow_stage change → send milestone email | HIGH | Agent Smith |
 | 232 | ⏳ | Entity automation: Order fully_live → trigger sendNPSSurvey after 7-day delay | MEDIUM |
 | 233 | ⏳ | Verify sendClientWelcomeEmail includes correct client portal URL + temp access instructions | HIGH |
 | 234 | ⏳ | Verify sendPortalWelcomeEmail is triggered automatically after order is paid | HIGH |
@@ -532,7 +532,7 @@
 |---|---|---|---|
 | 236 | ⏳ | Write README_ENV.md documenting all required environment variables | MEDIUM |
 | 237 | ⏳ | Write RUNBOOK_OUTAGE.md: steps for Twilio/Resend/Stripe outage scenarios | MEDIUM |
-| 238 | ✅ | Write ONBOARDING_SOP.md: step-by-step for onboarding a new client manually | HIGH  Agent Smith |
+| 238 | ✅ | Write ONBOARDING_SOP.md: step-by-step for onboarding a new client manually | HIGH | Agent Smith |
 | 239 | ✅ | Write STRIPE_GO_LIVE.md: checklist for switching to live Stripe keys | CRITICAL |
 | 240 | ⏳ | Update INSTALLATION_WORKFLOW_GUIDE.md with latest install OS fields | MEDIUM |
 
@@ -548,7 +548,7 @@
 | 244 | ⏳ | Final: verify all email templates render correctly in Gmail, Outlook, Apple Mail | HIGH |
 | 245 | 🔄 | Final: test complete lead → SMS → follow-up → booking flow with test lead | CRITICAL |
 | 246 | ⏳ | Final: verify admin panel loads in < 3 seconds with 100+ leads in database | MEDIUM |
-| 247 | ✅ | Final: confirm robots.txt is correct and sitemap is submitted to Google Search Console | HIGH  Agent Smith |
+| 247 | ✅ | Final: confirm robots.txt is correct and sitemap is submitted to Google Search Console | HIGH | Agent Smith |
 | 248 | ✅ | Final: review all legal pages (Privacy, Terms) for accuracy and TCPA compliance | CRITICAL |
 | 249 | 🔄 | Final: do a full purchase test with a real card → verify order, emails, SMS all fire | CRITICAL |
 | 250 | 🔄 | Final: team sign-off — all 3 agents mark their sections complete before go-live | CRITICAL |
@@ -636,11 +636,11 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 251 | ✅ | Wire scoreLeadIntelligence to fire on every new WebsiteLead creation — currently deployed but never called from frontend | CRITICAL |
-| 252 | ✅ | Wire classifyLeadIntent on inbound SMS replies — currently deployed but disconnected | HIGH  Agent Smith |
+| 252 | ✅ | Wire classifyLeadIntent on inbound SMS replies — currently deployed but disconnected | HIGH | Agent Smith |
 | 253 | ⏳ | Wire predictChurnRisk to run weekly on all active Orders — alert Nolan if score > 70 | HIGH |
 | 254 | ⏳ | Wire automationOrchestrator to Admin dashboard so Nolan can trigger it manually | MEDIUM |
-| 255 | ✅ | /lead-intelligence page: display lead_score and quality_label per lead in the UI | HIGH  Agent Smith |
-| 256 | ✅ | Lead Intelligence dashboard: add real LeadAnalytics entity reads — currently shows no data | HIGH  Agent Smith |
+| 255 | ✅ | /lead-intelligence page: display lead_score and quality_label per lead in the UI | HIGH | Agent Smith |
+| 256 | ✅ | Lead Intelligence dashboard: add real LeadAnalytics entity reads — currently shows no data | HIGH | Agent Smith |
 | 257 | ⏳ | Add "AI Re-Score" button in admin lead list — calls scoreLeadIntelligence for selected lead | MEDIUM |
 | 258 | ⏳ | predictLeadOutcome: surface prediction result in ClientPortal leads tab | LOW |
 
@@ -650,14 +650,14 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 259 | ✅ | ClientPortal: build "Get Help" tab with support ticket form → creates SupportMessage entity record | HIGH  Agent Smith |
+| 259 | ✅ | ClientPortal: build "Get Help" tab with support ticket form → creates SupportMessage entity record | HIGH | Agent Smith |
 | 260 | ✅ | ClientPortal: build "Billing" tab — show current plan, next billing date, amount | CRITICAL |
-| 261 | ✅ | ClientPortal: "Cancel Subscription" button → redirect to Stripe customer portal URL | HIGH  Agent Smith |
-| 262 | ✅ | ClientPortal: "Download Invoice" button → pull Stripe invoice_pdf URL and open in new tab | HIGH  Agent Smith |
+| 261 | ✅ | ClientPortal: "Cancel Subscription" button → redirect to Stripe customer portal URL | HIGH | Agent Smith |
+| 262 | ✅ | ClientPortal: "Download Invoice" button → pull Stripe invoice_pdf URL and open in new tab | HIGH | Agent Smith |
 | 263 | ✅ | ClientPortal: show red PaymentFailedBanner when Order billing_status === "past_due" | CRITICAL |
 | 264 | ⏳ | ClientPortal: build "Refer a Business" tab with unique referral link generated per client | MEDIUM |
-| 265 | ✅ | ClientPortal: AutomationChecklist — display live checklist progress pulled from AutomationChecklist entity | HIGH  Agent Smith |
-| 266 | ✅ | ClientPortal: show "Setup Progress" bar driven by real ClientInstallationOS fields (twilio_configured, etc.) | HIGH  Agent Smith |
+| 265 | ✅ | ClientPortal: AutomationChecklist — display live checklist progress pulled from AutomationChecklist entity | HIGH | Agent Smith |
+| 266 | ✅ | ClientPortal: show "Setup Progress" bar driven by real ClientInstallationOS fields (twilio_configured, etc.) | HIGH | Agent Smith |
 | 267 | ⏳ | ClientPortal: add "What's New" tab reading from a Changelog entity or AdminSettings changelog field | LOW |
 
 ---
@@ -667,12 +667,12 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 268 | ✅ | AdminDashboard: build MRR metric card — sum total_monthly from all Orders with payment_status=paid | CRITICAL |
-| 269 | ✅ | AdminDashboard: build LTV card — total revenue per client over their lifetime | HIGH  Agent Smith |
-| 270 | ✅ | AdminDashboard: build Churn Risk panel — list clients with predictChurnRisk score > 70 | HIGH  Agent Smith |
+| 269 | ✅ | AdminDashboard: build LTV card — total revenue per client over their lifetime | HIGH | Agent Smith |
+| 270 | ✅ | AdminDashboard: build Churn Risk panel — list clients with predictChurnRisk score > 70 | HIGH | Agent Smith |
 | 271 | ⏳ | AdminDashboard: wire AdminGlobalSearch to all entity types (Lead, Client, Order, SupportMessage) | MEDIUM |
 | 272 | ⏳ | AdminDashboard: add session inactivity timeout — show warning modal after 30min, logout after 45min | MEDIUM |
-| 273 | ✅ | AdminDashboard: add "Install Status" table showing each client's onboarding step completion | HIGH  Agent Smith |
-| 274 | ✅ | AdminDashboard: add quick-action buttons — "Send Day 1 Email", "Trigger Follow-Up", "Mark Live" per client | HIGH  Agent Smith |
+| 273 | ✅ | AdminDashboard: add "Install Status" table showing each client's onboarding step completion | HIGH | Agent Smith |
+| 274 | ✅ | AdminDashboard: add quick-action buttons — "Send Day 1 Email", "Trigger Follow-Up", "Mark Live" per client | HIGH | Agent Smith |
 | 275 | ⏳ | Admin leads list: add bulk action — "Mark as contacted", "Export to CSV", "Rescore with AI" | MEDIUM |
 
 ---
@@ -682,9 +682,9 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 276 | ✅ | Build InstallChecklistPanel component — reads AutomationChecklist entity fields and renders live progress | CRITICAL |
-| 277 | ✅ | Wire onboarding_complete, went_live, twilio_configured fields to admin UI — currently invisible | HIGH  Agent Smith |
-| 278 | ✅ | Auto-send "You're Live!" email via Resend when went_live is set to true on a ClientOnboarding record | HIGH  Agent Smith |
-| 279 | ✅ | Auto-send Telegram alert to Nolan when any onboarding step changes (twilio_configured, lead_sources_connected, etc.) | HIGH  Agent Smith |
+| 277 | ✅ | Wire onboarding_complete, went_live, twilio_configured fields to admin UI — currently invisible | HIGH | Agent Smith |
+| 278 | ✅ | Auto-send "You're Live!" email via Resend when went_live is set to true on a ClientOnboarding record | HIGH | Agent Smith |
+| 279 | ✅ | Auto-send Telegram alert to Nolan when any onboarding step changes (twilio_configured, lead_sources_connected, etc.) | HIGH | Agent Smith |
 | 280 | ⏳ | Build client-facing onboarding status page at /setup — shows their install progress without admin login | MEDIUM |
 | 281 | ⏳ | Onboarding form: validate all required fields before submit — currently submits with empty required fields | HIGH |
 
@@ -694,11 +694,11 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 282 | ✅ | Add LocalBusiness + Service JSON-LD schema to all 6 industry pages | HIGH  Agent Smith |
+| 282 | ✅ | Add LocalBusiness + Service JSON-LD schema to all 6 industry pages | HIGH | Agent Smith |
 | 283 | ⏳ | Add BreadcrumbList JSON-LD schema to all inner pages | MEDIUM |
 | 284 | ✅ | Add setPageMetadata() utility — dynamic title + description + og:image per route | HIGH |
 | 285 | ✅ | Add preconnect links for fonts.googleapis.com, stripe.com, resend.com in index.html | MEDIUM |
-| 286 | ✅ | Industry pages: include Phoenix/Scottsdale city name in H1 and meta title for local SEO | HIGH  Agent Smith |
+| 286 | ✅ | Industry pages: include Phoenix/Scottsdale city name in H1 and meta title for local SEO | HIGH | Agent Smith |
 | 287 | ⏳ | Create /blog with 3 pillar posts: AI Automation for Med Spas, Missed Call Text-Back Guide, How AI Books Appointments | MEDIUM |
 | 288 | ⏳ | Add twitter:card meta tags to all pages (currently only on homepage) | LOW |
 
@@ -721,10 +721,10 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 294 | ✅ | Connect GA4 property — add G- tracking ID to index.html gtag snippet | HIGH |
-| 295 | ✅ | Track checkout button clicks as GA4 conversion events | HIGH  Agent Smith |
-| 296 | ✅ | Track form submissions (lead capture, contact, onboarding) as GA4 events | HIGH  Agent Smith |
+| 295 | ✅ | Track checkout button clicks as GA4 conversion events | HIGH | Agent Smith |
+| 296 | ✅ | Track form submissions (lead capture, contact, onboarding) as GA4 events | HIGH | Agent Smith |
 | 297 | ⏳ | Add UTM parameter persistence — store utm_source and utm_medium on lead record at capture | MEDIUM |
-| 298 | ✅ | Build weekly analytics digest automation — email Nolan every Monday: new leads, MRR, conversion rate, churn risk | HIGH  Agent Smith |
+| 298 | ✅ | Build weekly analytics digest automation — email Nolan every Monday: new leads, MRR, conversion rate, churn risk | HIGH | Agent Smith |
 
 ---
 
@@ -757,14 +757,14 @@
 |---|---|---|---|
 | 301 | ✅ | Pricing.jsx: replace all 6 test Stripe links (buy.stripe.com/test_*) with live payment links — currently LIVE SITE IS TAKING TEST PAYMENTS | CRITICAL |
 | 302 | ✅ | salesCatalog.js: audit all setup_fee and monthly_fee values — store products show $97/mo and $297 setup but tier pages show $497/mo — must be ONE source of truth | CRITICAL |
-| 303 | ✅ | CartSidebar handleCheckout: wire to createCheckoutSession backend function — currently unclear what endpoint it calls | HIGH  Agent Smith |
+| 303 | ✅ | CartSidebar handleCheckout: wire to createCheckoutSession backend function — currently unclear what endpoint it calls | HIGH | Agent Smith |
 | 304 | ✅ | createCheckoutSession: verify it uses sk_live_ not sk_test_ — check STRIPE_SECRET_KEY env var is set to live key | CRITICAL |
-| 305 | ✅ | Add Stripe Customer Portal link to BillingDashboard — getStripeCustomerPortalUrl is deployed but never called | HIGH  Agent Smith |
-| 306 | ✅ | getClientInvoices function is deployed — wire it to BillingDashboard so real invoice history shows (currently blank) | HIGH  Agent Smith |
+| 305 | ✅ | Add Stripe Customer Portal link to BillingDashboard — getStripeCustomerPortalUrl is deployed but never called | HIGH | Agent Smith |
+| 306 | ✅ | getClientInvoices function is deployed — wire it to BillingDashboard so real invoice history shows (currently blank) | HIGH | Agent Smith |
 | 307 | ⏳ | requestSubscriptionChange function is deployed — wire "Upgrade/Downgrade" button in BillingDashboard to call it | MEDIUM |
-| 308 | ✅ | stripeWebhookOrders: add handling for customer.subscription.deleted to set Order status = cancelled and notify Nolan | HIGH  Agent Smith |
-| 309 | ✅ | Add post-checkout redirect from Stripe back to /client-portal with session_id param so portal auto-loads after purchase | HIGH  Agent Smith |
-| 310 | ✅ | Add Stripe test mode warning banner in Admin panel — show red "TEST MODE ACTIVE" badge if STRIPE_SECRET_KEY starts with sk_test_ | HIGH  Agent Smith |
+| 308 | ✅ | stripeWebhookOrders: add handling for customer.subscription.deleted to set Order status = cancelled and notify Nolan | HIGH | Agent Smith |
+| 309 | ✅ | Add post-checkout redirect from Stripe back to /client-portal with session_id param so portal auto-loads after purchase | HIGH | Agent Smith |
+| 310 | ✅ | Add Stripe test mode warning banner in Admin panel — show red "TEST MODE ACTIVE" badge if STRIPE_SECRET_KEY starts with sk_test_ | HIGH | Agent Smith |
 
 ---
 
@@ -790,12 +790,12 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 321 | ✅ | Wire getAdminAnalytics to AdminDashboard/RevenueDashboard — function is deployed but never invoked from frontend | CRITICAL |
-| 322 | ✅ | Wire getLeadPipelineSummary to LeadManagementDashboard — deployed but disconnected | HIGH  Agent Smith |
-| 323 | ✅ | Wire deduplicateLeads to a "Clean Duplicates" button in admin leads panel | HIGH  Agent Smith |
-| 324 | ✅ | Wire stalledOnboardingAlert to a cron automation — currently deployed but no scheduler triggers it | HIGH  Agent Smith |
-| 325 | ✅ | Wire monthlyClientReport to send on 1st of each month — function exists, no automation created for it | HIGH  Agent Smith |
+| 322 | ✅ | Wire getLeadPipelineSummary to LeadManagementDashboard — deployed but disconnected | HIGH | Agent Smith |
+| 323 | ✅ | Wire deduplicateLeads to a "Clean Duplicates" button in admin leads panel | HIGH | Agent Smith |
+| 324 | ✅ | Wire stalledOnboardingAlert to a cron automation — currently deployed but no scheduler triggers it | HIGH | Agent Smith |
+| 325 | ✅ | Wire monthlyClientReport to send on 1st of each month — function exists, no automation created for it | HIGH | Agent Smith |
 | 326 | ⏳ | Wire autoSchedule30DayCheckin — deployed but no trigger exists to schedule 30-day follow-up with clients | MEDIUM |
-| 327 | ✅ | Wire sendDailyDigest to a daily 8am MST automation — deployed but never scheduled | HIGH  Agent Smith |
+| 327 | ✅ | Wire sendDailyDigest to a daily 8am MST automation — deployed but never scheduled | HIGH | Agent Smith |
 | 328 | ⏳ | Wire runWinBackSequence — deployed but no UI button or automation triggers it for churned clients | MEDIUM |
 | 329 | ⏳ | Wire reactivateLeadOutreach — deployed but no UI or automation triggers lead reactivation flow | MEDIUM |
 | 330 | ⏳ | Admin IntegrationHealth.jsx: call getIntegrationHealth on load — component exists but verify it's wired to the right function | HIGH |
@@ -806,10 +806,10 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 331 | ✅ | bulkLeadAction function is deployed — wire it to BulkActionToolbar.jsx which currently has no backend connection | HIGH  Agent Smith |
+| 331 | ✅ | bulkLeadAction function is deployed — wire it to BulkActionToolbar.jsx which currently has no backend connection | HIGH | Agent Smith |
 | 332 | ⏳ | importLeads function is deployed — build a CSV import UI in admin leads panel that calls it | MEDIUM |
 | 333 | ⏳ | dispatchLeadWebhook is deployed — add webhook test button in admin that fires a sample lead payload | MEDIUM |
-| 334 | ✅ | routeLead function deployed — verify LeadRoutingPanel.jsx actually calls it and doesn't just show static routing rules | HIGH  Agent Smith |
+| 334 | ✅ | routeLead function deployed — verify LeadRoutingPanel.jsx actually calls it and doesn't just show static routing rules | HIGH | Agent Smith |
 | 335 | ⏳ | LeadCRMDrawer.jsx: verify it calls enrichLeadWithAI on open — should auto-enrich lead if AI fields are empty | MEDIUM |
 | 336 | ✅ | onLeadCreated function: verify it fires for EVERY new WebsiteLead — check entity automation exists and is active | CRITICAL |
 | 337 | ✅ | processWebsiteLeadFollowUps automation: verify it is ACTIVE and scheduled — this is the core follow-up engine | CRITICAL |
@@ -823,10 +823,10 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 341 | ✅ | seo.js: DEFAULT_OG_IMAGE points to base44.com CDN — host og-image.png at clientsurgesystems.com/og-image.png and update | HIGH  Agent Smith |
+| 341 | ✅ | seo.js: DEFAULT_OG_IMAGE points to base44.com CDN — host og-image.png at clientsurgesystems.com/og-image.png and update | HIGH | Agent Smith |
 | 342 | ⏳ | index.html: missing viewport-fit=cover in meta viewport tag — needed for iPhone notch safe area | MEDIUM |
 | 343 | ⏳ | index.html: Space Grotesk font loaded but rarely used — remove to save 60KB on initial load | MEDIUM |
-| 344 | ✅ | Add canonical tag to every industry page using setPageMetadata — currently setJsonLd is called but canonical may be missing | HIGH  Agent Smith |
+| 344 | ✅ | Add canonical tag to every industry page using setPageMetadata — currently setJsonLd is called but canonical may be missing | HIGH | Agent Smith |
 | 345 | ⏳ | MedSpa.jsx calls setPageMetadata — verify Dental, Chiro, HVAC, Roofing, Contractors pages also call it (IndustryTemplate may not) | HIGH |
 | 346 | ⏳ | SchemaMarkup.jsx getFAQSchema is used on MedSpa only — add FAQ schema to all 6 industry pages | MEDIUM |
 | 347 | ⏳ | Footer: "Tanning Salons" industry missing from footer nav links — only 5 industries listed, should be 6 | MEDIUM |
@@ -841,8 +841,8 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 351 | ⏳ | Testimonials.jsx: all 3 testimonials use Unsplash stock photos of strangers — replace with generated avatars or initials | HIGH |
-| 352 | ✅ | Testimonials.jsx: Jessica M. is in "Miami, FL" — change all testimonial locations to Phoenix/Scottsdale, AZ for local credibility | HIGH  Agent Smith |
-| 353 | ✅ | SocialProofTicker says "6 automations per client" — Starter gets 2, Growth 4, Elite 6 — change to "Up to 6 automations" | HIGH  Agent Smith |
+| 352 | ✅ | Testimonials.jsx: Jessica M. is in "Miami, FL" — change all testimonial locations to Phoenix/Scottsdale, AZ for local credibility | HIGH | Agent Smith |
+| 353 | ✅ | SocialProofTicker says "6 automations per client" — Starter gets 2, Growth 4, Elite 6 — change to "Up to 6 automations" | HIGH | Agent Smith |
 | 354 | ⏳ | constants.js BUTTON_TEXT.BOOK_DEMO = "Get Your Free Audit" — verify this replaces ALL former "Book Demo" references site-wide | MEDIUM |
 | 355 | ⏳ | ExitIntentPopup.jsx: verify it doesn't fire on /admin or /client-portal routes — admin should never see exit intent | MEDIUM |
 | 356 | ⏳ | CookieConsent.jsx: verify it persists dismissal in localStorage — if not, re-shows on every page visit | HIGH |
