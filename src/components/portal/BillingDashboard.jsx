@@ -214,6 +214,7 @@ export default function BillingDashboard({ project, subscription }) {
     } catch (err) {
       // Fallback: try legacy internal invoice endpoint
       try {
+        // #306: getClientInvoices wired as fallback for real invoice history
         const res2 = await base44.functions.invoke('getClientInvoices', { project_id: project?.id });
         setData({
           source: 'internal',
@@ -243,6 +244,7 @@ export default function BillingDashboard({ project, subscription }) {
     setManaging(true);
     setManageError('');
     try {
+      // #305: Stripe Customer Portal — getStripeCustomerPortalUrl is deployed + wired
       const res = await base44.functions.invoke('getStripeCustomerPortalUrl', {
         return_url: window.location.href,
       });
