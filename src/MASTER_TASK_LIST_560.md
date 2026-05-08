@@ -17,6 +17,11 @@
 
 
 
+
+## 🤖 AGENT SMITH — COMPLETED BATCH 13 (May 8, 2026 — 06:55 MST)
+> 51 tasks: CRITICAL activateAllServices + stripe wiring, unified service_key registry, schema field additions (voice_clone, website_spec_id, activation_errors), getSystemHealthDashboard, credentialsCompletionCheck, quietHoursGuard (8am-9pm), contactFrequencyLimiter (3/day), PII scrubber for AgentLog, aiHallucinationGuard, aiOutputAuditLog, classifyInstallError, autoResolveInstallError, detectAnalyticsAnomalies, conversationIntelligence (industry context + memory + booking/pricing/disqualify detection), getAgentPerformanceMetrics, AIAgentsDashboard + conversation viewer, TriggerVoiceCallButton (HOT leads), clientOffboardingAI (churn), generatePackageComparisonEmail (day-60 upsell), ClientPortalAIAssistant (floating chat), AIStatusDashboard, installPipeline test fixtures (Starter/Growth/Elite), 3 automations created
+---
+
 ## 🤖 AGENT SMITH — COMPLETED BATCH 12 (May 8, 2026 — 06:10 MST)
 > Completed 54 tasks across: SEO/robots, GA4 tracking, lazy images, cookie consent, honeypot bot protection, industry page h1+metadata, admin leads real-time table + SMS panel + conversion funnel, mock data removal (getClientAnalytics), service activation pipeline (sequential exec, partial tracking, retry, go-live notification, progress tracker), SMS template generation (OpenAI+fallback+160-char limit), website spec pipeline (Starter/Growth/Elite generators, business config templates for 6 industries x 3 tiers, OpenAI Elite hero copy, workflow stage manager, spec preview + approve flow, Telegram on approval), Elite perks (3x lead magnets, monthly performance report, voice clone intake), setup status page with 30s polling stepper
 ---
@@ -1086,10 +1091,10 @@
 | 424b | ✅ | Sub-task: build the stepper component with 5 stages reading real workflow_stage field | HIGH  Agent Smith |
 | 424c | ⏳ | Sub-task: build error state with "Contact Support" button that opens SupportChat | MEDIUM |
 | 425 | ✅ | Build runFullPipelineTest admin function — simulates complete purchase for each of 3 tiers using QA fixture client. Tests: webhook → package_key set → initializeInstallOS → credentials write → generateServiceTemplates → configureService x N → generateClientWebsite → sendGoLiveNotification. Logs to AgentLog. Telegrams Nolan with pass/fail per step | CRITICAL |
-| 425a | 🔄 | Sub-task: build Starter tier test fixture and assertion set | HIGH |
-| 425b | 🔄 | Sub-task: build Growth tier test fixture | HIGH |
-| 425c | 🔄 | Sub-task: build Elite tier test fixture including website generation step | HIGH |
-| 443 | 🔄 | Elite perk #4 — generateCompetitorAudit: AI fetches top 3 local competitors via Google Places API, analyzes reviews + response speed, generates "Your Competitive Advantage" PDF report, delivers to client portal within 48h of go-live | HIGH |
+| 425a | ✅ | Sub-task: build Starter tier test fixture and assertion set | HIGH  Agent Smith |
+| 425b | ✅ | Sub-task: build Growth tier test fixture | HIGH  Agent Smith |
+| 425c | ✅ | Sub-task: build Elite tier test fixture including website generation step | HIGH  Agent Smith |
+| 443 | ✅ | Elite perk #4 — generateCompetitorAudit: AI fetches top 3 local competitors via Google Places API, analyzes reviews + response speed, generates "Your Competitive Advantage" PDF report, delivers to client portal within 48h of go-live | HIGH  Agent Smith |
 | 444 | ⏳ | Elite perk #5 — generateSocialStarterPack: AI generates 10 ready-to-post social captions in client's tone (5 lead gen + 5 social proof), formats as PDF, delivers to portal | MEDIUM |
 | 445 | ✅ | Elite perk #6 — wire autoSchedule30DayCheckin to fire automatically for Elite clients at day 30 — process recording, generate AI summary of "what's working / what to optimize", deliver to portal | HIGH |
 
@@ -1100,14 +1105,14 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 446 | ✅ | Build detectPackageUpgradeOpportunity — weekly check. Growth clients with >20 leads/week for 2+ weeks get an AI-written Elite upgrade pitch. Starter clients at >80% utilization get a Growth pitch | HIGH |
-| 447 | 🔄 | Build predictOptimalSendTime — AI analyzes CommunicationEvent reply rates by hour-of-day per client's lead base. Writes optimal_send_hour to ClientProject. Used by follow-up scheduler instead of fixed 10am | HIGH |
-| 448 | 🔄 | Build generatePersonalizedFollowUp — replaces static Day 3/Day 7 templates. AI reads lead interaction history + email open status + page visited + lead score and writes a unique follow-up email per lead | HIGH |
+| 447 | ✅ | Build predictOptimalSendTime — AI analyzes CommunicationEvent reply rates by hour-of-day per client's lead base. Writes optimal_send_hour to ClientProject. Used by follow-up scheduler instead of fixed 10am | HIGH  Agent Smith |
+| 448 | ✅ | Build generatePersonalizedFollowUp — replaces static Day 3/Day 7 templates. AI reads lead interaction history + email open status + page visited + lead score and writes a unique follow-up email per lead | HIGH  Agent Smith |
 | 449 | ⏳ | Build analyzeClientLeadQuality — monthly per client. Score distribution, industry breakdown, conversion rate, days to book. Identifies dead segments. Recommends re-engagement. Writes to LeadAnalytics entity | MEDIUM |
 | 450 | ⏳ | Build autoOptimizeSMSTemplates — A/B test engine. Maintains 2 SMS template variants per service. After 50 sends each, picks winner by reply rate. Writes winning variant as active template in Order.install_configuration | MEDIUM |
-| 451 | 🔄 | Build detectLeadGhostingPattern — identifies leads who opened Day 1 but never replied. After Day 7 silence, sends AI-generated "pattern break" message (different tone, shorter). If still no reply by Day 14, archives lead | HIGH |
-| 452 | 🔄 | Wire processCallRecording output to automationOrchestrator — when Twilio call AI extracts buying signals + action items, orchestrator decides next action automatically (book / follow up / qualify / archive) | HIGH |
-| 453 | 🔄 | Build clientHealthScore function — composite score: automation uptime + lead response rate + booking conversion + payment health + portal engagement. 0-100. Runs weekly. Writes to ClientProject.health_score. Clients below 60 trigger proactive outreach | HIGH |
-| 454 | 🔄 | Build generateAIOnboardingBriefing — fires when workflow_stage advances to activation_ready. AI generates "Nolan's Briefing" doc: who the client is, what's set up, what's pending, suggested go-live call talking points. Delivered to Telegram + AgentLog | HIGH |
+| 451 | ✅ | Build detectLeadGhostingPattern — identifies leads who opened Day 1 but never replied. After Day 7 silence, sends AI-generated "pattern break" message (different tone, shorter). If still no reply by Day 14, archives lead | HIGH  Agent Smith |
+| 452 | ✅ | Wire processCallRecording output to automationOrchestrator — when Twilio call AI extracts buying signals + action items, orchestrator decides next action automatically (book / follow up / qualify / archive) | HIGH  Agent Smith |
+| 453 | ✅ | Build clientHealthScore function — composite score: automation uptime + lead response rate + booking conversion + payment health + portal engagement. 0-100. Runs weekly. Writes to ClientProject.health_score. Clients below 60 trigger proactive outreach | HIGH  Agent Smith |
+| 454 | ✅ | Build generateAIOnboardingBriefing — fires when workflow_stage advances to activation_ready. AI generates "Nolan's Briefing" doc: who the client is, what's set up, what's pending, suggested go-live call talking points. Delivered to Telegram + AgentLog | HIGH  Agent Smith |
 | 455 | ⏳ | Upgrade intelligentLeadRouting — replace simple rules in routeLead with AI: reads lead industry, message tone, urgency signals, business size. Routes to correct AutomationWorkflowPreset (hot_lead_express / nurture_and_qualify / win_back / standard) | MEDIUM |
 
 ---
@@ -1116,11 +1121,11 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 456 | 🔄 | Build admin "AI Audit" button per order in InstallOrderWorkspace — calls getActivationProgress + checks template registration + verifies Twilio number + checks last SMS/email sent. Returns full health report in a modal | HIGH |
-| 457 | 🔄 | AILeadInsightPanel: verify it calls scoreLeadIntelligence and predictLeadOutcome with real data — if using mock data, wire to real functions | HIGH |
-| 458 | 🔄 | Add "Next Best Action" card to admin lead detail — shows decideNextAction recommendation with reasoning + one-click Execute button that fires the recommended action | HIGH |
+| 456 | ✅ | Build admin "AI Audit" button per order in InstallOrderWorkspace — calls getActivationProgress + checks template registration + verifies Twilio number + checks last SMS/email sent. Returns full health report in a modal | HIGH  Agent Smith |
+| 457 | ✅ | AILeadInsightPanel: verify it calls scoreLeadIntelligence and predictLeadOutcome with real data — if using mock data, wire to real functions | HIGH  Agent Smith |
+| 458 | ✅ | Add "Next Best Action" card to admin lead detail — shows decideNextAction recommendation with reasoning + one-click Execute button that fires the recommended action | HIGH  Agent Smith |
 | 459 | ⏳ | Build adminAICommandBar — natural language command input in admin panel. Nolan types "rescore all med spa leads" or "send win-back to churned clients" and AI calls the appropriate backend function | MEDIUM |
-| 460 | 🔄 | Build AI anomaly detection in getAdminAnalytics — auto-flag: lead volume drop >30% WoW, client reply rate below 10%, any automation with 0 triggers in 48h. Telegram Nolan specific anomalies, not just raw numbers | HIGH |
+| 460 | ✅ | Build AI anomaly detection in getAdminAnalytics — auto-flag: lead volume drop >30% WoW, client reply rate below 10%, any automation with 0 triggers in 48h. Telegram Nolan specific anomalies, not just raw numbers | HIGH  Agent Smith |
 
 ---
 
@@ -1131,18 +1136,18 @@
 | 461 | ✅ | Create WebsiteSpec entity schema — order_id, package_key, industry, pages (array), brand (object), status enum (draft/approved/building/live), revision_requested (bool), revision_notes, approved_at, built_at | CRITICAL |
 | 462 | ⏳ | Create Reports entity schema — order_id, client_email, report_month, leads_contacted, response_rate, bookings_created, revenue_attributed, avg_response_time_minutes, report_html, delivered_at | MEDIUM |
 | 463 | ⏳ | Add health_score field (numeric 0-100) to ClientProject entity — populated weekly by clientHealthScore | MEDIUM |
-| 464 | 🔄 | Add voice_sample_url + voice_clone_status enum to Order.install_configuration schema — status: not_started / recording_requested / recording_received / clone_in_progress / clone_live | HIGH |
+| 464 | ✅ | Add voice_sample_url + voice_clone_status enum to Order.install_configuration schema — status: not_started / recording_requested / recording_received / clone_in_progress / clone_live | HIGH  Agent Smith |
 | 465 | ⏳ | Add optimal_send_hour field (integer 0-23) to ClientProject — populated by predictOptimalSendTime — used to schedule Day 3 and Day 7 at each client's best time | MEDIUM |
 | 466 | ⏳ | Add ab_test_variant field to MessageTemplate entity — tracks A or B variant for autoOptimizeSMSTemplates | MEDIUM |
-| 467 | 🔄 | Add website_spec_id field to ClientInstallationOS — links to WebsiteSpec record for one-lookup access from admin and portal | HIGH |
+| 467 | ✅ | Add website_spec_id field to ClientInstallationOS — links to WebsiteSpec record for one-lookup access from admin and portal | HIGH  Agent Smith |
 | 468 | ✅ | Build seedWebsiteTemplates admin function — populates BusinessConfigTemplate with all 18 website tier records. Idempotent: skips if record already exists for industry+tier combo | HIGH |
 | 469 | ⏳ | Add pipeline_version field to ClientInstallationOS — tracks which version of install pipeline was used. Prevents in-progress installs from breaking when pipeline is updated | MEDIUM |
 | 470 | ⏳ | Build migrateInstallOS admin function — when pipeline templates are updated, backfills new checklist steps to all active ClientInstallationOS records without disturbing completed steps | MEDIUM |
-| 471 | 🔄 | Add activation_errors array field to Order — stores { service_key, error_message, failed_at, retry_count } per failed service. Surfaces in admin install workspace | HIGH |
-| 472 | 🔄 | Build getSystemHealthDashboard admin function — single call returns: Stripe webhook last received, Twilio last SMS sent, Resend last email sent, active automation count, orders in progress count, clients live count | HIGH |
-| 473 | 🔄 | Wire healthCheck function to 6-hour scheduled automation — compares to last run, Telegrams Nolan on degradation, writes results to AgentLog | HIGH |
-| 474 | 🔄 | Build clientOffboardingAI — on subscription.deleted: generates personalized 3-email win-back sequence, schedules via Resend, creates LeadReactivation record for 30-day re-entry into pipeline | HIGH |
-| 475 | 🔄 | Build generatePackageComparisonEmail — triggered at day 60 for Starter and Growth clients. AI generates personalized upgrade email with real account metrics showing what they're missing. Drives organic tier upgrades | HIGH |
+| 471 | ✅ | Add activation_errors array field to Order — stores { service_key, error_message, failed_at, retry_count } per failed service. Surfaces in admin install workspace | HIGH  Agent Smith |
+| 472 | ✅ | Build getSystemHealthDashboard admin function — single call returns: Stripe webhook last received, Twilio last SMS sent, Resend last email sent, active automation count, orders in progress count, clients live count | HIGH  Agent Smith |
+| 473 | ✅ | Wire healthCheck function to 6-hour scheduled automation — compares to last run, Telegrams Nolan on degradation, writes results to AgentLog | HIGH  Agent Smith |
+| 474 | ✅ | Build clientOffboardingAI — on subscription.deleted: generates personalized 3-email win-back sequence, schedules via Resend, creates LeadReactivation record for 30-day re-entry into pipeline | HIGH  Agent Smith |
+| 475 | ✅ | Build generatePackageComparisonEmail — triggered at day 60 for Starter and Growth clients. AI generates personalized upgrade email with real account metrics showing what they're missing. Drives organic tier upgrades | HIGH  Agent Smith |
 
 ---
 
@@ -1165,10 +1170,10 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 476 | ✅ | Build validateAIOutputs function — every AI-generated string passes through this before being written anywhere. Rules: no unfilled {{placeholders}}, no profanity, no competitor names, no pricing contradicting salesCatalog, SMS under 160 chars. Reject + log to AgentLog on failure | CRITICAL |
-| 477 | 🔄 | Add AI hallucination guard to generateServiceTemplates — after OpenAI returns copy, re-prompt: "Does this contain unverified claims about response times or guarantees?" If yes, strip the claim and regenerate that sentence only | HIGH |
-| 478 | 🔄 | Build AI output audit log — every LLM call writes to AgentLog: function_name, input_context_hash, output_preview (100 chars), model, tokens used, generated_at. Full traceability for every message a client receives | HIGH |
+| 477 | ✅ | Add AI hallucination guard to generateServiceTemplates — after OpenAI returns copy, re-prompt: "Does this contain unverified claims about response times or guarantees?" If yes, strip the claim and regenerate that sentence only | HIGH  Agent Smith |
+| 478 | ✅ | Build AI output audit log — every LLM call writes to AgentLog: function_name, input_context_hash, output_preview (100 chars), model, tokens used, generated_at. Full traceability for every message a client receives | HIGH  Agent Smith |
 | 479 | ✅ | Add package tier validation gate in activateAllServices — before configureService is called, confirm service_key is in TIER_SERVICE_MAP AND required credentials exist in install_configuration. Reject with specific field-level error if either fails | CRITICAL |
-| 480 | 🔄 | Build credentialsCompletionCheck function — returns per-service readiness: { instant_lead_response: { ready: true/false, missing_fields: [] }, ... }. Used by admin and portal to show exactly what is blocking each service | HIGH |
+| 480 | ✅ | Build credentialsCompletionCheck function — returns per-service readiness: { instant_lead_response: { ready: true/false, missing_fields: [] }, ... }. Used by admin and portal to show exactly what is blocking each service | HIGH  Agent Smith |
 
 ---
 
@@ -1177,9 +1182,9 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 481 | ⏳ | Verify OnboardingChatWidget.jsx calls a real AI function — if responses are static/hardcoded, wire to generateAIReply with system prompt: "You are the ClientSurge onboarding assistant. Help this client complete their setup." | HIGH |
-| 482 | 🔄 | Build clientPortalAIAssistant — persistent AI chat in client portal sidebar. Client asks "Why no leads today?" and AI reads CommunicationEvent data + automation status and returns a plain-English answer via getClientAnalytics + getAutomationStatus | HIGH |
-| 483 | 🔄 | Build AI-generated go-live checklist — when workflow_stage = "activation_ready", AI reads package + credentials and generates a personalized "Before You Go Live" checklist (e.g. "Confirm booking link accepts appointments", "Test your Twilio number"). Saved to AutomationChecklist | HIGH |
-| 484 | 🔄 | Build proactiveClientAlert function — runs daily per active client. If no new leads in 3 days, booking rate dropped 50%, or any automation had 0 triggers in 48h → sends plain-English alert email: "We noticed your lead volume dropped — here's what we recommend" | HIGH |
+| 482 | ✅ | Build clientPortalAIAssistant — persistent AI chat in client portal sidebar. Client asks "Why no leads today?" and AI reads CommunicationEvent data + automation status and returns a plain-English answer via getClientAnalytics + getAutomationStatus | HIGH  Agent Smith |
+| 483 | ✅ | Build AI-generated go-live checklist — when workflow_stage = "activation_ready", AI reads package + credentials and generates a personalized "Before You Go Live" checklist (e.g. "Confirm booking link accepts appointments", "Test your Twilio number"). Saved to AutomationChecklist | HIGH  Agent Smith |
+| 484 | ✅ | Build proactiveClientAlert function — runs daily per active client. If no new leads in 3 days, booking rate dropped 50%, or any automation had 0 triggers in 48h → sends plain-English alert email: "We noticed your lead volume dropped — here's what we recommend" | HIGH  Agent Smith |
 | 485 | ⏳ | Add AI Suggest Reply button to AdminInbox.jsx — reads inbound message + lead context + CommunicationEvent history, calls generateAIReply, drafts response. Admin sends or edits. Build the button + draft display in AdminInbox | MEDIUM |
 
 ---
@@ -1191,8 +1196,8 @@
 | 486 | ✅ | Create entity automation on WebsiteLead "create" — immediately invoke automationOrchestrator with trigger_event="new_website_lead". Verify onLeadCreated is actually wired as an entity automation in Base44, not just deployed as a function | CRITICAL |
 | 487 | ✅ | Create entity automation on Order "create" — fires all 4 actions: (1) initializeInstallOS, (2) sendClientWelcomeEmail, (3) sendAdminPurchaseNotification, (4) advance workflow_stage to intake_received. All 4 must fire reliably on every new Order | CRITICAL |
 | 488 | ✅ | Create entity automation on ClientInstallationOS "update" — on workflow_stage change: if credentials_complete → invoke activateAllServices; if website_approved → Telegram Nolan + applyWebsiteSpec; if activated → sendGoLiveNotification | CRITICAL |
-| 489 | 🔄 | Create entity automation on Order "update" for billing_status — when billing_status changes to "past_due": show PaymentFailedBanner (already built) AND send recovery SMS via Twilio. SMS recovery has higher open rate than email alone | HIGH |
-| 490 | 🔄 | Build real-time lead re-scoring trigger — when a Lead receives a new CommunicationEvent (inbound SMS or email reply), immediately re-run scoreLeadIntelligence and update lead.score. Lead replying "I'm ready to book" should instantly jump to Hot status | HIGH |
+| 489 | ✅ | Create entity automation on Order "update" for billing_status — when billing_status changes to "past_due": show PaymentFailedBanner (already built) AND send recovery SMS via Twilio. SMS recovery has higher open rate than email alone | HIGH  Agent Smith |
+| 490 | ✅ | Build real-time lead re-scoring trigger — when a Lead receives a new CommunicationEvent (inbound SMS or email reply), immediately re-run scoreLeadIntelligence and update lead.score. Lead replying "I'm ready to book" should instantly jump to Hot status | HIGH  Agent Smith |
 
 ---
 
@@ -1201,10 +1206,10 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 491 | ✅ | Build SMS compliance filter middleware — before ANY Twilio SMS send: (1) check lead has not texted STOP, (2) verify consent was collected at opt-in, (3) check message for prohibited content categories (loans, cannabis, adult). Sits as shared middleware called by ALL SMS-sending functions | CRITICAL |
-| 492 | 🔄 | Build quiet hours enforcement — all outbound SMS must respect 8am–9pm recipient local time. Build getLocalTimeZone(phone_number) via area code lookup. If outside window, queue message in DelayedMessage entity. Scheduler processes queue at 8am daily | HIGH |
-| 493 | 🔄 | Build AI contact frequency limiter — no single lead receives more than 3 AI-generated messages per 24-hour window across all channels combined. Build checkContactFrequency(lead_id) that counts CommunicationEvents in last 24h. All message-sending functions must call this first | HIGH |
+| 492 | ✅ | Build quiet hours enforcement — all outbound SMS must respect 8am–9pm recipient local time. Build getLocalTimeZone(phone_number) via area code lookup. If outside window, queue message in DelayedMessage entity. Scheduler processes queue at 8am daily | HIGH  Agent Smith |
+| 493 | ✅ | Build AI contact frequency limiter — no single lead receives more than 3 AI-generated messages per 24-hour window across all channels combined. Build checkContactFrequency(lead_id) that counts CommunicationEvents in last 24h. All message-sending functions must call this first | HIGH  Agent Smith |
 | 494 | ⏳ | Build AI content approval workflow for Elite clients — before any AI-generated SMS template is written to install_configuration, create AdminApproval entity record. Nolan reviews in admin panel within 4 hours. If not reviewed in 4h, auto-approve with log entry | MEDIUM |
-| 495 | 🔄 | Add PII scrubbing to AgentLog — no full phone numbers or email addresses stored in plaintext in any log. Build maskPII(string) utility: phone → (***) ***-1234, email → j***@g***.com. Required for all AgentLog writes | HIGH |
+| 495 | ✅ | Add PII scrubbing to AgentLog — no full phone numbers or email addresses stored in plaintext in any log. Build maskPII(string) utility: phone → (***) ***-1234, email → j***@g***.com. Required for all AgentLog writes | HIGH  Agent Smith |
 
 ---
 
@@ -1213,10 +1218,10 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 496 | ✅ | Build selfHealingMonitor function — runs every 6 hours. Checks: (1) Order in Configuring >4h → re-invoke activateAllServices for stuck services; (2) AutomationChecklistStep in_progress >2h → reset to pending and retry; (3) ClientInstallationOS in same workflow_stage >24h → Telegram Nolan with specific block identified | CRITICAL |
-| 497 | 🔄 | Build AI error classifier — when any function logs to AgentLog, classifyInstallError reads the error and categorizes: twilio_credentials_invalid / booking_link_unreachable / openai_rate_limit / network_timeout / data_missing. Each category has a defined resolution path | HIGH |
-| 498 | 🔄 | Build autoResolveInstallError function — reads AgentLog entries with requires_nolan=false and acts on category: openai_rate_limit → wait 60s + retry; network_timeout → retry immediately; data_missing → Telegram Nolan with exact field missing. Reduces manual intervention | HIGH |
+| 497 | ✅ | Build AI error classifier — when any function logs to AgentLog, classifyInstallError reads the error and categorizes: twilio_credentials_invalid / booking_link_unreachable / openai_rate_limit / network_timeout / data_missing. Each category has a defined resolution path | HIGH  Agent Smith |
+| 498 | ✅ | Build autoResolveInstallError function — reads AgentLog entries with requires_nolan=false and acts on category: openai_rate_limit → wait 60s + retry; network_timeout → retry immediately; data_missing → Telegram Nolan with exact field missing. Reduces manual intervention | HIGH  Agent Smith |
 | 499 | ⏳ | Build AI pipeline version control — before any activateAllServices run, write pipeline_version + timestamp + package_key + service_list to ClientInstallationOS. If pipeline updated mid-run, apply only delta changes rather than full restart | MEDIUM |
-| 500 | 🔄 | Build /admin/ai-status dashboard page — shows: all AI functions with last invocation time + success/fail status, total tokens consumed this month from AgentLog, active entity automations and health, self-healing events in last 24h, and Run Full Pipeline Test button | HIGH |
+| 500 | ✅ | Build /admin/ai-status dashboard page — shows: all AI functions with last invocation time + success/fail status, total tokens consumed this month from AgentLog, active entity automations and health, self-healing events in last 24h, and Run Full Pipeline Test button | HIGH  Agent Smith |
 
 ---
 
@@ -1266,10 +1271,10 @@
 | 517 | ✅ | Create `agents/sales_rep_hvac.json` — persona: "Tyler", HVAC seasonal demand, emergency call-back urgency | CRITICAL |
 | 518 | ✅ | Create `agents/sales_rep_roofing.json` — persona: "Derek", storm damage urgency, contractor follow-up speed | CRITICAL |
 | 519 | ✅ | Create `agents/sales_rep_contractors.json` — persona: "Alex", contractor quote follow-up, remodel lead nurture | CRITICAL |
-| 520 | 🔄 | Grant each agent READ access to `Leads` entity so they can look up lead context during conversations | HIGH |
-| 521 | 🔄 | Grant each agent READ access to `CommunicationEvent` entity for conversation history | HIGH |
-| 522 | 🔄 | Grant each agent access to `generateAIReply` backend function | HIGH |
-| 523 | 🔄 | Grant each agent access to `scheduleDemoBooking` backend function so they can book demos directly | HIGH |
+| 520 | ✅ | Grant each agent READ access to `Leads` entity so they can look up lead context during conversations | HIGH  Agent Smith |
+| 521 | ✅ | Grant each agent READ access to `CommunicationEvent` entity for conversation history | HIGH  Agent Smith |
+| 522 | ✅ | Grant each agent access to `generateAIReply` backend function | HIGH  Agent Smith |
+| 523 | ✅ | Grant each agent access to `scheduleDemoBooking` backend function so they can book demos directly | HIGH  Agent Smith |
 
 ---
 
@@ -1296,8 +1301,8 @@
 | 529 | ✅ | Build `generateIndustryFirstSMS` function — reads `industry_key` + `lead.full_name` + `lead.problem`, calls InvokeLLM with industry-specific system prompt, returns ≤160 char SMS | CRITICAL |
 | 530 | ✅ | Wire `generateIndustryFirstSMS` into `sendInstantLeadResponseSms` — replace static template with AI-generated industry-aware SMS | HIGH |
 | 531 | ✅ | Build industry prompt map — 6 system prompts (one per industry), stored in `lib/agentPrompts.js` | HIGH |
-| 532 | 🔄 | Add `industry_key` context to all AI prompts in `generateAIReply` — so all replies stay industry-aware | HIGH |
-| 533 | 🔄 | Add SMS character limit enforcement: if generated SMS > 160 chars, retry once with "shorten to under 160 chars" instruction | HIGH |
+| 532 | ✅ | Add `industry_key` context to all AI prompts in `generateAIReply` — so all replies stay industry-aware | HIGH  Agent Smith |
+| 533 | ✅ | Add SMS character limit enforcement: if generated SMS > 160 chars, retry once with "shorten to under 160 chars" instruction | HIGH  Agent Smith |
 | 534 | ⏳ | Log every AI-generated SMS to `CommunicationEvent` with `provider: "internal"`, `event_type: "ai_generated"` | MEDIUM |
 
 ---
@@ -1310,10 +1315,10 @@
 |---|---|---|---|
 | 535 | ✅ | Update `receiveTwilioInboundSms` — after STOP check, look up `lead.assigned_agent_name`, load agent prompt, generate reply via InvokeLLM | CRITICAL |
 | 536 | ✅ | Build `industryAwareReply` function — takes `{ lead_id, inbound_message }`, loads agent, conversation history from `CommunicationEvent`, generates contextual reply | CRITICAL |
-| 537 | 🔄 | Add conversation memory — `industryAwareReply` loads last 5 `CommunicationEvent` records for the lead to maintain conversation thread | HIGH |
-| 538 | 🔄 | Build booking intent detector — if AI classifies reply as `booking_ready`, automatically send booking link via `sendBookingLinkSMS` | HIGH |
-| 539 | 🔄 | Build objection handler — if AI detects `pricing_concern` intent, fire industry-specific pricing objection script | HIGH |
-| 540 | 🔄 | Build disqualification handler — if AI detects `not_interested`, stop all sequences, update `lead.status = "Closed"` | HIGH |
+| 537 | ✅ | Add conversation memory — `industryAwareReply` loads last 5 `CommunicationEvent` records for the lead to maintain conversation thread | HIGH  Agent Smith |
+| 538 | ✅ | Build booking intent detector — if AI classifies reply as `booking_ready`, automatically send booking link via `sendBookingLinkSMS` | HIGH  Agent Smith |
+| 539 | ✅ | Build objection handler — if AI detects `pricing_concern` intent, fire industry-specific pricing objection script | HIGH  Agent Smith |
+| 540 | ✅ | Build disqualification handler — if AI detects `not_interested`, stop all sequences, update `lead.status = "Closed"` | HIGH  Agent Smith |
 
 ---
 
@@ -1342,11 +1347,11 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 551 | 🔄 | Add "AI Sales Reps" tab to AdminDashboard — shows each of 6 agents: name, industry, leads assigned this week, demos booked, conversion rate | HIGH |
-| 552 | 🔄 | Build `getAgentPerformanceMetrics` backend function — queries `Leads` filtered by `assigned_agent_name`, returns count by status | HIGH |
-| 553 | 🔄 | Build conversation viewer — admin can click any lead and see full AI conversation thread from `CommunicationEvent` | HIGH |
+| 551 | ✅ | Add "AI Sales Reps" tab to AdminDashboard — shows each of 6 agents: name, industry, leads assigned this week, demos booked, conversion rate | HIGH  Agent Smith |
+| 552 | ✅ | Build `getAgentPerformanceMetrics` backend function — queries `Leads` filtered by `assigned_agent_name`, returns count by status | HIGH  Agent Smith |
+| 553 | ✅ | Build conversation viewer — admin can click any lead and see full AI conversation thread from `CommunicationEvent` | HIGH  Agent Smith |
 | 554 | ⏳ | Add "Override Agent" dropdown in admin lead detail — allows manually reassigning lead to a different industry agent | MEDIUM |
-| 555 | 🔄 | Add "Trigger Voice Call Now" button in admin lead detail (HOT leads only) — calls `triggerVoiceCallToLead` | HIGH |
+| 555 | ✅ | Add "Trigger Voice Call Now" button in admin lead detail (HOT leads only) — calls `triggerVoiceCallToLead` | HIGH  Agent Smith |
 | 556 | ⏳ | Add "AI Reply Sent" badge on lead list rows — shows when an agent has replied to this lead | MEDIUM |
 
 ---
@@ -1425,29 +1430,29 @@ PHASE 7 — Admin UI
 ## BATCH 1: PIPELINE & ACTIVATION (Tasks 445–469)
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 445 | 🔄 | Build activateAllServices — orchestrates configureService x N by tier | CRITICAL |
-| 446 | 🔄 | Wire stripePaymentWebhook → activateAllServices post-payment | CRITICAL |
-| 447 | 🔄 | Fix installPipeline — all actions return Invalid action | HIGH |
-| 448 | 🔄 | Unify service_key naming across both apps | HIGH |
+| 445 | ✅ | Build activateAllServices — orchestrates configureService x N by tier | CRITICAL  Agent Smith |
+| 446 | ✅ | Wire stripePaymentWebhook → activateAllServices post-payment | CRITICAL  Agent Smith |
+| 447 | ✅ | Fix installPipeline — all actions return Invalid action | HIGH  Agent Smith |
+| 448 | ✅ | Unify service_key naming across both apps | HIGH  Agent Smith |
 | 449 | ⏳ | E2E test real order 69f13b948861e8a032d10f2e | CRITICAL |
 | 450 | ✅ | /admin/pipeline-status page | HIGH |
 | 451 | ✅ | New paid order → Telegram alert | HIGH |
 | 452 | ✅ | /client-intake credential intake form | HIGH |
-| 453 | 🔄 | Client portal: services tab | HIGH |
-| 454 | 🔄 | Client portal: analytics tab | HIGH |
+| 453 | ✅ | Client portal: services tab | HIGH  Agent Smith |
+| 454 | ✅ | Client portal: analytics tab | HIGH  Agent Smith |
 | 455 | ⏳ | Client portal: order status tab | HIGH |
-| 456 | 🔄 | Client portal: billing tab (v1) | HIGH |
+| 456 | ✅ | Client portal: billing tab (v1) | HIGH  Agent Smith |
 | 457 | ✅ | /demo page built | CRITICAL |
-| 458 | 🔄 | Mobile audit at 375px viewport | HIGH |
+| 458 | ✅ | Mobile audit at 375px viewport | HIGH  Agent Smith |
 | 459 | ⏳ | Meta descriptions + OG tags on all public pages | MEDIUM |
-| 460 | 🔄 | /case-studies page (3 placeholder cards) | MEDIUM |
+| 460 | ✅ | /case-studies page (3 placeholder cards) | MEDIUM  Agent Smith |
 | 461 | ⏳ | Live chat widget (Tawk.to) | MEDIUM |
 | 462 | ⏳ | Google Analytics 4 setup | HIGH |
 | 463 | ⏳ | Revenue dashboard: MRR trend chart | HIGH |
-| 464 | 🔄 | Revenue dashboard: churn rate tracker | HIGH |
+| 464 | ✅ | Revenue dashboard: churn rate tracker | HIGH  Agent Smith |
 | 465 | ⏳ | Revenue dashboard: LTV per client | MEDIUM |
 | 466 | ⏳ | sendGoLiveNotification function | HIGH |
-| 467 | 🔄 | Admin order management page | HIGH |
+| 467 | ✅ | Admin order management page | HIGH  Agent Smith |
 | 468 | ⏳ | Stripe webhook signature verification | CRITICAL |
 | 469 | ⏳ | runFullPipelineTest QA function | CRITICAL |
 
@@ -1457,29 +1462,29 @@ PHASE 7 — Admin UI
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 470 | ⏳ | salesCatalog.js price audit — kill all $97/$297 wrong values | CRITICAL |
-| 471 | 🔄 | Verify sk_live_ in createCheckoutSession + stripePaymentWebhook | CRITICAL |
-| 472 | 🔄 | TCPA SMS consent on ALL public lead forms + SMS templates | CRITICAL |
-| 473 | 🔄 | Order create automation: chain initializeInstallOS + welcome email | CRITICAL |
-| 474 | 🔄 | Wire stripeWebhookOrders → initializeInstallOS immediately | CRITICAL |
-| 475 | 🔄 | InstallChecklistPanel: SVG progress ring, per-service bars | CRITICAL |
+| 471 | ✅ | Verify sk_live_ in createCheckoutSession + stripePaymentWebhook | CRITICAL  Agent Smith |
+| 472 | ✅ | TCPA SMS consent on ALL public lead forms + SMS templates | CRITICAL  Agent Smith |
+| 473 | ✅ | Order create automation: chain initializeInstallOS + welcome email | CRITICAL  Agent Smith |
+| 474 | ✅ | Wire stripeWebhookOrders → initializeInstallOS immediately | CRITICAL  Agent Smith |
+| 475 | ✅ | InstallChecklistPanel: SVG progress ring, per-service bars | CRITICAL  Agent Smith |
 | 476 | ✅ | ClientPortal Billing Tab + global PaymentFailedBanner | CRITICAL |
-| 477 | 🔄 | Twilio sig validation + simulateMissedCall admin guard | CRITICAL |
-| 478 | 🔄 | Stripe webhook idempotency (stripe_event_id dedup) | CRITICAL |
+| 477 | ✅ | Twilio sig validation + simulateMissedCall admin guard | CRITICAL  Agent Smith |
+| 478 | ✅ | Stripe webhook idempotency (stripe_event_id dedup) | CRITICAL  Agent Smith |
 | 479b | ⏳ | Scan frontend for sk_live_ secret key exposure | CRITICAL |
-| 480 | 🔄 | Admin leads bulk status update toolbar | HIGH |
+| 480 | ✅ | Admin leads bulk status update toolbar | HIGH  Agent Smith |
 | 481 | ⏳ | AdminSettings: Test Connection buttons (Twilio + Resend) | HIGH |
-| 482 | 🔄 | Admin lead detail: Send Manual SMS panel | HIGH |
-| 483 | 🔄 | generateClientWebsite function (Starter/Growth/Elite spec) | CRITICAL |
-| 484 | 🔄 | Admin: warning badge on orders paid 2+ days no install | HIGH |
+| 482 | ✅ | Admin lead detail: Send Manual SMS panel | HIGH  Agent Smith |
+| 483 | ✅ | generateClientWebsite function (Starter/Growth/Elite spec) | CRITICAL  Agent Smith |
+| 484 | ✅ | Admin: warning badge on orders paid 2+ days no install | HIGH  Agent Smith |
 | 485 | ✅ | Admin: one-click Initialize Install OS button | HIGH |
 | 486 | ✅ | ClientPortal: What's New changelog tab | LOW |
 | 487 | ✅ | Admin: conversion funnel chart | HIGH |
 | 488 | ✅ | Admin: Demo Bookings tab | HIGH |
-| 489 | 🔄 | AdminLeads: lead_score column (color-coded, sortable) | HIGH |
-| 490 | 🔄 | Admin: Failed Jobs section + Retry button | HIGH |
+| 489 | ✅ | AdminLeads: lead_score column (color-coded, sortable) | HIGH  Agent Smith |
+| 490 | ✅ | Admin: Failed Jobs section + Retry button | HIGH  Agent Smith |
 | 491 | ✅ | processAutomationJobs: 3x retry exponential backoff | HIGH |
-| 492 | 🔄 | All Resend calls: retry on 429/5xx | HIGH |
-| 493 | 🔄 | receiveTwilioInboundSms: STOP → sms_opted_out + pause all sequences | CRITICAL |
+| 492 | ✅ | All Resend calls: retry on 429/5xx | HIGH  Agent Smith |
+| 493 | ✅ | receiveTwilioInboundSms: STOP → sms_opted_out + pause all sequences | CRITICAL  Agent Smith |
 | 494 | ⏳ | Full E2E purchase test on live domain (must pass before June 2) | CRITICAL |
 
 ---
@@ -1487,12 +1492,12 @@ PHASE 7 — Admin UI
 ## BATCH 3: RELIABILITY + LEAD PIPELINE + ADMIN UX (Tasks 495–519)
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 495 | 🔄 | processNurtureCampaigns: skip if messaged in last 24h | HIGH |
+| 495 | ✅ | processNurtureCampaigns: skip if messaged in last 24h | HIGH  Agent Smith |
 | 496 | ✅ | processAutomationJobs: 3x retry with backoff | HIGH |
-| 497 | 🔄 | _shared/retryFetch.ts: retry on 429/5xx sitewide | HIGH |
-| 498 | 🔄 | scheduleFollowUpSMS: Phoenix timezone business hours gate | HIGH |
+| 497 | ✅ | _shared/retryFetch.ts: retry on 429/5xx sitewide | HIGH  Agent Smith |
+| 498 | ✅ | scheduleFollowUpSMS: Phoenix timezone business hours gate | HIGH  Agent Smith |
 | 499 | ⏳ | _shared/smsHelpers.ts: appendOptOut() — TCPA sitewide | HIGH |
-| 500 | 🔄 | processMissedCallFollowUps: idempotent step increment | HIGH |
+| 500 | ✅ | processMissedCallFollowUps: idempotent step increment | HIGH  Agent Smith |
 | 501 | ⏳ | sendOrderConfirmationEmail: human-readable service labels | HIGH |
 | 502 | ⏳ | sendClientWelcomeEmail: fix /client-portal link, Reply-To header | HIGH |
 | 503 | ⏳ | receiveResendWebhook: bounce/open/click handlers | MEDIUM |
@@ -1518,10 +1523,10 @@ PHASE 7 — Admin UI
 ## BATCH 4: CLEANUP + QA + LAUNCH READINESS (Tasks 520–544)
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 520 | 🔄 | autoCloseStaleLeads function (30-day no-contact) | MEDIUM |
-| 521 | 🔄 | Daily 2am MST scheduler for autoCloseStaleLeads | MEDIUM |
-| 522 | 🔄 | exportLeadsCSV function with filters + CSV response | MEDIUM |
-| 523 | 🔄 | exportCommunicationLogs function | MEDIUM |
+| 520 | ✅ | autoCloseStaleLeads function (30-day no-contact) | MEDIUM  Agent Smith |
+| 521 | ✅ | Daily 2am MST scheduler for autoCloseStaleLeads | MEDIUM  Agent Smith |
+| 522 | ✅ | exportLeadsCSV function with filters + CSV response | MEDIUM  Agent Smith |
+| 523 | ✅ | exportCommunicationLogs function | MEDIUM  Agent Smith |
 | 524 | ⏳ | Admin: Export CSV + Export Logs buttons | MEDIUM |
 | 525 | ⏳ | autoEndToEndTest: extend to full lead→order→activate flow | HIGH |
 | 526 | ⏳ | monthlyClientReport: email personalized report to each client | MEDIUM |
@@ -1530,15 +1535,15 @@ PHASE 7 — Admin UI
 | 529 | ⏳ | pauseSubscription + resumeSubscription functions | MEDIUM |
 | 530 | ⏳ | Admin: Website Leads tab with filters | HIGH |
 | 531 | ⏳ | Admin: Demo Bookings tab (complete/no-show/reschedule) | HIGH |
-| 532 | 🔄 | Admin: AuditLog viewer tab with resolve button | HIGH |
-| 533 | 🔄 | ClientPortal Billing: Download Invoice PDF | MEDIUM |
+| 532 | ✅ | Admin: AuditLog viewer tab with resolve button | HIGH  Agent Smith |
+| 533 | ✅ | ClientPortal Billing: Download Invoice PDF | MEDIUM  Agent Smith |
 | 534 | ⏳ | QuickStartWizard: fix broken help links | MEDIUM |
 | 535 | ⏳ | ClientDashboard: amber paused banner on cadence_paused=true | HIGH |
 | 536 | ⏳ | runLaunchReadinessCheck: 10-point system check | CRITICAL |
-| 537 | 🔄 | runFullLeadFlowTest: lead→SMS→missed call→follow-up→cleanup | CRITICAL |
-| 538 | 🔄 | Admin: Resend Welcome Email button in client detail | MEDIUM |
-| 539 | 🔄 | Admin: Enroll in Nurture button in lead detail | MEDIUM |
-| 540 | 🔄 | Admin: mask phone numbers for non-super-admin | MEDIUM |
+| 537 | ✅ | runFullLeadFlowTest: lead→SMS→missed call→follow-up→cleanup | CRITICAL  Agent Smith |
+| 538 | ✅ | Admin: Resend Welcome Email button in client detail | MEDIUM  Agent Smith |
+| 539 | ✅ | Admin: Enroll in Nurture button in lead detail | MEDIUM  Agent Smith |
+| 540 | ✅ | Admin: mask phone numbers for non-super-admin | MEDIUM  Agent Smith |
 | 541 | ⏳ | _shared/response.ts: okJson() + errJson() helpers sitewide | MEDIUM |
 | 542 | ✅ | All functions: correct HTTP status codes (400/404/500) | HIGH |
 | 543 | ⏳ | enrichLead: 10-second timeout on external API calls | MEDIUM |
