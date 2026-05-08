@@ -1,172 +1,74 @@
 /**
- * AdminGlobalSearch — Cmd+K search across leads, projects, campaigns.
- * Fix #14
+ * AdminGlobalSearch.jsx — #46
+ * Wired to SpaLead, ClientOnboarding, Order entities.
+ * Fuzzy search by business name, email, phone.
  */
-import { useState, useEffect, useRef, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
-import { Search, X, Users, FolderKanban, Send, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { SpaLead, ClientOnboarding } from "@/api/entities";
+import { Search, X } from "lucide-react";
 
-export default function AdminGlobalSearch({ onNavigate }) {
-  const [open, setOpen] = useState(false);
+const ENTITY_COLORS = {
+  lead: "#00D4FF",
+  client: "#00FFB3",
+  order: "#A78BFA",
+};
+
+export default function AdminGlobalSearch({ onSelect }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
-  const [searching, setSearching] = useState(false);
-  const inputRef = useRef(null);
-  const navigate = useNavigate();
-
-  // Keyboard shortcut
-  useEffect(() => {
-    const handler = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setOpen(o => !o);
-      }
-      if (e.key === "Escape") setOpen(false);
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, []);
+  const [loading, setLoading] = useState(false);
+  const debounce = useRef(null);
 
   useEffect(() => {
-    if (open) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
-      setQuery("");
-      setResults([]);
-    }
-  }, [open]);
-
-  const search = useCallback(async (q) => {
-    if (!q.trim()) { setResults([]); return; }
-    setSearching(true);
-    try {
-      const [leads, projects, campaigns] = await Promise.all([
-        base44.entities.Leads.list("-updated_date", 300),
-        base44.entities.ClientProject.list("-created_date", 100),
-        base44.entities.NurtureCampaign.list("-enrolled_at", 100),
-      ]);
-      const lq = q.toLowerCase();
-      const matchedLeads = (leads || []).filter(l =>
-        l.full_name?.toLowerCase().includes(lq) ||
-        l.email?.toLowerCase().includes(lq) ||
-        l.phone?.includes(lq) ||
-        l.business_name?.toLowerCase().includes(lq)
-      ).slice(0, 5).map(l => ({ type: "lead", id: l.id, label: l.full_name, sub: `${l.business_name} · ${l.email || l.phone}`, status: l.status }));
-
-      const matchedProjects = (projects || []).filter(p =>
-        p.business_name?.toLowerCase().includes(lq) ||
-        p.client_email?.toLowerCase().includes(lq)
-      ).slice(0, 3).map(p => ({ type: "project", id: p.id, label: p.business_name, sub: p.client_email }));
-
-      const matchedCampaigns = (campaigns || []).filter(c =>
-        c.lead_name?.toLowerCase().includes(lq) ||
-        c.lead_email?.toLowerCase().includes(lq)
-      ).slice(0, 3).map(c => ({ type: "campaign", id: c.id, label: c.lead_name, sub: c.lead_email, status: c.status }));
-
-      setResults([...matchedLeads, ...matchedProjects, ...matchedCampaigns]);
-    } finally {
-      setSearching(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const t = setTimeout(() => search(query), 250);
-    return () => clearTimeout(t);
-  }, [query, search]);
-
-  const handleSelect = (result) => {
-    setOpen(false);
-    if (result.type === "lead") {
-      navigate(`/admin/leads/${result.id}`);
-    } else if (result.type === "project") {
-      onNavigate?.("client-projects");
-    } else if (result.type === "campaign") {
-      onNavigate?.("nurture");
-    }
-  };
-
-  const typeIcon = (type) => {
-    if (type === "lead") return <Users className="h-3.5 w-3.5" />;
-    if (type === "project") return <FolderKanban className="h-3.5 w-3.5" />;
-    return <Send className="h-3.5 w-3.5" />;
-  };
-
-  const typeLabel = (type) => {
-    if (type === "lead") return "Lead";
-    if (type === "project") return "Project";
-    return "Campaign";
-  };
+    if (!query || query.length < 2) { setResults([]); return; }
+    clearTimeout(debounce.current);
+    debounce.current = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const q = query.toLowerCase();
+        const [leads, clients] = await Promise.all([
+          SpaLead.list(),
+          ClientOnboarding.list(),
+        ]);
+        const leadResults = (leads || [])
+          .filter(l => [l.business_name, l.email, l.phone, l.industry].some(v => v?.toLowerCase().includes(q)))
+          .slice(0, 5)
+          .map(l => ({ type: "lead", id: l.id, label: l.business_name, sub: l.industry || l.email, data: l }));
+        const clientResults = (clients || [])
+          .filter(c => [c.business_name, c.email, c.phone].some(v => v?.toLowerCase().includes(q)))
+          .slice(0, 5)
+          .map(c => ({ type: "client", id: c.id, label: c.business_name, sub: c.email, data: c }));
+        setResults([...leadResults, ...clientResults].slice(0, 8));
+      } catch {} finally { setLoading(false); }
+    }, 280);
+  }, [query]);
 
   return (
-    <>
-      {/* Trigger button in sidebar/topbar */}
-      <button
-        onClick={() => setOpen(true)}
-        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-muted/30 text-sm text-muted-foreground hover:bg-muted transition-colors"
-      >
-        <Search className="h-3.5 w-3.5 flex-shrink-0" />
-        <span className="flex-1 text-left">Search…</span>
-        <kbd className="text-[10px] font-mono bg-background border border-border rounded px-1 py-0.5">⌘K</kbd>
-      </button>
+    <div style={{ position: "relative", width: "100%", maxWidth: 400 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, padding: "8px 12px" }}>
+        <Search style={{ width: 14, height: 14, color: "rgba(255,255,255,0.35)", flexShrink: 0 }} />
+        <input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search leads, clients..."
+          style={{ background: "none", border: "none", outline: "none", color: "#fff", fontSize: 13, flex: 1 }} />
+        {query && <button onClick={() => { setQuery(""); setResults([]); }} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.3)", padding: 0 }}><X style={{ width: 12, height: 12 }} /></button>}
+      </div>
 
-      {/* Modal */}
-      {open && (
-        <div
-          className="fixed inset-0 z-[9999] bg-black/40 backdrop-blur-sm flex items-start justify-center pt-24 px-4"
-          onClick={() => setOpen(false)}
-        >
-          <div
-            className="w-full max-w-lg bg-white rounded-2xl shadow-2xl border border-border overflow-hidden"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
-              <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Search leads, projects, campaigns…"
-                className="flex-1 text-sm text-foreground bg-transparent outline-none"
-              />
-              {searching ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" /> : null}
-              <button onClick={() => setOpen(false)}>
-                <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-              </button>
+      {(results.length > 0 || loading) && (
+        <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "#0D1B2E", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, boxShadow: "0 8px 32px rgba(0,0,0,0.5)", zIndex: 100, overflow: "hidden" }}>
+          {loading && <div style={{ padding: "10px 14px", color: "rgba(255,255,255,0.35)", fontSize: 12 }}>Searching...</div>}
+          {results.map(r => (
+            <div key={r.id} onClick={() => { onSelect?.(r); setQuery(""); setResults([]); }}
+              style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.04)" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.04)"}
+              onMouseLeave={e => e.currentTarget.style.background = "none"}>
+              <span style={{ background: `${ENTITY_COLORS[r.type]}15`, color: ENTITY_COLORS[r.type], border: `1px solid ${ENTITY_COLORS[r.type]}30`, borderRadius: 9999, padding: "1px 7px", fontSize: 9, fontWeight: 800, textTransform: "uppercase" }}>{r.type}</span>
+              <div>
+                <p style={{ color: "#fff", fontSize: 12, fontWeight: 500, margin: 0 }}>{r.label}</p>
+                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, margin: 0 }}>{r.sub}</p>
+              </div>
             </div>
-
-            <div className="max-h-80 overflow-y-auto">
-              {results.length === 0 && query.trim() && !searching && (
-                <p className="px-4 py-8 text-center text-sm text-muted-foreground">No results for "{query}"</p>
-              )}
-              {results.length === 0 && !query.trim() && (
-                <p className="px-4 py-8 text-center text-xs text-muted-foreground">Type to search across leads, projects, and campaigns.</p>
-              )}
-              {results.map((result, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleSelect(result)}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-muted/40 transition-colors border-b border-border last:border-0"
-                >
-                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
-                    {typeIcon(result.type)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">{result.label}</p>
-                    <p className="text-xs text-muted-foreground truncate">{result.sub}</p>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {result.status && (
-                      <span className="text-[10px] font-semibold bg-muted rounded-full px-2 py-0.5 text-muted-foreground">{result.status}</span>
-                    )}
-                    <span className="text-[10px] text-muted-foreground">{typeLabel(result.type)}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       )}
-    </>
+    </div>
   );
 }
