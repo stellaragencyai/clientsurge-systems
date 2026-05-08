@@ -5,6 +5,28 @@
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+
+// #131: canonical service names for all 6 automations
+const SERVICE_NAMES = {
+  instant_lead_response:    { icon: "⚡", name: "Instant Lead Response" },
+  missed_call_textback:     { icon: "📞", name: "Missed Call Text-Back" },
+  appointment_booking_ai:   { icon: "📅", name: "Appointment Booking AI" },
+  followup_sequences:       { icon: "🔁", name: "Follow-Up Sequences" },
+  review_request_ai:        { icon: "⭐", name: "Review Request AI" },
+  reactivation_campaign:    { icon: "🚀", name: "Reactivation Campaign" },
+};
+
+const TIER_SERVICES = {
+  starter: ["instant_lead_response", "missed_call_textback"],
+  growth:  ["instant_lead_response", "missed_call_textback", "appointment_booking_ai", "followup_sequences"],
+  elite:   Object.keys(SERVICE_NAMES),
+};
+
+function getServiceItems(package_key) {
+  const keys = TIER_SERVICES[package_key] || TIER_SERVICES.starter;
+  return keys.map(k => ({ ...SERVICE_NAMES[k], key: k }));
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
