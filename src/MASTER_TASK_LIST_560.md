@@ -470,13 +470,13 @@
 | 201 | 🔄 | Switch Stripe from Test Mode to Live Mode (sk_live_ / pk_live_ keys in Dashboard) | CRITICAL |
 | 202 | 🔄 | Update Stripe webhook endpoint URL to production domain | CRITICAL |
 | 203 | 🔄 | Test full purchase flow end-to-end with real card on live domain | CRITICAL |
-| 204 | ⏳ | Verify Stripe subscription renewal fires invoice.paid webhook and is handled | HIGH |
+| 204 | 🔄 | Verify Stripe subscription renewal fires invoice.paid webhook and is handled | HIGH |
 | 205 | ⏳ | Add capacity limit: AdminSettings.max_active_onboarding — block checkout if exceeded | MEDIUM |
 | 206 | 🔄 | getStripeCustomerPortalUrl: verify it returns working URL for all paid customers | HIGH |
 | 207 | ⏳ | Stripe proration: implement preview before plan change in requestSubscriptionChange | MEDIUM |
-| 208 | ⏳ | Verify Stripe metadata includes base44_app_id on all checkout sessions | HIGH |
+| 208 | 🔄 | Verify Stripe metadata includes base44_app_id on all checkout sessions | HIGH |
 | 209 | ⏳ | Add Stripe customer ID to ClientProject for portal billing lookups | MEDIUM |
-| 210 | ⏳ | Verify all Stripe webhook event types are handled (created, updated, deleted, failed) | HIGH |
+| 210 | 🔄 | Verify all Stripe webhook event types are handled (created, updated, deleted, failed) | HIGH |
 
 ---
 
@@ -520,8 +520,8 @@
 | 230 | ⏳ | Create sendNPSSurvey function — email 7 days after fully_live with 1-10 rating link | MEDIUM |
 | 231 | ✅ | Entity automation: ClientProject workflow_stage change → send milestone email | HIGH | Agent Smith |
 | 232 | ⏳ | Entity automation: Order fully_live → trigger sendNPSSurvey after 7-day delay | MEDIUM |
-| 233 | ⏳ | Verify sendClientWelcomeEmail includes correct client portal URL + temp access instructions | HIGH |
-| 234 | ⏳ | Verify sendPortalWelcomeEmail is triggered automatically after order is paid | HIGH |
+| 233 | 🔄 | Verify sendClientWelcomeEmail includes correct client portal URL + temp access instructions | HIGH |
+| 234 | 🔄 | Verify sendPortalWelcomeEmail is triggered automatically after order is paid | HIGH |
 | 235 | ⏳ | Create Changelog entity records: add first 3 "What's New" entries for portal | LOW |
 
 ---
@@ -637,7 +637,7 @@
 |---|---|---|---|
 | 251 | ✅ | Wire scoreLeadIntelligence to fire on every new WebsiteLead creation — currently deployed but never called from frontend | CRITICAL |
 | 252 | ✅ | Wire classifyLeadIntent on inbound SMS replies — currently deployed but disconnected | HIGH | Agent Smith |
-| 253 | ⏳ | Wire predictChurnRisk to run weekly on all active Orders — alert Nolan if score > 70 | HIGH |
+| 253 | 🔄 | Wire predictChurnRisk to run weekly on all active Orders — alert Nolan if score > 70 | HIGH |
 | 254 | ⏳ | Wire automationOrchestrator to Admin dashboard so Nolan can trigger it manually | MEDIUM |
 | 255 | ✅ | /lead-intelligence page: display lead_score and quality_label per lead in the UI | HIGH | Agent Smith |
 | 256 | ✅ | Lead Intelligence dashboard: add real LeadAnalytics entity reads — currently shows no data | HIGH | Agent Smith |
@@ -686,7 +686,7 @@
 | 278 | ✅ | Auto-send "You're Live!" email via Resend when went_live is set to true on a ClientOnboarding record | HIGH | Agent Smith |
 | 279 | ✅ | Auto-send Telegram alert to Nolan when any onboarding step changes (twilio_configured, lead_sources_connected, etc.) | HIGH | Agent Smith |
 | 280 | ⏳ | Build client-facing onboarding status page at /setup — shows their install progress without admin login | MEDIUM |
-| 281 | ⏳ | Onboarding form: validate all required fields before submit — currently submits with empty required fields | HIGH |
+| 281 | 🔄 | Onboarding form: validate all required fields before submit — currently submits with empty required fields | HIGH |
 
 ---
 
@@ -774,12 +774,12 @@
 |---|---|---|---|
 | 311 | ✅ | AutomationsOverview.jsx: replace SAMPLE_AUTOMATIONS hardcoded array with real AutomationChecklist entity reads | CRITICAL |
 | 312 | ⏳ | SocialProofTicker.jsx: currently shows only static stats strings — wire to real Order entity count for "X businesses automated" | MEDIUM |
-| 313 | ⏳ | WeeklyReports.jsx: verify BUILD_STEPS keys match actual ClientInstallationOS entity fields — step_onboarding, step_sms etc. may be wrong field names | HIGH |
-| 314 | ⏳ | RevenueMetricsPanel.jsx: verify it reads from real Order entities not mock data — add fallback empty state if no paid orders exist yet | HIGH |
+| 313 | 🔄 | WeeklyReports.jsx: verify BUILD_STEPS keys match actual ClientInstallationOS entity fields — step_onboarding, step_sms etc. may be wrong field names | HIGH |
+| 314 | 🔄 | RevenueMetricsPanel.jsx: verify it reads from real Order entities not mock data — add fallback empty state if no paid orders exist yet | HIGH |
 | 315 | ⏳ | TasksDashboard.jsx: confirm getClientTaskJobs function returns real data — add empty state for new clients with zero tasks | MEDIUM |
-| 316 | ⏳ | ClientPortal.jsx: getClientPortalContext is invoked — verify it returns project, order, AND subscription in a single call, not just project | HIGH |
+| 316 | 🔄 | ClientPortal.jsx: getClientPortalContext is invoked — verify it returns project, order, AND subscription in a single call, not just project | HIGH |
 | 317 | ✅ | PaymentFailedBanner component is imported in ClientPortal but never conditionally rendered — add billing_status === "past_due" check to show it | CRITICAL |
-| 318 | ⏳ | Portal tab "Automations" shows AutomationsOverview with fake data — replace with real getAutomationStatus function call | HIGH |
+| 318 | 🔄 | Portal tab "Automations" shows AutomationsOverview with fake data — replace with real getAutomationStatus function call | HIGH |
 | 319 | ⏳ | Portal WeeklyReports tab: wire generateWeeklyReport backend function to "Generate Report" button | MEDIUM |
 | 320 | ⏳ | Portal NotificationBell: verify it polls real entity for unread notifications — add badge count from real data | MEDIUM |
 
@@ -798,7 +798,7 @@
 | 327 | ✅ | Wire sendDailyDigest to a daily 8am MST automation — deployed but never scheduled | HIGH | Agent Smith |
 | 328 | ⏳ | Wire runWinBackSequence — deployed but no UI button or automation triggers it for churned clients | MEDIUM |
 | 329 | ⏳ | Wire reactivateLeadOutreach — deployed but no UI or automation triggers lead reactivation flow | MEDIUM |
-| 330 | ⏳ | Admin IntegrationHealth.jsx: call getIntegrationHealth on load — component exists but verify it's wired to the right function | HIGH |
+| 330 | 🔄 | Admin IntegrationHealth.jsx: call getIntegrationHealth on load — component exists but verify it's wired to the right function | HIGH |
 
 ---
 
@@ -857,12 +857,12 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 361 | ⏳ | Store salesCatalog.js: individual service setup_fee is $297 and monthly_fee is $97 — this conflicts with tier pricing ($497+) — document the pricing hierarchy clearly in salesCatalog comments | HIGH |
+| 361 | 🔄 | Store salesCatalog.js: individual service setup_fee is $297 and monthly_fee is $97 — this conflicts with tier pricing ($497+) — document the pricing hierarchy clearly in salesCatalog comments | HIGH |
 | 362 | ⏳ | Store GuidedPathToggle: "Explore All" mode shows all products — add a "Most Popular" sort as default | LOW |
-| 363 | ⏳ | Store BuildYourStackFlow.jsx: lazy loaded — verify it actually renders on mobile without crashing | HIGH |
-| 364 | ⏳ | CartSidebar: after successful checkout, cart items should be cleared and success state shown — verify this happens | HIGH |
+| 363 | 🔄 | Store BuildYourStackFlow.jsx: lazy loaded — verify it actually renders on mobile without crashing | HIGH |
+| 364 | 🔄 | CartSidebar: after successful checkout, cart items should be cleared and success state shown — verify this happens | HIGH |
 | 365 | ⏳ | Store StackValueCounter: verify it reads from cart context in real time — if it uses static values, replace | MEDIUM |
-| 366 | ⏳ | Store page: CANONICAL_SERVICE_PRODUCTS and AI_PRODUCTS both imported from aiProducts — aiProducts.js is only 15 lines, verify it exports what Store expects | HIGH |
+| 366 | 🔄 | Store page: CANONICAL_SERVICE_PRODUCTS and AI_PRODUCTS both imported from aiProducts — aiProducts.js is only 15 lines, verify it exports what Store expects | HIGH |
 | 367 | ⏳ | ProductCard.jsx: "Add to Cart" should be disabled for coming_soon products — verify checkout_enabled flag gates the button | MEDIUM |
 | 368 | ⏳ | Store ServiceComparisonModal: lazy loaded — add error boundary wrapper so the store doesn't crash if it fails to load | MEDIUM |
 | 369 | ✅ | CartSidebar: smsConsent checkbox is present but is it validated before checkout proceeds? Block checkout if unchecked | CRITICAL |
@@ -874,16 +874,16 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 371 | ⏳ | initializeInstallOS function is deployed — verify it is called when a new Order is created, not just manually | HIGH |
-| 372 | ⏳ | installPipeline function: wire it to Admin InstallOrderWorkspace.jsx — verify the workspace actually calls the pipeline | HIGH |
+| 371 | 🔄 | initializeInstallOS function is deployed — verify it is called when a new Order is created, not just manually | HIGH |
+| 372 | 🔄 | installPipeline function: wire it to Admin InstallOrderWorkspace.jsx — verify the workspace actually calls the pipeline | HIGH |
 | 373 | ⏳ | autoProvisionTwilioNumber is deployed — add "Auto-Provision Number" button in admin install workspace | MEDIUM |
-| 374 | ⏳ | configureService function is deployed — wire to ServiceConfigEditor.jsx in admin install panel | HIGH |
+| 374 | 🔄 | configureService function is deployed — wire to ServiceConfigEditor.jsx in admin install panel | HIGH |
 | 375 | ⏳ | getInstallConfiguration function deployed — verify InstallOrderWorkspace calls it on load to pre-populate fields | MEDIUM |
-| 376 | ⏳ | listInstallQueue function deployed — verify InstallQueuePanel.jsx calls it (not a static list) | HIGH |
-| 377 | ⏳ | sendClientWelcomeEmail deployed — verify it fires when Order goes to "paid_setup_in_progress" status, not manually | HIGH |
-| 378 | ⏳ | sendPortalWelcomeEmail deployed — verify it fires when client portal account is first created | HIGH |
+| 376 | 🔄 | listInstallQueue function deployed — verify InstallQueuePanel.jsx calls it (not a static list) | HIGH |
+| 377 | 🔄 | sendClientWelcomeEmail deployed — verify it fires when Order goes to "paid_setup_in_progress" status, not manually | HIGH |
+| 378 | 🔄 | sendPortalWelcomeEmail deployed — verify it fires when client portal account is first created | HIGH |
 | 379 | ⏳ | stalledOnboardingAlert: create a daily 9am automation that calls this function and Telegrams Nolan if any client is stalled | HIGH |
-| 380 | ⏳ | Onboarding.jsx form: currently 531 lines with no field-level validation — add required field validation before submitClientOnboarding is called | HIGH |
+| 380 | 🔄 | Onboarding.jsx form: currently 531 lines with no field-level validation — add required field validation before submitClientOnboarding is called | HIGH |
 
 ---
 
@@ -892,14 +892,14 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 381 | ✅ | autoEndToEndTest function: no auth guard found — anyone with the URL can trigger a full system test — add admin role check immediately | CRITICAL |
-| 382 | ⏳ | secureFormSubmission function exists but verify submitLeadCapture and submitContactInquiry actually call it (not duplicate logic) | HIGH |
-| 383 | ⏳ | authGuards.js shared lib exists — audit which functions import and use it vs which skip it entirely | HIGH |
+| 382 | 🔄 | secureFormSubmission function exists but verify submitLeadCapture and submitContactInquiry actually call it (not duplicate logic) | HIGH |
+| 383 | 🔄 | authGuards.js shared lib exists — audit which functions import and use it vs which skip it entirely | HIGH |
 | 384 | ✅ | webhookSecurity.js and webhookValidation shared libs exist — verify receiveTwilioInboundSms validates Twilio signature header | CRITICAL |
 | 385 | ⏳ | AuditLog entity exists in schema — verify admin actions (lead updates, order changes) actually write to it | MEDIUM |
 | 386 | ⏳ | legacyQuarantine.js shared lib exists — identify and remove all legacy function references it wraps | MEDIUM |
 | 387 | ⏳ | Base44 vite.config.js has legacySDKImports set to env var — ensure BASE44_LEGACY_SDK_IMPORTS=false in production | HIGH |
-| 388 | ⏳ | manageWebhookRegistration function deployed — ensure webhook secrets are stored encrypted, not in plain text in WebhookRegistration entity | HIGH |
-| 389 | ⏳ | sendTestLead function deployed and exposed — add admin-only guard so it cannot be called externally | HIGH |
+| 388 | 🔄 | manageWebhookRegistration function deployed — ensure webhook secrets are stored encrypted, not in plain text in WebhookRegistration entity | HIGH |
+| 389 | 🔄 | sendTestLead function deployed and exposed — add admin-only guard so it cannot be called externally | HIGH |
 | 390 | ✅ | simulateMissedCall function deployed — add admin-only guard, this function can trigger real SMS sends | CRITICAL |
 
 ---
@@ -909,15 +909,15 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 391 | ✅ | Create entity automation on Order for "create" event — triggers initializeInstallOS + sendClientWelcomeEmail automatically | CRITICAL |
-| 392 | ⏳ | Create entity automation on ClientInstallationOS for "update" event — fires stalledOnboardingAlert check when progress stalls | HIGH |
+| 392 | 🔄 | Create entity automation on ClientInstallationOS for "update" event — fires stalledOnboardingAlert check when progress stalls | HIGH |
 | 393 | ⏳ | bookingConfirmationLoop: verify it is called after every scheduleDemoBooking — sends confirmation email + SMS + creates DemoRequest record | HIGH |
-| 394 | ⏳ | processQualifiedFollowUps: verify it runs on a schedule — add daily automation if missing | HIGH |
-| 395 | ⏳ | processDripCampaigns: create scheduled automation to run every 4 hours — currently may be manual only | HIGH |
-| 396 | ⏳ | processDynamicFollowUps: verify it runs every hour for active sequences — add automation if missing | HIGH |
+| 394 | 🔄 | processQualifiedFollowUps: verify it runs on a schedule — add daily automation if missing | HIGH |
+| 395 | 🔄 | processDripCampaigns: create scheduled automation to run every 4 hours — currently may be manual only | HIGH |
+| 396 | 🔄 | processDynamicFollowUps: verify it runs every hour for active sequences — add automation if missing | HIGH |
 | 397 | ⏳ | autoSendWebhookInstructions: wire to fire when a new client Order is created — sends Twilio/webhook setup guide to client | MEDIUM |
-| 398 | ⏳ | generateWeeklyReport: create weekly Monday 8am MST automation — currently deployed but no schedule triggers it | HIGH |
-| 399 | ⏳ | sendDailyDigest: create daily 7am MST automation — deployed but unscheduled | HIGH |
-| 400 | ⏳ | Create a healthCheck automation that runs every 6 hours and posts results to AgentLog — function deployed, no trigger exists | HIGH |
+| 398 | 🔄 | generateWeeklyReport: create weekly Monday 8am MST automation — currently deployed but no schedule triggers it | HIGH |
+| 399 | 🔄 | sendDailyDigest: create daily 7am MST automation — deployed but unscheduled | HIGH |
+| 400 | 🔄 | Create a healthCheck automation that runs every 6 hours and posts results to AgentLog — function deployed, no trigger exists | HIGH |
 
 ---
 
@@ -946,28 +946,28 @@
 |---|---|---|---|
 | 401 | ✅ | stripeWebhookOrders: on checkout.session.completed, read metadata.package_key from Stripe session and write to Order.package_key — field exists in schema but is NEVER auto-set by the webhook — entire downstream pipeline is blind without it | CRITICAL |
 | 401a | ✅ | Sub-task: verify metadata.package_key is attached to the Stripe checkout session at the moment of creation in createCheckoutSession | CRITICAL |
-| 401b | ⏳ | Sub-task: add fallback — if metadata.package_key is missing, derive package_key from line items by matching price IDs against salesCatalog | HIGH |
-| 401c | ⏳ | Sub-task: write test case — create a mock checkout.session.completed event and assert Order.package_key is correctly set | HIGH |
-| 402 | ⏳ | Build classifyPurchasedPackage function — AI reads selected_service_keys[] on à la carte orders and maps to nearest tier: 2 services = starter, 4 = growth, 6 = elite. Write result to Order.package_type | HIGH |
-| 402a | ⏳ | Sub-task: define TIER_SERVICE_MAP constant with canonical service_key lists per tier | HIGH |
+| 401b | 🔄 | Sub-task: add fallback — if metadata.package_key is missing, derive package_key from line items by matching price IDs against salesCatalog | HIGH |
+| 401c | 🔄 | Sub-task: write test case — create a mock checkout.session.completed event and assert Order.package_key is correctly set | HIGH |
+| 402 | 🔄 | Build classifyPurchasedPackage function — AI reads selected_service_keys[] on à la carte orders and maps to nearest tier: 2 services = starter, 4 = growth, 6 = elite. Write result to Order.package_type | HIGH |
+| 402a | 🔄 | Sub-task: define TIER_SERVICE_MAP constant with canonical service_key lists per tier | HIGH |
 | 402b | ⏳ | Sub-task: handle edge cases — client buys 3 services (map to Growth), 5 services (map to Elite minus 1, flag for admin review) | MEDIUM |
 | 402c | ⏳ | Sub-task: log classification decision with reasoning to AgentLog | MEDIUM |
 | 403 | ✅ | stripeWebhookOrders: immediately after setting package_key, invoke initializeInstallOS — currently fully disconnected and requires manual trigger | CRITICAL |
 | 403a | ✅ | Sub-task: wrap initializeInstallOS call in try/catch so a failure does NOT return 500 to Stripe (Stripe would retry infinitely) | CRITICAL |
-| 403b | ⏳ | Sub-task: log initializeInstallOS failure to AgentLog and fire Telegram alert to Nolan | HIGH |
-| 403c | ⏳ | Sub-task: add idempotency check — if ClientInstallationOS already exists for this order_id, skip creation silently | HIGH |
-| 404 | ⏳ | sendOrderConfirmationEmail: make email body package-aware — Starter = "2 AI systems activating", Growth = "4 systems", Elite = "all 6 + custom website being built" — currently sends generic confirmation | HIGH |
-| 404a | ⏳ | Sub-task: build 3 HTML email templates (one per tier) with service checklist rendered from Order.package_service_keys | HIGH |
+| 403b | 🔄 | Sub-task: log initializeInstallOS failure to AgentLog and fire Telegram alert to Nolan | HIGH |
+| 403c | 🔄 | Sub-task: add idempotency check — if ClientInstallationOS already exists for this order_id, skip creation silently | HIGH |
+| 404 | 🔄 | sendOrderConfirmationEmail: make email body package-aware — Starter = "2 AI systems activating", Growth = "4 systems", Elite = "all 6 + custom website being built" — currently sends generic confirmation | HIGH |
+| 404a | 🔄 | Sub-task: build 3 HTML email templates (one per tier) with service checklist rendered from Order.package_service_keys | HIGH |
 | 404b | ⏳ | Sub-task: build à la carte fallback template that lists individual services from Order.items[] | MEDIUM |
-| 404c | ⏳ | Sub-task: test all 4 variants (3 tiers + à la carte) with real order_id before going live | HIGH |
-| 405 | ⏳ | sendAdminPurchaseNotification: guarantee it fires on EVERY checkout.session.completed — add explicit call with tier, business name, total revenue, and deep link to admin order view | HIGH |
-| 405a | ⏳ | Sub-task: wire Telegram message — format: "💳 New Payment: [Business] — [Tier] — $[Setup] + $[Monthly]/mo" | HIGH |
+| 404c | 🔄 | Sub-task: test all 4 variants (3 tiers + à la carte) with real order_id before going live | HIGH |
+| 405 | 🔄 | sendAdminPurchaseNotification: guarantee it fires on EVERY checkout.session.completed — add explicit call with tier, business name, total revenue, and deep link to admin order view | HIGH |
+| 405a | 🔄 | Sub-task: wire Telegram message — format: "💳 New Payment: [Business] — [Tier] — $[Setup] + $[Monthly]/mo" | HIGH |
 | 405b | ⏳ | Sub-task: wire backup email to nolan@clientsurgesystems.com in case Telegram fails | MEDIUM |
 | 426 | ✅ | validateStripeWebhookSignature: confirm stripeWebhookOrders uses stripe.webhooks.constructEvent() with STRIPE_WEBHOOK_SECRET — if env var is missing, return 500 immediately not a silent pass | CRITICAL |
 | 427 | ✅ | Add stripe_event_id idempotency check to stripeWebhookOrders — before processing any event, query Orders for existing stripe_event_id. If found, return 200 immediately — without this Stripe retries double-process payments | CRITICAL |
-| 428 | ⏳ | Handle checkout.session.expired in stripeWebhookOrders — set Order.payment_status = "expired" and send recovery email with a fresh checkout link | HIGH |
+| 428 | 🔄 | Handle checkout.session.expired in stripeWebhookOrders — set Order.payment_status = "expired" and send recovery email with a fresh checkout link | HIGH |
 | 429 | ✅ | Handle customer.subscription.deleted in stripeWebhookOrders — set Order.status = "cancelled", billing_status = "cancelled", invoke runWinBackSequence, Telegram Nolan with MRR lost | HIGH |
-| 430 | ⏳ | Handle invoice.payment_failed properly — currently sets billing_status = "past_due" but does NOT send recovery email with Stripe hosted invoice URL — add sendMissedCallRecoveryEmail call with invoice link | HIGH |
+| 430 | 🔄 | Handle invoice.payment_failed properly — currently sets billing_status = "past_due" but does NOT send recovery email with Stripe hosted invoice URL — add sendMissedCallRecoveryEmail call with invoice link | HIGH |
 
 ---
 
@@ -977,23 +977,23 @@
 |---|---|---|---|
 | 406 | ✅ | Build /setup/credentials page — post-purchase landing. Reads order_id from URL, confirms Order.payment_status = "paid", renders intake form. If order not found or unpaid, redirect to /pricing | CRITICAL |
 | 406a | ✅ | Sub-task: build the /setup/credentials route in App.jsx | CRITICAL |
-| 406b | ⏳ | Sub-task: add order validation hook on page load — fetch Order, verify payment_status | HIGH |
+| 406b | 🔄 | Sub-task: add order validation hook on page load — fetch Order, verify payment_status | HIGH |
 | 406c | ⏳ | Sub-task: add loading skeleton for the 200ms fetch delay before form renders | MEDIUM |
 | 407 | ✅ | Build tiered credentials intake form — Starter: 3 fields (business phone, business name, booking link). Growth: 6 fields (add marketing platform, Google Business Profile URL, existing website). Elite: 10 fields (add logo upload, brand primary/secondary color, target audience, AI tone selector) | CRITICAL |
-| 407a | ⏳ | Sub-task: build the Starter 3-field form variant | HIGH |
-| 407b | ⏳ | Sub-task: build the Growth 6-field form variant | HIGH |
+| 407a | 🔄 | Sub-task: build the Starter 3-field form variant | HIGH |
+| 407b | 🔄 | Sub-task: build the Growth 6-field form variant | HIGH |
 | 407c | ⏳ | Sub-task: build Elite 10-field wizard with logo upload (Base44 private storage), hex color pickers with live swatch preview, and AI tone radio buttons (Professional / Warm / Energetic) | HIGH |
 | 407d | ⏳ | Sub-task: add sessionStorage persistence between wizard steps so page refresh doesn't lose data | MEDIUM |
 | 408 | ✅ | On credentials submit, call saveClientCredentials which writes all fields into Order.install_configuration in the exact nested structure configureService expects | CRITICAL |
 | 408a | ✅ | Sub-task: map business_phone → install_configuration.twilio_business_phone | CRITICAL |
 | 408b | ✅ | Sub-task: map booking_link → install_configuration.booking.booking_link | CRITICAL |
-| 408c | ⏳ | Sub-task: map logo_url → install_configuration.brand.logo_url, primary_color → install_configuration.brand.primary_color | HIGH |
+| 408c | 🔄 | Sub-task: map logo_url → install_configuration.brand.logo_url, primary_color → install_configuration.brand.primary_color | HIGH |
 | 408d | ✅ | Sub-task: advance ClientInstallationOS.workflow_stage to "Ready for Install" after successful write | CRITICAL |
-| 409 | ⏳ | Build "Missing Credentials" daily automation — 9am MST. Queries Orders: payment_status=paid AND workflow_stage=intake_received AND created_date > 24h ago. Sends reminder email + Telegram per stalled client | HIGH |
-| 409a | ⏳ | Sub-task: write the reminder email template — warm, not alarming: "We're ready to activate your systems — we just need a few details" | HIGH |
+| 409 | 🔄 | Build "Missing Credentials" daily automation — 9am MST. Queries Orders: payment_status=paid AND workflow_stage=intake_received AND created_date > 24h ago. Sends reminder email + Telegram per stalled client | HIGH |
+| 409a | 🔄 | Sub-task: write the reminder email template — warm, not alarming: "We're ready to activate your systems — we just need a few details" | HIGH |
 | 409b | ⏳ | Sub-task: create the Base44 scheduled automation triggering this check daily | HIGH |
-| 410 | ⏳ | Build saveClientCredentials backend function — validates required fields per tier with field-specific error messages, writes to Order.install_configuration, invokes installPipeline action=advance | CRITICAL |
-| 410a | ⏳ | Sub-task: define REQUIRED_FIELDS_BY_TIER constant — Starter: [business_phone, business_name, booking_link], Growth: +3, Elite: +4 | HIGH |
+| 410 | 🔄 | Build saveClientCredentials backend function — validates required fields per tier with field-specific error messages, writes to Order.install_configuration, invokes installPipeline action=advance | CRITICAL |
+| 410a | 🔄 | Sub-task: define REQUIRED_FIELDS_BY_TIER constant — Starter: [business_phone, business_name, booking_link], Growth: +3, Elite: +4 | HIGH |
 | 410b | ⏳ | Sub-task: return structured validation errors: { field: "business_phone", message: "Required for Twilio SMS setup" } — not just a generic 400 | HIGH |
 | 410c | ⏳ | Sub-task: add admin_bypass flag — if caller is admin role, skip validation and write whatever is provided | MEDIUM |
 | 431 | ⏳ | Add multi-step progress bar to Elite intake form — "Step 1: Business Info → Step 2: Brand Assets → Step 3: Review & Confirm" — with sessionStorage persistence | MEDIUM |
