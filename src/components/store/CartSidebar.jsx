@@ -57,7 +57,7 @@ export default function CartSidebar() {
         customer_email: form.email,
         customer_phone: form.phone,
         business_name: form.business,
-        success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${window.location.origin}/client-portal?session_id={CHECKOUT_SESSION_ID}&new=1`, // #309: redirect to portal post-checkout,
         cancel_url: `${window.location.origin}/store`,
       });
 
