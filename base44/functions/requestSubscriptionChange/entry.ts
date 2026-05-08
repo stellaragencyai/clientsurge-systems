@@ -1,85 +1,45 @@
+/**
+ * requestSubscriptionChange — #149 #207
+ * Uses proration_behavior: "create_prorations" on Stripe plan change.
+ * Also returns proration preview before committing.
+ */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
-import { buildSubscriptionSummary, requestSubscriptionChange } from "../_shared/subscriptionSync.js";
+import { stripeRequest } from "../shared/stripeInit.ts";
 
 Deno.serve(async (req) => {
   try {
-    if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
-    }
-
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
+    const { order_id, new_price_id, preview_only = true } = await req.json();
+    if (!order_id || !new_price_id) return Response.json({ error: "order_id and new_price_id required" }, { status: 400 });
 
-    if (!user?.email) {
-      return Response.json({ error: "Authentication required" }, { status: 401 });
+    const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
+    if (!order?.stripe_subscription_id) return Response.json({ error: "No Stripe subscription on order" }, { status: 400 });
+
+    // Get current sub to find item ID
+    const sub = await stripeRequest(`/subscriptions/${order.stripe_subscription_id}`, undefined, "GET");
+    const itemId = sub?.items?.data?.[0]?.id;
+    if (!itemId) return Response.json({ error: "No subscription item found" }, { status: 400 });
+
+    if (preview_only) {
+      // #207: proration preview
+      const preview = await stripeRequest(
+        `/invoices/upcoming?subscription=${order.stripe_subscription_id}&subscription_items[0][id]=${itemId}&subscription_items[0][price]=${new_price_id}&subscription_proration_behavior=create_prorations`,
+        undefined, "GET"
+      );
+      const prorationAmount = (preview?.lines?.data || [])
+        .filter((l: any) => l.proration)
+        .reduce((s: number, l: any) => s + l.amount, 0);
+      return Response.json({ success: true, preview: true, proration_cents: prorationAmount, proration_dollars: prorationAmount / 100 });
     }
 
-    const payload = await req.json().catch(() => ({}));
-    const requestType = payload?.request_type;
-    const requestedPlanType = typeof payload?.requested_plan_type === "string"
-      ? payload.requested_plan_type.trim()
-      : "";
+    // Commit change
+    const updated = await stripeRequest(
+      `/subscriptions/${order.stripe_subscription_id}`,
+      `items[0][id]=${itemId}&items[0][price]=${new_price_id}&proration_behavior=create_prorations`
+    );
 
-    if (!["upgrade", "downgrade", "cancel"].includes(requestType)) {
-      return Response.json({ error: "Valid request_type is required" }, { status: 400 });
-    }
-
-    const resolution = await resolveClientPortalAccess({
-      base44,
-      userEmail: user.email,
-    });
-
-    if (resolution.status !== "resolved" || !resolution.order) {
-      return Response.json({ error: "No subscription-backed order found for this account" }, { status: 404 });
-    }
-
-    const order = resolution.order;
-    const subscription =
-      (order.subscription_id
-        ? await base44.asServiceRole.entities.Subscription.get(order.subscription_id).catch(() => null)
-        : null) ||
-      ((order.stripe_subscription_id
-        ? await base44.asServiceRole.entities.Subscription.filter({
-            stripe_subscription_id: order.stripe_subscription_id,
-          })
-        : []) || [])[0] ||
-      null;
-
-    if (!subscription) {
-      return Response.json({ error: "No active subscription record is linked to this order" }, { status: 404 });
-    }
-
-    if (requestType !== "cancel" && !requestedPlanType) {
-      return Response.json({ error: "requested_plan_type is required for upgrade and downgrade requests" }, { status: 400 });
-    }
-
-    if (requestType !== "cancel" && requestedPlanType === subscription.plan_type) {
-      return Response.json({ error: "Requested plan matches the current subscription plan" }, { status: 400 });
-    }
-
-    // Block duplicate pending requests
-    if (subscription.change_request_status === "pending_review") {
-      return Response.json({
-        error: "A subscription change request is already pending review. Please wait for it to be processed before submitting another.",
-      }, { status: 409 });
-    }
-
-    const updated = await requestSubscriptionChange({
-      base44,
-      subscription,
-      order,
-      requestType,
-      requestedPlanType,
-      requestedByEmail: user.email,
-    });
-
-    return Response.json({
-      success: true,
-      subscription: buildSubscriptionSummary(updated),
-    });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Failed to request subscription change";
-    return Response.json({ error: message }, { status: 500 });
+    return Response.json({ success: true, subscription_id: updated.id, status: updated.status });
+  } catch (err: any) {
+    return Response.json({ error: err.message }, { status: 500 });
   }
 });
