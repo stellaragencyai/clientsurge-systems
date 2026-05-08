@@ -14,6 +14,12 @@
 
 
 
+
+## 🤖 AGENT SMITH — COMPLETED BATCH 10 (May 8, 2026 — 02:58 MST)
+> Completed: #191 #199 #238 #259 #282 #286 #295 #296 #298 #303 #305 #306 #308 #309 #310 #322 #323 #324 #325 #327 #331 #334 #341 #344 #352 #353
+> Workstreams: Stripe sub.deleted handler, test mode banner, portal redirect post-checkout, Get Help tab, order tracker stages, SOP doc, weekly digest function, industry JSON-LD, local SEO + canonical, GA4 events utility, billing/cart wiring verified, lead pipeline wired, dedup in toolbar, routing panel verified, OG image fixed, testimonials localized, ticker copy fixed, automations scheduled
+---
+
 ## 🤖 AGENT SMITH — COMPLETED BATCH 9 (May 7, 2026 — 21:55 MST)
 > Completed: #99 #116 #118 #131 #133 #137 #160 #200 #212 #215 #225 #231 #247 #252 #255 #256 #261 #262 #265 #266 #269 #270 #273 #274 #277 #278 #279
 > Workstreams: Demo booking lock, slot filter, service name map, portal URL fix, 60min dedup, timeout utility, healthCheck, milestone emails, went_live email, Telegram onboarding alerts, portal components (paused banner, cancel sub, invoice download, setup progress, checklist), admin cards (LTV, churn risk, install table, quick actions), lead intelligence dashboard (real data), onboarding fields panel, robots.txt, consent fields doc, classifyLeadIntent wiring
@@ -447,12 +453,12 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 191 | 🔄 | ClientPortal: add "Get Help" support ticket tab → SupportMessage entity | HIGH |
+| 191 | ✅ | ClientPortal: add "Get Help" support ticket tab → SupportMessage entity | HIGH |
 | 192 | ⏳ | ClientPortal: add "What's New" changelog section from Changelog entity | LOW |
 | 196 | ⏳ | BillingDashboard: "Download Invoice PDF" using Stripe invoice_pdf URL | MEDIUM |
 | 197 | ⏳ | ClientPortal: add NPS score display after it's collected | LOW |
 | 198 | ⏳ | QuickStartWizard: ensure all onboarding steps link to correct help resources | MEDIUM |
-| 199 | 🔄 | ClientPortal: verify OrderTracker shows correct install stages for all service types | HIGH |
+| 199 | ✅ | ClientPortal: verify OrderTracker shows correct install stages for all service types | HIGH |
 | 200 | ✅ | ClientDashboard: add "Your Automation is Paused" warning when cadence_paused = true | HIGH |
 
 ---
@@ -526,7 +532,7 @@
 |---|---|---|---|
 | 236 | ⏳ | Write README_ENV.md documenting all required environment variables | MEDIUM |
 | 237 | ⏳ | Write RUNBOOK_OUTAGE.md: steps for Twilio/Resend/Stripe outage scenarios | MEDIUM |
-| 238 | 🔄 | Write ONBOARDING_SOP.md: step-by-step for onboarding a new client manually | HIGH |
+| 238 | ✅ | Write ONBOARDING_SOP.md: step-by-step for onboarding a new client manually | HIGH |
 | 239 | ✅ | Write STRIPE_GO_LIVE.md: checklist for switching to live Stripe keys | CRITICAL |
 | 240 | ⏳ | Update INSTALLATION_WORKFLOW_GUIDE.md with latest install OS fields | MEDIUM |
 
@@ -644,7 +650,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 259 | 🔄 | ClientPortal: build "Get Help" tab with support ticket form → creates SupportMessage entity record | HIGH |
+| 259 | ✅ | ClientPortal: build "Get Help" tab with support ticket form → creates SupportMessage entity record | HIGH |
 | 260 | ✅ | ClientPortal: build "Billing" tab — show current plan, next billing date, amount | CRITICAL |
 | 261 | ✅ | ClientPortal: "Cancel Subscription" button → redirect to Stripe customer portal URL | HIGH |
 | 262 | ✅ | ClientPortal: "Download Invoice" button → pull Stripe invoice_pdf URL and open in new tab | HIGH |
@@ -688,11 +694,11 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 282 | 🔄 | Add LocalBusiness + Service JSON-LD schema to all 6 industry pages | HIGH |
+| 282 | ✅ | Add LocalBusiness + Service JSON-LD schema to all 6 industry pages | HIGH |
 | 283 | ⏳ | Add BreadcrumbList JSON-LD schema to all inner pages | MEDIUM |
 | 284 | ✅ | Add setPageMetadata() utility — dynamic title + description + og:image per route | HIGH |
 | 285 | ✅ | Add preconnect links for fonts.googleapis.com, stripe.com, resend.com in index.html | MEDIUM |
-| 286 | 🔄 | Industry pages: include Phoenix/Scottsdale city name in H1 and meta title for local SEO | HIGH |
+| 286 | ✅ | Industry pages: include Phoenix/Scottsdale city name in H1 and meta title for local SEO | HIGH |
 | 287 | ⏳ | Create /blog with 3 pillar posts: AI Automation for Med Spas, Missed Call Text-Back Guide, How AI Books Appointments | MEDIUM |
 | 288 | ⏳ | Add twitter:card meta tags to all pages (currently only on homepage) | LOW |
 
@@ -715,10 +721,10 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 294 | ✅ | Connect GA4 property — add G- tracking ID to index.html gtag snippet | HIGH |
-| 295 | 🔄 | Track checkout button clicks as GA4 conversion events | HIGH |
-| 296 | 🔄 | Track form submissions (lead capture, contact, onboarding) as GA4 events | HIGH |
+| 295 | ✅ | Track checkout button clicks as GA4 conversion events | HIGH |
+| 296 | ✅ | Track form submissions (lead capture, contact, onboarding) as GA4 events | HIGH |
 | 297 | ⏳ | Add UTM parameter persistence — store utm_source and utm_medium on lead record at capture | MEDIUM |
-| 298 | 🔄 | Build weekly analytics digest automation — email Nolan every Monday: new leads, MRR, conversion rate, churn risk | HIGH |
+| 298 | ✅ | Build weekly analytics digest automation — email Nolan every Monday: new leads, MRR, conversion rate, churn risk | HIGH |
 
 ---
 
@@ -751,14 +757,14 @@
 |---|---|---|---|
 | 301 | ✅ | Pricing.jsx: replace all 6 test Stripe links (buy.stripe.com/test_*) with live payment links — currently LIVE SITE IS TAKING TEST PAYMENTS | CRITICAL |
 | 302 | ✅ | salesCatalog.js: audit all setup_fee and monthly_fee values — store products show $97/mo and $297 setup but tier pages show $497/mo — must be ONE source of truth | CRITICAL |
-| 303 | 🔄 | CartSidebar handleCheckout: wire to createCheckoutSession backend function — currently unclear what endpoint it calls | HIGH |
+| 303 | ✅ | CartSidebar handleCheckout: wire to createCheckoutSession backend function — currently unclear what endpoint it calls | HIGH |
 | 304 | ✅ | createCheckoutSession: verify it uses sk_live_ not sk_test_ — check STRIPE_SECRET_KEY env var is set to live key | CRITICAL |
-| 305 | 🔄 | Add Stripe Customer Portal link to BillingDashboard — getStripeCustomerPortalUrl is deployed but never called | HIGH |
-| 306 | 🔄 | getClientInvoices function is deployed — wire it to BillingDashboard so real invoice history shows (currently blank) | HIGH |
+| 305 | ✅ | Add Stripe Customer Portal link to BillingDashboard — getStripeCustomerPortalUrl is deployed but never called | HIGH |
+| 306 | ✅ | getClientInvoices function is deployed — wire it to BillingDashboard so real invoice history shows (currently blank) | HIGH |
 | 307 | ⏳ | requestSubscriptionChange function is deployed — wire "Upgrade/Downgrade" button in BillingDashboard to call it | MEDIUM |
-| 308 | 🔄 | stripeWebhookOrders: add handling for customer.subscription.deleted to set Order status = cancelled and notify Nolan | HIGH |
-| 309 | 🔄 | Add post-checkout redirect from Stripe back to /client-portal with session_id param so portal auto-loads after purchase | HIGH |
-| 310 | 🔄 | Add Stripe test mode warning banner in Admin panel — show red "TEST MODE ACTIVE" badge if STRIPE_SECRET_KEY starts with sk_test_ | HIGH |
+| 308 | ✅ | stripeWebhookOrders: add handling for customer.subscription.deleted to set Order status = cancelled and notify Nolan | HIGH |
+| 309 | ✅ | Add post-checkout redirect from Stripe back to /client-portal with session_id param so portal auto-loads after purchase | HIGH |
+| 310 | ✅ | Add Stripe test mode warning banner in Admin panel — show red "TEST MODE ACTIVE" badge if STRIPE_SECRET_KEY starts with sk_test_ | HIGH |
 
 ---
 
@@ -784,12 +790,12 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 321 | ✅ | Wire getAdminAnalytics to AdminDashboard/RevenueDashboard — function is deployed but never invoked from frontend | CRITICAL |
-| 322 | 🔄 | Wire getLeadPipelineSummary to LeadManagementDashboard — deployed but disconnected | HIGH |
-| 323 | 🔄 | Wire deduplicateLeads to a "Clean Duplicates" button in admin leads panel | HIGH |
-| 324 | 🔄 | Wire stalledOnboardingAlert to a cron automation — currently deployed but no scheduler triggers it | HIGH |
-| 325 | 🔄 | Wire monthlyClientReport to send on 1st of each month — function exists, no automation created for it | HIGH |
+| 322 | ✅ | Wire getLeadPipelineSummary to LeadManagementDashboard — deployed but disconnected | HIGH |
+| 323 | ✅ | Wire deduplicateLeads to a "Clean Duplicates" button in admin leads panel | HIGH |
+| 324 | ✅ | Wire stalledOnboardingAlert to a cron automation — currently deployed but no scheduler triggers it | HIGH |
+| 325 | ✅ | Wire monthlyClientReport to send on 1st of each month — function exists, no automation created for it | HIGH |
 | 326 | ⏳ | Wire autoSchedule30DayCheckin — deployed but no trigger exists to schedule 30-day follow-up with clients | MEDIUM |
-| 327 | 🔄 | Wire sendDailyDigest to a daily 8am MST automation — deployed but never scheduled | HIGH |
+| 327 | ✅ | Wire sendDailyDigest to a daily 8am MST automation — deployed but never scheduled | HIGH |
 | 328 | ⏳ | Wire runWinBackSequence — deployed but no UI button or automation triggers it for churned clients | MEDIUM |
 | 329 | ⏳ | Wire reactivateLeadOutreach — deployed but no UI or automation triggers lead reactivation flow | MEDIUM |
 | 330 | ⏳ | Admin IntegrationHealth.jsx: call getIntegrationHealth on load — component exists but verify it's wired to the right function | HIGH |
@@ -800,10 +806,10 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 331 | 🔄 | bulkLeadAction function is deployed — wire it to BulkActionToolbar.jsx which currently has no backend connection | HIGH |
+| 331 | ✅ | bulkLeadAction function is deployed — wire it to BulkActionToolbar.jsx which currently has no backend connection | HIGH |
 | 332 | ⏳ | importLeads function is deployed — build a CSV import UI in admin leads panel that calls it | MEDIUM |
 | 333 | ⏳ | dispatchLeadWebhook is deployed — add webhook test button in admin that fires a sample lead payload | MEDIUM |
-| 334 | 🔄 | routeLead function deployed — verify LeadRoutingPanel.jsx actually calls it and doesn't just show static routing rules | HIGH |
+| 334 | ✅ | routeLead function deployed — verify LeadRoutingPanel.jsx actually calls it and doesn't just show static routing rules | HIGH |
 | 335 | ⏳ | LeadCRMDrawer.jsx: verify it calls enrichLeadWithAI on open — should auto-enrich lead if AI fields are empty | MEDIUM |
 | 336 | ✅ | onLeadCreated function: verify it fires for EVERY new WebsiteLead — check entity automation exists and is active | CRITICAL |
 | 337 | ✅ | processWebsiteLeadFollowUps automation: verify it is ACTIVE and scheduled — this is the core follow-up engine | CRITICAL |
@@ -817,10 +823,10 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 341 | 🔄 | seo.js: DEFAULT_OG_IMAGE points to base44.com CDN — host og-image.png at clientsurgesystems.com/og-image.png and update | HIGH |
+| 341 | ✅ | seo.js: DEFAULT_OG_IMAGE points to base44.com CDN — host og-image.png at clientsurgesystems.com/og-image.png and update | HIGH |
 | 342 | ⏳ | index.html: missing viewport-fit=cover in meta viewport tag — needed for iPhone notch safe area | MEDIUM |
 | 343 | ⏳ | index.html: Space Grotesk font loaded but rarely used — remove to save 60KB on initial load | MEDIUM |
-| 344 | 🔄 | Add canonical tag to every industry page using setPageMetadata — currently setJsonLd is called but canonical may be missing | HIGH |
+| 344 | ✅ | Add canonical tag to every industry page using setPageMetadata — currently setJsonLd is called but canonical may be missing | HIGH |
 | 345 | ⏳ | MedSpa.jsx calls setPageMetadata — verify Dental, Chiro, HVAC, Roofing, Contractors pages also call it (IndustryTemplate may not) | HIGH |
 | 346 | ⏳ | SchemaMarkup.jsx getFAQSchema is used on MedSpa only — add FAQ schema to all 6 industry pages | MEDIUM |
 | 347 | ⏳ | Footer: "Tanning Salons" industry missing from footer nav links — only 5 industries listed, should be 6 | MEDIUM |
@@ -835,8 +841,8 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 351 | ⏳ | Testimonials.jsx: all 3 testimonials use Unsplash stock photos of strangers — replace with generated avatars or initials | HIGH |
-| 352 | 🔄 | Testimonials.jsx: Jessica M. is in "Miami, FL" — change all testimonial locations to Phoenix/Scottsdale, AZ for local credibility | HIGH |
-| 353 | 🔄 | SocialProofTicker says "6 automations per client" — Starter gets 2, Growth 4, Elite 6 — change to "Up to 6 automations" | HIGH |
+| 352 | ✅ | Testimonials.jsx: Jessica M. is in "Miami, FL" — change all testimonial locations to Phoenix/Scottsdale, AZ for local credibility | HIGH |
+| 353 | ✅ | SocialProofTicker says "6 automations per client" — Starter gets 2, Growth 4, Elite 6 — change to "Up to 6 automations" | HIGH |
 | 354 | ⏳ | constants.js BUTTON_TEXT.BOOK_DEMO = "Get Your Free Audit" — verify this replaces ALL former "Book Demo" references site-wide | MEDIUM |
 | 355 | ⏳ | ExitIntentPopup.jsx: verify it doesn't fire on /admin or /client-portal routes — admin should never see exit intent | MEDIUM |
 | 356 | ⏳ | CookieConsent.jsx: verify it persists dismissal in localStorage — if not, re-shows on every page visit | HIGH |
