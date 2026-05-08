@@ -1,3 +1,17 @@
+
+// #99: optimistic lock — re-fetch available slots right before confirming
+async function optimisticLockSlot(base44, scheduled_date, scheduled_time) {
+  const existing = await base44.asServiceRole.entities.DemoRequest.filter({
+    scheduled_date,
+    scheduled_time,
+    status: { $in: ['requested', 'scheduled', 'confirmed'] },
+  });
+  if (existing && existing.length > 0) {
+    throw new Error(`Time slot ${scheduled_time} on ${scheduled_date} was just taken. Please choose another time.`);
+  }
+  return true;
+}
+
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const MAX_FIELD_LENGTH = 500;
