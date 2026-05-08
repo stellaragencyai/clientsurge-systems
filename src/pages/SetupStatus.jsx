@@ -1,148 +1,113 @@
-import { useEffect, useState, useRef } from "react";
+/**
+ * SetupStatus.jsx — #434
+ * Page: /setup/status/[order_id]
+ * Shows live install progress stepper.
+ * Redirected to after credentials submission.
+ */
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { Loader2, AlertCircle, ArrowLeft } from "lucide-react";
-import SetupRoadmapStepper from "@/components/setup/SetupRoadmapStepper";
-import Navbar from "@/components/landing/Navbar";
-import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 
-const POLL_INTERVAL_MS = 30_000;
+const STAGES = [
+  { key: "Paid", label: "Payment confirmed" },
+  { key: "Configuring", label: "Setup in progress" },
+  { key: "Installing", label: "AI systems being installed" },
+  { key: "Testing", label: "Testing & verification" },
+  { key: "Live", label: "Your system is live! 🚀" },
+];
 
 export default function SetupStatus() {
-  const { orderId: routeOrderId } = useParams();
-  const urlParams = new URLSearchParams(window.location.search);
-  const orderId = routeOrderId || urlParams.get("order_id");
-
-  const [record, setRecord] = useState(null);
+  const { order_id } = useParams();
+  const [order, setOrder] = useState(null);
+  const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const pollRef = useRef(null);
 
-  const fetchRecord = async () => {
-    if (!orderId || orderId === "status") {
-      setError("No order ID provided.");
-      setLoading(false);
-      return;
-    }
+  const fetchStatus = async () => {
     try {
-      const results = await base44.entities.ClientInstallationOS.filter({ order_id: orderId });
-      if (results && results.length > 0) {
-        setRecord(results[0]);
-        setError(null);
-      } else {
-        setError("No installation record found for this order. It may still be initializing — please check back in a few minutes.");
-      }
-    } catch (e) {
-      setError("Unable to load your installation status. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+      const [orderRes, progressRes] = await Promise.all([
+        base44.functions.invoke("getOrderStatus", { order_id }),
+        base44.functions.invoke("getActivationProgress", { order_id }),
+      ]);
+      if (orderRes?.order) setOrder(orderRes.order);
+      if (progressRes) setProgress(progressRes);
+    } catch {} finally { setLoading(false); }
   };
 
   useEffect(() => {
-    fetchRecord();
-    // Poll every 30 seconds for real-time updates
-    pollRef.current = setInterval(fetchRecord, POLL_INTERVAL_MS);
-    return () => clearInterval(pollRef.current);
-  }, [orderId]);
+    fetchStatus();
+    // #424a: 30-second polling
+    const interval = setInterval(fetchStatus, 30000);
+    return () => clearInterval(interval);
+  }, [order_id]);
+
+  const currentStageIndex = STAGES.findIndex(s => s.key === order?.workflow_stage);
+
+  if (loading) return <div style={{ color: "#9CA3AF", padding: 60, textAlign: "center" }}>Loading your setup status...</div>;
 
   return (
-    <DemoBookingProvider>
-      <div style={{ minHeight: "100vh", background: "#f5f7fc", fontFamily: "'Inter', sans-serif" }}>
-        <Navbar />
-
-        <div style={{ maxWidth: "680px", margin: "0 auto", padding: "clamp(5rem,10vw,7rem) 20px 60px" }}>
-
-          {/* Back link */}
-          <a
-            href="/client-portal"
-            style={{
-              display: "inline-flex", alignItems: "center", gap: "6px",
-              fontSize: "13px", fontWeight: "600", color: "#0088CC",
-              textDecoration: "none", marginBottom: "24px",
-              opacity: 0.8,
-            }}
-          >
-            <ArrowLeft style={{ width: "14px", height: "14px" }} />
-            Back to Portal
-          </a>
-
-          {/* Page title */}
-          <div style={{ marginBottom: "28px" }}>
-            <p style={{ fontSize: "11px", fontWeight: "700", color: "#00AEEF", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 6px" }}>
-              ClientSurge Systems
-            </p>
-            <h1 style={{ fontSize: "clamp(1.6rem,5vw,2.2rem)", fontWeight: "800", color: "#0A1628", margin: 0, lineHeight: 1.2, fontFamily: "Montserrat, sans-serif" }}>
-              Your Setup Roadmap
-            </h1>
-            {record?.business_name && (
-              <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.5)", margin: "6px 0 0" }}>
-                {record.business_name}
-              </p>
-            )}
-          </div>
-
-          {/* Loading state */}
-          {loading && (
-            <div style={{
-              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-              padding: "60px 20px", background: "#ffffff", borderRadius: "20px",
-              border: "1.5px solid rgba(0,174,239,0.12)",
-              boxShadow: "0 4px 20px rgba(0,59,143,0.07)",
-            }}>
-              <Loader2 style={{ width: "32px", height: "32px", color: "#0088CC", animation: "roadmap-spin 1s linear infinite", marginBottom: "14px" }} />
-              <p style={{ fontSize: "14px", fontWeight: "600", color: "#0A1628", margin: "0 0 4px" }}>Loading your roadmap…</p>
-              <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.45)", margin: 0 }}>Fetching your installation status</p>
-            </div>
-          )}
-
-          {/* Error state */}
-          {!loading && error && (
-            <div style={{
-              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-              padding: "48px 24px", background: "#ffffff", borderRadius: "20px",
-              border: "1.5px solid rgba(239,68,68,0.18)",
-              boxShadow: "0 4px 20px rgba(0,59,143,0.07)",
-              textAlign: "center",
-            }}>
-              <AlertCircle style={{ width: "28px", height: "28px", color: "#ef4444", marginBottom: "12px" }} />
-              <p style={{ fontSize: "14px", fontWeight: "700", color: "#0A1628", margin: "0 0 6px" }}>Can't load installation record</p>
-              <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", margin: "0 0 20px", lineHeight: 1.6, maxWidth: "420px" }}>{error}</p>
-              <button
-                onClick={fetchRecord}
-                style={{
-                  padding: "10px 24px", borderRadius: "9999px", border: "1.5px solid rgba(0,136,204,0.3)",
-                  background: "rgba(0,136,204,0.06)", color: "#0088CC", fontWeight: "700", fontSize: "13px",
-                  cursor: "pointer",
-                }}
-              >
-                Try Again
-              </button>
-            </div>
-          )}
-
-          {/* Main stepper */}
-          {!loading && !error && record && (
-            <div style={{
-              borderRadius: "20px",
-              border: "1.5px solid rgba(0,174,239,0.15)",
-              boxShadow: "0 6px 32px rgba(0,59,143,0.09)",
-              overflow: "hidden",
-            }}>
-              <SetupRoadmapStepper record={record} />
-            </div>
-          )}
-
-          {/* Order ID footer */}
-          {orderId && orderId !== "status" && (
-            <p style={{ textAlign: "center", fontSize: "11px", color: "rgba(10,22,40,0.3)", marginTop: "20px" }}>
-              Order ID: {orderId} · Updates automatically every 30 seconds
-            </p>
-          )}
+    <div style={{ minHeight: "100vh", background: "#0A0F1E", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px" }}>
+      <div style={{ maxWidth: 520, width: "100%" }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>⚙️</div>
+          <h1 style={{ color: "#fff", fontSize: 24, fontWeight: 800, margin: "0 0 8px" }}>We're setting up your system</h1>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>
+            {order?.client_name ? `Hey ${order.client_name} — ` : ""}we'll email you the moment it's live.
+          </p>
         </div>
-      </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `@keyframes roadmap-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }` }} />
-    </DemoBookingProvider>
+        {/* #424b: stepper with 5 stages reading real workflow_stage */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+          {STAGES.map((stage, i) => {
+            const isDone = currentStageIndex > i;
+            const isActive = currentStageIndex === i;
+            const isPending = currentStageIndex < i;
+            return (
+              <div key={stage.key} style={{ display: "flex", alignItems: "flex-start", gap: 16, paddingBottom: i < STAGES.length - 1 ? 0 : 0 }}>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <div style={{
+                    width: 32, height: 32, borderRadius: "50%", flexShrink: 0,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    background: isDone ? "linear-gradient(135deg,#00D4FF,#00FFB3)"
+                      : isActive ? "rgba(0,212,255,0.15)"
+                      : "rgba(255,255,255,0.06)",
+                    border: isActive ? "2px solid #00D4FF" : isDone ? "none" : "1px solid rgba(255,255,255,0.1)",
+                    fontSize: 13, fontWeight: 800,
+                    color: isDone ? "#0A0F1E" : isActive ? "#00D4FF" : "rgba(255,255,255,0.3)",
+                  }}>
+                    {isDone ? "✓" : i + 1}
+                  </div>
+                  {i < STAGES.length - 1 && (
+                    <div style={{ width: 2, height: 32, background: isDone ? "linear-gradient(#00FFB3,rgba(0,212,255,0.3))" : "rgba(255,255,255,0.08)", margin: "4px 0" }} />
+                  )}
+                </div>
+                <div style={{ paddingTop: 6 }}>
+                  <p style={{ color: isDone ? "#00FFB3" : isActive ? "#fff" : "rgba(255,255,255,0.35)", fontWeight: isActive ? 700 : 500, fontSize: 14, margin: "0 0 4px" }}>
+                    {stage.label}
+                    {isActive && <span style={{ marginLeft: 8, fontSize: 11, color: "#00D4FF", fontWeight: 600 }}>← In progress</span>}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Progress bar */}
+        {progress && (
+          <div style={{ marginTop: 32, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: "16px 20px", border: "1px solid rgba(0,212,255,0.1)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+              <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 12 }}>Services activated</span>
+              <span style={{ color: "#00D4FF", fontSize: 12, fontWeight: 700 }}>{progress.configured}/{progress.total_services}</span>
+            </div>
+            <div style={{ height: 6, background: "rgba(255,255,255,0.06)", borderRadius: 999 }}>
+              <div style={{ height: "100%", width: `${progress.percent_complete || 0}%`, background: "linear-gradient(90deg,#00D4FF,#00FFB3)", borderRadius: 999, transition: "width 0.5s ease" }} />
+            </div>
+          </div>
+        )}
+
+        <p style={{ textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: 11, marginTop: 24 }}>
+          Updates every 30 seconds · Questions? Email nolan@clientsurgesystems.com
+        </p>
+      </div>
+    </div>
   );
 }
