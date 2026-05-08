@@ -134,7 +134,7 @@
 | 15 | ⏳ | DemoBookingModal time slot grid: force 2-col on viewports < 480px | MEDIUM |
 | 16 | ✅ | CookieConsent banner: add bottom: 80px on mobile to avoid MobileCallBar overlap | LOW |
 | 17 | ✅ | FAQ accordion items: add border-bottom tap target on mobile | LOW |
-| 18 | ⏳ | Industry sub-pages: ensure hero headline renders as semantic `<h1>` tag | HIGH |
+| 18 | 🔄 | Industry sub-pages: ensure hero headline renders as semantic `<h1>` tag | HIGH |
 | 19 | ⏳ | Add descriptive alt text to all hero, testimonial, and TrustBar images | MEDIUM |
 | 20 | ⏳ | Fix robots.txt: change Disallow: /leads/ to Disallow: /leads/admin | MEDIUM |
 | 21 | ⏳ | Add hreflang tag to index.html for future i18n readiness | LOW |
@@ -388,7 +388,7 @@
 | 152 | ⏳ | Register healthCheck function URL with UptimeRobot or Better Stack | HIGH |
 | 153 | ⏳ | Add Cache-Control: public, max-age=60 to read-only functions (getAdminSettings, etc.) | MEDIUM |
 | 154 | 🔄 | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | CRITICAL |
-| 155 | ⏳ | getClientAnalytics: remove/replace any hardcoded mock data with real entity queries | HIGH |
+| 155 | 🔄 | getClientAnalytics: remove/replace any hardcoded mock data with real entity queries | HIGH |
 | 156 | ⏳ | getClientPortalContext: on auth, write portal_login CommunicationEvent | LOW |
 | 157 | ⏳ | Create AuditLog entity with fields: admin_email, action, entity, before, after, timestamp | MEDIUM |
 | 158 | ⏳ | Add standardized console.log format to all functions: [functionName] message {context} | LOW |
@@ -423,15 +423,15 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 168 | ✅ | Add bulk status update to admin lead table (checkboxes + "Mark as Contacted" toolbar) — Claimed by Morpheus 2026-05-05 | HIGH |
-| 169 | ⏳ | Wire Leads.subscribe() real-time listener to auto-refresh admin leads table — Claimed by Morpheus 2026-05-05 | HIGH |
+| 169 | 🔄 | Wire Leads.subscribe() real-time listener to auto-refresh admin leads table — Claimed by Morpheus 2026-05-05 | HIGH |
 | 170 | ⏳ | Install Queue panel: show estimated completion date (install_initialized_at + 6 days) — Claimed by Morpheus 2026-05-05 | MEDIUM |
 | 171 | ⏳ | Add "Resend Welcome Email" button in client detail view → sendPortalWelcomeEmail — Claimed by Morpheus 2026-05-05 | MEDIUM |
 | 172 | ✅ | AdminSettings: add "Test Connection" buttons for Twilio + Resend → testProviderConnections — Claimed by Morpheus 2026-05-05 | HIGH |
 | 173 | ✅ | Add "Website Leads" tab in AdminDashboard showing WebsiteLead entity with filters — Claimed by Morpheus 2026-05-05 | HIGH |
 | 174 | ⏳ | Add "Override & Mark Live" button with required reason field in AutomationInstallChecklist — Claimed by Morpheus 2026-05-05 | MEDIUM |
-| 175 | ⏳ | AdminLeadDetail: add "Send Manual SMS" text area + button → sendSMS — Claimed by Morpheus 2026-05-05 | HIGH |
+| 175 | 🔄 | AdminLeadDetail: add "Send Manual SMS" text area + button → sendSMS — Claimed by Morpheus 2026-05-05 | HIGH |
 | 176 | ⏳ | AdminSettings: add "Preview Email Template" modal with sample variable substitution — Claimed by Morpheus 2026-05-05 | MEDIUM |
-| 177 | ⏳ | Admin analytics: add conversion funnel chart (Lead→Contacted→Booked→Paid) — Claimed by Morpheus 2026-05-05 | HIGH |
+| 177 | 🔄 | Admin analytics: add conversion funnel chart (Lead→Contacted→Booked→Paid) — Claimed by Morpheus 2026-05-05 | HIGH |
 | 178 | ⏳ | CommunicationLogsPanel: add "Export Logs" button → exportCommunicationLogs | MEDIUM |
 | 179 | ✅ | AdminLeads table: add lead_score column (visible, sortable, color-coded) | HIGH |
 | 180 | ✅ | Add "Demo Bookings" tab in AdminDashboard for DemoRequest management | HIGH |
@@ -494,7 +494,7 @@
 | 212 | ✅ | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | HIGH | Agent Smith |
 | 213 | ✅ | Configure Resend domain authentication (SPF, DKIM, DMARC) for deliverability | CRITICAL |
 | 213b | ✅ | Verify Twilio number is A2P 10DLC registered for commercial SMS in the US | CRITICAL |
-| 214 | ⏳ | Add Google Analytics 4 event tracking for: purchase, demo_booked, lead_submitted | HIGH |
+| 214 | 🔄 | Add Google Analytics 4 event tracking for: purchase, demo_booked, lead_submitted | HIGH |
 | 215 | ✅ | Set up error alerting: admin email on any backend function 5xx error | HIGH | Agent Smith |
 | 216 | ⏳ | Document all environment variables in a README_ENV.md file | MEDIUM |
 | 217 | ⏳ | Create runbook: what to do when Twilio is down / Resend is down / Stripe is down | MEDIUM |
@@ -512,7 +512,7 @@
 | 222 | ⏳ | Create Referral entity (referrer_client_id, referred_email, status, credit_amount) | LOW |
 | 223 | ⏳ | Add nps_score + nps_responded_at fields to ClientProject entity | MEDIUM |
 | 225 | ✅ | Add consent_given_at + consent_ip fields to Leads entity | HIGH | Agent Smith |
-| 226 | ⏳ | Verify all entity RLS rules are correct — Client entity has correct read/write rules | HIGH |
+| 226 | 🔄 | Verify all entity RLS rules are correct — Client entity has correct read/write rules | HIGH |
 | 227 | ⏳ | Add max_active_onboarding field to AdminSettings entity | MEDIUM |
 | 228 | ⏳ | Add blocked_dates array field to AdminSettings for holiday/weekend booking blocks | MEDIUM |
 | 229 | ⏳ | Add allowed_admin_ips array field to AdminSettings for IP allowlisting | LOW |
@@ -717,7 +717,7 @@
 | 289 | ⏳ | Add preconnect and dns-prefetch for Stripe, Twilio, Resend CDNs in index.html | MEDIUM |
 | 290 | ⏳ | Add manifest.json with name, icons, theme_color for PWA installability | LOW |
 | 291 | ⏳ | Add Vite manualChunks to split recharts, framer-motion, lucide into separate bundles | MEDIUM |
-| 292 | ⏳ | Add loading=lazy attribute to ALL below-fold images site-wide | HIGH |
+| 292 | 🔄 | Add loading=lazy attribute to ALL below-fold images site-wide | HIGH |
 | 293 | ⏳ | Subset Google Fonts — load only Inter 400/500/600/700 + Playfair 400/600 instead of full family | MEDIUM |
 
 ---
@@ -833,12 +833,12 @@
 | 342 | ⏳ | index.html: missing viewport-fit=cover in meta viewport tag — needed for iPhone notch safe area | MEDIUM |
 | 343 | ⏳ | index.html: Space Grotesk font loaded but rarely used — remove to save 60KB on initial load | MEDIUM |
 | 344 | ✅ | Add canonical tag to every industry page using setPageMetadata — currently setJsonLd is called but canonical may be missing | HIGH | Agent Smith |
-| 345 | ⏳ | MedSpa.jsx calls setPageMetadata — verify Dental, Chiro, HVAC, Roofing, Contractors pages also call it (IndustryTemplate may not) | HIGH |
+| 345 | 🔄 | MedSpa.jsx calls setPageMetadata — verify Dental, Chiro, HVAC, Roofing, Contractors pages also call it (IndustryTemplate may not) | HIGH |
 | 346 | ⏳ | SchemaMarkup.jsx getFAQSchema is used on MedSpa only — add FAQ schema to all 6 industry pages | MEDIUM |
 | 347 | ⏳ | Footer: "Tanning Salons" industry missing from footer nav links — only 5 industries listed, should be 6 | MEDIUM |
 | 348 | ⏳ | Footer: Roofing and Contractors pages missing from footer nav — add all active industry routes | MEDIUM |
 | 349 | ⏳ | Add /sitemap.xml route that reads from AdminSettings or returns hardcoded XML including all industry pages | MEDIUM |
-| 350 | ⏳ | Add robots.txt with correct Disallow: /admin Disallow: /client-portal Allow: / | HIGH |
+| 350 | 🔄 | Add robots.txt with correct Disallow: /admin Disallow: /client-portal Allow: / | HIGH |
 
 ---
 
@@ -851,8 +851,8 @@
 | 353 | ✅ | SocialProofTicker says "6 automations per client" — Starter gets 2, Growth 4, Elite 6 — change to "Up to 6 automations" | HIGH | Agent Smith |
 | 354 | ⏳ | constants.js BUTTON_TEXT.BOOK_DEMO = "Get Your Free Audit" — verify this replaces ALL former "Book Demo" references site-wide | MEDIUM |
 | 355 | ⏳ | ExitIntentPopup.jsx: verify it doesn't fire on /admin or /client-portal routes — admin should never see exit intent | MEDIUM |
-| 356 | ⏳ | CookieConsent.jsx: verify it persists dismissal in localStorage — if not, re-shows on every page visit | HIGH |
-| 357 | ⏳ | LeadCaptureForm: add honeypot hidden field website_url to block bots — confirmed missing from at least one form variant | HIGH |
+| 356 | 🔄 | CookieConsent.jsx: verify it persists dismissal in localStorage — if not, re-shows on every page visit | HIGH |
+| 357 | 🔄 | LeadCaptureForm: add honeypot hidden field website_url to block bots — confirmed missing from at least one form variant | HIGH |
 | 358 | ⏳ | MobileCallBar.jsx: hardcoded phone number — pull from AdminSettings.twilio_from_number instead | MEDIUM |
 | 359 | ⏳ | Hero.jsx checklist says "14 days of automated follow-up" — verify backend processDynamicFollowUps actually runs for 14 days | MEDIUM |
 | 360 | ⏳ | ScrollProgressBar.jsx: verify it only renders on long-scroll pages (homepage, industry pages) — not on /admin or portal | LOW |
@@ -888,7 +888,7 @@
 | 376 | ✅ | listInstallQueue function deployed — verify InstallQueuePanel.jsx calls it (not a static list) | HIGH  Agent Smith |
 | 377 | ✅ | sendClientWelcomeEmail deployed — verify it fires when Order goes to "paid_setup_in_progress" status, not manually | HIGH  Agent Smith |
 | 378 | ✅ | sendPortalWelcomeEmail deployed — verify it fires when client portal account is first created | HIGH  Agent Smith |
-| 379 | ⏳ | stalledOnboardingAlert: create a daily 9am automation that calls this function and Telegrams Nolan if any client is stalled | HIGH |
+| 379 | 🔄 | stalledOnboardingAlert: create a daily 9am automation that calls this function and Telegrams Nolan if any client is stalled | HIGH |
 | 380 | ✅ | Onboarding.jsx form: currently 531 lines with no field-level validation — add required field validation before submitClientOnboarding is called | HIGH  Agent Smith |
 
 ---
@@ -916,7 +916,7 @@
 |---|---|---|---|
 | 391 | ✅ | Create entity automation on Order for "create" event — triggers initializeInstallOS + sendClientWelcomeEmail automatically | CRITICAL |
 | 392 | ✅ | Create entity automation on ClientInstallationOS for "update" event — fires stalledOnboardingAlert check when progress stalls | HIGH  Agent Smith |
-| 393 | ⏳ | bookingConfirmationLoop: verify it is called after every scheduleDemoBooking — sends confirmation email + SMS + creates DemoRequest record | HIGH |
+| 393 | 🔄 | bookingConfirmationLoop: verify it is called after every scheduleDemoBooking — sends confirmation email + SMS + creates DemoRequest record | HIGH |
 | 394 | ✅ | processQualifiedFollowUps: verify it runs on a schedule — add daily automation if missing | HIGH  Agent Smith |
 | 395 | ✅ | processDripCampaigns: create scheduled automation to run every 4 hours — currently may be manual only | HIGH  Agent Smith |
 | 396 | ✅ | processDynamicFollowUps: verify it runs every hour for active sequences — add automation if missing | HIGH  Agent Smith |
@@ -1000,12 +1000,12 @@
 | 409b | ⏳ | Sub-task: create the Base44 scheduled automation triggering this check daily | HIGH |
 | 410 | ✅ | Build saveClientCredentials backend function — validates required fields per tier with field-specific error messages, writes to Order.install_configuration, invokes installPipeline action=advance | CRITICAL  Agent Smith |
 | 410a | ✅ | Sub-task: define REQUIRED_FIELDS_BY_TIER constant — Starter: [business_phone, business_name, booking_link], Growth: +3, Elite: +4 | HIGH  Agent Smith |
-| 410b | ⏳ | Sub-task: return structured validation errors: { field: "business_phone", message: "Required for Twilio SMS setup" } — not just a generic 400 | HIGH |
+| 410b | 🔄 | Sub-task: return structured validation errors: { field: "business_phone", message: "Required for Twilio SMS setup" } — not just a generic 400 | HIGH |
 | 410c | ⏳ | Sub-task: add admin_bypass flag — if caller is admin role, skip validation and write whatever is provided | MEDIUM |
 | 431 | ⏳ | Add multi-step progress bar to Elite intake form — "Step 1: Business Info → Step 2: Brand Assets → Step 3: Review & Confirm" — with sessionStorage persistence | MEDIUM |
 | 432 | ⏳ | Add hex color picker with live preview swatch to Elite form — brand.primary_color and brand.secondary_color stored in Order.install_configuration | MEDIUM |
 | 433 | ⏳ | Add Google Business Profile URL validator in intake form — must match google.com/maps or g.page pattern — used by generateClientWebsite to pull real business data | MEDIUM |
-| 434 | ⏳ | After credentials submission: redirect to /setup/status/[order_id] AND immediately send "We got your info — activating now" Resend confirmation email | HIGH |
+| 434 | 🔄 | After credentials submission: redirect to /setup/status/[order_id] AND immediately send "We got your info — activating now" Resend confirmation email | HIGH |
 
 ---
 
@@ -1014,24 +1014,24 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 411 | ✅ | installPipeline: add TIER_SERVICE_MAP gate — starter activates [instant_lead_response, missed_call_text_back]; growth adds [appointment_booking_ai, follow_up_sequences]; elite adds [review_request_automation, ai_receptionist] — currently no tier gate exists | CRITICAL |
-| 411a | ⏳ | Sub-task: define TIER_SERVICE_MAP as a shared constant accessible by both installPipeline and activateAllServices | HIGH |
+| 411a | 🔄 | Sub-task: define TIER_SERVICE_MAP as a shared constant accessible by both installPipeline and activateAllServices | HIGH |
 | 411b | ⏳ | Sub-task: add admin override — if admin manually triggers a service outside client's tier, log a warning but allow it | MEDIUM |
-| 412 | ⏳ | configureService: after each successful config, update AutomationChecklistStep.status = "complete" + completed_at timestamp + Telegram Nolan "Service configured for [Business]" | HIGH |
-| 412a | ⏳ | Sub-task: query AutomationChecklistStep by order_id + service_key to find the right record | HIGH |
+| 412 | 🔄 | configureService: after each successful config, update AutomationChecklistStep.status = "complete" + completed_at timestamp + Telegram Nolan "Service configured for [Business]" | HIGH |
+| 412a | 🔄 | Sub-task: query AutomationChecklistStep by order_id + service_key to find the right record | HIGH |
 | 412b | ⏳ | Sub-task: handle gracefully if AutomationChecklistStep record doesn't exist — create it rather than failing | MEDIUM |
 | 413 | ✅ | Build generateServiceTemplates function — AI personalization layer. Reads industry + business_name + tone_of_voice from Order.install_configuration. Generates personalized: instant SMS, missed call SMS, nurture Day 1 email, review request SMS. Writes to install_configuration | CRITICAL |
-| 413a | ⏳ | Sub-task: build OpenAI prompt for each of the 4 template types with tone + industry context | HIGH |
-| 413b | ⏳ | Sub-task: enforce 160-char hard limit on all SMS output with retry if exceeded | HIGH |
+| 413a | 🔄 | Sub-task: build OpenAI prompt for each of the 4 template types with tone + industry context | HIGH |
+| 413b | 🔄 | Sub-task: enforce 160-char hard limit on all SMS output with retry if exceeded | HIGH |
 | 413c | ⏳ | Sub-task: add character count validation and rejection before writing to install_configuration | MEDIUM |
-| 413d | ⏳ | Sub-task: add static fallback templates per industry if OpenAI call fails | HIGH |
-| 414 | ⏳ | autoProvisionTwilioNumber: trigger automatically in installPipeline when install_configuration.twilio_business_phone is empty — store provisioned number in Order + Telegram Nolan | HIGH |
+| 413d | 🔄 | Sub-task: add static fallback templates per industry if OpenAI call fails | HIGH |
+| 414 | 🔄 | autoProvisionTwilioNumber: trigger automatically in installPipeline when install_configuration.twilio_business_phone is empty — store provisioned number in Order + Telegram Nolan | HIGH |
 | 415 | ✅ | Build activateAllServices function — reads package_service_keys, calls generateServiceTemplates first, then configureService for each service in sequence with per-service error handling and no full-halt on individual failure | CRITICAL |
-| 415a | ⏳ | Sub-task: sequential execution with individual try/catch per service | HIGH |
-| 415b | ⏳ | Sub-task: track partial success — write { service_key, status, error } array to Order.activation_errors | HIGH |
-| 415c | ⏳ | Sub-task: on full completion (all services attempted), call sendGoLiveNotification | HIGH |
-| 435 | ⏳ | Build sendGoLiveNotification function — fires when all package services confirmed active. Client email: "Your systems are live" + service list + portal login link. Telegram Nolan: "[Business] is LIVE — $[MRR]/mo active" | HIGH |
-| 436 | ⏳ | Add service activation retry logic — if configureService fails, wait 5min and retry once. If fails twice: mark error, create AgentLog entry, Telegram Nolan. Do not block other services | HIGH |
-| 437 | ⏳ | Build getActivationProgress function — returns { total_services, configured, live, errored, percent_complete } — used by admin install workspace AND client activation status page | HIGH |
+| 415a | 🔄 | Sub-task: sequential execution with individual try/catch per service | HIGH |
+| 415b | 🔄 | Sub-task: track partial success — write { service_key, status, error } array to Order.activation_errors | HIGH |
+| 415c | 🔄 | Sub-task: on full completion (all services attempted), call sendGoLiveNotification | HIGH |
+| 435 | 🔄 | Build sendGoLiveNotification function — fires when all package services confirmed active. Client email: "Your systems are live" + service list + portal login link. Telegram Nolan: "[Business] is LIVE — $[MRR]/mo active" | HIGH |
+| 436 | 🔄 | Add service activation retry logic — if configureService fails, wait 5min and retry once. If fails twice: mark error, create AgentLog entry, Telegram Nolan. Do not block other services | HIGH |
+| 437 | 🔄 | Build getActivationProgress function — returns { total_services, configured, live, errored, percent_complete } — used by admin install workspace AND client activation status page | HIGH |
 | 438 | ⏳ | Add activation_started_at and activation_completed_at timestamp fields to Order — currently install_initialized_at exists but no completion timestamp exists | MEDIUM |
 
 ---
@@ -1041,23 +1041,23 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 416 | ✅ | Build generateClientWebsite backend function (AI-powered rewrite with InvokeLLM copy generation — 2026-05-08) — takes order_id, reads package_key + industry + install_configuration, returns structured WebsiteSpec object. Starter = 1-page, Growth = 3-page, Elite = 5-page interactive. Writes spec to WebsiteSpec entity | CRITICAL |
-| 416a | ⏳ | Sub-task: define WebsiteSpec JSON schema — pages array with sections, copy blocks, brand object | HIGH |
-| 416b | ⏳ | Sub-task: build the Starter 1-page spec generator (Hero + Problem + Solution + 2 Automation blocks + CTA + Footer) | HIGH |
-| 416c | ⏳ | Sub-task: build Growth 3-page spec (Home + Services + Book Now) | HIGH |
-| 416d | ⏳ | Sub-task: build Elite 5-page spec (Home + Services + Industry Landing + Client Portal Login + Lead Intelligence Dashboard) | HIGH |
-| 417 | ⏳ | Define 3 website tier templates per industry in BusinessConfigTemplate — 6 industries x 3 tiers = 18 template records. Seed via seedWebsiteTemplates function | CRITICAL |
-| 417a | ⏳ | Sub-task: write Starter template JSON for all 6 industries (med_spa, dental, hvac, chiropractic, roofing, contractors) | HIGH |
-| 417b | ⏳ | Sub-task: write Growth template JSON for all 6 industries | HIGH |
-| 417c | ⏳ | Sub-task: write Elite template JSON for all 6 industries | HIGH |
-| 417d | ⏳ | Sub-task: build seedWebsiteTemplates admin function with idempotency check | HIGH |
-| 418 | ⏳ | generateClientWebsite — Elite tier: call OpenAI to write hero headline, subheading, 3 proof points, primary CTA using { business_name, industry, tone_of_voice, target_audience } — store in WebsiteSpec.pages[0].copy | HIGH |
-| 419 | ⏳ | Auto-update ClientInstallationOS.workflow_stage as website build progresses through: intake_received → credentials_complete → templates_generating → website_building → website_review → website_approved → website_live — each transition writes a _at timestamp | HIGH |
-| 420 | ⏳ | Build /setup/preview/[order_id] page — shows AI-generated WebsiteSpec as visual mockup with section list, copy blocks, automation feature cards. Has Approve button and one-time Revision Request form | HIGH |
-| 420a | ⏳ | Sub-task: build the approve handler — sets WebsiteSpec.status = "approved", advances workflow_stage, Telegrams Nolan | HIGH |
+| 416a | 🔄 | Sub-task: define WebsiteSpec JSON schema — pages array with sections, copy blocks, brand object | HIGH |
+| 416b | 🔄 | Sub-task: build the Starter 1-page spec generator (Hero + Problem + Solution + 2 Automation blocks + CTA + Footer) | HIGH |
+| 416c | 🔄 | Sub-task: build Growth 3-page spec (Home + Services + Book Now) | HIGH |
+| 416d | 🔄 | Sub-task: build Elite 5-page spec (Home + Services + Industry Landing + Client Portal Login + Lead Intelligence Dashboard) | HIGH |
+| 417 | 🔄 | Define 3 website tier templates per industry in BusinessConfigTemplate — 6 industries x 3 tiers = 18 template records. Seed via seedWebsiteTemplates function | CRITICAL |
+| 417a | 🔄 | Sub-task: write Starter template JSON for all 6 industries (med_spa, dental, hvac, chiropractic, roofing, contractors) | HIGH |
+| 417b | 🔄 | Sub-task: write Growth template JSON for all 6 industries | HIGH |
+| 417c | 🔄 | Sub-task: write Elite template JSON for all 6 industries | HIGH |
+| 417d | 🔄 | Sub-task: build seedWebsiteTemplates admin function with idempotency check | HIGH |
+| 418 | 🔄 | generateClientWebsite — Elite tier: call OpenAI to write hero headline, subheading, 3 proof points, primary CTA using { business_name, industry, tone_of_voice, target_audience } — store in WebsiteSpec.pages[0].copy | HIGH |
+| 419 | 🔄 | Auto-update ClientInstallationOS.workflow_stage as website build progresses through: intake_received → credentials_complete → templates_generating → website_building → website_review → website_approved → website_live — each transition writes a _at timestamp | HIGH |
+| 420 | 🔄 | Build /setup/preview/[order_id] page — shows AI-generated WebsiteSpec as visual mockup with section list, copy blocks, automation feature cards. Has Approve button and one-time Revision Request form | HIGH |
+| 420a | 🔄 | Sub-task: build the approve handler — sets WebsiteSpec.status = "approved", advances workflow_stage, Telegrams Nolan | HIGH |
 | 420b | ⏳ | Sub-task: build the revision request handler — saves revision_notes, marks revision_requested = true, disables the button after one use | MEDIUM |
 | 439 | ✅ | Create WebsiteSpec entity schema — fields: order_id, package_key, industry, pages (array), brand (object with logo_url/primary_color/secondary_color/fonts), status enum (draft/approved/building/live), revision_requested (bool), revision_notes, approved_at, built_at | CRITICAL |
-| 440 | ⏳ | After client approves WebsiteSpec, auto-Telegram Nolan with spec summary and deep link to admin order view — Nolan clicks "Start Build" in admin to begin construction | HIGH |
-| 441 | ⏳ | Build applyWebsiteSpec admin function — converts WebsiteSpec JSON into a structured, pasteable Base44 editor prompt with exact component names, copy, brand colors, section order — writes to AgentLog | HIGH |
+| 440 | 🔄 | After client approves WebsiteSpec, auto-Telegram Nolan with spec summary and deep link to admin order view — Nolan clicks "Start Build" in admin to begin construction | HIGH |
+| 441 | 🔄 | Build applyWebsiteSpec admin function — converts WebsiteSpec JSON into a structured, pasteable Base44 editor prompt with exact component names, copy, brand colors, section order — writes to AgentLog | HIGH |
 | 442 | ⏳ | Build AI website copy finalizer — if client submitted revision_notes, AI regenerates only the affected sections, re-saves to WebsiteSpec, marks status = "approved" | MEDIUM |
 
 ---
@@ -1066,19 +1066,19 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 421 | ⏳ | Build generateLeadMagnet function — Elite perk #1. OpenAI generates 600-800 word industry lead magnet in markdown, converts to PDF, uploads to private storage, creates Files entity record, sends portal notification | HIGH |
-| 421a | ⏳ | Sub-task: generate 3 lead magnets (one per major pain point per industry) not just 1 | HIGH |
-| 421b | ⏳ | Sub-task: convert markdown to PDF and upload to Base44 private storage | HIGH |
+| 421 | 🔄 | Build generateLeadMagnet function — Elite perk #1. OpenAI generates 600-800 word industry lead magnet in markdown, converts to PDF, uploads to private storage, creates Files entity record, sends portal notification | HIGH |
+| 421a | 🔄 | Sub-task: generate 3 lead magnets (one per major pain point per industry) not just 1 | HIGH |
+| 421b | 🔄 | Sub-task: convert markdown to PDF and upload to Base44 private storage | HIGH |
 | 421c | ⏳ | Sub-task: create Files entity record linked to order_id and notify client via portal | MEDIUM |
-| 422 | ⏳ | Build generateMonthlyPerformanceReport function — Elite perk #2. Runs 1st of month. Queries CommunicationEvent + Lead + Order for client's project. Calculates: leads responded, response rate, bookings, revenue attributed, avg response time. Renders HTML report, emails client, saves to Reports entity | HIGH |
-| 422a | ⏳ | Sub-task: build the data queries per metric | HIGH |
-| 422b | ⏳ | Sub-task: build HTML report template with metric cards | HIGH |
+| 422 | 🔄 | Build generateMonthlyPerformanceReport function — Elite perk #2. Runs 1st of month. Queries CommunicationEvent + Lead + Order for client's project. Calculates: leads responded, response rate, bookings, revenue attributed, avg response time. Renders HTML report, emails client, saves to Reports entity | HIGH |
+| 422a | 🔄 | Sub-task: build the data queries per metric | HIGH |
+| 422b | 🔄 | Sub-task: build HTML report template with metric cards | HIGH |
 | 422c | ⏳ | Sub-task: create Reports entity and save report record | MEDIUM |
-| 422d | ⏳ | Sub-task: create monthly 1st-of-month scheduled automation | HIGH |
-| 423 | ⏳ | Build Elite voice clone intake flow — perk #3. After Elite payment, email client a Retell AI recording link. On receipt, store voice_sample_url in Order.install_configuration, create AutomationChecklistStep "Voice Clone Pending", Telegram Nolan | HIGH |
+| 422d | 🔄 | Sub-task: create monthly 1st-of-month scheduled automation | HIGH |
+| 423 | 🔄 | Build Elite voice clone intake flow — perk #3. After Elite payment, email client a Retell AI recording link. On receipt, store voice_sample_url in Order.install_configuration, create AutomationChecklistStep "Voice Clone Pending", Telegram Nolan | HIGH |
 | 424 | ✅ | Build /setup/status/[order_id] activation tracker — polls ClientInstallationOS.workflow_stage every 30 seconds. Shows vertical stepper: Payment Confirmed → Credentials Received → Systems Configuring → Website Building → All Live. Shows timestamps per step. Shows spinner on current step. Error state shows support CTA | CRITICAL |
-| 424a | ⏳ | Sub-task: build 30-second polling with useInterval hook | HIGH |
-| 424b | ⏳ | Sub-task: build the stepper component with 5 stages reading real workflow_stage field | HIGH |
+| 424a | 🔄 | Sub-task: build 30-second polling with useInterval hook | HIGH |
+| 424b | 🔄 | Sub-task: build the stepper component with 5 stages reading real workflow_stage field | HIGH |
 | 424c | ⏳ | Sub-task: build error state with "Contact Support" button that opens SupportChat | MEDIUM |
 | 425 | ✅ | Build runFullPipelineTest admin function — simulates complete purchase for each of 3 tiers using QA fixture client. Tests: webhook → package_key set → initializeInstallOS → credentials write → generateServiceTemplates → configureService x N → generateClientWebsite → sendGoLiveNotification. Logs to AgentLog. Telegrams Nolan with pass/fail per step | CRITICAL |
 | 425a | ⏳ | Sub-task: build Starter tier test fixture and assertion set | HIGH |
