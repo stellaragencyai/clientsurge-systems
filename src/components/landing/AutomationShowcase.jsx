@@ -121,273 +121,123 @@ const AUTOMATIONS = [
 }];
 
 
-// Animated SVG pipeline with traveling data pulse
+// Accent colors per automation
+const AUTOMATION_ACCENTS = [
+  "#00AEEF", // Instant Lead — electric blue
+  "#f97316", // Missed Call — orange
+  "#a855f7", // Nurture — purple
+  "#10b981", // Booking — emerald
+  "#f59e0b", // Review — amber
+  "#ef4444", // Reactivation — red
+];
+
+// Vertical card-based pipeline selector
 function PipelineStrip({ activeId, onSelect }) {
-  const activeIndex = AUTOMATIONS.findIndex((a) => a.id === activeId);
-  const [pulsePos, setPulsePos] = useState(0);
-  const animFrameRef = useRef(null);
-  const startTimeRef = useRef(null);
-  const DURATION = 3000;
-
-  useEffect(() => {
-    startTimeRef.current = null;
-    const animate = (ts) => {
-      if (!startTimeRef.current) startTimeRef.current = ts;
-      const elapsed = ts - startTimeRef.current;
-      const progress = elapsed % DURATION / DURATION;
-      setPulsePos(progress);
-      animFrameRef.current = requestAnimationFrame(animate);
-    };
-    animFrameRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(animFrameRef.current);
-  }, []);
-
-  // Node positions — evenly spaced
-  const NODE_COUNT = AUTOMATIONS.length;
-  const SVG_W = 600;
-  const SVG_H = 56;
-  const NODE_Y = SVG_H / 2;
-  const PAD = 40;
-  const spacing = (SVG_W - PAD * 2) / (NODE_COUNT - 1);
-  const nodeXs = AUTOMATIONS.map((_, i) => PAD + i * spacing);
-
-  // Pulse x position along the line
-  const pulseX = PAD + pulsePos * (SVG_W - PAD * 2);
-
   return (
-    <div className="w-full mb-10 md:mb-14">
-      {/* SVG pipeline line — desktop */}
-      <div className="hidden sm:flex justify-center">
-        <div style={{ position: "relative", width: "100%", maxWidth: 640 }}>
-          <svg
-            width="100%"
-            viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-            style={{ overflow: "visible", display: "block" }}>
-            
-            <defs>
-              <linearGradient id="pipelineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor={BRAND_COLOR} stopOpacity="0.15" />
-                <stop offset="100%" stopColor={BRAND_COLOR} stopOpacity="0.35" />
-              </linearGradient>
-              <radialGradient id="pulseGlow" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor={BRAND_COLOR} stopOpacity="0.9" />
-                <stop offset="100%" stopColor={BRAND_COLOR} stopOpacity="0" />
-              </radialGradient>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur" />
-                <feMerge>
-                  <feMergeNode in="coloredBlur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
-
-            {/* Base pipeline track */}
-            <line
-              x1={PAD} y1={NODE_Y} x2={SVG_W - PAD} y2={NODE_Y}
-              stroke="rgba(0,212,255,0.12)"
-              strokeWidth="2"
-              strokeDasharray="6 4" />
-            
-
-            {/* Lit segment — up to active node */}
-            {activeIndex > 0 &&
-            <line
-              x1={nodeXs[0]} y1={NODE_Y}
-              x2={nodeXs[activeIndex]} y2={NODE_Y}
-              stroke={BRAND_COLOR}
-              strokeWidth="2"
-              strokeOpacity="0.45" />
-
-            }
-
-            {/* Traveling pulse dot */}
-            <circle
-              cx={pulseX}
-              cy={NODE_Y}
-              r="5"
-              fill={BRAND_COLOR}
-              filter="url(#glow)"
-              opacity="0.85" />
-            
-            <circle
-              cx={pulseX}
-              cy={NODE_Y}
-              r="10"
-              fill="url(#pulseGlow)"
-              opacity="0.4" />
-            
-
-            {/* Node circles (clickable via foreignObject overlay) */}
-            {AUTOMATIONS.map((a, i) => {
-              const isActive = a.id === activeId;
-              return (
-                <g key={a.id}>
-                  {isActive &&
-                  <circle
-                    cx={nodeXs[i]}
-                    cy={NODE_Y}
-                    r="24"
-                    fill={BRAND_COLOR}
-                    opacity="0.08" />
-
-                  }
-                  <circle
-                   cx={nodeXs[i]}
-                   cy={NODE_Y}
-                   r="18"
-                   fill={isActive ? BRAND_COLOR : "rgba(255,255,255,0.06)"}
-                   stroke={isActive ? BRAND_COLOR : "rgba(0,212,255,0.2)"}
-                   strokeWidth={isActive ? "2" : "1.5"}
-                   filter={isActive ? "url(#glow)" : "none"}
-                   style={{ cursor: "pointer" }}
-                   onClick={() => onSelect(a.id)} />
-                  
-                </g>);
-
-            })}
-          </svg>
-
-          {/* Icon + label overlays positioned over SVG nodes */}
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: SVG_H,
-              pointerEvents: "none"
-            }}>
-            
-            {AUTOMATIONS.map((a, i) => {
-              const isActive = a.id === activeId;
-              const Icon = a.icon;
-              const xPct = (nodeXs[i] / SVG_W * 100).toFixed(2);
-              return (
-                <button
-                  key={a.id}
-                  type="button"
-                  onClick={() => onSelect(a.id)}
-                  style={{
-                    position: "absolute",
-                    left: `${xPct}%`,
-                    top: "50%",
-                    transform: "translate(-50%, -50%)",
-                    pointerEvents: "auto",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 36,
-                    height: 36
-                  }}>
-                  
-                  <motion.div
-                    animate={isActive ?
-                    { scale: 1.2 } :
-                    { scale: 1 }
-                    }
-                    transition={{ type: "spring", stiffness: 320, damping: 22 }}>
-                    
-                    <Icon
-                      style={{
-                        width: 16,
-                        height: 16,
-                        color: isActive ? "#040d1a" : BRAND_COLOR,
-                        opacity: isActive ? 1 : 0.7
-                      }} />
-                    
-                  </motion.div>
-                </button>);
-
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Labels row */}
-      <div className="hidden sm:flex justify-center mt-3">
-        <div style={{ width: "100%", maxWidth: 640, display: "flex", justifyContent: "space-between", padding: `0 ${PAD - 20}px` }}>
-          {AUTOMATIONS.map((a) => {
-            const isActive = a.id === activeId;
-            return (
-              <button
-                key={a.id}
-                type="button"
-                onClick={() => onSelect(a.id)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  textAlign: "center",
-                  width: 72,
-                  marginLeft: -16,
-                  padding: 0
-                }}>
-                
-                <span
-                  style={{
-                    display: "block",
-                    fontSize: 10,
-                    fontWeight: isActive ? 700 : 500,
-                    color: isActive ? BRAND_COLOR : "rgba(0,0,0,0.4)",
-                    lineHeight: 1.3,
-                    transition: "color 0.2s ease"
-                  }}>
-                  
-                  {a.title.split(" ").slice(0, 2).join(" ")}
-                </span>
-              </button>);
-
-          })}
-        </div>
-      </div>
-
-      {/* Mobile horizontal scroll fallback */}
-      <div className="sm:hidden flex gap-3 overflow-x-auto pb-2 px-2">
-        {AUTOMATIONS.map((a) => {
+    <div className="w-full mb-10 md:mb-12">
+      {/* Desktop: vertical card list on left, content on right — but here we do horizontal pills row */}
+      <div className="flex flex-col gap-2">
+        {AUTOMATIONS.map((a, i) => {
           const isActive = a.id === activeId;
           const Icon = a.icon;
+          const accent = AUTOMATION_ACCENTS[i];
           return (
-            <button
+            <motion.button
               key={a.id}
               type="button"
               onClick={() => onSelect(a.id)}
-              className="flex flex-col items-center gap-1.5 flex-shrink-0 focus:outline-none">
-              
-              <div
-                style={{
-                  width: 44, height: 44, borderRadius: 14,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  background: isActive ? BRAND_COLOR : "rgba(0,136,204,0.07)",
-                  border: isActive ? "none" : "1.5px solid rgba(0,136,204,0.18)",
-                  boxShadow: isActive ? `0 0 0 3px rgba(0,136,204,0.2), 0 0 22px rgba(0,136,204,0.35)` : "none",
-                  transition: "all 0.25s ease"
-                }}>
-                
-                <Icon style={{ width: 18, height: 18, color: isActive ? "#ffffff" : BRAND_COLOR }} />
-              </div>
-              <span style={{ fontSize: 10, fontWeight: isActive ? 700 : 500, color: isActive ? BRAND_COLOR : "rgba(0,0,0,0.4)", textAlign: "center", maxWidth: 60, lineHeight: 1.3 }}>
-                {a.title.split(" ").slice(0, 2).join(" ")}
-              </span>
-            </button>);
+              whileHover={{ x: isActive ? 0 : 4 }}
+              transition={{ type: "spring", stiffness: 400, damping: 28 }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "14px",
+                padding: "14px 18px",
+                borderRadius: "14px",
+                border: isActive ? `1.5px solid ${accent}40` : "1.5px solid rgba(0,0,0,0.07)",
+                background: isActive
+                  ? `linear-gradient(135deg, ${accent}12 0%, ${accent}06 100%)`
+                  : "rgba(255,255,255,0.6)",
+                cursor: "pointer",
+                textAlign: "left",
+                width: "100%",
+                position: "relative",
+                overflow: "hidden",
+                boxShadow: isActive
+                  ? `0 4px 20px ${accent}22, inset 0 1px 0 rgba(255,255,255,0.6)`
+                  : "0 1px 4px rgba(0,0,0,0.05)",
+                transition: "background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease",
+              }}>
 
+              {/* Left accent bar */}
+              <div style={{
+                position: "absolute",
+                left: 0, top: 0, bottom: 0,
+                width: isActive ? "4px" : "0px",
+                background: `linear-gradient(to bottom, ${accent}, ${accent}88)`,
+                borderRadius: "14px 0 0 14px",
+                transition: "width 0.25s ease",
+              }} />
+
+              {/* Icon badge */}
+              <div style={{
+                width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: isActive ? `${accent}20` : "rgba(0,0,0,0.05)",
+                border: isActive ? `1.5px solid ${accent}40` : "1.5px solid rgba(0,0,0,0.08)",
+                boxShadow: isActive ? `0 0 12px ${accent}40` : "none",
+                transition: "all 0.25s ease",
+              }}>
+                <Icon style={{ width: 18, height: 18, color: isActive ? accent : "rgba(0,0,0,0.4)" }} />
+              </div>
+
+              {/* Text */}
+              <div className="flex-1 min-w-0">
+                <p style={{
+                  fontSize: "13px",
+                  fontWeight: isActive ? 700 : 600,
+                  color: isActive ? "#0a1628" : "rgba(0,0,0,0.55)",
+                  margin: 0,
+                  lineHeight: 1.2,
+                  transition: "color 0.2s ease",
+                }}>{a.title}</p>
+                <p style={{
+                  fontSize: "11px",
+                  color: isActive ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.35)",
+                  margin: "2px 0 0",
+                  lineHeight: 1.3,
+                  transition: "color 0.2s ease",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  textOverflow: "ellipsis",
+                }}>{a.tagline}</p>
+              </div>
+
+              {/* Step number */}
+              <div style={{
+                flexShrink: 0,
+                width: 24, height: 24, borderRadius: "50%",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: isActive ? accent : "rgba(0,0,0,0.06)",
+                fontSize: "10px",
+                fontWeight: 800,
+                color: isActive ? "#fff" : "rgba(0,0,0,0.35)",
+                transition: "all 0.25s ease",
+              }}>{i + 1}</div>
+            </motion.button>
+          );
         })}
       </div>
-
-      <p className="text-center text-[11px] mt-4 tracking-wide text-muted-foreground">
+      <p className="text-center text-[11px] mt-5 tracking-wide text-muted-foreground">
         One connected pipeline — each system hands off to the next
       </p>
-    </div>);
-
+    </div>
+  );
 }
 
-// Flow diagram with Lucide icons + line-draw connectors
-function AnimatedFlowDiagram({ automation }) {
+// Flow diagram with dark glassmorphism treatment
+function AnimatedFlowDiagram({ automation, accent }) {
   const [visibleStep, setVisibleStep] = useState(-1);
-  const [hovered, setHovered] = useState(false);
   const intervalRef = useRef(null);
 
   useEffect(() => {
@@ -412,22 +262,26 @@ function AnimatedFlowDiagram({ automation }) {
 
   return (
     <div
-      className="rounded-2xl p-5 flex flex-col gap-3 h-full"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      className="rounded-2xl p-6 flex flex-col gap-4 h-full"
       style={{
-        background: "hsl(var(--card))",
-        border: "1px solid hsl(var(--border))",
-        boxShadow: hovered
-          ? "0 12px 40px rgba(0,136,204,0.15), 0 0 0 1px rgba(0,136,204,0.2)"
-          : "0 4px 16px rgba(0,0,0,0.08)",
-        transform: hovered ? "translateY(-4px) scale(1.01)" : "translateY(0) scale(1)",
-        transition: "transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease",
+        background: "linear-gradient(150deg, #0d1f3c 0%, #0a1a30 50%, #07121f 100%)",
+        border: `1px solid ${accent}30`,
+        boxShadow: `0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px ${accent}18, inset 0 1px 0 rgba(255,255,255,0.06)`,
       }}>
-      
-      <p className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: BRAND_COLOR }}>
-        Live Flow
-      </p>
+
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div style={{
+          width: 8, height: 8, borderRadius: "50%",
+          background: accent,
+          boxShadow: `0 0 10px ${accent}`,
+          animation: "flowPulse 2s ease-in-out infinite",
+        }} />
+        <p style={{ fontSize: "11px", fontWeight: 800, color: accent, textTransform: "uppercase", letterSpacing: "0.22em", margin: 0 }}>
+          Live Flow
+        </p>
+      </div>
+
       <div className="flex flex-col gap-0" style={{ position: "relative" }}>
         {automation.steps.map((step, i) => {
           const Icon = step.icon;
@@ -438,53 +292,47 @@ function AnimatedFlowDiagram({ automation }) {
           return (
             <div key={i} className="flex items-stretch gap-3">
               {/* Left column: icon + animated line */}
-              <div className="flex flex-col items-center" style={{ width: 36 }}>
+              <div className="flex flex-col items-center" style={{ width: 38 }}>
                 <motion.div
                   initial={{ scale: 0, opacity: 0 }}
-                  animate={isVisible ?
-                  { scale: 1, opacity: 1 } :
-                  { scale: 0.6, opacity: 0.15 }
-                  }
+                  animate={isVisible ? { scale: 1, opacity: 1 } : { scale: 0.6, opacity: 0.2 }}
                   transition={{ type: "spring", stiffness: 400, damping: 22 }}
                   style={{
-                    width: 36, height: 36, borderRadius: 10,
+                    width: 38, height: 38, borderRadius: 11,
                     display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                    background: isVisible ? `rgba(0,136,204,0.1)` : "rgba(0,0,0,0.03)",
-                    border: `1.5px solid ${isVisible ? "rgba(0,136,204,0.3)" : "rgba(0,0,0,0.08)"}`,
-                    boxShadow: isActive ? `0 0 14px rgba(0,136,204,0.35)` : "none",
-                    position: "relative"
+                    background: isVisible ? `${accent}20` : "rgba(255,255,255,0.04)",
+                    border: `1.5px solid ${isVisible ? `${accent}50` : "rgba(255,255,255,0.08)"}`,
+                    boxShadow: isActive ? `0 0 18px ${accent}50` : "none",
+                    position: "relative",
                   }}>
-                  
-                  <Icon style={{ width: 16, height: 16, color: isVisible ? BRAND_COLOR : "rgba(0,0,0,0.25)" }} />
-                  {isActive &&
-                  <motion.div
-                    style={{
-                      position: "absolute", inset: -3, borderRadius: 13,
-                      border: `1.5px solid ${BRAND_COLOR}`,
-                      opacity: 0
-                    }}
-                    animate={{ opacity: [0, 0.6, 0], scale: [0.9, 1.15, 0.9] }}
-                    transition={{ duration: 0.9, repeat: 2 }} />
-
-                  }
+                  <Icon style={{ width: 16, height: 16, color: isVisible ? accent : "rgba(255,255,255,0.2)" }} />
+                  {isActive && (
+                    <motion.div
+                      style={{
+                        position: "absolute", inset: -4, borderRadius: 15,
+                        border: `1.5px solid ${accent}`,
+                        opacity: 0,
+                      }}
+                      animate={{ opacity: [0, 0.7, 0], scale: [0.9, 1.2, 0.9] }}
+                      transition={{ duration: 1, repeat: 2 }} />
+                  )}
                 </motion.div>
 
-                {/* Animated line-draw connector */}
-                {!isLast &&
-                <div style={{ width: 2, flex: 1, minHeight: 18, position: "relative", margin: "3px 0", overflow: "hidden" }}>
+                {/* Animated line connector */}
+                {!isLast && (
+                  <div style={{ width: 2, flex: 1, minHeight: 18, position: "relative", margin: "3px 0", overflow: "hidden" }}>
                     <motion.div
-                    style={{
-                      position: "absolute", top: 0, left: 0, right: 0,
-                      background: `linear-gradient(to bottom, ${BRAND_COLOR}, rgba(0,174,239,0.3))`,
-                      borderRadius: 2
-                    }}
-                    initial={{ height: "0%" }}
-                    animate={i < visibleStep ? { height: "100%" } : { height: "0%" }}
-                    transition={{ duration: 0.4, ease: "easeOut" }} />
-                  
-                    <div style={{ position: "absolute", inset: 0, background: "rgba(0,174,239,0.08)", borderRadius: 2 }} />
+                      style={{
+                        position: "absolute", top: 0, left: 0, right: 0,
+                        background: `linear-gradient(to bottom, ${accent}, ${accent}40)`,
+                        borderRadius: 2,
+                      }}
+                      initial={{ height: "0%" }}
+                      animate={i < visibleStep ? { height: "100%" } : { height: "0%" }}
+                      transition={{ duration: 0.4, ease: "easeOut" }} />
+                    <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.05)", borderRadius: 2 }} />
                   </div>
-                }
+                )}
               </div>
 
               {/* Text */}
@@ -493,16 +341,16 @@ function AnimatedFlowDiagram({ automation }) {
                 initial={{ opacity: 0, x: -10 }}
                 animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0.15, x: -6 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}>
-                
-                <p className="text-sm font-semibold leading-tight text-foreground">{step.label}</p>
-                <p className="text-xs mt-0.5 text-muted-foreground">{step.sub}</p>
+                <p style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.92)", margin: 0, lineHeight: 1.3 }}>{step.label}</p>
+                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.42)", margin: "2px 0 0" }}>{step.sub}</p>
               </motion.div>
-            </div>);
-
+            </div>
+          );
         })}
       </div>
-    </div>);
-
+      <style>{`@keyframes flowPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }`}</style>
+    </div>
+  );
 }
 
 // Before/After card
@@ -586,6 +434,8 @@ export default function AutomationShowcase() {
   const [activeId, setActiveId] = useState(AUTOMATIONS[0].id);
   const [rippleKey, setRippleKey] = useState(null);
   const active = AUTOMATIONS.find((a) => a.id === activeId);
+  const activeIndex = AUTOMATIONS.findIndex((a) => a.id === activeId);
+  const accent = AUTOMATION_ACCENTS[activeIndex];
 
   const handleSelect = (id) => {
     if (id === activeId) return;
@@ -595,8 +445,8 @@ export default function AutomationShowcase() {
 
   return (
     <section className="py-20 md:py-28 overflow-hidden" style={{ position: "relative" }}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6" style={{ position: "relative", zIndex: 1 }}>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6" style={{ position: "relative", zIndex: 1 }}>
         {/* Header */}
         <div className="text-center mb-14">
           <p className="text-xs font-bold tracking-[0.3em] uppercase mb-4" style={{ color: BRAND_COLOR }}>
@@ -605,9 +455,8 @@ export default function AutomationShowcase() {
           <h2
             className="font-bold tracking-tight leading-tight"
             style={{ fontSize: "clamp(2rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif" }}>
-            
             One System.{" "}
-            <span style={{ 
+            <span style={{
               background: "linear-gradient(135deg, #0088CC, #003B8F)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -618,70 +467,88 @@ export default function AutomationShowcase() {
             Zero Leads Lost.
           </h2>
           <p className="mt-4 text-base md:text-lg max-w-2xl mx-auto leading-relaxed text-muted-foreground">
-            Click any automation to see exactly how it works and what it changes for your business.
+            Select any automation to see exactly how it works and what it changes for your business.
           </p>
         </div>
 
-        {/* Pipeline Strip */}
-        <PipelineStrip activeId={activeId} onSelect={handleSelect} />
+        {/* Main layout: left rail (selector) + right panel (detail) */}
+        <div className="grid md:grid-cols-[340px_1fr] gap-8 items-start">
 
-        {/* Active automation detail */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeId}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}>
-            
-            {/* Hero bar with ripple */}
-            <div
-              className="rounded-2xl p-6 mb-6 flex items-center gap-4"
-              style={{
-                background: `linear-gradient(135deg, #001f5c 0%, #003B8F 45%, #0055b3 100%)`,
-                border: "1px solid rgba(0,212,255,0.2)",
-                boxShadow: "0 8px 40px rgba(0,59,143,0.5), 0 0 0 1px rgba(0,212,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06)",
-                position: "relative",
-                overflow: "hidden"
-              }}>
-              
-              {rippleKey &&
-              <RippleEffect
-                key={rippleKey}
-                color="#ffffff"
-                onDone={() => setRippleKey(null)} />
+          {/* Left: Vertical card selector */}
+          <PipelineStrip activeId={activeId} onSelect={handleSelect} />
 
-              }
+          {/* Right: Detail panel */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeId}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="flex flex-col gap-5">
 
-              <motion.div
-                key={activeId + "-icon"}
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0"
-                style={{ position: "relative", zIndex: 2 }}>
-                
-                <active.icon className="w-6 h-6 text-white" />
-              </motion.div>
+              {/* Hero bar */}
+              <div
+                className="rounded-2xl p-6 flex items-center gap-4"
+                style={{
+                  background: `linear-gradient(135deg, #0a1628 0%, #0d1f40 50%, #0a1830 100%)`,
+                  border: `1px solid ${accent}35`,
+                  boxShadow: `0 8px 40px rgba(0,0,0,0.35), 0 0 0 1px ${accent}15, inset 0 1px 0 rgba(255,255,255,0.05)`,
+                  position: "relative",
+                  overflow: "hidden",
+                }}>
 
-              <div className="flex-1 min-w-0" style={{ position: "relative", zIndex: 2 }}>
-                <h3 className="text-xl md:text-2xl font-bold text-white leading-tight">{active.title}</h3>
-                <p className="text-white/85 text-sm mt-0.5">{active.tagline}</p>
+                {/* Accent glow blob */}
+                <div style={{
+                  position: "absolute", top: "-30%", right: "-10%",
+                  width: "200px", height: "200px", borderRadius: "50%",
+                  background: `radial-gradient(circle, ${accent}25 0%, transparent 70%)`,
+                  pointerEvents: "none",
+                }} />
+
+                {rippleKey && <RippleEffect key={rippleKey} color={accent} onDone={() => setRippleKey(null)} />}
+
+                <motion.div
+                  key={activeId + "-icon"}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                  style={{
+                    width: 52, height: 52, borderRadius: 16, flexShrink: 0,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    background: `${accent}25`,
+                    border: `1.5px solid ${accent}50`,
+                    boxShadow: `0 0 20px ${accent}40`,
+                    position: "relative", zIndex: 2,
+                  }}>
+                  <active.icon style={{ width: 24, height: 24, color: accent }} />
+                </motion.div>
+
+                <div className="flex-1 min-w-0" style={{ position: "relative", zIndex: 2 }}>
+                  <h3 className="text-xl md:text-2xl font-bold leading-tight" style={{ color: "#ffffff" }}>{active.title}</h3>
+                  <p style={{ color: "rgba(255,255,255,0.65)", fontSize: "13px", marginTop: 2 }}>{active.tagline}</p>
+                </div>
+                <div className="hidden sm:flex flex-col items-end flex-shrink-0" style={{ position: "relative", zIndex: 2 }}>
+                  <span style={{
+                    fontSize: "10px", fontWeight: 800, color: accent,
+                    textTransform: "uppercase", letterSpacing: "0.15em",
+                    background: `${accent}18`, border: `1px solid ${accent}35`,
+                    padding: "3px 10px", borderRadius: "999px",
+                  }}>
+                    Step {activeIndex + 1} of 6
+                  </span>
+                </div>
               </div>
-              <div className="hidden sm:block text-right flex-shrink-0" style={{ position: "relative", zIndex: 2 }}>
-                <p className="text-white/60 text-[10px] uppercase tracking-widest mb-1">Pipeline Step</p>
-                <p className="text-white font-bold text-lg">{AUTOMATIONS.findIndex((a) => a.id === activeId) + 1} of 6</p>
-              </div>
-            </div>
 
-            {/* 2-col: flow diagram + before/after */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <AnimatedFlowDiagram automation={active} key={activeId} />
-              <BeforeAfterStat automation={active} />
-            </div>
-          </motion.div>
-        </AnimatePresence>
+              {/* 2-col: flow + before/after */}
+              <div className="grid sm:grid-cols-2 gap-5">
+                <AnimatedFlowDiagram automation={active} accent={accent} key={activeId} />
+                <BeforeAfterStat automation={active} />
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
-    </section>);
-
+    </section>
+  );
 }
