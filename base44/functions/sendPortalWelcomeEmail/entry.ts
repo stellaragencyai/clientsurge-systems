@@ -13,6 +13,8 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+// #234: verified — fires when client portal account is first created/activated
+// #378: called from stripeWebhookOrders after Order paid + ClientInstallationOS initialized
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
