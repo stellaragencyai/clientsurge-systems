@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
     }
 
     // Generate dashboard URL
-    const dashboardUrl = `${new URL(req.url).origin}/client-dashboard`;
+    const dashboardUrl = `https://clientsurgesystems.com/client-portal?order_id=${order_id}`; // #133: correct portal URL with order_id
 
     // Send email via Resend
     const response = await fetch("https://api.resend.com/emails", {
