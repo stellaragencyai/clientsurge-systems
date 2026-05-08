@@ -23,14 +23,17 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
 
+    // #102: safe fallbacks for all template variables
     const {
       customer_email,
-      customer_name,
-      business_name,
-      order_id,
-      items = [],
-      total_setup,
-      total_monthly,
+      customer_name   = "Valued Client",
+      business_name   = "Your Business",
+      order_id        = "N/A",
+      items           = [],
+      total_setup     = 0,
+      total_monthly   = 0,
+      package_key     = "starter",
+      industry        = "your industry",
     } = body;
 
     if (!customer_email) {
