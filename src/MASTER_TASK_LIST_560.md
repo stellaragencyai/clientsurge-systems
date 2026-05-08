@@ -146,16 +146,16 @@
 | 7 | ✅ | Add `<link rel="preload">` for hero image in index.html | HIGH |
 | 8 | ✅ | Split recharts/framer-motion into separate Vite chunks via manualChunks | MEDIUM  Agent Smith |
 | 9 | ✅ | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | MEDIUM  Agent Smith |
-| 10 | ⏳ | Store page: implement intersection-observer lazy rendering for 8+ products | MEDIUM |
+| 10 | 🔄 | Store page: implement intersection-observer lazy rendering for 8+ products | MEDIUM |
 | 11 | ✅ | Build out pages/ThankYou — currently a blank page | HIGH |
 | 12 | ✅ | Add Navbar to LegalPage — currently renders with no header/branding | MEDIUM  Agent Smith |
 | 13 | ⏳ | Standardize all form inputs to rounded-xl (12px) globally | LOW |
 | 14 | ✅ | ClientPortal loading state: replace raw spinner with branded skeleton | MEDIUM  Agent Smith |
-| 15 | ⏳ | DemoBookingModal time slot grid: force 2-col on viewports < 480px | MEDIUM |
+| 15 | 🔄 | DemoBookingModal time slot grid: force 2-col on viewports < 480px | MEDIUM |
 | 16 | ✅ | CookieConsent banner: add bottom: 80px on mobile to avoid MobileCallBar overlap | LOW |
 | 17 | ✅ | FAQ accordion items: add border-bottom tap target on mobile | LOW |
 | 18 | ✅ | Industry sub-pages: ensure hero headline renders as semantic `<h1>` tag | HIGH  Agent Smith |
-| 19 | ⏳ | Add descriptive alt text to all hero, testimonial, and TrustBar images | MEDIUM |
+| 19 | 🔄 | Add descriptive alt text to all hero, testimonial, and TrustBar images | MEDIUM |
 | 20 | ✅ | Fix robots.txt: change Disallow: /leads/ to Disallow: /leads/admin | MEDIUM  Agent Smith |
 | 21 | ⏳ | Add hreflang tag to index.html for future i18n readiness | LOW |
 | 22 | ✅ | Stub /blog route with 3 placeholder posts for organic SEO | MEDIUM  Agent Smith |
@@ -169,12 +169,12 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 26 | ⏳ | Add dark mode ☀️/🌙 toggle to Navbar desktop + mobile menu | MEDIUM |
+| 26 | 🔄 | Add dark mode ☀️/🌙 toggle to Navbar desktop + mobile menu | MEDIUM |
 | 27 | 🔄 | Implement ThemeProvider from next-themes so dark mode class is actually applied | HIGH |
 | 28 | 🔄 | Standardize primary CTAs to blue gradient; gold = store/checkout only | MEDIUM |
 | 29 | ✅ | Redesign PageNotFound (404) with logo, links, search bar | MEDIUM  Agent Smith |
 | 30 | ⏳ | Add framer-motion + canvas-confetti to Contact page success state | LOW |
-| 31 | ⏳ | pages/Industries: add gradient hero section with industry grid icons | MEDIUM |
+| 31 | 🔄 | pages/Industries: add gradient hero section with industry grid icons | MEDIUM |
 | 32 | ⏳ | Industry pages: give each card a unique accent color or icon style | LOW |
 | 33 | ✅ | Mobile sticky cart bar: add padding-top: 72px to main content when visible | MEDIUM  Agent Smith |
 | 34 | ✅ | AdminDashboard sidebar: add active-state highlight on current route | MEDIUM  Agent Smith |
@@ -182,7 +182,7 @@
 | 36 | ✅ | Add favicon (32x32 + 180x180) and apple-touch-icon to index.html | HIGH |
 | 37 | ⏳ | GuidedPathToggle: add Tooltip explaining Guided vs Explore All modes | LOW |
 | 38 | ✅ | ClientPortal tabs: "Setup Progress" is now first tab and default landing tab on login | DONE |
-| 39 | ⏳ | Industry pages CTAs: use industry-specific headline copy from industryData.js | MEDIUM |
+| 39 | 🔄 | Industry pages CTAs: use industry-specific headline copy from industryData.js | MEDIUM |
 | 40 | ⏳ | Mobile nav: show logged-in user name/role after nav links | LOW |
 
 ---
@@ -196,7 +196,7 @@
 | 43 | 🔄 | CartSidebar: apply acquireBodyScrollLock("cart-sidebar") on open, release on close | HIGH |
 | 44 | ⏳ | Mobile sticky cart bar: add circular badge with items.length count | LOW |
 | 45 | ✅ | Store page: add "Talk to a Human" escape valve CTA below product grid | MEDIUM  Agent Smith |
-| 46 | ⏳ | AdminDashboard sidebar: wire AdminGlobalSearch to all entity types | MEDIUM |
+| 46 | 🔄 | AdminDashboard sidebar: wire AdminGlobalSearch to all entity types | MEDIUM |
 | 47 | 🔄 | Store SocialProofTicker: verify data is from real Orders (not hardcoded) | MEDIUM |
 | 48 | ⏳ | CartSidebar: show empty state with top 3 popular nudge tiles | LOW |
 | 49 | ✅ | Store: Guided mode with no industry selected should show all non-coming-soon products | MEDIUM  Agent Smith |
@@ -211,7 +211,7 @@
 | 51 | 🔄 | pages/Book Calendly iframe: set width:100%, height:700px, scrolling:yes | HIGH |
 | 52 | ✅ | MobileCallBar: pull phone number from AdminSettings instead of hardcoding | MEDIUM  Agent Smith |
 | 53 | 🔄 | Audit all form inputs for iOS zoom issue (font-size < 16px) | HIGH |
-| 54 | ⏳ | DemoBookingModal step 2: set min-height:48px on date/time inputs | MEDIUM |
+| 54 | 🔄 | DemoBookingModal step 2: set min-height:48px on date/time inputs | MEDIUM |
 | 55 | 🔄 | pages/Book Calendly: test CSP allows calendly.com frames on live domain | HIGH |
 
 ---
@@ -235,7 +235,7 @@
 |---|---|---|---|
 | 62 | ⏳ | Add manifest.json + minimal service worker for PWA installability | LOW |
 | 63 | ✅ | Move all Recharts imports inside lazy() components — audit AdminDashboard/Portal | MEDIUM  Agent Smith |
-| 64 | ⏳ | Add ?w=800&q=80 Unsplash query params + srcSet to all hero/industry images | MEDIUM |
+| 64 | 🔄 | Add ?w=800&q=80 Unsplash query params + srcSet to all hero/industry images | MEDIUM |
 | 65 | 🔄 | Remove three.js from package.json if not actively used (saves ~600KB) | HIGH |
 | 66 | ✅ | Subset Google Fonts: Inter 400/500/600/700 + Playfair 400/600/700 only | MEDIUM  Agent Smith |
 
@@ -247,9 +247,9 @@
 |---|---|---|---|
 | 67 | ✅ | ClientPortal: add "Get Help" tab with support ticket form → SupportMessage entity | HIGH |
 | 68 | ⏳ | ClientPortal: add "What's New" section reading from Changelog entity | LOW |
-| 69 | ⏳ | ClientPortal: add "Refer a Business" section with unique referral link | MEDIUM |
+| 69 | 🔄 | ClientPortal: add "Refer a Business" section with unique referral link | MEDIUM |
 | 70 | ✅ | BillingDashboard: add "Cancel Subscription" → getStripeCustomerPortalUrl redirect | HIGH |
-| 71 | ⏳ | BillingDashboard: add "Download Invoice PDF" using Stripe invoice_pdf URL | MEDIUM |
+| 71 | 🔄 | BillingDashboard: add "Download Invoice PDF" using Stripe invoice_pdf URL | MEDIUM |
 | 72 | ✅ | ClientPortal: show "payment failed" banner when billing_status === "past_due" | HIGH |
 
 ---
@@ -258,16 +258,16 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 73 | ⏳ | chatBubbleAI: add typing indicator ("...") while LLM processes response | MEDIUM |
+| 73 | 🔄 | chatBubbleAI: add typing indicator ("...") while LLM processes response | MEDIUM |
 | 74 | ✅ | chatBubbleAI: add sessionStorage counter, block after 10 messages per session | HIGH |
-| 75 | ⏳ | Add session timeout warning modal after 30min admin inactivity | MEDIUM |
+| 75 | 🔄 | Add session timeout warning modal after 30min admin inactivity | MEDIUM |
 | 76 | ✅ | Verify Stripe publishable key is ONLY in frontend (not sk_live_ anywhere) | CRITICAL |
 | 77 | ✅ | Portal graceful empty state — no navigation errors on null project | DONE |
 | 78 | ✅ | Add cookie consent to all public lead capture forms | HIGH |
-| 79 | ⏳ | pages/Success: verify content is correct and not stale | MEDIUM |
-| 80 | ⏳ | Onboarding page: ensure form validates all required fields before submit | MEDIUM |
-| 81 | ⏳ | All pages: verify meta description is unique (not default fallback) | MEDIUM |
-| 83 | ⏳ | pages/Industries: verify all 6 industry cards link to correct routes | MEDIUM |
+| 79 | 🔄 | pages/Success: verify content is correct and not stale | MEDIUM |
+| 80 | 🔄 | Onboarding page: ensure form validates all required fields before submit | MEDIUM |
+| 81 | 🔄 | All pages: verify meta description is unique (not default fallback) | MEDIUM |
+| 83 | 🔄 | pages/Industries: verify all 6 industry cards link to correct routes | MEDIUM |
 
 ---
 
@@ -288,7 +288,7 @@
 | 87 | ✅ | submitLeadCapture: normalize phone to E.164 (+1 prefix, reject < 10 digits) | HIGH |
 | 88 | ✅ | Add consent_given_at + consent_ip fields to WebsiteLead/Leads entities | HIGH |
 | 89 | ✅ | Capture X-Forwarded-For IP in submitLeadCapture and store as consent_ip | HIGH |
-| 90 | ⏳ | Add IP allowlist option in AdminSettings for admin panel access | MEDIUM |
+| 90 | 🔄 | Add IP allowlist option in AdminSettings for admin panel access | MEDIUM |
 | 91 | ✅ | Create autoArchiveOldLeads: anonymize WebsiteLead records > 365 days old | MEDIUM  Agent Smith |
 | 92 | ✅ | Ensure honeypot website_url field is in ALL public forms (LeadCaptureForm, CaptureLeads) | HIGH |
 | 93 | ✅ | Add X-Frame-Options: DENY header to all backend function responses | MEDIUM  Agent Smith |
@@ -327,7 +327,7 @@
 | 112 | ✅ | Extend autoEndToEndTest: full checkout → webhook → email → status flow with cleanup | HIGH  Agent Smith |
 | 113 | ✅ | sendDailyDigest: add gate — skip send if leads_today === 0 AND orders_today === 0 | LOW  Agent Smith |
 | 114 | ✅ | All Resend fetch calls: add retry once on 429/5xx with 2-second delay | HIGH |
-| 115 | ⏳ | monthlyClientReport: after generating report, email it to the client | MEDIUM |
+| 115 | 🔄 | monthlyClientReport: after generating report, email it to the client | MEDIUM |
 | 116 | ✅ | getBookedDemoSlots: add {scheduled_date: selectedDate} filter — don't fetch all records | HIGH | Agent Smith |
 | 117 | ✅ | Create sendNPSSurvey function: triggered 7 days after order_status = "fully_live" | MEDIUM  Agent Smith |
 
@@ -427,7 +427,7 @@
 | 164 | ✅ | Add data validation: Order.total_monthly must equal sum of item monthly_fees | MEDIUM  Agent Smith |
 | 165 | ✅ | Ensure AutomationChecklist records are created for every paid service | MEDIUM  Agent Smith |
 | 166 | ✅ | Verify pipeline_status and order_status stay in sync after every transition | HIGH |
-| 167 | ⏳ | Run deduplicateLeads on all existing Leads records to clean up database | MEDIUM |
+| 167 | 🔄 | Run deduplicateLeads on all existing Leads records to clean up database | MEDIUM |
 
 ---
 
@@ -444,18 +444,18 @@
 |---|---|---|---|
 | 168 | ✅ | Add bulk status update to admin lead table (checkboxes + "Mark as Contacted" toolbar) — Claimed by Morpheus 2026-05-05 | HIGH |
 | 169 | ✅ | Wire Leads.subscribe() real-time listener to auto-refresh admin leads table — Claimed by Morpheus 2026-05-05 | HIGH  Agent Smith |
-| 170 | ⏳ | Install Queue panel: show estimated completion date (install_initialized_at + 6 days) — Claimed by Morpheus 2026-05-05 | MEDIUM |
-| 171 | ⏳ | Add "Resend Welcome Email" button in client detail view → sendPortalWelcomeEmail — Claimed by Morpheus 2026-05-05 | MEDIUM |
+| 170 | 🔄 | Install Queue panel: show estimated completion date (install_initialized_at + 6 days) — Claimed by Morpheus 2026-05-05 | MEDIUM |
+| 171 | 🔄 | Add "Resend Welcome Email" button in client detail view → sendPortalWelcomeEmail — Claimed by Morpheus 2026-05-05 | MEDIUM |
 | 172 | ✅ | AdminSettings: add "Test Connection" buttons for Twilio + Resend → testProviderConnections — Claimed by Morpheus 2026-05-05 | HIGH |
 | 173 | ✅ | Add "Website Leads" tab in AdminDashboard showing WebsiteLead entity with filters — Claimed by Morpheus 2026-05-05 | HIGH |
-| 174 | ⏳ | Add "Override & Mark Live" button with required reason field in AutomationInstallChecklist — Claimed by Morpheus 2026-05-05 | MEDIUM |
+| 174 | 🔄 | Add "Override & Mark Live" button with required reason field in AutomationInstallChecklist — Claimed by Morpheus 2026-05-05 | MEDIUM |
 | 175 | ✅ | AdminLeadDetail: add "Send Manual SMS" text area + button → sendSMS — Claimed by Morpheus 2026-05-05 | HIGH  Agent Smith |
-| 176 | ⏳ | AdminSettings: add "Preview Email Template" modal with sample variable substitution — Claimed by Morpheus 2026-05-05 | MEDIUM |
+| 176 | 🔄 | AdminSettings: add "Preview Email Template" modal with sample variable substitution — Claimed by Morpheus 2026-05-05 | MEDIUM |
 | 177 | ✅ | Admin analytics: add conversion funnel chart (Lead→Contacted→Booked→Paid) — Claimed by Morpheus 2026-05-05 | HIGH  Agent Smith |
-| 178 | ⏳ | CommunicationLogsPanel: add "Export Logs" button → exportCommunicationLogs | MEDIUM |
+| 178 | 🔄 | CommunicationLogsPanel: add "Export Logs" button → exportCommunicationLogs | MEDIUM |
 | 179 | ✅ | AdminLeads table: add lead_score column (visible, sortable, color-coded) | HIGH |
 | 180 | ✅ | Add "Demo Bookings" tab in AdminDashboard for DemoRequest management | HIGH |
-| 181 | ⏳ | AdminLeadDetail: add "Enroll in Nurture" button → startNurtureCampaign | MEDIUM |
+| 181 | 🔄 | AdminLeadDetail: add "Enroll in Nurture" button → startNurtureCampaign | MEDIUM |
 | 182 | ✅ | Add "Failed Jobs" section in AdminAutomation showing AutomationJob failures + Retry | HIGH |
 | 183 | ✅ | AdminLeads: mask phone numbers as (602) ***-3227 for non-super-admin users | MEDIUM  Agent Smith |
 | 184 | ✅ | Create AuditLog viewer tab in AdminDashboard for tracking all admin actions | MEDIUM  Agent Smith |
@@ -468,7 +468,7 @@
 |---|---|---|---|
 | 185 | ✅ | AdminOnboarding: add client search/filter by business name or email | MEDIUM  Agent Smith |
 | 186 | ✅ | AdminOnboarding: show pipeline_status badge prominently on each client card | HIGH |
-| 187 | ⏳ | InstallQueuePanel: add "Assign to Admin" dropdown for each pending install | MEDIUM |
+| 187 | 🔄 | InstallQueuePanel: add "Assign to Admin" dropdown for each pending install | MEDIUM |
 | 188 | ✅ | AutomationInstallChecklist: add progress bar showing % of checklist items complete | MEDIUM  Agent Smith |
 | 189 | ✅ | Admin: add one-click "Initialize Install OS" button for newly paid orders | HIGH |
 | 190 | ✅ | Admin: show warning badge when order has been paid > 2 days with no install started | HIGH |
@@ -483,7 +483,7 @@
 | 192 | ⏳ | ClientPortal: add "What's New" changelog section from Changelog entity | LOW |
 | 196 | ✅ | BillingDashboard: "Download Invoice PDF" using Stripe invoice_pdf URL | MEDIUM  Agent Smith |
 | 197 | ⏳ | ClientPortal: add NPS score display after it's collected | LOW |
-| 198 | ⏳ | QuickStartWizard: ensure all onboarding steps link to correct help resources | MEDIUM |
+| 198 | 🔄 | QuickStartWizard: ensure all onboarding steps link to correct help resources | MEDIUM |
 | 199 | ✅ | ClientPortal: verify OrderTracker shows correct install stages for all service types | HIGH | Agent Smith |
 | 200 | ✅ | ClientDashboard: add "Your Automation is Paused" warning when cadence_paused = true | HIGH | Agent Smith |
 
@@ -501,7 +501,7 @@
 | 206 | 🔄 | getStripeCustomerPortalUrl: verify it returns working URL for all paid customers | HIGH |
 | 207 | ✅ | Stripe proration: implement preview before plan change in requestSubscriptionChange | MEDIUM  Agent Smith |
 | 208 | ✅ | Verify Stripe metadata includes base44_app_id on all checkout sessions | HIGH  Agent Smith |
-| 209 | ⏳ | Add Stripe customer ID to ClientProject for portal billing lookups | MEDIUM |
+| 209 | 🔄 | Add Stripe customer ID to ClientProject for portal billing lookups | MEDIUM |
 | 210 | ✅ | Verify all Stripe webhook event types are handled (created, updated, deleted, failed) | HIGH  Agent Smith |
 
 ---
@@ -516,7 +516,7 @@
 | 213b | ✅ | Verify Twilio number is A2P 10DLC registered for commercial SMS in the US | CRITICAL |
 | 214 | ✅ | Add Google Analytics 4 event tracking for: purchase, demo_booked, lead_submitted | HIGH  Agent Smith |
 | 215 | ✅ | Set up error alerting: admin email on any backend function 5xx error | HIGH | Agent Smith |
-| 216 | ⏳ | Document all environment variables in a README_ENV.md file | MEDIUM |
+| 216 | 🔄 | Document all environment variables in a README_ENV.md file | MEDIUM |
 | 217 | ⏳ | Create runbook: what to do when Twilio is down / Resend is down / Stripe is down | MEDIUM |
 | 218 | ✅ | Verify all secrets are set in production (not just dev) environment | CRITICAL |
 | 219 | ⏳ | Load test: simulate 50 concurrent lead submissions and measure response time | MEDIUM |
@@ -527,15 +527,15 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 220 | ⏳ | Create AuditLog entity (admin_email, action, entity_name, record_id, before, after, timestamp) | MEDIUM |
-| 221 | ⏳ | Create Changelog entity (title, description, date, is_published) for client portal | LOW |
-| 222 | ⏳ | Create Referral entity (referrer_client_id, referred_email, status, credit_amount) | LOW |
-| 223 | ⏳ | Add nps_score + nps_responded_at fields to ClientProject entity | MEDIUM |
+| 220 | 🔄 | Create AuditLog entity (admin_email, action, entity_name, record_id, before, after, timestamp) | MEDIUM |
+| 221 | 🔄 | Create Changelog entity (title, description, date, is_published) for client portal | LOW |
+| 222 | 🔄 | Create Referral entity (referrer_client_id, referred_email, status, credit_amount) | LOW |
+| 223 | 🔄 | Add nps_score + nps_responded_at fields to ClientProject entity | MEDIUM |
 | 225 | ✅ | Add consent_given_at + consent_ip fields to Leads entity | HIGH | Agent Smith |
 | 226 | ✅ | Verify all entity RLS rules are correct — Client entity has correct read/write rules | HIGH  Agent Smith |
-| 227 | ⏳ | Add max_active_onboarding field to AdminSettings entity | MEDIUM |
-| 228 | ⏳ | Add blocked_dates array field to AdminSettings for holiday/weekend booking blocks | MEDIUM |
-| 229 | ⏳ | Add allowed_admin_ips array field to AdminSettings for IP allowlisting | LOW |
+| 227 | 🔄 | Add max_active_onboarding field to AdminSettings entity | MEDIUM |
+| 228 | 🔄 | Add blocked_dates array field to AdminSettings for holiday/weekend booking blocks | MEDIUM |
+| 229 | 🔄 | Add allowed_admin_ips array field to AdminSettings for IP allowlisting | LOW |
 
 ---
 
@@ -543,12 +543,12 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 230 | ⏳ | Create sendNPSSurvey function — email 7 days after fully_live with 1-10 rating link | MEDIUM |
+| 230 | 🔄 | Create sendNPSSurvey function — email 7 days after fully_live with 1-10 rating link | MEDIUM |
 | 231 | ✅ | Entity automation: ClientProject workflow_stage change → send milestone email | HIGH | Agent Smith |
-| 232 | ⏳ | Entity automation: Order fully_live → trigger sendNPSSurvey after 7-day delay | MEDIUM |
+| 232 | 🔄 | Entity automation: Order fully_live → trigger sendNPSSurvey after 7-day delay | MEDIUM |
 | 233 | ✅ | Verify sendClientWelcomeEmail includes correct client portal URL + temp access instructions | HIGH  Agent Smith |
 | 234 | ✅ | Verify sendPortalWelcomeEmail is triggered automatically after order is paid | HIGH  Agent Smith |
-| 235 | ⏳ | Create Changelog entity records: add first 3 "What's New" entries for portal | LOW |
+| 235 | 🔄 | Create Changelog entity records: add first 3 "What's New" entries for portal | LOW |
 
 ---
 
@@ -556,11 +556,11 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 236 | ⏳ | Write README_ENV.md documenting all required environment variables | MEDIUM |
-| 237 | ⏳ | Write RUNBOOK_OUTAGE.md: steps for Twilio/Resend/Stripe outage scenarios | MEDIUM |
+| 236 | 🔄 | Write README_ENV.md documenting all required environment variables | MEDIUM |
+| 237 | 🔄 | Write RUNBOOK_OUTAGE.md: steps for Twilio/Resend/Stripe outage scenarios | MEDIUM |
 | 238 | ✅ | Write ONBOARDING_SOP.md: step-by-step for onboarding a new client manually | HIGH | Agent Smith |
 | 239 | ✅ | Write STRIPE_GO_LIVE.md: checklist for switching to live Stripe keys | CRITICAL |
-| 240 | ⏳ | Update INSTALLATION_WORKFLOW_GUIDE.md with latest install OS fields | MEDIUM |
+| 240 | 🔄 | Update INSTALLATION_WORKFLOW_GUIDE.md with latest install OS fields | MEDIUM |
 
 ---
 
@@ -573,7 +573,7 @@
 | 243 | ✅ | Final: test all CTA buttons across mobile (375px, 390px, 414px) | HIGH  Agent Smith |
 | 244 | ✅ | Final: verify all email templates render correctly in Gmail, Outlook, Apple Mail | HIGH  Agent Smith |
 | 245 | 🔄 | Final: test complete lead → SMS → follow-up → booking flow with test lead | CRITICAL |
-| 246 | ⏳ | Final: verify admin panel loads in < 3 seconds with 100+ leads in database | MEDIUM |
+| 246 | 🔄 | Final: verify admin panel loads in < 3 seconds with 100+ leads in database | MEDIUM |
 | 247 | ✅ | Final: confirm robots.txt is correct and sitemap is submitted to Google Search Console | HIGH | Agent Smith |
 | 248 | ✅ | Final: review all legal pages (Privacy, Terms) for accuracy and TCPA compliance | CRITICAL |
 | 249 | 🔄 | Final: do a full purchase test with a real card → verify order, emails, SMS all fire | CRITICAL |
