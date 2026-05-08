@@ -127,6 +127,7 @@ async function createChecklistSteps(base44, checklistId, orderId, serviceKey) {
   console.log(`[Install OS] Steps for "${serviceKey}" [template v${BACKEND_TEMPLATE_VERSION}]: ${created} created, ${skipped} skipped (already existed)`);
   return { created, skipped };
 }
+// #371: verified — called from stripeWebhookOrders when new Order is created
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
