@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 const PLANS = {
@@ -76,6 +77,8 @@ function AnimatedCheckmark({ visible }) {
 }
 
 export default function ThankYou() {
+  const [searchParams] = useSearchParams();
+  const orderId = searchParams.get("order_id") || searchParams.get("session_id");
   const [visible, setVisible] = useState(false);
 
   const params = new URLSearchParams(window.location.search);
@@ -405,6 +408,26 @@ export default function ThankYou() {
           }}
         >
           ← Back to Home
+        </Link>
+        {orderId && (
+          <Link
+            to={`/setup/credentials?order_id=${orderId}`}
+            style={{
+              display: "inline-block",
+              marginTop: "16px",
+              padding: "14px 36px",
+              borderRadius: "9999px",
+              background: "linear-gradient(135deg, #7C3AED, #00D4FF)",
+              color: "#fff",
+              fontWeight: "800",
+              fontSize: "15px",
+              textDecoration: "none",
+              boxShadow: "0 8px 32px rgba(124,58,237,0.3)",
+            }}
+          >
+            Set Up My Account →
+          </Link>
+        )
         </Link>
       </div>
     </div>
