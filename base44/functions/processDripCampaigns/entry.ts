@@ -14,7 +14,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
-const STOP_STATUSES = ["Qualified", "Booking Prompt Sent", "Booked", "Closed"];
+const STOP_STATUSES = ["Qualified", "Booking Prompt Sent", "Booked", "Closed", "Won", "Lost", "opted_out"]; // #96
 
 const STEPS = [
   { key: "day1", hoursRequired: 24,  sentAtField: "day1_sent_at", statusField: "day1_status" },
