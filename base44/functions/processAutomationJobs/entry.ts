@@ -9,6 +9,40 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+// #114: Resend with retry on 429/5xx
+async function resendWithRetry(payload, apiKey, retries = 1) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) return res.json();
+    if ((res.status === 429 || res.status >= 500) && attempt < retries) {
+      await new Promise(r => setTimeout(r, 2000));
+      continue;
+    }
+    const err = await res.json().catch(() => ({}));
+    throw new Error(`Resend ${res.status}: ${err?.message || "unknown"}`);
+  }
+}
+
+// #123: exponential backoff retry wrapper for jobs
+const MAX_RETRIES_JOB = 3;
+async function withRetry(fn, label = "job") {
+  for (let attempt = 1; attempt <= MAX_RETRIES_JOB; attempt++) {
+    try { return await fn(); }
+    catch (err) {
+      const delay = Math.pow(2, attempt - 1) * 1000;
+      console.warn(`[AutomationJobs] ${label} attempt ${attempt}/${MAX_RETRIES_JOB} failed: ${err.message}${attempt < MAX_RETRIES_JOB ? `, retrying in ${delay}ms` : " — giving up"}`);
+      if (attempt === MAX_RETRIES_JOB) throw err;
+      await new Promise(r => setTimeout(r, delay));
+    }
+  }
+}
+
+
+
 const MAX_JOBS_PER_RUN = 25;
 const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
 const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
