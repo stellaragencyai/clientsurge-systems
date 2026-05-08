@@ -3,6 +3,8 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL");
 
+// #233: verified — includes correct /client-portal URL and temp access instructions
+// #377: fires when Order goes to paid_setup_in_progress (called from stripeWebhookOrders)
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
