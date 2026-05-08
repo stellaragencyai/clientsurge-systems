@@ -16,6 +16,20 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+
+// #97: 23-hour idempotency guard — prevents duplicate nurture sends
+const IDEMPOTENCY_WINDOW_MS = 23 * 3600000;
+async function wasRecentlySent(base44, leadId, stepKey) {
+  const since = new Date(Date.now() - IDEMPOTENCY_WINDOW_MS).toISOString();
+  const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
+    { context_id: leadId, context_type: "nurture" }, "-created_date", 10
+  ).catch(() => []);
+  return (events || []).some(e => {
+    try { return JSON.parse(e.metadata_json || "{}").step_key === stepKey && e.created_date > since; }
+    catch { return false; }
+  });
+}
+
 // Inlined from _shared/automationSecurity.js (relative imports not supported in deployed Deno runtime)
 function constantTimeEqual(left, right) {
   if (typeof left !== "string" || typeof right !== "string" || left.length !== right.length) return false;
