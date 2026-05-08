@@ -11,6 +11,14 @@
 
 
 
+
+## 🤖 AGENT SMITH — COMPLETED BATCH 7 (May 7, 2026 — 20:30 MST)
+> Completed: #11 #35 #56 #57 #67 #74 #78 #260 #263 #276 #391 #424 #425 #476 #479 #486 #487 #488 #491 #496 #542
+> Skipped: #51 #55 (Calendly — per Nolan instruction)
+> Pending manual: #65 (three.js removal — requires npm uninstall in repo)
+> Workstreams: SMS compliance, AI safety, self-healing monitor, E2E test, ElevenLabs, portal tabs, cookie consent, SEO schemas, testimonial fallbacks, entity automations
+---
+
 ## 🤖 AGENT SMITH — COMPLETED BATCH 6 (May 7, 2026 — 15:50 MST)
 > Completed: #439 #461 #413 #415 #445 #416 #446 #468
 > Workstream: WebsiteSpec entity, generateServiceTemplates, activateAllServices, generateClientWebsite, stripePaymentWebhook
@@ -95,7 +103,7 @@
 | 8 | ⏳ | Split recharts/framer-motion into separate Vite chunks via manualChunks | MEDIUM |
 | 9 | ⏳ | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | MEDIUM |
 | 10 | ⏳ | Store page: implement intersection-observer lazy rendering for 8+ products | MEDIUM |
-| 11 | 🔄 | Build out pages/ThankYou — currently a blank page | HIGH |
+| 11 | ✅ | Build out pages/ThankYou — currently a blank page | HIGH |
 | 12 | ⏳ | Add Navbar to LegalPage — currently renders with no header/branding | MEDIUM |
 | 13 | ⏳ | Standardize all form inputs to rounded-xl (12px) globally | LOW |
 | 14 | ⏳ | ClientPortal loading state: replace raw spinner with branded skeleton | MEDIUM |
@@ -126,7 +134,7 @@
 | 32 | ⏳ | Industry pages: give each card a unique accent color or icon style | LOW |
 | 33 | ⏳ | Mobile sticky cart bar: add padding-top: 72px to main content when visible | MEDIUM |
 | 34 | ⏳ | AdminDashboard sidebar: add active-state highlight on current route | MEDIUM |
-| 35 | 🔄 | Testimonials: replace broken image URLs with initials-based avatar fallbacks | HIGH |
+| 35 | ✅ | Testimonials: replace broken image URLs with initials-based avatar fallbacks | HIGH |
 | 36 | ✅ | Add favicon (32x32 + 180x180) and apple-touch-icon to index.html | HIGH |
 | 37 | ⏳ | GuidedPathToggle: add Tooltip explaining Guided vs Explore All modes | LOW |
 | 38 | ✅ | ClientPortal tabs: "Setup Progress" is now first tab and default landing tab on login | DONE |
@@ -168,8 +176,8 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 56 | 🔄 | Industry pages: inject LocalBusiness + Service JSON-LD schema markup | HIGH |
-| 57 | 🔄 | Generate og:image (1200x630) and add to index.html + setPageMetadata | HIGH |
+| 56 | ✅ | Industry pages: inject LocalBusiness + Service JSON-LD schema markup | HIGH |
+| 57 | ✅ | Generate og:image (1200x630) and add to index.html + setPageMetadata | HIGH |
 | 58 | ⏳ | Industry page titles: include city/location for local SEO signals | MEDIUM |
 | 59 | ⏳ | Add internal linking: Footer cross-links industry pages; Store links to industry pages | MEDIUM |
 | 60 | ✅ | sitemap.xml: add all industry pages and core routes | DONE |
@@ -193,7 +201,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 67 | 🔄 | ClientPortal: add "Get Help" tab with support ticket form → SupportMessage entity | HIGH |
+| 67 | ✅ | ClientPortal: add "Get Help" tab with support ticket form → SupportMessage entity | HIGH |
 | 68 | ⏳ | ClientPortal: add "What's New" section reading from Changelog entity | LOW |
 | 69 | ⏳ | ClientPortal: add "Refer a Business" section with unique referral link | MEDIUM |
 | 70 | ✅ | BillingDashboard: add "Cancel Subscription" → getStripeCustomerPortalUrl redirect | HIGH |
@@ -207,11 +215,11 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 73 | ⏳ | chatBubbleAI: add typing indicator ("...") while LLM processes response | MEDIUM |
-| 74 | 🔄 | chatBubbleAI: add sessionStorage counter, block after 10 messages per session | HIGH |
+| 74 | ✅ | chatBubbleAI: add sessionStorage counter, block after 10 messages per session | HIGH |
 | 75 | ⏳ | Add session timeout warning modal after 30min admin inactivity | MEDIUM |
 | 76 | ✅ | Verify Stripe publishable key is ONLY in frontend (not sk_live_ anywhere) | CRITICAL |
 | 77 | ✅ | Portal graceful empty state — no navigation errors on null project | DONE |
-| 78 | 🔄 | Add cookie consent to all public lead capture forms | HIGH |
+| 78 | ✅ | Add cookie consent to all public lead capture forms | HIGH |
 | 79 | ⏳ | pages/Success: verify content is correct and not stale | MEDIUM |
 | 80 | ⏳ | Onboarding page: ensure form validates all required fields before submit | MEDIUM |
 | 81 | ⏳ | All pages: verify meta description is unique (not default fallback) | MEDIUM |
@@ -625,10 +633,10 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 259 | ⏳ | ClientPortal: build "Get Help" tab with support ticket form → creates SupportMessage entity record | HIGH |
-| 260 | 🔄 | ClientPortal: build "Billing" tab — show current plan, next billing date, amount | CRITICAL |
+| 260 | ✅ | ClientPortal: build "Billing" tab — show current plan, next billing date, amount | CRITICAL |
 | 261 | ⏳ | ClientPortal: "Cancel Subscription" button → redirect to Stripe customer portal URL | HIGH |
 | 262 | ⏳ | ClientPortal: "Download Invoice" button → pull Stripe invoice_pdf URL and open in new tab | HIGH |
-| 263 | 🔄 | ClientPortal: show red PaymentFailedBanner when Order billing_status === "past_due" | CRITICAL |
+| 263 | ✅ | ClientPortal: show red PaymentFailedBanner when Order billing_status === "past_due" | CRITICAL |
 | 264 | ⏳ | ClientPortal: build "Refer a Business" tab with unique referral link generated per client | MEDIUM |
 | 265 | ⏳ | ClientPortal: AutomationChecklist — display live checklist progress pulled from AutomationChecklist entity | HIGH |
 | 266 | ⏳ | ClientPortal: show "Setup Progress" bar driven by real ClientInstallationOS fields (twilio_configured, etc.) | HIGH |
@@ -655,7 +663,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 276 | 🔄 | Build InstallChecklistPanel component — reads AutomationChecklist entity fields and renders live progress | CRITICAL |
+| 276 | ✅ | Build InstallChecklistPanel component — reads AutomationChecklist entity fields and renders live progress | CRITICAL |
 | 277 | ⏳ | Wire onboarding_complete, went_live, twilio_configured fields to admin UI — currently invisible | HIGH |
 | 278 | ⏳ | Auto-send "You're Live!" email via Resend when went_live is set to true on a ClientOnboarding record | HIGH |
 | 279 | ⏳ | Auto-send Telegram alert to Nolan when any onboarding step changes (twilio_configured, lead_sources_connected, etc.) | HIGH |
@@ -882,7 +890,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 391 | 🔄 | Create entity automation on Order for "create" event — triggers initializeInstallOS + sendClientWelcomeEmail automatically | CRITICAL |
+| 391 | ✅ | Create entity automation on Order for "create" event — triggers initializeInstallOS + sendClientWelcomeEmail automatically | CRITICAL |
 | 392 | ⏳ | Create entity automation on ClientInstallationOS for "update" event — fires stalledOnboardingAlert check when progress stalls | HIGH |
 | 393 | ⏳ | bookingConfirmationLoop: verify it is called after every scheduleDemoBooking — sends confirmation email + SMS + creates DemoRequest record | HIGH |
 | 394 | ⏳ | processQualifiedFollowUps: verify it runs on a schedule — add daily automation if missing | HIGH |
@@ -1044,11 +1052,11 @@
 | 422c | ⏳ | Sub-task: create Reports entity and save report record | MEDIUM |
 | 422d | ⏳ | Sub-task: create monthly 1st-of-month scheduled automation | HIGH |
 | 423 | ⏳ | Build Elite voice clone intake flow — perk #3. After Elite payment, email client a Retell AI recording link. On receipt, store voice_sample_url in Order.install_configuration, create AutomationChecklistStep "Voice Clone Pending", Telegram Nolan | HIGH |
-| 424 | 🔄 | Build /setup/status/[order_id] activation tracker — polls ClientInstallationOS.workflow_stage every 30 seconds. Shows vertical stepper: Payment Confirmed → Credentials Received → Systems Configuring → Website Building → All Live. Shows timestamps per step. Shows spinner on current step. Error state shows support CTA | CRITICAL |
+| 424 | ✅ | Build /setup/status/[order_id] activation tracker — polls ClientInstallationOS.workflow_stage every 30 seconds. Shows vertical stepper: Payment Confirmed → Credentials Received → Systems Configuring → Website Building → All Live. Shows timestamps per step. Shows spinner on current step. Error state shows support CTA | CRITICAL |
 | 424a | ⏳ | Sub-task: build 30-second polling with useInterval hook | HIGH |
 | 424b | ⏳ | Sub-task: build the stepper component with 5 stages reading real workflow_stage field | HIGH |
 | 424c | ⏳ | Sub-task: build error state with "Contact Support" button that opens SupportChat | MEDIUM |
-| 425 | 🔄 | Build runFullPipelineTest admin function — simulates complete purchase for each of 3 tiers using QA fixture client. Tests: webhook → package_key set → initializeInstallOS → credentials write → generateServiceTemplates → configureService x N → generateClientWebsite → sendGoLiveNotification. Logs to AgentLog. Telegrams Nolan with pass/fail per step | CRITICAL |
+| 425 | ✅ | Build runFullPipelineTest admin function — simulates complete purchase for each of 3 tiers using QA fixture client. Tests: webhook → package_key set → initializeInstallOS → credentials write → generateServiceTemplates → configureService x N → generateClientWebsite → sendGoLiveNotification. Logs to AgentLog. Telegrams Nolan with pass/fail per step | CRITICAL |
 | 425a | ⏳ | Sub-task: build Starter tier test fixture and assertion set | HIGH |
 | 425b | ⏳ | Sub-task: build Growth tier test fixture | HIGH |
 | 425c | ⏳ | Sub-task: build Elite tier test fixture including website generation step | HIGH |
@@ -1127,10 +1135,10 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 476 | 🔄 | Build validateAIOutputs function — every AI-generated string passes through this before being written anywhere. Rules: no unfilled {{placeholders}}, no profanity, no competitor names, no pricing contradicting salesCatalog, SMS under 160 chars. Reject + log to AgentLog on failure | CRITICAL |
+| 476 | ✅ | Build validateAIOutputs function — every AI-generated string passes through this before being written anywhere. Rules: no unfilled {{placeholders}}, no profanity, no competitor names, no pricing contradicting salesCatalog, SMS under 160 chars. Reject + log to AgentLog on failure | CRITICAL |
 | 477 | ⏳ | Add AI hallucination guard to generateServiceTemplates — after OpenAI returns copy, re-prompt: "Does this contain unverified claims about response times or guarantees?" If yes, strip the claim and regenerate that sentence only | HIGH |
 | 478 | ⏳ | Build AI output audit log — every LLM call writes to AgentLog: function_name, input_context_hash, output_preview (100 chars), model, tokens used, generated_at. Full traceability for every message a client receives | HIGH |
-| 479 | 🔄 | Add package tier validation gate in activateAllServices — before configureService is called, confirm service_key is in TIER_SERVICE_MAP AND required credentials exist in install_configuration. Reject with specific field-level error if either fails | CRITICAL |
+| 479 | ✅ | Add package tier validation gate in activateAllServices — before configureService is called, confirm service_key is in TIER_SERVICE_MAP AND required credentials exist in install_configuration. Reject with specific field-level error if either fails | CRITICAL |
 | 480 | ⏳ | Build credentialsCompletionCheck function — returns per-service readiness: { instant_lead_response: { ready: true/false, missing_fields: [] }, ... }. Used by admin and portal to show exactly what is blocking each service | HIGH |
 
 ---
@@ -1151,9 +1159,9 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 486 | 🔄 | Create entity automation on WebsiteLead "create" — immediately invoke automationOrchestrator with trigger_event="new_website_lead". Verify onLeadCreated is actually wired as an entity automation in Base44, not just deployed as a function | CRITICAL |
-| 487 | 🔄 | Create entity automation on Order "create" — fires all 4 actions: (1) initializeInstallOS, (2) sendClientWelcomeEmail, (3) sendAdminPurchaseNotification, (4) advance workflow_stage to intake_received. All 4 must fire reliably on every new Order | CRITICAL |
-| 488 | 🔄 | Create entity automation on ClientInstallationOS "update" — on workflow_stage change: if credentials_complete → invoke activateAllServices; if website_approved → Telegram Nolan + applyWebsiteSpec; if activated → sendGoLiveNotification | CRITICAL |
+| 486 | ✅ | Create entity automation on WebsiteLead "create" — immediately invoke automationOrchestrator with trigger_event="new_website_lead". Verify onLeadCreated is actually wired as an entity automation in Base44, not just deployed as a function | CRITICAL |
+| 487 | ✅ | Create entity automation on Order "create" — fires all 4 actions: (1) initializeInstallOS, (2) sendClientWelcomeEmail, (3) sendAdminPurchaseNotification, (4) advance workflow_stage to intake_received. All 4 must fire reliably on every new Order | CRITICAL |
+| 488 | ✅ | Create entity automation on ClientInstallationOS "update" — on workflow_stage change: if credentials_complete → invoke activateAllServices; if website_approved → Telegram Nolan + applyWebsiteSpec; if activated → sendGoLiveNotification | CRITICAL |
 | 489 | ⏳ | Create entity automation on Order "update" for billing_status — when billing_status changes to "past_due": show PaymentFailedBanner (already built) AND send recovery SMS via Twilio. SMS recovery has higher open rate than email alone | HIGH |
 | 490 | ⏳ | Build real-time lead re-scoring trigger — when a Lead receives a new CommunicationEvent (inbound SMS or email reply), immediately re-run scoreLeadIntelligence and update lead.score. Lead replying "I'm ready to book" should instantly jump to Hot status | HIGH |
 
@@ -1163,7 +1171,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 491 | 🔄 | Build SMS compliance filter middleware — before ANY Twilio SMS send: (1) check lead has not texted STOP, (2) verify consent was collected at opt-in, (3) check message for prohibited content categories (loans, cannabis, adult). Sits as shared middleware called by ALL SMS-sending functions | CRITICAL |
+| 491 | ✅ | Build SMS compliance filter middleware — before ANY Twilio SMS send: (1) check lead has not texted STOP, (2) verify consent was collected at opt-in, (3) check message for prohibited content categories (loans, cannabis, adult). Sits as shared middleware called by ALL SMS-sending functions | CRITICAL |
 | 492 | ⏳ | Build quiet hours enforcement — all outbound SMS must respect 8am–9pm recipient local time. Build getLocalTimeZone(phone_number) via area code lookup. If outside window, queue message in DelayedMessage entity. Scheduler processes queue at 8am daily | HIGH |
 | 493 | ⏳ | Build AI contact frequency limiter — no single lead receives more than 3 AI-generated messages per 24-hour window across all channels combined. Build checkContactFrequency(lead_id) that counts CommunicationEvents in last 24h. All message-sending functions must call this first | HIGH |
 | 494 | ⏳ | Build AI content approval workflow for Elite clients — before any AI-generated SMS template is written to install_configuration, create AdminApproval entity record. Nolan reviews in admin panel within 4 hours. If not reviewed in 4h, auto-approve with log entry | MEDIUM |
@@ -1175,7 +1183,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 496 | 🔄 | Build selfHealingMonitor function — runs every 6 hours. Checks: (1) Order in Configuring >4h → re-invoke activateAllServices for stuck services; (2) AutomationChecklistStep in_progress >2h → reset to pending and retry; (3) ClientInstallationOS in same workflow_stage >24h → Telegram Nolan with specific block identified | CRITICAL |
+| 496 | ✅ | Build selfHealingMonitor function — runs every 6 hours. Checks: (1) Order in Configuring >4h → re-invoke activateAllServices for stuck services; (2) AutomationChecklistStep in_progress >2h → reset to pending and retry; (3) ClientInstallationOS in same workflow_stage >24h → Telegram Nolan with specific block identified | CRITICAL |
 | 497 | ⏳ | Build AI error classifier — when any function logs to AgentLog, classifyInstallError reads the error and categorizes: twilio_credentials_invalid / booking_link_unreachable / openai_rate_limit / network_timeout / data_missing. Each category has a defined resolution path | HIGH |
 | 498 | ⏳ | Build autoResolveInstallError function — reads AgentLog entries with requires_nolan=false and acts on category: openai_rate_limit → wait 60s + retry; network_timeout → retry immediately; data_missing → Telegram Nolan with exact field missing. Reduces manual intervention | HIGH |
 | 499 | ⏳ | Build AI pipeline version control — before any activateAllServices run, write pipeline_version + timestamp + package_key + service_list to ClientInstallationOS. If pipeline updated mid-run, apply only delta changes rather than full restart | MEDIUM |
@@ -1287,7 +1295,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 541 | ✅ | Research ElevenLabs Conversational AI API (`/v1/convai/agents`) — confirm endpoint, auth, and Twilio integration method | CRITICAL |
-| 542 | 🔄 | Build `createElevenLabsAgent` admin function — creates one ElevenLabs agent per industry via API, stores `elevenlabs_agent_id` in AdminSettings | CRITICAL |
+| 542 | ✅ | Build `createElevenLabsAgent` admin function — creates one ElevenLabs agent per industry via API, stores `elevenlabs_agent_id` in AdminSettings | CRITICAL |
 | 543 | ✅ | Build `triggerVoiceCallToLead` backend function — takes `lead_id`, fetches `assigned_agent_name`, retrieves `elevenlabs_agent_id`, initiates Twilio outbound call with ElevenLabs TwiML | CRITICAL |
 | 544 | ✅ | Build Twilio TwiML handler for ElevenLabs — `<Connect>` verb pointing at ElevenLabs websocket stream with agent_id | HIGH |
 | 545 | ✅ | Wire `triggerVoiceCallToLead` into HOT lead flow — fires when `priority_tier === "HOT"` AND `lead_score >= 75` | HIGH |
@@ -1425,7 +1433,7 @@ PHASE 7 — Admin UI
 | 473 | ⏳ | Order create automation: chain initializeInstallOS + welcome email | CRITICAL |
 | 474 | ⏳ | Wire stripeWebhookOrders → initializeInstallOS immediately | CRITICAL |
 | 475 | ⏳ | InstallChecklistPanel: SVG progress ring, per-service bars | CRITICAL |
-| 476 | 🔄 | ClientPortal Billing Tab + global PaymentFailedBanner | CRITICAL |
+| 476 | ✅ | ClientPortal Billing Tab + global PaymentFailedBanner | CRITICAL |
 | 477 | ⏳ | Twilio sig validation + simulateMissedCall admin guard | CRITICAL |
 | 478 | ⏳ | Stripe webhook idempotency (stripe_event_id dedup) | CRITICAL |
 | 479b | ⏳ | Scan frontend for sk_live_ secret key exposure | CRITICAL |
@@ -1435,12 +1443,12 @@ PHASE 7 — Admin UI
 | 483 | ⏳ | generateClientWebsite function (Starter/Growth/Elite spec) | CRITICAL |
 | 484 | ⏳ | Admin: warning badge on orders paid 2+ days no install | HIGH |
 | 485 | ✅ | Admin: one-click Initialize Install OS button | HIGH |
-| 486 | 🔄 | ClientPortal: What's New changelog tab | LOW |
-| 487 | 🔄 | Admin: conversion funnel chart | HIGH |
-| 488 | 🔄 | Admin: Demo Bookings tab | HIGH |
+| 486 | ✅ | ClientPortal: What's New changelog tab | LOW |
+| 487 | ✅ | Admin: conversion funnel chart | HIGH |
+| 488 | ✅ | Admin: Demo Bookings tab | HIGH |
 | 489 | ⏳ | AdminLeads: lead_score column (color-coded, sortable) | HIGH |
 | 490 | ⏳ | Admin: Failed Jobs section + Retry button | HIGH |
-| 491 | 🔄 | processAutomationJobs: 3x retry exponential backoff | HIGH |
+| 491 | ✅ | processAutomationJobs: 3x retry exponential backoff | HIGH |
 | 492 | ⏳ | All Resend calls: retry on 429/5xx | HIGH |
 | 493 | ⏳ | receiveTwilioInboundSms: STOP → sms_opted_out + pause all sequences | CRITICAL |
 | 494 | ⏳ | Full E2E purchase test on live domain (must pass before June 2) | CRITICAL |
@@ -1451,7 +1459,7 @@ PHASE 7 — Admin UI
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 495 | ⏳ | processNurtureCampaigns: skip if messaged in last 24h | HIGH |
-| 496 | 🔄 | processAutomationJobs: 3x retry with backoff | HIGH |
+| 496 | ✅ | processAutomationJobs: 3x retry with backoff | HIGH |
 | 497 | ⏳ | _shared/retryFetch.ts: retry on 429/5xx sitewide | HIGH |
 | 498 | ⏳ | scheduleFollowUpSMS: Phoenix timezone business hours gate | HIGH |
 | 499 | ⏳ | _shared/smsHelpers.ts: appendOptOut() — TCPA sitewide | HIGH |
@@ -1503,7 +1511,7 @@ PHASE 7 — Admin UI
 | 539 | ⏳ | Admin: Enroll in Nurture button in lead detail | MEDIUM |
 | 540 | ⏳ | Admin: mask phone numbers for non-super-admin | MEDIUM |
 | 541 | ⏳ | _shared/response.ts: okJson() + errJson() helpers sitewide | MEDIUM |
-| 542 | 🔄 | All functions: correct HTTP status codes (400/404/500) | HIGH |
+| 542 | ✅ | All functions: correct HTTP status codes (400/404/500) | HIGH |
 | 543 | ⏳ | enrichLead: 10-second timeout on external API calls | MEDIUM |
 | 544 | ⏳ | scoreLeadIntelligence: skip if confidence < 0.6 | MEDIUM |
 
