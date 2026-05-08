@@ -266,7 +266,7 @@
 | 96 | ✅ | processDripCampaigns: skip leads with status "Booked" before sending each step | HIGH |
 | 97 | ✅ | processNurtureCampaigns: add idempotency guard (check for duplicate send within 23hr) | HIGH |
 | 98 | ✅ | processWebsiteLeadFollowUps: add cadence_paused: true skip guard | HIGH |
-| 99 | ⏳ | scheduleDemoBooking: add optimistic lock — re-fetch slots before confirming | HIGH |
+| 99 | 🔄 | scheduleDemoBooking: add optimistic lock — re-fetch slots before confirming | HIGH |
 | 100 | ⏳ | scheduleDemoBooking: reject weekend bookings (Sat/Sun) + blocked_dates in AdminSettings | MEDIUM |
 | 101 | ✅ | CartSidebar: add 12-second timeout fallback for Stripe redirect | DONE |
 | 102 | ✅ | sendOrderConfirmationEmail: add fallback values for all template variables | HIGH |
@@ -290,7 +290,7 @@
 | 113 | ⏳ | sendDailyDigest: add gate — skip send if leads_today === 0 AND orders_today === 0 | LOW |
 | 114 | ✅ | All Resend fetch calls: add retry once on 429/5xx with 2-second delay | HIGH |
 | 115 | ⏳ | monthlyClientReport: after generating report, email it to the client | MEDIUM |
-| 116 | ⏳ | getBookedDemoSlots: add {scheduled_date: selectedDate} filter — don't fetch all records | HIGH |
+| 116 | 🔄 | getBookedDemoSlots: add {scheduled_date: selectedDate} filter — don't fetch all records | HIGH |
 | 117 | ⏳ | Create sendNPSSurvey function: triggered 7 days after order_status = "fully_live" | MEDIUM |
 
 ---
@@ -299,7 +299,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 118 | ⏳ | Create entity automation: ClientProject update → send milestone email when workflow_stage changes | HIGH |
+| 118 | 🔄 | Create entity automation: ClientProject update → send milestone email when workflow_stage changes | HIGH |
 | 119 | ⏳ | Create entity automation: Order update → trigger sendNPSSurvey when order_status = "fully_live" | MEDIUM |
 | 120 | ⏳ | Create scheduled automation: autoCloseStaleLeads — runs daily at 2am | MEDIUM |
 | 121 | ✅ | "$0 setup" renamed to "No setup fee" in store | DONE |
@@ -326,9 +326,9 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 131 | ⏳ | sendOrderConfirmationEmail: verify all 6 service names render correctly in email | HIGH |
+| 131 | 🔄 | sendOrderConfirmationEmail: verify all 6 service names render correctly in email | HIGH |
 | 132 | ⏳ | sendDemoConfirmationEmail: verify scheduled_date/time display correctly in all timezones | MEDIUM |
-| 133 | ⏳ | sendClientWelcomeEmail: ensure it links to correct client portal URL | HIGH |
+| 133 | 🔄 | sendClientWelcomeEmail: ensure it links to correct client portal URL | HIGH |
 | 134 | ⏳ | receiveResendWebhook: on email bounce, update CommunicationEvent status to "failed" | MEDIUM |
 | 135 | ⏳ | receiveResendWebhook: on email open, update lead.last_engagement_at | LOW |
 
@@ -338,7 +338,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 137 | ⏳ | submitLeadCapture: verify deduplication window is exactly 60 minutes | HIGH |
+| 137 | 🔄 | submitLeadCapture: verify deduplication window is exactly 60 minutes | HIGH |
 | 138 | ⏳ | onLeadCreated: verify webhook payload includes all required fields | MEDIUM |
 | 139 | ⏳ | scoreLeads: verify lead_score calculation accounts for all scoring factors | MEDIUM |
 | 140 | ⏳ | scoreLeadIntelligence: add confidence threshold — skip if AI confidence < 0.6 | MEDIUM |
@@ -375,7 +375,7 @@
 | 157 | ⏳ | Create AuditLog entity with fields: admin_email, action, entity, before, after, timestamp | MEDIUM |
 | 158 | ⏳ | Add standardized console.log format to all functions: [functionName] message {context} | LOW |
 | 159 | ⏳ | Verify all functions return proper HTTP status codes (not always 200) | MEDIUM |
-| 160 | ⏳ | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | HIGH |
+| 160 | 🔄 | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | HIGH |
 
 ---
 
@@ -447,7 +447,7 @@
 | 197 | ⏳ | ClientPortal: add NPS score display after it's collected | LOW |
 | 198 | ⏳ | QuickStartWizard: ensure all onboarding steps link to correct help resources | MEDIUM |
 | 199 | ⏳ | ClientPortal: verify OrderTracker shows correct install stages for all service types | HIGH |
-| 200 | ⏳ | ClientDashboard: add "Your Automation is Paused" warning when cadence_paused = true | HIGH |
+| 200 | 🔄 | ClientDashboard: add "Your Automation is Paused" warning when cadence_paused = true | HIGH |
 
 ---
 
@@ -473,11 +473,11 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 211 | ✅ | Configure custom domain DNS (if not already done) and verify SSL cert | CRITICAL |
-| 212 | ⏳ | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | HIGH |
+| 212 | 🔄 | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | HIGH |
 | 213 | ✅ | Configure Resend domain authentication (SPF, DKIM, DMARC) for deliverability | CRITICAL |
 | 213b | ✅ | Verify Twilio number is A2P 10DLC registered for commercial SMS in the US | CRITICAL |
 | 214 | ⏳ | Add Google Analytics 4 event tracking for: purchase, demo_booked, lead_submitted | HIGH |
-| 215 | ⏳ | Set up error alerting: admin email on any backend function 5xx error | HIGH |
+| 215 | 🔄 | Set up error alerting: admin email on any backend function 5xx error | HIGH |
 | 216 | ⏳ | Document all environment variables in a README_ENV.md file | MEDIUM |
 | 217 | ⏳ | Create runbook: what to do when Twilio is down / Resend is down / Stripe is down | MEDIUM |
 | 218 | ✅ | Verify all secrets are set in production (not just dev) environment | CRITICAL |
@@ -493,7 +493,7 @@
 | 221 | ⏳ | Create Changelog entity (title, description, date, is_published) for client portal | LOW |
 | 222 | ⏳ | Create Referral entity (referrer_client_id, referred_email, status, credit_amount) | LOW |
 | 223 | ⏳ | Add nps_score + nps_responded_at fields to ClientProject entity | MEDIUM |
-| 225 | ⏳ | Add consent_given_at + consent_ip fields to Leads entity | HIGH |
+| 225 | 🔄 | Add consent_given_at + consent_ip fields to Leads entity | HIGH |
 | 226 | ⏳ | Verify all entity RLS rules are correct — Client entity has correct read/write rules | HIGH |
 | 227 | ⏳ | Add max_active_onboarding field to AdminSettings entity | MEDIUM |
 | 228 | ⏳ | Add blocked_dates array field to AdminSettings for holiday/weekend booking blocks | MEDIUM |
@@ -506,7 +506,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 230 | ⏳ | Create sendNPSSurvey function — email 7 days after fully_live with 1-10 rating link | MEDIUM |
-| 231 | ⏳ | Entity automation: ClientProject workflow_stage change → send milestone email | HIGH |
+| 231 | 🔄 | Entity automation: ClientProject workflow_stage change → send milestone email | HIGH |
 | 232 | ⏳ | Entity automation: Order fully_live → trigger sendNPSSurvey after 7-day delay | MEDIUM |
 | 233 | ⏳ | Verify sendClientWelcomeEmail includes correct client portal URL + temp access instructions | HIGH |
 | 234 | ⏳ | Verify sendPortalWelcomeEmail is triggered automatically after order is paid | HIGH |
@@ -536,7 +536,7 @@
 | 244 | ⏳ | Final: verify all email templates render correctly in Gmail, Outlook, Apple Mail | HIGH |
 | 245 | 🔄 | Final: test complete lead → SMS → follow-up → booking flow with test lead | CRITICAL |
 | 246 | ⏳ | Final: verify admin panel loads in < 3 seconds with 100+ leads in database | MEDIUM |
-| 247 | ⏳ | Final: confirm robots.txt is correct and sitemap is submitted to Google Search Console | HIGH |
+| 247 | 🔄 | Final: confirm robots.txt is correct and sitemap is submitted to Google Search Console | HIGH |
 | 248 | ✅ | Final: review all legal pages (Privacy, Terms) for accuracy and TCPA compliance | CRITICAL |
 | 249 | 🔄 | Final: do a full purchase test with a real card → verify order, emails, SMS all fire | CRITICAL |
 | 250 | 🔄 | Final: team sign-off — all 3 agents mark their sections complete before go-live | CRITICAL |
@@ -624,11 +624,11 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 251 | ✅ | Wire scoreLeadIntelligence to fire on every new WebsiteLead creation — currently deployed but never called from frontend | CRITICAL |
-| 252 | ⏳ | Wire classifyLeadIntent on inbound SMS replies — currently deployed but disconnected | HIGH |
+| 252 | 🔄 | Wire classifyLeadIntent on inbound SMS replies — currently deployed but disconnected | HIGH |
 | 253 | ⏳ | Wire predictChurnRisk to run weekly on all active Orders — alert Nolan if score > 70 | HIGH |
 | 254 | ⏳ | Wire automationOrchestrator to Admin dashboard so Nolan can trigger it manually | MEDIUM |
-| 255 | ⏳ | /lead-intelligence page: display lead_score and quality_label per lead in the UI | HIGH |
-| 256 | ⏳ | Lead Intelligence dashboard: add real LeadAnalytics entity reads — currently shows no data | HIGH |
+| 255 | 🔄 | /lead-intelligence page: display lead_score and quality_label per lead in the UI | HIGH |
+| 256 | 🔄 | Lead Intelligence dashboard: add real LeadAnalytics entity reads — currently shows no data | HIGH |
 | 257 | ⏳ | Add "AI Re-Score" button in admin lead list — calls scoreLeadIntelligence for selected lead | MEDIUM |
 | 258 | ⏳ | predictLeadOutcome: surface prediction result in ClientPortal leads tab | LOW |
 
@@ -640,12 +640,12 @@
 |---|---|---|---|
 | 259 | ⏳ | ClientPortal: build "Get Help" tab with support ticket form → creates SupportMessage entity record | HIGH |
 | 260 | ✅ | ClientPortal: build "Billing" tab — show current plan, next billing date, amount | CRITICAL |
-| 261 | ⏳ | ClientPortal: "Cancel Subscription" button → redirect to Stripe customer portal URL | HIGH |
-| 262 | ⏳ | ClientPortal: "Download Invoice" button → pull Stripe invoice_pdf URL and open in new tab | HIGH |
+| 261 | 🔄 | ClientPortal: "Cancel Subscription" button → redirect to Stripe customer portal URL | HIGH |
+| 262 | 🔄 | ClientPortal: "Download Invoice" button → pull Stripe invoice_pdf URL and open in new tab | HIGH |
 | 263 | ✅ | ClientPortal: show red PaymentFailedBanner when Order billing_status === "past_due" | CRITICAL |
 | 264 | ⏳ | ClientPortal: build "Refer a Business" tab with unique referral link generated per client | MEDIUM |
-| 265 | ⏳ | ClientPortal: AutomationChecklist — display live checklist progress pulled from AutomationChecklist entity | HIGH |
-| 266 | ⏳ | ClientPortal: show "Setup Progress" bar driven by real ClientInstallationOS fields (twilio_configured, etc.) | HIGH |
+| 265 | 🔄 | ClientPortal: AutomationChecklist — display live checklist progress pulled from AutomationChecklist entity | HIGH |
+| 266 | 🔄 | ClientPortal: show "Setup Progress" bar driven by real ClientInstallationOS fields (twilio_configured, etc.) | HIGH |
 | 267 | ⏳ | ClientPortal: add "What's New" tab reading from a Changelog entity or AdminSettings changelog field | LOW |
 
 ---
@@ -655,12 +655,12 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 268 | ✅ | AdminDashboard: build MRR metric card — sum total_monthly from all Orders with payment_status=paid | CRITICAL |
-| 269 | ⏳ | AdminDashboard: build LTV card — total revenue per client over their lifetime | HIGH |
-| 270 | ⏳ | AdminDashboard: build Churn Risk panel — list clients with predictChurnRisk score > 70 | HIGH |
+| 269 | 🔄 | AdminDashboard: build LTV card — total revenue per client over their lifetime | HIGH |
+| 270 | 🔄 | AdminDashboard: build Churn Risk panel — list clients with predictChurnRisk score > 70 | HIGH |
 | 271 | ⏳ | AdminDashboard: wire AdminGlobalSearch to all entity types (Lead, Client, Order, SupportMessage) | MEDIUM |
 | 272 | ⏳ | AdminDashboard: add session inactivity timeout — show warning modal after 30min, logout after 45min | MEDIUM |
-| 273 | ⏳ | AdminDashboard: add "Install Status" table showing each client's onboarding step completion | HIGH |
-| 274 | ⏳ | AdminDashboard: add quick-action buttons — "Send Day 1 Email", "Trigger Follow-Up", "Mark Live" per client | HIGH |
+| 273 | 🔄 | AdminDashboard: add "Install Status" table showing each client's onboarding step completion | HIGH |
+| 274 | 🔄 | AdminDashboard: add quick-action buttons — "Send Day 1 Email", "Trigger Follow-Up", "Mark Live" per client | HIGH |
 | 275 | ⏳ | Admin leads list: add bulk action — "Mark as contacted", "Export to CSV", "Rescore with AI" | MEDIUM |
 
 ---
@@ -670,9 +670,9 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 276 | ✅ | Build InstallChecklistPanel component — reads AutomationChecklist entity fields and renders live progress | CRITICAL |
-| 277 | ⏳ | Wire onboarding_complete, went_live, twilio_configured fields to admin UI — currently invisible | HIGH |
-| 278 | ⏳ | Auto-send "You're Live!" email via Resend when went_live is set to true on a ClientOnboarding record | HIGH |
-| 279 | ⏳ | Auto-send Telegram alert to Nolan when any onboarding step changes (twilio_configured, lead_sources_connected, etc.) | HIGH |
+| 277 | 🔄 | Wire onboarding_complete, went_live, twilio_configured fields to admin UI — currently invisible | HIGH |
+| 278 | 🔄 | Auto-send "You're Live!" email via Resend when went_live is set to true on a ClientOnboarding record | HIGH |
+| 279 | 🔄 | Auto-send Telegram alert to Nolan when any onboarding step changes (twilio_configured, lead_sources_connected, etc.) | HIGH |
 | 280 | ⏳ | Build client-facing onboarding status page at /setup — shows their install progress without admin login | MEDIUM |
 | 281 | ⏳ | Onboarding form: validate all required fields before submit — currently submits with empty required fields | HIGH |
 
