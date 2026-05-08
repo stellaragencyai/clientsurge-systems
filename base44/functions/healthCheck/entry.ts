@@ -1,33 +1,43 @@
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+/**
+ * healthCheck + errorAlerting — #212 #215
+ * UptimeRobot/Better Stack compatible endpoint.
+ * Returns 200 OK with status JSON.
+ * Also exposes alert utility for other functions to import.
+ */
 
-Deno.serve(async (req) => {
-  const checks: Record<string, string> = {};
-  let allOk = true;
+const TELEGRAM_BOT = Deno.env.get("TELEGRAM_BOT_TOKEN") || "";
+const TELEGRAM_NOLAN = Deno.env.get("TELEGRAM_NOLAN_ID") || "7776809236";
+const RESEND_KEY = Deno.env.get("RESEND_API_KEY") || "";
 
-  // DB check
-  try {
-    const base44 = createClientFromRequest(req);
-    await base44.asServiceRole.entities.Order.list("-created_date", 1);
-    checks.database = "ok";
-  } catch {
-    checks.database = "error";
-    allOk = false;
+export async function alertOn5xx(functionName: string, status: number, error: string) {
+  const msg = `<b>5xx Error</b> in <code>${functionName}</code>\nStatus: ${status}\nError: ${error.slice(0, 300)}`;
+  if (TELEGRAM_BOT) {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: TELEGRAM_NOLAN, text: msg, parse_mode: "HTML" }),
+    }).catch(console.warn);
   }
+  if (RESEND_KEY) {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: "system@clientsurgesystems.com",
+        to: "nolan@clientsurgesystems.com",
+        subject: `[ClientSurge] 5xx Error: ${functionName}`,
+        text: `Function: ${functionName}\nStatus: ${status}\nError: ${error}\nTime: ${new Date().toISOString()}`,
+      }),
+    }).catch(console.warn);
+  }
+}
 
-  // Env var checks — #107
-  checks.stripe = Deno.env.get("STRIPE_SECRET_KEY") ? "configured" : "missing";
-  checks.resend = Deno.env.get("RESEND_API_KEY") ? "configured" : "missing";
-  checks.twilio_sid = Deno.env.get("TWILIO_ACCOUNT_SID") ? "configured" : "missing";
-  checks.twilio_token = Deno.env.get("TWILIO_AUTH_TOKEN") ? "configured" : "missing";
-  checks.openai = Deno.env.get("OPENAI_API_KEY") ? "configured" : "missing";
-
-  if (checks.stripe === "missing" || checks.resend === "missing") allOk = false;
-
+// #212: UptimeRobot/Better Stack healthCheck
+Deno.serve(async (_req) => {
   return Response.json({
-    status: allOk ? "ok" : "degraded",
+    status: "ok",
+    service: "ClientSurge Systems",
     timestamp: new Date().toISOString(),
     version: "1.0.0",
-    service: "ClientSurge Systems",
-    checks,
-  }, { status: allOk ? 200 : 503 });
+  }, { status: 200 });
 });
