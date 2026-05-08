@@ -5,7 +5,7 @@ const stats = [
 "Under 60 sec lead response",
 "24–48 hr setup time",
 "100% done-for-you",
-"6 automations per client",
+"Up to 6 automations per client",
 "Serving Phoenix & Scottsdale"];
 
 
