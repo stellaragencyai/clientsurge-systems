@@ -7,6 +7,12 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+// #126: business hours locked to America/Phoenix (no DST)
+function isPhoenixBusinessHours() {
+  const h = parseInt(new Date().toLocaleString("en-US", { timeZone: "America/Phoenix", hour: "numeric", hour12: false }), 10);
+  return h >= 8 && h < 20;
+}
+
 function minutesSince(isoDate) {
   if (!isoDate) return 0;
   return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60);
