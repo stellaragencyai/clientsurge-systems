@@ -18,7 +18,6 @@ export default function CredentialsSetup() {
 
   useEffect(() => {
     if (!orderId) {
-      // #406 — no order_id in URL → redirect to /pricing
       navigate("/pricing");
       return;
     }
@@ -27,19 +26,22 @@ export default function CredentialsSetup() {
 
   const validateOrder = async () => {
     try {
-      const orders = await base44.entities.Order.filter({ id: orderId });
-      const found = orders?.[0];
-      if (!found) {
+      const result = await base44.functions.invoke("getOrderStatus", {
+        order_id: orderId,
+      });
+
+      if (!result?.order) {
         setError("Order not found. Please check your confirmation email for the correct link.");
         return;
       }
-      if (found.payment_status !== "paid") {
-        // #406 — redirect to pricing if order not paid
+
+      if (!result.eligible) {
         navigate("/pricing");
         return;
       }
-      setOrder(found);
-    } catch (err) {
+
+      setOrder(result.order);
+    } catch {
       setError("Unable to verify your order. Please try again or contact support.");
     } finally {
       setLoading(false);
@@ -55,7 +57,7 @@ export default function CredentialsSetup() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-3">
           <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
-          <p className="text-sm text-muted-foreground">Verifying your order…</p>
+          <p className="text-sm text-muted-foreground">Verifying your order...</p>
         </div>
       </div>
     );
@@ -90,7 +92,7 @@ export default function CredentialsSetup() {
           </div>
           <h1 className="text-2xl font-semibold text-foreground">Setup Info Received!</h1>
           <p className="text-muted-foreground leading-relaxed">
-            Thank you — our team will review your details and have your system configured within <strong>24–48 hours</strong>. You'll receive a confirmation email when your automations are live.
+            Thank you - our team will review your details and have your system configured within <strong>24-48 hours</strong>. You'll receive a confirmation email when your automations are live.
           </p>
           <p className="text-sm text-muted-foreground">
             Questions? Email{" "}

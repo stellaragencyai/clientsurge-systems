@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Trash2, Tag, ListChecks, X, ChevronDown, Loader2, CheckCircle2 } from "lucide-react";
+import { Trash2, Tag, ListChecks, X, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const STATUSES = ["New", "Contacted", "Replied", "Qualified", "Booking Prompt Sent", "Booked", "Closed"];

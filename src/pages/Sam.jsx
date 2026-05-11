@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Send, Loader2, Plus, Trash2, MessageSquare } from 'lucide-react';
+import { Send, Loader2, Plus } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
 

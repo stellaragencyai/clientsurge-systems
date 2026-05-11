@@ -6,7 +6,7 @@
  *   1. Write install_configuration to Order
  *   2. Advance ClientInstallationOS.workflow_stage to "credentials_complete"
  *   3. Run aiOnboardingIntelligence (pre-flight check + auto-fill defaults)
- *   4. If ready_to_activate → invoke aiPackageOrchestrator
+ *   4. If ready_to_activate → leave the order ready for the canonical install workspace
  *   5. Send admin notification that credentials were submitted
  */
 
@@ -17,12 +17,17 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const { order_id, install_configuration } = await req.json();
 
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
-    if (!install_configuration) return Response.json({ error: "install_configuration required" }, { status: 400 });
+    if (!order_id) {
+      return Response.json({ error: "order_id required" }, { status: 400 });
+    }
+    if (!install_configuration) {
+      return Response.json({ error: "install_configuration required" }, { status: 400 });
+    }
 
-    // Step 1: Write credentials to Order
     const order = await base44.asServiceRole.entities.Order.get(order_id);
-    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+    if (!order) {
+      return Response.json({ error: "Order not found" }, { status: 404 });
+    }
 
     await base44.asServiceRole.entities.Order.update(order_id, {
       install_configuration,
@@ -30,7 +35,6 @@ Deno.serve(async (req) => {
     });
     console.log(`[saveClientCredentials] install_configuration saved for order ${order_id}`);
 
-    // Step 2: Advance ClientInstallationOS workflow_stage
     const existing = await base44.asServiceRole.entities.ClientInstallationOS.filter(
       { order_id },
       "-created_date",
@@ -41,36 +45,32 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.ClientInstallationOS.update(existing[0].id, {
         workflow_stage: "credentials_complete",
       });
-      console.log(`[saveClientCredentials] workflow_stage → credentials_complete`);
+      console.log("[saveClientCredentials] workflow_stage → credentials_complete");
     }
 
-    // Step 3: Run AI pre-flight intelligence check
     let intelligenceResult = null;
     try {
       intelligenceResult = await base44.asServiceRole.functions.invoke("aiOnboardingIntelligence", {
         order_id,
       });
-      console.log(`[saveClientCredentials] pre-flight check: ready=${intelligenceResult?.ready_to_activate}, blockers=${intelligenceResult?.blockers?.length || 0}`);
-    } catch (e) {
-      console.warn(`[saveClientCredentials] aiOnboardingIntelligence warning: ${e.message}`);
+      console.log(
+        `[saveClientCredentials] pre-flight check: ready=${intelligenceResult?.ready_to_activate}, blockers=${intelligenceResult?.blockers?.length || 0}`
+      );
+    } catch (error) {
+      console.warn(`[saveClientCredentials] aiOnboardingIntelligence warning: ${error.message}`);
     }
 
-    // Step 4: If ready, kick off full package activation
-    let activationResult = null;
+    let activationDeferredReason = null;
     if (intelligenceResult?.ready_to_activate) {
-      try {
-        activationResult = await base44.asServiceRole.functions.invoke("aiPackageOrchestrator", {
-          order_id,
-        });
-        console.log(`[saveClientCredentials] activation launched: ${activationResult?.message}`);
-      } catch (e) {
-        console.warn(`[saveClientCredentials] aiPackageOrchestrator warning: ${e.message}`);
-      }
+      activationDeferredReason =
+        "Legacy aiPackageOrchestrator is retired. Continue activation from the canonical install workspace.";
+      console.log(`[saveClientCredentials] ${activationDeferredReason}`);
     } else {
-      console.log(`[saveClientCredentials] activation deferred — blockers present: ${(intelligenceResult?.blockers || []).join(", ")}`);
+      console.log(
+        `[saveClientCredentials] activation deferred — blockers present: ${(intelligenceResult?.blockers || []).join(", ")}`
+      );
     }
 
-    // Step 5: Notify admin that credentials were submitted
     try {
       const adminEmail = Deno.env.get("ADMIN_NOTIFICATION_EMAIL") || "nolan@clientsurgesystems.com";
       const appUrl = Deno.env.get("APP_URL") || "https://clientsurgesystems.com";
@@ -86,19 +86,20 @@ Deno.serve(async (req) => {
   <h2 style="color:#0A1628;margin:0 0 16px;">Credentials Submitted</h2>
   <p style="color:#555;margin:0 0 20px;"><strong>${order.business_name}</strong> (${order.customer_email}) just completed their setup intake form.</p>
 
-  <div style="background:${intelligenceResult?.ready_to_activate ? '#f0fdf4' : '#fffbeb'};border:1px solid ${intelligenceResult?.ready_to_activate ? '#86efac' : '#fcd34d'};border-radius:10px;padding:16px;margin-bottom:20px;">
-    <p style="font-weight:700;color:${intelligenceResult?.ready_to_activate ? '#16a34a' : '#92400e'};margin:0 0 8px;">
-      ${intelligenceResult?.ready_to_activate ? '✅ Auto-Activation Triggered' : '⚠️ Activation Deferred — Blockers Found'}
+  <div style="background:${intelligenceResult?.ready_to_activate ? "#f0fdf4" : "#fffbeb"};border:1px solid ${intelligenceResult?.ready_to_activate ? "#86efac" : "#fcd34d"};border-radius:10px;padding:16px;margin-bottom:20px;">
+    <p style="font-weight:700;color:${intelligenceResult?.ready_to_activate ? "#16a34a" : "#92400e"};margin:0 0 8px;">
+      ${intelligenceResult?.ready_to_activate ? "✅ Ready for Canonical Install Review" : "⚠️ Activation Deferred — Blockers Found"}
     </p>
-    ${blockers.length > 0 ? `<ul style="margin:0;padding-left:20px;color:#92400e;font-size:13px;">${blockers.map(b => `<li>${b}</li>`).join("")}</ul>` : ""}
+    ${blockers.length > 0 ? `<ul style="margin:0;padding-left:20px;color:#92400e;font-size:13px;">${blockers.map((blocker) => `<li>${blocker}</li>`).join("")}</ul>` : ""}
     ${autoFilled.length > 0 ? `<p style="font-size:13px;color:#555;margin:8px 0 0;">Auto-filled: ${autoFilled.join(", ")}</p>` : ""}
+    ${activationDeferredReason ? `<p style="font-size:13px;color:#166534;margin:8px 0 0;">${activationDeferredReason}</p>` : ""}
   </div>
 
   <a href="${appUrl}/admin/onboarding" style="display:inline-block;background:#0A1628;color:#fff;padding:12px 28px;border-radius:9999px;text-decoration:none;font-weight:600;font-size:14px;">View in Admin →</a>
 </div>`,
       });
-    } catch (e) {
-      console.warn(`[saveClientCredentials] admin notification failed: ${e.message}`);
+    } catch (error) {
+      console.warn(`[saveClientCredentials] admin notification failed: ${error.message}`);
     }
 
     return Response.json({
@@ -106,7 +107,8 @@ Deno.serve(async (req) => {
       ready_to_activate: intelligenceResult?.ready_to_activate || false,
       blockers: intelligenceResult?.blockers || [],
       auto_filled: intelligenceResult?.auto_filled || [],
-      activation_launched: !!activationResult,
+      activation_launched: false,
+      activation_deferred_reason: activationDeferredReason,
     });
   } catch (error) {
     console.error("[saveClientCredentials] Error:", error.message);

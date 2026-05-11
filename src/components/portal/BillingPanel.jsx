@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Download, Eye, ExternalLink, Loader2, AlertCircle, CheckCircle2, Clock, FileText } from 'lucide-react';
+import { Download, ExternalLink, Loader2, AlertCircle, CheckCircle2, Clock, FileText } from 'lucide-react';
 
 const STATUS_COLORS = {
   paid: 'bg-green-50 border-green-200 text-green-700',

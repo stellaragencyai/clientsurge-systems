@@ -24,6 +24,14 @@
       "title": "Email Address",
       "format": "email"
     },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "business_type": {
+      "type": "string",
+      "title": "Business Type"
+    },
     "service_interest": {
       "type": "string",
       "title": "Service Interest"
@@ -31,6 +39,10 @@
     "message": {
       "type": "string",
       "title": "Message"
+    },
+    "problem": {
+      "type": "string",
+      "title": "Problem Summary"
     },
     "source": {
       "type": "string",
@@ -42,6 +54,55 @@
         "landing_page"
       ],
       "default": "website_form"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Linked Client Project ID"
+    },
+    "crm_lead_id": {
+      "type": "string",
+      "title": "Linked CRM Lead ID"
+    },
+    "source_page": {
+      "type": "string",
+      "title": "Source Page"
+    },
+    "routing_key": {
+      "type": "string",
+      "title": "Verified Routing Key"
+    },
+    "requested_channels": {
+      "type": "array",
+      "title": "Requested Contact Channels",
+      "items": {
+        "type": "string"
+      }
+    },
+    "consent_given": {
+      "type": "boolean",
+      "title": "Consent Given",
+      "default": false
+    },
+    "consent_given_at": {
+      "type": "string",
+      "title": "Consent Given At",
+      "format": "date-time"
+    },
+    "consent_source": {
+      "type": "string",
+      "title": "Consent Source"
+    },
+    "consent_text_version": {
+      "type": "string",
+      "title": "Consent Text Version"
+    },
+    "user_agent": {
+      "type": "string",
+      "title": "User Agent"
+    },
+    "ip_address": {
+      "type": "string",
+      "title": "IP Address"
     },
     "lead_status": {
       "type": "string",
@@ -162,7 +223,27 @@
       "format": "date-time"
     }
   },
-  "required": [
-    "email"
-  ]
+  "required": [],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

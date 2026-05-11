@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import {
-  CheckCircle2, Loader2, AlertCircle, ArrowLeft, Eye, Edit3,
+  CheckCircle2, Loader2, AlertCircle, ArrowLeft, Edit3,
   Globe, Layers, Palette, Zap, ChevronRight, Send
 } from "lucide-react";
 

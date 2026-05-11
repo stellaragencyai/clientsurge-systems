@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Loader2, LogOut, LayoutDashboard } from "lucide-react";
-import BuildTracker from "../components/portal/BuildTracker";
+import { LogOut, LayoutDashboard } from "lucide-react";
 import SetupProgressHub from "../components/portal/SetupProgressHub";
 import SupportChat from "../components/portal/SupportChat";
 import PlanManager from "../components/portal/PlanManager";
@@ -68,10 +67,9 @@ export default function ClientPortal() {
         setProject(context.project || null);
         setPortalOrder(context.order || null);
         setSubscription(context.subscription || null);
-        // Show Quick Start wizard if not yet completed
-        setShowQuickStart(!context.project?.quick_start_completed);
-        setNotFound(false);
-        setPortalError("");
+        setShowQuickStart(context.project?.quick_start_completed !== true);
+        setNotFound(!context.project);
+        setPortalError(context.message || "");
       } catch (error) {
         setProject(null);
         setPortalOrder(null);
@@ -98,7 +96,13 @@ export default function ClientPortal() {
         setPortalOrder(context.order || null);
         setSubscription(context.subscription || null);
         setNotFound(false);
-        setPortalError("");
+        setPortalError(context.message || "");
+      } else {
+        setProject(null);
+        setPortalOrder(context?.order || null);
+        setSubscription(context?.subscription || null);
+        setNotFound(true);
+        setPortalError(context?.message || "No portal project is linked to this account yet.");
       }
     } catch (error) {
       setProject(null);
@@ -147,7 +151,7 @@ export default function ClientPortal() {
           </div>
           <h1 className="font-display text-2xl font-semibold text-foreground mb-2">Setting Up Your System</h1>
           <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-            Your services are being set up. You'll receive a confirmation email within 24 hours once your project is linked.
+            {portalError || "Your services are being set up. You'll receive a confirmation email within 24 hours once your project is linked."}
           </p>
           <div className="rounded-xl border border-border bg-muted/30 p-4 text-left mb-6">
             <p className="text-xs font-semibold text-foreground mb-2">What to expect:</p>

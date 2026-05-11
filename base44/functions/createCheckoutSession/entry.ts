@@ -127,6 +127,8 @@ Deno.serve(async (req) => {
       install_configuration: normalizeInstallConfiguration({}, orderItems),
       payment_status: "pending",
       order_status: "pending_payment",
+      selected_package_type: pricingSummary.package_offer?.package_key || null,
+      package_type: pricingSummary.package_offer?.package_key || null,
       plan_type: pricingSummary.package_offer?.name || "Custom Service Bundle",
     });
 

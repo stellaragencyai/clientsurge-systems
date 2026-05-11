@@ -1,6 +1,5 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Loader2, CheckCircle2, Mail, Phone, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";

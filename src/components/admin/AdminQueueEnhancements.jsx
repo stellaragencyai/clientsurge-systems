@@ -4,7 +4,7 @@
  */
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Send, CheckCircle, RotateCcw, Eye, Download, UserPlus, Play } from "lucide-react";
+import { Send, CheckCircle, Download, Play } from "lucide-react";
 
 // #170: Install Queue — estimated completion date
 export function InstallCompletionDate({ install_initialized_at }) {

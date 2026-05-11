@@ -1,94 +1,61 @@
-# ClientSurge Systems — Stripe Go-Live Checklist
+# ClientSurge Systems - Stripe Go-Live Checklist
 
 Complete every item before switching from test to live Stripe payments.
 
----
+## Canonical Webhook Endpoint
+
+- Canonical Stripe webhook URL: `https://clientsurgesystems.com/api/functions/stripeWebhookOrders`
+- Base44 hostname fallback: `https://grinning-apex-flow-growth.base44.app/api/functions/stripeWebhookOrders`
+- Stripe should deliver to the canonical custom-domain URL only.
+
+## Required Stripe Events
+
+- `checkout.session.completed`
+- `customer.subscription.created`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
+- `invoice.payment_succeeded`
+- `invoice.payment_failed`
+
+## Legacy Stripe Endpoints to Remove or Disable
+
+- `stripePaymentWebhook`
+- `stripeInvoiceWebhook`
+- `stripeInvoiceHandlers`
+
+Those wrappers still exist for compatibility, but Stripe should not actively deliver to them.
+
+## Verification Notes
+
+- `GET https://clientsurgesystems.com/api/functions/stripeWebhookOrders` returns `400` with `Webhook Error: No webhook payload was provided.`
+- That response confirms the deployed custom-domain function route exists and is serving the Stripe webhook handler.
+- Live Stripe dashboard delivery and event replay are still **NOT VERIFIED** until one real Stripe test-mode delivery is observed in `CommunicationEvent`.
 
 ## Pre-Flight Checks
 
-- [ ] All product prices created in **live** Stripe dashboard (not just test)
-- [ ] Stripe account identity verification complete (Stripe requires this before live charges)
-- [ ] Bank account connected and verified in Stripe
-- [ ] Business address and tax info set in Stripe Dashboard → Settings → Business details
+- [ ] All product prices created in live Stripe
+- [ ] Stripe account identity verification complete
+- [ ] Bank account connected and verified
+- [ ] Business address and tax info set in Stripe Dashboard
+- [ ] `STRIPE_SECRET_KEY` is live
+- [ ] `STRIPE_PUBLISHABLE_KEY` is live
+- [ ] `STRIPE_WEBHOOK_SECRET` matches the canonical endpoint only
 
----
+## End-to-End Test Required Before Real Payments
 
-## Step 1 — Swap API Keys ✅ DONE
-
-1. ✅ `STRIPE_SECRET_KEY` → updated to `sk_live_...`
-2. ✅ `STRIPE_PUBLISHABLE_KEY` → updated to `pk_live_...`
-3. ✅ `STRIPE_WEBHOOK_SECRET` → live `whsec_...` already set
-
----
-
-## Step 2 — Update the Webhook Endpoint ✅ DONE
-
-1. ✅ Live webhook endpoint added in Stripe Dashboard
-2. ✅ Pointed to `stripeWebhookOrders` function URL
-3. ✅ Events subscribed:
-   - `checkout.session.completed`
-   - `customer.subscription.created`
-   - `customer.subscription.updated`
-   - `customer.subscription.deleted`
-   - `invoice.payment_succeeded`
-   - `invoice.payment_failed`
-4. ✅ `STRIPE_WEBHOOK_SECRET` set to live signing secret
-
----
-
-## Step 3 — Live Stripe Price IDs ← NEXT
-
-- [ ] Confirm all `price_id` values in `lib/salesCatalog.js` use **live** Stripe price IDs (format: `price_live_...`)
-- [ ] Test cards will NOT work in live mode — use a real card for verification
-
----
-
-## Step 4 — End-to-End Test with Real Card
-
-- [ ] Place a test order on the live domain with a real credit card
-- [ ] Confirm `checkout.session.completed` webhook fires and is logged
-- [ ] Confirm Order entity shows `payment_status: "paid"`
-- [ ] Confirm customer confirmation email is received
-- [ ] Confirm admin notification email is received
-- [ ] Verify ClientProject is created and linked to the order
-- [ ] Cancel and refund the test order in Stripe Dashboard
-
----
-
-## Step 5 — Stripe Invoice Webhook (Subscriptions)
-
-- [ ] Confirm `invoice.payment_succeeded` updates `subscription_status` on Order
-- [ ] Confirm `invoice.payment_failed` sets `billing_status: "past_due"` on Order
-- [ ] Confirm `PaymentFailedBanner` shows in client portal when `billing_status === "past_due"`
-
----
-
-## Step 6 — Customer Portal URL
-
-- [ ] Enable **Customer Portal** in [Stripe Dashboard → Settings → Billing → Customer portal](https://dashboard.stripe.com/settings/billing/portal)
-- [ ] Test `getStripeCustomerPortalUrl` returns a working portal URL for a paid customer
-- [ ] Confirm BillingDashboard "Manage Subscription" button redirects correctly
-
----
+- [ ] Place one Stripe test-mode checkout on the deployed site
+- [ ] Confirm `checkout.session.completed` appears in `CommunicationEvent`
+- [ ] Confirm `Order.payment_status = "paid"`
+- [ ] Confirm `Order.client_id` and `Order.client_project_id` are both set
+- [ ] Confirm `Order.install_configuration` and `Order.items[].install_status` initialize
+- [ ] Confirm a one-time portal invite ledger entry is written
+- [ ] Confirm a one-time order confirmation ledger entry is written
+- [ ] Confirm `getClientPortalContext` returns canonical order/project/package/install state
 
 ## Rollback Plan
 
-If something breaks in live mode:
-1. Revert `STRIPE_SECRET_KEY` and `STRIPE_PUBLISHABLE_KEY` back to `sk_test_` / `pk_test_`
-2. Disable the live webhook in Stripe Dashboard
-3. Re-enable the test webhook
-4. Revert `STRIPE_WEBHOOK_SECRET` to the test signing secret
-5. Notify affected customers if any charges occurred
-
----
-
-## Sign-Off
-
-| Check | Person | Date |
-|---|---|---|
-| API keys swapped | ✅ | 2026-05-04 |
-| Webhook updated | ✅ | 2026-05-04 |
-| Price IDs updated | | |
-| End-to-end purchase tested | | |
-| Customer portal verified | | |
-| Team sign-off | | |
+1. Disable the live Stripe webhook endpoint.
+2. Revert Stripe API keys to test mode if a live key swap was performed.
+3. Restore the test webhook signing secret.
+4. Inspect `CommunicationEvent` for any partially processed live orders.
+5. Notify affected customers if any real charges were created.

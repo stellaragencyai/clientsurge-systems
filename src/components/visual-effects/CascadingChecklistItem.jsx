@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 
 const checkVariants = {
   hidden: { pathLength: 0, opacity: 0 },

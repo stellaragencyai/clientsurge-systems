@@ -4,7 +4,7 @@
  * color-codes by sniper score, and supports proximity radius filtering.
  */
 import { useEffect, useRef, useState, useMemo } from 'react';
-import { MapPin, Layers, Sliders, X } from 'lucide-react';
+import { Sliders, X } from 'lucide-react';
 
 // City coordinates for common target markets
 const CITY_COORDS = {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Bot, CheckCircle2, Calendar, MessageSquare, Clock, Sparkles, Phone } from "lucide-react";
+import { Bot, CheckCircle2 } from "lucide-react";
 
 const STEPS = [
   {

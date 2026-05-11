@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { getPackageOffer, normalizePackageKey } from "@/lib/salesCatalog";
 
 const PLANS = {
   starter: {
-    name: "Starter Plan",
-    price: "$797 Setup + $497/month",
-    includes: "Includes: Instant Lead Response + Missed Call Text-Back",
+    name: "Starter System",
+    price: "$695 Setup + $197/month",
+    includes: "Includes: Instant Lead Response + AI Booking Agent",
   },
   growth: {
-    name: "Growth Plan",
-    price: "$1,297 Setup + $997/month",
-    includes: "Includes: Instant Lead Response, Missed Call Text-Back, Appointment Booking AI + Follow-Up Sequences",
+    name: "Growth System",
+    price: "$1,195 Setup + $349/month",
+    includes: "Includes: Instant Lead Response, Missed Call Text-Back, 14-Day Nurture Sequence + AI Booking Agent",
   },
   elite: {
-    name: "Elite Plan",
-    price: "$2,497 Setup + $1,997/month",
+    name: "Elite System",
+    price: "$1,495 Setup + $469/month",
     includes: "Includes: All 6 Automations — fully built and live",
   },
 };
@@ -82,8 +83,16 @@ export default function ThankYou() {
   const [visible, setVisible] = useState(false);
 
   const params = new URLSearchParams(window.location.search);
-  const planKey = (params.get("plan") || "").toLowerCase();
-  const plan = PLANS[planKey] || null;
+  const planKey = normalizePackageKey(params.get("plan") || "");
+  const packageOffer = getPackageOffer(planKey);
+  const plan =
+    (packageOffer && {
+      name: packageOffer.name,
+      price: `$${packageOffer.setup_total} Setup + $${packageOffer.monthly_total}/month`,
+      includes: `Includes: ${packageOffer.included_services.map((service) => service.name).join(", ")}`,
+    }) ||
+    PLANS[planKey] ||
+    null;
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
@@ -427,8 +436,7 @@ export default function ThankYou() {
           >
             Set Up My Account →
           </Link>
-        )
-        </Link>
+        )}
       </div>
     </div>
   );

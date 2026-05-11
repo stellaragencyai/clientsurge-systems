@@ -9,7 +9,6 @@ import {
   INDUSTRY_SELECTION_STORAGE_KEY } from
 "@/lib/industryRecommendations";
 import { systemsById, systemGroups, coreOfferSectionConfig, iconMap } from "./coreOffer/coreOfferData";
-import SystemMap from "./coreOffer/SystemMapSection";
 import VerticalTimeline from "./coreOffer/VerticalTimeline";
 import LaunchTimeline from "./coreOffer/LaunchTimeline";
 import StackBuilder from "./coreOffer/StackBuilder";

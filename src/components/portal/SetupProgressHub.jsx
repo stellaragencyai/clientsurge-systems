@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import {
-  CheckCircle2, Clock, Loader2, Zap, Upload, X, FileText,
-  MessageCircle, Send, ImageIcon, Paperclip, ChevronDown, ChevronUp
+  CheckCircle2, Loader2, Upload,
+  MessageCircle, Send, ChevronDown, ChevronUp
 } from "lucide-react";
 import OnboardingTracker from "./OnboardingTracker";
 

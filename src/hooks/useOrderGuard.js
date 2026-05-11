@@ -23,7 +23,7 @@ export function useOrderGuard() {
     (async () => {
       try {
         const result = await base44.functions.invoke("getOrderStatus", { order_id });
-        if (!result?.order || result.order.payment_status !== "paid") {
+        if (!result?.order || !result.eligible) {
           navigate("/pricing?error=unpaid_order");
           return;
         }

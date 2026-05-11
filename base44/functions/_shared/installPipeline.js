@@ -1082,13 +1082,23 @@ async function resolveClientProjectRecord(base44, order, client, pipelineStatus)
       business_name: order.business_name,
     });
 
-  const projectPatch = buildClientProjectPatch({ pipelineStatus, trackedItems: getTrackedInstallItems(order.items || []) });
+  const planName =
+    order.pricing_summary?.package_name ||
+    order.plan_type ||
+    "Starter System";
+  const projectPatch = buildClientProjectPatch({
+    pipelineStatus,
+    trackedItems: getTrackedInstallItems(order.items || []),
+  });
 
   if (existing) {
     await base44.asServiceRole.entities.ClientProject.update(existing.id, {
       client_id: existing.client_id || client.id,
+      client_email: existing.client_email || order.customer_email,
+      contact_email: existing.contact_email || order.customer_email,
       client_name: existing.client_name || order.customer_name,
       business_name: existing.business_name || order.business_name,
+      plan: existing.plan || planName,
       ...projectPatch,
     });
     return base44.asServiceRole.entities.ClientProject.get(existing.id);
@@ -1097,9 +1107,10 @@ async function resolveClientProjectRecord(base44, order, client, pipelineStatus)
   return base44.asServiceRole.entities.ClientProject.create({
     client_id: client.id,
     client_email: order.customer_email,
+    contact_email: order.customer_email,
     client_name: order.customer_name,
     business_name: order.business_name,
-    plan: "Starter System",
+    plan: planName,
     ...projectPatch,
   });
 }

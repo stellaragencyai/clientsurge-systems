@@ -4,7 +4,8 @@ import Hero from "../components/landing/Hero.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
 import { SectionSkeleton, LargeSectionSkeleton } from "../components/landing/SkeletonLoader";
-import { FAQ_ITEMS } from "../components/landing/FAQ";
+import FAQ, { FAQ_ITEMS } from "../components/landing/FAQ";
+import Footer from "../components/landing/Footer";
 
 // Lazy load ALL below-the-fold sections individually for independent rendering
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
@@ -12,13 +13,11 @@ const InteractiveJourneyMap = lazy(() => import("../components/landing/Interacti
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const IntegrationPartners = lazy(() => import("../components/landing/IntegrationPartners"));
-const FAQ = lazy(() => import("../components/landing/FAQ"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
 const LeadLeakage = lazy(() => import("../components/landing/LeadLeakage"));
 const BeforeAfter = lazy(() => import("../components/landing/BeforeAfter"));
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
-const Footer = lazy(() => import("../components/landing/Footer"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
 const AutomationShowcase = lazy(() => import("../components/landing/AutomationShowcase"));
 const SystemDiagramSection = lazy(() => import("../components/landing/SystemDiagram"));
@@ -142,9 +141,7 @@ export default function Home() {
           <SectionBreak />
           <FinalCTA />
         </Suspense>
-        <Suspense fallback={null}>
-          <Footer />
-        </Suspense>
+        <Footer />
         <ChatBubble />
         <CookieConsent />
       </div>

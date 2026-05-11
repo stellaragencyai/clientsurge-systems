@@ -313,6 +313,17 @@ const PACKAGE_DEFINITIONS = [
   },
 ];
 
+export const PACKAGE_KEY_ALIASES = {
+  starter: "starter_system",
+  starter_system: "starter_system",
+  growth: "growth_system",
+  growth_system: "growth_system",
+  elite: "elite_system",
+  elite_system: "elite_system",
+  pro: "elite_system",
+  pro_system: "elite_system",
+};
+
 const SERVICE_BY_PRODUCT_ID = Object.fromEntries(
   CANONICAL_SERVICE_PRODUCTS.map((product) => [product.product_id, product])
 );
@@ -433,6 +444,23 @@ export function formatCurrency(amount) {
   return Number(amount || 0).toLocaleString();
 }
 
+export function normalizePackageKey(packageKey) {
+  const normalized = String(packageKey || "").trim().toLowerCase();
+  return PACKAGE_KEY_ALIASES[normalized] || normalized || null;
+}
+
+export function getPackageOfferByName(packageName) {
+  const normalizedName = String(packageName || "").trim().toLowerCase();
+  if (!normalizedName) {
+    return null;
+  }
+
+  return (
+    PACKAGE_OFFERS.find((offer) => offer.name.toLowerCase() === normalizedName) ||
+    null
+  );
+}
+
 export function getServiceProductById(productId) {
   return SERVICE_BY_PRODUCT_ID[productId] || null;
 }
@@ -450,7 +478,8 @@ export function getServiceProductBySetupPriceId(priceId) {
 }
 
 export function getPackageOffer(packageKey) {
-  return PACKAGE_OFFERS.find((offer) => offer.package_key === packageKey) || null;
+  const normalizedKey = normalizePackageKey(packageKey);
+  return PACKAGE_OFFERS.find((offer) => offer.package_key === normalizedKey) || null;
 }
 
 export function getBestPackageOfferForServiceKeys(serviceKeys = []) {

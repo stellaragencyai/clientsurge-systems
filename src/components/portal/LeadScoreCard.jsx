@@ -1,4 +1,4 @@
-import { Star, TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 
 export default function LeadScoreCard({ lead }) {
   const score = lead.lead_score ?? 0;

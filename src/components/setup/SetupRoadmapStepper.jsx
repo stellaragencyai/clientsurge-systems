@@ -1,4 +1,4 @@
-import { CheckCircle2, Loader2, Clock, CreditCard, ClipboardList, Settings, Globe, Zap } from "lucide-react";
+import { CheckCircle2, Loader2, CreditCard, ClipboardList, Settings, Globe, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 
 // Maps workflow_stage values to which phase index is "in_progress" or "complete"

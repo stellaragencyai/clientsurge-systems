@@ -4,8 +4,7 @@
  * Supports SMS (Twilio), Email (Resend), and Stripe events.
  */
 import { useState, useEffect } from "react";
-import {
-  XCircle, RefreshCw, Loader2, ChevronDown, ChevronUp,
+import { RefreshCw, Loader2, ChevronDown, ChevronUp,
   MessageSquare, Mail, CreditCard, AlertTriangle, CheckCircle2, ExternalLink
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";

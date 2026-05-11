@@ -1,16 +1,113 @@
 /**
  * manageWebhookRegistration
- * CRUD + secret generation for webhook registrations
+ * CRUD + secret generation for signed project-scoped webhook registrations.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+
+function cleanString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
 
 function generateSecret() {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
   let result = "whsec_";
-  for (let i = 0; i < 32; i++) {
+  for (let i = 0; i < 32; i += 1) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
   return result;
+}
+
+function normalizeRegistrationPayload(data = {}) {
+  return {
+    ...data,
+    source_name: cleanString(data.source_name),
+    service_key: cleanString(data.service_key),
+    client_project_id: cleanString(data.client_project_id),
+    webhook_url: cleanString(data.webhook_url),
+    signature_algorithm: "hmac_sha256",
+  };
+}
+
+function sanitizeRegistration(registration, { revealSecret = false } = {}) {
+  if (!registration) {
+    return registration;
+  }
+
+  const { secret_key, ...rest } = registration;
+  return {
+    ...rest,
+    has_secret: Boolean(secret_key),
+    ...(revealSecret && secret_key ? { secret_key } : {}),
+  };
+}
+
+async function syncProjectWebhookMetadata(base44, registration) {
+  const clientProjectId = cleanString(registration?.client_project_id);
+  if (!clientProjectId) {
+    return;
+  }
+
+  const project = await base44.asServiceRole.entities.ClientProject.get(clientProjectId).catch(
+    () => null
+  );
+  if (!project) {
+    return;
+  }
+
+  const installConfiguration = project.install_configuration || {};
+  const integrations = installConfiguration.integrations || {};
+
+  await base44.asServiceRole.entities.ClientProject.update(project.id, {
+    install_configuration: {
+      ...installConfiguration,
+      integrations: {
+        ...integrations,
+        lead_capture_webhook: {
+          registration_id: registration.id,
+          source_name: registration.source_name || "",
+          service_key: registration.service_key || "",
+          webhook_url: registration.webhook_url || "",
+          status: registration.status || "active",
+          signature_algorithm: registration.signature_algorithm || "hmac_sha256",
+          last_triggered_at: registration.last_triggered_at || null,
+        },
+      },
+    },
+  });
+}
+
+async function clearProjectWebhookMetadata(base44, registration) {
+  const clientProjectId = cleanString(registration?.client_project_id);
+  if (!clientProjectId) {
+    return;
+  }
+
+  const project = await base44.asServiceRole.entities.ClientProject.get(clientProjectId).catch(
+    () => null
+  );
+  if (!project) {
+    return;
+  }
+
+  const installConfiguration = project.install_configuration || {};
+  const integrations = installConfiguration.integrations || {};
+
+  if (
+    integrations.lead_capture_webhook?.registration_id &&
+    integrations.lead_capture_webhook.registration_id !== registration.id
+  ) {
+    return;
+  }
+
+  await base44.asServiceRole.entities.ClientProject.update(project.id, {
+    install_configuration: {
+      ...installConfiguration,
+      integrations: {
+        ...integrations,
+        lead_capture_webhook: null,
+      },
+    },
+  });
 }
 
 Deno.serve(async (req) => {
@@ -25,36 +122,57 @@ Deno.serve(async (req) => {
     const { action, id, data } = body;
 
     if (action === "list") {
-      const registrations = await base44.asServiceRole.entities.WebhookRegistration.list("-created_date", 50);
-      return Response.json({ success: true, registrations });
+      const registrations = await base44.asServiceRole.entities.WebhookRegistration.list(
+        "-created_date",
+        50
+      );
+      return Response.json({
+        success: true,
+        registrations: registrations.map((registration) => sanitizeRegistration(registration)),
+      });
     }
 
     if (action === "create") {
-      const secret = generateSecret();
+      const payload = normalizeRegistrationPayload(data);
       const record = await base44.asServiceRole.entities.WebhookRegistration.create({
-        ...data,
-        secret_key: secret,
+        ...payload,
+        secret_key: generateSecret(),
         status: "active",
+        signature_algorithm: "hmac_sha256",
         failure_count: 0,
         created_at: new Date().toISOString(),
       });
-      return Response.json({ success: true, registration: record });
+      await syncProjectWebhookMetadata(base44, record);
+      return Response.json({
+        success: true,
+        registration: sanitizeRegistration(record, { revealSecret: true }),
+      });
     }
 
     if (action === "update") {
-      const record = await base44.asServiceRole.entities.WebhookRegistration.update(id, data);
-      return Response.json({ success: true, registration: record });
+      const payload = normalizeRegistrationPayload(data);
+      const record = await base44.asServiceRole.entities.WebhookRegistration.update(id, payload);
+      await syncProjectWebhookMetadata(base44, record);
+      return Response.json({ success: true, registration: sanitizeRegistration(record) });
     }
 
     if (action === "delete") {
+      const existing = await base44.asServiceRole.entities.WebhookRegistration.get(id);
       await base44.asServiceRole.entities.WebhookRegistration.delete(id);
+      await clearProjectWebhookMetadata(base44, existing);
       return Response.json({ success: true });
     }
 
     if (action === "regenerate_secret") {
-      const secret = generateSecret();
-      const record = await base44.asServiceRole.entities.WebhookRegistration.update(id, { secret_key: secret });
-      return Response.json({ success: true, registration: record });
+      const record = await base44.asServiceRole.entities.WebhookRegistration.update(id, {
+        secret_key: generateSecret(),
+        signature_algorithm: "hmac_sha256",
+      });
+      await syncProjectWebhookMetadata(base44, record);
+      return Response.json({
+        success: true,
+        registration: sanitizeRegistration(record, { revealSecret: true }),
+      });
     }
 
     return Response.json({ error: "Unknown action" }, { status: 400 });

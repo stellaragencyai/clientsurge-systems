@@ -6,8 +6,8 @@ import {
 } from 'recharts';
 import {
   Users, TrendingUp, PhoneCall, Calendar, MessageSquare,
-  RefreshCw, Loader2, ChevronDown, ChevronUp, Zap, Target,
-  Mail, AlertCircle, Clock, ArrowUpRight, BarChart3
+  RefreshCw, ChevronDown, ChevronUp, Zap, Target,
+  Mail, AlertCircle, Clock, BarChart3
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

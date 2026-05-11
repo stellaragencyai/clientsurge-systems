@@ -6,8 +6,7 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   CheckCircle2, XCircle, AlertTriangle, RefreshCw, Zap, Loader2,
-  Clock, Activity, MessageSquare, Mail, CreditCard, ClipboardList,
-  ExternalLink, ChevronDown, ChevronUp, Shield, AlertCircle
+  Clock, Activity, MessageSquare, Mail, CreditCard, ClipboardList, ChevronDown, ChevronUp, Shield, AlertCircle
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import AutomationAlertsPanel from "./AutomationAlertsPanel";

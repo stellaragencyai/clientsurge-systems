@@ -1,7 +1,5 @@
-import { useState, useEffect, useRef } from "react";
 import { X, CheckCircle2 } from "lucide-react";
 import ProblemMatcher from "./ProblemMatcher";
-import ProblemVideoButton from "./ProblemVideoButton";
 import AnimatedStats from "./AnimatedStats";
 import { motion } from "framer-motion";
 

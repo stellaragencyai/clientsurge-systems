@@ -8,7 +8,6 @@
  */
 import { useEffect, useState, useRef } from "react";
 import { SpaLead } from "@/api/entities";
-import { base44 } from "@/api/base44Client";
 
 // #511: CSS-only funnel
 export function ConversionFunnelCSS({ leads }) {

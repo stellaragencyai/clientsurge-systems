@@ -4,6 +4,8 @@
  * Validates required fields before submit.
  */
 
+import { useState } from "react";
+
 const ONBOARDING_RULES = {
   client_name: { required: true, label: "Your name" },
   business_name: { required: true, label: "Business name" },
@@ -17,8 +19,8 @@ const ONBOARDING_RULES = {
 export function validateOnboardingField(field, value) {
   const rule = ONBOARDING_RULES[field];
   if (!rule) return null;
-  if (rule.required && (!value || String(value).trim() === "")) return \`\${rule.label} is required\`;
-  if (rule.pattern && value && !rule.pattern.test(String(value).trim())) return \`\${rule.label} is invalid\`;
+  if (rule.required && (!value || String(value).trim() === "")) return `${rule.label} is required`;
+  if (rule.pattern && value && !rule.pattern.test(String(value).trim())) return `${rule.label} is invalid`;
   return null;
 }
 
@@ -32,7 +34,6 @@ export function validateOnboardingForm(formData) {
 }
 
 export function useOnboardingValidation() {
-  const { useState } = require("react");
   const [errors, setErrors] = useState({});
 
   const validateField = (field, value) => {

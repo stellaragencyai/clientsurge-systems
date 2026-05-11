@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ShoppingCart, Zap, Search, ArrowRight, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
+import { ShoppingCart, Search, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
-import { AI_PRODUCTS, CATEGORIES, CANONICAL_SERVICE_PRODUCTS } from "@/lib/aiProducts";
+import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
 import CartSidebar from "@/components/store/CartSidebar";
 import Navbar from "@/components/landing/Navbar";
@@ -10,9 +10,8 @@ import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
 import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
-import { getRecommendedProducts } from "@/lib/productRecommendations";
-import StackValueCounter from "@/components/store/StackValueCounter";
 import { setPageMetadata } from "@/lib/seo";
+import Footer from "@/components/landing/Footer";
 
 // Lazy load heavy store components
 const InteractiveStackBuilder = lazy(() =>
@@ -20,7 +19,6 @@ import("@/components/store/InteractiveStackBuilder")
 );
 const SocialProofTicker = lazy(() => import("@/components/store/SocialProofTicker"));
 const ServiceComparisonModal = lazy(() => import("@/components/store/ServiceComparisonModal"));
-const Footer = lazy(() => import("@/components/landing/Footer"));
 const BuildYourStackFlow = lazy(() => import("@/components/store/BuildYourStackFlow"));
 const BundleSavingsToast = lazy(() => import("@/components/store/BundleSavingsToast"));
 
@@ -670,8 +668,8 @@ function StoreInner() {
                We'll tell you exactly which services will move the needle for your business.
              </p>
            </div>
+           <Footer />
            <Suspense fallback={null}>
-             <Footer />
              <SocialProofTicker />
            </Suspense>
            {showComparison &&

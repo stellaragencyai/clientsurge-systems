@@ -1,4 +1,4 @@
-import { Instagram, Globe, Phone, Zap, Facebook, Users, ArrowRight } from "lucide-react";
+import { Instagram, Globe, Phone, Zap, Facebook, Users } from "lucide-react";
 
 export default function MedSpaPositioning() {
   const channels = [

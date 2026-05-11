@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import {
   Sparkles, Loader2, CheckCircle2, Clock, Globe, Linkedin, Instagram,
-  BookOpen, Filter, ChevronDown, ChevronUp, Copy, Check, Archive, RefreshCw,
+  BookOpen, ChevronDown, ChevronUp, Copy, Check, Archive, RefreshCw,
   AlertCircle, Twitter, Facebook, Video
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';

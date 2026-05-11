@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import {
-  LineChart, Line, AreaChart, Area,
+  LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
 import {
-  Trophy, Flame, TrendingUp, Users, Zap, RefreshCw,
-  Loader2, AlertCircle, Star, Crown, Medal, ArrowUp, ArrowDown, Minus,
+  Trophy, Flame, TrendingUp, Users, Zap, RefreshCw, AlertCircle, Star, Crown, Medal, ArrowUp, ArrowDown, Minus,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

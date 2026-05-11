@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ExternalLink, Eye, Zap } from 'lucide-react';
+import { ExternalLink, Eye } from 'lucide-react';
 
 const statusColors = {
   'New': 'bg-slate-100 text-slate-800',

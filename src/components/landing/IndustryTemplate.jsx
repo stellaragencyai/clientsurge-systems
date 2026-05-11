@@ -5,11 +5,10 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import IndustryHero from "../industry/IndustryHero";
 import IndustryPainBar from "../industry/IndustryPainBar";
-import ProblemSolution from "./ProblemSolution";
 import IndustrySMSDemo from "../industry/IndustrySMSDemo";
 import IndustryResults from "../industry/IndustryResults";
 import IndustryFAQ from "../industry/IndustryFAQ";
-import { INDUSTRIES, getIndustryBySlug } from "@/lib/industryData";
+import { getIndustryBySlug } from "@/lib/industryData";
 import { setPageMetadata } from "@/lib/seo";
 
 function IndustryTemplateInner({ industrySlug }) {

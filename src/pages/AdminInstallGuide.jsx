@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, CheckCircle2, Circle, ChevronDown, ChevronUp,
-  Phone, Settings, Zap, TestTube, Rocket, AlertCircle, Copy
+  ArrowLeft, CheckCircle2, ChevronDown, ChevronUp,
+  Phone, Settings, Zap, TestTube, Rocket, AlertCircle
 } from "lucide-react";
 
 const STEPS = [

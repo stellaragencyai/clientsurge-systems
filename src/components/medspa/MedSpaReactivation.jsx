@@ -1,4 +1,4 @@
-import { ArrowRight, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 
 export default function MedSpaReactivation() {
   return (

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import {
-  AlertTriangle, XCircle, Zap, RefreshCw, CheckCircle2, ExternalLink,
+  AlertTriangle, XCircle, Zap, RefreshCw, CheckCircle2,
   ChevronDown, ChevronUp, Bell, BellOff, Loader2, ArrowRight, X
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";

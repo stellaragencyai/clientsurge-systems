@@ -5,6 +5,8 @@
  * Also exports LazyImg component for use in JSX.
  */
 
+import { createElement } from "react";
+
 // Runtime patch: find all <img> without loading=lazy that are NOT in the hero
 export function patchLazyImages() {
   if (typeof document === "undefined") return;
@@ -23,5 +25,13 @@ export function patchLazyImages() {
 
 // JSX component wrapper
 export function LazyImg({ src, alt, style, className, ...props }) {
-  return <img src={src} alt={alt || ""} loading="lazy" decoding="async" style={style} className={className} {...props} />;
+  return createElement("img", {
+    src,
+    alt: alt || "",
+    loading: "lazy",
+    decoding: "async",
+    style,
+    className,
+    ...props
+  });
 }

@@ -215,6 +215,7 @@ const AuthenticatedApp = () => {
       <Route path="/privacy-policy" element={<Navigate to="/legal/privacy" replace />} />
       <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
       <Route path="/login" element={<Navigate to="/client-portal" replace />} />
+      <Route path="/ClientPortal" element={<Navigate to="/client-portal" replace />} />
       <Route path="/success" element={<Success />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/leads/capture" element={<CaptureLeads />} />

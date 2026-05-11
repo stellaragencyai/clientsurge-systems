@@ -15,14 +15,12 @@ import {
   Activity,
   AlertCircle,
   ArrowUpRight,
-  Flame,
   Mail,
   MessageSquare,
   RefreshCw,
   Star,
   Target,
   TrendingUp,
-  Users,
   Zap,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";

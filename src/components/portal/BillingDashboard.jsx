@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import {
   CreditCard, Download, ExternalLink, Loader2, AlertCircle,
   CheckCircle2, Clock, RefreshCw, FileText, ShieldCheck, Zap,
-  XCircle, Calendar, ChevronDown, ChevronUp, BadgeCheck, AlertTriangle,
+  XCircle, ChevronDown, ChevronUp, BadgeCheck, AlertTriangle,
 } from 'lucide-react';
 
 // ─── helpers ────────────────────────────────────────────────────────────────

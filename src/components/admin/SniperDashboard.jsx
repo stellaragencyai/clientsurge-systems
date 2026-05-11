@@ -6,8 +6,8 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import {
   Target, Zap, Globe, Star, RefreshCw, Loader2, AlertCircle,
-  CheckCircle2, XCircle, ExternalLink, ChevronDown, ChevronUp,
-  MapPin, Phone, Building2, TrendingUp, Eye, Filter, Play, Map, List,
+  CheckCircle2, XCircle, ChevronDown, ChevronUp,
+  MapPin, Phone, TrendingUp, Filter, Play, Map, List,
 } from 'lucide-react';
 import SniperMap from './SniperMap';
 

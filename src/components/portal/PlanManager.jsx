@@ -33,32 +33,31 @@ function formatDate(value) {
 }
 
 export default function PlanManager({ project, subscription, onUpdated }) {
-  const currentPlan = subscription?.plan_type || project.plan;
+  const currentPlan = subscription?.plan_name || subscription?.plan_type || project.plan;
   const [selected, setSelected] = useState(null);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  const submitRequest = async (requestType, requestedPlanType = "") => {
+  const submitRequest = async (requestedPlanType = "") => {
     setSaving(true);
     setSuccess("");
     setError("");
 
     try {
-      await base44.functions.invoke("requestSubscriptionChange", {
-        request_type: requestType,
-        requested_plan_type: requestedPlanType,
+      if (!project?.id) {
+        throw new Error("Project is not linked yet.");
+      }
+
+      await base44.entities.ClientProject.update(project.id, {
+        plan_change_request: requestedPlanType || "None",
       });
       setSelected(null);
-      setSuccess(
-        requestType === "cancel"
-          ? "Cancellation request submitted for operator review."
-          : `Plan change request to ${requestedPlanType} submitted for operator review.`
-      );
+      setSuccess(`Plan change request to ${requestedPlanType} submitted for operator review.`);
       onUpdated?.();
       setTimeout(() => setSuccess(""), 4000);
     } catch (requestError) {
-      setError(requestError?.data?.error || requestError?.message || "Unable to submit subscription request.");
+      setError(requestError?.data?.error || requestError?.message || "Unable to submit plan request.");
     } finally {
       setSaving(false);
     }
@@ -132,12 +131,7 @@ export default function PlanManager({ project, subscription, onUpdated }) {
             </p>
           </div>
           <button
-            onClick={() =>
-              submitRequest(
-                (PLAN_RANK[selected] || 0) > (PLAN_RANK[currentPlan] || 0) ? "upgrade" : "downgrade",
-                selected
-              )
-            }
+            onClick={() => submitRequest(selected)}
             disabled={saving}
             className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-50"
             style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
@@ -153,19 +147,17 @@ export default function PlanManager({ project, subscription, onUpdated }) {
           <CircleAlert className="w-4 h-4 text-amber-700 mt-0.5" />
           <div className="space-y-3">
             <div>
-              <p className="text-sm font-semibold text-amber-900">Cancellation</p>
+              <p className="text-sm font-semibold text-amber-900">Billing changes</p>
               <p className="text-xs text-amber-800 mt-1">
-                Cancellation requests are reviewed manually. Data is preserved and services are disabled safely after the billing change is confirmed.
+                Package changes are operator-reviewed because these bundles provision multiple services. Cancellation and payment-method changes still need direct support help for now.
               </p>
             </div>
-            <button
-              onClick={() => submitRequest("cancel")}
-              disabled={saving || subscription?.change_request_type === "cancel"}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-300 text-sm font-semibold text-amber-900 hover:bg-amber-100 disabled:opacity-50"
+            <a
+              href="mailto:support@clientsurgesystems.com?subject=ClientSurge%20billing%20change"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-300 text-sm font-semibold text-amber-900 hover:bg-amber-100"
             >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-              Request Cancellation
-            </button>
+              Contact Support
+            </a>
           </div>
         </div>
       </div>

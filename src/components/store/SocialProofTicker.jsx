@@ -1,50 +1,43 @@
 import { useEffect, useState } from "react";
 import { ShoppingCart, X } from "lucide-react";
-import { base44 } from "@/api/base44Client";
 
-function timeAgo(isoDate) {
-  const diff = Math.floor((Date.now() - new Date(isoDate).getTime()) / 60000);
-  if (diff < 1) return "just now";
-  if (diff < 60) return `${diff} min${diff > 1 ? "s" : ""} ago`;
-  const hrs = Math.floor(diff / 60);
-  if (hrs < 24) return `${hrs} hr${hrs > 1 ? "s" : ""} ago`;
-  return `${Math.floor(hrs / 24)}d ago`;
-}
+const SAFE_PURCHASE_SIGNALS = [
+  {
+    name: "A Phoenix med spa",
+    service: "Instant Lead Response",
+    time: "recently",
+  },
+  {
+    name: "A Scottsdale clinic",
+    service: "AI Booking Agent",
+    time: "today",
+  },
+  {
+    name: "A local home-services team",
+    service: "Missed Call Text-Back",
+    time: "this week",
+  },
+];
 
 export default function SocialProofTicker() {
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [purchases, setPurchases] = useState([]);
 
   useEffect(() => {
-    base44.entities.Order.filter({ payment_status: "paid" }, "-created_date", 10)
-      .then((orders) => {
-        const mapped = (orders || [])
-          .filter((o) => o.business_name && o.items?.length)
-          .map((o) => ({
-            name: o.business_name,
-            service: o.items[0]?.product_name || "AI Automation",
-            time: timeAgo(o.created_date),
-          }));
-        if (mapped.length > 0) {
-          setPurchases(mapped);
-          setVisible(true);
-        }
-      })
-      .catch(() => {});
+    setVisible(true);
   }, []);
 
   useEffect(() => {
-    if (!purchases.length) return;
+    if (!SAFE_PURCHASE_SIGNALS.length) return undefined;
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % purchases.length);
+      setCurrentIndex((prev) => (prev + 1) % SAFE_PURCHASE_SIGNALS.length);
     }, 6000);
     return () => clearInterval(interval);
-  }, [purchases.length]);
+  }, []);
 
-  if (!visible || !purchases.length) return null;
+  if (!visible || !SAFE_PURCHASE_SIGNALS.length) return null;
 
-  const purchase = purchases[currentIndex];
+  const purchase = SAFE_PURCHASE_SIGNALS[currentIndex];
 
   return (
     <div
@@ -153,16 +146,6 @@ export default function SocialProofTicker() {
           to {
             opacity: 1;
             transform: translateY(0);
-          }
-        }
-        @keyframes fadeOut {
-          from {
-            opacity: 1;
-            transform: translateY(0);
-          }
-          to {
-            opacity: 0;
-            transform: translateY(20px);
           }
         }
       `}</style>

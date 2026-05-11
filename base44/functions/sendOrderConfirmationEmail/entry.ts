@@ -1,74 +1,131 @@
-/**
- * sendOrderConfirmationEmail — #501
- * Human-readable service labels (not raw service_key strings).
- */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  getPackageOffer,
+  getPackageDisplayLabel,
+  getServiceProductByKey,
+  normalizePackageKey,
+} from "../../../src/lib/salesCatalog.js";
 
-const SERVICE_LABELS: Record<string, string> = {
-  instant_response: "Instant Lead Response (24/7 AI replies)",
-  missed_call_textback: "Missed Call Text-Back",
-  followup_sequences: "Follow-Up Sequences (Day 1, 3 & 7)",
-  appointment_booking_ai: "AI Appointment Booking",
-  review_request_ai: "Review Request AI (auto 5-star requests)",
-  reactivation_campaign: "Reactivation Campaign (re-engage past clients)",
-};
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
-import { getServicesForTier } from "../shared/tierServiceMap.ts";
+function formatMoney(amount: unknown) {
+  return Number(amount || 0).toLocaleString();
+}
+
+function resolveServiceRows(order: any, packageOffer: any) {
+  const orderItems = Array.isArray(order?.items) ? order.items : [];
+  if (orderItems.length > 0) {
+    return orderItems.map((item: any) => ({
+      name:
+        item.product_name ||
+        getServiceProductByKey(item.service_key)?.name ||
+        item.service_key ||
+        "Service",
+      setup_fee: item.setup_fee ?? 0,
+      monthly_fee: item.monthly_fee ?? 0,
+    }));
+  }
+
+  return (packageOffer?.included_services || []).map((service: any) => ({
+    name: service.name,
+    setup_fee: service.setup_fee,
+    monthly_fee: service.monthly_fee,
+  }));
+}
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { order_id } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    const { order_id, portal_activation_url } = await req.json();
+
+    if (!order_id) {
+      return Response.json({ error: "order_id required" }, { status: 400 });
+    }
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+    if (!order) {
+      return Response.json({ error: "Order not found" }, { status: 404 });
+    }
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (!order.client_email || !resendKey) return Response.json({ error: "No email or Resend key" }, { status: 400 });
+    if (!resendKey) {
+      return Response.json({ error: "RESEND_API_KEY missing" }, { status: 500 });
+    }
 
-    const services = getServicesForTier(order.package_key || "starter");
-    const serviceList = services.map(k => `<li style="color:#374151;margin-bottom:6px">✅ ${SERVICE_LABELS[k] || k}</li>`).join("");
+    const customerEmail = order.customer_email || "";
+    if (!customerEmail) {
+      return Response.json({ error: "Order missing customer_email" }, { status: 400 });
+    }
 
-    const tierPrices: Record<string, { monthly: number; setup: number }> = {
-      starter: { monthly: 497, setup: 797 },
-      growth: { monthly: 997, setup: 1297 },
-      elite: { monthly: 1997, setup: 2497 },
-    };
-    const pricing = tierPrices[order.package_key || "starter"] || tierPrices.starter;
+    const packageOffer =
+      getPackageOffer(order.pricing_summary?.package_key || order.package_key) ||
+      getPackageOffer(normalizePackageKey(order.package_type)) ||
+      null;
+    const packageLabel = packageOffer?.name || order.plan_type || getPackageDisplayLabel(order.pricing_summary) || "Custom Service Bundle";
+    const portalUrl =
+      portal_activation_url ||
+      `${Deno.env.get("APP_URL") || "https://clientsurgesystems.com"}/client-portal`;
+    const customerName = escapeHtml(order.customer_name || "there");
+    const businessName = escapeHtml(order.business_name || "your business");
+    const serviceRows = resolveServiceRows(order, packageOffer);
+    const serviceList = serviceRows
+      .map(
+        (service) =>
+          `<li style="margin-bottom:8px;color:#374151;"><strong>${escapeHtml(service.name)}</strong> · $${formatMoney(service.setup_fee)} setup / $${formatMoney(service.monthly_fee)}/mo</li>`
+      )
+      .join("");
 
-    await fetch("https://api.resend.com/emails", {
+    const html = `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px 20px;color:#111827;">
+        <h1 style="margin:0 0 12px;font-size:28px;color:#0F172A;">Your ClientSurge order is confirmed</h1>
+        <p style="margin:0 0 18px;font-size:15px;line-height:1.6;">Hi ${customerName}, thanks for choosing ClientSurge for <strong>${businessName}</strong>.</p>
+        <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:20px;margin-bottom:20px;">
+          <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0369A1;">Package</p>
+          <p style="margin:0 0 8px;font-size:20px;font-weight:800;color:#0F172A;">${escapeHtml(packageLabel)}</p>
+          <p style="margin:0 0 6px;font-size:14px;color:#334155;">Setup total: <strong>$${formatMoney(order.total_setup)}</strong></p>
+          <p style="margin:0;font-size:14px;color:#334155;">Monthly total: <strong>$${formatMoney(order.total_monthly)}/mo</strong></p>
+        </div>
+        <div style="margin-bottom:20px;">
+          <p style="margin:0 0 10px;font-size:15px;font-weight:700;color:#0F172A;">Included services</p>
+          <ul style="margin:0;padding-left:20px;">${serviceList}</ul>
+        </div>
+        <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:16px;padding:20px;margin-bottom:24px;">
+          <p style="margin:0 0 10px;font-size:15px;font-weight:700;color:#1D4ED8;">What happens next</p>
+          <p style="margin:0 0 8px;font-size:14px;line-height:1.6;color:#1E3A8A;">Your order has been recorded and linked into our install workflow. You'll receive your portal access and setup guidance as that workflow progresses.</p>
+          <a href="${portalUrl}" style="display:inline-block;margin-top:8px;background:#0F172A;color:#FFFFFF;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:700;font-size:14px;">Open Client Portal</a>
+        </div>
+        <p style="margin:0;font-size:13px;line-height:1.6;color:#64748B;">Questions? Reply to this email and our team will help.</p>
+      </div>
+    `;
+
+    const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
-        from: "system@clientsurgesystems.com",
-        reply_to: "nolan@clientsurgesystems.com",
-        to: order.client_email,
-        subject: `🎉 Order confirmed — ${order.client_name} (${order.package_key?.charAt(0).toUpperCase()}${order.package_key?.slice(1)})`,
-        html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px 20px;background:#fff">
-          <h2 style="color:#0A0F1E;font-size:20px;font-weight:800">You're in! 🎉</h2>
-          <p style="color:#374151;font-size:15px">Hey ${order.client_name || "there"}, your <b>${order.package_key} plan</b> is confirmed.</p>
-          <div style="background:#F9FAFB;border-radius:12px;padding:20px;margin:20px 0">
-            <p style="color:#0A0F1E;font-weight:700;margin:0 0 12px">What you're getting:</p>
-            <ul style="margin:0;padding-left:16px">${serviceList}</ul>
-          </div>
-          <div style="display:flex;gap:16px;margin:16px 0">
-            <div style="flex:1;background:#F0FDF4;border-radius:10px;padding:14px;text-align:center">
-              <p style="color:#6B7280;font-size:11px;font-weight:700;text-transform:uppercase;margin:0 0 4px">Monthly</p>
-              <p style="color:#059669;font-size:22px;font-weight:900;margin:0">$${pricing.monthly}/mo</p>
-            </div>
-            <div style="flex:1;background:#EFF6FF;border-radius:10px;padding:14px;text-align:center">
-              <p style="color:#6B7280;font-size:11px;font-weight:700;text-transform:uppercase;margin:0 0 4px">Setup (one-time)</p>
-              <p style="color:#2563EB;font-size:22px;font-weight:900;margin:0">$${pricing.setup}</p>
-            </div>
-          </div>
-          <p style="color:#374151;font-size:14px;line-height:1.6"><b>Next step:</b> You'll receive a credentials setup link within the next few minutes. It takes about 5 minutes to complete.</p>
-          <p style="color:#6B7280;font-size:13px">Questions? Just reply to this email — Nolan reads every one.</p>
-        </div>`,
+        from: "ClientSurge Systems <system@clientsurgesystems.com>",
+        reply_to: "support@clientsurgesystems.com",
+        to: customerEmail,
+        subject: `Order confirmed — ${packageLabel}`,
+        html,
       }),
     });
 
-    return Response.json({ success: true, sent_to: order.client_email });
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Resend request failed: ${response.status} ${body}`);
+    }
+
+    return Response.json({ success: true, sent_to: customerEmail });
   } catch (err: any) {
     return Response.json({ error: err.message }, { status: 500 });
   }

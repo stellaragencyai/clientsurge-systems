@@ -5,6 +5,8 @@
  * #7: injectHeroPreload() — adds <link rel="preload"> for hero image
  */
 
+import { createElement } from "react";
+
 // #7: Call once in index.html or App.jsx useEffect
 export function injectHeroPreload(heroSrc) {
   if (!heroSrc) return;
@@ -20,16 +22,14 @@ export function injectHeroPreload(heroSrc) {
 
 // #6: LazyImage — always use below the fold
 export function LazyImage({ src, alt, width, height, className, style }) {
-  return (
-    <img
-      src={src}
-      alt={alt || ""}
-      loading="lazy"
-      decoding="async"
-      width={width}
-      height={height}
-      className={className}
-      style={{ ...style, maxWidth: "100%", height: "auto" }}
-    />
-  );
+  return createElement("img", {
+    src,
+    alt: alt || "",
+    loading: "lazy",
+    decoding: "async",
+    width,
+    height,
+    className,
+    style: { ...style, maxWidth: "100%", height: "auto" }
+  });
 }

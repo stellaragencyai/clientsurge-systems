@@ -125,7 +125,7 @@ Body: {
 | ProjectTask | /ProjectTask | All dev/ops tasks — your to-do list |
 | AgentLog | /AgentLog | Work logs from all agents |
 | AgentMessage | /AgentMessage | Inter-agent messages |
-| SpaLead | /SpaLead | 1,106 prospect businesses |
+| SpaLead | /SpaLead | Historical legacy lead entity name; use WebsiteLead/Leads for current recovery work |
 | ClientOnboarding | /ClientOnboarding | Active client onboarding checklists |
 
 **Website app entities** (Orders, AutomationChecklist, etc.):
@@ -145,7 +145,7 @@ GET /entities/ProjectTask
 GET /entities/ProjectTask?status=⏳ Pending
 GET /entities/ProjectTask?priority=CRITICAL&status=⏳ Pending
 GET /entities/ProjectTask?agent=Surge Dev
-GET /entities/SpaLead?status=new&industry=med_spa
+GET /entities/SpaLead?status=new&industry=med_spa  // historical example only
 ```
 
 ### Get a single record

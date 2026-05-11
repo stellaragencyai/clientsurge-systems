@@ -1,4 +1,4 @@
-import { CheckCircle2, Circle, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 
 // Plain-English stage labels — no technical terms visible to clients
 const DEFAULT_STAGES = ["Payment Confirmed", "Queued for Setup", "Being Configured", "Being Tested", "You're Live! ✦"];

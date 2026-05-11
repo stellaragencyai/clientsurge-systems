@@ -225,7 +225,6 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
               disabled={product?.coming_soon || product?.checkout_enabled === false}
               style={{
                 width: "100%",
-                background: "transparent",
                 border: "none",
                 padding: "3px",
                 borderRadius: "9999px",

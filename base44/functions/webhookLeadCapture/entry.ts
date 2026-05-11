@@ -1,241 +1,408 @@
 /**
- * Webhook: /webhooks/lead-capture
- * Handles incoming lead data from forms, API integrations, and call tracking
- * Triggers instant SMS response and lead creation automation
+ * Canonical client lead intake webhook.
+ * Accepts only signed project-scoped webhook registrations and stores the
+ * website lead first, then bridges into the CRM Leads entity.
  */
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+const SIGNATURE_WINDOW_SECONDS = 300;
 
-Deno.serve(async (req) => {
-  // Only accept POST
-  if (req.method !== "POST") {
-    return Response.json({ error: "Method not allowed" }, { status: 405 });
+function cleanString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeEmail(value) {
+  return cleanString(value).toLowerCase();
+}
+
+function normalizePhone(value) {
+  return cleanString(value).replace(/[^\d+]/g, "");
+}
+
+function normalizeRequestedChannels(value) {
+  if (!Array.isArray(value)) {
+    return [];
   }
 
-  // #86: Webhook secret validation — must pass X-Webhook-Secret header
-  const webhookSecret = req.headers.get("x-webhook-secret") || req.headers.get("X-Webhook-Secret");
-  const configuredSecret = Deno.env.get("WEBHOOK_SECRET");
-  if (configuredSecret && webhookSecret !== configuredSecret) {
-    return Response.json({ error: "Unauthorized — invalid webhook secret" }, { status: 401 });
-  }
-
-  try {
-    const base44 = createClientFromRequest(req);
-    const payload = await req.json();
-
-    console.log("[LeadCapture] Received webhook:", JSON.stringify(payload, null, 2));
-
-    // Parse incoming data (supports multiple formats)
-    const lead = parseCapturePayload(payload);
-
-    if (!lead.email && !lead.phone) {
-      return Response.json(
-        { error: "Email or phone required" },
-        { status: 400 }
-      );
-    }
-
-    // 1. Get client project from webhook context or find by domain/identifier
-    const project = await findClientProject(base44, payload, lead);
-    if (!project) {
-      console.warn("[LeadCapture] No matching project found, skipping");
-      return Response.json({
-        success: false,
-        message: "No matching project configuration found",
-      });
-    }
-
-    // 2. Create or update lead record
-    const createdLead = await base44.asServiceRole.entities.Leads.create({
-      full_name: lead.name || "Unknown",
-      business_name: lead.business || "Not provided",
-      email: lead.email || "",
-      phone: lead.phone || "",
-      business_type: lead.business_type || "Not specified",
-      problem: lead.problem || payload.message || "Form submission",
-      source: lead.source || "form_submission",
-      status: "New",
-      lead_score: 50, // Default score
-      activation_priority: "Medium",
-      intake_type: "form",
-      assigned_to: project.owner_email,
-      created_date: new Date().toISOString(),
-    });
-
-    console.log("[LeadCapture] Created lead:", createdLead.id);
-
-    // 3. Log communication event
-    await base44.asServiceRole.entities.CommunicationEvent.create({
-      lead_id: createdLead.id,
-      client_project_id: project.id,
-      service_key: "instant_lead_response",
-      channel: "form",
-      direction: "inbound",
-      event_type: "lead_created",
-      provider: "internal",
-      status: "received",
-      message_body: lead.problem || payload.message,
-      metadata_json: JSON.stringify(payload),
-    });
-
-    // 4. Trigger instant SMS response if configured
-    const serviceConfig = project.install_configuration?.services?.instant_lead_response;
-    if (serviceConfig?.enabled && lead.phone) {
-      await triggerInstantResponse(base44, createdLead, project, serviceConfig);
-    }
-
-    // 5. Trigger lead assignment workflow
-    await triggerLeadAssignment(base44, createdLead, project);
-
-    return Response.json({
-      success: true,
-      lead_id: createdLead.id,
-      message: "Lead captured and instant response triggered",
-    });
-  } catch (error) {
-    console.error("[LeadCapture] Error:", error.message);
-    return Response.json(
-      { error: error.message, success: false },
-      { status: 500 }
-    );
-  }
-});
-
-// ─────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────
+  return [...new Set(value.map((entry) => cleanString(entry)).filter(Boolean))];
+}
 
 function parseCapturePayload(payload) {
-  // Support multiple webhook formats
   return {
-    name: payload.full_name || payload.name || payload.contact_name || "",
-    email: payload.email || payload.contact_email || "",
-    phone: payload.phone || payload.contact_phone || "",
-    business: payload.business_name || payload.company || "",
-    business_type: payload.business_type || payload.industry || "",
-    problem: payload.problem || payload.message || payload.inquiry || "",
-    source: payload.source || payload.utm_source || "unknown",
+    full_name:
+      cleanString(payload.full_name) ||
+      cleanString(payload.name) ||
+      cleanString(payload.contact_name),
+    email:
+      normalizeEmail(payload.email) || normalizeEmail(payload.contact_email),
+    phone:
+      normalizePhone(payload.phone) || normalizePhone(payload.contact_phone),
+    business_name:
+      cleanString(payload.business_name) || cleanString(payload.company),
+    business_type:
+      cleanString(payload.business_type) || cleanString(payload.industry),
+    problem:
+      cleanString(payload.problem) ||
+      cleanString(payload.message) ||
+      cleanString(payload.inquiry),
+    source:
+      cleanString(payload.source) ||
+      cleanString(payload.utm_source) ||
+      "client_webhook",
+    requested_channels: normalizeRequestedChannels(payload.requested_channels),
   };
 }
 
-async function findClientProject(base44, payload, lead) {
-  // Try to match by project_id in payload first
-  if (payload.project_id) {
-    try {
-      return await base44.asServiceRole.entities.ClientProject.get(payload.project_id);
-    } catch {
-      console.warn("[LeadCapture] Project ID not found:", payload.project_id);
-    }
-  }
+function getHeader(headers, key) {
+  return cleanString(headers.get(key) || headers.get(key.toUpperCase()) || "");
+}
 
-  // Try to match by webhook registration
-  if (payload.webhook_key) {
-    const webhook = await base44.asServiceRole.entities.WebhookRegistration.filter(
-      { webhook_registered: true, service_key: "instant_lead_response" },
-      "-created_at",
-      1
-    );
-
-    if (webhook?.length > 0) {
-      const order = await base44.asServiceRole.entities.Order.filter(
-        { id: webhook[0].order_id },
-        "-created_date",
-        1
-      );
-
-      if (order?.length > 0 && order[0].client_id) {
-        return await base44.asServiceRole.entities.ClientProject.get(order[0].client_id);
-      }
-    }
-  }
-
-  // Default: return first active project (for testing)
-  const projects = await base44.asServiceRole.entities.ClientProject.filter(
-    { status: "Active" },
-    "-created_date",
-    1
+export async function computeWebhookSignature(secretKey, timestamp, rawBody) {
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secretKey),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
   );
 
-  return projects?.[0] || null;
+  const payload = new TextEncoder().encode(`${timestamp}.${rawBody}`);
+  const signature = await crypto.subtle.sign("HMAC", cryptoKey, payload);
+  return Array.from(new Uint8Array(signature))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 }
 
-async function triggerInstantResponse(base44, lead, project, serviceConfig) {
-  console.log("[LeadCapture] Triggering instant SMS response");
+function normalizeSignature(value) {
+  const normalized = cleanString(value);
+  return normalized.startsWith("sha256=") ? normalized.slice(7) : normalized;
+}
 
-  // Get template
-  const template = await base44.asServiceRole.entities.MessageTemplate.get(
-    serviceConfig.sms_template_id
-  ).catch(() => null);
-
-  if (!template) {
-    console.warn("[LeadCapture] SMS template not found, skipping");
-    return;
+function signaturesMatch(left, right) {
+  if (!left || !right || left.length !== right.length) {
+    return false;
   }
 
-  // Fill template variables
-  const messageBody = fillTemplate(template.body, {
-    name: lead.full_name,
-    business: project.business_name,
-    response_time: "within 1 hour",
-  });
-
-  // Queue SMS send job
-  await base44.asServiceRole.entities.AutomationJob.create({
-    lead_id: lead.id,
-    job_type: "instant_sms",
-    trigger_event: "lead_created",
-    status: "queued",
-    scheduled_for: new Date().toISOString(),
-    result_metadata: JSON.stringify({
-      template_id: serviceConfig.sms_template_id,
-      recipient_phone: lead.phone,
-      message_body: messageBody,
-    }),
-  });
-
-  // Log communication
-  await base44.asServiceRole.entities.CommunicationEvent.create({
-    lead_id: lead.id,
-    client_project_id: project.id,
-    service_key: "instant_lead_response",
-    channel: "sms",
-    direction: "outbound",
-    event_type: "sms_sent",
-    provider: "twilio",
-    status: "pending",
-    message_body: messageBody,
-  });
-
-  console.log("[LeadCapture] SMS queued for:", lead.phone);
+  let mismatch = 0;
+  for (let i = 0; i < left.length; i += 1) {
+    mismatch |= left.charCodeAt(i) ^ right.charCodeAt(i);
+  }
+  return mismatch === 0;
 }
 
-async function triggerLeadAssignment(base44, lead, project) {
-  console.log("[LeadCapture] Triggering lead assignment workflow");
+function validateTimestamp(timestamp) {
+  const timestampNumber = Number(timestamp);
+  if (!Number.isFinite(timestampNumber)) {
+    return false;
+  }
 
-  // Create assignment task
-  await base44.asServiceRole.entities.AutomationJob.create({
-    lead_id: lead.id,
-    job_type: "lead_assignment",
-    trigger_event: "lead_created",
-    status: "queued",
-    scheduled_for: new Date().toISOString(),
-    result_metadata: JSON.stringify({
-      assigned_to: project.owner_email,
-      priority: "High",
-    }),
-  });
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  return Math.abs(nowSeconds - timestampNumber) <= SIGNATURE_WINDOW_SECONDS;
+}
 
-  // Update lead with assignment
-  await base44.asServiceRole.entities.Leads.update(lead.id, {
-    assigned_to: project.owner_email,
+async function logRejectedAttempt(base44, {
+  registration = null,
+  reason,
+  metadata = {},
+}) {
+  await base44.asServiceRole.entities.CommunicationEvent.create({
+    client_project_id: registration?.client_project_id || undefined,
+    channel: "webhook",
+    direction: "inbound",
+    event_type: "status_update",
+    provider: "internal",
+    status: "failed",
+    subject: "Lead webhook rejected",
+    message_body: reason,
+    context_type: "lead_webhook_security",
+    context_id: registration?.id || metadata.registration_id || "unmatched",
+    metadata_json: JSON.stringify(metadata),
+  }).catch(() => null);
+
+  if (registration?.id) {
+    await base44.asServiceRole.entities.WebhookRegistration.update(registration.id, {
+      failure_count: Number(registration.failure_count || 0) + 1,
+      last_error: reason,
+    }).catch(() => null);
+  }
+}
+
+async function verifySignedRegistration({ base44, headers, rawBody }) {
+  const registrationId = getHeader(headers, "x-webhook-id");
+  const timestamp = getHeader(headers, "x-webhook-timestamp");
+  const signature = normalizeSignature(getHeader(headers, "x-webhook-signature"));
+
+  if (!registrationId || !timestamp || !signature) {
+    return {
+      ok: false,
+      code: "lead_webhook_signature_missing",
+      status: 401,
+      reason: "Missing signed webhook headers.",
+      metadata: {
+        registration_id: registrationId || null,
+      },
+    };
+  }
+
+  const registration = await base44.asServiceRole.entities.WebhookRegistration.get(
+    registrationId
+  ).catch(() => null);
+
+  if (!registration) {
+    return {
+      ok: false,
+      code: "lead_webhook_registration_not_found",
+      status: 401,
+      reason: "Webhook registration not found.",
+      metadata: {
+        registration_id: registrationId,
+      },
+    };
+  }
+
+  if (registration.status !== "active") {
+    return {
+      ok: false,
+      code: "lead_webhook_registration_inactive",
+      status: 403,
+      reason: "Webhook registration is inactive.",
+      registration,
+      metadata: {
+        registration_id: registration.id,
+        client_project_id: registration.client_project_id || null,
+      },
+    };
+  }
+
+  if (!cleanString(registration.client_project_id)) {
+    return {
+      ok: false,
+      code: "lead_webhook_registration_unlinked",
+      status: 409,
+      reason: "Webhook registration is missing client_project_id.",
+      registration,
+      metadata: {
+        registration_id: registration.id,
+      },
+    };
+  }
+
+  if (!validateTimestamp(timestamp)) {
+    return {
+      ok: false,
+      code: "lead_webhook_timestamp_invalid",
+      status: 401,
+      reason: "Webhook timestamp is outside the allowed verification window.",
+      registration,
+      metadata: {
+        registration_id: registration.id,
+        timestamp,
+      },
+    };
+  }
+
+  const expectedSignature = await computeWebhookSignature(
+    registration.secret_key || "",
+    timestamp,
+    rawBody
+  );
+
+  if (!signaturesMatch(signature, expectedSignature)) {
+    return {
+      ok: false,
+      code: "lead_webhook_signature_invalid",
+      status: 401,
+      reason: "Webhook signature verification failed.",
+      registration,
+      metadata: {
+        registration_id: registration.id,
+        client_project_id: registration.client_project_id || null,
+      },
+    };
+  }
+
+  return {
+    ok: true,
+    registration,
+  };
+}
+
+async function createCrmLead(base44, lead, project) {
+  return base44.asServiceRole.entities.Leads.create({
+    full_name: lead.full_name || "Unknown",
+    business_name: lead.business_name || project.business_name || "Not provided",
+    email: lead.email || "",
+    phone: lead.phone || "",
+    business_type: lead.business_type || "Not specified",
+    problem: lead.problem || "Webhook submission",
+    source: lead.source || "client_webhook",
+    status: "New",
+    lead_score: 50,
+    activation_priority: "Medium",
+    intake_type: "webhook",
+    assigned_to: project.contact_email || project.client_email || "",
     assigned_at: new Date().toISOString(),
   });
 }
 
-function fillTemplate(template, variables) {
-  let result = template;
-  for (const [key, value] of Object.entries(variables)) {
-    result = result.replace(new RegExp(`{{${key}}}`, "g"), value || "");
+async function getBase44Client(req, base44Override) {
+  if (base44Override) {
+    return base44Override;
   }
-  return result;
+
+  const { createClientFromRequest } = await import("npm:@base44/sdk@0.8.25");
+  return createClientFromRequest(req);
+}
+
+export async function handleLeadCaptureWebhook(req, base44Override = null) {
+  if (req.method !== "POST") {
+    return Response.json({ error: "Method not allowed" }, { status: 405 });
+  }
+
+  const base44 = await getBase44Client(req, base44Override);
+  const rawBody = await req.text();
+
+  let payload;
+  try {
+    payload = rawBody ? JSON.parse(rawBody) : {};
+  } catch {
+    return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
+  }
+
+  const verification = await verifySignedRegistration({
+    base44,
+    headers: req.headers,
+    rawBody,
+  });
+
+  if (!verification.ok) {
+    await logRejectedAttempt(base44, {
+      registration: verification.registration || null,
+      reason: verification.reason,
+      metadata: {
+        ...verification.metadata,
+        source_ip:
+          getHeader(req.headers, "x-forwarded-for") ||
+          getHeader(req.headers, "cf-connecting-ip") ||
+          getHeader(req.headers, "x-real-ip") ||
+          null,
+      },
+    });
+
+    return Response.json(
+      {
+        success: false,
+        code: verification.code,
+        error: verification.reason,
+      },
+      { status: verification.status }
+    );
+  }
+
+  const registration = verification.registration;
+  const lead = parseCapturePayload(payload);
+
+  if (!lead.email && !lead.phone) {
+    return Response.json(
+      { error: "Email or phone required" },
+      { status: 400 }
+    );
+  }
+
+  const project = await base44.asServiceRole.entities.ClientProject.get(
+    registration.client_project_id
+  ).catch(() => null);
+
+  if (!project) {
+    await logRejectedAttempt(base44, {
+      registration,
+      reason: "Webhook registration points to a missing client project.",
+      metadata: {
+        registration_id: registration.id,
+        client_project_id: registration.client_project_id,
+      },
+    });
+
+    return Response.json(
+      {
+        success: false,
+        code: "lead_webhook_project_not_found",
+        error: "Webhook registration points to a missing client project.",
+      },
+      { status: 409 }
+    );
+  }
+
+  const now = new Date().toISOString();
+  const websiteLead = await base44.asServiceRole.entities.WebsiteLead.create({
+    full_name: lead.full_name,
+    first_name: cleanString(lead.full_name.split(" ")[0] || ""),
+    business_name: lead.business_name || project.business_name || "",
+    business_type: lead.business_type,
+    email: lead.email,
+    phone_number: lead.phone,
+    message: lead.problem,
+    problem: lead.problem,
+    source: lead.source,
+    client_project_id: project.id,
+    routing_key: registration.id,
+    requested_channels: lead.requested_channels,
+    consent_given: payload.consent_given === true,
+    consent_given_at: payload.consent_given ? now : null,
+    consent_source: cleanString(payload.consent_source || registration.source_name || "client_webhook"),
+    consent_text_version: cleanString(payload.consent_text_version || "client_webhook_v1"),
+    source_page: cleanString(payload.source_page || payload.page_url || ""),
+    user_agent: cleanString(req.headers.get("user-agent") || ""),
+    ip_address: cleanString(
+      req.headers.get("x-forwarded-for") ||
+        req.headers.get("cf-connecting-ip") ||
+        req.headers.get("x-real-ip") ||
+        ""
+    ),
+  });
+
+  const crmLead = await createCrmLead(base44, lead, project);
+  await base44.asServiceRole.entities.WebsiteLead.update(websiteLead.id, {
+    crm_lead_id: crmLead.id,
+  }).catch(() => {});
+
+  await base44.asServiceRole.entities.WebhookRegistration.update(registration.id, {
+    last_triggered_at: now,
+    last_error: "",
+  }).catch(() => {});
+
+  await base44.asServiceRole.entities.CommunicationEvent.create({
+    lead_id: crmLead.id,
+    client_project_id: project.id,
+    service_key: cleanString(registration.service_key || "instant_lead_response"),
+    channel: "webhook",
+    direction: "inbound",
+    event_type: "lead_created",
+    provider: "internal",
+    status: "received",
+    subject: "Signed lead webhook accepted",
+    message_body: lead.problem || "Lead webhook received",
+    context_type: "lead_webhook",
+    context_id: registration.id,
+    metadata_json: JSON.stringify({
+      registration_id: registration.id,
+      source_name: registration.source_name || "",
+      website_lead_id: websiteLead.id,
+      payload_summary: {
+        email_present: Boolean(lead.email),
+        phone_present: Boolean(lead.phone),
+      },
+    }),
+  });
+
+  return Response.json({
+    success: true,
+    website_lead_id: websiteLead.id,
+    lead_id: crmLead.id,
+    client_project_id: project.id,
+    message: "Lead captured and linked to canonical project routing.",
+  });
+}
+
+if (import.meta.main) {
+  Deno.serve((req) => handleLeadCaptureWebhook(req));
 }

@@ -1,4 +1,3 @@
-import { CheckCircle2, ArrowRight } from "lucide-react";
 
 const STEPS = [
   {

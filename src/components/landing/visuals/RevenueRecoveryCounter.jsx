@@ -4,7 +4,7 @@
  * wallpaper, haptic tab switching, mouse-reactive reflection, Apple Pencil,
  * speaker grilles, boot/wake animation
  */
-import { motion, useInView, animate, useMotionValue, useTransform } from "framer-motion";
+import { motion, useInView, animate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
 const SF = "-apple-system,'SF Pro Display','SF Pro Text','Helvetica Neue',ui-sans-serif,sans-serif";

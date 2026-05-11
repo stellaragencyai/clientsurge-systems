@@ -1,4 +1,6 @@
 # Batch 10 — Remaining Tasks Reference (#220–240)
+
+> Historical schema/task note. References to `activateAllServices` and `SpaLead` below reflect the earlier architecture and should not be treated as current canonical runtime names.
 **Author:** Agent Smith | May 8, 2026
 
 These tasks were verified and resolved as follows:

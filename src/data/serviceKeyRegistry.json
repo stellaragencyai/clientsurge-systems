@@ -6,37 +6,37 @@
       "label": "Instant Lead Response",
       "tiers": ["starter", "growth", "elite"],
       "twilio_action": "auto_reply_sms",
-      "configure_fn": "configureService"
+      "configure_fn": "installPipeline"
     },
     "missed_call_textback": {
       "label": "Missed Call Text-Back",
       "tiers": ["starter", "growth", "elite"],
       "twilio_action": "missed_call_sms",
-      "configure_fn": "configureService"
+      "configure_fn": "installPipeline"
     },
     "followup_sequences": {
       "label": "Follow-Up Sequences (Day 1, 3, 7)",
       "tiers": ["growth", "elite"],
       "twilio_action": "drip_sms",
-      "configure_fn": "configureService"
+      "configure_fn": "installPipeline"
     },
     "appointment_booking_ai": {
       "label": "AI Appointment Booking",
       "tiers": ["growth", "elite"],
       "twilio_action": "booking_intent",
-      "configure_fn": "configureService"
+      "configure_fn": "installPipeline"
     },
     "review_request_ai": {
       "label": "Review Request AI",
       "tiers": ["elite"],
       "twilio_action": "review_request_sms",
-      "configure_fn": "configureService"
+      "configure_fn": "installPipeline"
     },
     "reactivation_campaign": {
       "label": "Reactivation Campaign",
       "tiers": ["elite"],
       "twilio_action": "reactivation_sms",
-      "configure_fn": "configureService"
+      "configure_fn": "installPipeline"
     }
   }
 }

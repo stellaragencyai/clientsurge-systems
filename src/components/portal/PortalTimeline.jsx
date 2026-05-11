@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { CheckCircle2, Clock, Loader2, Zap, MessageSquare, Mail, Phone, AlertCircle } from "lucide-react";
+import { CheckCircle2, Clock, Loader2, Zap, MessageSquare, Mail, AlertCircle } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 
 // ── Stage definitions ────────────────────────────────────────────────────────

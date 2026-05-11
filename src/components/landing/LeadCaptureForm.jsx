@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
 
@@ -14,6 +13,11 @@ const NICHES = [
 ];
 
 const CONTACT_METHODS = ["Email", "Phone Call", "Text Message"];
+const CONTACT_METHOD_CHANNELS = {
+  Email: ["email"],
+  "Phone Call": ["call"],
+  "Text Message": ["sms"],
+};
 
 const sections = [
   { step: 1, title: "Your Info" },
@@ -75,6 +79,12 @@ export default function LeadCaptureForm() {
         phone: formData.phone,
         business_type: formData.niche || "Other",
         problem: buildProblemSummary(),
+        source: "website_form",
+        source_page: typeof window !== "undefined" ? window.location.pathname : "/",
+        requested_channels: CONTACT_METHOD_CHANNELS[formData.contact_method] || [],
+        consent_given: true,
+        consent_source: "lead_capture_form",
+        consent_text_version: "lead_capture_form_v1",
         website_url: formData.website_url,
       });
 

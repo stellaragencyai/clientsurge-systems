@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Zap, CheckCircle2, TrendingUp, Calendar, Mail, MessageSquare, Clock } from "lucide-react";
+import { Zap, CheckCircle2, TrendingUp, Calendar, Mail, MessageSquare } from "lucide-react";
 
 const STEPS = [
   {

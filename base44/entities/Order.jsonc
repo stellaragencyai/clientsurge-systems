@@ -255,21 +255,21 @@
     "selected_package_type": {
       "type": "string",
       "title": "Selected Package Type (User Intent)",
-      "enum": [
-        "starter_system",
-        "growth_system",
-        "pro_system"
-      ],
+        "enum": [
+          "starter_system",
+          "growth_system",
+          "elite_system"
+        ],
       "description": "Package type selected by user from store/quiz (null if custom selection)"
     },
     "package_type": {
       "type": "string",
       "title": "Detected Package Type",
-      "enum": [
-        "starter_system",
-        "growth_system",
-        "pro_system"
-      ],
+        "enum": [
+          "starter_system",
+          "growth_system",
+          "elite_system"
+        ],
       "description": "Auto-detected package type based on purchased services (null if individual services)"
     },
     "payment_status": {
@@ -537,5 +537,41 @@
     "customer_email",
     "customer_name",
     "business_name"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.customer_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.customer_email": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

@@ -6,11 +6,8 @@
 import { useEffect, useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  FunnelChart, Funnel, LabelList, Cell,
 } from "recharts";
-import {
-  Activity, AlertCircle, ArrowRight, CheckCircle2, Clock, Mail,
-  MessageSquare, RefreshCw, TrendingUp, User, Users, Zap,
+import { AlertCircle, ArrowRight, CheckCircle2, Clock, Mail, RefreshCw, TrendingUp, User, Zap,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 

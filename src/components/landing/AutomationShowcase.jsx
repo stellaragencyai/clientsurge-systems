@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import {
   ArrowRight, Zap, PhoneMissed, MailCheck, CalendarCheck, Star, Repeat2,
-  FileInput, Brain, MessageSquare, Mail, Clock, CheckCircle, Phone,
-  Send, RotateCcw, BookOpen, AlertCircle, DollarSign } from
+  FileInput, Brain, MessageSquare, Mail, Clock, CheckCircle,
+  Send, RotateCcw, AlertCircle, DollarSign } from
 "lucide-react";
-import { motion, AnimatePresence, useAnimation } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const BRAND_COLOR = "#00D4FF";
 const BRAND_GRADIENT_FROM = "#003B8F";

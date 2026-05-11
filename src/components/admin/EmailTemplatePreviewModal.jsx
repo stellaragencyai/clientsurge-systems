@@ -3,7 +3,7 @@
  * AdminSettings: preview email template with sample variable substitution.
  */
 import { useState } from "react";
-import { X, Eye } from "lucide-react";
+import { Eye } from "lucide-react";
 
 const SAMPLE_VARS = {
   "{{client_name}}": "Maria Rodriguez",

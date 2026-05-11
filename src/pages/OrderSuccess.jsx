@@ -3,20 +3,15 @@ import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
-import OrderTracker from "@/components/landing/OrderTracker";
 
 // Prevent search engines from indexing the order success page
 const noIndexMeta = document.querySelector('meta[name="robots"]');
 if (noIndexMeta) noIndexMeta.setAttribute("content", "noindex,nofollow");
 
 export default function OrderSuccess() {
-  const [sessionId, setSessionId] = useState("");
-
   const [orderSummary, setOrderSummary] = useState(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setSessionId(params.get("session_id") || "");
     // Read pre-checkout summary saved to sessionStorage before Stripe redirect
     try {
       const raw = sessionStorage.getItem("clientsurge:last-order");
@@ -206,12 +201,6 @@ export default function OrderSuccess() {
               Add more AI services
             </Link>
           </div>
-
-          {sessionId && (
-            <div className="mt-8 text-left">
-              <OrderTracker sessionId={sessionId} />
-            </div>
-          )}
         </div>
       </div>
     </DemoBookingProvider>

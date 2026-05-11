@@ -7,9 +7,9 @@ import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 
 const AI_FUNCTIONS = [
-  "activateAllServices", "configureService", "generateSmsTemplates",
-  "generateWebsiteSpec", "generateClientWebsite", "sendGoLiveNotification",
-  "predictChurnRisk", "detectAnalyticsAnomalies", "classifyInstallError",
+  "stripeWebhookOrders", "installPipeline", "sendOrderConfirmationEmail",
+  "getClientPortalContext", "manageWebhookRegistration", "webhookLeadCapture",
+  "aiOnboardingIntelligence", "detectAnalyticsAnomalies", "classifyInstallError",
   "autoResolveInstallError", "getSystemHealthDashboard", "generateLeadMagnet",
   "generateMonthlyPerformanceReport", "initiateVoiceCloneIntake",
   "clientOffboardingAI", "generatePackageComparisonEmail", "conversationIntelligence",

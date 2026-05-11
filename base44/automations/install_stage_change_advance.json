@@ -2,8 +2,8 @@
   "id": "install_stage_change_advance",
   "name": "ClientInstallationOS stage change → Advance pipeline",
   "trigger": { "entity": "ClientInstallationOS", "event": "update", "watch_field": "workflow_stage" },
-  "task": "When ClientInstallationOS.workflow_stage changes: if new stage is 'Ready for Install' → invoke activateAllServices with order_id. If stage is 'Complete' → send Telegram to Nolan confirming client is live + log to AgentLog. If stage is 'Failed' → Telegram Nolan with error details + set requires_nolan=true in AgentLog.",
+  "task": "Historical automation only. The old activateAllServices trigger path is retired. Do not auto-invoke legacy activation from ClientInstallationOS stage changes; use the canonical install workspace and shared install pipeline state instead.",
   "task_refs": ["#488"],
   "priority": "CRITICAL",
-  "active": true
+  "active": false
 }
