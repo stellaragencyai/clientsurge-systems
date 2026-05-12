@@ -1,6 +1,27 @@
 # AGENTS.md
 
-This repository is a Base44-synced website project.
+This repository is a Base44-synced website project and the ClientSurge AI Acquisition Engine.
+
+PRIMARY OPERATING RULES:
+- SQLite is the only source of truth.
+- Base44 is only a CRM/UI projection layer.
+- OpenClaw/Codex orchestrate work; they do not become storage.
+- No Airtable.
+- No outreach automation unless explicitly requested.
+- No Twilio, Resend, Gmail, or Calendly changes unless explicitly requested.
+- No demo website generation inside the acquisition-engine repo.
+- Do not touch unrelated repositories.
+- Do not commit secrets.
+- Do not create or modify `.env`.
+- Only update `.env.example` when needed.
+- Use Windows PowerShell-compatible commands in all docs.
+- Prefer small, reviewable branches.
+- Preserve all existing migrations.
+- Add or update tests/sanity scripts for every new functional layer.
+- Never overwrite non-null canonical lead fields with null values.
+- Always preserve dedupe, ingestion run logging, and lead change history.
+- New scripts must support safe dry-run behavior where practical.
+- Final task reports must include files changed, tests run, branch, commit hash, blockers, and exact next PowerShell command.
 
 Rules:
 - Preserve existing working behavior unless explicitly improving a known issue.
@@ -43,3 +64,5 @@ IMPORTANT:
 - Do not overwrite or fight Base44-style visual structure unless necessary.
 - If a finding from the audit is weak, low-value, or cosmetic, deprioritize it.
 - Focus on changes that improve conversion, reliability, lead capture, technical integrity, and scalability.
+- When a task touches canonical lead data, treat SQLite as authoritative and preserve dedupe, ingestion run logging, and lead change history.
+- Do not introduce new storage layers or use Base44, OpenClaw, or Codex as a system of record.
