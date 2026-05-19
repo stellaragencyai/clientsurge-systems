@@ -3,24 +3,18 @@ import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
-import { SectionSkeleton, LargeSectionSkeleton } from "../components/landing/SkeletonLoader";
+import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import FAQ, { FAQ_ITEMS } from "../components/landing/FAQ";
 import Footer from "../components/landing/Footer";
 
-// Lazy load ALL below-the-fold sections individually for independent rendering
+// Lazy load below-the-fold sections individually for independent rendering
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
-const InteractiveJourneyMap = lazy(() => import("../components/landing/InteractiveJourneyMap"));
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
-const IntegrationPartners = lazy(() => import("../components/landing/IntegrationPartners"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
-const LeadLeakage = lazy(() => import("../components/landing/LeadLeakage"));
-const BeforeAfter = lazy(() => import("../components/landing/BeforeAfter"));
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
-const AutomationShowcase = lazy(() => import("../components/landing/AutomationShowcase"));
-const SystemDiagramSection = lazy(() => import("../components/landing/SystemDiagram"));
 
 import {
   getFAQSchema,
@@ -98,46 +92,14 @@ export default function Home() {
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <TrustBar />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <InteractiveJourneyMap />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <SectionBreak />
-          <LeadLeakage />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <BeforeAfter />
-        </Suspense>
-        <Suspense fallback={<LargeSectionSkeleton />}>
           <SectionBreak />
           <CoreOffer />
-        </Suspense>
-        <Suspense fallback={<LargeSectionSkeleton />}>
-          <SectionBreak />
-          <SystemDiagramSection />
-        </Suspense>
-        <Suspense fallback={<LargeSectionSkeleton />}>
-          <SectionBreak />
-          <AutomationShowcase />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
-          <SectionBreak />
-          <IntegrationPartners />
-        </Suspense>
-        <Suspense fallback={<LargeSectionSkeleton />}>
           <SectionBreak />
           <Pricing />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
           <FAQ />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
           <Testimonials />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
           <SectionBreak />
           <FinalCTA />
         </Suspense>
