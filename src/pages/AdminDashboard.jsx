@@ -39,6 +39,7 @@ import AutomationAlertsPanel from '../components/admin/AutomationAlertsPanel';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 import SniperDashboard from '../components/admin/SniperDashboard';
+import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 
 const NAV_GROUPS = [
   {
@@ -400,6 +401,8 @@ function OverviewDashboard({ onNavigate }) {
 
   return (
     <div className="space-y-8">
+      <AdminAICommandBar />
+
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>

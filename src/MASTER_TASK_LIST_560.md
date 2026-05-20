@@ -1163,7 +1163,7 @@
 | 456 | ✅ | Build admin "AI Audit" button per order in InstallOrderWorkspace - calls getActivationProgress + checks template registration + verifies Twilio number + checks last SMS/email sent. Returns full health report in a modal | HIGH  Agent Smith |
 | 457 | ✅ | AILeadInsightPanel: verify it calls scoreLeadIntelligence and predictLeadOutcome with real data - if using mock data, wire to real functions | HIGH  Agent Smith |
 | 458 | ✅ | Add "Next Best Action" card to admin lead detail - shows decideNextAction recommendation with reasoning + one-click Execute button that fires the recommended action | HIGH  Agent Smith |
-| 459 | ⏳ | Build adminAICommandBar - natural language command input in admin panel. Nolan types "rescore all med spa leads" or "send win-back to churned clients" and AI calls the appropriate backend function | MEDIUM |
+| 459 | ✅ | Build adminAICommandBar - natural language command input on admin overview routes safe commands to automation status, win-back dry-run, lead pipeline refresh, and provider dry-run checks | MEDIUM | Morpheus |
 | 460 | ✅ | Build AI anomaly detection in getAdminAnalytics - auto-flag: lead volume drop >30% WoW, client reply rate below 10%, any automation with 0 triggers in 48h. Telegram Nolan specific anomalies, not just raw numbers | HIGH  Agent Smith |
 
 ---
