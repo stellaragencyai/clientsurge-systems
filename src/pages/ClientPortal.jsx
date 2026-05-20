@@ -13,6 +13,7 @@ import QuickStartInline from "../components/portal/QuickStartInline";
 import DeadlinesPanel from "../components/portal/DeadlinesPanel";
 import FilesPanel from "../components/portal/FilesPanel";
 import BillingDashboard from "../components/portal/BillingDashboard";
+import ReferABusiness from "../components/portal/ReferABusiness";
 import PortalSettings from "../components/portal/PortalSettings";
 import TasksDashboard from "../components/portal/TasksDashboard";
 import WeeklyReports from "../components/portal/WeeklyReports";
@@ -35,6 +36,7 @@ const TABS = [
   { id: "deadlines", label: "Deadlines" },
   { id: "files", label: "Files & Docs" },
   { id: "billing", label: "Billing" },
+  { id: "referrals", label: "Referrals" },
   { id: "support", label: "Support & Messaging" },
   { id: "plan", label: "My Plan" },
   { id: "reports", label: "Weekly Report" },
@@ -314,6 +316,12 @@ export default function ClientPortal() {
         )}
         {activeTab === "billing" && (
           <BillingDashboard project={project} order={portalOrder} subscription={subscription} onSubscriptionChanged={refreshProject} />
+        )}
+        {activeTab === "referrals" && (
+          <ReferABusiness
+            order_id={portalOrder?.id || project?.id || user?.email}
+            client_name={project?.client_name || user?.full_name || user?.email}
+          />
         )}
         {activeTab === "support" && (
           <SupportChat project={project} user={user} />

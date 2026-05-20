@@ -711,7 +711,7 @@
 | 261 | ✅ | ClientPortal: "Cancel Subscription" button → redirect to Stripe customer portal URL | HIGH | Agent Smith |
 | 262 | ✅ | ClientPortal: "Download Invoice" button → pull Stripe invoice_pdf URL and open in new tab | HIGH | Agent Smith |
 | 263 | ✅ | ClientPortal: show red PaymentFailedBanner when Order billing_status === "past_due" | CRITICAL |
-| 264 | ⏳ | ClientPortal: build "Refer a Business" tab with unique referral link generated per client | MEDIUM |
+| 264 | ✅ | ClientPortal: build "Refer a Business" tab with unique referral link generated per client | MEDIUM | Morpheus |
 | 265 | ✅ | ClientPortal: AutomationChecklist - display live checklist progress pulled from AutomationChecklist entity | HIGH | Agent Smith |
 | 266 | ✅ | ClientPortal: show "Setup Progress" bar driven by real ClientInstallationOS fields (twilio_configured, etc.) | HIGH | Agent Smith |
 | 267 | ✅ | ClientPortal: add "What's New" tab reading from a Changelog entity or AdminSettings changelog field | LOW  Trinity |

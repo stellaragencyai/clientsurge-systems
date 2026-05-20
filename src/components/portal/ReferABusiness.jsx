@@ -7,7 +7,8 @@ import { Share2, Copy, Check } from "lucide-react";
 
 export default function ReferABusiness({ order_id, client_name }) {
   const [copied, setCopied] = useState(false);
-  const ref_code = btoa(`ref_${order_id}`).slice(0, 12);
+  const refSource = order_id || client_name || "clientsurge";
+  const ref_code = btoa(`ref_${refSource}`).replace(/=+$/g, "").slice(0, 12);
   const ref_url = `https://clientsurgesystems.com/?ref=${ref_code}`;
 
   const copy = () => {
