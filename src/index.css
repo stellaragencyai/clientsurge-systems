@@ -90,6 +90,12 @@
     @apply bg-background text-foreground font-inter;
     position: relative;
   }
+
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  select,
+  textarea {
+    border-radius: 0.75rem;
+  }
 }
 
 html {

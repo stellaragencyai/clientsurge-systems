@@ -228,7 +228,7 @@ export default function ProductCard({ product }) {
             <span>💰</span>
             ${product.monthly_fee}<span>/month</span>
           </div>
-          <div className="setup-fee">${product.setup_fee} one-time setup</div>
+          <div className="setup-fee">{product.setup_fee === 0 ? "No setup fee" : `$${product.setup_fee} one-time setup`}</div>
         </div>
 
         {/* Full-Width CTA Footer */}

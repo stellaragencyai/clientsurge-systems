@@ -1,12 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import MedSpaDemoModal from '@/components/medspa/MedSpaDemoModal';
+import { setPageMetadata } from '@/lib/seo';
 
 export default function Start() {
   const [showModal, setShowModal] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => setPageMetadata({
+    title: 'Start Your AI Automation Audit | ClientSurge Systems',
+    description: 'Launch the guided ClientSurge demo flow and see the fastest AI automation wins for your service business.',
+    canonicalPath: '/start',
+    ogTitle: 'Start Your ClientSurge Audit',
+    ogDescription: 'Begin the guided demo flow to see where ClientSurge can tighten lead response and booking follow-up.',
+  }), []);
 
   const handleClose = () => {
     setShowModal(false);

@@ -7,6 +7,7 @@ import { trackCTA } from "@/lib/analytics";
 import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 import { BUTTON_TEXT } from "@/lib/constants";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
+import { useAuth } from "@/lib/AuthContext";
 
 
 const sectionLinks = [
@@ -95,6 +96,10 @@ export default function Navbar() {
   const [industriesOpen, setIndustriesOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+
+  const mobileUserName = user?.full_name || user?.email?.split("@")[0] || null;
+  const mobileUserRole = user?.role ? user.role.replace(/_/g, " ") : null;
 
   // Track page views
   usePageViewTracking();
@@ -341,7 +346,13 @@ export default function Navbar() {
             </div>
           </div>
 
-
+          {mobileUserName && (
+            <div className="rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-primary/70 mb-1">Signed in</p>
+              <p className="text-sm font-semibold text-foreground truncate">{mobileUserName}</p>
+              <p className="text-xs text-muted-foreground capitalize">{mobileUserRole || "client"}</p>
+            </div>
+          )}
 
           <button
             onClick={() => {

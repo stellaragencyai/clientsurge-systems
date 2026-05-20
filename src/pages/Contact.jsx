@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import confetti from "canvas-confetti";
+import { motion } from "framer-motion";
 import { ArrowRight, Loader2, CheckCircle2, Mail, Phone, MapPin } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
@@ -41,6 +43,24 @@ export default function Contact() {
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
   const [showBookingModal, setShowBookingModal] = useState(false);
+
+  useEffect(() => {
+    if (!success) {
+      return;
+    }
+
+    const fire = () => {
+      confetti({
+        particleCount: 140,
+        spread: 80,
+        startVelocity: 38,
+        origin: { y: 0.55 },
+        colors: ["#00AEEF", "#009DFF", "#003B8F", "#7DD3FC", "#FFFFFF"],
+      });
+    };
+
+    fire();
+  }, [success]);
 
   useEffect(() => {
     return setPageMetadata({
@@ -183,15 +203,43 @@ export default function Contact() {
 
           <div className="bg-card rounded-2xl border border-border p-8 shadow-sm">
             {success ? (
-              <div className="flex flex-col items-center text-center py-8" aria-live="polite">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-5">
+              <motion.div
+                className="flex flex-col items-center text-center py-8"
+                aria-live="polite"
+                initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
+              >
+                <motion.div
+                  className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-5"
+                  initial={{ scale: 0.8, rotate: -8 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.08, type: "spring", stiffness: 260, damping: 16 }}
+                >
                   <CheckCircle2 className="w-8 h-8 text-green-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Message Sent!</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                </motion.div>
+                <motion.h3
+                  className="text-xl font-semibold text-foreground mb-2"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.14, duration: 0.3 }}
+                >
+                  Message Sent!
+                </motion.h3>
+                <motion.p
+                  className="text-sm text-muted-foreground leading-relaxed"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.3 }}
+                >
                   Thanks for reaching out. We&apos;ll get back to you within one business day.
-                </p>
-                <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                </motion.p>
+                <motion.div
+                  className="mt-6 flex flex-col sm:flex-row gap-3"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.28, duration: 0.3 }}
+                >
                   <button
                     type="button"
                     onClick={() => setShowBookingModal(true)}
@@ -205,8 +253,8 @@ export default function Contact() {
                   >
                     Email us directly
                   </a>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <h3 className="font-display text-xl font-semibold text-foreground mb-2">Send a Message</h3>

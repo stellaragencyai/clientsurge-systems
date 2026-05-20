@@ -289,17 +289,25 @@ const AuthenticatedApp = () => {
 function App() {
   return (
     <ErrorBoundary>
-    <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router style={{ overflowX: "hidden" }}>
-          <ScrollToTop />
-          <AutoCTAAnalytics />
-          <RouteIndexingGuard />
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
+      <AuthProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router style={{ overflowX: "hidden" }}>
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-lg"
+            >
+              Skip to content
+            </a>
+            <ScrollToTop />
+            <AutoCTAAnalytics />
+            <RouteIndexingGuard />
+            <div id="main-content" tabIndex={-1}>
+              <AuthenticatedApp />
+            </div>
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

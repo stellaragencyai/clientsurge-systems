@@ -1,16 +1,30 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
+import { setPageMetadata } from '@/lib/seo';
 
 export default function Success() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const cleanupMetadata = setPageMetadata({
+      title: 'Demo Request Received | ClientSurge Systems',
+      description: 'Your ClientSurge demo request is confirmed. Review what happens next before we meet.',
+      canonicalPath: '/success',
+      ogTitle: 'ClientSurge Demo Request Confirmed',
+      ogDescription: 'Your demo is booked. Here is what happens next and how we prepare your audit.',
+      robots: 'noindex,nofollow',
+    });
+
     // Auto-redirect to home after 12 seconds
     const timer = setTimeout(() => {
       navigate('/');
     }, 12000);
-    return () => clearTimeout(timer);
+
+    return () => {
+      cleanupMetadata();
+      clearTimeout(timer);
+    };
   }, [navigate]);
 
   return (
