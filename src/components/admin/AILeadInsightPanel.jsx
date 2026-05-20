@@ -74,6 +74,7 @@ function ScoreBar({ score }) {
 
 export default function AILeadInsightPanel({ lead, onLeadUpdated }) {
   const [loading, setLoading] = useState(false);
+  const [orchestrating, setOrchestrating] = useState(false);
   const [result, setResult] = useState(() => {
     // Parse existing classification if saved on lead
     if (lead?.ai_last_classification) {
@@ -86,6 +87,8 @@ export default function AILeadInsightPanel({ lead, onLeadUpdated }) {
     return null;
   });
   const [error, setError] = useState("");
+  const [orchestrationError, setOrchestrationError] = useState("");
+  const [orchestrationResult, setOrchestrationResult] = useState(null);
   const [actionsExpanded, setActionsExpanded] = useState(true);
 
   const runQualification = async () => {
@@ -112,6 +115,29 @@ export default function AILeadInsightPanel({ lead, onLeadUpdated }) {
     }
   };
 
+  const runOrchestration = async () => {
+    setOrchestrating(true);
+    setOrchestrationError("");
+    setOrchestrationResult(null);
+    try {
+      const res = await base44.functions.invoke("automationOrchestrator", {
+        lead_id: lead.id,
+        project_id: lead.project_id || lead.client_project_id || lead.assigned_project_id || null,
+        trigger_event: "manual_admin_trigger",
+      });
+      const data = res.data || res;
+      if (data?.success === false || data?.error) {
+        throw new Error(data.error || data.reason || "AI workflow failed");
+      }
+      setOrchestrationResult(data);
+      onLeadUpdated?.();
+    } catch (err) {
+      setOrchestrationError(err?.response?.data?.error || err?.message || "AI workflow failed");
+    } finally {
+      setOrchestrating(false);
+    }
+  };
+
   const tier = result?.tier;
   const tierCfg = TIER_CONFIG[tier] || null;
 
@@ -129,8 +155,18 @@ export default function AILeadInsightPanel({ lead, onLeadUpdated }) {
           )}
         </div>
         <button
+          onClick={runOrchestration}
+          disabled={orchestrating || loading}
+          className="ml-auto inline-flex items-center gap-2 rounded-lg border border-primary/25 bg-white px-4 py-2 text-xs font-semibold text-primary hover:bg-primary/5 transition-colors disabled:opacity-50"
+        >
+          {orchestrating
+            ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Running Workflow...</>
+            : <><BrainCircuit className="w-3.5 h-3.5" /> Run AI Workflow</>
+          }
+        </button>
+        <button
           onClick={runQualification}
-          disabled={loading}
+          disabled={loading || orchestrating}
           className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50"
         >
           {loading
@@ -145,6 +181,27 @@ export default function AILeadInsightPanel({ lead, onLeadUpdated }) {
         {error && (
           <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
+          </div>
+        )}
+
+        {orchestrationError && (
+          <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" /> {orchestrationError}
+          </div>
+        )}
+
+        {orchestrationResult?.summary && (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+            <div className="mb-2 flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-700" />
+              <p className="text-sm font-semibold text-emerald-900">AI workflow completed</p>
+            </div>
+            <div className="grid gap-2 text-xs text-emerald-900 sm:grid-cols-2 lg:grid-cols-4">
+              <span>Score: {orchestrationResult.summary.score ?? "n/a"}</span>
+              <span>Intent: {orchestrationResult.summary.intent || "general"}</span>
+              <span>Next: {orchestrationResult.summary.next_action || "none"}</span>
+              <span>Pipeline: {orchestrationResult.summary.pipeline_stage || "n/a"}</span>
+            </div>
           </div>
         )}
 

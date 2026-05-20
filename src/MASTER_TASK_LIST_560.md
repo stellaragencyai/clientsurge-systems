@@ -693,7 +693,7 @@
 | 251 | ✅ | Wire scoreLeadIntelligence to fire on every new WebsiteLead creation - currently deployed but never called from frontend | CRITICAL |
 | 252 | ✅ | Wire classifyLeadIntent on inbound SMS replies - currently deployed but disconnected | HIGH | Agent Smith |
 | 253 | ✅ | Wire predictChurnRisk to run weekly on all active Orders - alert Nolan if score > 70 | HIGH  Agent Smith |
-| 254 | ⏳ | Wire automationOrchestrator to Admin dashboard so Nolan can trigger it manually | MEDIUM |
+| 254 | ✅ | Wire automationOrchestrator to Admin dashboard so Nolan can trigger it manually | MEDIUM | Morpheus |
 | 255 | ✅ | /lead-intelligence page: display lead_score and quality_label per lead in the UI | HIGH | Agent Smith |
 | 256 | ✅ | Lead Intelligence dashboard: add real LeadAnalytics entity reads - currently shows no data | HIGH | Agent Smith |
 | 257 | ✅ | Add "AI Re-Score" button in admin lead list - calls scoreLeadIntelligence for selected lead | MEDIUM | Trinity |
