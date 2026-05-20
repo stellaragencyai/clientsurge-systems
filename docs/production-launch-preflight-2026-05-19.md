@@ -1,19 +1,21 @@
 # ClientSurge Production Launch Preflight
 
 Generated: 2026-05-19 22:45 America/Phoenix
-Last updated: 2026-05-19 22:58 America/Phoenix
+Last updated: 2026-05-19 23:18 America/Phoenix
 
 ## Current Verdict
 
 ClientSurge is code-ready for the package activation workflow, but not yet full production-launch ready.
 
-The website and Base44 app are reachable, GitHub PR conflicts are resolved, and the first two automation readiness check passes. The remaining blockers are operational: Stripe CLI/auth setup, controlled Stripe proof, and production Base44 backend deploy limitations for the current app ID.
+The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base44 UI publish completed successfully, and the first two automation readiness check passes. The remaining blockers are operational: Stripe CLI/auth setup, controlled Stripe proof, and production Base44 backend deploy limitations for the current app ID.
 
 ## Verified Ready
 
 - Base44 hosted app responds over HTTPS:
   - `https://client-surge-systems-copy-a9653cae.base44.app` returned `200 OK`.
   - `https://clientsurgesystems.com` returned `200 OK`.
+  - `https://grinning-apex-flow-growth.base44.app` returned `200 OK`.
+- Base44 production UI publish completed with success message: `Your app is published and live online!`
 - GitHub PR #1087 is mergeable after resolving conflicts with `main`.
 - Stripe-facing package mapping is aligned with the automation activation brain:
   - Starter/Basic: `instant_lead_response`, `missed_call_text_back`
@@ -40,6 +42,7 @@ The website and Base44 app are reachable, GitHub PR conflicts are resolved, and 
 - `npm run build`
 - `npm run openclaw:basic-package-check`
 - `node --test tests/salesCatalog.test.js tests/basicPackageActivation.test.js tests/installPipeline.test.js`
+- Direct production `ClientProject` schema smoke via `base44 exec` with `client_email`, `client_name`, and `business_name`
 
 ## Current Blockers
 
@@ -80,16 +83,19 @@ Required fix:
 2. If staying on the current production app, publish backend/entity changes through the Base44 UI or Base44-supported production workflow.
 3. If moving to the Backend Platform app, confirm domain/publish routing before switching `clientsurgesystems.com`.
 
-### 3. Purchase-To-Onboarding Smoke Needs Production Backend Sync
+### 3. Purchase-To-Onboarding Smoke Needs Production Backend Function Sync
 
-After merging latest `main`, local tests pass, but the live Base44 smoke test currently fails because production backend behavior is not in sync with the branch:
+After merging latest `main` and publishing the production app through the Base44 UI, local tests pass and the live domain is reachable, but the live Base44 smoke test still fails because the deployed `installPipeline` function behavior is not in sync with the branch:
 
 - `npm run openclaw:purchase-onboarding-smoke` fails while creating/linking `ClientProject`.
-- The function/entity deploy needed to refresh that path is blocked by the production app type issue above.
+- Failure details: `Error in field client_email: Field required` and `Error in field client_name: Field required`.
+- A direct `ClientProject.create` smoke with `client_email`, `client_name`, and `business_name` succeeds, so the production entity schema itself is valid.
+- The likely issue is the deployed production `installPipeline` function still creating/updating `ClientProject` using older field names or stale code.
+- The function deploy needed to refresh that path is blocked by the production app type issue above.
 
 Required fix:
 
-1. Publish the resolved backend/entity changes through the correct Base44 production workflow.
+1. Publish the resolved `installPipeline` backend changes through the correct Base44 production workflow.
 2. Re-run `npm run openclaw:purchase-onboarding-smoke`.
 3. Only then run Stripe webhook proof.
 
