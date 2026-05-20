@@ -264,7 +264,7 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
           </a>
           <button type="button" onClick={onBookDemo} style={{ borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)", border: "none", cursor: "pointer" }}>
             <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "42px", padding: "0 24px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.875rem" }}>
-              Book Your Free Demo <ArrowRight className="w-4 h-4" />
+              Make the Leap <ArrowRight className="w-4 h-4" />
             </span>
           </button>
         </div>

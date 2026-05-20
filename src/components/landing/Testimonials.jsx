@@ -136,7 +136,7 @@ export default function Testimonials() {
               className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white"
               style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
             >
-              Book Your Free Demo
+              Make the Leap
             </button>
           ) : (
             <a
@@ -144,7 +144,7 @@ export default function Testimonials() {
               className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white"
               style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
             >
-              Book Your Free Demo
+              Make the Leap
             </a>
           )}
         </div>

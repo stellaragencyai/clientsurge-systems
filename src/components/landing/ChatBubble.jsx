@@ -259,7 +259,7 @@ export default function ChatBubble() {
               className="text-[11px] font-bold px-3 py-1 rounded-full text-white"
               style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
             >
-              Book Demo →
+              Make the Leap →
             </button>
           </div>
         </div>
@@ -309,3 +309,4 @@ export default function ChatBubble() {
     </>
   );
 }
+

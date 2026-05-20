@@ -697,7 +697,7 @@ function StoreInner() {
                 boxShadow: "0 4px 14px rgba(0,174,239,0.35)"
               }}>
               
-               📞 Book a free 15-min strategy call
+               📞 Make the Leap: free 15-min strategy call
              </a>
              <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.35)", marginTop: "10px" }}>
                We'll tell you exactly which services will move the needle for your business.
@@ -727,3 +727,4 @@ export default function Store() {
     </DemoBookingProvider>);
 
 }
+

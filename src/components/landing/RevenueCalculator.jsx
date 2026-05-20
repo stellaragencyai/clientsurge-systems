@@ -140,7 +140,7 @@ export default function RevenueCalculator() {
 
               <a href="/book">
                 <Button className="rounded-full w-full font-semibold gap-2 h-12">
-                  Stop the Leak - Book Your Free Demo
+                  Stop the Leak - Make the Leap
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </a>
@@ -154,3 +154,4 @@ export default function RevenueCalculator() {
     </section>
   );
 }
+

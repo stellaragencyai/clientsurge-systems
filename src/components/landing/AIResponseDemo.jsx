@@ -406,7 +406,7 @@ Return a JSON object with:
                 className="text-sm font-semibold flex items-center gap-1.5 hover:underline focus:outline-none"
                 style={{ color: "#9a5c2e" }}
               >
-                Book Your Free Demo
+                Make the Leap
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
@@ -426,4 +426,5 @@ Return a JSON object with:
     </section>
   );
 }
+
 

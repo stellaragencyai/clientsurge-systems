@@ -38,7 +38,7 @@ export const coreOfferSectionConfig = {
     href: "#pricing",
   },
   secondaryCta: {
-    label: "Book Your Free Demo",
+    label: "Make the Leap",
   },
 };
 

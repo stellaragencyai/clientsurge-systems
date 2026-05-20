@@ -124,7 +124,7 @@ export default function Industries() {
                   onClick={() => setShowBookingModal(true)}
                   className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted transition-colors">
                   
-                    Book Your Free Demo
+                    Make the Leap
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 }

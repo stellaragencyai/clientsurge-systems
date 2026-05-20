@@ -11,11 +11,11 @@ export default function Book() {
 
   useEffect(() => {
     const cleanupMetadata = setPageMetadata({
-      title: 'Book Your Free Demo | ClientSurge Systems',
+      title: 'Make the Leap | ClientSurge Systems',
       description:
-        'Book a free ClientSurge Systems demo to review your follow-up process, lead leaks, and the fastest automation wins for your business.',
+        'Schedule a free ClientSurge Systems strategy call to review your follow-up process, lead leaks, and the fastest automation wins for your business.',
       canonicalPath: '/book',
-      ogTitle: 'Book Your Free ClientSurge Demo',
+      ogTitle: 'Make the Leap with ClientSurge',
       ogDescription:
         'Schedule a walkthrough to see how ClientSurge can improve your lead response and booking flow.',
     });
@@ -39,7 +39,7 @@ export default function Book() {
       <div className="w-full max-w-3xl">
         <div className="text-center mb-12">
           <h1 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-4">
-            Book Your Free Demo
+            Make the Leap
           </h1>
           <p className="text-muted-foreground text-lg">Free 15 minutes. No commitment. Same guided booking flow as the rest of the site.</p>
           <a
@@ -121,3 +121,4 @@ export default function Book() {
     </div>
   );
 }
+

@@ -195,7 +195,7 @@ export default function Contact() {
                 style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", boxShadow: "0 4px 14px rgba(0,174,239,0.4)", border: "none", cursor: "pointer", textDecoration: "none" }}
               >
                 <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 20px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.8rem" }}>
-                  Book Your Free Demo <ArrowRight className="w-3.5 h-3.5" />
+                  Make the Leap <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </button>
             </div>

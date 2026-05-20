@@ -14,7 +14,7 @@ const industries = [
 ];
 
 const routeMap = {
-  book: { href: "/book", label: "Book Your Free Demo" },
+  book: { href: "/book", label: "Make the Leap" },
   med_spa: { href: "/med-spa", label: "See the Med Spa Page" },
   industries: { href: "/industries", label: "Explore Industries" },
   contact: { href: "/contact", label: "Talk to Our Team" },
@@ -160,3 +160,4 @@ function SelectField({ label, value, onChange, options }) {
     </div>
   );
 }
+

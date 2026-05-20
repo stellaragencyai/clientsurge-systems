@@ -82,12 +82,12 @@ export default function AutomationWalkthrough() {
                 onClick={demoBooking.openDemoBooking}
                 className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary/80 transition-colors"
               >
-                Book Your Free Demo
+                Make the Leap
                 <ArrowRight className="w-4 h-4" />
               </button>
             ) : (
               <a href="/book" className="inline-flex items-center gap-2 text-primary font-semibold hover:text-primary/80 transition-colors">
-                Book Your Free Demo
+                Make the Leap
                 <ArrowRight className="w-4 h-4" />
               </a>
             )}
@@ -97,3 +97,4 @@ export default function AutomationWalkthrough() {
     </section>
   );
 }
+

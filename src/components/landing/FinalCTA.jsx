@@ -20,7 +20,7 @@ export default function FinalCTA() {
             You&apos;re Already Getting Leads. <span className="text-primary">Let&apos;s Make Sure You&apos;re Converting Them.</span>
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
-            Book a free 15-minute demo. We will map out exactly where your business is leaking bookings and show you what an AI lead conversion system would look like for your specific situation — no obligation.
+            Schedule a free 15-minute strategy call. We will map out exactly where your business is leaking bookings and show you what an AI lead conversion system would look like for your specific situation — no obligation.
           </p>
 
           {/* Projection stats — clearly framed as targets not guarantees */}

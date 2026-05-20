@@ -899,7 +899,7 @@
 | 351 | ✅ | Testimonials.jsx: all 3 testimonials use Unsplash stock photos of strangers - replace with generated avatars or initials | HIGH  Agent Smith |
 | 352 | ✅ | Testimonials.jsx: Jessica M. is in "Miami, FL" - change all testimonial locations to Phoenix/Scottsdale, AZ for local credibility | HIGH | Agent Smith |
 | 353 | ✅ | SocialProofTicker says "6 automations per client" - Starter gets 2, Growth 4, Elite 6 - change to "Up to 6 automations" | HIGH | Agent Smith |
-| 354 | ⏳ | constants.js BUTTON_TEXT.BOOK_DEMO = "Get Your Free Audit" - verify this replaces ALL former "Book Demo" references site-wide | MEDIUM |
+| 354 | ✅ | constants.js BUTTON_TEXT.BOOK_DEMO = "Make the Leap" - verified former "Book Demo" / "Book Your Free Demo" CTA references are replaced site-wide | MEDIUM | Morpheus |
 | 355 | ✅ | ExitIntentPopup.jsx: verify it doesn't fire on /admin or /client-portal routes - admin should never see exit intent | MEDIUM | Trinity |
 | 356 | ✅ | CookieConsent.jsx: verify it persists dismissal in localStorage - if not, re-shows on every page visit | HIGH  Agent Smith |
 | 357 | ✅ | LeadCaptureForm: add honeypot hidden field website_url to block bots - confirmed missing from at least one form variant | HIGH  Agent Smith |
