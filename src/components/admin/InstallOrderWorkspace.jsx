@@ -553,7 +553,7 @@ function BasicPackageActivationPanel({ detail, form, onApplyConfig }) {
               <div className="rounded-lg border border-border bg-white p-3">
                 <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">AI Booking Agent</p>
                 <p className="mt-2 text-xs leading-5 text-foreground">
-                  {brief.install_configuration.services.ai_booking_agent.booking_mode || "No mode"} -> {brief.install_configuration.services.ai_booking_agent.booking_link || "No booking link"}
+                  {brief.install_configuration.services.ai_booking_agent.booking_mode || "No mode"} {"->"} {brief.install_configuration.services.ai_booking_agent.booking_link || "No booking link"}
                 </p>
               </div>
             ) : null}

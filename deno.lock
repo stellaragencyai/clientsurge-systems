@@ -38,8 +38,8 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@base44/sdk@~0.8.27",
-        "npm:@base44/vite-plugin@^1.0.13",
+        "npm:@base44/sdk@~0.8.30",
+        "npm:@base44/vite-plugin@^1.0.18",
         "npm:@eslint/js@^9.19.0",
         "npm:@hello-pangea/dnd@17",
         "npm:@hookform/resolvers@^4.1.2",
@@ -115,7 +115,6 @@
         "npm:tailwind-merge@^3.0.2",
         "npm:tailwindcss-animate@^1.0.7",
         "npm:tailwindcss@^3.4.17",
-        "npm:three@0.171",
         "npm:typescript@^5.8.2",
         "npm:vaul@^1.1.2",
         "npm:vite@^6.1.0",

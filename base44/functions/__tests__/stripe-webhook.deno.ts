@@ -35,7 +35,7 @@ Deno.test("canonical package selection matches current service bundles", async (
   assertEquals(
     getBestPackageOfferForServiceKeys([
       "instant_lead_response",
-      "ai_booking_agent",
+      "missed_call_text_back",
     ])?.package_key,
     "starter_system"
   );
