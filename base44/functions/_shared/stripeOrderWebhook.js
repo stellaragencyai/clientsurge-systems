@@ -272,10 +272,33 @@ export async function ensureConfirmationEmail(base44, order, portalActivationUrl
     return { alreadyRecorded: true };
   }
 
-  await base44.asServiceRole.functions.invoke("sendOrderConfirmationEmail", {
-    order_id: order.id,
-    portal_activation_url: buildPortalUrl(portalActivationUrl),
-  });
+  try {
+    await base44.asServiceRole.functions.invoke("sendOrderConfirmationEmail", {
+      order_id: order.id,
+      portal_activation_url: buildPortalUrl(portalActivationUrl),
+    });
+  } catch (error) {
+    await createCommunicationEvent(
+      base44,
+      buildCommunicationEvent({
+        provider: "resend",
+        channel: "email",
+        direction: "outbound",
+        eventType: "email_failed",
+        status: "failed",
+        providerMessageId,
+        subject: "Order confirmation email failed",
+        messageBody: error instanceof Error ? error.message : String(error),
+        order,
+        metadata: {
+          order_id: order.id,
+          email: order.customer_email,
+        },
+      })
+    );
+
+    return { alreadyRecorded: false, email_failed: true };
+  }
 
   await createCommunicationEvent(
     base44,
