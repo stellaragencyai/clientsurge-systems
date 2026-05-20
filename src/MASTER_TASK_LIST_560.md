@@ -725,7 +725,7 @@
 | 268 | ✅ | AdminDashboard: build MRR metric card - sum total_monthly from all Orders with payment_status=paid | CRITICAL |
 | 269 | ✅ | AdminDashboard: build LTV card - total revenue per client over their lifetime | HIGH | Agent Smith |
 | 270 | ✅ | AdminDashboard: build Churn Risk panel - list clients with predictChurnRisk score > 70 | HIGH | Agent Smith |
-| 271 | ⏳ | AdminDashboard: wire AdminGlobalSearch to all entity types (Lead, Client, Order, SupportMessage) | MEDIUM |
+| 271 | ✅ | AdminDashboard: wire AdminGlobalSearch to all entity types (Lead, Client, Order, SupportMessage) | MEDIUM | Morpheus |
 | 272 | ⏳ | AdminDashboard: add session inactivity timeout - show warning modal after 30min, logout after 45min | MEDIUM |
 | 273 | ✅ | AdminDashboard: add "Install Status" table showing each client's onboarding step completion | HIGH | Agent Smith |
 | 274 | ✅ | AdminDashboard: add quick-action buttons - "Send Day 1 Email", "Trigger Follow-Up", "Mark Live" per client | HIGH | Agent Smith |
