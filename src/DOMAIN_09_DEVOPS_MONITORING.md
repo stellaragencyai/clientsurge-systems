@@ -39,7 +39,7 @@
 |---|---|---|---|---|---|---|---|
 | 107 | ⏳ | Create healthCheck function: returns {status:"ok", timestamp, version} — no auth | B | — | → C (#152 register with UptimeRobot) | 🧵 Monitoring | ~20 min |
 | 152 | ⏳ | Register healthCheck URL with UptimeRobot or Better Stack | C | #107 | — | 🧵 Monitoring | ~30 min |
-| 154 | ⏳ | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | B | — | — | — | ~1 hr |
+| 154 | ✅ | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | B | — | — | — | Done |
 | 155 | ⏳ | getClientAnalytics: remove hardcoded mock data — replace with real entity queries | B | — | — | — | ~1 hr |
 | 212 | ⏳ | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | C | #107 | — | 🧵 Monitoring | ~30 min |
 | 215 | ⏳ | Set up error alerting: admin email on any backend function 5xx error | C | — | — | 🧵 Monitoring | ~1 hr |

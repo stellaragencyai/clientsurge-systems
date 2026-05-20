@@ -14,11 +14,13 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { buildRevenueMetrics } from "../_shared/adminAnalyticsMetrics.js";
 
 const USER_LIMIT = 5000;
 const LEAD_LIMIT = 10000;
 const EVENT_LIMIT = 5000;
 const DRIP_LIMIT = 10000;
+const ORDER_LIMIT = 10000;
 
 function formatDay(date) {
   return date.toISOString().slice(0, 10);
@@ -53,16 +55,19 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
     }
 
-    const [users, leads, events, drips] = await Promise.all([
+    const [users, leads, events, drips, orders] = await Promise.all([
       base44.asServiceRole.entities.User.list("-created_date", USER_LIMIT),
       base44.asServiceRole.entities.Leads.list("-created_date", LEAD_LIMIT),
       base44.asServiceRole.entities.CommunicationEvent.list("-created_date", EVENT_LIMIT),
       base44.asServiceRole.entities.DripCampaign.list("-created_date", DRIP_LIMIT),
+      base44.asServiceRole.entities.Order.list("-created_date", ORDER_LIMIT),
     ]);
 
     const allLeads = leads || [];
     const allUsers = users || [];
     const allDrips = drips || [];
+    const allOrders = orders || [];
+    const revenue = buildRevenueMetrics(allOrders);
 
     // ── Users ────────────────────────────────────────────────────────────────
     const activeUserCount = allUsers.filter((u) => u.role !== "admin").length;
@@ -193,11 +198,14 @@ Deno.serve(async (req) => {
       leads_capped: allLeads.length >= LEAD_LIMIT,
       events_capped: (events || []).length >= EVENT_LIMIT,
       drip_campaigns_capped: allDrips.length >= DRIP_LIMIT,
+      orders_capped: allOrders.length >= ORDER_LIMIT,
     };
 
     return Response.json({
       success: true,
       users: { total: allUsers.length, active: activeUserCount, admins: adminCount },
+      revenue,
+      metrics: revenue,
       leads: { total: totalLeads, new_last_30_days: newLast30, avg_score: avgScore, high_intent_count: highIntentCount, status_counts: statusCounts },
       last30Days,
       funnel,
@@ -213,6 +221,7 @@ Deno.serve(async (req) => {
           leads: LEAD_LIMIT,
           events: EVENT_LIMIT,
           drip_campaigns: DRIP_LIMIT,
+          orders: ORDER_LIMIT,
         },
         truncated: truncation,
       },

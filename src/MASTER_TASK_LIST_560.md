@@ -412,7 +412,7 @@
 |---|---|---|---|
 | 152 | ⏳ | Register healthCheck function URL with UptimeRobot or Better Stack | HIGH |
 | 153 | ✅ | Add Cache-Control: public, max-age=60 to read-only functions (getAdminSettings, etc.) | MEDIUM  Agent Smith |
-| 154 | 🔄 | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | CRITICAL |
+| 154 | ✅ | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | CRITICAL | Morpheus |
 | 155 | ✅ | getClientAnalytics: remove/replace any hardcoded mock data with real entity queries | HIGH  Agent Smith |
 | 156 | ✅ | getClientPortalContext: on auth, write portal_login CommunicationEvent | LOW  Trinity |
 | 157 | ✅ | Create AuditLog entity with fields: admin_email, action, entity, before, after, timestamp | MEDIUM  Agent Smith |
