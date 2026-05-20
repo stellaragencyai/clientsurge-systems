@@ -829,7 +829,7 @@
 | # | Status | Task | Priority |
 |---|---|---|---|
 | 311 | ✅ | AutomationsOverview.jsx: replace SAMPLE_AUTOMATIONS hardcoded array with real AutomationChecklist entity reads | CRITICAL |
-| 312 | ⏳ | SocialProofTicker.jsx: currently shows only static stats strings - wire to real Order entity count for "X businesses automated" | MEDIUM |
+| 312 | ✅ | SocialProofTicker.jsx: currently shows only static stats strings - wire to real Order entity count for "X businesses automated" | MEDIUM | Morpheus |
 | 313 | ✅ | WeeklyReports.jsx: verify BUILD_STEPS keys match actual ClientInstallationOS entity fields - step_onboarding, step_sms etc. may be wrong field names | HIGH  Agent Smith |
 | 314 | ✅ | RevenueMetricsPanel.jsx: verify it reads from real Order entities not mock data - add fallback empty state if no paid orders exist yet | HIGH  Agent Smith |
 | 315 | ✅ | TasksDashboard.jsx: confirm getClientTaskJobs function returns real data - add empty state for new clients with zero tasks | MEDIUM  Trinity |
