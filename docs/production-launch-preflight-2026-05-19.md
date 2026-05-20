@@ -1,13 +1,13 @@
 # ClientSurge Production Launch Preflight
 
 Generated: 2026-05-19 22:45 America/Phoenix
-Last updated: 2026-05-19 23:56 America/Phoenix
+Last updated: 2026-05-20 12:50 America/Phoenix
 
 ## Current Verdict
 
 ClientSurge is code-ready for the package activation workflow, but not yet full production-launch ready.
 
-The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base44 UI publish completed successfully, the first two automation readiness check passes, and Stripe CLI is authenticated. The remaining blockers are operational: live Stripe catalog alignment, controlled Stripe proof, and production Base44 backend deploy limitations for the current app ID.
+The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base44 UI publish completed successfully, the first two automation readiness check passes, and Stripe CLI is authenticated. The checkout source is now locally aligned to the live Stripe package catalog. The remaining blockers are operational: deploy/publish the updated checkout/backend code, run controlled Stripe proof, and resolve production Base44 backend deploy limitations for the current app ID.
 
 ## Verified Ready
 
@@ -39,17 +39,28 @@ The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base
 - Stripe CLI is authenticated to the live ClientSurge Systems account:
   - Account ID: `acct_1TSOFVBVGjsISdG0`
   - Test and live CLI keys are available locally until `2026-08-18`.
+- Local checkout code now uses the live Stripe package products/prices:
+  - Starter product `prod_UReWMpnZsCnfcL`
+    - setup `price_1TSlDWBVGjsISdG0SyoWzAm3`
+    - monthly `price_1TSlDWBVGjsISdG0Ej1O16ov`
+  - Growth product `prod_UReWhZsWks1HuA`
+    - setup `price_1TSlDXBVGjsISdG0eTWcARLM`
+    - monthly `price_1TSlDXBVGjsISdG0X9unS4Qf`
+  - Elite product `prod_UReW1LmsVbn4BZ`
+    - setup `price_1TSlDYBVGjsISdG0l2rHzet1`
+    - monthly `price_1TSlDXBVGjsISdG0Abdx85z3`
 
 ## Verification Commands Passed
 
 - `npm run build`
 - `npm run openclaw:basic-package-check`
 - `node --test tests/salesCatalog.test.js tests/basicPackageActivation.test.js tests/installPipeline.test.js`
+- Post-alignment targeted tests: `node --test tests/salesCatalog.test.js tests/basicPackageActivation.test.js tests/installPipeline.test.js` passed 40/40.
 - Direct production `ClientProject` schema smoke via `base44 exec` with `client_email`, `client_name`, and `business_name`
 
 ## Current Blockers
 
-### 1. Live Stripe Catalog Must Be Aligned With App Checkout Code
+### 1. Live Stripe Catalog Alignment Must Be Deployed And Proven
 
 Stripe CLI is now installed and authenticated, but the first read-only Stripe audit found a catalog mismatch:
 
@@ -59,14 +70,16 @@ Stripe CLI is now installed and authenticated, but the first read-only Stripe au
   - `ClientSurge Systems — Growth`
   - `ClientSurge Systems — Elite`
 - Live mode has package-level setup and monthly prices for those three packages.
-- The current app checkout catalog still references older individual-service Stripe product/price IDs such as `prod_UNi5...` and `price_1TOwfi...`.
+- Previous app checkout code referenced older individual-service Stripe product/price IDs such as `prod_UNi5...` and `price_1TOwfi...`.
+- Local source now maps Starter/Growth/Elite checkout line items to the live package-level Stripe prices while preserving internal per-automation order/service tracking.
+- Add-on checkout is intentionally blocked until live Stripe add-on/package prices exist, so the app cannot accidentally create Checkout Sessions with stale individual-service price IDs.
 
 Required fix:
 
-1. Decide whether checkout should use the current live package products/prices or recreate the old individual-service products/prices in Stripe.
-2. Recommended path: update app checkout to use the current live package products/prices, while internally expanding the package into the correct automation service keys.
-3. Mirror the live package products/prices into Stripe test mode so test-mode checkout can be proven without live charges.
-4. Re-run a test-mode checkout/webhook proof.
+1. Deploy/publish the updated checkout source through the correct Base44 production workflow.
+2. Mirror the live package products/prices into Stripe test mode so test-mode checkout can be proven without live charges.
+3. Re-run a test-mode checkout/webhook proof.
+4. Run one controlled production payment proof only with explicit approval for amount, card, and refund/no-refund plan.
 
 ### 2. Stripe Webhook Endpoint URL Needs Canonical Review
 
@@ -132,7 +145,7 @@ Required fix:
 3. Decide/fix the Base44 production backend deploy path.
 4. Publish backend/entity changes through the correct Base44 production workflow.
 5. Re-run purchase-to-onboarding smoke.
-6. Align the app checkout catalog with live Stripe package products/prices.
+6. Deploy the locally aligned app checkout catalog that now uses live Stripe package products/prices.
 7. Mirror package products/prices in Stripe test mode.
 8. Run Stripe checkout/webhook smoke test in test mode first.
 9. Run one controlled production payment test only with explicit approval for amount, card, and refund/no-refund plan.
@@ -142,7 +155,7 @@ Required fix:
 ## Do Not Launch Until
 
 - Stripe webhook proof passes.
-- App checkout catalog matches the live Stripe package products/prices.
+- The locally aligned checkout catalog is deployed and proven against Stripe.
 - Production Base44 backend/entity deployment path is confirmed.
 - Purchase-to-onboarding live smoke passes after production backend sync.
 - Base44 production publish target is explicitly confirmed.

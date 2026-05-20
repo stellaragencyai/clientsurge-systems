@@ -1,7 +1,11 @@
 import Stripe from "npm:stripe@14";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { getTrackedServiceConfig, normalizeInstallConfiguration } from "../_shared/installPipeline.js";
-import { buildPricingSummaryForProducts, buildStoredPricingSummary } from "../../../src/lib/salesCatalog.js";
+import {
+  buildPricingSummaryForProducts,
+  buildStoredPricingSummary,
+  buildStripeLineItemsForPricingSummary,
+} from "../../../src/lib/salesCatalog.js";
 
 // TASK #304 — Prefer live key; fallback to STRIPE_SECRET_KEY for local dev
 const stripeSecretKey = Deno.env.get("STRIPE_LIVE_SECRET_KEY") || Deno.env.get("STRIPE_SECRET_KEY") || "";
@@ -132,16 +136,7 @@ Deno.serve(async (req) => {
       plan_type: pricingSummary.package_offer?.name || "Custom Service Bundle",
     });
 
-    const line_items = pricingSummary.priced_items.flatMap((item) => ([
-      {
-        price: item.setup_price_id,
-        quantity: 1,
-      },
-      {
-        price: item.monthly_price_id,
-        quantity: 1,
-      },
-    ]));
+    const line_items = buildStripeLineItemsForPricingSummary(pricingSummary);
 
     const sessionMetadata = {
       order_id: order.id,
@@ -157,6 +152,7 @@ Deno.serve(async (req) => {
         }))
       ),
       package_key: pricingSummary.package_offer?.package_key || "",
+      package_stripe_product_id: pricingSummary.package_offer?.stripe_product_id || "",
       request_id: requestId,
     };
 

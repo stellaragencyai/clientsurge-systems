@@ -7,6 +7,7 @@ import {
   CANONICAL_SERVICE_PRODUCTS,
   buildPricingSummaryForProducts,
   buildStoredPricingSummary,
+  buildStripeLineItemsForPricingSummary,
   getPackageOffer,
   getPackageServices,
 } from "../src/lib/salesCatalog.js";
@@ -50,8 +51,9 @@ test("package offers map directly to canonical service bundles", () => {
       "ai_booking_agent",
     ]
   );
-  assert.equal(growth.setup_total, 1195);
-  assert.equal(growth.monthly_total, 349);
+  assert.equal(growth.setup_total, 1297);
+  assert.equal(growth.monthly_total, 997);
+  assert.equal(growth.stripe_product_id, "prod_UReWhZsWks1HuA");
 });
 
 test("pricing summary matches best package when selected services align", () => {
@@ -61,10 +63,10 @@ test("pricing summary matches best package when selected services align", () => 
 
   assert.equal(summary.package_offer?.package_key, "growth_system");
   assert.equal(summary.priced_items.length, 4);
-  assert.equal(summary.total_setup, 1195);
-  assert.equal(summary.total_monthly, 349);
-  assert.equal(summary.setup_discount_total, 193);
-  assert.equal(summary.monthly_discount_total, 89);
+  assert.equal(summary.total_setup, 1297);
+  assert.equal(summary.total_monthly, 997);
+  assert.equal(summary.setup_discount_total, 91);
+  assert.equal(summary.monthly_discount_total, -559);
 });
 
 test("pricing summary preserves add-ons outside matched package", () => {
@@ -75,8 +77,8 @@ test("pricing summary preserves add-ons outside matched package", () => {
 
   assert.equal(summary.package_offer?.package_key, "starter_system");
   assert.deepEqual(summary.add_on_service_keys, ["review_request"]);
-  assert.equal(summary.total_setup, 892);
-  assert.equal(summary.total_monthly, 264);
+  assert.equal(summary.total_setup, 994);
+  assert.equal(summary.total_monthly, 564);
 });
 
 test("stored pricing summary keeps package and discount visibility for admin", () => {
@@ -87,10 +89,36 @@ test("stored pricing summary keeps package and discount visibility for admin", (
 
   assert.equal(stored.package_key, "elite_system");
   assert.equal(stored.package_name, "Elite System");
-  assert.equal(stored.total_setup, 1495);
-  assert.equal(stored.total_monthly, 469);
-  assert.equal(stored.setup_discount_total, 387);
-  assert.equal(stored.monthly_discount_total, 133);
+  assert.equal(stored.package_stripe_product_id, "prod_UReW1LmsVbn4BZ");
+  assert.equal(stored.package_setup_price_id, "price_1TSlDYBVGjsISdG0l2rHzet1");
+  assert.equal(stored.package_monthly_price_id, "price_1TSlDXBVGjsISdG0Abdx85z3");
+  assert.equal(stored.total_setup, 2497);
+  assert.equal(stored.total_monthly, 1997);
+  assert.equal(stored.setup_discount_total, -615);
+  assert.equal(stored.monthly_discount_total, -1395);
+});
+
+test("package checkout uses the live Stripe package price ids", () => {
+  const summary = buildPricingSummaryForProducts(
+    getPackageServices("starter_system").map((service) => service.product_id)
+  );
+
+  assert.deepEqual(buildStripeLineItemsForPricingSummary(summary), [
+    { price: "price_1TSlDWBVGjsISdG0SyoWzAm3", quantity: 1 },
+    { price: "price_1TSlDWBVGjsISdG0Ej1O16ov", quantity: 1 },
+  ]);
+});
+
+test("add-on checkout is blocked until live Stripe add-on prices exist", () => {
+  const summary = buildPricingSummaryForProducts([
+    ...getPackageServices("starter_system").map((service) => service.product_id),
+    "prod_UNi5dvOUm6Fi9i",
+  ]);
+
+  assert.throws(
+    () => buildStripeLineItemsForPricingSummary(summary),
+    /add-on checkout is not enabled/
+  );
 });
 
 test("non-self-serve public offers do not leak into checkout pricing", () => {

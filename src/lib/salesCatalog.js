@@ -275,23 +275,29 @@ const PACKAGE_DEFINITIONS = [
     name: "Starter System",
     fit: "Best for businesses that need instant response and missed-call recovery first.",
     description: "Start with immediate website lead response plus automatic missed-call text-back.",
+    stripe_product_id: "prod_UReWMpnZsCnfcL",
+    setup_price_id: "price_1TSlDWBVGjsISdG0SyoWzAm3",
+    monthly_price_id: "price_1TSlDWBVGjsISdG0Ej1O16ov",
     included_service_keys: ["instant_lead_response", "missed_call_text_back"],
-    setup_total: 695,
-    monthly_total: 197,
+    setup_total: 797,
+    monthly_total: 497,
   },
   {
     package_key: "growth_system",
     name: "Growth System",
     fit: "Best for steady lead flow that needs response, recovery, nurture, and booking.",
     description: "The core response and nurture stack for businesses actively converting inbound demand.",
+    stripe_product_id: "prod_UReWhZsWks1HuA",
+    setup_price_id: "price_1TSlDXBVGjsISdG0eTWcARLM",
+    monthly_price_id: "price_1TSlDXBVGjsISdG0X9unS4Qf",
     included_service_keys: [
       "instant_lead_response",
       "missed_call_text_back",
       "nurture_sequence_14d",
       "ai_booking_agent",
     ],
-    setup_total: 1195,
-    monthly_total: 349,
+    setup_total: 1297,
+    monthly_total: 997,
     badge: "Most Popular",
     highlight: true,
   },
@@ -300,6 +306,9 @@ const PACKAGE_DEFINITIONS = [
     name: "Elite System",
     fit: "Best for teams that want the full response, reactivation, and review stack.",
     description: "The complete AI automation bundle — every service, fully managed.",
+    stripe_product_id: "prod_UReW1LmsVbn4BZ",
+    setup_price_id: "price_1TSlDYBVGjsISdG0l2rHzet1",
+    monthly_price_id: "price_1TSlDXBVGjsISdG0Abdx85z3",
     included_service_keys: [
       "instant_lead_response",
       "missed_call_text_back",
@@ -308,8 +317,8 @@ const PACKAGE_DEFINITIONS = [
       "lead_reactivation",
       "review_request",
     ],
-    setup_total: 1495,
-    monthly_total: 469,
+    setup_total: 2497,
+    monthly_total: 1997,
   },
 ];
 
@@ -638,6 +647,9 @@ export function buildStoredPricingSummary(items = []) {
     pricing_version: "canonical_sales_catalog_v1",
     package_key: packageOffer?.package_key || null,
     package_name: packageOffer?.name || null,
+    package_stripe_product_id: packageOffer?.stripe_product_id || null,
+    package_setup_price_id: packageOffer?.setup_price_id || null,
+    package_monthly_price_id: packageOffer?.monthly_price_id || null,
     package_service_keys: summary.package_service_keys,
     add_on_service_keys: summary.add_on_service_keys,
     selected_service_keys: summary.selected_service_keys,
@@ -651,6 +663,30 @@ export function buildStoredPricingSummary(items = []) {
     compare_at_setup: packageOffer?.compare_at_setup || null,
     compare_at_monthly: packageOffer?.compare_at_monthly || null,
   };
+}
+
+export function buildStripeLineItemsForPricingSummary(pricingSummary) {
+  const packageOffer = pricingSummary?.package_offer || null;
+  const addOnServiceKeys = pricingSummary?.add_on_service_keys || [];
+
+  if (!packageOffer?.setup_price_id || !packageOffer?.monthly_price_id) {
+    throw new Error("Live checkout currently requires a Starter, Growth, or Elite package bundle.");
+  }
+
+  if (addOnServiceKeys.length > 0) {
+    throw new Error("Live checkout currently supports package bundles only; add-on checkout is not enabled.");
+  }
+
+  return [
+    {
+      price: packageOffer.setup_price_id,
+      quantity: 1,
+    },
+    {
+      price: packageOffer.monthly_price_id,
+      quantity: 1,
+    },
+  ];
 }
 
 export function getPackageDisplayLabel(pricingSummary) {
