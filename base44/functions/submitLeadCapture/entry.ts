@@ -29,19 +29,19 @@ const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const RATE_LIMIT_MAX = 3;
 const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
 
-function cleanString(value) {
+function cleanString(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function normalizeEmail(value) {
+function normalizeEmail(value: unknown) {
   return cleanString(value).toLowerCase();
 }
 
-function normalizePhone(value) {
+function normalizePhone(value: unknown) {
   return cleanString(value).replace(/[^\d+]/g, "");
 }
 
-function normalizeRequestedChannels(value) {
+function normalizeRequestedChannels(value: unknown) {
   if (!Array.isArray(value)) {
     return [];
   }
@@ -49,16 +49,26 @@ function normalizeRequestedChannels(value) {
   return [...new Set(value.map((entry) => cleanString(entry).toLowerCase()).filter(Boolean))];
 }
 
-function isDisposableEmail(email) {
+function normalizeUtmParams(body: Record<string, unknown>) {
+  return {
+    utm_source: cleanString(body.utm_source),
+    utm_medium: cleanString(body.utm_medium),
+    utm_campaign: cleanString(body.utm_campaign),
+    utm_content: cleanString(body.utm_content),
+    utm_term: cleanString(body.utm_term),
+  };
+}
+
+function isDisposableEmail(email: string) {
   const domain = normalizeEmail(email).split("@")[1] || "";
   return DISPOSABLE_DOMAINS.has(domain);
 }
 
-function buildDedupKey({ email, phone }) {
+function buildDedupKey({ email, phone }: { email: string; phone: string }) {
   return email || phone || crypto.randomUUID();
 }
 
-async function createCrmLeadFromWebsiteLead(base44, lead) {
+async function createCrmLeadFromWebsiteLead(base44: any, lead: any) {
   return base44.asServiceRole.entities.Leads.create({
     full_name: lead.full_name || lead.first_name || "Unknown",
     business_name: lead.business_name || "Not provided",
@@ -67,6 +77,11 @@ async function createCrmLeadFromWebsiteLead(base44, lead) {
     business_type: lead.business_type || "Not specified",
     problem: lead.problem || lead.message || "Website submission",
     source: lead.source || "website_form",
+    utm_source: lead.utm_source || "",
+    utm_medium: lead.utm_medium || "",
+    utm_campaign: lead.utm_campaign || "",
+    utm_content: lead.utm_content || "",
+    utm_term: lead.utm_term || "",
     status: "New",
     lead_score: 50,
     activation_priority: "Medium",
@@ -76,7 +91,10 @@ async function createCrmLeadFromWebsiteLead(base44, lead) {
   });
 }
 
-async function invokeAutomationOrchestrator(base44, { leadId, projectId = null, triggerEvent }) {
+async function invokeAutomationOrchestrator(
+  base44: any,
+  { leadId, projectId = null, triggerEvent }: { leadId: string; projectId?: string | null; triggerEvent: string }
+) {
   try {
     const result = await base44.asServiceRole.functions.invoke("automationOrchestrator", {
       lead_id: leadId,
@@ -102,6 +120,7 @@ async function invokeAutomationOrchestrator(base44, { leadId, projectId = null, 
 
     return result;
   } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id: leadId,
       client_project_id: projectId || undefined,
@@ -111,8 +130,8 @@ async function invokeAutomationOrchestrator(base44, { leadId, projectId = null, 
       provider: "automationOrchestrator",
       status: "failed",
       subject: "AI workflow trigger failed",
-      message_body: error.message,
-      error_message: error.message,
+      message_body: errorMsg,
+      error_message: errorMsg,
       metadata_json: JSON.stringify({ trigger_event: triggerEvent }),
     }).catch(() => null);
 
@@ -120,7 +139,7 @@ async function invokeAutomationOrchestrator(base44, { leadId, projectId = null, 
   }
 }
 
-function getClientIp(req) {
+function getClientIp(req: Request) {
   return cleanString(
     req.headers.get("x-forwarded-for")?.split(",")[0] ||
       req.headers.get("cf-connecting-ip") ||
@@ -129,7 +148,7 @@ function getClientIp(req) {
   );
 }
 
-function isRateLimited(ip) {
+function isRateLimited(ip: string) {
   const now = Date.now();
   const entry = rateLimitMap.get(ip);
   if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
@@ -198,6 +217,7 @@ Deno.serve(async (req) => {
 
     const now = new Date().toISOString();
     const consentGiven = body.consent_given === true;
+    const utmParams = normalizeUtmParams(body);
     const lead = await base44.asServiceRole.entities.WebsiteLead.create({
       full_name: cleanString(body.full_name),
       first_name: cleanString(body.first_name || body.full_name?.split?.(" ")?.[0]),
@@ -209,6 +229,7 @@ Deno.serve(async (req) => {
       message: cleanString(body.message || body.problem || ""),
       problem: cleanString(body.problem || body.message || ""),
       source: body.source || "website_form",
+      ...utmParams,
       lead_status: "new",
       dedup_key: buildDedupKey({ email, phone }),
       requested_channels: normalizeRequestedChannels(body.requested_channels),
@@ -242,6 +263,7 @@ Deno.serve(async (req) => {
       deduplicated: false,
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    return Response.json({ error: errorMsg }, { status: 500 });
   }
 });

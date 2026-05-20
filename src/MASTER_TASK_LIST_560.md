@@ -778,7 +778,7 @@
 | 294 | ✅ | Connect GA4 property - add G- tracking ID to index.html gtag snippet | HIGH |
 | 295 | ✅ | Track checkout button clicks as GA4 conversion events | HIGH | Agent Smith |
 | 296 | ✅ | Track form submissions (lead capture, contact, onboarding) as GA4 events | HIGH | Agent Smith |
-| 297 | ⏳ | Add UTM parameter persistence - store utm_source and utm_medium on lead record at capture | MEDIUM |
+| 297 | ✅ | Add UTM parameter persistence - submitLeadCapture stores utm_source/medium/campaign/content/term on WebsiteLead and mirrored CRM Leads | MEDIUM | Morpheus |
 | 298 | ✅ | Build weekly analytics digest automation - email Nolan every Monday: new leads, MRR, conversion rate, churn risk | HIGH | Agent Smith |
 
 ---

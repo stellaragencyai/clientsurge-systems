@@ -35,6 +35,26 @@
       "type": "string",
       "title": "Lead Source"
     },
+    "utm_source": {
+      "type": "string",
+      "title": "UTM Source"
+    },
+    "utm_medium": {
+      "type": "string",
+      "title": "UTM Medium"
+    },
+    "utm_campaign": {
+      "type": "string",
+      "title": "UTM Campaign"
+    },
+    "utm_content": {
+      "type": "string",
+      "title": "UTM Content"
+    },
+    "utm_term": {
+      "type": "string",
+      "title": "UTM Term"
+    },
     "intake_type": {
       "type": "string",
       "title": "Intake Type"
