@@ -1508,7 +1508,7 @@ function deriveServiceRequiredActions({
   };
 }
 
-export async function buildRemoteSetupWorkspace({ base44, order, orderEvents = [] }) {
+export async function buildRemoteSetupWorkspace({ base44, order, orderEvents = [], now = new Date().toISOString() }) {
   const snapshot = buildInstallSnapshot(order);
   const [{ settings }, healthEvents] = await Promise.all([
     loadAdminSettings(base44),
@@ -1539,6 +1539,7 @@ export async function buildRemoteSetupWorkspace({ base44, order, orderEvents = [
           order,
           targetSegment: serviceState.configuration?.target_segment,
           maxBatchSize: serviceState.configuration?.max_batch_size || 25,
+          now,
         })
       : [];
     const reactivationSegmentInsights = serviceState.service_key === "lead_reactivation"
@@ -1549,6 +1550,7 @@ export async function buildRemoteSetupWorkspace({ base44, order, orderEvents = [
               order,
               targetSegment: segment,
               maxBatchSize: 500,
+              now,
             });
 
             return {

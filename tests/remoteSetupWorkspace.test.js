@@ -415,6 +415,7 @@ test("remote setup workspace derives lead reactivation blockers and target size 
     base44,
     order,
     orderEvents: [],
+    now: "2026-04-22T12:00:00.000Z",
   });
 
   const service = workspace.services[0];
