@@ -147,7 +147,29 @@ export default function IntegrationPartners() {
                   display: "block"
                 }}
 
-                onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  const fallback = e.currentTarget.nextElementSibling;
+                  if (fallback) fallback.style.display = "flex";
+                }} />
+                <span
+                  aria-hidden="true"
+                  style={{
+                    display: "none",
+                    height: "72px",
+                    width: `${ITEM_WIDTH}px`,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(0,174,239,0.18)",
+                    background: "rgba(0,174,239,0.06)",
+                    color: "#0088CC",
+                    fontSize: "13px",
+                    fontWeight: 800,
+                  }}
+                >
+                  {integration.name}
+                </span>
               
                 
 

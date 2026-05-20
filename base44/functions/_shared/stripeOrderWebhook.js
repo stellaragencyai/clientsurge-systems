@@ -295,6 +295,43 @@ export async function ensureConfirmationEmail(base44, order, portalActivationUrl
   return { alreadyRecorded: false };
 }
 
+export async function ensureAdminPurchaseNotification(base44, order) {
+  const providerMessageId = `admin_purchase_notification:${order.id}`;
+  const existingEvent = await findCommunicationEvent(base44, providerMessageId);
+  if (existingEvent) {
+    return { alreadyRecorded: true };
+  }
+
+  await base44.asServiceRole.functions.invoke("sendAdminPurchaseNotification", {
+    order_id: order.id,
+    customer_name: order.business_name || order.customer_name,
+    customer_email: order.customer_email,
+    package_key: order.pricing_summary?.package_key || order.package_key || order.package_type,
+    setup_fee: order.total_setup,
+    monthly_rate: order.total_monthly,
+  }).catch(() => null);
+
+  await createCommunicationEvent(
+    base44,
+    buildCommunicationEvent({
+      provider: "internal",
+      channel: "notification",
+      direction: "outbound",
+      eventType: "admin_purchase_notification",
+      providerMessageId,
+      subject: "Admin purchase notification queued",
+      messageBody: `Admin purchase notification queued for order ${order.id}.`,
+      order,
+      metadata: {
+        order_id: order.id,
+        email: order.customer_email,
+      },
+    })
+  );
+
+  return { alreadyRecorded: false };
+}
+
 export async function processCheckoutSessionCompleted({
   base44,
   event,
@@ -376,6 +413,7 @@ export async function processCheckoutSessionCompleted({
     updatedOrder,
     portalInvite.activation_link
   );
+  await ensureAdminPurchaseNotification(base44, updatedOrder);
 
   await createCommunicationEvent(
     base44,

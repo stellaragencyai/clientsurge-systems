@@ -3,6 +3,8 @@ import { MessageCircle, X, Send, Loader2, ChevronDown } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import DemoBookingModal from "../forms/DemoBookingModal";
 
+const SEND_COOLDOWN_MS = 2000;
+
 const QUICK_QUESTIONS = [
   "How fast does the AI respond?",
   "What's the pricing?",
@@ -27,8 +29,10 @@ export default function ChatBubble() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
   const [pulsed, setPulsed] = useState(false);
+  const [cooldown, setCooldown] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const cooldownTimerRef = useRef(null);
 
   // Pulse the bubble after 6s to draw attention
   useEffect(() => {
@@ -47,10 +51,15 @@ export default function ChatBubble() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
+  useEffect(() => () => clearTimeout(cooldownTimerRef.current), []);
+
   const sendMessage = async (text) => {
     const userText = (text || input).trim();
-    if (!userText || loading) return;
+    if (!userText || loading || cooldown) return;
     setInput("");
+    setCooldown(true);
+    clearTimeout(cooldownTimerRef.current);
+    cooldownTimerRef.current = setTimeout(() => setCooldown(false), SEND_COOLDOWN_MS);
 
     const newMessages = [...messages, { role: "user", content: userText }];
     setMessages(newMessages);
@@ -195,7 +204,7 @@ export default function ChatBubble() {
                 <button
                   key={q}
                   onClick={() => sendMessage(q)}
-                  disabled={loading}
+                  disabled={loading || cooldown}
                   className="text-xs font-semibold px-3 py-1.5 rounded-full border transition-all disabled:opacity-50"
                   style={{
                     borderColor: "rgba(154,92,46,0.3)",
@@ -222,11 +231,12 @@ export default function ChatBubble() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask anything…"
+              disabled={loading || cooldown}
               className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
             />
             <button
               onClick={() => sendMessage()}
-              disabled={!input.trim() || loading}
+              disabled={!input.trim() || loading || cooldown}
               className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-40"
               style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
             >

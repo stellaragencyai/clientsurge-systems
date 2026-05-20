@@ -141,7 +141,8 @@ function StoreInner() {
       style={{
         minHeight: "100vh",
         fontFamily: "'Inter', sans-serif",
-        position: "relative"
+        position: "relative",
+        background: "linear-gradient(180deg, #fdfbf8 0%, #ffffff 42%, #fdfbf8 100%)"
       }}>
       
       

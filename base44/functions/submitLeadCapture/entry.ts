@@ -25,6 +25,9 @@ const DISPOSABLE_DOMAINS = new Set([
 ]);
 
 const SIXTY_MINUTES = 60 * 60 * 1000;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
+const RATE_LIMIT_MAX = 3;
+const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
 
 function cleanString(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -55,9 +58,37 @@ function buildDedupKey({ email, phone }) {
   return email || phone || crypto.randomUUID();
 }
 
+function getClientIp(req) {
+  return cleanString(
+    req.headers.get("x-forwarded-for")?.split(",")[0] ||
+      req.headers.get("cf-connecting-ip") ||
+      req.headers.get("x-real-ip") ||
+      "unknown"
+  );
+}
+
+function isRateLimited(ip) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+    rateLimitMap.set(ip, { count: 1, windowStart: now });
+    return false;
+  }
+  if (entry.count >= RATE_LIMIT_MAX) return true;
+  entry.count += 1;
+  return false;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    const ip = getClientIp(req);
+    if (isRateLimited(ip)) {
+      return Response.json(
+        { error: "Too many submissions. Please try again later." },
+        { status: 429 }
+      );
+    }
     const body = await req.json();
 
     if (cleanString(body.website_url)) {
