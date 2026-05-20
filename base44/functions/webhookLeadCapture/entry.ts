@@ -244,6 +244,50 @@ async function createCrmLead(base44, lead, project) {
   });
 }
 
+async function invokeAutomationOrchestrator(base44, { leadId, projectId, triggerEvent }) {
+  try {
+    const result = await base44.asServiceRole.functions.invoke("automationOrchestrator", {
+      lead_id: leadId,
+      project_id: projectId,
+      trigger_event: triggerEvent,
+    });
+
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id: leadId,
+      client_project_id: projectId,
+      channel: "internal",
+      direction: "internal",
+      event_type: "workflow_triggered",
+      provider: "automationOrchestrator",
+      status: result?.success === false ? "failed" : "completed",
+      subject: "AI workflow triggered from signed lead webhook",
+      message_body: triggerEvent,
+      metadata_json: JSON.stringify({
+        trigger_event: triggerEvent,
+        summary: result?.data?.summary || result?.summary || null,
+      }),
+    }).catch(() => null);
+
+    return result;
+  } catch (error) {
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id: leadId,
+      client_project_id: projectId,
+      channel: "internal",
+      direction: "internal",
+      event_type: "workflow_triggered",
+      provider: "automationOrchestrator",
+      status: "failed",
+      subject: "AI workflow trigger failed",
+      message_body: error.message,
+      error_message: error.message,
+      metadata_json: JSON.stringify({ trigger_event: triggerEvent }),
+    }).catch(() => null);
+
+    return null;
+  }
+}
+
 async function getBase44Client(req, base44Override) {
   if (base44Override) {
     return base44Override;
@@ -392,6 +436,12 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
         phone_present: Boolean(lead.phone),
       },
     }),
+  });
+
+  await invokeAutomationOrchestrator(base44, {
+    leadId: crmLead.id,
+    projectId: project.id,
+    triggerEvent: "new_client_webhook_lead",
   });
 
   return Response.json({

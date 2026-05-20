@@ -58,6 +58,68 @@ function buildDedupKey({ email, phone }) {
   return email || phone || crypto.randomUUID();
 }
 
+async function createCrmLeadFromWebsiteLead(base44, lead) {
+  return base44.asServiceRole.entities.Leads.create({
+    full_name: lead.full_name || lead.first_name || "Unknown",
+    business_name: lead.business_name || "Not provided",
+    email: lead.email || "",
+    phone: lead.phone_number || "",
+    business_type: lead.business_type || "Not specified",
+    problem: lead.problem || lead.message || "Website submission",
+    source: lead.source || "website_form",
+    status: "New",
+    lead_score: 50,
+    activation_priority: "Medium",
+    intake_type: "lead_capture",
+    website_lead_id: lead.id,
+    assigned_at: new Date().toISOString(),
+  });
+}
+
+async function invokeAutomationOrchestrator(base44, { leadId, projectId = null, triggerEvent }) {
+  try {
+    const result = await base44.asServiceRole.functions.invoke("automationOrchestrator", {
+      lead_id: leadId,
+      project_id: projectId,
+      trigger_event: triggerEvent,
+    });
+
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id: leadId,
+      client_project_id: projectId || undefined,
+      channel: "internal",
+      direction: "internal",
+      event_type: "workflow_triggered",
+      provider: "automationOrchestrator",
+      status: result?.success === false ? "failed" : "completed",
+      subject: "AI workflow triggered from website lead capture",
+      message_body: triggerEvent,
+      metadata_json: JSON.stringify({
+        trigger_event: triggerEvent,
+        summary: result?.data?.summary || result?.summary || null,
+      }),
+    }).catch(() => null);
+
+    return result;
+  } catch (error) {
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id: leadId,
+      client_project_id: projectId || undefined,
+      channel: "internal",
+      direction: "internal",
+      event_type: "workflow_triggered",
+      provider: "automationOrchestrator",
+      status: "failed",
+      subject: "AI workflow trigger failed",
+      message_body: error.message,
+      error_message: error.message,
+      metadata_json: JSON.stringify({ trigger_event: triggerEvent }),
+    }).catch(() => null);
+
+    return null;
+  }
+}
+
 function getClientIp(req) {
   return cleanString(
     req.headers.get("x-forwarded-for")?.split(",")[0] ||
@@ -164,9 +226,19 @@ Deno.serve(async (req) => {
       ),
     });
 
+    const crmLead = await createCrmLeadFromWebsiteLead(base44, lead);
+    await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
+      crm_lead_id: crmLead.id,
+    }).catch(() => {});
+    await invokeAutomationOrchestrator(base44, {
+      leadId: crmLead.id,
+      triggerEvent: "new_website_lead",
+    });
+
     return Response.json({
       success: true,
       lead_id: lead.id,
+      crm_lead_id: crmLead.id,
       deduplicated: false,
     });
   } catch (error) {
