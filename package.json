@@ -10,6 +10,10 @@
     "lint:fix": "eslint . --fix",
     "test": "node --test",
     "openclaw:validate-install": "node scripts/openclaw/run-install-validation.mjs",
+    "openclaw:basic-package-check": "node scripts/openclaw/basic-package-activation-check.mjs",
+    "openclaw:basic-package-config": "node scripts/openclaw/build-basic-package-config.mjs",
+    "openclaw:growth-package-config": "node scripts/openclaw/build-basic-package-config.mjs --growth",
+    "openclaw:pro-package-config": "node scripts/openclaw/build-basic-package-config.mjs --pro",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview"
   },

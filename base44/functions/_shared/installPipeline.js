@@ -812,10 +812,6 @@ export function mapPipelineStatusToOrderStatus({
     return "partially_live";
   }
 
-  if (pipelineStatus === "Live") {
-    return "fully_live";
-  }
-
   return paymentStatus === "paid" ? "paid_setup_in_progress" : "pending_payment";
 }
 
@@ -1360,7 +1356,56 @@ export async function initializePaidOrderInstallPipeline({
   const hadPaidStatus = order.payment_status === "paid";
   const alreadyInitialized = Boolean(order.install_initialized_at);
   const initializedItems = normalizeOrderItems(order.items || [], "Ready for Install");
+  const trackedItems = getTrackedInstallItems(initializedItems);
   const installConfiguration = normalizeInstallConfiguration(order.install_configuration, initializedItems);
+
+  if (trackedItems.length === 0) {
+    const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, {
+      payment_status: "paid",
+      stripe_customer_id: stripeCustomerId || order.stripe_customer_id,
+      items: initializedItems,
+      install_configuration: installConfiguration,
+      pipeline_status: "Error",
+      order_status: mapPipelineStatusToOrderStatus({
+        pipelineStatus: "Error",
+        trackedItems,
+        paymentStatus: "paid",
+      }),
+      pipeline_error: "Paid order has no tracked install services. Manual repair required before install can begin.",
+      last_install_event_at: now,
+    });
+
+    await createCommunicationEvent(
+      base44,
+      buildCommunicationEvent({
+        order: updatedOrder,
+        event_type: "workflow_triggered",
+        status: "failed",
+        provider: "internal",
+        subject: "Install initialization blocked",
+        message_body: `Paid order ${order.id} has no tracked install services and cannot enter the install pipeline.`,
+        metadata: {
+          order_id: order.id,
+          event_source: eventSource,
+          failure_code: "missing_tracked_items",
+        },
+      })
+    );
+
+    return {
+      order: {
+        ...updatedOrder,
+        items: initializedItems,
+        install_configuration: installConfiguration,
+        pipeline_status: "Error",
+      },
+      client: null,
+      clientProject: null,
+      onboardingClient: null,
+      createdEvents: [],
+    };
+  }
+
   const provisionalOrder = {
     ...order,
     items: initializedItems,
@@ -1421,7 +1466,6 @@ export async function initializePaidOrderInstallPipeline({
     throw error;
   }
 
-  const trackedItems = getTrackedInstallItems(initializedItems);
   const orderUpdate = {
     payment_status: "paid",
     stripe_customer_id: stripeCustomerId || order.stripe_customer_id,

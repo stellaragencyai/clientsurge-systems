@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { formatCurrency, getPackageDisplayLabel } from "@/lib/aiProducts";
+import {
+  buildPackageActivationBrief,
+} from "@/lib/basicPackageActivation";
 import ServiceConfigEditor from "@/components/admin/install/ServiceConfigEditor";
 import DeploymentSummaryPanel from "@/components/admin/install/DeploymentSummaryPanel";
 import { CheckCircle2, Clock3, Loader2, Save, ShieldAlert, Sparkles, TestTube2, TriangleAlert, Wrench } from "lucide-react";
@@ -314,6 +317,279 @@ function mergePreparedPatch(currentConfig, patch) {
       }
     ),
   };
+}
+
+function getBasicPackageIntake(detail, form) {
+  const serviceNames = (detail?.services || [])
+    .filter((service) => ["instant_lead_response", "missed_call_text_back"].includes(service.service_key))
+    .map((service) => service.display_name)
+    .filter(Boolean);
+
+  return {
+    business_name: detail?.business_name || detail?.client_project?.business_name || "",
+    owner_or_contact_name: detail?.customer_name || detail?.client?.full_name || "",
+    client_email: detail?.customer_email || detail?.client?.email || "",
+    business_phone:
+      form?.shared?.twilio_business_phone ||
+      detail?.onboarding_client?.twilio_number ||
+      detail?.customer_phone ||
+      detail?.client?.phone ||
+      "",
+    website_domain:
+      detail?.onboarding_client?.website ||
+      detail?.client_project?.website_url ||
+      detail?.website_url ||
+      "",
+    booking_link: detail?.onboarding_client?.booking_link || detail?.client_project?.booking_link || "",
+    services: detail?.onboarding_client?.services || serviceNames,
+    business_hours: form?.shared?.business_hours || detail?.onboarding_client?.business_hours || "",
+    brand_voice: detail?.onboarding_client?.brand_voice || detail?.onboarding_client?.tone || "",
+    common_customer_questions: detail?.onboarding_client?.customer_questions || "",
+    compliance_notes: detail?.onboarding_client?.compliance_notes || "",
+    preferred_follow_up_email: detail?.customer_email || detail?.client?.email || "",
+    lead_sources: detail?.onboarding_client?.lead_sources || detail?.lead_sources || "",
+    booking_process: detail?.onboarding_client?.booking_platform || detail?.onboarding_client?.booking_process || "",
+    booking_mode: form?.services?.ai_booking_agent?.booking_mode || "external_link",
+    booking_intake_fields: form?.services?.ai_booking_agent?.intake_fields,
+    booking_reminder_enabled: form?.services?.ai_booking_agent?.reminder_enabled,
+    reactivation_target_segment: form?.services?.lead_reactivation?.target_segment || "contacted_no_reply",
+    reactivation_message_template: form?.services?.lead_reactivation?.message_template,
+    reactivation_max_batch_size: form?.services?.lead_reactivation?.max_batch_size,
+    review_link: form?.services?.review_request?.review_link || detail?.onboarding_client?.review_link || "",
+    review_trigger_event: form?.services?.review_request?.trigger_event || "manual_trigger",
+    review_request_channel: form?.services?.review_request?.channel || "email",
+    review_send_delay_minutes: form?.services?.review_request?.send_delay_minutes,
+  };
+}
+
+function BasicPackageActivationPanel({ detail, form, onApplyConfig }) {
+  const serviceKeys = (detail?.services || []).map((service) => service.service_key).filter(Boolean);
+  const brief = buildPackageActivationBrief({
+    intake: getBasicPackageIntake(detail, form),
+    order: detail,
+    serviceKeys,
+  });
+
+  if (brief.package_tier === "custom") return null;
+
+  const missingFields = brief.validation.missing_fields || [];
+  const packageServices = brief.service_keys
+    .map((serviceKey) => (detail?.services || []).find((service) => service.service_key === serviceKey))
+    .filter(Boolean);
+  const generatedConfigPresent = brief.service_keys.every(
+    (serviceKey) => Boolean(form?.services?.[serviceKey]) || Boolean(brief.install_configuration.services?.[serviceKey])
+  ) && Boolean(form?.shared?.twilio_business_phone) && Boolean(form?.shared?.business_hours);
+  const servicesTestingOrLive = packageServices.every((service) =>
+    ["Testing", "Live"].includes(service.install_status)
+  );
+  const servicesLive = packageServices.length > 0 && packageServices.every((service) => service.install_status === "Live");
+  const successfulTests = packageServices.filter((service) => service.test_summary?.latest_success_at).length;
+  const checklistItems = [
+    {
+      label: "Client intake complete",
+      helper: brief.validation.valid ? "Sam/onboarding has enough fields to generate config." : `${missingFields.length} required field(s) still missing.`,
+      complete: brief.validation.valid,
+    },
+    {
+      label: "Generated config applied",
+      helper: "Apply the AI-generated shared and service config into this order.",
+      complete: generatedConfigPresent,
+      action: "Apply Generated Config",
+      onClick: () => onApplyConfig(brief.install_configuration),
+    },
+    {
+      label: "Install config saved",
+      helper: "Save the form so runtime tests use the canonical order config.",
+      complete: Boolean(detail?.install_configuration_updated_at),
+    },
+    {
+      label: "Services moved to Testing",
+      helper: `${packageServices.filter((service) => ["Testing", "Live"].includes(service.install_status)).length}/${packageServices.length} package services are testing-ready.`,
+      complete: servicesTestingOrLive,
+    },
+    {
+      label: "Runtime tests passed",
+      helper: `${successfulTests}/${packageServices.length} package services have a successful runtime event.`,
+      complete: packageServices.length > 0 && successfulTests === packageServices.length,
+    },
+    {
+      label: "Ready to mark Live",
+      helper: servicesLive ? "All package services are Live." : "Move each tested service to Live after provider gates pass.",
+      complete: servicesLive,
+    },
+  ];
+
+  return (
+    <div className="rounded-2xl border border-border bg-white p-6 shadow-sm">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <h4 className="text-lg font-semibold text-foreground">
+              {brief.package_tier === "pro" ? "Pro Package Activation Brain" : brief.package_tier === "growth" ? "Growth Package Activation Brain" : "Basic Package Activation Brain"}
+            </h4>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Converts client intake into the exact config needed for the purchased automation bundle.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => onApplyConfig(brief.install_configuration)}
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-white px-4 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
+        >
+          <Sparkles className="h-4 w-4" />
+          Apply Generated Config
+        </button>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        <InfoTile
+          label="Intake Status"
+          value={brief.validation.valid ? "Ready" : "Needs fields"}
+          helper={brief.validation.valid ? "Enough info to generate install config." : `${missingFields.length} field(s) missing.`}
+        />
+        <InfoTile
+          label="Automations"
+          value={String(brief.service_keys.length)}
+          helper={brief.package_tier === "pro" ? "Full six-automation stack." : brief.package_tier === "growth" ? "Instant, missed-call, nurture, and booking." : "Instant response and missed-call recovery."}
+        />
+        <InfoTile label="Go-Live Gates" value={String(brief.activation_gates.length)} helper="Must pass before marking Live." />
+      </div>
+
+      <div className="mt-4 grid gap-3 md:grid-cols-[160px_minmax(0,1fr)]">
+        <InfoTile label="Readiness Score" value={`${brief.readiness.score}%`} helper={brief.readiness.label} />
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+          <p className="text-sm font-semibold text-blue-900">Next Best Action</p>
+          <p className="mt-1 text-sm leading-6 text-blue-800">{brief.readiness.next_best_action}</p>
+          {!brief.intake_gap_resolution.complete ? (
+            <p className="mt-2 text-xs font-semibold text-blue-900">
+              Sam should ask next: {brief.intake_gap_resolution.next_question}
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-xl border border-border bg-muted/20 p-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-foreground">Operator Activation Checklist</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Intake to generated config, runtime tests, and Live readiness for this purchased bundle.
+            </p>
+          </div>
+          <div className="rounded-full border border-border bg-white px-3 py-1 text-xs font-semibold text-foreground">
+            {checklistItems.filter((item) => item.complete).length}/{checklistItems.length} complete
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-2">
+          {checklistItems.map((item) => (
+            <div key={item.label} className="flex flex-col gap-3 rounded-lg border border-border bg-white p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <div className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
+                  item.complete ? "bg-green-100 text-green-700" : "bg-slate-100 text-slate-500"
+                }`}>
+                  {item.complete ? <CheckCircle2 className="h-4 w-4" /> : <Clock3 className="h-4 w-4" />}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{item.label}</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">{item.helper}</p>
+                </div>
+              </div>
+              {item.action ? (
+                <button
+                  type="button"
+                  onClick={item.onClick}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-white px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:border-primary hover:text-primary"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  {item.action}
+                </button>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {missingFields.length > 0 ? (
+        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm font-semibold text-amber-900">Missing client details</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {missingFields.map((field) => (
+              <span key={field} className="rounded-md border border-amber-200 bg-white px-2.5 py-1 text-xs font-semibold text-amber-800">
+                {field.replaceAll("_", " ")}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+          Required activation intake is present. Apply the generated config, save, then run the provider gates before going live.
+        </div>
+      )}
+
+      <div className="mt-4 grid gap-4 xl:grid-cols-2">
+        <div className="rounded-xl border border-border bg-muted/20 p-4">
+          <p className="text-sm font-semibold text-foreground">Generated SMS Templates</p>
+          <div className="mt-3 space-y-3">
+            <div className="rounded-lg border border-border bg-white p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Instant Lead Response</p>
+              <p className="mt-2 text-xs leading-5 text-foreground">{brief.install_configuration.services.instant_lead_response.sms_template}</p>
+            </div>
+            <div className="rounded-lg border border-border bg-white p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Missed Call Text-Back</p>
+              <p className="mt-2 text-xs leading-5 text-foreground">{brief.install_configuration.services.missed_call_text_back.sms_template}</p>
+            </div>
+            {brief.install_configuration.services.nurture_sequence_14d ? (
+              <div className="rounded-lg border border-border bg-white p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">14-Day Nurture</p>
+                <p className="mt-2 text-xs leading-5 text-foreground">
+                  {brief.install_configuration.services.nurture_sequence_14d.steps.length} step sequence, SMS {brief.install_configuration.services.nurture_sequence_14d.sms_enabled ? "on" : "off"}, email {brief.install_configuration.services.nurture_sequence_14d.email_enabled ? "on" : "off"}.
+                </p>
+              </div>
+            ) : null}
+            {brief.install_configuration.services.ai_booking_agent ? (
+              <div className="rounded-lg border border-border bg-white p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">AI Booking Agent</p>
+                <p className="mt-2 text-xs leading-5 text-foreground">
+                  {brief.install_configuration.services.ai_booking_agent.booking_mode || "No mode"} -> {brief.install_configuration.services.ai_booking_agent.booking_link || "No booking link"}
+                </p>
+              </div>
+            ) : null}
+            {brief.install_configuration.services.lead_reactivation ? (
+              <div className="rounded-lg border border-border bg-white p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Old Lead Reactivation</p>
+                <p className="mt-2 text-xs leading-5 text-foreground">
+                  Segment: {brief.install_configuration.services.lead_reactivation.target_segment}. Batch cap: {brief.install_configuration.services.lead_reactivation.max_batch_size}.
+                </p>
+              </div>
+            ) : null}
+            {brief.install_configuration.services.review_request ? (
+              <div className="rounded-lg border border-border bg-white p-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Review Request</p>
+                <p className="mt-2 text-xs leading-5 text-foreground">
+                  {brief.install_configuration.services.review_request.channel} after {brief.install_configuration.services.review_request.trigger_event}: {brief.install_configuration.services.review_request.review_link || "No review link"}
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-border bg-muted/20 p-4">
+          <p className="text-sm font-semibold text-foreground">Activation Gates</p>
+          <div className="mt-3 grid gap-2">
+            {brief.activation_gates.map((gate) => (
+              <div key={gate} className="flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-2 text-xs font-medium text-foreground">
+                <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                {gate.replaceAll("_", " ")}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function OperatorFocusPanel({ workspaceSummary }) {
@@ -871,6 +1147,12 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
     handleSharedChange(field, value);
   };
 
+  const handleApplyBasicPackageConfig = (patch) => {
+    setForm((current) => mergePreparedPatch(current, patch));
+    setConfigFeedback("Generated basic-package config applied. Save install configuration to persist it.");
+    setPrepareFeedback("");
+  };
+
   const handleServiceConfigChange = (serviceKey, field, value) => {
     setForm((current) => ({
       ...current,
@@ -1047,7 +1329,8 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
     try {
       setSavingConfig(true);
       setConfigFeedback("");
-      await base44.functions.invoke("updateInstallConfiguration", {
+      await base44.functions.invoke("installPipeline", {
+        action: "update_configuration",
         order_id: detail.id,
         shared: form.shared,
         services: form.services,
@@ -1126,7 +1409,8 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
         [serviceKey]: "",
       }));
 
-      await base44.functions.invoke("updateInstallStatus", {
+      await base44.functions.invoke("installPipeline", {
+        action: "update_status",
         order_id: detail.id,
         service_key: serviceKey,
         install_status: nextStatus,
@@ -1163,8 +1447,15 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
     if (!detail) return;
 
     const saveKey = service.service_key;
-    const endpoint =
-      service.service_key === "instant_lead_response"
+    const usesInstallPipelineRuntime = [
+      "nurture_sequence_14d",
+      "ai_booking_agent",
+      "lead_reactivation",
+      "review_request",
+    ].includes(service.service_key);
+    const endpoint = usesInstallPipelineRuntime
+      ? "installPipeline"
+      : service.service_key === "instant_lead_response"
         ? "sendTestLead"
         : service.service_key === "missed_call_text_back"
         ? "simulateMissedCall"
@@ -1192,6 +1483,7 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
           }
         : service.service_key === "ai_booking_agent"
         ? {
+            action: "run_booking_agent_test",
             order_id: detail.id,
             lead_name: "Booking Test Lead",
             lead_email: runtimeTargetEmail || detail.customer_email,
@@ -1200,11 +1492,13 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
           }
         : service.service_key === "lead_reactivation"
         ? {
+            action: "run_reactivation_test",
             order_id: detail.id,
             max_test_leads: 3,
           }
         : service.service_key === "review_request"
         ? {
+            action: "run_review_request_test",
             order_id: detail.id,
             target_phone: runtimeTargetPhone || detail.customer_phone,
             target_email: runtimeTargetEmail || detail.customer_email,
@@ -1212,6 +1506,7 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
             trigger_event: service.configuration?.trigger_event || "manual_trigger",
           }
         : {
+            action: "run_nurture_sequence_test",
             order_id: detail.id,
             target_phone: runtimeTargetPhone || detail.customer_phone,
             target_email: runtimeTargetEmail || detail.customer_email,
@@ -1408,6 +1703,11 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
       ) : null}
 
       <OperatorFocusPanel workspaceSummary={workspaceSummary} />
+      <BasicPackageActivationPanel
+        detail={detail}
+        form={form}
+        onApplyConfig={handleApplyBasicPackageConfig}
+      />
       <SetupAssistPanel workspaceSummary={workspaceSummary} />
       <DeploymentSummaryPanel
         overview={detail.assisted_deployment?.overview || workspaceSummary?.deployment_summary}

@@ -1,14 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Loader2, Send, Sparkles, X } from "lucide-react";
+import { Bot, CheckCircle2, Loader2, MessageSquareText, Send, Sparkles, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { trackCTA } from "@/lib/analytics";
 
 const quickPrompts = [
-  "Which industries are the best fit?",
-  "What happens after I book a demo?",
-  "How does your lead follow-up automation work?",
+  "What is included in the basic package?",
+  "What information do you need to activate it?",
+  "How do the two automations work?",
+];
+
+const starterFields = [
+  "Business phone",
+  "Website domain",
+  "Booking link",
+  "Business hours",
+  "Services",
 ];
 
 export default function SamChatWidget() {
@@ -30,7 +38,10 @@ export default function SamChatWidget() {
   });
   const [leadForm, setLeadForm] = useState(() => ({
     full_name: leadProfile?.full_name || "",
+    business_name: leadProfile?.business_name || "",
     email: leadProfile?.email || "",
+    phone: leadProfile?.phone || "",
+    website_url: leadProfile?.website_url || "",
     industry: leadProfile?.industry || "Med Spas & Aesthetic Clinics",
   }));
   const messagesEndRef = useRef(null);
@@ -56,7 +67,11 @@ export default function SamChatWidget() {
   const initConversation = async () => {
     const conv = await base44.agents.createConversation({
       agent_name: "sam",
-      metadata: { name: "AI Concierge Chat" },
+      metadata: {
+        name: "AI Concierge Chat",
+        lead_profile: leadProfile || leadForm,
+        focus: "basic_package_activation",
+      },
     });
     setConversation(conv);
     setMessages(conv.messages || []);
@@ -105,10 +120,10 @@ export default function SamChatWidget() {
       const result = await base44.functions.invoke("submitContactInquiry", {
         full_name: leadForm.full_name,
         email: leadForm.email,
-        phone: "",
+        phone: leadForm.phone,
         business_type: leadForm.industry,
-        message: `AI concierge chat request. Industry: ${leadForm.industry}.`,
-        website_url: "",
+        message: `AI concierge chat request for basic package activation. Business: ${leadForm.business_name || "Not provided"}. Industry: ${leadForm.industry}.`,
+        website_url: leadForm.website_url,
       });
 
       if (!result.data?.success) {
@@ -133,37 +148,62 @@ export default function SamChatWidget() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-foreground text-background px-5 py-3 rounded-full shadow-xl hover:bg-foreground/90 transition-all font-semibold text-sm mb-14 sm:mb-0"
+          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-lg bg-foreground px-4 py-3 text-sm font-semibold text-background shadow-xl transition-colors hover:bg-foreground/90 sm:bottom-6 sm:right-6"
         >
-          <Sparkles className="w-4 h-4" />
+          <MessageSquareText className="h-4 w-4" />
           AI Concierge
         </button>
       )}
 
       {/* Chat window */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 w-[360px] max-h-[560px] flex flex-col bg-white rounded-2xl shadow-2xl border border-border overflow-hidden">
+        <div className="fixed inset-x-3 bottom-3 z-50 flex max-h-[calc(100vh-24px)] flex-col overflow-hidden rounded-lg border border-border bg-white shadow-2xl sm:inset-auto sm:bottom-6 sm:right-6 sm:h-[620px] sm:w-[400px]">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-foreground text-background">
+          <div className="flex items-center justify-between border-b border-border bg-white px-4 py-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-sm font-bold text-white">AI</div>
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-foreground text-background">
+                <Bot className="h-4 w-4" />
+              </div>
               <div>
-                <p className="text-sm font-semibold">ClientSurge AI Concierge</p>
-                <p className="text-xs opacity-60">Pricing, industries, booking, and automation help</p>
+                <p className="text-sm font-semibold text-foreground">ClientSurge AI Concierge</p>
+                <p className="text-xs text-muted-foreground">Package fit, setup details, automation handoff</p>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} className="opacity-60 hover:opacity-100 transition-opacity">
-              <X className="w-4 h-4" />
+            <button onClick={() => setOpen(false)} className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+              <X className="h-4 w-4" />
             </button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-secondary/20 min-h-[300px] max-h-[380px]">
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-muted/20 p-4">
             {!leadProfile ? (
-              <form onSubmit={handleCapture} className="rounded-2xl border border-border bg-white p-4 shadow-sm">
-                <p className="text-sm font-semibold text-foreground">Start with your email so we can follow up usefully.</p>
-                <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  Every concierge conversation becomes a qualified lead instead of disappearing anonymously.
+              <form onSubmit={handleCapture} className="rounded-lg border border-border bg-white p-4 shadow-sm">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <Sparkles className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Start your automation setup</p>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      A few basics let Sam qualify the package and collect the details needed for activation.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 rounded-lg border border-border bg-muted/30 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Sam will collect next</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {starterFields.map((field) => (
+                      <span key={field} className="inline-flex items-center gap-1 rounded-md border border-border bg-white px-2 py-1 text-[11px] font-medium text-muted-foreground">
+                        <CheckCircle2 className="h-3 w-3 text-primary" />
+                        {field}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Contact
                 </p>
                 <div className="mt-4 space-y-3">
                   <input
@@ -171,7 +211,14 @@ export default function SamChatWidget() {
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, full_name: e.target.value }))}
                     required
                     placeholder="Your name"
-                    className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                  <input
+                    value={leadForm.business_name}
+                    onChange={(e) => setLeadForm((prev) => ({ ...prev, business_name: e.target.value }))}
+                    required
+                    placeholder="Business name"
+                    className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                   <input
                     type="email"
@@ -179,12 +226,24 @@ export default function SamChatWidget() {
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, email: e.target.value }))}
                     required
                     placeholder="you@business.com"
-                    className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                  <input
+                    value={leadForm.phone}
+                    onChange={(e) => setLeadForm((prev) => ({ ...prev, phone: e.target.value }))}
+                    placeholder="Business phone"
+                    className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                  <input
+                    value={leadForm.website_url}
+                    onChange={(e) => setLeadForm((prev) => ({ ...prev, website_url: e.target.value }))}
+                    placeholder="Website URL"
+                    className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                   <select
                     value={leadForm.industry}
                     onChange={(e) => setLeadForm((prev) => ({ ...prev, industry: e.target.value }))}
-                    className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   >
                     <option>Med Spas & Aesthetic Clinics</option>
                     <option>Dental & Orthodontics</option>
@@ -199,19 +258,19 @@ export default function SamChatWidget() {
                 <button
                   type="submit"
                   disabled={captureLoading}
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-foreground px-4 py-2.5 text-sm font-semibold text-background transition-colors hover:bg-foreground/90 disabled:opacity-60"
                 >
-                  {captureLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                  {captureLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
                   Start AI Concierge
                 </button>
               </form>
             ) : visibleMessages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center py-8">
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                  <span className="text-xl font-bold text-primary">AI</span>
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <Bot className="h-5 w-5" />
                 </div>
-                <p className="text-sm font-semibold text-foreground">Ask the AI concierge anything</p>
-                <p className="text-xs text-muted-foreground mt-1">Use it to find the right page, understand the offer, or decide whether to book now.</p>
+                <p className="text-sm font-semibold text-foreground">Ask Sam about setup</p>
+                <p className="mt-1 max-w-[260px] text-xs leading-5 text-muted-foreground">Sam can explain the offer and gather the fields needed to activate the first two automations.</p>
                 <div className="mt-4 flex flex-wrap justify-center gap-2">
                   {quickPrompts.map((prompt) => (
                     <button
@@ -221,7 +280,7 @@ export default function SamChatWidget() {
                         trackCTA("ai_concierge_prompt", "chat_widget", { prompt });
                         void sendMessage(prompt);
                       }}
-                      className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted transition-colors"
+                      className="rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-muted"
                     >
                       {prompt}
                     </button>
@@ -231,10 +290,10 @@ export default function SamChatWidget() {
             ) : null}
             {visibleMessages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] px-3 py-2 rounded-xl text-sm ${
+                <div className={`max-w-[84%] rounded-lg px-3 py-2 text-sm ${
                   msg.role === 'user'
-                    ? 'bg-foreground text-background rounded-br-sm'
-                    : 'bg-white border border-border text-foreground rounded-bl-sm'
+                    ? 'bg-foreground text-background'
+                    : 'bg-white border border-border text-foreground'
                 }`}>
                   {msg.role === 'assistant' ? (
                     <ReactMarkdown className="prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
@@ -246,7 +305,7 @@ export default function SamChatWidget() {
             ))}
             {sending && (
               <div className="flex justify-start">
-                <div className="bg-white border border-border px-3 py-2 rounded-xl rounded-bl-sm">
+                <div className="rounded-lg border border-border bg-white px-3 py-2">
                   <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
                 </div>
               </div>
@@ -255,16 +314,16 @@ export default function SamChatWidget() {
           </div>
 
           {/* Input */}
-          <div className="px-3 py-3 border-t border-border bg-white flex gap-2">
+          <div className="flex gap-2 border-t border-border bg-white px-3 py-3">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKey}
               disabled={!leadProfile}
-              placeholder="Ask about pricing, industries, demos, or integrations..."
-              className="flex-1 text-sm border border-input rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-ring"
+              placeholder="Ask about setup, pricing, or automations..."
+              className="min-w-0 flex-1 rounded-lg border border-input px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
             />
-            <Button size="icon" onClick={() => void handleSend()} disabled={!leadProfile || !input.trim() || sending} className="rounded-lg h-9 w-9">
+            <Button size="icon" onClick={() => void handleSend()} disabled={!leadProfile || !input.trim() || sending} className="h-9 w-9 rounded-lg">
               <Send className="w-4 h-4" />
             </Button>
           </div>

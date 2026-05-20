@@ -24,13 +24,67 @@ async function checkAlreadySent(base44, leadId, stepKey) {
   const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
     {
       lead_id: leadId,
-      metadata_json: { $regex: `"missed_call_step":"${stepKey}"` },
+      metadata_json: { $regex: `"key":"${stepKey}"|"missed_call_step":"${stepKey}"` },
       event_type: { $in: ["sms_sent", "email_sent"] },
     },
     "-created_date",
     1
   );
   return events?.length > 0;
+}
+
+function buildMissedCallEvent({
+  lead,
+  stepConfig,
+  channel = "internal",
+  direction = "system",
+  event_type = "workflow_triggered",
+  provider = "internal",
+  status = "processed",
+  subject,
+  message_body,
+  provider_message_id,
+  error_message,
+  metadata = {},
+}) {
+  return {
+    lead_id: lead.id,
+    channel,
+    direction,
+    event_type,
+    provider,
+    status,
+    subject,
+    message_body,
+    provider_message_id,
+    error_message,
+    metadata_json: JSON.stringify({
+      step: stepConfig?.step,
+      key: stepConfig?.key,
+      missed_call_processor: true,
+      timestamp: new Date().toISOString(),
+      ...metadata,
+    }),
+  };
+}
+
+async function recordProcessedStep(base44, lead, stepConfig, extraPatch = {}) {
+  await base44.asServiceRole.entities.Leads.update(lead.id, {
+    missed_call_step_sent: Math.max(Number(lead.missed_call_step_sent || 0), stepConfig.step),
+    missed_call_sequence_complete: stepConfig.step >= FOLLOW_UP_STEPS.length
+      ? true
+      : lead.missed_call_sequence_complete,
+    ...extraPatch,
+  });
+}
+
+function getNextDueStep({ lead, minutesElapsed }) {
+  const lastProcessedStep = Number(lead.missed_call_step_sent || 0);
+  return FOLLOW_UP_STEPS.find(
+    (stepConfig) =>
+      stepConfig.step > lastProcessedStep &&
+      minutesElapsed >= stepConfig.minutesAfter
+  );
 }
 
 async function sendSMS(base44, lead, messageBody, fromNumber, stepKey) {
@@ -189,6 +243,12 @@ Deno.serve(async (req) => {
         const minutesElapsed = minutesSince(lead.last_contacted_at);
 
         // Re-check stop conditions
+        if (lead.missed_call_sequence_complete || Number(lead.missed_call_step_sent || 0) >= FOLLOW_UP_STEPS.length) {
+          results.skipped++;
+          results.processed++;
+          continue;
+        }
+
         if (!["Contacted"].includes(lead.status)) {
           console.log(
             `[processMissedCallFollowUps] Lead ${lead.id} status changed to ${lead.status} — stopping`
@@ -197,8 +257,16 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        // Process each follow-up step
-        for (const stepConfig of FOLLOW_UP_STEPS) {
+        const nextDueStep = getNextDueStep({ lead, minutesElapsed });
+        if (!nextDueStep) {
+          results.skipped++;
+          results.processed++;
+          continue;
+        }
+
+        // Process only the next due step. This prevents a delayed scheduled
+        // run from sending several overdue follow-ups at once.
+        for (const stepConfig of [nextDueStep]) {
           try {
             // Check if enough time has passed
             if (minutesElapsed < stepConfig.minutesAfter) {
@@ -215,6 +283,7 @@ Deno.serve(async (req) => {
               console.log(
                 `[processMissedCallFollowUps] Step ${stepConfig.step} already sent for lead ${lead.id} — skipping`
               );
+              await recordProcessedStep(base44, lead, stepConfig);
               results.skipped++;
               continue;
             }
@@ -227,21 +296,18 @@ Deno.serve(async (req) => {
               console.log(
                 `[processMissedCallFollowUps] Lead ${lead.id} no longer in Contacted status — stopping`
               );
-              await base44.asServiceRole.entities.CommunicationEvent.create({
-                lead_id: lead.id,
-                channel: "internal",
-                direction: "system",
-                event_type: "workflow_triggered",
-                provider: "internal",
-                status: "stopped",
-                subject: `Missed-call follow-up stopped at step ${stepConfig.step}`,
-                message_body: `Lead status changed or lead not found`,
-                metadata_json: JSON.stringify({
-                  step: stepConfig.step,
-                  reason: "status_changed_or_not_found",
-                  timestamp: new Date().toISOString(),
-                }),
-              });
+              await base44.asServiceRole.entities.CommunicationEvent.create(
+                buildMissedCallEvent({
+                  lead,
+                  stepConfig,
+                  subject: `Missed-call follow-up stopped at step ${stepConfig.step}`,
+                  message_body: "Lead status changed or lead not found",
+                  metadata: {
+                    reason: "status_changed_or_not_found",
+                    previous_status: lead.status,
+                  },
+                })
+              );
               results.stopped++;
               continue;
             }
@@ -256,21 +322,19 @@ Deno.serve(async (req) => {
                 console.log(
                   `[processMissedCallFollowUps] No phone for lead ${lead.id} at step ${stepConfig.step}`
                 );
-                await base44.asServiceRole.entities.CommunicationEvent.create({
-                  lead_id: lead.id,
-                  channel: "sms",
-                  direction: "outbound",
-                  event_type: "sms_skipped",
-                  provider: "twilio",
-                  status: "skipped",
-                  subject: `Missed-call SMS step ${stepConfig.step} skipped`,
-                  message_body: "No phone number on lead",
-                  metadata_json: JSON.stringify({
-                    step: stepConfig.step,
-                    key: stepConfig.key,
-                    reason: "no_phone",
-                  }),
-                });
+                await base44.asServiceRole.entities.CommunicationEvent.create(
+                  buildMissedCallEvent({
+                    lead: freshLead,
+                    stepConfig,
+                    subject: `Missed-call SMS step ${stepConfig.step} skipped`,
+                    message_body: "No phone number on lead",
+                    metadata: {
+                      intended_channel: "sms",
+                      reason: "no_phone",
+                    },
+                  })
+                );
+                await recordProcessedStep(base44, freshLead, stepConfig);
                 results.skipped++;
                 continue;
               }
@@ -306,21 +370,19 @@ Deno.serve(async (req) => {
                 console.log(
                   `[processMissedCallFollowUps] No email for lead ${lead.id} at step ${stepConfig.step}`
                 );
-                await base44.asServiceRole.entities.CommunicationEvent.create({
-                  lead_id: lead.id,
-                  channel: "email",
-                  direction: "outbound",
-                  event_type: "email_skipped",
-                  provider: "resend",
-                  status: "skipped",
-                  subject: `Missed-call email step ${stepConfig.step} skipped`,
-                  message_body: "No email address on lead",
-                  metadata_json: JSON.stringify({
-                    step: stepConfig.step,
-                    key: stepConfig.key,
-                    reason: "no_email",
-                  }),
-                });
+                await base44.asServiceRole.entities.CommunicationEvent.create(
+                  buildMissedCallEvent({
+                    lead: freshLead,
+                    stepConfig,
+                    subject: `Missed-call email step ${stepConfig.step} skipped`,
+                    message_body: "No email address on lead",
+                    metadata: {
+                      intended_channel: "email",
+                      reason: "no_email",
+                    },
+                  })
+                );
+                await recordProcessedStep(base44, freshLead, stepConfig);
                 results.skipped++;
                 continue;
               }
@@ -352,49 +414,44 @@ Deno.serve(async (req) => {
 
             // Log result
             if (sent) {
-              await base44.asServiceRole.entities.CommunicationEvent.create({
-                lead_id: lead.id,
-                channel: stepConfig.channel,
-                direction: "outbound",
-                event_type:
-                  stepConfig.channel === "sms" ? "sms_sent" : "email_sent",
-                provider: stepConfig.channel === "sms" ? "twilio" : "resend",
-                status: "sent",
-                subject: `Missed-call follow-up step ${stepConfig.step}`,
-                message_body: templates[stepConfig.key]?.body ||
-                  templates[stepConfig.key] || "(message body)",
-                provider_message_id: messageId,
-                metadata_json: JSON.stringify({
-                  step: stepConfig.step,
-                  key: stepConfig.key,
-                  missed_call_processor: true,
-                  timestamp: new Date().toISOString(),
-                }),
-              });
+              await base44.asServiceRole.entities.CommunicationEvent.create(
+                buildMissedCallEvent({
+                  lead: freshLead,
+                  stepConfig,
+                  channel: stepConfig.channel,
+                  direction: "outbound",
+                  event_type:
+                    stepConfig.channel === "sms" ? "sms_sent" : "email_sent",
+                  provider: stepConfig.channel === "sms" ? "twilio" : "resend",
+                  status: "sent",
+                  subject: `Missed-call follow-up step ${stepConfig.step}`,
+                  message_body: templates[stepConfig.key]?.body ||
+                    templates[stepConfig.key] || "(message body)",
+                  provider_message_id: messageId,
+                })
+              );
 
               // Update lead last_contacted_at
-              await base44.asServiceRole.entities.Leads.update(lead.id, {
+              await recordProcessedStep(base44, freshLead, stepConfig, {
                 last_contacted_at: new Date().toISOString(),
               });
 
               results.sent++;
             } else if (error) {
-              await base44.asServiceRole.entities.CommunicationEvent.create({
-                lead_id: lead.id,
-                channel: stepConfig.channel,
-                direction: "outbound",
-                event_type: stepConfig.channel === "sms" ? "sms_failed" : "email_failed",
-                provider: stepConfig.channel === "sms" ? "twilio" : "resend",
-                status: "failed",
-                subject: `Missed-call step ${stepConfig.step} failed`,
-                message_body: error,
-                error_message: error,
-                metadata_json: JSON.stringify({
-                  step: stepConfig.step,
-                  key: stepConfig.key,
-                  missed_call_processor: true,
-                }),
-              });
+              await base44.asServiceRole.entities.CommunicationEvent.create(
+                buildMissedCallEvent({
+                  lead: freshLead,
+                  stepConfig,
+                  channel: stepConfig.channel,
+                  direction: "outbound",
+                  event_type: stepConfig.channel === "sms" ? "sms_failed" : "email_failed",
+                  provider: stepConfig.channel === "sms" ? "twilio" : "resend",
+                  status: "failed",
+                  subject: `Missed-call step ${stepConfig.step} failed`,
+                  message_body: error,
+                  error_message: error,
+                })
+              );
               results.failed++;
             }
           } catch (stepError) {

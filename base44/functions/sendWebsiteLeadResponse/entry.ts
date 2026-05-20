@@ -9,6 +9,7 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 async function sendSMS(base44, lead, messageBody, fromNumber) {
   const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
   const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+  const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
 
   if (!accountSid || !authToken || !fromNumber) {
     throw new Error("Twilio credentials missing");
@@ -26,6 +27,7 @@ async function sendSMS(base44, lead, messageBody, fromNumber) {
         To: lead.phone_number,
         From: fromNumber,
         Body: messageBody,
+        ...(statusCallbackUrl ? { StatusCallback: statusCallbackUrl } : {}),
       }),
     }
   );
