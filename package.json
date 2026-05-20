@@ -11,6 +11,7 @@
     "test": "node --test",
     "openclaw:validate-install": "node scripts/openclaw/run-install-validation.mjs",
     "openclaw:basic-package-check": "node scripts/openclaw/basic-package-activation-check.mjs",
+    "openclaw:purchase-onboarding-smoke": "node scripts/openclaw/purchase-onboarding-smoke.mjs",
     "openclaw:basic-package-config": "node scripts/openclaw/build-basic-package-config.mjs",
     "openclaw:growth-package-config": "node scripts/openclaw/build-basic-package-config.mjs --growth",
     "openclaw:pro-package-config": "node scripts/openclaw/build-basic-package-config.mjs --pro",

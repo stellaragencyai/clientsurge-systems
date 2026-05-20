@@ -220,6 +220,28 @@ npm run openclaw:basic-package-check
 
 This check does not send SMS, place calls, or mutate provider state. It verifies CLI availability, Base44 secret names, and Twilio number routing shape.
 
+Run the safe purchase-to-onboarding smoke test:
+
+```bash
+npm run openclaw:purchase-onboarding-smoke
+```
+
+This creates a clearly labeled QA order, initializes the deployed `installPipeline`, verifies Basic/Growth/Pro package detection, confirms an `OnboardingClient` handoff is created, and checks that Sam/onboarding receives the first missing intake question. It does not charge Stripe, send SMS, place calls, or mark services live.
+
+## Full Smoke Test Sequence
+
+Use this order before trusting a first real client:
+
+1. Run `npm run openclaw:basic-package-check`.
+2. Run `npm run openclaw:purchase-onboarding-smoke`.
+3. Confirm the QA order is labeled as non-customer test data.
+4. Complete the missing intake fields on the QA onboarding record.
+5. Generate package config with `npm run openclaw:pro-package-config` or JSON `service_keys`.
+6. Apply generated config to the install order.
+7. Run provider/runtime tests from the admin install workspace.
+8. Move services to Testing, then Live only after all provider gates pass.
+9. Only after the QA path passes, run one tiny live Stripe payment proof with explicit approval.
+
 ## Handoff Summary Template
 
 Use this after activation:
