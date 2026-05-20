@@ -108,8 +108,8 @@ function detectPackageType(serviceKeys = []) {
     return "growth_system";
   }
 
-  // Starter System: EXACTLY these 2 services
-  const starterSet = new Set(["instant_lead_response", "ai_booking_agent"]);
+  // Starter/Basic System: EXACTLY the first 2 automations
+  const starterSet = new Set(["instant_lead_response", "missed_call_text_back"]);
   if (setsEqual(keySet, starterSet)) {
     return "starter_system";
   }

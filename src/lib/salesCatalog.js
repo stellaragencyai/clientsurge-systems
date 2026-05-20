@@ -273,9 +273,9 @@ const PACKAGE_DEFINITIONS = [
   {
     package_key: "starter_system",
     name: "Starter System",
-    fit: "Best for businesses that need instant response and booking handoff first.",
-    description: "Start with immediate lead response plus a done-for-you booking handoff.",
-    included_service_keys: ["instant_lead_response", "ai_booking_agent"],
+    fit: "Best for businesses that need instant response and missed-call recovery first.",
+    description: "Start with immediate website lead response plus automatic missed-call text-back.",
+    included_service_keys: ["instant_lead_response", "missed_call_text_back"],
     setup_total: 797,
     monthly_total: 497,
   },
@@ -499,6 +499,13 @@ function selectBestPackageOffer(products) {
   }
 
   return [...eligible].sort((left, right) => {
+    const serviceCountDifference =
+      right.included_service_keys.length - left.included_service_keys.length;
+
+    if (serviceCountDifference !== 0) {
+      return serviceCountDifference;
+    }
+
     const savingsDifference =
       (right.setup_savings + right.monthly_savings) -
       (left.setup_savings + left.monthly_savings);
@@ -507,7 +514,7 @@ function selectBestPackageOffer(products) {
       return savingsDifference;
     }
 
-    return right.included_service_keys.length - left.included_service_keys.length;
+    return 0;
   })[0];
 }
 

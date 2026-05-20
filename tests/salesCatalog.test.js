@@ -32,8 +32,14 @@ test("public store catalog exposes all 12 offers while checkout stays canonical"
 });
 
 test("package offers map directly to canonical service bundles", () => {
+  const starter = getPackageOffer("starter_system");
   const growth = getPackageOffer("growth_system");
 
+  assert.ok(starter);
+  assert.deepEqual(starter.included_service_keys, [
+    "instant_lead_response",
+    "missed_call_text_back",
+  ]);
   assert.ok(growth);
   assert.deepEqual(
     growth.included_service_keys,
@@ -44,8 +50,8 @@ test("package offers map directly to canonical service bundles", () => {
       "ai_booking_agent",
     ]
   );
-  assert.equal(growth.setup_total, 1195);
-  assert.equal(growth.monthly_total, 349);
+  assert.equal(growth.setup_total, 1297);
+  assert.equal(growth.monthly_total, 997);
 });
 
 test("pricing summary matches best package when selected services align", () => {
@@ -55,10 +61,10 @@ test("pricing summary matches best package when selected services align", () => 
 
   assert.equal(summary.package_offer?.package_key, "growth_system");
   assert.equal(summary.priced_items.length, 4);
-  assert.equal(summary.total_setup, 1195);
-  assert.equal(summary.total_monthly, 349);
-  assert.equal(summary.setup_discount_total, 193);
-  assert.equal(summary.monthly_discount_total, 89);
+  assert.equal(summary.total_setup, 1297);
+  assert.equal(summary.total_monthly, 997);
+  assert.equal(summary.setup_discount_total, 191);
+  assert.equal(summary.monthly_discount_total, -559);
 });
 
 test("pricing summary preserves add-ons outside matched package", () => {
@@ -69,8 +75,8 @@ test("pricing summary preserves add-ons outside matched package", () => {
 
   assert.equal(summary.package_offer?.package_key, "starter_system");
   assert.deepEqual(summary.add_on_service_keys, ["review_request"]);
-  assert.equal(summary.total_setup, 892);
-  assert.equal(summary.total_monthly, 264);
+  assert.equal(summary.total_setup, 994);
+  assert.equal(summary.total_monthly, 564);
 });
 
 test("stored pricing summary keeps package and discount visibility for admin", () => {
@@ -80,11 +86,11 @@ test("stored pricing summary keeps package and discount visibility for admin", (
   const stored = buildStoredPricingSummary(summary.priced_items);
 
   assert.equal(stored.package_key, "pro_system");
-  assert.equal(stored.package_name, "Pro System");
-  assert.equal(stored.total_setup, 1495);
-  assert.equal(stored.total_monthly, 469);
-  assert.equal(stored.setup_discount_total, 387);
-  assert.equal(stored.monthly_discount_total, 133);
+  assert.equal(stored.package_name, "Elite System");
+  assert.equal(stored.total_setup, 2497);
+  assert.equal(stored.total_monthly, 1997);
+  assert.equal(stored.setup_discount_total, -515);
+  assert.equal(stored.monthly_discount_total, -1395);
 });
 
 test("non-self-serve public offers do not leak into checkout pricing", () => {
