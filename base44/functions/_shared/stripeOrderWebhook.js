@@ -13,11 +13,14 @@ function getStripeSecretKey() {
   }
 }
 
-function getWebhookSecret() {
+function getWebhookSecrets() {
   try {
-    return Deno.env.get("STRIPE_WEBHOOK_SECRET") || "";
+    return [
+      Deno.env.get("STRIPE_WEBHOOK_SECRET") || "",
+      Deno.env.get("STRIPE_TEST_WEBHOOK_SECRET") || "",
+    ].filter(Boolean);
   } catch {
-    return "";
+    return [];
   }
 }
 
@@ -543,25 +546,37 @@ export async function handleCanonicalStripeWebhook(
     return new Response("Stripe is not configured", { status: 500 });
   }
 
-  const webhookSecret = getWebhookSecret();
+  const webhookSecrets = getWebhookSecrets();
 
-  if (!webhookSecret) {
-    return new Response("STRIPE_WEBHOOK_SECRET is missing", { status: 500 });
+  if (webhookSecrets.length === 0) {
+    return new Response("Stripe webhook secret is missing", { status: 500 });
   }
 
   const body = await req.text();
   const signature = req.headers.get("stripe-signature");
 
   let event;
+  let signatureError;
   try {
-    event = await stripe.webhooks.constructEventAsync(
-      body,
-      signature,
-      webhookSecret
-    );
+    for (const webhookSecret of webhookSecrets) {
+      try {
+        event = await stripe.webhooks.constructEventAsync(
+          body,
+          signature,
+          webhookSecret
+        );
+        break;
+      } catch (error) {
+        signatureError = error;
+      }
+    }
   } catch (error) {
+    signatureError = error;
+  }
+
+  if (!event) {
     return new Response(
-      `Webhook Error: ${error instanceof Error ? error.message : String(error)}`,
+      `Webhook Error: ${signatureError instanceof Error ? signatureError.message : String(signatureError)}`,
       { status: 400 }
     );
   }
