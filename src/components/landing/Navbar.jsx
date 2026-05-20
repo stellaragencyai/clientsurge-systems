@@ -156,7 +156,7 @@ export default function Navbar() {
         overflow: "visible",
       }}>
       
-      <div className="w-full flex items-center justify-between px-4 md:px-6" style={{ height: "clamp(72px, 8vw, 90px)", paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
+      <div className="w-full flex items-center justify-between px-4 md:px-6" style={{ height: "clamp(64px, 7vw, 82px)", paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
         <button
           onClick={handleLogoClick}
           className="shrink-0 bg-none border-none cursor-pointer transition-transform duration-300 hover:-translate-y-0.5"
@@ -167,11 +167,10 @@ export default function Navbar() {
             fetchPriority="high"
             decoding="async"
             style={{
-              height: "clamp(100px, 11vw, 140px)",
+              height: "clamp(52px, 6vw, 72px)",
               width: "auto",
               objectFit: "contain",
               display: "block",
-              overflow: "visible",
             }}
           />
         </button>
