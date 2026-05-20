@@ -604,6 +604,7 @@
 
 | Date | Agent | Change |
 |---|---|---|
+| 2026-05-20 | Trinity | PL-18 + PL-30 + PL-33 + PL-35 + PL-89 ✅ - advanced the 100-task push to 75/100 by verifying the existing `index.html` noscript fallback, confirming `ServiceDetailModal` no longer has duplicate CTA style props, documenting one service license per cart line item, verifying the checkout footer already links cancellation/refund policy language before payment, and confirming Google Fonts are loaded from the document head with preload instead of CSS `@import`. Verified with direct code inspection plus `npm run build`. |
 | 2026-05-20 | Trinity | #288 + #348 + #358 + PL-6 + PL-84 ✅ - extended `setPageMetadata` coverage across `Start`, `Success`, and legal pages so Twitter/Open Graph tags follow those routes too; switched `MobileCallBar` to load `AdminSettings.twilio_from_number` with a safe fallback/formatting; verified the homepage still renders `Testimonials`, the footer already includes Roofing + Contractors industry links, and industry sub-pages already set unique metadata via `IndustryTemplate`. Verified with `npm run build`. |
 | 2026-05-19 | Trinity | #355 + #360 + #362 + #368 + #375 ✅ - verified `ExitIntentPopup` stays off admin/client-portal routes via its public-path allowlist, scoped `ScrollProgressBar` to homepage + industry routes only, defaulted Store `Explore All` sorting to popular products first, wrapped the lazy `ServiceComparisonModal` in an error boundary, and confirmed `InstallOrderWorkspace` already invokes `getInstallConfiguration` on load to pre-populate fields. Verified with `npm run build`. |
 | 2026-05-19 | Trinity | #21 + #25 + #53 + #267 + #290 + #291 + #342 + #365 + #367 + #370 ✅ - verified existing public/store/client-portal wins already present in code and wrapped the dev app render in `React.StrictMode`. Evidence: `index.html` already includes `hreflang`, `viewport-fit=cover`, and the PWA manifest link; `src/index.css` enforces ≥16px input font sizes on inputs/textareas/selects; `src/pages/ClientPortal.jsx` exposes the `What's New` tab; `vite.config.js` splits `recharts`/`framer-motion`/`lucide-react`; `src/components/store/StackValueCounter.jsx`, `src/components/store/ProductCard.jsx`, and `src/pages/Store.jsx` already satisfy the real-time cart, coming-soon gating, and store metadata checks. Verified with `node --test tests/portalWhatsNew.test.js` + `npm run build`. |
@@ -1614,7 +1615,7 @@ PHASE 7 - Admin UI
 | PL-15 | ⏳ | InteractiveJourneyMap - verify all steps clickable | Review each step copy, icon, click |
 | PL-16 | ⏳ | FAQ search filter loses focus on mobile | Add autoFocus=false, test iOS Safari |
 | PL-17 | ⏳ | IntegrationPartners logos not loading | Add onerror fallback to each img |
-| PL-18 | ⏳ | No noscript fallback for JS-disabled users | Add noscript tag to index.html |
+| PL-18 | ✅ | No noscript fallback for JS-disabled users | Add noscript tag to index.html  Trinity |
 | PL-19 | ⏳ | All CTA buttons say "Book a Demo" - no variety | Add "See Pricing", "Get Started", "View Services" variants |
 | PL-20 | ⏳ | LeadLeakage stat numbers are hardcoded | Add CountUp animation on scroll entry |
 
@@ -1631,12 +1632,12 @@ PHASE 7 - Admin UI
 | PL-27 | ⏳ | No admin notification on new purchase | Add sendAdminLeadNotification in stripeWebhookOrders |
 | PL-28 | ⏳ | Stripe webhook not verified in prod | Verify STRIPE_WEBHOOK_SECRET + constructEventAsync |
 | PL-29 | ⏳ | ProductCard "Popular" badge overlaps on mobile | Position absolute top:-10px right:10px z-index:10 |
-| PL-30 | ⏳ | ServiceDetailModal CTA has duplicate style prop | Merge both style objects into one |
+| PL-30 | ✅ | ServiceDetailModal CTA has duplicate style prop | Merge both style objects into one  Trinity |
 | PL-31 | ✅ | CartSidebar "loading" hangs indefinitely on failure | Add 12s timeout fallback |
 | PL-32 | ⏳ | createCheckoutSession missing base44_app_id metadata | Add metadata.base44_app_id |
-| PL-33 | ⏳ | No quantity selector - document "1 license" clearly | Add "1 license per service" label in UI |
+| PL-33 | ✅ | No quantity selector - document "1 license" clearly | Add "1 license per service" label in UI  Trinity |
 | PL-34 | ⏳ | Bundle savings toast fires every add | Add sessionStorage flag to show once per session |
-| PL-35 | ⏳ | No refund/cancel policy before checkout | Add one-liner below Stripe button |
+| PL-35 | ✅ | No refund/cancel policy before checkout | Add one-liner below Stripe button  Trinity |
 
 ## 🔐 AUTH & USER ACCOUNTS
 
@@ -1715,7 +1716,7 @@ PHASE 7 - Admin UI
 | PL-86 | ⏳ | Images missing width/height - causes CLS | Add explicit width/height to all img tags |
 | PL-87 | ⏳ | Google Analytics not installed | Add GA4 tracking in index.html or main.jsx |
 | PL-88 | ⏳ | No structured data on industry pages | Add LocalBusiness JSON-LD schema |
-| PL-89 | ⏳ | Font loading via @import slows FCP | Move Google Fonts link to index.html head with preload |
+| PL-89 | ✅ | Font loading via @import slows FCP | Move Google Fonts link to index.html head with preload  Trinity |
 | PL-90 | ⏳ | Lazy-loaded sections have no min-height | Add min-height to Suspense skeletons |
 
 ## 🔒 LEGAL & COMPLIANCE

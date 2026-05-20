@@ -260,6 +260,15 @@ export default function CartSidebar() {
                     >
                       {item.setup_fee === 0 ? "No setup fee" : `$${item.setup_fee} setup`} — ${item.monthly_fee}/mo
                     </p>
+                    <p
+                      style={{
+                        fontSize: "10px",
+                        color: "rgba(26,18,9,0.38)",
+                        margin: "3px 0 0",
+                      }}
+                    >
+                      1 service license included
+                    </p>
                   </div>
                   <motion.button
                     whileTap={{ scale: 0.85 }}
