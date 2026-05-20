@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
+import { countWebhookErrorEvents } from "@/lib/adminUnreadCounts";
 import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
@@ -21,7 +22,7 @@ const NAV_GROUPS = [
       { id: "overview",         label: "Overview",          icon: LayoutDashboard, path: "/admin" },
       { id: "leads",            label: "Leads",             icon: Users,           path: "/admin/leads" },
       { id: "client-projects",  label: "Client Projects",   icon: FolderKanban,    path: "/admin", tab: "client-projects" },
-      { id: "inbox",            label: "Inbox",             icon: Inbox,           path: "/admin", tab: "inbox", badge: true },
+      { id: "inbox",            label: "Inbox",             icon: Inbox,           path: "/admin", tab: "inbox", badge: "inbox" },
       { id: "onboarding",       label: "Client Onboarding", icon: ClipboardList,   path: "/admin/onboarding" },
     ],
   },
@@ -55,7 +56,7 @@ const NAV_GROUPS = [
     items: [
       { id: "task-board",       label: "Task Board",        icon: ClipboardList,   path: "/admin", tab: "task-board" },
       { id: "health",           label: "Integration Health",icon: Activity,        path: "/admin", tab: "health" },
-      { id: "logs",             label: "Communication Logs",icon: MessageSquare,   path: "/admin", tab: "logs" },
+      { id: "logs",             label: "Communication Logs",icon: MessageSquare,   path: "/admin", tab: "logs", badge: "webhook-errors" },
       { id: "templates",        label: "Templates",         icon: MessageSquare,   path: "/admin", tab: "templates" },
       { id: "review-request",   label: "Review Requests",   icon: Star,            path: "/admin", tab: "review-request" },
       { id: "settings",         label: "Settings",          icon: Settings,        path: "/admin", tab: "settings" },
@@ -72,12 +73,17 @@ export default function AdminShell({ children, title, activeId }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
   const [inboxUnread, setInboxUnread] = useState(0);
+  const [webhookErrorCount, setWebhookErrorCount] = useState(0);
 
   useEffect(() => {
     const loadUnread = async () => {
       try {
-        const msgs = await base44.entities.SupportMessage.filter({ read: false }, "-created_date", 200);
+        const [msgs, failedEvents] = await Promise.all([
+          base44.entities.SupportMessage.filter({ read: false }, "-created_date", 200),
+          base44.asServiceRole.entities.CommunicationEvent.filter({ status: "failed" }, "-created_date", 200),
+        ]);
         setInboxUnread((msgs || []).filter(m => m.role === "client").length);
+        setWebhookErrorCount(countWebhookErrorEvents(failedEvents || []));
       } catch {}
     };
     loadUnread();
@@ -146,7 +152,11 @@ export default function AdminShell({ children, title, activeId }) {
                 {items.map((item) => {
                   const Icon = item.icon;
                   const active = isActive(item);
-                  const unread = item.badge ? inboxUnread : 0;
+                  const unread = item.badge === "inbox"
+                    ? inboxUnread
+                    : item.badge === "webhook-errors"
+                    ? webhookErrorCount
+                    : 0;
                   return (
                     <button
                       key={item.id}

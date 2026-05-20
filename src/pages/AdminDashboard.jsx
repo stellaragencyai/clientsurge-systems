@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
+import { countWebhookErrorEvents } from '@/lib/adminUnreadCounts';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
 import AnalyticsDashboard from '../components/admin/AnalyticsDashboard';
@@ -48,7 +49,7 @@ const NAV_GROUPS = [
       { id: 'overview', label: 'Overview', icon: LayoutDashboard },
       { id: 'leads', label: 'Leads', icon: Users },
       { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
-      { id: 'inbox', label: 'Inbox', icon: Inbox, badge: true },
+      { id: 'inbox', label: 'Inbox', icon: Inbox, badge: 'inbox' },
       { id: 'onboarding', label: 'Client Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
     ],
   },
@@ -87,7 +88,7 @@ const NAV_GROUPS = [
       { id: 'website-copy', label: 'Website Copy AI', icon: Wand2 },
       { id: 'task-board', label: 'Task Board', icon: ClipboardList },
       { id: 'health', label: 'Integration Health', icon: Activity },
-      { id: 'logs', label: 'Communication Logs', icon: MessageSquare },
+      { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
       { id: 'templates', label: 'Templates', icon: MessageSquare },
       { id: 'review-request', label: 'Review Requests', icon: Star },
       { id: 'settings', label: 'Settings', icon: Settings },
@@ -117,6 +118,7 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
   const [inboxUnread, setInboxUnread] = useState(0);
+  const [webhookErrorCount, setWebhookErrorCount] = useState(0);
 
   // Sync tab from URL param (e.g. when navigating back from sub-pages)
   useEffect(() => {
@@ -125,13 +127,17 @@ export default function AdminDashboard() {
     if (tab) setActiveTab(tab);
   }, [location.search]);
 
-  // Load unread message count for inbox badge
+  // Load unread counts for nav badges
   useEffect(() => {
     const loadUnread = async () => {
       try {
-        const msgs = await base44.entities.SupportMessage.filter({ read: false }, "-created_date", 200);
+        const [msgs, failedEvents] = await Promise.all([
+          base44.entities.SupportMessage.filter({ read: false }, "-created_date", 200),
+          base44.asServiceRole.entities.CommunicationEvent.filter({ status: "failed" }, "-created_date", 200),
+        ]);
         const clientMsgs = (msgs || []).filter(m => m.role === "client");
         setInboxUnread(clientMsgs.length);
+        setWebhookErrorCount(countWebhookErrorEvents(failedEvents || []));
       } catch {}
     };
     loadUnread();
@@ -259,7 +265,11 @@ export default function AdminDashboard() {
                 {items.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
-                  const unread = item.badge ? inboxUnread : 0;
+                  const unread = item.badge === 'inbox'
+                    ? inboxUnread
+                    : item.badge === 'webhook-errors'
+                    ? webhookErrorCount
+                    : 0;
                   return (
                     <button
                       key={item.id}
