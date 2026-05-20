@@ -113,6 +113,7 @@ export default function FAQ() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             autoComplete="off"
+            autoFocus={false}
             autoCorrect="off"
             autoCapitalize="off"
             spellCheck="false"

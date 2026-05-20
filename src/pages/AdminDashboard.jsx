@@ -140,8 +140,22 @@ export default function AdminDashboard() {
 
   if (isLoadingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin" />
+      <div className="min-h-screen bg-background flex">
+        <div className="hidden lg:block w-64 border-r border-border p-4">
+          <div className="h-6 w-40 rounded bg-muted mb-6" />
+          {Array.from({ length: 10 }).map((_, index) => (
+            <div key={index} className="mb-3 h-9 rounded-lg bg-muted/70" />
+          ))}
+        </div>
+        <div className="flex-1 p-6">
+          <div className="mb-6 h-8 w-56 rounded bg-muted" />
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="h-28 rounded-xl border border-border bg-muted/40" />
+            <div className="h-28 rounded-xl border border-border bg-muted/40" />
+            <div className="h-28 rounded-xl border border-border bg-muted/40" />
+          </div>
+          <div className="mt-6 h-80 rounded-xl border border-border bg-muted/30" />
+        </div>
       </div>
     );
   }

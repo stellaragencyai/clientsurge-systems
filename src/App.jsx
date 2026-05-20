@@ -18,6 +18,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import PageNotFound from "./lib/PageNotFound";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
 import { scrollToTop } from "@/lib/scroll";
+import { setPageMetadata } from "@/lib/seo";
 
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
@@ -127,10 +128,38 @@ function SectionRedirect({ hash }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const cleanupMetadata = setPageMetadata({
+      title: "ClientSurge Systems | AI Lead Response and Booking Automation",
+      description: "Done-for-you automation that helps appointment-based businesses respond faster, follow up consistently, and book more appointments.",
+      canonicalPath: "/",
+    });
     navigate("/", { replace: true });
+    return cleanupMetadata;
   }, [hash, navigate]);
 
   return null;
+}
+
+function AdminLoadingSkeleton() {
+  return (
+    <div className="min-h-screen bg-background flex">
+      <div className="hidden lg:block w-64 border-r border-border p-4">
+        <div className="h-6 w-40 rounded bg-muted mb-6" />
+        {Array.from({ length: 10 }).map((_, index) => (
+          <div key={index} className="mb-3 h-9 rounded-lg bg-muted/70" />
+        ))}
+      </div>
+      <div className="flex-1 p-6">
+        <div className="mb-6 h-8 w-56 rounded bg-muted" />
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="h-28 rounded-xl border border-border bg-muted/40" />
+          <div className="h-28 rounded-xl border border-border bg-muted/40" />
+          <div className="h-28 rounded-xl border border-border bg-muted/40" />
+        </div>
+        <div className="mt-6 h-80 rounded-xl border border-border bg-muted/30" />
+      </div>
+    </div>
+  );
 }
 
 function RouteIndexingGuard() {
@@ -268,14 +297,14 @@ const AuthenticatedApp = () => {
       >
         <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
         <Route path="/admin-settings" element={<Navigate to="/admin" replace />} />
-        <Route path="/admin" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminDashboard /></Suspense>} />
-        <Route path="/admin/leads" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminLeads /></Suspense>} />
-        <Route path="/admin/leads/:leadId" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminLeadDetail /></Suspense>} />
-        <Route path="/admin/automations" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminAutomation /></Suspense>} />
+        <Route path="/admin" element={<Suspense fallback={<AdminLoadingSkeleton />}><AdminDashboard /></Suspense>} />
+        <Route path="/admin/leads" element={<Suspense fallback={<AdminLoadingSkeleton />}><AdminLeads /></Suspense>} />
+        <Route path="/admin/leads/:leadId" element={<Suspense fallback={<AdminLoadingSkeleton />}><AdminLeadDetail /></Suspense>} />
+        <Route path="/admin/automations" element={<Suspense fallback={<AdminLoadingSkeleton />}><AdminAutomation /></Suspense>} />
         <Route path="/lead-intelligence" element={<Navigate to="/admin" replace />} />
         <Route path="/sam" element={<Navigate to="/admin" replace />} />
         <Route path="/medspa-dashboard" element={<Navigate to="/admin" replace />} />
-        <Route path="/admin/onboarding" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminOnboarding /></Suspense>} />
+        <Route path="/admin/onboarding" element={<Suspense fallback={<AdminLoadingSkeleton />}><AdminOnboarding /></Suspense>} />
         <Route path="/admin/install-guide" element={<AdminInstallGuide />} />
         <Route path="/admin/ai-sales" element={<AISalesCommandCenter />} />
         <Route path="/admin/performance-wars" element={<PerformanceWars />} />

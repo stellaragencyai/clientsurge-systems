@@ -1,13 +1,23 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingCart, Trash2, ArrowRight, Lock } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
 import { base44 } from "@/api/base44Client";
+import { AI_PRODUCTS } from "@/lib/aiProducts";
+
+const COMPLEMENTARY_SERVICES = {
+  instant_lead_response: ["missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent"],
+  missed_call_text_back: ["instant_lead_response", "ai_booking_agent", "nurture_sequence_14d"],
+  nurture_sequence_14d: ["instant_lead_response", "lead_reactivation", "ai_booking_agent"],
+  ai_booking_agent: ["instant_lead_response", "nurture_sequence_14d", "review_request"],
+  lead_reactivation: ["nurture_sequence_14d", "instant_lead_response", "review_request"],
+};
 
 export default function CartSidebar() {
   const {
     items,
     removeItem,
+    addItem,
     cartOpen,
     setCartOpen,
     totalSetup,
@@ -22,6 +32,30 @@ export default function CartSidebar() {
   });
   const [smsConsent, setSmsConsent] = useState(false);
   const [error, setError] = useState("");
+  const suggestedAddon = useMemo(() => {
+    if (!items.length) return null;
+
+    const selectedProductIds = new Set(items.map((item) => item.product_id));
+    const selectedServiceKeys = new Set(items.map((item) => item.service_key).filter(Boolean));
+    const preferredServiceKeys = items.flatMap((item) => COMPLEMENTARY_SERVICES[item.service_key] || []);
+
+    return (
+      preferredServiceKeys
+        .map((serviceKey) => AI_PRODUCTS.find((product) => product.service_key === serviceKey))
+        .find((product) =>
+          product?.checkout_enabled &&
+          !product.coming_soon &&
+          !selectedProductIds.has(product.product_id) &&
+          !selectedServiceKeys.has(product.service_key)
+        ) ||
+      AI_PRODUCTS.find((product) =>
+        product.checkout_enabled &&
+        !product.coming_soon &&
+        !selectedProductIds.has(product.product_id)
+      ) ||
+      null
+    );
+  }, [items]);
 
   const handleCheckout = async () => {
     if (!form.name || !form.email || !form.business) {
@@ -286,6 +320,48 @@ export default function CartSidebar() {
                 </motion.div>
               ))}
               </AnimatePresence>
+              {suggestedAddon && (
+                <div
+                  style={{
+                    marginTop: "8px",
+                    borderRadius: "16px",
+                    padding: "14px",
+                    background: "linear-gradient(135deg, rgba(0,174,239,0.08), rgba(0,59,143,0.04))",
+                    border: "1px solid rgba(0,174,239,0.18)",
+                  }}
+                >
+                  <p style={{ margin: "0 0 4px", fontSize: "10px", fontWeight: "800", letterSpacing: "0.12em", textTransform: "uppercase", color: "#0088CC" }}>
+                    Recommended Add-On
+                  </p>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ margin: "0 0 3px", fontSize: "13px", fontWeight: "800", color: "#1a1209" }}>
+                        {suggestedAddon.icon} {suggestedAddon.name}
+                      </p>
+                      <p style={{ margin: 0, fontSize: "11px", color: "rgba(26,18,9,0.58)" }}>
+                        Complements your current stack - ${suggestedAddon.monthly_fee}/mo
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => addItem(suggestedAddon)}
+                      style={{
+                        border: "none",
+                        borderRadius: "999px",
+                        background: "linear-gradient(135deg,#0088CC,#00AEEF)",
+                        color: "#fff",
+                        fontSize: "11px",
+                        fontWeight: "800",
+                        padding: "8px 12px",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>

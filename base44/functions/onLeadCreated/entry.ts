@@ -9,7 +9,20 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid event' }, { status: 400 });
     }
 
-    // Deduplication — skip if same email/phone submitted within last 60 minutes
+    // Deduplication — skip if the source dedup key or same email was submitted recently.
+    if (data.dedup_key) {
+      const existingByKey = await base44.asServiceRole.entities.Leads.filter(
+        { dedup_key: data.dedup_key },
+        "-created_date",
+        5
+      ).catch(() => []);
+      const duplicateByKey = (existingByKey || []).find((l) => l.id !== data.id);
+      if (duplicateByKey) {
+        console.log(`[onLeadCreated] Duplicate dedup_key ${data.dedup_key} — skipping dispatch`);
+        return Response.json({ success: true, skipped: true, reason: "duplicate_dedup_key" });
+      }
+    }
+
     if (data.email || data.phone) {
       const sixtyMinutesAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
       const existing = await base44.asServiceRole.entities.Leads.filter(

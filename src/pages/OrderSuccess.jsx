@@ -19,6 +19,7 @@ export default function OrderSuccess() {
         setOrderSummary(JSON.parse(raw));
         sessionStorage.removeItem("clientsurge:last-order");
       }
+      sessionStorage.removeItem("clientsurge:cart");
     } catch {}
   }, []);
 

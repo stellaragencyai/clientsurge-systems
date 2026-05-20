@@ -1,43 +1,69 @@
 import { useEffect, useState } from "react";
 import { ShoppingCart, X } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
-const SAFE_PURCHASE_SIGNALS = [
-  {
-    name: "A Phoenix med spa",
-    service: "Instant Lead Response",
+function formatOrderSignal(order) {
+  const firstItem = Array.isArray(order?.items) ? order.items[0] : null;
+  const service =
+    firstItem?.product_name ||
+    order?.pricing_summary?.package_name ||
+    order?.plan_type ||
+    "AI automation stack";
+
+  return {
+    name: order?.business_name || "A ClientSurge customer",
+    service,
     time: "recently",
-  },
-  {
-    name: "A Scottsdale clinic",
-    service: "AI Booking Agent",
-    time: "today",
-  },
-  {
-    name: "A local home-services team",
-    service: "Missed Call Text-Back",
-    time: "this week",
-  },
-];
+  };
+}
 
 export default function SocialProofTicker() {
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [purchaseSignals, setPurchaseSignals] = useState([]);
 
   useEffect(() => {
     setVisible(true);
   }, []);
 
   useEffect(() => {
-    if (!SAFE_PURCHASE_SIGNALS.length) return undefined;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % SAFE_PURCHASE_SIGNALS.length);
-    }, 6000);
-    return () => clearInterval(interval);
+    let cancelled = false;
+
+    async function loadRecentOrders() {
+      try {
+        const orders = await base44.entities.Order.filter(
+          { payment_status: "paid" },
+          "-created_date",
+          5
+        );
+        if (!cancelled) {
+          setPurchaseSignals((orders || []).map(formatOrderSignal));
+        }
+      } catch {
+        if (!cancelled) {
+          setPurchaseSignals([]);
+        }
+      }
+    }
+
+    loadRecentOrders();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  if (!visible || !SAFE_PURCHASE_SIGNALS.length) return null;
+  useEffect(() => {
+    if (!purchaseSignals.length) return undefined;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % purchaseSignals.length);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [purchaseSignals.length]);
 
-  const purchase = SAFE_PURCHASE_SIGNALS[currentIndex];
+  if (!visible || !purchaseSignals.length) return null;
+
+  const purchase = purchaseSignals[currentIndex] || purchaseSignals[0];
 
   return (
     <div
