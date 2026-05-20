@@ -17,6 +17,27 @@ import {
   validateGrowthPackageIntake,
   validateProPackageIntake,
 } from "../src/lib/basicPackageActivation.js";
+import {
+  PACKAGE_CAPABILITY_MATRIX,
+  getPackageCapabilities,
+  getPackageTierForServiceKeys,
+} from "../src/lib/packageCapabilities.js";
+
+test("package capability matrix centralizes tier services, intake, and runtime gates", () => {
+  assert.deepEqual(getPackageCapabilities("basic").service_keys, BASIC_PACKAGE_SERVICE_KEYS);
+  assert.deepEqual(getPackageCapabilities("growth").service_keys, GROWTH_PACKAGE_SERVICE_KEYS);
+  assert.deepEqual(getPackageCapabilities("pro").service_keys, PRO_PACKAGE_SERVICE_KEYS);
+  assert.equal(getPackageCapabilities("pro").required_intake_fields.includes("review_link"), true);
+  assert.equal(getPackageCapabilities("growth").runtime_gates.includes("booking_confirmation_simulated"), true);
+  assert.equal(Object.keys(PACKAGE_CAPABILITY_MATRIX).length, 3);
+});
+
+test("package capability matrix classifies selected services by highest matched tier", () => {
+  assert.equal(getPackageTierForServiceKeys(BASIC_PACKAGE_SERVICE_KEYS), "basic");
+  assert.equal(getPackageTierForServiceKeys(GROWTH_PACKAGE_SERVICE_KEYS), "growth");
+  assert.equal(getPackageTierForServiceKeys(PRO_PACKAGE_SERVICE_KEYS), "pro");
+  assert.equal(getPackageTierForServiceKeys(["instant_lead_response"]), null);
+});
 
 test("basic package service keys match the first two automations", () => {
   assert.deepEqual(BASIC_PACKAGE_SERVICE_KEYS, [

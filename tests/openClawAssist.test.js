@@ -139,6 +139,10 @@ test("openclaw install assist returns machine-readable operator summary without 
   assert.equal(assist.blocker_queue.length, 2);
   assert.equal(assist.assisted_deployment.overview.can_prepare_setup, true);
   assert.equal(assist.assisted_deployment.safe_commands[1].requires_confirmation, true);
+  assert.equal(assist.install_copilot.package_tier, "basic");
+  assert.equal(assist.install_copilot.current_phase, "intake_or_configuration_blocked");
+  assert.equal(assist.install_copilot.next_service_key, "instant_lead_response");
+  assert.equal(assist.install_copilot.ai_engagements.length, 3);
   assert.equal(assist.services[0].timeline_summary.latest_event_type, "runtime_attempt_blocked");
   assert.equal(assist.timeline_summary.blocked_events, 1);
   assert.equal(assist.manual_approval_required.length > 0, true);

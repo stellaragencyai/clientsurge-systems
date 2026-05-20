@@ -1,63 +1,14 @@
-export const BASIC_PACKAGE_SERVICE_KEYS = [
-  "instant_lead_response",
-  "missed_call_text_back",
-];
+import { PACKAGE_CAPABILITY_MATRIX, getPackageTierForServiceKeys } from "./packageCapabilities.js";
 
-export const GROWTH_PACKAGE_SERVICE_KEYS = [
-  ...BASIC_PACKAGE_SERVICE_KEYS,
-  "nurture_sequence_14d",
-  "ai_booking_agent",
-];
+export const BASIC_PACKAGE_SERVICE_KEYS = PACKAGE_CAPABILITY_MATRIX.basic.service_keys;
+export const GROWTH_PACKAGE_SERVICE_KEYS = PACKAGE_CAPABILITY_MATRIX.growth.service_keys;
+export const PRO_PACKAGE_SERVICE_KEYS = PACKAGE_CAPABILITY_MATRIX.pro.service_keys;
 
-export const PRO_PACKAGE_SERVICE_KEYS = [
-  ...GROWTH_PACKAGE_SERVICE_KEYS,
-  "lead_reactivation",
-  "review_request",
-];
+export const BASIC_PACKAGE_REQUIRED_INTAKE_FIELDS = PACKAGE_CAPABILITY_MATRIX.basic.required_intake_fields;
+export const GROWTH_PACKAGE_REQUIRED_INTAKE_FIELDS = PACKAGE_CAPABILITY_MATRIX.growth.required_intake_fields;
+export const PRO_PACKAGE_REQUIRED_INTAKE_FIELDS = PACKAGE_CAPABILITY_MATRIX.pro.required_intake_fields;
 
-export const BASIC_PACKAGE_REQUIRED_INTAKE_FIELDS = [
-  "business_name",
-  "business_phone",
-  "business_hours",
-  "booking_link",
-  "brand_voice",
-  "services",
-];
-
-export const GROWTH_PACKAGE_REQUIRED_INTAKE_FIELDS = [
-  ...BASIC_PACKAGE_REQUIRED_INTAKE_FIELDS,
-  "lead_sources",
-  "booking_process",
-  "common_customer_questions",
-];
-
-export const PRO_PACKAGE_REQUIRED_INTAKE_FIELDS = [
-  ...GROWTH_PACKAGE_REQUIRED_INTAKE_FIELDS,
-  "reactivation_target_segment",
-  "review_link",
-  "review_trigger_event",
-];
-
-export const PACKAGE_ACTIVATION_DEFINITIONS = {
-  basic: {
-    package_key: "basic_website_plus_two_automations",
-    package_name: "Website Redesign + Instant Lead Response + Missed Call Text-Back",
-    service_keys: BASIC_PACKAGE_SERVICE_KEYS,
-    required_intake_fields: BASIC_PACKAGE_REQUIRED_INTAKE_FIELDS,
-  },
-  growth: {
-    package_key: "growth_website_plus_four_automations",
-    package_name: "Website Redesign + Instant Response + Missed Call + 14-Day Nurture + AI Booking Agent",
-    service_keys: GROWTH_PACKAGE_SERVICE_KEYS,
-    required_intake_fields: GROWTH_PACKAGE_REQUIRED_INTAKE_FIELDS,
-  },
-  pro: {
-    package_key: "pro_website_plus_six_automations",
-    package_name: "Website Redesign + Full Six-Automation Stack",
-    service_keys: PRO_PACKAGE_SERVICE_KEYS,
-    required_intake_fields: PRO_PACKAGE_REQUIRED_INTAKE_FIELDS,
-  },
-};
+export const PACKAGE_ACTIVATION_DEFINITIONS = PACKAGE_CAPABILITY_MATRIX;
 
 const DEFAULT_AFTER_HOURS_BEHAVIOR = "send_after_hours_sms";
 const DEFAULT_CONSENT_BEHAVIOR = "include_opt_out_language";
@@ -214,18 +165,10 @@ function getOrderServiceKeys(order = {}) {
 }
 
 export function detectPackageActivationDefinition({ order = null, serviceKeys = [] } = {}) {
-  const selected = new Set(normalizeServiceKeys(serviceKeys.length ? serviceKeys : getOrderServiceKeys(order || {})));
-
-  if (PRO_PACKAGE_SERVICE_KEYS.every((serviceKey) => selected.has(serviceKey))) {
-    return { package_tier: "pro", ...PACKAGE_ACTIVATION_DEFINITIONS.pro };
-  }
-
-  if (GROWTH_PACKAGE_SERVICE_KEYS.every((serviceKey) => selected.has(serviceKey))) {
-    return { package_tier: "growth", ...PACKAGE_ACTIVATION_DEFINITIONS.growth };
-  }
-
-  if (BASIC_PACKAGE_SERVICE_KEYS.every((serviceKey) => selected.has(serviceKey))) {
-    return { package_tier: "basic", ...PACKAGE_ACTIVATION_DEFINITIONS.basic };
+  const selected = normalizeServiceKeys(serviceKeys.length ? serviceKeys : getOrderServiceKeys(order || {}));
+  const packageTier = getPackageTierForServiceKeys(selected);
+  if (packageTier) {
+    return { package_tier: packageTier, ...PACKAGE_ACTIVATION_DEFINITIONS[packageTier] };
   }
 
   return null;

@@ -13,6 +13,12 @@ const HIGH_RISK_ACTIONS = [
   },
 ];
 
+const PACKAGE_LABELS = {
+  basic: "Basic",
+  growth: "Growth",
+  pro: "Pro",
+};
+
 function formatEventType(eventType) {
   return eventType ? eventType.replaceAll("_", " ") : "unknown";
 }
@@ -32,6 +38,57 @@ function getServiceTimelineSummary(orderDetail, service) {
     latest_failure_type: latestFailure?.event_type || null,
     latest_failure_at: latestFailure?.created_date || null,
     recent_event_count: serviceEvents.length,
+  };
+}
+
+function inferPackageTier(orderDetail) {
+  const serviceCount = orderDetail.services?.length || orderDetail.order?.tracked_service_count || 0;
+  if (serviceCount >= 6) return "pro";
+  if (serviceCount >= 4) return "growth";
+  return "basic";
+}
+
+function buildInstallCopilotPlan({ orderDetail, blockers, services }) {
+  const workspaceSummary = orderDetail.workspace_summary || {};
+  const packageTier = orderDetail.activation_package_tier || inferPackageTier(orderDetail);
+  const commandView = workspaceSummary.command_view || {};
+  const nextService =
+    commandView.configure_first ||
+    commandView.move_to_testing_now ||
+    commandView.test_now ||
+    commandView.go_live_now ||
+    services.find((service) => (service.operator_summary?.blocker_count || 0) > 0) ||
+    services[0] ||
+    null;
+  const manualFields = workspaceSummary.setup_assist?.manual_required || [];
+  const safeAutofill = workspaceSummary.setup_assist?.safe_autofill || [];
+
+  return {
+    package_tier: packageTier,
+    package_label: PACKAGE_LABELS[packageTier] || "Basic",
+    current_phase:
+      blockers.length > 0 ? "intake_or_configuration_blocked" :
+      nextService?.install_status === "Live" ? "go_live_verification" :
+      nextService?.install_status === "Testing" ? "runtime_testing" :
+      "configuration",
+    next_best_action:
+      workspaceSummary.next_best_actions?.[0]?.title ||
+      nextService?.operator_summary?.next_action_title ||
+      "Review package workspace and apply the next safe setup action.",
+    next_best_detail:
+      workspaceSummary.next_best_actions?.[0]?.detail ||
+      nextService?.operator_summary?.next_action_detail ||
+      "",
+    next_service_key: nextService?.service_key || null,
+    safe_autofill_count: safeAutofill.length,
+    manual_required_count: manualFields.length,
+    blocker_count: blockers.length,
+    suggested_operator_sequence: (orderDetail.operator_sequence || []).slice(0, 5),
+    ai_engagements: [
+      "Ask only for the next missing intake field.",
+      "Draft package-specific SMS/email/service config from saved business context.",
+      "Run guarded runtime tests before any Live transition.",
+    ],
   };
 }
 
@@ -99,6 +156,7 @@ export function buildOpenClawInstallAssist({ orderDetail }) {
       manual_required: [],
       blocker_summary: [],
     },
+    install_copilot: buildInstallCopilotPlan({ orderDetail, blockers, services }),
     assisted_deployment: {
       overview: orderDetail.assisted_deployment?.overview || {
         can_prepare_setup: false,
