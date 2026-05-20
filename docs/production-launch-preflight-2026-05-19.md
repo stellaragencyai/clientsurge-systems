@@ -1,13 +1,13 @@
 # ClientSurge Production Launch Preflight
 
 Generated: 2026-05-19 22:45 America/Phoenix
-Last updated: 2026-05-19 23:18 America/Phoenix
+Last updated: 2026-05-19 23:56 America/Phoenix
 
 ## Current Verdict
 
 ClientSurge is code-ready for the package activation workflow, but not yet full production-launch ready.
 
-The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base44 UI publish completed successfully, and the first two automation readiness check passes. The remaining blockers are operational: Stripe CLI/auth setup, controlled Stripe proof, and production Base44 backend deploy limitations for the current app ID.
+The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base44 UI publish completed successfully, the first two automation readiness check passes, and Stripe CLI is authenticated. The remaining blockers are operational: live Stripe catalog alignment, controlled Stripe proof, and production Base44 backend deploy limitations for the current app ID.
 
 ## Verified Ready
 
@@ -36,6 +36,9 @@ The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base
 - Base44 Stripe webhook secret is present:
   - `STRIPE_WEBHOOK_SECRET`
 - The 877 Twilio number is routed to the Base44 missed-call webhook with the matching `TWILIO_WEBHOOK_KEY`.
+- Stripe CLI is authenticated to the live ClientSurge Systems account:
+  - Account ID: `acct_1TSOFVBVGjsISdG0`
+  - Test and live CLI keys are available locally until `2026-08-18`.
 
 ## Verification Commands Passed
 
@@ -46,23 +49,34 @@ The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base
 
 ## Current Blockers
 
-### 1. Stripe CLI Is Installed But Not Authenticated
+### 1. Live Stripe Catalog Must Be Aligned With App Checkout Code
 
-Stripe CLI is installed:
+Stripe CLI is now installed and authenticated, but the first read-only Stripe audit found a catalog mismatch:
 
-- `stripe version 1.40.9`
-
-But it is not configured locally:
-
-- Missing local Stripe config at `C:\Users\nolan\.config\stripe\config.toml`
+- Test mode has no products, prices, or webhook endpoints.
+- Live mode has three package products:
+  - `ClientSurge Systems — Starter`
+  - `ClientSurge Systems — Growth`
+  - `ClientSurge Systems — Elite`
+- Live mode has package-level setup and monthly prices for those three packages.
+- The current app checkout catalog still references older individual-service Stripe product/price IDs such as `prod_UNi5...` and `price_1TOwfi...`.
 
 Required fix:
 
-1. Run `stripe login`, or configure a secure Stripe API key path.
-2. Confirm webhook endpoint visibility from the CLI.
-3. Use the CLI only for read-only verification or controlled test-mode proof unless Nolan explicitly approves a live charge.
+1. Decide whether checkout should use the current live package products/prices or recreate the old individual-service products/prices in Stripe.
+2. Recommended path: update app checkout to use the current live package products/prices, while internally expanding the package into the correct automation service keys.
+3. Mirror the live package products/prices into Stripe test mode so test-mode checkout can be proven without live charges.
+4. Re-run a test-mode checkout/webhook proof.
 
-### 2. Production Base44 App Does Not Accept CLI Backend Deploys
+### 2. Stripe Webhook Endpoint URL Needs Canonical Review
+
+Live Stripe currently has one enabled webhook endpoint:
+
+- `https://grinning-apex-flow-growth.base44.app/api/functions/stripePaymentWebhook`
+
+The code/docs also reference `stripeWebhookOrders` as the canonical post-payment order handler. Before live payment proof, confirm whether `stripePaymentWebhook` is the intended wrapper/alias or whether the live endpoint should move to the canonical `stripeWebhookOrders` URL.
+
+### 3. Production Base44 App Does Not Accept CLI Backend Deploys
 
 The current production app ID in `base44/.app.jsonc` is:
 
@@ -83,7 +97,7 @@ Required fix:
 2. If staying on the current production app, publish backend/entity changes through the Base44 UI or Base44-supported production workflow.
 3. If moving to the Backend Platform app, confirm domain/publish routing before switching `clientsurgesystems.com`.
 
-### 3. Purchase-To-Onboarding Smoke Needs Production Backend Function Sync
+### 4. Purchase-To-Onboarding Smoke Needs Production Backend Function Sync
 
 After merging latest `main` and publishing the production app through the Base44 UI, local tests pass and the live domain is reachable, but the live Base44 smoke test still fails because the deployed `installPipeline` function behavior is not in sync with the branch:
 
@@ -99,7 +113,7 @@ Required fix:
 2. Re-run `npm run openclaw:purchase-onboarding-smoke`.
 3. Only then run Stripe webhook proof.
 
-### 4. Base44 Functions List Read-Only Check Fails
+### 5. Base44 Functions List Read-Only Check Fails
 
 `base44 functions list` currently fails with multiple automation metadata schema errors:
 
@@ -118,15 +132,17 @@ Required fix:
 3. Decide/fix the Base44 production backend deploy path.
 4. Publish backend/entity changes through the correct Base44 production workflow.
 5. Re-run purchase-to-onboarding smoke.
-6. Authenticate Stripe CLI or verify Stripe through a secure API-key path.
-7. Run Stripe checkout/webhook smoke test in test mode first.
-8. Run one controlled production payment test only with explicit approval for amount, card, and refund/no-refund plan.
-9. Confirm custom domain publish state for `clientsurgesystems.com`.
-10. Run final end-to-end production launch checklist.
+6. Align the app checkout catalog with live Stripe package products/prices.
+7. Mirror package products/prices in Stripe test mode.
+8. Run Stripe checkout/webhook smoke test in test mode first.
+9. Run one controlled production payment test only with explicit approval for amount, card, and refund/no-refund plan.
+10. Confirm custom domain publish state for `clientsurgesystems.com`.
+11. Run final end-to-end production launch checklist.
 
 ## Do Not Launch Until
 
 - Stripe webhook proof passes.
+- App checkout catalog matches the live Stripe package products/prices.
 - Production Base44 backend/entity deployment path is confirmed.
 - Purchase-to-onboarding live smoke passes after production backend sync.
 - Base44 production publish target is explicitly confirmed.
