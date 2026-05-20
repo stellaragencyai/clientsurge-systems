@@ -524,6 +524,22 @@
       "type": "string",
       "title": "Install Configuration Updated At"
     },
+    "activation_package_tier": {
+      "type": "string",
+      "title": "Activation Package Tier"
+    },
+    "activation_package_key": {
+      "type": "string",
+      "title": "Activation Package Key"
+    },
+    "activation_package_name": {
+      "type": "string",
+      "title": "Activation Package Name"
+    },
+    "purchase_onboarding_handoff": {
+      "type": "object",
+      "title": "Purchase To Onboarding Handoff"
+    },
     "pipeline_error": {
       "type": "string",
       "title": "Pipeline Error"

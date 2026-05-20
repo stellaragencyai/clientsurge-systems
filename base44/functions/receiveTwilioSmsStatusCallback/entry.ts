@@ -10,6 +10,13 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import crypto from "node:crypto";
 
 async function validateTwilioSignature(req, rawBody) {
+  const webhookKey = Deno.env.get("TWILIO_WEBHOOK_KEY");
+  const providedWebhookKey = new URL(req.url).searchParams.get("twilio_webhook_key");
+  if (webhookKey && providedWebhookKey && webhookKey === providedWebhookKey) {
+    console.log("[SmsStatusCallback] Twilio webhook key valid");
+    return { valid: true, key_validated: true };
+  }
+
   const token = Deno.env.get("TWILIO_AUTH_TOKEN");
   if (!token) {
     console.error("[SmsStatusCallback] TWILIO_AUTH_TOKEN is not set — cannot validate signature");
@@ -22,7 +29,15 @@ async function validateTwilioSignature(req, rawBody) {
     return { valid: false, missing_signature: true };
   }
 
-  const url = new URL(req.url).toString();
+  const originalUrl = new URL(req.url);
+  const forwardedProto = req.headers.get("x-forwarded-proto");
+  const forwardedHost = req.headers.get("x-forwarded-host");
+  const detectedHost = forwardedHost || req.headers.get("host") || originalUrl.host;
+  const host = /^(127\.0\.0\.1|localhost)(:\d+)?$/.test(detectedHost)
+    ? "client-surge-systems-copy-a9653cae.base44.app"
+    : detectedHost;
+  const protocol = forwardedProto || originalUrl.protocol.replace(":", "");
+  const url = `${protocol}://${host}${originalUrl.pathname}${originalUrl.search}`;
   const params = new URLSearchParams(rawBody);
   const toSign =
     url +
