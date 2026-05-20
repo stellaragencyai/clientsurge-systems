@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import {
   InstallLinkingError,
   InstallTransitionError,
+  buildPurchaseOnboardingHandoff,
   derivePipelineStatus,
   initializePaidOrderInstallPipeline,
   listInstallQueueOrders,
@@ -311,7 +312,55 @@ test("paid order initializes canonical install pipeline and links existing struc
   assert.equal(entities.Client.records.length, 1);
   assert.equal(entities.ClientProject.records.length, 1);
   assert.equal(entities.OnboardingClient.records.length, 1);
-  assert.equal(entities.CommunicationEvent.records.length, 3);
+  assert.equal(entities.CommunicationEvent.records.length, 4);
+  assert.equal(result.order.activation_package_tier, "basic");
+  assert.equal(result.order.purchase_onboarding_handoff.next_missing_field, "business_hours");
+  assert.equal(result.onboardingClient.activation_package_tier, "basic");
+  assert.equal(result.onboardingClient.next_onboarding_question, "What are the client's normal business hours?");
+});
+
+test("purchase onboarding handoff detects pro package and first missing intake field", () => {
+  const order = {
+    business_name: "Signal Med Spa",
+    customer_name: "Jamie Owner",
+    customer_email: "owner@example.com",
+    customer_phone: "+16025550123",
+    items: [
+      buildTrackedItem("prod_UNi5RHiKNSTfQl", "Instant Lead Response"),
+      buildTrackedItem("prod_UNi5QL0bQl98If", "Missed Call Text-Back"),
+      buildTrackedItem("prod_UNi5N0l5MtaV0R", "14-Day Nurture Sequence"),
+      buildTrackedItem("prod_UNi5fLL2SyJJdP", "AI Booking Agent"),
+      buildTrackedItem("prod_UNi5PWv05ECzXI", "Old Lead Reactivation"),
+      buildTrackedItem("prod_UNi5dvOUm6Fi9i", "Review Request Automation"),
+    ],
+  };
+  const normalizedOrder = {
+    ...order,
+    items: order.items.map((item) => ({
+      ...item,
+      ...(
+        item.product_id === "prod_UNi5RHiKNSTfQl"
+          ? { service_key: "instant_lead_response", tracking_enabled: true }
+          : item.product_id === "prod_UNi5QL0bQl98If"
+          ? { service_key: "missed_call_text_back", tracking_enabled: true }
+          : item.product_id === "prod_UNi5N0l5MtaV0R"
+          ? { service_key: "nurture_sequence_14d", tracking_enabled: true }
+          : item.product_id === "prod_UNi5fLL2SyJJdP"
+          ? { service_key: "ai_booking_agent", tracking_enabled: true }
+          : item.product_id === "prod_UNi5PWv05ECzXI"
+          ? { service_key: "lead_reactivation", tracking_enabled: true }
+          : { service_key: "review_request", tracking_enabled: true }
+      ),
+    })),
+  };
+
+  const handoff = buildPurchaseOnboardingHandoff({ order: normalizedOrder });
+
+  assert.equal(handoff.package_tier, "pro");
+  assert.equal(handoff.package_key, "pro_website_plus_six_automations");
+  assert.equal(handoff.service_keys.length, 6);
+  assert.equal(handoff.next_missing_field, "business_hours");
+  assert.equal(handoff.next_question, "What are the client's normal business hours?");
 });
 
 test("pipeline_status rollups are deterministic across mixed service states", () => {

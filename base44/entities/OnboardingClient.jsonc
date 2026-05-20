@@ -98,6 +98,43 @@
       "type": "string",
       "title": "AI Generated Messages (JSON)"
     },
+    "activation_package_tier": {
+      "type": "string",
+      "title": "Activation Package Tier"
+    },
+    "activation_package_key": {
+      "type": "string",
+      "title": "Activation Package Key"
+    },
+    "package_service_keys": {
+      "type": "array",
+      "title": "Package Service Keys",
+      "items": {
+        "type": "string"
+      }
+    },
+    "onboarding_required_fields": {
+      "type": "array",
+      "title": "Onboarding Required Fields",
+      "items": {
+        "type": "string"
+      }
+    },
+    "onboarding_missing_fields": {
+      "type": "array",
+      "title": "Onboarding Missing Fields",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_onboarding_question": {
+      "type": "string",
+      "title": "Next Onboarding Question"
+    },
+    "package_activation_context": {
+      "type": "object",
+      "title": "Package Activation Context"
+    },
     "notes": {
       "type": "string",
       "title": "Internal Notes / Activity Log"

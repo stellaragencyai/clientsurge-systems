@@ -83,6 +83,75 @@ const TRACKED_INSTALL_SERVICES_BY_KEY = Object.fromEntries(
   Object.values(TRACKED_INSTALL_SERVICES).map((service) => [service.service_key, service])
 );
 
+const PACKAGE_ACTIVATION_DEFINITIONS = {
+  basic: {
+    package_tier: "basic",
+    package_key: "basic_website_plus_two_automations",
+    package_name: "Website Redesign + Instant Lead Response + Missed Call Text-Back",
+    plan: "Starter System",
+    service_keys: ["instant_lead_response", "missed_call_text_back"],
+    required_intake_fields: [
+      "business_name",
+      "business_phone",
+      "business_hours",
+      "booking_link",
+      "brand_voice",
+      "services",
+    ],
+  },
+  growth: {
+    package_tier: "growth",
+    package_key: "growth_website_plus_four_automations",
+    package_name: "Website Redesign + Four-Automation Growth Stack",
+    plan: "Growth System",
+    service_keys: [
+      "instant_lead_response",
+      "missed_call_text_back",
+      "nurture_sequence_14d",
+      "ai_booking_agent",
+    ],
+    required_intake_fields: [
+      "business_name",
+      "business_phone",
+      "business_hours",
+      "booking_link",
+      "brand_voice",
+      "services",
+      "lead_sources",
+      "booking_process",
+      "common_customer_questions",
+    ],
+  },
+  pro: {
+    package_tier: "pro",
+    package_key: "pro_website_plus_six_automations",
+    package_name: "Website Redesign + Full Six-Automation Stack",
+    plan: "Pro System",
+    service_keys: [
+      "instant_lead_response",
+      "missed_call_text_back",
+      "nurture_sequence_14d",
+      "ai_booking_agent",
+      "lead_reactivation",
+      "review_request",
+    ],
+    required_intake_fields: [
+      "business_name",
+      "business_phone",
+      "business_hours",
+      "booking_link",
+      "brand_voice",
+      "services",
+      "lead_sources",
+      "booking_process",
+      "common_customer_questions",
+      "reactivation_target_segment",
+      "review_link",
+      "review_trigger_event",
+    ],
+  },
+};
+
 const STATUS_TO_LEGACY_ITEM_STATUS = {
   Paid: "pending",
   "Ready for Install": "pending",
@@ -324,6 +393,32 @@ function getConfiguredServiceKeys(config = {}) {
 
 function getTrackedServiceKeys(items = []) {
   return getTrackedInstallItems(items).map((item) => item.service_key);
+}
+
+function detectPackageActivationDefinition(serviceKeys = []) {
+  const selected = new Set(serviceKeys.map(cleanString).filter(Boolean));
+
+  if (PACKAGE_ACTIVATION_DEFINITIONS.pro.service_keys.every((serviceKey) => selected.has(serviceKey))) {
+    return PACKAGE_ACTIVATION_DEFINITIONS.pro;
+  }
+
+  if (PACKAGE_ACTIVATION_DEFINITIONS.growth.service_keys.every((serviceKey) => selected.has(serviceKey))) {
+    return PACKAGE_ACTIVATION_DEFINITIONS.growth;
+  }
+
+  if (PACKAGE_ACTIVATION_DEFINITIONS.basic.service_keys.every((serviceKey) => selected.has(serviceKey))) {
+    return PACKAGE_ACTIVATION_DEFINITIONS.basic;
+  }
+
+  return null;
+}
+
+function getPackageActivationDefinitionForOrder(orderLike = {}) {
+  return detectPackageActivationDefinition(getTrackedServiceKeys(orderLike.items || []));
+}
+
+function getPackagePlanForOrder(orderLike = {}) {
+  return getPackageActivationDefinitionForOrder(orderLike)?.plan || "Starter System";
 }
 
 function getTrackedItemStatus(item, defaultStatus) {
@@ -992,6 +1087,105 @@ function buildInstallLinkingBlockedEvent({ order, error }) {
   });
 }
 
+function buildActivationIntakeSnapshot({ order = {}, onboardingClient = {} } = {}) {
+  return {
+    business_name: order.business_name || onboardingClient.business_name || "",
+    business_phone:
+      order.install_configuration?.shared?.twilio_business_phone ||
+      onboardingClient.twilio_number ||
+      onboardingClient.phone ||
+      order.customer_phone ||
+      "",
+    business_hours: order.install_configuration?.shared?.business_hours || onboardingClient.business_hours || "",
+    booking_link:
+      order.install_configuration?.services?.ai_booking_agent?.booking_link ||
+      onboardingClient.booking_link ||
+      "",
+    brand_voice: onboardingClient.brand_voice || onboardingClient.tone_of_voice || "",
+    services: onboardingClient.services || "",
+    lead_sources: onboardingClient.lead_sources || "",
+    booking_process: onboardingClient.booking_platform || onboardingClient.booking_process || "",
+    common_customer_questions: onboardingClient.customer_questions || "",
+    reactivation_target_segment:
+      order.install_configuration?.services?.lead_reactivation?.target_segment ||
+      onboardingClient.reactivation_target_segment ||
+      "",
+    review_link:
+      order.install_configuration?.services?.review_request?.review_link ||
+      onboardingClient.review_link ||
+      "",
+    review_trigger_event:
+      order.install_configuration?.services?.review_request?.trigger_event ||
+      onboardingClient.review_trigger_event ||
+      "",
+  };
+}
+
+function getNextOnboardingQuestion(field, packageLabel) {
+  const questionByField = {
+    business_name: "What is the client's public business name?",
+    business_phone: "What business phone number should the automations use?",
+    business_hours: "What are the client's normal business hours?",
+    booking_link: "What booking link should we use for leads who are ready to schedule?",
+    brand_voice: "How should the automation sound: professional, friendly, luxury, direct, or something else?",
+    services: "Which services should the automation mention when responding to leads?",
+    lead_sources: "Where do this client's leads usually come from?",
+    booking_process: "How does this client currently book appointments or consultations?",
+    common_customer_questions: "What common customer questions should the automation understand?",
+    reactivation_target_segment: "Which old leads should be reactivated first: contacted_no_reply, qualified_unbooked, or all_dormant?",
+    review_link: "What Google or preferred review link should review requests send customers to?",
+    review_trigger_event: "When should review requests trigger: manual_trigger, appointment_completed, or order_completed?",
+  };
+
+  return field
+    ? questionByField[field] || `Please provide ${field.replaceAll("_", " ")}.`
+    : `${packageLabel} intake is complete. Apply the generated configuration and run provider tests.`;
+}
+
+export function buildPurchaseOnboardingHandoff({ order = {}, onboardingClient = null } = {}) {
+  const definition = getPackageActivationDefinitionForOrder(order);
+  const serviceKeys = getTrackedServiceKeys(order.items || []);
+
+  if (!definition) {
+    return {
+      package_tier: "custom",
+      package_key: "custom_or_unsupported_package",
+      package_name: "Custom or unsupported package",
+      service_keys: serviceKeys,
+      required_intake_fields: [],
+      missing_intake_fields: ["supported_package_services"],
+      next_missing_field: "supported_package_services",
+      next_question: "Which ClientSurge package did this client purchase: Basic, Growth, or Pro?",
+      readiness_score: 0,
+      next_best_action: "Match this order to a canonical package before automated activation.",
+    };
+  }
+
+  const intake = buildActivationIntakeSnapshot({ order, onboardingClient: onboardingClient || {} });
+  const missing = definition.required_intake_fields.filter((field) => !cleanString(intake[field]));
+  const nextMissingField = missing[0] || null;
+  const packageLabel = definition.package_tier === "pro"
+    ? "Pro"
+    : definition.package_tier === "growth"
+    ? "Growth"
+    : "Basic";
+
+  return {
+    package_tier: definition.package_tier,
+    package_key: definition.package_key,
+    package_name: definition.package_name,
+    service_keys: definition.service_keys,
+    required_intake_fields: definition.required_intake_fields,
+    missing_intake_fields: missing,
+    next_missing_field: nextMissingField,
+    next_question: getNextOnboardingQuestion(nextMissingField, packageLabel),
+    readiness_score: missing.length === 0 ? 35 : 20,
+    next_best_action: missing.length === 0
+      ? "Apply and save the generated install configuration."
+      : "Have Sam/onboarding ask the next missing intake question.",
+  };
+}
+
 async function resolveClientRecord(base44, order) {
   if (order.client_id) {
     try {
@@ -1079,12 +1273,14 @@ async function resolveClientProjectRecord(base44, order, client, pipelineStatus)
     });
 
   const projectPatch = buildClientProjectPatch({ pipelineStatus, trackedItems: getTrackedInstallItems(order.items || []) });
+  const plan = getPackagePlanForOrder(order);
 
   if (existing) {
     await base44.asServiceRole.entities.ClientProject.update(existing.id, {
       client_id: existing.client_id || client.id,
       client_name: existing.client_name || order.customer_name,
       business_name: existing.business_name || order.business_name,
+      plan: existing.plan || plan,
       ...projectPatch,
     });
     return base44.asServiceRole.entities.ClientProject.get(existing.id);
@@ -1095,7 +1291,7 @@ async function resolveClientProjectRecord(base44, order, client, pipelineStatus)
     client_email: order.customer_email,
     client_name: order.customer_name,
     business_name: order.business_name,
-    plan: "Starter System",
+    plan,
     ...projectPatch,
   });
 }
@@ -1271,6 +1467,7 @@ export function buildOnboardingClientPatch({ order, pipelineStatus }) {
   const snapshot = buildInstallSnapshot(order);
   const trackedItems = snapshot.trackedItems;
   const trackedStatusByService = Object.fromEntries(trackedItems.map((item) => [item.service_key, item.install_status]));
+  const handoff = buildPurchaseOnboardingHandoff({ order });
   const allTemplatesConfigured =
     trackedItems.length > 0 &&
     trackedItems.every((item) => {
@@ -1312,6 +1509,13 @@ export function buildOnboardingClientPatch({ order, pipelineStatus }) {
     step_messages_customized: allTemplatesConfigured,
     step_tested: allTestingComplete,
     step_live: pipelineStatus === "Live",
+    activation_package_tier: handoff.package_tier,
+    activation_package_key: handoff.package_key,
+    package_service_keys: handoff.service_keys,
+    onboarding_required_fields: handoff.required_intake_fields,
+    onboarding_missing_fields: handoff.missing_intake_fields,
+    next_onboarding_question: handoff.next_question,
+    package_activation_context: handoff,
   };
 }
 
@@ -1413,6 +1617,7 @@ export async function initializePaidOrderInstallPipeline({
     install_initialized_at: alreadyInitialized ? order.install_initialized_at : now,
     install_configuration: installConfiguration,
   };
+  const purchaseOnboardingHandoff = buildPurchaseOnboardingHandoff({ order: provisionalOrder });
   const pipelineStatus = derivePipelineStatus(provisionalOrder);
   let client;
   let clientProject;
@@ -1475,6 +1680,10 @@ export async function initializePaidOrderInstallPipeline({
     items: initializedItems,
     install_initialized_at: alreadyInitialized ? order.install_initialized_at : now,
     install_configuration: installConfiguration,
+    activation_package_tier: purchaseOnboardingHandoff.package_tier,
+    activation_package_key: purchaseOnboardingHandoff.package_key,
+    activation_package_name: purchaseOnboardingHandoff.package_name,
+    purchase_onboarding_handoff: purchaseOnboardingHandoff,
     pipeline_status: pipelineStatus,
     order_status: mapPipelineStatusToOrderStatus({
       pipelineStatus,
@@ -1525,6 +1734,27 @@ export async function initializePaidOrderInstallPipeline({
         metadata: {
           order_id: order.id,
           tracked_services: trackedItems.map((item) => item.service_key),
+          package_tier: purchaseOnboardingHandoff.package_tier,
+          next_onboarding_question: purchaseOnboardingHandoff.next_question,
+        },
+      })
+    );
+  }
+
+  if (!alreadyInitialized) {
+    events.push(
+      buildCommunicationEvent({
+        order: updatedOrder,
+        event_type: "onboarding_handoff_initialized",
+        subject: "Purchase-to-onboarding handoff initialized",
+        message_body: `Sam/onboarding initialized for ${purchaseOnboardingHandoff.package_name}. Next question: ${purchaseOnboardingHandoff.next_question}`,
+        metadata: {
+          order_id: order.id,
+          package_tier: purchaseOnboardingHandoff.package_tier,
+          service_keys: purchaseOnboardingHandoff.service_keys,
+          missing_intake_fields: purchaseOnboardingHandoff.missing_intake_fields,
+          next_missing_field: purchaseOnboardingHandoff.next_missing_field,
+          next_question: purchaseOnboardingHandoff.next_question,
         },
       })
     );
@@ -1549,6 +1779,7 @@ export async function initializePaidOrderInstallPipeline({
       ...updatedOrder,
       items: initializedItems,
       install_configuration: installConfiguration,
+      purchase_onboarding_handoff: purchaseOnboardingHandoff,
       pipeline_status: pipelineStatus,
     },
     client,
