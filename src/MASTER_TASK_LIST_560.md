@@ -230,7 +230,7 @@
 | 58 | ✅ | Industry page titles: include city/location for local SEO signals | MEDIUM  Agent Smith |
 | 59 | ✅ | Add internal linking: Footer cross-links industry pages; Store links to industry pages | MEDIUM  Agent Smith |
 | 60 | ✅ | sitemap.xml: add all industry pages and core routes | DONE |
-| 61 | ⏳ | Create generateSitemap backend function for dynamic sitemap at /sitemap.xml | LOW |
+| 61 | ✅ | Create generateSitemap backend function for dynamic sitemap at /sitemap.xml | LOW | Trinity |
 
 ---
 
@@ -884,7 +884,7 @@
 | 346 | ✅ | SchemaMarkup.jsx getFAQSchema is used on MedSpa only - add FAQ schema to all 6 industry pages | MEDIUM | Trinity |
 | 347 | ⏳ | Footer: "Tanning Salons" industry missing from footer nav links - only 5 industries listed, should be 6 | MEDIUM |
 | 348 | ✅ | Footer: Roofing and Contractors pages missing from footer nav - add all active industry routes | MEDIUM | Trinity |
-| 349 | ⏳ | Add /sitemap.xml route that reads from AdminSettings or returns hardcoded XML including all industry pages | MEDIUM |
+| 349 | ✅ | Add /sitemap.xml route that reads from AdminSettings or returns hardcoded XML including all industry pages | MEDIUM | Trinity |
 | 350 | ✅ | Add robots.txt with correct Disallow: /admin Disallow: /client-portal Allow: / | HIGH  Agent Smith |
 
 ---
@@ -1685,8 +1685,8 @@ PHASE 7 - Admin UI
 | PL-66 | ⏳ | Email templates have no plain-text fallback | Add text: field to all Resend fetch calls |
 | PL-67 | ⏳ | Nurture emails don't respect client timezone | Store timezone in Client entity, offset processNurtureCampaigns |
 | PL-68 | ⏳ | No email preview for admin before campaigns | Add "Send Preview" button in email template editor |
-| PL-69 | ⏳ | AdminSettings.lead_notification_email may be empty | Fallback to ADMIN_EMAIL env var |
-| PL-70 | ⏳ | Drip campaign doesn't check if lead already booked | Check lead.status === "Booked" and skip in processDripCampaigns |
+| PL-69 | ✅ | AdminSettings.lead_notification_email may be empty | Fallback to ADMIN_EMAIL env var |
+| PL-70 | ✅ | Drip campaign doesn't check if lead already booked | Check lead.status === "Booked" and skip in processDripCampaigns |
 
 ## ⚙️ BACKEND FUNCTIONS & AUTOMATIONS
 
@@ -1694,7 +1694,7 @@ PHASE 7 - Admin UI
 |---|---|---|---|
 | PL-71 | ⏳ | onLeadCreated may fire multiple times for duplicates | Dedup check via dedup_key before dispatching |
 | PL-72 | ⏳ | processWebsiteLeadFollowUps - verify it's running | Check automation list, confirm cron is active |
-| PL-73 | ⏳ | scheduleFollowUpSMS sends at any hour | Add business hours check before sending |
+| PL-73 | ✅ | scheduleFollowUpSMS sends at any hour | Add business hours check before sending |
 | PL-74 | ⏳ | installPipeline has no timeout handling | Add 30s timeout with error logging |
 | PL-75 | ⏳ | discoverLeads Google Maps API key not set | Set key as secret, add error handling |
 | PL-76 | ✅ | autoEndToEndTest has no admin guard | Admin role check added |
