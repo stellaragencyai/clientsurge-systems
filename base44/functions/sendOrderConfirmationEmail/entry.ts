@@ -19,7 +19,21 @@ function formatMoney(amount: unknown) {
   return Number(amount || 0).toLocaleString();
 }
 
-function resolveServiceRows(order: any, packageOffer: any) {
+function formatFromAddress(value: string | undefined | null) {
+  const email = String(value || "noreply@clientsurgesystems.com").trim();
+  if (email.includes("<") && email.includes(">")) {
+    return email;
+  }
+  return `ClientSurge Systems <${email}>`;
+}
+
+type ServiceRow = {
+  name: string;
+  setup_fee: unknown;
+  monthly_fee: unknown;
+};
+
+function resolveServiceRows(order: any, packageOffer: any): ServiceRow[] {
   const orderItems = Array.isArray(order?.items) ? order.items : [];
   if (orderItems.length > 0) {
     return orderItems.map((item: any) => ({
@@ -58,6 +72,8 @@ Deno.serve(async (req) => {
     if (!resendKey) {
       return Response.json({ error: "RESEND_API_KEY missing" }, { status: 500 });
     }
+    const from = formatFromAddress(Deno.env.get("RESEND_FROM_EMAIL"));
+    const replyTo = Deno.env.get("ADMIN_EMAIL") || "system@clientsurgesystems.com";
 
     const customerEmail = order.customer_email || "";
     if (!customerEmail) {
@@ -68,7 +84,11 @@ Deno.serve(async (req) => {
       getPackageOffer(order.pricing_summary?.package_key || order.package_key) ||
       getPackageOffer(normalizePackageKey(order.package_type)) ||
       null;
-    const packageLabel = packageOffer?.name || order.plan_type || getPackageDisplayLabel(order.pricing_summary) || "Custom Service Bundle";
+    const packageLabel =
+      packageOffer?.name ||
+      order.plan_type ||
+      getPackageDisplayLabel(order.pricing_summary) ||
+      "Custom Service Bundle";
     const portalUrl =
       portal_activation_url ||
       `${Deno.env.get("APP_URL") || "https://clientsurgesystems.com"}/client-portal`;
@@ -78,9 +98,34 @@ Deno.serve(async (req) => {
     const serviceList = serviceRows
       .map(
         (service) =>
-          `<li style="margin-bottom:8px;color:#374151;"><strong>${escapeHtml(service.name)}</strong> · $${formatMoney(service.setup_fee)} setup / $${formatMoney(service.monthly_fee)}/mo</li>`
+          `<li style="margin-bottom:8px;color:#374151;"><strong>${escapeHtml(service.name)}</strong> - $${formatMoney(service.setup_fee)} setup / $${formatMoney(service.monthly_fee)}/mo</li>`
       )
       .join("");
+    const textServiceList = serviceRows
+      .map(
+        (service) =>
+          `- ${service.name}: $${formatMoney(service.setup_fee)} setup / $${formatMoney(service.monthly_fee)}/mo`
+      )
+      .join("\n");
+    const text = [
+      `Hi ${order.customer_name || "there"},`,
+      "",
+      `Your ClientSurge order for ${order.business_name || "your business"} is confirmed.`,
+      "",
+      `Package: ${packageLabel}`,
+      `Setup total: $${formatMoney(order.total_setup)}`,
+      `Monthly total: $${formatMoney(order.total_monthly)}/mo`,
+      "",
+      "Included services:",
+      textServiceList || "- Service bundle",
+      "",
+      "What happens next:",
+      "Your order has been recorded and linked into our install workflow. You'll receive your portal access and setup guidance as that workflow progresses.",
+      "",
+      `Open Client Portal: ${portalUrl}`,
+      "",
+      "Questions? Reply to this email and our team will help.",
+    ].join("\n");
 
     const html = `
       <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:32px 20px;color:#111827;">
@@ -112,16 +157,24 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "ClientSurge Systems <system@clientsurgesystems.com>",
-        reply_to: "support@clientsurgesystems.com",
+        from,
+        reply_to: replyTo,
         to: customerEmail,
-        subject: `Order confirmed — ${packageLabel}`,
+        subject: `Order confirmed - ${packageLabel}`,
+        text,
         html,
       }),
     });
 
     if (!response.ok) {
       const body = await response.text();
+      console.error("[sendOrderConfirmationEmail] Resend request failed", {
+        status: response.status,
+        body,
+        from,
+        reply_to: replyTo,
+        to: customerEmail,
+      });
       throw new Error(`Resend request failed: ${response.status} ${body}`);
     }
 
