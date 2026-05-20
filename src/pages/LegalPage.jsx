@@ -2,7 +2,9 @@
  * LegalPage.jsx — #12
  * Wraps Privacy Policy / Terms with proper Navbar + Footer.
  */
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { setPageMetadata } from "@/lib/seo";
 
 const LEGAL_CONTENT = {
   privacy: {
@@ -38,6 +40,14 @@ const LEGAL_CONTENT = {
 export default function LegalPage() {
   const { type = "privacy" } = useParams();
   const content = LEGAL_CONTENT[type] || LEGAL_CONTENT.privacy;
+
+  useEffect(() => setPageMetadata({
+    title: `${content.title} | ClientSurge Systems`,
+    description: `Read the ClientSurge Systems ${content.title.toLowerCase()} and how we handle customer data, messaging, and service terms.`,
+    canonicalPath: `/legal/${type}`,
+    ogTitle: `${content.title} | ClientSurge Systems`,
+    ogDescription: `Review the latest ClientSurge Systems ${content.title.toLowerCase()} for lead capture, messaging, and service operations.`,
+  }), [content.title, type]);
 
   return (
     <div style={{ minHeight: "100vh", background: "#0A0F1E" }}>
