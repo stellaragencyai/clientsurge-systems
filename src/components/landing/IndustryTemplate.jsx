@@ -9,7 +9,8 @@ import IndustrySMSDemo from "../industry/IndustrySMSDemo";
 import IndustryResults from "../industry/IndustryResults";
 import IndustryFAQ from "../industry/IndustryFAQ";
 import { getIndustryBySlug } from "@/lib/industryData";
-import { setPageMetadata } from "@/lib/seo";
+import { getFAQSchema } from "../SEO/SchemaMarkup";
+import { setJsonLd, setPageMetadata } from "@/lib/seo";
 
 function IndustryTemplateInner({ industrySlug }) {
   const industry = getIndustryBySlug(industrySlug);
@@ -18,13 +19,20 @@ function IndustryTemplateInner({ industrySlug }) {
 
   useEffect(() => {
     if (!industry) return;
-    return setPageMetadata({
+
+    const cleanupMetadata = setPageMetadata({
       title: `${industry.name} AI Automation | ClientSurge Systems`,
       description: industry.hero?.subheadline || `Done-for-you AI lead response and booking automation for ${industry.name}.`,
       canonicalPath: `/${industrySlug}`,
       ogTitle: `${industry.name} AI Automation | ClientSurge Systems`,
       ogDescription: industry.hero?.subheadline || `AI automation built specifically for ${industry.name}.`,
     });
+    const cleanupFaq = setJsonLd(`industry-faq-${industrySlug}`, getFAQSchema(industry.faqs || []));
+
+    return () => {
+      cleanupFaq?.();
+      cleanupMetadata?.();
+    };
   }, [industry, industrySlug]);
 
   if (notFound || !industry) {

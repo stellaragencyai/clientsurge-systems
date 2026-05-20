@@ -146,9 +146,31 @@ export async function handleTrustedResendWebhook({ base44, payload }) {
   });
 
   if (events.length > 0) {
-    await base44.entities.CommunicationEvent.update(events[0].id, {
+    await base44.asServiceRole.entities.CommunicationEvent.update(events[0].id, {
       status,
     });
+
+    if (type === "email.opened") {
+      const event = events[0];
+      const engagementAt = new Date().toISOString();
+      const leadEmail = data?.to?.[0] || null;
+
+      if (event?.lead_id) {
+        await base44.asServiceRole.entities.SpaLead.update(event.lead_id, {
+          last_engagement_at: engagementAt,
+        }).catch(() => {});
+      } else if (leadEmail) {
+        const leads = await base44.asServiceRole.entities.SpaLead.filter({
+          email: leadEmail,
+        }).catch(() => []);
+
+        if (leads?.[0]?.id) {
+          await base44.asServiceRole.entities.SpaLead.update(leads[0].id, {
+            last_engagement_at: engagementAt,
+          }).catch(() => {});
+        }
+      }
+    }
   }
 
   return {

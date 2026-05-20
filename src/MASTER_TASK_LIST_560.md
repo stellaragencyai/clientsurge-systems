@@ -154,7 +154,7 @@
 | 10 | ✅ | Store page: implement intersection-observer lazy rendering for 8+ products | MEDIUM  Agent Smith |
 | 11 | ✅ | Build out pages/ThankYou - currently a blank page | HIGH |
 | 12 | ✅ | Add Navbar to LegalPage - currently renders with no header/branding | MEDIUM  Agent Smith |
-| 13 | ⏳ | Standardize all form inputs to rounded-xl (12px) globally | LOW |
+| 13 | ✅ | Standardize all form inputs to rounded-xl (12px) globally | LOW | Trinity |
 | 14 | ✅ | ClientPortal loading state: replace raw spinner with branded skeleton | MEDIUM  Agent Smith |
 | 15 | ✅ | DemoBookingModal time slot grid: force 2-col on viewports < 480px | MEDIUM  Agent Smith |
 | 16 | ✅ | CookieConsent banner: add bottom: 80px on mobile to avoid MobileCallBar overlap | LOW |
@@ -241,7 +241,7 @@
 | 62 | ✅ | Add manifest.json + minimal service worker for PWA installability | LOW  Trinity |
 | 63 | ✅ | Move all Recharts imports inside lazy() components - audit AdminDashboard/Portal | MEDIUM  Agent Smith |
 | 64 | ✅ | Add ?w=800&q=80 Unsplash query params + srcSet to all hero/industry images | MEDIUM  Agent Smith |
-| 65 | 🔄 | Remove three.js from package.json if not actively used (saves ~600KB) | HIGH |
+| 65 | ✅ | Remove three.js from package.json if not actively used (saves ~600KB) | HIGH | Trinity |
 | 66 | ✅ | Subset Google Fonts: Inter 400/500/600/700 + Playfair 400/600/700 only | MEDIUM  Agent Smith |
 
 ---
@@ -373,7 +373,7 @@
 | 132 | ✅ | sendDemoConfirmationEmail: verify scheduled_date/time display correctly in all timezones | MEDIUM  Agent Smith |
 | 133 | ✅ | sendClientWelcomeEmail: ensure it links to correct client portal URL | HIGH | Agent Smith |
 | 134 | ✅ | receiveResendWebhook: on email bounce, update CommunicationEvent status to "failed" | MEDIUM  Agent Smith |
-| 135 | ⏳ | receiveResendWebhook: on email open, update lead.last_engagement_at | LOW |
+| 135 | ✅ | receiveResendWebhook: on email open, update lead.last_engagement_at | LOW | Trinity |
 
 ---
 
@@ -878,10 +878,10 @@
 |---|---|---|---|
 | 341 | ✅ | seo.js: DEFAULT_OG_IMAGE points to base44.com CDN - host og-image.png at clientsurgesystems.com/og-image.png and update | HIGH | Agent Smith |
 | 342 | ✅ | index.html: missing viewport-fit=cover in meta viewport tag - needed for iPhone notch safe area | MEDIUM  Trinity |
-| 343 | ⏳ | index.html: Space Grotesk font loaded but rarely used - remove to save 60KB on initial load | MEDIUM |
+| 343 | ✅ | index.html: Space Grotesk font loaded but rarely used - remove to save 60KB on initial load | MEDIUM | Trinity |
 | 344 | ✅ | Add canonical tag to every industry page using setPageMetadata - currently setJsonLd is called but canonical may be missing | HIGH | Agent Smith |
 | 345 | ✅ | MedSpa.jsx calls setPageMetadata - verify Dental, Chiro, HVAC, Roofing, Contractors pages also call it (IndustryTemplate may not) | HIGH  Agent Smith |
-| 346 | ⏳ | SchemaMarkup.jsx getFAQSchema is used on MedSpa only - add FAQ schema to all 6 industry pages | MEDIUM |
+| 346 | ✅ | SchemaMarkup.jsx getFAQSchema is used on MedSpa only - add FAQ schema to all 6 industry pages | MEDIUM | Trinity |
 | 347 | ⏳ | Footer: "Tanning Salons" industry missing from footer nav links - only 5 industries listed, should be 6 | MEDIUM |
 | 348 | ✅ | Footer: Roofing and Contractors pages missing from footer nav - add all active industry routes | MEDIUM | Trinity |
 | 349 | ⏳ | Add /sitemap.xml route that reads from AdminSettings or returns hardcoded XML including all industry pages | MEDIUM |
