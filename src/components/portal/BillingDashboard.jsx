@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import {
+  getCurrentPackageKey,
+  getSubscriptionChangeOptions,
+  getSubscriptionChangeOrderId,
+} from '@/lib/subscriptionChangeOptions';
+import {
   CreditCard, Download, ExternalLink, Loader2, AlertCircle,
   CheckCircle2, Clock, RefreshCw, FileText, ShieldCheck, Zap,
   XCircle, ChevronDown, ChevronUp, BadgeCheck, AlertTriangle,
+  ArrowRight,
 } from 'lucide-react';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
@@ -134,6 +140,198 @@ function SubscriptionCard({ sub, onManage, managing }) {
   );
 }
 
+function SubscriptionChangePanel({
+  project,
+  order,
+  subscription,
+  onChanged,
+}) {
+  const currentPackageKey = getCurrentPackageKey({ project, subscription, order });
+  const orderId = getSubscriptionChangeOrderId({ project, subscription, order });
+  const options = getSubscriptionChangeOptions({ project, subscription, order });
+  const [selectedKey, setSelectedKey] = useState('');
+  const [previewing, setPreviewing] = useState(false);
+  const [applying, setApplying] = useState(false);
+  const [preview, setPreview] = useState(null);
+  const [changeError, setChangeError] = useState('');
+  const [changeSuccess, setChangeSuccess] = useState('');
+
+  const selectedPlan = options.find((plan) => plan.package_key === selectedKey) || null;
+  const canRequestChange = Boolean(orderId && selectedPlan && !selectedPlan.is_current);
+
+  const previewChange = async () => {
+    if (!canRequestChange) return;
+    setPreviewing(true);
+    setChangeError('');
+    setChangeSuccess('');
+    setPreview(null);
+
+    try {
+      const res = await base44.functions.invoke('requestSubscriptionChange', {
+        order_id: orderId,
+        new_price_id: selectedPlan.monthly_price_id,
+        preview_only: true,
+      });
+      setPreview(res.data || res);
+    } catch (err) {
+      setChangeError(
+        err?.response?.data?.error ||
+          err?.data?.error ||
+          err?.message ||
+          'Unable to preview this subscription change.'
+      );
+    } finally {
+      setPreviewing(false);
+    }
+  };
+
+  const applyChange = async () => {
+    if (!canRequestChange || !preview) return;
+    setApplying(true);
+    setChangeError('');
+    setChangeSuccess('');
+
+    try {
+      await base44.functions.invoke('requestSubscriptionChange', {
+        order_id: orderId,
+        new_price_id: selectedPlan.monthly_price_id,
+        preview_only: false,
+      });
+      setChangeSuccess(`Subscription change to ${selectedPlan.name} submitted.`);
+      setPreview(null);
+      setSelectedKey('');
+      onChanged?.();
+    } catch (err) {
+      setChangeError(
+        err?.response?.data?.error ||
+          err?.data?.error ||
+          err?.message ||
+          'Unable to apply this subscription change.'
+      );
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  if (!currentPackageKey && !orderId) {
+    return null;
+  }
+
+  return (
+    <div className="rounded-2xl border border-border bg-white shadow-sm overflow-hidden">
+      <div className="px-5 py-4 border-b border-border">
+        <h3 className="font-semibold text-foreground flex items-center gap-2">
+          <ArrowRight className="w-4 h-4 text-primary" />
+          Upgrade or Downgrade
+        </h3>
+        <p className="text-xs text-muted-foreground mt-1">
+          Preview Stripe proration before changing your monthly package.
+        </p>
+      </div>
+
+      <div className="p-5 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {options.map((plan) => {
+            const isSelected = selectedKey === plan.package_key;
+            return (
+              <button
+                key={plan.package_key}
+                type="button"
+                disabled={plan.is_current || previewing || applying}
+                onClick={() => {
+                  setSelectedKey(plan.package_key);
+                  setPreview(null);
+                  setChangeError('');
+                  setChangeSuccess('');
+                }}
+                className={`text-left rounded-xl border-2 p-4 transition-colors ${
+                  plan.is_current
+                    ? 'border-green-300 bg-green-50 cursor-default'
+                    : isSelected
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-primary/40 hover:bg-muted/30'
+                } disabled:opacity-80`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm font-bold text-foreground">{plan.name}</p>
+                  {plan.is_current && (
+                    <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                      Current
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm font-semibold text-primary mt-1">{fmtDollars(plan.monthly_total)} / month</p>
+                <p className="text-xs text-muted-foreground mt-2 leading-relaxed">{plan.description}</p>
+              </button>
+            );
+          })}
+        </div>
+
+        {!orderId && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            This portal account is missing a linked order ID, so package changes need support review.
+          </div>
+        )}
+
+        {selectedPlan && !selectedPlan.is_current && (
+          <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">Change to {selectedPlan.name}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  First preview the prorated invoice impact, then confirm the change.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={previewChange}
+                disabled={!canRequestChange || previewing || applying}
+                className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white disabled:opacity-60"
+                style={{ background: 'linear-gradient(135deg,#0088CC,#003B8F)' }}
+              >
+                {previewing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                {previewing ? 'Previewing...' : 'Preview Proration'}
+              </button>
+            </div>
+
+            {preview && (
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-lg border border-border bg-white p-3">
+                <div className="flex-1">
+                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Proration Preview</p>
+                  <p className="text-sm font-semibold text-foreground mt-0.5">
+                    {fmtCents(preview.proration_cents || 0)} prorated adjustment
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={applyChange}
+                  disabled={applying}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-green-700 hover:bg-green-800 disabled:opacity-60"
+                >
+                  {applying ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                  {applying ? 'Applying...' : 'Confirm Change'}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {changeSuccess && (
+          <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+            <CheckCircle2 className="w-4 h-4" /> {changeSuccess}
+          </div>
+        )}
+
+        {changeError && (
+          <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <AlertCircle className="w-4 h-4" /> {changeError}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function InvoiceRow({ inv }) {
   const isPaid = inv.status === 'paid';
 
@@ -195,7 +393,7 @@ function InvoiceRow({ inv }) {
 
 // ─── main component ───────────────────────────────────────────────────────────
 
-export default function BillingDashboard({ project, subscription }) {
+export default function BillingDashboard({ project, order, subscription, onSubscriptionChanged }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -366,6 +564,16 @@ export default function BillingDashboard({ project, subscription }) {
       )}
 
       {/* ── Security note ─────────────────────────────────────── */}
+      <SubscriptionChangePanel
+        project={project}
+        order={order}
+        subscription={subscription}
+        onChanged={() => {
+          load();
+          onSubscriptionChanged?.();
+        }}
+      />
+
       <div className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
         <ShieldCheck className="w-4 h-4 flex-shrink-0 text-green-600" />
         <span>Payment details are managed securely by <strong>Stripe</strong>. We never store your full card number.</span>

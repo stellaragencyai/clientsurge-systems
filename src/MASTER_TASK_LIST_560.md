@@ -522,9 +522,9 @@
 | 214 | ✅ | Add Google Analytics 4 event tracking for: purchase, demo_booked, lead_submitted | HIGH  Agent Smith |
 | 215 | ✅ | Set up error alerting: admin email on any backend function 5xx error | HIGH | Agent Smith |
 | 216 | ✅ | Document all environment variables in a README_ENV.md file | MEDIUM  Agent Smith |
-| 217 | ⏳ | Create runbook: what to do when Twilio is down / Resend is down / Stripe is down | MEDIUM |
+| 217 | ✅ | Create runbook: what to do when Twilio is down / Resend is down / Stripe is down | MEDIUM | Morpheus |
 | 218 | ✅ | Verify all secrets are set in production (not just dev) environment | CRITICAL |
-| 219 | ⏳ | Load test: simulate 50 concurrent lead submissions and measure response time | MEDIUM |
+| 219 | ⏳ | Load test: simulate 50 concurrent lead submissions and measure response time - harness added; needs local/staging endpoint run | MEDIUM | Morpheus partial |
 
 ---
 
@@ -604,6 +604,7 @@
 
 | Date | Agent | Change |
 |---|---|---|
+| 2026-05-20 | Morpheus | #217 ✅ + #219 partial + #385 partial - added provider outage runbook for Twilio/Resend/Stripe, added safe local/staging-only 50-concurrent lead submission load-test harness, fixed AuditLog helper schema fields, added AuditLog writes for admin lead status and install status mutations, and paginated CommunicationEvent admin logs. Verified with focused node tests. |
 | 2026-05-20 | Trinity | PL-18 + PL-30 + PL-33 + PL-35 + PL-89 ✅ - advanced the 100-task push to 75/100 by verifying the existing `index.html` noscript fallback, confirming `ServiceDetailModal` no longer has duplicate CTA style props, documenting one service license per cart line item, verifying the checkout footer already links cancellation/refund policy language before payment, and confirming Google Fonts are loaded from the document head with preload instead of CSS `@import`. Verified with direct code inspection plus `npm run build`. |
 | 2026-05-20 | Trinity | PL-4 + PL-11 + PL-12 + PL-13 + PL-16 + PL-17 + PL-20 + PL-22 + PL-23 + PL-24 + PL-27 + PL-28 + PL-29 + PL-32 + PL-34 + PL-36 + PL-37 + PL-46 + PL-48 + PL-52 + PL-53 + PL-54 + PL-71 + PL-78 + PL-85 ✅ - completed the final 25-task push to 100/100 with real Order-backed store social proof, 2-second chat send cooldown, shorter mobile nav, consistent store page background, FAQ mobile focus hardening, integration-logo text fallbacks, checkout cart clearing, complementary cart upsell, admin purchase notification queuing, admin skeleton fallback, dedup-key protection on lead-created automation, submitLeadCapture 3/IP/hour rate limiting, and canonical metadata on section redirects. Verified additional already-satisfied items by code inspection: LeadLeakage count-up, order success sessionStorage summary, Stripe webhook signature verification, ProductCard mobile Popular badge placement, checkout metadata.base44_app_id, once-per-session bundle toast, portal login error handling + forgot-password flow, Install Queue refresh, admin onboarding phone validation, Admin Leads search, and lead CSV export. `npx eslint` on touched frontend files passed; `npm run build` and `npx vite build --configLoader runner` were blocked before app compilation by local `spawn EPERM` while Vite/esbuild loaded config. |
 | 2026-05-20 | Trinity | #288 + #348 + #358 + PL-6 + PL-84 ✅ - extended `setPageMetadata` coverage across `Start`, `Success`, and legal pages so Twitter/Open Graph tags follow those routes too; switched `MobileCallBar` to load `AdminSettings.twilio_from_number` with a safe fallback/formatting; verified the homepage still renders `Testimonials`, the footer already includes Roofing + Contractors industry links, and industry sub-pages already set unique metadata via `IndustryTemplate`. Verified with `npm run build`. |
@@ -763,11 +764,11 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 289 | ⏳ | Add preconnect and dns-prefetch for Stripe, Twilio, Resend CDNs in index.html | MEDIUM |
+| 289 | ✅ | Add preconnect and dns-prefetch for Stripe, Twilio, Resend CDNs in index.html | MEDIUM | Morpheus |
 | 290 | ✅ | Add manifest.json with name, icons, theme_color for PWA installability | LOW  Trinity |
 | 291 | ✅ | Add Vite manualChunks to split recharts, framer-motion, lucide into separate bundles | MEDIUM  Trinity |
 | 292 | ✅ | Add loading=lazy attribute to ALL below-fold images site-wide | HIGH  Agent Smith |
-| 293 | ⏳ | Subset Google Fonts - load only Inter 400/500/600/700 + Playfair 400/600 instead of full family | MEDIUM |
+| 293 | ✅ | Subset Google Fonts - load only Inter 400/500/600/700 + Playfair 400/600 instead of full family | MEDIUM | Morpheus |
 
 ---
 
@@ -816,7 +817,7 @@
 | 304 | ✅ | createCheckoutSession: verify it uses sk_live_ not sk_test_ - check STRIPE_SECRET_KEY env var is set to live key | CRITICAL |
 | 305 | ✅ | Add Stripe Customer Portal link to BillingDashboard - getStripeCustomerPortalUrl is deployed but never called | HIGH | Agent Smith |
 | 306 | ✅ | getClientInvoices function is deployed - wire it to BillingDashboard so real invoice history shows (currently blank) | HIGH | Agent Smith |
-| 307 | ⏳ | requestSubscriptionChange function is deployed - wire "Upgrade/Downgrade" button in BillingDashboard to call it | MEDIUM |
+| 307 | ✅ | requestSubscriptionChange function is deployed - wire "Upgrade/Downgrade" button in BillingDashboard to call it | MEDIUM | Morpheus + Agent A |
 | 308 | ✅ | stripeWebhookOrders: add handling for customer.subscription.deleted to set Order status = cancelled and notify Nolan | HIGH | Agent Smith |
 | 309 | ✅ | Add post-checkout redirect from Stripe back to /client-portal with session_id param so portal auto-loads after purchase | HIGH | Agent Smith |
 | 310 | ✅ | Add Stripe test mode warning banner in Admin panel - show red "TEST MODE ACTIVE" badge if STRIPE_SECRET_KEY starts with sk_test_ | HIGH | Agent Smith |
@@ -950,7 +951,7 @@
 | 382 | ✅ | secureFormSubmission function exists but verify submitLeadCapture and submitContactInquiry actually call it (not duplicate logic) | HIGH  Agent Smith |
 | 383 | ✅ | authGuards.js shared lib exists - audit which functions import and use it vs which skip it entirely | HIGH  Agent Smith |
 | 384 | ✅ | webhookSecurity.js and webhookValidation shared libs exist - verify receiveTwilioInboundSms validates Twilio signature header | CRITICAL |
-| 385 | ⏳ | AuditLog entity exists in schema - verify admin actions (lead updates, order changes) actually write to it | MEDIUM |
+| 385 | ⏳ | AuditLog entity exists in schema - lead status + install status admin actions now write AuditLog; broader admin action audit still open | MEDIUM | Morpheus partial |
 | 386 | ⏳ | legacyQuarantine.js shared lib exists - identify and remove all legacy function references it wraps | MEDIUM |
 | 387 | ✅ | Base44 vite.config.js has legacySDKImports set to env var - ensure BASE44_LEGACY_SDK_IMPORTS=false in production | HIGH  Agent Smith |
 | 388 | ✅ | manageWebhookRegistration function deployed - ensure webhook secrets are stored encrypted, not in plain text in WebhookRegistration entity | HIGH  Agent Smith |

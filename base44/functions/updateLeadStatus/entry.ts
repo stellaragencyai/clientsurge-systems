@@ -1,5 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
+import { createAuditLog } from "../shared/auditLog.ts";
 import {
   buildLeadStatusEvent,
   LEAD_STATUSES,
@@ -12,7 +13,7 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    await requireAdminUser(base44);
+    const user = await requireAdminUser(base44);
 
     const payload = await req.json().catch(() => ({}));
     const leadId = payload?.lead_id;
@@ -62,6 +63,24 @@ Deno.serve(async (req) => {
         note,
       })
     );
+    await createAuditLog(base44, {
+      admin_email: user.email || "unknown_admin",
+      action: "update_lead_status",
+      entity_name: "Leads",
+      record_id: leadId,
+      before: {
+        status: lead.status,
+        last_activity_at: lead.last_activity_at || null,
+        last_contacted_at: lead.last_contacted_at || null,
+      },
+      after: {
+        status: updatedLead.status,
+        last_activity_at: updatedLead.last_activity_at || null,
+        last_contacted_at: updatedLead.last_contacted_at || null,
+        communication_event_id: event.id,
+      },
+      notes: note || "",
+    });
 
     return Response.json({
       success: true,

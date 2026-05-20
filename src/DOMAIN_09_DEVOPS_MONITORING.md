@@ -55,7 +55,7 @@
 | 158 | ⏳ | Add standardized console.log format to all functions: [functionName] msg {ctx} | B | — | — | — | ~1 hr |
 | 159 | ⏳ | Verify all functions return proper HTTP status codes (not always 200) | B | — | — | — | ~45 min |
 | 216 | ⏳ | Document all environment variables in README_ENV.md | C | — | — | — | ~30 min |
-| 217 | ⏳ | Create runbook: Twilio down / Resend down / Stripe down scenarios | C | — | — | — | ~1 hr |
+| 217 | ✅ | Create runbook: Twilio down / Resend down / Stripe down scenarios | C | docs/RUNBOOK_OUTAGE.md | Morpheus | 2026-05-20 | ~1 hr |
 | 219 | ⏳ | Load test: simulate 50 concurrent lead submissions, measure response time | C | — | — | — | ~1 hr |
 
 ---

@@ -1,4 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
+import { createAuditLog } from "../shared/auditLog.ts";
 
 const VALID_TRANSITIONS = {
   "Paid": ["Ready for Install"],
@@ -26,10 +28,7 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    if (!user || user.role !== "admin") {
-      return Response.json({ error: "Admin access required" }, { status: 403 });
-    }
+    const user = await requireAdminUser(base44);
 
     const payload = await req.json().catch(() => ({}));
     const { order_id, service_key, install_status, note } = payload || {};
@@ -73,6 +72,23 @@ Deno.serve(async (req) => {
       last_install_event_at: timestamp,
       ...(updatedItems.every((i) => i.install_status === "Live") ? { order_status: "fully_live" } : {}),
     });
+    await createAuditLog(base44, {
+      admin_email: user.email || "unknown_admin",
+      action: "update_install_status",
+      entity_name: "Order",
+      record_id: order_id,
+      before: {
+        service_key,
+        install_status: currentStatus,
+        pipeline_status: order.pipeline_status || null,
+      },
+      after: {
+        service_key,
+        install_status,
+        pipeline_status: updatedOrder.pipeline_status || newPipelineStatus,
+      },
+      notes: note || "",
+    });
 
     return Response.json({
       success: true,
@@ -83,6 +99,16 @@ Deno.serve(async (req) => {
       },
     });
   } catch (error) {
+    if (error instanceof AuthGuardError) {
+      return Response.json(
+        {
+          error: error.message,
+          code: error.code,
+        },
+        { status: error.status }
+      );
+    }
+
     console.error("[updateInstallStatus] Error:", error.message);
     return Response.json({ error: error.message || "Failed to update install status" }, { status: 500 });
   }

@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { AlertCircle, Check, Loader2, Send } from 'lucide-react';
+import {
+  COMMUNICATION_LOG_PAGE_SIZE,
+  getCommunicationLogFetchLimit,
+  getCommunicationLogOffset,
+  getCommunicationLogPage,
+  hasNextCommunicationLogPage,
+} from '@/lib/communicationLogPagination';
 
 export default function CommunicationLogsPanel() {
   const [logs, setLogs] = useState([]);
@@ -8,12 +15,18 @@ export default function CommunicationLogsPanel() {
   const [filter, setFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
   const [reassignModal, setReassignModal] = useState(null);
+  const [page, setPage] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
 
   useEffect(() => {
-    loadLogs();
+    setPage(0);
   }, [filter]);
 
-  const loadLogs = async () => {
+  useEffect(() => {
+    loadLogs(page);
+  }, [filter, page]);
+
+  const loadLogs = async (nextPage = page) => {
     try {
       setLoading(true);
       let query = {};
@@ -24,14 +37,21 @@ export default function CommunicationLogsPanel() {
         query = { context_type: 'inbound_sms_unmatched' };
       }
 
+      const fetchLimit = getCommunicationLogFetchLimit({ page: nextPage });
       const data = await base44.asServiceRole.entities.CommunicationEvent.filter(
         query,
         '-created_date',
-        100
+        fetchLimit
       );
-      setLogs(data || []);
+      const pageLogs = getCommunicationLogPage(data, { page: nextPage });
+      setLogs(pageLogs);
+      setHasNextPage(hasNextCommunicationLogPage(
+        (data || []).slice(getCommunicationLogOffset({ page: nextPage }) + COMMUNICATION_LOG_PAGE_SIZE),
+        COMMUNICATION_LOG_PAGE_SIZE
+      ));
     } catch (error) {
       console.error('Failed to load logs:', error);
+      setHasNextPage(false);
     } finally {
       setLoading(false);
     }
@@ -69,7 +89,7 @@ export default function CommunicationLogsPanel() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-foreground">Communication Logs</h2>
         <button
-          onClick={() => loadLogs()}
+          onClick={() => loadLogs(page)}
           className="px-3 py-1.5 bg-primary text-primary-foreground text-sm rounded hover:bg-primary/90 transition"
         >
           Refresh
@@ -206,6 +226,26 @@ export default function CommunicationLogsPanel() {
           ))}
         </div>
       )}
+
+      <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <span>Page {page + 1}</span>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPage((current) => Math.max(0, current - 1))}
+            disabled={page === 0 || loading}
+            className="px-3 py-1.5 border border-border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => setPage((current) => current + 1)}
+            disabled={!hasNextPage || loading}
+            className="px-3 py-1.5 border border-border rounded disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted transition"
+          >
+            Next
+          </button>
+        </div>
+      </div>
 
       {reassignModal && (
         <ReassignModal

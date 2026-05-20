@@ -313,7 +313,7 @@ export default function ClientPortal() {
           <FilesPanel project={project} />
         )}
         {activeTab === "billing" && (
-          <BillingDashboard project={project} subscription={subscription} />
+          <BillingDashboard project={project} order={portalOrder} subscription={subscription} onSubscriptionChanged={refreshProject} />
         )}
         {activeTab === "support" && (
           <SupportChat project={project} user={user} />

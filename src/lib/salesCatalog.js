@@ -269,7 +269,7 @@ export const CANONICAL_SERVICE_PRODUCTS = PUBLIC_STORE_PRODUCTS.filter(
   (product) => product.checkout_enabled
 );
 
-const PACKAGE_DEFINITIONS = [
+export const PACKAGE_DEFINITIONS = [
   {
     package_key: "starter_system",
     name: "Starter System",
@@ -324,12 +324,16 @@ const PACKAGE_DEFINITIONS = [
 
 export const PACKAGE_KEY_ALIASES = {
   starter: "starter_system",
+  "starter system": "starter_system",
   starter_system: "starter_system",
   growth: "growth_system",
+  "growth system": "growth_system",
   growth_system: "growth_system",
   elite: "elite_system",
+  "elite system": "elite_system",
   elite_system: "elite_system",
   pro: "elite_system",
+  "pro system": "elite_system",
   pro_system: "elite_system",
 };
 
