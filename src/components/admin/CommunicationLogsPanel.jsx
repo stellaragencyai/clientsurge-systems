@@ -6,7 +6,6 @@ import {
   getCommunicationLogFetchLimit,
   getCommunicationLogOffset,
   getCommunicationLogPage,
-  hasNextCommunicationLogPage,
 } from '@/lib/communicationLogPagination';
 
 export default function CommunicationLogsPanel() {
@@ -45,10 +44,7 @@ export default function CommunicationLogsPanel() {
       );
       const pageLogs = getCommunicationLogPage(data, { page: nextPage });
       setLogs(pageLogs);
-      setHasNextPage(hasNextCommunicationLogPage(
-        (data || []).slice(getCommunicationLogOffset({ page: nextPage }) + COMMUNICATION_LOG_PAGE_SIZE),
-        COMMUNICATION_LOG_PAGE_SIZE
-      ));
+      setHasNextPage((data || []).length > getCommunicationLogOffset({ page: nextPage }) + COMMUNICATION_LOG_PAGE_SIZE);
     } catch (error) {
       console.error('Failed to load logs:', error);
       setHasNextPage(false);
