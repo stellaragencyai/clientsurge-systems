@@ -1628,6 +1628,11 @@ export async function initializePaidOrderInstallPipeline({
     install_configuration: installConfiguration,
   };
   const purchaseOnboardingHandoff = buildPurchaseOnboardingHandoff({ order: provisionalOrder });
+  const installConfigurationWithHandoff = {
+    ...installConfiguration,
+    package_activation_context: purchaseOnboardingHandoff,
+    purchase_onboarding_handoff: purchaseOnboardingHandoff,
+  };
   const pipelineStatus = derivePipelineStatus(provisionalOrder);
   let client;
   let clientProject;
@@ -1689,7 +1694,7 @@ export async function initializePaidOrderInstallPipeline({
     onboarding_client_id: onboardingClient.id,
     items: initializedItems,
     install_initialized_at: alreadyInitialized ? order.install_initialized_at : now,
-    install_configuration: installConfiguration,
+    install_configuration: installConfigurationWithHandoff,
     activation_package_tier: purchaseOnboardingHandoff.package_tier,
     activation_package_key: purchaseOnboardingHandoff.package_key,
     activation_package_name: purchaseOnboardingHandoff.package_name,
@@ -1710,7 +1715,7 @@ export async function initializePaidOrderInstallPipeline({
     order: {
       ...updatedOrder,
       items: initializedItems,
-      install_configuration: installConfiguration,
+      install_configuration: installConfigurationWithHandoff,
     },
     now,
   });
@@ -1788,7 +1793,7 @@ export async function initializePaidOrderInstallPipeline({
     order: {
       ...updatedOrder,
       items: initializedItems,
-      install_configuration: installConfiguration,
+      install_configuration: installConfigurationWithHandoff,
       purchase_onboarding_handoff: purchaseOnboardingHandoff,
       pipeline_status: pipelineStatus,
     },

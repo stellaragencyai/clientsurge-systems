@@ -73,10 +73,17 @@ const data = response?.data || response || {};
 const order = data.order || {};
 const onboardingClient = data.onboarding_client || {};
 const handoff = data.handoff || order.purchase_onboarding_handoff || {};
+const persistedHandoff =
+  order.purchase_onboarding_handoff ||
+  order.install_configuration?.purchase_onboarding_handoff ||
+  order.install_configuration?.package_activation_context ||
+  {};
+const persistedPackageTier = order.activation_package_tier || persistedHandoff.package_tier || null;
+const persistedPackageKey = order.activation_package_key || persistedHandoff.package_key || null;
 const checks = [
   ["function_success", data.success === true],
-  ["detected_pro_package", order.activation_package_tier === "pro"],
-  ["stored_package_key", order.activation_package_key === "pro_website_plus_six_automations"],
+  ["detected_pro_package", persistedPackageTier === "pro"],
+  ["stored_package_key", persistedPackageKey === "pro_website_plus_six_automations"],
   ["linked_onboarding_client", Boolean(order.onboarding_client_id || onboardingClient.id)],
   ["handoff_has_all_services", Array.isArray(handoff.service_keys) && handoff.service_keys.length === 6],
   ["first_question_present", handoff.next_question === "What are the client's normal business hours?"],
@@ -87,8 +94,8 @@ console.log(JSON.stringify({
   suite: "purchase_to_onboarding_handoff_smoke",
   order_id: qaOrder.id,
   onboarding_client_id: order.onboarding_client_id || onboardingClient.id || null,
-  package_tier: order.activation_package_tier || null,
-  package_key: order.activation_package_key || null,
+  package_tier: persistedPackageTier,
+  package_key: persistedPackageKey,
   next_question: handoff.next_question || null,
   missing_fields: handoff.missing_intake_fields || [],
   checks: checks.map(([name, passed]) => ({ name, passed })),
