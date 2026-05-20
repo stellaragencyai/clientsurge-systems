@@ -15,6 +15,23 @@ const FOLLOW_UP_STEPS = [
   { step: 4, minutesAfter: 1440, channel: "email", key: "missed_call_email_24hr" },
 ];
 
+// #128: opt-out footer
+function appendOptOut(msg) {
+  if ((msg || "").toLowerCase().includes("reply stop")) return msg;
+  return msg + "\n\nReply STOP to unsubscribe.";
+}
+
+// #129: idempotent step increment — re-reads before writing
+async function incrementStepSafely(base44, leadId, field, currentVal) {
+  const fresh = await base44.asServiceRole.entities.SpaLead.get(leadId).catch(() => null);
+  if (!fresh || fresh[field] !== currentVal) {
+    console.log(`[processMissedCallFollowUps] Idempotency: ${field} changed concurrently, skipping`);
+    return false;
+  }
+  await base44.asServiceRole.entities.SpaLead.update(leadId, { [field]: (currentVal || 0) + 1 });
+  return true;
+}
+
 function minutesSince(isoDate) {
   if (!isoDate) return 0;
   return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60);

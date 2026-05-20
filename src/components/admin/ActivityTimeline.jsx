@@ -5,10 +5,9 @@
 
 import { useEffect, useState } from "react";
 import {
-  MessageSquare, Mail, Phone, Loader2, RefreshCw,
+  MessageSquare, Mail, Loader2, RefreshCw,
   StickyNote, ArrowUpCircle, Zap, CheckCircle2,
-  AlertCircle, MessageCircle, Globe, ArrowDownLeft,
-  ArrowUpRight, Activity, Info, ChevronDown, ChevronUp,
+  AlertCircle, MessageCircle, Globe, ArrowDownLeft, Activity, Info, ChevronDown, ChevronUp,
   ThumbsUp, ThumbsDown, Minus, ListChecks, Mic,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";

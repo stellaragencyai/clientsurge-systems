@@ -1,10 +1,16 @@
+// redeployed 2026-05-02
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    await requireAdminUser(base44);
+
+    // Allow scheduled automation (no user) or admin
+    let user = null;
+    try { user = await base44.auth.me(); } catch (_) {}
+    if (user && user.role !== "admin") {
+      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    }
 
     const { niche, city, state, radius = 25, require_website = false, min_rating = 0 } =
       await req.json();
@@ -85,11 +91,8 @@ Deno.serve(async (req) => {
       leads_updated: leadsUpdated,
     });
   } catch (error) {
-    const status = error instanceof AuthGuardError ? error.status : 500;
-    const code = error instanceof AuthGuardError ? error.code : undefined;
-    const message = error instanceof Error ? error.message : "Failed to discover leads";
-
-    return Response.json({ error: message, code }, { status });
+    console.error("[discoverLeads] Fatal error:", error.message);
+    return Response.json({ error: error.message || "Failed to discover leads" }, { status: 500 });
   }
 });
 

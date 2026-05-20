@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Accordion,
   AccordionContent,
@@ -25,7 +25,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "How fast can I get set up?",
-  a: "Most clients are fully live within 5-7 business days. We do the work. You just need to show up for one onboarding call.",
+  a: "Most clients are fully live within 24-48 hours. We do the work. You just need to show up for one onboarding call.",
   category: "setup"
 },
 {
@@ -40,7 +40,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "How much does it cost?",
-  a: "Plans start at $497/month with a one-time setup fee. We have three tiers - Starter, Growth, and Elite - depending on your lead volume and goals. See our Pricing section for full details, and we will confirm the best fit on your demo call.",
+  a: "Plans start at $497/month with a one-time setup fee. We have three tiers - Starter, Growth, and Elite - depending on your lead volume and goals. See our Pricing section for full details.",
   category: "pricing"
 },
 {
@@ -70,7 +70,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "How do I know if this is the right investment for my business?",
-  a: "That is what the demo is for. We will show you the specific system we would build, what it costs, and the projected ROI based on your current lead volume and conversion rate. You will have concrete numbers before deciding.",
+  a: "We will walk you through the specific system we would build, what it costs, and the projected ROI based on your current lead volume and conversion rate. You will have concrete numbers before deciding.",
   category: "support"
 }];
 
@@ -78,12 +78,11 @@ export const FAQ_ITEMS = [
 export default function FAQ() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
-  const [expandedIndex, setExpandedIndex] = useState(0);
 
   const categories = ["all", "setup", "pricing", "integration", "support"];
   const categoryLabels = { all: "All", setup: "Getting Started", pricing: "Pricing", integration: "Integrations", support: "Support" };
 
-  const filtered = FAQ_ITEMS.filter((item, idx) => {
+  const filtered = FAQ_ITEMS.filter((item) => {
     const matchesSearch = item.q.toLowerCase().includes(search.toLowerCase()) || 
                          item.a.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = category === "all" || item.category === category;
@@ -94,13 +93,13 @@ export default function FAQ() {
     <section id="faq" className="px-6 pt-10 pb-24 md:pb-32 relative overflow-hidden bg-gradient-to-b from-card to-background">
 
       <div className="max-w-3xl mx-auto relative z-10">
-        <div className="text-center pt-10 mb-14">
+        <div className="text-center mb-14">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Questions</p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
            Frequently Asked Questions
           </h2>
           <p className="mt-4 text-muted-foreground text-base">
-            Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">See your specific gaps</a> or <a href="#pricing" className="text-primary font-semibold hover:underline">get your custom plan</a>
+            Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">See your specific gaps</a> or <a href="/#pricing" className="text-primary font-semibold hover:underline">get your custom plan</a>
           </p>
           <div className="mt-8 border-t border-border/40" />
         </div>
@@ -108,10 +107,16 @@ export default function FAQ() {
         {/* Search bar */}
         <div className="mb-6">
           <input
+            id="faq-search"
             type="text"
             placeholder="Search FAQs..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck="false"
+            aria-label="Search FAQs"
             className="w-full px-4 py-2.5 rounded-lg border border-border bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm"
           />
         </div>
@@ -124,7 +129,7 @@ export default function FAQ() {
               onClick={() => setCategory(cat)}
               className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-all ${
                 category === cat
-                  ? "bg-foreground text-background"
+                  ? "bg-primary text-primary-foreground"
                   : "bg-muted text-foreground hover:bg-muted/80"
               }`}
             >
@@ -134,7 +139,7 @@ export default function FAQ() {
         </div>
 
         {filtered.length > 0 ? (
-          <Accordion type="single" collapsible value={`faq-${expandedIndex}`} onValueChange={(val) => setExpandedIndex(parseInt(val.split("-")[1]))} className="space-y-3">
+          <Accordion type="single" collapsible className="space-y-3">
             {filtered.map((faq, idx) => (
               <motion.div
                 key={idx}
@@ -153,7 +158,7 @@ export default function FAQ() {
                     boxShadow: "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
                   }}
                 >
-                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded">
+                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded min-h-[48px] border-b border-border/20 last:border-b-0">
                     {faq.q}
                   </AccordionTrigger>
                   <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5 word-wrap break-words">

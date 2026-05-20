@@ -1,11 +1,23 @@
 /**
  * BulkActionToolbar — floating toolbar shown when leads are selected.
- * Supports: status change, drip sequence trigger, add note.
+ * Supports: status change, drip sequence trigger, add note, nurture campaign enroll, CSV export.
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+// #323: Clean Duplicates action
+async function handleDeduplicateSelected(selectedIds, base44Client) {
+  const results = await Promise.allSettled(
+    selectedIds.map(id => base44Client.functions.invoke("deduplicateLeads", { lead_id: id }))
+  );
+  const merged = results.filter(r => r.status === "fulfilled" && r.value?.duplicates_merged > 0).length;
+  return { merged, total: selectedIds.length };
+}
+
+
 import {
-  X, ChevronDown, CheckCircle, Loader2, MessageSquare, StickyNote, Tag, AlertCircle, Sparkles
+  X, ChevronDown, CheckCircle, Loader2, MessageSquare, StickyNote, Tag, AlertCircle, Sparkles,
+  Download, Phone, BookOpen
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -85,10 +97,64 @@ function NoteModal({ count, onConfirm, onClose, loading }) {
   );
 }
 
-export default function BulkActionToolbar({ selectedIds, onClearSelection, onActionComplete }) {
+function NurtureCampaignModal({ count, onConfirm, onClose, loading }) {
+  const [campaigns, setCampaigns] = useState([]);
+  const [selectedCampaign, setSelectedCampaign] = useState("");
+  const [loadingCampaigns, setLoadingCampaigns] = useState(true);
+
+  useEffect(() => {
+    base44.entities.NurtureCampaign.list("-created_date", 50)
+      .then(res => setCampaigns(res || []))
+      .catch(() => setCampaigns([]))
+      .finally(() => setLoadingCampaigns(false));
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-foreground">Enroll {count} Lead{count !== 1 ? "s" : ""} in Nurture Campaign</h3>
+          <button onClick={onClose} className="p-1 hover:bg-muted rounded-lg"><X className="w-4 h-4" /></button>
+        </div>
+        {loadingCampaigns ? (
+          <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
+            <Loader2 className="w-4 h-4 animate-spin" /> Loading campaigns…
+          </div>
+        ) : campaigns.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4">No nurture campaigns found. Create one in the Campaigns panel first.</p>
+        ) : (
+          <select
+            value={selectedCampaign}
+            onChange={e => setSelectedCampaign(e.target.value)}
+            className="w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="">Select a campaign…</option>
+            {campaigns.map(c => (
+              <option key={c.id} value={c.id}>{c.name || c.campaign_name || c.id}</option>
+            ))}
+          </select>
+        )}
+        <div className="flex gap-2 justify-end">
+          <button onClick={onClose} className="px-4 py-2 rounded-lg border border-border text-sm text-foreground hover:bg-muted">Cancel</button>
+          <button
+            onClick={() => onConfirm(selectedCampaign)}
+            disabled={loading || !selectedCampaign}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
+          >
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <BookOpen className="w-3.5 h-3.5" />}
+            Enroll Leads
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function BulkActionToolbar({ selectedIds, leads = [], onClearSelection, onActionComplete }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null); // { success, failed, message }
   const [showNoteModal, setShowNoteModal] = useState(false);
+  const [showNurtureModal, setShowNurtureModal] = useState(false);
 
   const count = selectedIds.length;
 
@@ -126,6 +192,57 @@ export default function BulkActionToolbar({ selectedIds, onClearSelection, onAct
   };
   const handleBulkEnrich = () => runAction("bulk_enrich");
 
+  const handleMarkContacted = () => runAction("status_change", { status: "Contacted" });
+
+  const handleNurtureEnroll = async (campaignId) => {
+    setLoading(true);
+    setResult(null);
+    let successCount = 0;
+    let failedCount = 0;
+    for (const lead_id of selectedIds) {
+      try {
+        await base44.functions.invoke("startNurtureCampaign", { lead_id, campaign_id: campaignId });
+        successCount++;
+      } catch {
+        failedCount++;
+      }
+    }
+    setResult({
+      success: true,
+      message: `✓ ${successCount} enrolled in campaign${failedCount > 0 ? ` · ${failedCount} failed` : ""}`,
+    });
+    setShowNurtureModal(false);
+    onActionComplete?.();
+    setTimeout(() => { setResult(null); onClearSelection(); }, 2500);
+    setLoading(false);
+  };
+
+  // CSV export — uses the leads array passed in (filtered list)
+  const handleExportCSV = () => {
+    const exportLeads = leads.length > 0
+      ? leads.filter(l => selectedIds.length === 0 || selectedIds.includes(l.id))
+      : [];
+    if (exportLeads.length === 0) return;
+
+    const fields = ["full_name", "business_name", "email", "phone", "status", "lead_score", "source", "intake_type", "last_contacted_at", "next_follow_up_at", "created_date"];
+    const header = fields.join(",");
+    const rows = exportLeads.map(l =>
+      fields.map(f => {
+        const val = l[f] ?? "";
+        const str = String(val).replace(/"/g, '""');
+        return str.includes(",") || str.includes('"') || str.includes("\n") ? `"${str}"` : str;
+      }).join(",")
+    );
+    const csv = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `leads_export_${new Date().toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (count === 0) return null;
 
   return (
@@ -144,6 +261,16 @@ export default function BulkActionToolbar({ selectedIds, onClearSelection, onAct
           </div>
 
           <div className="h-5 w-px bg-border mx-1" />
+
+          {/* Quick: Mark as Contacted */}
+          <button
+            onClick={handleMarkContacted}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors disabled:opacity-50"
+          >
+            <Phone className="w-3.5 h-3.5" />
+            Mark Contacted
+          </button>
 
           {/* Status change */}
           <DropdownMenu
@@ -182,6 +309,27 @@ export default function BulkActionToolbar({ selectedIds, onClearSelection, onAct
             Enrich
           </button>
 
+          {/* Nurture Campaign enroll */}
+          <button
+            onClick={() => setShowNurtureModal(true)}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors disabled:opacity-50"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            Nurture Campaign
+          </button>
+
+          {/* CSV Export */}
+          <button
+            onClick={handleExportCSV}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-border bg-white text-foreground hover:bg-muted transition-colors disabled:opacity-50"
+            title="Export selected leads (or all filtered leads) to CSV"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Export CSV
+          </button>
+
           {/* Result feedback */}
           {result && (
             <div className={`flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg ${result.success ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
@@ -212,6 +360,14 @@ export default function BulkActionToolbar({ selectedIds, onClearSelection, onAct
           count={count}
           onConfirm={handleNote}
           onClose={() => setShowNoteModal(false)}
+          loading={loading}
+        />
+      )}
+      {showNurtureModal && (
+        <NurtureCampaignModal
+          count={count}
+          onConfirm={handleNurtureEnroll}
+          onClose={() => setShowNurtureModal(false)}
           loading={loading}
         />
       )}

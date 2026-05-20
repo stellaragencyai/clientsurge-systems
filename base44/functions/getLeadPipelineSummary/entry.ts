@@ -24,7 +24,7 @@ function getRecommendedOffer(lead) {
   const score = lead.lead_score || 0;
   const status = lead.status || "New";
   if (score >= 75 || status === "Booked" || status === "Qualified") {
-    return { package_key: "pro_system", package_name: "Pro System", primary_service_name: "Full-Stack Automation" };
+    return { package_key: "elite_system", package_name: "Elite System", primary_service_name: "Full-Stack Automation" };
   }
   if (score >= 50) {
     return { package_key: "growth_system", package_name: "Growth System", primary_service_name: "Response + Nurture" };
@@ -62,7 +62,7 @@ function buildLeadPipelineSnapshot({ leads, filters = {}, limit = 100, offset = 
     if (lead.ai_intent === "booking_ready") segment_counts.demo_requested++;
   }
 
-  const recommended_offer_counts = { starter_system: 0, growth_system: 0, pro_system: 0, single_service: 0 };
+  const recommended_offer_counts = { starter_system: 0, growth_system: 0, elite_system: 0, single_service: 0 };
   for (const lead of leads) {
     const offer = getRecommendedOffer(lead);
     if (offer.package_key in recommended_offer_counts) recommended_offer_counts[offer.package_key]++;

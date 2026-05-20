@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
-import { RefreshCw, Loader2, LayoutDashboard, Users, Zap, ArrowRight } from "lucide-react";
+import { RefreshCw, Loader2, LayoutDashboard, Zap, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatsCards from "@/components/medspa-dashboard/StatsCards";
 import PipelineChart from "@/components/medspa-dashboard/PipelineChart";

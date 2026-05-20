@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ShoppingCart, Zap, Search, ArrowRight, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
+import { ShoppingCart, Search, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
-import { AI_PRODUCTS, CATEGORIES, CANONICAL_SERVICE_PRODUCTS } from "@/lib/aiProducts";
+import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
 import CartSidebar from "@/components/store/CartSidebar";
 import Navbar from "@/components/landing/Navbar";
@@ -10,17 +10,15 @@ import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
 import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
-import { getRecommendedProducts } from "@/lib/productRecommendations";
-import StackValueCounter from "@/components/store/StackValueCounter";
 import { setPageMetadata } from "@/lib/seo";
+import Footer from "@/components/landing/Footer";
 
 // Lazy load heavy store components
 const InteractiveStackBuilder = lazy(() =>
-  import("@/components/store/InteractiveStackBuilder")
+import("@/components/store/InteractiveStackBuilder")
 );
 const SocialProofTicker = lazy(() => import("@/components/store/SocialProofTicker"));
 const ServiceComparisonModal = lazy(() => import("@/components/store/ServiceComparisonModal"));
-const Footer = lazy(() => import("@/components/landing/Footer"));
 const BuildYourStackFlow = lazy(() => import("@/components/store/BuildYourStackFlow"));
 const BundleSavingsToast = lazy(() => import("@/components/store/BundleSavingsToast"));
 
@@ -46,7 +44,7 @@ function StoreInner() {
       description: "Build your custom AI automation stack for your local business. Instant lead response, missed call text-back, 14-day nurture sequences, and more. Start for $97/month.",
       canonicalPath: "/store",
       ogTitle: "AI Automation Store | ClientSurge Systems",
-      ogDescription: "Pick the AI automations your business needs. Done-for-you setup in 5–7 business days. No contracts.",
+      ogDescription: "Pick the AI automations your business needs. Done-for-you setup in 5–7 business days. No contracts."
     });
     return cleanupMeta;
   }, []);
@@ -67,7 +65,7 @@ function StoreInner() {
             recommendedPackage: pkg,
             recommendedServiceKeys: pkg.included_service_keys,
             recommendedServices: pkg.included_services.map((s) => ({ ...s, whyThisMatters: s.description })),
-            whyItWorks: pkg.fit,
+            whyItWorks: pkg.fit
           });
           return;
         }
@@ -92,11 +90,11 @@ function StoreInner() {
 
     let results = AI_PRODUCTS.filter((product) => {
       const matchCategory =
-        activeCategory === "All" || product.category === activeCategory;
+      activeCategory === "All" || product.category === activeCategory;
       const matchSearch =
-        !search ||
-        product.name.toLowerCase().includes(search.toLowerCase()) ||
-        product.description.toLowerCase().includes(search.toLowerCase());
+      !search ||
+      product.name.toLowerCase().includes(search.toLowerCase()) ||
+      product.description.toLowerCase().includes(search.toLowerCase());
       return matchCategory && matchSearch;
     }).sort((left, right) => {
       const leftRecommended = recommendedKeys.has(left.service_key);
@@ -116,10 +114,8 @@ function StoreInner() {
           selectedIndustry?.recommendedServices?.map((s) => s.name) || []
         );
         results = results.filter((p) => recommendedNames.has(p.name)).slice(0, 6);
-      } else {
-        // No industry selected — show all checkout-enabled (non-coming-soon) products
-        results = results.filter((p) => p.checkout_enabled !== false && !p.coming_soon);
       }
+      // No industry selected in guided mode — show all 12 products (live + coming soon)
     }
 
     return results;
@@ -132,22 +128,22 @@ function StoreInner() {
 
   const recommendedOverflow = Math.max(
     (selectedIndustry?.recommendedServices?.length || 0) -
-      recommendedPreview.length,
+    recommendedPreview.length,
     0
   );
 
   const resultLabel = `${filtered.length} service${
-    filtered.length === 1 ? "" : "s"
-  }`;
+  filtered.length === 1 ? "" : "s"}`;
+
 
   return (
     <div
       style={{
         minHeight: "100vh",
         fontFamily: "'Inter', sans-serif",
-        position: "relative",
-      }}
-    >
+        position: "relative"
+      }}>
+      
       
 
       <div style={{ position: "relative", zIndex: 2 }}>
@@ -227,15 +223,15 @@ function StoreInner() {
             z-index: 50;
             margin: 0 24px 20px;
             border-radius: 18px;
-            background: linear-gradient(135deg, rgba(65,35,15,0.94) 0%, rgba(108,65,30,0.94) 52%, rgba(76,43,19,0.96) 100%);
+            background: linear-gradient(135deg, rgba(0,80,160,0.95) 0%, rgba(0,136,204,0.95) 52%, rgba(0,59,143,0.97) 100%);
             padding: 12px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 14px;
             cursor: pointer;
-            box-shadow: 0 10px 28px rgba(12,7,3,0.24);
-            border: 1px solid rgba(245,217,168,0.14);
+            box-shadow: 0 10px 28px rgba(0,59,143,0.28);
+            border: 1px solid rgba(0,174,239,0.25);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
           }
@@ -259,9 +255,9 @@ function StoreInner() {
             padding: 7px 12px;
             font-size: 11px;
             font-weight: 700;
-            color: #f6ddb0;
+            color: #e0f4ff;
             background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(200,150,92,0.24);
+            border: 1px solid rgba(0,174,239,0.3);
           }
           @media (max-width: 1080px) {
             .store-page .store-grid {
@@ -314,123 +310,123 @@ function StoreInner() {
 
 
               <h1
-               className="font-display"
-               style={{
-                 fontSize: "clamp(1.5rem, 4.5vw, 2.6rem)",
-                 fontWeight: "800",
-                 lineHeight: 1.08,
-                 letterSpacing: "-0.035em",
-                 color: "rgba(245,225,195,0.95)",
-                 marginBottom: "8px",
-               }}
-              >
+                className="font-display"
+                style={{
+                  fontSize: "clamp(1.5rem, 4.5vw, 2.6rem)",
+                  fontWeight: "800",
+                  lineHeight: 1.08,
+                  letterSpacing: "-0.035em",
+                  color: "hsl(var(--foreground))",
+                  marginBottom: "8px"
+                }}>
+                
                 Build Your{" "}
                 <span
-                  style={{
-                    background: "linear-gradient(135deg, #f5d9a8 0%, #c8965c 52%, #e8b87a 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    filter: "drop-shadow(0 0 18px rgba(200,150,92,0.5))",
-                  }}
-                >
-                  AI-Powered Business
+                style={{
+                  background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 52%, #003B8F 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  filter: "drop-shadow(0 0 18px rgba(0,174,239,0.4))"
+                }}>
+
+                AI-Powered Business
                 </span>
               </h1>
 
               <p
                 style={{
                   fontSize: "0.9rem",
-                  color: "rgba(220,190,150,0.65)",
+                  color: "rgba(27,20,13,0.72)",
                   lineHeight: 1.6,
                   maxWidth: "620px",
-                  margin: "0 auto 12px",
-                }}
-              >
+                  margin: "0 auto 12px"
+                }}>
+                
                 Pick the services you need, add them to your cart, and we handle
                 the setup. Your automations go live in 5 to 7 business days.
               </p>
             </div>
 
-            {selectedIndustry ? (
-              <div
-                style={{
-                  maxWidth: "760px",
-                  margin: "0 auto 10px",
-                  padding: "8px 12px",
-                  borderRadius: "12px",
-                  background: "rgba(255,255,255,0.4)",
-                  border: "none",
-                  borderBottom: "1px solid rgba(154,92,46,0.1)",
-                  boxShadow: "none",
-                  fontSize: "12px",
-                }}
-              >
+            {selectedIndustry ?
+            <div
+              style={{
+                maxWidth: "760px",
+                margin: "0 auto 10px",
+                padding: "8px 12px",
+                borderRadius: "12px",
+                background: "rgba(255,255,255,0.4)",
+                border: "none",
+                borderBottom: "1px solid rgba(154,92,46,0.1)",
+                boxShadow: "none",
+                fontSize: "12px"
+              }}>
+              
                 <p
-                  style={{
-                    fontSize: "10px",
-                    fontWeight: "700",
-                    letterSpacing: "0.16em",
-                    textTransform: "uppercase",
-                    color: "#9a5c2e",
-                    margin: "0 0 4px",
-                  }}
-                >
+                style={{
+                  fontSize: "10px",
+                  fontWeight: "700",
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: "#00AEEF",
+                  margin: "0 0 4px"
+                }}>
+                
                   Personalized For {selectedIndustry.shortName}
                 </p>
                 <p
-                  style={{
-                    fontSize: "13px",
-                    color: "#1b140d",
-                    fontWeight: "600",
-                    margin: "0 0 2px",
-                    lineHeight: 1.4,
-                  }}
-                >
+                style={{
+                  fontSize: "13px",
+                  color: "#1b140d",
+                  fontWeight: "600",
+                  margin: "0 0 2px",
+                  lineHeight: 1.4
+                }}>
+                
                   Recommended: {selectedIndustry.recommendedPackage?.name}
                 </p>
-              </div>
-            ) : null}
+              </div> :
+            null}
 
             <div className="store-stat-grid" style={{ marginBottom: "8px" }}>
               {[
-                { label: "AI Services Available", val: "12", Icon: LayoutGrid },
-                { label: "Avg. Setup Time", val: "4–6 Hours", Icon: Clock },
-                { label: "Cancel Anytime", val: "No Contracts", Icon: BadgeCheck },
-              ].map(({ label, val, Icon }, idx) => (
-                <motion.div
-                 key={label}
-                 initial={{ opacity: 0, y: 28 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 transition={{ type: "spring", stiffness: 300, damping: 28, delay: idx * 0.1 }}
-                 whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(154,92,46,0.13)" }}
-                 style={{
-                   display: "flex",
-                   alignItems: "center",
-                   gap: "14px",
-                   borderRadius: "14px",
-                   padding: "14px 18px",
-                   background: "#ffffff",
-                   border: "1.5px solid rgba(0,0,0,0.1)",
-                   boxShadow: "0 4px 14px rgba(0,0,0,0.07)",
-                   cursor: "default",
-                 }}
-                >
+              { label: "AI Services Available", val: "12", Icon: LayoutGrid },
+              { label: "Avg. Setup Time", val: "4–6 Hours", Icon: Clock },
+              { label: "Cancel Anytime", val: "No Contracts", Icon: BadgeCheck }].
+              map(({ label, val, Icon }, idx) =>
+              <motion.div
+                key={label}
+                initial={{ opacity: 0, y: 28 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 28, delay: idx * 0.1 }}
+                whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(0,136,204,0.13)" }}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "14px",
+                  borderRadius: "14px",
+                  padding: "14px 18px",
+                  background: "#ffffff",
+                  border: "1.5px solid rgba(0,0,0,0.1)",
+                  boxShadow: "0 4px 14px rgba(0,0,0,0.07)",
+                  cursor: "default"
+                }}>
+                
                   <div style={{
-                    width: "42px",
-                    height: "42px",
-                    borderRadius: "12px",
-                    background: "linear-gradient(135deg, rgba(154,92,46,0.12) 0%, rgba(200,150,92,0.08) 100%)",
-                    border: "1px solid rgba(154,92,46,0.18)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}>
-                    <Icon style={{ width: "18px", height: "18px", color: "#9a5c2e" }} />
+                  width: "42px",
+                  height: "42px",
+                  borderRadius: "12px",
+                  background: "linear-gradient(135deg, rgba(0,174,239,0.12) 0%, rgba(0,157,255,0.08) 100%)",
+                  border: "1px solid rgba(0,174,239,0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0
+                }}>
+                    <Icon style={{ width: "18px", height: "18px", color: "#00AEEF" }} />
                   </div>
                   <div style={{ textAlign: "left" }}>
-                    <p style={{ fontSize: "15px", fontWeight: "800", color: "#9a5c2e", margin: "0 0 2px" }}>
+                    <p style={{ fontSize: "15px", fontWeight: "800", color: "#000000", margin: "0 0 2px" }}>
                       {val}
                     </p>
                     <p style={{ fontSize: "10px", color: "rgba(27,20,13,0.6)", margin: 0, fontWeight: "600" }}>
@@ -438,85 +434,85 @@ function StoreInner() {
                     </p>
                   </div>
                 </motion.div>
-              ))}
+              )}
             </div>
           </div>
 
-          {items.length > 0 ? (
-            <div onClick={() => setCartOpen(true)} className="store-sticky-cart">
+          {items.length > 0 ?
+          <div onClick={() => setCartOpen(true)} className="store-sticky-cart">
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <ShoppingCart
-                  style={{ width: "18px", height: "18px", color: "#f5e6d0" }}
-                />
+                style={{ width: "18px", height: "18px", color: "#e0f4ff" }} />
+              
                 <span
-                  style={{
-                    color: "#f5e6d0",
-                    fontWeight: "700",
-                    fontSize: "14px",
-                  }}
-                >
+                style={{
+                  color: "#e0f4ff",
+                  fontWeight: "700",
+                  fontSize: "14px"
+                }}>
+                
                   {items.length} service{items.length > 1 ? "s" : ""} in cart
                 </span>
               </div>
               <div className="store-sticky-cart__meta">
                 <span
-                  style={{
-                    fontSize: "12px",
-                    color: "rgba(245,230,208,0.78)",
-                  }}
-                >
+                style={{
+                  fontSize: "12px",
+                  color: "rgba(200,235,255,0.85)"
+                }}>
+                
                   ${totalSetup} setup - ${totalMonthly}/mo
                 </span>
                 <span
-                  style={{
-                    background: "rgba(255,255,255,0.15)",
-                    color: "#f5e6d0",
-                    fontSize: "12px",
-                    fontWeight: "700",
-                    padding: "6px 16px",
-                    borderRadius: "9999px",
-                  }}
-                >
+                style={{
+                  background: "rgba(255,255,255,0.15)",
+                  color: "#e0f4ff",
+                  fontSize: "12px",
+                  fontWeight: "700",
+                  padding: "6px 16px",
+                  borderRadius: "9999px"
+                }}>
+                
                   View Cart
                 </span>
               </div>
-            </div>
-          ) : null}
+            </div> :
+          null}
 
           <div
             style={{
               maxWidth: "1300px",
               margin: "0 auto",
-              padding: "0 24px 24px",
-            }}
-          >
+              padding: "0 24px 24px"
+            }}>
+            
 
 
             <div style={{ display: "flex", gap: "10px", marginBottom: "18px", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
-              <button
-                onClick={() => setShowComparison(true)}
-                style={{
-                  borderRadius: "9999px",
-                  padding: "8px 20px",
-                  fontSize: "12px",
-                  fontWeight: "600",
-                  border: "1.5px solid rgba(154,92,46,0.3)",
-                  background: "rgba(255,255,255,0.7)",
-                  color: "#9a5c2e",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.9)";
-                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.5)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "rgba(255,255,255,0.7)";
-                  e.currentTarget.style.borderColor = "rgba(154,92,46,0.3)";
-                }}
-              >
-                📊 Compare All Services
-              </button>
+              
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              
               <GuidedPathToggle mode={pathMode} onModeChange={setPathMode} />
             </div>
 
@@ -530,27 +526,27 @@ function StoreInner() {
                     transform: "translateY(-50%)",
                     width: "14px",
                     height: "14px",
-                    color: "rgba(154,92,46,0.6)",
-                  }}
-                />
+                    color: "rgba(0,136,204,0.6)"
+                  }} />
+                
                 <input
                   type="text"
                   placeholder="Search services..."
                   value={searchInput}
-                  onChange={(event) => setSearch(event.target.value)}
+                  onChange={(e) => handleSearchChange(e.target.value)}
                   style={{
                     width: "100%",
                     borderRadius: "9999px",
-                    border: "1.5px solid rgba(154,92,46,0.22)",
+                    border: "1.5px solid rgba(0,136,204,0.22)",
                     padding: "11px 16px 11px 38px",
                     fontSize: "13px",
                     background: "rgba(255,255,255,0.85)",
                     outline: "none",
                     boxSizing: "border-box",
                     color: "#1b140d",
-                    boxShadow: "0 2px 8px rgba(111,67,31,0.05)",
-                  }}
-                />
+                    boxShadow: "0 2px 8px rgba(0,136,204,0.07)"
+                  }} />
+                
               </div>
 
               <div className="store-filterMeta">
@@ -560,82 +556,85 @@ function StoreInner() {
                     fontWeight: "700",
                     color: "rgba(27,20,13,0.55)",
                     letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                  }}
-                >
+                    textTransform: "uppercase"
+                  }}>
+                  
                   {resultLabel}
                 </span>
                 <div className="store-categories">
-                  {CATEGORIES.filter((cat) => {
-                      if (cat === "All") return true;
-                      return CANONICAL_SERVICE_PRODUCTS.some(p => p.category === cat && p.checkout_enabled && !p.coming_soon);
-                    }).map((category) => (
-                    <motion.button
-                      key={category}
-                      onClick={() => setActiveCategory(category)}
-                      whileHover={{ y: -1, scale: 1.03 }}
-                      whileTap={{ scale: 0.94 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      style={{
-                        borderRadius: "9999px",
-                        padding: "7px 16px",
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        border:
-                          activeCategory === category
-                            ? "1.5px solid rgba(154,92,46,0.5)"
-                            : "1.5px solid rgba(154,92,46,0.18)",
-                        cursor: "pointer",
-                        background:
-                          activeCategory === category
-                            ? "linear-gradient(135deg,#6b3f1f,#9a5c2e)"
-                            : "rgba(255,255,255,0.75)",
-                        color:
-                          activeCategory === category
-                            ? "#f5e6d0"
-                            : "rgba(27,20,13,0.72)",
-                        boxShadow:
-                          activeCategory === category
-                            ? "0 4px 14px rgba(120,70,20,0.28)"
-                            : "0 1px 4px rgba(111,67,31,0.06)",
-                      }}
-                    >
+                  {CATEGORIES.map((category) =>
+                  <motion.button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    whileHover={{ y: -1, scale: 1.03 }}
+                    whileTap={{ scale: 0.94 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    style={{
+                      borderRadius: "9999px",
+                      padding: "7px 16px",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      border:
+                      activeCategory === category ?
+                      "1.5px solid rgba(0,136,204,0.6)" :
+                      "1.5px solid rgba(0,136,204,0.18)",
+                      cursor: "pointer",
+                      background:
+                      activeCategory === category ?
+                      "linear-gradient(135deg,#0088CC,#00AEEF)" :
+                      "rgba(255,255,255,0.75)",
+                      color:
+                      activeCategory === category ?
+                      "#ffffff" :
+                      "rgba(27,20,13,0.72)",
+                      boxShadow:
+                      activeCategory === category ?
+                      "0 4px 14px rgba(0,174,239,0.35)" :
+                      "0 1px 4px rgba(0,136,204,0.08)"
+                    }}>
+                    
                       {category}
                     </motion.button>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>
 
-            <div className="store-grid">
-              {filtered.map((product) => (
-                <ProductCard key={product.product_id} product={product} />
-              ))}
-            </div>
+            <motion.div
+              className="store-grid"
+              variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+              initial="hidden"
+              animate="visible"
+              key={activeCategory + search + pathMode}
+            >
+              {filtered.map((product) =>
+              <ProductCard key={product.product_id} product={product} />
+              )}
+            </motion.div>
 
-            {filtered.length === 0 ? (
-              <div
-                style={{
-                  textAlign: "center",
-                  padding: "48px",
-                  color: "rgba(27,20,13,0.45)",
-                }}
-              >
+            {filtered.length === 0 ?
+            <div
+              style={{
+                textAlign: "center",
+                padding: "48px",
+                color: "rgba(27,20,13,0.45)"
+              }}>
+              
                 <p style={{ fontSize: "16px", fontWeight: "600" }}>
-                  {pathMode === "guided" && !selectedIndustry
-                    ? "No services available — try 'Explore All'"
-                    : pathMode === "guided" && selectedIndustry
-                    ? "Try switching to 'Explore All' to see more services"
-                    : "No services match your search"}
+                  {pathMode === "guided" && !selectedIndustry ?
+                "No services available — try 'Explore All'" :
+                pathMode === "guided" && selectedIndustry ?
+                "Try switching to 'Explore All' to see more services" :
+                "No services match your search"}
                 </p>
-              </div>
-            ) : null}
+              </div> :
+            null}
 
-            {items.length > 0 ? (
-              <Suspense fallback={null}>
+            {items.length > 0 ?
+            <Suspense fallback={null}>
                 <InteractiveStackBuilder />
-              </Suspense>
-            ) : null}
+              </Suspense> :
+            null}
           </div>
 
           <Suspense fallback={null}>
@@ -645,43 +644,43 @@ function StoreInner() {
            <CartSidebar />
            {/* S25: Talk to a Human — escape valve for overwhelmed visitors */}
            <div style={{
-             background: "linear-gradient(135deg, rgba(154,92,46,0.06), rgba(200,150,92,0.03))",
-             borderTop: "1px solid rgba(154,92,46,0.1)",
-             padding: "28px 24px",
-             textAlign: "center",
-           }}>
+            background: "linear-gradient(135deg, rgba(0,174,239,0.06), rgba(0,136,204,0.03))",
+            borderTop: "1px solid rgba(0,174,239,0.12)",
+            padding: "28px 24px",
+            textAlign: "center"
+          }}>
              <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.6)", margin: "0 0 12px" }}>
                Not sure what your business needs?
              </p>
              <a
-               href="/book"
-               style={{
-                 display: "inline-flex", alignItems: "center", gap: "6px",
-                 background: "linear-gradient(135deg, #7a4825, #c8965c)",
-                 color: "#fff8ee", fontWeight: "700", fontSize: "13px",
-                 padding: "10px 22px", borderRadius: "999px", textDecoration: "none",
-                 boxShadow: "0 4px 14px rgba(154,92,46,0.25)",
-               }}
-             >
+              href="/book"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: "6px",
+                background: "linear-gradient(135deg, #0088CC, #00AEEF)",
+                color: "#ffffff", fontWeight: "700", fontSize: "13px",
+                padding: "10px 22px", borderRadius: "999px", textDecoration: "none",
+                boxShadow: "0 4px 14px rgba(0,174,239,0.35)"
+              }}>
+              
                📞 Book a free 15-min strategy call
              </a>
              <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.35)", marginTop: "10px" }}>
                We'll tell you exactly which services will move the needle for your business.
              </p>
            </div>
+           <Footer />
            <Suspense fallback={null}>
-             <Footer />
              <SocialProofTicker />
            </Suspense>
-           {showComparison && (
-             <Suspense fallback={null}>
+           {showComparison &&
+          <Suspense fallback={null}>
                <ServiceComparisonModal onClose={() => setShowComparison(false)} />
              </Suspense>
-           )}
+          }
         </div>
       </div>
-    </div>
-  );
+    </div>);
+
 }
 
 export default function Store() {
@@ -690,6 +689,6 @@ export default function Store() {
       <CartProvider>
         <StoreInner />
       </CartProvider>
-    </DemoBookingProvider>
-  );
+    </DemoBookingProvider>);
+
 }

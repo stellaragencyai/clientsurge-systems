@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw, Plus,
+  Server, RotateCcw, BookOpen, Wand2, Sparkles, Crosshair, Trophy,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
@@ -33,6 +34,11 @@ import CommunicationLogsPanel from '../components/admin/CommunicationLogsPanel';
 import AutomationInstallChecklist from '../components/admin/AutomationInstallChecklist';
 import ReviewRequestPanel from '../components/admin/ReviewRequestPanel';
 import LeadReactivationPanel from '../components/admin/LeadReactivationPanel';
+import TaskBoardPanel from '../components/admin/TaskBoardPanel';
+import AutomationAlertsPanel from '../components/admin/AutomationAlertsPanel';
+import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
+import SocialMediaEngine from '../components/admin/SocialMediaEngine';
+import SniperDashboard from '../components/admin/SniperDashboard';
 
 const NAV_GROUPS = [
   {
@@ -42,22 +48,22 @@ const NAV_GROUPS = [
       { id: 'leads', label: 'Leads', icon: Users },
       { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
       { id: 'inbox', label: 'Inbox', icon: Inbox, badge: true },
-      { id: 'onboarding', label: 'Client Onboarding', icon: ClipboardList, external: true },
+      { id: 'onboarding', label: 'Client Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
     ],
   },
   {
     group: 'Automation',
     items: [
       { id: 'website-leads', label: 'Website Leads', icon: Target },
-      { id: 'install-queue', label: 'Install Queue', icon: Zap },
+      { id: 'install-queue', label: 'Install Queue', icon: Server },
       { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
-      { id: 'automations', label: 'Automation Status', icon: Zap },
+      { id: 'automations', label: 'Automation Status', icon: Zap, external: true, externalPath: '/admin/automations' },
       { id: 'drip', label: 'Drip Campaigns', icon: Send },
       { id: 'nurture', label: 'Nurture Campaigns', icon: Flame },
       { id: 'cadence', label: 'Dynamic Cadence', icon: Settings },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Mail },
       { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
-      { id: 'reactivation', label: 'Lead Reactivation', icon: Zap },
+      { id: 'reactivation', label: 'Lead Reactivation', icon: RotateCcw },
       { id: 'routing', label: 'Lead Routing', icon: Target },
     ],
   },
@@ -73,12 +79,19 @@ const NAV_GROUPS = [
   {
     group: 'System',
     items: [
+      { id: 'sniper', label: '🎯 Lead Sniper', icon: Crosshair },
+      { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
+      { id: 'performance-wars', label: '🏆 Performance Wars', icon: Trophy, external: true, externalPath: '/admin/performance-wars' },
+      { id: 'social-engine', label: 'Social Media Engine', icon: Sparkles },
+      { id: 'website-copy', label: 'Website Copy AI', icon: Wand2 },
+      { id: 'task-board', label: 'Task Board', icon: ClipboardList },
       { id: 'health', label: 'Integration Health', icon: Activity },
       { id: 'logs', label: 'Communication Logs', icon: MessageSquare },
       { id: 'templates', label: 'Templates', icon: MessageSquare },
       { id: 'review-request', label: 'Review Requests', icon: Star },
       { id: 'settings', label: 'Settings', icon: Settings },
       { id: 'qa', label: 'QA Tools', icon: RefreshCw },
+      { id: 'install-guide', label: 'Install Guide', icon: BookOpen, external: true, externalPath: '/admin/install-guide' },
     ],
   },
 ];
@@ -95,10 +108,21 @@ const TAB_ACTIONS = {
 export default function AdminDashboard() {
   const { user, isLoadingAuth } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('overview');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('tab') || 'overview';
+  });
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
   const [inboxUnread, setInboxUnread] = useState(0);
+
+  // Sync tab from URL param (e.g. when navigating back from sub-pages)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get('tab');
+    if (tab) setActiveTab(tab);
+  }, [location.search]);
 
   // Load unread message count for inbox badge
   useEffect(() => {
@@ -138,9 +162,9 @@ export default function AdminDashboard() {
     base44.auth.logout('/');
   };
 
-  const handleTabChange = (tabId, external) => {
+  const handleTabChange = (tabId, external, externalPath) => {
     if (external) {
-      navigate('/admin/onboarding');
+      navigate(externalPath || '/admin/onboarding');
       return;
     }
     setActiveTab(tabId);
@@ -173,6 +197,10 @@ export default function AdminDashboard() {
       case 'cadence': return <DynamicCadencePanel />;
       case 'reactivation': return <LeadReactivationPanel />;
       case 'review-request': return <ReviewRequestPanel />;
+      case 'sniper': return <SniperDashboard />;
+      case 'social-engine': return <SocialMediaEngine />;
+      case 'website-copy': return <WebsiteCopyPanel />;
+      case 'task-board': return <TaskBoardPanel />;
       case 'qa': return (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">QA Tools</h2>
@@ -220,7 +248,7 @@ export default function AdminDashboard() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => handleTabChange(item.id, item.external)}
+                      onClick={() => handleTabChange(item.id, item.external, item.externalPath)}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors font-medium text-sm ${
                         isActive
                           ? 'bg-primary text-primary-foreground'
@@ -265,7 +293,7 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <div className="bg-white border-b border-border px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+        <div className="bg-background border-b border-border px-6 py-3 flex items-center justify-between sticky top-0 z-10">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -358,9 +386,12 @@ function OverviewDashboard({ onNavigate }) {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>
-        <p className="text-sm text-muted-foreground mt-1">Lead activation overview — click any card to drill in.</p>
+      <div className="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>
+          <p className="text-sm text-muted-foreground mt-1">Lead activation overview — click any card to drill in.</p>
+        </div>
+        <AutomationAlertsPanel compact onNavigate={onNavigate} />
       </div>
 
       {/* Stats Grid */}
@@ -424,7 +455,7 @@ function OverviewDashboard({ onNavigate }) {
             {[
               { key: 'starter_system', label: 'Starter', helper: 'Response + booking fit' },
               { key: 'growth_system', label: 'Growth', helper: 'Response + nurture fit' },
-              { key: 'pro_system', label: 'Pro', helper: 'Full-stack fit' },
+              { key: 'elite_system', label: 'Elite', helper: 'Full-stack fit' },
               { key: 'single_service', label: 'Single Service', helper: 'One clear first-service fit' },
             ].map(({ key, label, helper }) => (
               <button

@@ -20,6 +20,7 @@ export default function CartSidebar() {
     phone: "",
     business: "",
   });
+  const [smsConsent, setSmsConsent] = useState(false);
   const [error, setError] = useState("");
 
   const handleCheckout = async () => {
@@ -28,8 +29,19 @@ export default function CartSidebar() {
       return;
     }
 
+    if (form.phone && !smsConsent) {
+      setError("Please check the SMS consent box to continue, or remove your phone number.");
+      return;
+    }
+
     setError("");
     setStep("loading");
+
+    // Timeout fallback — reset if Stripe redirect takes too long
+    const timeoutId = setTimeout(() => {
+      setStep("info");
+      setError("Checkout timed out. Please try again.");
+    }, 12000);
 
     if (window.self !== window.top) {
       // Silently redirect to the live site if inside iframe preview
@@ -45,11 +57,12 @@ export default function CartSidebar() {
         customer_email: form.email,
         customer_phone: form.phone,
         business_name: form.business,
-        success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${window.location.origin}/client-portal?session_id={CHECKOUT_SESSION_ID}&new=1`, // #309: redirect to portal post-checkout,
         cancel_url: `${window.location.origin}/store`,
       });
 
       if (response.data?.url) {
+        clearTimeout(timeoutId);
         // Save order summary so OrderSuccess can display what was purchased
         try {
           sessionStorage.setItem("clientsurge:last-order", JSON.stringify({
@@ -62,9 +75,11 @@ export default function CartSidebar() {
         return;
       }
 
+      clearTimeout(timeoutId);
       setError("Could not start checkout. Please try again.");
       setStep("info");
     } catch (e) {
+      clearTimeout(timeoutId);
       setError(e.message || "Checkout failed.");
       setStep("info");
     }
@@ -243,7 +258,7 @@ export default function CartSidebar() {
                         margin: 0,
                       }}
                     >
-                      ${item.setup_fee} setup - ${item.monthly_fee}/mo
+                      {item.setup_fee === 0 ? "No setup fee" : `$${item.setup_fee} setup`} — ${item.monthly_fee}/mo
                     </p>
                   </div>
                   <motion.button
@@ -338,6 +353,22 @@ export default function CartSidebar() {
                   />
                 </div>
               ))}
+              {/* SMS Consent — only shown when phone is entered */}
+              {form.phone && (
+                <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={smsConsent}
+                    onChange={(e) => setSmsConsent(e.target.checked)}
+                    style={{ marginTop: "2px", flexShrink: 0, accentColor: "#9a5c2e", width: "14px", height: "14px" }}
+                  />
+                  <span style={{ fontSize: "11px", color: "rgba(26,18,9,0.6)", lineHeight: 1.5 }}>
+                    I agree to receive SMS messages from ClientSurge Systems about my order and service updates. Message & data rates may apply. Reply STOP to unsubscribe at any time.{" "}
+                    <a href="/legal/privacy" target="_blank" style={{ color: "#9a5c2e", fontWeight: "600" }}>Privacy Policy</a>
+                  </span>
+                </label>
+              )}
+
               {error ? (
                 <p
                   style={{
@@ -412,32 +443,32 @@ export default function CartSidebar() {
               <button
                 onClick={() => setStep("info")}
                 style={{
-                  width: "100%",
-                  borderRadius: "9999px",
-                  padding: "2px",
-                  background:
-                    "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                  border: "none",
-                  cursor: "pointer",
-                  boxShadow: "0 4px 18px rgba(120,70,20,0.28)",
-                }}
-              >
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "6px",
-                    height: "48px",
+                    width: "100%",
                     borderRadius: "9999px",
+                    padding: "2px",
                     background:
-                      "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                    color: "#f5e6d0",
-                    fontWeight: "700",
-                    fontSize: "14px",
+                      "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+                    border: "none",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
                   }}
                 >
-                  Continue to Checkout{" "}
+                  <span
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "6px",
+                      height: "48px",
+                      borderRadius: "9999px",
+                      background:
+                        "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
+                      color: "#ffffff",
+                      fontWeight: "700",
+                      fontSize: "14px",
+                    }}
+                  >
+                    Continue to Checkout{" "}
                   <ArrowRight style={{ width: "15px", height: "15px" }} />
                 </span>
               </button>
@@ -451,11 +482,11 @@ export default function CartSidebar() {
                     borderRadius: "9999px",
                     padding: "2px",
                     background:
-                      "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                      "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
                     border: "none",
                     cursor: step === "loading" ? "not-allowed" : "pointer",
                     opacity: step === "loading" ? 0.7 : 1,
-                    boxShadow: "0 4px 18px rgba(120,70,20,0.28)",
+                    boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
                   }}
                 >
                   <span
@@ -467,8 +498,8 @@ export default function CartSidebar() {
                       height: "48px",
                       borderRadius: "9999px",
                       background:
-                        "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                      color: "#f5e6d0",
+                        "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
+                      color: "#ffffff",
                       fontWeight: "700",
                       fontSize: "14px",
                     }}
@@ -507,7 +538,10 @@ export default function CartSidebar() {
                 marginTop: "10px",
               }}
             >
-              Secured by Stripe - Cancel anytime
+              Secured by Stripe · Cancel anytime ·{" "}
+              <a href="/legal/terms" target="_blank" style={{ color: "rgba(26,18,9,0.45)", textDecoration: "underline" }}>
+                Refund Policy
+              </a>
             </p>
           </div>
         ) : null}

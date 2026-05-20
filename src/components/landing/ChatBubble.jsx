@@ -262,11 +262,11 @@ export default function ChatBubble() {
         className="fixed bottom-5 right-5 sm:right-8 z-[9991] h-14 px-4 rounded-full flex items-center gap-2.5 shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
         style={{
           background: open
-            ? "linear-gradient(135deg,#3a2010,#6b3f1f)"
-            : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 60%,#c8965c 100%)",
+            ? "linear-gradient(135deg,#006BB0,#003B8F)"
+            : "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
           boxShadow: pulsed && !open
-            ? "0 0 0 0 rgba(154,92,46,0.5), 0 8px 24px rgba(100,60,20,0.35)"
-            : "0 8px 24px rgba(100,60,20,0.35)",
+            ? "0 0 0 0 rgba(0,174,239,0.5), 0 8px 24px rgba(0,100,200,0.35)"
+            : "0 8px 24px rgba(0,100,200,0.35)",
           animation: pulsed && !open ? "chatPulse 2.5s ease-in-out 3" : "none",
         }}
       >
@@ -287,9 +287,9 @@ export default function ChatBubble() {
 
       <style>{`
         @keyframes chatPulse {
-          0%   { box-shadow: 0 0 0 0 rgba(154,92,46,0.55), 0 8px 24px rgba(100,60,20,0.35); }
-          50%  { box-shadow: 0 0 0 12px rgba(154,92,46,0), 0 8px 24px rgba(100,60,20,0.35); }
-          100% { box-shadow: 0 0 0 0 rgba(154,92,46,0), 0 8px 24px rgba(100,60,20,0.35); }
+          0%   { box-shadow: 0 0 0 0 rgba(0,174,239,0.55), 0 8px 24px rgba(0,100,200,0.35); }
+          50%  { box-shadow: 0 0 0 12px rgba(0,174,239,0), 0 8px 24px rgba(0,100,200,0.35); }
+          100% { box-shadow: 0 0 0 0 rgba(0,174,239,0), 0 8px 24px rgba(0,100,200,0.35); }
         }
       `}</style>
 

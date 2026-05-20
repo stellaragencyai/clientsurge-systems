@@ -1,1165 +1,440 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
-const MOTION_MULTIPLIER = 1.4;
+// ─── Industry Data ─────────────────────────────────────────────────────────
+const INDUSTRIES = [
+{
+  badge: "MED SPA",
+  accent: "Bookings.",
+  headline: "AI That Fills Your",
+  sub: "Respond to every lead in under 60 seconds — even after hours. Our system handles the follow-up so your staff can focus on patients.",
+  cardTitle: "Lead Conversion",
+  cardSub: "Glow Med Spa · 3 Locations",
+  metrics: [{ label: "LEADS TODAY", val: 24 }, { label: "RESPONDED", val: 24 }],
+  checks: ["Instant SMS sent", "Follow-up queued", "Booking link shared", "Reminder scheduled"],
+  footer: "Avg response: 38 seconds",
+  color: "#00AEEF",
+  notification: "🔔 New lead captured · Glow Med Spa",
+},
+{
+  badge: "DENTAL",
+  accent: "Appointments.",
+  headline: "AI That Books More",
+  sub: "Turn missed calls and web inquiries into confirmed appointments — automatically. No extra staff. No dropped leads.",
+  cardTitle: "Missed Call Recovery",
+  cardSub: "Summit Dental · 2 Offices",
+  metrics: [{ label: "MISSED CALLS", val: 11 }, { label: "RECOVERED", val: 10 }],
+  checks: ["Text-back sent in 60s", "Patient matched", "Booking link delivered", "Follow-up active"],
+  footer: "Recovery rate: 91%",
+  color: "#009DFF",
+  notification: "📅 Appointment booked · Summit Dental",
+},
+{
+  badge: "HVAC",
+  accent: "Service Calls.",
+  headline: "AI That Wins More",
+  sub: "Beat the competition to every hot lead. Our AI responds instantly, qualifies the job, and books the appointment before they call someone else.",
+  cardTitle: "Speed-to-Lead",
+  cardSub: "CoolBreeze HVAC · Phoenix",
+  metrics: [{ label: "LEADS THIS WEEK", val: 47 }, { label: "BOOKED", val: 39 }],
+  checks: ["Lead captured", "Responded in 44s", "Job qualified by AI", "Tech dispatched"],
+  footer: "Booking rate: 83%",
+  color: "#0088CC",
+  notification: "⚡ Lead responded · CoolBreeze HVAC",
+},
+{
+  badge: "ROOFING",
+  accent: "Estimates.",
+  headline: "AI That Schedules More",
+  sub: "Capture storm-season leads instantly and schedule estimates before your competitors even see the inquiry.",
+  cardTitle: "Storm Season Pipeline",
+  cardSub: "Peak Roofing · 5 Crews",
+  metrics: [{ label: "INQUIRIES", val: 63 }, { label: "ESTIMATES SET", val: 58 }],
+  checks: ["Inquiry captured", "Rapid SMS sent", "Estimate scheduled", "Crew notified"],
+  footer: "Avg booking time: 6 min",
+  color: "#003B8F",
+  notification: "🏠 Estimate scheduled · Peak Roofing",
+}];
 
-function scaleMs(duration) {
-  return Math.round(duration * MOTION_MULTIPLIER);
+const CYCLE_DURATION = 5000;
+
+// ─── Enhancement 1: Realistic iOS App Icons (SVG-based) ───────────────────
+function AppIcon({ type, size = 32 }) {
+  const r = Math.round(size * 0.225);
+  if (type === "messages") return (
+    <svg width={size} height={size} viewBox="0 0 32 32">
+      <defs><linearGradient id="msg-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5DF075"/><stop offset="100%" stopColor="#19C335"/></linearGradient></defs>
+      <rect width="32" height="32" rx={r} fill="url(#msg-g)"/>
+      <path d="M7 9.5C7 8.12 8.12 7 9.5 7h13C23.88 7 25 8.12 25 9.5v8C25 18.88 23.88 20 22.5 20H18l-4 4.5-1.5-4.5H9.5C8.12 20 7 18.88 7 17.5V9.5z" fill="white"/>
+    </svg>
+  );
+  if (type === "calendar") return (
+    <svg width={size} height={size} viewBox="0 0 32 32">
+      <rect width="32" height="32" rx={r} fill="white"/>
+      <rect x="0" y="0" width="32" height="9" rx={r} fill="#FC3D39"/>
+      <rect x="0" y="5" width="32" height="4" fill="#FC3D39"/>
+      <text x="16" y="7.5" textAnchor="middle" fill="white" fontSize="5.5" fontWeight="800" fontFamily="-apple-system,sans-serif">{new Date().toLocaleString('en-US',{month:'short'}).toUpperCase()}</text>
+      <text x="16" y="22" textAnchor="middle" fill="#1a1a1a" fontSize="12" fontWeight="800" fontFamily="-apple-system,sans-serif">{new Date().getDate()}</text>
+    </svg>
+  );
+  if (type === "clientsurge") return (
+    <svg width={size} height={size} viewBox="0 0 32 32">
+      <defs><linearGradient id="cs-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#00AEEF"/><stop offset="100%" stopColor="#003B8F"/></linearGradient></defs>
+      <rect width="32" height="32" rx={r} fill="url(#cs-g)"/>
+      <polygon points="18,6 10,17 15.5,17 14,26 22,15 16.5,15" fill="white" opacity="0.95"/>
+    </svg>
+  );
+  if (type === "settings") return (
+    <svg width={size} height={size} viewBox="0 0 32 32">
+      <defs><linearGradient id="set-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#A0A0A5"/><stop offset="100%" stopColor="#636366"/></linearGradient></defs>
+      <rect width="32" height="32" rx={r} fill="url(#set-g)"/>
+      {[0,45,90,135,180,225,270,315].map((deg,i)=>{
+        const rad=(deg*Math.PI)/180;
+        return <line key={i} x1={16+Math.cos(rad)*6.5} y1={16+Math.sin(rad)*6.5} x2={16+Math.cos(rad)*9.5} y2={16+Math.sin(rad)*9.5} stroke="white" strokeWidth="2.8" strokeLinecap="round"/>;
+      })}
+      <circle cx="16" cy="16" r="4.5" fill="url(#set-g)"/><circle cx="16" cy="16" r="2.2" fill="white"/>
+    </svg>
+  );
+  if (type === "safari") return (
+    <svg width={size} height={size} viewBox="0 0 32 32">
+      <defs><linearGradient id="saf-g" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stopColor="#1A8BFF"/><stop offset="100%" stopColor="#38CFFF"/></linearGradient></defs>
+      <rect width="32" height="32" rx={r} fill="url(#saf-g)"/>
+      <circle cx="16" cy="16" r="8.5" fill="none" stroke="white" strokeWidth="1.2" opacity="0.5"/>
+      <line x1="16" y1="8" x2="16" y2="24" stroke="white" strokeWidth="0.8" opacity="0.35"/>
+      <line x1="8" y1="16" x2="24" y2="16" stroke="white" strokeWidth="0.8" opacity="0.35"/>
+      <polygon points="16,8.5 19.5,19.5 16,17.5 12.5,19.5" fill="white" opacity="0.95"/>
+      <polygon points="16,23.5 12.5,12.5 16,14.5 19.5,12.5" fill="#FF3B30" opacity="0.85"/>
+    </svg>
+  );
+  if (type === "maps") return (
+    <svg width={size} height={size} viewBox="0 0 32 32">
+      <defs><linearGradient id="map-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#34C759"/><stop offset="100%" stopColor="#1CA34C"/></linearGradient></defs>
+      <rect width="32" height="32" rx={r} fill="url(#map-g)"/>
+      <path d="M6 20 Q12 16 16 12 Q20 8 26 10" stroke="white" strokeWidth="2.5" fill="none" strokeLinecap="round" opacity="0.6"/>
+      <circle cx="17" cy="11" r="4" fill="#FF3B30"/>
+      <circle cx="17" cy="11" r="2" fill="white"/>
+      <line x1="17" y1="15" x2="17" y2="19" stroke="#FF3B30" strokeWidth="1.5" strokeLinecap="round"/>
+    </svg>
+  );
+  return null;
 }
 
-function useCounter(target, duration = 1800, delay = 0) {
-  const [value, setValue] = useState(0);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      const start = performance.now();
-
-      const tick = (now) => {
-        const progress = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        setValue(Math.round(eased * target));
-
-        if (progress < 1) {
-          requestAnimationFrame(tick);
-        }
-      };
-
-      requestAnimationFrame(tick);
-    }, delay);
-
-    return () => clearTimeout(timeoutId);
-  }, [delay, duration, target]);
-
-  return value;
+// ─── Enhancement 2: Home Screen Grid (blurred behind content) ─────────────
+function HomeScreenGrid() {
+  const apps = ["safari","maps","calendar","messages","settings","clientsurge","safari","maps","calendar","messages","settings","safari"];
+  return (
+    <div style={{ position:"absolute", inset:0, zIndex:0, display:"grid", gridTemplateColumns:"repeat(4, 1fr)", alignContent:"start", gap:"18px", padding:"18px 14px", opacity:0.18, pointerEvents:"none", filter:"blur(1.5px)" }}>
+      {apps.map((t,i) => <div key={i} style={{display:"flex",justifyContent:"center"}}><AppIcon type={t} size={36}/></div>)}
+    </div>
+  );
 }
 
-const DEMO_MODES = {
-  lead_response: {
-    label: "New Lead",
-    helper: "A new lead comes in and the first text goes out right away.",
-    headerTitle: "Lead inbox",
-    status: "Replying in 4s",
-    notification: {
-      type: "lead",
-      appName: "ClientSurge",
-      title: "New lead captured",
-      source: "Glow Med Spa",
-      detail: "Form lead received / intro text sent automatically",
-    },
-    stats: [
-      { label: "Lead", value: "Marcus D.", accent: "#6366f1" },
-      { label: "Source", value: "Website form", accent: "#c8965c" },
-      { label: "Next step", value: "First text", accent: "#22c55e" },
-    ],
-    queueItems: [
-      { title: "Marcus D.", meta: "Requested pricing", badge: "New" },
-      { title: "Phone captured", meta: "(602) 555-0148", badge: "Ready" },
-      { title: "Automation rule", meta: "Instant Lead Response", badge: "On" },
-    ],
-    messages: [
-      { role: "system", text: "Lead synced from website form" },
-      { role: "ai", text: "Hi Marcus. Thanks for reaching out to Glow Med Spa." },
-      { role: "ai", text: "Would you like a quick pricing breakdown or a booking link first?" },
-      { role: "lead", text: "Send me pricing first, please." },
-    ],
-    steps: [
-      "New lead arrives",
-      "Lead details land in the inbox",
-      "First SMS sends automatically",
-    ],
-  },
-  missed_call: {
-    label: "Missed Call",
-    helper: "A missed call turns into a text message instead of a lost lead.",
-    headerTitle: "Call recovery",
-    status: "Text-back in 60s",
-    notification: {
-      type: "lead",
-      appName: "ClientSurge",
-      title: "Missed call recovered",
-      source: "Peak Health Clinic",
-      detail: "No answer / text-back queued automatically",
-    },
-    stats: [
-      { label: "Caller", value: "Priya K.", accent: "#6366f1" },
-      { label: "Trigger", value: "Missed call", accent: "#c8965c" },
-      { label: "Next step", value: "Recovery text", accent: "#22c55e" },
-    ],
-    queueItems: [
-      { title: "Incoming call", meta: "11:42 AM / 23 sec", badge: "Missed" },
-      { title: "Caller ID", meta: "(480) 555-0102", badge: "Matched" },
-      { title: "Automation rule", meta: "Missed Call Text-Back", badge: "On" },
-    ],
-    messages: [
-      { role: "system", text: "Call ended without answer" },
-      { role: "ai", text: "Hi Priya. Sorry we missed your call." },
-      { role: "ai", text: "Want us to text you details or help you book?" },
-      { role: "lead", text: "Text me the details and the booking link." },
-    ],
-    steps: [
-      "Missed call is detected",
-      "Caller is matched to a record",
-      "Text-back sends automatically",
-    ],
-  },
-  booking: {
-    label: "Booking",
-    helper: "The system nudges the lead toward a booking link and confirmed next step.",
-    headerTitle: "Booking handoff",
-    status: "Booking in progress",
-    notification: {
-      type: "payment",
-      appName: "Venmo",
-      title: "Payment received",
-      source: "Luxe Aesthetics",
-      detail: "paid you $320 for setup deposit",
-    },
-    stats: [
-      { label: "Lead", value: "Jordan T.", accent: "#6366f1" },
-      { label: "Stage", value: "Ready to book", accent: "#c8965c" },
-      { label: "Next step", value: "Booking link", accent: "#22c55e" },
-    ],
-    queueItems: [
-      { title: "Jordan T.", meta: "Asked for next available slot", badge: "Hot" },
-      { title: "Booking link", meta: "Shared automatically", badge: "Sent" },
-      { title: "Follow-up", meta: "Reminder scheduled", badge: "Queued" },
-    ],
-    messages: [
-      { role: "system", text: "Lead asked for the next available appointment" },
-      { role: "ai", text: "Perfect. Here is your booking link for the next open slot." },
-      { role: "ai", text: "Once you pick a time, we will send the confirmation for you." },
-      { role: "lead", text: "Done. I booked for Thursday afternoon." },
-    ],
-    steps: [
-      "Lead asks to move forward",
-      "Booking link is shared",
-      "Confirmation and reminders are queued",
-    ],
-  },
-};
-
-function StatusBar() {
-  const [time, setTime] = useState("");
-
+// ─── Animated Counter ──────────────────────────────────────────────────────
+function useCounter(target, duration = 1200) {
+  const [val, setVal] = useState(0);
+  const prev = useRef(0);
   useEffect(() => {
-    const formatTime = () => {
-      const date = new Date();
-      let hours = date.getHours();
-      const minutes = date.getMinutes();
-      const ampm = hours >= 12 ? "PM" : "AM";
-      hours = hours % 12 || 12;
-      return `${hours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+    const from = prev.current;
+    prev.current = target;
+    const start = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - start) / duration, 1);
+      const e = 1 - Math.pow(1 - p, 3);
+      setVal(Math.round(from + e * (target - from)));
+      if (p < 1) requestAnimationFrame(tick);
     };
+    requestAnimationFrame(tick);
+  }, [target, duration]);
+  return val;
+}
 
-    setTime(formatTime());
-    const intervalId = setInterval(() => setTime(formatTime()), 1000);
-    return () => clearInterval(intervalId);
+// ─── Live Clock ────────────────────────────────────────────────────────────
+function useLiveClock() {
+  const [time, setTime] = useState(() => new Date().toLocaleTimeString("en-US", { hour:"numeric", minute:"2-digit", hour12:true }));
+  useEffect(() => {
+    const t = setInterval(() => setTime(new Date().toLocaleTimeString("en-US", { hour:"numeric", minute:"2-digit", hour12:true })), 1000);
+    return () => clearInterval(t);
   }, []);
+  return time;
+}
 
+// ─── Enhancement 3: Hyper-accurate iPadOS Status Bar ─────────────────────
+function StatusBar() {
+  const time = useLiveClock();
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "4px 14px 2px",
-        height: "20px",
-      }}
-    >
-      <span
-        style={{
-          fontSize: "10px",
-          fontWeight: "700",
-          color: "rgba(26,18,9,0.75)",
-          letterSpacing: "0.02em",
-        }}
-      >
-        {time}
-      </span>
+    <div style={{ height:"32px", background:"rgba(0,0,0,0.5)", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", display:"flex", alignItems:"center", justifyContent:"space-between", padding:"0 18px", flexShrink:0, position:"relative", zIndex:20 }}>
+      <span style={{ fontSize:"12px", fontWeight:"700", color:"rgba(255,255,255,0.95)", fontVariantNumeric:"tabular-nums", letterSpacing:"-0.3px", fontFamily:"-apple-system,'SF Pro Display',sans-serif" }}>{time}</span>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-        <svg width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
-          {[0, 1, 2, 3].map((index) => (
-            <rect
-              key={index}
-              x={index * 3.5}
-              y={10 - (index + 1) * 2.5}
-              width="2.5"
-              height={(index + 1) * 2.5}
-              rx="0.5"
-              fill="rgba(26,18,9,0.65)"
-            />
-          ))}
+      {/* Dynamic Island */}
+      <div style={{ position:"absolute", left:"50%", top:"6px", transform:"translateX(-50%)", width:"90px", height:"20px", background:"#000", borderRadius:"12px", boxShadow:"0 0 0 1.5px rgba(255,255,255,0.08), inset 0 0 8px rgba(0,0,0,0.8)", display:"flex", alignItems:"center", justifyContent:"center", gap:"6px" }}>
+        <div style={{ width:"6px", height:"6px", borderRadius:"50%", background:"#1a1a1a", border:"1px solid rgba(255,255,255,0.06)" }}/>
+        <div style={{ width:"9px", height:"9px", borderRadius:"50%", background:"#0a0a0a", border:"1.5px solid rgba(255,255,255,0.08)", boxShadow:"0 0 3px rgba(0,140,255,0.25)" }}/>
+      </div>
+
+      {/* Right icons */}
+      <div style={{ display:"flex", alignItems:"center", gap:"6px" }}>
+        <div style={{ display:"flex", alignItems:"flex-end", gap:"1.5px" }}>
+          {[5,8,11,14].map((h,i) => <div key={i} style={{ width:"3px", height:`${h}px`, background: i<3 ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.3)", borderRadius:"1.5px" }}/>)}
+        </div>
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+          <path d="M8 10a1 1 0 100 2 1 1 0 000-2z" fill="rgba(255,255,255,0.95)"/>
+          <path d="M4.5 7.5C5.6 6.5 6.7 6 8 6s2.4.5 3.5 1.5" stroke="rgba(255,255,255,0.95)" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
+          <path d="M1.5 4.5C3.2 2.8 5.4 2 8 2s4.8.8 6.5 2.5" stroke="rgba(255,255,255,0.5)" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
         </svg>
-        <svg width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
-          <path
-            d="M7 8.5 C7 8.5 7 8.5 7 8.5"
-            stroke="rgba(26,18,9,0.65)"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-          />
-          <path
-            d="M4.5 6.5 C5.2 5.8 5.9 5.5 7 5.5 C8.1 5.5 8.8 5.8 9.5 6.5"
-            stroke="rgba(26,18,9,0.65)"
-            strokeWidth="1.3"
-            fill="none"
-            strokeLinecap="round"
-          />
-          <path
-            d="M2.2 4.2 C3.5 2.9 5.1 2.2 7 2.2 C8.9 2.2 10.5 2.9 11.8 4.2"
-            stroke="rgba(26,18,9,0.65)"
-            strokeWidth="1.3"
-            fill="none"
-            strokeLinecap="round"
-          />
-        </svg>
-        <div style={{ display: "flex", alignItems: "center", gap: "1px" }}>
-          <div
-            style={{
-              width: "18px",
-              height: "9px",
-              borderRadius: "2px",
-              border: "1px solid rgba(26,18,9,0.5)",
-              padding: "1px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <div
-              style={{
-                width: "75%",
-                height: "100%",
-                borderRadius: "1px",
-                background: "#22c55e",
-              }}
-            />
+        <div style={{ display:"flex", alignItems:"center", gap:"1px" }}>
+          <span style={{ fontSize:"10px", fontWeight:"600", color:"rgba(255,255,255,0.8)", marginRight:"2px", fontFamily:"-apple-system,sans-serif" }}>71%</span>
+          <div style={{ width:"22px", height:"11px", borderRadius:"3px", border:"1.5px solid rgba(255,255,255,0.55)", padding:"1.5px", display:"flex", alignItems:"center" }}>
+            <div style={{ width:"65%", height:"100%", background:"rgba(255,255,255,0.9)", borderRadius:"1px" }}/>
           </div>
-          <div
-            style={{
-              width: "2px",
-              height: "4px",
-              borderRadius: "0 1px 1px 0",
-              background: "rgba(26,18,9,0.4)",
-            }}
-          />
+          <div style={{ width:"2px", height:"5px", background:"rgba(255,255,255,0.45)", borderRadius:"0 1.5px 1.5px 0" }}/>
         </div>
       </div>
     </div>
   );
 }
 
-function VenmoLogo() {
+// ─── Notification Banner ───────────────────────────────────────────────────
+function NotificationBanner({ text, visible }) {
   return (
-    <div
-      aria-hidden="true"
-      style={{
-        width: "28px",
-        height: "28px",
-        borderRadius: "8px",
-        background: "#008CFF",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3)",
-        flexShrink: 0,
-      }}
-    >
-      <span
-        style={{
-          color: "#fff",
-          fontSize: "19px",
-          fontWeight: "900",
-          fontStyle: "italic",
-          transform: "translateY(-1px) skewX(-11deg)",
-          lineHeight: 1,
-          fontFamily: "'Arial Black', 'Inter', sans-serif",
-        }}
-      >
-        v
-      </span>
-    </div>
-  );
-}
-
-function NotificationBanner({ notification, visible }) {
-  if (!notification) {
-    return null;
-  }
-
-  const isPayment = notification.type === "payment";
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: "24px",
-        left: "10px",
-        right: "10px",
-        zIndex: 30,
-        background: "rgba(255,255,255,0.92)",
-        color: "#1a1209",
-        backdropFilter: "blur(18px)",
-        WebkitBackdropFilter: "blur(18px)",
-        borderRadius: "16px",
-        padding: "10px 12px",
-        boxShadow: "0 18px 40px rgba(15,23,42,0.14), 0 2px 8px rgba(0,0,0,0.08)",
-        border: "1px solid rgba(255,255,255,0.55)",
-        display: "flex",
-        alignItems: "flex-start",
-        gap: "9px",
-        transform: visible ? "translateY(0)" : "translateY(-115%)",
-        opacity: visible ? 1 : 0,
-        transition: `transform ${scaleMs(350)}ms ease, opacity ${scaleMs(250)}ms ease`,
-        pointerEvents: "none",
-      }}
-    >
-      {isPayment ? (
-        <VenmoLogo />
-      ) : (
-        <div
-          style={{
-            width: "28px",
-            height: "28px",
-            borderRadius: "8px",
-            background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            fontSize: "13px",
-            fontWeight: "800",
-            color: "#fff",
-          }}
-        >
-          CS
-        </div>
-      )}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "3px",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "5px", minWidth: 0 }}>
-            <span
-              style={{
-                fontSize: "10px",
-                fontWeight: "800",
-                color: "#111827",
-                letterSpacing: "0.01em",
-              }}
-            >
-              {notification.appName}
-            </span>
-            <span style={{ fontSize: "9px", color: "rgba(26,18,9,0.35)" }}>now</span>
-          </div>
-        </div>
-        <p
-          style={{
-            fontSize: "11px",
-            fontWeight: "700",
-            margin: "0 0 1px",
-            color: "#111827",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {notification.title}
-        </p>
-        <p
-          style={{
-            fontSize: "10px",
-            margin: "0 0 1px",
-            color: "#111827",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {notification.source}
-        </p>
-        <p
-          style={{
-            fontSize: "10px",
-            margin: 0,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            color: "rgba(26,18,9,0.55)",
-          }}
-        >
-          {notification.detail}
-        </p>
+    <div style={{ position:"absolute", top:"40px", left:"50%", transform:`translateX(-50%) translateY(${visible?"0":"-70px"})`, opacity: visible?1:0, transition:"transform 0.45s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease", zIndex:30, background:"rgba(28,28,32,0.94)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)", borderRadius:"18px", padding:"10px 14px", display:"flex", alignItems:"center", gap:"10px", border:"1px solid rgba(255,255,255,0.1)", boxShadow:"0 12px 32px rgba(0,0,0,0.5)", whiteSpace:"nowrap", minWidth:"240px" }}>
+      <AppIcon type="clientsurge" size={28}/>
+      <div>
+        <p style={{ fontSize:"10px", fontWeight:"700", color:"rgba(255,255,255,0.55)", margin:0, letterSpacing:"0.02em", fontFamily:"-apple-system,sans-serif" }}>CLIENTSURGE · NOW</p>
+        <p style={{ fontSize:"12px", fontWeight:"600", color:"rgba(255,255,255,0.95)", margin:"1px 0 0", fontFamily:"-apple-system,sans-serif" }}>{text}</p>
       </div>
     </div>
   );
 }
 
-function TypingDots() {
+// ─── Enhancement 4: Springboard Page Indicator ────────────────────────────
+function PageIndicator({ activeIdx, total, onSelect }) {
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "3px",
-        padding: "7px 10px",
-        background: "#f0ece6",
-        borderRadius: "3px 10px 10px 10px",
-        width: "fit-content",
-      }}
-    >
-      {[0, 1, 2].map((index) => (
-        <div
-          key={index}
-          style={{
-            width: "5px",
-            height: "5px",
-            borderRadius: "50%",
-            background: "rgba(26,18,9,0.35)",
-            animation: `typingDot ${scaleMs(1200)}ms ease-in-out ${Math.round(index * 280)}ms infinite`,
-          }}
-        />
+    <div style={{ display:"flex", alignItems:"center", gap:"7px", justifyContent:"center", padding:"6px 0", position:"relative", zIndex:10 }}>
+      {Array.from({ length: total }).map((_,i) => (
+        <button key={i} onClick={() => onSelect(i)} style={{ width: i===activeIdx?"20px":"6px", height:"6px", borderRadius:"9999px", background: i===activeIdx?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.3)", border:"none", cursor:"pointer", padding:0, transition:"width 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease" }}/>
       ))}
     </div>
   );
 }
 
+// ─── Dashboard Card ────────────────────────────────────────────────────────
+function DashboardCard({ industry, visible }) {
+  const val0 = useCounter(industry.metrics[0].val, 1200);
+  const val1 = useCounter(industry.metrics[1].val, 1400);
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    setTick(0);
+    let i = 0;
+    const interval = setInterval(() => { i++; setTick(i); }, 900);
+    return () => clearInterval(interval);
+  }, [industry]);
+  const visibleChecks = Math.min(tick, industry.checks.length);
+  return (
+    <div style={{ position:"absolute", right:"10px", top:"50%", transform:`translateY(-50%) ${visible?"translateX(0) scale(1)":"translateX(30px) scale(0.95)"}`, opacity: visible?1:0, transition:"transform 0.55s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease", width:"190px", background:"rgba(255,255,255,0.12)", backdropFilter:"blur(24px)", WebkitBackdropFilter:"blur(24px)", borderRadius:"18px", boxShadow:"0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.2)", border:"1px solid rgba(255,255,255,0.2)", padding:"14px", zIndex:10 }}>
+      <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:"10px" }}>
+        <div>
+          <p style={{ fontSize:"10px", fontWeight:"800", color:"rgba(255,255,255,0.9)", margin:0 }}>{industry.cardTitle}</p>
+          <p style={{ fontSize:"9px", color:"rgba(255,255,255,0.45)", margin:"2px 0 0", fontWeight:"600" }}>{industry.cardSub}</p>
+        </div>
+        <span style={{ fontSize:"8px", fontWeight:"800", color:"#4ade80", background:"rgba(74,222,128,0.15)", border:"1px solid rgba(74,222,128,0.3)", padding:"2px 7px", borderRadius:"999px" }}>LIVE</span>
+      </div>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"6px", marginBottom:"10px" }}>
+        {[{ label:industry.metrics[0].label, val:val0 },{ label:industry.metrics[1].label, val:val1 }].map(m => (
+          <div key={m.label} style={{ background:"rgba(255,255,255,0.08)", borderRadius:"10px", padding:"7px", border:"1px solid rgba(255,255,255,0.1)" }}>
+            <p style={{ fontSize:"7px", fontWeight:"700", color:"rgba(255,255,255,0.45)", textTransform:"uppercase", letterSpacing:"0.06em", margin:"0 0 3px" }}>{m.label}</p>
+            <p style={{ fontSize:"18px", fontWeight:"900", color:"#fff", margin:0, lineHeight:1 }}>{m.val}</p>
+          </div>
+        ))}
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:"5px", marginBottom:"8px" }}>
+        {industry.checks.map((check,i) => (
+          <div key={check} style={{ display:"flex", alignItems:"center", gap:"6px", opacity: i<visibleChecks?1:0.2, transform: i<visibleChecks?"translateX(0)":"translateX(-4px)", transition:`opacity 0.3s ease ${i*0.08}s, transform 0.3s ease ${i*0.08}s` }}>
+            <div style={{ width:"13px", height:"13px", borderRadius:"50%", flexShrink:0, background: i<visibleChecks?"linear-gradient(135deg,#00AEEF,#003B8F)":"rgba(255,255,255,0.1)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow: i<visibleChecks?"0 2px 6px rgba(0,174,239,0.4)":"none" }}>
+              {i<visibleChecks && <svg width="7" height="7" viewBox="0 0 10 10" fill="none"><polyline points="2,5 4,7.5 8,2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+            </div>
+            <span style={{ fontSize:"9px", fontWeight: i<visibleChecks?"700":"500", color: i<visibleChecks?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.3)" }}>{check}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ paddingTop:"7px", borderTop:"1px solid rgba(255,255,255,0.1)", display:"flex", alignItems:"center", gap:"5px" }}>
+        <div style={{ width:"5px", height:"5px", borderRadius:"50%", background:"#4ade80", boxShadow:"0 0 5px #4ade80", animation:"ipadPulse 2s infinite", flexShrink:0 }}/>
+        <span style={{ fontSize:"8px", fontWeight:"700", color:"rgba(255,255,255,0.5)" }}>{industry.footer}</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Enhancement 1: Realistic iOS Dock ────────────────────────────────────
+function AppDock() {
+  const dockApps = [
+    { type:"messages", label:"Messages" },
+    { type:"calendar", label:"Calendar" },
+    { type:"clientsurge", label:"ClientSurge" },
+    { type:"settings", label:"Settings" },
+  ];
+  return (
+    <div style={{ display:"flex", justifyContent:"center", padding:"5px 0 7px", background:"rgba(0,0,0,0.25)", borderTop:"0.5px solid rgba(255,255,255,0.1)", flexShrink:0, position:"relative", zIndex:10 }}>
+      <div style={{ display:"flex", gap:"16px", alignItems:"center", background:"rgba(255,255,255,0.13)", backdropFilter:"blur(28px)", WebkitBackdropFilter:"blur(28px)", borderRadius:"20px", border:"0.5px solid rgba(255,255,255,0.2)", padding:"7px 16px", boxShadow:"0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)" }}>
+        {dockApps.map(app => (
+          <div key={app.label} style={{ display:"flex", flexDirection:"column", alignItems:"center", gap:"3px" }}>
+            <div style={{ borderRadius:"9px", boxShadow:"0 3px 10px rgba(0,0,0,0.35)", overflow:"hidden" }}>
+              <AppIcon type={app.type} size={34}/>
+            </div>
+            <span style={{ fontSize:"8px", color:"rgba(255,255,255,0.65)", fontWeight:"600", fontFamily:"-apple-system,sans-serif" }}>{app.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Screen Content ────────────────────────────────────────────────────────
+function ScreenContent({ industry, fading, cardVisible }) {
+  const PILLS = ["⚡ 60s Response", "🤖 AI-Powered", "📍 All Industries", "✅ No Contracts"];
+  return (
+    <div style={{ flex:1, display:"flex", overflow:"hidden", position:"relative" }}>
+      <HomeScreenGrid/>
+      <div aria-hidden="true" style={{ position:"absolute", inset:0, pointerEvents:"none", zIndex:1 }}>
+        <div style={{ position:"absolute", top:"-15%", left:"-5%", width:"55%", height:"55%", borderRadius:"50%", background:"radial-gradient(circle, rgba(0,174,239,0.2) 0%, transparent 70%)", filter:"blur(30px)" }}/>
+        <div style={{ position:"absolute", bottom:"-10%", right:"15%", width:"50%", height:"50%", borderRadius:"50%", background:"radial-gradient(circle, rgba(0,59,143,0.28) 0%, transparent 70%)", filter:"blur(30px)" }}/>
+      </div>
+      <div style={{ flex:1, padding:"16px 200px 12px 16px", display:"flex", flexDirection:"column", gap:"10px", position:"relative", zIndex:2, opacity: fading?0:1, transform: fading?"translateY(4px)":"translateY(0)", transition:"opacity 0.35s ease, transform 0.35s ease" }}>
+        <span style={{ display:"inline-flex", alignItems:"center", gap:"5px", background:"rgba(0,174,239,0.15)", border:"1px solid rgba(0,174,239,0.4)", borderRadius:"999px", padding:"3px 12px", fontSize:"9px", fontWeight:"800", color:"#00AEEF", letterSpacing:"0.12em", textTransform:"uppercase", alignSelf:"flex-start" }}>
+          <span style={{ width:"5px", height:"5px", borderRadius:"50%", background:"#00AEEF", display:"inline-block", animation:"ipadPulse 1.8s infinite" }}/>
+          {industry.badge}
+        </span>
+        <h2 style={{ fontSize:"clamp(1.1rem, 2.8vw, 1.6rem)", fontWeight:"800", color:"#ffffff", lineHeight:1.1, margin:0, letterSpacing:"-0.03em", fontFamily:"-apple-system,'SF Pro Display','Helvetica Neue',sans-serif" }}>
+          {industry.headline}{" "}
+          <span style={{ color:industry.color, filter:`drop-shadow(0 0 10px ${industry.color}80)` }}>{industry.accent}</span>
+        </h2>
+        <div style={{ width:"36px", height:"2px", background:`linear-gradient(90deg, ${industry.color}, transparent)`, borderRadius:"2px" }}/>
+        <p style={{ fontSize:"11px", color:"rgba(255,255,255,0.62)", lineHeight:1.6, maxWidth:"260px", margin:0, fontFamily:"-apple-system,'SF Pro Text','Helvetica Neue',sans-serif", fontWeight:"400" }}>{industry.sub}</p>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:"5px" }}>
+          {PILLS.map(pill => <span key={pill} style={{ display:"inline-flex", alignItems:"center", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.13)", borderRadius:"999px", padding:"3px 9px", fontSize:"9px", fontWeight:"700", color:"rgba(255,255,255,0.78)" }}>{pill}</span>)}
+        </div>
+        <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("clientsurge:open-demo"))}
+          style={{ display:"inline-flex", alignItems:"center", gap:"6px", alignSelf:"flex-start", background:"linear-gradient(135deg, #00AEEF 0%, #0088CC 50%, #003B8F 100%)", color:"#ffffff", fontWeight:"700", fontSize:"11px", padding:"8px 18px", borderRadius:"999px", border:"none", cursor:"pointer", boxShadow:"0 4px 14px rgba(0,174,239,0.45)", transition:"transform 0.15s ease", fontFamily:"-apple-system,'SF Pro Display','Helvetica Neue',sans-serif" }}
+          onMouseDown={e => e.currentTarget.style.transform="scale(0.96)"}
+          onMouseUp={e => e.currentTarget.style.transform="scale(1)"}
+          onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}>
+          Make the Leap
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
+        <div style={{ height:"1px", background:"rgba(255,255,255,0.08)", borderRadius:"1px", margin:"2px 0" }}/>
+        <div style={{ display:"flex", flexWrap:"wrap", gap:"5px" }}>
+          {["Pay-as-you-go","3x avg bookings","Live in 24–48 hrs"].map(item => <span key={item} style={{ display:"inline-flex", alignItems:"center", background:"rgba(0,0,0,0.2)", borderRadius:"999px", padding:"2px 8px", fontSize:"8px", fontWeight:"700", color:"rgba(255,255,255,0.45)", border:"1px solid rgba(255,255,255,0.07)" }}>{item}</span>)}
+        </div>
+      </div>
+      <DashboardCard industry={industry} visible={cardVisible}/>
+    </div>
+  );
+}
+
+// ─── Enhancement 5: Ultra-realistic iPad Pro Chassis ──────────────────────
+function IPadChassis({ children }) {
+  return (
+    <div style={{ position:"relative", background:"linear-gradient(160deg, #3a3a3e 0%, #2c2c2f 15%, #1e1e21 40%, #161618 65%, #1c1c1f 85%, #252528 100%)", borderRadius:"30px", padding:"15px", boxShadow:["0 0 0 0.5px rgba(255,255,255,0.04)","0 1px 0 0.5px rgba(255,255,255,0.1)","0 40px 100px rgba(0,0,0,0.7)","0 16px 40px rgba(0,0,0,0.5)","0 4px 8px rgba(0,0,0,0.4)","inset 0 1px 0 rgba(255,255,255,0.06)"].join(", "), outline:"1px solid rgba(255,255,255,0.04)" }}>
+      {/* Power button */}
+      <div style={{ position:"absolute", right:"-3.5px", top:"90px", width:"3.5px", height:"48px", background:"linear-gradient(to right, #252528, #3a3a3e, #2c2c2f)", borderRadius:"0 4px 4px 0", boxShadow:"2px 0 5px rgba(0,0,0,0.5)" }}/>
+      {/* Volume buttons */}
+      <div style={{ position:"absolute", left:"-3.5px", top:"75px", width:"3.5px", height:"36px", background:"linear-gradient(to left, #252528, #3a3a3e)", borderRadius:"4px 0 0 4px", boxShadow:"-2px 0 5px rgba(0,0,0,0.4)" }}/>
+      <div style={{ position:"absolute", left:"-3.5px", top:"120px", width:"3.5px", height:"36px", background:"linear-gradient(to left, #252528, #3a3a3e)", borderRadius:"4px 0 0 4px", boxShadow:"-2px 0 5px rgba(0,0,0,0.4)" }}/>
+      <div style={{ position:"absolute", left:"-3.5px", top:"168px", width:"3.5px", height:"22px", background:"linear-gradient(to left, #252528, #3a3a3e)", borderRadius:"4px 0 0 4px" }}/>
+      {/* Front camera */}
+      <div style={{ position:"absolute", top:"6px", left:"50%", transform:"translateX(-50%)", display:"flex", alignItems:"center", gap:"4px" }}>
+        <div style={{ width:"4px", height:"4px", borderRadius:"50%", background:"#0d0d10", border:"0.5px solid rgba(255,255,255,0.04)" }}/>
+        <div style={{ width:"8px", height:"8px", borderRadius:"50%", background:"radial-gradient(circle at 35% 35%, #1a1a22, #0a0a0e)", border:"1px solid rgba(255,255,255,0.07)", boxShadow:"0 0 4px rgba(0,120,255,0.12)" }}/>
+        <div style={{ width:"3px", height:"3px", borderRadius:"50%", background:"#0d0d10" }}/>
+      </div>
+      {/* Screen */}
+      <div style={{ borderRadius:"20px", overflow:"hidden", background:"#050810", boxShadow:"inset 0 0 0 1px rgba(0,0,0,0.8), inset 0 3px 12px rgba(0,0,0,0.6)", position:"relative" }}>
+        <div aria-hidden="true" style={{ position:"absolute", inset:0, zIndex:50, pointerEvents:"none", borderRadius:"20px", background:"linear-gradient(130deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 20%, transparent 45%)" }}/>
+        {children}
+      </div>
+      {/* Bottom bar */}
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", paddingTop:"9px", paddingLeft:"20px", paddingRight:"20px" }}>
+        <div style={{ display:"flex", gap:"5px" }}>{[0,1,2].map(i=><div key={i} style={{ width:"3px", height:"3px", borderRadius:"50%", background:"rgba(255,255,255,0.08)" }}/>)}</div>
+        <div style={{ width:"40px", height:"4px", borderRadius:"9999px", background:"rgba(255,255,255,0.2)" }}/>
+        <div style={{ display:"flex", gap:"5px" }}>{[0,1,2].map(i=><div key={i} style={{ width:"3px", height:"3px", borderRadius:"50%", background:"rgba(255,255,255,0.08)" }}/>)}</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Export ───────────────────────────────────────────────────────────
 export default function HeroDashboardScreen() {
-  const [activeMode, setActiveMode] = useState("lead_response");
-  const [aiRespondingDot, setAiRespondingDot] = useState(0);
-  const [notificationVisible, setNotificationVisible] = useState(false);
-  const [visibleMessages, setVisibleMessages] = useState(0);
-  const [showTyping, setShowTyping] = useState(false);
-  const [fadingOut, setFadingOut] = useState(false);
-  const [liveLeads, setLiveLeads] = useState(247);
-  const [liveRevenue, setLiveRevenue] = useState(4200);
-  const [revenueFlash, setRevenueFlash] = useState(false);
-  const [freshStep, setFreshStep] = useState(0);
-  const [ripple, setRipple] = useState(null);
-  const [glareVisible, setGlareVisible] = useState(false);
-  const [todayLeadTick, setTodayLeadTick] = useState(0);
+  const [idx, setIdx] = useState(0);
+  const [fading, setFading] = useState(false);
+  const [cardVisible, setCardVisible] = useState(false);
+  const [notifVisible, setNotifVisible] = useState(false);
+  const cycleRef = useRef(null);
   const touchStartX = useRef(null);
-  const cycleRef = useRef(0);
 
-  const currentMode = useMemo(() => DEMO_MODES[activeMode], [activeMode]);
-  const initialLeads = useCounter(247, scaleMs(2200), scaleMs(400));
-  const initialRevenue = useCounter(4200, scaleMs(2400), scaleMs(1000));
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setAiRespondingDot((value) => (value + 1) % 3);
-    }, scaleMs(400));
-
-    return () => clearInterval(intervalId);
+  const goToIndex = useCallback((newIdx) => {
+    setFading(true);
+    setCardVisible(false);
+    setNotifVisible(false);
+    clearTimeout(cycleRef.current);
+    setTimeout(() => {
+      setIdx(newIdx);
+      setFading(false);
+      setTimeout(() => {
+        setCardVisible(true);
+        setNotifVisible(true);
+        setTimeout(() => setNotifVisible(false), 2800);
+      }, 200);
+    }, 380);
   }, []);
 
-  useEffect(() => {
-    const rotateId = setInterval(() => {
-      setActiveMode((previous) => {
-        const keys = Object.keys(DEMO_MODES);
-        const nextIndex = (keys.indexOf(previous) + 1) % keys.length;
-        return keys[nextIndex];
-      });
-    }, scaleMs(18000));
+  useEffect(() => { const t = setTimeout(() => setCardVisible(true), 300); return () => clearTimeout(t); }, []);
 
-    return () => clearInterval(rotateId);
+  useEffect(() => {
+    cycleRef.current = setTimeout(() => goToIndex((idx + 1) % INDUSTRIES.length), CYCLE_DURATION);
+    return () => clearTimeout(cycleRef.current);
+  }, [idx, goToIndex]);
+
+  useEffect(() => {
+    const t = setTimeout(() => { setNotifVisible(true); setTimeout(() => setNotifVisible(false), 2800); }, 800);
+    return () => clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    setNotificationVisible(true);
-    const hideId = setTimeout(() => setNotificationVisible(false), scaleMs(3600));
-    return () => clearTimeout(hideId);
-  }, [activeMode]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      if (Math.random() > 0.55) setLiveLeads((v) => v + 1);
-      if (Math.random() > 0.5) {
-        setLiveRevenue((v) => v + Math.floor(Math.random() * 90 + 30));
-        setRevenueFlash(true);
-        setTimeout(() => setRevenueFlash(false), 900);
-      }
-    }, scaleMs(16000));
-    return () => clearInterval(intervalId);
-  }, []);
-
-  // Enhancement 3: Periodic glare sweep
-  useEffect(() => {
-    const triggerGlare = () => {
-      setGlareVisible(true);
-      setTimeout(() => setGlareVisible(false), 1400);
-    };
-    triggerGlare();
-    const id = setInterval(triggerGlare, 8000);
-    return () => clearInterval(id);
-  }, []);
-
-  // Functionality enhancement 2: live "today" lead ticker in header
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (Math.random() > 0.6) setTodayLeadTick((v) => v + 1);
-    }, scaleMs(7000));
-    return () => clearInterval(id);
-  }, []);
-
-  // Enhancement 4: Swipe gesture to change tabs
-  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
-  const handleTouchEnd = (e) => {
+  const handleTouchStart = e => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = e => {
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) < 40) return;
-    const keys = Object.keys(DEMO_MODES);
-    setActiveMode((prev) => {
-      const idx = keys.indexOf(prev);
-      return diff > 0 ? keys[(idx + 1) % keys.length] : keys[(idx - 1 + keys.length) % keys.length];
-    });
+    if (Math.abs(diff) > 40) goToIndex(diff > 0 ? (idx+1)%INDUSTRIES.length : (idx-1+INDUSTRIES.length)%INDUSTRIES.length);
     touchStartX.current = null;
   };
 
-  // Enhancement 1: Tap ripple
-  const handleTabClick = (key, e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setRipple({ key, x: e.clientX - rect.left, y: e.clientY - rect.top });
-    setTimeout(() => setRipple(null), 500);
-    setActiveMode(key);
-  };
-
-  useEffect(() => {
-    setVisibleMessages(0);
-    setShowTyping(false);
-    setFadingOut(false);
-    setFreshStep(0);
-    cycleRef.current += 1;
-    const runId = cycleRef.current;
-    const timeouts = [];
-    const messages = currentMode.messages;
-
-    let delay = scaleMs(700);
-    messages.forEach((message, index) => {
-      if (message.role === "ai" && index > 0) {
-        timeouts.push(
-          setTimeout(() => {
-            if (cycleRef.current !== runId) {
-              return;
-            }
-            setShowTyping(true);
-          }, delay)
-        );
-        delay += scaleMs(1000);
-        timeouts.push(
-          setTimeout(() => {
-            if (cycleRef.current !== runId) {
-              return;
-            }
-            setShowTyping(false);
-            setVisibleMessages(index + 1);
-            setFreshStep(Math.min(index + 1, currentMode.steps.length - 1));
-          }, delay)
-        );
-      } else {
-        timeouts.push(
-          setTimeout(() => {
-            if (cycleRef.current !== runId) {
-              return;
-            }
-            setVisibleMessages(index + 1);
-            setFreshStep(Math.min(index, currentMode.steps.length - 1));
-          }, delay)
-        );
-      }
-
-      delay += scaleMs(1300);
-    });
-
-    timeouts.push(
-      setTimeout(() => {
-        if (cycleRef.current !== runId) {
-          return;
-        }
-        setFadingOut(true);
-      }, delay + scaleMs(2400))
-    );
-
-    timeouts.push(
-      setTimeout(() => {
-        if (cycleRef.current !== runId) {
-          return;
-        }
-        setVisibleMessages(0);
-        setShowTyping(false);
-        setFadingOut(false);
-        setFreshStep(0);
-      }, delay + scaleMs(3200))
-    );
-
-    return () => {
-      cycleRef.current += 1;
-      timeouts.forEach((timeoutId) => clearTimeout(timeoutId));
-    };
-  }, [currentMode]);
-
-  const displayLeads = liveLeads || initialLeads;
-  const displayRevenue = liveRevenue || initialRevenue;
-  const textPrimary = "#1a1209";
-  const textMuted = "rgba(26,18,9,0.45)";
-  const cardBackground = "#ffffff";
-  const cardBorder = "rgba(0,0,0,0.07)";
-  const sectionBackground = "#f0ece6";
+  const industry = INDUSTRIES[idx];
 
   return (
-    <div
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-      style={{
-        width: "100%",
-        height: "100%",
-        background: "#f8f5f0",
-        borderRadius: "12px",
-        display: "flex",
-        flexDirection: "column",
-        fontFamily: "-apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif",
-        overflow: "hidden",
-        position: "relative",
-        WebkitFontSmoothing: "antialiased",
-        MozOsxFontSmoothing: "grayscale",
-        textRendering: "optimizeLegibility",
-      }}
-    >
-      {/* Enhancement 3: Glass glare sweep */}
-      <div style={{
-        position: "absolute",
-        inset: 0,
-        zIndex: 50,
-        pointerEvents: "none",
-        overflow: "hidden",
-        borderRadius: "12px",
-      }}>
-        <div style={{
-          position: "absolute",
-          top: "-20%",
-          left: glareVisible ? "120%" : "-60%",
-          width: "40%",
-          height: "140%",
-          background: "linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.18) 50%, transparent 80%)",
-          transform: "skewX(-12deg)",
-          transition: `left ${glareVisible ? 1400 : 0}ms cubic-bezier(0.4,0,0.2,1)`,
-          pointerEvents: "none",
-        }} />
-      </div>
-      <NotificationBanner notification={currentMode.notification} visible={notificationVisible} />
-
-      <StatusBar />
-
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: "2px" }}>
-        <div
-          style={{
-            width: "80px",
-            height: "3px",
-            borderRadius: "9999px",
-            background: "rgba(26,18,9,0.12)",
-          }}
-        />
-      </div>
-
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          gap: "10px",
-          padding: "0 14px 0",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            background: "rgba(255,255,255,0.82)",
-            backdropFilter: "blur(10px)",
-            WebkitBackdropFilter: "blur(10px)",
-            borderRadius: "10px",
-            padding: "7px 12px",
-            border: "1px solid rgba(255,255,255,0.35)",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <div
-              style={{
-                width: "26px",
-                height: "26px",
-                borderRadius: "7px",
-                background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <span style={{ fontSize: "9px", fontWeight: "800", color: "#fff" }}>CS</span>
-            </div>
-            <div>
-              <span style={{ fontSize: "11px", fontWeight: "700", color: textPrimary, display: "block" }}>
-                ClientSurge
-              </span>
-              <span style={{ fontSize: "8px", color: textMuted }}>{currentMode.helper}</span>
-            </div>
+    <div style={{ width:"100%", fontFamily:"-apple-system,'SF Pro Display','Helvetica Neue',sans-serif" }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <IPadChassis>
+        {/* Enhancement 3: Aurora wallpaper */}
+        <div style={{ display:"flex", flexDirection:"column", background:"linear-gradient(150deg, #0d1f3c 0%, #0a2a5e 20%, #071535 40%, #0c1a3d 60%, #061028 80%, #0a1830 100%)", height:"600px", position:"relative", overflow:"hidden" }}>
+          {/* Aurora layers */}
+          <div aria-hidden="true" style={{ position:"absolute", inset:0, pointerEvents:"none", zIndex:0 }}>
+            <div style={{ position:"absolute", top:"-20%", left:"10%", width:"60%", height:"60%", borderRadius:"50%", background:"radial-gradient(ellipse, rgba(0,80,200,0.35) 0%, transparent 65%)", filter:"blur(40px)", animation:"auroraFloat 8s ease-in-out infinite" }}/>
+            <div style={{ position:"absolute", top:"10%", right:"-10%", width:"50%", height:"50%", borderRadius:"50%", background:"radial-gradient(ellipse, rgba(0,140,240,0.25) 0%, transparent 65%)", filter:"blur(50px)", animation:"auroraFloat 10s ease-in-out infinite reverse" }}/>
+            <div style={{ position:"absolute", bottom:"-10%", left:"20%", width:"55%", height:"45%", borderRadius:"50%", background:"radial-gradient(ellipse, rgba(30,0,180,0.3) 0%, transparent 65%)", filter:"blur(45px)", animation:"auroraFloat 12s ease-in-out infinite 2s" }}/>
+            {[...Array(20)].map((_,i) => (
+              <div key={i} style={{ position:"absolute", left:`${(i*37+11)%90+5}%`, top:`${(i*53+7)%85+5}%`, width:`${(i%3)+1}px`, height:`${(i%3)+1}px`, borderRadius:"50%", background:"rgba(255,255,255,0.6)", animation:`starTwinkle ${2+(i%3)}s ease-in-out infinite ${(i*0.3)%2}s` }}/>
+            ))}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            {/* Functionality enhancement 2: live today counter badge */}
-            <div style={{
-              display: "flex", alignItems: "center", gap: "3px",
-              background: "linear-gradient(135deg,rgba(154,92,46,0.12),rgba(200,150,92,0.1))",
-              border: "1px solid rgba(154,92,46,0.2)",
-              borderRadius: "8px", padding: "2px 6px",
-            }}>
-              <span style={{ fontSize: "8px", fontWeight: "800", color: "#9a5c2e", letterSpacing: "0.04em" }}>
-                +{todayLeadTick + 3} today
-              </span>
-            </div>
-            <div
-              style={{
-                width: "6px",
-                height: "6px",
-                borderRadius: "50%",
-                background: "#22c55e",
-                boxShadow: "0 0 6px #22c55e",
-                animation: `hPulse ${scaleMs(2000)}ms infinite`,
-              }}
-            />
-            <span style={{ fontSize: "9px", color: textMuted, fontWeight: "600" }}>
-              {currentMode.status}
-            </span>
+          <StatusBar/>
+          <NotificationBanner text={industry.notification} visible={notifVisible}/>
+          <div style={{ flex:1, display:"flex", overflow:"hidden", position:"relative", zIndex:1 }}>
+            <ScreenContent industry={industry} fading={fading} cardVisible={cardVisible}/>
           </div>
+          {/* Enhancement 4: Page indicator */}
+          <PageIndicator activeIdx={idx} total={INDUSTRIES.length} onSelect={goToIndex}/>
+          <AppDock/>
         </div>
-
-        <div
-          style={{
-            display: "flex",
-            gap: "6px",
-            background: "rgba(255,255,255,0.75)",
-            borderRadius: "11px",
-            padding: "4px",
-            border: "1px solid rgba(0,0,0,0.05)",
-          }}
-        >
-          {Object.entries(DEMO_MODES).map(([key, mode]) => {
-            const isActive = key === activeMode;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={(e) => handleTabClick(key, e)}
-                    style={{
-                      overflow: "hidden",
-                  flex: 1,
-                  border: isActive ? "1.5px solid rgba(200,150,92,0.55)" : "1.5px solid transparent",
-                  borderRadius: "8px",
-                  padding: "8px 6px",
-                  background: isActive
-                    ? "linear-gradient(135deg,#1a1209 0%,#2a1e0f 100%)"
-                    : "transparent",
-                  color: isActive ? "#f5e6d0" : textPrimary,
-                  cursor: "pointer",
-                  transition: `background ${scaleMs(220)}ms ease, color ${scaleMs(220)}ms ease, border-color ${scaleMs(220)}ms ease`,
-                  boxShadow: isActive ? "0 6px 14px rgba(26,18,9,0.2), inset 0 1px 0 rgba(200,150,92,0.2)" : "none",
-                }}
-              >
-                {/* Enhancement 1: Tap ripple */}
-                {ripple?.key === key && (
-                  <span style={{
-                    position: "absolute",
-                    borderRadius: "50%",
-                    background: "rgba(255,255,255,0.35)",
-                    width: "80px", height: "80px",
-                    left: ripple.x - 40, top: ripple.y - 40,
-                    animation: "rippleOut 0.5s ease-out forwards",
-                    pointerEvents: "none",
-                  }} />
-                )}
-                <span style={{ display: "block", fontSize: "10px", fontWeight: "800", position: "relative", zIndex: 1 }}>{mode.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "7px" }}>
-          {currentMode.stats.map((stat) => (
-            <div
-              key={stat.label}
-              style={{
-                background: cardBackground,
-                border: `1.5px solid ${cardBorder}`,
-                borderRadius: "11px",
-                padding: "10px 8px",
-                position: "relative",
-                overflow: "hidden",
-                boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-              }}
-            >
-              <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: "3px",
-                    background: `linear-gradient(90deg,${stat.accent}80,${stat.accent})`,
-                  }}
-                />
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-                  <div>
-                    <div style={{ fontSize: "8px", fontWeight: "700", color: textMuted, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                      {stat.label}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: "800",
-                        color: stat.accent,
-                        lineHeight: 1.15,
-                        marginTop: "5px",
-                      }}
-                    >
-                      {stat.value}
-                    </div>
-                  </div>
-                  {/* Functionality enhancement 1: mini sparkline */}
-                  <svg width="28" height="16" viewBox="0 0 28 16" style={{ marginTop: "2px", opacity: 0.7 }}>
-                    <polyline
-                      points="0,14 5,10 9,11 13,6 17,8 22,3 28,1"
-                      fill="none"
-                      stroke={stat.accent}
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <circle cx="28" cy="1" r="2" fill={stat.accent} />
-                  </svg>
-                </div>
-            </div>
-          ))}
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "0.92fr 1.08fr", gap: "10px", flex: 1, minHeight: 0 }}>
-          <div
-            style={{
-              background: cardBackground,
-              border: `1px solid ${cardBorder}`,
-              borderRadius: "11px",
-              padding: "12px",
-              display: "flex",
-              flexDirection: "column",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-              minHeight: 0,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "10px",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "9px",
-                  fontWeight: "700",
-                  color: textMuted,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.1em",
-                }}
-              >
-                {currentMode.headerTitle}
-              </span>
-              <span
-                style={{
-                  fontSize: "8px",
-                  fontWeight: "700",
-                  color: "#22c55e",
-                  background: "rgba(34,197,94,0.1)",
-                  padding: "2px 7px",
-                  borderRadius: "8px",
-                  border: "1px solid rgba(34,197,94,0.2)",
-                }}
-              >
-                Running
-              </span>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "7px", flex: 1 }}>
-              {currentMode.queueItems.map((item, index) => (
-                <div
-                  key={item.title}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "3px",
-                    padding: "8px 9px",
-                    borderRadius: "10px",
-                    background: sectionBackground,
-                    border: index === freshStep ? "1px solid rgba(34,197,94,0.35)" : "1px solid rgba(0,0,0,0.04)",
-                    boxShadow: index === freshStep ? "0 0 0 2px rgba(34,197,94,0.08)" : "none",
-                    transition: `border-color ${scaleMs(240)}ms ease, box-shadow ${scaleMs(240)}ms ease`,
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "6px" }}>
-                    <span style={{ fontSize: "10px", fontWeight: "700", color: textPrimary }}>{item.title}</span>
-                    <span
-                      style={{
-                        fontSize: "8px",
-                        fontWeight: "800",
-                        color: "#22c55e",
-                        background: "rgba(34,197,94,0.12)",
-                        border: "1px solid rgba(34,197,94,0.2)",
-                        padding: "2px 6px",
-                        borderRadius: "999px",
-                      }}
-                    >
-                      {item.badge}
-                    </span>
-                  </div>
-                  <span style={{ fontSize: "8px", color: textMuted }}>{item.meta}</span>
-                </div>
-              ))}
-
-              <div
-                style={{
-                  marginTop: "auto",
-                  padding: "8px 9px",
-                  borderRadius: "10px",
-                  background: "#f9f7f3",
-                  border: "1px dashed rgba(154,92,46,0.18)",
-                }}
-              >
-                <div style={{ fontSize: "8px", color: textMuted, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                  Today
-                </div>
-                <div style={{ fontSize: "12px", fontWeight: "800", color: textPrimary, marginTop: "2px" }}>
-                  {displayLeads}
-                </div>
-                {/* Enhancement 2: Revenue flash on tick */}
-                <div style={{
-                  fontSize: "8px",
-                  color: revenueFlash ? "#16a34a" : textMuted,
-                  fontWeight: revenueFlash ? "800" : "400",
-                  transition: "color 0.3s, font-weight 0.3s",
-                  background: revenueFlash ? "rgba(34,197,94,0.1)" : "transparent",
-                  borderRadius: "4px",
-                  padding: revenueFlash ? "1px 4px" : "0",
-                }}>
-                  active leads / ${displayRevenue.toLocaleString()} tracked
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            style={{
-              background: cardBackground,
-              border: `1px solid ${cardBorder}`,
-              borderRadius: "11px",
-              padding: "12px",
-              display: "flex",
-              flexDirection: "column",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-              overflow: "hidden",
-              minHeight: 0,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
-              <div
-                style={{
-                  width: "24px",
-                  height: "24px",
-                  borderRadius: "50%",
-                  background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  position: "relative",
-                }}
-              >
-                <span style={{ fontSize: "8px", fontWeight: "800", color: "#fff" }}>AI</span>
-                {[0, 1, 2].map((index) => (
-                  <div
-                    key={index}
-                    style={{
-                      position: "absolute",
-                      width: "3px",
-                      height: "3px",
-                      borderRadius: "50%",
-                      background: "#22c55e",
-                      boxShadow: "0 0 4px #22c55e",
-                      top: "-6px",
-                      left: `${4 + index * 3}px`,
-                      opacity: aiRespondingDot === index ? 1 : 0.28,
-                      transition: `opacity ${scaleMs(220)}ms ease`,
-                    }}
-                  />
-                ))}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ fontSize: "10px", fontWeight: "700", color: textPrimary, display: "block" }}>
-                  Automation conversation
-                </span>
-                <span style={{ fontSize: "8px", color: textMuted }}>{currentMode.label} workflow</span>
-              </div>
-              <div
-                style={{
-                  fontSize: "8px",
-                  fontWeight: "800",
-                  color: "#22c55e",
-                  background: "rgba(34,197,94,0.1)",
-                  border: "1px solid rgba(34,197,94,0.2)",
-                  padding: "2px 7px",
-                  borderRadius: "8px",
-                  flexShrink: 0,
-                }}
-              >
-                Live
-              </div>
-            </div>
-
-            <div
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                gap: "5px",
-                justifyContent: "flex-end",
-                opacity: fadingOut ? 0.45 : 1,
-                transition: `opacity ${scaleMs(420)}ms ease`,
-                minHeight: 0,
-              }}
-            >
-              {currentMode.messages.slice(0, visibleMessages).map((message, index) => {
-                const isAi = message.role === "ai";
-                const isSystem = message.role === "system";
-                return (
-                  <div
-                    key={`${activeMode}-${index}`}
-                    style={{
-                      display: "flex",
-                      justifyContent: isSystem ? "center" : isAi ? "flex-start" : "flex-end",
-                      animation: `sIn ${scaleMs(300)}ms ease-out`,
-                    }}
-                  >
-                    <div
-                      style={{
-                        maxWidth: isSystem ? "92%" : "82%",
-                        padding: isSystem ? "5px 8px" : "5px 8px",
-                        borderRadius: isSystem ? "999px" : isAi ? "3px 9px 9px 9px" : "9px 3px 9px 9px",
-                        background: isSystem
-                          ? "rgba(99,102,241,0.08)"
-                          : isAi
-                            ? "linear-gradient(135deg,#22c55e,#16a34a)"
-                            : "#e8e4de",
-                        fontSize: isSystem ? "8px" : "9px",
-                        lineHeight: 1.45,
-                        color: isSystem ? "#4f46e5" : isAi ? "#fff" : textPrimary,
-                        boxShadow: isAi ? "0 2px 8px rgba(34,197,94,0.18)" : "none",
-                        border: isSystem ? "1px solid rgba(99,102,241,0.12)" : "none",
-                        textAlign: isSystem ? "center" : "left",
-                      }}
-                    >
-                      {message.text}
-                    </div>
-                  </div>
-                );
-              })}
-              {showTyping && <TypingDots />}
-            </div>
-          </div>
-        </div>
-
-        <div
-          style={{
-            background: cardBackground,
-            border: `1px solid ${cardBorder}`,
-            borderRadius: "11px",
-            padding: "10px 12px",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: "7px",
-            }}
-          >
-            <span
-              style={{
-                fontSize: "9px",
-                fontWeight: "700",
-                color: textMuted,
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-              }}
-            >
-              What happens automatically
-            </span>
-            <span style={{ fontSize: "8px", color: textMuted }}>1 / 2 / 3</span>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "6px" }}>
-            {currentMode.steps.map((step, index) => {
-              const isActive = index <= freshStep;
-              return (
-                <div
-                  key={step}
-                  style={{
-                    padding: "7px 8px",
-                    borderRadius: "9px",
-                    background: isActive ? "rgba(34,197,94,0.12)" : sectionBackground,
-                    border: isActive ? "1px solid rgba(34,197,94,0.2)" : "1px solid rgba(0,0,0,0.04)",
-                    transition: `background ${scaleMs(220)}ms ease, border-color ${scaleMs(220)}ms ease`,
-                  }}
-                >
-                  <div style={{ fontSize: "8px", color: isActive ? "#15803d" : textMuted, marginBottom: "3px", fontWeight: "800" }}>
-                    STEP {index + 1}
-                  </div>
-                  <div style={{ fontSize: "9px", color: textPrimary, lineHeight: 1.35, fontWeight: "600" }}>
-                    {step}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "20px",
-          flexShrink: 0,
-        }}
-      >
-        <div
-          style={{
-            width: "32%",
-            height: "4px",
-            borderRadius: "9999px",
-            background: "rgba(26,18,9,0.18)",
-          }}
-        />
-      </div>
-
+      </IPadChassis>
       <style>{`
-        @keyframes hPulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.35 } }
-        @keyframes sIn { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: translateY(0) } }
-        @keyframes typingDot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4 } 30% { transform: translateY(-3px); opacity: 1 } }
-        @keyframes rippleOut { from { transform: scale(0); opacity: 1; } to { transform: scale(3); opacity: 0; } }
+        @keyframes ipadPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.85)} }
+        @keyframes auroraFloat { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(15px,-10px) scale(1.05)} 66%{transform:translate(-10px,8px) scale(0.97)} }
+        @keyframes starTwinkle { 0%,100%{opacity:0.6} 50%{opacity:0.1} }
       `}</style>
     </div>
   );

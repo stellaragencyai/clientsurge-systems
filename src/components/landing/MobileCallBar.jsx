@@ -8,13 +8,13 @@ export default function MobileCallBar() {
 
   return (
     <>
-      <div className="fixed bottom-0 inset-x-0 z-40 border-t border-primary/20 bg-background/95 backdrop-blur-sm md:hidden safe-area-inset-bottom">
-        <div className="px-3 py-2.5 flex gap-2">
+      <div className="fixed bottom-0 inset-x-0 z-40 border-t border-primary/20 bg-background/95 backdrop-blur-sm md:hidden safe-area-bottom-bar">
+        <div className="px-3 py-2.5 flex gap-2" style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 10px))" }}>
           <a
             href="tel:+16025843227"
             onClick={() => trackCTA?.("mobile_call_bar_call")}
             className="flex-1 flex items-center justify-center gap-2 rounded-full border border-primary/30 px-3 py-2.5 text-sm font-semibold text-primary"
-            style={{ background: "rgba(154,92,46,0.07)" }}
+            style={{ background: "rgba(0,174,239,0.07)" }}
           >
             <Phone className="w-4 h-4 flex-shrink-0" />
             <span>Call Now</span>
@@ -26,8 +26,8 @@ export default function MobileCallBar() {
             }}
             className="flex-2 flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white"
             style={{
-              background: "linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 40%, #7a4825 100%)",
-              boxShadow: "0 4px 14px rgba(120,70,20,0.35)",
+              background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
+              boxShadow: "0 4px 14px rgba(0,174,239,0.4)",
               flex: 2,
             }}
           >

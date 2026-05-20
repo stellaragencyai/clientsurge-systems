@@ -1,6 +1,10 @@
-import AdminDashboardLayout from "@/components/admin/AdminDashboardLayout";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import AdminShell from "@/components/admin/AdminShell";
+import AutomationsPanel from "@/components/admin/AutomationsPanel";
 
 export default function AdminAutomation() {
-  return <AdminDashboardLayout />;
+  return (
+    <AdminShell title="System Automations" activeId="automations">
+      <AutomationsPanel />
+    </AdminShell>
+  );
 }

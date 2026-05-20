@@ -33,7 +33,7 @@
       "enum": [
         "Starter System",
         "Growth System",
-        "Pro System"
+        "Elite System"
       ],
       "default": "Starter System"
     },
@@ -44,7 +44,7 @@
         "None",
         "Starter System",
         "Growth System",
-        "Pro System"
+        "Elite System"
       ],
       "default": "None"
     },
@@ -233,5 +233,47 @@
     "client_email",
     "client_name",
     "business_name"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "data.contact_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "data.contact_email": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

@@ -1,5 +1,5 @@
 /**
- * processNurtureCampaigns — daily runner for the 30-day nurture email sequence.
+ * processNurtureCampaigns — daily runner for the 30-day nurture email sequence. (redeployed 2026-05-02b)
  *
  * 8 steps over 30 days, each with a distinct content theme:
  *  Step 1 — Day 1  : Welcome + what to expect
@@ -16,7 +16,41 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
+
+// #97: 23-hour idempotency guard — prevents duplicate nurture sends
+const IDEMPOTENCY_WINDOW_MS = 23 * 3600000;
+async function wasRecentlySent(base44, leadId, stepKey) {
+  const since = new Date(Date.now() - IDEMPOTENCY_WINDOW_MS).toISOString();
+  const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
+    { context_id: leadId, context_type: "nurture" }, "-created_date", 10
+  ).catch(() => []);
+  return (events || []).some(e => {
+    try { return JSON.parse(e.metadata_json || "{}").step_key === stepKey && e.created_date > since; }
+    catch { return false; }
+  });
+}
+
+// Inlined from _shared/automationSecurity.js (relative imports not supported in deployed Deno runtime)
+function constantTimeEqual(left, right) {
+  if (typeof left !== "string" || typeof right !== "string" || left.length !== right.length) return false;
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+  return mismatch === 0;
+}
+function getBearerToken(req) {
+  const authorization = req.headers.get("authorization") || "";
+  const [scheme, token] = authorization.split(/\s+/, 2);
+  if (scheme?.toLowerCase() !== "bearer" || !token) return "";
+  return token.trim();
+}
+function allowAnonymousAutomation(req) {
+  const configuredSecret = Deno.env.get("AUTOMATION_SHARED_SECRET");
+  if (!configuredSecret) return true;
+  const candidateSecret = req.headers.get("x-automation-secret") || getBearerToken(req);
+  return constantTimeEqual(candidateSecret || "", configuredSecret);
+}
 
 const STOP_STATUSES = ["Booked", "Closed"];
 
@@ -242,6 +276,17 @@ Deno.serve(async (req) => {
         if (STOP_STATUSES.includes(lead.status)) {
           const stopReason = lead.status === "Booked" ? "booked" : "closed";
           await base44.asServiceRole.entities.NurtureCampaign.update(campaign.id, { status: "stopped", stop_reason: stopReason });
+          results.stopped++;
+          continue;
+        }
+
+        // #95: TCPA — skip if lead has opted out via SMS STOP keyword
+        if (lead.automation_enabled === false || lead.cadence_paused === true) {
+          await base44.asServiceRole.entities.NurtureCampaign.update(campaign.id, {
+            status: "stopped",
+            stop_reason: "opted_out",
+            notes: "Lead opted out via SMS STOP or cadence manually paused."
+          });
           results.stopped++;
           continue;
         }

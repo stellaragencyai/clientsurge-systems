@@ -51,7 +51,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     name: "14-Day Nurture Sequence",
     subtitle: "SMS + Email",
     description: "Multi-step SMS and email follow-up keeps leads warm for 14 days.",
-    setup_fee: 497,
+    setup_fee: 397,
     monthly_fee: 127,
     setup_price_id: "price_1TOwfiB9GU5ysJqEtwQAmCuN",
     monthly_price_id: "price_1TOwfiB9GU5ysJqEsoZmFl6D",
@@ -276,8 +276,8 @@ const PACKAGE_DEFINITIONS = [
     fit: "Best for businesses that need instant response and missed-call recovery first.",
     description: "Start with immediate website lead response plus automatic missed-call text-back.",
     included_service_keys: ["instant_lead_response", "missed_call_text_back"],
-    setup_total: 797,
-    monthly_total: 497,
+    setup_total: 695,
+    monthly_total: 197,
   },
   {
     package_key: "growth_system",
@@ -290,13 +290,13 @@ const PACKAGE_DEFINITIONS = [
       "nurture_sequence_14d",
       "ai_booking_agent",
     ],
-    setup_total: 1297,
-    monthly_total: 997,
+    setup_total: 1195,
+    monthly_total: 349,
     badge: "Most Popular",
     highlight: true,
   },
   {
-    package_key: "pro_system",
+    package_key: "elite_system",
     name: "Elite System",
     fit: "Best for teams that want the full response, reactivation, and review stack.",
     description: "The complete AI automation bundle — every service, fully managed.",
@@ -308,10 +308,21 @@ const PACKAGE_DEFINITIONS = [
       "lead_reactivation",
       "review_request",
     ],
-    setup_total: 2497,
-    monthly_total: 1997,
+    setup_total: 1495,
+    monthly_total: 469,
   },
 ];
+
+export const PACKAGE_KEY_ALIASES = {
+  starter: "starter_system",
+  starter_system: "starter_system",
+  growth: "growth_system",
+  growth_system: "growth_system",
+  elite: "elite_system",
+  elite_system: "elite_system",
+  pro: "elite_system",
+  pro_system: "elite_system",
+};
 
 const SERVICE_BY_PRODUCT_ID = Object.fromEntries(
   CANONICAL_SERVICE_PRODUCTS.map((product) => [product.product_id, product])
@@ -433,6 +444,23 @@ export function formatCurrency(amount) {
   return Number(amount || 0).toLocaleString();
 }
 
+export function normalizePackageKey(packageKey) {
+  const normalized = String(packageKey || "").trim().toLowerCase();
+  return PACKAGE_KEY_ALIASES[normalized] || normalized || null;
+}
+
+export function getPackageOfferByName(packageName) {
+  const normalizedName = String(packageName || "").trim().toLowerCase();
+  if (!normalizedName) {
+    return null;
+  }
+
+  return (
+    PACKAGE_OFFERS.find((offer) => offer.name.toLowerCase() === normalizedName) ||
+    null
+  );
+}
+
 export function getServiceProductById(productId) {
   return SERVICE_BY_PRODUCT_ID[productId] || null;
 }
@@ -450,7 +478,8 @@ export function getServiceProductBySetupPriceId(priceId) {
 }
 
 export function getPackageOffer(packageKey) {
-  return PACKAGE_OFFERS.find((offer) => offer.package_key === packageKey) || null;
+  const normalizedKey = normalizePackageKey(packageKey);
+  return PACKAGE_OFFERS.find((offer) => offer.package_key === normalizedKey) || null;
 }
 
 export function getBestPackageOfferForServiceKeys(serviceKeys = []) {
@@ -499,11 +528,11 @@ function selectBestPackageOffer(products) {
   }
 
   return [...eligible].sort((left, right) => {
-    const serviceCountDifference =
+    const packageSizeDifference =
       right.included_service_keys.length - left.included_service_keys.length;
 
-    if (serviceCountDifference !== 0) {
-      return serviceCountDifference;
+    if (packageSizeDifference !== 0) {
+      return packageSizeDifference;
     }
 
     const savingsDifference =
@@ -514,7 +543,7 @@ function selectBestPackageOffer(products) {
       return savingsDifference;
     }
 
-    return 0;
+    return right.setup_total - left.setup_total;
   })[0];
 }
 

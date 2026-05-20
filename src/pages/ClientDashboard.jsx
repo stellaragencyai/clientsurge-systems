@@ -10,6 +10,7 @@ import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import ChatAssistant from "@/components/dashboard/ChatAssistant";
 import { Loader2, ShoppingBag, Mail, Phone, RefreshCw } from "lucide-react";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
+import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
 
 // Map real install_status → numeric stage index (0–4)
 export const STAGE_MAP = {
@@ -26,15 +27,15 @@ function LoadingState() {
     <div style={{ textAlign: "center", padding: "80px 20px" }}>
       <div style={{
         width: "64px", height: "64px", borderRadius: "16px",
-        background: "linear-gradient(135deg,rgba(154,92,46,0.1),rgba(200,150,92,0.05))",
-        border: "1px solid rgba(154,92,46,0.15)",
+        background: "linear-gradient(135deg,rgba(0,174,239,0.1),rgba(0,59,143,0.05))",
+        border: "1px solid rgba(0,174,239,0.15)",
         display: "flex", alignItems: "center", justifyContent: "center",
         margin: "0 auto 16px",
       }}>
-        <Loader2 style={{ width: "28px", height: "28px", color: "#9a5c2e", animation: "spin 1s linear infinite" }} />
+        <Loader2 style={{ width: "28px", height: "28px", color: "#00AEEF", animation: "spin 1s linear infinite" }} />
       </div>
-      <p style={{ fontSize: "15px", fontWeight: "600", color: "#1b140d", margin: "0 0 4px" }}>Loading your dashboard…</p>
-      <p style={{ fontSize: "13px", color: "rgba(27,20,13,0.5)", margin: 0 }}>Fetching your installation status</p>
+      <p style={{ fontSize: "15px", fontWeight: "600", color: "#0A1628", margin: "0 0 4px" }}>Loading your dashboard…</p>
+      <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.5)", margin: 0 }}>Fetching your installation status</p>
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
   );
@@ -66,27 +67,27 @@ function EmptyState() {
   return (
     <div style={{
       borderRadius: "20px", textAlign: "center", padding: "60px 32px",
-      background: "rgba(255,255,255,0.85)", border: "1px solid rgba(154,92,46,0.1)",
-      boxShadow: "0 4px 24px rgba(15,23,42,0.06)",
+      background: "#ffffff", border: "1px solid rgba(0,174,239,0.12)",
+      boxShadow: "0 4px 24px rgba(0,59,143,0.07)",
     }}>
       <div style={{
         width: "72px", height: "72px", borderRadius: "20px", margin: "0 auto 20px",
-        background: "linear-gradient(135deg,rgba(154,92,46,0.1),rgba(200,150,92,0.06))",
-        border: "1px solid rgba(154,92,46,0.15)",
+        background: "linear-gradient(135deg,rgba(0,174,239,0.1),rgba(0,59,143,0.06))",
+        border: "1px solid rgba(0,174,239,0.15)",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
-        <ShoppingBag style={{ width: "32px", height: "32px", color: "#9a5c2e" }} />
+        <ShoppingBag style={{ width: "32px", height: "32px", color: "#0088CC" }} />
       </div>
-      <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#1b140d", margin: "0 0 8px" }}>No Services Yet</h3>
-      <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.55)", margin: "0 0 24px", maxWidth: "360px", display: "inline-block", lineHeight: 1.6 }}>
+      <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#0A1628", margin: "0 0 8px" }}>No Services Yet</h3>
+      <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.55)", margin: "0 0 24px", maxWidth: "360px", display: "inline-block", lineHeight: 1.6 }}>
         You don't have any active orders yet. Browse our AI automation store to get started.
       </p>
       <a href="/store" style={{
         display: "inline-flex", alignItems: "center", gap: "8px",
         padding: "12px 28px", borderRadius: "9999px",
-        background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)",
-        color: "#f5e6d0", fontWeight: "700", fontSize: "14px",
-        textDecoration: "none", boxShadow: "0 4px 18px rgba(120,70,20,0.28)",
+        background: "linear-gradient(135deg,#00AEEF,#003B8F)",
+        color: "#ffffff", fontWeight: "700", fontSize: "14px",
+        textDecoration: "none", boxShadow: "0 4px 18px rgba(0,174,239,0.35)",
       }}>
         Browse the AI Store →
       </a>
@@ -98,16 +99,16 @@ function SupportCard() {
   return (
     <div style={{
       borderRadius: "16px",
-      background: "linear-gradient(135deg, rgba(154,92,46,0.07) 0%, rgba(200,150,92,0.04) 100%)",
-      border: "1px solid rgba(154,92,46,0.14)",
+      background: "linear-gradient(135deg, rgba(0,174,239,0.06) 0%, rgba(0,59,143,0.03) 100%)",
+      border: "1px solid rgba(0,174,239,0.14)",
       padding: "24px 28px", marginTop: "32px",
       display: "flex", alignItems: "center", justifyContent: "space-between",
       flexWrap: "wrap", gap: "16px",
     }}>
       <div>
-        <p style={{ fontSize: "13px", fontWeight: "800", color: "#9a5c2e", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Need Help?</p>
-        <p style={{ fontSize: "15px", fontWeight: "700", color: "#1b140d", margin: "0 0 2px" }}>Our onboarding team is here for you</p>
-        <p style={{ fontSize: "13px", color: "rgba(27,20,13,0.55)", margin: 0 }}>Average response time: under 4 hours</p>
+        <p style={{ fontSize: "13px", fontWeight: "800", color: "#0088CC", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Need Help?</p>
+        <p style={{ fontSize: "15px", fontWeight: "700", color: "#0A1628", margin: "0 0 2px" }}>Our onboarding team is here for you</p>
+        <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", margin: 0 }}>Average response time: under 4 hours</p>
       </div>
       <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
         {[
@@ -117,8 +118,8 @@ function SupportCard() {
           <a key={label} href={href} style={{
             display: "inline-flex", alignItems: "center", gap: "6px",
             padding: "9px 16px", borderRadius: "9999px",
-            background: "rgba(255,255,255,0.85)", border: "1px solid rgba(154,92,46,0.18)",
-            color: "#9a5c2e", fontWeight: "600", fontSize: "13px", textDecoration: "none",
+            background: "#ffffff", border: "1px solid rgba(0,174,239,0.22)",
+            color: "#0088CC", fontWeight: "600", fontSize: "13px", textDecoration: "none",
           }}>
             <Icon style={{ width: "14px", height: "14px" }} />
             {label}
@@ -149,8 +150,8 @@ function LiveIndicator({ lastUpdated, onRefresh, isRefreshing }) {
       <button onClick={onRefresh} disabled={isRefreshing} style={{
         display: "inline-flex", alignItems: "center", gap: "4px",
         padding: "4px 10px", borderRadius: "9999px",
-        background: "rgba(154,92,46,0.07)", border: "1px solid rgba(154,92,46,0.15)",
-        color: "#9a5c2e", fontSize: "11px", fontWeight: "600", cursor: "pointer",
+        background: "rgba(0,174,239,0.07)", border: "1px solid rgba(0,174,239,0.15)",
+        color: "#0088CC", fontSize: "11px", fontWeight: "600", cursor: "pointer",
         opacity: isRefreshing ? 0.5 : 1,
       }}>
         <RefreshCw style={{ width: "10px", height: "10px", animation: isRefreshing ? "spin 1s linear infinite" : "none" }} />
@@ -167,6 +168,7 @@ export default function ClientDashboard() {
   const [userEmail, setUserEmail] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [portalUser, setPortalUser] = useState(null);
 
   const fetchPortal = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -176,16 +178,29 @@ export default function ClientDashboard() {
       const user = await base44.auth.me();
       if (!user) { setError("Please log in to view your dashboard."); return; }
       setUserEmail(user.email);
+      setPortalUser(user);
       const res = await base44.functions.invoke("getClientPortalContext", {});
       if (res.data?.success) {
         setPortalData(res.data);
+        setLastUpdated(new Date());
+      } else if (res.data?.code === "portal_project_not_found") {
+        // No project linked yet — show empty state, not an error
+        setPortalData({ success: true, project: null, order: null });
         setLastUpdated(new Date());
       } else {
         setError(res.data?.error || "Unable to load your portal data.");
       }
     } catch (err) {
       console.error("Portal fetch error:", err);
-      setError("Unable to load dashboard. Please try again.");
+      // Check if it's a 404 (no project linked yet)
+      const status = err?.response?.status || err?.status;
+      const code = err?.response?.data?.code || err?.data?.code;
+      if (status === 404 || code === "portal_project_not_found") {
+        setPortalData({ success: true, project: null, order: null });
+        setLastUpdated(new Date());
+      } else {
+        setError("Unable to load dashboard. Please try again.");
+      }
     } finally {
       setLoading(false);
       setIsRefreshing(false);
@@ -205,6 +220,8 @@ export default function ClientDashboard() {
   const services = portalData?.order?.services || [];
   const project = portalData?.project;
   const order = portalData?.order;
+  const user = portalData?.user || null;
+  const hasSetupInfo = !!(order?.install_configuration?.brand?.business_name || order?.install_configuration?.shared?.twilio_business_phone);
 
   // Build activeServices in the shape the sub-components expect
   const activeServices = services.map(svc => ({
@@ -221,11 +238,11 @@ export default function ClientDashboard() {
   if (!loading && !portalData && !error) {
     return (
       <DemoBookingProvider>
-        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#fdfbf8" }}>
+        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#ffffff" }}>
           <div style={{ textAlign: "center", padding: "48px 24px" }}>
-            <p style={{ fontSize: "20px", fontWeight: "700", color: "#1b140d", marginBottom: "8px" }}>Something went wrong</p>
-            <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.55)", marginBottom: "24px" }}>We could not load your dashboard. Please refresh or contact support.</p>
-            <a href="mailto:support@clientsurgesystems.com" style={{ color: "#9a5c2e", fontWeight: "600", fontSize: "14px" }}>support@clientsurgesystems.com</a>
+            <p style={{ fontSize: "20px", fontWeight: "700", color: "#0A1628", marginBottom: "8px" }}>Something went wrong</p>
+            <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.55)", marginBottom: "24px" }}>We could not load your dashboard. Please refresh or contact support.</p>
+            <a href="mailto:support@clientsurgesystems.com" style={{ color: "#0088CC", fontWeight: "600", fontSize: "14px" }}>support@clientsurgesystems.com</a>
           </div>
         </div>
       </DemoBookingProvider>
@@ -236,7 +253,7 @@ export default function ClientDashboard() {
     <DemoBookingProvider>
       <ChatAssistant installStatus={activeServices[0]?.installStatus} services={activeServices} />
       <MobileBottomNav />
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "linear-gradient(180deg, #fdfbf8 0%, #f8f3eb 50%, #fdfbf8 100%)" }}>
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#ffffff" }}>
         <Navbar />
 
         <main style={{ flex: 1, paddingTop: "72px" }}>
@@ -244,8 +261,13 @@ export default function ClientDashboard() {
 
             {loading ? <LoadingState /> : error ? <ErrorState message={error} onRetry={() => fetchPortal(false)} /> : (
               <>
+                <WelcomeBanner
+                  user={portalUser || { email: userEmail }}
+                  order={order}
+                  hasSetupInfo={hasSetupInfo}
+                />
+
                 <DashboardHeader
-                  userEmail={userEmail}
                   activeServices={activeServices}
                   project={project}
                   order={order}

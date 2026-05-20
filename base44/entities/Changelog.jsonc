@@ -1,0 +1,45 @@
+{
+  "name": "Changelog",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Title"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 2000
+    },
+    "version": {
+      "type": "string",
+      "title": "Version",
+      "description": "e.g. v1.2.0"
+    },
+    "category": {
+      "type": "string",
+      "title": "Category",
+      "enum": [
+        "new_feature",
+        "improvement",
+        "bug_fix",
+        "announcement"
+      ],
+      "default": "new_feature"
+    },
+    "date": {
+      "type": "string",
+      "title": "Release Date",
+      "format": "date"
+    },
+    "is_published": {
+      "type": "boolean",
+      "title": "Published",
+      "default": false
+    }
+  },
+  "required": [
+    "title",
+    "date"
+  ]
+}

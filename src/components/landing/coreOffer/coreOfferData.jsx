@@ -200,7 +200,7 @@ export const launchTimelineSteps = [
     title: "Browse & Select",
     duration: "5-10 min",
     description: "Pick the automations you need from our AI Store.",
-    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=85",
     bullets: [
       "Explore 12+ automation services in the AI Store",
       "Watch 2-3 minute demo videos for each automation",
@@ -215,7 +215,7 @@ export const launchTimelineSteps = [
     title: "Quick Signup & Checkout",
     duration: "5 min",
     description: "Create account, add to cart, and pay securely.",
-    image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1556742400-b5b7c512df18?w=800&q=85",
     bullets: [
       "Sign up with email and password in 60 seconds",
       "Add your selected automations to cart",
@@ -230,7 +230,7 @@ export const launchTimelineSteps = [
     title: "Instant Dashboard Access",
     duration: "Immediate",
     description: "You're in the system right now with everything ready.",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&q=85",
     bullets: [
       "Access your private dashboard immediately after payment",
       "Download setup guides and integration docs",
@@ -245,7 +245,7 @@ export const launchTimelineSteps = [
     title: "We Install Everything",
     duration: "1-2 hours",
     description: "Our system configures everything in the background while you watch.",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1573164713988-8665fc963095?w=800&q=85",
     bullets: [
       "Automated setup connects your integrations",
       "Your messaging and automation logic configured instantly",
@@ -260,7 +260,7 @@ export const launchTimelineSteps = [
     title: "You're Live & We Notify You",
     duration: "Fully automated",
     description: "Your automations are running and generating value now.",
-    image: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&q=85",
     bullets: [
       "All services live and actively handling leads",
       "Real-time dashboard shows leads coming through",

@@ -1,4 +1,4 @@
-import { Star, CheckCircle2 } from "lucide-react";
+import { Star } from "lucide-react";
 
 const testimonials = [
   { name: "Med Spa Owner", clinic: "Phoenix, AZ", text: "We went from missing leads to booking consultations same-day.", rating: 5 },

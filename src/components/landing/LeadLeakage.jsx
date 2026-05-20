@@ -13,13 +13,10 @@ export default function LeadLeakage() {
       }}
     >
       <div className="max-w-5xl mx-auto">
-        <div className="text-center pt-10 pb-16">
+        <div className="text-center pb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">Revenue You're Missing</p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
-            Already Have Great Reviews?{" "}
-            <span style={{ background: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 52%, #9a5c2e 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-              You're Sitting on Untapped Revenue.
-            </span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
+            Already Have Great Reviews? You're Sitting on Untapped Revenue.
           </h2>
         </div>
       </div>
@@ -31,7 +28,7 @@ export default function LeadLeakage() {
             {/* Hook stat */}
             <p
               className="font-titles text-lg font-bold mb-6"
-              style={{ color: "#9a5c2e" }}
+              style={{ color: "#0088CC" }}
             >
               78% of leads go cold in under an hour — most of yours already have.
             </p>
@@ -55,7 +52,7 @@ export default function LeadLeakage() {
                 <div
                   key={item.label}
                   className="flex gap-4"
-                  style={{ borderLeft: "2px solid rgba(154,92,46,0.25)", paddingLeft: "16px" }}
+                  style={{ borderLeft: "2px solid rgba(0,174,239,0.25)", paddingLeft: "16px" }}
                 >
                   <div>
                     <p className="font-titles text-sm font-semibold text-foreground mb-1">
@@ -73,11 +70,11 @@ export default function LeadLeakage() {
             <div
               className="mt-6 rounded-2xl px-5 py-4 leading-relaxed"
               style={{
-                background: "rgba(154,92,46,0.06)",
-                border: "1px solid rgba(154,92,46,0.14)",
+                background: "rgba(0,174,239,0.06)",
+                border: "1px solid rgba(0,174,239,0.14)",
               }}
             >
-              <p className="font-titles text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5" style={{ color: "#9a5c2e" }}>
+              <p className="font-titles text-[10px] font-bold uppercase tracking-[0.18em] mb-1.5" style={{ color: "#0088CC" }}>
                 Also Included
               </p>
               <p className="font-titles text-sm" style={{ color: "rgba(27,20,13,0.72)" }}>
@@ -87,7 +84,7 @@ export default function LeadLeakage() {
           </div>
 
           {/* Revenue Recovery Counter Visual */}
-          <div className="flex justify-center scale-[1.15] origin-center">
+          <div className="flex justify-center scale-[1.05] origin-center">
             <RevenueRecoveryCounter />
           </div>
         </div>

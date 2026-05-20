@@ -46,7 +46,8 @@
         "sms",
         "email",
         "webhook",
-        "internal"
+        "internal",
+        "voice"
       ]
     },
     "direction": {
@@ -85,7 +86,12 @@
         "lead_reactivation_batch_completed",
         "review_request_trigger_simulated",
         "workflow_triggered",
-        "status_update"
+        "status_update",
+        "ai_generated",
+        "voice_call_initiated",
+        "voice_call_answered",
+        "voice_call_no_answer",
+        "voice_call_completed"
       ]
     },
     "provider": {
@@ -98,7 +104,8 @@
         "gmail",
         "zapier",
         "n8n",
-        "internal"
+        "internal",
+        "elevenlabs"
       ]
     },
     "status": {
@@ -141,5 +148,27 @@
     "event_type",
     "provider",
     "status"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

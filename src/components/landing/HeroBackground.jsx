@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 
-// Layer 1: Floating keyword drift canvas (#2)
-export function KeywordDriftCanvas() {
+export default function HeroBackground() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -9,291 +8,148 @@ export function KeywordDriftCanvas() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
 
-    const words = [
-      "LEADS", "AI", "BOOKED", "FOLLOW-UP", "SMS", "REVENUE",
-      "CLIENTS", "BOOKINGS", "RESPOND", "AUTOMATION", "$4,200",
-      "+32", "NURTURE", "PIPELINE", "INSTANT", "SEQUENCE",
-      "CONVERT", "SALES", "AGENTS", "CAPTURE",
-    ];
-
+    let animFrame;
     let particles = [];
-    let animId;
+    let w, h;
 
     function resize() {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
     }
 
-    function init() {
-      resize();
-      particles = Array.from({ length: 28 }, () => ({
-        word: words[Math.floor(Math.random() * words.length)],
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 11 + 8,
-        opacity: Math.random() * 0.055 + 0.018,
-        speedX: (Math.random() - 0.5) * 0.18,
-        speedY: (Math.random() - 0.5) * 0.12,
-        rotation: (Math.random() - 0.5) * 0.4,
-      }));
+    function createParticles() {
+      particles = [];
+      const count = Math.floor((w * h) / 7000);
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.random() * 1.6 + 0.3,
+          speed: Math.random() * 0.25 + 0.05,
+          opacity: Math.random() * 0.6 + 0.2,
+          drift: (Math.random() - 0.5) * 0.12,
+          pulse: Math.random() * Math.PI * 2,
+        });
+      }
     }
+
+    let t = 0;
 
     function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach((p) => {
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rotation);
-        ctx.globalAlpha = p.opacity;
-        ctx.font = `700 ${p.size}px 'Inter', sans-serif`;
-        ctx.fillStyle = "#c8965c";
-        ctx.letterSpacing = "0.08em";
-        ctx.fillText(p.word, 0, 0);
-        ctx.restore();
+      ctx.clearRect(0, 0, w, h);
 
-        p.x += p.speedX;
-        p.y += p.speedY;
+      // Deep space gradient base
+      const grad = ctx.createLinearGradient(0, 0, w, h);
+      grad.addColorStop(0, "#020818");
+      grad.addColorStop(0.35, "#030d24");
+      grad.addColorStop(0.65, "#050f30");
+      grad.addColorStop(1, "#020a1a");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
 
-        if (p.x > canvas.width + 100) p.x = -100;
-        if (p.x < -100) p.x = canvas.width + 100;
-        if (p.y > canvas.height + 40) p.y = -40;
-        if (p.y < -40) p.y = canvas.height + 40;
-      });
-      animId = requestAnimationFrame(draw);
+      // Nebula glow — top left
+      const glow1 = ctx.createRadialGradient(w * 0.08, h * 0.12, 0, w * 0.08, h * 0.12, w * 0.55);
+      glow1.addColorStop(0, "rgba(0,120,255,0.13)");
+      glow1.addColorStop(0.5, "rgba(0,80,200,0.06)");
+      glow1.addColorStop(1, "transparent");
+      ctx.fillStyle = glow1;
+      ctx.fillRect(0, 0, w, h);
+
+      // Nebula glow — right
+      const glow2 = ctx.createRadialGradient(w * 0.85, h * 0.3, 0, w * 0.85, h * 0.3, w * 0.45);
+      glow2.addColorStop(0, "rgba(0,174,239,0.1)");
+      glow2.addColorStop(0.5, "rgba(0,100,200,0.04)");
+      glow2.addColorStop(1, "transparent");
+      ctx.fillStyle = glow2;
+      ctx.fillRect(0, 0, w, h);
+
+      // Bottom aurora glow
+      const aurora = ctx.createLinearGradient(0, h * 0.7, 0, h);
+      aurora.addColorStop(0, "transparent");
+      aurora.addColorStop(0.5, "rgba(0,80,160,0.07)");
+      aurora.addColorStop(1, "rgba(0,40,100,0.12)");
+      ctx.fillStyle = aurora;
+      ctx.fillRect(0, 0, w, h);
+
+      // Grid lines — horizontal
+      ctx.strokeStyle = "rgba(0,174,239,0.04)";
+      ctx.lineWidth = 1;
+      const gridSize = 72;
+      for (let gx = 0; gx < w; gx += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(gx, 0);
+        ctx.lineTo(gx, h);
+        ctx.stroke();
+      }
+      for (let gy = 0; gy < h; gy += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, gy);
+        ctx.lineTo(w, gy);
+        ctx.stroke();
+      }
+
+      // Animated horizontal scan line
+      const scanY = ((t * 0.4) % (h + 100)) - 50;
+      const scanGrad = ctx.createLinearGradient(0, scanY - 60, 0, scanY + 60);
+      scanGrad.addColorStop(0, "transparent");
+      scanGrad.addColorStop(0.5, "rgba(0,174,239,0.06)");
+      scanGrad.addColorStop(1, "transparent");
+      ctx.fillStyle = scanGrad;
+      ctx.fillRect(0, scanY - 60, w, 120);
+
+      // Draw particles (stars)
+      t += 0.8;
+      for (let p of particles) {
+        p.y -= p.speed;
+        p.x += p.drift;
+        p.pulse += 0.02;
+        if (p.y < -5) { p.y = h + 5; p.x = Math.random() * w; }
+        if (p.x < -5) p.x = w + 5;
+        if (p.x > w + 5) p.x = -5;
+
+        const pulsedOpacity = p.opacity * (0.75 + 0.25 * Math.sin(p.pulse));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(180,220,255,${pulsedOpacity})`;
+        ctx.fill();
+
+        // Bright core for larger stars
+        if (p.r > 1.2) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r * 0.4, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${pulsedOpacity * 0.9})`;
+          ctx.fill();
+        }
+      }
+
+      animFrame = requestAnimationFrame(draw);
     }
 
-    init();
+    resize();
+    createParticles();
     draw();
 
-    const ro = new ResizeObserver(init);
-    ro.observe(canvas);
+    const handleResize = () => { resize(); createParticles(); };
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      cancelAnimationFrame(animId);
-      ro.disconnect();
+      cancelAnimationFrame(animFrame);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ zIndex: 1 }}
+      aria-hidden="true"
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 0,
+      }}
     />
-  );
-}
-
-// Layer 4: Radial spotlight glow (#4)
-export function RadialSpotlight() {
-  return (
-    <div
-      className="absolute inset-0 pointer-events-none"
-      style={{ zIndex: 2 }}
-      aria-hidden="true"
-    >
-      {/* Main warm amber spotlight centered-right */}
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "60%",
-          transform: "translate(-50%, -50%)",
-          width: "900px",
-          height: "700px",
-          borderRadius: "50%",
-          background: "radial-gradient(ellipse at center, rgba(200,150,92,0.13) 0%, rgba(154,92,46,0.06) 40%, transparent 70%)",
-          filter: "blur(2px)",
-        }}
-      />
-      {/* Secondary deep amber left glow */}
-      <div
-        style={{
-          position: "absolute",
-          top: "30%",
-          left: "10%",
-          width: "500px",
-          height: "500px",
-          borderRadius: "50%",
-          background: "radial-gradient(ellipse at center, rgba(120,70,20,0.10) 0%, transparent 65%)",
-        }}
-      />
-      {/* Top-center highlight */}
-      <div
-        style={{
-          position: "absolute",
-          top: "-10%",
-          left: "45%",
-          width: "600px",
-          height: "300px",
-          borderRadius: "50%",
-          background: "radial-gradient(ellipse at center, rgba(200,150,92,0.07) 0%, transparent 70%)",
-        }}
-      />
-    </div>
-  );
-}
-
-// Layer 9: Grain texture overlay (#9)
-export function GrainOverlay() {
-  return (
-    <>
-      <svg width="0" height="0" style={{ position: "absolute" }}>
-        <filter id="hero-grain">
-          <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-          <feColorMatrix type="saturate" values="0" />
-          <feBlend in="SourceGraphic" mode="overlay" />
-        </filter>
-      </svg>
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          zIndex: 3,
-          filter: "url(#hero-grain)",
-          opacity: 0.035,
-          background: "#fff",
-          mixBlendMode: "overlay",
-        }}
-        aria-hidden="true"
-      />
-    </>
-  );
-}
-
-// Layer 10: Giant watermark typography (#10)
-export function WatermarkTypography() {
-  return (
-    <div
-      className="absolute inset-0 overflow-hidden pointer-events-none select-none"
-      style={{ zIndex: 1 }}
-      aria-hidden="true"
-    >
-      <span
-        style={{
-          position: "absolute",
-          top: "-4%",
-          right: "-5%",
-          fontSize: "clamp(120px, 20vw, 280px)",
-          fontWeight: "900",
-          fontFamily: "'Inter', sans-serif",
-          color: "rgba(200,150,92,0.032)",
-          letterSpacing: "-0.04em",
-          lineHeight: 1,
-          transform: "rotate(-8deg)",
-          userSelect: "none",
-          whiteSpace: "nowrap",
-        }}
-      >
-        LEADS
-      </span>
-      <span
-        style={{
-          position: "absolute",
-          bottom: "5%",
-          left: "-2%",
-          fontSize: "clamp(80px, 14vw, 200px)",
-          fontWeight: "900",
-          fontFamily: "'Inter', sans-serif",
-          color: "rgba(200,150,92,0.025)",
-          letterSpacing: "-0.04em",
-          lineHeight: 1,
-          transform: "rotate(5deg)",
-          userSelect: "none",
-          whiteSpace: "nowrap",
-        }}
-      >
-        BOOKED
-      </span>
-      <span
-        style={{
-          position: "absolute",
-          top: "42%",
-          left: "28%",
-          fontSize: "clamp(60px, 10vw, 150px)",
-          fontWeight: "900",
-          fontFamily: "'Inter', sans-serif",
-          color: "rgba(200,150,92,0.018)",
-          letterSpacing: "-0.04em",
-          lineHeight: 1,
-          transform: "rotate(-3deg)",
-          userSelect: "none",
-          whiteSpace: "nowrap",
-        }}
-      >
-        AI
-      </span>
-    </div>
-  );
-}
-
-// Layer 3: Ghost stat cards (#3)
-export function GhostStatCards() {
-  const cards = [
-    {
-      label: "New Lead",
-      value: "Sarah M.",
-      sub: "Via Instagram Ad · 2 sec ago",
-      dot: "#22c55e",
-      top: "12%",
-      left: "4%",
-      rotate: "-6deg",
-    },
-    {
-      label: "Booking Confirmed",
-      value: "Thu 3:00 PM ✓",
-      sub: "Glow Med Spa · Laser Facial",
-      dot: "#c8965c",
-      top: "58%",
-      left: "2%",
-      rotate: "4deg",
-    },
-    {
-      label: "AI Replied",
-      value: "8 seconds",
-      sub: "Before competitor responded",
-      dot: "#a78bfa",
-      top: "30%",
-      right: "2%",
-      rotate: "5deg",
-    },
-  ];
-
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 4 }} aria-hidden="true">
-      {cards.map((card, i) => (
-        <div
-          key={i}
-          style={{
-            position: "absolute",
-            top: card.top,
-            left: card.left,
-            right: card.right,
-            transform: `rotate(${card.rotate})`,
-            width: "180px",
-            background: "rgba(255,255,255,0.035)",
-            border: "1px solid rgba(200,150,92,0.12)",
-            borderRadius: "16px",
-            padding: "12px 14px",
-            backdropFilter: "blur(6px)",
-            WebkitBackdropFilter: "blur(6px)",
-            opacity: 0.7,
-            animation: `ghostFloat${i} ${4 + i * 1.2}s ease-in-out infinite`,
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
-            <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: card.dot, flexShrink: 0 }} />
-            <span style={{ fontSize: "8px", fontWeight: "700", color: "rgba(245,230,208,0.45)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
-              {card.label}
-            </span>
-          </div>
-          <p style={{ fontSize: "12px", fontWeight: "700", color: "rgba(245,230,208,0.55)", margin: "2px 0" }}>{card.value}</p>
-          <p style={{ fontSize: "9px", color: "rgba(245,230,208,0.28)", lineHeight: 1.3 }}>{card.sub}</p>
-        </div>
-      ))}
-      <style>{`
-        @keyframes ghostFloat0 { 0%,100%{transform:rotate(-6deg) translateY(0)} 50%{transform:rotate(-6deg) translateY(-8px)} }
-        @keyframes ghostFloat1 { 0%,100%{transform:rotate(4deg) translateY(0)} 50%{transform:rotate(4deg) translateY(-6px)} }
-        @keyframes ghostFloat2 { 0%,100%{transform:rotate(5deg) translateY(0)} 50%{transform:rotate(5deg) translateY(-10px)} }
-      `}</style>
-    </div>
   );
 }

@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { TrendingUp, Users, Target, Zap, BarChart3, CheckCircle2 } from 'lucide-react';
+import { TrendingUp, Users, Target, BarChart3 } from 'lucide-react';
 
 export default function LeadMetrics({ analytics }) {
   const metrics = [

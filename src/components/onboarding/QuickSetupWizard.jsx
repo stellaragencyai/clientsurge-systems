@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 
 const INDUSTRIES = [
   { id: "med_spa", name: "Med Spa & Aesthetic Clinics", icon: "✨" },
@@ -11,49 +12,27 @@ const INDUSTRIES = [
   { id: "contractors", name: "General Contractors", icon: "🏗️" },
 ];
 
-const MODES = [
-  {
-    id: "instant_response",
-    name: "Instant Response",
-    price: "$397/mo",
-    setup: "$997",
-    description: "Instant SMS response to every lead",
-    features: ["Instant SMS response", "Basic confirmation", "Simple dashboard"],
-    best_for: "Get started quickly",
-  },
-  {
-    id: "instant_plus_nurture",
-    name: "Instant + Nurture",
-    price: "$797/mo",
-    setup: "$1,997",
-    description: "Instant response + 8-step follow-up",
-    features: [
-      "Everything in Instant",
-      "Missed call recovery",
-      "14-day nurture sequence",
-      "Booking integration",
-      "Team routing",
-    ],
-    best_for: "Stop losing leads to slow response",
-    recommended: true,
-  },
-  {
-    id: "full_automation",
-    name: "Full Automation",
-    price: "$1,500/mo",
-    setup: "$3,500",
-    description: "Complete AI-powered automation system",
-    features: [
-      "Everything above",
-      "AI lead scoring",
-      "AI intent detection",
-      "Smart routing",
-      "Churn prediction",
-      "Real-time analytics",
-    ],
-    best_for: "Maximum automation & intelligence",
-  },
-];
+function formatMoney(amount) {
+  return `$${Number(amount || 0).toLocaleString()}`;
+}
+
+const PACKAGE_MODE_MAP = {
+  starter_system: "instant_response",
+  growth_system: "instant_plus_nurture",
+  elite_system: "full_automation",
+};
+
+const MODES = PACKAGE_OFFERS.map((offer) => ({
+  id: PACKAGE_MODE_MAP[offer.package_key] || "full_automation",
+  packageKey: offer.package_key,
+  name: offer.name,
+  price: `${formatMoney(offer.monthly_total)}/mo`,
+  setup: formatMoney(offer.setup_total),
+  description: offer.description,
+  features: offer.included_services.map((service) => service.name),
+  best_for: offer.fit,
+  recommended: Boolean(offer.highlight),
+}));
 
 export default function QuickSetupWizard({ projectId, onComplete }) {
   const [step, setStep] = useState(1); // 1: Industry, 2: Mode, 3: Review, 4: Complete

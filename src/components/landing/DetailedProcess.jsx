@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { MessageSquare, Zap, Send, CalendarCheck, CheckCircle2, ChevronDown, ArrowRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { MessageSquare, Zap, Send, CalendarCheck, CheckCircle2 } from "lucide-react";
 
 const steps = [
   {

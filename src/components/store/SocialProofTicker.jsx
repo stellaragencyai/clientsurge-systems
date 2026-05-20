@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
 import { ShoppingCart, X } from "lucide-react";
 
-const mockPurchases = [
-  { name: "John's Roofing", service: "Instant Lead Response", time: "2 mins ago" },
-  { name: "Green HVAC Co", service: "14-Day Nurture Sequence", time: "8 mins ago" },
-  { name: "Elite Dental", service: "AI Booking Agent", time: "15 mins ago" },
-  { name: "Med Spa Luxe", service: "Missed Call Text-Back", time: "22 mins ago" },
-  { name: "Pro Contractors", service: "Instant Lead Response", time: "28 mins ago" },
+const SAFE_PURCHASE_SIGNALS = [
+  {
+    name: "A Phoenix med spa",
+    service: "Instant Lead Response",
+    time: "recently",
+  },
+  {
+    name: "A Scottsdale clinic",
+    service: "AI Booking Agent",
+    time: "today",
+  },
+  {
+    name: "A local home-services team",
+    service: "Missed Call Text-Back",
+    time: "this week",
+  },
 ];
 
 export default function SocialProofTicker() {
@@ -15,15 +25,19 @@ export default function SocialProofTicker() {
 
   useEffect(() => {
     setVisible(true);
+  }, []);
+
+  useEffect(() => {
+    if (!SAFE_PURCHASE_SIGNALS.length) return undefined;
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % mockPurchases.length);
+      setCurrentIndex((prev) => (prev + 1) % SAFE_PURCHASE_SIGNALS.length);
     }, 6000);
     return () => clearInterval(interval);
   }, []);
 
-  if (!visible) return null;
+  if (!visible || !SAFE_PURCHASE_SIGNALS.length) return null;
 
-  const purchase = mockPurchases[currentIndex];
+  const purchase = SAFE_PURCHASE_SIGNALS[currentIndex];
 
   return (
     <div
@@ -132,16 +146,6 @@ export default function SocialProofTicker() {
           to {
             opacity: 1;
             transform: translateY(0);
-          }
-        }
-        @keyframes fadeOut {
-          from {
-            opacity: 1;
-            transform: translateY(0);
-          }
-          to {
-            opacity: 0;
-            transform: translateY(20px);
           }
         }
       `}</style>

@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { useDemoBooking } from "./DemoBookingContext";
 import StardustOverlay from "./StardustOverlay";
 
@@ -5,12 +6,13 @@ const testimonials = [
   {
     name: "Jessica M.",
     businessType: "Med Spa",
-    location: "Miami, FL",
+    location: "Scottsdale, AZ",
     before: "Booking 2 consults/week from online leads",
     after: "10+ consults/week",
     result: "5x booking increase",
     quote: "The system just runs. I do not have to touch it.",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=65&auto=format",
+    initials: "JM",
+    color: "#00AEEF",
   },
   {
     name: "Carlos R.",
@@ -20,52 +22,61 @@ const testimonials = [
     after: "Close rate doubled",
     result: "ROI within the first month",
     quote: "It paid for itself in the first week.",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=65&auto=format",
+    initials: "CR",
+    color: "#003B8F",
   },
   {
     name: "Amanda T.",
     businessType: "Dental & Orthodontics",
-    location: "Austin, TX",
+    location: "Tempe, AZ",
     before: "Manual follow-up draining team time",
     after: "Consult requests answered same day",
     result: "Team freed for growth",
     quote: "Our front desk has breathing room again, and consults are getting booked faster.",
-    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&q=65&auto=format",
+    initials: "AT",
+    color: "#009DFF",
   },
 ];
 
 export default function Testimonials() {
   const demoBooking = useDemoBooking();
   return (
-    <section id="testimonials" className="nebula-testimonials py-24 md:py-32 px-6 relative overflow-hidden">
+    <section id="testimonials" className="nebula-testimonials py-32 md:py-44 px-6 relative overflow-hidden">
       <StardustOverlay seed={21} opacity={0.4} />
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Proven Results</p>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
            Real Results From Businesses Using Our System
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <motion.div
+          className="grid md:grid-cols-3 gap-6"
+          variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+        >
           {testimonials.map((testimonial) => (
-            <article
+            <motion.article
               key={testimonial.name}
-              className="flex flex-col rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 active:-translate-y-1 focus:-translate-y-1"
+              className="flex flex-col rounded-2xl p-6"
+              variants={{
+                hidden: { opacity: 0, y: 36 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+              }}
+              whileHover={{
+                y: -6,
+                boxShadow: "0 18px 48px rgba(0,174,239,0.18), 0 0 0 1.5px rgba(0,174,239,0.45), inset 0 1px 0 rgba(255,255,255,0.9)",
+              }}
+              transition={{ type: "spring", stiffness: 320, damping: 26 }}
               style={{
-                background: "linear-gradient(135deg, rgba(255,252,247,0.72) 0%, rgba(252,240,220,0.55) 100%)",
+                background: "linear-gradient(135deg, rgba(240,249,255,0.72) 0%, rgba(224,242,254,0.55) 100%)",
                 backdropFilter: "blur(18px)",
                 WebkitBackdropFilter: "blur(18px)",
-                border: "1.5px solid rgba(200,150,92,0.22)",
-                boxShadow: "0 4px 24px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.75)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.border = "1.5px solid rgba(200,150,92,0.5)";
-                e.currentTarget.style.boxShadow = "0 18px 48px rgba(154,92,46,0.16), 0 0 0 1px rgba(200,150,92,0.18), inset 0 1px 0 rgba(255,255,255,0.9)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.border = "1.5px solid rgba(200,150,92,0.22)";
-                e.currentTarget.style.boxShadow = "0 4px 24px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.75)";
+                border: "1.5px solid rgba(0,174,239,0.22)",
+                boxShadow: "0 4px 24px rgba(0,174,239,0.07), inset 0 1px 0 rgba(255,255,255,0.75)",
               }}
             >
               <div className="mb-4 flex items-center justify-between gap-3">
@@ -87,31 +98,32 @@ export default function Testimonials() {
               </div>
 
               <div className="mb-5 mt-5">
-                <span className="inline-flex items-center text-sm font-bold text-white px-4 py-2 rounded-full bg-gradient-to-r from-amber-800 to-amber-700">
+                <span className="inline-flex items-center text-sm font-bold text-white px-4 py-2 rounded-full bg-gradient-to-r from-[#0088CC] to-[#00AEEF]">
                   {testimonial.result}
                 </span>
               </div>
 
-              <p className="text-sm text-foreground/75 leading-relaxed flex-1 min-h-[72px] mb-6">
+              <div className="text-sm text-foreground/75 leading-relaxed flex-1 mb-6">
                 <div className="flex gap-0.5 mb-2">{[1,2,3,4,5].map(i => <span key={i} style={{fontSize:"13px"}}>⭐</span>)}</div>
                 "{testimonial.quote}"
-              </p>
+              </div>
 
               <div className="flex items-center gap-4">
-                <img
-                  src={testimonial.avatar}
-                  alt={`${testimonial.name}, ${testimonial.businessType} client testimonial`}
-                  loading="lazy"
-                  className="w-14 h-14 rounded-full object-cover ring-2 ring-primary/20 shadow-md"
-                />
+                <div
+                  className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-primary/20 shadow-md text-white text-sm font-bold"
+                  style={{ background: `linear-gradient(135deg, ${testimonial.color} 0%, ${testimonial.color}cc 100%)` }}
+                  aria-label={testimonial.name}
+                >
+                  {testimonial.initials}
+                </div>
                 <div>
                   <p className="text-sm font-bold text-foreground">{testimonial.name}</p>
-                  <p className="text-xs text-muted-foreground">{testimonial.location}</p>
+                  <p className="text-xs text-muted-foreground">{testimonial.businessType}</p>
                 </div>
               </div>
-            </article>
+            </motion.article>
           ))}
-        </div>
+        </motion.div>
 
         <div className="text-center mt-16 pt-10 border-t border-border">
           <p className="text-lg font-semibold text-foreground mb-4">
@@ -121,14 +133,16 @@ export default function Testimonials() {
             <button
               type="button"
               onClick={demoBooking.openDemoBooking}
-              className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white"
+              style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
             >
               Book Your Free Demo
             </button>
           ) : (
             <a
               href="/book"
-              className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white"
+              style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
             >
               Book Your Free Demo
             </a>

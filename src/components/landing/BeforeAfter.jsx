@@ -16,7 +16,7 @@ const scenarios = [
   {
     label: "Cold Lead",
     without: "You followed up once. No reply. You move on and forget about them.",
-    withCS: "System automatically sends Day 3, Day 7, and Day 14 messages. 30-40% of cold leads convert from follow-up alone.",
+    withCS: "System automatically sends Day 3, Day 7, and Day 14 messages. Many cold leads convert from follow-up alone.",
   },
   {
     label: "Busy Season",
@@ -30,13 +30,13 @@ export default function BeforeAfter() {
   const demoBooking = useDemoBooking();
 
   return (
-    <section className="py-20 md:py-28 px-6" style={{ background: "#faf8f5" }}>
+    <section id="problem-solution" className="py-20 md:py-28 px-6" style={{ background: "transparent" }}>
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
-          <p className="text-xs font-bold tracking-[0.3em] uppercase mb-4" style={{ color: "#9a5c2e" }}>
+          <p className="text-xs font-bold tracking-[0.3em] uppercase mb-4" style={{ color: "#00AEEF" }}>
             The Difference
           </p>
-          <h2 className="font-display font-bold tracking-tight text-foreground" style={{ fontSize: "clamp(1.75rem, 4vw, 3rem)" }}>
+          <h2 className="font-bold tracking-tight text-foreground" style={{ fontSize: "clamp(1.75rem, 4vw, 3rem)", fontFamily: "Montserrat, sans-serif" }}>
             What Changes When You Install ClientSurge
           </h2>
           <p className="mt-4 text-muted-foreground text-base max-w-2xl mx-auto">
@@ -49,14 +49,15 @@ export default function BeforeAfter() {
             <button
               key={i}
               onClick={() => setActive(i)}
-              className="px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 relative"
+              aria-pressed={active === i}
+              className="px-4 py-2 min-h-[44px] rounded-full text-sm font-semibold transition-all duration-200 relative"
               style={{
                 background: active === i
-                  ? "linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 100%)"
-                  : "rgba(154,92,46,0.08)",
-                color: active === i ? "#fff8ee" : "#9a5c2e",
-                border: active === i ? "none" : "1px solid rgba(154,92,46,0.2)",
-                boxShadow: active === i ? "0 4px 14px rgba(120,70,20,0.3)" : "none",
+                  ? "linear-gradient(135deg, #0088CC 0%, #00AEEF 100%)"
+                  : "rgba(0,174,239,0.08)",
+                color: active === i ? "#ffffff" : "#0088CC",
+                border: active === i ? "1px solid transparent" : "1px solid rgba(0,174,239,0.2)",
+                boxShadow: active === i ? "0 4px 14px rgba(0,174,239,0.35)" : "none",
               }}
             >
               {s.label}
@@ -89,10 +90,11 @@ export default function BeforeAfter() {
         <div className="text-center mt-12">
           <button
             onClick={() => demoBooking?.openDemoBooking?.()}
+            aria-label="See this system in action — book a free demo"
             className="inline-flex items-center gap-2 font-bold text-sm px-8 py-4 rounded-full text-white"
             style={{
-              background: "linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 40%, #7a4825 100%)",
-              boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+              background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #00AEEF 100%)",
+              boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
             }}
           >
             See This System in Action — Free Demo

@@ -4,7 +4,27 @@
  * Sends a rich HTML email to the admin via Resend.
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
+// Inlined from _shared/automationSecurity.js (relative imports not supported in deployed Deno runtime)
+function constantTimeEqual(left, right) {
+  if (typeof left !== "string" || typeof right !== "string" || left.length !== right.length) return false;
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+  return mismatch === 0;
+}
+function getBearerToken(req) {
+  const authorization = req.headers.get("authorization") || "";
+  const [scheme, token] = authorization.split(/\s+/, 2);
+  if (scheme?.toLowerCase() !== "bearer" || !token) return "";
+  return token.trim();
+}
+function allowAnonymousAutomation(req) {
+  const configuredSecret = Deno.env.get("AUTOMATION_SHARED_SECRET");
+  if (!configuredSecret) return true;
+  const candidateSecret = req.headers.get("x-automation-secret") || getBearerToken(req);
+  return constantTimeEqual(candidateSecret || "", configuredSecret);
+}
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -52,9 +72,9 @@ Deno.serve(async (req) => {
       return Response.json({ skipped: true, reason: 'Resend is disabled in AdminSettings' });
     }
 
-    const toEmail = settings.lead_notification_email;
+    const toEmail = settings.lead_notification_email || Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || Deno.env.get('ADMIN_EMAIL');
     if (!toEmail) {
-      console.warn('No lead_notification_email configured in AdminSettings — skipping notification.');
+      console.warn('No lead_notification_email configured in AdminSettings or env — skipping notification.');
       return Response.json({ skipped: true, reason: 'No notification email configured' });
     }
 
@@ -97,7 +117,7 @@ Deno.serve(async (req) => {
         <tr style="background:#fafafa;"><td style="padding:8px 6px;color:#888;vertical-align:top;font-weight:600;">Submitted</td><td style="padding:8px 6px;color:#888;font-size:12px;">${submittedAt}</td></tr>
       </table>
       <div style="margin-top:24px;">
-        <a href="https://clientsurge.base44.app/admin/leads/${lead.id}" style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
+        <a href="https://clientsurgesystems.com/admin/leads/${lead.id}" style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
           View Lead in Dashboard →
         </a>
       </div>
@@ -113,7 +133,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: settings.resend_from_email || 'notifications@clientsurge.com',
+        from: `ClientSurge Systems <${settings.resend_from_email || 'notifications@clientsurgesystems.com'}>`,
         to: toEmail,
         subject: `🎯 New Lead: ${lead.full_name} — ${lead.business_name || lead.business_type || 'Unknown'}`,
         html: htmlBody,

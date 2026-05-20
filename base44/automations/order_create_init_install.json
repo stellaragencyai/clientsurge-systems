@@ -1,0 +1,9 @@
+{
+  "id": "order_create_init_install",
+  "name": "Order created → Initialize Install Pipeline",
+  "trigger": { "entity": "Order", "event": "create" },
+  "task": "When a new Order record is created with payment_status=paid: (1) invoke installPipeline with action=initialize + order_id, (2) invoke generateClientWebsite with order_id, (3) send welcome email via Resend, (4) Telegram Nolan with business_name + tier + email",
+  "task_refs": ["#391", "#487"],
+  "priority": "CRITICAL",
+  "active": true
+}

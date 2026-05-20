@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import {
   ArrowRight, ArrowLeft, CheckCircle2, Loader2,
-  Building2, MessageSquare, Mail, Calendar, Rocket, Sparkles,
-  Phone, Globe, Clock, Users, X,
+  Building2, MessageSquare, Mail, Calendar, Rocket, Sparkles, X,
 } from 'lucide-react';
 
 // ── Step definitions ──────────────────────────────────────────────────────────

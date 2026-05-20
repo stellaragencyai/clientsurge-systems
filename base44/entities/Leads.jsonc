@@ -86,6 +86,11 @@
       "type": "string",
       "title": "Assigned At"
     },
+    "assigned_agent_name": {
+      "type": "string",
+      "title": "Assigned AI Agent Name",
+      "description": "Name of the industry-specific AI sales agent handling this lead (e.g. sales_rep_med_spa)"
+    },
     "last_contacted_at": {
       "type": "string",
       "title": "Last Contacted At"
@@ -211,6 +216,30 @@
       "type": "boolean",
       "title": "Missed-Call Sequence Complete",
       "default": false
+    },
+    "voice_call_attempted": {
+      "type": "boolean",
+      "title": "Voice Call Attempted",
+      "default": false,
+      "description": "True if an ElevenLabs voice call was attempted for this lead"
+    },
+    "voice_call_outcome": {
+      "type": "string",
+      "title": "Voice Call Outcome",
+      "enum": [
+        "answered",
+        "no_answer",
+        "busy",
+        "failed",
+        "not_attempted"
+      ],
+      "default": "not_attempted"
+    },
+    "voice_call_followup_sent": {
+      "type": "boolean",
+      "title": "Voice Call Follow-Up Sent",
+      "default": false,
+      "description": "True if the 24h post-call follow-up SMS/email has been sent (idempotency guard)"
     }
   },
   "required": [
@@ -220,5 +249,27 @@
     "phone",
     "business_type",
     "problem"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

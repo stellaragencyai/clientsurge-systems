@@ -242,8 +242,8 @@ export default function MedSpaDemoModal({ onClose }) {
 
             <button
               type="submit"
-              style={{background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}
-              className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90"
+              style={{background:"linear-gradient(135deg,#00AEEF 0%,#0088CC 50%,#003B8F 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(0,136,204,0.35)"}}
+              className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-white transition hover:opacity-90"
             >
               Next: Choose Time <ArrowRight className="w-4 h-4" />
             </button>
@@ -311,8 +311,8 @@ export default function MedSpaDemoModal({ onClose }) {
               <button
                 type="submit"
                 disabled={saving}
-                style={{background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(120,70,20,0.35)"}}
-                className="flex-1 h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-60"
+                style={{background:"linear-gradient(135deg,#00AEEF 0%,#0088CC 50%,#003B8F 100%)",borderRadius:"9999px",boxShadow:"0 4px 18px rgba(0,136,204,0.35)"}}
+                 className="flex-1 h-12 flex items-center justify-center gap-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60"
               >
                 {saving ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</>
@@ -331,4 +331,3 @@ export default function MedSpaDemoModal({ onClose }) {
     </div>
   );
 }
-

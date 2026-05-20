@@ -14,7 +14,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
-const STOP_STATUSES = ["Qualified", "Booking Prompt Sent", "Booked", "Closed"];
+const STOP_STATUSES = ["Qualified", "Booking Prompt Sent", "Booked", "Closed", "Won", "Lost", "opted_out"]; // #96
 
 const STEPS = [
   { key: "day1", hoursRequired: 24,  sentAtField: "day1_sent_at", statusField: "day1_status" },
@@ -124,6 +124,13 @@ Deno.serve(async (req) => {
         const lead = await base44.asServiceRole.entities.Leads.get(campaign.lead_id);
         if (!lead) {
           await base44.asServiceRole.entities.DripCampaign.update(campaign.id, { status: "stopped", stop_reason: "completed_all_steps", notes: "Lead record not found." });
+          results.stopped++;
+          continue;
+        }
+
+        // #29: Stop if lead opted out via STOP keyword
+        if (lead.sms_opted_out || lead.automation_enabled === false) {
+          await base44.asServiceRole.entities.DripCampaign.update(campaign.id, { status: "stopped", stop_reason: "sms_opt_out" });
           results.stopped++;
           continue;
         }
@@ -262,3 +269,4 @@ Deno.serve(async (req) => {
     return Response.json({ error: error.message || "Failed to process drip campaigns" }, { status: 500 });
   }
 });
+

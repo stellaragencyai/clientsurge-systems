@@ -1,0 +1,246 @@
+/**
+ * AdminShell — shared layout wrapper for all standalone admin pages.
+ * Provides a consistent sidebar + topbar with full nav links back to /admin.
+ */
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
+import { base44 } from "@/api/base44Client";
+import {
+  LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
+  Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
+  Mail, Target, PieChart, Layers, DollarSign, Inbox, RefreshCw,
+  Server, RotateCcw, BookOpen, Star, ArrowLeft,
+} from "lucide-react";
+import AdminGlobalSearch from "./AdminGlobalSearch";
+
+const NAV_GROUPS = [
+  {
+    group: "Main",
+    items: [
+      { id: "overview",         label: "Overview",          icon: LayoutDashboard, path: "/admin" },
+      { id: "leads",            label: "Leads",             icon: Users,           path: "/admin/leads" },
+      { id: "client-projects",  label: "Client Projects",   icon: FolderKanban,    path: "/admin", tab: "client-projects" },
+      { id: "inbox",            label: "Inbox",             icon: Inbox,           path: "/admin", tab: "inbox", badge: true },
+      { id: "onboarding",       label: "Client Onboarding", icon: ClipboardList,   path: "/admin/onboarding" },
+    ],
+  },
+  {
+    group: "Automation",
+    items: [
+      { id: "website-leads",    label: "Website Leads",     icon: Target,          path: "/admin", tab: "website-leads" },
+      { id: "install-queue",    label: "Install Queue",     icon: Server,          path: "/admin", tab: "install-queue" },
+      { id: "install-checklists", label: "Install Checklists", icon: ClipboardList, path: "/admin", tab: "install-checklists" },
+      { id: "automations",      label: "Automation Status", icon: Zap,             path: "/admin/automations" },
+      { id: "drip",             label: "Drip Campaigns",    icon: Send,            path: "/admin", tab: "drip" },
+      { id: "nurture",          label: "Nurture Campaigns", icon: Flame,           path: "/admin", tab: "nurture" },
+      { id: "cadence",          label: "Dynamic Cadence",   icon: Settings,        path: "/admin", tab: "cadence" },
+      { id: "email-campaigns",  label: "Email Campaigns",   icon: Mail,            path: "/admin", tab: "email-campaigns" },
+      { id: "campaign-builder", label: "Campaign Builder",  icon: Layers,          path: "/admin", tab: "campaign-builder" },
+      { id: "reactivation",     label: "Lead Reactivation", icon: RotateCcw,       path: "/admin", tab: "reactivation" },
+      { id: "routing",          label: "Lead Routing",      icon: Target,          path: "/admin", tab: "routing" },
+    ],
+  },
+  {
+    group: "Insights",
+    items: [
+      { id: "analytics",        label: "Analytics",         icon: BarChart3,       path: "/admin", tab: "analytics" },
+      { id: "revenue",          label: "Revenue & MRR",     icon: DollarSign,      path: "/admin", tab: "revenue" },
+      { id: "priority",         label: "Priority Queue",    icon: Star,            path: "/admin", tab: "priority" },
+      { id: "attribution",      label: "Source Attribution",icon: PieChart,        path: "/admin", tab: "attribution" },
+    ],
+  },
+  {
+    group: "System",
+    items: [
+      { id: "task-board",       label: "Task Board",        icon: ClipboardList,   path: "/admin", tab: "task-board" },
+      { id: "health",           label: "Integration Health",icon: Activity,        path: "/admin", tab: "health" },
+      { id: "logs",             label: "Communication Logs",icon: MessageSquare,   path: "/admin", tab: "logs" },
+      { id: "templates",        label: "Templates",         icon: MessageSquare,   path: "/admin", tab: "templates" },
+      { id: "review-request",   label: "Review Requests",   icon: Star,            path: "/admin", tab: "review-request" },
+      { id: "settings",         label: "Settings",          icon: Settings,        path: "/admin", tab: "settings" },
+      { id: "qa",               label: "QA Tools",          icon: RefreshCw,       path: "/admin", tab: "qa" },
+      { id: "install-guide",    label: "Install Guide",     icon: BookOpen,        path: "/admin/install-guide" },
+    ],
+  },
+];
+
+export default function AdminShell({ children, title, activeId }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const [inboxUnread, setInboxUnread] = useState(0);
+
+  useEffect(() => {
+    const loadUnread = async () => {
+      try {
+        const msgs = await base44.entities.SupportMessage.filter({ read: false }, "-created_date", 200);
+        setInboxUnread((msgs || []).filter(m => m.role === "client").length);
+      } catch {}
+    };
+    loadUnread();
+    const t = setInterval(loadUnread, 30000);
+    return () => clearInterval(t);
+  }, []);
+
+  const handleNavClick = (item) => {
+    if (item.tab) {
+      // Navigate to /admin with a ?tab= param so AdminDashboard can pick it up
+      navigate(`/admin?tab=${item.tab}`);
+    } else {
+      navigate(item.path);
+    }
+    if (window.innerWidth < 1024) setSidebarOpen(false);
+  };
+
+  const handleLogout = () => {
+    setLoggingOut(true);
+    base44.auth.logout("/");
+  };
+
+  const isActive = (item) => {
+    if (item.path !== "/admin" && !item.tab) {
+      return location.pathname === item.path;
+    }
+    return activeId === item.id;
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex">
+      {/* Sidebar */}
+      <div
+        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-background border-r border-border transition-transform duration-300 lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } flex flex-col`}
+      >
+        {/* Logo */}
+        <div className="p-4 border-b border-border">
+          <button
+            onClick={() => navigate("/admin")}
+            className="font-display text-lg font-semibold text-foreground hover:text-primary transition-colors"
+          >
+            ClientSurge <span className="text-primary">Admin</span>
+          </button>
+        </div>
+
+        {/* Search */}
+        <div className="px-3 py-2 border-b border-border">
+          <AdminGlobalSearch
+            onNavigate={(tab) => {
+              navigate(`/admin?tab=${tab}`);
+              if (window.innerWidth < 1024) setSidebarOpen(false);
+            }}
+          />
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 p-3 overflow-y-auto space-y-4">
+          {NAV_GROUPS.map(({ group, items }) => (
+            <div key={group}>
+              <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                {group}
+              </p>
+              <div className="space-y-0.5">
+                {items.map((item) => {
+                  const Icon = item.icon;
+                  const active = isActive(item);
+                  const unread = item.badge ? inboxUnread : 0;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavClick(item)}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors font-medium text-sm ${
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : "text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 flex-shrink-0" />
+                      <span className="flex-1 text-left">{item.label}</span>
+                      {unread > 0 && (
+                        <span className={`rounded-full text-[10px] font-bold px-1.5 py-0.5 ${active ? "bg-white/20 text-white" : "bg-primary text-primary-foreground"}`}>
+                          {unread}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+
+        {/* User */}
+        <div className="p-4 border-t border-border space-y-3">
+          <div className="px-4 py-2">
+            <p className="text-xs text-muted-foreground">Signed in as</p>
+            <p className="text-sm font-semibold text-foreground truncate">{user?.full_name || "Admin"}</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors text-sm disabled:opacity-60"
+          >
+            {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
+            {loggingOut ? "Signing out…" : "Logout"}
+          </button>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top Bar */}
+        <div className="bg-background border-b border-border px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="lg:hidden p-2 hover:bg-muted rounded-lg transition-colors"
+            >
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <button
+              onClick={() => navigate("/admin")}
+              className="hidden lg:flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> Main Menu
+            </button>
+            <span className="hidden lg:block text-muted-foreground/40">|</span>
+            <h2 className="text-base font-semibold text-foreground">{title}</h2>
+          </div>
+          <div className="flex items-center gap-2">
+            {inboxUnread > 0 && (
+              <button
+                onClick={() => navigate("/admin?tab=inbox")}
+                className="flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
+              >
+                <Inbox className="w-3.5 h-3.5" />
+                {inboxUnread} unread
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-auto p-6">
+          <div className="max-w-7xl mx-auto">{children}</div>
+        </div>
+      </div>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black/20 z-30 lg:hidden"
+        />
+      )}
+
+      {loggingOut && (
+        <div className="fixed inset-0 z-[9998] bg-black/30 backdrop-blur-sm flex items-center justify-center">
+          <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+        </div>
+      )}
+    </div>
+  );
+}

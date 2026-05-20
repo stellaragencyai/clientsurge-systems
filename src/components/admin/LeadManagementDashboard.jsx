@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import {
   executeLeadImport,
-  fetchLeadPipelineSummary,
+  fetchLeadPipelineSummary, // #322: wired — called on load via leadPipelineApi
   getLeadPipelineError,
   previewLeadImport,
   triggerLeadScoring,
@@ -550,8 +550,8 @@ export default function LeadManagementDashboard() {
                 tone="green"
               />
               <SummaryCard
-                label="Pro"
-                value={offerMix.pro_system || 0}
+                label="Elite"
+                value={offerMix.elite_system || 0}
                 helper="Leads best matched to the full stack."
                 tone="purple"
               />
@@ -680,6 +680,7 @@ export default function LeadManagementDashboard() {
       <div className="rounded-xl border border-border bg-white p-4 space-y-4">
           <BulkActionToolbar
             selectedIds={Array.from(selectedIds)}
+            leads={leads}
             onClearSelection={clearSelection}
             onActionComplete={() => loadSnapshot({ append: false, nextOffset: 0 })}
           />

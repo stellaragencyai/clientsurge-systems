@@ -7,7 +7,6 @@ export default function NotificationPreferences({ orderId }) {
 
   const handleSave = async () => {
     // In a real app, this would POST to a backend function
-    console.log(`[Notifications] Email: ${notifyEmail}, SMS: ${notifySMS}`);
   };
 
   return (

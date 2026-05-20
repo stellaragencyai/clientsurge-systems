@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Mail, MessageSquare, CheckCircle2, AlertCircle, Clock, Filter, Search } from "lucide-react";
+import { Mail, MessageSquare, CheckCircle2, AlertCircle, Clock, Search } from "lucide-react";
 
 const ACTIVITY_DATA = [
   {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bell, Trash2, Check, X } from 'lucide-react';
+import { Bell, Trash2, Check } from 'lucide-react';
 
 export default function NotificationBell({ notifications, unreadCount, onMarkAsRead, onMarkAllAsRead, onClear }) {
   const [open, setOpen] = useState(false);

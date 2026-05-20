@@ -6,8 +6,6 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
-    // Focus trap: keep focus within modal while open
     const handleKeyDown = (e) => {
       if (e.key === "Escape") { onClose(); return; }
       if (e.key !== "Tab") return;
@@ -15,28 +13,16 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
       if (!modal) return;
       const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
       if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-      } else {
-        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey) { if (document.activeElement === first) { e.preventDefault(); last.focus(); } }
+      else { if (document.activeElement === last) { e.preventDefault(); first.focus(); } }
     };
     document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = prev || "";
-      document.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => { document.body.style.overflow = prev || ""; document.removeEventListener("keydown", handleKeyDown); };
   }, [onClose]);
 
   const handleToggle = () => {
-    // Guard: don't allow adding coming_soon or non-checkout items
-    if (product?.coming_soon || product?.checkout_enabled === false) {
-      onClose();
-      return;
-    }
+    if (product?.coming_soon || product?.checkout_enabled === false) { onClose(); return; }
     onToggle();
     onClose();
   };
@@ -49,29 +35,23 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.45, ease: "easeOut" }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
         onClick={onClose}
         style={{
           position: "fixed", inset: 0, zIndex: 1000,
-          background: "rgba(4,2,1,0.35)",
-          backdropFilter: "blur(8px) saturate(0.8)",
-          WebkitBackdropFilter: "blur(8px) saturate(0.8)",
+          background: "rgba(0,0,0,0.75)",
+          backdropFilter: "blur(10px) saturate(0.6)",
+          WebkitBackdropFilter: "blur(10px) saturate(0.6)",
         }}
       />
 
-      {/* Card — rises from below & scales into focus */}
+      {/* Modal card */}
       <motion.div
         key="modal"
-        initial={{ opacity: 0, y: 140, scale: 0.72, rotateX: 10 }}
-        animate={{ opacity: 1, y: 0,   scale: 1,    rotateX: 0  }}
-        exit={{    opacity: 0, y: 60,  scale: 0.88, rotateX: 4  }}
-        transition={{
-          type: "spring",
-          stiffness: 260,
-          damping: 26,
-          mass: 0.9,
-          opacity: { duration: 0.3, ease: "easeOut" },
-        }}
+        initial={{ opacity: 0, y: 60, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 30, scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 130, damping: 22, opacity: { duration: 0.4 } }}
         role="dialog"
         aria-modal="true"
         aria-label={product?.name ? `${product.name} details` : "Service details"}
@@ -81,7 +61,6 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
           display: "flex", alignItems: "center", justifyContent: "center",
           padding: "20px",
           pointerEvents: "none",
-          perspective: "1200px",
         }}
       >
         <div
@@ -89,107 +68,113 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
           style={{
             pointerEvents: "auto",
             width: "100%",
-            maxWidth: "520px",
-            maxHeight: "88vh",
+            maxWidth: "600px",
+            maxHeight: "90vh",
             overflowY: "auto",
-            borderRadius: "24px",
-            background: "linear-gradient(160deg, #ffffff 0%, #fdf8f2 100%)",
-            border: "1.5px solid rgba(154,92,46,0.18)",
-            boxShadow: "0 50px 130px rgba(0,0,0,0.55), 0 0 0 1px rgba(154,92,46,0.1)",
+            borderRadius: "20px",
+            background: "linear-gradient(160deg, #0D1B2E 0%, #0A1628 60%, #060D18 100%)",
+            border: "1px solid rgba(0,212,255,0.18)",
+            boxShadow: "0 40px 100px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,212,255,0.06), inset 0 1px 0 rgba(255,255,255,0.04)",
             position: "relative",
           }}
         >
-          {/* Top bar */}
+          {/* Cyan top accent bar */}
           <div style={{
-            position: "absolute", top: 0, left: 0, right: 0, height: "3px",
-            borderRadius: "24px 24px 0 0",
-            background: "linear-gradient(90deg, #7a4825 0%, #c8965c 40%, #f5d9a8 60%, #c8965c 80%, #7a4825 100%)",
+            position: "absolute", top: 0, left: 0, right: 0, height: "2px",
+            borderRadius: "20px 20px 0 0",
+            background: "linear-gradient(90deg, transparent 0%, #00D4FF 30%, #00FFB3 70%, transparent 100%)",
           }} />
 
-          {/* Close */}
+          {/* Close button */}
           <button
             onClick={onClose}
             style={{
               position: "absolute", top: "14px", right: "14px",
               width: "30px", height: "30px", borderRadius: "50%",
-              background: "rgba(154,92,46,0.07)", border: "1px solid rgba(154,92,46,0.14)",
+              background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.1)",
               cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+              transition: "background 0.2s",
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(154,92,46,0.16)"}
-            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(154,92,46,0.07)"}
+            onMouseEnter={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.12)"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
           >
-            <X style={{ width: "13px", height: "13px", color: "#9a5c2e" }} />
+            <X style={{ width: "13px", height: "13px", color: "rgba(255,255,255,0.7)" }} />
           </button>
 
-          <div style={{ padding: "26px 26px 22px" }}>
+          <div style={{ padding: "28px 26px 24px" }}>
 
             {/* Header */}
             <div style={{ display: "flex", alignItems: "flex-start", gap: "14px", marginBottom: "18px" }}>
               <div style={{
                 width: "56px", height: "56px", borderRadius: "16px", flexShrink: 0,
-                display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px",
-                background: "linear-gradient(145deg, rgba(154,92,46,0.1), rgba(200,150,92,0.05))",
-                border: "1.5px solid rgba(154,92,46,0.18)",
-                boxShadow: "0 4px 14px rgba(154,92,46,0.1)",
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px",
+                background: "linear-gradient(145deg, rgba(0,212,255,0.12), rgba(0,255,179,0.06))",
+                border: "1px solid rgba(0,212,255,0.2)",
+                boxShadow: "0 4px 16px rgba(0,212,255,0.1)",
               }}>
                 {product.icon}
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "4px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "5px" }}>
                   <span style={{
                     fontSize: "8px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.16em",
-                    color: "rgba(154,92,46,0.7)", background: "rgba(154,92,46,0.07)",
-                    padding: "3px 9px", borderRadius: "999px", border: "1px solid rgba(154,92,46,0.14)",
+                    color: "#00D4FF",
+                    background: "rgba(0,212,255,0.1)",
+                    padding: "3px 9px", borderRadius: "999px",
+                    border: "1px solid rgba(0,212,255,0.2)",
                   }}>{product.category}</span>
                   {product.popular && (
                     <span style={{
                       fontSize: "8px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.12em",
-                      color: "#fff", background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
+                      color: "#0A0F1E",
+                      background: "linear-gradient(135deg,#00D4FF,#00FFB3)",
                       padding: "3px 9px", borderRadius: "999px",
                     }}>Popular</span>
                   )}
                 </div>
-                <h2 style={{ fontSize: "20px", fontWeight: "800", color: "#1b140d", margin: "0 0 2px", lineHeight: 1.15 }}>
+                <h2 style={{ fontSize: "20px", fontWeight: "800", color: "#FFFFFF", margin: "0 0 3px", lineHeight: 1.15 }}>
                   {product.name}
                 </h2>
-                <p style={{ fontSize: "9px", color: "rgba(154,92,46,0.6)", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                <p style={{ fontSize: "9px", color: "rgba(0,212,255,0.6)", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
                   {product.subtitle}
                 </p>
               </div>
             </div>
 
             {/* Description */}
-            <p style={{ fontSize: "13px", color: "rgba(27,20,13,0.65)", lineHeight: 1.7, margin: "0 0 18px" }}>
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.6)", lineHeight: 1.75, margin: "0 0 20px" }}>
               {product.description}
             </p>
 
-            {/* Highlights */}
-            <div style={{ marginBottom: "18px" }}>
-              <p style={{ fontSize: "9px", fontWeight: "800", color: "rgba(154,92,46,0.55)", textTransform: "uppercase", letterSpacing: "0.18em", margin: "0 0 8px" }}>
+            {/* What's Included */}
+            <div style={{ marginBottom: "20px" }}>
+              <p style={{ fontSize: "9px", fontWeight: "800", color: "rgba(0,212,255,0.5)", textTransform: "uppercase", letterSpacing: "0.18em", margin: "0 0 10px" }}>
                 What's Included
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 {product.highlights.map((h, i) => (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, x: -14 }}
+                    initial={{ opacity: 0, x: -12 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.18 + i * 0.07, duration: 0.32, ease: "easeOut" }}
+                    transition={{ delay: 0.15 + i * 0.06, duration: 0.28, ease: "easeOut" }}
                     style={{
                       display: "flex", alignItems: "flex-start", gap: "10px",
                       padding: "9px 12px", borderRadius: "10px",
-                      background: "rgba(154,92,46,0.04)", border: "1px solid rgba(154,92,46,0.09)",
+                      background: "rgba(0,212,255,0.04)",
+                      border: "1px solid rgba(0,212,255,0.1)",
                     }}
                   >
-                    <CheckCircle2 style={{ width: "14px", height: "14px", color: "#22c55e", flexShrink: 0, marginTop: "1px" }} />
-                    <span style={{ fontSize: "12px", color: "rgba(27,20,13,0.7)", fontWeight: "500", lineHeight: 1.5 }}>{h}</span>
+                    <CheckCircle2 style={{ width: "14px", height: "14px", color: "#00FFB3", flexShrink: 0, marginTop: "1px" }} />
+                    <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", fontWeight: "500", lineHeight: 1.5 }}>{h}</span>
                   </motion.div>
                 ))}
               </div>
             </div>
 
             {/* Trust chips */}
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "20px" }}>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "22px" }}>
               {[
                 { icon: <Zap style={{ width: "10px", height: "10px" }} />, label: "Live in 5–7 days" },
                 { icon: <Clock style={{ width: "10px", height: "10px" }} />, label: "No contracts" },
@@ -197,48 +182,39 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
               ].map((chip) => (
                 <div key={chip.label} style={{
                   display: "flex", alignItems: "center", gap: "5px",
-                  padding: "5px 10px", borderRadius: "999px",
-                  background: "rgba(154,92,46,0.05)", border: "1px solid rgba(154,92,46,0.11)",
-                  fontSize: "10px", fontWeight: "600", color: "rgba(154,92,46,0.75)",
+                  padding: "5px 11px", borderRadius: "999px",
+                  background: "rgba(0,255,179,0.06)",
+                  border: "1px solid rgba(0,255,179,0.15)",
+                  fontSize: "10px", fontWeight: "600", color: "rgba(0,255,179,0.8)",
                 }}>
                   {chip.icon}{chip.label}
                 </div>
               ))}
             </div>
 
-            {/* Pricing */}
+            {/* Pricing row */}
             <div style={{
-              borderRadius: "16px",
-              background: "linear-gradient(135deg, rgba(154,92,46,0.06), rgba(200,150,92,0.03))",
-              border: "1.5px solid rgba(154,92,46,0.14)",
+              borderRadius: "14px",
+              background: "rgba(0,212,255,0.04)",
+              border: "1px solid rgba(0,212,255,0.12)",
               padding: "16px 18px",
-              marginBottom: "16px",
+              marginBottom: "18px",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-around",
               gap: "12px",
             }}>
               <div style={{ textAlign: "center" }}>
-                <p style={{ fontSize: "8px", fontWeight: "800", color: "rgba(154,92,46,0.5)", textTransform: "uppercase", letterSpacing: "0.16em", margin: "0 0 2px" }}>Monthly</p>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "1px" }}>
-                  <span style={{ fontSize: "10px", fontWeight: "700", color: "rgba(154,92,46,0.55)" }}>$</span>
-                  <span style={{ fontSize: "38px", fontWeight: "900", color: "#9a5c2e", lineHeight: 1, letterSpacing: "-0.02em" }}>{product.monthly_fee}</span>
-                  <span style={{ fontSize: "11px", fontWeight: "600", color: "rgba(154,92,46,0.45)", alignSelf: "flex-end", paddingBottom: "3px" }}>/mo</span>
-                </div>
+                <p style={{ fontSize: "8px", fontWeight: "800", color: "rgba(0,212,255,0.5)", textTransform: "uppercase", letterSpacing: "0.16em", margin: "0 0 3px" }}>Monthly</p>
+                <p style={{ fontSize: "22px", fontWeight: "900", color: "#FFFFFF", margin: 0, lineHeight: 1 }}>
+                  ${product.monthly_fee}<span style={{ fontSize: "11px", fontWeight: "600", color: "rgba(255,255,255,0.4)" }}>/mo</span>
+                </p>
               </div>
-              <div style={{ width: "1px", height: "48px", background: "rgba(154,92,46,0.14)" }} />
+              <div style={{ width: "1px", height: "36px", background: "rgba(0,212,255,0.12)" }} />
               <div style={{ textAlign: "center" }}>
-                <p style={{ fontSize: "8px", fontWeight: "800", color: "rgba(154,92,46,0.5)", textTransform: "uppercase", letterSpacing: "0.16em", margin: "0 0 2px" }}>One-Time Setup</p>
-                <div style={{ display: "flex", alignItems: "baseline", gap: "1px" }}>
-                  <span style={{ fontSize: "10px", fontWeight: "700", color: "rgba(27,20,13,0.45)" }}>$</span>
-                  <span style={{ fontSize: "38px", fontWeight: "900", color: "#1b140d", lineHeight: 1, letterSpacing: "-0.02em" }}>{product.setup_fee}</span>
-                </div>
-              </div>
-              <div style={{ width: "1px", height: "48px", background: "rgba(154,92,46,0.14)" }} />
-              <div style={{ flex: 1, minWidth: "120px" }}>
-                <p style={{ fontSize: "8px", fontWeight: "800", color: "rgba(154,92,46,0.5)", textTransform: "uppercase", letterSpacing: "0.16em", margin: "0 0 4px" }}>Includes</p>
-                <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.6)", lineHeight: 1.5, margin: 0, fontWeight: "500" }}>
-                  Full setup, config, testing & ongoing management.
+                <p style={{ fontSize: "8px", fontWeight: "800", color: "rgba(0,212,255,0.5)", textTransform: "uppercase", letterSpacing: "0.16em", margin: "0 0 3px" }}>One-Time Setup</p>
+                <p style={{ fontSize: "22px", fontWeight: "900", color: "#FFFFFF", margin: 0, lineHeight: 1 }}>
+                  ${product.setup_fee}<span style={{ fontSize: "11px", fontWeight: "600", color: "rgba(255,255,255,0.4)" }}> setup</span>
                 </p>
               </div>
             </div>
@@ -247,23 +223,30 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
             <button
               onClick={handleToggle}
               disabled={product?.coming_soon || product?.checkout_enabled === false}
-              style={(product?.coming_soon || product?.checkout_enabled === false) ? { opacity: 0.45, cursor: "not-allowed" } : {}}
               style={{
-                width: "100%", borderRadius: "9999px", padding: "2px",
+                width: "100%",
+                border: "none",
+                padding: "3px",
+                borderRadius: "9999px",
+                cursor: (product?.coming_soon || product?.checkout_enabled === false) ? "not-allowed" : "pointer",
+                opacity: (product?.coming_soon || product?.checkout_enabled === false) ? 0.45 : 1,
                 background: inCart
-                  ? "linear-gradient(135deg,#22c55e,#16a34a)"
-                  : "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                border: "none", cursor: "pointer",
-                boxShadow: inCart ? "0 6px 20px rgba(34,197,94,0.35)" : "0 6px 22px rgba(120,70,20,0.35)",
+                  ? "rgba(0,255,179,0.12)"
+                  : "linear-gradient(135deg,#00D4FF,#00FFB3)",
+                boxShadow: inCart
+                  ? "0 6px 20px rgba(0,255,179,0.2)"
+                  : "0 6px 24px rgba(0,212,255,0.35)",
+                transition: "all 0.2s",
               }}
+              onMouseEnter={(e) => { if (!product?.coming_soon) e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
             >
               <span style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "7px",
                 height: "46px", borderRadius: "9999px",
-                background: inCart
-                  ? "linear-gradient(135deg,#16a34a,#15803d)"
-                  : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                color: "#fff", fontWeight: "700", fontSize: "14px",
+                color: inCart ? "#00FFB3" : "#0A0F1E",
+                fontWeight: "800", fontSize: "14px",
+                border: inCart ? "1px solid rgba(0,255,179,0.3)" : "none",
               }}>
                 {inCart
                   ? <><Check style={{ width: "14px", height: "14px" }} /> Remove from Cart</>
@@ -271,9 +254,10 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
               </span>
             </button>
 
-            <p style={{ textAlign: "center", fontSize: "10px", color: "rgba(27,20,13,0.35)", marginTop: "8px" }}>
+            <p style={{ textAlign: "center", fontSize: "10px", color: "rgba(255,255,255,0.25)", marginTop: "10px" }}>
               Secured by Stripe · Cancel anytime
             </p>
+
           </div>
         </div>
       </motion.div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Clock, Loader2, Zap } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -22,7 +22,44 @@ const STATUS_STYLES = {
   Error: "bg-red-50 text-red-700",
 };
 
-function StepRow({ step, index, isLast }) {
+const CUSTOMER_PIPELINE_LABELS = {
+  Paid: "Paid",
+  "Ready for Install": "Ready for setup",
+  Configuring: "Setup in progress",
+  Testing: "Verification in progress",
+  Live: "Live after review",
+  Error: "Needs attention",
+};
+
+const CUSTOMER_INSTALL_STATUS_LABELS = {
+  Paid: "Paid",
+  "Ready for Install": "Queued for setup",
+  Configuring: "Setup in progress",
+  Testing: "Testing in progress",
+  Live: "Live after review",
+  Error: "Needs operator review",
+};
+
+function formatPortalDate(value) {
+  if (!value) return null;
+  const parsedDate = new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) return value;
+  return parsedDate.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function getCustomerPipelineLabel(value) {
+  return CUSTOMER_PIPELINE_LABELS[value] || value;
+}
+
+function getCustomerInstallStatusLabel(value) {
+  return CUSTOMER_INSTALL_STATUS_LABELS[value] || value;
+}
+
+function StepRow({ step, index, isLast, reduceMotion }) {
   const isComplete = step.status === "complete";
   const isInProgress = step.status === "in_progress";
   const isPending = step.status === "pending";
@@ -57,7 +94,7 @@ function StepRow({ step, index, isLast }) {
         }}
       >
         {isComplete && <CheckCircle2 className="h-5 w-5 text-white" />}
-        {isInProgress && <Loader2 className="h-5 w-5 animate-spin" style={{ color: "#9a5c2e" }} />}
+        {isInProgress && <Loader2 className={`h-5 w-5 ${reduceMotion ? "" : "animate-spin"}`} style={{ color: "#9a5c2e" }} />}
         {isPending && <Clock className="h-4 w-4 text-muted-foreground/40" />}
       </div>
 
@@ -84,7 +121,7 @@ function StepRow({ step, index, isLast }) {
           )}
           {isInProgress && (
             <span
-              className="animate-pulse rounded-full px-2 py-0.5 text-xs font-bold"
+              className={`${reduceMotion ? "" : "animate-pulse"} rounded-full px-2 py-0.5 text-xs font-bold`}
               style={{ background: "rgba(154,92,46,0.1)", color: "#9a5c2e" }}
             >
               In Progress
@@ -102,22 +139,32 @@ function OrderStatusBadge({ value }) {
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[value] || "bg-slate-100 text-slate-700"}`}
     >
-      {value}
+      {getCustomerPipelineLabel(value)}
     </span>
   );
 }
 
-export default function BuildTracker({ project: initialProject, order }) {
+export default function BuildTracker({ project: initialProject, order, testMode = false }) {
   const [project, setProject] = useState(initialProject);
+  const reduceMotion = useMemo(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+      return false;
+    }
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
 
   useEffect(() => {
+    if (testMode) {
+      return undefined;
+    }
+
     const unsubscribe = base44.entities.ClientProject.subscribe((event) => {
       if (event.id === initialProject.id && event.type !== "delete") {
         setProject(event.data);
       }
     });
     return unsubscribe;
-  }, [initialProject.id]);
+  }, [initialProject.id, testMode]);
 
   const steps = STEPS.map((step) => ({ ...step, status: project[step.key] || "pending" }));
   const completedCount = steps.filter((step) => step.status === "complete").length;
@@ -156,7 +203,7 @@ export default function BuildTracker({ project: initialProject, order }) {
                   key={service.service_key}
                   className="inline-flex items-center rounded-full bg-white px-3 py-1 text-xs font-semibold text-foreground shadow-sm"
                 >
-                  {service.display_name}: {service.install_status}
+                  {service.display_name}: {getCustomerInstallStatusLabel(service.install_status)}
                 </span>
               ))}
             </div>
@@ -169,11 +216,15 @@ export default function BuildTracker({ project: initialProject, order }) {
       )}
 
       <div className="mb-1 flex items-center justify-between">
-        <h2 className="font-display text-xl font-semibold text-foreground">System Build Progress</h2>
+        <h2 className="font-display text-xl font-semibold text-foreground">Customer Setup Checklist</h2>
         <span className="text-sm font-bold" style={{ color: "#9a5c2e" }}>
           {completedCount}/{steps.length} complete
         </span>
       </div>
+
+      <p className="mb-4 text-xs text-muted-foreground">
+        This checklist mirrors the customer-facing milestones behind your paid setup order. For exact service state, use the canonical setup status above.
+      </p>
 
       {allDone ? (
         <p className="mb-5 text-sm font-semibold" style={{ color: "#7a4825" }}>
@@ -199,7 +250,7 @@ export default function BuildTracker({ project: initialProject, order }) {
 
       <div>
         {steps.map((step, index) => (
-          <StepRow key={step.key} step={step} index={index} isLast={index === steps.length - 1} />
+          <StepRow key={step.key} step={step} index={index} isLast={index === steps.length - 1} reduceMotion={reduceMotion} />
         ))}
       </div>
 
@@ -210,7 +261,7 @@ export default function BuildTracker({ project: initialProject, order }) {
         >
           <Zap className="h-4 w-4 flex-shrink-0" style={{ color: "#9a5c2e" }} />
           <span className="text-foreground/70">
-            Target live review: <span className="font-semibold" style={{ color: "#7a4825" }}>{project.go_live_date}</span>
+            Target live review: <span className="font-semibold" style={{ color: "#7a4825" }}>{formatPortalDate(project.go_live_date)}</span>
           </span>
         </div>
       )}

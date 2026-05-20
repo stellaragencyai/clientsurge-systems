@@ -16,7 +16,7 @@ export default function IndustrySMSDemo({
   triggerEvent = "New lead detected",
   automationName = "AI Automation",
   accentColor = "#9a5c2e",
-  businessName = "Your Business",
+  businessName = "Your Business"
 }) {
   const [visible, setVisible] = useState([]);
   const [running, setRunning] = useState(false);
@@ -35,7 +35,7 @@ export default function IndustrySMSDemo({
   };
 
   const run = () => {
-    if (running) { reset(); return; }
+    if (running) {reset();return;}
     reset();
     setRunning(true);
 
@@ -93,15 +93,15 @@ export default function IndustrySMSDemo({
             style={{
               background: "rgba(255,255,255,0.9)",
               border: "1.5px solid rgba(212,184,142,0.35)",
-              boxShadow: "0 8px 28px rgba(111,67,31,0.09)",
-            }}
-          >
+              boxShadow: "0 8px 28px rgba(111,67,31,0.09)"
+            }}>
+            
             <div className="flex items-center gap-3 mb-5">
               <div
                 className="w-10 h-10 rounded-2xl flex items-center justify-center"
-                style={{ background: `${accentColor}15`, border: `1px solid ${accentColor}30` }}
-              >
-                <Zap style={{ width: "18px", height: "18px", color: accentColor }} />
+                style={{ background: `${accentColor}15`, border: `1px solid ${accentColor}30` }}>
+                
+                <Zap style={{ width: "18px", height: "18px", color: "#000" }} className="bg-[hsl(var(--background))] lucide lucide-zap" />
               </div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Automation Trigger</p>
@@ -111,8 +111,8 @@ export default function IndustrySMSDemo({
 
             <div
               className="rounded-xl px-4 py-3 mb-5 flex items-center gap-3"
-              style={{ background: `${accentColor}08`, border: `1px solid ${accentColor}18` }}
-            >
+              style={{ background: `${accentColor}08`, border: `1px solid ${accentColor}18` }}>
+              
               <span className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse" style={{ background: "#22c55e" }} />
               <p className="text-sm font-medium text-foreground/75">{triggerEvent}</p>
             </div>
@@ -124,14 +124,14 @@ export default function IndustrySMSDemo({
                 width: "100%",
                 borderRadius: "9999px",
                 padding: "2px",
-                background: done
-                  ? "linear-gradient(135deg,#22c55e,#16a34a)"
-                  : `linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)`,
+                background: done ?
+                "linear-gradient(135deg,#22c55e,#16a34a)" :
+                `linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)`,
                 border: "none",
                 cursor: "pointer",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.28)",
-              }}
-            >
+                boxShadow: "0 4px 18px rgba(120,70,20,0.28)"
+              }}>
+              
               <span
                 style={{
                   display: "flex",
@@ -140,23 +140,23 @@ export default function IndustrySMSDemo({
                   gap: "8px",
                   height: "44px",
                   borderRadius: "9999px",
-                  background: done
-                    ? "linear-gradient(135deg,#16a34a,#15803d)"
-                    : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
+                  background: done ?
+                  "linear-gradient(135deg,#16a34a,#15803d)" :
+                  "linear-gradient(135deg,#0069C0 0%,#003B8F 40%,#002a6e 100%)",
                   color: "#fff",
                   fontWeight: "700",
-                  fontSize: "14px",
-                }}
-              >
+                  fontSize: "14px"
+                }}>
+                
                 {running ? "Running…" : done ? "▶ Replay Demo" : `▶ ${triggerLabel}`}
               </span>
             </button>
 
-            {done && (
-              <p className="text-center text-xs text-green-600 font-semibold mt-3">
+            {done &&
+            <p className="text-center text-xs text-green-600 font-semibold mt-3">
                 ✓ Sequence complete — this runs automatically, 24/7
               </p>
-            )}
+            }
           </div>
 
           {/* Right: phone mockup */}
@@ -169,14 +169,14 @@ export default function IndustrySMSDemo({
               minHeight: "360px",
               maxHeight: "520px",
               display: "flex",
-              flexDirection: "column",
-            }}
-          >
+              flexDirection: "column"
+            }}>
+            
             {/* Phone header */}
             <div
               className="px-4 py-3 flex items-center gap-3 flex-shrink-0"
-              style={{ background: "#2c2c2e", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-            >
+              style={{ background: "#2c2c2e", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+              
               <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: accentColor }}>
                 <MessageSquare style={{ width: "14px", height: "14px", color: "#fff" }} />
               </div>
@@ -194,71 +194,71 @@ export default function IndustrySMSDemo({
             {/* Messages */}
             <div
               className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
-              style={{ background: "#1c1c1e" }}
-            >
-              {visible.length === 0 && !running && (
-                <div className="flex items-center justify-center h-full">
+              style={{ background: "#1c1c1e" }}>
+              
+              {visible.length === 0 && !running &&
+              <div className="flex items-center justify-center h-full">
                   <p className="text-xs text-white/25 text-center">
                     Press the button to see the automation run live →
                   </p>
                 </div>
-              )}
+              }
 
-              {visible.map((msg, i) => (
-                <div
-                  key={i}
-                  className={`flex ${msg.from === "system" ? "justify-start" : "justify-end"}`}
-                  style={{
-                    animation: "fadeSlideIn 0.35s cubic-bezier(0.22,1,0.36,1) both",
-                  }}
-                >
+              {visible.map((msg, i) =>
+              <div
+                key={i}
+                className={`flex ${msg.from === "system" ? "justify-start" : "justify-end"}`}
+                style={{
+                  animation: "fadeSlideIn 0.35s cubic-bezier(0.22,1,0.36,1) both"
+                }}>
+                
                   <div
-                    className="rounded-2xl px-3 py-2.5 max-w-[82%]"
-                    style={{
-                      background: msg.from === "system" ? accentColor : "#3a3a3c",
-                      color: "#fff",
-                      fontSize: "12px",
-                      lineHeight: 1.55,
-                      boxShadow: msg.from === "system"
-                        ? `0 4px 14px ${accentColor}55`
-                        : "0 2px 8px rgba(0,0,0,0.25)",
-                      borderRadius: msg.from === "system"
-                        ? "18px 18px 18px 4px"
-                        : "18px 18px 4px 18px",
-                    }}
-                  >
-                    {msg.from === "lead" && (
-                      <p className="text-[9px] font-bold uppercase tracking-wider mb-1" style={{ color: "rgba(255,255,255,0.55)" }}>
+                  className="rounded-2xl px-3 py-2.5 max-w-[82%]"
+                  style={{
+                    background: msg.from === "system" ? accentColor : "#3a3a3c",
+                    color: "#fff",
+                    fontSize: "12px",
+                    lineHeight: 1.55,
+                    boxShadow: msg.from === "system" ?
+                    `0 4px 14px ${accentColor}55` :
+                    "0 2px 8px rgba(0,0,0,0.25)",
+                    borderRadius: msg.from === "system" ?
+                    "18px 18px 18px 4px" :
+                    "18px 18px 4px 18px"
+                  }}>
+                  
+                    {msg.from === "lead" &&
+                  <p className="text-[9px] font-bold uppercase tracking-wider mb-1" style={{ color: "rgba(255,255,255,0.55)" }}>
                         Customer
                       </p>
-                    )}
-                    {msg.from === "system" && (
-                      <p className="text-[9px] font-bold uppercase tracking-wider mb-1" style={{ color: "rgba(255,255,255,0.65)" }}>
+                  }
+                    {msg.from === "system" &&
+                  <p className="text-[9px] font-bold uppercase tracking-wider mb-1" style={{ color: "rgba(255,255,255,0.65)" }}>
                         {businessName} · AI
                       </p>
-                    )}
+                  }
                     <p style={{ whiteSpace: "pre-wrap" }}>{msg.text}</p>
                   </div>
                 </div>
-              ))}
+              )}
 
               {/* Typing indicator */}
-              {typing && (
-                <div className="flex justify-start">
+              {typing &&
+              <div className="flex justify-start">
                   <div
-                    className="rounded-2xl px-4 py-3 flex items-center gap-1"
-                    style={{ background: accentColor, borderRadius: "18px 18px 18px 4px" }}
-                  >
-                    {[0, 1, 2].map((d) => (
-                      <span
-                        key={d}
-                        className="w-1.5 h-1.5 rounded-full bg-white"
-                        style={{ animation: `typingDot 1.2s ${d * 0.2}s infinite ease-in-out` }}
-                      />
-                    ))}
+                  className="rounded-2xl px-4 py-3 flex items-center gap-1"
+                  style={{ background: accentColor, borderRadius: "18px 18px 18px 4px" }}>
+                  
+                    {[0, 1, 2].map((d) =>
+                  <span
+                    key={d}
+                    className="w-1.5 h-1.5 rounded-full bg-white"
+                    style={{ animation: `typingDot 1.2s ${d * 0.2}s infinite ease-in-out` }} />
+
+                  )}
                   </div>
                 </div>
-              )}
+              }
 
               <div ref={bottomRef} />
             </div>
@@ -276,6 +276,6 @@ export default function IndustrySMSDemo({
           30%            { transform: translateY(-5px); opacity: 1; }
         }
       `}</style>
-    </section>
-  );
+    </section>);
+
 }

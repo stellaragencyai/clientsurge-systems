@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { X, ArrowRight, CheckCircle2 } from "lucide-react";
-import { PACKAGE_OFFERS, getPackageOffer } from "@/lib/salesCatalog";
+import { getPackageOffer } from "@/lib/salesCatalog";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import { useNavigate } from "react-router-dom";
 
@@ -71,7 +71,7 @@ function scoreAnswers(answers) {
 
   if (score <= 3) return "starter_system";
   if (score <= 6) return "growth_system";
-  return "pro_system";
+  return "elite_system";
 }
 
 function getRecommendationReason(answers) {

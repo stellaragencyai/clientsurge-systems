@@ -9,13 +9,91 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Invalid event' }, { status: 400 });
     }
 
+    // Deduplication — skip if same email/phone submitted within last 60 minutes
+    if (data.email || data.phone) {
+      const sixtyMinutesAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const existing = await base44.asServiceRole.entities.Leads.filter(
+        { email: data.email },
+        "-created_date",
+        5
+      ).catch(() => []);
+      const duplicate = (existing || []).find(
+        (l) => l.id !== data.id && new Date(l.created_date) > new Date(sixtyMinutesAgo)
+      );
+      if (duplicate) {
+        console.log(`[onLeadCreated] Duplicate detected for ${data.email} — skipping dispatch`);
+        return Response.json({ success: true, skipped: true, reason: "duplicate_within_60min" });
+      }
+    }
+
+    // ─────────────────────────────────────────────────────
+    // STEP 0: Score the lead immediately so downstream steps
+    //         have an accurate lead_score and activation_priority
+    // ─────────────────────────────────────────────────────
+    let scoreResult = null;
+    try {
+      scoreResult = await base44.asServiceRole.functions.invoke('calculateLeadScore', { lead_id: data.id });
+      console.log(`[onLeadCreated] Scored: score=${scoreResult?.score} priority=${scoreResult?.activation_priority}`);
+    } catch (scoreErr) {
+      console.log('[onLeadCreated] Scoring failed (non-blocking):', scoreErr.message);
+    }
+
+    // ─────────────────────────────────────────────────────
+    // STEP A: Route lead to industry-specific AI agent
+    // ─────────────────────────────────────────────────────
+    let routingResult = null;
+    try {
+      routingResult = await base44.asServiceRole.functions.invoke('routeLeadToIndustryAgent', { lead_id: data.id });
+      console.log(`[onLeadCreated] Routed to agent: ${routingResult?.agent_name} (${routingResult?.industry_key})`);
+    } catch (routeErr) {
+      console.log('[onLeadCreated] Routing failed (non-blocking):', routeErr.message);
+    }
+
+    // ─────────────────────────────────────────────────────
+    // STEP B: Generate & send industry-personalized first SMS
+    // ─────────────────────────────────────────────────────
+    if (data.phone) {
+      try {
+        const smsResult = await base44.asServiceRole.functions.invoke('generateIndustryFirstSMS', {
+          lead_id: data.id,
+          industry_key: routingResult?.industry_key || 'general',
+        });
+        console.log(`[onLeadCreated] Industry first SMS generated (${smsResult?.char_count} chars)`);
+
+        // Send via Twilio
+        if (smsResult?.sms) {
+          await base44.asServiceRole.functions.invoke('sendSMS', {
+            to: data.phone,
+            body: smsResult.sms,
+          });
+          console.log(`[onLeadCreated] Industry first SMS sent to ${data.phone}`);
+        }
+      } catch (smsErr) {
+        console.log('[onLeadCreated] Industry SMS failed (non-blocking):', smsErr.message);
+      }
+    }
+
+    // ─────────────────────────────────────────────────────
+    // STEP C: Trigger ElevenLabs voice call for HOT leads
+    // ─────────────────────────────────────────────────────
+    const isHot = (scoreResult?.score >= 75) || (scoreResult?.activation_priority === 'Hot') ||
+                  (data.lead_score >= 75) || (data.activation_priority === 'Hot');
+    if (isHot && data.phone) {
+      try {
+        await base44.asServiceRole.functions.invoke('triggerVoiceCallToLead', { lead_id: data.id });
+        console.log(`[onLeadCreated] Voice call triggered for HOT lead ${data.id}`);
+      } catch (voiceErr) {
+        console.log('[onLeadCreated] Voice call failed (non-blocking):', voiceErr.message);
+      }
+    }
+
     // Prepare structured webhook payload
     const payload = {
       event: 'lead_created',
       timestamp: new Date().toISOString(),
       lead: {
         id: data.id,
-        name: data.name,
+        name: data.full_name || data.name,
         email: data.email,
         phone: data.phone,
         niche: data.niche,
@@ -53,7 +131,21 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, payload });
+
+    // ─────────────────────────────────────────────────────
+    // STEP Z: #251 — Run AI scoreLeadIntelligence for full scoring
+    // Called after calculateLeadScore for deeper AI analysis
+    // ─────────────────────────────────────────────────────
+    try {
+      const intelligenceScore = await base44.asServiceRole.functions.invoke('scoreLeadIntelligence', {
+        lead_id: data.id,
+      });
+      console.log(`[onLeadCreated] AI intelligence score: ${intelligenceScore?.score} tier=${intelligenceScore?.tier}`);
+    } catch (intelligenceErr) {
+      console.log('[onLeadCreated] AI scoring failed (non-blocking):', intelligenceErr.message);
+    }
+
+        return Response.json({ success: true, payload });
   } catch (error) {
     console.error('Error:', error);
     return Response.json({ error: error.message }, { status: 500 });

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  X, Send, Save, CheckCircle, AlertCircle, Loader2, Trash2,
+  X, Save, CheckCircle, AlertCircle, Loader2, Trash2,
   MessageSquare, StickyNote, ChevronRight, PhoneCall, RotateCcw, Zap, MessageCircle
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";

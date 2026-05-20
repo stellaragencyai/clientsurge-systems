@@ -12,8 +12,12 @@ const SPAM_DOMAINS = new Set([
   "guerrillamail.com",
   "temp-mail.org",
   "mailinator.com",
-  "throwaway.email",
-]);
+  "throwaway.email","yopmail.com","sharklasers.com","guerrillamailblock.com",
+  "trashmail.com","trashmail.at","trashmail.io","trashmail.me","trashmail.net",
+  "dispostable.com","mailnull.com","fakeinbox.com","getairmail.com",
+  "discard.email","mailcatch.com","tempr.email","getnada.com","filzmail.com",
+  "spam4.me","spamex.com","spaml.de","deadaddress.com","spamfree24.org",
+]); // #143 expanded
 
 const RED_FLAG_KEYWORDS = [
   "test",

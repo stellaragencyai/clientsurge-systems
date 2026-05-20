@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   CalendarCheck,
-  CheckCircle2,
   HeadphonesIcon,
   LayoutDashboard,
   MessageSquare,

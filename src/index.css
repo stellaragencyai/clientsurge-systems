@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,77 +7,78 @@
 @layer base {
   :root {
     --font-inter: 'Inter', sans-serif;
-    --font-display: 'Playfair Display', serif;
-    --font-titles: 'Space Grotesk', sans-serif;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-titles: 'Montserrat', sans-serif;
 
-    --background: 0 0% 100%;
-    --foreground: 30 25% 15%;
-    --card: 40 30% 98%;
-    --card-foreground: 30 25% 15%;
+    /* ClientSurge Electric Blue Theme */
+    --background: 210 100% 99%;
+    --foreground: 220 80% 10%;
+    --card: 210 60% 98%;
+    --card-foreground: 220 80% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 30 25% 15%;
-    --primary: 33 72% 40%;
+    --popover-foreground: 220 80% 10%;
+    --primary: 199 100% 47%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 40 40% 94%;
-    --secondary-foreground: 30 25% 15%;
-    --muted: 40 30% 96%;
-    --muted-foreground: 30 15% 45%;
-    --accent: 33 72% 40%;
+    --secondary: 210 60% 95%;
+    --secondary-foreground: 220 80% 10%;
+    --muted: 210 50% 96%;
+    --muted-foreground: 215 25% 45%;
+    --accent: 199 100% 47%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 40 25% 88%;
-    --input: 40 25% 88%;
-    --ring: 33 72% 40%;
-    --chart-1: 33 72% 40%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --border: 210 40% 88%;
+    --input: 210 40% 88%;
+    --ring: 199 100% 47%;
+    --chart-1: 199 100% 47%;
+    --chart-2: 217 100% 40%;
+    --chart-3: 220 80% 20%;
+    --chart-4: 199 80% 65%;
+    --chart-5: 217 90% 55%;
     --radius: 0.5rem;
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 30 25% 15%;
-    --sidebar-primary: 33 72% 40%;
+    --sidebar-foreground: 220 80% 10%;
+    --sidebar-primary: 199 100% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 40 40% 94%;
-    --sidebar-accent-foreground: 30 25% 15%;
-    --sidebar-border: 40 25% 88%;
-    --sidebar-ring: 33 72% 40%;
+    --sidebar-accent: 210 60% 95%;
+    --sidebar-accent-foreground: 220 80% 10%;
+    --sidebar-border: 210 40% 88%;
+    --sidebar-ring: 199 100% 47%;
   }
 
   .dark {
-    --background: 28 20% 8%;
-    --foreground: 40 40% 92%;
-    --card: 28 18% 11%;
-    --card-foreground: 40 40% 92%;
-    --popover: 28 18% 11%;
-    --popover-foreground: 40 40% 92%;
-    --primary: 33 75% 52%;
-    --primary-foreground: 28 20% 8%;
-    --secondary: 28 15% 16%;
-    --secondary-foreground: 40 40% 92%;
-    --muted: 28 15% 13%;
-    --muted-foreground: 38 20% 55%;
-    --accent: 33 75% 52%;
-    --accent-foreground: 28 20% 8%;
+    --background: 220 50% 8%;
+    --foreground: 210 40% 92%;
+    --card: 220 45% 11%;
+    --card-foreground: 210 40% 92%;
+    --popover: 220 45% 11%;
+    --popover-foreground: 210 40% 92%;
+    --primary: 199 100% 50%;
+    --primary-foreground: 220 50% 8%;
+    --secondary: 220 35% 16%;
+    --secondary-foreground: 210 40% 92%;
+    --muted: 220 35% 13%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 199 100% 50%;
+    --accent-foreground: 220 50% 8%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 28 15% 18%;
-    --input: 28 15% 18%;
-    --ring: 33 75% 52%;
-    --chart-1: 33 75% 52%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 28 20% 8%;
-    --sidebar-foreground: 40 40% 92%;
-    --sidebar-primary: 33 75% 52%;
-    --sidebar-primary-foreground: 28 20% 8%;
-    --sidebar-accent: 28 15% 16%;
-    --sidebar-accent-foreground: 40 40% 92%;
-    --sidebar-border: 28 15% 18%;
-    --sidebar-ring: 33 75% 52%;
+    --border: 220 30% 18%;
+    --input: 220 30% 18%;
+    --ring: 199 100% 50%;
+    --chart-1: 199 100% 50%;
+    --chart-2: 217 90% 55%;
+    --chart-3: 199 80% 65%;
+    --chart-4: 220 70% 60%;
+    --chart-5: 195 85% 50%;
+    --sidebar-background: 220 50% 8%;
+    --sidebar-foreground: 210 40% 92%;
+    --sidebar-primary: 199 100% 50%;
+    --sidebar-primary-foreground: 220 50% 8%;
+    --sidebar-accent: 220 35% 16%;
+    --sidebar-accent-foreground: 210 40% 92%;
+    --sidebar-border: 220 30% 18%;
+    --sidebar-ring: 199 100% 50%;
   }
 }
 
@@ -92,7 +93,6 @@
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -175,9 +175,34 @@ a[role="button"]:focus-visible,
 /* 2. Prevent horizontal scroll on ALL viewports */
 html, body {
   overflow-x: hidden;
-  max-width: 100%;
+  max-width: 100vw;
   width: 100%;
 }
+
+/* FIX 6 — Heading text overflow */
+h1, h2, h3 { overflow-wrap: break-word; word-break: break-word; }
+
+/* FIX 10 — Image overflow prevention */
+img { max-width: 100%; height: auto; }
+
+/* FIX 2 — Timeline 4-col grid */
+@media (max-width: 640px) { .timeline-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; } }
+@media (max-width: 380px) { .timeline-grid { grid-template-columns: 1fr !important; } }
+
+/* FIX 3 — Hero checklist on tiny phones */
+@media (max-width: 380px) { .hero-checklist { grid-template-columns: 1fr !important; } }
+
+/* FIX 4 — Bottom padding for sticky bar */
+@media (max-width: 768px) { #root > div { padding-bottom: 80px; } }
+
+/* FIX 7 — Pricing cards mobile stacking */
+@media (max-width: 768px) { .pricing-cards { flex-direction: column !important; align-items: center !important; } }
+
+/* FIX 8 — Testimonial cards mobile stacking */
+@media (max-width: 768px) { .testimonial-grid { grid-template-columns: 1fr !important; } }
+
+/* FIX 9 — Hero min-height on mobile */
+@media (max-width: 768px) { .hero-section { min-height: auto !important; } }
 
 /* 3. Safe area insets — iPhone notch / Dynamic Island / iPad */
 :root {
@@ -211,7 +236,7 @@ body.nav-open {
   overflow: hidden;
   position: fixed;
   width: 100%;
-  top: 0;
+  top: var(--scroll-lock-top, 0px);
   left: 0;
   right: 0;
 }
@@ -224,6 +249,71 @@ body.nav-open {
   /* Fix 100vh on iOS Safari — use svh where supported */
   .full-height {
     height: 100svh;
+  }
+}
+
+/* M01: Replace 100vh with svh on all hero/full-height containers (Dynamic Island safe) */
+@supports (height: 100svh) {
+  .min-h-screen,
+  [class*="min-h-screen"] {
+    /* svh accounts for Dynamic Island + browser chrome on iPhone 15/17 */
+    min-height: 100svh;
+  }
+  .h-screen {
+    height: 100svh;
+  }
+}
+
+/* M08: Safari 17 backdrop-filter flicker fix — force GPU compositing on Navbar */
+nav {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* M02: iPhone notch / Dynamic Island — safe-area-inset-top on Navbar */
+@supports (padding-top: env(safe-area-inset-top)) {
+  nav {
+    padding-top: max(0px, env(safe-area-inset-top));
+  }
+}
+
+/* M05 / M18: MobileCallBar + body scroll lock — safe-area bottom for home indicator */
+.safe-area-bottom-bar {
+  padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+}
+
+/* M11: Ensure -webkit-sticky is applied for Safari sticky navbar */
+.sticky, [class*="sticky"] {
+  position: -webkit-sticky !important;
+  position: sticky !important;
+}
+
+/* M19: iPhone landscape — hero must not crop; override any fixed min-height */
+@media (max-height: 500px) and (orientation: landscape) {
+  .landing-hero__inner {
+    min-height: auto !important;
+    padding-top: 5rem !important;
+    padding-bottom: 3rem !important;
+  }
+  .hero-section {
+    min-height: auto !important;
+  }
+}
+
+/* M06: iPad portrait (768px) — pricing cards should be 2-col not 1-col */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .pricing-cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* M15: iPad portrait — Footer nav columns should be 2-col min */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .footer-nav-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
@@ -271,11 +361,11 @@ img {
   display: block;
 }
 
-/* 14. Smooth scrolling — disabled for reduced-motion users */
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
+/* 14. Smooth scrolling — handled entirely in JS via lib/scroll.js to avoid
+   conflicts between CSS scroll-behavior and programmatic scroll calls.
+   DO NOT re-enable scroll-behavior: smooth here. */
+html {
+  scroll-behavior: auto;
 }
 
 /* 15. Reduced motion — kill ALL animations/transitions for accessibility */
@@ -302,6 +392,35 @@ body {
   transition: background 0.6s ease;
 }
 
+body.homepage-white-canvas {
+  background: #ffffff !important;
+}
+
+body.homepage-white-canvas::before {
+  display: none !important;
+}
+
+body.homepage-white-canvas .nebula-bg::before,
+body.homepage-white-canvas .nebula-faq,
+body.homepage-white-canvas .nebula-cta,
+body.homepage-white-canvas .nebula-hero,
+body.homepage-white-canvas .nebula-pricing,
+body.homepage-white-canvas .nebula-testimonials,
+body.homepage-white-canvas .nebula-problem,
+body.homepage-white-canvas [class*="from-card"][class*="to-background"] {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+body.homepage-white-canvas .landing-hero__ambient {
+  display: none !important;
+}
+
+body.homepage-white-canvas .landing-hero__visualGlow {
+  background: radial-gradient(circle at center, rgba(0,174,239,0.16) 0%, rgba(0,157,255,0.08) 34%, transparent 74%) !important;
+  filter: blur(30px) !important;
+}
+
 /* ============================================
    IDEA 1: NEBULA BACKGROUND GRADIENTS
    Deep-space multi-layered radial gradients
@@ -319,10 +438,10 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 50% at 15% 20%, rgba(154, 92, 46, 0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 85% 75%, rgba(245, 217, 168, 0.06) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 60% at 50% 50%, rgba(122, 72, 37, 0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 90% 30% at 70% 10%, rgba(200, 150, 92, 0.05) 0%, transparent 50%);
+    radial-gradient(ellipse 80% 50% at 15% 20%, rgba(0, 174, 239, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 85% 75%, rgba(0, 157, 255, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 60% at 50% 50%, rgba(0, 59, 143, 0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 90% 30% at 70% 10%, rgba(0, 174, 239, 0.04) 0%, transparent 50%);
 }
 .nebula-bg > * {
   position: relative;
@@ -332,46 +451,46 @@ body {
 /* Section-specific nebula tints */
 .nebula-faq {
   background:
-    radial-gradient(ellipse 70% 60% at 10% 30%, rgba(154, 92, 46, 0.09) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 70% at 90% 80%, rgba(245, 217, 168, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 100% 40% at 50% 100%, rgba(122, 72, 37, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 60% at 10% 30%, rgba(0, 174, 239, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 70% at 90% 80%, rgba(0, 157, 255, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 40% at 50% 100%, rgba(0, 59, 143, 0.04) 0%, transparent 50%),
     hsl(var(--background));
 }
 
 .nebula-cta {
   background:
-    radial-gradient(ellipse 80% 80% at 20% 50%, rgba(200, 150, 92, 0.10) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(245, 217, 168, 0.07) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 90% at 60% 90%, rgba(154, 92, 46, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 80% at 20% 50%, rgba(0, 174, 239, 0.09) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(0, 157, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 90% at 60% 90%, rgba(0, 59, 143, 0.05) 0%, transparent 60%),
     hsl(var(--card));
 }
 
 .nebula-hero {
   background:
-    radial-gradient(ellipse 60% 70% at 0% 0%, rgba(200, 150, 92, 0.10) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 50% at 100% 50%, rgba(245, 217, 168, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse 80% 40% at 40% 100%, rgba(154, 92, 46, 0.05) 0%, transparent 60%);
+    radial-gradient(ellipse 60% 70% at 0% 0%, rgba(0, 174, 239, 0.09) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 100% 50%, rgba(0, 157, 255, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 40% at 40% 100%, rgba(0, 59, 143, 0.04) 0%, transparent 60%);
 }
 
 .nebula-pricing {
   background:
-    radial-gradient(ellipse 90% 60% at 5% 60%, rgba(154, 92, 46, 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 50% at 95% 30%, rgba(245, 217, 168, 0.07) 0%, transparent 50%),
-    radial-gradient(ellipse 70% 80% at 50% 50%, rgba(122, 72, 37, 0.04) 0%, transparent 65%),
+    radial-gradient(ellipse 90% 60% at 5% 60%, rgba(0, 174, 239, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 95% 30%, rgba(0, 157, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 80% at 50% 50%, rgba(0, 59, 143, 0.03) 0%, transparent 65%),
     hsl(var(--background));
 }
 
 .nebula-testimonials {
   background:
-    radial-gradient(ellipse 70% 50% at 80% 20%, rgba(200, 150, 92, 0.08) 0%, transparent 55%),
-    radial-gradient(ellipse 55% 65% at 10% 80%, rgba(245, 217, 168, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 80% 20%, rgba(0, 174, 239, 0.07) 0%, transparent 55%),
+    radial-gradient(ellipse 55% 65% at 10% 80%, rgba(0, 157, 255, 0.06) 0%, transparent 55%),
     hsl(var(--background));
 }
 
 .nebula-problem {
   background:
-    radial-gradient(ellipse 80% 55% at 30% 20%, rgba(154, 92, 46, 0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 70% at 75% 90%, rgba(245, 217, 168, 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 55% at 30% 20%, rgba(0, 174, 239, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 70% at 75% 90%, rgba(0, 157, 255, 0.05) 0%, transparent 55%),
     hsl(var(--background));
 }
 
@@ -468,13 +587,13 @@ body > * {
 /* Body / background */
 .dark body {
   background-image: none !important;
-  background-color: hsl(28, 20%, 8%) !important;
+  background-color: hsl(220, 50%, 8%) !important;
 }
 
 /* Navbar */
 .dark nav {
-  background: rgba(10, 12, 20, 0.85) !important;
-  border-bottom-color: rgba(200, 150, 92, 0.15) !important;
+  background: rgba(5, 10, 25, 0.9) !important;
+  border-bottom-color: rgba(0, 174, 239, 0.15) !important;
 }
 
 /* Hero section — force dark bg so text is visible */
@@ -494,14 +613,14 @@ body > * {
 
 /* WhyUs comparison cards — override hardcoded inline styles */
 .dark [style*="rgba(255,255,255,0.55)"] {
-  background: rgba(18, 20, 28, 0.9) !important;
-  border-color: rgba(200, 150, 92, 0.2) !important;
+  background: rgba(10, 18, 35, 0.9) !important;
+  border-color: rgba(0, 174, 239, 0.2) !important;
 }
 .dark [style*="rgba(255,235,235"] {
-  background: rgba(30, 15, 15, 0.8) !important;
+  background: rgba(10, 18, 35, 0.8) !important;
 }
 .dark [style*="rgba(255,248,235"] {
-  background: rgba(20, 15, 8, 0.8) !important;
+  background: rgba(8, 14, 28, 0.8) !important;
 }
 
 /* HowItWorks mobile cards */
@@ -516,29 +635,29 @@ body > * {
 
 /* Timeline strips */
 .dark [style*="rgba(154,92,46,0.04)"] {
-  background: rgba(30, 22, 10, 0.6) !important;
+  background: rgba(0, 30, 60, 0.5) !important;
 }
 
 /* Arrow connector circles */
 .dark [style*="border: 2px solid white"] {
-  border-color: rgba(200, 150, 92, 0.4) !important;
+  border-color: rgba(0, 174, 239, 0.4) !important;
 }
 
 /* Stats bar */
 .dark [style*="rgba(154,92,46,0.06)"] {
-  background: rgba(25, 18, 5, 0.7) !important;
-  border-color: rgba(200, 150, 92, 0.25) !important;
+  background: rgba(0, 20, 50, 0.7) !important;
+  border-color: rgba(0, 174, 239, 0.25) !important;
 }
 
 /* TrustBar */
 .dark .border-y {
-  border-color: rgba(200, 150, 92, 0.15) !important;
+  border-color: rgba(0, 174, 239, 0.15) !important;
 }
 
 /* Footer */
 .dark footer {
-  background: hsl(28, 20%, 6%) !important;
-  border-top-color: rgba(200, 150, 92, 0.15) !important;
+  background: hsl(220, 50%, 5%) !important;
+  border-top-color: rgba(0, 174, 239, 0.15) !important;
 }
 
 /* White text on gold gradient CTAs — keep them as-is (they look great in dark) */
@@ -556,12 +675,12 @@ body > * {
 
 /* Input fields in forms */
 .dark input, .dark select, .dark textarea {
-  background: hsl(220, 20%, 10%) !important;
-  border-color: rgba(200, 150, 92, 0.2) !important;
-  color: hsl(42, 30%, 88%) !important;
+  background: hsl(220, 40%, 10%) !important;
+  border-color: rgba(0, 174, 239, 0.2) !important;
+  color: hsl(210, 40%, 90%) !important;
 }
 .dark input::placeholder, .dark textarea::placeholder {
-  color: rgba(200, 170, 120, 0.4) !important;
+  color: rgba(100, 180, 230, 0.4) !important;
 }
 
 /* Borders */
@@ -589,8 +708,8 @@ body > * {
 
 /* Overlay cards */
 .dark .overlay-card {
-  background: rgba(25, 20, 10, 0.6) !important;
-  border-color: rgba(200, 150, 92, 0.18) !important;
+  background: rgba(0, 20, 50, 0.6) !important;
+  border-color: rgba(0, 174, 239, 0.18) !important;
 }
 
 /* SectionDivider & other gradient strips */
@@ -612,6 +731,23 @@ body > * {
 .font-display {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   PREMIUM WHITESPACE — more breathing room
+   ============================================ */
+
+/* Desktop: generous top/bottom for every section */
+@media (min-width: 1025px) {
+  section {
+    padding-top: max(var(--section-pt, 0px), 0px);
+    padding-bottom: max(var(--section-pb, 0px), 0px);
+  }
+}
+
+/* Global section min-vertical-gap — adds 40px on top of whatever each section already declares */
+section + section {
+  margin-top: clamp(0px, 2vw, 24px);
 }
 
 /* Responsive section padding — consistent across all screen sizes */
@@ -693,10 +829,10 @@ img[style*="object-fit"] {
 /* 4. Scrollbar styling — consistent cross-browser thin scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(154,92,46,0.3); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(154,92,46,0.55); }
+::-webkit-scrollbar-thumb { background: rgba(0,174,239,0.35); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,174,239,0.6); }
 @supports (scrollbar-width: thin) {
-  * { scrollbar-width: thin; scrollbar-color: rgba(154,92,46,0.3) transparent; }
+  * { scrollbar-width: thin; scrollbar-color: rgba(0,174,239,0.35) transparent; }
 }
 
 /* 5. Input zoom prevention on iOS (font-size must be ≥16px) */
@@ -754,7 +890,7 @@ button, [role="button"] {
 
 /* Dark mode gradient text fix */
 .dark span[style*="background"] {
-  background: linear-gradient(135deg, #f5d9a8 0%, #e8c499 52%, #d4a570 100%) !important;
+  background: linear-gradient(135deg, #00AEEF 0%, #009DFF 52%, #003B8F 100%) !important;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

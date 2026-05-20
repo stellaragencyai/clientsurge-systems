@@ -1,5 +1,6 @@
 /**
- * scoreLeads — batch re-scores ALL Leads and persists lead_score + activation_priority.
+ * scoreLeads — redeployed 2026-05-02
+ * Batch re-scores ALL Leads and persists lead_score + activation_priority.
  * Admin-only. Called manually from Priority Queue "Re-Score" button or on a schedule.
  *
  * Scoring model (additive, capped at 100):
@@ -20,7 +21,27 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { allowAnonymousAutomation } from "../_shared/automationSecurity.js";
+// Inlined from _shared/automationSecurity.js (relative imports not supported in deployed Deno runtime)
+function constantTimeEqual(left, right) {
+  if (typeof left !== "string" || typeof right !== "string" || left.length !== right.length) return false;
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+  return mismatch === 0;
+}
+function getBearerToken(req) {
+  const authorization = req.headers.get("authorization") || "";
+  const [scheme, token] = authorization.split(/\s+/, 2);
+  if (scheme?.toLowerCase() !== "bearer" || !token) return "";
+  return token.trim();
+}
+function allowAnonymousAutomation(req) {
+  const configuredSecret = Deno.env.get("AUTOMATION_SHARED_SECRET");
+  if (!configuredSecret) return true;
+  const candidateSecret = req.headers.get("x-automation-secret") || getBearerToken(req);
+  return constantTimeEqual(candidateSecret || "", configuredSecret);
+}
 
 const LEAD_LIMIT = 10000;
 const EVENT_LIMIT = 10000;

@@ -1,4 +1,4 @@
-import { FileText, Headphones, Eye, Download, MessageCircle } from "lucide-react";
+import { Headphones, Eye, Download } from "lucide-react";
 
 export default function ServiceCardActions({ serviceKey, orderId }) {
   const actions = [
@@ -9,7 +9,6 @@ export default function ServiceCardActions({ serviceKey, orderId }) {
 
   const handleAction = (actionType) => {
     // Placeholder for actions — can integrate modals or navigation later
-    console.log(`Action: ${actionType} for ${serviceKey}`);
   };
 
   return (

@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
       body: new URLSearchParams({
         From: fromNumber,
         To: phone,
-        Body: message,
+        Body: message.includes("Reply STOP") ? message : `${message}\n\nReply STOP to unsubscribe.`,
       }).toString(),
     });
 

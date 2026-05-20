@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, LogOut, Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Search, LogOut, Edit, Trash2, Eye } from "lucide-react";
 import EmailHistoryPanel from "../components/dashboard/EmailHistoryPanel";
 
 export default function Dashboard() {

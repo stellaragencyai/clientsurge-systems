@@ -52,18 +52,16 @@ const items = [
   {
     icon: CalendarCheck,
     label: "Average setup time",
-    display: "5-7 business days",
+    display: "24–48 hours",
     animatedValue: null,
     story:
-      "We handle the build, setup, and launch prep so your team is not stuck piecing together tools.",
+      "We handle the full build and launch prep. Most clients are live within 24–48 hours of onboarding.",
   },
   {
     icon: Building2,
     label: "Average recovery window",
     display: "30-day ROI",
     animatedValue: null,
-    suffix: "",
-    display: "30-day ROI",
     story:
       "A few additional booked appointments often cover the investment faster than teams expect.",
   },
@@ -88,23 +86,22 @@ function StatCard({ item, index, inView }) {
   return (
     <motion.article
       className="relative rounded-2xl border border-border text-left shadow-sm"
+      aria-label={`${statText} — ${item.label}`}
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.55, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        background: isHighlighted 
-          ? "linear-gradient(180deg, rgba(245,217,168,0.3) 0%, rgba(255,255,255,0.9) 100%)"
-          : "rgba(255,255,255,0.82)",
+        background: "#ffffff",
         minHeight: "clamp(140px, 20vw, 190px)",
         padding: "clamp(14px, 3vw, 20px)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        boxShadow: isHighlighted ? "0 0 20px rgba(245,217,168,0.4), 0 6px 22px rgba(0,0,0,0.06)" : "0 6px 22px rgba(0,0,0,0.06)",
+        boxShadow: isHighlighted ? "0 0 20px rgba(0,174,239,0.2), 0 6px 22px rgba(0,0,0,0.06)" : "0 6px 22px rgba(0,0,0,0.06)",
       }}
     >
-      <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3" style={isHighlighted ? { boxShadow: "0 0 12px rgba(34,199,89,0.4)" } : {}}>
+      <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3" style={isHighlighted ? { boxShadow: "0 0 12px rgba(0,174,239,0.3)" } : {}}>
         <Icon className="w-[17px] h-[17px] text-primary" />
       </div>
       <div>
@@ -150,7 +147,7 @@ export default function TrustBar() {
             What You Can Expect
           </h2>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
           {items.map((item, index) => (
             <StatCard key={item.label} item={item} index={index} inView={inView} />
           ))}

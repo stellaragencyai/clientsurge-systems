@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
+// #116: filter by scheduled_date to avoid fetching all records
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -9,15 +10,15 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Date required' }, { status: 400 });
     }
 
-    // Fetch all DemoRequests for the given date
+    // #116: explicit date filter — don't load all DemoRequests
     const bookings = await base44.asServiceRole.entities.DemoRequest.filter({
       scheduled_date: date,
-      status: { $in: ['requested', 'scheduled'] },
-    });
+      status: { $in: ['requested', 'scheduled', 'confirmed'] },
+    }, '-created_date', 50); // limit 50 max per day
 
-    const bookedTimes = bookings.map(b => b.scheduled_time);
+    const bookedTimes = (bookings || []).map(b => b.scheduled_time).filter(Boolean);
 
-    return Response.json({ booked_times: bookedTimes });
+    return Response.json({ booked_times: bookedTimes, date, count: bookedTimes.length });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

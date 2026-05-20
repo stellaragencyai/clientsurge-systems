@@ -220,7 +220,7 @@ return {
 
 #### Step 1: Configuration Phase (Automatic)
 ```javascript
-// In configureService function
+// Historical pre-recovery example from the retired configureService path.
 async function configureInstantLeadResponse(base44, order, item) {
   // Register SMS template
   const smsTemplate = await registerTemplate(base44, {

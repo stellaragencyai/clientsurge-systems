@@ -6,7 +6,8 @@ import {
   Home,
   MapPin,
   Sparkles,
-  Wrench } from
+  Wrench,
+  X } from
 "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDemoBooking } from "./DemoBookingContext";
@@ -14,6 +15,7 @@ import {
   INDUSTRY_RECOMMENDATIONS_BY_ID,
   INDUSTRY_SELECTION_STORAGE_KEY } from
 "@/lib/industryRecommendations";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 // Unique SVG pattern per industry — lightweight, inline, no external deps
 const industryPatterns = {
@@ -120,10 +122,10 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
   useEffect(() => {
     const onKey = (e) => {if (e.key === "Escape") onClose();};
     document.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
+    const releaseScrollLock = acquireBodyScrollLock("industry-recommendation-modal");
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      releaseScrollLock();
     };
   }, [onClose]);
 
@@ -143,8 +145,8 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
         <div
         className="px-7 pt-7 pb-5 flex items-start justify-between gap-4 sticky top-0 rounded-t-[28px] z-10"
         style={{
-          background: "linear-gradient(135deg, rgba(154,92,46,0.09) 0%, rgba(250,245,239,0.97) 100%)",
-          borderBottom: "1px solid rgba(154,92,46,0.12)"
+          background: "linear-gradient(135deg, rgba(0,174,239,0.06) 0%, rgba(240,249,255,0.97) 100%)",
+          borderBottom: "1px solid rgba(0,174,239,0.12)"
         }}>
         
           <div>
@@ -161,9 +163,10 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
           <button
           type="button"
           onClick={onClose}
-          className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-black/8 transition-colors text-xl font-light">
+          aria-label="Close"
+          className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-black/8 transition-colors">
           
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -178,11 +181,11 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
             <h4 className="text-xl font-semibold text-foreground">{recommendation.recommendedPackage?.name}</h4>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{recommendation.recommendedPackage?.fit}</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.14)", color: "#9a5c2e" }}>
+              <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.18)", color: "#0088CC" }}>
                 {recommendation.recommendedServices.length} services recommended
               </span>
               {recommendation.addOnsByReview.length ?
-            <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(26,18,9,0.05)", border: "1px solid rgba(26,18,9,0.08)", color: "rgba(26,18,9,0.6)" }}>
+            <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(0,174,239,0.06)", border: "1px solid rgba(0,174,239,0.15)", color: "rgba(0,80,160,0.7)" }}>
                   {recommendation.addOnsByReview.length} add-ons by review
                 </span> :
             null}
@@ -194,7 +197,7 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-3">Why This Stack Fits</p>
             <div className="space-y-2">
               {recommendation.pressurePoints.map((point) =>
-            <div key={point} className="rounded-2xl px-4 py-3" style={{ background: "rgba(154,92,46,0.05)", border: "1px solid rgba(154,92,46,0.12)" }}>
+            <div key={point} className="rounded-2xl px-4 py-3" style={{ background: "rgba(0,174,239,0.04)", border: "1px solid rgba(0,174,239,0.12)" }}>
                   <p className="text-sm leading-6 text-foreground/78">{point}</p>
                 </div>
             )}
@@ -203,13 +206,13 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
 
           {/* Available services */}
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-3">Available Now</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-3">Recommended Services</p>
             <div className="grid sm:grid-cols-2 gap-3">
               {recommendation.recommendedServices.map((service) =>
-            <div key={service.product_id} className="rounded-2xl px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(250,245,239,0.74) 100%)", border: "1px solid rgba(154,92,46,0.12)" }}>
+            <div key={service.product_id} className="rounded-2xl px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,249,255,0.74) 100%)", border: "1px solid rgba(0,174,239,0.12)" }}>
                   <p className="text-sm font-semibold text-foreground">{service.name}</p>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{service.whyThisMatters}</p>
-                  <span className="mt-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em]" style={{ background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.14)", color: "#9a5c2e" }}>
+                  <span className="mt-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em]" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.14)", color: "#0088CC" }}>
                     {service.availability_label}
                   </span>
                 </div>
@@ -223,8 +226,8 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
           <a href="/store" className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
             See The AI Store <ArrowRight className="w-4 h-4" />
           </a>
-          <button type="button" onClick={onBookDemo} style={{ borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.3)", border: "none", cursor: "pointer" }}>
-            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "42px", padding: "0 24px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.875rem" }}>
+          <button type="button" onClick={onBookDemo} style={{ borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)", border: "none", cursor: "pointer" }}>
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "42px", padding: "0 24px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.875rem" }}>
               Book Your Free Demo <ArrowRight className="w-4 h-4" />
             </span>
           </button>
@@ -298,7 +301,7 @@ export default function Industries() {
         <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">
           Choose Your Industry
         </p>
-        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
+        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
           Built for Businesses That Win on{" "}
           <span className="text-primary">Fast Response</span>
         </h2>
@@ -307,7 +310,7 @@ export default function Industries() {
         </p>
       </div>
 
-      <div className="max-w-[1800px] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10" style={{ overflowX: "hidden" }}>
+      <div className="max-w-7xl mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10" style={{ overflowX: "hidden" }}>
         {industries.map((industry, index) => {
           const Icon = industry.icon;
           const highlighted = hoveredIndustryId === industry.id;
@@ -315,14 +318,16 @@ export default function Industries() {
 
           return (
             <motion.button
-              key={industry.id}
-              type="button"
-              className="group relative block overflow-hidden h-[14rem] sm:h-[18rem] md:h-[27.6rem] text-left"
-              onClick={() => handleIndustrySelect(industry.id)}
-              onMouseEnter={() => setHoveredIndustryId(industry.id)}
-              onMouseLeave={() => setHoveredIndustryId("")}
-              onFocus={() => setHoveredIndustryId(industry.id)}
-              onBlur={() => setHoveredIndustryId("")}
+            key={industry.id}
+            type="button"
+            aria-label={industry.name}
+            aria-pressed={isSelected}
+            className="group relative block overflow-hidden h-[14rem] sm:h-[18rem] md:h-[27.6rem] text-left"
+            onClick={() => handleIndustrySelect(industry.id)}
+            onMouseEnter={() => setHoveredIndustryId(industry.id)}
+            onMouseLeave={() => setHoveredIndustryId("")}
+            onFocus={() => setHoveredIndustryId(industry.id)}
+            onBlur={() => setHoveredIndustryId("")}
               animate={isSelected ? { scale: [1, 1.04, 1.02], zIndex: 2 } : { scale: 1, zIndex: 1 }}
               transition={{ type: "spring", stiffness: 400, damping: 18 }}
               style={{
@@ -341,6 +346,9 @@ export default function Industries() {
                 src={industry.image}
                 alt={industry.name}
                 loading="lazy"
+                decoding="async"
+                width="600"
+                height="442"
                 className="absolute inset-0 h-full w-full object-cover" />
               
               {/* Unique per-industry SVG texture pattern */}
@@ -359,27 +367,21 @@ export default function Industries() {
               <div
                 className="absolute inset-0 border-2 transition-all duration-300"
                 style={{
-                  borderColor: highlighted ? "#c8965c" : "rgba(255,255,255,0.08)",
-                  boxShadow: highlighted ?
+                  borderColor: isSelected ? "#00AEEF" : highlighted ? "#c8965c" : "rgba(255,255,255,0.08)",
+                  boxShadow: isSelected ?
+                  "inset 0 0 0 1px rgba(0,174,239,0.4), inset 0 0 32px rgba(0,174,239,0.15), 0 0 0 2px rgba(0,174,239,0.5), 0 0 24px rgba(0,174,239,0.3)" :
+                  highlighted ?
                   "inset 0 0 0 1px rgba(245,217,168,0.26), inset 0 0 32px rgba(200,150,92,0.2), 0 0 0 2px rgba(200,150,92,0.34), 0 0 24px rgba(200,150,92,0.22)" :
                   "none"
                 }} />
+              {isSelected && (
+                <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-primary flex items-center justify-center shadow-lg z-20">
+                  <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4"><path d="M5 12l4 4 10-10" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+              )}
               
 
-              <div className="absolute top-5 left-5 right-5 flex items-start justify-between gap-3">
-                <div className="w-11 h-11 rounded-2xl flex items-center justify-center hidden"
 
-                style={{
-                  background: "rgba(255,255,255,0.16)",
-                  border: "1px solid rgba(255,255,255,0.18)",
-                  backdropFilter: "blur(10px)",
-                  WebkitBackdropFilter: "blur(10px)"
-                }}>
-                  
-                  <Icon style={{ width: "18px", height: "18px", color: "#fff" }} />
-                </div>
-
-              </div>
 
               <div className="absolute bottom-0 inset-x-0 px-5 pb-5 pt-12">
                 <p
@@ -399,7 +401,9 @@ export default function Industries() {
                     fontSize: "12px",
                     lineHeight: 1.6,
                     color: "rgba(255,255,255,0.74)",
-                    margin: "8px 0 0"
+                    margin: "8px 0 0",
+                    opacity: highlighted ? 1 : 0,
+                    transition: "opacity 0.3s ease",
                   }}>
                   
                   Click to see the recommended AI service stack for this niche.
@@ -411,7 +415,7 @@ export default function Industries() {
                 style={{
                   width: highlighted ? "100%" : "0%",
                   background:
-                  "linear-gradient(to right, #c8965c, #f5d9a8, #c8965c)"
+                  "linear-gradient(to right, #00AEEF, #009DFF, #00AEEF)"
                 }} />
               
             </motion.button>);

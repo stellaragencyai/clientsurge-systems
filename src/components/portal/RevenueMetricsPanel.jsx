@@ -1,161 +1,184 @@
-import { TrendingUp, DollarSign, Eye, CheckCircle2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
+import { TrendingUp, Users, CheckCircle2, Zap, Loader2, RefreshCw, Download } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
-const REVENUE_DATA = {
-  totalRevenue: 47250,
-  revenueThisMonth: 12840,
-  leadsGenerated: 156,
-  leadsConverted: 89,
-  averageOrderValue: 530,
-  roi: 340,
-  timeRange: "Last 30 days",
-};
+const formatCurrency = (n) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(n);
 
-const ATTRIBUTION_BREAKDOWN = [
-  { source: "SMS Response Automation", revenue: 18900, percentage: 40, leads: 36 },
-  { source: "Email Nurture Sequence", revenue: 15680, percentage: 33, leads: 29 },
-  { source: "Missed Call Recovery", revenue: 8430, percentage: 18, leads: 16 },
-  { source: "Booking Reminders", revenue: 4240, percentage: 9, leads: 8 },
-];
-
-const formatCurrency = (amount) => {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-  }).format(amount);
-};
+function StatCard({ icon: Icon, label, value, sub, color }) {
+  const colors = {
+    blue: "bg-blue-50 border-blue-100 text-blue-800",
+    green: "bg-emerald-50 border-emerald-100 text-emerald-800",
+    amber: "bg-amber-50 border-amber-100 text-amber-800",
+    purple: "bg-purple-50 border-purple-100 text-purple-800",
+  };
+  return (
+    <div className={`rounded-2xl border p-5 ${colors[color] || "bg-white border-border"}`}>
+      <div className="flex items-center gap-2 mb-2 opacity-70">
+        <Icon className="w-4 h-4" />
+        <p className="text-xs font-bold uppercase tracking-wide">{label}</p>
+      </div>
+      <p className="text-3xl font-bold">{value}</p>
+      {sub && <p className="text-xs mt-1 opacity-60">{sub}</p>}
+    </div>
+  );
+}
 
 export default function RevenueMetricsPanel() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const load = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await base44.functions.invoke("getClientAnalytics", {});
+      setData(res.data);
+    } catch (e) {
+      setError("Failed to load analytics.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const handleDownload = () => {
+    if (!data) return;
+    const { totals, pipeline, weeksData } = data;
+    const lines = [
+      "ClientSurge Systems — Monthly Performance Report",
+      `Generated: ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`,
+      "",
+      "=== OVERVIEW ===",
+      `Total Leads,${totals.totalLeads}`,
+      `Booked Appointments,${totals.bookedLeads}`,
+      `Qualified Leads,${totals.qualifiedLeads}`,
+      `Conversion Rate,${totals.conversionRate}%`,
+      `Response Rate,${totals.responseRate}%`,
+      `SMS Sent,${totals.smsSent}`,
+      `Emails Sent,${totals.emailSent}`,
+      `Total Automations Fired,${totals.totalAutomations}`,
+      `Estimated Revenue,$${totals.estimatedRevenue}`,
+      "",
+      "=== PIPELINE BREAKDOWN ===",
+      "Status,Count",
+      ...pipeline.map(p => `${p.status},${p.count}`),
+      "",
+      "=== WEEKLY LEAD TREND ===",
+      "Week,New Leads",
+      ...weeksData.map(w => `${w.week},${w.leads}`),
+    ];
+    const csv = lines.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `clientsurge-report-${new Date().toISOString().slice(0, 7)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-16 gap-2 text-muted-foreground text-sm">
+      <Loader2 className="w-4 h-4 animate-spin" /> Loading analytics…
+    </div>
+  );
+
+  if (error) return (
+    <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>
+  );
+
+  const { totals, weeksData, pipeline } = data;
+
   return (
     <div className="space-y-6">
-      {/* Main KPIs */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold text-green-700 uppercase tracking-widest">Total Revenue</p>
-            <DollarSign className="w-5 h-5 text-green-600" />
-          </div>
-          <p className="text-3xl font-bold text-green-900">{formatCurrency(REVENUE_DATA.totalRevenue)}</p>
-          <p className="text-xs text-green-700/70 mt-1">Generated by ClientSurge</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold text-blue-700 uppercase tracking-widest">This Month</p>
-            <TrendingUp className="w-5 h-5 text-blue-600" />
-          </div>
-          <p className="text-3xl font-bold text-blue-900">{formatCurrency(REVENUE_DATA.revenueThisMonth)}</p>
-          <p className="text-xs text-blue-700/70 mt-1">vs {formatCurrency(REVENUE_DATA.revenueThisMonth * 0.85)} last month</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold text-purple-700 uppercase tracking-widest">Leads Converted</p>
-            <CheckCircle2 className="w-5 h-5 text-purple-600" />
-          </div>
-          <p className="text-3xl font-bold text-purple-900">
-            {REVENUE_DATA.leadsConverted}/{REVENUE_DATA.leadsGenerated}
-          </p>
-          <p className="text-xs text-purple-700/70 mt-1">
-            {Math.round((REVENUE_DATA.leadsConverted / REVENUE_DATA.leadsGenerated) * 100)}% conversion rate
+      {/* Header actions */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">Performance Analytics</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Last updated: {new Date(data.lastUpdated).toLocaleTimeString()}
           </p>
         </div>
-
-        <div className="bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold text-orange-700 uppercase tracking-widest">ROI</p>
-            <TrendingUp className="w-5 h-5 text-orange-600" />
-          </div>
-          <p className="text-3xl font-bold text-orange-900">{REVENUE_DATA.roi}%</p>
-          <p className="text-xs text-orange-700/70 mt-1">Return on investment</p>
+        <div className="flex gap-2">
+          <button onClick={load} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:bg-muted transition">
+            <RefreshCw className="w-4 h-4" /> Refresh
+          </button>
+          <button onClick={handleDownload} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-primary/25 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 transition">
+            <Download className="w-4 h-4" /> Download Report
+          </button>
         </div>
       </div>
 
-      {/* Attribution Breakdown */}
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-border">
-          <h3 className="font-semibold text-foreground">Revenue by Automation</h3>
-          <p className="text-xs text-muted-foreground mt-1">Which automations are driving the most revenue?</p>
+      {/* KPI cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard icon={Users} label="Total Leads" value={totals.totalLeads} sub="All time" color="blue" />
+        <StatCard icon={CheckCircle2} label="Booked" value={totals.bookedLeads} sub={`${totals.conversionRate}% conversion`} color="green" />
+        <StatCard icon={Zap} label="Automations Fired" value={totals.totalAutomations} sub={`${totals.smsSent} SMS · ${totals.emailSent} email`} color="amber" />
+        <StatCard icon={TrendingUp} label="Est. Revenue" value={formatCurrency(totals.estimatedRevenue)} sub="Based on bookings" color="purple" />
+      </div>
+
+      {/* Weekly trend chart */}
+      {weeksData?.length > 0 && (
+        <div className="bg-card border border-border rounded-2xl p-6">
+          <h4 className="font-semibold text-foreground mb-4">Weekly Lead Trend</h4>
+          <ResponsiveContainer width="100%" height={180}>
+            <BarChart data={weeksData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+              <XAxis dataKey="week" tick={{ fontSize: 11 }} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
+              <Tooltip
+                contentStyle={{ fontSize: 12, borderRadius: 8, border: "1px solid #e5e7eb" }}
+                formatter={(v) => [v, "New Leads"]}
+              />
+              <Bar dataKey="leads" radius={[4, 4, 0, 0]}>
+                {weeksData.map((_, i) => (
+                  <Cell key={i} fill={i === weeksData.length - 1 ? "#9a5c2e" : "rgba(154,92,46,0.35)"} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
         </div>
+      )}
 
-        <div className="divide-y divide-border/50">
-          {ATTRIBUTION_BREAKDOWN.map((item, idx) => (
-            <div key={idx} className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h4 className="font-semibold text-foreground mb-1">{item.source}</h4>
-                  <p className="text-sm text-muted-foreground">{item.leads} leads converted</p>
+      {/* Pipeline breakdown */}
+      {pipeline?.length > 0 && (
+        <div className="bg-card border border-border rounded-2xl p-6">
+          <h4 className="font-semibold text-foreground mb-4">Pipeline Breakdown</h4>
+          <div className="space-y-3">
+            {pipeline.map(p => {
+              const pct = totals.totalLeads > 0 ? Math.round((p.count / totals.totalLeads) * 100) : 0;
+              return (
+                <div key={p.status} className="flex items-center gap-3">
+                  <span className="text-xs font-medium text-muted-foreground w-32 flex-shrink-0">{p.status}</span>
+                  <div className="flex-1 h-2.5 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full rounded-full bg-primary transition-all duration-500" style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="text-xs font-bold text-foreground w-8 text-right">{p.count}</span>
                 </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold text-foreground">{formatCurrency(item.revenue)}</p>
-                  <p className="text-xs text-muted-foreground">{item.percentage}% of total</p>
-                </div>
-              </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
-              {/* Progress bar */}
-              <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-                <div
-                  className={`h-full transition-all ${
-                    idx === 0
-                      ? "bg-blue-500"
-                      : idx === 1
-                      ? "bg-purple-500"
-                      : idx === 2
-                      ? "bg-amber-500"
-                      : "bg-green-500"
-                  }`}
-                  style={{ width: `${item.percentage}%` }}
-                />
-              </div>
+      {/* Key metrics table */}
+      <div className="bg-card border border-border rounded-2xl p-6">
+        <h4 className="font-semibold text-foreground mb-4">Key Metrics</h4>
+        <div className="space-y-3">
+          {[
+            { label: "Conversion Rate", value: `${totals.conversionRate}%` },
+            { label: "Response Rate", value: `${totals.responseRate}%` },
+            { label: "SMS Messages Sent", value: totals.smsSent },
+            { label: "Emails Sent", value: totals.emailSent },
+            { label: "Failed Events", value: totals.failedEvents },
+          ].map(item => (
+            <div key={item.label} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
+              <span className="text-sm text-muted-foreground">{item.label}</span>
+              <span className="font-semibold text-foreground">{item.value}</span>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Additional Metrics */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <div className="bg-card border border-border rounded-2xl p-6">
-          <h4 className="font-semibold text-foreground mb-4">Key Metrics</h4>
-          <div className="space-y-3">
-            <div className="flex justify-between items-center pb-3 border-b border-border/50">
-              <span className="text-sm text-muted-foreground">Average Order Value</span>
-              <span className="font-semibold text-foreground">{formatCurrency(REVENUE_DATA.averageOrderValue)}</span>
-            </div>
-            <div className="flex justify-between items-center pb-3 border-b border-border/50">
-              <span className="text-sm text-muted-foreground">Leads Generated</span>
-              <span className="font-semibold text-foreground">{REVENUE_DATA.leadsGenerated}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Conversion Rate</span>
-              <span className="font-semibold text-foreground">
-                {Math.round((REVENUE_DATA.leadsConverted / REVENUE_DATA.leadsGenerated) * 100)}%
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-6">
-          <h4 className="font-semibold text-foreground mb-3">Quick Insights</h4>
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-start gap-2">
-              <span className="text-primary font-bold mt-0.5">✓</span>
-              <span className="text-muted-foreground">
-                SMS automations are your top revenue driver at <strong className="text-foreground">40%</strong> of total revenue
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary font-bold mt-0.5">✓</span>
-              <span className="text-muted-foreground">
-                Month-over-month growth of <strong className="text-foreground">+15%</strong>
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-primary font-bold mt-0.5">✓</span>
-              <span className="text-muted-foreground">
-                Your ROI ({REVENUE_DATA.roi}%) is <strong className="text-foreground">3× higher</strong> than industry average
-              </span>
-            </li>
-          </ul>
         </div>
       </div>
     </div>

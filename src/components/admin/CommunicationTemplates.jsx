@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  MessageSquare, Mail, Phone, Send, Bell, Zap, BookOpen,
+  MessageSquare, Mail, Phone, Send, Bell, Zap,
   Eye, Save, X, AlertCircle, CheckCircle, ChevronDown, ChevronUp,
   Lightbulb, Copy, Check
 } from "lucide-react";

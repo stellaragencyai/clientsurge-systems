@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Play, Loader2, TrendingUp, Users, Target, Zap } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import DiscoveryPanel from '@/components/leads/DiscoveryPanel';
 import LeadsTable from '@/components/leads/LeadsTableIntelligence';
 import LeadMetrics from '@/components/leads/LeadMetrics';

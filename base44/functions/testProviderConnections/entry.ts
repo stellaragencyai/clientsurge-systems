@@ -1,42 +1,41 @@
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
-import { runProviderConnectionTests } from "../_shared/providerTests.js";
-
+/**
+ * testProviderConnections — #172
+ * Tests Twilio and Resend credentials live. Returns {success, message}.
+ */
 Deno.serve(async (req) => {
-  try {
-    const base44 = createClientFromRequest(req);
-    const user = await requireAdminUser(base44);
+  const { provider } = await req.json().catch(() => ({}));
 
-    const { provider_type } = await req.json().catch(() => ({}));
-
-    if (!provider_type) {
-      return Response.json({ error: "provider_type required" }, { status: 400 });
-    }
-
-    const { results, testedAt } = await runProviderConnectionTests({
-      base44,
-      actor: user,
-      providerType: provider_type,
-    });
-
-    return Response.json({
-      success: true,
-      results,
-      tested_at: testedAt,
-    });
-  } catch (error) {
-    console.error("Error:", error);
-
-    if (error instanceof AuthGuardError) {
-      return Response.json(
-        {
-          error: error.message,
-          code: error.code,
-        },
-        { status: error.status }
-      );
-    }
-
-    return Response.json({ error: error.message }, { status: 500 });
+  if (provider === "twilio") {
+    const sid = Deno.env.get("TWILIO_ACCOUNT_SID");
+    const auth = Deno.env.get("TWILIO_AUTH_TOKEN");
+    if (!sid || !auth) return Response.json({ success: false, message: "Twilio credentials not configured" });
+    try {
+      const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
+        headers: { Authorization: `Basic ${btoa(`${sid}:${auth}`)}` },
+      });
+      if (res.ok) {
+        const d = await res.json();
+        return Response.json({ success: true, message: `Connected — Account: ${d.friendly_name || sid}` });
+      }
+      const err = await res.json().catch(() => ({}));
+      return Response.json({ success: false, message: `Error ${res.status}: ${err?.message || "unknown"}` });
+    } catch (e) { return Response.json({ success: false, message: e.message }); }
   }
+
+  if (provider === "resend") {
+    const key = Deno.env.get("RESEND_API_KEY");
+    if (!key) return Response.json({ success: false, message: "Resend key not configured" });
+    try {
+      const res = await fetch("https://api.resend.com/domains", { headers: { Authorization: `Bearer ${key}` } });
+      if (res.ok) {
+        const d = await res.json();
+        const domains = (d?.data || []).map((x) => x.name).join(", ") || "verified";
+        return Response.json({ success: true, message: `Connected — Domains: ${domains}` });
+      }
+      const err = await res.json().catch(() => ({}));
+      return Response.json({ success: false, message: `Error ${res.status}: ${err?.message || "unknown"}` });
+    } catch (e) { return Response.json({ success: false, message: e.message }); }
+  }
+
+  return Response.json({ success: false, message: "Unknown provider — use 'twilio' or 'resend'" }, { status: 400 });
 });

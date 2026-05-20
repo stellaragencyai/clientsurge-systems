@@ -1,0 +1,35 @@
+{
+  "_comment": "#470 CRITICAL — canonical price list. Kill all $97/$297 wrong values. Only these are valid.",
+  "tiers": {
+    "starter": {
+      "monthly_fee": 497,
+      "setup_fee": 797,
+      "label": "Starter",
+      "stripe_price_id_monthly": "price_starter_monthly",
+      "stripe_price_id_setup": "price_starter_setup",
+      "services": ["Instant Lead Response", "Missed Call Text-Back"],
+      "service_count": 2
+    },
+    "growth": {
+      "monthly_fee": 997,
+      "setup_fee": 1297,
+      "label": "Growth",
+      "stripe_price_id_monthly": "price_growth_monthly",
+      "stripe_price_id_setup": "price_growth_setup",
+      "services": ["Instant Lead Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking"],
+      "service_count": 4
+    },
+    "elite": {
+      "monthly_fee": 1997,
+      "setup_fee": 2497,
+      "label": "Elite",
+      "stripe_price_id_monthly": "price_elite_monthly",
+      "stripe_price_id_setup": "price_elite_setup",
+      "services": ["Instant Lead Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking", "Review Request AI", "Reactivation Campaign"],
+      "service_count": 6
+    }
+  },
+  "INVALID_PRICES_TO_PURGE": ["$97", "$297", "$197", "$397", "97/mo", "297/mo"],
+  "valid_monthly": [497, 997, 1997],
+  "valid_setup": [797, 1297, 2497]
+}

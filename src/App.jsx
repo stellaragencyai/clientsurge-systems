@@ -14,8 +14,10 @@ import UserNotRegisteredError from "@/components/UserNotRegisteredError";
 import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
+import ErrorBoundary from "./components/ErrorBoundary";
 import PageNotFound from "./lib/PageNotFound";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
+import { scrollToTop } from "@/lib/scroll";
 
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
@@ -30,6 +32,16 @@ import Industries from "./pages/Industries";
 import OrderSuccess from "./pages/OrderSuccess";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
 import BusinessSetup from "./pages/BusinessSetup";
+import ThankYou from "./pages/ThankYou";
+import About from "./pages/About";
+import CredentialsSetup from "./pages/CredentialsSetup";
+import SetupStatus from "./pages/SetupStatus";
+import WebsitePreview from "./pages/WebsitePreview";
+import AdminInstallGuide from "./pages/AdminInstallGuide";
+import AISalesCommandCenter from "./pages/AISalesCommandCenter";
+import PerformanceWars from "./pages/PerformanceWars";
+import AutomationsDemo from "./pages/AutomationsDemo";
+
 
 const Store = lazy(() => import("./pages/Store"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -66,6 +78,7 @@ const PUBLIC_PATHS = [
   "/contact",
   "/leads/capture",
   "/onboarding",
+  "/setup/preview",
   // test/preview routes removed
 ];
 
@@ -73,14 +86,31 @@ const NOINDEX_PREFIXES = [
   "/admin",
   "/dashboard",
   "/client-portal",
+  "/client-dashboard",
   "/lead-intelligence",
   "/medspa-dashboard",
   "/sam",
   "/success",
+  "/setup",
+  "/onboarding",
+  "/order-success",
+  "/leads",
 ];
 
 const isPublicPath = (pathname) =>
   PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+
+// Fix 1: ScrollToTop — resets scroll position on every route change
+function ScrollToTop() {
+  const location = useLocation();
+  useEffect(() => {
+    // Don't scroll to top if navigating to a hash anchor
+    if (!location.hash) {
+      scrollToTop();
+    }
+  }, [location.pathname]);
+  return null;
+}
 
 function AppInner() {
   useEffect(() => {
@@ -92,21 +122,12 @@ function AppInner() {
   return null;
 }
 
+// SectionRedirect — just navigate to home, no auto-scroll
 function SectionRedirect({ hash }) {
   const navigate = useNavigate();
 
   useEffect(() => {
     navigate("/", { replace: true });
-
-    const timer = window.setTimeout(() => {
-      const element = document.querySelector(hash);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-      window.history.replaceState({}, "", `/${hash}`);
-    }, 450);
-
-    return () => window.clearTimeout(timer);
   }, [hash, navigate]);
 
   return null;
@@ -194,6 +215,7 @@ const AuthenticatedApp = () => {
       <Route path="/privacy-policy" element={<Navigate to="/legal/privacy" replace />} />
       <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
       <Route path="/login" element={<Navigate to="/client-portal" replace />} />
+      <Route path="/ClientPortal" element={<Navigate to="/client-portal" replace />} />
       <Route path="/success" element={<Success />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/leads/capture" element={<CaptureLeads />} />
@@ -215,6 +237,15 @@ const AuthenticatedApp = () => {
       />
       <Route path="/order-success" element={<OrderSuccess />} />
       <Route path="/setup" element={<BusinessSetup />} />
+      <Route path="/thank-you" element={<ThankYou />} />
+      <Route path="/about" element={<About />} />
+      <Route path="/automations" element={<AutomationsDemo />} />
+      <Route path="/setup/credentials" element={<CredentialsSetup />} />
+      <Route path="/setup/status/:orderId" element={<SetupStatus />} />
+      <Route path="/setup/status" element={<SetupStatus />} />
+      <Route path="/setup/preview/:specId" element={<WebsitePreview />} />
+      <Route path="/setup/preview" element={<WebsitePreview />} />
+      <Route path="/services/:serviceSlug" element={<Navigate to="/store" replace />} />
       <Route path="/:slug" element={<IndustryTemplate />} />
 
       <Route
@@ -245,6 +276,9 @@ const AuthenticatedApp = () => {
         <Route path="/sam" element={<Navigate to="/admin" replace />} />
         <Route path="/medspa-dashboard" element={<Navigate to="/admin" replace />} />
         <Route path="/admin/onboarding" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><AdminOnboarding /></Suspense>} />
+        <Route path="/admin/install-guide" element={<AdminInstallGuide />} />
+        <Route path="/admin/ai-sales" element={<AISalesCommandCenter />} />
+        <Route path="/admin/performance-wars" element={<PerformanceWars />} />
       </Route>
 
       <Route path="*" element={<PageNotFound />} />
@@ -254,9 +288,11 @@ const AuthenticatedApp = () => {
 
 function App() {
   return (
+    <ErrorBoundary>
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
+        <Router style={{ overflowX: "hidden" }}>
+          <ScrollToTop />
           <AutoCTAAnalytics />
           <RouteIndexingGuard />
           <AuthenticatedApp />
@@ -264,6 +300,7 @@ function App() {
         <Toaster />
       </QueryClientProvider>
     </AuthProvider>
+    </ErrorBoundary>
   );
 }
 

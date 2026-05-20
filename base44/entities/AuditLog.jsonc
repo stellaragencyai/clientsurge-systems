@@ -1,0 +1,73 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "admin_email": {
+      "type": "string",
+      "title": "Admin Email"
+    },
+    "action": {
+      "type": "string",
+      "title": "Action",
+      "description": "e.g. update_order, delete_lead, mark_live"
+    },
+    "entity_name": {
+      "type": "string",
+      "title": "Entity Name",
+      "description": "e.g. Order, ClientProject, Leads"
+    },
+    "record_id": {
+      "type": "string",
+      "title": "Record ID"
+    },
+    "before": {
+      "type": "string",
+      "title": "Before (JSON)",
+      "description": "Serialized previous state"
+    },
+    "after": {
+      "type": "string",
+      "title": "After (JSON)",
+      "description": "Serialized new state"
+    },
+    "timestamp": {
+      "type": "string",
+      "title": "Timestamp",
+      "format": "date-time"
+    },
+    "ip_address": {
+      "type": "string",
+      "title": "IP Address"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "admin_email",
+    "action"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

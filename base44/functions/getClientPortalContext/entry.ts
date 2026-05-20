@@ -1,109 +1,223 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  buildInstallSnapshot,
+} from "../_shared/installPipeline.js";
+import {
+  getPackageDisplayLabel,
+  normalizePackageKey,
+} from "../../../src/lib/salesCatalog.js";
 
-const SERVICE_DISPLAY_NAMES = {
-  instant_lead_response: "Instant Lead Response",
-  missed_call_text_back: "Missed Call Text-Back",
-  nurture_sequence_14d: "14-Day Nurture Sequence",
-  ai_booking_agent: "AI Booking Agent",
-  lead_reactivation: "Lead Reactivation",
-  review_request: "Review Request System",
-};
+function cleanString(value) {
+  return typeof value === "string" ? value.trim() : "";
+}
 
 function buildServiceStates(order) {
-  const items = order?.items || [];
-  if (items.length === 0) {
-    // Fall back to pricing_summary service keys
-    const keys = order?.pricing_summary?.selected_service_keys || [];
-    return keys.map((key) => ({
-      service_key: key,
-      display_name: SERVICE_DISPLAY_NAMES[key] || key,
-      install_status: order?.pipeline_status || "Paid",
-    }));
-  }
-  return items.map((item) => ({
-    service_key: item.service_key,
-    display_name: item.product_name || SERVICE_DISPLAY_NAMES[item.service_key] || item.service_key,
-    install_status: item.install_status || "Paid",
+  const snapshot = buildInstallSnapshot(order);
+  return snapshot.serviceStates.map((service) => ({
+    service_key: service.service_key,
+    display_name: service.display_name,
+    install_status: service.install_status,
+    configuration_complete: service.configuration_complete,
+    missing_configuration_fields: service.missing_configuration_fields,
   }));
+}
+
+function buildOrderSummary(order) {
+  const packageKey = normalizePackageKey(
+    order?.pricing_summary?.package_key ||
+      order?.selected_package_type ||
+      order?.package_type
+  );
+  const services = buildServiceStates(order);
+
+  return {
+    id: order.id,
+    payment_status: order.payment_status,
+    billing_status: order.billing_status,
+    subscription_status: order.subscription_status,
+    pipeline_status: buildInstallSnapshot(order).pipelineStatus,
+    order_status: order.order_status,
+    client_id: order.client_id,
+    client_project_id: order.client_project_id,
+    onboarding_client_id: order.onboarding_client_id,
+    selected_package_type: packageKey,
+    package_type: packageKey,
+    plan_type:
+      order.pricing_summary?.package_name ||
+      order.plan_type ||
+      getPackageDisplayLabel(order.pricing_summary),
+    total_setup: order.total_setup,
+    total_monthly: order.total_monthly,
+    current_period_start: order.current_period_start,
+    current_period_end: order.current_period_end,
+    pricing_summary: order.pricing_summary || null,
+    services,
+  };
+}
+
+function buildSubscriptionSummary(order, project) {
+  const services = buildServiceStates(order);
+  return {
+    id: order.stripe_subscription_id || order.subscription_id || null,
+    status: order.subscription_status || order.billing_status || order.payment_status,
+    plan_type:
+      order.pricing_summary?.package_name || order.plan_type || project?.plan || "Custom Service Bundle",
+    plan_name:
+      order.pricing_summary?.package_name || order.plan_type || project?.plan || "Custom Service Bundle",
+    plan_key: normalizePackageKey(
+      order.pricing_summary?.package_key ||
+        order.selected_package_type ||
+        order.package_type
+    ),
+    amount: Math.round(Number(order.total_monthly || 0) * 100),
+    currency: "usd",
+    interval: "month",
+    current_period_start: order.current_period_start,
+    current_period_end: order.current_period_end,
+    cancel_at_period_end: false,
+    services_included: services.map((service) => service.service_key),
+    change_request_status:
+      project?.plan_change_request && project.plan_change_request !== "None"
+        ? "pending_review"
+        : "none",
+    change_request_type:
+      project?.plan_change_request && project.plan_change_request !== "None"
+        ? project.plan_change_request === project.plan
+          ? "current"
+          : "change"
+        : null,
+    requested_plan_type:
+      project?.plan_change_request && project.plan_change_request !== "None"
+        ? project.plan_change_request
+        : null,
+  };
+}
+
+function buildProjectSummary(project) {
+  if (!project) {
+    return null;
+  }
+
+  return {
+    ...project,
+    quick_start_completed: project.quick_start_completed === true,
+  };
 }
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
+    let user = null;
+    try {
+      user = await base44.auth.me();
+    } catch (authError) {
+      const message = authError instanceof Error ? authError.message : String(authError);
+      if (/authentication required/i.test(message)) {
+        return Response.json(
+          { error: "Authentication required", code: "portal_auth_required" },
+          { status: 401 }
+        );
+      }
+      throw authError;
+    }
 
     if (!user?.email) {
-      return Response.json({ error: "Authentication required", code: "portal_auth_required" }, { status: 401 });
+      return Response.json(
+        { error: "Authentication required", code: "portal_auth_required" },
+        { status: 401 }
+      );
     }
 
-    const email = user.email.toLowerCase().trim();
-
-    // Find matching project by client_email
-    const projects = await base44.asServiceRole.entities.ClientProject.filter(
-      { client_email: email },
+    const email = cleanString(user.email).toLowerCase();
+    const orders = await base44.asServiceRole.entities.Order.filter(
+      { customer_email: email },
       "-created_date",
-      5
+      50
+    );
+    const matchingOrders = (orders || []).filter(
+      (order) => cleanString(order.customer_email).toLowerCase() === email
+    );
+    const paidOrders = matchingOrders.filter(
+      (order) => order.payment_status === "paid"
     );
 
-    let project = projects?.[0] || null;
-
-    // If no project found by client_email, try contact_email
-    if (!project) {
-      const byContact = await base44.asServiceRole.entities.ClientProject.filter(
-        { contact_email: email },
-        "-created_date",
-        1
-      );
-      project = byContact?.[0] || null;
-    }
-
-    if (!project) {
+    if (paidOrders.length === 0) {
       return Response.json({
-        error: "No portal project is linked to this account yet.",
-        code: "portal_project_not_found",
-      }, { status: 404 });
+        success: true,
+        project: null,
+        order: null,
+        subscription: null,
+        link_status: "no_paid_order",
+        empty_state: true,
+        message:
+          "No paid order is linked to this login yet. Complete checkout or contact support.",
+      });
     }
 
-    // Find associated order
-    let order = null;
-    if (project.id) {
-      const orders = await base44.asServiceRole.entities.Order.filter(
-        { client_project_id: project.id },
-        "-created_date",
-        1
-      );
-      order = orders?.[0] || null;
+    const businessNames = [
+      ...new Set(paidOrders.map((order) => cleanString(order.business_name)).filter(Boolean)),
+    ];
+    if (businessNames.length > 1) {
+      return Response.json({
+        success: true,
+        project: null,
+        order: null,
+        subscription: null,
+        link_status: "ambiguous_paid_orders",
+        empty_state: false,
+        message:
+          "Multiple paid businesses are linked to this email. Support needs to finish portal routing before access can be shown safely.",
+      });
     }
 
-    // Also try by customer_email if no order found
-    if (!order) {
-      const ordersByEmail = await base44.asServiceRole.entities.Order.filter(
-        { customer_email: email },
-        "-created_date",
-        1
-      );
-      order = ordersByEmail?.[0] || null;
+    const order = paidOrders[0];
+    const orderSummary = buildOrderSummary(order);
+
+    if (!order.client_project_id || !order.client_id) {
+      return Response.json({
+        success: true,
+        project: null,
+        order: orderSummary,
+        subscription: null,
+        link_status: "missing_canonical_links",
+        empty_state: false,
+        message:
+          "Your payment is confirmed, but your client/project linkage is not complete yet. Our team needs to finish linking your portal records.",
+      });
     }
 
-    const orderSummary = order
-      ? {
-          id: order.id,
-          payment_status: order.payment_status,
-          pipeline_status: order.pipeline_status,
-          order_status: order.order_status,
-          client_id: order.client_id,
-          client_project_id: order.client_project_id,
-          plan_type: order.plan_type || "",
-          services: buildServiceStates(order),
-        }
-      : null;
+    const [project, client] = await Promise.all([
+      base44.asServiceRole.entities.ClientProject.get(order.client_project_id).catch(
+        () => null
+      ),
+      base44.asServiceRole.entities.Client.get(order.client_id).catch(() => null),
+    ]);
+
+    if (!project || !client) {
+      return Response.json({
+        success: true,
+        project: null,
+        order: orderSummary,
+        subscription: null,
+        link_status: "linked_records_missing",
+        empty_state: false,
+        message:
+          "Your order is paid, but the linked client records are incomplete. Support needs to repair the portal linkage.",
+      });
+    }
+
+    const projectSummary = buildProjectSummary(project);
+    const subscription = buildSubscriptionSummary(order, projectSummary);
 
     return Response.json({
       success: true,
-      project,
+      project: projectSummary,
+      client,
       order: orderSummary,
+      subscription,
+      link_status: "linked",
+      empty_state: false,
     });
-
   } catch (error) {
     console.error("[getClientPortalContext] Error:", error.message);
     return Response.json({ error: error.message }, { status: 500 });

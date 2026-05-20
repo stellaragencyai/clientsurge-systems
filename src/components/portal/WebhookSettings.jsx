@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Webhook, Save, Loader2, CheckCircle2, AlertCircle, Trash2, Plus, Eye, EyeOff, ExternalLink } from "lucide-react";
+import { Webhook, Save, Loader2, CheckCircle2, AlertCircle, Trash2, Eye, EyeOff, ExternalLink } from "lucide-react";
 
 const EVENT_TYPES = [
   { key: "task_completed", label: "Task Completed", desc: "Fired when an AI service task finishes successfully" },
