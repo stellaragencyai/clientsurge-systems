@@ -1,13 +1,13 @@
 # ClientSurge Production Launch Preflight
 
 Generated: 2026-05-19 22:45 America/Phoenix
-Last updated: 2026-05-20 12:50 America/Phoenix
+Last updated: 2026-05-20 10:25 America/Phoenix
 
 ## Current Verdict
 
 ClientSurge is code-ready for the package activation workflow, but not yet full production-launch ready.
 
-The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base44 UI publish completed successfully, the first two automation readiness check passes, and Stripe CLI is authenticated. The checkout source is now locally aligned to the live Stripe package catalog. The remaining blockers are operational: deploy/publish the updated checkout/backend code, run controlled Stripe proof, and resolve production Base44 backend deploy limitations for the current app ID.
+The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base44 UI publish completed successfully, the first two automation readiness check passes, and Stripe CLI is authenticated. The checkout source is now locally aligned to the live Stripe package catalog, and the Stripe webhook URL has been verified as a legacy wrapper that delegates to the canonical order webhook handler. The remaining blockers are operational: deploy/publish the updated checkout/backend code, create or mirror test-mode Stripe package prices, run controlled Stripe proof, and resolve production Base44 backend deploy limitations for the current app ID.
 
 ## Verified Ready
 
@@ -17,6 +17,7 @@ The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base
   - `https://grinning-apex-flow-growth.base44.app` returned `200 OK`.
 - Base44 production UI publish completed with success message: `Your app is published and live online!`
 - GitHub PR #1087 is mergeable after resolving conflicts with `main`.
+- GitHub PR #1087 remains open, non-draft, and mergeable as of the 2026-05-20 morning check.
 - Stripe-facing package mapping is aligned with the automation activation brain:
   - Starter/Basic: `instant_lead_response`, `missed_call_text_back`
   - Growth: Basic plus `nurture_sequence_14d`, `ai_booking_agent`
@@ -49,13 +50,16 @@ The website and Base44 app are reachable, GitHub PR conflicts are resolved, Base
   - Elite product `prod_UReW1LmsVbn4BZ`
     - setup `price_1TSlDYBVGjsISdG0l2rHzet1`
     - monthly `price_1TSlDXBVGjsISdG0Abdx85z3`
+- Live Stripe webhook endpoint currently points to `stripePaymentWebhook`, and local source confirms that function delegates to the canonical `stripeWebhookOrders` shared handler.
+- Test-mode Stripe still has no products, prices, or webhook endpoints, so safe test-mode checkout proof requires creating/mirroring package catalog resources first.
 
 ## Verification Commands Passed
 
 - `npm run build`
 - `npm run openclaw:basic-package-check`
 - `node --test tests/salesCatalog.test.js tests/basicPackageActivation.test.js tests/installPipeline.test.js`
-- Post-alignment targeted tests: `node --test tests/salesCatalog.test.js tests/basicPackageActivation.test.js tests/installPipeline.test.js` passed 40/40.
+- Post-alignment targeted tests: `node --test tests/salesCatalog.test.js tests/basicPackageActivation.test.js tests/installPipeline.test.js` passed 42/42 on 2026-05-20.
+- `base44 functions list` was rechecked on 2026-05-20 and still fails on malformed automation metadata at functions indexes 37, 99, and 177.
 - Direct production `ClientProject` schema smoke via `base44 exec` with `client_email`, `client_name`, and `business_name`
 
 ## Current Blockers
@@ -81,13 +85,19 @@ Required fix:
 3. Re-run a test-mode checkout/webhook proof.
 4. Run one controlled production payment proof only with explicit approval for amount, card, and refund/no-refund plan.
 
-### 2. Stripe Webhook Endpoint URL Needs Canonical Review
+### 2. Stripe Test-Mode Proof Requires Test Catalog Setup
 
 Live Stripe currently has one enabled webhook endpoint:
 
 - `https://grinning-apex-flow-growth.base44.app/api/functions/stripePaymentWebhook`
 
-The code/docs also reference `stripeWebhookOrders` as the canonical post-payment order handler. Before live payment proof, confirm whether `stripePaymentWebhook` is the intended wrapper/alias or whether the live endpoint should move to the canonical `stripeWebhookOrders` URL.
+Local source confirms `stripePaymentWebhook` is a legacy compatibility wrapper that delegates to the same canonical shared handler used by `stripeWebhookOrders`. The remaining Stripe blocker is not the wrapper URL itself; it is that test mode has no package products, prices, or webhook endpoint.
+
+Required fix:
+
+1. Create/mirror Starter, Growth, and Elite package products/prices in Stripe test mode.
+2. Configure a test-mode webhook endpoint to the intended Base44 webhook URL, or use a Stripe CLI forwarding session for the controlled test.
+3. Run test-mode checkout/webhook proof before any live payment proof.
 
 ### 3. Production Base44 App Does Not Accept CLI Backend Deploys
 
@@ -99,6 +109,8 @@ This app allows secret management, but rejects backend deploy/entity push comman
 
 - `base44 functions deploy ...` returns `This endpoint is only available for Backend Platform apps`.
 - `base44 entities push` returns the same Backend Platform requirement.
+
+Base44 CLI docs describe CLI projects as backend-service projects and note that projects created with the CLI are not currently integrated with the Base44 app editor. This matches the observed split: the current production app-editor ID can be published through the UI/site flow, while backend deploy/list commands require a Backend Platform app.
 
 The pre-merge CLI-linked Backend Platform app ID was:
 

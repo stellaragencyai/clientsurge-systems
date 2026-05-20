@@ -8,6 +8,7 @@ import {
   derivePipelineStatus,
   initializePaidOrderInstallPipeline,
   listInstallQueueOrders,
+  normalizeInstallConfiguration,
   syncInstallMirrorsFromOrder,
   updateOrderInstallConfiguration,
   updateTrackedServiceInstallStatus,
@@ -317,6 +318,66 @@ test("paid order initializes canonical install pipeline and links existing struc
   assert.equal(result.order.purchase_onboarding_handoff.next_missing_field, "business_hours");
   assert.equal(result.onboardingClient.activation_package_tier, "basic");
   assert.equal(result.onboardingClient.next_onboarding_question, "What are the client's normal business hours?");
+});
+
+test("null install configuration normalizes to empty tracked service config", async () => {
+  const { base44, entities } = createFakeBase44({ install_configuration: null });
+  const order = await entities.Order.get("order_1");
+
+  const normalized = normalizeInstallConfiguration(order.install_configuration, order.items);
+  assert.deepEqual(Object.keys(normalized.services).sort(), [
+    "instant_lead_response",
+    "missed_call_text_back",
+  ]);
+
+  const result = await initializePaidOrderInstallPipeline({
+    base44,
+    order,
+    stripeCustomerId: "cus_null_config",
+    now: "2026-04-22T12:05:00.000Z",
+  });
+
+  assert.equal(result.order.payment_status, "paid");
+  assert.equal(result.order.pipeline_status, "Ready for Install");
+  assert.equal(result.order.install_configuration.shared.business_hours, "");
+});
+
+test("paid order initialization re-enables canonical tracked items with persisted false defaults", async () => {
+  const { base44, entities } = createFakeBase44({
+    items: [
+      {
+        product_id: "prod_UNi5RHiKNSTfQl",
+        product_name: "Instant Lead Response",
+        service_key: "instant_lead_response",
+        tracking_enabled: false,
+        status: "pending",
+      },
+      {
+        product_id: "prod_UNi5QL0bQl98If",
+        product_name: "Missed Call Text-Back",
+        service_key: "missed_call_text_back",
+        tracking_enabled: false,
+        status: "pending",
+      },
+    ],
+  });
+  const order = await entities.Order.get("order_1");
+
+  const result = await initializePaidOrderInstallPipeline({
+    base44,
+    order,
+    stripeCustomerId: "cus_false_defaults",
+    now: "2026-04-22T12:05:00.000Z",
+  });
+
+  assert.equal(result.order.pipeline_status, "Ready for Install");
+  assert.deepEqual(
+    result.order.items.map((item) => [item.service_key, item.tracking_enabled, item.install_status]),
+    [
+      ["instant_lead_response", true, "Ready for Install"],
+      ["missed_call_text_back", true, "Ready for Install"],
+    ]
+  );
 });
 
 test("purchase onboarding handoff detects pro package and first missing intake field", () => {

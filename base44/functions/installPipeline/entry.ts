@@ -10,7 +10,7 @@ import {
   initializePaidOrderInstallPipeline,
   listInstallQueueOrders,
   updateTrackedServiceInstallStatus,
-} from "../_shared/installPipeline.js";
+} from "./installPipeline.shared.js";
 
 Deno.serve(async (req) => {
   try {
