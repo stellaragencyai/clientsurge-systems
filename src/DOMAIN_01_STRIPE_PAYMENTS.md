@@ -39,7 +39,7 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 148 | ⏳ | stripeWebhookOrders: on payment_failed → send recovery email w/ payment update link | B | #147 ✅ | — | 🧵 Payment-Recovery | ~1 hr |
+| 148 | ✅ | stripeWebhookOrders: on payment_failed → send recovery email w/ payment update link | B | #147 ✅ | — | 🧵 Payment-Recovery | Done |
 | 195 | 🔄 | BillingDashboard: "Cancel Subscription" → getStripeCustomerPortalUrl redirect | C | — | — | 🧵 Billing-Portal | ~1 hr |
 | 204 | ⏳ | Verify Stripe subscription renewal fires invoice.paid and is handled | C | #203 | — | 🧵 Stripe-Live | ~30 min |
 | 206 | 🔄 | getStripeCustomerPortalUrl: verify it returns working URL for all paid customers | C | — | → A (smoke test portal) | 🧵 Billing-Portal | ~30 min |

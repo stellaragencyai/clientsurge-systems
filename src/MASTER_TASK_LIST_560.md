@@ -399,7 +399,7 @@
 |---|---|---|---|
 | 146 | 🔄 | createCheckoutSession: add subscription_data.metadata.order_id for subscription event matching | CRITICAL |
 | 147 | ✅ | stripeWebhookOrders: on invoice.payment_failed, set Order billing_status: "past_due" | CRITICAL |
-| 148 | 🔄 | stripeWebhookOrders: on payment_failed, send recovery email with Stripe payment update link | HIGH |
+| 148 | ✅ | stripeWebhookOrders: on payment_failed, send recovery email with Stripe payment update link | HIGH | Morpheus |
 | 149 | ✅ | requestSubscriptionChange: use proration_behavior: "create_prorations" in Stripe call | MEDIUM  Agent Smith |
 | 150 | ✅ | Extract Stripe init + signature validation into _shared/stripeInit.js | LOW  Agent Smith |
 | 151 | ✅ | Add createAuditLog helper: write admin action records to AuditLog entity | MEDIUM  Agent Smith |

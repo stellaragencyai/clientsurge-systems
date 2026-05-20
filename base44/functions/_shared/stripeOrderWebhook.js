@@ -1,5 +1,6 @@
 import { initializePaidOrderInstallPipeline } from "./installPipeline.js";
 import { normalizePackageKey } from "../../../src/lib/salesCatalog.js";
+import { buildPaymentRecoveryEmail } from "./paymentRecoveryEmail.js";
 
 function getStripeSecretKey() {
   try {
@@ -104,6 +105,46 @@ async function createCommunicationEvent(base44, payload) {
   );
 }
 
+async function sendPaymentRecoveryEmail({ base44, order, invoice }) {
+  if (!order?.customer_email) {
+    return { sent: false, reason: "missing_customer_email" };
+  }
+
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  if (!resendKey) {
+    return { sent: false, reason: "missing_resend_key" };
+  }
+
+  const paymentUpdateUrl = cleanString(invoice?.hosted_invoice_url || invoice?.invoice_pdf);
+  const payload = buildPaymentRecoveryEmail({
+    order,
+    invoice,
+    paymentUpdateUrl,
+    fromEmail: Deno.env.get("RESEND_FROM_EMAIL"),
+    replyToEmail: Deno.env.get("ADMIN_EMAIL"),
+  });
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${resendKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Resend payment recovery failed: ${response.status} ${body}`);
+  }
+
+  return {
+    sent: true,
+    to: payload.to,
+    payment_update_url_present: Boolean(paymentUpdateUrl),
+  };
+}
+
 function buildPortalUrl(activationLink) {
   return (
     cleanString(activationLink) ||
@@ -195,6 +236,43 @@ async function resolveOrderFromSubscription(base44, subscriptionId, fallbackOrde
   ).catch(() => []);
 
   return bySubscription?.[0] || null;
+}
+
+async function resolveOrderFromPaymentIntent(base44, paymentIntent) {
+  const metadataOrderId = cleanString(paymentIntent?.metadata?.order_id);
+  if (metadataOrderId) {
+    const direct = await base44.asServiceRole.entities.Order.get(metadataOrderId).catch(
+      () => null
+    );
+    if (direct) {
+      return direct;
+    }
+  }
+
+  const paymentIntentId = cleanString(paymentIntent?.id);
+  if (paymentIntentId) {
+    const byPaymentIntent = await base44.asServiceRole.entities.Order.filter(
+      { stripe_payment_intent_id: paymentIntentId },
+      "-created_date",
+      10
+    ).catch(() => []);
+    if (byPaymentIntent?.length) {
+      return byPaymentIntent[0];
+    }
+  }
+
+  const customerEmail = cleanString(paymentIntent?.receipt_email).toLowerCase();
+  if (!customerEmail) {
+    return null;
+  }
+
+  const byEmail = await base44.asServiceRole.entities.Order.filter(
+    { customer_email: customerEmail },
+    "-created_date",
+    20
+  ).catch(() => []);
+
+  return byEmail?.[0] || null;
 }
 
 export async function ensurePortalInvite(base44, order) {
@@ -537,7 +615,24 @@ async function processInvoiceEvent({ base44, event, source }) {
   const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, {
     stripe_event_id: event.id,
     billing_status: nextBillingStatus,
+    payment_status: event.type === "invoice.payment_failed" ? "payment_failed" : order.payment_status,
   });
+
+  let recoveryEmail = null;
+  if (event.type === "invoice.payment_failed") {
+    try {
+      recoveryEmail = await sendPaymentRecoveryEmail({
+        base44,
+        order: updatedOrder,
+        invoice,
+      });
+    } catch (error) {
+      recoveryEmail = {
+        sent: false,
+        reason: error instanceof Error ? error.message : String(error),
+      };
+    }
+  }
 
   await createCommunicationEvent(
     base44,
@@ -552,6 +647,123 @@ async function processInvoiceEvent({ base44, event, source }) {
         event_type: event.type,
         stripe_invoice_id: invoice?.id || "",
         stripe_subscription_id: invoice?.subscription || "",
+        recovery_email: recoveryEmail,
+      },
+    })
+  );
+
+  if (event.type === "invoice.payment_failed") {
+    await createCommunicationEvent(
+      base44,
+      buildCommunicationEvent({
+        provider: "resend",
+        channel: "email",
+        direction: "outbound",
+        eventType: recoveryEmail?.sent ? "email_sent" : "email_failed",
+        status: recoveryEmail?.sent ? "sent" : "failed",
+        providerMessageId: `payment_recovery:${event.id}:${order.id}`,
+        subject: recoveryEmail?.sent
+          ? "Payment recovery email sent"
+          : "Payment recovery email failed",
+        messageBody: recoveryEmail?.sent
+          ? `Payment recovery email sent to ${updatedOrder.customer_email}.`
+          : `Payment recovery email not sent: ${recoveryEmail?.reason || "unknown"}.`,
+        order: updatedOrder,
+        metadata: {
+          source,
+          event_id: event.id,
+          event_type: event.type,
+          stripe_invoice_id: invoice?.id || "",
+          payment_update_url_present: Boolean(
+            invoice?.hosted_invoice_url || invoice?.invoice_pdf
+          ),
+          recovery_email: recoveryEmail,
+        },
+      })
+    );
+  }
+
+  return { success: true, order_id: updatedOrder.id };
+}
+
+async function processPaymentIntentFailed({ base44, event, source }) {
+  const paymentIntent = event.data.object;
+  const order = await resolveOrderFromPaymentIntent(base44, paymentIntent);
+
+  if (!order) {
+    return { success: false, reason: "order_not_found" };
+  }
+
+  const providerMessageId = `${event.id}:${order.id}`;
+  const existingEvent = await findCommunicationEvent(base44, providerMessageId);
+  if (existingEvent) {
+    return { success: true, duplicate: true, order_id: order.id };
+  }
+
+  const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, {
+    stripe_event_id: event.id,
+    stripe_payment_intent_id: paymentIntent?.id || order.stripe_payment_intent_id,
+    payment_status: "payment_failed",
+    billing_status: "past_due",
+  });
+
+  let recoveryEmail = null;
+  try {
+    recoveryEmail = await sendPaymentRecoveryEmail({
+      base44,
+      order: updatedOrder,
+      invoice: {
+        id: paymentIntent?.invoice || "",
+        amount_due: paymentIntent?.amount || paymentIntent?.amount_received || 0,
+      },
+    });
+  } catch (error) {
+    recoveryEmail = {
+      sent: false,
+      reason: error instanceof Error ? error.message : String(error),
+    };
+  }
+
+  await createCommunicationEvent(
+    base44,
+    buildCommunicationEvent({
+      providerMessageId,
+      subject: "Stripe payment intent failed",
+      messageBody: `payment_intent.payment_failed synchronized to order ${order.id}.`,
+      order: updatedOrder,
+      metadata: {
+        source,
+        event_id: event.id,
+        event_type: event.type,
+        stripe_payment_intent_id: paymentIntent?.id || "",
+        stripe_invoice_id: paymentIntent?.invoice || "",
+        recovery_email: recoveryEmail,
+      },
+    })
+  );
+
+  await createCommunicationEvent(
+    base44,
+    buildCommunicationEvent({
+      provider: "resend",
+      channel: "email",
+      direction: "outbound",
+      eventType: recoveryEmail?.sent ? "email_sent" : "email_failed",
+      status: recoveryEmail?.sent ? "sent" : "failed",
+      providerMessageId: `payment_recovery:${event.id}:${order.id}`,
+      subject: recoveryEmail?.sent
+        ? "Payment recovery email sent"
+        : "Payment recovery email failed",
+      messageBody: recoveryEmail?.sent
+        ? `Payment recovery email sent to ${updatedOrder.customer_email}.`
+        : `Payment recovery email not sent: ${recoveryEmail?.reason || "unknown"}.`,
+      order: updatedOrder,
+      metadata: {
+        source,
+        event_id: event.id,
+        event_type: event.type,
+        stripe_payment_intent_id: paymentIntent?.id || "",
+        recovery_email: recoveryEmail,
       },
     })
   );
@@ -623,6 +835,8 @@ export async function handleCanonicalStripeWebhook(
       event.type === "invoice.paid"
     ) {
       result = await processInvoiceEvent({ base44, event, source });
+    } else if (event.type === "payment_intent.payment_failed") {
+      result = await processPaymentIntentFailed({ base44, event, source });
     }
 
     return Response.json({
