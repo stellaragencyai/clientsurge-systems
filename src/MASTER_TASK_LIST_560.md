@@ -849,10 +849,10 @@
 | 323 | ✅ | Wire deduplicateLeads to a "Clean Duplicates" button in admin leads panel | HIGH | Agent Smith |
 | 324 | ✅ | Wire stalledOnboardingAlert to a cron automation - currently deployed but no scheduler triggers it | HIGH | Agent Smith |
 | 325 | ✅ | Wire monthlyClientReport to send on 1st of each month - function exists, no automation created for it | HIGH | Agent Smith |
-| 326 | ⏳ | Wire autoSchedule30DayCheckin - deployed but no trigger exists to schedule 30-day follow-up with clients | MEDIUM |
+| 326 | ✅ | Wire autoSchedule30DayCheckin - added Client.status Live automation manifest invoking autoSchedule30DayCheckin | MEDIUM | Morpheus |
 | 327 | ✅ | Wire sendDailyDigest to a daily 8am MST automation - deployed but never scheduled | HIGH | Agent Smith |
-| 328 | ⏳ | Wire runWinBackSequence - deployed but no UI button or automation triggers it for churned clients | MEDIUM |
-| 329 | ⏳ | Wire reactivateLeadOutreach - deployed but no UI or automation triggers lead reactivation flow | MEDIUM |
+| 328 | ✅ | Wire runWinBackSequence - added System Automations win-back preview control and dry_run support before sends | MEDIUM | Morpheus |
+| 329 | ✅ | Wire reactivateLeadOutreach - verified Lead Reactivation admin tab creates LeadReactivation records and invokes reactivateLeadOutreach | MEDIUM | Morpheus |
 | 330 | ✅ | Admin IntegrationHealth.jsx: call getIntegrationHealth on load - component exists but verify it's wired to the right function | HIGH  Agent Smith |
 
 ---

@@ -18,12 +18,17 @@ const STEPS = [
 
 const CHURNED_STATUSES = ["canceled", "past_due", "failed"];
 
-function daysSince(isoDate) {
+function daysSince(isoDate: string | null | undefined) {
   if (!isoDate) return 0;
   return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60 * 60 * 24);
 }
 
-function buildEmailContent(stepKey, customerName, businessName, bookingLink) {
+function buildEmailContent(
+  stepKey: string,
+  customerName?: string,
+  businessName?: string,
+  bookingLink?: string
+) {
   const name = customerName || "there";
   const biz = businessName || "your business";
   const link = bookingLink || "https://clientsurgesystems.com/book";
@@ -84,7 +89,7 @@ function buildEmailContent(stepKey, customerName, businessName, bookingLink) {
   };
 }
 
-async function checkAlreadySent(base44, orderId, stepKey) {
+async function checkAlreadySent(base44: any, orderId: string, stepKey: string) {
   const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
     {
       context_id: orderId,
@@ -98,7 +103,13 @@ async function checkAlreadySent(base44, orderId, stepKey) {
   return events?.length > 0;
 }
 
-async function sendEmail(toEmail, subject, html, resendKey, fromEmail) {
+async function sendEmail(
+  toEmail: string,
+  subject: string,
+  html: string,
+  resendKey: string,
+  fromEmail: string
+) {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -118,6 +129,13 @@ async function sendEmail(toEmail, subject, html, resendKey, fromEmail) {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    let payload: { dry_run?: boolean } = {};
+    try {
+      payload = await req.json();
+    } catch (_) {
+      payload = {};
+    }
+    const dryRun = payload?.dry_run === true;
 
     // Allow scheduled automation (no user) or admin
     let user = null;
@@ -127,9 +145,10 @@ Deno.serve(async (req) => {
     }
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (!resendKey) {
+    if (!dryRun && !resendKey) {
       return Response.json({ error: "RESEND_API_KEY not set" }, { status: 500 });
     }
+    const activeResendKey = resendKey || "";
 
     // Load settings
     const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
@@ -149,6 +168,14 @@ Deno.serve(async (req) => {
     }
 
     const results = { processed: 0, sent: 0, skipped: 0, failed: 0 };
+    const preview: Array<{
+      order_id: string;
+      business_name: string;
+      customer_email: string;
+      step_key: string;
+      subject: string;
+      days_churned: number;
+    }> = [];
 
     for (const order of orders) {
       try {
@@ -177,12 +204,25 @@ Deno.serve(async (req) => {
           let success = false;
           let errorMsg = null;
 
+          if (dryRun) {
+            preview.push({
+              order_id: order.id,
+              business_name: order.business_name || "",
+              customer_email: toEmail,
+              step_key: step.key,
+              subject,
+              days_churned: Math.floor(daysChurned),
+            });
+            results.skipped++;
+            break;
+          }
+
           try {
-            emailId = await sendEmail(toEmail, subject, html, resendKey, fromEmail);
+            emailId = await sendEmail(toEmail, subject, html, activeResendKey, fromEmail);
             success = true;
           } catch (err) {
-            errorMsg = err.message;
-            console.error(`[runWinBackSequence] Email failed for order ${order.id} (${step.key}): ${err.message}`);
+            errorMsg = err instanceof Error ? err.message : String(err);
+            console.error(`[runWinBackSequence] Email failed for order ${order.id} (${step.key}): ${errorMsg}`);
           }
 
           await base44.asServiceRole.entities.CommunicationEvent.create({
@@ -213,16 +253,18 @@ Deno.serve(async (req) => {
 
         results.processed++;
       } catch (err) {
-        console.error(`[runWinBackSequence] Order ${order.id} error: ${err.message}`);
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        console.error(`[runWinBackSequence] Order ${order.id} error: ${errorMsg}`);
         results.failed++;
       }
     }
 
     console.log(`[runWinBackSequence] Done:`, results);
-    return Response.json({ success: true, ...results });
+    return Response.json({ success: true, dry_run: dryRun, ...results, preview });
 
   } catch (error) {
-    console.error("[runWinBackSequence] Fatal error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error("[runWinBackSequence] Fatal error:", errorMsg);
+    return Response.json({ error: errorMsg }, { status: 500 });
   }
 });

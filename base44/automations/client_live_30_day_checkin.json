@@ -1,0 +1,16 @@
+{
+  "id": "client_live_30_day_checkin",
+  "name": "Client Live -> Schedule 30-Day Check-In",
+  "trigger": {
+    "entity": "Client",
+    "event": "update",
+    "watch_field": "status",
+    "from": ["Onboarding", "Installing", "Pending", "Setup"],
+    "to": "Live"
+  },
+  "task": "When a Client status changes to Live, invoke autoSchedule30DayCheckin with entity_id, data, and old_data so the client receives the 30-day check-in and Nolan receives the reminder.",
+  "function": "autoSchedule30DayCheckin",
+  "task_refs": ["#326"],
+  "priority": "MEDIUM",
+  "active": true
+}

@@ -208,6 +208,9 @@ export default function AutomationsPanel() {
   const [expandedProject, setExpandedProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showInfoBanner, setShowInfoBanner] = useState(false);
+  const [winBackRunning, setWinBackRunning] = useState(false);
+  const [winBackResult, setWinBackResult] = useState(null);
+  const [winBackError, setWinBackError] = useState("");
 
   const loadData = async () => {
     try {
@@ -245,6 +248,20 @@ export default function AutomationsPanel() {
     loadData();
     loadAutomations();
   }, []);
+
+  const runWinBackPreview = async () => {
+    setWinBackRunning(true);
+    setWinBackError("");
+    setWinBackResult(null);
+    try {
+      const res = await base44.functions.invoke("runWinBackSequence", { dry_run: true });
+      setWinBackResult(res.data || res);
+    } catch (error) {
+      setWinBackError(error?.response?.data?.error || error.message || "Win-back preview failed.");
+    } finally {
+      setWinBackRunning(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -284,6 +301,53 @@ export default function AutomationsPanel() {
           Automation cards are derived only from canonical backend state. Status comes from paid orders, tracked service install states, and CommunicationEvent signals. If a workflow is not yet on the canonical order/install path, it is shown explicitly instead of being guessed.
         </div>
       )}
+
+      <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <RotateCcw className="h-4 w-4 text-primary" />
+              <h3 className="text-sm font-semibold text-foreground">Win-back sequence control</h3>
+            </div>
+            <p className="mt-1 max-w-2xl text-xs leading-relaxed text-muted-foreground">
+              Preview churned clients that are eligible for the next win-back email. Preview mode uses dry_run and does not send email.
+            </p>
+          </div>
+          <button
+            onClick={runWinBackPreview}
+            disabled={winBackRunning}
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+          >
+            <TestTube2 className={`h-3.5 w-3.5 ${winBackRunning ? "animate-pulse" : ""}`} />
+            Preview eligible
+          </button>
+        </div>
+
+        {winBackError && (
+          <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            {winBackError}
+          </div>
+        )}
+
+        {winBackResult && (
+          <div className="mt-3 rounded-lg border border-border bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
+            <span className="font-semibold text-foreground">
+              {winBackResult.preview?.length || 0} eligible
+            </span>
+            {" "}of {winBackResult.processed || 0} churned orders checked.
+            {winBackResult.preview?.length > 0 && (
+              <div className="mt-2 space-y-1">
+                {winBackResult.preview.slice(0, 5).map((item) => (
+                  <div key={`${item.order_id}-${item.step_key}`} className="flex justify-between gap-3">
+                    <span className="truncate">{item.business_name || item.customer_email}</span>
+                    <span className="flex-shrink-0 font-medium text-foreground">{item.step_key}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {automations.map((automation) => {

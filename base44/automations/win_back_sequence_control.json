@@ -1,0 +1,13 @@
+{
+  "id": "win_back_sequence_control",
+  "name": "Churned Client -> Win-Back Sequence",
+  "trigger": {
+    "entity": "Admin",
+    "event": "manual"
+  },
+  "task": "Use the System Automations admin control to preview or run runWinBackSequence for churned orders. Preview uses dry_run=true and sends no email; run mode sends due win-back emails through Resend.",
+  "function": "runWinBackSequence",
+  "task_refs": ["#328"],
+  "priority": "MEDIUM",
+  "active": true
+}
