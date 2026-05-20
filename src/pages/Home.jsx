@@ -11,6 +11,7 @@ const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const FAQ = lazy(() => import("../components/landing/FAQ"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
+const FounderSection = lazy(() => import("../components/landing/FounderSection"));
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 const Footer = lazy(() => import("../components/landing/Footer"));
@@ -102,6 +103,8 @@ export default function Home() {
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
           <FAQ />
+          <SectionBreak />
+          <FounderSection />
           <SectionBreak />
           <Testimonials />
           <SectionBreak />
