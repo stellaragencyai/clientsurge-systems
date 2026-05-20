@@ -4,7 +4,7 @@
  */
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { Loader2, Send, MessageSquare, RefreshCw, CheckCheck } from "lucide-react";
+import { Loader2, Send, MessageSquare, RefreshCw, CheckCheck, Sparkles } from "lucide-react";
 
 function timeAgo(iso) {
   if (!iso) return "";
@@ -23,6 +23,9 @@ export default function AdminInbox() {
   const [selectedId, setSelectedId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [aiSuggesting, setAiSuggesting] = useState(false);
+  const [aiError, setAiError] = useState("");
+  const [aiDraftMeta, setAiDraftMeta] = useState(null);
   const [input, setInput] = useState("");
   const bottomRef = useRef(null);
 
@@ -80,6 +83,66 @@ export default function AdminInbox() {
     setSelectedId(projectId);
     markRead(projectId);
     setInput("");
+    setAiError("");
+    setAiDraftMeta(null);
+  };
+
+  const inferIntentFromMessage = (message = "") => {
+    const text = message.toLowerCase();
+    if (/\bstop\b|unsubscribe|remove me|do not contact/.test(text)) return "stop";
+    if (/price|pricing|cost|how much|payment|invoice|bill/.test(text)) return "pricing_interest";
+    if (/book|schedule|appointment|calendar|available|availability/.test(text)) return "booking_ready";
+    if (/question|how do|what does|can you|why|when|where|\?/.test(text)) return "question";
+    if (/not interested|no thanks|cancel/.test(text)) return "not_interested";
+    if (/unsure|maybe|thinking|not sure/.test(text)) return "unsure";
+    return "question";
+  };
+
+  const handleSuggestReply = async () => {
+    if (!selectedProject || aiSuggesting) return;
+
+    const latestClientMessage = [...threadMessages].reverse().find(msg => msg.role === "client");
+    if (!latestClientMessage) {
+      setAiError("No client message to respond to yet.");
+      return;
+    }
+
+    setAiSuggesting(true);
+    setAiError("");
+    setAiDraftMeta(null);
+
+    try {
+      const recentHistory = threadMessages.slice(-8).map(msg => ({
+        role: msg.role,
+        message: msg.message,
+        created_date: msg.created_date,
+      }));
+      const leadContext = {
+        full_name: selectedProject.client_name || latestClientMessage.sender_name || "Client",
+        business_name: selectedProject.business_name,
+        email: selectedProject.client_email || selectedProject.contact_email || latestClientMessage.sender_email,
+        business_type: selectedProject.industry || selectedProject.plan || "ClientSurge client",
+        status: selectedProject.step_live === "complete" ? "Live Client" : "Onboarding Client",
+        booking_link: selectedProject.booking_link || "",
+        plan: selectedProject.plan,
+      };
+      const intent = inferIntentFromMessage(latestClientMessage.message);
+      const res = await base44.functions.invoke("generateAIReply", {
+        intent,
+        lead: leadContext,
+        inboundMessage: latestClientMessage.message,
+        conversation_history: recentHistory,
+        source: "admin_inbox_suggest_reply",
+      });
+      const draft = res.data?.message || res.message || "";
+      if (!draft) throw new Error("AI reply came back empty.");
+      setInput(draft);
+      setAiDraftMeta({ intent, sourceMessageId: latestClientMessage.id });
+    } catch (error) {
+      setAiError(error?.response?.data?.error || error.message || "AI suggestion failed.");
+    } finally {
+      setAiSuggesting(false);
+    }
   };
 
   const handleSend = async () => {
@@ -224,22 +287,45 @@ export default function AdminInbox() {
                   <div ref={bottomRef} />
                 </div>
 
-                <div className="px-4 py-3 border-t border-border flex gap-2">
-                  <input
-                    value={input}
-                    onChange={e => setInput(e.target.value)}
-                    onKeyDown={e => e.key === "Enter" && !e.shiftKey && handleSend()}
-                    placeholder="Reply to client..."
-                    className="flex-1 rounded-xl border border-border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                  />
-                  <button
-                    onClick={handleSend}
-                    disabled={!input.trim() || sending}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl disabled:opacity-40"
-                    style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
-                  >
-                    {sending ? <Loader2 className="h-4 w-4 text-white animate-spin" /> : <Send className="h-4 w-4 text-white" />}
-                  </button>
+                <div className="border-t border-border px-4 py-3">
+                  {aiError && (
+                    <div className="mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+                      {aiError}
+                    </div>
+                  )}
+                  {aiDraftMeta && (
+                    <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                      AI draft loaded as editable text. Intent: {aiDraftMeta.intent.replaceAll("_", " ")}.
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSuggestReply}
+                      disabled={aiSuggesting || !threadMessages.some(msg => msg.role === "client")}
+                      className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-border px-3 text-xs font-semibold text-foreground transition-colors hover:bg-muted disabled:opacity-40"
+                    >
+                      {aiSuggesting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+                      AI Draft
+                    </button>
+                    <input
+                      value={input}
+                      onChange={e => {
+                        setInput(e.target.value);
+                        setAiDraftMeta(null);
+                      }}
+                      onKeyDown={e => e.key === "Enter" && !e.shiftKey && handleSend()}
+                      placeholder="Reply to client..."
+                      className="flex-1 rounded-xl border border-border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
+                    <button
+                      onClick={handleSend}
+                      disabled={!input.trim() || sending}
+                      className="flex h-10 w-10 items-center justify-center rounded-xl disabled:opacity-40"
+                      style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+                    >
+                      {sending ? <Loader2 className="h-4 w-4 text-white animate-spin" /> : <Send className="h-4 w-4 text-white" />}
+                    </button>
+                  </div>
                 </div>
               </>
             ) : (

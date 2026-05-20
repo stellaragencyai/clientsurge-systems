@@ -1224,7 +1224,7 @@
 | 482 | ✅ | Build clientPortalAIAssistant - persistent AI chat in client portal sidebar. Client asks "Why no leads today?" and AI reads CommunicationEvent data + automation status and returns a plain-English answer via getClientAnalytics + getAutomationStatus | HIGH  Agent Smith |
 | 483 | ✅ | Build AI-generated go-live checklist - when workflow_stage = "activation_ready", AI reads package + credentials and generates a personalized "Before You Go Live" checklist (e.g. "Confirm booking link accepts appointments", "Test your Twilio number"). Saved to AutomationChecklist | HIGH  Agent Smith |
 | 484 | ✅ | Build proactiveClientAlert function - runs daily per active client. If no new leads in 3 days, booking rate dropped 50%, or any automation had 0 triggers in 48h → sends plain-English alert email: "We noticed your lead volume dropped - here's what we recommend" | HIGH  Agent Smith |
-| 485 | ⏳ | Add AI Suggest Reply button to AdminInbox.jsx - reads inbound message + lead context + CommunicationEvent history, calls generateAIReply, drafts response. Admin sends or edits. Build the button + draft display in AdminInbox | MEDIUM |
+| 485 | ✅ | Add AI Suggest Reply button to AdminInbox.jsx - reads latest inbound message + project context + recent thread history, calls generateAIReply, and loads editable draft without auto-sending | MEDIUM | Morpheus |
 
 ---
 
