@@ -5,6 +5,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { buildFailedSendRetryJob } from "../_shared/automationRetry.js";
 
 async function sendSMS(base44, lead, messageBody, fromNumber) {
   const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -95,6 +96,15 @@ async function checkAlreadySent(base44, leadId, messageType) {
     1
   ).catch(() => []);
   return events?.length > 0;
+}
+
+async function queueFailedSendRetry(base44, payload) {
+  return base44.asServiceRole.entities.AutomationJob.create(
+    buildFailedSendRetryJob(payload)
+  ).catch((error) => {
+    console.warn("[sendWebsiteLeadResponse] Failed to queue retry job:", error.message);
+    return null;
+  });
 }
 
 Deno.serve(async (req) => {
@@ -234,6 +244,14 @@ Or just reply to this email with any questions.
             website_lead_response: true,
           }),
         });
+        await queueFailedSendRetry(base44, {
+          lead,
+          channel: "sms",
+          message: renderTemplate(templates.sms, lead),
+          source: "website_lead_response",
+          step: 0,
+          stepKey: "initial_sms",
+        });
       }
     } else {
       console.log(`[sendWebsiteLeadResponse] No phone for lead ${lead.id}`);
@@ -322,6 +340,15 @@ Or just reply to this email with any questions.
             step: 0,
             website_lead_response: true,
           }),
+        });
+        await queueFailedSendRetry(base44, {
+          lead,
+          channel: "email",
+          subject: renderTemplate(templates.email_subject, lead),
+          message: renderTemplate(templates.email_body, lead),
+          source: "website_lead_response",
+          step: 0,
+          stepKey: "initial_email",
         });
       }
     } else {

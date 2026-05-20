@@ -19,7 +19,9 @@
         "confirmation_email",
         "admin_notification",
         "nurture_sequence",
-        "webhook_dispatch"
+        "webhook_dispatch",
+        "reactivation_sms",
+        "reactivation_email"
       ]
     },
     "trigger_event": {

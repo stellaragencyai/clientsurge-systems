@@ -1807,7 +1807,7 @@ PHASE 7 - Admin UI
 
 | # | Status | Task | Effort | Blocker |
 |---|---|---|---|---|
-| AC-26 | ⏳ | Add retry logic to failed SMS/email sends (exponential backoff: 1min, 5min, 30min) | 60 min | No |
+| AC-26 | ✅ | Add retry logic to failed SMS/email sends (exponential backoff: 1min, 5min, 30min) | 60 min | No | Morpheus |
 | AC-27 | ✅ | Add dead-letter queue for failed webhook processing | 45 min | No |
 | AC-28 | ✅ | Build health check endpoint returning last_run_at, success/fail counts per automation | 40 min | No |
 

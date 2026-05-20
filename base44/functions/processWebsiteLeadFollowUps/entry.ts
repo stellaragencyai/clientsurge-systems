@@ -6,6 +6,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { buildFailedSendRetryJob } from "../_shared/automationRetry.js";
 
 const FOLLOW_UP_STEPS = [
   { step: 1, minutesAfter: 10, channel: "sms", key: "website_follow_sms_10min" },
@@ -120,6 +121,15 @@ function renderTemplate(template, lead, bookingLink) {
     .replace(/{service_interest}/g, lead.service_interest || "our services")
     .replace(/{business_name}/g, Deno.env.get("DEFAULT_BUSINESS_NAME") || "us")
     .replace(/{booking_link}/g, bookingLink || "");
+}
+
+async function queueFailedSendRetry(base44, payload) {
+  return base44.asServiceRole.entities.AutomationJob.create(
+    buildFailedSendRetryJob(payload)
+  ).catch((error) => {
+    console.warn("[processWebsiteLeadFollowUps] Failed to queue retry job:", error.message);
+    return null;
+  });
 }
 
 Deno.serve(async (req) => {
@@ -429,6 +439,13 @@ Or reply to this email with any questions.
 
               results.sent++;
             } else if (error) {
+              const failedMessage = stepConfig.channel === "sms"
+                ? renderTemplate(templates[stepConfig.key] || "", freshLeadBefore, bookingLink)
+                : renderTemplate((templates[stepConfig.key] || {}).body || "", freshLeadBefore, bookingLink);
+              const failedSubject = stepConfig.channel === "email"
+                ? renderTemplate((templates[stepConfig.key] || {}).subject || "Follow-up", freshLeadBefore, bookingLink)
+                : "";
+
               await base44.asServiceRole.entities.CommunicationEvent.create({
                 context_id: lead.id,
                 context_type: "website_lead",
@@ -445,6 +462,15 @@ Or reply to this email with any questions.
                   step: stepConfig.step,
                   step_key: stepConfig.key,
                 }),
+              });
+              await queueFailedSendRetry(base44, {
+                lead: freshLeadBefore,
+                channel: stepConfig.channel,
+                message: failedMessage,
+                subject: failedSubject,
+                source: "website_lead_followup",
+                step: stepConfig.step,
+                stepKey: stepConfig.key,
               });
               results.failed++;
             }

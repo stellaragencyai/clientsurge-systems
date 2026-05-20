@@ -8,6 +8,10 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  buildRetrySchedulePatch,
+  isAutomationJobDue,
+} from "../_shared/automationRetry.js";
 
 // #114: Resend with retry on 429/5xx
 async function resendWithRetry(payload, apiKey, retries = 1) {
@@ -137,29 +141,32 @@ Deno.serve(async (req) => {
     const queuedJobs = await base44.asServiceRole.entities.AutomationJob.filter(
       {
         status: "queued",
-        job_type: { $in: ["reactivation_sms", "reactivation_email"] },
       },
       "created_date",
-      MAX_JOBS_PER_RUN
+      100
     );
+    const dueJobs = (queuedJobs || [])
+      .filter((job) => isAutomationJobDue(job))
+      .slice(0, MAX_JOBS_PER_RUN);
 
-    if (!queuedJobs || queuedJobs.length === 0) {
+    if (!dueJobs.length) {
       console.log("[ProcessAutomationJobs] No queued jobs found");
       return Response.json({
         success: true,
-        jobs_found: 0,
+        jobs_found: queuedJobs?.length || 0,
         jobs_processed: 0,
         jobs_failed: 0,
         message: "No jobs to process",
       });
     }
 
-    console.log(`[ProcessAutomationJobs] Found ${queuedJobs.length} queued jobs`);
+    console.log(`[ProcessAutomationJobs] Found ${dueJobs.length} due queued jobs`);
 
     const results = {
-      jobs_found: queuedJobs.length,
+      jobs_found: dueJobs.length,
       jobs_processed: 0,
       jobs_failed: 0,
+      jobs_requeued: 0,
       jobs_skipped: 0,
     };
 
@@ -169,7 +176,7 @@ Deno.serve(async (req) => {
     // ─────────────────────────────────────────────────────────
     // STEP 2: Process each job
     // ─────────────────────────────────────────────────────────
-    for (const job of queuedJobs) {
+    for (const job of dueJobs) {
       try {
         // Get lead details
         const lead = await base44.asServiceRole.entities.Leads.get(job.lead_id).catch(
@@ -194,7 +201,10 @@ Deno.serve(async (req) => {
         // ─────────────────────────────────────────────────────────
         // SEND SMS JOB
         // ─────────────────────────────────────────────────────────
-        if (job.job_type === "reactivation_sms") {
+        const isSmsJob = ["reactivation_sms", "instant_sms"].includes(job.job_type);
+        const isEmailJob = ["reactivation_email", "confirmation_email"].includes(job.job_type);
+
+        if (isSmsJob) {
           if (!lead.phone) {
             console.warn(
               `[ProcessAutomationJobs] Lead ${job.lead_id} missing phone — skipping SMS`
@@ -221,7 +231,7 @@ Deno.serve(async (req) => {
         // ─────────────────────────────────────────────────────────
         // SEND EMAIL JOB
         // ─────────────────────────────────────────────────────────
-        if (job.job_type === "reactivation_email") {
+        if (isEmailJob) {
           if (!lead.email) {
             console.warn(
               `[ProcessAutomationJobs] Lead ${job.lead_id} missing email — skipping email`
@@ -249,14 +259,20 @@ Deno.serve(async (req) => {
         // UPDATE JOB STATUS
         // ─────────────────────────────────────────────────────────
         try {
-          await base44.asServiceRole.entities.AutomationJob.update(job.id, {
-            status: sent ? "completed" : "failed",
-            processed_at: now,
-            error_message: error || null,
+          const retryPatch = buildRetrySchedulePatch({
+            attempts: job.attempts || 0,
+            error,
+            now: new Date(now),
           });
+          await base44.asServiceRole.entities.AutomationJob.update(
+            job.id,
+            sent ? { status: "completed", processed_at: now, last_error: null } : retryPatch
+          );
 
           if (sent) {
             results.jobs_processed++;
+          } else if (retryPatch.status === "queued") {
+            results.jobs_requeued++;
           } else {
             results.jobs_failed++;
           }
@@ -268,18 +284,21 @@ Deno.serve(async (req) => {
         // LOG COMMUNICATION EVENT
         // ─────────────────────────────────────────────────────────
         try {
+          const retryPatchForLog = !sent
+            ? buildRetrySchedulePatch({ attempts: job.attempts || 0, error, now: new Date(now) })
+            : null;
           await base44.asServiceRole.entities.CommunicationEvent.create({
             lead_id: job.lead_id,
-            channel: job.job_type === "reactivation_sms" ? "sms" : "email",
+            channel: isSmsJob ? "sms" : "email",
             direction: "outbound",
             event_type: sent
-              ? (job.job_type === "reactivation_sms" ? "sms_sent" : "email_sent")
-              : (job.job_type === "reactivation_sms" ? "sms_failed" : "email_failed"),
-            provider: job.job_type === "reactivation_sms" ? "twilio" : "resend",
+              ? (isSmsJob ? "sms_sent" : "email_sent")
+              : (isSmsJob ? "sms_failed" : "email_failed"),
+            provider: isSmsJob ? "twilio" : "resend",
             status: sent ? "sent" : "failed",
             subject: job.job_type === "reactivation_email" ? metadata.subject : undefined,
             message_body:
-              job.job_type === "reactivation_sms"
+              isSmsJob
                 ? metadata.message
                 : metadata.body,
             provider_message_id: messageId || null,
@@ -287,7 +306,9 @@ Deno.serve(async (req) => {
             metadata_json: JSON.stringify({
               job_id: job.id,
               job_type: job.job_type,
-              attempt: metadata.attempt || 1,
+              attempt: (job.attempts || 0) + 1,
+              requeued: retryPatchForLog?.status === "queued",
+              next_retry_at: retryPatchForLog?.scheduled_for || null,
               reactivation_id: metadata.reactivation_id,
               timestamp: now,
             }),
