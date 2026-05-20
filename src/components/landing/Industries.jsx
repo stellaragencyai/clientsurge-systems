@@ -78,6 +78,12 @@ const industries = [
   id: "med-spa",
   icon: Sparkles,
   name: "Med Spas & Aesthetic Clinics",
+  accent: {
+    color: "#f472b6",
+    soft: "rgba(244,114,182,0.18)",
+    glow: "rgba(244,114,182,0.36)",
+    iconBg: "rgba(244,114,182,0.2)"
+  },
   image:
   "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/741357982_Gemini_Generated_Image_hdkpn1hdkpn1hdkp.png"
 },
@@ -85,6 +91,12 @@ const industries = [
   id: "dental",
   icon: Heart,
   name: "Dental & Orthodontics",
+  accent: {
+    color: "#38bdf8",
+    soft: "rgba(56,189,248,0.18)",
+    glow: "rgba(56,189,248,0.34)",
+    iconBg: "rgba(56,189,248,0.18)"
+  },
   image:
   "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95"
 },
@@ -92,6 +104,12 @@ const industries = [
   id: "chiro-pt",
   icon: Building2,
   name: "Chiropractic & Physical Therapy",
+  accent: {
+    color: "#a78bfa",
+    soft: "rgba(167,139,250,0.18)",
+    glow: "rgba(167,139,250,0.34)",
+    iconBg: "rgba(167,139,250,0.18)"
+  },
   image:
   "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=1200&q=95"
 },
@@ -99,6 +117,12 @@ const industries = [
   id: "hvac",
   icon: Wrench,
   name: "HVAC, Plumbing & Home Services",
+  accent: {
+    color: "#22c55e",
+    soft: "rgba(34,197,94,0.18)",
+    glow: "rgba(34,197,94,0.34)",
+    iconBg: "rgba(34,197,94,0.18)"
+  },
   image:
   "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=95"
 },
@@ -106,6 +130,12 @@ const industries = [
   id: "roofing",
   icon: Home,
   name: "Roofing & Restoration",
+  accent: {
+    color: "#f97316",
+    soft: "rgba(249,115,22,0.18)",
+    glow: "rgba(249,115,22,0.34)",
+    iconBg: "rgba(249,115,22,0.18)"
+  },
   image:
   "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/3fcc65c06_Screenshot2026-04-21185605.png"
 },
@@ -113,6 +143,12 @@ const industries = [
   id: "contractors",
   icon: MapPin,
   name: "Contractors & Trades",
+  accent: {
+    color: "#facc15",
+    soft: "rgba(250,204,21,0.18)",
+    glow: "rgba(250,204,21,0.34)",
+    iconBg: "rgba(250,204,21,0.18)"
+  },
   image:
   "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=95"
 }];
@@ -315,6 +351,7 @@ export default function Industries() {
           const Icon = industry.icon;
           const highlighted = hoveredIndustryId === industry.id;
           const isSelected = selectedIndustryId === industry.id;
+          const accent = industry.accent;
 
           return (
             <motion.button
@@ -359,19 +396,19 @@ export default function Industries() {
                 className="absolute inset-0"
                 style={{
                   background: highlighted ?
-                  "linear-gradient(to bottom, rgba(10,10,14,0.28) 0%, rgba(10,10,14,0.74) 100%)" :
-                  "linear-gradient(to bottom, rgba(10,10,14,0.18) 0%, rgba(10,10,14,0.66) 100%)"
+                  `linear-gradient(to bottom, rgba(10,10,14,0.2) 0%, ${accent.soft} 42%, rgba(10,10,14,0.78) 100%)` :
+                  `linear-gradient(to bottom, rgba(10,10,14,0.12) 0%, rgba(10,10,14,0.18) 38%, rgba(10,10,14,0.72) 100%)`
                 }} />
               
 
               <div
                 className="absolute inset-0 border-2 transition-all duration-300"
                 style={{
-                  borderColor: isSelected ? "#00AEEF" : highlighted ? "#c8965c" : "rgba(255,255,255,0.08)",
+                  borderColor: isSelected ? accent.color : highlighted ? accent.color : "rgba(255,255,255,0.08)",
                   boxShadow: isSelected ?
-                  "inset 0 0 0 1px rgba(0,174,239,0.4), inset 0 0 32px rgba(0,174,239,0.15), 0 0 0 2px rgba(0,174,239,0.5), 0 0 24px rgba(0,174,239,0.3)" :
+                  `inset 0 0 0 1px ${accent.soft}, inset 0 0 36px ${accent.soft}, 0 0 0 2px ${accent.glow}, 0 0 28px ${accent.glow}` :
                   highlighted ?
-                  "inset 0 0 0 1px rgba(245,217,168,0.26), inset 0 0 32px rgba(200,150,92,0.2), 0 0 0 2px rgba(200,150,92,0.34), 0 0 24px rgba(200,150,92,0.22)" :
+                  `inset 0 0 0 1px ${accent.soft}, inset 0 0 28px ${accent.soft}, 0 0 0 2px ${accent.glow}, 0 0 22px ${accent.glow}` :
                   "none"
                 }} />
               {isSelected && (
@@ -384,6 +421,17 @@ export default function Industries() {
 
 
               <div className="absolute bottom-0 inset-x-0 px-5 pb-5 pt-12">
+                <div
+                  className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl border backdrop-blur-sm transition-transform duration-300"
+                  style={{
+                    background: highlighted || isSelected ? accent.iconBg : "rgba(255,255,255,0.12)",
+                    borderColor: highlighted || isSelected ? accent.soft : "rgba(255,255,255,0.14)",
+                    boxShadow: highlighted || isSelected ? `0 10px 30px ${accent.glow}` : "none",
+                    transform: highlighted ? "translateY(-2px) scale(1.02)" : "none"
+                  }}
+                >
+                  <Icon className="w-5 h-5" style={{ color: highlighted || isSelected ? accent.color : "#ffffff" }} />
+                </div>
                 <p
                   style={{
                     fontSize: "18px",
@@ -414,8 +462,7 @@ export default function Industries() {
                 className="absolute bottom-0 left-0 h-[2px] transition-all duration-500 ease-out"
                 style={{
                   width: highlighted ? "100%" : "0%",
-                  background:
-                  "linear-gradient(to right, #00AEEF, #009DFF, #00AEEF)"
+                  background: `linear-gradient(to right, ${accent.color}, #ffffff, ${accent.color})`
                 }} />
               
             </motion.button>);

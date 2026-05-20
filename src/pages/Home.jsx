@@ -3,17 +3,17 @@ import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
-import { SectionSkeleton } from "../components/landing/SkeletonLoader";
-import FAQ, { FAQ_ITEMS } from "../components/landing/FAQ";
-import Footer from "../components/landing/Footer";
+import { LargeSectionSkeleton, SectionSkeleton } from "../components/landing/SkeletonLoader";
+import { FAQ_ITEMS } from "../components/landing/FAQ";
 
-// Lazy load below-the-fold sections individually for independent rendering
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
+const FAQ = lazy(() => import("../components/landing/FAQ"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
+const Footer = lazy(() => import("../components/landing/Footer"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
 
 import {
@@ -93,17 +93,23 @@ export default function Home() {
         <Suspense fallback={<SectionSkeleton />}>
           <TrustBar />
           <SectionBreak />
+        </Suspense>
+        <Suspense fallback={<LargeSectionSkeleton />}>
           <CoreOffer />
           <SectionBreak />
           <Pricing />
           <SectionBreak />
+        </Suspense>
+        <Suspense fallback={<SectionSkeleton />}>
           <FAQ />
           <SectionBreak />
           <Testimonials />
           <SectionBreak />
           <FinalCTA />
         </Suspense>
-        <Footer />
+        <Suspense fallback={null}>
+          <Footer />
+        </Suspense>
         <ChatBubble />
         <CookieConsent />
       </div>

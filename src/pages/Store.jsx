@@ -441,8 +441,42 @@ function StoreInner() {
           {items.length > 0 ?
           <div onClick={() => setCartOpen(true)} className="store-sticky-cart">
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <ShoppingCart
-                style={{ width: "18px", height: "18px", color: "#e0f4ff" }} />
+                <span
+                  style={{
+                    position: "relative",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "30px",
+                    height: "30px"
+                  }}
+                >
+                  <ShoppingCart
+                    style={{ width: "18px", height: "18px", color: "#e0f4ff" }}
+                  />
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "-6px",
+                      right: "-6px",
+                      minWidth: "18px",
+                      height: "18px",
+                      borderRadius: "999px",
+                      padding: "0 5px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      background: "#ffffff",
+                      color: "#003B8F",
+                      fontSize: "10px",
+                      fontWeight: "800",
+                      boxShadow: "0 6px 14px rgba(0,0,0,0.18)"
+                    }}
+                    aria-label={`${items.length} item${items.length === 1 ? "" : "s"} in cart`}
+                  >
+                    {items.length}
+                  </span>
+                </span>
               
                 <span
                 style={{
