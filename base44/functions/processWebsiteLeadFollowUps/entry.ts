@@ -7,27 +7,16 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { buildFailedSendRetryJob } from "../_shared/automationRetry.js";
-
-const FOLLOW_UP_STEPS = [
-  { step: 1, minutesAfter: 10, channel: "sms", key: "website_follow_sms_10min" },
-  { step: 2, minutesAfter: 60, channel: "email", key: "website_follow_email_1hr" },
-  { step: 3, minutesAfter: 1440, channel: "sms", key: "website_follow_sms_24hr" },
-];
-
-// #98: cadence_paused guard
-function isCadencePaused(lead) {
-  return lead?.cadence_paused === true || lead?.status === "opted_out" || lead?.status === "Booked";
-}
+import {
+  getNextDueWebsiteLeadFollowUpStep,
+  shouldStopWebsiteLeadFollowUp,
+  WEBSITE_LEAD_FOLLOW_UP_STEPS,
+} from "../_shared/websiteLeadFollowUps.js";
 
 // #128: TCPA opt-out footer for all SMS
 function appendOptOut(msg) {
   if ((msg || "").toLowerCase().includes("reply stop")) return msg;
   return msg + "\n\nReply STOP to unsubscribe.";
-}
-
-function minutesSince(isoDate) {
-  if (!isoDate) return 0;
-  return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60);
 }
 
 async function checkAlreadySent(base44, leadId, stepKey) {
@@ -211,18 +200,11 @@ Or reply to this email with any questions.
     // Process each lead
     for (const lead of leads) {
       try {
-        const minutesElapsed = minutesSince(lead.initial_response_sent_at);
-
         // Re-check stop conditions
         const freshLead = await base44.asServiceRole.entities.WebsiteLead.get(
           lead.id
         );
-        if (
-          !freshLead ||
-          !["new", "contacted"].includes(freshLead.lead_status) ||
-          freshLead.reply_status !== "none" ||
-          freshLead.booking_status !== "none"
-        ) {
+        if (shouldStopWebsiteLeadFollowUp(freshLead)) {
           console.log(
             `[processWebsiteLeadFollowUps] Lead ${lead.id} stop condition met`
           );
@@ -245,14 +227,16 @@ Or reply to this email with any questions.
           continue;
         }
 
-        // Process each follow-up step
-        for (const stepConfig of FOLLOW_UP_STEPS) {
-          try {
-            // Check if enough time has passed
-            if (minutesElapsed < stepConfig.minutesAfter) {
-              continue; // Not due yet
-            }
+        const nextDueStep = getNextDueWebsiteLeadFollowUpStep(freshLead);
+        if (!nextDueStep) {
+          results.skipped++;
+          results.processed++;
+          continue;
+        }
 
+        // Process only the next due step so overdue leads do not receive a burst.
+        for (const stepConfig of [nextDueStep]) {
+          try {
             // Check if already sent (idempotency)
             const alreadySent = await checkAlreadySent(
               base44,
@@ -270,12 +254,7 @@ Or reply to this email with any questions.
             // Re-check stop conditions before send
             const freshLeadBefore =
               await base44.asServiceRole.entities.WebsiteLead.get(lead.id);
-            if (
-              !freshLeadBefore ||
-              !["new", "contacted"].includes(freshLeadBefore.lead_status) ||
-              freshLeadBefore.reply_status !== "none" ||
-              freshLeadBefore.booking_status !== "none"
-            ) {
+            if (shouldStopWebsiteLeadFollowUp(freshLeadBefore)) {
               console.log(
                 `[processWebsiteLeadFollowUps] Lead ${lead.id} stop condition before step ${stepConfig.step}`
               );
@@ -421,7 +400,7 @@ Or reply to this email with any questions.
               const nextStepMinutes =
                 stepConfig.step === 3
                   ? null
-                  : FOLLOW_UP_STEPS[stepConfig.step]?.minutesAfter;
+                  : WEBSITE_LEAD_FOLLOW_UP_STEPS[stepConfig.step]?.minutesAfter;
               const updateData = {
                 follow_up_step: stepConfig.step,
                 last_message_sent: new Date().toISOString(),

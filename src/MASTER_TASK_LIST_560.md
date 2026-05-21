@@ -1773,9 +1773,9 @@ PHASE 7 - Admin UI
 |---|---|---|---|---|
 | AC-10 | ✅ | Test WebsiteLeadsDashboard with 50+ test leads - pagination, filtering, sorting | 20 min | No |
 | AC-11 | ✅ | Verify immediate SMS + email sends on form submission within 60 sec | 25 min | No |
-| AC-12 | ⏳ | Verify 3-step follow-up sequence timing: 10min SMS, 1hr email, 24hr SMS | 120 min | No |
-| AC-13 | ⏳ | Test automation stop when lead replies by SMS | 30 min | Needs AC-11 |
-| AC-14 | ⏳ | Test automation stop when lead books appointment | 15 min | No |
+| AC-12 | ✅ | Verify 3-step follow-up sequence timing: 10min SMS, 1hr email, 24hr SMS | 120 min | No  Morpheus 2026-05-20 |
+| AC-13 | ✅ | Test automation stop when lead replies by SMS | 30 min | Needs AC-11  Morpheus 2026-05-20 |
+| AC-14 | ✅ | Test automation stop when lead books appointment | 15 min | No  Morpheus 2026-05-20 |
 
 ## PRIORITY 4: MISSED CALL RECOVERY (4 tasks)
 
@@ -1783,7 +1783,7 @@ PHASE 7 - Admin UI
 |---|---|---|---|---|
 | AC-15 | ⏳ | End-to-end test: missed call → instant SMS → full 4-step follow-up sequence | 90 min | Needs AC-2, AC-4 |
 | AC-16 | ⏳ | Verify old lead reactivation campaign logic | 45 min | No |
-| AC-17 | ⏳ | Test closed/booked lead protection - no reactivation | 20 min | No |
+| AC-17 | ✅ | Test closed/booked lead protection - no reactivation | 20 min | No  Morpheus 2026-05-20 |
 | AC-18 | ⏳ | Verify duplicate call handling idempotency (same CallSid processed once) | 20 min | Needs AC-4 |
 
 ## PRIORITY 5: ADMIN ENHANCEMENTS (3 tasks)
