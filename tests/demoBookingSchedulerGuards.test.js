@@ -10,6 +10,10 @@ const demoBookingGuard = readFileSync(
   new URL("../base44/functions/demoBookingGuard/entry.ts", import.meta.url),
   "utf8"
 );
+const getBookedDemoSlots = readFileSync(
+  new URL("../base44/functions/getBookedDemoSlots/entry.ts", import.meta.url),
+  "utf8"
+);
 
 test("scheduleDemoBooking enforces date availability and optimistic slot locks before confirming", () => {
   assert.match(scheduleDemoBooking, /assertBookingDateAvailable/);
@@ -25,4 +29,12 @@ test("scheduleDemoBooking enforces date availability and optimistic slot locks b
 test("demoBookingGuard entry reuses the shared booking-date guard", () => {
   assert.match(demoBookingGuard, /from "\.\.\/shared\/demoBookingGuard\.ts"/);
   assert.doesNotMatch(demoBookingGuard, /getUTCDay/);
+});
+
+test("getBookedDemoSlots queries by scheduled date with a bounded daily result set", () => {
+  assert.match(getBookedDemoSlots, /const \{ date \} = await req\.json\(\);/);
+  assert.match(getBookedDemoSlots, /scheduled_date:\s*date/);
+  assert.match(getBookedDemoSlots, /status:\s*\{\s*\$in:\s*\['requested', 'scheduled', 'confirmed'\]\s*\}/);
+  assert.match(getBookedDemoSlots, /'-created_date',\s*50/);
+  assert.doesNotMatch(getBookedDemoSlots, /DemoRequest\.list/);
 });
