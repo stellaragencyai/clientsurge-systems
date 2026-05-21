@@ -90,7 +90,7 @@ export default function LiveAutomationFeed() {
             Watch the Automation Run in Real Time
           </h2>
           <p className="text-muted-foreground text-base max-w-xl mx-auto">
-            This is what happens across our clients' businesses every single day — while they focus on their work.
+            This simulated feed shows the kinds of events the installed system is designed to capture, route, and report.
           </p>
         </div>
 

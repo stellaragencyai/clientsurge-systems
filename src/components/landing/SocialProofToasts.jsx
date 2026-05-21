@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { CalendarCheck } from "lucide-react";
 
 const proofItems = [
-  { name: "Mike R.", location: "Houston, TX", action: "just booked a demo", ago: "2 min ago", industry: "HVAC & Home Services" },
-  { name: "Sarah M.", location: "Miami, FL", action: "signed up today", ago: "11 min ago", industry: "Med Spas & Aesthetic Clinics" },
-  { name: "David L.", location: "Austin, TX", action: "just booked a demo", ago: "18 min ago", industry: "Roofing & Restoration" },
-  { name: "Jessica T.", location: "Atlanta, GA", action: "signed up today", ago: "34 min ago", industry: "Chiropractic & Physical Therapy" },
-  { name: "Carlos B.", location: "Phoenix, AZ", action: "just booked a demo", ago: "47 min ago", industry: "Contractors & Trades" },
-  { name: "Amy W.", location: "Nashville, TN", action: "signed up today", ago: "1 hr ago", industry: "Dental & Orthodontics" },
+  { scenario: "HVAC & Home Services", location: "Phoenix, AZ", action: "demo lead captured", ago: "2 min ago" },
+  { scenario: "Med Spas & Aesthetic Clinics", location: "Scottsdale, AZ", action: "checkout path previewed", ago: "11 min ago" },
+  { scenario: "Roofing & Restoration", location: "Mesa, AZ", action: "missed-call workflow triggered", ago: "18 min ago" },
+  { scenario: "Chiropractic & Physical Therapy", location: "Tempe, AZ", action: "booking sequence previewed", ago: "34 min ago" },
+  { scenario: "Contractors & Trades", location: "Glendale, AZ", action: "lead follow-up simulated", ago: "47 min ago" },
+  { scenario: "Dental & Orthodontics", location: "Chandler, AZ", action: "nurture workflow previewed", ago: "1 hr ago" },
 ];
 
 export default function SocialProofToasts() {
@@ -50,7 +50,7 @@ export default function SocialProofToasts() {
         </div>
         <div className="min-w-0">
           <p className="text-xs font-semibold text-foreground truncate">
-            {current.name} - {current.industry}
+            Example: {current.scenario}
           </p>
           <p className="text-xs text-muted-foreground">{current.action} - {current.location}</p>
         </div>
