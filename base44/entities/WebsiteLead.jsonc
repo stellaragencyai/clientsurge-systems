@@ -245,6 +245,16 @@
       "type": "string",
       "title": "Cadence Paused At",
       "format": "date-time"
+    },
+    "archived": {
+      "type": "boolean",
+      "title": "Archived",
+      "default": false
+    },
+    "archived_at": {
+      "type": "string",
+      "title": "Archived At",
+      "format": "date-time"
     }
   },
   "required": [],

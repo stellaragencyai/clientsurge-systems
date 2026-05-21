@@ -5,7 +5,7 @@
 
 ---
 
-## DOMAIN HEALTH: 83% Ready (15/18 done, 1 critical open)
+## DOMAIN HEALTH: 89% Ready (16/18 done, 1 critical open)
 > **Fastest win:** #93 - add X-Frame-Options: DENY header to backend function responses (~30 min, no deps) - Agent B
 > **Critical path:** #248 legal review after remaining security/privacy hardening
 
@@ -17,8 +17,8 @@
 | Unblocked Critical | 1 (#248 legal review) |
 | Fastest Win (< 30 min, no deps) | #93 - add X-Frame-Options: DENY header to backend function responses (~30 min) |
 | Longest Blocked Chain | none currently identified |
-| Done This Week | 15 tasks (#94, #20, #23, #78, #84, #85, #86, #87, #88, #89, #92, #128, #224, #225, #226) |
-| Est. Hours to Domain Complete | ~9 hrs |
+| Done This Week | 16 tasks (#94, #20, #23, #78, #84, #85, #86, #87, #88, #89, #91, #92, #128, #224, #225, #226) |
+| Est. Hours to Domain Complete | ~8 hrs |
 
 ---
 
@@ -43,7 +43,6 @@
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
 | 90 | pending | Add IP allowlist option in AdminSettings for admin panel access | B | #229 | - | - | ~45 min |
-| 91 | pending | Create autoArchiveOldLeads: anonymize WebsiteLead records > 365 days old | B | - | B (#122 scheduled automation) | - | ~1 hr |
 | 93 | pending | Add X-Frame-Options: DENY header to all backend function responses | B | - | - | - | ~30 min |
 | 151 | pending | Add createAuditLog helper: write admin action records to AuditLog entity | B | #157 | C (#184 AuditLog viewer) | AuditLog | ~45 min |
 | 184 | pending | Create AuditLog viewer tab in AdminDashboard | C | #157 | - | AuditLog | ~1 hr |
@@ -70,3 +69,4 @@
 | 225 | Add consent_given_at + consent_ip fields to Leads entity | Morpheus | 2026-05-21 | Added CRM Lead consent audit fields and propagation from website capture |
 | 226 | Verify all entity RLS rules are correct (Client entity read/write rules) | Morpheus | 2026-05-21 | Verified Client create/delete are admin-only and read/update are admin-or-own-email, with regression coverage |
 | 78 | Add cookie consent to all public lead capture forms | Morpheus | 2026-05-21 | Moved `CookieConsent` to the public app shell so all public lead/form routes share the same consent banner without duplicating it on protected routes |
+| 91 | Create autoArchiveOldLeads: anonymize WebsiteLead records > 365 days old | Morpheus | 2026-05-21 | Retargeted `autoArchiveOldLeads` from legacy `SpaLead` to canonical `WebsiteLead`, added archive schema markers, PII scrubbing, automation guard, and regression coverage |
