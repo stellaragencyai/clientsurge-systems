@@ -1,5 +1,7 @@
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { assertBookingDateAvailable } from "../shared/demoBookingGuard.ts";
 
-// #99: optimistic lock — re-fetch available slots right before confirming
+// #99: optimistic lock - re-fetch available slots right before confirming
 async function optimisticLockSlot(base44, scheduled_date, scheduled_time) {
   const existing = await base44.asServiceRole.entities.DemoRequest.filter({
     scheduled_date,
@@ -7,12 +9,13 @@ async function optimisticLockSlot(base44, scheduled_date, scheduled_time) {
     status: { $in: ['requested', 'scheduled', 'confirmed'] },
   });
   if (existing && existing.length > 0) {
-    throw new Error(`Time slot ${scheduled_time} on ${scheduled_date} was just taken. Please choose another time.`);
+    throw Object.assign(
+      new Error(`Time slot ${scheduled_time} on ${scheduled_date} was just taken. Please choose another time.`),
+      { status: 409 }
+    );
   }
   return true;
 }
-
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const MAX_FIELD_LENGTH = 500;
 const DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
@@ -221,6 +224,9 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Please wait a moment before submitting again.' }, { status: 429 });
     }
 
+    await assertBookingDateAvailable(base44, payload.scheduled_date);
+    await optimisticLockSlot(base44, payload.scheduled_date, payload.scheduled_time);
+
     const bookingDateTime = parseBookingDateTime(payload.scheduled_date, payload.scheduled_time);
     let existingLead = null;
 
@@ -259,6 +265,7 @@ Deno.serve(async (req) => {
       },
     });
 
+    await optimisticLockSlot(base44, payload.scheduled_date, payload.scheduled_time);
     await ensureDemoRequest(base44, lead.id, payload);
 
     const warnings: string[] = [];
@@ -402,6 +409,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to schedule demo';
-    return Response.json({ error: message }, { status: 500 });
+    return Response.json({ error: message }, { status: error.status || 500 });
   }
 });
