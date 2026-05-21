@@ -4,36 +4,36 @@ import StardustOverlay from "./StardustOverlay";
 
 const testimonials = [
   {
-    name: "Jessica M.",
+    name: "Med spa lead flow",
     businessType: "Med Spa",
     location: "Scottsdale, AZ",
-    before: "Booking 2 consults/week from online leads",
-    after: "10+ consults/week",
-    result: "5x booking increase",
-    quote: "The system just runs. I do not have to touch it.",
-    initials: "JM",
+    before: "Online consult requests wait for manual follow-up",
+    after: "New inquiries get an immediate response and booking path",
+    result: "Target outcome: faster consult capture",
+    quote: "Example workflow: lead captured, SMS sent, booking handoff started.",
+    initials: "MS",
     color: "#00AEEF",
   },
   {
-    name: "Carlos R.",
+    name: "HVAC missed-call flow",
     businessType: "HVAC Contractor",
     location: "Phoenix, AZ",
-    before: "$4k/month ad spend with low conversion",
-    after: "Close rate doubled",
-    result: "ROI within the first month",
-    quote: "It paid for itself in the first week.",
-    initials: "CR",
+    before: "Missed calls end without a callback or text thread",
+    after: "Missed callers receive a prompt text-back and routing step",
+    result: "Target outcome: fewer dropped calls",
+    quote: "Example workflow: missed call logged, reply captured, next step assigned.",
+    initials: "HV",
     color: "#003B8F",
   },
   {
-    name: "Amanda T.",
+    name: "Dental follow-up flow",
     businessType: "Dental & Orthodontics",
     location: "Tempe, AZ",
-    before: "Manual follow-up draining team time",
-    after: "Consult requests answered same day",
-    result: "Team freed for growth",
-    quote: "Our front desk has breathing room again, and consults are getting booked faster.",
-    initials: "AT",
+    before: "Manual follow-up depends on front desk availability",
+    after: "Follow-up sequence keeps qualified patients moving",
+    result: "Target outcome: cleaner follow-up queue",
+    quote: "Example workflow: inquiry qualified, nurture started, booking prompt sent.",
+    initials: "DE",
     color: "#009DFF",
   },
 ];
@@ -45,10 +45,13 @@ export default function Testimonials() {
       <StardustOverlay seed={21} opacity={0.4} />
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="max-w-2xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Proven Results</p>
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Launch Scenarios</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
-           Real Results From Businesses Using Our System
+            Example Outcomes This System Is Built To Create
           </h2>
+          <p className="mt-5 text-sm leading-6 text-muted-foreground">
+            Illustrative examples based on the installed workflows. Verified customer case studies can replace these after launch proof.
+          </p>
         </div>
 
         <motion.div
@@ -104,7 +107,7 @@ export default function Testimonials() {
               </div>
 
               <div className="text-sm text-foreground/75 leading-relaxed flex-1 mb-6">
-                <div className="flex gap-0.5 mb-2">{[1,2,3,4,5].map(i => <span key={i} style={{fontSize:"13px"}}>⭐</span>)}</div>
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-primary/80">Illustrative workflow</p>
                 "{testimonial.quote}"
               </div>
 
@@ -112,7 +115,7 @@ export default function Testimonials() {
                 <div
                   className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-primary/20 shadow-md text-white text-sm font-bold"
                   style={{ background: `linear-gradient(135deg, ${testimonial.color} 0%, ${testimonial.color}cc 100%)` }}
-                  aria-label={testimonial.name}
+                  aria-label={`${testimonial.name} scenario`}
                 >
                   {testimonial.initials}
                 </div>
@@ -127,7 +130,7 @@ export default function Testimonials() {
 
         <div className="text-center mt-16 pt-10 border-t border-border">
           <p className="text-lg font-semibold text-foreground mb-4">
-            Want results like this for your business?
+            Want a workflow like this for your business?
           </p>
           {demoBooking ? (
             <button
@@ -136,7 +139,7 @@ export default function Testimonials() {
               className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white"
               style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
             >
-              Make the Leap
+              Plan My System
             </button>
           ) : (
             <a
@@ -144,7 +147,7 @@ export default function Testimonials() {
               className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white"
               style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
             >
-              Make the Leap
+              Plan My System
             </a>
           )}
         </div>
