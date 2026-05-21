@@ -5,7 +5,7 @@
 
 ---
 
-## DOMAIN HEALTH: 72% Ready (13/18 done, 1 critical open)
+## DOMAIN HEALTH: 78% Ready (14/18 done, 1 critical open)
 > **Fastest win:** #93 - add X-Frame-Options: DENY header to backend function responses (~30 min, no deps) - Agent B
 > **Critical path:** #248 legal review after remaining security/privacy hardening
 
@@ -17,8 +17,8 @@
 | Unblocked Critical | 1 (#248 legal review) |
 | Fastest Win (< 30 min, no deps) | #93 - add X-Frame-Options: DENY header to backend function responses (~30 min) |
 | Longest Blocked Chain | none currently identified |
-| Done This Week | 13 tasks (#94, #20, #23, #84, #85, #86, #87, #88, #89, #92, #128, #224, #225) |
-| Est. Hours to Domain Complete | ~11 hrs |
+| Done This Week | 14 tasks (#94, #20, #23, #84, #85, #86, #87, #88, #89, #92, #128, #224, #225, #226) |
+| Est. Hours to Domain Complete | ~10 hrs |
 
 ---
 
@@ -34,7 +34,6 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 226 | pending | Verify all entity RLS rules are correct (Client entity read/write rules) | C | - | - | - | ~1 hr |
 | 78 | pending | Add cookie consent to all public lead capture forms | A | - | - | Consent-Capture | ~45 min |
 
 ---
@@ -69,3 +68,4 @@
 | 89 | Capture X-Forwarded-For IP in submitLeadCapture -> store as consent_ip | Morpheus | 2026-05-21 | `submitLeadCapture` now stores normalized client IP as `consent_ip` on WebsiteLead and propagates it to CRM Leads |
 | 224 | Add consent_given_at + consent_ip fields to WebsiteLead entity | Morpheus | 2026-05-21 | WebsiteLead already had `consent_given_at`; added `consent_ip` to complete the audit pair |
 | 225 | Add consent_given_at + consent_ip fields to Leads entity | Morpheus | 2026-05-21 | Added CRM Lead consent audit fields and propagation from website capture |
+| 226 | Verify all entity RLS rules are correct (Client entity read/write rules) | Morpheus | 2026-05-21 | Verified Client create/delete are admin-only and read/update are admin-or-own-email, with regression coverage |
