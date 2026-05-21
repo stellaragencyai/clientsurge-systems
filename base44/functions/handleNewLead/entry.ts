@@ -5,6 +5,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 function renderTemplate(template, lead) {
@@ -57,7 +58,7 @@ Deno.serve(async (req) => {
         const template = settings.sms_template ||
           "Hi {first_name}, thanks for reaching out! We'll be in touch with you shortly.";
 
-        const messageBody = renderTemplate(template, lead);
+        const messageBody = appendSmsOptOut(renderTemplate(template, lead));
 
         const params = { To: lead.phone, From: fromNumber, Body: messageBody };
         if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;

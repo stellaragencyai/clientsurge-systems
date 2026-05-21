@@ -11,6 +11,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 const SEQUENCE_TYPES = ["instant_response", "missed_call_recovery", "day1_followup", "day3_followup", "day7_followup", "reactivation"];
@@ -32,7 +33,7 @@ async function sendSMS(phone, body, accountSid, authToken, fromNumber) {
         Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams({ To: phone, From: fromNumber, Body: body }),
+      body: new URLSearchParams({ To: phone, From: fromNumber, Body: appendSmsOptOut(body) }),
     }
   );
   if (!res.ok) {
@@ -136,13 +137,14 @@ Deno.serve(async (req) => {
 
           const template = templateMap[sequence_type] || "";
           const body = renderTemplate(template, lead, settings.booking_link_default);
+          const outboundSmsBody = body ? appendSmsOptOut(body) : "";
 
           let smsSent = false;
           let smsError = null;
 
           if (twilioReady && lead.phone && body) {
             try {
-              await sendSMS(lead.phone, body, accountSid, authToken, fromNumber);
+              await sendSMS(lead.phone, outboundSmsBody, accountSid, authToken, fromNumber);
               smsSent = true;
             } catch (err) {
               smsError = err.message;
@@ -158,7 +160,7 @@ Deno.serve(async (req) => {
             provider: smsSent ? "twilio" : "internal",
             status: smsSent ? "sent" : "pending",
             subject: eventLabel,
-            message_body: body || eventLabel,
+            message_body: outboundSmsBody || eventLabel,
             error_message: smsError || undefined,
             metadata_json: JSON.stringify({ bulk: true, sequence_type, triggered_by: user.email }),
           });

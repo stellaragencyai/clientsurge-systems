@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 const SEQUENCE_TYPES = ["instant_response", "missed_call_recovery", "day1_followup", "day3_followup", "day7_followup", "reactivation"];
@@ -57,6 +58,7 @@ Deno.serve(async (req) => {
       .replace(/{business_name}/g, lead.business_name || "us")
       .replace(/{booking_link}/g, settings.booking_link_default || "")
       .replace(/{date}/g, new Date().toLocaleDateString());
+    const outboundSmsBody = rendered ? appendSmsOptOut(rendered) : "";
 
     let smsSent = false;
     let smsError = null;
@@ -75,7 +77,7 @@ Deno.serve(async (req) => {
               Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
               "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: new URLSearchParams({ To: lead.phone, From: fromNumber, Body: rendered }),
+            body: new URLSearchParams({ To: lead.phone, From: fromNumber, Body: outboundSmsBody }),
           }
         );
 
@@ -98,7 +100,7 @@ Deno.serve(async (req) => {
       provider: smsSent ? "twilio" : "internal",
       status: smsSent ? "sent" : "pending",
       subject: eventLabel,
-      message_body: rendered || custom_note || `${eventLabel} triggered manually`,
+      message_body: outboundSmsBody || custom_note || `${eventLabel} triggered manually`,
       error_message: smsError || undefined,
       metadata_json: JSON.stringify({
         sequence_type,

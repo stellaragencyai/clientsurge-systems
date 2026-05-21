@@ -7,6 +7,7 @@
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { stripeFetch, twilioFetch } from "../_shared/providerFetch.js";
 
 Deno.serve(async (req) => {
@@ -54,7 +55,7 @@ Deno.serve(async (req) => {
       const body = evt.message_body;
       if (!body) return Response.json({ error: 'No message body to retry' }, { status: 400 });
 
-      const formData = new URLSearchParams({ From: TWILIO_FROM, To: toPhone, Body: body });
+      const formData = new URLSearchParams({ From: TWILIO_FROM, To: toPhone, Body: appendSmsOptOut(body) });
       const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
         method: 'POST',
         headers: {

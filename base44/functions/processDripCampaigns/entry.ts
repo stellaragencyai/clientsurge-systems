@@ -14,6 +14,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 const STOP_STATUSES = ["Qualified", "Booking Prompt Sent", "Booked", "Closed", "Won", "Lost", "opted_out"]; // #96
@@ -45,7 +46,7 @@ async function sendSMS(phone, body, accountSid, authToken, fromNumber) {
         Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: new URLSearchParams({ To: phone, From: fromNumber, Body: body }),
+      body: new URLSearchParams({ To: phone, From: fromNumber, Body: appendSmsOptOut(body) }),
     }
   );
   if (!res.ok) {
@@ -179,6 +180,7 @@ Deno.serve(async (req) => {
           // Due — send now
           const template = templateMap[step.key] || "";
           const messageBody = renderTemplate(template, lead, settings.booking_link_default);
+          const outboundSmsBody = messageBody ? appendSmsOptOut(messageBody) : "";
 
           let sent = false;
           let channel = "sms";
@@ -186,7 +188,7 @@ Deno.serve(async (req) => {
 
           if (twilioReady && lead.phone && messageBody) {
             try {
-              await sendSMS(lead.phone, messageBody, accountSid, authToken, fromNumber);
+              await sendSMS(lead.phone, outboundSmsBody, accountSid, authToken, fromNumber);
               sent = true;
             } catch (err) {
               error = err.message;
@@ -227,7 +229,7 @@ Deno.serve(async (req) => {
             provider: channel === "sms" ? "twilio" : "resend",
             status: sent ? "sent" : "failed",
             subject: `Drip ${step.key} — automated follow-up`,
-            message_body: messageBody,
+            message_body: channel === "sms" ? outboundSmsBody : messageBody,
             error_message: error || undefined,
             metadata_json: JSON.stringify({ drip_step: step.key, campaign_id: campaign.id, auto: true }),
           });
@@ -270,4 +272,3 @@ Deno.serve(async (req) => {
     return Response.json({ error: error.message || "Failed to process drip campaigns" }, { status: 500 });
   }
 });
-

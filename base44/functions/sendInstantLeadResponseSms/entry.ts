@@ -5,6 +5,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -35,7 +36,7 @@ async function sendTwilioSms(toNumber, messageBody) {
   const params = {
     From: TWILIO_FROM_NUMBER,
     To: toNumber,
-    Body: messageBody,
+    Body: appendSmsOptOut(messageBody),
   };
   if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 

@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 Deno.serve(async (req) => {
@@ -27,7 +28,7 @@ Deno.serve(async (req) => {
       body: new URLSearchParams({
         From: fromNumber,
         To: phone,
-        Body: message.includes("Reply STOP") ? message : `${message}\n\nReply STOP to unsubscribe.`,
+        Body: appendSmsOptOut(message),
       }).toString(),
     });
 

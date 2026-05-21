@@ -8,6 +8,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 function hoursSince(isoDate) {
@@ -36,7 +37,7 @@ async function sendSMS(toNumber, messageBody) {
 
   if (!accountSid || !authToken || !fromNumber) throw new Error("Twilio credentials missing");
 
-  const params = { To: toNumber, From: fromNumber, Body: messageBody };
+  const params = { To: toNumber, From: fromNumber, Body: appendSmsOptOut(messageBody) };
   if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 
   const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
@@ -129,7 +130,8 @@ Deno.serve(async (req) => {
         // SMS
         if (lead.phone) {
           try {
-            const sid = await sendSMS(lead.phone, renderMsg(bookingSmsTemplate));
+            const smsBody = appendSmsOptOut(renderMsg(bookingSmsTemplate));
+            const sid = await sendSMS(lead.phone, smsBody);
             await base44.asServiceRole.entities.CommunicationEvent.create({
               lead_id: lead.id,
               channel: "sms",
@@ -138,7 +140,7 @@ Deno.serve(async (req) => {
               provider: "twilio",
               status: "sent",
               subject: "Qualified booking prompt SMS (24h)",
-              message_body: renderMsg(bookingSmsTemplate),
+              message_body: smsBody,
               provider_message_id: sid,
               metadata_json: JSON.stringify({ step_key: stepKey, timestamp: new Date().toISOString() }),
             });

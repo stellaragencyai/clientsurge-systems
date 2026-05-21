@@ -18,6 +18,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 Deno.serve(async (req) => {
@@ -120,7 +121,7 @@ Deno.serve(async (req) => {
             Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: new URLSearchParams({ To: phone, From: fromNumber, Body: message }),
+          body: new URLSearchParams({ To: phone, From: fromNumber, Body: appendSmsOptOut(message) }),
         }
       );
 

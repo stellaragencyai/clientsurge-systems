@@ -7,6 +7,7 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { buildFailedSendRetryJob } from "../_shared/automationRetry.js";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 async function sendSMS(base44, lead, messageBody, fromNumber) {
@@ -28,7 +29,7 @@ async function sendSMS(base44, lead, messageBody, fromNumber) {
       body: new URLSearchParams({
         To: lead.phone_number,
         From: fromNumber,
-        Body: messageBody,
+        Body: appendSmsOptOut(messageBody),
         ...(statusCallbackUrl ? { StatusCallback: statusCallbackUrl } : {}),
       }),
     }
@@ -188,10 +189,11 @@ Or just reply to this email with any questions.
         const alreadySentSMS = await checkAlreadySent(base44, lead.id, "sms");
         if (!alreadySentSMS) {
           const messageBody = renderTemplate(templates.sms, lead);
+          const outboundSmsBody = appendSmsOptOut(messageBody);
           const smsResult = await sendSMS(
             base44,
             lead,
-            messageBody,
+            outboundSmsBody,
             fromNumber
           );
 
@@ -204,7 +206,7 @@ Or just reply to this email with any questions.
             provider: "twilio",
             status: "sent",
             subject: "Website lead immediate SMS",
-            message_body: messageBody,
+            message_body: outboundSmsBody,
             provider_message_id: smsResult.messageId,
             metadata_json: JSON.stringify({
               step: 0,

@@ -6,6 +6,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import crypto from "node:crypto";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 async function validateTwilioSignature(req, rawBody) {
@@ -305,7 +306,7 @@ async function sendTwilioSms(toNumber, messageBody) {
 
   console.log(`[MissedCall] Sending SMS to ${toNumber}`);
 
-  const params = { From: TWILIO_FROM_NUMBER, To: toNumber, Body: messageBody };
+  const params = { From: TWILIO_FROM_NUMBER, To: toNumber, Body: appendSmsOptOut(messageBody) };
   if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 
   const response = await twilioFetch(TWILIO_API_URL, {
@@ -461,9 +462,11 @@ Deno.serve(async (req) => {
     }
 
     // Format message
-    const messageBody = lead
-      ? formatSmsTemplate(smsTemplate, lead)
-      : smsTemplate.replace("{first_name}", "there").replace("{business_name}", "our business");
+    const messageBody = appendSmsOptOut(
+      lead
+        ? formatSmsTemplate(smsTemplate, lead)
+        : smsTemplate.replace("{first_name}", "there").replace("{business_name}", "our business")
+    );
 
     // Send SMS
     const messageSid = await sendTwilioSms(normalizedPhone, messageBody);

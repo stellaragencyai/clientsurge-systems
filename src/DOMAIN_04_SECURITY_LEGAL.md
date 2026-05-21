@@ -5,8 +5,8 @@
 
 ---
 
-## DOMAIN HEALTH: 44% Ready (8/18 done, 1 critical open, 1 entity-blocked)
-> **Fastest win:** #128 - verify SMS opt-out language is appended across SMS sends (~30 min, no deps) - Agent B
+## DOMAIN HEALTH: 50% Ready (9/18 done, 1 critical open, 1 entity-blocked)
+> **Fastest win:** #93 - add X-Frame-Options: DENY header to backend function responses (~30 min, no deps) - Agent B
 > **Critical path:** #224/#225 (entity fields) -> #88/#89 (IP capture) - consent chain must complete for TCPA compliance
 
 ---
@@ -15,9 +15,9 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 1 (#248 legal review) |
-| Fastest Win (< 30 min, no deps) | #128 - verify SMS opt-out language is appended across SMS sends (~30 min) |
+| Fastest Win (< 30 min, no deps) | #93 - add X-Frame-Options: DENY header to backend function responses (~30 min) |
 | Longest Blocked Chain | #224 -> #88 -> #89 (consent capture chain, 3 deep) |
-| Done This Week | 8 tasks (#94, #20, #23, #84, #85, #86, #87, #92) |
+| Done This Week | 9 tasks (#94, #20, #23, #84, #85, #86, #87, #92, #128) |
 | Est. Hours to Domain Complete | ~13 hrs |
 
 ---
@@ -36,7 +36,6 @@
 |---|---|---|---|---|---|---|---|
 | 88 | pending | Add consent_given_at + consent_ip fields to WebsiteLead/Leads entities | B | - | B (#89 capture IP) | Consent-Capture | ~45 min |
 | 89 | pending | Capture X-Forwarded-For IP in submitLeadCapture -> store as consent_ip | B | #88 | - | Consent-Capture | ~20 min |
-| 128 | pending | All SMS sends: verify opt-out language "Reply STOP to unsubscribe" is appended | B | - | - | TCPA-Compliance | ~30 min |
 | 224 | pending | Add consent_given_at + consent_ip fields to WebsiteLead entity | C | - | B (#89) | Consent-Capture | ~20 min |
 | 225 | pending | Add consent_given_at + consent_ip fields to Leads entity | C | - | B (#89) | Consent-Capture | ~20 min |
 | 226 | pending | Verify all entity RLS rules are correct (Client entity read/write rules) | C | - | - | - | ~1 hr |
@@ -69,3 +68,4 @@
 | 86 | Move webhookLeadCapture secret from URL param to signed headers | Morpheus | 2026-05-21 | Verified `webhookLeadCapture` uses `x-webhook-id`, `x-webhook-timestamp`, and HMAC `x-webhook-signature` validation instead of URL-param secret auth |
 | 87 | submitLeadCapture: normalize phone to E.164 (+1 prefix, reject < 10 digits) | Morpheus | 2026-05-21 | `normalizePhone` now stores canonical `+1XXXXXXXXXX`, rejects short/unsupported phone input, and is covered by lead-capture quality tests |
 | 92 | Ensure honeypot website_url field in ALL public forms | Morpheus | 2026-05-21 | Standardized `website_url` as the public-form honeypot across lead/contact capture paths and moved Sam's real website capture to `business_website_url` |
+| 128 | All SMS sends: verify opt-out language "Reply STOP to unsubscribe" is appended | Morpheus | 2026-05-21 | Added shared `appendSmsOptOut` helper and wired it into core direct Twilio customer send paths plus regression tests |

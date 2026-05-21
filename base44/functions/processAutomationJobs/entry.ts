@@ -9,6 +9,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 import {
   buildRetrySchedulePatch,
@@ -49,7 +50,7 @@ async function sendTwilioSms(toNumber, messageBody) {
   const auth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
   const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
 
-  const params = { From: TWILIO_FROM_NUMBER, To: toNumber, Body: messageBody };
+  const params = { From: TWILIO_FROM_NUMBER, To: toNumber, Body: appendSmsOptOut(messageBody) };
   if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 
   const response = await twilioFetch(TWILIO_API_URL, {
@@ -198,7 +199,7 @@ Deno.serve(async (req) => {
           }
 
           try {
-            const smsBody = metadata.message || "Hello! We'd love to reconnect.";
+            const smsBody = appendSmsOptOut(metadata.message || "Hello! We'd love to reconnect.");
             messageId = await sendTwilioSms(lead.phone, smsBody);
             sent = true;
             console.log(
@@ -283,7 +284,7 @@ Deno.serve(async (req) => {
             subject: job.job_type === "reactivation_email" ? metadata.subject : undefined,
             message_body:
               isSmsJob
-                ? metadata.message
+                ? appendSmsOptOut(metadata.message || "Hello! We'd love to reconnect.")
                 : metadata.body,
             provider_message_id: messageId || null,
             error_message: error || null,

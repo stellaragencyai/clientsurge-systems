@@ -24,6 +24,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -50,7 +51,7 @@ async function sendTwilioSms(toNumber, messageBody) {
     body: new URLSearchParams({
       From: TWILIO_FROM_NUMBER,
       To: toNumber,
-      Body: messageBody,
+      Body: appendSmsOptOut(messageBody),
     }).toString(),
   });
 
@@ -219,7 +220,7 @@ Deno.serve(async (req) => {
       `Hi ${customer_name.split(" ")[0]}, we'd love your feedback! Share your experience with ${business_name}: ${google_review_link}`,
       `Hey ${customer_name.split(" ")[0]}, if you enjoyed working with us, we'd appreciate a quick review: ${google_review_link}`,
     ];
-    const smsBody = smsBodies[Math.floor(Math.random() * smsBodies.length)];
+    const smsBody = appendSmsOptOut(smsBodies[Math.floor(Math.random() * smsBodies.length)]);
 
     const emailSubject = `Share Your Experience with ${business_name}`;
     const emailBody = `Hi ${customer_name},

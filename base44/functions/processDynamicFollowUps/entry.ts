@@ -10,6 +10,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 const CHANNELS = {
@@ -54,6 +55,7 @@ async function sendFollowUp(base44, lead, channel, stepNumber, templates) {
       const body = template
         .replace(/{first_name}/g, lead.first_name || "there")
         .replace(/{service_interest}/g, lead.service_interest || "our services");
+      const outboundSmsBody = appendSmsOptOut(body);
 
       // Send SMS via Twilio
       const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -71,7 +73,7 @@ async function sendFollowUp(base44, lead, channel, stepNumber, templates) {
             body: new URLSearchParams({
               To: lead.phone_number,
               From: fromNumber,
-              Body: body,
+              Body: outboundSmsBody,
             }),
           }
         );
