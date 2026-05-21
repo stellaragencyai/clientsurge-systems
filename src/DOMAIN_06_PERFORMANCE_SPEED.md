@@ -1,12 +1,12 @@
 # DOMAIN 06 - Speed & Performance
 > **Business Area:** Bundle size, lazy loading, image optimization, caching, PWA, Lighthouse scores
-> **~12 tasks** | Last updated: 2026-05-21
+> **~16 tasks** | Last updated: 2026-05-21
 > **Agents who touch this:** Agent A (frontend), Agent B (backend caching)
 
 ---
 
-## DOMAIN HEALTH: 75% Ready (9/12 done, 0 critical open, 0 hard-blocked)
-> **Fastest win:** #116 - getBookedDemoSlots date filter (~20 min, no deps) - Agent B
+## DOMAIN HEALTH: 69% Ready (11/16 done, 0 critical open, 0 hard-blocked)
+> **Fastest win:** #64 - add optimized Unsplash params + srcSet to hero/industry images (~45 min) - Agent A
 > **No critical blockers** - all tasks independent, good domain to batch with other work
 
 ---
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 0 - no critical tasks in this domain |
-| Fastest Win (< 30 min, no deps) | #116 - getBookedDemoSlots date filter (~20 min) |
+| Fastest Win | #64 - optimized Unsplash params + srcSet (~45 min) |
 | Longest Blocked Chain | None - all tasks independent |
-| Done This Week | 9 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10) |
-| Est. Hours to Domain Complete | ~5.5 hrs |
+| Done This Week | 11 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10, #62, #116) |
+| Est. Hours to Domain Complete | ~4.5 hrs |
 
 ---
 
@@ -26,7 +26,6 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 116 | Pending | getBookedDemoSlots: add {scheduled_date: selectedDate} filter (don't fetch all) | B | - | - | - | ~20 min |
 | 160 | Pending | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | B | - | - | - | ~1 hr |
 | 241 | Pending | Final: run Lighthouse audit - target 90+ performance score | A | - | ALL sign-off | - | ~1 hr |
 | 246 | Pending | Final: verify admin panel loads in < 3 seconds with 100+ leads | C | - | ALL sign-off | - | ~30 min |
@@ -48,7 +47,6 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 62 | Pending | Add manifest.json + minimal service worker for PWA installability | A | - | - | - | ~1 hr |
 
 ---
 
@@ -65,3 +63,5 @@
 | 63 | Move all Recharts imports inside lazy() components - audit AdminDashboard/Portal | Morpheus | 2026-05-21 | Lazy-loaded chart-heavy AdminDashboard tabs and ClientPortal performance/report panels behind Suspense skeletons |
 | 9 | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | Morpheus | 2026-05-21 | Verified all Google Font stylesheet URLs in `index.html` include `display=swap` and added test coverage |
 | 10 | Store page: intersection-observer lazy rendering for 8+ products | Morpheus | 2026-05-21 | Wired the store product grid through `LazyProductGrid` when 8+ products are visible, preserving `.store-grid` layout while deferring card rendering until viewport approach |
+| 62 | Add manifest.json + minimal service worker for PWA installability | Morpheus | 2026-05-21 | Added `public/manifest.json`, local SVG PWA icon, same-origin `public/sw.js`, and production-only service worker registration |
+| 116 | getBookedDemoSlots: add {scheduled_date: selectedDate} filter (don't fetch all) | Morpheus | 2026-05-21 | Verified `getBookedDemoSlots` queries by `scheduled_date`, active booking statuses, and a bounded result count; guarded by `tests/demoBookingSchedulerGuards.test.js` |
