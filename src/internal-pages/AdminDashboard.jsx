@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -13,7 +13,6 @@ import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipeli
 import { countWebhookErrorEvents } from '@/lib/adminUnreadCounts';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
-import AnalyticsDashboard from '../components/admin/AnalyticsDashboard';
 import CommunicationTemplates from '../components/admin/CommunicationTemplates';
 import IntegrationHealth from '../components/admin/IntegrationHealth';
 import ClientProjectsPanel from '../components/admin/ClientProjectsPanel';
@@ -21,13 +20,10 @@ import AutomationsPanel from '../components/admin/AutomationsPanel';
 import QaCustomerPanel from '../components/admin/QaCustomerPanel';
 import LeadRoutingPanel from '../components/admin/LeadRoutingPanel';
 import DripCampaignPanel from '../components/admin/DripCampaignPanel';
-import EmailCampaignPanel from '../components/admin/EmailCampaignPanel';
 import NurtureCampaignPanel from '../components/admin/NurtureCampaignPanel';
 import LeadPriorityQueue from '../components/admin/LeadPriorityQueue';
 import DynamicCadencePanel from '../components/admin/DynamicCadencePanel';
-import LeadSourceAttribution from '../components/admin/LeadSourceAttribution';
 import CampaignLibrary from '../components/admin/CampaignLibrary';
-import RevenueDashboard from '../components/admin/RevenueDashboard';
 import AdminInbox from '../components/admin/AdminInbox';
 import AdminGlobalSearch from '../components/admin/AdminGlobalSearch';
 import InstallQueuePanel from '../components/admin/InstallQueuePanel';
@@ -44,6 +40,29 @@ import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 import SniperDashboard from '../components/admin/SniperDashboard';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
+
+const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
+const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
+const LeadSourceAttribution = lazy(() => import('../components/admin/LeadSourceAttribution'));
+const RevenueDashboard = lazy(() => import('../components/admin/RevenueDashboard'));
+
+function AdminPanelSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="h-8 w-48 rounded bg-muted" />
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="h-28 rounded-xl border border-border bg-muted/40" />
+        <div className="h-28 rounded-xl border border-border bg-muted/40" />
+        <div className="h-28 rounded-xl border border-border bg-muted/40" />
+      </div>
+      <div className="h-72 rounded-xl border border-border bg-muted/30" />
+    </div>
+  );
+}
+
+function LazyAdminPanel({ children }) {
+  return <Suspense fallback={<AdminPanelSkeleton />}>{children}</Suspense>;
+}
 
 const NAV_GROUPS = [
   {
@@ -194,19 +213,19 @@ export default function AdminDashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case 'leads': return <LeadManagementDashboard />;
-      case 'analytics': return <AnalyticsDashboard />;
+      case 'analytics': return <LazyAdminPanel><AnalyticsDashboard /></LazyAdminPanel>;
       case 'templates': return <CommunicationTemplates />;
       case 'health': return <IntegrationHealth />;
       case 'client-projects': return <ClientProjectsPanel />;
       case 'automations': return <AutomationsPanel />;
       case 'drip': return <DripCampaignPanel />;
       case 'nurture': return <NurtureCampaignPanel />;
-      case 'email-campaigns': return <EmailCampaignPanel />;
+      case 'email-campaigns': return <LazyAdminPanel><EmailCampaignPanel /></LazyAdminPanel>;
       case 'routing': return <LeadRoutingPanel />;
       case 'priority': return <LeadPriorityQueue />;
-      case 'attribution': return <LeadSourceAttribution />;
+      case 'attribution': return <LazyAdminPanel><LeadSourceAttribution /></LazyAdminPanel>;
       case 'campaign-builder': return <CampaignLibrary />;
-      case 'revenue': return <RevenueDashboard />;
+      case 'revenue': return <LazyAdminPanel><RevenueDashboard /></LazyAdminPanel>;
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
       case 'install-checklists': return <AutomationInstallChecklist />;

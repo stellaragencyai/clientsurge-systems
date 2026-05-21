@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { LogOut, LayoutDashboard } from "lucide-react";
 import SetupProgressHub from "../components/portal/SetupProgressHub";
@@ -16,14 +16,33 @@ import BillingDashboard from "../components/portal/BillingDashboard";
 import ReferABusiness from "../components/portal/ReferABusiness";
 import PortalSettings from "../components/portal/PortalSettings";
 import TasksDashboard from "../components/portal/TasksDashboard";
-import WeeklyReports from "../components/portal/WeeklyReports";
 import AutomationsOverview from "../components/portal/AutomationsOverview";
-import RevenueMetricsPanel from "../components/portal/RevenueMetricsPanel";
 import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalTimeline from "../components/portal/PortalTimeline";
 import SystemStatusBadge from "../components/portal/SystemStatusBadge";
+
+const RevenueMetricsPanel = lazy(() => import("../components/portal/RevenueMetricsPanel"));
+const WeeklyReports = lazy(() => import("../components/portal/WeeklyReports"));
+
+function PortalPanelSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="h-7 w-48 rounded bg-muted" />
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="h-24 rounded-xl border border-border bg-muted/40" />
+        <div className="h-24 rounded-xl border border-border bg-muted/40" />
+        <div className="h-24 rounded-xl border border-border bg-muted/40" />
+      </div>
+      <div className="h-64 rounded-xl border border-border bg-muted/30" />
+    </div>
+  );
+}
+
+function LazyPortalPanel({ children }) {
+  return <Suspense fallback={<PortalPanelSkeleton />}>{children}</Suspense>;
+}
 
 const TABS = [
   { id: "progress", label: "🚀 Setup Progress" },
@@ -282,7 +301,9 @@ export default function ClientPortal() {
               <h2 className="text-2xl font-bold text-foreground mb-2">Revenue & Automations</h2>
               <p className="text-muted-foreground">Track your system performance, active automations, and revenue impact.</p>
             </div>
-            <RevenueMetricsPanel />
+            <LazyPortalPanel>
+              <RevenueMetricsPanel />
+            </LazyPortalPanel>
             <div className="border-t border-border pt-8">
               <h3 className="text-xl font-bold text-foreground mb-4">Active Automations</h3>
               <AutomationsOverview />
@@ -330,7 +351,9 @@ export default function ClientPortal() {
           <PlanManager project={project} subscription={subscription} onUpdated={refreshProject} />
         )}
         {activeTab === "reports" && (
-          <WeeklyReports project={project} />
+          <LazyPortalPanel>
+            <WeeklyReports project={project} />
+          </LazyPortalPanel>
         )}
         {activeTab === "settings" && (
           <PortalSettings project={project} user={user} onUpdated={refreshProject} />
