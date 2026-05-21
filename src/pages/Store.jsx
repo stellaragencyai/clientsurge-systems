@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ShoppingCart, Search, LayoutGrid, Clock, BadgeCheck } from "lucide-react";
+import { ShoppingCart, Search, LayoutGrid, Clock, BadgeCheck, MessageCircle } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
 import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
@@ -37,6 +37,62 @@ function StoreSuspenseFallback({ minHeight = 240 }) {
         border: "1px solid rgba(0,136,204,0.12)"
       }}
     />
+  );
+}
+
+function StoreHumanFallbackCTA() {
+  return (
+    <section
+      aria-label="Talk to a human"
+      className="store-human-fallback"
+      style={{
+        margin: "28px 0 8px",
+        borderRadius: "24px",
+        border: "1px solid rgba(0,136,204,0.16)",
+        background: "linear-gradient(135deg, rgba(0,174,239,0.08), rgba(255,255,255,0.92))",
+        padding: "22px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: "18px",
+        flexWrap: "wrap",
+        boxShadow: "0 12px 32px rgba(0, 88, 132, 0.08)"
+      }}
+    >
+      <div style={{ maxWidth: "620px" }}>
+        <p style={{ fontSize: "13px", color: "rgba(27,20,13,0.55)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 6px" }}>
+          Not sure what to pick?
+        </p>
+        <p style={{ fontSize: "17px", color: "#1b140d", fontWeight: 800, margin: "0 0 4px" }}>
+          Talk to a human before building your stack.
+        </p>
+        <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.62)", margin: 0, lineHeight: 1.6 }}>
+          We will map the fastest path for your business and tell you which services are worth buying now.
+        </p>
+      </div>
+      <a
+        href="/book"
+        className="store-human-fallback__cta"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "8px",
+          minHeight: "48px",
+          borderRadius: "999px",
+          background: "linear-gradient(135deg, #0088CC, #00AEEF)",
+          color: "#ffffff",
+          fontWeight: 800,
+          fontSize: "14px",
+          padding: "0 22px",
+          textDecoration: "none",
+          boxShadow: "0 8px 20px rgba(0,174,239,0.28)"
+        }}
+      >
+        <MessageCircle style={{ width: "18px", height: "18px" }} aria-hidden="true" />
+        Talk to a Human
+      </a>
+    </section>
   );
 }
 
@@ -694,6 +750,8 @@ function StoreInner() {
               </div> :
             null}
 
+            <StoreHumanFallbackCTA />
+
             {items.length > 0 ?
             <Suspense fallback={<StoreSuspenseFallback minHeight={320} />}>
                 <InteractiveStackBuilder />
@@ -706,32 +764,6 @@ function StoreInner() {
             <BundleSavingsToast />
           </Suspense>
            <CartSidebar />
-           {/* S25: Talk to a Human — escape valve for overwhelmed visitors */}
-           <div style={{
-            background: "linear-gradient(135deg, rgba(0,174,239,0.06), rgba(0,136,204,0.03))",
-            borderTop: "1px solid rgba(0,174,239,0.12)",
-            padding: "28px 24px",
-            textAlign: "center"
-          }}>
-             <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.6)", margin: "0 0 12px" }}>
-               Not sure what your business needs?
-             </p>
-             <a
-              href="/book"
-              style={{
-                display: "inline-flex", alignItems: "center", gap: "6px",
-                background: "linear-gradient(135deg, #0088CC, #00AEEF)",
-                color: "#ffffff", fontWeight: "700", fontSize: "13px",
-                padding: "10px 22px", borderRadius: "999px", textDecoration: "none",
-                boxShadow: "0 4px 14px rgba(0,174,239,0.35)"
-              }}>
-              
-               📞 Make the Leap: free 15-min strategy call
-             </a>
-             <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.35)", marginTop: "10px" }}>
-               We'll tell you exactly which services will move the needle for your business.
-             </p>
-           </div>
            <Footer />
            <Suspense fallback={<StoreSuspenseFallback minHeight={96} />}>
              <SocialProofTicker />

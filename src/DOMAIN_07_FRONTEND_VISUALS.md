@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 57% Ready (20/35 done · 0 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** #45 — Store page human fallback CTA (~20 min, no deps) · Agent A
+## 📊 DOMAIN HEALTH: 🟡 60% Ready (21/35 done · 0 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** M03 — iOS scroll lock test pass (~30 min, no deps) · Agent A
 > ⚠️ **Critical:** none currently open
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 20 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,76,77 + M01,M02,M05,M06,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| ✅ Done This Week | 21 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,45,76,77 + M01,M02,M05,M06,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | #45 (Store human CTA), M03 (iOS scroll lock), M07 (iPad nav), M10 (modal scroll), #51 (Book iframe mobile sizing) |
+| 📱 Next 5 Priority Tasks | M03 (iOS scroll lock), M07 (iPad nav), M10 (modal scroll), #51 (Book iframe mobile sizing), #42 (Store mobile cart font) |
 
 ---
 
@@ -68,7 +68,7 @@
 | 41 | ⏳ | Store page initial load: show 6 ProductCard skeletons for 300ms then reveal | A | — | — | — | ~45 min |
 | 42 | ⏳ | Store ProductCard on mobile (375px): reduce "Add to Cart" font to 10px | A | — | — | 🧵 Mobile-UX | ~10 min |
 | 44 | ⏳ | Mobile sticky cart bar: add circular badge with items.length count | A | — | — | 🧵 Mobile-UX | ~15 min |
-| 45 | ⏳ | Store page: add "Talk to a Human" escape valve CTA below product grid | A | — | — | 🧵 CTA-Standards | ~20 min |
+| 45 | ✅ | Store page: add "Talk to a Human" escape valve CTA below product grid | Morpheus | — | — | 🧵 CTA-Standards | Done |
 | 49 | ⏳ | Store: Guided mode no industry → show all non-coming-soon products | A | — | — | — | ~30 min |
 | 52 | ⏳ | MobileCallBar: pull phone number from AdminSettings instead of hardcoding | A | — | — | 🧵 Mobile-UX | ~30 min |
 | 54 | ⏳ | DemoBookingModal step 2: set min-height:48px on date/time inputs | A | — | — | 🧵 Mobile-UX | ~10 min |
@@ -143,3 +143,4 @@
 | 77 | Portal graceful empty state — no nav errors on null project | Agent A | 2026-05-03 | Added null-guards and empty state UI in `ClientPortal.jsx` when `project === null` |
 | 76 | Stripe frontend secret exposure audit | Morpheus | 2026-05-21 | Added `tests/frontendSecretExposure.test.js` to scan frontend source/public assets for real Stripe/server-side secret key formats and verified no `sk_live_` exposure in frontend code |
 | 53 | iOS form input zoom audit | Morpheus | 2026-05-21 | Added a mobile global form-control font-size guard in `src/index.css` and `tests/iosInputZoomGuard.test.js` so text, date, time, URL, textarea, and select controls stay at 16px on mobile Safari |
+| 45 | Store human fallback CTA | Morpheus | 2026-05-21 | Moved the store escape-valve CTA directly below the product grid with a clear Talk to a Human path to `/book` and regression coverage |
