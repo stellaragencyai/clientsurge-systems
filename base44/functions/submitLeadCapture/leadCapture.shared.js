@@ -19,6 +19,8 @@ export const DISPOSABLE_DOMAINS = new Set([
 ]);
 
 export const SIXTY_MINUTES = 60 * 60 * 1000;
+export const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
+export const RATE_LIMIT_MAX = 3;
 
 export function cleanString(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -50,4 +52,32 @@ export function findDuplicateWebsiteLead({ leads, email, phone, nowMs = Date.now
     const matchesPhone = phone && normalizePhone(lead.phone_number) === phone;
     return (matchesEmail || matchesPhone) && lead.created_date >= since;
   }) || null;
+}
+
+export function createLeadCaptureRateLimiter({
+  max = RATE_LIMIT_MAX,
+  windowMs = RATE_LIMIT_WINDOW_MS,
+  now = () => Date.now(),
+  store = new Map(),
+} = {}) {
+  return {
+    isRateLimited(ip) {
+      const key = cleanString(ip) || "unknown";
+      const currentTime = now();
+      const entry = store.get(key);
+
+      if (!entry || currentTime - entry.windowStart > windowMs) {
+        store.set(key, { count: 1, windowStart: currentTime });
+        return false;
+      }
+
+      if (entry.count >= max) {
+        return true;
+      }
+
+      entry.count += 1;
+      return false;
+    },
+    store,
+  };
 }

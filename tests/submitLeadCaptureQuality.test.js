@@ -2,10 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  createLeadCaptureRateLimiter,
   findDuplicateWebsiteLead,
   isDisposableEmail,
   normalizeEmail,
   normalizePhone,
+  RATE_LIMIT_MAX,
+  RATE_LIMIT_WINDOW_MS,
   SIXTY_MINUTES,
 } from "../base44/functions/submitLeadCapture/leadCapture.shared.js";
 
@@ -66,4 +69,34 @@ test("submitLeadCapture blocks disposable email domains after normalization", ()
   assert.equal(normalizeEmail("  PERSON@Mailinator.com "), "person@mailinator.com");
   assert.equal(isDisposableEmail("PERSON@Mailinator.com"), true);
   assert.equal(isDisposableEmail("person@realbusiness.com"), false);
+});
+
+test("submitLeadCapture rate limits after 3 submissions per IP per hour", () => {
+  let now = NOW;
+  const limiter = createLeadCaptureRateLimiter({ now: () => now });
+  const ip = "203.0.113.42";
+
+  for (let attempt = 0; attempt < RATE_LIMIT_MAX; attempt += 1) {
+    assert.equal(limiter.isRateLimited(ip), false);
+  }
+
+  assert.equal(limiter.isRateLimited(ip), true);
+
+  now += RATE_LIMIT_WINDOW_MS + 1;
+  assert.equal(limiter.isRateLimited(ip), false);
+});
+
+test("submitLeadCapture rate limiting is scoped per normalized IP", () => {
+  const limiter = createLeadCaptureRateLimiter({ now: () => NOW });
+
+  for (let attempt = 0; attempt < RATE_LIMIT_MAX; attempt += 1) {
+    assert.equal(limiter.isRateLimited("203.0.113.42"), false);
+  }
+
+  assert.equal(limiter.isRateLimited("203.0.113.42"), true);
+  assert.equal(limiter.isRateLimited("198.51.100.10"), false);
+  assert.equal(limiter.isRateLimited("   "), false);
+  assert.equal(limiter.isRateLimited("unknown"), false);
+  assert.equal(limiter.isRateLimited("unknown"), false);
+  assert.equal(limiter.isRateLimited("unknown"), true);
 });

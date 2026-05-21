@@ -6,15 +6,14 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import {
   buildDedupKey,
   cleanString,
+  createLeadCaptureRateLimiter,
   findDuplicateWebsiteLead,
   isDisposableEmail,
   normalizeEmail,
   normalizePhone,
 } from "./leadCapture.shared.js";
 
-const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
-const RATE_LIMIT_MAX = 3;
-const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
+const rateLimiter = createLeadCaptureRateLimiter();
 
 function normalizeRequestedChannels(value: unknown) {
   if (!Array.isArray(value)) {
@@ -114,23 +113,11 @@ function getClientIp(req: Request) {
   );
 }
 
-function isRateLimited(ip: string) {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
-    rateLimitMap.set(ip, { count: 1, windowStart: now });
-    return false;
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return true;
-  entry.count += 1;
-  return false;
-}
-
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const ip = getClientIp(req);
-    if (isRateLimited(ip)) {
+    if (rateLimiter.isRateLimited(ip)) {
       return Response.json(
         { error: "Too many submissions. Please try again later." },
         { status: 429 }
