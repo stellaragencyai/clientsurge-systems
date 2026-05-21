@@ -26,7 +26,7 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 248 | pending | Final: review all legal pages (Privacy, Terms) for TCPA compliance accuracy | C | - | ALL sign-off in MASTER | TCPA-Compliance | ~2 hrs |
+| 248 | pending legal sign-off | Final: review all legal pages (Privacy, Terms) for TCPA compliance accuracy | C | - | ALL sign-off in MASTER | TCPA-Compliance | human/legal review |
 
 ---
 
@@ -71,3 +71,11 @@
 | 151 | Add createAuditLog helper: write admin action records to AuditLog entity | Morpheus | 2026-05-21 | Verified the shared `createAuditLog` helper writes canonical AuditLog entity fields through service-role create and added regression coverage |
 | 184 | Create AuditLog viewer tab in AdminDashboard | Morpheus | 2026-05-21 | Added an Admin Dashboard Audit Log tab backed by `AuditLog.list`, with search, expandable before/after details, refresh, and CSV export |
 | 93 | Add X-Frame-Options: DENY header to all backend function responses | Morpheus | 2026-05-21 | Added `secureJson` response helper, mechanically replaced raw backend `Response.json` calls, covered non-JSON responses with `X-Frame-Options: DENY`, and added regression tests preventing raw `Response.json` from returning |
+
+---
+
+## FINAL SIGN-OFF NOTES
+
+- #248 product/compliance draft review is documented in `docs/LEGAL_TCPA_REVIEW_2026-05-21.md`.
+- Legal copy was tightened for explicit SMS opt-in, consent-not-a-condition language, consent record disclosure, and client responsibility for their own customer consent.
+- This is not final legal advice or attorney approval; Nolan/legal counsel still needs to sign off before launch.
