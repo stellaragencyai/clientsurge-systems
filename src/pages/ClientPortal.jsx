@@ -36,7 +36,7 @@ const TABS = [
   { id: "deadlines", label: "Deadlines" },
   { id: "files", label: "Files & Docs" },
   { id: "billing", label: "Billing" },
-  { id: "refer", label: "Refer a Business" },
+  { id: "referrals", label: "Referrals" },
   { id: "support", label: "Support & Messaging" },
   { id: "plan", label: "My Plan" },
   { id: "reports", label: "Weekly Report" },
@@ -317,7 +317,7 @@ export default function ClientPortal() {
         {activeTab === "billing" && (
           <BillingDashboard project={project} order={portalOrder} subscription={subscription} onSubscriptionChanged={refreshProject} />
         )}
-        {activeTab === "refer" && (
+        {activeTab === "referrals" && (
           <ReferABusiness
             order_id={portalOrder?.id || project?.id || user?.email}
             client_name={project?.client_name || project?.business_name || user?.full_name || user?.email}

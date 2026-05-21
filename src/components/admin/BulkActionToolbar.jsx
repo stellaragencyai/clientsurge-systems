@@ -11,6 +11,7 @@ import {
   Download, Phone, BookOpen, BrainCircuit
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { buildLeadsCsv, downloadCsvFile } from "@/lib/leadCsvExport";
 
 const STATUSES = ["New", "Contacted", "Replied", "Qualified", "Booking Prompt Sent", "Booked", "Closed"];
 
@@ -234,23 +235,10 @@ export default function BulkActionToolbar({ selectedIds, leads = [], onClearSele
       : [];
     if (exportLeads.length === 0) return;
 
-    const fields = ["full_name", "business_name", "email", "phone", "status", "lead_score", "source", "intake_type", "last_contacted_at", "next_follow_up_at", "created_date"];
-    const header = fields.join(",");
-    const rows = exportLeads.map(l =>
-      fields.map(f => {
-        const val = l[f] ?? "";
-        const str = String(val).replace(/"/g, '""');
-        return str.includes(",") || str.includes('"') || str.includes("\n") ? `"${str}"` : str;
-      }).join(",")
-    );
-    const csv = [header, ...rows].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `leads_export_${new Date().toISOString().split("T")[0]}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCsvFile({
+      csv: buildLeadsCsv(exportLeads),
+      filename: `leads_export_${new Date().toISOString().split("T")[0]}.csv`,
+    });
   };
 
   if (count === 0) return null;

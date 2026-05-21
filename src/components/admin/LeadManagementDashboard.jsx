@@ -24,6 +24,7 @@ import {
   previewLeadImport,
   triggerLeadScoring,
 } from "@/lib/leadPipelineApi";
+import { buildLeadsCsv, downloadCsvFile } from "@/lib/leadCsvExport";
 import LeadCRMDrawer from "./LeadCRMDrawer";
 import LeadScoreBadge from "./LeadScoreBadge";
 import BulkActionToolbar from "./BulkActionToolbar";
@@ -342,6 +343,16 @@ export default function LeadManagementDashboard() {
   };
 
   const clearSelection = () => setSelectedIds(new Set());
+  const handleExportVisibleLeads = () => {
+    if (!leads.length) {
+      return;
+    }
+
+    downloadCsvFile({
+      csv: buildLeadsCsv(leads),
+      filename: `admin-leads-${new Date().toISOString().split("T")[0]}.csv`,
+    });
+  };
   const activationQueue = snapshot.summary.priority_queue || [];
   const activationSegments = snapshot.summary.activation_segments || [];
   const offerMix = snapshot.summary.recommended_offer_counts || {};
@@ -378,6 +389,15 @@ export default function LeadManagementDashboard() {
           >
             {scoringLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Gauge className="h-4 w-4" />}
             Score Leads
+          </button>
+          <button
+            onClick={handleExportVisibleLeads}
+            disabled={loading || leads.length === 0}
+            className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
+            title="Export the currently loaded filtered lead queue to CSV"
+          >
+            <Download className="h-4 w-4" />
+            Export CSV
           </button>
           <button
             onClick={() => setImportOpen((current) => !current)}
