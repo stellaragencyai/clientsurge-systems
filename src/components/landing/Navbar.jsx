@@ -171,7 +171,7 @@ export default function Navbar() {
           />
         </button>
 
-        <div className="hidden lg:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
+        <div className="hidden xl:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
           {sectionLinks.map((link) =>
           link.isPage ?
           <a
@@ -255,7 +255,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
+        <div className="hidden xl:flex items-center gap-3 shrink-0">
           <button
             onClick={() => {
               trackCTA("login", "navbar");
@@ -280,7 +280,7 @@ export default function Navbar() {
         </div>
 
         <button
-          className="lg:hidden w-10 h-10 rounded-full border bg-background/90 backdrop-blur flex items-center justify-center text-foreground shadow-sm"
+          className="xl:hidden w-10 h-10 rounded-full border bg-background/90 backdrop-blur flex items-center justify-center text-foreground shadow-sm"
           onClick={() => setOpen(!open)}
           style={{ borderColor: "rgba(200,150,92,0.2)" }}
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
@@ -292,8 +292,8 @@ export default function Navbar() {
 
       {open &&
       <>
-          <div className="fixed inset-0 z-40 lg:hidden" aria-hidden="true" onClick={() => setOpen(false)} />
-        <div className="lg:hidden bg-background border-b border-border px-5 pb-safe-bottom pb-6 pt-2 space-y-1 relative z-50" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
+          <div className="fixed inset-0 z-40 xl:hidden" aria-hidden="true" onClick={() => setOpen(false)} />
+        <div className="xl:hidden bg-background border-b border-border px-5 pb-safe-bottom pb-6 pt-2 space-y-1 relative z-50" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
           {sectionLinks.map((link) =>
           link.isPage ?
           <a

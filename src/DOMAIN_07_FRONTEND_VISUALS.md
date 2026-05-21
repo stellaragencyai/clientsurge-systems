@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 63% Ready (22/35 done · 0 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** M07 — iPad landscape navbar audit (~20 min, no deps) · Agent A
+## 📊 DOMAIN HEALTH: 🟡 66% Ready (23/35 done · 0 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** #51 — Book Calendly iframe mobile sizing (~20 min, no deps) · Agent A
 > ⚠️ **Critical:** none currently open
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 22 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,45,76,77 + M01,M02,M03,M05,M06,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| ✅ Done This Week | 23 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,45,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | M07 (iPad nav), M10 (modal scroll), #51 (Book iframe mobile sizing), #42 (Store mobile cart font), M12 (Store mobile grid) |
+| 📱 Next 5 Priority Tasks | #51 (Book iframe mobile sizing), M10 (modal scroll), #42 (Store mobile cart font), M12 (Store mobile grid), M13 (Hero CTA touch targets) |
 
 ---
 
@@ -90,7 +90,7 @@
 | M04 | ⏳ | iPhone 12 (375px): audit Hero headline — ensure `clamp()` font doesn't overflow or wrap awkwardly at 375px | A | iPhone 12 | 🧵 Mobile-UX | ~20 min |
 | M05 | ✅ | iPhone 17 Pro Max (430px): MobileCallBar safe-area bottom padding — `.safe-area-bottom-bar` class + inline style applied | A | iPhone 17 Pro Max | 🧵 Mobile-UX | ~15 min |
 | M06 | ✅ | iPad (768px / 1024px): pricing cards grid — `.pricing-cards-grid` class + CSS 2-col override at 768–1023px | A | iPad | 🧵 Mobile-UX | ~20 min |
-| M07 | ⏳ | iPad landscape (1024px): Navbar desktop links too cramped — audit at 1024px breakpoint | A | iPad landscape | 🧵 Mobile-UX | ~20 min |
+| M07 | ✅ | iPad landscape (1024px): Navbar desktop links too cramped — audit at 1024px breakpoint | Morpheus | iPad landscape | 🧵 Mobile-UX | Done |
 | M08 | ✅ | Safari 17: `backdrop-filter` with `blur()` causes flicker on scroll — add `transform: translateZ(0)` to Navbar | A | Safari / iPhone | 🧵 Mobile-UX | ~15 min |
 | M09 | ✅ | iOS input zoom: ALL text inputs must be `font-size: 16px` min — audit DemoBookingModal (all inputs fixed with style={{ fontSize:"16px" }}) | A | All iPhone | 🧵 Mobile-UX | ~30 min |
 | M10 | ⏳ | iPhone 12/15: DemoBookingModal scrollable inside fixed overlay — test that form is reachable without browser chrome interfering | A | iPhone 12, 15 | 🧵 Mobile-UX | ~25 min |
@@ -145,3 +145,4 @@
 | 53 | iOS form input zoom audit | Morpheus | 2026-05-21 | Added a mobile global form-control font-size guard in `src/index.css` and `tests/iosInputZoomGuard.test.js` so text, date, time, URL, textarea, and select controls stay at 16px on mobile Safari |
 | 45 | Store human fallback CTA | Morpheus | 2026-05-21 | Moved the store escape-valve CTA directly below the product grid with a clear Talk to a Human path to `/book` and regression coverage |
 | M03 | iOS body scroll lock verification | Morpheus | 2026-05-21 | Added `tests/bodyScrollLock.test.js` to verify stacked overlay locks preserve `nav-open` and `--scroll-lock-top` until final release; removed direct Navbar class/style clearing so shared lock ownership is not bypassed |
+| M07 | iPad landscape navbar audit | Morpheus | 2026-05-21 | Shifted desktop nav links/actions from `lg` to `xl` so 1024px iPad landscape uses the compact menu instead of cramped centered desktop navigation; added regression coverage in `tests/navbarVisualPolish.test.js` |
