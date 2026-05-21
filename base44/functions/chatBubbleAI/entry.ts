@@ -1,4 +1,9 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import {
+  buildChatConversationContext,
+  hasPromptInjectionAttempt,
+  sanitizeChatMessages,
+} from './chatBubbleAI.shared.js';
 
 const SALES_PROMPT = `You are a friendly, concise sales assistant for ClientSurge Systems — a done-for-you AI lead automation agency.
 
@@ -32,7 +37,6 @@ Rules:
 const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
 const RATE_LIMIT_MAX = 15;
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
-const MAX_MESSAGE_HISTORY = 20;
 
 function getClientIp(req: Request): string {
   return (
@@ -83,13 +87,13 @@ Deno.serve(async (req) => {
     }
 
     // Prompt injection guard — strip script tags and reject obvious injection attempts
-    const sanitizedMessages = messages.map((m: any) => ({
-      ...m,
-      content: typeof m.content === "string"
-        ? m.content.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "").slice(0, 2000)
-        : "",
-    }));
-    const trimmedMessages = sanitizedMessages.slice(-MAX_MESSAGE_HISTORY);
+    if (hasPromptInjectionAttempt(messages)) {
+      return Response.json({
+        reply: "I can help with ClientSurge pricing, demos, services, or installation support, but I can't follow requests to reveal or override internal instructions.",
+      });
+    }
+
+    const trimmedMessages = sanitizeChatMessages(messages);
 
     // Determine which system prompt to use
     // If installStatus or services are passed, this is a support chat (client dashboard)
@@ -105,7 +109,10 @@ Client context:
 - Purchased services: ${serviceNames || 'Unknown'}`;
     }
 
-    const conversationContext = `${systemPrompt}\n\n${trimmedMessages.map((m: any) => `${m.role === 'user' ? 'Client' : 'Assistant'}: ${m.content}`).join('\n')}\nAssistant:`;
+    const conversationContext = buildChatConversationContext({
+      systemPrompt,
+      messages: trimmedMessages,
+    });
 
     const reply = await base44.asServiceRole.integrations.Core.InvokeLLM({
       prompt: conversationContext,
