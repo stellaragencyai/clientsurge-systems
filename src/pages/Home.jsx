@@ -4,8 +4,9 @@ import Hero from "../components/landing/Hero.jsx";
 import HomepageConversionContent from "../components/landing/HomepageConversionContent";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
+import Footer from "../components/landing/Footer";
 import { LargeSectionSkeleton, SectionSkeleton } from "../components/landing/SkeletonLoader";
-import { FAQ_ITEMS } from "../components/landing/FAQ";
+import { FAQ_ITEMS } from "../components/landing/FAQData";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
@@ -17,7 +18,6 @@ const Pricing = lazy(() => import("../components/landing/Pricing"));
 const FounderSection = lazy(() => import("../components/landing/FounderSection"));
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
-const Footer = lazy(() => import("../components/landing/Footer"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
 
 import {
@@ -121,9 +121,7 @@ export default function Home() {
           <SectionBreak />
           <FinalCTA />
         </Suspense>
-        <Suspense fallback={null}>
-          <Footer />
-        </Suspense>
+        <Footer />
         <ChatBubble />
         <CookieConsent />
       </div>
