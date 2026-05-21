@@ -41,6 +41,7 @@ export default function LeadCaptureForm() {
     monthly_leads: "",
     biggest_problem: "",
     contact_method: "",
+    consent_given: false,
     website_url: "",
   });
 
@@ -82,9 +83,9 @@ export default function LeadCaptureForm() {
         source: "website_form",
         source_page: typeof window !== "undefined" ? window.location.pathname : "/",
         requested_channels: CONTACT_METHOD_CHANNELS[formData.contact_method] || [],
-        consent_given: true,
+        consent_given: formData.consent_given === true,
         consent_source: "lead_capture_form",
-        consent_text_version: "lead_capture_form_v1",
+        consent_text_version: "lead_capture_explicit_checkbox_v1",
         website_url: formData.website_url,
       });
 
@@ -245,6 +246,22 @@ export default function LeadCaptureForm() {
                   className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
                 />
               </div>
+              <label className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
+                <input
+                  type="checkbox"
+                  checked={formData.consent_given}
+                  onChange={(e) => updateField("consent_given", e.target.checked)}
+                  required
+                  className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
+                />
+                <span>
+                  I agree to receive automated SMS and email messages from ClientSurge Systems about my inquiry.
+                  Msg &amp; data rates may apply. Reply <strong>STOP</strong> to opt out. See our{" "}
+                  <a href="/privacy-policy" className="underline hover:text-foreground">Privacy Policy</a>
+                  {" "}and{" "}
+                  <a href="/terms" className="underline hover:text-foreground">Terms</a>.
+                </span>
+              </label>
             </div>
           )}
 
