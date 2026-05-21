@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 86% Ready (30/35 done · 0 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** #52 — MobileCallBar phone source (~30 min, no deps) · Agent A
+## 📊 DOMAIN HEALTH: 🟡 89% Ready (31/35 done · 0 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** M10 — DemoBookingModal scroll reachability (~25 min, no deps) · Agent A
 > ⚠️ **Critical:** none currently open
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 30 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,44,45,49,51,55,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M12,M13,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| ✅ Done This Week | 31 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,44,45,49,51,52,55,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M12,M13,M15,M16,M17,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | #52 (MobileCallBar phone source), M10 (modal scroll), #54 (stale date/time input row), M14 (Safari portal modal check), M18 (mobile menu scroll lock) |
+| 📱 Next 5 Priority Tasks | M10 (modal scroll), #54 (stale date/time input row), M14 (Safari portal modal check), M18 (mobile menu scroll lock), M04 (Hero headline 375px) |
 
 ---
 
@@ -70,7 +70,7 @@
 | 44 | ✅ | Mobile sticky cart bar: add circular badge with items.length count | Morpheus | — | — | 🧵 Mobile-UX | Done |
 | 45 | ✅ | Store page: add "Talk to a Human" escape valve CTA below product grid | Morpheus | — | — | 🧵 CTA-Standards | Done |
 | 49 | ✅ | Store: Guided mode no industry → show all non-coming-soon products | Morpheus | — | — | — | Done |
-| 52 | ⏳ | MobileCallBar: pull phone number from AdminSettings instead of hardcoding | A | — | — | 🧵 Mobile-UX | ~30 min |
+| 52 | ✅ | MobileCallBar: pull phone number from AdminSettings instead of hardcoding | Morpheus | — | — | 🧵 Mobile-UX | Done |
 | 54 | ⏳ | DemoBookingModal step 2: set min-height:48px on date/time inputs | A | — | — | 🧵 Mobile-UX | ~10 min |
 | 73 | ⏳ | chatBubbleAI: add typing indicator ("...") while LLM processes response | A | — | — | — | ~20 min |
 | 74 | ⏳ | chatBubbleAI: add sessionStorage counter, block after 10 messages per session | A | — | — | — | ~30 min |
