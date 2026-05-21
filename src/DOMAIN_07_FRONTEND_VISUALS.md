@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 94% Ready (33/35 done · 0 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** M18 — mobile menu scroll lock (~20 min, no deps) · Agent A
+## 📊 DOMAIN HEALTH: 🟢 97% Ready (34/35 done · 0 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** M04 — Hero headline 375px audit (~20 min, no deps) · Agent A
 > ⚠️ **Critical:** none currently open
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 33 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,44,45,49,51,52,55,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M10,M11,M12,M13,M14,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| ✅ Done This Week | 34 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,44,45,49,51,52,55,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M10,M11,M12,M13,M14,M15,M16,M17,M18,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | M18 (mobile menu scroll lock), #54 (stale date/time input row), M04 (Hero headline 375px), M20 (full device pass), #15 (stale time slot grid) |
+| 📱 Next 5 Priority Tasks | M04 (Hero headline 375px), #54 (stale date/time input row), M20 (full device pass), #15 (stale time slot grid), #12 (LegalPage navbar) |
 
 ---
 
@@ -101,7 +101,7 @@
 | M15 | ✅ | iPad: Footer nav grid — `.footer-nav-grid` class + CSS 2-col override at 640–1023px | A | iPad | 🧵 Mobile-UX | ~15 min |
 | M16 | ✅ | iPhone: Pricing "Most Popular" badge overflows card top on 375px — badge needs `position: relative` fallback at mobile | A | iPhone 12, 15 | 🧵 Mobile-UX | ~15 min |
 | M17 | ✅ | iOS Safari: `<input type="date">` — `minHeight: 48px` + `fontSize: 16px` applied to date/time inputs in DemoBookingModal | A | All iPhone | 🧵 Mobile-UX | ~20 min |
-| M18 | ⏳ | iPhone: Navbar mobile menu — verify `acquireBodyScrollLock` fully prevents background page scroll on all iPhone models | A | All iPhone | 🧵 Mobile-UX | ~20 min |
+| M18 | ✅ | iPhone: Navbar mobile menu — verify `acquireBodyScrollLock` fully prevents background page scroll on all iPhone models | Morpheus | All iPhone | 🧵 Mobile-UX | Done |
 | M19 | ✅ | iPhone landscape: Hero `min-height: auto` override at `max-height: 500px + landscape` in index.css | A | iPhone 12, 15, 17 | 🧵 Mobile-UX | ~15 min |
 | M20 | ⏳ | Full device test pass: manually test on iPhone 12 (375px), iPhone 15 (393px), iPhone 17 Pro Max (430px), iPad (768px) — document any layout breaks | A | All Apple devices | 🧵 Mobile-UX | ~2 hrs |
 
