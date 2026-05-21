@@ -7,7 +7,7 @@
 import { useState, useEffect, useRef } from "react";
 
 // #10 #41: LazyProductGrid
-export function LazyProductGrid({ products = [], renderCard }) {
+export function LazyProductGrid({ products = [], renderCard, className = "" }) {
   const [visible, setVisible] = useState(false);
   const [skeletonDone, setSkeletonDone] = useState(false);
   const ref = useRef(null);
@@ -36,7 +36,7 @@ export function LazyProductGrid({ products = [], renderCard }) {
     return (
       <>
         <style>{`@keyframes skeleton-pulse{0%{background-position:200% 0}100%{background-position:-200% 0}}`}</style>
-        <div ref={ref} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 14 }}>
+        <div ref={ref} className={className}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} style={{ ...pulse, height: 220 }} />
           ))}
@@ -50,7 +50,7 @@ export function LazyProductGrid({ products = [], renderCard }) {
   }
 
   return (
-    <div ref={ref} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(240px,1fr))", gap: 14 }}>
+    <div ref={ref} className={className}>
       {products.map((p, i) => renderCard(p, i))}
     </div>
   );

@@ -10,6 +10,7 @@ import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
 import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
+import { LazyProductGrid } from "@/components/store/StorePageEnhancements";
 import { setPageMetadata } from "@/lib/seo";
 import Footer from "@/components/landing/Footer";
 
@@ -652,17 +653,28 @@ function StoreInner() {
               </div>
             </div>
 
-            <motion.div
-              className="store-grid"
-              variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
-              initial="hidden"
-              animate="visible"
-              key={activeCategory + search + pathMode}
-            >
-              {filtered.map((product) =>
-              <ProductCard key={product.product_id} product={product} />
-              )}
-            </motion.div>
+            {filtered.length >= 8 ? (
+              <LazyProductGrid
+                key={activeCategory + search + pathMode}
+                className="store-grid"
+                products={filtered}
+                renderCard={(product) => (
+                  <ProductCard key={product.product_id} product={product} />
+                )}
+              />
+            ) : (
+              <motion.div
+                className="store-grid"
+                variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+                initial="hidden"
+                animate="visible"
+                key={activeCategory + search + pathMode}
+              >
+                {filtered.map((product) =>
+                <ProductCard key={product.product_id} product={product} />
+                )}
+              </motion.div>
+            )}
 
             {filtered.length === 0 ?
             <div

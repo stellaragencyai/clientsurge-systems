@@ -5,8 +5,8 @@
 
 ---
 
-## DOMAIN HEALTH: 58% Ready (7/12 done, 0 critical open, 0 hard-blocked)
-> **Fastest win:** #9 - font-display: swap (~15 min, no deps) - Agent A
+## DOMAIN HEALTH: 75% Ready (9/12 done, 0 critical open, 0 hard-blocked)
+> **Fastest win:** #116 - getBookedDemoSlots date filter (~20 min, no deps) - Agent B
 > **No critical blockers** - all tasks independent, good domain to batch with other work
 
 ---
@@ -17,8 +17,8 @@
 | Unblocked Critical | 0 - no critical tasks in this domain |
 | Fastest Win (< 30 min, no deps) | #116 - getBookedDemoSlots date filter (~20 min) |
 | Longest Blocked Chain | None - all tasks independent |
-| Done This Week | 7 tasks (#6, #7, #65, #66, #24, #8, #63) |
-| Est. Hours to Domain Complete | ~7 hrs |
+| Done This Week | 9 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10) |
+| Est. Hours to Domain Complete | ~5.5 hrs |
 
 ---
 
@@ -37,7 +37,6 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 10 | Pending | Store page: intersection-observer lazy rendering for 8+ products | A | - | - | - | ~45 min |
 | 64 | Pending | Add ?w=800&q=80 Unsplash query params + srcSet to all hero/industry images | A | - | - | - | ~45 min |
 | 114 | Pending | All Resend fetch calls: add retry once on 429/5xx with 2-second delay | B | - | - | - | ~45 min |
 | 153 | Pending | Add Cache-Control: public, max-age=60 to read-only functions | B | - | - | - | ~30 min |
@@ -49,7 +48,6 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 9 | Pending | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | A | - | - | - | ~15 min |
 | 62 | Pending | Add manifest.json + minimal service worker for PWA installability | A | - | - | - | ~1 hr |
 
 ---
@@ -65,3 +63,5 @@
 | 24 | staleTime: 60_000 and retry: 1 in lib/query-client.js | Agent A | 2026-05-03 | Updated `lib/query-client.js` defaultOptions |
 | 8 | Split recharts/framer-motion into separate Vite chunks via manualChunks | Morpheus | 2026-05-21 | Verified `vite.config.js` keeps `vendor-framer`, `vendor-charts`, and `vendor-lucide` manual chunks; removed the empty forced Stripe bundle |
 | 63 | Move all Recharts imports inside lazy() components - audit AdminDashboard/Portal | Morpheus | 2026-05-21 | Lazy-loaded chart-heavy AdminDashboard tabs and ClientPortal performance/report panels behind Suspense skeletons |
+| 9 | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | Morpheus | 2026-05-21 | Verified all Google Font stylesheet URLs in `index.html` include `display=swap` and added test coverage |
+| 10 | Store page: intersection-observer lazy rendering for 8+ products | Morpheus | 2026-05-21 | Wired the store product grid through `LazyProductGrid` when 8+ products are visible, preserving `.store-grid` layout while deferring card rendering until viewport approach |

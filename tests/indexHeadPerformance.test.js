@@ -27,6 +27,7 @@ test("index head loads only the approved Google Font subsets", () => {
   assert.equal(fontUrls.filter((url) => url.includes("family=Playfair+Display:wght@400;600")).length, 2);
   assert.equal(fontUrls.filter((url) => url.includes("family=Bebas+Neue")).length, 2);
   assert.equal(fontUrls.filter((url) => url.includes("family=Montserrat:wght@700;800;900")).length, 2);
+  assert.ok(fontUrls.every((url) => url.includes("display=swap")));
   assert.ok(fontUrls.every((url) => !url.includes("ital")));
   assert.ok(fontUrls.every((url) => !url.includes("font-display")));
 });
