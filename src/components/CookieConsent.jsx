@@ -4,6 +4,7 @@
  * Key: "cs_cookie_consent" | Value: "accepted" | "declined"
  */
 import { useState, useEffect } from "react";
+import { updateGa4Consent } from "@/lib/ga4";
 
 const STORAGE_KEY = "cs_cookie_consent";
 
@@ -18,15 +19,13 @@ export default function CookieConsent() {
   const accept = () => {
     localStorage.setItem(STORAGE_KEY, "accepted");
     setVisible(false);
-    // Fire GA consent if available
-    if (typeof window.gtag === "function") {
-      window.gtag("consent", "update", { analytics_storage: "granted", ad_storage: "granted" });
-    }
+    updateGa4Consent(true);
   };
 
   const decline = () => {
     localStorage.setItem(STORAGE_KEY, "declined");
     setVisible(false);
+    updateGa4Consent(false);
   };
 
   if (!visible) return null;

@@ -26,6 +26,7 @@ For pre-launch QA, use `docs/STAGING_ENVIRONMENT.md` and the Base44 test databas
 | `RETELL_API_KEY` | triggerOutboundCall | Retell AI voice agent key |
 | `ELEVENLABS_API_KEY` | voice clone generation | ElevenLabs API key |
 | `APOLLO_API_KEY` | Apollo lead enrichment | Apollo.io API key |
+| `VITE_GA4_MEASUREMENT_ID` | frontend analytics bootstrap | Public GA4 web stream measurement ID (`G-...`); not a secret |
 
 ## Notes
 - Never commit secret keys to source control

@@ -16,6 +16,7 @@ import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PageNotFound from "./lib/PageNotFound";
+import { installGa4 } from "@/lib/ga4";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
 import { scrollToTop } from "@/lib/scroll";
 import { setPageMetadata } from "@/lib/seo";
@@ -204,6 +205,7 @@ function AppInner() {
   useEffect(() => {
     // Initialize auto-tracking after React mounts — safe for SSR/pre-render
     if (typeof window !== "undefined") {
+      installGa4();
       initializeAnalyticsObserver();
     }
   }, []);
@@ -453,6 +455,7 @@ function App() {
               Skip to content
             </a>
             <ScrollToTop />
+            <AppInner />
             <AutoCTAAnalytics />
             <RouteIndexingGuard />
             <main id="main-content" tabIndex={-1}>

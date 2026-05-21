@@ -45,6 +45,12 @@ Never commit real secret values to source control.
 | `AUTOMATION_SHARED_SECRET` | Shared secret for internal automation calls | Random 32-char string |
 | `ELEVENLABS_API_KEY` | ElevenLabs voice API key (if used) | From ElevenLabs dashboard |
 
+### Client-side Analytics
+
+| Variable | Description | Example Value |
+|---|---|---|
+| `VITE_GA4_MEASUREMENT_ID` | Public GA4 measurement ID loaded by the frontend analytics bootstrap. This is not a secret, but it must be the real production GA4 web stream ID before launch. | `G-XXXXXXXXXX` |
+
 ---
 
 ## Switching to Live Mode
@@ -76,6 +82,7 @@ RESEND_API_KEY=re_...
 RESEND_FROM_EMAIL=test@yourdomain.com
 APP_URL=http://localhost:5173
 ADMIN_EMAIL=you@youremail.com
+VITE_GA4_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 
 `APP_URL=http://localhost:5173` is local development only. Do not use localhost values in Base44 production environment variables.

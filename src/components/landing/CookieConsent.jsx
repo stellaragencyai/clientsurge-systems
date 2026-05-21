@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { updateGa4Consent } from '@/lib/ga4';
 
 function safeGetCookieConsent() {
   try {
@@ -28,16 +29,19 @@ export default function CookieConsent() {
   const handleAccept = () => {
     safeSetCookieConsent('accepted');
     setVisible(false);
+    updateGa4Consent(true);
   };
 
   const handleDecline = () => {
     safeSetCookieConsent('declined');
     setVisible(false);
+    updateGa4Consent(false);
   };
 
   const handleDismiss = () => {
     safeSetCookieConsent('dismissed');
     setVisible(false);
+    updateGa4Consent(false);
   };
 
   if (!visible) return null;
