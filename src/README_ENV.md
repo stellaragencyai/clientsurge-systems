@@ -44,6 +44,7 @@ Never commit real secret values to source control.
 | `DEFAULT_BUSINESS_NAME` | Fallback business name in templates | `ClientSurge Systems` |
 | `AUTOMATION_SHARED_SECRET` | Shared secret for internal automation calls | Random 32-char string |
 | `ELEVENLABS_API_KEY` | ElevenLabs voice API key (if used) | From ElevenLabs dashboard |
+| `GOOGLE_MAPS_API_KEY` | Server-side Google Maps/Places API key for `discoverLeads`. If missing, lead discovery returns a clear 503 instead of silently failing. | Google Cloud Console |
 
 ### Client-side Analytics
 
