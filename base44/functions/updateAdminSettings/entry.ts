@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { saveAdminSettings } from "../_shared/adminSettings.js";
 
 Deno.serve(async (req) => {
   try {
@@ -13,18 +14,8 @@ Deno.serve(async (req) => {
     }
 
     const payload = await req.json().catch(() => ({}));
-    const patch = payload?.settings || {};
-
-    // Load current settings record
-    const records = await base44.asServiceRole.entities.AdminSettings.list(null, 1);
-    const existing = records?.[0];
-
-    let settings;
-    if (existing) {
-      settings = await base44.asServiceRole.entities.AdminSettings.update(existing.id, patch);
-    } else {
-      settings = await base44.asServiceRole.entities.AdminSettings.create(patch);
-    }
+    const patch = payload?.settings || payload || {};
+    const settings = await saveAdminSettings({ base44, actor: user, patch });
 
     return Response.json({ success: true, settings });
   } catch (error) {

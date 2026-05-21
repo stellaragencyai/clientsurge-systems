@@ -8,6 +8,7 @@ import { fetchAdminSettings, getAdminSettingsError, saveAdminSettings } from '@/
 
 const TABS = [
   { id: "channels", label: "Channels" },
+  { id: "security", label: "Security" },
   { id: "instant", label: "Instant Response" },
   { id: "followup", label: "Follow-Up SMS" },
   { id: "nurture", label: "Nurture Emails" },
@@ -75,6 +76,16 @@ export default function AdminSettingsPanel() {
   const set = (field, value) => {
     setSettings(prev => ({ ...prev, [field]: value }));
     setSaved(false);
+  };
+
+  const setAllowedAdminIps = (value) => {
+    set(
+      'allowed_admin_ips',
+      value
+        .split(/[\n,]/)
+        .map(ip => ip.trim())
+        .filter(Boolean)
+    );
   };
 
   const handleSave = async () => {
@@ -185,6 +196,30 @@ export default function AdminSettingsPanel() {
               </div>
               <Field label="WhatsApp From Number" helper={'Must include "whatsapp:" prefix'}>
                 <TextInput value={settings.whatsapp_from_number} onChange={v => set('whatsapp_from_number', v)} placeholder="whatsapp:+14155238886" />
+              </Field>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "security" && (
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl border border-border p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Key className="w-5 h-5 text-primary" />
+              <h3 className="text-lg font-semibold text-foreground">Admin Access Controls</h3>
+            </div>
+            <div className="space-y-4">
+              <Field
+                label="Allowed Admin IPs"
+                helper="Optional allowlist for admin access controls. Enter one IP per line or comma-separated. Leave empty to keep IP allowlisting disabled."
+              >
+                <TextArea
+                  value={(settings.allowed_admin_ips || []).join('\n')}
+                  onChange={setAllowedAdminIps}
+                  placeholder={"203.0.113.10\n198.51.100.25"}
+                  rows={4}
+                />
               </Field>
             </div>
           </div>

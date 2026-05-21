@@ -71,6 +71,15 @@
       "type": "string",
       "title": "Webhook URL"
     },
+    "allowed_admin_ips": {
+      "type": "array",
+      "title": "Allowed Admin IPs",
+      "description": "Optional admin panel IP allowlist. Empty means no IP allowlist is configured.",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
     "sms_template": {
       "type": "string",
       "title": "Lead Response SMS Template"

@@ -12,18 +12,21 @@ test("normalizeAdminSettings fills defaults without dropping stored values", () 
   const normalized = normalizeAdminSettings({
     resend_enabled: true,
     resend_from_email: "ops@example.com",
+    allowed_admin_ips: ["203.0.113.10"],
   });
 
   assert.equal(normalized.resend_enabled, true);
   assert.equal(normalized.resend_from_email, "ops@example.com");
   assert.equal(normalized.twilio_enabled, DEFAULT_ADMIN_SETTINGS.twilio_enabled);
   assert.equal(normalized.sms_template, DEFAULT_ADMIN_SETTINGS.sms_template);
+  assert.deepEqual(normalized.allowed_admin_ips, ["203.0.113.10"]);
 });
 
 test("buildAdminSettingsPatch only keeps mutable settings fields", () => {
   const patch = buildAdminSettingsPatch({
     sms_template: "hello",
     webhook_enabled: true,
+    allowed_admin_ips: ["203.0.113.10"],
     id: "forbidden",
     created_date: "ignore-me",
   });
@@ -31,6 +34,7 @@ test("buildAdminSettingsPatch only keeps mutable settings fields", () => {
   assert.deepEqual(patch, {
     sms_template: "hello",
     webhook_enabled: true,
+    allowed_admin_ips: ["203.0.113.10"],
   });
 });
 
