@@ -6,49 +6,49 @@ import { motion } from "framer-motion";
 const problems = [
   {
     problem: "Missed calls with no instant text-back",
-    stat: "62% of callers won't leave a voicemail",
+    stat: "Callers need a fast next step",
     solution: "Automatic SMS sent the moment a call is missed — keeps the conversation alive",
     result: "Zero missed opportunities",
   },
   {
     problem: "Form leads followed up too late",
-    stat: "Odds of qualifying a lead drop 21× after 5 minutes",
+    stat: "Speed shapes qualification",
     solution: "Instant automated response within seconds of every form submission",
     result: "Under 60 sec response",
   },
   {
     problem: "No automated SMS or email nurture",
-    stat: "80% of sales require 5+ follow-up touchpoints",
+    stat: "Follow-up needs more than one touchpoint",
     solution: "14-day automated nurture sequence keeps every lead warm without manual effort",
     result: "14-day nurture",
   },
   {
     problem: "No CRM pipeline tracking every opportunity",
-    stat: "Companies lose 20–30% of revenue to poor pipeline visibility",
+    stat: "Pipeline gaps hide lost leads",
     solution: "Every lead is tracked from first contact to booked appointment automatically",
     result: "Full pipeline visibility",
   },
   {
     problem: "Old leads sit with no reactivation",
-    stat: "56% of old leads convert when properly re-engaged",
+    stat: "Dormant lists need a route",
     solution: "Reactivation campaigns re-engage dormant contacts and recover lost revenue",
     result: "Old leads re-engaged",
   },
   {
     problem: "Interested people never get pushed to book",
-    stat: "Guided booking increases conversions by up to 3×",
+    stat: "Guided booking removes friction",
     solution: "Guided booking flow converts warm inquiries into confirmed appointments",
     result: "Cleaner path to booking",
   },
   {
     problem: "No insight into which leads are hot prospects",
-    stat: "AI scoring catches high-intent signals that reps miss 40% of the time",
+    stat: "AI scoring catches high-intent signals for review",
     solution: "AI analyzes every lead response and flags hot prospects for immediate follow-up",
     result: "Hot leads prioritized",
   },
   {
     problem: "Follow-up stops after booking — no post-appointment automation",
-    stat: "Post-booking confirmations reduce no-shows by 35%",
+    stat: "Post-booking confirmations keep the loop closed",
     solution: "Automated appointment reminders, confirmations, and feedback requests close the loop",
     result: "Complete follow-through",
   },
@@ -69,9 +69,9 @@ function CardWithFadeIn({ children, delay = 0 }) {
 
 export default function ProblemSolution() {
   const animatedStats = [
-    { value: 62, suffix: "%", label: "of callers won't leave a voicemail" },
-    { value: 21, suffix: "x", label: "drop in qualification odds after 5 min" },
-    { value: 80, suffix: "%", label: "of sales need 5+ follow-up touchpoints" },
+    { value: 3, suffix: "", label: "core lead-loss points covered" },
+    { value: 14, suffix: "d", label: "follow-up window available" },
+    { value: 24, suffix: "/7", label: "automation monitoring path" },
   ];
 
   return (

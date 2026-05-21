@@ -322,9 +322,9 @@ export default function InstantLeadResponseAnimation() {
               <p style={{ fontSize: "10px", fontWeight: "700", color: activeStep === 3 ? "#16a34a" : "rgba(0,0,0,0.3)", textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 14px" }}>What you gain</p>
               {[
                 { IconComp: Zap, color: "#8b5cf6", label: "Lead Captured", sub: "Every form submission tracked" },
-                { IconComp: MessageSquare, color: "#0088CC", label: "Instant Response", sub: "SMS + email in under 5 seconds" },
+                { IconComp: MessageSquare, color: "#0088CC", label: "Instant Response", sub: "SMS + email follow-up path" },
                 { IconComp: Calendar, color: "#0ea5e9", label: "Appointment Booked", sub: "While they're still engaged" },
-                { IconComp: TrendingUp, color: "#22c55e", label: "Revenue Gained", sub: "$300–$3,000 per new client" },
+                { IconComp: TrendingUp, color: "#22c55e", label: "Booking Path", sub: "Tracked from inquiry to handoff" },
               ].map(({ IconComp, color, label, sub }) => (
                 <div key={label} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px", opacity: activeStep === 3 ? 1 : 0.3, transition: "opacity 0.5s ease" }}>
                   <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -341,8 +341,8 @@ export default function InstantLeadResponseAnimation() {
             {/* Stats */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
               {[
-                { value: "< 5s", label: "Response time" },
-                { value: "78%", label: "Higher conversion" },
+                { value: "Fast", label: "Response path" },
+                { value: "Proof", label: "Before go-live" },
                 { value: "24/7", label: "Always on" },
                 { value: "0", label: "Staff needed" },
               ].map(({ value, label }) => (
@@ -362,9 +362,9 @@ export default function InstantLeadResponseAnimation() {
         {/* Bottom trust bar */}
         <div style={{ display: "flex", justifyContent: "center", gap: "32px", flexWrap: "wrap", paddingTop: "32px", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
           {[
-            { icon: "⚡", text: "Responds in under 5 seconds" },
+            { icon: "⚡", text: "Prompt response workflow" },
             { icon: "🧠", text: "AI-personalized for every lead" },
-            { icon: "📈", text: "78% higher booking rate vs manual follow-up" },
+            { icon: "📈", text: "Performance reviewed after launch" },
           ].map(({ icon, text }) => (
             <div key={text} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={{ fontSize: "16px" }}>{icon}</span>

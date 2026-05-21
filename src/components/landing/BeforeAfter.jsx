@@ -11,12 +11,12 @@ const scenarios = [
   {
     label: "Website Form",
     without: "Email lands in inbox. You see it Monday morning. Lead has already moved on.",
-    withCS: "Lead gets a text within 45 seconds. Automated follow-up runs for 14 days if they don't book. Most respond within the first 3 messages.",
+    withCS: "Lead gets a prompt text and the follow-up plan stays active if they do not book.",
   },
   {
     label: "Cold Lead",
     without: "You followed up once. No reply. You move on and forget about them.",
-    withCS: "System automatically sends Day 3, Day 7, and Day 14 messages. Many cold leads convert from follow-up alone.",
+    withCS: "System automatically sends scheduled follow-ups so dormant leads keep getting routed toward the next step.",
   },
   {
     label: "Busy Season",

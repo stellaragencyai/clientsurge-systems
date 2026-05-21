@@ -74,7 +74,7 @@ const INDUSTRY_BLUEPRINTS = {
       {
         step: "2",
         name: "Appointment Confirmation",
-        desc: "24-hour reminder SMS → Reduce no-shows by 40%+",
+        desc: "24-hour reminder SMS → Confirm attendance before the appointment",
         color: "#f59e0b",
       },
       {

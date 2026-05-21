@@ -11,29 +11,29 @@ const mainProblems = [
     id: "missed-calls",
     icon: "📞",
     problem: "Missed Calls",
-    stat: "62% never leave a voicemail",
+    stat: "Callers need a fast next step",
   },
   {
     id: "form-leads",
     icon: "⏱️",
     problem: "Slow Form Follow-Up",
-    stat: "21× drop in 5 minutes",
+    stat: "Speed shapes qualification",
   },
   {
     id: "old-leads",
     icon: "♻️",
     problem: "Dormant Leads",
-    stat: "56% convert if re-engaged",
+    stat: "Dormant lists need a route",
   },
 ];
 
 const allProblems = [
-  { id: "missed-calls", problem: "Missed calls with no instant text-back", stat: "62% of callers won't leave a voicemail", solution: "Automatic SMS sent the moment a call is missed — keeps the conversation alive", result: "Zero missed opportunities", recommendedPackage: "Growth System" },
-  { id: "form-leads", problem: "Form leads followed up too late", stat: "Odds of qualifying a lead drop 21× after 5 minutes", solution: "Instant automated response within seconds of every form submission", result: "Under 60 sec response", recommendedPackage: "Starter System" },
-  { id: "no-nurture", problem: "No automated SMS or email nurture", stat: "80% of sales require 5+ follow-up touchpoints", solution: "14-day automated nurture sequence keeps every lead warm without manual effort", result: "14-day nurture", recommendedPackage: "Growth System" },
-  { id: "no-tracking", problem: "No CRM pipeline tracking every opportunity", stat: "Companies lose 20–30% of revenue to poor pipeline visibility", solution: "Every lead is tracked from first contact to booked appointment automatically", result: "Full pipeline visibility", recommendedPackage: "Growth System" },
-  { id: "old-leads", problem: "Old leads sit with no reactivation", stat: "56% of old leads convert when properly re-engaged", solution: "Reactivation campaigns re-engage dormant contacts and recover lost revenue", result: "Old leads re-engaged", recommendedPackage: "Elite System" },
-  { id: "no-booking", problem: "Interested people never get pushed to book", stat: "Guided booking increases conversions by up to 3×", solution: "Guided booking flow converts warm inquiries into confirmed appointments", result: "Cleaner path to booking", recommendedPackage: "Growth System" },
+  { id: "missed-calls", problem: "Missed calls with no instant text-back", stat: "Callers need a fast next step", solution: "Automatic SMS sent the moment a call is missed — keeps the conversation alive", result: "Fewer dropped callers", recommendedPackage: "Growth System" },
+  { id: "form-leads", problem: "Form leads followed up too late", stat: "Speed shapes qualification", solution: "Instant automated response within seconds of every form submission", result: "Prompt response path", recommendedPackage: "Starter System" },
+  { id: "no-nurture", problem: "No automated SMS or email nurture", stat: "Follow-up needs more than one touch", solution: "14-day automated nurture sequence keeps every lead warm without manual effort", result: "14-day nurture", recommendedPackage: "Growth System" },
+  { id: "no-tracking", problem: "No CRM pipeline tracking every opportunity", stat: "Pipeline gaps hide lost leads", solution: "Every lead is tracked from first contact to booked appointment automatically", result: "Full pipeline visibility", recommendedPackage: "Growth System" },
+  { id: "old-leads", problem: "Old leads sit with no reactivation", stat: "Dormant lists need a route", solution: "Reactivation campaigns re-engage dormant contacts and recover lost revenue", result: "Old leads re-engaged", recommendedPackage: "Elite System" },
+  { id: "no-booking", problem: "Interested people never get pushed to book", stat: "Guided booking removes friction", solution: "Guided booking flow converts warm inquiries into confirmed appointments", result: "Cleaner path to booking", recommendedPackage: "Growth System" },
 ];
 
 export default function ProblemMatcher() {
@@ -47,8 +47,6 @@ export default function ProblemMatcher() {
       pricingSection?.scrollIntoView({ behavior: "smooth" });
     }, 100);
   };
-
-  const displayProblems = showAll ? allProblems : mainProblems;
 
   return (
     <div className="max-w-2xl">

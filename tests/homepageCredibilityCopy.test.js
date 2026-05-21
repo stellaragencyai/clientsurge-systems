@@ -4,13 +4,19 @@ import { test } from "node:test";
 
 const files = [
   "src/components/landing/AutomationShowcase.jsx",
+  "src/components/landing/BeforeAfter.jsx",
   "src/components/landing/ConversationModal.jsx",
   "src/components/landing/FAQ.jsx",
   "src/components/landing/FinalCTA.jsx",
   "src/components/landing/FounderSection.jsx",
   "src/components/landing/Hero.jsx",
   "src/components/landing/HeroDashboardScreen.jsx",
+  "src/components/landing/IndustryBlueprintModal.jsx",
+  "src/components/landing/InstantLeadResponseAnimation.jsx",
+  "src/components/landing/MissedCallAnimation.jsx",
   "src/components/landing/Pricing.jsx",
+  "src/components/landing/ProblemMatcher.jsx",
+  "src/components/landing/ProblemSolution.jsx",
   "src/components/landing/RevenueCalculator.jsx",
   "src/components/landing/TrustBar.jsx",
 ];
@@ -34,6 +40,22 @@ test("homepage launch copy avoids unproven average-results claims", () => {
     /pay for itself/i,
     /almost always yes/i,
     /Real Example:/,
+    /78% higher/i,
+    /\$300.*\$3,000/i,
+    /\$500.*\$5,000/i,
+    /recovers \$500/i,
+    /30.*40%/,
+    /40% more confirmed/i,
+    /2.*4.*more Google reviews/i,
+    /56%.*convert/i,
+    /21.*drop/i,
+    /20.*30%.*revenue/i,
+    /3.*more appointments/i,
+    /100% Automated/i,
+    /zero staff needed/i,
+    /Most respond/i,
+    /Many cold leads/i,
+    /Reduce no-shows by 40/i,
   ];
 
   for (const claim of blockedClaims) {

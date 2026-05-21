@@ -7,8 +7,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 const BRAND_COLOR = "#00D4FF";
-const BRAND_GRADIENT_FROM = "#003B8F";
-const BRAND_GRADIENT_TO = "#0066CC";
 
 const AUTOMATIONS = [
 {
@@ -20,7 +18,7 @@ const AUTOMATIONS = [
   "The moment a lead fills out a form, calls, or submits online — your AI fires a personalized SMS and email within 60 seconds. No manual work. No missed opportunities.",
   before: "Leads wait hours for a reply — most go cold",
   after: "Every lead hears from you before any competitor",
-  stat: "5× more likely to convert when contacted in 60s",
+  stat: "Fast response path ready for every captured lead",
   steps: [
   { icon: FileInput, label: "Lead submits form", sub: "Web, Facebook, or referral" },
   { icon: Brain, label: "AI scores & classifies", sub: "<2 sec routing" },
@@ -38,7 +36,7 @@ const AUTOMATIONS = [
   "When a call goes unanswered, the system automatically texts the caller back within seconds. Your leads get a response even when you're on another job.",
   before: "Missed calls = lost revenue, no follow-up ever happens",
   after: "Every missed call gets a text back in under 60 seconds",
-  stat: "Businesses recover 30–40% of calls they previously lost",
+  stat: "Missed callers get routed back into a booking path",
   steps: [
   { icon: PhoneMissed, label: "Call goes unanswered", sub: "Any time, any day" },
   { icon: AlertCircle, label: "System detects missed call", sub: "Webhook fires instantly" },
@@ -56,7 +54,7 @@ const AUTOMATIONS = [
   "A multi-touch SMS + email sequence that runs on autopilot for 14 days. Each message is personalized to the lead's industry and behavior — warming them until they're ready to book.",
   before: "1 follow-up attempt, then the lead is forgotten forever",
   after: "14 days of automated touchpoints convert cold leads",
-  stat: "3× more appointments booked vs. 1-touch follow-up",
+  stat: "Multi-touch follow-up keeps unbooked leads active",
   steps: [
   { icon: FileInput, label: "New lead enters sequence", sub: "Day 0 — instant welcome" },
   { icon: MessageSquare, label: "Day 1 SMS touchpoint", sub: "Personalized to industry" },
@@ -74,7 +72,7 @@ const AUTOMATIONS = [
   "When a lead signals intent to book, the AI takes over — sends the booking link, follows up if they don't click, and confirms the appointment automatically.",
   before: "\"Interested\" leads fall through because no one follows up",
   after: "AI detects booking intent and closes the appointment automatically",
-  stat: "40% more confirmed bookings without lifting a finger",
+  stat: "Booking intent gets a clear next step automatically",
   steps: [
   { icon: MessageSquare, label: "Lead signals booking intent", sub: "\"I want to book\" or similar" },
   { icon: Brain, label: "AI detects intent", sub: "Classification fires instantly" },
@@ -92,7 +90,7 @@ const AUTOMATIONS = [
   "After a job is done, the system sends a perfectly-timed review request via SMS. Happy customers leave reviews. You build social proof on autopilot.",
   before: "Happy clients leave — you never ask for a review",
   after: "Every completed appointment triggers a perfectly-timed review ask",
-  stat: "2–4× more Google reviews within the first 30 days",
+  stat: "Review requests fire after completed appointments",
   steps: [
   { icon: CheckCircle, label: "Appointment marked complete", sub: "Trigger event fires" },
   { icon: Clock, label: "Wait 30–60 minutes", sub: "Configurable delay" },
@@ -109,14 +107,14 @@ const AUTOMATIONS = [
   description:
   "Old leads who never booked get a targeted re-engagement campaign. A single reactivation blast can recover thousands in dormant revenue.",
   before: "Old leads sit ignored — dormant revenue never recovered",
-  after: "A targeted re-engagement campaign wakes up leads up to 90 days old",
+  after: "A targeted re-engagement campaign wakes up dormant leads",
   stat: "Reactivation value depends on dormant lead volume and offer strength",
   steps: [
   { icon: Clock, label: "Lead dormant 14–60 days", sub: "Daily scan detects it" },
   { icon: Brain, label: "Reactivation tier assigned", sub: "14d / 30d / 60d offer" },
   { icon: MessageSquare, label: "Special offer SMS sent", sub: "\"20% off — limited time\"" },
   { icon: Mail, label: "Email follow-up at 24h", sub: "If SMS unanswered" },
-  { icon: DollarSign, label: "Dormant revenue recovered", sub: "Up to 90 days back" }]
+  { icon: DollarSign, label: "Dormant lead re-engaged", sub: "Offer timing depends on list quality" }]
 
 }];
 

@@ -44,7 +44,7 @@ const STEPS = [
   },
 ];
 
-function PhoneScreen({ step, smsVisible, typingDone }) {
+function PhoneScreen({ step, smsVisible }) {
   return (
     <div style={{
       width: "180px",
@@ -215,11 +215,11 @@ export default function MissedCallAnimation() {
           <h2 style={{ fontSize: "clamp(28px,5vw,44px)", fontWeight: "800", color: "#0A1628", margin: "0 0 12px", lineHeight: 1.15 }}>
             Every missed call is a missed<br />
             <span style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              $500–$5,000 opportunity.
+              booking opportunity.
             </span>
           </h2>
           <p style={{ fontSize: "16px", color: "rgba(10,22,40,0.55)", maxWidth: "520px", margin: "0 auto", lineHeight: 1.6 }}>
-            Watch how our system turns a missed call into a booked appointment — automatically, in under 5 seconds.
+            Watch how our system routes a missed call back into a booking conversation automatically.
           </p>
         </div>
 
@@ -297,7 +297,7 @@ export default function MissedCallAnimation() {
               {[
                 { IconComp: CheckCircle2, color: "#22c55e", label: "Lead Recovered", sub: "Call that would have been lost" },
                 { IconComp: Calendar, color: "#0088CC", label: "Appointment Booked", sub: "Via the SMS booking link" },
-                { IconComp: TrendingUp, color: "#9a5c2e", label: "Revenue Recovered", sub: "$500–$5,000 per job" },
+                { IconComp: TrendingUp, color: "#9a5c2e", label: "Booking Path Reopened", sub: "Caller gets a next step" },
               ].map(({ IconComp, color, label, sub }) => (
                 <div key={label} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "12px", opacity: activeStep === 3 ? 1 : 0.3, transition: "opacity 0.5s ease" }}>
                   <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -314,8 +314,8 @@ export default function MissedCallAnimation() {
             {/* Stats */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
               {[
-                { value: "< 5s", label: "Response time" },
-                { value: "100%", label: "Automated" },
+                { value: "Fast", label: "Response path" },
+                { value: "Auto", label: "Text-back flow" },
                 { value: "24/7", label: "Always on" },
                 { value: "0", label: "Staff needed" },
               ].map(({ value, label }) => (
@@ -335,9 +335,9 @@ export default function MissedCallAnimation() {
         {/* Bottom trust bar */}
         <div style={{ display: "flex", justifyContent: "center", gap: "32px", flexWrap: "wrap", paddingTop: "32px", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
           {[
-            { icon: "🛡️", text: "100% Automated — zero staff needed" },
-            { icon: "⚡", text: "Texts sent in under 5 seconds" },
-            { icon: "💰", text: "Recovers $500–$5,000 per missed call" },
+            { icon: "🛡️", text: "Automated text-back workflow" },
+            { icon: "⚡", text: "Prompt caller follow-up" },
+            { icon: "💰", text: "Recovery value depends on job size and caller intent" },
           ].map(({ icon, text }) => (
             <div key={text} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={{ fontSize: "16px" }}>{icon}</span>
