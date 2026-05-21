@@ -82,15 +82,17 @@ function StatCard({ item, index, inView }) {
     typeof item.animatedValue === "number" ? `${count}${item.suffix || ""}` : item.display;
 
   const isHighlighted = index === 1; // 3x more bookings stat
+  const progress = typeof item.animatedValue === "number" ? Math.min(count / item.animatedValue, 1) : inView ? 1 : 0;
   
   return (
     <motion.article
-      className="relative rounded-2xl border border-border text-left shadow-sm"
+      className="relative overflow-hidden rounded-2xl border border-border text-left shadow-sm"
       aria-label={`${statText} — ${item.label}`}
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.55, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -6, scale: 1.015 }}
       style={{
         background: "#ffffff",
         minHeight: "clamp(140px, 20vw, 190px)",
@@ -101,6 +103,20 @@ function StatCard({ item, index, inView }) {
         boxShadow: isHighlighted ? "0 0 20px rgba(0,174,239,0.2), 0 6px 22px rgba(0,0,0,0.06)" : "0 6px 22px rgba(0,0,0,0.06)",
       }}
     >
+      <motion.div
+        aria-hidden="true"
+        animate={{ x: ["-120%", "120%"] }}
+        transition={{ duration: 3.6, repeat: Infinity, repeatDelay: 1.6, ease: "easeInOut", delay: index * 0.2 }}
+        style={{
+          position: "absolute",
+          top: 0,
+          bottom: 0,
+          width: "42%",
+          background: "linear-gradient(90deg, transparent, rgba(0,174,239,0.08), transparent)",
+          transform: "skewX(-16deg)",
+          pointerEvents: "none",
+        }}
+      />
       <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3" style={isHighlighted ? { boxShadow: "0 0 12px rgba(0,174,239,0.3)" } : {}}>
         <Icon className="w-[17px] h-[17px] text-primary" />
       </div>
@@ -112,6 +128,31 @@ function StatCard({ item, index, inView }) {
           {item.label}
         </p>
         <p className="text-xs text-foreground/60 leading-relaxed">{item.story}</p>
+      </div>
+      <div
+        aria-hidden="true"
+        style={{
+          height: "3px",
+          width: "100%",
+          marginTop: "12px",
+          borderRadius: "999px",
+          background: "rgba(0,174,239,0.1)",
+          overflow: "hidden",
+        }}
+      >
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: progress }}
+          transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+          style={{
+            height: "100%",
+            width: "100%",
+            transformOrigin: "left",
+            borderRadius: "inherit",
+            background: "linear-gradient(90deg, #00AEEF, #003B8F)",
+            boxShadow: "0 0 14px rgba(0,174,239,0.38)",
+          }}
+        />
       </div>
     </motion.article>
   );

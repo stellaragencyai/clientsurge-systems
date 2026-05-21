@@ -10,7 +10,6 @@ import { FAQ_ITEMS } from "../components/landing/FAQ";
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
 const SixAutomationSystems = lazy(() => import("../components/landing/SixAutomationSystems"));
-const ProofBeforeLaunch = lazy(() => import("../components/landing/ProofBeforeLaunch"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const FAQ = lazy(() => import("../components/landing/FAQ"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
@@ -29,6 +28,11 @@ import {
 } from "../components/SEO/SchemaMarkup";
 import CookieConsent from "../components/landing/CookieConsent";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
+import {
+  CinematicSectionDivider,
+  HomepageMotionShell,
+  MotionSection,
+} from "@/components/landing/PremiumHomepageMotion";
 
 function useHomepageWhiteCanvas() {
   useEffect(() => {
@@ -63,7 +67,7 @@ export default function Home() {
       cleanupMetadata = setPageMetadata({
         title: "AI Automation Systems for Local Leads | ClientSurge Systems",
         description:
-          "six done-for-you automations for lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation for local service businesses.",
+          "six done-for-you automations, AI-powered websites, voice agents, missed-call recovery, lead follow-up, and booking automation for local service businesses that want more booked jobs.",
         canonicalPath: "/",
         ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
         ogDescription:
@@ -90,36 +94,63 @@ export default function Home() {
 
   return (
     <DemoBookingProvider>
+      <HomepageMotionShell>
       <div className="min-h-screen">
         <Navbar />
         <Hero />
-        <HomepageConversionContent />
+        <MotionSection>
+          <HomepageConversionContent />
+        </MotionSection>
         <Suspense fallback={<SectionSkeleton />}>
-          <SixAutomationSystems />
+          <MotionSection>
+            <SixAutomationSystems />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
-          <ProofBeforeLaunch />
-          <SectionBreak />
-          <Industries />
+          <MotionSection>
+            <Industries />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
-          <TrustBar />
+          <MotionSection>
+            <TrustBar />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
         </Suspense>
         <Suspense fallback={<LargeSectionSkeleton />}>
-          <CoreOffer />
+          <MotionSection>
+            <CoreOffer />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
-          <Pricing />
+          <MotionSection>
+            <Pricing />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
-          <FAQ />
+          <MotionSection>
+            <FAQ />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
-          <FounderSection />
+          <MotionSection>
+            <FounderSection />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
-          <Testimonials />
+          <MotionSection>
+            <Testimonials />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
-          <FinalCTA />
+          <MotionSection>
+            <FinalCTA />
+          </MotionSection>
         </Suspense>
         <Suspense fallback={null}>
           <Footer />
@@ -127,6 +158,7 @@ export default function Home() {
         <ChatBubble />
         <CookieConsent />
       </div>
+      </HomepageMotionShell>
     </DemoBookingProvider>
   );
 }

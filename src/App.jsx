@@ -55,6 +55,7 @@ const AdminAutomation = lazy(() => import("./internal-pages/AdminAutomation"));
 const AdminOnboarding = lazy(() => import("./internal-pages/AdminOnboarding"));
 const ClientPortal = lazy(() => import("./internal-pages/ClientPortal"));
 const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
+const MotionLab = lazy(() => import("./internal-pages/MotionLab"));
 
 const PUBLIC_PATHS = [
   "/",
@@ -92,6 +93,7 @@ const PUBLIC_PATHS = [
   "/leads/capture",
   "/onboarding",
   "/setup/preview",
+  "/motion-lab",
   // test/preview routes removed
 ];
 
@@ -114,6 +116,7 @@ const NOINDEX_PREFIXES = [
   "/order-success",
   "/websitespecpreview",
   "/leads",
+  "/motion-lab",
 ];
 
 const routePath = (...segments) => `/${segments.join("/")}`;
@@ -361,6 +364,14 @@ const AuthenticatedApp = () => {
       />
       <Route path="/about" element={<About />} />
       <Route path="/automations" element={<Automations />} />
+      <Route
+        path="/motion-lab"
+        element={
+          <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}>
+            <MotionLab />
+          </Suspense>
+        }
+      />
       {AUTOMATION_SERVICE_ROUTES.map((path) => (
         <Route key={path} path={path} element={<AutomationServicePage />} />
       ))}
