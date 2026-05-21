@@ -94,17 +94,384 @@
         ]
       }
     </script>
+    <style>
+      .static-fallback {
+        min-height: 100vh;
+        margin: 0;
+        background: #f7faf9;
+        color: #0f172a;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        line-height: 1.65;
+      }
+
+      .static-shell {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .static-header,
+      .static-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 24px 0;
+      }
+
+      .static-brand {
+        font-weight: 700;
+        letter-spacing: 0;
+      }
+
+      .static-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        font-size: 14px;
+      }
+
+      .static-fallback a {
+        color: #0f766e;
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .static-fallback a:hover {
+        text-decoration: underline;
+      }
+
+      .static-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+        gap: 40px;
+        align-items: center;
+        padding: 72px 0 48px;
+      }
+
+      .static-eyebrow {
+        margin: 0 0 12px;
+        color: #0f766e;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .static-fallback h1,
+      .static-fallback h2,
+      .static-fallback h3 {
+        margin: 0;
+        color: #0f172a;
+        line-height: 1.12;
+      }
+
+      .static-fallback h1 {
+        max-width: 820px;
+        font-size: clamp(38px, 7vw, 72px);
+      }
+
+      .static-fallback h2 {
+        font-size: clamp(28px, 4vw, 44px);
+      }
+
+      .static-fallback h3 {
+        font-size: 20px;
+      }
+
+      .static-lede {
+        max-width: 760px;
+        margin: 20px 0 0;
+        color: #334155;
+        font-size: 19px;
+      }
+
+      .static-actions,
+      .static-bullets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      .static-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        border-radius: 999px;
+        padding: 0 18px;
+        background: #0f172a;
+        color: #ffffff !important;
+        text-decoration: none !important;
+      }
+
+      .static-button.secondary {
+        background: #dff7f2;
+        color: #0f766e !important;
+      }
+
+      .static-bullets span,
+      .static-card,
+      .static-panel {
+        border: 1px solid #dbe7e4;
+        background: #ffffff;
+      }
+
+      .static-bullets span {
+        border-radius: 999px;
+        padding: 8px 12px;
+        color: #334155;
+        font-size: 14px;
+      }
+
+      .static-panel {
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+      }
+
+      .static-panel p,
+      .static-card p,
+      .static-section p {
+        margin: 10px 0 0;
+        color: #475569;
+      }
+
+      .static-section {
+        padding: 56px 0;
+      }
+
+      .static-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 28px;
+      }
+
+      .static-grid.two {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .static-card {
+        border-radius: 16px;
+        padding: 22px;
+      }
+
+      .static-card ul {
+        margin: 14px 0 0;
+        padding-left: 18px;
+        color: #475569;
+      }
+
+      .static-cta {
+        border-radius: 24px;
+        margin: 56px 0;
+        padding: 42px;
+        background: #0f172a;
+        color: #ffffff;
+      }
+
+      .static-cta h2,
+      .static-cta p {
+        color: #ffffff;
+      }
+
+      .static-cta p {
+        max-width: 760px;
+      }
+
+      @media (max-width: 820px) {
+        .static-header,
+        .static-footer,
+        .static-hero {
+          display: block;
+        }
+
+        .static-nav {
+          margin-top: 16px;
+        }
+
+        .static-hero {
+          padding-top: 40px;
+        }
+
+        .static-panel {
+          margin-top: 28px;
+        }
+
+        .static-grid,
+        .static-grid.two {
+          grid-template-columns: 1fr;
+        }
+
+        .static-cta {
+          padding: 28px;
+        }
+      }
+    </style>
     <title>AI Automation Systems for Local Leads | ClientSurge Systems</title>
   </head>
   <body>
-    <noscript>
-      <div style="padding:40px;text-align:center;font-family:sans-serif;">
-        <h2>JavaScript is required</h2>
-        <p>Please enable JavaScript in your browser to use ClientSurge Systems.</p>
-        <p>Visit <a href="https://www.enable-javascript.com">enable-javascript.com</a> for instructions.</p>
-      </div>
-    </noscript>
-    <div id="root"></div>
+    <div id="root">
+      <main class="static-fallback" aria-label="ClientSurge Systems public website">
+        <div class="static-shell">
+          <header class="static-header">
+            <a class="static-brand" href="/">ClientSurge Systems</a>
+            <nav class="static-nav" aria-label="Public navigation">
+              <a href="/">Home</a>
+              <a href="/automations">Automations</a>
+              <a href="/industries">Industries</a>
+              <a href="/about">About</a>
+              <a href="/blog">Blog</a>
+              <a href="/contact">Contact</a>
+              <a href="/book">Book Audit</a>
+            </nav>
+          </header>
+
+          <section class="static-hero" aria-labelledby="static-home-heading">
+            <div>
+              <p class="static-eyebrow">AI automation for local service businesses</p>
+              <h1 id="static-home-heading">AI Automation Systems That Turn More Local Leads Into Booked Jobs</h1>
+              <p class="static-lede">ClientSurge Systems builds AI-powered websites, voice agents, and lead automation systems for local service businesses - helping you recover missed calls, respond instantly, nurture leads automatically, and book more appointments without adding staff.</p>
+              <div class="static-actions">
+                <a class="static-button" href="/book">Book Your Free Automation Audit</a>
+                <a class="static-button secondary" href="/automations">View AI Automations</a>
+              </div>
+              <div class="static-bullets" aria-label="Conversion benefits">
+                <span>Recover missed calls and after-hours leads</span>
+                <span>Automatically follow up with every inquiry</span>
+                <span>Book more appointments without hiring extra staff</span>
+              </div>
+            </div>
+            <aside class="static-panel" aria-label="Core ClientSurge offer">
+              <h2>What ClientSurge Does</h2>
+              <p>We build the front-end website and the back-end AI lead conversion system together, so local businesses can capture demand, respond faster, route inquiries, book appointments, request reviews, and reactivate old opportunities from one connected workflow.</p>
+              <p>Core services include AI voice agents, AI phone receptionist systems, missed-call text-back, instant lead response, lead nurturing, AI booking systems, review request automation, old lead reactivation, and workflow automation.</p>
+            </aside>
+          </section>
+
+          <section class="static-section" aria-labelledby="static-automation-heading">
+            <p class="static-eyebrow">Six AI automation systems</p>
+            <h2 id="static-automation-heading">Crawler-readable automation content</h2>
+            <p class="static-lede">These are the six public automation systems ClientSurge uses to help local companies reduce lead loss and convert more inquiries into booked jobs.</p>
+            <div class="static-grid">
+              <article class="static-card">
+                <h3>Lead Capture Automation</h3>
+                <p>Turns website visitors, form fills, calls, and ad traffic into organized leads inside your CRM.</p>
+              </article>
+              <article class="static-card">
+                <h3>Missed-Call Text-Back Automation</h3>
+                <p>When a business misses a call, the system instantly texts the lead so they do not call a competitor.</p>
+              </article>
+              <article class="static-card">
+                <h3>AI Lead Follow-Up Automation</h3>
+                <p>Follows up with new leads by SMS and email until they respond, book, or opt out.</p>
+              </article>
+              <article class="static-card">
+                <h3>Appointment Booking Automation</h3>
+                <p>Helps convert interested leads into booked appointments with reminders, confirmations, and calendar sync.</p>
+              </article>
+              <article class="static-card">
+                <h3>Review & Reputation Automation</h3>
+                <p>Automatically requests reviews after completed jobs and helps increase Google reviews over time.</p>
+              </article>
+              <article class="static-card">
+                <h3>Reactivation / Win-Back Automation</h3>
+                <p>Re-engages old leads, past customers, no-shows, and cold contacts with targeted campaigns.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="static-section" aria-labelledby="static-voice-heading">
+            <p class="static-eyebrow">AI voice agents and lead recovery</p>
+            <h2 id="static-voice-heading">AI phone receptionist systems for missed calls, inbound calls, and after-hours leads</h2>
+            <p class="static-lede">ClientSurge can add AI voice agents and AI receptionist workflows that answer or triage calls, capture caller details, trigger missed-call text-back, route urgent inquiries, and hand warm leads into follow-up and booking automation.</p>
+          </section>
+
+          <section class="static-section" aria-labelledby="static-industry-heading">
+            <p class="static-eyebrow">Industries served</p>
+            <h2 id="static-industry-heading">Built for appointment-based and quote-driven local service businesses</h2>
+            <div class="static-grid">
+              <article class="static-card">
+                <h3>Roofing</h3>
+                <p>Storm-season lead capture, missed-call recovery, inspection booking, insurance-guidance follow-up, and old estimate reactivation.</p>
+                <a href="/roofing">Roofing automation</a>
+              </article>
+              <article class="static-card">
+                <h3>HVAC</h3>
+                <p>Emergency call handling, seasonal urgency follow-up, estimate nurturing, service-call reminders, and maintenance plan automation.</p>
+                <a href="/hvac">HVAC automation</a>
+              </article>
+              <article class="static-card">
+                <h3>Dental</h3>
+                <p>New patient booking, missed appointment recovery, treatment-plan follow-up, emergency inquiry response, and review automation.</p>
+                <a href="/dental">Dental automation</a>
+              </article>
+              <article class="static-card">
+                <h3>Med Spa</h3>
+                <p>Consultation booking, no-show reduction, package and membership nurture, review requests, and old inquiry reactivation.</p>
+                <a href="/med-spa">Med spa automation</a>
+              </article>
+              <article class="static-card">
+                <h3>Chiropractic</h3>
+                <p>New-patient intake, appointment reminders, reactivation campaigns, review automation, and follow-up for unfinished care plans.</p>
+                <a href="/chiropractic">Chiropractic automation</a>
+              </article>
+              <article class="static-card">
+                <h3>Contractors</h3>
+                <p>Project inquiry routing, quote follow-up, job estimate nurturing, missed-call recovery, and reactivation for old opportunities.</p>
+                <a href="/contractors">Contractor automation</a>
+              </article>
+            </div>
+          </section>
+
+          <section class="static-section" aria-labelledby="static-page-content-heading">
+            <p class="static-eyebrow">Public page content</p>
+            <h2 id="static-page-content-heading">Clear public routes without exposing internal tools</h2>
+            <div class="static-grid two">
+              <article class="static-card">
+                <h3>About ClientSurge</h3>
+                <p>ClientSurge Systems serves local companies that need more than a brochure website. We combine conversion-focused pages with AI response, routing, follow-up, and booking workflows so fewer leads fall through the cracks.</p>
+                <a href="/about">Read about ClientSurge</a>
+              </article>
+              <article class="static-card">
+                <h3>Book Your Free Automation Audit</h3>
+                <p>Schedule a focused audit to review missed-call leakage, speed-to-lead gaps, follow-up consistency, booking friction, and practical automation opportunities for your business.</p>
+                <a href="/book">Book an audit</a>
+              </article>
+              <article class="static-card">
+                <h3>Contact</h3>
+                <p>Reach ClientSurge Systems for AI automation, lead capture, and public website questions. Public contact options include support@clientsurgesystems.com and (602) 584-3227.</p>
+                <a href="/contact">Contact ClientSurge</a>
+              </article>
+              <article class="static-card">
+                <h3>Blog</h3>
+                <p>Read practical guidance on missed-call recovery, AI lead follow-up, booking automation, local SEO, and conversion systems for service businesses.</p>
+                <a href="/blog">View the blog</a>
+              </article>
+            </div>
+          </section>
+
+          <section class="static-cta" aria-labelledby="static-cta-heading">
+            <h2 id="static-cta-heading">Ready to recover more leads before they call someone else?</h2>
+            <p>Book a free automation audit and ClientSurge will identify where your current website, phones, forms, and follow-up process are leaking revenue.</p>
+            <div class="static-actions">
+              <a class="static-button secondary" href="/book">Book Your Free Automation Audit</a>
+              <a class="static-button secondary" href="/automations">Explore AI Automations</a>
+            </div>
+          </section>
+
+          <footer class="static-footer">
+            <p>ClientSurge Systems builds AI automation systems for local service businesses.</p>
+            <nav class="static-nav" aria-label="Legal navigation">
+              <a href="/legal/privacy">Privacy Policy</a>
+              <a href="/legal/terms">Terms</a>
+              <a href="/login">Client Login</a>
+            </nav>
+          </footer>
+        </div>
+      </main>
+    </div>
     <!-- Google Analytics GA4 — add your Measurement ID here when ready -->
     <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
     <script>

@@ -96,22 +96,59 @@ const PUBLIC_PATHS = [
 
 const NOINDEX_PREFIXES = [
   "/admin",
+  "/adminleaddetail",
+  "/adminsettings",
   "/dashboard",
   "/client-portal",
   "/client-dashboard",
+  "/industrytemplate",
   "/lead-intelligence",
   "/medspa-dashboard",
+  "/notfound",
   "/sam",
   "/success",
   "/setup",
   "/thank-you",
   "/onboarding",
   "/order-success",
+  "/websitespecpreview",
   "/leads",
 ];
 
+const LEGACY_REDIRECTS = [
+  { from: "/Blog", to: "/blog" },
+  { from: "/IndustriesPage", to: "/industries" },
+  { from: "/IndustryTemplate", to: "/industries" },
+  { from: "/Roofing", to: "/roofing" },
+  { from: "/HVAC", to: "/hvac" },
+  { from: "/Dental", to: "/dental" },
+  { from: "/MedSpa", to: "/med-spa" },
+  { from: "/Chiropractic", to: "/chiropractic" },
+  { from: "/Contractors", to: "/contractors" },
+  { from: "/industries/roofing", to: "/roofing" },
+  { from: "/industries/hvac", to: "/hvac" },
+  { from: "/industries/dental", to: "/dental" },
+  { from: "/industries/med-spa", to: "/med-spa" },
+  { from: "/industries/chiropractic", to: "/chiropractic" },
+  { from: "/industries/contractors", to: "/contractors" },
+  { from: "/Dashboard", to: "/admin" },
+  { from: "/AdminSettings", to: "/admin" },
+  { from: "/AdminLeadDetail", to: "/admin/leads" },
+  { from: "/LeadIntelligence", to: "/admin" },
+  { from: "/Sam", to: "/admin" },
+  { from: "/MedSpaDashboard", to: "/admin" },
+  { from: "/WebsiteSpecPreview", to: "/admin" },
+];
+
 const isPublicPath = (pathname) =>
-  PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  PUBLIC_PATHS.some((path) => {
+    const normalizedPathname = pathname.toLowerCase();
+    const normalizedPath = path.toLowerCase();
+    return (
+      normalizedPathname === normalizedPath ||
+      normalizedPathname.startsWith(`${normalizedPath}/`)
+    );
+  });
 
 // Fix 1: ScrollToTop — resets scroll position on every route change
 function ScrollToTop() {
@@ -182,9 +219,9 @@ function RouteIndexingGuard() {
     if (!robotsMeta) return;
 
     const previous = robotsMeta.getAttribute("content") || "index,follow";
+    const pathname = location.pathname.toLowerCase();
     const shouldNoindex = NOINDEX_PREFIXES.some(
-      (prefix) =>
-        location.pathname === prefix || location.pathname.startsWith(`${prefix}/`)
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
     );
 
     robotsMeta.setAttribute(
@@ -244,6 +281,15 @@ const AuthenticatedApp = () => {
 
   return (
     <Routes>
+      {LEGACY_REDIRECTS.map(({ from, to }) => (
+        <Route
+          key={from}
+          caseSensitive
+          path={from}
+          element={<Navigate to={to} replace />}
+        />
+      ))}
+      <Route path="/NotFound" caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />
@@ -326,6 +372,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin/onboarding" element={<Suspense fallback={<AdminLoadingSkeleton />}><AdminOnboarding /></Suspense>} />
         <Route path="/admin/install-guide" element={<AdminInstallGuide />} />
         <Route path="/admin/ai-sales" element={<AISalesCommandCenter />} />
+        <Route path="/admin/AIStatusDashboard" caseSensitive element={<Navigate to="/admin" replace />} />
         <Route path="/admin/performance-wars" element={<PerformanceWars />} />
       </Route>
 
