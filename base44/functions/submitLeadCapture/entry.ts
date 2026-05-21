@@ -3,43 +3,18 @@
  * Stores top-of-funnel submissions in WebsiteLead only.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  buildDedupKey,
+  cleanString,
+  findDuplicateWebsiteLead,
+  isDisposableEmail,
+  normalizeEmail,
+  normalizePhone,
+} from "./leadCapture.shared.js";
 
-const DISPOSABLE_DOMAINS = new Set([
-  "mailinator.com",
-  "guerrillamail.com",
-  "temp-mail.org",
-  "throwaway.email",
-  "fakeinbox.com",
-  "yopmail.com",
-  "trashmail.com",
-  "sharklasers.com",
-  "guerrillamailblock.com",
-  "grr.la",
-  "guerrillamail.info",
-  "spam4.me",
-  "tempmail.com",
-  "tmpmail.net",
-  "tmpmail.org",
-  "tmp-mail.org",
-  "throwam.com",
-]);
-
-const SIXTY_MINUTES = 60 * 60 * 1000;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const RATE_LIMIT_MAX = 3;
 const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
-
-function cleanString(value: unknown) {
-  return typeof value === "string" ? value.trim() : "";
-}
-
-function normalizeEmail(value: unknown) {
-  return cleanString(value).toLowerCase();
-}
-
-function normalizePhone(value: unknown) {
-  return cleanString(value).replace(/[^\d+]/g, "");
-}
 
 function normalizeRequestedChannels(value: unknown) {
   if (!Array.isArray(value)) {
@@ -57,15 +32,6 @@ function normalizeUtmParams(body: Record<string, unknown>) {
     utm_content: cleanString(body.utm_content),
     utm_term: cleanString(body.utm_term),
   };
-}
-
-function isDisposableEmail(email: string) {
-  const domain = normalizeEmail(email).split("@")[1] || "";
-  return DISPOSABLE_DOMAINS.has(domain);
-}
-
-function buildDedupKey({ email, phone }: { email: string; phone: string }) {
-  return email || phone || crypto.randomUUID();
 }
 
 async function createCrmLeadFromWebsiteLead(base44: any, lead: any) {
@@ -193,17 +159,14 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Invalid email address" }, { status: 422 });
     }
 
-    const since = new Date(Date.now() - SIXTY_MINUTES).toISOString();
     const recentWebsiteLeads = await base44.asServiceRole.entities.WebsiteLead.list(
       "-created_date",
       100
     ).catch(() => []);
-    const duplicate = (recentWebsiteLeads || []).find((lead) => {
-      const matchesEmail =
-        email && normalizeEmail(lead.email) === email;
-      const matchesPhone =
-        phone && normalizePhone(lead.phone_number) === phone;
-      return (matchesEmail || matchesPhone) && lead.created_date >= since;
+    const duplicate = findDuplicateWebsiteLead({
+      leads: recentWebsiteLeads,
+      email,
+      phone,
     });
 
     if (duplicate) {

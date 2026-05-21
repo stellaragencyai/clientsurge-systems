@@ -1,9 +1,10 @@
 /**
- * deduplicateLeads — #167
+ * deduplicateLeads - #167/#506
  * Runs dedup on all existing SpaLead records.
- * Merges by phone number — keeps highest lead_score, removes duplicates.
+ * Merges by phone hash or normalized phone number, keeps highest lead_score, removes duplicates.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { groupDuplicateLeads, selectLeadKeeper } from "./deduplicateLeads.shared.js";
 
 Deno.serve(async (req) => {
   try {
@@ -12,37 +13,21 @@ Deno.serve(async (req) => {
 
     const leads = await base44.asServiceRole.entities.SpaLead.list().catch(() => []);
     const all = leads || [];
-
-    // Group by normalised phone
-    const byPhone: Record<string, any[]> = {};
-    for (const l of all) {
-      const phone = (l.phone || "").replace(/\D/g, "");
-      if (!phone || phone.length < 7) continue;
-      if (!byPhone[phone]) byPhone[phone] = [];
-      byPhone[phone].push(l);
-    }
+    const duplicateGroups = groupDuplicateLeads(all);
 
     let duplicates_found = 0;
     let merged = 0;
 
-    for (const [phone, group] of Object.entries(byPhone)) {
-      if (group.length < 2) continue;
+    for (const group of Object.values(duplicateGroups) as any[][]) {
       duplicates_found += group.length - 1;
-
-      // Keep the one with highest lead_score (or most recent)
-      const keeper = group.sort((a, b) =>
-        (b.lead_score || 0) - (a.lead_score || 0) || new Date(b.created_date).getTime() - new Date(a.created_date).getTime()
-      )[0];
-
-      const dupes = group.filter(l => l.id !== keeper.id);
+      const keeper = selectLeadKeeper(group);
+      const dupes = group.filter((lead) => lead.id !== keeper.id);
 
       if (!dry_run) {
         for (const dupe of dupes) {
-          // Merge notes before deleting
           if (dupe.notes) {
             await base44.asServiceRole.entities.SpaLead.update(keeper.id, {
-              notes: [keeper.notes, `[Merged from ${dupe.id}]: ${dupe.notes}`].filter(Boolean).join("
-"),
+              notes: [keeper.notes, `[Merged from ${dupe.id}]: ${dupe.notes}`].filter(Boolean).join("\n"),
             }).catch(() => {});
           }
           await base44.asServiceRole.entities.SpaLead.delete(dupe.id).catch(() => {});
@@ -51,7 +36,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, dry_run, total_leads: all.length, duplicate_groups: Object.keys(byPhone).filter(k => byPhone[k].length > 1).length, duplicates_found, merged });
+    return Response.json({
+      success: true,
+      dry_run,
+      total_leads: all.length,
+      duplicate_groups: Object.keys(duplicateGroups).length,
+      duplicates_found,
+      merged,
+    });
   } catch (err: any) {
     return Response.json({ error: err.message }, { status: 500 });
   }
