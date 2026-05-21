@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { DemoBookingProvider, useDemoBooking } from "./DemoBookingContext";
 import Navbar from "./Navbar";
@@ -12,6 +12,7 @@ import IndustryAutomationUseCases from "./IndustryAutomationUseCases";
 import { getIndustryBySlug } from "@/lib/industryData";
 import { getFAQSchema } from "../SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
+import { buildIndustryJsonLd } from "@/utils/industryJsonLd";
 
 const INDUSTRY_SEO = {
   roofing: {
@@ -56,7 +57,7 @@ function IndustryTemplateInner({ industrySlug }) {
   const industry = getIndustryBySlug(industrySlug);
   const seo = INDUSTRY_SEO[industrySlug];
   const demoBooking = useDemoBooking();
-  const [notFound, setNotFound] = useState(!industry);
+  const notFound = !industry;
 
   useEffect(() => {
     if (!industry) return;
@@ -69,8 +70,10 @@ function IndustryTemplateInner({ industrySlug }) {
       ogDescription: seo?.description || industry.hero?.subheadline || `AI automation built specifically for ${industry.name}.`,
     });
     const cleanupFaq = setJsonLd(`industry-faq-${industrySlug}`, getFAQSchema(industry.faqs || []));
+    const cleanupIndustryJsonLd = setJsonLd(`industry-local-business-${industrySlug}`, buildIndustryJsonLd(industrySlug));
 
     return () => {
+      cleanupIndustryJsonLd?.();
       cleanupFaq?.();
       cleanupMetadata?.();
     };

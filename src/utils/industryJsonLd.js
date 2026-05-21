@@ -20,6 +20,12 @@ const INDUSTRY_CONFIG = {
     serviceType: "Med Spa Marketing Automation",
     areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Tempe, AZ", "Chandler, AZ"],
   },
+  "med-spa": {
+    name: "Med Spa AI Automation - ClientSurge Systems",
+    description: "AI lead response and appointment booking automation for med spas in Phoenix & Scottsdale, AZ.",
+    serviceType: "Med Spa Marketing Automation",
+    areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Tempe, AZ", "Chandler, AZ"],
+  },
   dental: {
     name: "Dental Practice AI Automation — ClientSurge Systems",
     description: "AI lead response and patient follow-up automation for dental offices in Phoenix & Scottsdale, AZ.",
@@ -50,10 +56,17 @@ const INDUSTRY_CONFIG = {
     serviceType: "General Contractor Automation",
     areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Tempe, AZ", "Mesa, AZ"],
   },
+  chiropractic: {
+    name: "Chiropractic Clinic AI Automation - ClientSurge Systems",
+    description: "AI lead response, appointment booking, and patient follow-up automation for chiropractic clinics in Phoenix & Scottsdale.",
+    serviceType: "Chiropractic Clinic Automation",
+    areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Tempe, AZ", "Mesa, AZ"],
+  },
 };
 
 export function buildIndustryJsonLd(industry) {
-  const config = INDUSTRY_CONFIG[industry] || INDUSTRY_CONFIG.medspa;
+  const normalizedIndustry = String(industry || "medspa").toLowerCase().replace(/_/g, "-");
+  const config = INDUSTRY_CONFIG[normalizedIndustry] || INDUSTRY_CONFIG.medspa;
   return {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "ProfessionalService"],
@@ -63,6 +76,7 @@ export function buildIndustryJsonLd(industry) {
     telephone: "+16023727438",
     address: BASE_ADDRESS,
     areaServed: config.areaServed,
+    serviceType: config.serviceType,
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "AI Automation Services",
