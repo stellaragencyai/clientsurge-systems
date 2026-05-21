@@ -1764,8 +1764,8 @@ PHASE 7 - Admin UI
 |---|---|---|---|---|
 | AC-6 | ✅ | Test CommunicationLogsPanel with failed webhook events - filter by "failed", verify error messages display | 20 min | No |
 | AC-7 | ✅ | Test manual lead reassignment from unmatched SMS modal | 25 min | Needs AC-6 |
-| AC-8 | ✅ | Add filtering for email_sent/email_failed events in CommunicationLogsPanel | 15 min | Needs AC-6 |
-| AC-9 | ✅ | Add Export/Download CSV functionality for communication logs | 30 min | Needs AC-8 |
+| AC-8 | ✅ | Add filtering for email_sent/email_failed events in CommunicationLogsPanel | 15 min | Needs AC-6  Morpheus 2026-05-20 |
+| AC-9 | ✅ | Add Export/Download CSV functionality for communication logs | 30 min | Needs AC-8  Morpheus 2026-05-20 |
 
 ## PRIORITY 3: WEBSITE LEAD AUTOMATION (5 tasks)
 

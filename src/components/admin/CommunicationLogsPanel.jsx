@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { AlertCircle, Check, Loader2, Send } from 'lucide-react';
+import { AlertCircle, Check, Download, Loader2, Send } from 'lucide-react';
+import {
+  buildCommunicationLogQuery,
+  buildCommunicationLogsCsv,
+  getCommunicationLogFilterLabel,
+} from '@/lib/communicationLogExport';
 import {
   COMMUNICATION_LOG_PAGE_SIZE,
   getCommunicationLogFetchLimit,
@@ -16,6 +21,7 @@ export default function CommunicationLogsPanel() {
   const [reassignModal, setReassignModal] = useState(null);
   const [page, setPage] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     setPage(0);
@@ -28,13 +34,7 @@ export default function CommunicationLogsPanel() {
   const loadLogs = async (nextPage = page) => {
     try {
       setLoading(true);
-      let query = {};
-
-      if (filter === 'failed') {
-        query = { status: 'failed' };
-      } else if (filter === 'unmatched') {
-        query = { context_type: 'inbound_sms_unmatched' };
-      }
+      const query = buildCommunicationLogQuery(filter);
 
       const fetchLimit = getCommunicationLogFetchLimit({ page: nextPage });
       const data = await base44.asServiceRole.entities.CommunicationEvent.filter(
@@ -50,6 +50,33 @@ export default function CommunicationLogsPanel() {
       setHasNextPage(false);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const exportLogs = async () => {
+    try {
+      setExporting(true);
+      const query = buildCommunicationLogQuery(filter);
+      const data = await base44.asServiceRole.entities.CommunicationEvent.filter(
+        query,
+        '-created_date',
+        1000
+      );
+      const csv = buildCommunicationLogsCsv(data || []);
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `communication-logs-${filter}-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to export logs:', error);
+      alert('Failed to export logs: ' + error.message);
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -84,16 +111,26 @@ export default function CommunicationLogsPanel() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-foreground">Communication Logs</h2>
-        <button
-          onClick={() => loadLogs(page)}
-          className="px-3 py-1.5 bg-primary text-primary-foreground text-sm rounded hover:bg-primary/90 transition"
-        >
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={exportLogs}
+            disabled={exporting}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-border text-sm rounded hover:bg-muted transition disabled:opacity-50"
+          >
+            {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+            Export CSV
+          </button>
+          <button
+            onClick={() => loadLogs(page)}
+            className="px-3 py-1.5 bg-primary text-primary-foreground text-sm rounded hover:bg-primary/90 transition"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-2 flex-wrap">
-        {['all', 'failed', 'unmatched', 'received'].map((f) => (
+        {['all', 'failed', 'unmatched', 'received', 'email_sent', 'email_failed'].map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
@@ -103,7 +140,7 @@ export default function CommunicationLogsPanel() {
                 : 'bg-border text-foreground hover:bg-muted'
             }`}
           >
-            {f === 'all' ? 'All Events' : f.charAt(0).toUpperCase() + f.slice(1)}
+            {getCommunicationLogFilterLabel(f)}
           </button>
         ))}
       </div>
