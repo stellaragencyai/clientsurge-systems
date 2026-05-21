@@ -25,6 +25,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { twilioFetch } from "../_shared/providerFetch.js";
 import {
   buildWebhookAuthErrorResponse,
   verifyTwilioWebhookRequest,
@@ -41,8 +42,7 @@ function twilioAuth(accountSid, authToken) {
 
 async function fetchTwilioTranscript(accountSid, authToken, recordingSid) {
   // Fetch recording transcription via Recordings API when available.
-  const transcriptRes = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Recordings/${recordingSid}/Transcriptions.json`,
+  const transcriptRes = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Recordings/${recordingSid}/Transcriptions.json`,
     { headers: { Authorization: twilioAuth(accountSid, authToken) } }
   );
   if (!transcriptRes.ok) return null;
@@ -52,8 +52,7 @@ async function fetchTwilioTranscript(accountSid, authToken, recordingSid) {
 }
 
 async function fetchRecordingMetadata(accountSid, authToken, recordingSid) {
-  const res = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Recordings/${recordingSid}.json`,
+  const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Recordings/${recordingSid}.json`,
     { headers: { Authorization: twilioAuth(accountSid, authToken) } }
   );
   if (!res.ok) return null;

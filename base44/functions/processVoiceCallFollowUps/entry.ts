@@ -18,6 +18,7 @@
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 const QUIET_START = 20; // 8pm Phoenix
 const QUIET_END = 8;   // 8am Phoenix
@@ -132,8 +133,7 @@ Deno.serve(async (req) => {
           }
 
           try {
-            const twilioRes = await fetch(
-              `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+            const twilioRes = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
               {
                 method: 'POST',
                 headers: {

@@ -4,6 +4,7 @@
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { stripeFetch } from "../_shared/providerFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -19,8 +20,7 @@ Deno.serve(async (req) => {
 
     // Cancel at period end on Stripe
     if (stripeKey && order.stripe_subscription_id) {
-      const stripeRes = await fetch(
-        `https://api.stripe.com/v1/subscriptions/${order.stripe_subscription_id}`,
+      const stripeRes = await stripeFetch(`https://api.stripe.com/v1/subscriptions/${order.stripe_subscription_id}`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${stripeKey}`, "Content-Type": "application/x-www-form-urlencoded" },

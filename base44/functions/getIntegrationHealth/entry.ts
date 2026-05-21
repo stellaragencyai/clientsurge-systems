@@ -1,12 +1,13 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { stripeFetch, twilioFetch } from "../_shared/providerFetch.js";
 
 async function pingTwilio() {
   const sid = Deno.env.get('TWILIO_ACCOUNT_SID');
   const token = Deno.env.get('TWILIO_AUTH_TOKEN');
   if (!sid || !token) return { ok: false, error: 'Credentials not configured' };
   try {
-    const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
+    const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
       headers: { 'Authorization': 'Basic ' + btoa(`${sid}:${token}`) },
     });
     return res.ok ? { ok: true } : { ok: false, error: `HTTP ${res.status}` };
@@ -28,7 +29,7 @@ async function pingStripe() {
   const key = Deno.env.get('STRIPE_SECRET_KEY') || Deno.env.get('STRIPE_LIVE_SECRET_KEY');
   if (!key) return { ok: false, error: 'STRIPE_SECRET_KEY not set' };
   try {
-    const res = await fetch('https://api.stripe.com/v1/balance', {
+    const res = await stripeFetch('https://api.stripe.com/v1/balance', {
       headers: { 'Authorization': `Bearer ${key}` },
     });
     return res.ok ? { ok: true } : { ok: false, error: `HTTP ${res.status}` };

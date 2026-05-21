@@ -5,8 +5,8 @@
 
 ---
 
-## DOMAIN HEALTH: 88% Ready (14/16 done, 0 critical open, 0 hard-blocked)
-> **Fastest win:** #160 - request timeout handling for external APIs (~1 hr) - Agent B
+## DOMAIN HEALTH: 94% Ready (15/16 done, 0 critical open, 0 hard-blocked)
+> **Fastest win:** #246 - verify admin panel loads in < 3 seconds with 100+ leads (~30 min) - Agent C
 > **No critical blockers** - all tasks independent, good domain to batch with other work
 
 ---
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 0 - no critical tasks in this domain |
-| Fastest Win | #160 - request timeout handling for external APIs (~1 hr) |
+| Fastest Win | #246 - verify admin panel loads in < 3 seconds with 100+ leads (~30 min) |
 | Longest Blocked Chain | None - all tasks independent |
-| Done This Week | 14 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10, #62, #64, #116, #153, #114) |
-| Est. Hours to Domain Complete | ~2.5 hrs |
+| Done This Week | 15 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10, #62, #64, #116, #153, #114, #160) |
+| Est. Hours to Domain Complete | ~1.5 hrs |
 
 ---
 
@@ -26,7 +26,6 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 160 | Pending | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | B | - | - | - | ~1 hr |
 | 241 | Pending | Final: run Lighthouse audit - target 90+ performance score | A | - | ALL sign-off | - | ~1 hr |
 | 246 | Pending | Final: verify admin panel loads in < 3 seconds with 100+ leads | C | - | ALL sign-off | - | ~30 min |
 
@@ -65,3 +64,4 @@
 | 116 | getBookedDemoSlots: add {scheduled_date: selectedDate} filter (don't fetch all) | Morpheus | 2026-05-21 | Verified `getBookedDemoSlots` queries by `scheduled_date`, active booking statuses, and a bounded result count; guarded by `tests/demoBookingSchedulerGuards.test.js` |
 | 153 | Add Cache-Control: public, max-age=60 to read-only functions | Morpheus | 2026-05-21 | Added short public cache headers to public read-only booking availability responses while leaving admin settings uncached/no-store |
 | 114 | All Resend fetch calls: add retry once on 429/5xx with 2-second delay | Morpheus | 2026-05-21 | Added shared `resendFetch` helper and routed Base44 Resend API callers through one retry-on-429/5xx path with a two-second retry delay |
+| 160 | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | Morpheus | 2026-05-21 | Added shared provider timeout wrappers and routed Base44 Twilio, Stripe, and Resend API fetches through timeout-aware helpers |

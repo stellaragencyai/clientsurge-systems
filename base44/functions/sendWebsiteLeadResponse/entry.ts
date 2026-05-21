@@ -7,6 +7,7 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { buildFailedSendRetryJob } from "../_shared/automationRetry.js";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 async function sendSMS(base44, lead, messageBody, fromNumber) {
   const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -17,8 +18,7 @@ async function sendSMS(base44, lead, messageBody, fromNumber) {
     throw new Error("Twilio credentials missing");
   }
 
-  const res = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+  const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
     {
       method: "POST",
       headers: {

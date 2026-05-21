@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -27,7 +28,7 @@ Deno.serve(async (req) => {
     const firstName = (full_name || 'there').split(' ')[0];
     const message = `Hi ${firstName}! ✅ Your ClientSurge demo is confirmed for ${friendlyDate} at ${scheduled_time} (AZ time). Nolan will call you directly at this number — keep it handy! Questions before then? Just reply here. Reply STOP to opt out.`;
 
-    const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
+    const response = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
       method: 'POST',
       headers: {
         Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,

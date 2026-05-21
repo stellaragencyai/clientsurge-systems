@@ -5,6 +5,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 function renderTemplate(template, lead) {
   return template
@@ -62,8 +63,7 @@ Deno.serve(async (req) => {
         if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 
         try {
-          const res = await fetch(
-            `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+          const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
             {
               method: "POST",
               headers: {

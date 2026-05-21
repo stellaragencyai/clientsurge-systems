@@ -1,18 +1,9 @@
+import { fetchWithTimeout } from "./providerFetch.js";
+
 const RETRYABLE_RESEND_STATUSES = new Set([429, 500, 502, 503, 504]);
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function fetchWithTimeout(url, init, timeoutMs) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    return await fetch(url, { ...init, signal: controller.signal });
-  } finally {
-    clearTimeout(timer);
-  }
 }
 
 export async function resendFetch(
@@ -20,12 +11,18 @@ export async function resendFetch(
   init = {},
   { retryDelayMs = 2000, timeoutMs = 10000 } = {}
 ) {
-  const firstResponse = await fetchWithTimeout(url, init, timeoutMs);
+  const firstResponse = await fetchWithTimeout(url, init, {
+    timeoutMs,
+    label: "Resend API request",
+  });
 
   if (!RETRYABLE_RESEND_STATUSES.has(firstResponse.status)) {
     return firstResponse;
   }
 
   await delay(retryDelayMs);
-  return fetchWithTimeout(url, init, timeoutMs);
+  return fetchWithTimeout(url, init, {
+    timeoutMs,
+    label: "Resend API request",
+  });
 }

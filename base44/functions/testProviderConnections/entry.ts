@@ -1,4 +1,5 @@
 import { resendFetch } from "../_shared/resendFetch.js";
+import { twilioFetch } from "../_shared/providerFetch.js";
 /**
  * testProviderConnections — #172
  * Tests Twilio and Resend credentials live. Returns {success, message}.
@@ -11,7 +12,7 @@ Deno.serve(async (req) => {
     const auth = Deno.env.get("TWILIO_AUTH_TOKEN");
     if (!sid || !auth) return Response.json({ success: false, message: "Twilio credentials not configured" });
     try {
-      const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
+      const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
         headers: { Authorization: `Basic ${btoa(`${sid}:${auth}`)}` },
       });
       if (res.ok) {

@@ -8,29 +8,12 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import {
 import { resendFetch } from "../_shared/resendFetch.js";
+import { twilioFetch } from "../_shared/providerFetch.js";
+import {
   buildRetrySchedulePatch,
   isAutomationJobDue,
 } from "../_shared/automationRetry.js";
-
-// #114: Resend with retry on 429/5xx
-async function resendWithRetry(payload, apiKey, retries = 1) {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    const res = await resendFetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) return res.json();
-    if ((res.status === 429 || res.status >= 500) && attempt < retries) {
-      await new Promise(r => setTimeout(r, 2000));
-      continue;
-    }
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Resend ${res.status}: ${err?.message || "unknown"}`);
-  }
-}
 
 // #123: exponential backoff retry wrapper for jobs
 const MAX_RETRIES_JOB = 3;
@@ -69,7 +52,7 @@ async function sendTwilioSms(toNumber, messageBody) {
   const params = { From: TWILIO_FROM_NUMBER, To: toNumber, Body: messageBody };
   if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 
-  const response = await fetch(TWILIO_API_URL, {
+  const response = await twilioFetch(TWILIO_API_URL, {
     method: "POST",
     headers: {
       Authorization: `Basic ${auth}`,

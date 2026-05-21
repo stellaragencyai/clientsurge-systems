@@ -24,6 +24,7 @@
  */
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 const PHOENIX_OFFSET_HOURS = 7; // UTC-7, no DST
 
@@ -184,8 +185,7 @@ End with the single most important action to take first thing today.`;
           // Since we can't create a public URL inline, we use Twilio TwiML Bins or
           // encode as base64 data URI. Instead, use the simpler approach:
           // Call with twiml parameter (Twilio supports this directly in the API)
-          const callRes = await fetch(
-            `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls.json`,
+          const callRes = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Calls.json`,
             {
               method: 'POST',
               headers: {
@@ -220,7 +220,7 @@ End with the single most important action to take first thing today.`;
       const smsBody = `📊 Morning Briefing:\n• ${newLeads.length} new leads (24h)\n• ${hotLeads.length} HOT leads uncalled\n• ${overdueFollowUps.length} overdue follow-ups\n• ${pastDueClients.length} past-due clients\n• ${stalledInstalls.length} stalled installs\n\nReply STOP to unsubscribe.`;
 
       if (accountSid && authToken && fromNumber) {
-        await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
+        await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
           method: 'POST',
           headers: {
             Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,

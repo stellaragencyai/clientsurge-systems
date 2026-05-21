@@ -10,6 +10,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 const CHANNELS = {
   SMS: "sms",
@@ -60,8 +61,7 @@ async function sendFollowUp(base44, lead, channel, stepNumber, templates) {
       const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
 
       if (accountSid && authToken && fromNumber && lead.phone_number) {
-        const res = await fetch(
-          `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+        const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
           {
             method: "POST",
             headers: {

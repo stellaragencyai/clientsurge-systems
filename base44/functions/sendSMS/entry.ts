@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -17,7 +18,7 @@ Deno.serve(async (req) => {
     }
 
     const auth = btoa(`${accountSid}:${authToken}`);
-    const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
+    const response = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${auth}`,

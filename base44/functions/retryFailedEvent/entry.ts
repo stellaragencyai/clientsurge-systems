@@ -7,6 +7,7 @@
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
+import { stripeFetch, twilioFetch } from "../_shared/providerFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -54,7 +55,7 @@ Deno.serve(async (req) => {
       if (!body) return Response.json({ error: 'No message body to retry' }, { status: 400 });
 
       const formData = new URLSearchParams({ From: TWILIO_FROM, To: toPhone, Body: body });
-      const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
+      const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
         method: 'POST',
         headers: {
           'Authorization': 'Basic ' + btoa(`${TWILIO_SID}:${TWILIO_TOKEN}`),
@@ -112,7 +113,7 @@ Deno.serve(async (req) => {
       const stripeEventId = evt.provider_message_id;
       if (!stripeEventId) return Response.json({ error: 'No Stripe event ID stored — cannot retry' }, { status: 400 });
 
-      const stripeRes = await fetch(`https://api.stripe.com/v1/events/${stripeEventId}`, {
+      const stripeRes = await stripeFetch(`https://api.stripe.com/v1/events/${stripeEventId}`, {
         headers: { 'Authorization': `Bearer ${STRIPE_KEY}` },
       });
       if (!stripeRes.ok) {

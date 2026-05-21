@@ -1,4 +1,5 @@
 import { loadAdminSettings } from "./adminSettings.js";
+import { twilioFetch } from "./providerFetch.js";
 
 function buildResult({
   integrationId,
@@ -113,7 +114,8 @@ async function testTwilio({ settings, fetchImpl, env, testedAt }) {
   }
 
   try {
-    const response = await fetchImpl(
+    const twilioRequest = fetchImpl === fetch ? twilioFetch : fetchImpl;
+    const response = await twilioRequest(
       `https://api.twilio.com/2010-04-01/Accounts/${accountSid}.json`,
       {
         headers: {

@@ -7,6 +7,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { canSendFollowUpSms } from "../shared/followUpSmsHours.ts";
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 function minutesSince(isoDate) {
   if (!isoDate) return 0;
@@ -115,8 +116,7 @@ Deno.serve(async (req) => {
         const params = { To: lead.phone, From: fromNumber, Body: messageBody };
         if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 
-        const res = await fetch(
-          `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+        const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
           {
             method: "POST",
             headers: {

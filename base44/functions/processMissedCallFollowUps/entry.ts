@@ -8,6 +8,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 const FOLLOW_UP_STEPS = [
   { step: 1, minutesAfter: 2, channel: "sms", key: "missed_call_sms_2min" },
@@ -120,8 +121,7 @@ async function sendSMS(base44, lead, messageBody, fromNumber, stepKey) {
   const params = { To: lead.phone, From: fromNumber, Body: messageBody };
   if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 
-  const res = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+  const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
     {
       method: "POST",
       headers: {

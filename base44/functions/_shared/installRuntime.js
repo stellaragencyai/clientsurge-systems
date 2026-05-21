@@ -7,6 +7,7 @@ import {
   validateServiceConfiguration,
 } from "./installPipeline.js";
 import { listLeadReactivationTargets as listLeadReactivationTargetsFromPipeline } from "./leadPipeline.js";
+import { twilioFetch } from "./providerFetch.js";
 
 export const ALLOWED_RUNTIME_INSTALL_STATUSES = ["Testing", "Live"];
 export const MISSED_CALL_TRIGGER_STATUSES = ["busy", "canceled", "failed", "no-answer"];
@@ -515,7 +516,7 @@ export async function findPaidOrderByConfiguredPhone({ base44, businessPhone, se
   return matches[0] || null;
 }
 
-export async function sendTwilioSms({ to, from, body, fetchImpl = fetch }) {
+export async function sendTwilioSms({ to, from, body, fetchImpl = twilioFetch }) {
   const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
   const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
 

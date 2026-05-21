@@ -6,6 +6,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import crypto from "node:crypto";
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 async function validateTwilioSignature(req, rawBody) {
   const webhookKey = Deno.env.get("TWILIO_WEBHOOK_KEY");
@@ -307,7 +308,7 @@ async function sendTwilioSms(toNumber, messageBody) {
   const params = { From: TWILIO_FROM_NUMBER, To: toNumber, Body: messageBody };
   if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 
-  const response = await fetch(TWILIO_API_URL, {
+  const response = await twilioFetch(TWILIO_API_URL, {
     method: "POST",
     headers: {
       Authorization: `Basic ${auth}`,

@@ -18,6 +18,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -112,8 +113,7 @@ Deno.serve(async (req) => {
         `Score: ${lead.lead_score || 0}/100\n` +
         `Problem: ${(lead.problem || "").slice(0, 80)}`;
 
-      const twilioRes = await fetch(
-        `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+      const twilioRes = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
         {
           method: "POST",
           headers: {

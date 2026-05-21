@@ -24,6 +24,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
 const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
@@ -40,7 +41,7 @@ async function sendTwilioSms(toNumber, messageBody) {
   }
 
   const auth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
-  const response = await fetch(TWILIO_API_URL, {
+  const response = await twilioFetch(TWILIO_API_URL, {
     method: "POST",
     headers: {
       Authorization: `Basic ${auth}`,
