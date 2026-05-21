@@ -28,6 +28,7 @@ import Book from "./pages/Book";
 import Contact from "./pages/Contact";
 import Industries from "./pages/Industries";
 import Blog from "./pages/Blog";
+import Login from "./pages/Login";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
 import About from "./pages/About";
 import Automations from "./pages/Automations";
@@ -116,6 +117,7 @@ const NOINDEX_PREFIXES = [
   "/order-success",
   "/websitespecpreview",
   "/leads",
+  "/login",
   "/motion-lab",
 ];
 
@@ -344,7 +346,7 @@ const AuthenticatedApp = () => {
       <Route path={routePath("testimonials")} element={<SectionRedirect hash="#testimonials" />} />
       <Route path="/privacy-policy" element={<LegalPage fixedType="privacy" canonicalPath="/privacy-policy" />} />
       <Route path={routePath("terms")} element={<LegalPage fixedType="terms" canonicalPath="/terms" />} />
-      <Route path="/login" element={<Navigate to="/client-portal" replace />} />
+      <Route path="/login" element={<Login />} />
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/blog" element={<Blog />} />
