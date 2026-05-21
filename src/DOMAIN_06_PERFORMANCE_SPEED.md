@@ -5,8 +5,8 @@
 
 ---
 
-## DOMAIN HEALTH: 75% Ready (12/16 done, 0 critical open, 0 hard-blocked)
-> **Fastest win:** #153 - add Cache-Control to read-only functions (~30 min) - Agent B
+## DOMAIN HEALTH: 81% Ready (13/16 done, 0 critical open, 0 hard-blocked)
+> **Fastest win:** #114 - Resend retry once on 429/5xx (~45 min) - Agent B
 > **No critical blockers** - all tasks independent, good domain to batch with other work
 
 ---
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 0 - no critical tasks in this domain |
-| Fastest Win | #153 - Cache-Control on read-only functions (~30 min) |
+| Fastest Win | #114 - Resend retry once on 429/5xx (~45 min) |
 | Longest Blocked Chain | None - all tasks independent |
-| Done This Week | 12 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10, #62, #64, #116) |
-| Est. Hours to Domain Complete | ~3.75 hrs |
+| Done This Week | 13 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10, #62, #64, #116, #153) |
+| Est. Hours to Domain Complete | ~3.25 hrs |
 
 ---
 
@@ -37,7 +37,6 @@
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
 | 114 | Pending | All Resend fetch calls: add retry once on 429/5xx with 2-second delay | B | - | - | - | ~45 min |
-| 153 | Pending | Add Cache-Control: public, max-age=60 to read-only functions | B | - | - | - | ~30 min |
 | 219 | Pending | Load test: simulate 50 concurrent lead submissions, measure response time | C | - | - | - | ~1 hr |
 
 ---
@@ -65,3 +64,4 @@
 | 62 | Add manifest.json + minimal service worker for PWA installability | Morpheus | 2026-05-21 | Added `public/manifest.json`, local SVG PWA icon, same-origin `public/sw.js`, and production-only service worker registration |
 | 64 | Add ?w=800&q=80 Unsplash query params + srcSet to all hero/industry images | Morpheus | 2026-05-21 | Added shared Unsplash optimization helpers and wired responsive `srcSet`/`sizes` into public industry hero/card/modal/process/timeline image surfaces |
 | 116 | getBookedDemoSlots: add {scheduled_date: selectedDate} filter (don't fetch all) | Morpheus | 2026-05-21 | Verified `getBookedDemoSlots` queries by `scheduled_date`, active booking statuses, and a bounded result count; guarded by `tests/demoBookingSchedulerGuards.test.js` |
+| 153 | Add Cache-Control: public, max-age=60 to read-only functions | Morpheus | 2026-05-21 | Added short public cache headers to public read-only booking availability responses while leaving admin settings uncached/no-store |

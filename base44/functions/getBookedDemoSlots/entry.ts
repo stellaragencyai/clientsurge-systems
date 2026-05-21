@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { cachedJson } from "../_shared/response.ts";
 
 // #116: filter by scheduled_date to avoid fetching all records
 Deno.serve(async (req) => {
@@ -18,7 +19,7 @@ Deno.serve(async (req) => {
 
     const bookedTimes = (bookings || []).map(b => b.scheduled_time).filter(Boolean);
 
-    return Response.json({ booked_times: bookedTimes, date, count: bookedTimes.length });
+    return cachedJson({ booked_times: bookedTimes, date, count: bookedTimes.length }, 60);
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
