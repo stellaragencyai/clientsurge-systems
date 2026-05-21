@@ -6,6 +6,7 @@ import {
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw, Plus,
   Server, RotateCcw, BookOpen, Wand2, Sparkles, Crosshair, Trophy,
+  CalendarCheck2,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
@@ -31,6 +32,7 @@ import AdminInbox from '../components/admin/AdminInbox';
 import AdminGlobalSearch from '../components/admin/AdminGlobalSearch';
 import InstallQueuePanel from '../components/admin/InstallQueuePanel';
 import WebsiteLeadsDashboard from '../components/admin/WebsiteLeadsDashboard';
+import AdminDemoBookingsTab from '../components/admin/AdminDemoBookingsTab';
 import CommunicationLogsPanel from '../components/admin/CommunicationLogsPanel';
 import AutomationInstallChecklist from '../components/admin/AutomationInstallChecklist';
 import ReviewRequestPanel from '../components/admin/ReviewRequestPanel';
@@ -57,6 +59,7 @@ const NAV_GROUPS = [
     group: 'Automation',
     items: [
       { id: 'website-leads', label: 'Website Leads', icon: Target },
+      { id: 'demo-bookings', label: 'Demo Bookings', icon: CalendarCheck2 },
       { id: 'install-queue', label: 'Install Queue', icon: Server },
       { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
       { id: 'automations', label: 'Automation Status', icon: Zap, external: true, externalPath: '/admin/automations' },
@@ -214,6 +217,7 @@ export default function AdminDashboard() {
       case 'install-queue': return <InstallQueuePanel />;
       case 'install-checklists': return <AutomationInstallChecklist />;
       case 'website-leads': return <WebsiteLeadsDashboard />;
+      case 'demo-bookings': return <AdminDemoBookingsTab />;
       case 'logs': return <CommunicationLogsPanel />;
       case 'cadence': return <DynamicCadencePanel />;
       case 'reactivation': return <LeadReactivationPanel />;
