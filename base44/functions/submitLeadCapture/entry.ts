@@ -3,6 +3,7 @@
  * Stores top-of-funnel submissions in WebsiteLead only.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { validatePublicFormOrigin } from "../_shared/publicFormOriginGuard.js";
 import {
   buildDedupKey,
   cleanString,
@@ -115,6 +116,11 @@ function getClientIp(req: Request) {
 
 Deno.serve(async (req) => {
   try {
+    const originGuard = validatePublicFormOrigin(req);
+    if (!originGuard.ok) {
+      return Response.json({ error: originGuard.error }, { status: originGuard.status });
+    }
+
     const base44 = createClientFromRequest(req);
     const ip = getClientIp(req);
     if (rateLimiter.isRateLimited(ip)) {

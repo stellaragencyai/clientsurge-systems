@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { validatePublicFormOrigin } from "../_shared/publicFormOriginGuard.js";
 import { resendFetch } from "../_shared/resendFetch.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
@@ -281,6 +282,11 @@ Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
       return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
+
+    const originGuard = validatePublicFormOrigin(req);
+    if (!originGuard.ok) {
+      return Response.json({ error: originGuard.error }, { status: originGuard.status });
     }
 
     const base44 = createClientFromRequest(req);
