@@ -17,8 +17,8 @@ function sanitizeString(value: unknown, maxLength = MAX_FIELD_LENGTH) {
 }
 
 function normalizeContactInput(payload: Record<string, unknown>) {
-  const realWebsite = sanitizeString(payload.website_url || payload.website);
-  const honeypot = sanitizeString(payload.website_hp || payload.website_honeypot || payload.company_website_hp);
+  const realWebsite = sanitizeString(payload.business_website_url || payload.website);
+  const honeypot = sanitizeString(payload.website_url || payload.website_hp || payload.website_honeypot || payload.company_website_hp);
   return {
     full_name: sanitizeString(payload.full_name),
     email: sanitizeString(payload.email).toLowerCase(),

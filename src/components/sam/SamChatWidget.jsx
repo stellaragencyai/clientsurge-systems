@@ -41,7 +41,8 @@ export default function SamChatWidget() {
     business_name: leadProfile?.business_name || "",
     email: leadProfile?.email || "",
     phone: leadProfile?.phone || "",
-    website_url: leadProfile?.website_url || "",
+    business_website_url: leadProfile?.business_website_url || leadProfile?.website_url || "",
+    website_url: "",
     industry: leadProfile?.industry || "Med Spas & Aesthetic Clinics",
   }));
   const messagesEndRef = useRef(null);
@@ -123,6 +124,7 @@ export default function SamChatWidget() {
         phone: leadForm.phone,
         business_type: leadForm.industry,
         message: `AI concierge chat request for basic package activation. Business: ${leadForm.business_name || "Not provided"}. Industry: ${leadForm.industry}.`,
+        business_website_url: leadForm.business_website_url,
         website_url: leadForm.website_url,
       });
 
@@ -235,10 +237,19 @@ export default function SamChatWidget() {
                     className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                   <input
-                    value={leadForm.website_url}
-                    onChange={(e) => setLeadForm((prev) => ({ ...prev, website_url: e.target.value }))}
+                    value={leadForm.business_website_url}
+                    onChange={(e) => setLeadForm((prev) => ({ ...prev, business_website_url: e.target.value }))}
                     placeholder="Website URL"
                     className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  />
+                  <input
+                    type="text"
+                    value={leadForm.website_url}
+                    onChange={(e) => setLeadForm((prev) => ({ ...prev, website_url: e.target.value }))}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    className="hidden"
+                    aria-hidden="true"
                   />
                   <select
                     value={leadForm.industry}
