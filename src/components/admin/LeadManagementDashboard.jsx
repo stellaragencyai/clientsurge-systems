@@ -24,6 +24,7 @@ import {
   previewLeadImport,
   triggerLeadScoring,
 } from "@/lib/leadPipelineApi";
+import { buildAdminConversionFunnel } from "@/lib/adminConversionFunnel";
 import { buildLeadsCsv, downloadCsvFile } from "@/lib/leadCsvExport";
 import LeadCRMDrawer from "./LeadCRMDrawer";
 import LeadScoreBadge from "./LeadScoreBadge";
@@ -139,6 +140,60 @@ function SummaryCard({ label, value, helper, tone = "default" }) {
       <p className="text-xs font-semibold uppercase tracking-wide opacity-75">{label}</p>
       <p className="mt-2 text-3xl font-bold">{value}</p>
       {helper ? <p className="mt-2 text-xs opacity-80">{helper}</p> : null}
+    </div>
+  );
+}
+
+function ConversionFunnelChart({ summary }) {
+  const stages = buildAdminConversionFunnel(summary);
+  const toneClasses = {
+    blue: "bg-blue-500",
+    purple: "bg-purple-500",
+    emerald: "bg-emerald-500",
+    amber: "bg-amber-500",
+  };
+
+  return (
+    <div className="rounded-xl border border-border bg-white p-4">
+      <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground">Conversion Funnel</h3>
+          <p className="text-sm text-muted-foreground">Lead to contacted to booked to paid, rendered with CSS only.</p>
+        </div>
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          {stages[0]?.count || 0} total leads
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+        {stages.map((stage, index) => (
+          <div key={stage.key} className="rounded-lg border border-border bg-muted/20 p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-foreground">{stage.label}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{stage.helper}</p>
+              </div>
+              <span className="rounded-full bg-white px-2 py-1 text-xs font-bold text-foreground">
+                {stage.count}
+              </span>
+            </div>
+            <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className={`h-full rounded-full ${toneClasses[stage.tone] || "bg-slate-500"}`}
+                style={{ width: `${stage.percentage}%` }}
+              />
+            </div>
+            <div className="mt-2 flex items-center justify-between text-xs">
+              <span className="font-semibold text-foreground">{stage.percentage}%</span>
+              {index > 0 ? (
+                <span className="text-muted-foreground">from total leads</span>
+              ) : (
+                <span className="text-muted-foreground">top of funnel</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -480,6 +535,8 @@ export default function LeadManagementDashboard() {
           tone="default"
         />
       </div>
+
+      <ConversionFunnelChart summary={snapshot.summary} />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.4fr,1fr]">
         <div className="rounded-xl border border-border bg-white p-4 space-y-4">
