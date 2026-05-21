@@ -1782,7 +1782,7 @@ PHASE 7 - Admin UI
 | # | Status | Task | Effort | Blocker |
 |---|---|---|---|---|
 | AC-15 | ⏳ | End-to-end test: missed call → instant SMS → full 4-step follow-up sequence | 90 min | Needs AC-2, AC-4 |
-| AC-16 | ⏳ | Verify old lead reactivation campaign logic | 45 min | No |
+| AC-16 | ✅ | Verify old lead reactivation campaign logic | 45 min | Morpheus 2026-05-20 |
 | AC-17 | ✅ | Test closed/booked lead protection - no reactivation | 20 min | No  Morpheus 2026-05-20 |
 | AC-18 | ✅ | Verify duplicate call handling idempotency (same CallSid processed once) | 20 min | Morpheus 2026-05-20 |
 

@@ -767,6 +767,100 @@ test("lead reactivation test uses canonical Leads and logs per-lead plus summary
   assert.equal(metadata.selected_lead_count, 2);
 });
 
+test("lead reactivation campaign logic excludes fresh, booked, closed, and unrelated leads", async () => {
+  const { base44, entities } = createFakeBase44();
+  entities.Leads.records.push(
+    {
+      id: "lead_booked",
+      full_name: "Booked Dormant",
+      email: "booked@example.com",
+      phone: "+16025550115",
+      business_name: "Signal Med Spa",
+      status: "Booked",
+      booked_at: "2026-02-20T12:00:00.000Z",
+      created_date: "2026-01-15T12:00:00.000Z",
+      last_contacted_at: "2026-02-01T12:00:00.000Z",
+    },
+    {
+      id: "lead_closed",
+      full_name: "Closed Dormant",
+      email: "closed@example.com",
+      phone: "+16025550116",
+      business_name: "Signal Med Spa",
+      status: "Closed",
+      created_date: "2026-01-15T12:00:00.000Z",
+      last_contacted_at: "2026-02-01T12:00:00.000Z",
+    }
+  );
+
+  let currentOrder = await initializeRuntimeReadyOrder(base44, entities);
+  currentOrder = await moveServiceToTesting(base44, currentOrder, "lead_reactivation");
+
+  const dormantResult = await executeLeadReactivationTest({
+    base44,
+    order: currentOrder,
+    maxTestLeads: 10,
+    now: "2026-04-22T12:18:00.000Z",
+  });
+
+  assert.deepEqual(dormantResult.selected_lead_ids.sort(), ["lead_1", "lead_2"]);
+  const reactivationSuccessEvents = entities.CommunicationEvent.records.filter(
+    (event) =>
+      event.service_key === "lead_reactivation" &&
+      event.event_type === "provider_send_succeeded"
+  );
+  assert.equal(reactivationSuccessEvents.length, 2);
+  assert.ok(
+    reactivationSuccessEvents.every(
+      (event) => event.channel === "internal" && event.provider === "internal"
+    )
+  );
+
+  currentOrder = await updateOrderInstallConfiguration({
+    base44,
+    order: await entities.Order.get("order_1"),
+    patch: {
+      services: {
+        lead_reactivation: {
+          target_segment: "contacted_no_reply",
+        },
+      },
+    },
+    now: "2026-04-22T12:19:00.000Z",
+  });
+
+  const contactedResult = await executeLeadReactivationTest({
+    base44,
+    order: currentOrder,
+    maxTestLeads: 10,
+    now: "2026-04-22T12:20:00.000Z",
+  });
+
+  assert.deepEqual(contactedResult.selected_lead_ids, ["lead_2"]);
+
+  currentOrder = await updateOrderInstallConfiguration({
+    base44,
+    order: await entities.Order.get("order_1"),
+    patch: {
+      services: {
+        lead_reactivation: {
+          target_segment: "qualified_unbooked",
+        },
+      },
+    },
+    now: "2026-04-22T12:21:00.000Z",
+  });
+
+  const qualifiedResult = await executeLeadReactivationTest({
+    base44,
+    order: currentOrder,
+    maxTestLeads: 10,
+    now: "2026-04-22T12:22:00.000Z",
+  });
+
+  assert.deepEqual(qualifiedResult.selected_lead_ids, ["lead_1"]);
+});
+
 test("lead reactivation test blocks when canonical config is incomplete", async () => {
   const { base44, entities } = createFakeBase44({
     payment_status: "paid",
