@@ -15,6 +15,9 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { withTimeout } from "../_shared/timeout.js";
+
+const ENRICH_LEAD_TIMEOUT_MS = 10_000;
 
 Deno.serve(async (req) => {
   try {
@@ -64,30 +67,35 @@ Search the web for this business and extract:
 
 Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
 
-    let enriched = {};
+    let enriched: any = {};
     try {
-      enriched = await base44.asServiceRole.integrations.Core.InvokeLLM({
-        prompt,
-        add_context_from_internet: true,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            industry_tags:     { type: "array", items: { type: "string" } },
-            company_size:      { type: "string" },
-            social_profiles:   { type: "object" },
-            website:           { type: "string" },
-            enrichment_notes:  { type: "string" }
+      enriched = await withTimeout(
+        base44.asServiceRole.integrations.Core.InvokeLLM({
+          prompt,
+          add_context_from_internet: true,
+          response_json_schema: {
+            type: "object",
+            properties: {
+              industry_tags:     { type: "array", items: { type: "string" } },
+              company_size:      { type: "string" },
+              social_profiles:   { type: "object" },
+              website:           { type: "string" },
+              enrichment_notes:  { type: "string" }
+            }
           }
-        }
-      });
+        }),
+        ENRICH_LEAD_TIMEOUT_MS,
+        "enrichLead InvokeLLM"
+      );
     } catch (llmErr) {
-      console.error("enrichLead LLM error:", llmErr.message);
+      const message = llmErr instanceof Error ? llmErr.message : String(llmErr);
+      console.error("enrichLead LLM error:", message);
       // Still write a partial enrichment record so we don't retry in a loop
       await base44.asServiceRole.entities.Leads.update(leadId, {
         enriched_at: new Date().toISOString(),
-        enrichment_notes: `Enrichment attempted but failed: ${llmErr.message}`
+        enrichment_notes: `Enrichment attempted but failed: ${message}`
       });
-      return Response.json({ success: false, error: llmErr.message });
+      return Response.json({ success: false, error: message });
     }
 
     // Validate company_size against allowed enum values
@@ -95,7 +103,7 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
     const companySize = validSizes.includes(enriched.company_size) ? enriched.company_size : "unknown";
 
     // Build update payload — only write fields that came back with real values
-    const update = {
+    const update: any = {
       enriched_at: new Date().toISOString(),
       enrichment_notes: enriched.enrichment_notes || null,
       company_size: companySize,
@@ -137,6 +145,7 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
 
   } catch (error) {
     console.error("enrichLead error:", error);
-    return Response.json({ error: error.message || "Enrichment failed" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "Enrichment failed";
+    return Response.json({ error: message }, { status: 500 });
   }
 });

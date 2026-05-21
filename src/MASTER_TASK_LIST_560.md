@@ -1586,7 +1586,7 @@ PHASE 7 - Admin UI
 | 540 | ✅ | Admin: mask phone numbers for non-super-admin | MEDIUM  Agent Smith |
 | 541 | ⏳ | _shared/response.ts: okJson() + errJson() helpers sitewide | MEDIUM |
 | 542 | ✅ | All functions: correct HTTP status codes (400/404/500) | HIGH |
-| 543 | ⏳ | enrichLead: 10-second timeout on external API calls | MEDIUM |
+| 543 | ✅ | enrichLead: 10-second timeout on external API calls | MEDIUM  Morpheus 2026-05-20 |
 | 544 | ✅ | scoreLeadIntelligence: skip if confidence < 0.6 | MEDIUM  Morpheus 2026-05-20 |
 
 ---
