@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Loader2, CheckCircle2, AlertCircle, Clock } from "lucide-react";
+import { getStalledInstallWarning } from "@/lib/installQueueStatus";
 
 const STATUS_COLORS = {
   "Paid": "bg-blue-50 border-blue-200",
@@ -99,6 +100,7 @@ export default function InstallQueuePanel() {
 
       {orders.map((order) => {
         const StatusIcon = STATUS_ICONS[order.pipeline_status] || Clock;
+        const stalledWarning = getStalledInstallWarning(order);
         return (
           <div
             key={order.id}
@@ -118,6 +120,17 @@ export default function InstallQueuePanel() {
                 {order.pipeline_status}
               </span>
             </div>
+
+            {stalledWarning && (
+              <div
+                title={stalledWarning.title}
+                className="inline-flex w-fit items-center gap-2 rounded-full border border-amber-300 bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800"
+              >
+                <AlertCircle className="h-3.5 w-3.5" />
+                {stalledWarning.label}
+                <span className="font-medium text-amber-700">{stalledWarning.hoursSincePaid}h</span>
+              </div>
+            )}
 
             {/* Services */}
             <div className="space-y-2 border-t border-current/10 pt-3">
