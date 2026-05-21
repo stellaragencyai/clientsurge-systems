@@ -9,9 +9,13 @@ import { BUTTON_TEXT } from "@/lib/constants";
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
 
 const checklist = [
-"Recover missed calls and after-hours leads",
-"Automatically follow up with every inquiry",
-"Book more appointments without hiring extra staff"];
+  "Lead capture",
+  "Missed-call text-back",
+  "AI follow-up",
+  "Appointment booking",
+  "Review requests",
+  "Customer reactivation",
+];
 
 
 export default function Hero() {
@@ -92,14 +96,14 @@ export default function Hero() {
               marginBottom: "16px"
             }}>
             
-            AI Automation Systems That Turn More Local Leads Into{" "}
+            AI Automation Systems That Help Local Businesses Capture Leads, Follow Up Faster, Book More Appointments, and{" "}
             <span
               style={{
                 color: "#00AEEF",
                 display: "inline"
               }}>
               
-              Booked Jobs
+              Recover Lost Revenue
             </span>
           </h1>
 
@@ -116,7 +120,7 @@ export default function Hero() {
               margin: "0 0 18px"
             }}>
             
-            ClientSurge Systems builds AI-powered websites, voice agents, and lead automation systems for local service businesses. Recover missed calls, respond instantly, nurture leads automatically, and book more appointments without adding staff.
+            ClientSurge Systems installs six done-for-you automations for service businesses: lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation. The website, CRM handoff, and AI workflow are packaged as one remote launch system.
           </p>
 
           <div

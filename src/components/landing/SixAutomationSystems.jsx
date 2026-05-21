@@ -55,6 +55,15 @@ export default function SixAutomationSystems() {
                 <h3 className="mb-3 text-xl font-bold leading-tight text-foreground">{automation.title}</h3>
                 <p className="mb-5 text-sm leading-6 text-muted-foreground">{automation.summary}</p>
 
+                <ul className="mb-5 space-y-2">
+                  {automation.bullets.map((bullet) => (
+                    <li key={bullet} className="flex items-start gap-2 text-xs font-semibold text-slate-600">
+                      <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: "#0088CC" }} />
+                      {bullet}
+                    </li>
+                  ))}
+                </ul>
+
                 <div className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: "#0088CC" }}>
                   See how it works
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

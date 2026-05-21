@@ -1,29 +1,29 @@
 export const SIX_AUTOMATIONS = [
   {
-    id: "ai-voice-agent",
+    id: "missed-call-text-back",
     slug: "ai-voice-agent-missed-call-recovery",
     routePath: "/missed-call-text-back",
-    title: "AI Voice Agent & Missed-Call Recovery",
-    shortTitle: "AI Voice Agent",
+    title: "Missed-Call Text-Back Automation",
+    shortTitle: "Missed-Call Text-Back",
     icon: "phone",
     summary:
-      "Answers or triages missed calls, after-hours calls, and inbound inquiries so fewer leads disappear before your team can respond.",
+      "When a business misses a call, the system instantly texts the lead so they do not call a competitor.",
     bullets: [
+      "Texts missed callers instantly",
       "Captures caller details",
-      "Handles common questions",
-      "Routes urgent or qualified leads into follow-up",
+      "Routes replies into follow-up",
     ],
     whatItDoes:
-      "Uses AI phone receptionist workflows, missed-call recovery, and lead routing to keep high-intent callers moving toward follow-up or booking.",
+      "Detects missed calls, sends an immediate text-back, captures the lead context, and routes the conversation into follow-up or booking.",
     whoFor:
       "Local service businesses where phone calls, after-hours inquiries, and unanswered calls turn into lost revenue.",
     triggers: ["Missed inbound call", "After-hours call", "Busy-line call", "Qualified phone inquiry"],
     exampleMessages: [
-      "Thanks for calling. What can we help you with today?",
-      "We captured your request and will get you the fastest next step.",
+      "Sorry we missed your call. What can we help you with today?",
+      "We can still help. Reply here and we will get you the fastest next step.",
     ],
     before: "Callers hit voicemail, hang up, or call the next competitor.",
-    after: "Callers are answered, triaged, routed, and followed up with quickly.",
+    after: "Missed callers receive an instant reply and stay in your pipeline.",
     industries: ["HVAC", "Roofing", "Dental", "Med spas", "Contractors", "Chiropractic"],
   },
   {

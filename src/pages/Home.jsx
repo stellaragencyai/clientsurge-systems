@@ -62,7 +62,7 @@ export default function Home() {
       cleanupMetadata = setPageMetadata({
         title: "AI Automation Systems for Local Leads | ClientSurge Systems",
         description:
-          "six done-for-you automations, AI-powered websites, voice agents, missed-call recovery, lead follow-up, and booking automation for local service businesses that want more booked jobs.",
+          "six done-for-you automations for lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation for local service businesses.",
         canonicalPath: "/",
         ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
         ogDescription:

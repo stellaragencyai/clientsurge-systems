@@ -4,19 +4,19 @@ import { useDemoBooking } from "./DemoBookingContext";
 
 const services = [
   {
+    icon: Workflow,
+    title: "Website plus AI install engine",
+    body: "Connect the public website, checkout package, onboarding intake, CRM records, and remote install workspace into one launch path.",
+  },
+  {
     icon: Headphones,
     title: "AI voice agents and phone receptionist",
     body: "Answer inbound calls, qualify urgent opportunities, collect contact details, and route ready prospects toward booking instead of voicemail.",
   },
   {
-    icon: PhoneCall,
-    title: "Missed-call recovery",
-    body: "Trigger instant text-back when a call is missed so high-intent leads stay in conversation before they contact a competitor.",
-  },
-  {
     icon: MessageSquareText,
-    title: "Instant lead response",
-    body: "Respond to web forms, ad leads, and direct inquiries in under 60 seconds with personalized SMS and email follow-up.",
+    title: "Six automation service stack",
+    body: "Package lead capture, missed-call text-back, AI follow-up, booking, reviews, and reactivation as the core customer offer.",
   },
   {
     icon: CalendarCheck,
@@ -29,9 +29,9 @@ const services = [
     body: "Keep new leads warm for 14 days and bring old leads back with controlled SMS and email campaigns.",
   },
   {
-    icon: Workflow,
-    title: "Workflow automation",
-    body: "Connect the website, lead pipeline, notifications, CRM handoff, and review requests so the operation runs with less manual chasing.",
+    icon: PhoneCall,
+    title: "Missed-call recovery",
+    body: "Trigger instant text-back when a call is missed so high-intent leads stay in conversation before they contact a competitor.",
   },
 ];
 
@@ -79,10 +79,10 @@ export default function HomepageConversionContent() {
             id="ai-automation-overview"
             className="font-display text-3xl md:text-5xl font-bold tracking-tight text-foreground leading-tight"
           >
-            Websites, voice agents, and follow-up automation built for local service revenue.
+            A complete website foundation around the six automations customers actually buy.
           </h2>
           <p className="mt-5 text-base md:text-lg text-muted-foreground leading-relaxed">
-            ClientSurge Systems is the front end of a larger lead conversion engine. We build high-converting business websites and connect them to AI-powered response, phone, booking, and workflow automations so local service companies can capture more demand without adding front-desk headcount.
+            ClientSurge Systems is the front end of a larger lead conversion engine. We build high-converting business websites and connect them to AI-powered response, phone, booking, review, and reactivation automations so local service companies can capture more demand without adding front-desk headcount.
           </p>
         </div>
 
@@ -118,10 +118,10 @@ export default function HomepageConversionContent() {
               <Bot className="h-5 w-5 text-primary" aria-hidden="true" />
             </div>
             <h2 className="mt-5 font-display text-2xl md:text-4xl font-bold tracking-tight text-foreground">
-              Built to recover the leads local businesses already paid for.
+              Built so a customer can choose a package and move into remote AI installation.
             </h2>
             <p className="mt-4 text-muted-foreground leading-relaxed">
-              The system focuses on the moments that decide revenue: who answers the phone, how fast a new inquiry gets a response, whether follow-up actually happens, and whether ready prospects reach the booking step.
+              The system focuses on the moments that decide revenue: the visitor understands the offer, picks one of the three packages, completes checkout, submits onboarding details, and enters the install workspace where the AI automation stack can be configured and tested.
             </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <button
