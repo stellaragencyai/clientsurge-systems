@@ -83,9 +83,6 @@ export default function Navbar() {
 
   useEffect(() => {
     if (!open) {
-      // Ensure nav-open is never stuck on the body when menu is closed
-      document.body.classList.remove("nav-open");
-      document.body.style.removeProperty("--scroll-lock-top");
       return undefined;
     }
 
@@ -112,9 +109,6 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.removeEventListener("scroll", onScroll);
-      // Safety: always remove scroll lock on unmount
-      document.body.classList.remove("nav-open");
-      document.body.style.removeProperty("--scroll-lock-top");
     };
   }, []);
 
