@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 77% Ready (27/35 done · 0 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** #44 — Mobile sticky cart badge (~15 min, no deps) · Agent A
+## 📊 DOMAIN HEALTH: 🟡 80% Ready (28/35 done · 0 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** #55 — Calendly CSP frame check (~30 min, no deps) · Agent A
 > ⚠️ **Critical:** none currently open
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 27 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,45,51,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M12,M13,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| ✅ Done This Week | 28 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,44,45,51,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M12,M13,M15,M16,M17,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | #44 (sticky cart badge), M10 (modal scroll), #55 (Calendly CSP frame check), #54 (stale date/time input row), M14 (Safari portal modal check) |
+| 📱 Next 5 Priority Tasks | #55 (Calendly CSP frame check), M10 (modal scroll), #54 (stale date/time input row), M14 (Safari portal modal check), #49 (guided mode no industry) |
 
 ---
 
@@ -67,7 +67,7 @@
 | 34 | ⏳ | AdminDashboard sidebar: add active-state highlight on current route | A | — | — | — | ~20 min |
 | 41 | ⏳ | Store page initial load: show 6 ProductCard skeletons for 300ms then reveal | A | — | — | — | ~45 min |
 | 42 | ✅ | Store ProductCard on mobile (375px): reduce "Add to Cart" font to 10px | Morpheus | — | — | 🧵 Mobile-UX | Done |
-| 44 | ⏳ | Mobile sticky cart bar: add circular badge with items.length count | A | — | — | 🧵 Mobile-UX | ~15 min |
+| 44 | ✅ | Mobile sticky cart bar: add circular badge with items.length count | Morpheus | — | — | 🧵 Mobile-UX | Done |
 | 45 | ✅ | Store page: add "Talk to a Human" escape valve CTA below product grid | Morpheus | — | — | 🧵 CTA-Standards | Done |
 | 49 | ⏳ | Store: Guided mode no industry → show all non-coming-soon products | A | — | — | — | ~30 min |
 | 52 | ⏳ | MobileCallBar: pull phone number from AdminSettings instead of hardcoding | A | — | — | 🧵 Mobile-UX | ~30 min |
