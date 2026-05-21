@@ -180,13 +180,15 @@
         var aliases = {
           "/Blog": "/blog",
           "/IndustriesPage": "/industries",
+          "/IndustryTemplate": "/industries",
           "/Roofing": "/roofing",
           "/HVAC": "/hvac",
           "/Dental": "/dental",
           "/MedSpa": "/med-spa",
           "/Chiropractic": "/chiropractic",
           "/Contractors": "/contractors",
-          "/legal/privacy": "/privacy-policy"
+          "/legal/privacy": "/privacy-policy",
+          "/legal/terms": "/terms"
         };
         var path = window.location.pathname.replace(/\/+$/, "") || "/";
         var canonicalPath = aliases[path] || path;
