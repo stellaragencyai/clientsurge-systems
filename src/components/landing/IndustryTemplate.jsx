@@ -16,37 +16,37 @@ import { buildIndustryJsonLd } from "@/utils/industryJsonLd";
 
 const INDUSTRY_SEO = {
   roofing: {
-    title: "Roofing Automation Systems | ClientSurge Systems",
+    title: "Roofing Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for Roofing Companies",
     description:
       "AI automation for roofing companies: storm-season lead surges, missed-call recovery, inspection booking, estimate follow-up, insurance and storm-damage inquiry routing, and old estimate reactivation.",
   },
   hvac: {
-    title: "HVAC Automation Systems | ClientSurge Systems",
+    title: "HVAC Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for HVAC Companies",
     description:
       "AI automation for HVAC companies: emergency call handling, seasonal demand spikes, missed-call recovery, estimate follow-up, service-call reminders, and maintenance plan automation.",
   },
   dental: {
-    title: "Dental Automation Systems | ClientSurge Systems",
+    title: "Dental Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for Dental Practices",
     description:
       "AI automation for dental practices: new patient booking, emergency dental inquiries, missed appointment recovery, treatment-plan follow-up, and review automation.",
   },
   "med-spa": {
-    title: "Med Spa Automation Systems | ClientSurge Systems",
+    title: "Med Spa Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for Med Spas",
     description:
       "AI automation for med spas: consultation booking, package lead nurture, membership follow-up, no-show reduction, review requests, and old inquiry reactivation.",
   },
   chiropractic: {
-    title: "Chiropractic Automation Systems | ClientSurge Systems",
+    title: "Chiropractic Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for Chiropractic Clinics",
     description:
       "AI automation for chiropractic clinics: new patient intake, appointment reminders, unfinished care plan follow-up, reactivation campaigns, and review automation.",
   },
   contractors: {
-    title: "Contractor Automation Systems | ClientSurge Systems",
+    title: "Contractor Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for Contractors",
     description:
       "AI automation for contractors: project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation.",

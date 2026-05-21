@@ -28,3 +28,21 @@ test("industry JSON-LD covers active industry slugs with LocalBusiness schema", 
     assert.ok(schema.hasOfferCatalog.itemListElement.length >= 4);
   }
 });
+
+test("active industry pages set unique local SEO titles", () => {
+  const titleMatches = [...industryTemplate.matchAll(/title:\s*"([^"]+\| ClientSurge Systems)"/g)].map(
+    (match) => match[1]
+  );
+
+  assert.equal(titleMatches.length, 6);
+  assert.equal(new Set(titleMatches).size, 6);
+
+  for (const title of titleMatches) {
+    assert.match(title, /Phoenix & Scottsdale/);
+    assert.match(title, /\| ClientSurge Systems$/);
+  }
+
+  assert.match(industryTemplate, /setPageMetadata\(\{/);
+  assert.match(industryTemplate, /title: seo\?\.title/);
+  assert.match(industryTemplate, /canonicalPath: `\/\$\{industrySlug\}`/);
+});
