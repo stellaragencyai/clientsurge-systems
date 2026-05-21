@@ -4,18 +4,11 @@ const DEFAULT_BASE_URL = "https://clientsurgesystems.com";
 
 const ROUTES = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
-  { path: "/store", changefreq: "weekly", priority: "0.9" },
   { path: "/automations", changefreq: "monthly", priority: "0.9" },
   { path: "/industries", changefreq: "monthly", priority: "0.8" },
   { path: "/about", changefreq: "monthly", priority: "0.7" },
   { path: "/contact", changefreq: "monthly", priority: "0.8" },
   { path: "/blog", changefreq: "weekly", priority: "0.7" },
-  { path: "/lead-capture-automation", changefreq: "monthly", priority: "0.8" },
-  { path: "/missed-call-text-back", changefreq: "monthly", priority: "0.8" },
-  { path: "/ai-lead-follow-up", changefreq: "monthly", priority: "0.8" },
-  { path: "/appointment-booking-automation", changefreq: "monthly", priority: "0.8" },
-  { path: "/review-automation", changefreq: "monthly", priority: "0.8" },
-  { path: "/customer-reactivation", changefreq: "monthly", priority: "0.8" },
   { path: "/med-spa", changefreq: "monthly", priority: "0.8" },
   { path: "/dental", changefreq: "monthly", priority: "0.8" },
   { path: "/hvac", changefreq: "monthly", priority: "0.8" },
@@ -23,8 +16,7 @@ const ROUTES = [
   { path: "/chiropractic", changefreq: "monthly", priority: "0.8" },
   { path: "/contractors", changefreq: "monthly", priority: "0.8" },
   { path: "/book", changefreq: "monthly", priority: "0.7" },
-  { path: "/legal/privacy", changefreq: "yearly", priority: "0.4" },
-  { path: "/legal/terms", changefreq: "yearly", priority: "0.4" },
+  { path: "/privacy-policy", changefreq: "yearly", priority: "0.4" },
 ];
 
 function normalizeBaseUrl(value) {

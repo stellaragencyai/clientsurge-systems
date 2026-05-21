@@ -13,8 +13,48 @@ import { getIndustryBySlug } from "@/lib/industryData";
 import { getFAQSchema } from "../SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
 
+const INDUSTRY_SEO = {
+  roofing: {
+    title: "Roofing Automation Systems | ClientSurge Systems",
+    h1: "AI Automation Systems for Roofing Companies",
+    description:
+      "AI automation for roofing companies: storm-season lead surges, missed-call recovery, inspection booking, estimate follow-up, insurance and storm-damage inquiry routing, and old estimate reactivation.",
+  },
+  hvac: {
+    title: "HVAC Automation Systems | ClientSurge Systems",
+    h1: "AI Automation Systems for HVAC Companies",
+    description:
+      "AI automation for HVAC companies: emergency call handling, seasonal demand spikes, missed-call recovery, estimate follow-up, service-call reminders, and maintenance plan automation.",
+  },
+  dental: {
+    title: "Dental Automation Systems | ClientSurge Systems",
+    h1: "AI Automation Systems for Dental Practices",
+    description:
+      "AI automation for dental practices: new patient booking, emergency dental inquiries, missed appointment recovery, treatment-plan follow-up, and review automation.",
+  },
+  "med-spa": {
+    title: "Med Spa Automation Systems | ClientSurge Systems",
+    h1: "AI Automation Systems for Med Spas",
+    description:
+      "AI automation for med spas: consultation booking, package lead nurture, membership follow-up, no-show reduction, review requests, and old inquiry reactivation.",
+  },
+  chiropractic: {
+    title: "Chiropractic Automation Systems | ClientSurge Systems",
+    h1: "AI Automation Systems for Chiropractic Clinics",
+    description:
+      "AI automation for chiropractic clinics: new patient intake, appointment reminders, unfinished care plan follow-up, reactivation campaigns, and review automation.",
+  },
+  contractors: {
+    title: "Contractor Automation Systems | ClientSurge Systems",
+    h1: "AI Automation Systems for Contractors",
+    description:
+      "AI automation for contractors: project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation.",
+  },
+};
+
 function IndustryTemplateInner({ industrySlug }) {
   const industry = getIndustryBySlug(industrySlug);
+  const seo = INDUSTRY_SEO[industrySlug];
   const demoBooking = useDemoBooking();
   const [notFound, setNotFound] = useState(!industry);
 
@@ -22,11 +62,11 @@ function IndustryTemplateInner({ industrySlug }) {
     if (!industry) return;
 
     const cleanupMetadata = setPageMetadata({
-      title: `${industry.name} AI Automation | ClientSurge Systems`,
-      description: industry.hero?.subheadline || `Done-for-you AI lead response and booking automation for ${industry.name}.`,
+      title: seo?.title || `${industry.name} AI Automation | ClientSurge Systems`,
+      description: seo?.description || industry.hero?.subheadline || `Done-for-you AI lead response and booking automation for ${industry.name}.`,
       canonicalPath: `/${industrySlug}`,
-      ogTitle: `${industry.name} AI Automation | ClientSurge Systems`,
-      ogDescription: industry.hero?.subheadline || `AI automation built specifically for ${industry.name}.`,
+      ogTitle: seo?.title || `${industry.name} AI Automation | ClientSurge Systems`,
+      ogDescription: seo?.description || industry.hero?.subheadline || `AI automation built specifically for ${industry.name}.`,
     });
     const cleanupFaq = setJsonLd(`industry-faq-${industrySlug}`, getFAQSchema(industry.faqs || []));
 
@@ -34,7 +74,7 @@ function IndustryTemplateInner({ industrySlug }) {
       cleanupFaq?.();
       cleanupMetadata?.();
     };
-  }, [industry, industrySlug]);
+  }, [industry, industrySlug, seo]);
 
   if (notFound || !industry) {
     return (
@@ -55,8 +95,8 @@ function IndustryTemplateInner({ industrySlug }) {
         {/* Hero Section */}
         <IndustryHero
           eyebrow={industry.hero.eyebrow}
-          headline={industry.hero.headline}
-          subheadline={industry.hero.subheadline}
+          headline={seo?.h1 || industry.hero.headline}
+          subheadline={seo?.description || industry.hero.subheadline}
           image={industry.hero.image || `https://via.placeholder.com/1200x600?text=${industry.name}`}
           cta={industry.hero.cta}
           onBookDemo={() => demoBooking?.openDemoBooking?.()}

@@ -449,7 +449,7 @@ export default function CartSidebar() {
                   />
                   <span style={{ fontSize: "11px", color: "rgba(26,18,9,0.6)", lineHeight: 1.5 }}>
                     I agree to receive SMS messages from ClientSurge Systems about my order and service updates. Message & data rates may apply. Reply STOP to unsubscribe at any time.{" "}
-                    <a href="/legal/privacy" target="_blank" style={{ color: "#9a5c2e", fontWeight: "600" }}>Privacy Policy</a>
+                    <a href="/privacy-policy" target="_blank" style={{ color: "#9a5c2e", fontWeight: "600" }}>Privacy Policy</a>
                   </span>
                 </label>
               )}

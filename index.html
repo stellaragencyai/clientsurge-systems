@@ -94,6 +94,120 @@
         ]
       }
     </script>
+    <script>
+      (function () {
+        var routeMap = {
+          "/": {
+            key: "home",
+            title: "AI Automation Systems for Local Leads | ClientSurge Systems",
+            description: "AI-powered websites, voice agents, missed-call recovery, lead follow-up, and booking automation for local service businesses that want more booked jobs."
+          },
+          "/automations": {
+            key: "automations",
+            title: "AI Automation Systems for Local Service Businesses | ClientSurge Systems",
+            description: "ClientSurge installs AI automation systems that capture, follow up with, qualify, book, and reactivate leads for local service businesses."
+          },
+          "/about": {
+            key: "about",
+            title: "About ClientSurge Systems | AI Automation for Local Businesses",
+            description: "Learn how ClientSurge Systems combines conversion-focused websites, AI voice agents, lead follow-up, booking automation, and recovery workflows for local service businesses."
+          },
+          "/book": {
+            key: "book",
+            title: "Book Your Free ClientSurge Automation Audit | ClientSurge Systems",
+            description: "Book a free audit to review missed-call leakage, speed-to-lead gaps, website conversion, follow-up gaps, booking friction, and practical automation opportunities."
+          },
+          "/contact": {
+            key: "contact",
+            title: "Contact ClientSurge Systems | AI Automation Questions",
+            description: "Contact ClientSurge Systems about AI voice agents, lead capture, missed-call recovery, booking automation, and local service business automation."
+          },
+          "/blog": {
+            key: "blog",
+            title: "ClientSurge Blog | AI Automation for Local Service Businesses",
+            description: "Guides on missed-call recovery, AI lead follow-up, AI voice agents, local service business automation, conversion systems, and booking automation."
+          },
+          "/industries": {
+            key: "industries",
+            title: "Industries We Help | ClientSurge Systems",
+            description: "AI automation systems for roofing, HVAC, dental, med spa, chiropractic, contractor, and local service businesses."
+          },
+          "/roofing": {
+            key: "roofing",
+            title: "Roofing Automation Systems | ClientSurge Systems",
+            description: "AI automation for roofing companies: storm-season lead surges, missed-call recovery, inspection booking, estimate follow-up, storm-damage routing, and old estimate reactivation."
+          },
+          "/hvac": {
+            key: "hvac",
+            title: "HVAC Automation Systems | ClientSurge Systems",
+            description: "AI automation for HVAC companies: emergency call handling, seasonal demand spikes, missed-call recovery, estimate follow-up, service reminders, and maintenance plan automation."
+          },
+          "/dental": {
+            key: "dental",
+            title: "Dental Automation Systems | ClientSurge Systems",
+            description: "AI automation for dental practices: new patient booking, emergency dental inquiries, missed appointment recovery, treatment-plan follow-up, and review automation."
+          },
+          "/med-spa": {
+            key: "med-spa",
+            title: "Med Spa Automation Systems | ClientSurge Systems",
+            description: "AI automation for med spas: consultation booking, package lead nurture, membership follow-up, no-show reduction, review requests, and old inquiry reactivation."
+          },
+          "/chiropractic": {
+            key: "chiropractic",
+            title: "Chiropractic Automation Systems | ClientSurge Systems",
+            description: "AI automation for chiropractic clinics: new patient intake, appointment reminders, unfinished care plan follow-up, reactivation campaigns, and review automation."
+          },
+          "/contractors": {
+            key: "contractors",
+            title: "Contractor Automation Systems | ClientSurge Systems",
+            description: "AI automation for contractors: project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation."
+          },
+          "/privacy-policy": {
+            key: "privacy",
+            title: "Privacy Policy | ClientSurge Systems",
+            description: "Read the ClientSurge Systems privacy policy, including what data we collect, how data is used, cookies, third-party services, and contact information."
+          },
+          "/login": {
+            key: "login",
+            title: "Client Login | ClientSurge Systems",
+            description: "ClientSurge Systems client login for existing customers accessing their portal and automation dashboard."
+          }
+        };
+        var aliases = {
+          "/Blog": "/blog",
+          "/IndustriesPage": "/industries",
+          "/Roofing": "/roofing",
+          "/HVAC": "/hvac",
+          "/Dental": "/dental",
+          "/MedSpa": "/med-spa",
+          "/Chiropractic": "/chiropractic",
+          "/Contractors": "/contractors",
+          "/legal/privacy": "/privacy-policy"
+        };
+        var path = window.location.pathname.replace(/\/+$/, "") || "/";
+        var canonicalPath = aliases[path] || path;
+        var meta = routeMap[canonicalPath] || routeMap["/"];
+        var canonicalUrl = "https://clientsurgesystems.com" + canonicalPath;
+        document.documentElement.setAttribute("data-static-route", meta.key);
+        document.title = meta.title;
+        var description = document.querySelector('meta[name="description"]');
+        var canonical = document.querySelector('link[rel="canonical"]');
+        var ogUrl = document.querySelector('meta[property="og:url"]');
+        var ogTitle = document.querySelector('meta[property="og:title"]');
+        var ogDescription = document.querySelector('meta[property="og:description"]');
+        var twitterUrl = document.querySelector('meta[property="twitter:url"]');
+        var twitterTitle = document.querySelector('meta[property="twitter:title"]');
+        var twitterDescription = document.querySelector('meta[property="twitter:description"]');
+        if (description) description.setAttribute("content", meta.description);
+        if (canonical) canonical.setAttribute("href", canonicalUrl);
+        if (ogUrl) ogUrl.setAttribute("content", canonicalUrl);
+        if (ogTitle) ogTitle.setAttribute("content", meta.title);
+        if (ogDescription) ogDescription.setAttribute("content", meta.description);
+        if (twitterUrl) twitterUrl.setAttribute("content", canonicalUrl);
+        if (twitterTitle) twitterTitle.setAttribute("content", meta.title);
+        if (twitterDescription) twitterDescription.setAttribute("content", meta.description);
+      })();
+    </script>
     <style>
       .static-fallback {
         min-height: 100vh;
@@ -107,6 +221,36 @@
       .static-shell {
         width: min(1120px, calc(100% - 32px));
         margin: 0 auto;
+      }
+
+      .static-route {
+        display: none;
+      }
+
+      .static-route--home {
+        display: block;
+      }
+
+      html[data-static-route] .static-route {
+        display: none;
+      }
+
+      html[data-static-route="home"] .static-route--home,
+      html[data-static-route="automations"] .static-route--automations,
+      html[data-static-route="about"] .static-route--about,
+      html[data-static-route="book"] .static-route--book,
+      html[data-static-route="contact"] .static-route--contact,
+      html[data-static-route="blog"] .static-route--blog,
+      html[data-static-route="industries"] .static-route--industries,
+      html[data-static-route="roofing"] .static-route--roofing,
+      html[data-static-route="hvac"] .static-route--hvac,
+      html[data-static-route="dental"] .static-route--dental,
+      html[data-static-route="med-spa"] .static-route--med-spa,
+      html[data-static-route="chiropractic"] .static-route--chiropractic,
+      html[data-static-route="contractors"] .static-route--contractors,
+      html[data-static-route="privacy"] .static-route--privacy,
+      html[data-static-route="login"] .static-route--login {
+        display: block;
       }
 
       .static-header,
@@ -328,127 +472,198 @@
             </nav>
           </header>
 
-          <section class="static-hero" aria-labelledby="static-home-heading">
-            <div>
-              <p class="static-eyebrow">AI automation for local service businesses</p>
-              <h1 id="static-home-heading">AI Automation Systems That Turn More Local Leads Into Booked Jobs</h1>
-              <p class="static-lede">ClientSurge Systems builds AI-powered websites, voice agents, and lead automation systems for local service businesses - helping you recover missed calls, respond instantly, nurture leads automatically, and book more appointments without adding staff.</p>
-              <div class="static-actions">
-                <a class="static-button" href="/book">Book Your Free Automation Audit</a>
-                <a class="static-button secondary" href="/automations">View AI Automations</a>
+          <section class="static-route static-route--home">
+            <div class="static-hero" aria-labelledby="static-home-heading">
+              <div>
+                <p class="static-eyebrow">AI automation for local service businesses</p>
+                <h1 id="static-home-heading">AI Automation Systems That Turn More Local Leads Into Booked Jobs</h1>
+                <p class="static-lede">ClientSurge Systems builds AI-powered websites, voice agents, and lead automation systems for local service businesses - helping you recover missed calls, respond instantly, nurture leads automatically, and book more appointments without adding staff.</p>
+                <div class="static-actions">
+                  <a class="static-button" href="/book">Book Your Free Automation Audit</a>
+                  <a class="static-button secondary" href="/automations">View AI Automations</a>
+                </div>
+                <div class="static-bullets" aria-label="Conversion benefits">
+                  <span>Recover missed calls and after-hours leads</span>
+                  <span>Automatically follow up with every inquiry</span>
+                  <span>Book more appointments without hiring extra staff</span>
+                </div>
               </div>
-              <div class="static-bullets" aria-label="Conversion benefits">
-                <span>Recover missed calls and after-hours leads</span>
-                <span>Automatically follow up with every inquiry</span>
-                <span>Book more appointments without hiring extra staff</span>
-              </div>
+              <aside class="static-panel" aria-label="Core ClientSurge offer">
+                <h2>What ClientSurge Does</h2>
+                <p>We build the front-end website and the back-end AI lead conversion system together, so local businesses can capture demand, respond faster, route inquiries, book appointments, request reviews, and reactivate old opportunities from one connected workflow.</p>
+                <p>Core services include AI voice agents, AI phone receptionist systems, missed-call text-back, instant lead response, lead nurturing, AI booking systems, review request automation, old lead reactivation, and workflow automation.</p>
+              </aside>
             </div>
-            <aside class="static-panel" aria-label="Core ClientSurge offer">
-              <h2>What ClientSurge Does</h2>
-              <p>We build the front-end website and the back-end AI lead conversion system together, so local businesses can capture demand, respond faster, route inquiries, book appointments, request reviews, and reactivate old opportunities from one connected workflow.</p>
-              <p>Core services include AI voice agents, AI phone receptionist systems, missed-call text-back, instant lead response, lead nurturing, AI booking systems, review request automation, old lead reactivation, and workflow automation.</p>
-            </aside>
           </section>
 
-          <section class="static-section" aria-labelledby="static-automation-heading">
+          <section class="static-route static-route--automations static-section" aria-labelledby="static-automations-heading">
             <p class="static-eyebrow">Six AI automation systems</p>
-            <h2 id="static-automation-heading">Crawler-readable automation content</h2>
-            <p class="static-lede">These are the six public automation systems ClientSurge uses to help local companies reduce lead loss and convert more inquiries into booked jobs.</p>
+            <h1 id="static-automations-heading">AI Automation Systems for Local Service Businesses</h1>
+            <p class="static-lede">ClientSurge installs automation systems that capture, follow up with, qualify, book, and reactivate leads so fewer calls, forms, and old opportunities fall through the cracks.</p>
+            <h2>Core Automation Grid</h2>
             <div class="static-grid">
               <article class="static-card">
-                <h3>Lead Capture Automation</h3>
-                <p>Turns website visitors, form fills, calls, and ad traffic into organized leads inside your CRM.</p>
+                <h3>AI Voice Agent &amp; Missed-Call Recovery</h3>
+                <p>Answers or triages missed calls, after-hours calls, and inbound inquiries so fewer leads disappear before your team can respond.</p>
+                <ul><li>Captures caller details</li><li>Handles common questions</li><li>Routes urgent or qualified leads into follow-up</li></ul>
               </article>
               <article class="static-card">
-                <h3>Missed-Call Text-Back Automation</h3>
-                <p>When a business misses a call, the system instantly texts the lead so they do not call a competitor.</p>
+                <h3>Lead Capture Automation</h3>
+                <p>Turns website visitors, form fills, ad traffic, and phone inquiries into organized leads inside your CRM or pipeline.</p>
+                <ul><li>Captures every inquiry</li><li>Tags lead source</li><li>Notifies the right person instantly</li></ul>
               </article>
               <article class="static-card">
                 <h3>AI Lead Follow-Up Automation</h3>
-                <p>Follows up with new leads by SMS and email until they respond, book, or opt out.</p>
+                <p>Automatically follows up with new leads by SMS and email until they reply, book, or opt out.</p>
+                <ul><li>Improves speed-to-lead</li><li>Prevents forgotten follow-up</li><li>Keeps prospects warm</li></ul>
               </article>
               <article class="static-card">
                 <h3>Appointment Booking Automation</h3>
-                <p>Helps convert interested leads into booked appointments with reminders, confirmations, and calendar sync.</p>
+                <p>Helps convert interested leads into booked appointments with reminders, confirmations, qualification, and calendar sync.</p>
+                <ul><li>Reduces booking friction</li><li>Confirms appointments</li><li>Sends reminders automatically</li></ul>
               </article>
               <article class="static-card">
-                <h3>Review & Reputation Automation</h3>
-                <p>Automatically requests reviews after completed jobs and helps increase Google reviews over time.</p>
+                <h3>Review &amp; Reputation Automation</h3>
+                <p>Requests reviews after completed jobs and helps build stronger Google reputation over time.</p>
+                <ul><li>Triggers review requests</li><li>Improves review volume</li><li>Surfaces unhappy customers earlier</li></ul>
               </article>
               <article class="static-card">
                 <h3>Reactivation / Win-Back Automation</h3>
-                <p>Re-engages old leads, past customers, no-shows, and cold contacts with targeted campaigns.</p>
+                <p>Re-engages old leads, past customers, no-shows, unbooked quotes, and cold opportunities with targeted campaigns.</p>
+                <ul><li>Revives old opportunities</li><li>Books past inquiries</li><li>Creates revenue from existing contacts</li></ul>
               </article>
             </div>
+            <h2>AI Voice Agents</h2>
+            <p class="static-lede">AI voice agents and AI phone receptionist workflows can answer or triage inbound calls, capture caller details, recover missed calls, and route qualified leads into follow-up or booking.</p>
+            <div class="static-actions"><a class="static-button" href="/book">Book Your Free Automation Audit</a></div>
           </section>
 
-          <section class="static-section" aria-labelledby="static-voice-heading">
-            <p class="static-eyebrow">AI voice agents and lead recovery</p>
-            <h2 id="static-voice-heading">AI phone receptionist systems for missed calls, inbound calls, and after-hours leads</h2>
-            <p class="static-lede">ClientSurge can add AI voice agents and AI receptionist workflows that answer or triage calls, capture caller details, trigger missed-call text-back, route urgent inquiries, and hand warm leads into follow-up and booking automation.</p>
-          </section>
-
-          <section class="static-section" aria-labelledby="static-industry-heading">
-            <p class="static-eyebrow">Industries served</p>
-            <h2 id="static-industry-heading">Built for appointment-based and quote-driven local service businesses</h2>
-            <div class="static-grid">
-              <article class="static-card">
-                <h3>Roofing</h3>
-                <p>Storm-season lead capture, missed-call recovery, inspection booking, insurance-guidance follow-up, and old estimate reactivation.</p>
-                <a href="/roofing">Roofing automation</a>
-              </article>
-              <article class="static-card">
-                <h3>HVAC</h3>
-                <p>Emergency call handling, seasonal urgency follow-up, estimate nurturing, service-call reminders, and maintenance plan automation.</p>
-                <a href="/hvac">HVAC automation</a>
-              </article>
-              <article class="static-card">
-                <h3>Dental</h3>
-                <p>New patient booking, missed appointment recovery, treatment-plan follow-up, emergency inquiry response, and review automation.</p>
-                <a href="/dental">Dental automation</a>
-              </article>
-              <article class="static-card">
-                <h3>Med Spa</h3>
-                <p>Consultation booking, no-show reduction, package and membership nurture, review requests, and old inquiry reactivation.</p>
-                <a href="/med-spa">Med spa automation</a>
-              </article>
-              <article class="static-card">
-                <h3>Chiropractic</h3>
-                <p>New-patient intake, appointment reminders, reactivation campaigns, review automation, and follow-up for unfinished care plans.</p>
-                <a href="/chiropractic">Chiropractic automation</a>
-              </article>
-              <article class="static-card">
-                <h3>Contractors</h3>
-                <p>Project inquiry routing, quote follow-up, job estimate nurturing, missed-call recovery, and reactivation for old opportunities.</p>
-                <a href="/contractors">Contractor automation</a>
-              </article>
-            </div>
-          </section>
-
-          <section class="static-section" aria-labelledby="static-page-content-heading">
-            <p class="static-eyebrow">Public page content</p>
-            <h2 id="static-page-content-heading">Clear public routes without exposing internal tools</h2>
+          <section class="static-route static-route--about static-section" aria-labelledby="static-about-heading">
+            <p class="static-eyebrow">About</p>
+            <h1 id="static-about-heading">About ClientSurge Systems</h1>
+            <p class="static-lede">ClientSurge Systems helps local service businesses turn more calls, forms, and inquiries into booked appointments. Instead of just building a website, we install the response, follow-up, booking, and recovery systems behind it so fewer leads fall through the cracks.</p>
             <div class="static-grid two">
-              <article class="static-card">
-                <h3>About ClientSurge</h3>
-                <p>ClientSurge Systems serves local companies that need more than a brochure website. We combine conversion-focused pages with AI response, routing, follow-up, and booking workflows so fewer leads fall through the cracks.</p>
-                <a href="/about">Read about ClientSurge</a>
-              </article>
-              <article class="static-card">
-                <h3>Book Your Free Automation Audit</h3>
-                <p>Schedule a focused audit to review missed-call leakage, speed-to-lead gaps, follow-up consistency, booking friction, and practical automation opportunities for your business.</p>
-                <a href="/book">Book an audit</a>
-              </article>
-              <article class="static-card">
-                <h3>Contact</h3>
-                <p>Reach ClientSurge Systems for AI automation, lead capture, and public website questions. Public contact options include support@clientsurgesystems.com and (602) 584-3227.</p>
-                <a href="/contact">Contact ClientSurge</a>
-              </article>
-              <article class="static-card">
-                <h3>Blog</h3>
-                <p>Read practical guidance on missed-call recovery, AI lead follow-up, booking automation, local SEO, and conversion systems for service businesses.</p>
-                <a href="/blog">View the blog</a>
-              </article>
+              <article class="static-card"><h2>Who We Help</h2><p>Roofing, HVAC, dental, med spa, chiropractic, contractor, home service, and other local businesses that depend on fast response and booked appointments.</p></article>
+              <article class="static-card"><h2>What Makes It Different</h2><p>ClientSurge combines conversion-focused websites with AI voice agents, missed-call recovery, lead follow-up, booking workflows, review requests, and reactivation campaigns.</p></article>
+              <article class="static-card"><h2>Why Leads Get Lost</h2><p>Local businesses lose revenue when calls are missed, forms sit too long, quotes are not followed up, and old opportunities stay buried in the CRM.</p></article>
+              <article class="static-card"><h2>How We Fix It</h2><p>We connect the website, phones, forms, CRM, and calendar into a practical automation system built around real service-business operations.</p></article>
+            </div>
+            <div class="static-actions"><a class="static-button" href="/book">Book Your Free Automation Audit</a></div>
+          </section>
+
+          <section class="static-route static-route--book static-section" aria-labelledby="static-book-heading">
+            <p class="static-eyebrow">Free automation audit</p>
+            <h1 id="static-book-heading">Book Your Free ClientSurge Automation Audit</h1>
+            <p class="static-lede">Use the audit to review missed-call leakage, speed-to-lead, website conversion, follow-up gaps, booking friction, and practical automation recommendations for your local service business.</p>
+            <div class="static-grid two">
+              <article class="static-card"><h2>What We Review</h2><ul><li>Missed-call leakage</li><li>Speed-to-lead gaps</li><li>Website conversion path</li><li>Follow-up consistency</li><li>Booking friction</li><li>Automation opportunities</li></ul></article>
+              <article class="static-card"><h2>What Happens Next</h2><ul><li>Choose a time</li><li>Join a quick discovery call</li><li>Receive practical automation opportunities</li></ul><p>If the scheduler fails, email support@clientsurgesystems.com or call (602) 584-3227.</p></article>
+            </div>
+            <div class="static-actions"><a class="static-button" href="/book">Schedule Your Audit</a></div>
+          </section>
+
+          <section class="static-route static-route--contact static-section" aria-labelledby="static-contact-heading">
+            <p class="static-eyebrow">Contact</p>
+            <h1 id="static-contact-heading">Contact ClientSurge Systems</h1>
+            <p class="static-lede">Reach out about AI voice agents, lead capture, missed-call recovery, booking automation, public website optimization, or questions about your local service business automation plan.</p>
+            <div class="static-grid two">
+              <article class="static-card"><h2>Contact Information</h2><p>Email: <a href="mailto:support@clientsurgesystems.com">support@clientsurgesystems.com</a></p><p>Phone: <a href="tel:+16025843227">(602) 584-3227</a></p><p>Typical response time: within one business day.</p></article>
+              <article class="static-card"><h2>Best Next Step</h2><p>For a practical review of your lead flow, book the free automation audit. For general questions, use the contact form when JavaScript loads or email us directly.</p><a href="/book">Book an audit</a></article>
+            </div>
+          </section>
+
+          <section class="static-route static-route--blog static-section" aria-labelledby="static-blog-heading">
+            <p class="static-eyebrow">Blog</p>
+            <h1 id="static-blog-heading">ClientSurge Blog</h1>
+            <p class="static-lede">Practical AI automation guidance for local service businesses covering missed-call recovery, AI lead follow-up, AI voice agents, local service business automation, conversion systems, and booking automation.</p>
+            <div class="static-grid">
+              <article class="static-card"><h2>Missed-Call Recovery</h2><p>How to recover phone leads before they call the next competitor.</p></article>
+              <article class="static-card"><h2>AI Lead Follow-Up</h2><p>How automated SMS and email follow-up keeps prospects warm until they reply or book.</p></article>
+              <article class="static-card"><h2>Booking Automation</h2><p>How reminders, qualification, and calendar workflows reduce booking friction.</p></article>
+            </div>
+          </section>
+
+          <section class="static-route static-route--industries static-section" aria-labelledby="static-industries-heading">
+            <p class="static-eyebrow">Industries</p>
+            <h1 id="static-industries-heading">AI Automation Systems by Industry</h1>
+            <p class="static-lede">ClientSurge adapts the same lead conversion engine to each local business model, from storm-season roofing demand to emergency HVAC calls, new patient booking, med spa consultations, chiropractic intake, and contractor estimates.</p>
+            <div class="static-grid">
+              <article class="static-card"><h2>Roofing</h2><p>Storm-season lead surges, missed-call recovery, inspection booking, estimate follow-up, insurance and storm-damage inquiry routing, and old estimate reactivation.</p><a href="/roofing">Roofing automation</a></article>
+              <article class="static-card"><h2>HVAC</h2><p>Emergency call handling, seasonal demand spikes, missed-call recovery, estimate follow-up, service-call reminders, and maintenance plan automation.</p><a href="/hvac">HVAC automation</a></article>
+              <article class="static-card"><h2>Dental</h2><p>New patient booking, emergency dental inquiries, missed appointment recovery, treatment-plan follow-up, and review automation.</p><a href="/dental">Dental automation</a></article>
+              <article class="static-card"><h2>Med Spa</h2><p>Consultation booking, package lead nurture, membership follow-up, no-show reduction, review requests, and old inquiry reactivation.</p><a href="/med-spa">Med spa automation</a></article>
+              <article class="static-card"><h2>Chiropractic</h2><p>New patient intake, appointment reminders, unfinished care plan follow-up, reactivation campaigns, and review automation.</p><a href="/chiropractic">Chiropractic automation</a></article>
+              <article class="static-card"><h2>Contractors</h2><p>Project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation.</p><a href="/contractors">Contractor automation</a></article>
+            </div>
+          </section>
+
+          <section class="static-route static-route--roofing static-section" aria-labelledby="static-roofing-heading">
+            <p class="static-eyebrow">Roofing automation</p>
+            <h1 id="static-roofing-heading">AI Automation Systems for Roofing Companies</h1>
+            <p class="static-lede">ClientSurge helps roofing companies handle storm-season lead surges, recover missed calls, book inspections, follow up on estimates, route insurance and storm-damage inquiries, and reactivate old estimates.</p>
+            <div class="static-grid two"><article class="static-card"><h2>Lead Recovery</h2><p>AI voice agents and missed-call workflows capture homeowner details during high-volume storm windows.</p></article><article class="static-card"><h2>Estimate Follow-Up</h2><p>Inspection booking, insurance guidance, and old estimate reactivation keep roofing opportunities moving.</p></article></div>
+            <div class="static-actions"><a class="static-button" href="/book">Book a Roofing Automation Audit</a></div>
+          </section>
+
+          <section class="static-route static-route--hvac static-section" aria-labelledby="static-hvac-heading">
+            <p class="static-eyebrow">HVAC automation</p>
+            <h1 id="static-hvac-heading">AI Automation Systems for HVAC Companies</h1>
+            <p class="static-lede">ClientSurge helps HVAC companies handle emergency call volume, seasonal demand spikes, missed-call recovery, estimate follow-up, service-call reminders, and maintenance plan automation.</p>
+            <div class="static-grid two"><article class="static-card"><h2>Emergency Calls</h2><p>Answer or triage urgent inbound calls and route qualified homeowners into the fastest next step.</p></article><article class="static-card"><h2>Recurring Revenue</h2><p>Automated reminders, estimate nurture, and maintenance plan follow-up improve service-call consistency.</p></article></div>
+            <div class="static-actions"><a class="static-button" href="/book">Book an HVAC Automation Audit</a></div>
+          </section>
+
+          <section class="static-route static-route--dental static-section" aria-labelledby="static-dental-heading">
+            <p class="static-eyebrow">Dental automation</p>
+            <h1 id="static-dental-heading">AI Automation Systems for Dental Practices</h1>
+            <p class="static-lede">ClientSurge helps dental practices with new patient booking, emergency dental inquiries, missed appointment recovery, treatment-plan follow-up, and review automation.</p>
+            <div class="static-grid two"><article class="static-card"><h2>Patient Intake</h2><p>Capture new patient and emergency dental inquiries with clear next steps and appointment routing.</p></article><article class="static-card"><h2>Practice Growth</h2><p>Recover missed appointments, follow up on treatment plans, and request reviews after positive visits.</p></article></div>
+            <div class="static-actions"><a class="static-button" href="/book">Book a Dental Automation Audit</a></div>
+          </section>
+
+          <section class="static-route static-route--med-spa static-section" aria-labelledby="static-med-spa-heading">
+            <p class="static-eyebrow">Med spa automation</p>
+            <h1 id="static-med-spa-heading">AI Automation Systems for Med Spas</h1>
+            <p class="static-lede">ClientSurge helps med spas with consultation booking, lead nurture for packages, membership follow-up, no-show reduction, review requests, and old inquiry reactivation.</p>
+            <div class="static-grid two"><article class="static-card"><h2>Consultation Booking</h2><p>Turn treatment inquiries into booked consults with fast response, reminders, and qualification.</p></article><article class="static-card"><h2>Revenue Recovery</h2><p>Nurture package leads, revive old inquiries, reduce no-shows, and trigger review requests after visits.</p></article></div>
+            <div class="static-actions"><a class="static-button" href="/book">Book a Med Spa Automation Audit</a></div>
+          </section>
+
+          <section class="static-route static-route--chiropractic static-section" aria-labelledby="static-chiropractic-heading">
+            <p class="static-eyebrow">Chiropractic automation</p>
+            <h1 id="static-chiropractic-heading">AI Automation Systems for Chiropractic Clinics</h1>
+            <p class="static-lede">ClientSurge helps chiropractic clinics with new patient intake, appointment reminders, unfinished care plan follow-up, reactivation campaigns, and review automation.</p>
+            <div class="static-grid two"><article class="static-card"><h2>New Patient Flow</h2><p>Capture inquiry details, answer common intake questions, and move prospects toward booked visits.</p></article><article class="static-card"><h2>Ongoing Follow-Up</h2><p>Automate reminders, unfinished care plan follow-up, patient reactivation, and review requests.</p></article></div>
+            <div class="static-actions"><a class="static-button" href="/book">Book a Chiropractic Automation Audit</a></div>
+          </section>
+
+          <section class="static-route static-route--contractors static-section" aria-labelledby="static-contractors-heading">
+            <p class="static-eyebrow">Contractor automation</p>
+            <h1 id="static-contractors-heading">AI Automation Systems for Contractors</h1>
+            <p class="static-lede">ClientSurge helps contractors with project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation.</p>
+            <div class="static-grid two"><article class="static-card"><h2>Project Inquiry Routing</h2><p>Capture job type, timeline, location, budget range, and next-step needs before the opportunity gets cold.</p></article><article class="static-card"><h2>Quote Follow-Up</h2><p>Recover missed calls, nurture estimates, and reactivate old opportunities sitting in email or the CRM.</p></article></div>
+            <div class="static-actions"><a class="static-button" href="/book">Book a Contractor Automation Audit</a></div>
+          </section>
+
+          <section class="static-route static-route--privacy static-section" aria-labelledby="static-privacy-heading">
+            <p class="static-eyebrow">Effective May 21, 2026</p>
+            <h1 id="static-privacy-heading">Privacy Policy</h1>
+            <p class="static-lede">This privacy policy explains what data ClientSurge Systems collects, how it is used, cookies and tracking, third-party services, and how to contact us.</p>
+            <div class="static-grid two">
+              <article class="static-card"><h2>What We Collect</h2><p>Business name, contact name, phone number, email address, website URL, service interest, form messages, booking details, UTM data, and information needed to respond to inquiries.</p></article>
+              <article class="static-card"><h2>How We Use Data</h2><p>We use information to respond to inquiries, schedule audits, provide services, support automation workflows, improve website performance, and maintain business records.</p></article>
+              <article class="static-card"><h2>Cookies and Services</h2><p>We may use cookies, analytics, pixels, booking tools, messaging providers, payment processors, email platforms, automation tools, and AI infrastructure such as Base44, Twilio, Resend, Stripe, OpenAI, Google, and Calendly.</p></article>
+              <article class="static-card"><h2>Contact</h2><p>Email <a href="mailto:support@clientsurgesystems.com">support@clientsurgesystems.com</a> or call <a href="tel:+16025843227">(602) 584-3227</a> with privacy questions.</p></article>
+            </div>
+          </section>
+
+          <section class="static-route static-route--login static-section" aria-labelledby="static-login-heading">
+            <p class="static-eyebrow">Client portal</p>
+            <h1 id="static-login-heading">Client Login</h1>
+            <p class="static-lede">Existing ClientSurge customers can use the client portal to access project status, automation setup, and business dashboard information after signing in.</p>
+            <div class="static-grid two">
+              <article class="static-card"><h2>Existing Clients</h2><p>Continue to the secure client portal to sign in and view your account.</p><a href="/client-portal">Open the client portal</a></article>
+              <article class="static-card"><h2>New Inquiries</h2><p>If you are not a client yet, book a free automation audit or contact our team before trying to access the portal.</p><a href="/book">Book Your Free Automation Audit</a></article>
             </div>
           </section>
 
@@ -464,8 +679,7 @@
           <footer class="static-footer">
             <p>ClientSurge Systems builds AI automation systems for local service businesses.</p>
             <nav class="static-nav" aria-label="Legal navigation">
-              <a href="/legal/privacy">Privacy Policy</a>
-              <a href="/legal/terms">Terms</a>
+              <a href="/privacy-policy">Privacy Policy</a>
               <a href="/login">Client Login</a>
             </nav>
           </footer>

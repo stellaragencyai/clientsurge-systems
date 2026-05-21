@@ -40,8 +40,8 @@ const navColumns = [
     links: [
       { label: "About Us", href: "/about" },
       { label: "Contact Us", href: "/contact" },
-      { label: "Privacy Policy", href: "/legal/privacy" },
-      { label: "Terms of Service", href: "/legal/terms" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Terms of Service", href: "/terms" },
     ],
   },
 ];
@@ -189,12 +189,12 @@ export default function Footer() {
         <div style={{ marginTop: "48px", paddingTop: "24px", borderTop: "1px solid rgba(0,174,239,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
             <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.4)" }}>© {new Date().getFullYear()} ClientSurge Systems</span>
-            <a href="/legal/privacy" onClick={(e) => handleNavClick(e, "/legal/privacy")} style={{ fontSize: "12px", color: "rgba(10,22,40,0.4)", textDecoration: "none" }}
+            <a href="/privacy-policy" onClick={(e) => handleNavClick(e, "/privacy-policy")} style={{ fontSize: "12px", color: "rgba(10,22,40,0.4)", textDecoration: "none" }}
               onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
               onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.4)"}>
               Privacy
             </a>
-            <a href="/legal/terms" onClick={(e) => handleNavClick(e, "/legal/terms")} style={{ fontSize: "12px", color: "rgba(10,22,40,0.4)", textDecoration: "none" }}
+            <a href="/terms" onClick={(e) => handleNavClick(e, "/terms")} style={{ fontSize: "12px", color: "rgba(10,22,40,0.4)", textDecoration: "none" }}
               onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
               onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.4)"}>
               Terms

@@ -200,7 +200,7 @@ export default function LeadCaptureForm() {
       {/* TCPA SMS Consent */}
       <p className="text-xs text-muted-foreground leading-relaxed border border-border rounded-lg p-3 bg-muted/30">
         By submitting this form, you consent to receive automated SMS messages and emails from ClientSurge Systems regarding your inquiry. Message & data rates may apply. Reply <strong>STOP</strong> at any time to opt out.{" "}
-        <a href="/legal/privacy" className="underline hover:text-foreground">Privacy Policy</a>
+        <a href="/privacy-policy" className="underline hover:text-foreground">Privacy Policy</a>
         {" · "}
         <a href="/legal/terms" className="underline hover:text-foreground">Terms</a>
       </p>

@@ -68,7 +68,7 @@ export default function CookieConsent() {
         <p className="text-xs text-muted-foreground leading-relaxed">
           We use cookies to enhance your experience and analyze site traffic. By continuing to use this site, you agree to our{' '}
           <a 
-            href="/legal/privacy" 
+            href="/privacy-policy"
             className="font-medium text-primary hover:text-primary/80 transition-colors"
           >
             privacy policy

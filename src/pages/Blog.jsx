@@ -28,7 +28,16 @@ export default function Blog() {
     <div style={{ minHeight: "100vh", background: "#0A0F1E", padding: "60px 20px" }}>
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
         <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 900, margin: "0 0 6px" }}>ClientSurge Blog</h1>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 36px" }}>AI automation insights for Phoenix & Scottsdale local businesses</p>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 18px" }}>
+          Practical guides on missed-call recovery, AI lead follow-up, AI voice agents, local service business automation, conversion systems, and booking automation.
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, margin: "0 0 36px" }} aria-label="Blog topics">
+          {["Missed-call recovery", "AI lead follow-up", "AI voice agents", "Booking automation", "Conversion systems"].map((topic) => (
+            <span key={topic} style={{ color: "rgba(255,255,255,0.68)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 9999, padding: "4px 10px", fontSize: 11 }}>
+              {topic}
+            </span>
+          ))}
+        </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {POSTS.map(p => (
             <div key={p.slug} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "22px 24px" }}>

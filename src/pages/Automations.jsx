@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, Zap, Phone, Mail, Calendar, Star, RefreshCw, X, Play, CheckCircle, Headphones } from "lucide-react";
+import { ArrowRight, Zap, Mail, Calendar, Star, RefreshCw, X, Play, CheckCircle, Headphones } from "lucide-react";
 import { Link } from "react-router-dom";
 import { setPageMetadata } from "@/lib/seo";
 
@@ -7,146 +7,114 @@ const SERVICES = [
   {
     id: "ai-voice-agent",
     icon: Headphones,
-    title: "AI Voice Agent",
-    tagline: "AI phone receptionist for inbound calls, missed leads, and booking handoff.",
+    title: "AI Voice Agent & Missed-Call Recovery",
+    tagline: "Answers, triages, and recovers phone leads before they disappear.",
     description:
-      "Your AI voice agent answers inbound calls, captures caller details, qualifies intent, and routes ready prospects toward the right next step. It gives local service businesses front-desk coverage for high-intent calls without adding another hire.",
+      "Answers or triages missed calls, after-hours calls, and inbound inquiries so fewer leads disappear before your team can respond.",
     stats: [
-      { value: "24/7", label: "phone coverage for new opportunities", source: "Our system" },
-      { value: "0", label: "voicemail-only lead capture gaps", source: "Target outcome" },
-      { value: "1st", label: "response advantage before competitors", source: "Speed-to-lead benchmark" },
+      { value: "24/7", label: "coverage for calls and after-hours inquiries", source: "System capability" },
+      { value: "Fast", label: "missed-call recovery before competitors respond", source: "Speed-to-lead goal" },
+      { value: "Clean", label: "handoff into follow-up and booking workflows", source: "ClientSurge routing" },
     ],
     whatYouGet: [
-      "AI phone receptionist configured around your services and booking process",
-      "Caller intent capture with lead notes for your team",
-      "Booking or callback handoff for qualified prospects",
-      "Escalation rules for urgent or sensitive calls",
+      "Captures caller details",
+      "Handles common questions",
+      "Routes urgent or qualified leads into follow-up",
     ],
     poster: "https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=800&q=80",
   },
   {
-    id: "instant-lead-response",
+    id: "lead-capture-automation",
     icon: Zap,
-    emoji: "⚡",
-    title: "Instant Lead Response",
-    tagline: "Contact every inbound lead within 60 seconds — automatically.",
+    title: "Lead Capture Automation",
+    tagline: "Turns every inquiry into a trackable lead.",
     description:
-      "Research consistently shows that the probability of qualifying a lead drops by over 80% if contact is delayed beyond five minutes. Our Instant Lead Response system eliminates that risk entirely. The moment a lead submits a form, calls your number, or reaches out through any connected channel, a personalized SMS and email are dispatched within 60 seconds — without any manual intervention.",
+      "Turns website visitors, form fills, ad traffic, and phone inquiries into organized leads inside your CRM or pipeline.",
     stats: [
-      { value: "78%", label: "of buyers choose the first responder", source: "Harvard Business Review" },
-      { value: "60s", label: "average response time with our system", source: "Typical result" },
-      { value: "5×", label: "higher conversion vs. 5-min response", source: "MIT / InsideSales study" },
+      { value: "1", label: "organized pipeline for calls, forms, and ads", source: "ClientSurge workflow" },
+      { value: "Source", label: "lead attribution tags for cleaner follow-up", source: "CRM routing" },
+      { value: "Instant", label: "notification to the right person", source: "Automation trigger" },
     ],
     whatYouGet: [
-      "Personalized SMS sent within 60 seconds of lead submission",
-      "Branded email confirmation dispatched simultaneously",
-      "Works 24 hours a day, 7 days a week — including holidays",
-      "Integrates with your existing web forms and ad platforms",
+      "Captures every inquiry",
+      "Tags lead source",
+      "Notifies the right person instantly",
     ],
     poster: "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?w=800&q=80",
   },
   {
-    id: "missed-call-textback",
-    icon: Phone,
-    emoji: "📞",
-    title: "Missed Call Text-Back",
-    tagline: "Every unanswered call triggers an automatic, personalized follow-up.",
-    description:
-      "A missed call is not a lost lead — it is a lead in motion. When a prospect calls and no one answers, they rarely call back. Our Missed Call Text-Back system sends a professional, branded SMS to the caller within 30 seconds, opening a two-way conversation before they have a chance to reach a competitor. This system operates continuously, regardless of your business hours.",
-    stats: [
-      { value: "62%", label: "of callers won't call back if unanswered", source: "Invoca Call Intelligence" },
-      { value: "30s", label: "typical text-back delivery time", source: "Typical result" },
-      { value: "3 in 10", label: "missed-call leads recovered on average", source: "Industry benchmark" },
-    ],
-    whatYouGet: [
-      "Automatic SMS reply within 30 seconds of a missed call",
-      "Two-way SMS conversation initiated from your business number",
-      "After-hours coverage with configurable messaging",
-      "Full conversation log in your dashboard",
-    ],
-    poster: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
-  },
-  {
-    id: "nurture-sequence",
+    id: "ai-lead-follow-up",
     icon: Mail,
-    emoji: "📧",
-    title: "14-Day Nurture Sequence",
-    tagline: "A structured, multi-touch follow-up system that works while you focus on your business.",
+    title: "AI Lead Follow-Up Automation",
+    tagline: "Keeps new prospects warm until there is a clear outcome.",
     description:
-      "Most leads require between five and twelve touchpoints before making a buying decision. Our 14-Day Nurture Sequence delivers a precisely timed series of SMS and email messages that maintain professional contact over two weeks. Each message is contextually relevant, non-intrusive, and designed to move the lead toward a booking — without requiring any manual effort from your team.",
+      "Automatically follows up with new leads by SMS and email until they reply, book, or opt out.",
     stats: [
-      { value: "80%", label: "of sales require 5+ follow-up contacts", source: "Marketing Donut" },
-      { value: "14 days", label: "of automated, structured follow-up", source: "Our system" },
-      { value: "2–3×", label: "more booked appointments vs. no follow-up", source: "Industry benchmark" },
+      { value: "Fast", label: "speed-to-lead support for every new inquiry", source: "Automation trigger" },
+      { value: "Consistent", label: "follow-up even when staff are busy", source: "ClientSurge sequence" },
+      { value: "Warm", label: "prospects kept engaged until they respond", source: "Nurture workflow" },
     ],
     whatYouGet: [
-      "8+ touchpoints across SMS and email over 14 days",
-      "Sequence pauses automatically when a lead replies or books",
-      "Messaging personalized to the lead's source and industry",
-      "Fully managed — no manual scheduling required",
+      "Improves speed-to-lead",
+      "Prevents forgotten follow-up",
+      "Keeps prospects warm",
     ],
     poster: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&q=80",
   },
   {
-    id: "ai-booking-agent",
+    id: "appointment-booking-automation",
     icon: Calendar,
-    emoji: "🤖",
-    title: "AI Booking Agent",
-    tagline: "Converts SMS conversations into confirmed appointments without staff involvement.",
+    title: "Appointment Booking Automation",
+    tagline: "Moves qualified leads from interest to confirmed appointments.",
     description:
-      "When a lead signals readiness to book, our AI Booking Agent takes over the conversation. It sends the booking link, follows up if the link goes unclicked, confirms the appointment once scheduled, and sends a reminder before the appointment date. The entire booking workflow runs autonomously — your team is notified only when a confirmed appointment is on the calendar.",
+      "Helps convert interested leads into booked appointments with reminders, confirmations, qualification, and calendar sync.",
     stats: [
-      { value: "40%", label: "increase in appointment conversion rates", source: "Industry benchmark" },
-      { value: "100%", label: "of booking follow-ups handled automatically", source: "Our system" },
-      { value: "30%", label: "reduction in no-show rates with reminders", source: "Acuity Scheduling data" },
+      { value: "Less", label: "back-and-forth before booking", source: "Booking workflow" },
+      { value: "Auto", label: "confirmation and reminder messages", source: "Calendar automation" },
+      { value: "Clear", label: "handoff when the lead is ready", source: "Lead qualification" },
     ],
     whatYouGet: [
-      "Automated booking link delivery via SMS when lead intent is detected",
-      "Follow-up sent if link is not clicked within a set window",
-      "Appointment confirmation message sent immediately after booking",
-      "Pre-appointment reminder to reduce no-shows",
+      "Reduces booking friction",
+      "Confirms appointments",
+      "Sends reminders automatically",
     ],
     poster: "https://images.unsplash.com/photo-1633613286991-611fe299c4be?w=800&q=80",
   },
   {
-    id: "review-request",
+    id: "review-reputation-automation",
     icon: Star,
-    emoji: "⭐",
-    title: "Review Request System",
-    tagline: "Systematically build your online reputation after every completed appointment.",
+    title: "Review & Reputation Automation",
+    tagline: "Builds stronger local trust after completed jobs.",
     description:
-      "The optimal window for requesting a review is within two hours of a completed appointment, when client satisfaction is at its highest. Our Review Request System sends a professionally worded, perfectly timed SMS request to every client after their visit. This consistent, automated approach generates a steady stream of authentic reviews — the single most important driver of new patient and client acquisition in local service markets.",
+      "Requests reviews after completed jobs and helps build stronger Google reputation over time.",
     stats: [
-      { value: "88%", label: "of consumers trust online reviews as much as personal referrals", source: "BrightLocal" },
-      { value: "3–4×", label: "more reviews generated vs. manual requests", source: "Industry benchmark" },
-      { value: "4.7+", label: "average star rating achieved by active users", source: "Typical result" },
+      { value: "Timely", label: "review requests after the right customer moment", source: "Post-job trigger" },
+      { value: "More", label: "consistent Google review opportunities", source: "Reputation workflow" },
+      { value: "Earlier", label: "visibility into unhappy customer signals", source: "Feedback routing" },
     ],
     whatYouGet: [
-      "Automated review request sent via SMS after each appointment",
-      "Timing optimized for maximum response rates",
-      "Direct link to your Google Business or preferred review platform",
-      "Works for any appointment type or service category",
+      "Triggers review requests",
+      "Improves review volume",
+      "Surfaces unhappy customers earlier",
     ],
     poster: "https://images.unsplash.com/photo-1531973576160-7125cd663d86?w=800&q=80",
   },
   {
-    id: "lead-reactivation",
+    id: "reactivation-win-back-automation",
     icon: RefreshCw,
-    emoji: "🔁",
-    title: "Lead Reactivation",
-    tagline: "Recover revenue from leads you've already acquired but never converted.",
+    title: "Reactivation / Win-Back Automation",
+    tagline: "Turns dormant leads and old opportunities back into conversations.",
     description:
-      "Every business has a database of leads that expressed interest, engaged briefly, and then went quiet. These prospects represent paid acquisition costs with zero return. Our Lead Reactivation system deploys a targeted re-engagement campaign to dormant contacts, using proven messaging frameworks to revive interest. A single reactivation campaign regularly converts leads that went cold 30, 60, or even 90 days ago.",
+      "Re-engages old leads, past customers, no-shows, unbooked quotes, and cold opportunities with targeted campaigns.",
     stats: [
-      { value: "20–35%", label: "of dormant leads can be reactivated with the right message", source: "Industry benchmark" },
-      { value: "90 days", label: "lookback window for reactivation campaigns", source: "Our system" },
-      { value: "$0", label: "additional acquisition cost — these leads are already yours", source: "Our system" },
+      { value: "Old", label: "quotes and past inquiries brought back", source: "CRM segment" },
+      { value: "Targeted", label: "campaigns based on lead context", source: "Win-back workflow" },
+      { value: "Existing", label: "revenue from contacts already in your database", source: "Client list" },
     ],
     whatYouGet: [
-      "Targeted SMS and email re-engagement sequence",
-      "Segmented by lead age, source, and previous interaction",
-      "A/B tested messaging frameworks for maximum reactivation rates",
-      "Can be run as a one-time campaign or on a recurring schedule",
+      "Revives old opportunities",
+      "Books past inquiries",
+      "Creates revenue from existing contacts",
     ],
     poster: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
   },
@@ -331,9 +299,9 @@ function ServiceCard({ service }) {
 export default function Automations() {
   useEffect(() => {
     return setPageMetadata({
-      title: "AI Automations for Local Service Businesses | ClientSurge",
+      title: "AI Automation Systems for Local Service Businesses | ClientSurge",
       description:
-        "Explore ClientSurge AI voice agents, missed-call text-back, instant lead response, nurturing, booking automation, review requests, and lead reactivation.",
+        "ClientSurge installs AI automation systems that capture, follow up with, qualify, book, and reactivate leads for local service businesses.",
       canonicalPath: "/automations",
       ogTitle: "AI Automations That Turn Local Leads Into Booked Jobs",
       ogDescription:
@@ -376,12 +344,12 @@ export default function Automations() {
           className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-5"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          The Complete Lead Conversion
+          AI Automation Systems for
           <br />
-          <span style={{ color: BRAND.color }}>Infrastructure for Service Businesses</span>
+          <span style={{ color: BRAND.color }}>Local Service Businesses</span>
         </h1>
         <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed mb-8">
-          Each system below addresses a specific failure point in the lead-to-booking journey: phone coverage, missed-call recovery, speed-to-lead, follow-up, booking, reviews, and old lead reactivation.
+          ClientSurge installs automation systems that capture, follow up with, qualify, book, and reactivate leads so fewer local service opportunities fall through the cracks.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
           {[

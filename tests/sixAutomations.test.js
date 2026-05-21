@@ -14,8 +14,8 @@ const industryTemplate = readFileSync(
 test("the public offer is packaged around exactly six automation systems", () => {
   assert.equal(SIX_AUTOMATIONS.length, 6);
   assert.deepEqual(getAutomationRoutes(), [
-    "/lead-capture-automation",
     "/missed-call-text-back",
+    "/lead-capture-automation",
     "/ai-lead-follow-up",
     "/appointment-booking-automation",
     "/review-automation",
@@ -25,7 +25,7 @@ test("the public offer is packaged around exactly six automation systems", () =>
 
 test("automation routes are public and no catch-all industry route advertises templates", () => {
   for (const route of getAutomationRoutes()) {
-    assert.match(app, new RegExp(`"${route}"`));
+    assert.match(app, new RegExp(`routePath\\("${route.slice(1)}"\\)`));
   }
   assert.doesNotMatch(app, /path="\/:slug"/);
 });
@@ -37,9 +37,12 @@ test("blog route is public and wired for SEO", () => {
   assert.match(sitemap, /https:\/\/clientsurgesystems\.com\/blog/);
 });
 
-test("sitemap includes every public automation service page", () => {
-  for (const route of getAutomationRoutes()) {
+test("sitemap prioritizes canonical public marketing pages", () => {
+  for (const route of ["/automations", "/industries", "/roofing", "/hvac", "/dental", "/med-spa", "/chiropractic", "/contractors", "/book", "/contact", "/blog", "/privacy-policy"]) {
     assert.match(sitemap, new RegExp(`https://clientsurgesystems\\.com${route}`));
+  }
+  for (const route of getAutomationRoutes()) {
+    assert.doesNotMatch(sitemap, new RegExp(`https://clientsurgesystems\\.com${route}`));
   }
 });
 

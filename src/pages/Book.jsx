@@ -11,13 +11,13 @@ export default function Book() {
 
   useEffect(() => {
     const cleanupMetadata = setPageMetadata({
-      title: 'Make the Leap | ClientSurge Systems',
+      title: 'Book Your Free ClientSurge Automation Audit | ClientSurge Systems',
       description:
-        'Schedule a free ClientSurge Systems strategy call to review your follow-up process, lead leaks, and the fastest automation wins for your business.',
+        'Book a free ClientSurge automation audit to review missed-call leakage, speed-to-lead gaps, website conversion, follow-up gaps, and booking friction.',
       canonicalPath: '/book',
-      ogTitle: 'Make the Leap with ClientSurge',
+      ogTitle: 'Book Your Free ClientSurge Automation Audit',
       ogDescription:
-        'Schedule a walkthrough to see how ClientSurge can improve your lead response and booking flow.',
+        'Choose a time for a practical review of your lead flow, missed-call recovery, follow-up automation, and booking opportunities.',
     });
 
     return cleanupMetadata;
@@ -39,15 +39,17 @@ export default function Book() {
       <div className="w-full max-w-3xl">
         <div className="text-center mb-12">
           <h1 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-4">
-            Make the Leap
+            Book Your Free ClientSurge Automation Audit
           </h1>
-          <p className="text-muted-foreground text-lg">Free 15 minutes. No commitment. Same guided booking flow as the rest of the site.</p>
+          <p className="text-muted-foreground text-lg">
+            Review the places your local service business may be losing calls, forms, follow-up, and booked appointments.
+          </p>
           <a
-            href="/#services"
-            onClick={() => trackCTA('review_8_system_flow', 'book_page_header')}
+            href="/automations"
+            onClick={() => trackCTA('review_automation_systems', 'book_page_header')}
             className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
           >
-            Review the 8-step system
+            Review the automation systems
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>
@@ -56,29 +58,44 @@ export default function Book() {
           <div className="max-w-2xl mx-auto text-center mb-8">
             <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What Happens After You Book</p>
             <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
-              Clear next steps before the call
+              What the audit includes
             </h2>
             <p className="mt-3 text-sm md:text-base text-muted-foreground">
-              You are not booking yourself into a black box. Here is exactly what happens next.
+              Built for roofers, HVAC companies, dental practices, med spas, chiropractic clinics, contractors, and other local service businesses.
             </p>
+          </div>
+
+          <div className="mb-8 grid sm:grid-cols-2 gap-3">
+            {[
+              "Missed-call leakage review",
+              "Speed-to-lead review",
+              "Website conversion review",
+              "Follow-up gap review",
+              "Booking friction review",
+              "Practical automation recommendations",
+            ].map((item) => (
+              <div key={item} className="rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground">
+                {item}
+              </div>
+            ))}
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
             {[
               {
                 icon: CalendarCheck2,
-                title: "You book",
-                body: "Choose a time that works for you and get an immediate confirmation.",
+                title: "Choose a time",
+                body: "Pick a time that works for you and get an immediate confirmation.",
               },
               {
                 icon: ClipboardList,
-                title: "We prepare your audit",
-                body: "We review your lead flow, follow-up gaps, and where bookings are leaking.",
+                title: "Quick discovery call",
+                body: "We review your current calls, forms, website path, follow-up process, and booking handoff.",
               },
               {
                 icon: MessagesSquare,
-                title: "We meet",
-                body: "On the call, we show the fastest automation wins and what implementation would look like for your business.",
+                title: "Get automation opportunities",
+                body: "You leave with practical ways to recover missed leads, respond faster, and book more appointments.",
               },
             ].map((step) => {
               const Icon = step.icon;
@@ -95,16 +112,16 @@ export default function Book() {
           </div>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
-            No spam. No pressure. Just a tailored walkthrough of your current lead and booking process.
+            If the embedded scheduler fails to load, use the contact page or email support@clientsurgesystems.com and we will help schedule manually.
           </p>
 
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               type="button"
-              onClick={() => trackCTA('book_your_free_demo', 'book_page')}
+              onClick={() => trackCTA('schedule_your_audit', 'book_page')}
               className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
-              Booking modal is open above
+              Schedule Your Audit
             </button>
             <Link
               to="/contact"

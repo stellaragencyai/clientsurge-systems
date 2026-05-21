@@ -66,7 +66,7 @@ export default function Contact() {
     return setPageMetadata({
       title: "Contact ClientSurge Systems | Questions and Demo Requests",
       description:
-        "Contact ClientSurge Systems to ask questions, request a walkthrough, or discuss lead capture automation for your business.",
+        "Contact ClientSurge Systems to ask questions, request a walkthrough, or discuss AI voice agents, lead follow-up, booking automation, and local service business systems.",
       canonicalPath: "/contact",
       ogTitle: "Contact ClientSurge Systems",
       ogDescription: "Reach out to discuss your lead flow, booking process, or automation questions.",
@@ -139,10 +139,10 @@ export default function Contact() {
       <section className="py-20 px-6 text-center" style={{ background: "linear-gradient(to bottom, hsl(var(--muted)), hsl(var(--background)))" }}>
         <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Get In Touch</p>
         <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
-          Let&apos;s Talk About Your Business
+          Contact ClientSurge Systems
         </h1>
         <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-          Have a question or want to learn more? Send us a message and we&apos;ll get back to you within one business day.
+          Have a question about AI automation, lead capture, or booking systems? Send a message and we&apos;ll get back to you within one business day.
         </p>
       </section>
 
@@ -168,8 +168,10 @@ export default function Contact() {
                     <Phone className="w-4 h-4 text-primary" />
                   </div>
                   <div>
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">Demo Calls</p>
-                    <p className="text-sm text-foreground">Available by appointment during your free walkthrough.</p>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-0.5">Phone</p>
+                    <a href="tel:+16025843227" className="text-sm text-foreground hover:text-primary transition-colors">
+                      (602) 584-3227
+                    </a>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -187,7 +189,7 @@ export default function Contact() {
             <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5">
               <p className="text-sm font-semibold text-foreground mb-2">Prefer a live walkthrough?</p>
               <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-                Skip the form and book a free 15-minute demo. We&apos;ll show you exactly how the system works for your business.
+                Skip the form and book a free automation audit. We&apos;ll review your current lead flow and show the fastest practical automation wins.
               </p>
               <button
                 type="button"
@@ -195,7 +197,7 @@ export default function Contact() {
                 style={{ display: "inline-flex", alignItems: "center", gap: "6px", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", boxShadow: "0 4px 14px rgba(0,174,239,0.4)", border: "none", cursor: "pointer", textDecoration: "none" }}
               >
                 <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 20px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.8rem" }}>
-                  Make the Leap <ArrowRight className="w-3.5 h-3.5" />
+                  Book Your Free Audit <ArrowRight className="w-3.5 h-3.5" />
                 </span>
               </button>
             </div>
@@ -382,7 +384,7 @@ export default function Contact() {
                 </p>
                 <p className="text-center text-xs text-muted-foreground mt-1">
                   We respect your privacy. See our{" "}
-                  <a href="/legal/privacy" className="underline hover:text-foreground transition-colors">Privacy Policy</a>.
+                  <a href="/privacy-policy" className="underline hover:text-foreground transition-colors">Privacy Policy</a>.
                 </p>
               </form>
             )}

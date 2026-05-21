@@ -141,6 +141,8 @@ const LEGACY_REDIRECTS = [
   { from: routePath("Sam"), to: routePath("admin") },
   { from: routePath("MedSpaDashboard"), to: routePath("admin") },
   { from: routePath("WebsiteSpecPreview"), to: routePath("admin") },
+  { from: routePath("legal", "privacy"), to: routePath("privacy-policy") },
+  { from: routePath("legal", "terms"), to: routePath("terms") },
 ];
 
 const AUTOMATION_SERVICE_ROUTES = [
@@ -325,20 +327,20 @@ const AuthenticatedApp = () => {
           element={<Navigate to={to} replace />}
         />
       ))}
-      <Route path="/NotFound" caseSensitive element={<PageNotFound />} />
+      <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
       <Route path="/start" element={<Start />} />
       <Route path="/book" element={<Book />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
       <Route path="/industries" element={<Industries />} />
-      <Route path="/pricing" element={<SectionRedirect hash="#pricing" />} />
-      <Route path="/faq" element={<SectionRedirect hash="#faq" />} />
-      <Route path="/our-system" element={<SectionRedirect hash="#services" />} />
-      <Route path="/testimonials" element={<SectionRedirect hash="#testimonials" />} />
-      <Route path="/privacy-policy" element={<Navigate to="/legal/privacy" replace />} />
-      <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
+      <Route path={routePath("pricing")} element={<SectionRedirect hash="#pricing" />} />
+      <Route path={routePath("faq")} element={<SectionRedirect hash="#faq" />} />
+      <Route path={routePath("our-system")} element={<SectionRedirect hash="#services" />} />
+      <Route path={routePath("testimonials")} element={<SectionRedirect hash="#testimonials" />} />
+      <Route path="/privacy-policy" element={<LegalPage fixedType="privacy" canonicalPath="/privacy-policy" />} />
+      <Route path={routePath("terms")} element={<LegalPage fixedType="terms" canonicalPath="/terms" />} />
       <Route path="/login" element={<Navigate to="/client-portal" replace />} />
-      <Route path="/ClientPortal" element={<Navigate to="/client-portal" replace />} />
+      <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/blog" element={<Blog />} />
       <Route
@@ -370,7 +372,7 @@ const AuthenticatedApp = () => {
       {HIDDEN_PUBLIC_ROUTES.map(({ route, element }) => (
         <Route key={route} path={route} element={element} />
       ))}
-      <Route path="/services/:serviceSlug" element={<Navigate to="/store" replace />} />
+      <Route path={routePath("services", dynamicParam("serviceSlug"))} element={<Navigate to="/store" replace />} />
 
       <Route
         element={

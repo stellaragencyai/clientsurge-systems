@@ -8,7 +8,7 @@ test('buildBreadcrumbSchema returns null for homepage', () => {
 
 test('buildBreadcrumbSchema builds nested inner-page breadcrumbs', () => {
   const schema = buildBreadcrumbSchema({
-    canonicalPath: '/legal/privacy',
+    canonicalPath: '/privacy-policy',
     title: 'Privacy Policy | ClientSurge Systems',
   });
 
@@ -17,8 +17,7 @@ test('buildBreadcrumbSchema builds nested inner-page breadcrumbs', () => {
     schema.itemListElement.map((item) => ({ position: item.position, name: item.name, item: item.item })),
     [
       { position: 1, name: 'Home', item: 'https://clientsurgesystems.com/' },
-      { position: 2, name: 'Legal', item: 'https://clientsurgesystems.com/legal' },
-      { position: 3, name: 'Privacy Policy', item: 'https://clientsurgesystems.com/legal/privacy' },
+      { position: 2, name: 'Privacy Policy', item: 'https://clientsurgesystems.com/privacy-policy' },
     ]
   );
 });

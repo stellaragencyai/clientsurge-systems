@@ -1,5 +1,32 @@
 export const SIX_AUTOMATIONS = [
   {
+    id: "ai-voice-agent",
+    slug: "ai-voice-agent-missed-call-recovery",
+    routePath: "/missed-call-text-back",
+    title: "AI Voice Agent & Missed-Call Recovery",
+    shortTitle: "AI Voice Agent",
+    icon: "phone",
+    summary:
+      "Answers or triages missed calls, after-hours calls, and inbound inquiries so fewer leads disappear before your team can respond.",
+    bullets: [
+      "Captures caller details",
+      "Handles common questions",
+      "Routes urgent or qualified leads into follow-up",
+    ],
+    whatItDoes:
+      "Uses AI phone receptionist workflows, missed-call recovery, and lead routing to keep high-intent callers moving toward follow-up or booking.",
+    whoFor:
+      "Local service businesses where phone calls, after-hours inquiries, and unanswered calls turn into lost revenue.",
+    triggers: ["Missed inbound call", "After-hours call", "Busy-line call", "Qualified phone inquiry"],
+    exampleMessages: [
+      "Thanks for calling. What can we help you with today?",
+      "We captured your request and will get you the fastest next step.",
+    ],
+    before: "Callers hit voicemail, hang up, or call the next competitor.",
+    after: "Callers are answered, triaged, routed, and followed up with quickly.",
+    industries: ["HVAC", "Roofing", "Dental", "Med spas", "Contractors", "Chiropractic"],
+  },
+  {
     id: "lead-capture",
     slug: "lead-capture-automation",
     routePath: "/lead-capture-automation",
@@ -7,7 +34,12 @@ export const SIX_AUTOMATIONS = [
     shortTitle: "Lead Capture",
     icon: "inbox",
     summary:
-      "Turns website visitors, form fills, calls, and ad traffic into organized leads inside your CRM.",
+      "Turns website visitors, form fills, ad traffic, and phone inquiries into organized leads inside your CRM or pipeline.",
+    bullets: [
+      "Captures every inquiry",
+      "Tags lead source",
+      "Notifies the right person instantly",
+    ],
     whatItDoes:
       "Captures every inbound lead source and routes the contact, source, service interest, and next step into one trackable pipeline.",
     whoFor:
@@ -22,28 +54,6 @@ export const SIX_AUTOMATIONS = [
     industries: ["Med spas", "Dental offices", "HVAC companies", "Roofers", "Contractors", "Chiropractors"],
   },
   {
-    id: "missed-call",
-    slug: "missed-call-text-back",
-    routePath: "/missed-call-text-back",
-    title: "Missed-Call Text-Back Automation",
-    shortTitle: "Missed-Call Text-Back",
-    icon: "phone",
-    summary:
-      "When a business misses a call, the system instantly texts the lead so they do not call a competitor.",
-    whatItDoes:
-      "Detects missed calls and sends a fast, branded SMS reply that keeps the conversation open.",
-    whoFor:
-      "Businesses where missed calls mean lost jobs, appointments, consultations, or estimates.",
-    triggers: ["Missed inbound call", "After-hours call", "Busy-line call", "Voicemail event"],
-    exampleMessages: [
-      "Hi, this is ClientSurge Systems. Sorry we missed your call. What can we help with today?",
-      "We can still help. Reply here and we will get you the fastest next step.",
-    ],
-    before: "The caller reaches voicemail and often calls the next competitor.",
-    after: "The caller gets an immediate response and can continue by text.",
-    industries: ["HVAC", "Roofing", "Dental", "Med spas", "Contractors", "Chiropractic"],
-  },
-  {
     id: "ai-follow-up",
     slug: "ai-lead-follow-up",
     routePath: "/ai-lead-follow-up",
@@ -51,7 +61,12 @@ export const SIX_AUTOMATIONS = [
     shortTitle: "AI Follow-Up",
     icon: "message",
     summary:
-      "Follows up with new leads by SMS and email until they respond, book, or opt out.",
+      "Automatically follows up with new leads by SMS and email until they reply, book, or opt out.",
+    bullets: [
+      "Improves speed-to-lead",
+      "Prevents forgotten follow-up",
+      "Keeps prospects warm",
+    ],
     whatItDoes:
       "Runs a structured follow-up sequence that keeps interested prospects warm without manual chasing.",
     whoFor:
@@ -73,7 +88,12 @@ export const SIX_AUTOMATIONS = [
     shortTitle: "Appointment Booking",
     icon: "calendar",
     summary:
-      "Helps convert interested leads into booked appointments with reminders, confirmations, and calendar sync.",
+      "Helps convert interested leads into booked appointments with reminders, confirmations, qualification, and calendar sync.",
+    bullets: [
+      "Reduces booking friction",
+      "Confirms appointments",
+      "Sends reminders automatically",
+    ],
     whatItDoes:
       "Moves qualified leads from conversation to scheduled appointment, then confirms and reminds them before the visit.",
     whoFor:
@@ -95,7 +115,12 @@ export const SIX_AUTOMATIONS = [
     shortTitle: "Review Automation",
     icon: "star",
     summary:
-      "Automatically requests reviews after completed jobs and helps increase Google reviews over time.",
+      "Requests reviews after completed jobs and helps build stronger Google reputation over time.",
+    bullets: [
+      "Triggers review requests",
+      "Improves review volume",
+      "Surfaces unhappy customers earlier",
+    ],
     whatItDoes:
       "Sends timely review requests after successful appointments, jobs, or projects while the experience is still fresh.",
     whoFor:
@@ -117,7 +142,12 @@ export const SIX_AUTOMATIONS = [
     shortTitle: "Customer Reactivation",
     icon: "refresh",
     summary:
-      "Re-engages old leads, past customers, no-shows, and cold contacts with targeted campaigns.",
+      "Re-engages old leads, past customers, no-shows, unbooked quotes, and cold opportunities with targeted campaigns.",
+    bullets: [
+      "Revives old opportunities",
+      "Books past inquiries",
+      "Creates revenue from existing contacts",
+    ],
     whatItDoes:
       "Finds dormant opportunities and sends relevant win-back messages based on service type, timing, and customer history.",
     whoFor:
