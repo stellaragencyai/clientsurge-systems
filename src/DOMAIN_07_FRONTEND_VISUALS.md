@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 71% Ready (25/35 done · 0 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** #54 — DemoBookingModal date/time input min-height check (~10 min, no deps) · Agent A
+## 📊 DOMAIN HEALTH: 🟡 74% Ready (26/35 done · 0 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** M13 — Hero CTA touch-target audit (~15 min, no deps) · Agent A
 > ⚠️ **Critical:** none currently open
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 25 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,45,51,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| ✅ Done This Week | 26 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,45,51,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M12,M15,M16,M17,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | M10 (modal scroll), M12 (Store mobile grid), M13 (Hero CTA touch targets), #55 (Calendly CSP frame check), #54 (date/time input min-height check) |
+| 📱 Next 5 Priority Tasks | M13 (Hero CTA touch targets), M10 (modal scroll), #55 (Calendly CSP frame check), #44 (sticky cart badge), #54 (stale date/time input row) |
 
 ---
 
@@ -95,7 +95,7 @@
 | M09 | ✅ | iOS input zoom: ALL text inputs must be `font-size: 16px` min — audit DemoBookingModal (all inputs fixed with style={{ fontSize:"16px" }}) | A | All iPhone | 🧵 Mobile-UX | ~30 min |
 | M10 | ⏳ | iPhone 12/15: DemoBookingModal scrollable inside fixed overlay — test that form is reachable without browser chrome interfering | A | iPhone 12, 15 | 🧵 Mobile-UX | ~25 min |
 | M11 | ✅ | Safari: `position: sticky` navbar — `-webkit-sticky` added to index.css for all `.sticky` elements | A | All Safari | 🧵 Mobile-UX | ~10 min |
-| M12 | ⏳ | iPhone 12 (375px): Store page product grid — confirm single-column layout and no horizontal scroll leakage | A | iPhone 12 | 🧵 Mobile-UX | ~20 min |
+| M12 | ✅ | iPhone 12 (375px): Store page product grid — confirm single-column layout and no horizontal scroll leakage | Morpheus | iPhone 12 | 🧵 Mobile-UX | Done |
 | M13 | ⏳ | iPhone 17 Pro Max (430px): Hero CTA buttons — confirm min 44×44px touch target and no overlap with visual glow decorations | A | iPhone 17 Pro Max | 🧵 Mobile-UX | ~15 min |
 | M14 | ⏳ | Safari: test `createPortal` DemoBookingModal renders correctly in Safari 16/17 (known z-index stacking context bugs) | A | Safari / iPhone | 🧵 Mobile-UX | ~20 min |
 | M15 | ✅ | iPad: Footer nav grid — `.footer-nav-grid` class + CSS 2-col override at 640–1023px | A | iPad | 🧵 Mobile-UX | ~15 min |
