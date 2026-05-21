@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { formatChecklistStepCompletedAt } from "@/lib/installChecklistTimestamps";
 import {
   CheckCircle2, Circle, XCircle, AlertCircle, Plus, ChevronDown, ChevronRight,
   Pencil, Save, X, Play, PauseCircle, RefreshCw, Loader2
@@ -170,21 +171,29 @@ const DB_STEP_STATUS_CONFIG = {
 function DbStepRow({ step, onToggle, saving }) {
   const cfg = DB_STEP_STATUS_CONFIG[step.status] || DB_STEP_STATUS_CONFIG.pending;
   const isComplete = step.status === "complete";
+  const completedAtLabel = formatChecklistStepCompletedAt(step.completed_at);
   return (
     <div
-      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+      className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
         isComplete ? "bg-green-50 border-green-200" : "bg-white border-slate-200 hover:bg-slate-50"
       }`}
       onClick={() => !saving && onToggle(step)}
     >
-      <div className="flex-shrink-0">
+      <div className="flex-shrink-0 mt-0.5">
         {isComplete
           ? <CheckCircle2 className="w-4 h-4 text-green-600" />
           : <Circle className="w-4 h-4 text-slate-300" />}
       </div>
-      <span className={`flex-1 text-sm ${isComplete ? "line-through text-green-800 opacity-70" : "text-slate-700"}`}>
-        {step.step_label}
-      </span>
+      <div className="flex-1 min-w-0">
+        <span className={`block text-sm ${isComplete ? "line-through text-green-800 opacity-70" : "text-slate-700"}`}>
+          {step.step_label}
+        </span>
+        {completedAtLabel && (
+          <span className="mt-1 block text-[11px] font-medium text-green-700">
+            Completed {completedAtLabel}{step.completed_by ? ` by ${step.completed_by}` : ""}
+          </span>
+        )}
+      </div>
       <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${cfg.color}`}>
         {cfg.label}
       </span>

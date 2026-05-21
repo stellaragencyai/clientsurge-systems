@@ -7,6 +7,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { shouldApplyLeadScoreResult } from "../_shared/leadScoringGuards.js";
 
 Deno.serve(async (req) => {
   try {
@@ -76,7 +77,8 @@ Respond with JSON:
   "tier": "Hot" | "Warm" | "Cold",
   "reasoning": "why this score",
   "top_signals": ["signal1", "signal2"],
-  "next_action": "what to do next"
+  "next_action": "what to do next",
+  "confidence": number 0.0-1.0
 }`,
       response_json_schema: {
         type: "object",
@@ -86,17 +88,49 @@ Respond with JSON:
           reasoning: { type: "string" },
           top_signals: { type: "array", items: { type: "string" } },
           next_action: { type: "string" },
+          confidence: { type: "number", minimum: 0, maximum: 1 },
         },
-        required: ["score", "tier", "reasoning"],
+        required: ["score", "tier", "reasoning", "confidence"],
       },
     });
+
+    const { confidence, shouldApply } = shouldApplyLeadScoreResult(result);
+    if (!shouldApply) {
+      await base44.asServiceRole.entities.CommunicationEvent.create({
+        lead_id,
+        channel: "internal",
+        direction: "system",
+        event_type: "status_update",
+        provider: "internal",
+        status: "processed",
+        subject: "AI lead score skipped",
+        message_body: `AI score confidence ${confidence.toFixed(2)} was below the 0.60 update threshold.`,
+        metadata_json: JSON.stringify({
+          source: "scoreLeadIntelligence",
+          skipped: true,
+          confidence,
+          proposed_score: result.score,
+          proposed_tier: result.tier,
+        }),
+      });
+
+      return Response.json({
+        success: true,
+        skipped: true,
+        reason: "AI score confidence below 0.60 threshold",
+        lead_id,
+        confidence,
+        proposed_score: result.score,
+        proposed_tier: result.tier,
+      });
+    }
 
     // Update lead with score
     await base44.asServiceRole.entities.Leads.update(lead_id, {
       lead_score: result.score,
       activation_priority: result.tier,
       ai_last_classification: `Score: ${result.score} - ${result.reasoning}`,
-      ai_confidence: 85,
+      ai_confidence: confidence,
     });
 
     console.log(`[ScoreLead] ${lead_id} scored ${result.score} (${result.tier})`);
@@ -109,6 +143,7 @@ Respond with JSON:
       reasoning: result.reasoning,
       signals: result.top_signals,
       next_action: result.next_action,
+      confidence,
     });
   } catch (error) {
     console.error("[ScoreLead] Error:", error.message);

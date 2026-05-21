@@ -1587,7 +1587,7 @@ PHASE 7 - Admin UI
 | 541 | ⏳ | _shared/response.ts: okJson() + errJson() helpers sitewide | MEDIUM |
 | 542 | ✅ | All functions: correct HTTP status codes (400/404/500) | HIGH |
 | 543 | ⏳ | enrichLead: 10-second timeout on external API calls | MEDIUM |
-| 544 | ⏳ | scoreLeadIntelligence: skip if confidence < 0.6 | MEDIUM |
+| 544 | ✅ | scoreLeadIntelligence: skip if confidence < 0.6 | MEDIUM  Morpheus 2026-05-20 |
 
 ---
 
@@ -1665,7 +1665,7 @@ PHASE 7 - Admin UI
 | PL-48 | ✅ | Install Queue panel has no Refresh button | Add refresh icon button  Trinity |
 | PL-49 | ⏳ | No audit log for admin actions | Log key actions to CommunicationEvent entity |
 | PL-50 | ⏳ | Admin can delete orders with no confirmation | Add DeleteConfirmModal before destructive ops |
-| PL-51 | ⏳ | AutomationInstallChecklist steps have no timestamps | Add completed_at field + display in UI |
+| PL-51 | ✅ | AutomationInstallChecklist steps have no timestamps | Add completed_at field + display in UI  Morpheus 2026-05-20 |
 | PL-52 | ✅ | Admin onboarding form has no phone validation | Add US phone regex before form submit  Trinity |
 | PL-53 | ✅ | No search in Admin Leads table | Add search bar filtering by name/email/phone  Trinity |
 | PL-54 | ✅ | Leads table has no CSV export | Add Export CSV button  Trinity |
