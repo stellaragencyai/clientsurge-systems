@@ -1,3 +1,6 @@
+import { useEffect } from "react";
+import { setPageMetadata } from "@/lib/seo";
+
 /**
  * Blog.jsx — #22
  * 3 placeholder posts for organic SEO. Stubs only — no CMS needed yet.
@@ -9,6 +12,18 @@ const POSTS = [
 ];
 
 export default function Blog() {
+  useEffect(() => {
+    return setPageMetadata({
+      title: "ClientSurge Blog | AI Automation for Local Service Businesses",
+      description:
+        "AI automation guides for local service businesses covering missed-call text-back, lead follow-up, appointment booking, and industry-specific growth.",
+      canonicalPath: "/blog",
+      ogTitle: "ClientSurge Blog | AI Automation for Local Service Businesses",
+      ogDescription:
+        "Practical AI automation guides for service businesses that need faster lead response, better follow-up, and more booked appointments.",
+    });
+  }, []);
+
   return (
     <div style={{ minHeight: "100vh", background: "#0A0F1E", padding: "60px 20px" }}>
       <div style={{ maxWidth: 720, margin: "0 auto" }}>

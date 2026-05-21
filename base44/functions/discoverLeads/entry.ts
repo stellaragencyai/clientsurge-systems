@@ -1,5 +1,6 @@
 // redeployed 2026-05-02
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { requireGoogleMapsKey } from "../shared/discoverLeadsGuard.ts";
 
 Deno.serve(async (req) => {
   try {
@@ -21,6 +22,8 @@ Deno.serve(async (req) => {
         { status: 400 }
       );
     }
+
+    requireGoogleMapsKey();
 
     const job = await base44.entities.LeadDiscoveryJob.create({
       niche,
@@ -92,7 +95,10 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[discoverLeads] Fatal error:", error.message);
-    return Response.json({ error: error.message || "Failed to discover leads" }, { status: 500 });
+    return Response.json(
+      { error: error.message || "Failed to discover leads" },
+      { status: error.status || 500 },
+    );
   }
 });
 

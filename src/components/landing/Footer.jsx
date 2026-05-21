@@ -1,14 +1,15 @@
 import { ArrowUp, Mail, Phone, Shield, Zap, MessageSquare, Calendar, RefreshCw, Star } from "lucide-react";
 
 import { useLocation, useNavigate } from "react-router-dom";
+import { SIX_AUTOMATIONS } from "@/lib/sixAutomations";
 
 const AUTOMATIONS = [
-  { label: "Instant Lead Response", desc: "Reply to every lead in under 60 seconds.", href: "/store", icon: Zap },
-  { label: "Missed Call Text-Back", desc: "Recover missed calls automatically.", href: "/store", icon: Phone },
-  { label: "AI Booking Agent", desc: "Turns conversations into appointments.", href: "/store", icon: Calendar },
-  { label: "14-Day Nurture Sequence", desc: "Multi-touch follow-up on autopilot.", href: "/store", icon: MessageSquare },
-  { label: "Lead Reactivation", desc: "Wake up cold leads from up to 90 days.", href: "/store", icon: RefreshCw },
-  { label: "Review Request System", desc: "Auto-request reviews after every appointment.", href: "/store", icon: Star },
+  { ...SIX_AUTOMATIONS[0], label: "Lead Capture", desc: SIX_AUTOMATIONS[0].summary, href: SIX_AUTOMATIONS[0].routePath, icon: Zap },
+  { ...SIX_AUTOMATIONS[1], label: "Missed Call Text-Back", desc: SIX_AUTOMATIONS[1].summary, href: SIX_AUTOMATIONS[1].routePath, icon: Phone },
+  { ...SIX_AUTOMATIONS[2], label: "AI Lead Follow-Up", desc: SIX_AUTOMATIONS[2].summary, href: SIX_AUTOMATIONS[2].routePath, icon: MessageSquare },
+  { ...SIX_AUTOMATIONS[3], label: "Appointment Booking", desc: SIX_AUTOMATIONS[3].summary, href: SIX_AUTOMATIONS[3].routePath, icon: Calendar },
+  { ...SIX_AUTOMATIONS[4], label: "Review Automation", desc: SIX_AUTOMATIONS[4].summary, href: SIX_AUTOMATIONS[4].routePath, icon: Star },
+  { ...SIX_AUTOMATIONS[5], label: "Customer Reactivation", desc: SIX_AUTOMATIONS[5].summary, href: SIX_AUTOMATIONS[5].routePath, icon: RefreshCw },
 ];
 
 const navColumns = [
@@ -17,9 +18,11 @@ const navColumns = [
     links: [
       { label: "How It Works", href: "/#problem-solution" },
       { label: "Our System", href: "/#services" },
+      { label: "6 Automations", href: "/#six-automations" },
       { label: "Pricing", href: "/#pricing" },
       { label: "FAQ", href: "/#faq" },
       { label: "AI Store", href: "/store" },
+      { label: "Blog", href: "/blog" },
     ],
   },
   {

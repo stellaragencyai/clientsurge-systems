@@ -30,6 +30,8 @@ import Success from "./pages/Success";
 import LegalPage from "./pages/LegalPage";
 import Contact from "./pages/Contact";
 import Industries from "./pages/Industries";
+import AutomationServicePage from "./pages/AutomationServicePage";
+import Blog from "./pages/Blog";
 import OrderSuccess from "./pages/OrderSuccess";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
 import BusinessSetup from "./pages/BusinessSetup";
@@ -63,6 +65,12 @@ const PUBLIC_PATHS = [
   "/roofing",
   "/contractors",
   "/chiropractic",
+  "/lead-capture-automation",
+  "/missed-call-text-back",
+  "/ai-lead-follow-up",
+  "/appointment-booking-automation",
+  "/review-automation",
+  "/customer-reactivation",
   "/start",
   "/book",
   "/book-demo",
@@ -77,6 +85,7 @@ const PUBLIC_PATHS = [
   "/success",
   "/legal",
   "/contact",
+  "/blog",
   "/leads/capture",
   "/onboarding",
   "/setup/preview",
@@ -250,6 +259,7 @@ const AuthenticatedApp = () => {
       <Route path="/leads/capture" element={<CaptureLeads />} />
       <Route path="/legal/:type" element={<LegalPage />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/blog" element={<Blog />} />
       <Route
         path="/store"
         element={
@@ -269,6 +279,12 @@ const AuthenticatedApp = () => {
       <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/about" element={<About />} />
       <Route path="/automations" element={<AutomationsDemo />} />
+      <Route path="/lead-capture-automation" element={<AutomationServicePage />} />
+      <Route path="/missed-call-text-back" element={<AutomationServicePage />} />
+      <Route path="/ai-lead-follow-up" element={<AutomationServicePage />} />
+      <Route path="/appointment-booking-automation" element={<AutomationServicePage />} />
+      <Route path="/review-automation" element={<AutomationServicePage />} />
+      <Route path="/customer-reactivation" element={<AutomationServicePage />} />
       <Route path="/setup/credentials" element={<CredentialsSetup />} />
       <Route path="/setup/status/:orderId" element={<SetupStatus />} />
       <Route path="/setup/status" element={<SetupStatus />} />

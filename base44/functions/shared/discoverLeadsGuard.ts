@@ -3,8 +3,7 @@
  * Patch: return 503 with clear error if Google Maps API key is missing.
  * Inject at top of discoverLeads/entry.ts.
  */
-export function requireGoogleMapsKey(): string {
-  const key = Deno.env.get("GOOGLE_MAPS_API_KEY");
+export function resolveGoogleMapsKey(key?: string | null): string {
   if (!key) {
     throw Object.assign(
       new Error("Google Maps API key is not configured. Set GOOGLE_MAPS_API_KEY in environment variables."),
@@ -12,6 +11,10 @@ export function requireGoogleMapsKey(): string {
     );
   }
   return key;
+}
+
+export function requireGoogleMapsKey(): string {
+  return resolveGoogleMapsKey(Deno.env.get("GOOGLE_MAPS_API_KEY"));
 }
 
 // Wrapper for any function that needs the Maps key

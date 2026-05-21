@@ -8,6 +8,7 @@ import IndustryPainBar from "../industry/IndustryPainBar";
 import IndustrySMSDemo from "../industry/IndustrySMSDemo";
 import IndustryResults from "../industry/IndustryResults";
 import IndustryFAQ from "../industry/IndustryFAQ";
+import IndustryAutomationUseCases from "./IndustryAutomationUseCases";
 import { getIndustryBySlug } from "@/lib/industryData";
 import { getFAQSchema } from "../SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
@@ -128,6 +129,8 @@ function IndustryTemplateInner({ industrySlug }) {
             </div>
           </div>
         </section>
+
+        <IndustryAutomationUseCases industry={industry} />
 
         {/* SMS Demo */}
         <IndustrySMSDemo

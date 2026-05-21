@@ -12,6 +12,7 @@ import { useAuth } from "@/lib/AuthContext";
 
 const sectionLinks = [
 { label: "How It Works", href: "#problem-solution" },
+{ label: "6 Automations", href: "#six-automations" },
 { label: "AI Store", href: "/store", isPage: true },
 { label: "Pricing", href: "#pricing" },
 { label: "FAQ", href: "#faq" }];
@@ -28,6 +29,7 @@ const industryLinks = [
 
 const SAFE_SECTION_HASHES = new Set([
 "#problem-solution",
+"#six-automations",
 "#services",
 "#pricing",
 "#faq",

@@ -8,6 +8,7 @@ import { FAQ_ITEMS } from "../components/landing/FAQ";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
+const SixAutomationSystems = lazy(() => import("../components/landing/SixAutomationSystems"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const FAQ = lazy(() => import("../components/landing/FAQ"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
@@ -58,11 +59,11 @@ export default function Home() {
       cleanupMetadata = setPageMetadata({
         title: "ClientSurge Systems | AI Lead Response and Booking Automation",
         description:
-          "Done-for-you automation for med spas and lead-driven service businesses that need faster response, stronger follow-up, and more booked appointments.",
+          "ClientSurge Systems installs six done-for-you automations for service businesses: lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation.",
         canonicalPath: "/",
         ogTitle: "ClientSurge Systems | AI Lead Response and Booking Automation",
         ogDescription:
-          "See how ClientSurge helps med spas and lead-driven service businesses turn more leads into booked appointments.",
+          "See the six ClientSurge automation systems that help local service businesses capture leads, follow up faster, book appointments, and recover lost revenue.",
       });
       cleanupOrg = setJsonLd("organization", getOrganizationSchema());
       cleanupBusiness = setJsonLd("local-business", getLocalBusinessSchema());
@@ -87,6 +88,7 @@ export default function Home() {
         <Navbar />
         <Hero />
         <Suspense fallback={<SectionSkeleton />}>
+          <SixAutomationSystems />
           <SectionBreak />
           <Industries />
           <SectionBreak />

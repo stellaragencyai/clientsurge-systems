@@ -8,11 +8,11 @@ import { BUTTON_TEXT } from "@/lib/constants";
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
 
 const checklist = [
-"Every lead hears from you within 60 seconds — even after hours",
+"Lead capture from forms, calls, ads, and landing pages",
 "Missed calls instantly turn into text conversations, not dead ends",
-"14 days of automated follow-up keeps leads warm without manual work",
-"Guided booking flow converts ready prospects into confirmed appointments",
-"Fully built and live in 24–48 hours — we handle everything"];
+"AI follow-up by SMS and email until the lead responds",
+"Appointment booking with reminders and confirmations",
+"Review generation and customer reactivation built in"];
 
 
 export default function Hero() {
@@ -93,14 +93,14 @@ export default function Hero() {
               marginBottom: "16px"
             }}>
             
-            Stop Losing Leads to Slow Response —{" "}
+            AI Automation Systems That Help Local Businesses{" "}
             <span
               style={{
                 color: "#00AEEF",
                 display: "inline"
               }}>
               
-              AI Systems That Convert 3x More Leads Into Bookings
+              Capture Leads, Follow Up Faster, Book More Appointments, and Recover Lost Revenue.
             </span>
           </h1>
 
@@ -117,7 +117,7 @@ export default function Hero() {
               margin: "0 0 18px"
             }}>
             
-            ClientSurge installs AI-powered conversion systems that capture leads, respond instantly, follow up automatically, and turn more of your existing demand into booked clients.
+            ClientSurge Systems installs six done-for-you automations for service businesses: lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation.
           </p>
 
           <div
