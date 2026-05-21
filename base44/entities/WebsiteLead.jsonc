@@ -108,6 +108,10 @@
       "title": "Consent Given At",
       "format": "date-time"
     },
+    "consent_ip": {
+      "type": "string",
+      "title": "Consent IP Address"
+    },
     "consent_source": {
       "type": "string",
       "title": "Consent Source"

@@ -5,9 +5,9 @@
 
 ---
 
-## DOMAIN HEALTH: 50% Ready (9/18 done, 1 critical open, 1 entity-blocked)
+## DOMAIN HEALTH: 72% Ready (13/18 done, 1 critical open)
 > **Fastest win:** #93 - add X-Frame-Options: DENY header to backend function responses (~30 min, no deps) - Agent B
-> **Critical path:** #224/#225 (entity fields) -> #88/#89 (IP capture) - consent chain must complete for TCPA compliance
+> **Critical path:** #248 legal review after remaining security/privacy hardening
 
 ---
 
@@ -16,9 +16,9 @@
 |---|---|
 | Unblocked Critical | 1 (#248 legal review) |
 | Fastest Win (< 30 min, no deps) | #93 - add X-Frame-Options: DENY header to backend function responses (~30 min) |
-| Longest Blocked Chain | #224 -> #88 -> #89 (consent capture chain, 3 deep) |
-| Done This Week | 9 tasks (#94, #20, #23, #84, #85, #86, #87, #92, #128) |
-| Est. Hours to Domain Complete | ~13 hrs |
+| Longest Blocked Chain | none currently identified |
+| Done This Week | 13 tasks (#94, #20, #23, #84, #85, #86, #87, #88, #89, #92, #128, #224, #225) |
+| Est. Hours to Domain Complete | ~11 hrs |
 
 ---
 
@@ -34,10 +34,6 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 88 | pending | Add consent_given_at + consent_ip fields to WebsiteLead/Leads entities | B | - | B (#89 capture IP) | Consent-Capture | ~45 min |
-| 89 | pending | Capture X-Forwarded-For IP in submitLeadCapture -> store as consent_ip | B | #88 | - | Consent-Capture | ~20 min |
-| 224 | pending | Add consent_given_at + consent_ip fields to WebsiteLead entity | C | - | B (#89) | Consent-Capture | ~20 min |
-| 225 | pending | Add consent_given_at + consent_ip fields to Leads entity | C | - | B (#89) | Consent-Capture | ~20 min |
 | 226 | pending | Verify all entity RLS rules are correct (Client entity read/write rules) | C | - | - | - | ~1 hr |
 | 78 | pending | Add cookie consent to all public lead capture forms | A | - | - | Consent-Capture | ~45 min |
 
@@ -69,3 +65,7 @@
 | 87 | submitLeadCapture: normalize phone to E.164 (+1 prefix, reject < 10 digits) | Morpheus | 2026-05-21 | `normalizePhone` now stores canonical `+1XXXXXXXXXX`, rejects short/unsupported phone input, and is covered by lead-capture quality tests |
 | 92 | Ensure honeypot website_url field in ALL public forms | Morpheus | 2026-05-21 | Standardized `website_url` as the public-form honeypot across lead/contact capture paths and moved Sam's real website capture to `business_website_url` |
 | 128 | All SMS sends: verify opt-out language "Reply STOP to unsubscribe" is appended | Morpheus | 2026-05-21 | Added shared `appendSmsOptOut` helper and wired it into core direct Twilio customer send paths plus regression tests |
+| 88 | Add consent_given_at + consent_ip fields to WebsiteLead/Leads entities | Morpheus | 2026-05-21 | Added consent audit fields to lead entities and source tests |
+| 89 | Capture X-Forwarded-For IP in submitLeadCapture -> store as consent_ip | Morpheus | 2026-05-21 | `submitLeadCapture` now stores normalized client IP as `consent_ip` on WebsiteLead and propagates it to CRM Leads |
+| 224 | Add consent_given_at + consent_ip fields to WebsiteLead entity | Morpheus | 2026-05-21 | WebsiteLead already had `consent_given_at`; added `consent_ip` to complete the audit pair |
+| 225 | Add consent_given_at + consent_ip fields to Leads entity | Morpheus | 2026-05-21 | Added CRM Lead consent audit fields and propagation from website capture |

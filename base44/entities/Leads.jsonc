@@ -59,6 +59,39 @@
       "type": "string",
       "title": "Intake Type"
     },
+    "website_lead_id": {
+      "type": "string",
+      "title": "Linked Website Lead ID"
+    },
+    "consent_given": {
+      "type": "boolean",
+      "title": "Consent Given",
+      "default": false
+    },
+    "consent_given_at": {
+      "type": "string",
+      "title": "Consent Given At",
+      "format": "date-time"
+    },
+    "consent_ip": {
+      "type": "string",
+      "title": "Consent IP Address"
+    },
+    "consent_source": {
+      "type": "string",
+      "title": "Consent Source"
+    },
+    "consent_text_version": {
+      "type": "string",
+      "title": "Consent Text Version"
+    },
+    "requested_channels": {
+      "type": "array",
+      "title": "Requested Contact Channels",
+      "items": {
+        "type": "string"
+      }
+    },
     "status": {
       "type": "string",
       "title": "Status",

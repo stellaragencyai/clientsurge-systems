@@ -12,6 +12,14 @@ const submitLeadCaptureSource = readFileSync(
   new URL("../base44/functions/submitLeadCapture/entry.ts", import.meta.url),
   "utf8"
 );
+const websiteLeadEntity = readFileSync(
+  new URL("../base44/entities/WebsiteLead.jsonc", import.meta.url),
+  "utf8"
+);
+const leadsEntity = readFileSync(
+  new URL("../base44/entities/Leads.jsonc", import.meta.url),
+  "utf8"
+);
 
 test("public lead capture forms require explicit SMS and email consent", () => {
   for (const [name, path] of frontendForms) {
@@ -31,10 +39,29 @@ test("submitLeadCapture persists consent metadata for auditability", () => {
   for (const field of [
     "consent_given",
     "consent_given_at",
+    "consent_ip",
     "consent_source",
     "consent_text_version",
     "requested_channels",
   ]) {
     assert.match(submitLeadCaptureSource, new RegExp(field), `submitLeadCapture stores ${field}`);
+  }
+});
+
+test("lead entities expose consent audit fields", () => {
+  for (const [entityName, source] of [
+    ["WebsiteLead", websiteLeadEntity],
+    ["Leads", leadsEntity],
+  ]) {
+    for (const field of [
+      "consent_given",
+      "consent_given_at",
+      "consent_ip",
+      "consent_source",
+      "consent_text_version",
+      "requested_channels",
+    ]) {
+      assert.match(source, new RegExp(`"${field}"`), `${entityName} includes ${field}`);
+    }
   }
 });
