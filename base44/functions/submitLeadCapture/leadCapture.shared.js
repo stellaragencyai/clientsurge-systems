@@ -21,9 +21,21 @@ export const DISPOSABLE_DOMAINS = new Set([
 export const SIXTY_MINUTES = 60 * 60 * 1000;
 export const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 export const RATE_LIMIT_MAX = 3;
+export const MAX_FIELD_LENGTH = 500;
+export const MAX_PROBLEM_LENGTH = 1500;
+export const MAX_LEAD_CAPTURE_BYTES = 12 * 1024;
+export const ALLOWED_REQUESTED_CHANNELS = new Set(["email", "sms", "call"]);
 
-export function cleanString(value) {
-  return typeof value === "string" ? value.trim() : "";
+export function cleanString(value, maxLength = MAX_FIELD_LENGTH) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  return value
+    .replace(/[\u0000-\u001F\u007F]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, maxLength);
 }
 
 export function normalizeEmail(value) {
@@ -32,12 +44,57 @@ export function normalizeEmail(value) {
 
 export function normalizePhone(value) {
   const digits = cleanString(value).replace(/\D/g, "");
-  return digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
+  const normalized = digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
+  return normalized.length >= 10 && normalized.length <= 15 ? normalized : "";
 }
 
 export function isDisposableEmail(email) {
   const domain = normalizeEmail(email).split("@")[1] || "";
   return DISPOSABLE_DOMAINS.has(domain);
+}
+
+export function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(email));
+}
+
+export function normalizeRequestedChannels(value) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return [
+    ...new Set(
+      value
+        .map((entry) => cleanString(entry).toLowerCase())
+        .filter((entry) => ALLOWED_REQUESTED_CHANNELS.has(entry))
+    ),
+  ];
+}
+
+export function normalizeSourcePage(value) {
+  const sourcePage = cleanString(value, 300);
+  if (!sourcePage || !sourcePage.startsWith("/")) {
+    return "/";
+  }
+
+  if (sourcePage.startsWith("//") || sourcePage.includes("://")) {
+    return "/";
+  }
+
+  return sourcePage;
+}
+
+export function maskIpAddress(value) {
+  const ip = cleanString(value, 80).split(",")[0].trim();
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(ip)) {
+    return ip.replace(/\.\d{1,3}$/, ".0");
+  }
+
+  if (ip.includes(":")) {
+    return ip.split(":").slice(0, 4).join(":") + "::";
+  }
+
+  return "";
 }
 
 export function buildDedupKey({ email, phone }) {

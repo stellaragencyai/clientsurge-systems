@@ -49,6 +49,19 @@ function CopyButton({ text }) {
   );
 }
 
+function PlainTextPreview({ text }) {
+  return (
+    <>
+      {String(text || '').split('\n').map((line, index) => (
+        <span key={`${index}-${line.slice(0, 12)}`}>
+          {line}
+          {index < String(text || '').split('\n').length - 1 && <br />}
+        </span>
+      ))}
+    </>
+  );
+}
+
 function ContentCard({ log, onStatusChange }) {
   const [expanded, setExpanded] = useState(false);
   const typeInfo = CONTENT_TYPES.find(t => t.key === log.content_type) || CONTENT_TYPES[0];
@@ -84,8 +97,9 @@ function ContentCard({ log, onStatusChange }) {
             <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 mb-2">Content</p>
             <div
               className="text-sm text-foreground leading-relaxed bg-muted/30 rounded-lg p-3 prose prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: log.body.replace(/\n/g, '<br/>') }}
-            />
+            >
+              <PlainTextPreview text={log.body} />
+            </div>
           </div>
 
           {/* Hashtags */}

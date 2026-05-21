@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { escapeAttribute, escapeHtml } from '../_shared/htmlEscape.js';
 
 const MAX_FIELD_LENGTH = 500;
 const MAX_MESSAGE_LENGTH = 1500;
@@ -10,7 +11,12 @@ const INTAKE_TYPE = 'contact_inquiry';
 
 function sanitizeString(value: unknown, maxLength = MAX_FIELD_LENGTH) {
   if (typeof value !== 'string') return '';
-  return value.replace(/[<>]/g, '').trim().slice(0, maxLength);
+  return value
+    .replace(/[\u0000-\u001F\u007F]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/[<>]/g, '')
+    .trim()
+    .slice(0, maxLength);
 }
 
 function normalizeContactInput(payload: Record<string, unknown>) {
@@ -191,11 +197,11 @@ async function sendAdminNotification(contact: ReturnType<typeof normalizeContact
   const emailBody = `
     <h2>New Contact Form Submission</h2>
     <table cellpadding="8" style="border-collapse:collapse;width:100%;max-width:600px;">
-      <tr><td style="font-weight:bold;width:160px;">Name</td><td>${contact.full_name}</td></tr>
-      <tr style="background:#f9f9f9"><td style="font-weight:bold;">Email</td><td><a href="mailto:${contact.email}">${contact.email}</a></td></tr>
-      <tr><td style="font-weight:bold;">Phone</td><td>${contact.phone || 'Not provided'}</td></tr>
-      <tr style="background:#f9f9f9"><td style="font-weight:bold;">Business Type</td><td>${contact.business_type}</td></tr>
-      <tr><td style="font-weight:bold;vertical-align:top;padding-top:12px;">Message</td><td style="padding-top:12px;">${contact.message}</td></tr>
+      <tr><td style="font-weight:bold;width:160px;">Name</td><td>${escapeHtml(contact.full_name)}</td></tr>
+      <tr style="background:#f9f9f9"><td style="font-weight:bold;">Email</td><td><a href="mailto:${escapeAttribute(contact.email)}">${escapeHtml(contact.email)}</a></td></tr>
+      <tr><td style="font-weight:bold;">Phone</td><td>${escapeHtml(contact.phone || 'Not provided')}</td></tr>
+      <tr style="background:#f9f9f9"><td style="font-weight:bold;">Business Type</td><td>${escapeHtml(contact.business_type)}</td></tr>
+      <tr><td style="font-weight:bold;vertical-align:top;padding-top:12px;">Message</td><td style="padding-top:12px;">${escapeHtml(contact.message)}</td></tr>
     </table>
   `;
 
@@ -230,10 +236,12 @@ async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContact
   }
 
   const businessTypeGreeting = `for ${contact.business_type}s`;
+  const firstName = escapeHtml(contact.full_name.split(' ')[0] || 'there');
+  const businessType = escapeHtml(contact.business_type);
   const emailBody = `
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;">
-      <h2>Thanks for Reaching Out, ${contact.full_name.split(' ')[0]}!</h2>
-      <p style="color:#555;line-height:1.6;">We've received your message and we're excited to learn more about how we can help your business ${businessTypeGreeting}.</p>
+      <h2>Thanks for Reaching Out, ${firstName}!</h2>
+      <p style="color:#555;line-height:1.6;">We've received your message and we're excited to learn more about how we can help your business ${escapeHtml(businessTypeGreeting)}.</p>
       
       <div style="background:#f9f9f9;border-left:4px solid #9a5c2e;padding:16px;margin:24px 0;border-radius:4px;">
         <p style="margin:0;color:#666;font-size:14px;"><strong>What happens next:</strong></p>
@@ -244,7 +252,7 @@ async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContact
         </ul>
       </div>
 
-      <p style="color:#666;line-height:1.6;">In the meantime, feel free to explore how our automation system works for ${contact.business_type.toLowerCase()}. We're here to help.</p>
+      <p style="color:#666;line-height:1.6;">In the meantime, feel free to explore how our automation system works for ${businessType.toLowerCase()}. We're here to help.</p>
       
       <p style="color:#999;font-size:12px;margin-top:32px;border-top:1px solid #eee;padding-top:16px;">
         <strong>ClientSurge Systems</strong><br>
@@ -263,7 +271,7 @@ async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContact
     body: JSON.stringify({
       from: 'ClientSurge Systems <system@clientsurgesystems.com>',
       to: [contact.email],
-      subject: `Thank You for Your Message, ${contact.full_name.split(' ')[0]}!`,
+      subject: `Thank You for Your Message, ${contact.full_name.split(' ')[0] || 'there'}!`,
       html: emailBody,
     }),
   });
@@ -421,7 +429,7 @@ Deno.serve(async (req) => {
       thank_you_sent: thankYouEmail.sent,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to submit contact inquiry';
-    return Response.json({ error: message }, { status: 500 });
+    console.error('[submitContactInquiry] submission failed', error);
+    return Response.json({ error: 'Failed to submit contact inquiry' }, { status: 500 });
   }
 });

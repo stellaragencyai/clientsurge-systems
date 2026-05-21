@@ -2,6 +2,22 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Plus, Trash2, Save, Loader2, ChevronRight, Mail, Eye } from 'lucide-react';
 
+function buildSandboxedPreviewDocument(body = '') {
+  return `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: https:; style-src 'unsafe-inline'; font-src data: https:;" />
+    <style>
+      body { margin: 0; padding: 12px; font-family: Inter, Arial, sans-serif; color: #111827; background: #fff; line-height: 1.5; }
+      a { color: #7c3aed; }
+      img { max-width: 100%; height: auto; }
+    </style>
+  </head>
+  <body>${body || '<p class="text-muted">No content yet</p>'}</body>
+</html>`;
+}
+
 export default function CampaignBuilder({ sequenceId = null, onClose }) {
   const [campaign, setCampaign] = useState({
     name: '',
@@ -245,9 +261,11 @@ export default function CampaignBuilder({ sequenceId = null, onClose }) {
                 </button>
               </div>
               {showPreview ? (
-                <div
-                  className="w-full px-3 py-2 border border-border rounded-lg text-sm min-h-32 bg-white prose prose-sm max-w-none overflow-auto"
-                  dangerouslySetInnerHTML={{ __html: selectedStep.body || '<p class="text-muted">No content yet</p>' }}
+                <iframe
+                  title="Sandboxed email preview"
+                  sandbox=""
+                  srcDoc={buildSandboxedPreviewDocument(selectedStep.body)}
+                  className="w-full border border-border rounded-lg bg-white min-h-32"
                 />
               ) : (
                 <textarea
