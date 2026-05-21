@@ -1,5 +1,6 @@
 import Stripe from "npm:stripe@14";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { assertCheckoutCapacityAvailable } from "./checkoutCapacity.shared.js";
 import { getTrackedServiceConfig, normalizeInstallConfiguration } from "./installPipeline.shared.js";
 import {
   buildPricingSummaryForProducts,
@@ -82,6 +83,25 @@ Deno.serve(async (req) => {
 
     if (!requestedProductIds.length || !customer_email) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const capacity = await assertCheckoutCapacityAvailable({ base44 });
+    if (!capacity.ok) {
+      console.warn("[createCheckoutSession] capacity limit reached", {
+        requestId,
+        active_orders: capacity.active_orders,
+        capacity_limit: capacity.capacity_limit,
+      });
+      return Response.json(
+        {
+          error: capacity.reason,
+          code: "checkout_capacity_full",
+          active_orders: capacity.active_orders,
+          capacity_limit: capacity.capacity_limit,
+          request_id: requestId,
+        },
+        { status: 409 }
+      );
     }
 
     const pricingSummary = buildPricingSummaryForProducts(requestedProductIds);

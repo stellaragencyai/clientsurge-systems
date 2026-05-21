@@ -174,25 +174,42 @@ export async function handleTrustedResendWebhook({ base44, payload }) {
     "email.sent": "sent",
     "email.delivered": "delivered",
     "email.opened": "opened",
-    "email.clicked": "opened",
+    "email.clicked": "clicked",
     "email.bounced": "failed",
     "email.complained": "failed",
   };
 
   const status = statusMap[type] || "processed";
+  const engagementAt = new Date().toISOString();
 
-  const events = await base44.entities.CommunicationEvent.filter({
+  const events = await base44.asServiceRole.entities.CommunicationEvent.filter({
     provider_message_id: email_id,
   });
 
   if (events.length > 0) {
-    await base44.asServiceRole.entities.CommunicationEvent.update(events[0].id, {
+    const update = {
       status,
-    });
+    };
 
-    if (type === "email.opened") {
+    if (type === "email.bounced") {
+      update.failure_reason = data?.bounce?.message || data?.reason || "resend_email_bounced";
+      update.failed_at = engagementAt;
+    }
+
+    if (type === "email.complained") {
+      update.failure_reason = data?.complaint?.complaint_feedback_type || data?.reason || "resend_email_complaint";
+      update.failed_at = engagementAt;
+    }
+
+    if (type === "email.opened" || type === "email.clicked") {
+      update.last_engagement_at = engagementAt;
+      update.engagement_type = type === "email.clicked" ? "clicked" : "opened";
+    }
+
+    await base44.asServiceRole.entities.CommunicationEvent.update(events[0].id, update);
+
+    if (type === "email.opened" || type === "email.clicked") {
       const event = events[0];
-      const engagementAt = new Date().toISOString();
       const leadEmail = data?.to?.[0] || null;
 
       if (event?.lead_id) {

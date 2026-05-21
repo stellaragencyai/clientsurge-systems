@@ -417,3 +417,77 @@ test("trusted Resend webhook still updates canonical CommunicationEvent status",
   assert.equal(result.status, "delivered");
   assert.equal((await entities.CommunicationEvent.get("event_email")).status, "delivered");
 });
+
+test("trusted Resend bounce stores failure details on canonical CommunicationEvent", async () => {
+  const { base44, entities } = createFakeBase44({}, [
+    {
+      id: "event_bounced_email",
+      provider_message_id: "email_bounced_123",
+      provider: "resend",
+      channel: "email",
+      direction: "outbound",
+      event_type: "email_sent",
+      status: "sent",
+    },
+  ]);
+
+  const result = await handleTrustedResendWebhook({
+    base44,
+    payload: {
+      type: "email.bounced",
+      data: {
+        email_id: "email_bounced_123",
+        reason: "mailbox_full",
+      },
+    },
+  });
+
+  const event = await entities.CommunicationEvent.get("event_bounced_email");
+  assert.equal(result.success, true);
+  assert.equal(result.status, "failed");
+  assert.equal(event.status, "failed");
+  assert.equal(event.failure_reason, "mailbox_full");
+  assert.match(event.failed_at, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test("trusted Resend click marks engagement and refreshes linked lead", async () => {
+  const { base44, entities } = createFakeBase44({}, [
+    {
+      id: "event_clicked_email",
+      provider_message_id: "email_clicked_123",
+      provider: "resend",
+      channel: "email",
+      direction: "outbound",
+      event_type: "email_sent",
+      status: "sent",
+      lead_id: "lead_1",
+    },
+  ]);
+  entities.SpaLead = new InMemoryCollection([
+    {
+      id: "lead_1",
+      email: "lead@example.com",
+      last_engagement_at: null,
+    },
+  ]);
+
+  const result = await handleTrustedResendWebhook({
+    base44,
+    payload: {
+      type: "email.clicked",
+      data: {
+        email_id: "email_clicked_123",
+        to: ["lead@example.com"],
+      },
+    },
+  });
+
+  const event = await entities.CommunicationEvent.get("event_clicked_email");
+  const lead = await entities.SpaLead.get("lead_1");
+  assert.equal(result.success, true);
+  assert.equal(result.status, "clicked");
+  assert.equal(event.status, "clicked");
+  assert.equal(event.engagement_type, "clicked");
+  assert.match(event.last_engagement_at, /^\d{4}-\d{2}-\d{2}T/);
+  assert.match(lead.last_engagement_at, /^\d{4}-\d{2}-\d{2}T/);
+});
