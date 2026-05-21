@@ -31,3 +31,4 @@ base44/.app.jsonc
 .env
 .vite
 .playwright-cli/
+output/playwright/

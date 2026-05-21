@@ -167,7 +167,6 @@ export default function Navbar() {
             alt="ClientSurge Systems"
             width="240"
             height="72"
-            fetchPriority="high"
             decoding="async"
             style={{
               height: "clamp(52px, 6vw, 72px)",

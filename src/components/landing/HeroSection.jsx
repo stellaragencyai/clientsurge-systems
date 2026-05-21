@@ -56,7 +56,6 @@ export default function HeroSection({
             height="1000"
             className="w-full h-full object-cover object-top"
             loading="eager"
-            fetchPriority="high"
             decoding="async"
           />
           <div className="absolute inset-0 bg-black/35" />

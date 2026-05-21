@@ -17,7 +17,6 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
           height="1000"
           className="w-full h-full object-cover object-center"
           loading="eager"
-          fetchPriority="high"
           decoding="async"
         />
         {/* Dark gradient overlay for readability */}
