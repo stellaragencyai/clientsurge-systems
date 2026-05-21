@@ -5,7 +5,7 @@
 
 ---
 
-## DOMAIN HEALTH: 82% Ready (18/22 done, 1 critical open)
+## DOMAIN HEALTH: 91% Ready (20/22 done, 1 critical open)
 > **Fastest win:** #93 - add X-Frame-Options: DENY header to backend function responses (~30 min, no deps) - Agent B
 > **Critical path:** #248 legal review after remaining security/privacy hardening
 
@@ -17,8 +17,8 @@
 | Unblocked Critical | 1 (#248 legal review) |
 | Fastest Win (< 30 min, no deps) | #93 - add X-Frame-Options: DENY header to backend function responses (~30 min) |
 | Longest Blocked Chain | none currently identified |
-| Done This Week | 18 tasks (#94, #20, #23, #78, #84, #85, #86, #87, #88, #89, #90, #91, #92, #128, #224, #225, #226, #229) |
-| Est. Hours to Domain Complete | ~4 hrs plus legal review |
+| Done This Week | 20 tasks (#94, #20, #23, #78, #84, #85, #86, #87, #88, #89, #90, #91, #92, #128, #151, #184, #224, #225, #226, #229) |
+| Est. Hours to Domain Complete | ~2.5 hrs plus legal review |
 
 ---
 
@@ -43,8 +43,6 @@
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
 | 93 | pending | Add X-Frame-Options: DENY header to all backend function responses | B | - | - | - | ~30 min |
-| 151 | pending | Add createAuditLog helper: write admin action records to AuditLog entity | B | #157 | C (#184 AuditLog viewer) | AuditLog | ~45 min |
-| 184 | pending | Create AuditLog viewer tab in AdminDashboard | C | #157 | - | AuditLog | ~1 hr |
 
 ---
 
@@ -70,3 +68,5 @@
 | 91 | Create autoArchiveOldLeads: anonymize WebsiteLead records > 365 days old | Morpheus | 2026-05-21 | Retargeted `autoArchiveOldLeads` from legacy `SpaLead` to canonical `WebsiteLead`, added archive schema markers, PII scrubbing, automation guard, and regression coverage |
 | 229 | Add allowed_admin_ips array field to AdminSettings entity | Morpheus | 2026-05-21 | Added `allowed_admin_ips` array to AdminSettings schema, defaults, mutable settings whitelist, and regression tests |
 | 90 | Add IP allowlist option in AdminSettings for admin panel access | Morpheus | 2026-05-21 | Added Admin Settings Security tab editor for allowed admin IPs and fixed settings API unwrap/save behavior so the option persists |
+| 151 | Add createAuditLog helper: write admin action records to AuditLog entity | Morpheus | 2026-05-21 | Verified the shared `createAuditLog` helper writes canonical AuditLog entity fields through service-role create and added regression coverage |
+| 184 | Create AuditLog viewer tab in AdminDashboard | Morpheus | 2026-05-21 | Added an Admin Dashboard Audit Log tab backed by `AuditLog.list`, with search, expandable before/after details, refresh, and CSV export |

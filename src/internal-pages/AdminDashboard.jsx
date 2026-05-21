@@ -6,7 +6,7 @@ import {
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw,
   Server, RotateCcw, BookOpen, Wand2, Sparkles, Crosshair, Trophy,
-  CalendarCheck2,
+  CalendarCheck2, ShieldCheck,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
@@ -38,6 +38,7 @@ import AutomationAlertsPanel from '../components/admin/AutomationAlertsPanel';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 import SniperDashboard from '../components/admin/SniperDashboard';
+import AuditLogPanel from '../components/admin/AuditLogPanel';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 
@@ -111,6 +112,7 @@ const NAV_GROUPS = [
       { id: 'website-copy', label: 'Website Copy AI', icon: Wand2 },
       { id: 'task-board', label: 'Task Board', icon: ClipboardList },
       { id: 'health', label: 'Integration Health', icon: Activity },
+      { id: 'audit-log', label: 'Audit Log', icon: ShieldCheck },
       { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
       { id: 'templates', label: 'Templates', icon: MessageSquare },
       { id: 'review-request', label: 'Review Requests', icon: Star },
@@ -239,6 +241,7 @@ export default function AdminDashboard() {
       case 'social-engine': return <SocialMediaEngine />;
       case 'website-copy': return <WebsiteCopyPanel />;
       case 'task-board': return <TaskBoardPanel />;
+      case 'audit-log': return <AuditLogPanel />;
       case 'qa': return (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">QA Tools</h2>

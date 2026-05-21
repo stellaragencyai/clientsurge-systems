@@ -11,7 +11,7 @@ import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, PieChart, Layers, DollarSign, Inbox, RefreshCw,
-  Server, RotateCcw, BookOpen, Star, ArrowLeft,
+  Server, RotateCcw, BookOpen, Star, ArrowLeft, ShieldCheck,
 } from "lucide-react";
 import AdminGlobalSearch from "./AdminGlobalSearch";
 
@@ -56,6 +56,7 @@ const NAV_GROUPS = [
     items: [
       { id: "task-board",       label: "Task Board",        icon: ClipboardList,   path: "/admin", tab: "task-board" },
       { id: "health",           label: "Integration Health",icon: Activity,        path: "/admin", tab: "health" },
+      { id: "audit-log",        label: "Audit Log",         icon: ShieldCheck,     path: "/admin", tab: "audit-log" },
       { id: "logs",             label: "Communication Logs",icon: MessageSquare,   path: "/admin", tab: "logs", badge: "webhook-errors" },
       { id: "templates",        label: "Templates",         icon: MessageSquare,   path: "/admin", tab: "templates" },
       { id: "review-request",   label: "Review Requests",   icon: Star,            path: "/admin", tab: "review-request" },
