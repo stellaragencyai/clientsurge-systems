@@ -189,7 +189,10 @@ function StoreInner() {
         );
         results = results.filter((p) => recommendedNames.has(p.name)).slice(0, 6);
       }
-      // No industry selected in guided mode — show all 12 products (live + coming soon)
+      if (!selectedIndustry) {
+        results = results.filter((product) => !product.coming_soon);
+      }
+      // No industry selected in guided mode — show all live self-serve products
     }
 
     return results;
