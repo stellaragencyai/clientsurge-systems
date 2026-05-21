@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 54% Ready (19/35 done · 0 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** #53 — audit form inputs iOS zoom (~45 min, no deps) · Agent A  
+## 📊 DOMAIN HEALTH: 🟡 57% Ready (20/35 done · 0 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** #45 — Store page human fallback CTA (~20 min, no deps) · Agent A
 > ⚠️ **Critical:** none currently open
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 18 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,77 + M01,M02,M05,M06,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| ✅ Done This Week | 20 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,76,77 + M01,M02,M05,M06,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | #53 (form input audit), M03 (iOS scroll lock), M07 (iPad nav), M10 (modal scroll), #45 (Store human CTA) |
+| 📱 Next 5 Priority Tasks | #45 (Store human CTA), M03 (iOS scroll lock), M07 (iPad nav), M10 (modal scroll), #51 (Book iframe mobile sizing) |
 
 ---
 
@@ -40,7 +40,7 @@
 | 35 | ✅ | Testimonials: replaced broken Unsplash URLs with initials-based gradient avatars | A | — | — | — | ~30 min |
 | 36 | ✅ | Favicon + apple-touch-icon already present in index.html — verified | A | — | — | — | ~20 min |
 | 51 | ⏳ | pages/Book Calendly iframe: set width:100%, height:700px, scrolling:yes | A | — | — | — | ~20 min |
-| 53 | ⏳ | Audit all form inputs for iOS zoom issue (font-size < 16px) | A | — | — | 🧵 Mobile-UX | ~45 min |
+| 53 | ✅ | Audit all form inputs for iOS zoom issue (font-size < 16px) | Morpheus | — | — | 🧵 Mobile-UX | Done |
 | 55 | ⏳ | pages/Book Calendly: test CSP allows calendly.com frames on live domain | A | — | — | — | ~30 min |
 | 67 | ⏳ | ClientPortal: add "Get Help" tab with support ticket form → SupportMessage entity | A | — | — | — | ~1 hr |
 | 80 | ⏳ | Onboarding page: ensure form validates all required fields before submit | A | — | — | — | ~30 min |
@@ -142,3 +142,4 @@
 | 43 | CartSidebar: acquireBodyScrollLock on open/close | Agent A (🔄) | 2026-05-03 | Confirmed `bodyScrollLock` properly acquired/released in `CartSidebar` useEffect |
 | 77 | Portal graceful empty state — no nav errors on null project | Agent A | 2026-05-03 | Added null-guards and empty state UI in `ClientPortal.jsx` when `project === null` |
 | 76 | Stripe frontend secret exposure audit | Morpheus | 2026-05-21 | Added `tests/frontendSecretExposure.test.js` to scan frontend source/public assets for real Stripe/server-side secret key formats and verified no `sk_live_` exposure in frontend code |
+| 53 | iOS form input zoom audit | Morpheus | 2026-05-21 | Added a mobile global form-control font-size guard in `src/index.css` and `tests/iosInputZoomGuard.test.js` so text, date, time, URL, textarea, and select controls stay at 16px on mobile Safari |
