@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Send Email Drip Step
  * Called by automation job when email is due
@@ -12,7 +13,7 @@ Deno.serve(async (req) => {
     const { lead_id, campaign_id, step_number } = await req.json();
 
     if (!lead_id || !campaign_id || step_number === undefined) {
-      return Response.json(
+      return secureJson(
         { error: "lead_id, campaign_id, step_number required" },
         { status: 400 }
       );
@@ -28,13 +29,13 @@ Deno.serve(async (req) => {
     );
     if (!campaign || campaign.status !== "active") {
       console.log(`[SendEmailDrip] Campaign not active, skipping`);
-      return Response.json({ success: false, message: "Campaign not active" }, { status: 409 });
+      return secureJson({ success: false, message: "Campaign not active" }, { status: 409 });
     }
 
     // 2. Get step data
     const step = campaign.steps[step_number - 1];
     if (!step) {
-      return Response.json(
+      return secureJson(
         { error: `Step ${step_number} not found` },
         { status: 404 }
       );
@@ -43,7 +44,7 @@ Deno.serve(async (req) => {
     // 3. Get lead email
     const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
     if (!lead?.email) {
-      return Response.json({ error: "Lead email not found" }, { status: 400 });
+      return secureJson({ error: "Lead email not found" }, { status: 400 });
     }
 
     // 4. Send via Resend
@@ -104,7 +105,7 @@ Deno.serve(async (req) => {
       console.log(`[SendEmailDrip] Campaign ${campaign_id} completed`);
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id,
       step_number,
@@ -112,7 +113,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[SendEmailDrip] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

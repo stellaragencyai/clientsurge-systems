@@ -5,9 +5,9 @@
 
 ---
 
-## DOMAIN HEALTH: 91% Ready (20/22 done, 1 critical open)
-> **Fastest win:** #93 - add X-Frame-Options: DENY header to backend function responses (~30 min, no deps) - Agent B
-> **Critical path:** #248 legal review after remaining security/privacy hardening
+## DOMAIN HEALTH: 95% Ready (21/22 done, 1 critical open)
+> **Fastest win:** #248 legal review draft/checklist (~2 hrs, requires human/legal sign-off) - Agent C
+> **Critical path:** #248 legal review after security/privacy hardening
 
 ---
 
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 1 (#248 legal review) |
-| Fastest Win (< 30 min, no deps) | #93 - add X-Frame-Options: DENY header to backend function responses (~30 min) |
+| Fastest Win (< 30 min, no deps) | none remaining |
 | Longest Blocked Chain | none currently identified |
-| Done This Week | 20 tasks (#94, #20, #23, #78, #84, #85, #86, #87, #88, #89, #90, #91, #92, #128, #151, #184, #224, #225, #226, #229) |
-| Est. Hours to Domain Complete | ~2.5 hrs plus legal review |
+| Done This Week | 21 tasks (#94, #20, #23, #78, #84, #85, #86, #87, #88, #89, #90, #91, #92, #93, #128, #151, #184, #224, #225, #226, #229) |
+| Est. Hours to Domain Complete | legal review/sign-off only |
 
 ---
 
@@ -42,7 +42,7 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 93 | pending | Add X-Frame-Options: DENY header to all backend function responses | B | - | - | - | ~30 min |
+| - | - | No remaining medium-priority safe internal items | - | - | - | - | - |
 
 ---
 
@@ -70,3 +70,4 @@
 | 90 | Add IP allowlist option in AdminSettings for admin panel access | Morpheus | 2026-05-21 | Added Admin Settings Security tab editor for allowed admin IPs and fixed settings API unwrap/save behavior so the option persists |
 | 151 | Add createAuditLog helper: write admin action records to AuditLog entity | Morpheus | 2026-05-21 | Verified the shared `createAuditLog` helper writes canonical AuditLog entity fields through service-role create and added regression coverage |
 | 184 | Create AuditLog viewer tab in AdminDashboard | Morpheus | 2026-05-21 | Added an Admin Dashboard Audit Log tab backed by `AuditLog.list`, with search, expandable before/after details, refresh, and CSV export |
+| 93 | Add X-Frame-Options: DENY header to all backend function responses | Morpheus | 2026-05-21 | Added `secureJson` response helper, mechanically replaced raw backend `Response.json` calls, covered non-JSON responses with `X-Frame-Options: DENY`, and added regression tests preventing raw `Response.json` from returning |

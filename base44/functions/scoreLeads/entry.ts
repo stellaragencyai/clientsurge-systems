@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * scoreLeads — redeployed 2026-05-02
  * Batch re-scores ALL Leads and persists lead_score + activation_priority.
@@ -128,7 +129,7 @@ function computeScore(lead, eventsByLead, emailStatsByLead) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -136,10 +137,10 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+      return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
     }
     if (!user && !allowAnonymousAutomation(req)) {
-      return Response.json({ error: "Forbidden: Trusted automation only" }, { status: 403 });
+      return secureJson({ error: "Forbidden: Trusted automation only" }, { status: 403 });
     }
 
     const payload = req.method === "POST" ? await req.json().catch(() => ({})) : {};
@@ -156,7 +157,7 @@ Deno.serve(async (req) => {
     ]);
 
     if (!leads?.length) {
-      return Response.json({ success: true, scored: 0, message: "No leads to score" });
+      return secureJson({ success: true, scored: 0, message: "No leads to score" });
     }
 
     // Index events by lead_id
@@ -201,7 +202,7 @@ Deno.serve(async (req) => {
 
     console.log(`[scoreLeads] Done — scored ${updates.length} leads, updated ${updated}`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       scored: updates.length,
       updated,
@@ -227,6 +228,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error("[scoreLeads] scoreLeads error:", error);
-    return Response.json({ error: error.message || "Scoring failed" }, { status: 500 });
+    return secureJson({ error: error.message || "Scoring failed" }, { status: 500 });
   }
 });

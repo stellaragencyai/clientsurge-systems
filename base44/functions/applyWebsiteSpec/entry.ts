@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * applyWebsiteSpec — #441
  * Converts WebsiteSpec JSON into a structured, pasteable prompt for the site builder.
@@ -11,10 +12,10 @@ Deno.serve(async (req) => {
     const { spec_id, order_id } = await req.json();
 
     const specId = spec_id || (await base44.asServiceRole.entities.WebsiteSpec.filter({ order_id }).catch(() => []))[0]?.id;
-    if (!specId) return Response.json({ error: "WebsiteSpec not found" }, { status: 404 });
+    if (!specId) return secureJson({ error: "WebsiteSpec not found" }, { status: 404 });
 
     const spec = await base44.asServiceRole.entities.WebsiteSpec.get(specId).catch(() => null);
-    if (!spec) return Response.json({ error: "Spec not found" }, { status: 404 });
+    if (!spec) return secureJson({ error: "Spec not found" }, { status: 404 });
 
     const pages = typeof spec.pages === "string" ? JSON.parse(spec.pages) : spec.pages;
     const brand = typeof spec.brand === "string" ? JSON.parse(spec.brand) : spec.brand;
@@ -63,8 +64,8 @@ Deno.serve(async (req) => {
       }).catch(() => {});
     }
 
-    return Response.json({ success: true, spec_id: specId, prompt, page_count: pages?.length || 0 });
+    return secureJson({ success: true, spec_id: specId, prompt, page_count: pages?.length || 0 });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

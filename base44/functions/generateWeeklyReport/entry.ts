@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { Resend } from 'npm:resend@2.0.0';
 
@@ -166,7 +167,7 @@ Deno.serve(async (req) => {
       projects = await base44.asServiceRole.entities.ClientProject.list('-created_date', 200);
     }
 
-    if (!projects.length) return Response.json({ error: 'No projects found' }, { status: 404 });
+    if (!projects.length) return secureJson({ error: 'No projects found' }, { status: 404 });
 
     const weekEnd = new Date();
     const weekStart = new Date(weekEnd);
@@ -224,9 +225,9 @@ Deno.serve(async (req) => {
       results.push(reportData);
     }
 
-    return Response.json({ success: true, reports: results, count: results.length });
+    return secureJson({ success: true, reports: results, count: results.length });
   } catch (error) {
     console.error('[generateWeeklyReport] generateWeeklyReport error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

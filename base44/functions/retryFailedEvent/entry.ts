@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * retryFailedEvent
  * Re-processes a failed CommunicationEvent by replaying the underlying action.
@@ -15,17 +16,17 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== 'admin') {
-      return Response.json({ error: 'Admin access required' }, { status: 403 });
+      return secureJson({ error: 'Admin access required' }, { status: 403 });
     }
 
     const { event_id } = await req.json().catch(() => ({}));
-    if (!event_id) return Response.json({ error: 'Missing event_id' }, { status: 400 });
+    if (!event_id) return secureJson({ error: 'Missing event_id' }, { status: 400 });
 
     // Load the failed event
     const events = await base44.asServiceRole.entities.CommunicationEvent.filter({ id: event_id });
     const evt = events?.[0];
-    if (!evt) return Response.json({ error: 'Event not found' }, { status: 404 });
-    if (evt.status !== 'failed') return Response.json({ error: 'Event is not in failed status' }, { status: 400 });
+    if (!evt) return secureJson({ error: 'Event not found' }, { status: 404 });
+    if (evt.status !== 'failed') return secureJson({ error: 'Event is not in failed status' }, { status: 400 });
 
     console.log(`[retryFailedEvent] Retrying event ${event_id} — provider: ${evt.provider}, channel: ${evt.channel}`);
 
@@ -38,7 +39,7 @@ Deno.serve(async (req) => {
       const TWILIO_FROM = Deno.env.get('TWILIO_PHONE_NUMBER');
 
       if (!TWILIO_SID || !TWILIO_TOKEN || !TWILIO_FROM) {
-        return Response.json({ error: 'Twilio credentials not configured' }, { status: 500 });
+        return secureJson({ error: 'Twilio credentials not configured' }, { status: 500 });
       }
 
       // Get phone from lead if linked
@@ -50,10 +51,10 @@ Deno.serve(async (req) => {
       if (!toPhone && evt.metadata_json) {
         try { toPhone = JSON.parse(evt.metadata_json)?.to; } catch {}
       }
-      if (!toPhone) return Response.json({ error: 'Cannot determine destination phone number' }, { status: 400 });
+      if (!toPhone) return secureJson({ error: 'Cannot determine destination phone number' }, { status: 400 });
 
       const body = evt.message_body;
-      if (!body) return Response.json({ error: 'No message body to retry' }, { status: 400 });
+      if (!body) return secureJson({ error: 'No message body to retry' }, { status: 400 });
 
       const formData = new URLSearchParams({ From: TWILIO_FROM, To: toPhone, Body: appendSmsOptOut(body) });
       const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
@@ -74,7 +75,7 @@ Deno.serve(async (req) => {
       const RESEND_KEY = Deno.env.get('RESEND_API_KEY');
       const RESEND_FROM = Deno.env.get('RESEND_FROM_EMAIL');
       if (!RESEND_KEY || !RESEND_FROM) {
-        return Response.json({ error: 'Resend credentials not configured' }, { status: 500 });
+        return secureJson({ error: 'Resend credentials not configured' }, { status: 500 });
       }
 
       let toEmail = null;
@@ -85,7 +86,7 @@ Deno.serve(async (req) => {
       if (!toEmail && evt.metadata_json) {
         try { toEmail = JSON.parse(evt.metadata_json)?.to; } catch {}
       }
-      if (!toEmail) return Response.json({ error: 'Cannot determine destination email' }, { status: 400 });
+      if (!toEmail) return secureJson({ error: 'Cannot determine destination email' }, { status: 400 });
 
       const res = await resendFetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -109,10 +110,10 @@ Deno.serve(async (req) => {
     else if (evt.provider === 'stripe') {
       // Re-fetch the Stripe event and re-process
       const STRIPE_KEY = Deno.env.get('STRIPE_SECRET_KEY');
-      if (!STRIPE_KEY) return Response.json({ error: 'STRIPE_SECRET_KEY not configured' }, { status: 500 });
+      if (!STRIPE_KEY) return secureJson({ error: 'STRIPE_SECRET_KEY not configured' }, { status: 500 });
 
       const stripeEventId = evt.provider_message_id;
-      if (!stripeEventId) return Response.json({ error: 'No Stripe event ID stored — cannot retry' }, { status: 400 });
+      if (!stripeEventId) return secureJson({ error: 'No Stripe event ID stored — cannot retry' }, { status: 400 });
 
       const stripeRes = await stripeFetch(`https://api.stripe.com/v1/events/${stripeEventId}`, {
         headers: { 'Authorization': `Bearer ${STRIPE_KEY}` },
@@ -132,7 +133,7 @@ Deno.serve(async (req) => {
     }
 
     else {
-      return Response.json({ error: `No retry strategy for channel=${evt.channel} provider=${evt.provider}` }, { status: 400 });
+      return secureJson({ error: `No retry strategy for channel=${evt.channel} provider=${evt.provider}` }, { status: 400 });
     }
 
     // Update the event status
@@ -145,10 +146,10 @@ Deno.serve(async (req) => {
     }
 
     console.log(`[retryFailedEvent] Done. Result:`, retryResult);
-    return Response.json({ success: true, result: retryResult });
+    return secureJson({ success: true, result: retryResult });
 
   } catch (error) {
     console.error('[retryFailedEvent] Error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

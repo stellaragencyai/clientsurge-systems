@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * missingCredentialsAlert — #409 #409a
  * Runs daily at 9am MST. Finds Orders: paid but credentials not submitted (workflow_stage = "Configuring").
@@ -70,9 +71,9 @@ Deno.serve(async (req) => {
     }
 
     console.log(\`[missingCredentialsAlert] Reminded \${reminded} clients\`);
-    return Response.json({ success: true, reminded, total_stalled: orders?.length || 0 });
+    return secureJson({ success: true, reminded, total_stalled: orders?.length || 0 });
   } catch (err) {
     console.error("[missingCredentialsAlert]", err.message);
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

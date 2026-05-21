@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * exportLeadsCSV — #110 #111
  * Returns CSV with Content-Disposition header. Supports filters + date range.
@@ -58,6 +59,6 @@ Deno.serve(async (req) => {
       },
     });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

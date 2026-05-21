@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * discoverLeadsGuard.ts — #103
  * Patch: return 503 with clear error if Google Maps API key is missing.
@@ -22,9 +23,9 @@ export async function withMapsKey<T>(fn: (key: string) => Promise<T>): Promise<R
   try {
     const key = requireGoogleMapsKey();
     const result = await fn(key);
-    return Response.json({ success: true, ...( typeof result === "object" ? result : { data: result } ) });
+    return secureJson({ success: true, ...( typeof result === "object" ? result : { data: result } ) });
   } catch (err: any) {
-    return Response.json(
+    return secureJson(
       { success: false, error: err.message },
       { status: err.status || 500 }
     );

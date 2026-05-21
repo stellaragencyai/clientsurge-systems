@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Test Instant Lead Response SMS End-to-End
  * Admin-only endpoint to verify SMS sending works
@@ -8,7 +9,7 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -47,7 +48,7 @@ Deno.serve(async (req) => {
 
     const smsSent = events && events.length > 0;
 
-    return Response.json({
+    return secureJson({
       success: smsResult.success && smsSent,
       test_lead_id: testLead.id,
       sms_result: smsResult,
@@ -60,6 +61,6 @@ Deno.serve(async (req) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error(`[TestResponse] Error: ${message}`);
-    return Response.json({ error: message, success: false }, { status: 500 });
+    return secureJson({ error: message, success: false }, { status: 500 });
   }
 });

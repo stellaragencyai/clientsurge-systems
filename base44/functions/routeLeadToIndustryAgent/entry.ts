@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 // ─────────────────────────────────────────────
@@ -72,13 +73,13 @@ Deno.serve(async (req) => {
     const { lead_id } = await req.json();
 
     if (!lead_id) {
-      return Response.json({ error: 'lead_id required' }, { status: 400 });
+      return secureJson({ error: 'lead_id required' }, { status: 400 });
     }
 
     // Fetch the lead
     const leads = await base44.asServiceRole.entities.Leads.filter({ id: lead_id });
     if (!leads || leads.length === 0) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+      return secureJson({ error: 'Lead not found' }, { status: 404 });
     }
 
     const lead = leads[0];
@@ -91,7 +92,7 @@ Deno.serve(async (req) => {
       assigned_agent_name: routing.agent_name,
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id,
       industry_key: routing.industry_key,
@@ -101,6 +102,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('[routeLeadToIndustryAgent] Error:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

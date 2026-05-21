@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * sendMonthlyClientReportEmail — #115
  * After generating monthly report, emails it to the client.
@@ -11,10 +12,10 @@ Deno.serve(async (req) => {
     const { order_id } = await req.json();
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order?.client_email) return Response.json({ error: "No client email" }, { status: 400 });
+    if (!order?.client_email) return secureJson({ error: "No client email" }, { status: 400 });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (!resendKey) return Response.json({ error: "No Resend key" }, { status: 500 });
+    if (!resendKey) return secureJson({ error: "No Resend key" }, { status: 500 });
 
     // Generate report data
     const report = await base44.asServiceRole.functions
@@ -53,8 +54,8 @@ Deno.serve(async (req) => {
       }),
     });
 
-    return Response.json({ success: true, sent_to: order.client_email, month });
+    return secureJson({ success: true, sent_to: order.client_email, month });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Update Metrics Snapshot - runs hourly
  * Aggregates all lead/booking data into easy-to-read metrics
@@ -11,7 +12,7 @@ Deno.serve(async (req) => {
     const { project_id, period = "today" } = await req.json();
 
     if (!project_id) {
-      return Response.json({ error: "project_id required" }, { status: 400 });
+      return secureJson({ error: "project_id required" }, { status: 400 });
     }
 
     console.log(`[Metrics] Updating snapshot for ${period}`);
@@ -99,7 +100,7 @@ Deno.serve(async (req) => {
 
     console.log(`[Metrics] ✅ Snapshot saved`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       project_id,
       period,
@@ -108,7 +109,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[Metrics] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

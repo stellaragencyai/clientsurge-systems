@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * AI Function 3: generateSmartResponse
  * Generates personalized, context-aware SMS/email responses
@@ -14,7 +15,7 @@ Deno.serve(async (req) => {
     const { lead_id, intent, message_type = "sms", project_id } = await req.json();
 
     if (!lead_id || !intent) {
-      return Response.json(
+      return secureJson(
         { error: "lead_id and intent required" },
         { status: 400 }
       );
@@ -51,7 +52,7 @@ Deno.serve(async (req) => {
 
     console.log(`[SmartResponse] Generated for ${lead_id}`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id,
       message: result.message,
@@ -61,7 +62,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[SmartResponse] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

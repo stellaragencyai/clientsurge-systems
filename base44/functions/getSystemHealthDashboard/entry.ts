@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * getSystemHealthDashboard — #472
  * Single call returns: Stripe webhook last received, Resend delivery rate,
@@ -44,8 +45,8 @@ Deno.serve(async (req) => {
       overall_status: unresolvedErrors.length > 3 ? "degraded" : stalledOrders.length > 2 ? "warning" : "healthy",
     };
 
-    return Response.json({ success: true, health });
+    return secureJson({ success: true, health });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * processCallRecording — Twilio recording webhook handler.
  *
@@ -62,7 +63,7 @@ async function fetchRecordingMetadata(accountSid, authToken, recordingSid) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -89,7 +90,7 @@ Deno.serve(async (req) => {
     } else {
       // Support direct admin test call
       if (!user || user.role !== "admin") {
-        return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+        return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
       }
       params = await req.json().catch(() => ({}));
     }
@@ -98,7 +99,7 @@ Deno.serve(async (req) => {
     const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
 
     if (!accountSid || !authToken) {
-      return Response.json({ error: "Twilio credentials not configured" }, { status: 500 });
+      return secureJson({ error: "Twilio credentials not configured" }, { status: 500 });
     }
 
     // Extract recording fields from Twilio webhook
@@ -114,7 +115,7 @@ Deno.serve(async (req) => {
     const directLeadId = params.lead_id || null;
 
     if (!recordingSid && !directLeadId) {
-      return Response.json({ error: "RecordingSid required" }, { status: 400 });
+      return secureJson({ error: "RecordingSid required" }, { status: 400 });
     }
 
     console.log(`[processCallRecording] processCallRecording: duration=${durationSecs}s, verified=${verifiedTwilioWebhook}, directLead=${!!directLeadId}`);
@@ -144,7 +145,7 @@ Deno.serve(async (req) => {
     if (!leadId) {
       console.warn(`[processCallRecording] processCallRecording: No lead found for caller ${callerRaw}`);
       // Still log the recording so it's not lost
-      return Response.json({
+      return secureJson({
         success: true,
         warning: "No matching lead found for this caller",
         caller: callerRaw,
@@ -323,7 +324,7 @@ Short calls (< 60s) likely indicate voicemail or no answer.`;
 
     console.log(`[processCallRecording] processCallRecording: Successfully processed for lead ${leadId}, sentiment=${aiSummary.overall_sentiment}`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: leadId,
       recording_sid: recordingSid,
@@ -337,6 +338,6 @@ Short calls (< 60s) likely indicate voicemail or no answer.`;
 
   } catch (error) {
     console.error("[processCallRecording] processCallRecording error:", error);
-    return Response.json({ error: error.message || "Failed to process call recording" }, { status: 500 });
+    return secureJson({ error: error.message || "Failed to process call recording" }, { status: 500 });
   }
 });

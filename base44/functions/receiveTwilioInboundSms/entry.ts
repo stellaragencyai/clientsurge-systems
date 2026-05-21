@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * PUBLIC WEBHOOK: Twilio Inbound SMS Reply Handler
  * POST: /api/receiveTwilioInboundSms
@@ -92,7 +93,7 @@ async function isMessageAlreadyProcessed(base44, messageSid) {
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
-    return Response.json({ error: "Method not allowed" }, { status: 405 });
+    return secureJson({ error: "Method not allowed" }, { status: 405 });
   }
 
   let base44;
@@ -119,13 +120,13 @@ Deno.serve(async (req) => {
     const token = Deno.env.get("TWILIO_AUTH_TOKEN");
     if (!token) {
       console.error("[receiveTwilioInboundSms] TWILIO_AUTH_TOKEN is not set — rejecting");
-      return Response.json({ error: "Server configuration error" }, { status: 500 });
+      return secureJson({ error: "Server configuration error" }, { status: 500 });
     }
 
     const signature = req.headers.get("X-Twilio-Signature");
     if (!signature) {
       console.warn("[receiveTwilioInboundSms] X-Twilio-Signature header is missing — rejecting");
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     const url = new URL(req.url).toString();
@@ -140,7 +141,7 @@ Deno.serve(async (req) => {
 
     if (computed !== signature) {
       console.warn("[receiveTwilioInboundSms] Signature invalid — rejecting");
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     console.log("[receiveTwilioInboundSms] Signature valid");
@@ -156,7 +157,7 @@ Deno.serve(async (req) => {
 
     if (errors.length > 0) {
       console.warn("[receiveTwilioInboundSms] Validation errors:", errors);
-      return Response.json(
+      return secureJson(
         { error: "Invalid payload", details: errors },
         { status: 400 }
       );
@@ -187,7 +188,7 @@ Deno.serve(async (req) => {
     const alreadyProcessed = await isMessageAlreadyProcessed(base44, smsEvent.message_sid);
     if (alreadyProcessed) {
       console.log("[receiveTwilioInboundSms] Duplicate MessageSid, skipping");
-      return Response.json(
+      return secureJson(
         { status: "ok_duplicate", message_sid: smsEvent.message_sid },
         { status: 200 }
       );
@@ -229,14 +230,14 @@ Deno.serve(async (req) => {
         metadata_json: JSON.stringify({ from: smsEvent.from_number, keyword: bodyUpper, leads_updated: (stopMatches || []).length }),
       }).catch(() => {});
       return new Response(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, {
-        headers: { "Content-Type": "text/xml" },
+        headers: { "Content-Type": "text/xml", "X-Frame-Options": "DENY" },
       });
     }
 
     if (startKeywords.includes(bodyUpper)) {
       console.log("[receiveTwilioInboundSms] START/UNSTOP received from", smsEvent.from_number);
       return new Response(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, {
-        headers: { "Content-Type": "text/xml" },
+        headers: { "Content-Type": "text/xml", "X-Frame-Options": "DENY" },
       });
     }
 
@@ -306,7 +307,7 @@ Deno.serve(async (req) => {
         }).catch(() => {});
       }
 
-      return Response.json(
+      return secureJson(
         { status: "ok_ai_replied", lead_id: matchedLead.id, message_sid: smsEvent.message_sid },
         { status: 200 }
       );
@@ -360,7 +361,7 @@ Deno.serve(async (req) => {
         console.error("[receiveTwilioInboundSms] Failed to log event:", logError.message);
       }
 
-      return Response.json(
+      return secureJson(
         { status: "ok_matched", lead_id: websiteLead.id, message_sid: smsEvent.message_sid },
         { status: 200 }
       );
@@ -397,7 +398,7 @@ Deno.serve(async (req) => {
     }
 
     // Still return 200 so Twilio doesn't retry
-    return Response.json(
+    return secureJson(
       { status: "ok_unmatched", message_sid: smsEvent.message_sid },
       { status: 200 }
     );
@@ -428,6 +429,6 @@ Deno.serve(async (req) => {
     }
 
     // Still return 200 to prevent Twilio retry loop
-    return Response.json({ status: "error_logged", message_sid: smsEvent.message_sid }, { status: 200 });
+    return secureJson({ status: "error_logged", message_sid: smsEvent.message_sid }, { status: 200 });
   }
 });

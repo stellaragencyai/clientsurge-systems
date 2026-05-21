@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 const VALID_TRANSITIONS = {
@@ -25,19 +26,19 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== "admin") {
-      return Response.json({ error: "Admin access required" }, { status: 403 });
+      return secureJson({ error: "Admin access required" }, { status: 403 });
     }
 
     const payload = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const orderId = payload?.order_id || new URL(req.url).searchParams.get("order_id");
 
     if (!orderId) {
-      return Response.json({ error: "order_id is required" }, { status: 400 });
+      return secureJson({ error: "order_id is required" }, { status: 400 });
     }
 
     const order = await base44.asServiceRole.entities.Order.get(orderId);
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      return secureJson({ error: "Order not found" }, { status: 404 });
     }
 
     const installConfig = order.install_configuration || {};
@@ -70,7 +71,7 @@ Deno.serve(async (req) => {
       allowed_next_statuses: VALID_TRANSITIONS[item.install_status || "Paid"] || [],
     }));
 
-    return Response.json({
+    return secureJson({
       success: true,
       order: {
         id: order.id,
@@ -147,6 +148,6 @@ Deno.serve(async (req) => {
       message === "Admin access required" ? 403 :
       message === "Order not found" ? 404 :
       message === "order_id is required" ? 400 : 500;
-    return Response.json({ error: message }, { status });
+    return secureJson({ error: message }, { status });
   }
 });

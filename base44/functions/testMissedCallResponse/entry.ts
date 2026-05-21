@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Test Missed Call Text-Back Response
  * Simulates a missed call webhook and verifies the response flow
@@ -8,7 +9,7 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -57,7 +58,7 @@ Deno.serve(async (req) => {
       console.warn("[TestMissedCall] Event check failed:", e.message);
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       test_lead_id: testLead.id,
       phone_number: "+16025874608",
@@ -67,6 +68,6 @@ Deno.serve(async (req) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error(`[TestMissedCall] Error: ${message}`);
-    return Response.json({ error: message, success: false }, { status: 500 });
+    return secureJson({ error: message, success: false }, { status: 500 });
   }
 });

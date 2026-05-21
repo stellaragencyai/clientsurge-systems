@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * autoArchiveOldLeads - #91
  * Anonymizes WebsiteLead records older than 365 days.
@@ -38,7 +39,7 @@ function anonymizeWebsiteLead(lead: any, archivedAt: string) {
 Deno.serve(async (req) => {
   try {
     if (!allowAnonymousAutomation(req)) {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -57,8 +58,8 @@ Deno.serve(async (req) => {
       archived++;
     }
 
-    return Response.json({ success: true, archived, total_checked: old.length });
+    return secureJson({ success: true, archived, total_checked: old.length });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

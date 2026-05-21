@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * generateLeadMagnet — #421 #421a #421b
  * Elite perk #1: generates 3 lead magnets (600-800 words each) per industry pain point.
@@ -24,11 +25,11 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { order_id } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order || order.package_key !== "elite") {
-      return Response.json({ error: "Elite tier only" }, { status: 403 });
+      return secureJson({ error: "Elite tier only" }, { status: 403 });
     }
 
     const industry = order.industry || "default";
@@ -70,8 +71,8 @@ Deno.serve(async (req) => {
       service: "elite_perks", requires_nolan: false, resolved: true,
     }).catch(() => {});
 
-    return Response.json({ success: true, magnets: magnets.map(m => ({ pain_point: m.pain_point, word_count: m.word_count })), order_id });
+    return secureJson({ success: true, magnets: magnets.map(m => ({ pain_point: m.pain_point, word_count: m.word_count })), order_id });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

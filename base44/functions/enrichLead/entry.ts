@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * enrichLead — auto-enrichment for the canonical Leads entity.
  *
@@ -29,7 +30,7 @@ Deno.serve(async (req) => {
     const leadData = body?.data ?? null;
 
     if (!leadId) {
-      return Response.json({ error: "lead_id is required" }, { status: 400 });
+      return secureJson({ error: "lead_id is required" }, { status: 400 });
     }
 
     // Load lead — use automation pre-loaded data if available
@@ -38,14 +39,14 @@ Deno.serve(async (req) => {
       : await base44.asServiceRole.entities.Leads.get(leadId);
 
     if (!lead) {
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     // Skip if already enriched recently (within 24h) to avoid redundant runs
     if (lead.enriched_at) {
       const hoursSince = (Date.now() - new Date(lead.enriched_at).getTime()) / 3600000;
       if (hoursSince < 24) {
-        return Response.json({ success: true, skipped: true, reason: "Already enriched within 24h" });
+        return secureJson({ success: true, skipped: true, reason: "Already enriched within 24h" });
       }
     }
 
@@ -95,7 +96,7 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
         enriched_at: new Date().toISOString(),
         enrichment_notes: `Enrichment attempted but failed: ${message}`
       });
-      return Response.json({ success: false, error: message }, { status: 502 });
+      return secureJson({ success: false, error: message }, { status: 502 });
     }
 
     // Validate company_size against allowed enum values
@@ -137,7 +138,7 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
       metadata_json: JSON.stringify({ source: "enrichLead", lead_id: leadId, tags: update.industry_tags, size: companySize }),
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: leadId,
       enriched: update,
@@ -146,6 +147,6 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
   } catch (error) {
     console.error("[enrichLead] enrichLead error:", error);
     const message = error instanceof Error ? error.message : "Enrichment failed";
-    return Response.json({ error: message }, { status: 500 });
+    return secureJson({ error: message }, { status: 500 });
   }
 });

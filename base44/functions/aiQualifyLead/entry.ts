@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * aiQualifyLead — full AI qualification analysis for a single lead.
  *
@@ -28,7 +29,7 @@ const VALID_OFFERS = ["Starter System", "Growth System", "Pro System", "None —
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -36,13 +37,13 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (!user || user.role !== "admin") {
-      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+      return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
     }
 
     const body = await req.json().catch(() => ({}));
     const leadId = body?.lead_id;
     if (!leadId) {
-      return Response.json({ error: "lead_id required" }, { status: 400 });
+      return secureJson({ error: "lead_id required" }, { status: 400 });
     }
 
     // Load lead + communication history in parallel
@@ -53,7 +54,7 @@ Deno.serve(async (req) => {
     ]);
 
     if (!lead) {
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     // Build communication context
@@ -172,7 +173,7 @@ Based on ALL this data, provide a comprehensive lead qualification analysis. Ret
     });
 
     if (!VALID_TIERS.includes(result?.qualification_tier)) {
-      return Response.json({ error: "AI qualification response was invalid" }, { status: 502 });
+      return secureJson({ error: "AI qualification response was invalid" }, { status: 502 });
     }
 
     // Save key qualification fields back to lead
@@ -217,7 +218,7 @@ Based on ALL this data, provide a comprehensive lead qualification analysis. Ret
       metadata_json: JSON.stringify({ source: "aiQualifyLead", tier: result.qualification_tier }),
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: leadId,
       ...result,
@@ -225,6 +226,6 @@ Based on ALL this data, provide a comprehensive lead qualification analysis. Ret
 
   } catch (error) {
     console.error("[aiQualifyLead] aiQualifyLead error:", error);
-    return Response.json({ error: error.message || "Qualification failed" }, { status: 500 });
+    return secureJson({ error: error.message || "Qualification failed" }, { status: 500 });
   }
 });

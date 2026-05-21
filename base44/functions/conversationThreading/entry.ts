@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Conversation Threading & Auto-Context
  * Stitches SMS + email + call logs into one thread
@@ -12,7 +13,7 @@ Deno.serve(async (req) => {
     const { lead_id } = await req.json();
 
     if (!lead_id) {
-      return Response.json({ error: "lead_id required" }, { status: 400 });
+      return secureJson({ error: "lead_id required" }, { status: 400 });
     }
 
     console.log(`[Threading] Building conversation thread for ${lead_id}`);
@@ -25,7 +26,7 @@ Deno.serve(async (req) => {
     );
 
     if (!events || events.length === 0) {
-      return Response.json({
+      return secureJson({
         success: true,
         lead_id,
         thread: [],
@@ -71,7 +72,7 @@ Preferred channel: ${events.filter((e) => e.direction === "inbound").length > 0 
 
     console.log(`[Threading] Built thread with ${thread.length} events`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id,
       thread_length: thread.length,
@@ -89,7 +90,7 @@ Preferred channel: ${events.filter((e) => e.direction === "inbound").length > 0 
     });
   } catch (error) {
     console.error("[Threading] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

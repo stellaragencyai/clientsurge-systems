@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Apply Automation Rules
  * Checks all active rules and fires actions when conditions match
@@ -11,7 +12,7 @@ Deno.serve(async (req) => {
     const { project_id, lead_id, trigger_type } = await req.json();
 
     if (!project_id) {
-      return Response.json({ error: "project_id required" }, { status: 400 });
+      return secureJson({ error: "project_id required" }, { status: 400 });
     }
 
     console.log(
@@ -26,7 +27,7 @@ Deno.serve(async (req) => {
     );
 
     if (!rules?.length) {
-      return Response.json({
+      return secureJson({
         success: true,
         rules_fired: 0,
       });
@@ -67,14 +68,14 @@ Deno.serve(async (req) => {
 
     console.log(`[ApplyRules] ${firedRules.length} rules fired`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       rules_fired: firedRules.length,
       fired_rules: firedRules,
     });
   } catch (error) {
     console.error("[ApplyRules] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

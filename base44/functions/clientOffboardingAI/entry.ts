@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * clientOffboardingAI — #474
  * On subscription.deleted: generates personalized 3-email win-back sequence.
@@ -9,10 +10,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { order_id, reason } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
     const business_name = order.client_name || "your business";
@@ -57,8 +58,8 @@ Reason: ${reason || "not specified"}`,
       }).catch(() => {});
     }
 
-    return Response.json({ success: true, order_id, churned_at: new Date().toISOString() });
+    return secureJson({ success: true, order_id, churned_at: new Date().toISOString() });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

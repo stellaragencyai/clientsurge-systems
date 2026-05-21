@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -6,14 +7,14 @@ Deno.serve(async (req) => {
     const { lead, bookingLink } = await req.json();
 
     if (!lead || !bookingLink) {
-      return Response.json(
+      return secureJson(
         { error: 'lead and bookingLink required' },
         { status: 400 }
       );
     }
 
     if (!lead.email) {
-      return Response.json(
+      return secureJson(
         { triggered: false, reason: 'no email on lead' },
         { status: 200 }
       );
@@ -35,11 +36,11 @@ Deno.serve(async (req) => {
       throw e;
     }
 
-    return Response.json({
+    return secureJson({
       triggered: true,
       message: 'Booking email sent',
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

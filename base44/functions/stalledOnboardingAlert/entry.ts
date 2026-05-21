@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const STEP_LABELS = {
@@ -28,7 +29,7 @@ Deno.serve(async (req) => {
     });
 
     if (stalledClients.length === 0) {
-      return Response.json({ success: true, message: 'No stalled clients found.' });
+      return secureJson({ success: true, message: 'No stalled clients found.' });
     }
 
     let clientRows = '';
@@ -72,8 +73,8 @@ ${clientRows}
       body: emailBody,
     });
 
-    return Response.json({ success: true, stalled_count: stalledClients.length });
+    return secureJson({ success: true, stalled_count: stalledClients.length });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -9,7 +10,7 @@ Deno.serve(async (req) => {
     const client = data;
 
     if (!client || !client.business_name) {
-      return Response.json({ error: 'No client data' }, { status: 400 });
+      return secureJson({ error: 'No client data' }, { status: 400 });
     }
 
     const prompt = `You are an SMS copywriter for a local service business automation agency called ClientSurge Systems.
@@ -58,8 +59,8 @@ Return a JSON object with exactly these keys:
       generated_messages: JSON.stringify(generated)
     });
 
-    return Response.json({ success: true, messages: generated });
+    return secureJson({ success: true, messages: generated });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

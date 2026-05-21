@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
 
@@ -50,14 +51,14 @@ function normalizeDateInput(value: unknown, fieldLabel: string) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
     if (!user?.email) {
-      return Response.json({ error: "Authentication required" }, { status: 401 });
+      return secureJson({ error: "Authentication required" }, { status: 401 });
     }
 
     const payload = await req.json().catch(() => ({}));
@@ -67,7 +68,7 @@ Deno.serve(async (req) => {
     const timelineDeathDate = normalizeDateInput(payload?.timeline_death_date, "Death date");
 
     if (timelineBirthDate && timelineDeathDate && timelineDeathDate < timelineBirthDate) {
-      return Response.json(
+      return secureJson(
         { error: "Death date must be later than or equal to birth date." },
         { status: 400 }
       );
@@ -79,7 +80,7 @@ Deno.serve(async (req) => {
     });
 
     if (resolution.status !== "resolved" || !resolution.project?.id) {
-      return Response.json({ error: "No portal project is linked to this account yet." }, { status: 404 });
+      return secureJson({ error: "No portal project is linked to this account yet." }, { status: 404 });
     }
 
     const updatedProject = await base44.asServiceRole.entities.ClientProject.update(
@@ -92,12 +93,12 @@ Deno.serve(async (req) => {
       }
     );
 
-    return Response.json({
+    return secureJson({
       success: true,
       project: updatedProject,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update portal timeline";
-    return Response.json({ error: message }, { status: 500 });
+    return secureJson({ error: message }, { status: 500 });
   }
 });

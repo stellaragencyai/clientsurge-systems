@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Test Website Lead Automation
  * Manual testing function for all 9 test scenarios
@@ -23,7 +24,7 @@ Deno.serve(async (req) => {
       user = await base44.auth.me();
     } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     const results = {};
@@ -233,14 +234,14 @@ Deno.serve(async (req) => {
       };
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       test,
       results,
     });
   } catch (error) {
     console.error("[testWebsiteLeadAutomation] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message || "Test failed" },
       { status: 500 }
     );

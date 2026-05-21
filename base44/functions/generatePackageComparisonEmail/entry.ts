@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * generatePackageComparisonEmail — #475
  * Finds Starter/Growth clients live for ~60 days.
@@ -102,8 +103,8 @@ Deno.serve(async (req) => {
     }).catch(() => {});
 
     console.log(\`[Day60Upgrade] Sent \${sent} upgrade emails\`);
-    return Response.json({ success: true, eligible: eligible.length, sent });
+    return secureJson({ success: true, eligible: eligible.length, sent });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

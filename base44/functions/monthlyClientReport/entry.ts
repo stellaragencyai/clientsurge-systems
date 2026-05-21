@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * monthlyClientReport — #526
  * Generates personalized monthly reports for live clients. Email delivery is
@@ -156,13 +157,13 @@ Deno.serve(async (req) => {
     const liveClients = (clients || []).filter((client: any) => REPORT_STATUSES.has(client.status));
 
     if (!liveClients.length) {
-      return Response.json({ success: true, month, reports: [], emails_sent: 0, message: "No live clients to report on." });
+      return secureJson({ success: true, month, reports: [], emails_sent: 0, message: "No live clients to report on." });
     }
 
     const resendKey = Deno.env.get("RESEND_API_KEY") || "";
     const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "reports@clientsurgesystems.com";
     if (send_email && !resendKey) {
-      return Response.json({ error: "RESEND_API_KEY missing" }, { status: 500 });
+      return secureJson({ error: "RESEND_API_KEY missing" }, { status: 500 });
     }
 
     const results = [];
@@ -217,7 +218,7 @@ Deno.serve(async (req) => {
       results.push(result);
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       month,
       preview: !send_email,
@@ -225,6 +226,6 @@ Deno.serve(async (req) => {
       reports: results,
     });
   } catch (error: any) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

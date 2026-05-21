@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Canonical client lead intake webhook.
  * Accepts only signed project-scoped webhook registrations and stores the
@@ -299,7 +300,7 @@ async function getBase44Client(req, base44Override) {
 
 export async function handleLeadCaptureWebhook(req, base44Override = null) {
   if (req.method !== "POST") {
-    return Response.json({ error: "Method not allowed" }, { status: 405 });
+    return secureJson({ error: "Method not allowed" }, { status: 405 });
   }
 
   const base44 = await getBase44Client(req, base44Override);
@@ -309,7 +310,7 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
   try {
     payload = rawBody ? JSON.parse(rawBody) : {};
   } catch {
-    return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
+    return secureJson({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
   const verification = await verifySignedRegistration({
@@ -332,7 +333,7 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
       },
     });
 
-    return Response.json(
+    return secureJson(
       {
         success: false,
         code: verification.code,
@@ -346,7 +347,7 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
   const lead = parseCapturePayload(payload);
 
   if (!lead.email && !lead.phone) {
-    return Response.json(
+    return secureJson(
       { error: "Email or phone required" },
       { status: 400 }
     );
@@ -366,7 +367,7 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
       },
     });
 
-    return Response.json(
+    return secureJson(
       {
         success: false,
         code: "lead_webhook_project_not_found",
@@ -444,7 +445,7 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
     triggerEvent: "new_client_webhook_lead",
   });
 
-  return Response.json({
+  return secureJson({
     success: true,
     website_lead_id: websiteLead.id,
     lead_id: crmLead.id,

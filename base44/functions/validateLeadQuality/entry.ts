@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Validate Lead Quality - AI Spam/Bot Detection
  * Runs on form submission BEFORE lead is created
@@ -96,7 +97,7 @@ Deno.serve(async (req) => {
       `[QualityCheck] Score: ${score}, Quality: ${isQuality}, Reject: ${shouldReject}`
     );
 
-    return Response.json({
+    return secureJson({
       success: true,
       email,
       quality_score: Math.max(0, score),
@@ -111,7 +112,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[QualityCheck] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

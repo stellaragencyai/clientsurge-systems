@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * AUTOMATION ORCHESTRATOR
  * Central hub that runs all 7 AI functions in sequence
@@ -12,7 +13,7 @@ Deno.serve(async (req) => {
     const { lead_id, project_id, trigger_event } = await req.json();
 
     if (!lead_id) {
-      return Response.json({ error: "lead_id required" }, { status: 400 });
+      return secureJson({ error: "lead_id required" }, { status: 400 });
     }
 
     const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
@@ -35,7 +36,7 @@ Deno.serve(async (req) => {
     
     if (qualityResult.data?.should_reject) {
       console.log(`[Orchestrator] Lead rejected due to low quality (score: ${qualityResult.data.quality_score})`);
-      return Response.json(
+      return secureJson(
         {
           success: false,
           lead_id,
@@ -252,7 +253,7 @@ Deno.serve(async (req) => {
 
     console.log(`[Orchestrator] ✅ Complete workflow for ${lead_id}`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id,
       workflow_complete: true,
@@ -261,7 +262,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[Orchestrator] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * runLaunchReadinessCheck — #536 CRITICAL
  * 10-point system check before June 2 launch.
@@ -67,8 +68,8 @@ ${lines}`,
       }).catch(() => {});
     }
 
-    return Response.json({ success: true, launch_ready: ready, passed, failed, checks });
+    return secureJson({ success: true, launch_ready: ready, passed, failed, checks });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

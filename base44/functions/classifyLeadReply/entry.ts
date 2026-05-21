@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -6,7 +7,7 @@ Deno.serve(async (req) => {
     const { messageText, lead } = await req.json();
 
     if (!messageText || !lead) {
-      return Response.json(
+      return secureJson(
         { error: 'messageText and lead required' },
         { status: 400 }
       );
@@ -45,7 +46,7 @@ Respond with JSON only: { "intent": "...", "confidence": 0.0-1.0, "recommended_n
       });
 
       if (result?.intent) {
-        return Response.json(result);
+        return secureJson(result);
       }
     } catch (llmErr) {
       console.warn("[classifyLeadReply] classifyLeadReply LLM failed, falling back to keyword match:", llmErr.message);
@@ -61,7 +62,7 @@ Respond with JSON only: { "intent": "...", "confidence": 0.0-1.0, "recommended_n
       text.includes('no thanks') ||
       text.includes('not interested')
     ) {
-      return Response.json({
+      return secureJson({
         intent: 'stop',
         confidence: 0.95,
         recommended_next_action: 'stop_follow_up',
@@ -74,7 +75,7 @@ Respond with JSON only: { "intent": "...", "confidence": 0.0-1.0, "recommended_n
       text.includes('not for me') ||
       text.includes('wrong number')
     ) {
-      return Response.json({
+      return secureJson({
         intent: 'not_interested',
         confidence: 0.9,
         recommended_next_action: 'stop_follow_up',
@@ -91,7 +92,7 @@ Respond with JSON only: { "intent": "...", "confidence": 0.0-1.0, "recommended_n
       text.includes('book me') ||
       text.includes('schedule')
     ) {
-      return Response.json({
+      return secureJson({
         intent: 'booking_ready',
         confidence: 0.9,
         recommended_next_action: 'send_booking_link',
@@ -106,7 +107,7 @@ Respond with JSON only: { "intent": "...", "confidence": 0.0-1.0, "recommended_n
       text.includes('schedule') ||
       text.includes('appointment')
     ) {
-      return Response.json({
+      return secureJson({
         intent: 'availability_interest',
         confidence: 0.85,
         recommended_next_action: 'send_booking_link',
@@ -121,7 +122,7 @@ Respond with JSON only: { "intent": "...", "confidence": 0.0-1.0, "recommended_n
       text.includes('rates') ||
       text.includes('pricing')
     ) {
-      return Response.json({
+      return secureJson({
         intent: 'pricing_interest',
         confidence: 0.85,
         recommended_next_action: 'answer_question',
@@ -130,7 +131,7 @@ Respond with JSON only: { "intent": "...", "confidence": 0.0-1.0, "recommended_n
 
     // Question
     if (text.includes('?')) {
-      return Response.json({
+      return secureJson({
         intent: 'question',
         confidence: 0.8,
         recommended_next_action: 'answer_question',
@@ -144,7 +145,7 @@ Respond with JSON only: { "intent": "...", "confidence": 0.0-1.0, "recommended_n
       text.includes('depends') ||
       text.includes('tell me more')
     ) {
-      return Response.json({
+      return secureJson({
         intent: 'unsure',
         confidence: 0.8,
         recommended_next_action: 'ask_clarifying_question',
@@ -152,12 +153,12 @@ Respond with JSON only: { "intent": "...", "confidence": 0.0-1.0, "recommended_n
     }
 
     // Default to other
-    return Response.json({
+    return secureJson({
       intent: 'other',
       confidence: 0.5,
       recommended_next_action: 'escalate_to_admin',
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

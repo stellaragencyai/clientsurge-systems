@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * manageWebhookRegistration
  * CRUD + secret generation for signed project-scoped webhook registrations.
@@ -115,7 +116,7 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== "admin") {
-      return Response.json({ error: "Admin access required" }, { status: 403 });
+      return secureJson({ error: "Admin access required" }, { status: 403 });
     }
 
     const body = await req.json();
@@ -126,7 +127,7 @@ Deno.serve(async (req) => {
         "-created_date",
         50
       );
-      return Response.json({
+      return secureJson({
         success: true,
         registrations: registrations.map((registration) => sanitizeRegistration(registration)),
       });
@@ -143,7 +144,7 @@ Deno.serve(async (req) => {
         created_at: new Date().toISOString(),
       });
       await syncProjectWebhookMetadata(base44, record);
-      return Response.json({
+      return secureJson({
         success: true,
         registration: sanitizeRegistration(record, { revealSecret: true }),
       });
@@ -153,14 +154,14 @@ Deno.serve(async (req) => {
       const payload = normalizeRegistrationPayload(data);
       const record = await base44.asServiceRole.entities.WebhookRegistration.update(id, payload);
       await syncProjectWebhookMetadata(base44, record);
-      return Response.json({ success: true, registration: sanitizeRegistration(record) });
+      return secureJson({ success: true, registration: sanitizeRegistration(record) });
     }
 
     if (action === "delete") {
       const existing = await base44.asServiceRole.entities.WebhookRegistration.get(id);
       await base44.asServiceRole.entities.WebhookRegistration.delete(id);
       await clearProjectWebhookMetadata(base44, existing);
-      return Response.json({ success: true });
+      return secureJson({ success: true });
     }
 
     if (action === "regenerate_secret") {
@@ -169,15 +170,15 @@ Deno.serve(async (req) => {
         signature_algorithm: "hmac_sha256",
       });
       await syncProjectWebhookMetadata(base44, record);
-      return Response.json({
+      return secureJson({
         success: true,
         registration: sanitizeRegistration(record, { revealSecret: true }),
       });
     }
 
-    return Response.json({ error: "Unknown action" }, { status: 400 });
+    return secureJson({ error: "Unknown action" }, { status: 400 });
   } catch (error) {
     console.error("[WebhookRegistration] Error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

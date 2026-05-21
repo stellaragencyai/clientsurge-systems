@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Legacy configureService quarantine.
  * Real install state now flows through the canonical install pipeline and
@@ -41,7 +42,7 @@ export async function handleConfigureServiceRequest(req) {
     }).catch(() => null);
   }
 
-  return Response.json(
+  return secureJson(
     {
       success: false,
       retired: true,

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Inlined Stripe payment webhook for Base44 legacy runtime.
  * This embeds the canonical handler so the deployed legacy endpoint can verify
@@ -626,13 +627,19 @@ export async function handleCanonicalStripeWebhook(
   const stripe = await getStripeClient();
 
   if (!stripe) {
-    return new Response("Stripe is not configured", { status: 500 });
+    return new Response("Stripe is not configured", {
+      status: 500,
+      headers: { "X-Frame-Options": "DENY" },
+    });
   }
 
   const webhookSecrets = getWebhookSecrets();
 
   if (webhookSecrets.length === 0) {
-    return new Response("Stripe webhook secret is missing", { status: 500 });
+    return new Response("Stripe webhook secret is missing", {
+      status: 500,
+      headers: { "X-Frame-Options": "DENY" },
+    });
   }
 
   const body = await req.text();
@@ -660,7 +667,10 @@ export async function handleCanonicalStripeWebhook(
   if (!event) {
     return new Response(
       `Webhook Error: ${signatureError instanceof Error ? signatureError.message : String(signatureError)}`,
-      { status: 400 }
+      {
+        status: 400,
+        headers: { "X-Frame-Options": "DENY" },
+      }
     );
   }
 
@@ -685,7 +695,7 @@ export async function handleCanonicalStripeWebhook(
       result = await processInvoiceEvent({ base44, event, source });
     }
 
-    return Response.json({
+    return secureJson({
       received: true,
       source,
       event_type: event.type,
@@ -707,7 +717,7 @@ export async function handleCanonicalStripeWebhook(
       })
     );
 
-    return Response.json({
+    return secureJson({
       received: true,
       source,
       event_type: event.type,

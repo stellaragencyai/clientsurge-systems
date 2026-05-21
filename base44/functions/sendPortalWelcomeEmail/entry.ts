@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
 
@@ -19,26 +20,26 @@ function escapeHtml(value) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (!user || user.role !== 'admin') {
-      return Response.json({ error: 'Forbidden: Admin only' }, { status: 403 });
+      return secureJson({ error: 'Forbidden: Admin only' }, { status: 403 });
     }
 
     if (!RESEND_API_KEY) {
-      return Response.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
+      return secureJson({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
     }
 
     const { client_name, client_email, business_name } = await req.json();
     if (!client_name || !client_email || !business_name) {
-      return Response.json({ error: 'client_name, client_email, and business_name are required' }, { status: 400 });
+      return secureJson({ error: 'client_name, client_email, and business_name are required' }, { status: 400 });
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(client_email)) {
-      return Response.json({ error: 'client_email must be valid' }, { status: 400 });
+      return secureJson({ error: 'client_email must be valid' }, { status: 400 });
     }
     const safeClientName = escapeHtml(client_name);
     const safeBusinessName = escapeHtml(business_name);
@@ -141,8 +142,8 @@ Deno.serve(async (req) => {
       throw new Error(`Resend admin email failed: ${JSON.stringify(adminData)}`);
     }
 
-    return Response.json({ success: true, client_email_id: clientData.id, admin_email_id: adminData.id });
+    return secureJson({ success: true, client_email_id: clientData.id, admin_email_id: adminData.id });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

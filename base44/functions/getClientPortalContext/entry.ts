@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import {
   buildInstallSnapshot,
@@ -156,7 +157,7 @@ Deno.serve(async (req) => {
     } catch (authError) {
       const message = authError instanceof Error ? authError.message : String(authError);
       if (/authentication required/i.test(message)) {
-        return Response.json(
+        return secureJson(
           { error: "Authentication required", code: "portal_auth_required" },
           { status: 401 }
         );
@@ -165,7 +166,7 @@ Deno.serve(async (req) => {
     }
 
     if (!user?.email) {
-      return Response.json(
+      return secureJson(
         { error: "Authentication required", code: "portal_auth_required" },
         { status: 401 }
       );
@@ -191,7 +192,7 @@ Deno.serve(async (req) => {
         linkStatus: "no_paid_order",
       });
 
-      return Response.json({
+      return secureJson({
         success: true,
         project: null,
         order: null,
@@ -213,7 +214,7 @@ Deno.serve(async (req) => {
         linkStatus: "ambiguous_paid_orders",
       });
 
-      return Response.json({
+      return secureJson({
         success: true,
         project: null,
         order: null,
@@ -236,7 +237,7 @@ Deno.serve(async (req) => {
         order,
       });
 
-      return Response.json({
+      return secureJson({
         success: true,
         project: null,
         order: orderSummary,
@@ -263,7 +264,7 @@ Deno.serve(async (req) => {
         order,
       });
 
-      return Response.json({
+      return secureJson({
         success: true,
         project: null,
         order: orderSummary,
@@ -287,7 +288,7 @@ Deno.serve(async (req) => {
       project: projectSummary,
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       project: projectSummary,
       client,
@@ -298,6 +299,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[getClientPortalContext] Error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

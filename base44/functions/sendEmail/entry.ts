@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
 
@@ -6,12 +7,12 @@ Deno.serve(async (req) => {
     const { email, subject, body, leadId } = await req.json();
 
     if (!email || !subject || !body) {
-      return Response.json({ error: 'Email, subject, and body required' }, { status: 400 });
+      return secureJson({ error: 'Email, subject, and body required' }, { status: 400 });
     }
 
     const apiKey = Deno.env.get('RESEND_API_KEY');
     if (!apiKey) {
-      return Response.json({ error: 'Resend API key not configured' }, { status: 500 });
+      return secureJson({ error: 'Resend API key not configured' }, { status: 500 });
     }
 
     const response = await resendFetch('https://api.resend.com/emails', {
@@ -31,7 +32,7 @@ Deno.serve(async (req) => {
     const data = await response.json();
 
     if (!response.ok) {
-      return Response.json({ error: 'Failed to send email', details: data }, { status: 500 });
+      return secureJson({ error: 'Failed to send email', details: data }, { status: 500 });
     }
 
     // Log email in database
@@ -46,8 +47,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    return Response.json({ success: true, emailId: data.id });
+    return secureJson({ success: true, emailId: data.id });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -6,12 +7,12 @@ Deno.serve(async (req) => {
     const { lead_id } = await req.json();
 
     if (!lead_id) {
-      return Response.json({ error: 'lead_id required' }, { status: 400 });
+      return secureJson({ error: 'lead_id required' }, { status: 400 });
     }
 
     const lead = await base44.entities.Lead.get(lead_id);
     if (!lead) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+      return secureJson({ error: 'Lead not found' }, { status: 404 });
     }
 
     const settings = await base44.asServiceRole.entities.AdminSettings.list();
@@ -52,12 +53,12 @@ Deno.serve(async (req) => {
       });
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       event_id: event.id,
     });
   } catch (error) {
     console.error('[sendLeadConfirmationEmail] Error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

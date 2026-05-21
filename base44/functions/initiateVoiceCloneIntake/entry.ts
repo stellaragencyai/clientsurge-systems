@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * initiateVoiceCloneIntake — #423
  * Elite perk #3. After Elite payment, emails client a Retell voice recording link.
@@ -10,16 +11,16 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { order_id } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order || order.package_key !== "elite") {
-      return Response.json({ error: "Elite tier only" }, { status: 403 });
+      return secureJson({ error: "Elite tier only" }, { status: 403 });
     }
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!order.client_email || !resendKey) {
-      return Response.json({ error: "No client email or Resend key" }, { status: 400 });
+      return secureJson({ error: "No client email or Resend key" }, { status: 400 });
     }
 
     const retellLink = "https://app.retellai.com/voice-clone"; // Retell voice clone intake URL
@@ -57,8 +58,8 @@ Deno.serve(async (req) => {
       voice_clone_status: "intake_sent",
     });
 
-    return Response.json({ success: true, sent_to: order.client_email });
+    return secureJson({ success: true, sent_to: order.client_email });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

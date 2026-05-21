@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
 import { createAuditLog } from "../shared/auditLog.ts";
@@ -24,7 +25,7 @@ function calculatePipelineStatus(items) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -34,22 +35,22 @@ Deno.serve(async (req) => {
     const { order_id, service_key, install_status, note } = payload || {};
 
     if (!order_id || !service_key || !install_status) {
-      return Response.json({ error: "order_id, service_key, and install_status are required" }, { status: 400 });
+      return secureJson({ error: "order_id, service_key, and install_status are required" }, { status: 400 });
     }
 
     const order = await base44.asServiceRole.entities.Order.get(order_id);
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      return secureJson({ error: "Order not found" }, { status: 404 });
     }
 
     const item = order.items?.find((i) => i.service_key === service_key);
     if (!item) {
-      return Response.json({ error: "Service not found on order" }, { status: 404 });
+      return secureJson({ error: "Service not found on order" }, { status: 404 });
     }
 
     const currentStatus = item.install_status || "Paid";
     if (!VALID_TRANSITIONS[currentStatus]?.includes(install_status)) {
-      return Response.json({
+      return secureJson({
         error: `Invalid transition: ${currentStatus} → ${install_status}`,
         valid_transitions: VALID_TRANSITIONS[currentStatus] || [],
       }, { status: 409 });
@@ -90,7 +91,7 @@ Deno.serve(async (req) => {
       notes: note || "",
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       order: {
         id: updatedOrder.id,
@@ -100,7 +101,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     if (error instanceof AuthGuardError) {
-      return Response.json(
+      return secureJson(
         {
           error: error.message,
           code: error.code,
@@ -110,6 +111,6 @@ Deno.serve(async (req) => {
     }
 
     console.error("[updateInstallStatus] Error:", error.message);
-    return Response.json({ error: error.message || "Failed to update install status" }, { status: 500 });
+    return secureJson({ error: error.message || "Failed to update install status" }, { status: 500 });
   }
 });

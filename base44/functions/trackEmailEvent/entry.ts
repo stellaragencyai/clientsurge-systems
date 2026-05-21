@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * trackEmailEvent — webhook handler for Resend email events.
  *
@@ -41,7 +42,7 @@ async function updateCampaignMetrics(base44, campaignId) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -64,7 +65,7 @@ Deno.serve(async (req) => {
     try {
       body = rawPayload ? JSON.parse(rawPayload) : {};
     } catch {
-      return Response.json({ error: "Invalid JSON payload" }, { status: 400 });
+      return secureJson({ error: "Invalid JSON payload" }, { status: 400 });
     }
 
     // Resend webhook payload structure
@@ -72,7 +73,7 @@ Deno.serve(async (req) => {
     const data = body?.data || {};
 
     if (!eventType) {
-      return Response.json({ error: "Missing event type" }, { status: 400 });
+      return secureJson({ error: "Missing event type" }, { status: 400 });
     }
 
     // Extract campaign and recipient IDs from headers or custom fields
@@ -94,11 +95,11 @@ Deno.serve(async (req) => {
 
     if (!recipient) {
       console.log(`[trackEmailEvent] trackEmailEvent: No recipient found for event ${eventType}`);
-      return Response.json({ success: true, skipped: true, reason: "Recipient not found" });
+      return secureJson({ success: true, skipped: true, reason: "Recipient not found" });
     }
 
     if (campaignId && recipient.campaign_id && recipient.campaign_id !== campaignId) {
-      return Response.json({ error: "Recipient campaign mismatch" }, { status: 400 });
+      return secureJson({ error: "Recipient campaign mismatch" }, { status: 400 });
     }
 
     const now = new Date().toISOString();
@@ -144,7 +145,7 @@ Deno.serve(async (req) => {
 
       default:
         console.log(`[trackEmailEvent] trackEmailEvent: Unhandled event type ${eventType}`);
-        return Response.json({ success: true, skipped: true, reason: `Unhandled event: ${eventType}` });
+        return secureJson({ success: true, skipped: true, reason: `Unhandled event: ${eventType}` });
     }
 
     // Update recipient record
@@ -174,10 +175,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    return Response.json({ success: true, event: eventType, recipient_id: recipient.id });
+    return secureJson({ success: true, event: eventType, recipient_id: recipient.id });
 
   } catch (error) {
     console.error("[trackEmailEvent] trackEmailEvent error:", error);
-    return Response.json({ error: error.message || "Failed to process event" }, { status: 500 });
+    return secureJson({ error: error.message || "Failed to process event" }, { status: 500 });
   }
 });

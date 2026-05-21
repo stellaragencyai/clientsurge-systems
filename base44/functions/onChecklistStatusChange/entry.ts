@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { getAppUrl } from '../_shared/appUrl.js';
 import { resendFetch } from "../_shared/resendFetch.js";
@@ -29,7 +30,7 @@ Deno.serve(async (req) => {
 
     // Only fire when status changes TO "active"
     if (data?.status !== 'active' || old_data?.status === 'active') {
-      return Response.json({ skipped: true, reason: 'Status did not transition to active' });
+      return secureJson({ skipped: true, reason: 'Status did not transition to active' });
     }
 
     const checklist = data;
@@ -43,14 +44,14 @@ Deno.serve(async (req) => {
 
     if (!clientEmail) {
       console.log('[onChecklistStatusChange] No client email on checklist, skipping notification');
-      return Response.json({ skipped: true, reason: 'No client_email on checklist' });
+      return secureJson({ skipped: true, reason: 'No client_email on checklist' });
     }
 
     // Send email via Resend
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) {
       console.error('[onChecklistStatusChange] RESEND_API_KEY not set');
-      return Response.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
+      return secureJson({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
     }
 
     const emailBody = `
@@ -127,7 +128,7 @@ Deno.serve(async (req) => {
 
     if (!emailRes.ok) {
       console.error('[onChecklistStatusChange] Resend error:', emailResult);
-      return Response.json({ error: 'Failed to send email', details: emailResult }, { status: 500 });
+      return secureJson({ error: 'Failed to send email', details: emailResult }, { status: 500 });
     }
 
     // Log the communication event
@@ -146,10 +147,10 @@ Deno.serve(async (req) => {
     });
 
     console.log(`[onChecklistStatusChange] Progress email sent to ${clientEmail} for service: ${serviceLabel}`);
-    return Response.json({ success: true, email_id: emailResult.id, sent_to: clientEmail });
+    return secureJson({ success: true, email_id: emailResult.id, sent_to: clientEmail });
 
   } catch (error) {
     console.error('[onChecklistStatusChange] onChecklistStatusChange error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

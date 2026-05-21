@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
 import {
@@ -9,7 +10,7 @@ import {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -23,7 +24,7 @@ Deno.serve(async (req) => {
       : "manual_import";
 
     if (rows.length === 0) {
-      return Response.json({ error: "rows is required and must be a non-empty array" }, { status: 400 });
+      return secureJson({ error: "rows is required and must be a non-empty array" }, { status: 400 });
     }
 
     if (dryRun) {
@@ -34,7 +35,7 @@ Deno.serve(async (req) => {
         importSource,
       });
 
-      return Response.json({
+      return secureJson({
         success: true,
         dry_run: true,
         preview,
@@ -47,7 +48,7 @@ Deno.serve(async (req) => {
       importSource,
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       dry_run: false,
       result: {
@@ -77,7 +78,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     if (error instanceof AuthGuardError) {
-      return Response.json(
+      return secureJson(
         {
           error: error.message,
           code: error.code,
@@ -87,6 +88,6 @@ Deno.serve(async (req) => {
     }
 
     const message = error instanceof Error ? error.message : "Failed to import leads";
-    return Response.json({ error: message }, { status: 500 });
+    return secureJson({ error: message }, { status: 500 });
   }
 });

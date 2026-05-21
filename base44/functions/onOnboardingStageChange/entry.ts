@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { getAppUrl } from "../_shared/appUrl.js";
 import { resendFetch } from "../_shared/resendFetch.js";
@@ -216,13 +217,13 @@ Deno.serve(async (req) => {
     const { event, data: project, old_data, changed_fields } = body;
 
     if (!project) {
-      return Response.json({ skipped: true, reason: "No project data" });
+      return secureJson({ skipped: true, reason: "No project data" });
     }
 
     const clientEmail = project.client_email || project.contact_email;
     if (!clientEmail) {
       console.warn("[StageChange] No client email on project", project.id);
-      return Response.json({ skipped: true, reason: "No client email" });
+      return secureJson({ skipped: true, reason: "No client email" });
     }
 
     const results = [];
@@ -275,12 +276,12 @@ Deno.serve(async (req) => {
     }
 
     if (results.length === 0) {
-      return Response.json({ skipped: true, reason: "No stage completions detected" });
+      return secureJson({ skipped: true, reason: "No stage completions detected" });
     }
 
-    return Response.json({ success: true, triggered: results });
+    return secureJson({ success: true, triggered: results });
   } catch (error) {
     console.error("[StageChange] Error:", error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

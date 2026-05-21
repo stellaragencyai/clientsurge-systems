@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * processDripCampaigns — hourly runner that fires overdue drip steps.
  *
@@ -80,7 +81,7 @@ async function sendEmail(to, subject, body, resendKey, fromEmail) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -89,13 +90,13 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     // Load all active campaigns
     const campaigns = await base44.asServiceRole.entities.DripCampaign.filter({ status: "active" }, "-enrolled_at", 5000);
     if (!campaigns?.length) {
-      return Response.json({ success: true, processed: 0, message: "No active drip campaigns." });
+      return secureJson({ success: true, processed: 0, message: "No active drip campaigns." });
     }
 
     // Load admin settings once
@@ -265,10 +266,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, campaigns_checked: campaigns.length, ...results });
+    return secureJson({ success: true, campaigns_checked: campaigns.length, ...results });
 
   } catch (error) {
     console.error("[processDripCampaigns] processDripCampaigns error:", error);
-    return Response.json({ error: error.message || "Failed to process drip campaigns" }, { status: 500 });
+    return secureJson({ error: error.message || "Failed to process drip campaigns" }, { status: 500 });
   }
 });

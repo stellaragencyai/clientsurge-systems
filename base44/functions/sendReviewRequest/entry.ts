@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Send Review Request — SMS & Email
  * Called manually by admin or via automation
@@ -183,7 +184,7 @@ Deno.serve(async (req) => {
 
     if (errors.length > 0) {
       console.error("[SendReviewRequest] Validation errors:", errors);
-      return Response.json({ success: false, errors }, { status: 400 });
+      return secureJson({ success: false, errors }, { status: 400 });
     }
 
     console.log(
@@ -199,7 +200,7 @@ Deno.serve(async (req) => {
         console.log(
           `[SendReviewRequest] Duplicate review request within 7 days for ${customer_phone || customer_email} — skipping`
         );
-        return Response.json(
+        return secureJson(
           {
             success: false,
             error: "Review request already sent in the last 7 days",
@@ -361,7 +362,7 @@ ${business_name} Team`;
     const allFailed = (preferred_channel === "sms" || preferred_channel === "both") && !smsSent
       && (preferred_channel === "email" || preferred_channel === "both") && !emailSent;
 
-    return Response.json({
+    return secureJson({
       success: !allFailed,
       sms_sent: smsSent,
       email_sent: emailSent,
@@ -371,7 +372,7 @@ ${business_name} Team`;
     });
   } catch (error) {
     console.error("[SendReviewRequest] Fatal error:", error.message);
-    return Response.json(
+    return secureJson(
       { success: false, error: error.message },
       { status: 500 }
     );

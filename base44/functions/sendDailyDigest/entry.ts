@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 // redeployed 2026-05-02
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
@@ -33,7 +34,7 @@ function formatPhoenixDate(reference = new Date()) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -42,10 +43,10 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== 'admin') {
-      return Response.json({ error: 'Forbidden' }, { status: 403 });
+      return secureJson({ error: 'Forbidden' }, { status: 403 });
     }
     if (!user && !allowAnonymousAutomation(req)) {
-      return Response.json({ error: 'Forbidden' }, { status: 403 });
+      return secureJson({ error: 'Forbidden' }, { status: 403 });
     }
 
     const [settings] = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
@@ -61,7 +62,7 @@ Deno.serve(async (req) => {
         `ADMIN_NOTIFICATION_EMAIL env=${Deno.env.get('ADMIN_NOTIFICATION_EMAIL') ?? 'not set'}, ` +
         `ADMIN_EMAIL env=${Deno.env.get('ADMIN_EMAIL') ?? 'not set'}`
       );
-      return Response.json(
+      return secureJson(
         { error: 'No admin notification email configured. Set AdminSettings.lead_notification_email or ADMIN_NOTIFICATION_EMAIL secret.' },
         { status: 400 }
       );
@@ -140,7 +141,7 @@ Deno.serve(async (req) => {
 
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) {
-      return Response.json({ error: 'RESEND_API_KEY not set' }, { status: 500 });
+      return secureJson({ error: 'RESEND_API_KEY not set' }, { status: 500 });
     }
     const fromEmail = settings?.resend_from_email || Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@clientsurgesystems.com';
 
@@ -168,9 +169,9 @@ Deno.serve(async (req) => {
       throw emailError;
     }
 
-    return Response.json({ success: true, stats: { newToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length } });
+    return secureJson({ success: true, stats: { newToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length } });
   } catch (error) {
     console.error('[sendDailyDigest] sendDailyDigest error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

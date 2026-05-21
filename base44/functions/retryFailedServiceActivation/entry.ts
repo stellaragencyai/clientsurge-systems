@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Legacy retry path quarantine.
  * The old configureService retry branch is retired to prevent stale automation
@@ -24,7 +25,7 @@ Deno.serve(async (req) => {
       resolved: false,
     }).catch(() => {});
 
-    return Response.json(
+    return secureJson(
       {
         success: false,
         retired: true,
@@ -37,6 +38,6 @@ Deno.serve(async (req) => {
       { status: 410 }
     );
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Send Smart Email
  * Generates AI subject line + sends email via Resend
@@ -15,7 +16,7 @@ Deno.serve(async (req) => {
     const { lead_id, email_body, campaign_type, intent, from_email } = await req.json();
 
     if (!lead_id || !email_body || !from_email) {
-      return Response.json(
+      return secureJson(
         { error: "lead_id, email_body, and from_email required" },
         { status: 400 }
       );
@@ -26,7 +27,7 @@ Deno.serve(async (req) => {
     // 1. Get lead
     const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
     if (!lead) {
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     // 2. Generate smart subject line
@@ -41,7 +42,7 @@ Deno.serve(async (req) => {
     );
 
     if (!subjectResult.data?.recommended_subject) {
-      return Response.json(
+      return secureJson(
         { error: "Failed to generate subject line", success: false },
         { status: 500 }
       );
@@ -68,13 +69,13 @@ Deno.serve(async (req) => {
     if (!emailResponse.ok) {
       const error = await emailResponse.text();
       console.error(`[SmartEmail] Resend error: ${error}`);
-      return Response.json(
+      return secureJson(
         { error: `Email delivery failed: ${error}`, success: false },
         { status: 500 }
       );
     }
 
-    const resendData = await emailResponse.json();
+    const resendData = await emailsecureJson();
 
     // 4. Log communication event
     await base44.asServiceRole.entities.CommunicationEvent.create({
@@ -97,7 +98,7 @@ Deno.serve(async (req) => {
 
     console.log(`[SmartEmail] Sent to ${lead.email}, ID: ${resendData.id}`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id,
       email_id: resendData.id,
@@ -108,7 +109,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[SmartEmail] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

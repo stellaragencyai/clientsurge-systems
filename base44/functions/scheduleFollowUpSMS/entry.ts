@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * scheduleFollowUpSMS — redeployed 2026-05-02
  * Scheduled: Every 15 minutes
@@ -22,7 +23,7 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -30,7 +31,7 @@ Deno.serve(async (req) => {
     const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
 
     if (!accountSid || !authToken) {
-      return Response.json({ error: "Twilio credentials not configured" }, { status: 500 });
+      return secureJson({ error: "Twilio credentials not configured" }, { status: 500 });
     }
 
     // Load admin settings for phone number and templates
@@ -42,7 +43,7 @@ Deno.serve(async (req) => {
       "Hi {name}, thanks for reaching out to {business_name}! We'd love to help — when's a good time to connect? {booking_link}";
 
     if (!fromNumber) {
-      return Response.json({ error: "Twilio from number not configured" }, { status: 500 });
+      return secureJson({ error: "Twilio from number not configured" }, { status: 500 });
     }
 
     // Find new leads with a phone number that haven't been contacted yet
@@ -57,7 +58,7 @@ Deno.serve(async (req) => {
     );
 
     if (!leads?.length) {
-      return Response.json({ success: true, processed: 0, message: "No new leads to contact" });
+      return secureJson({ success: true, processed: 0, message: "No new leads to contact" });
     }
 
     const results = { processed: 0, sent: 0, skipped: 0, failed: 0 };
@@ -179,9 +180,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, ...results });
+    return secureJson({ success: true, ...results });
   } catch (error) {
     console.error("[scheduleFollowUpSMS] Fatal error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

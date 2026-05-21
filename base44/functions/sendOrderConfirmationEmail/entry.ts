@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
 import {
@@ -31,24 +32,24 @@ Deno.serve(async (req) => {
     const { order_id, portal_activation_url } = await req.json();
 
     if (!order_id) {
-      return Response.json({ error: "order_id required" }, { status: 400 });
+      return secureJson({ error: "order_id required" }, { status: 400 });
     }
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      return secureJson({ error: "Order not found" }, { status: 404 });
     }
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey) {
-      return Response.json({ error: "RESEND_API_KEY missing" }, { status: 500 });
+      return secureJson({ error: "RESEND_API_KEY missing" }, { status: 500 });
     }
     const from = formatFromAddress(Deno.env.get("RESEND_FROM_EMAIL"));
     const replyTo = Deno.env.get("ADMIN_EMAIL") || "system@clientsurgesystems.com";
 
     const customerEmail = order.customer_email || "";
     if (!customerEmail) {
-      return Response.json({ error: "Order missing customer_email" }, { status: 400 });
+      return secureJson({ error: "Order missing customer_email" }, { status: 400 });
     }
 
     const packageOffer =
@@ -149,8 +150,8 @@ Deno.serve(async (req) => {
       throw new Error(`Resend request failed: ${response.status} ${body}`);
     }
 
-    return Response.json({ success: true, sent_to: customerEmail });
+    return secureJson({ success: true, sent_to: customerEmail });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * bulkLeadAction — performs batch operations on multiple leads.
  *
@@ -46,23 +47,23 @@ async function sendSMS(phone, body, accountSid, authToken, fromNumber) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
-    if (user.role !== "admin") return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    if (!user) return secureJson({ error: "Unauthorized" }, { status: 401 });
+    if (user.role !== "admin") return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
 
     const payload = await req.json().catch(() => ({}));
     const { action, lead_ids, status, sequence_type, note } = payload;
 
-    if (!action) return Response.json({ error: "action is required" }, { status: 400 });
+    if (!action) return secureJson({ error: "action is required" }, { status: 400 });
     if (!Array.isArray(lead_ids) || lead_ids.length === 0) {
-      return Response.json({ error: "lead_ids must be a non-empty array" }, { status: 400 });
+      return secureJson({ error: "lead_ids must be a non-empty array" }, { status: 400 });
     }
     if (lead_ids.length > 100) {
-      return Response.json({ error: "Maximum 100 leads per bulk action" }, { status: 400 });
+      return secureJson({ error: "Maximum 100 leads per bulk action" }, { status: 400 });
     }
 
     const now = new Date().toISOString();
@@ -71,7 +72,7 @@ Deno.serve(async (req) => {
     // ── STATUS CHANGE ─────────────────────────────────────────────────────────
     if (action === "status_change") {
       if (!status || !VALID_STATUSES.includes(status)) {
-        return Response.json({ error: `status must be one of: ${VALID_STATUSES.join(", ")}` }, { status: 400 });
+        return secureJson({ error: `status must be one of: ${VALID_STATUSES.join(", ")}` }, { status: 400 });
       }
 
       for (const lead_id of lead_ids) {
@@ -96,13 +97,13 @@ Deno.serve(async (req) => {
         }
       }
 
-      return Response.json({ success: true, action, status, ...results });
+      return secureJson({ success: true, action, status, ...results });
     }
 
     // ── TRIGGER SEQUENCE ──────────────────────────────────────────────────────
     if (action === "trigger_sequence") {
       if (!sequence_type || !SEQUENCE_TYPES.includes(sequence_type)) {
-        return Response.json({ error: `sequence_type must be one of: ${SEQUENCE_TYPES.join(", ")}` }, { status: 400 });
+        return secureJson({ error: `sequence_type must be one of: ${SEQUENCE_TYPES.join(", ")}` }, { status: 400 });
       }
 
       const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
@@ -177,13 +178,13 @@ Deno.serve(async (req) => {
         }
       }
 
-      return Response.json({ success: true, action, sequence_type, ...results });
+      return secureJson({ success: true, action, sequence_type, ...results });
     }
 
     // ── ADD NOTE ──────────────────────────────────────────────────────────────
     if (action === "add_note") {
       if (!note || !note.trim()) {
-        return Response.json({ error: "note text is required" }, { status: 400 });
+        return secureJson({ error: "note text is required" }, { status: 400 });
       }
 
       for (const lead_id of lead_ids) {
@@ -201,7 +202,7 @@ Deno.serve(async (req) => {
         }
       }
 
-      return Response.json({ success: true, action, ...results });
+      return secureJson({ success: true, action, ...results });
     }
 
     // ── BULK ENRICH ───────────────────────────────────────────────────────────
@@ -216,13 +217,13 @@ Deno.serve(async (req) => {
           console.error(`[bulkLeadAction] bulkLeadAction enrich error for ${lead_id}:`, err.message);
         }
       }
-      return Response.json({ success: true, action, ...results });
+      return secureJson({ success: true, action, ...results });
     }
 
-    return Response.json({ error: `Unknown action: ${action}. Must be status_change, trigger_sequence, add_note, or bulk_enrich.` }, { status: 400 });
+    return secureJson({ error: `Unknown action: ${action}. Must be status_change, trigger_sequence, add_note, or bulk_enrich.` }, { status: 400 });
 
   } catch (error) {
     console.error("[bulkLeadAction] bulkLeadAction error:", error);
-    return Response.json({ error: error.message || "Bulk action failed" }, { status: 500 });
+    return secureJson({ error: error.message || "Bulk action failed" }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * cancelSubscription — #528
  * cancel_at_period_end=true on Stripe + notify client + Nolan.
@@ -10,10 +11,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { order_id, reason } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     let stripeCancelled = false;
@@ -77,8 +78,8 @@ Stripe cancel_at_period_end: ${stripeCancelled}`,
       }).catch(() => {});
     }
 
-    return Response.json({ success: true, order_id, cancel_at_period_end: stripeCancelled });
+    return secureJson({ success: true, order_id, cancel_at_period_end: stripeCancelled });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

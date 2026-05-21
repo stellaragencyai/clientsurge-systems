@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * generateWebsiteCopy
  * Generates AI website copy for a client based on their industry, tone, and business details.
@@ -36,12 +37,12 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== 'admin') {
-      return Response.json({ error: 'Admin access required' }, { status: 403 });
+      return secureJson({ error: 'Admin access required' }, { status: 403 });
     }
 
     const { order_id, sections: requestedSections } = await req.json();
     if (!order_id) {
-      return Response.json({ error: 'order_id is required' }, { status: 400 });
+      return secureJson({ error: 'order_id is required' }, { status: 400 });
     }
 
     const sectionsToGenerate = (requestedSections && requestedSections.length > 0)
@@ -49,13 +50,13 @@ Deno.serve(async (req) => {
       : ALL_SECTIONS;
 
     if (sectionsToGenerate.length === 0) {
-      return Response.json({ error: 'No valid sections specified' }, { status: 400 });
+      return secureJson({ error: 'No valid sections specified' }, { status: 400 });
     }
 
     // Fetch the Order
     const order = await base44.asServiceRole.entities.Order.get(order_id);
     if (!order) {
-      return Response.json({ error: 'Order not found' }, { status: 404 });
+      return secureJson({ error: 'Order not found' }, { status: 404 });
     }
 
     // Build context from order + install_configuration
@@ -99,7 +100,7 @@ Deno.serve(async (req) => {
       })
     );
 
-    return Response.json({
+    return secureJson({
       order_id,
       business_name: businessName,
       industry,
@@ -109,6 +110,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('[generateWebsiteCopy] Error:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

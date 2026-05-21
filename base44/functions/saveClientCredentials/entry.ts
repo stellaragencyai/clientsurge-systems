@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * saveClientCredentials
  * Called when a client submits the /setup/credentials wizard.
@@ -19,15 +20,15 @@ Deno.serve(async (req) => {
     const { order_id, install_configuration } = await req.json();
 
     if (!order_id) {
-      return Response.json({ error: "order_id required" }, { status: 400 });
+      return secureJson({ error: "order_id required" }, { status: 400 });
     }
     if (!install_configuration) {
-      return Response.json({ error: "install_configuration required" }, { status: 400 });
+      return secureJson({ error: "install_configuration required" }, { status: 400 });
     }
 
     const order = await base44.asServiceRole.entities.Order.get(order_id);
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      return secureJson({ error: "Order not found" }, { status: 404 });
     }
 
     await base44.asServiceRole.entities.Order.update(order_id, {
@@ -103,7 +104,7 @@ Deno.serve(async (req) => {
       console.warn(`[saveClientCredentials] admin notification failed: ${error.message}`);
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       ready_to_activate: intelligenceResult?.ready_to_activate || false,
       blockers: intelligenceResult?.blockers || [],
@@ -113,6 +114,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[saveClientCredentials] Error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

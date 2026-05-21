@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * generateServiceTemplates — #413
  * AI personalization layer for ClientSurge service activation.
@@ -43,10 +44,10 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const { order_id } = await req.json();
 
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(order_id);
-    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
 
     const cfg = order.install_configuration || {};
     const brand = cfg.brand || {};
@@ -58,7 +59,7 @@ Deno.serve(async (req) => {
     const booking_link  = messaging.booking_link || "";
 
     if (!business_name) {
-      return Response.json({ error: "install_configuration.brand.business_name is required" }, { status: 422 });
+      return secureJson({ error: "install_configuration.brand.business_name is required" }, { status: 422 });
     }
 
     const templates = buildTemplates(business_name, industry, tone, booking_link);
@@ -80,7 +81,7 @@ Deno.serve(async (req) => {
 
     console.log(`[generateServiceTemplates] Templates generated for order ${order_id} — tone: ${tone}, industry: ${industry}`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       order_id,
       templates,
@@ -89,6 +90,6 @@ Deno.serve(async (req) => {
     });
   } catch (err) {
     console.error("[generateServiceTemplates] Error:", err.message);
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

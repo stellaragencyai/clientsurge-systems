@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * receiveElevenLabsPostCallWebhook — USE CASE #4
  * PUBLIC WEBHOOK: ElevenLabs post-call event handler
@@ -41,7 +42,7 @@ function mapStatus(elevenLabsStatus) {
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') {
-    return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    return secureJson({ error: 'Method not allowed' }, { status: 405 });
   }
 
   const rawBody = await req.text();
@@ -54,7 +55,7 @@ Deno.serve(async (req) => {
       const computed = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
       if (`sha256=${computed}` !== signature) {
         console.warn('[receiveElevenLabsPostCallWebhook] Invalid signature — rejected');
-        return Response.json({ error: 'Forbidden' }, { status: 403 });
+        return secureJson({ error: 'Forbidden' }, { status: 403 });
       }
     } else {
       console.warn('[receiveElevenLabsPostCallWebhook] No ElevenLabs-Signature header — proceeding without validation');
@@ -65,7 +66,7 @@ Deno.serve(async (req) => {
   try {
     payload = JSON.parse(rawBody);
   } catch (_) {
-    return Response.json({ error: 'Invalid JSON' }, { status: 400 });
+    return secureJson({ error: 'Invalid JSON' }, { status: 400 });
   }
 
   console.log('[receiveElevenLabsPostCallWebhook] Received:', JSON.stringify({
@@ -126,7 +127,7 @@ Deno.serve(async (req) => {
 
     if (!lead) {
       console.warn('[receiveElevenLabsPostCallWebhook] No matching lead found for phone:', rawPhone, '/ conversation:', conversationId);
-      return Response.json({ success: true, warning: 'No matching lead found' });
+      return secureJson({ success: true, warning: 'No matching lead found' });
     }
 
     console.log(`[receiveElevenLabsPostCallWebhook] Matched lead ${lead.id} — outcome: ${voiceCallOutcome}`);
@@ -188,7 +189,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: lead.id,
       outcome: voiceCallOutcome,
@@ -197,6 +198,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('[receiveElevenLabsPostCallWebhook] Error:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

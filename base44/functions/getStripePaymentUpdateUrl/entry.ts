@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * getStripePaymentUpdateUrl — returns a Stripe Billing Portal session URL
  * so the authenticated client can update their payment method directly.
@@ -11,14 +12,14 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
     if (!user?.email) {
-      return Response.json({ error: "Authentication required" }, { status: 401 });
+      return secureJson({ error: "Authentication required" }, { status: 401 });
     }
 
     const resolution = await resolveClientPortalAccess({
@@ -29,7 +30,7 @@ Deno.serve(async (req) => {
     const order = resolution.status === "resolved" ? resolution.order : null;
 
     if (!order?.stripe_customer_id) {
-      return Response.json({ error: "No Stripe customer found for this account." }, { status: 404 });
+      return secureJson({ error: "No Stripe customer found for this account." }, { status: 404 });
     }
 
     const portalSession = await stripe.billingPortal.sessions.create({
@@ -37,9 +38,9 @@ Deno.serve(async (req) => {
       return_url: "https://clientsurgesystems.com/client-portal",
     });
 
-    return Response.json({ url: portalSession.url });
+    return secureJson({ url: portalSession.url });
   } catch (error) {
     console.error("[getStripePaymentUpdateUrl] getStripePaymentUpdateUrl error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

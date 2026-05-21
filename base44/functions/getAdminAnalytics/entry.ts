@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * getAdminAnalytics — extended metrics for the admin analytics dashboard.
  *
@@ -44,7 +45,7 @@ function hoursBetween(a, b) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -52,7 +53,7 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (!user || user.role !== "admin") {
-      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+      return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
     }
 
     const [users, leads, events, drips, orders] = await Promise.all([
@@ -201,7 +202,7 @@ Deno.serve(async (req) => {
       orders_capped: allOrders.length >= ORDER_LIMIT,
     };
 
-    return Response.json({
+    return secureJson({
       success: true,
       users: { total: allUsers.length, active: activeUserCount, admins: adminCount },
       revenue,
@@ -229,6 +230,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error("[getAdminAnalytics] getAdminAnalytics error:", error);
-    return Response.json({ error: error.message || "Failed to load analytics" }, { status: 500 });
+    return secureJson({ error: error.message || "Failed to load analytics" }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Missed Call Text-Back Handler
  * Triggered when a call comes in and no one answers
@@ -122,7 +123,7 @@ async function isInboundSmsAlreadyProcessed(base44, messageSid) {
 function emptyTwilioResponse() {
   return new Response("<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response></Response>", {
     status: 200,
-    headers: { "Content-Type": "text/xml; charset=utf-8" },
+    headers: { "Content-Type": "text/xml; charset=utf-8", "X-Frame-Options": "DENY" },
   });
 }
 
@@ -131,7 +132,7 @@ function voiceTwilioResponse() {
     "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>Thanks for calling. We missed you, and we are sending a text now.</Say></Response>",
     {
       status: 200,
-      headers: { "Content-Type": "text/xml; charset=utf-8" },
+      headers: { "Content-Type": "text/xml; charset=utf-8", "X-Frame-Options": "DENY" },
     }
   );
 }
@@ -160,12 +161,12 @@ async function handleSmsStatusCallback(base44, formData) {
   console.log(`[SmsStatusCallback] SID=${messageSid} status=${messageStatus} errorCode=${errorCode || "none"}`);
 
   if (!messageSid) {
-    return Response.json({ error: "Missing MessageSid" }, { status: 400 });
+    return secureJson({ error: "Missing MessageSid" }, { status: 400 });
   }
 
   const mappedStatus = mapTwilioStatus(messageStatus);
   if (!mappedStatus) {
-    return Response.json({ status: "ok_noop" });
+    return secureJson({ status: "ok_noop" });
   }
 
   const matches = await base44.asServiceRole.entities.CommunicationEvent.filter(
@@ -179,12 +180,12 @@ async function handleSmsStatusCallback(base44, formData) {
     // Twilio can deliver status callbacks before our send path finishes writing
     // the CommunicationEvent. Return a retryable error so the next attempt can
     // attach to the event instead of silently losing delivery state.
-    return Response.json({ error: "CommunicationEvent not ready", retry: true }, { status: 503 });
+    return secureJson({ error: "CommunicationEvent not ready", retry: true }, { status: 503 });
   }
 
   const event = matches[0];
   if (event.status === mappedStatus && ["delivered", "failed"].includes(mappedStatus)) {
-    return Response.json({ status: "ok_idempotent" });
+    return secureJson({ status: "ok_idempotent" });
   }
 
   let existingMeta = {};
@@ -213,7 +214,7 @@ async function handleSmsStatusCallback(base44, formData) {
   });
 
   console.log(`[SmsStatusCallback] Updated CommunicationEvent ${event.id} -> status=${mappedStatus}`);
-  return Response.json({ status: "ok_updated", event_id: event.id, mapped_status: mappedStatus });
+  return secureJson({ status: "ok_updated", event_id: event.id, mapped_status: mappedStatus });
 }
 
 async function handleInboundSms(base44, formData) {
@@ -233,7 +234,7 @@ async function handleInboundSms(base44, formData) {
 
   if (errors.length) {
     console.warn("[InboundSms] Invalid payload", errors);
-    return Response.json({ error: "Invalid SMS payload", details: errors }, { status: 400 });
+    return secureJson({ error: "Invalid SMS payload", details: errors }, { status: 400 });
   }
 
   if (await isInboundSmsAlreadyProcessed(base44, messageSid)) {
@@ -332,7 +333,7 @@ async function sendTwilioSms(toNumber, messageBody) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     // Read raw body for signature validation (must be done before formData)
@@ -341,10 +342,10 @@ Deno.serve(async (req) => {
     // Validate Twilio signature before processing anything
     const sigResult = await validateTwilioSignature(req, rawBody);
     if (sigResult.missing_token) {
-      return Response.json({ error: "Server configuration error" }, { status: 500 });
+      return secureJson({ error: "Server configuration error" }, { status: 500 });
     }
     if (!sigResult.valid) {
-      return Response.json({
+      return secureJson({
         error: "Forbidden",
         reason: sigResult.missing_signature ? "missing_signature" : "invalid_signature",
       }, { status: 403 });
@@ -387,12 +388,12 @@ Deno.serve(async (req) => {
     }
 
     if (!fromNumber) {
-      return Response.json({ error: "Missing phone number" }, { status: 400 });
+      return secureJson({ error: "Missing phone number" }, { status: 400 });
     }
 
     const normalizedPhone = normalizePhoneNumber(fromNumber);
     if (!normalizedPhone) {
-      return Response.json({ error: "Invalid phone number" }, { status: 400 });
+      return secureJson({ error: "Invalid phone number" }, { status: 400 });
     }
 
     // ─────────────────────────────────────────────────────────
@@ -443,7 +444,7 @@ Deno.serve(async (req) => {
         );
         if (existingEvent && existingEvent.length > 0) {
           console.log(`[MissedCall] CallSid ${callSid} already processed — skipping duplicate`);
-          return Response.json({ message: "Already processed", callSid });
+          return secureJson({ message: "Already processed", callSid });
         }
       } catch (e) {
         console.warn(`[MissedCall] Dedup check failed: ${e.message} — proceeding anyway`);
@@ -552,6 +553,6 @@ Deno.serve(async (req) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error(`[MissedCall] Handler error: ${message}`);
-    return Response.json({ error: message }, { status: 500 });
+    return secureJson({ error: message }, { status: 500 });
   }
 });

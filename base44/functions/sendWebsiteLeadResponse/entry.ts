@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Website Lead Immediate Response
  * Sends instant SMS + email to new website form submissions
@@ -118,7 +119,7 @@ Deno.serve(async (req) => {
     const leadId = payload.lead_id || payload.id || payload.data?.id;
 
     if (!leadId) {
-      return Response.json(
+      return secureJson(
         { error: "lead_id required" },
         { status: 400 }
       );
@@ -127,7 +128,7 @@ Deno.serve(async (req) => {
     // Load lead
     const lead = await base44.asServiceRole.entities.WebsiteLead.get(leadId);
     if (!lead) {
-      return Response.json(
+      return secureJson(
         { error: "Lead not found" },
         { status: 404 }
       );
@@ -138,7 +139,7 @@ Deno.serve(async (req) => {
       console.log(
         `[sendWebsiteLeadResponse] Automation disabled for lead ${lead.id}`
       );
-      return Response.json({
+      return secureJson({
         success: true,
         skipped: true,
         reason: "automation_disabled",
@@ -385,14 +386,14 @@ Or just reply to this email with any questions.
       });
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: lead.id,
       ...results,
     });
   } catch (error) {
     console.error("[sendWebsiteLeadResponse] Fatal error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message || "Failed to send response" },
       { status: 500 }
     );

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * getClientAnalytics - real entity-backed client/admin analytics.
  */
@@ -102,7 +103,7 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me().catch(() => null);
     if (!user?.email) {
-      return Response.json({ error: "Authentication required" }, { status: 401 });
+      return secureJson({ error: "Authentication required" }, { status: 401 });
     }
 
     const { order_id: orderId, period_days: rawPeriodDays = 30 } = await req.json().catch(() => ({}));
@@ -119,7 +120,7 @@ Deno.serve(async (req) => {
       getScopedEvents(base44, { orderIds, projectIds }),
     ]);
 
-    return Response.json(
+    return secureJson(
       buildClientAnalytics({
         orders: paidOrders,
         leads,
@@ -129,6 +130,6 @@ Deno.serve(async (req) => {
     );
   } catch (err) {
     const status = Number.isInteger(err?.status) ? err.status : 500;
-    return Response.json({ error: err.message || "Failed to load analytics" }, { status });
+    return secureJson({ error: err.message || "Failed to load analytics" }, { status });
   }
 });

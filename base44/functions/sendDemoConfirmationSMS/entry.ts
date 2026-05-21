@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { twilioFetch } from "../_shared/providerFetch.js";
 
@@ -7,7 +8,7 @@ Deno.serve(async (req) => {
     const { phone, full_name, scheduled_date, scheduled_time } = await req.json();
 
     if (!phone || !scheduled_date || !scheduled_time) {
-      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+      return secureJson({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
@@ -15,7 +16,7 @@ Deno.serve(async (req) => {
     const fromNumber = Deno.env.get('TWILIO_PHONE_NUMBER');
 
     if (!accountSid || !authToken || !fromNumber) {
-      return Response.json({ error: 'Twilio credentials not configured' }, { status: 500 });
+      return secureJson({ error: 'Twilio credentials not configured' }, { status: 500 });
     }
 
     // Format date nicely e.g. "Monday, May 5"
@@ -47,8 +48,8 @@ Deno.serve(async (req) => {
       throw new Error(data.message || 'Failed to send SMS');
     }
 
-    return Response.json({ success: true, message_sid: data.sid });
+    return secureJson({ success: true, message_sid: data.sid });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

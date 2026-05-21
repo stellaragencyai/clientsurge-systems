@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * processNurtureCampaigns — daily runner for the 30-day nurture email sequence. (redeployed 2026-05-02b)
  *
@@ -227,7 +228,7 @@ async function sendEmail(to, subject, html, resendKey, fromEmail) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -236,10 +237,10 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
     if (!user && !allowAnonymousAutomation(req)) {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     const campaigns = await base44.asServiceRole.entities.NurtureCampaign.filter(
@@ -249,7 +250,7 @@ Deno.serve(async (req) => {
     );
 
     if (!campaigns?.length) {
-      return Response.json({ success: true, processed: 0, message: "No active nurture campaigns." });
+      return secureJson({ success: true, processed: 0, message: "No active nurture campaigns." });
     }
 
     const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
@@ -259,7 +260,7 @@ Deno.serve(async (req) => {
     const resendReady = !!(resendKey && settings.resend_enabled);
 
     if (!resendReady) {
-      return Response.json(
+      return secureJson(
         { success: false, error: "Resend not configured. Enable Resend in Admin Settings." },
         { status: 503 }
       );
@@ -385,10 +386,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, campaigns_checked: campaigns.length, ...results });
+    return secureJson({ success: true, campaigns_checked: campaigns.length, ...results });
 
   } catch (error) {
     console.error("[processNurtureCampaigns] processNurtureCampaigns error:", error);
-    return Response.json({ error: error.message || "Failed to process nurture campaigns" }, { status: 500 });
+    return secureJson({ error: error.message || "Failed to process nurture campaigns" }, { status: 500 });
   }
 });

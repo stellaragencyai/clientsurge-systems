@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * sendEmailCampaign — sends an email campaign to segmented leads.
  *
@@ -88,7 +89,7 @@ async function sendViaResend(to, subject, html, text, fromEmail, resendKey, camp
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -97,24 +98,24 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (!user || user.role !== "admin") {
-      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+      return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
     }
 
     const body = await req.json().catch(() => ({}));
     const { campaign_id, preview_only } = body;
 
     if (!campaign_id) {
-      return Response.json({ error: "campaign_id is required" }, { status: 400 });
+      return secureJson({ error: "campaign_id is required" }, { status: 400 });
     }
 
     // Load campaign
     const campaign = await base44.asServiceRole.entities.EmailCampaign.get(campaign_id);
     if (!campaign) {
-      return Response.json({ error: "Campaign not found" }, { status: 404 });
+      return secureJson({ error: "Campaign not found" }, { status: 404 });
     }
 
     if (!preview_only && !["draft", "scheduled"].includes(campaign.status)) {
-      return Response.json({ error: `Cannot send campaign with status: ${campaign.status}` }, { status: 400 });
+      return secureJson({ error: `Cannot send campaign with status: ${campaign.status}` }, { status: 400 });
     }
 
     // Load settings
@@ -125,7 +126,7 @@ Deno.serve(async (req) => {
     const fromEmail = settings.resend_from_email || "noreply@clientsurge.com";
 
     if (!preview_only && !resendKey) {
-      return Response.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
+      return secureJson({ error: "RESEND_API_KEY not configured" }, { status: 500 });
     }
 
     // Get all leads with email
@@ -136,7 +137,7 @@ Deno.serve(async (req) => {
     });
 
     if (preview_only) {
-      return Response.json({
+      return secureJson({
         success: true,
         preview: true,
         recipient_count: eligibleLeads.length,
@@ -260,7 +261,7 @@ Deno.serve(async (req) => {
       total_sent: sent,
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       campaign_id,
       total_recipients: eligibleLeads.length,
@@ -271,6 +272,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error("[sendEmailCampaign] sendEmailCampaign error:", error);
-    return Response.json({ error: error.message || "Failed to send campaign" }, { status: 500 });
+    return secureJson({ error: error.message || "Failed to send campaign" }, { status: 500 });
   }
 });

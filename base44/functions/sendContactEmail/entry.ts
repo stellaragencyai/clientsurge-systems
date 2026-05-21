@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
 
@@ -7,7 +8,7 @@ Deno.serve(async (req) => {
     const { full_name, email, phone, business_type, message } = await req.json();
 
     if (!full_name || !email || !message) {
-      return Response.json({ error: "Missing required fields" }, { status: 400 });
+      return secureJson({ error: "Missing required fields" }, { status: 400 });
     }
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -40,11 +41,11 @@ Deno.serve(async (req) => {
 
     if (!res.ok) {
       const err = await res.text();
-      return Response.json({ error: err }, { status: 500 });
+      return secureJson({ error: err }, { status: 500 });
     }
 
-    return Response.json({ success: true });
+    return secureJson({ success: true });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

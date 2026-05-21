@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import Stripe from "npm:stripe@14";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { assertCheckoutCapacityAvailable } from "./checkoutCapacity.shared.js";
@@ -72,7 +73,7 @@ Deno.serve(async (req) => {
         requestId,
         secret_present: false,
       });
-      return Response.json({ error: "Stripe is not configured", request_id: requestId }, { status: 500 });
+      return secureJson({ error: "Stripe is not configured", request_id: requestId }, { status: 500 });
     }
 
     const requestedProductIds = Array.isArray(product_ids) && product_ids.length
@@ -82,7 +83,7 @@ Deno.serve(async (req) => {
       : [];
 
     if (!requestedProductIds.length || !customer_email) {
-      return Response.json({ error: "Missing required fields" }, { status: 400 });
+      return secureJson({ error: "Missing required fields" }, { status: 400 });
     }
 
     const capacity = await assertCheckoutCapacityAvailable({ base44 });
@@ -92,7 +93,7 @@ Deno.serve(async (req) => {
         active_orders: capacity.active_orders,
         capacity_limit: capacity.capacity_limit,
       });
-      return Response.json(
+      return secureJson(
         {
           error: capacity.reason,
           code: "checkout_capacity_full",
@@ -106,7 +107,7 @@ Deno.serve(async (req) => {
 
     const pricingSummary = buildPricingSummaryForProducts(requestedProductIds);
     if (!pricingSummary.priced_items.length) {
-      return Response.json({ error: "No canonical services selected for checkout", request_id: requestId }, { status: 400 });
+      return secureJson({ error: "No canonical services selected for checkout", request_id: requestId }, { status: 400 });
     }
 
     const stripeAccount = await resolveStripeAccountSummary();
@@ -217,13 +218,13 @@ Deno.serve(async (req) => {
       lineItemPriceIds: line_items.map((item) => item.price),
     });
 
-    return Response.json({ url: session.url, session_id: session.id, request_id: requestId });
+    return secureJson({ url: session.url, session_id: session.id, request_id: requestId });
   } catch (error) {
     console.error("[createCheckoutSession] Checkout error", {
       requestId,
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
     });
-    return Response.json({ error: error instanceof Error ? error.message : "Checkout failed", request_id: requestId }, { status: 500 });
+    return secureJson({ error: error instanceof Error ? error.message : "Checkout failed", request_id: requestId }, { status: 500 });
   }
 });

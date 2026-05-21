@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Enroll Missed-Call Leads into Follow-Up Drip Campaign
  * Triggered: When initial SMS is sent to a missed-call lead
@@ -16,7 +17,7 @@ Deno.serve(async (req) => {
 
     // Only process when initial SMS is sent to a missed-call lead
     if (event?.type !== "create") {
-      return Response.json({ status: "skipped", reason: "not a create event" });
+      return secureJson({ status: "skipped", reason: "not a create event" });
     }
 
     // Check if this is the initial missed-call SMS
@@ -27,7 +28,7 @@ Deno.serve(async (req) => {
       data?.subject?.includes("missed");
 
     if (!isMissedCallSMS || !data?.lead_id) {
-      return Response.json({ status: "skipped", reason: "not a missed-call sms" });
+      return secureJson({ status: "skipped", reason: "not a missed-call sms" });
     }
 
     const leadId = data.lead_id;
@@ -40,13 +41,13 @@ Deno.serve(async (req) => {
     const lead = await base44.asServiceRole.entities.Leads.get(leadId);
     if (!lead) {
       console.warn("[enrollMissedCallDrip] Lead not found:", leadId);
-      return Response.json({ status: "failed", reason: "lead_not_found" });
+      return secureJson({ status: "failed", reason: "lead_not_found" });
     }
 
     // Skip if lead already replied, booked, or closed
     if (["Replied", "Booking Prompt Sent", "Booked", "Closed"].includes(lead.status)) {
       console.log("[enrollMissedCallDrip] Skipping — lead already progressed:", lead.status);
-      return Response.json({ status: "skipped", reason: "lead_already_progressed" });
+      return secureJson({ status: "skipped", reason: "lead_already_progressed" });
     }
 
     // Check if this lead already has an active missed-call drip
@@ -58,7 +59,7 @@ Deno.serve(async (req) => {
 
     if (existingCampaigns?.length > 0) {
       console.log("[enrollMissedCallDrip] Lead already has active drip campaign");
-      return Response.json({ status: "skipped", reason: "already_enrolled" });
+      return secureJson({ status: "skipped", reason: "already_enrolled" });
     }
 
     // ─────────────────────────────────────────────────────
@@ -99,14 +100,14 @@ Deno.serve(async (req) => {
       }),
     });
 
-    return Response.json({
+    return secureJson({
       status: "success",
       lead_id: leadId,
       campaign_id: campaign.id,
     });
   } catch (error) {
     console.error("[enrollMissedCallDrip] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { status: "error", message: error.message },
       { status: 500 }
     );

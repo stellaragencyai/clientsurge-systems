@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
 
@@ -7,14 +8,14 @@ Deno.serve(async (req) => {
     const { full_name, business_name, email, phone, scheduled_date, scheduled_time, biggest_issue, industry } = await req.json();
 
     if (!full_name || !email || !scheduled_date || !scheduled_time) {
-      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+      return secureJson({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
     const adminEmail = Deno.env.get('ADMIN_EMAIL') || 'system@clientsurgesystems.com';
 
     if (!resendApiKey) {
-      return Response.json({ error: 'Resend credentials not configured' }, { status: 500 });
+      return secureJson({ error: 'Resend credentials not configured' }, { status: 500 });
     }
 
     const dateObj = new Date(`${scheduled_date}T12:00:00`);
@@ -69,11 +70,11 @@ Deno.serve(async (req) => {
     const data = await response.json();
 
     if (!response.ok) {
-      return Response.json({ error: data.message || 'Email send failed' }, { status: 500 });
+      return secureJson({ error: data.message || 'Email send failed' }, { status: 500 });
     }
 
-    return Response.json({ success: true });
+    return secureJson({ success: true });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

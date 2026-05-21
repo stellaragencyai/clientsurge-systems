@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * generateSocialContent
  * Generates blog posts and social media content for ClientSurge Systems.
@@ -202,17 +203,17 @@ Deno.serve(async (req) => {
     const ua = req.headers.get('user-agent') || '';
     const isAutomation = ua.includes('base44');
     if (user && user.role !== 'admin') {
-      return Response.json({ error: 'Admin access required' }, { status: 403 });
+      return secureJson({ error: 'Admin access required' }, { status: 403 });
     }
     if (!user && !isAutomation) {
-      return Response.json({ error: 'Forbidden' }, { status: 403 });
+      return secureJson({ error: 'Forbidden' }, { status: 403 });
     }
 
     const { industry = 'general', content_types, topic_override } = await req.json();
 
     const meta = INDUSTRY_META[industry];
     if (!meta) {
-      return Response.json({ error: `Unknown industry: ${industry}` }, { status: 400 });
+      return secureJson({ error: `Unknown industry: ${industry}` }, { status: 400 });
     }
 
     const typesToGenerate = content_types && content_types.length > 0
@@ -255,7 +256,7 @@ Deno.serve(async (req) => {
       }
     }));
 
-    return Response.json({
+    return secureJson({
       success: true,
       industry,
       topic,
@@ -265,6 +266,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('[generateSocialContent] Fatal:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

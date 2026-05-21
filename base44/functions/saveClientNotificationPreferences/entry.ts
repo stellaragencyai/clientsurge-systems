@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -6,13 +7,13 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
 
     if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return secureJson({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { project_id, preferences } = await req.json();
 
     if (!project_id || !preferences) {
-      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+      return secureJson({ error: 'Missing required fields' }, { status: 400 });
     }
 
     // Save preferences to client's user data
@@ -29,9 +30,9 @@ Deno.serve(async (req) => {
       },
     });
 
-    return Response.json({ success: true, message: 'Preferences saved' });
+    return secureJson({ success: true, message: 'Preferences saved' });
   } catch (error) {
     console.error('[saveClientNotificationPreferences] Error saving preferences:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

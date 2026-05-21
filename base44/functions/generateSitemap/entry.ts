@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 const DEFAULT_BASE_URL = "https://clientsurgesystems.com";
@@ -45,7 +46,10 @@ function buildSitemapXml(baseUrl) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "GET" && req.method !== "POST") {
-      return new Response("Method not allowed", { status: 405 });
+      return new Response("Method not allowed", {
+        status: 405,
+        headers: { "X-Frame-Options": "DENY" },
+      });
     }
 
     const base44 = createClientFromRequest(req);
@@ -72,7 +76,7 @@ Deno.serve(async (req) => {
       },
     });
   } catch (error) {
-    return Response.json(
+    return secureJson(
       { error: error instanceof Error ? error.message : "Failed to generate sitemap" },
       { status: 500 }
     );

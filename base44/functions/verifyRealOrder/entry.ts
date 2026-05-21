@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * verifyRealOrder — #449 CRITICAL
  * E2E verification of real order 69f13b948861e8a032d10f2e.
@@ -13,7 +14,7 @@ Deno.serve(async (req) => {
     const { order_id = REAL_ORDER_ID } = await req.json().catch(() => ({}));
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order) return Response.json({ error: `Order ${order_id} not found` }, { status: 404 });
+    if (!order) return secureJson({ error: `Order ${order_id} not found` }, { status: 404 });
 
     const checks: { check: string; passed: boolean; value: any }[] = [
       { check: "payment_status = paid", passed: order.payment_status === "paid", value: order.payment_status },
@@ -50,8 +51,8 @@ ${lines}`,
       }).catch(() => {});
     }
 
-    return Response.json({ success: true, order_id, all_passed, passed, total: checks.length, checks });
+    return secureJson({ success: true, order_id, all_passed, passed, total: checks.length, checks });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

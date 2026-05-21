@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * analyzeReplySentiment — AI sentiment analysis for inbound lead replies.
  *
@@ -37,7 +38,7 @@ function allowAnonymousAutomation(req) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -47,10 +48,10 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+      return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
     }
     if (!user && (!isAutomationPayload || !allowAnonymousAutomation(req))) {
-      return Response.json({ error: "Forbidden: Trusted automation only" }, { status: 403 });
+      return secureJson({ error: "Forbidden: Trusted automation only" }, { status: 403 });
     }
 
     // Support automation payload (Messages entity) and direct call
@@ -60,18 +61,18 @@ Deno.serve(async (req) => {
     const direction = messageData?.direction ?? "inbound";
 
     if (!leadId) {
-      return Response.json({ error: "lead_id is required" }, { status: 400 });
+      return secureJson({ error: "lead_id is required" }, { status: 400 });
     }
 
     // Only process inbound messages
     if (direction !== "inbound") {
-      return Response.json({ success: true, skipped: true, reason: "Outbound message — skipping sentiment analysis" });
+      return secureJson({ success: true, skipped: true, reason: "Outbound message — skipping sentiment analysis" });
     }
 
     // Load the lead
     const lead = await base44.asServiceRole.entities.Leads.get(leadId);
     if (!lead) {
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     // If no message text provided, fetch the latest inbound message for this lead
@@ -86,7 +87,7 @@ Deno.serve(async (req) => {
     }
 
     if (!textToAnalyze) {
-      return Response.json({ success: true, skipped: true, reason: "No inbound message text to analyze" });
+      return secureJson({ success: true, skipped: true, reason: "No inbound message text to analyze" });
     }
 
     // Call LLM for sentiment analysis
@@ -150,7 +151,7 @@ Respond ONLY with valid JSON in this exact format:
 
     console.log(`[analyzeReplySentiment] analyzeReplySentiment: Lead ${leadId} → ${finalSentiment} (${reason})`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: leadId,
       sentiment: finalSentiment,
@@ -159,6 +160,6 @@ Respond ONLY with valid JSON in this exact format:
 
   } catch (error) {
     console.error("[analyzeReplySentiment] analyzeReplySentiment error:", error);
-    return Response.json({ error: error.message || "Sentiment analysis failed" }, { status: 500 });
+    return secureJson({ error: error.message || "Sentiment analysis failed" }, { status: 500 });
   }
 });

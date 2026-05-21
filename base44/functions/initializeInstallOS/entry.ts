@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 /**
@@ -141,13 +142,13 @@ Deno.serve(async (req) => {
     // ─────────────────────────────────────────────────────────────────────────
 
     if (!order_id) {
-      return Response.json({ error: "order_id required" }, { status: 400 });
+      return secureJson({ error: "order_id required" }, { status: 400 });
     }
 
     // Get order details
     const order = await base44.asServiceRole.entities.Order.get(order_id);
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      return secureJson({ error: "Order not found" }, { status: 404 });
     }
 
     // ─────────────────────────────────────
@@ -161,7 +162,7 @@ Deno.serve(async (req) => {
 
     if (existing?.length > 0) {
       console.log(`[Install OS] Already initialized for order ${order_id}, skipping`);
-      return Response.json({
+      return secureJson({
         success: true,
         install_os_id: existing[0].id,
         already_initialized: true,
@@ -250,7 +251,7 @@ Deno.serve(async (req) => {
     const totalStepsCreated = stepSummary.reduce((sum, s) => sum + s.created, 0);
     console.log(`[Install OS] Created successfully for order ${order_id}: ${allChecklistIds.length} checklists, ${totalStepsCreated} steps`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       install_os_id: installOS.id,
       checklist_ids: allChecklistIds,
@@ -259,6 +260,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[Install OS] Error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

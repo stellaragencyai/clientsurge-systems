@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -6,7 +7,7 @@ Deno.serve(async (req) => {
     const { event, data } = await req.json();
 
     if (event !== 'lead_created') {
-      return Response.json({ error: 'Invalid event' }, { status: 400 });
+      return secureJson({ error: 'Invalid event' }, { status: 400 });
     }
 
     // Deduplication — skip if the source dedup key or same email was submitted recently.
@@ -19,7 +20,7 @@ Deno.serve(async (req) => {
       const duplicateByKey = (existingByKey || []).find((l) => l.id !== data.id);
       if (duplicateByKey) {
         console.log(`[onLeadCreated] Duplicate dedup_key ${data.dedup_key} — skipping dispatch`);
-        return Response.json({ success: true, skipped: true, reason: "duplicate_dedup_key" });
+        return secureJson({ success: true, skipped: true, reason: "duplicate_dedup_key" });
       }
     }
 
@@ -35,7 +36,7 @@ Deno.serve(async (req) => {
       );
       if (duplicate) {
         console.log(`[onLeadCreated] Duplicate detected for ${data.email} — skipping dispatch`);
-        return Response.json({ success: true, skipped: true, reason: "duplicate_within_60min" });
+        return secureJson({ success: true, skipped: true, reason: "duplicate_within_60min" });
       }
     }
 
@@ -158,9 +159,9 @@ Deno.serve(async (req) => {
       console.log('[onLeadCreated] AI scoring failed (non-blocking):', intelligenceErr.message);
     }
 
-        return Response.json({ success: true, payload });
+        return secureJson({ success: true, payload });
   } catch (error) {
     console.error('[onLeadCreated] Error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

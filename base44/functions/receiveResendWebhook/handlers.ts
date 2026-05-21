@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * resendWebhookHandlers.ts — #134 #135
  * #134: on email.bounced → update CommunicationEvent status = "failed"
@@ -43,8 +44,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ received: true, type });
+    return secureJson({ received: true, type });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

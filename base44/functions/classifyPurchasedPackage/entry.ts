@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * classifyPurchasedPackage — #402 #402a
  * Reads selected_service_keys[] from à la carte orders and maps to a package tier.
@@ -65,9 +66,9 @@ Deno.serve(async (req) => {
     }
 
     const package_key = classifyPackageFromServices(keys || []);
-    return Response.json({ success: true, package_key, service_keys: keys, tier_services: TIER_SERVICE_MAP[package_key] });
+    return secureJson({ success: true, package_key, service_keys: keys, tier_services: TIER_SERVICE_MAP[package_key] });
   } catch (err) {
     console.error('[classifyPurchasedPackage]', err.message);
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

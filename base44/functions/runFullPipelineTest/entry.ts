@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * runFullPipelineTest — #469 CRITICAL
  * End-to-end QA: lead → order → activate → email → status flow.
@@ -304,7 +305,7 @@ ${persist_records ? "persist_records=true (test records retained)." : "Test reco
       }).catch(() => {});
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       all_passed,
       passed,
@@ -319,6 +320,6 @@ ${persist_records ? "persist_records=true (test records retained)." : "Test reco
       initialized_order_id: initializedOrder?.id || null,
     });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

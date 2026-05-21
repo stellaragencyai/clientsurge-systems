@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * sendClientWelcomeEmail — #502
  * Fixed: correct /client-portal link + Reply-To: nolan@clientsurgesystems.com header.
@@ -9,13 +10,13 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { order_id } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order?.client_email) return Response.json({ error: "No client email" }, { status: 400 });
+    if (!order?.client_email) return secureJson({ error: "No client email" }, { status: 400 });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (!resendKey) return Response.json({ error: "No Resend key" }, { status: 500 });
+    if (!resendKey) return secureJson({ error: "No Resend key" }, { status: 500 });
 
     // #502: correct portal URL + Reply-To fix
     const portalUrl = `https://clientsurgesystems.com/client-portal?order_id=${order_id}`;
@@ -43,8 +44,8 @@ Deno.serve(async (req) => {
       }),
     });
 
-    return Response.json({ success: true, sent_to: order.client_email, portal_url: portalUrl });
+    return secureJson({ success: true, sent_to: order.client_email, portal_url: portalUrl });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

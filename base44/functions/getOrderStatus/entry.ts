@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { normalizePackageKey } from "../../../src/lib/salesCatalog.js";
 
@@ -25,7 +26,7 @@ function buildSafeOrderSummary(order: any) {
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
-    return Response.json({ error: "Method not allowed" }, { status: 405 });
+    return secureJson({ error: "Method not allowed" }, { status: 405 });
   }
 
   const base44 = createClientFromRequest(req);
@@ -34,7 +35,7 @@ Deno.serve(async (req) => {
   const sessionId = cleanString(payload?.session_id);
 
   if (!orderId && !sessionId) {
-    return Response.json({ error: "order_id or session_id is required" }, { status: 400 });
+    return secureJson({ error: "order_id or session_id is required" }, { status: 400 });
   }
 
   let order: any = null;
@@ -51,13 +52,13 @@ Deno.serve(async (req) => {
   }
 
   if (!order) {
-    return Response.json({ error: "Order not found" }, { status: 404 });
+    return secureJson({ error: "Order not found" }, { status: 404 });
   }
 
   const safeOrder = buildSafeOrderSummary(order);
   const eligible = safeOrder.payment_status.toLowerCase() === "paid";
 
-  return Response.json({
+  return secureJson({
     success: true,
     eligible,
     order: safeOrder,

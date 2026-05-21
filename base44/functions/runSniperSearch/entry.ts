@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * runSniperSearch
  * Autonomous AI sniper: finds established businesses with strong reviews
@@ -117,7 +118,7 @@ Deno.serve(async (req) => {
       const user = await base44.auth.me();
       if (user && user.role === 'admin') isAdmin = true;
       else if (user && user.role !== 'admin') {
-        return Response.json({ error: 'Admin access required' }, { status: 403 });
+        return secureJson({ error: 'Admin access required' }, { status: 403 });
       }
     } catch {
       // Scheduled trigger — allow
@@ -219,7 +220,7 @@ Deno.serve(async (req) => {
 
     console.log(`[Sniper] Hunt complete: ${results.saved} saved, ${results.skipped_duplicate} dupes, ${results.skipped_low_score} low score`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       message: `Sniper hunt complete. Found ${results.saved} new high-value targets.`,
       ...results,
@@ -227,6 +228,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('[runSniperSearch] Fatal error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

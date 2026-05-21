@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * runIntegrationHealthCheck
  * Scheduled function that:
@@ -102,7 +103,7 @@ Deno.serve(async (req) => {
     try {
       const user = await base44.auth.me();
       if (user && user.role !== 'admin') {
-        return Response.json({ error: 'Admin access required' }, { status: 403 });
+        return secureJson({ error: 'Admin access required' }, { status: 403 });
       }
     } catch {
       // Unauthenticated = scheduled trigger, allow it
@@ -185,7 +186,7 @@ Deno.serve(async (req) => {
       metadata_json: JSON.stringify({ triggered_by: isScheduled ? 'scheduler' : 'admin', failure_counts: Object.fromEntries(Object.entries(failuresByProvider).map(([k, v]) => [k, v.length])) }),
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       generated_at: new Date().toISOString(),
       ping_results: results,
@@ -196,6 +197,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('[runIntegrationHealthCheck] Error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

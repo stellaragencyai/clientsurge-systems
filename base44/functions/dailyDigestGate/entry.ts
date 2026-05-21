@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * dailyDigestGate.ts — #113
  * Gate: skip sendDailyDigest if leads_today === 0 AND orders_today === 0.
@@ -19,13 +20,13 @@ Deno.serve(async (req) => {
     const ordersToday = (orders||[]).filter((o:any) => o.created_date >= todayStr && o.payment_status === "paid").length;
 
     if (leadsToday === 0 && ordersToday === 0) {
-      return Response.json({ success: true, skipped: true, reason: "No leads or orders today — digest skipped" });
+      return secureJson({ success: true, skipped: true, reason: "No leads or orders today — digest skipped" });
     }
 
     // Delegate to actual digest function
     const digest = await base44.asServiceRole.functions.invoke("sendDailyDigest", {}).catch((e:any) => ({ error: e.message }));
-    return Response.json({ success: true, skipped: false, leads_today: leadsToday, orders_today: ordersToday, digest });
+    return secureJson({ success: true, skipped: false, leads_today: leadsToday, orders_today: ordersToday, digest });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

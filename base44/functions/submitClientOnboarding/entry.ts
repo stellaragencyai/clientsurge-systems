@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import {
   ClientOnboardingAccessError,
@@ -9,7 +10,7 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const data = await req.json();
@@ -18,13 +19,13 @@ Deno.serve(async (req) => {
       payload: data,
     });
 
-    return Response.json(result);
+    return secureJson(result);
   } catch (error) {
     if (error instanceof ClientOnboardingAccessError) {
-      return Response.json({ error: error.message, code: error.code }, { status: error.status });
+      return secureJson({ error: error.message, code: error.code }, { status: error.status });
     }
 
     console.error('[submitClientOnboarding] Error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

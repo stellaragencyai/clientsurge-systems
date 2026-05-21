@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { deriveAutomationStatuses } from "../_shared/automationStatus.js";
 
@@ -7,7 +8,7 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
 
     if (!user || user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     const [orders, events] = await Promise.all([
@@ -20,7 +21,7 @@ Deno.serve(async (req) => {
       events,
     });
 
-    return Response.json({
+    return secureJson({
       automations,
       summary: {
         canonical_services_tracked: automations.filter((automation) => automation.supported).length,
@@ -29,7 +30,7 @@ Deno.serve(async (req) => {
       },
     });
   } catch (error) {
-    return Response.json(
+    return secureJson(
       {
         error: error instanceof Error ? error.message : "Failed to derive automation status",
       },

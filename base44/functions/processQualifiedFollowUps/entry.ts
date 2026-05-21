@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * processQualifiedFollowUps — redeployed 2026-05-02
  * Scheduled: Every hour
@@ -90,7 +91,7 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     // Load settings once
@@ -241,10 +242,10 @@ Deno.serve(async (req) => {
     }
 
     console.log(`[processQualifiedFollowUps] Done:`, results);
-    return Response.json({ success: true, ...results });
+    return secureJson({ success: true, ...results });
 
   } catch (error) {
     console.error("[processQualifiedFollowUps] Fatal error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

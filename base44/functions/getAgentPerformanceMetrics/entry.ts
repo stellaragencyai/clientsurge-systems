@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * getAgentPerformanceMetrics — #552
  * Queries Leads filtered by assigned_agent.
@@ -31,8 +32,8 @@ Deno.serve(async (req) => {
       };
     }
 
-    return Response.json({ success: true, agents: Object.values(metrics) });
+    return secureJson({ success: true, agents: Object.values(metrics) });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

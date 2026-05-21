@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
 import { stripeFetch, twilioFetch } from "../_shared/providerFetch.js";
@@ -41,7 +42,7 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== "admin") {
-      return Response.json({ error: "Admin access required" }, { status: 403 });
+      return secureJson({ error: "Admin access required" }, { status: 403 });
     }
 
     // Parallel: settings, events, live pings
@@ -117,7 +118,7 @@ Deno.serve(async (req) => {
     const totalCount = successCount + errorCount;
     const allHealthy = integrations.every(i => i.derived_status === 'healthy');
 
-    return Response.json({
+    return secureJson({
       success: true,
       generated_at: new Date().toISOString(),
       integrations,
@@ -136,6 +137,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[getIntegrationHealth] Error:", error);
-    return Response.json({ error: error.message || "Failed to load integration health" }, { status: 500 });
+    return secureJson({ error: error.message || "Failed to load integration health" }, { status: 500 });
   }
 });

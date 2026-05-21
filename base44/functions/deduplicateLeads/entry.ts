@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * deduplicateLeads - #167/#506
  * Runs dedup on all existing SpaLead records.
@@ -36,7 +37,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       dry_run,
       total_leads: all.length,
@@ -45,6 +46,6 @@ Deno.serve(async (req) => {
       merged,
     });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

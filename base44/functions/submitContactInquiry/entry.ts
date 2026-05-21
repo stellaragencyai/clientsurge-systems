@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { validatePublicFormOrigin } from "../_shared/publicFormOriginGuard.js";
 import { resendFetch } from "../_shared/resendFetch.js";
@@ -281,12 +282,12 @@ async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContact
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const originGuard = validatePublicFormOrigin(req);
     if (!originGuard.ok) {
-      return Response.json({ error: originGuard.error }, { status: originGuard.status });
+      return secureJson({ error: originGuard.error }, { status: originGuard.status });
     }
 
     const base44 = createClientFromRequest(req);
@@ -294,17 +295,17 @@ Deno.serve(async (req) => {
     const contact = normalizeContactInput(payload);
 
     if (contact.honeypot) {
-      return Response.json({ success: true, ignored: true });
+      return secureJson({ success: true, ignored: true });
     }
 
     const errors = validateContactInput(contact);
 
     if (errors.length > 0) {
-      return Response.json({ error: errors[0], errors }, { status: 400 });
+      return secureJson({ error: errors[0], errors }, { status: 400 });
     }
 
     if (await isRateLimited(base44, contact)) {
-      return Response.json({ error: 'Please wait a moment before submitting again.' }, { status: 429 });
+      return secureJson({ error: 'Please wait a moment before submitting again.' }, { status: 429 });
     }
 
     let existingInquiry = null;
@@ -419,7 +420,7 @@ Deno.serve(async (req) => {
       // Silently fail tracking if it errors - don't block form submission
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: leadId,
       action,
@@ -429,6 +430,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to submit contact inquiry';
-    return Response.json({ error: message }, { status: 500 });
+    return secureJson({ error: message }, { status: 500 });
   }
 });

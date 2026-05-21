@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * sendGoLiveNotification — #435
  * Fires when ALL package services confirmed active.
@@ -10,10 +11,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { order_id } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
 
     // Mark order as live
     await base44.asServiceRole.entities.Order.update(order_id, {
@@ -64,8 +65,8 @@ Deno.serve(async (req) => {
       requires_nolan: false, resolved: true,
     }).catch(() => {});
 
-    return Response.json({ success: true, order_id, went_live_at: new Date().toISOString() });
+    return secureJson({ success: true, order_id, went_live_at: new Date().toISOString() });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

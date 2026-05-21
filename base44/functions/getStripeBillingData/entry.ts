@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * getStripeBillingData
  * Returns live Stripe subscription + invoice data for the authenticated client.
@@ -12,7 +13,7 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!user) return secureJson({ error: 'Unauthorized' }, { status: 401 });
 
     // Find order with stripe customer id
     const orders = await base44.asServiceRole.entities.Order.filter(
@@ -28,7 +29,7 @@ Deno.serve(async (req) => {
         ? await base44.asServiceRole.entities.Invoice.filter({ project_id: project.id }, '-created_date', 50)
         : [];
 
-      return Response.json({
+      return secureJson({
         success: true,
         source: 'internal',
         subscriptions: [],
@@ -109,7 +110,7 @@ Deno.serve(async (req) => {
       .filter(i => i.status !== 'paid' && i.status !== 'void')
       .reduce((s, i) => s + (i.amount_due || 0), 0);
 
-    return Response.json({
+    return secureJson({
       success: true,
       source: 'stripe',
       subscriptions,
@@ -124,6 +125,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('[getStripeBillingData] error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

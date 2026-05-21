@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Auto Review Request Trigger
  * Called via entity automation when Order.order_status = "fully_live"
@@ -13,7 +14,7 @@ Deno.serve(async (req) => {
 
     if (!data || data.order_status !== "fully_live") {
       console.log("[AutoReviewRequest] Skipped — not fully_live status");
-      return Response.json({ skipped: true, reason: "Not fully_live status" });
+      return secureJson({ skipped: true, reason: "Not fully_live status" });
     }
 
     const order = data;
@@ -26,7 +27,7 @@ Deno.serve(async (req) => {
       console.log(
         `[AutoReviewRequest] Skipped — missing customer_name or business_name for order ${order.id}`
       );
-      return Response.json({
+      return secureJson({
         skipped: true,
         reason: "Missing customer_name or business_name",
       });
@@ -36,7 +37,7 @@ Deno.serve(async (req) => {
       console.log(
         `[AutoReviewRequest] Skipped — no phone or email for order ${order.id}`
       );
-      return Response.json({
+      return secureJson({
         skipped: true,
         reason: "No phone or email on order",
       });
@@ -63,7 +64,7 @@ Deno.serve(async (req) => {
         console.log(
           `[AutoReviewRequest] Skipped — review request already sent within 7 days for order ${order.id}`
         );
-        return Response.json({
+        return secureJson({
           skipped: true,
           reason: "Review request already sent in past 7 days",
         });
@@ -100,7 +101,7 @@ Deno.serve(async (req) => {
       console.log(
         `[AutoReviewRequest] Skipped — no google_review_link configured in order ${order.id}`
       );
-      return Response.json({
+      return secureJson({
         skipped: true,
         reason: "No google_review_link configured",
       });
@@ -128,7 +129,7 @@ Deno.serve(async (req) => {
       console.log(
         `[AutoReviewRequest] Review request sent for order ${order.id} — SMS: ${result.data.sms_sent}, Email: ${result.data.email_sent}`
       );
-      return Response.json({
+      return secureJson({
         success: true,
         sms_sent: result.data.sms_sent,
         email_sent: result.data.email_sent,
@@ -137,7 +138,7 @@ Deno.serve(async (req) => {
       console.warn(
         `[AutoReviewRequest] Review request failed for order ${order.id}: ${result.data?.error || "Unknown error"}`
       );
-      return Response.json(
+      return secureJson(
         {
           success: false,
           error: result.data?.error || "Failed to send review request",
@@ -147,7 +148,7 @@ Deno.serve(async (req) => {
     }
   } catch (error) {
     console.error("[AutoReviewRequest] Fatal error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

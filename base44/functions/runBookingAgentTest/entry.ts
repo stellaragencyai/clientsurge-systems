@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { executeBookingSimulation, RuntimeExecutionError } from "../_shared/installRuntime.js";
 
@@ -11,7 +12,7 @@ async function requireAdmin(base44: ReturnType<typeof createClientFromRequest>) 
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -27,12 +28,12 @@ Deno.serve(async (req) => {
     } = payload || {};
 
     if (!order_id) {
-      return Response.json({ error: "order_id is required" }, { status: 400 });
+      return secureJson({ error: "order_id is required" }, { status: 400 });
     }
 
     const order = await base44.asServiceRole.entities.Order.get(order_id);
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      return secureJson({ error: "Order not found" }, { status: 404 });
     }
 
     const result = await executeBookingSimulation({
@@ -45,7 +46,7 @@ Deno.serve(async (req) => {
       scheduledAt: scheduled_at,
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       result,
     });
@@ -58,7 +59,7 @@ Deno.serve(async (req) => {
       error instanceof RuntimeExecutionError ? error.status || 409 :
       500;
 
-    return Response.json(
+    return secureJson(
       {
         error: message,
         details: error instanceof RuntimeExecutionError ? error.details : undefined,

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * autoEndToEndTest - #112/#525 extended.
  * Full checkout -> webhook -> email -> status flow with cleanup.
@@ -16,12 +17,12 @@ Deno.serve(async (req) => {
       notify_telegram: false,
       scenario: "checkout_webhook_email_status_cleanup",
     });
-    return Response.json({ success: true, ...result, extended: true });
+    return secureJson({ success: true, ...result, extended: true });
   } catch (err: any) {
     if (err instanceof AuthGuardError) {
-      return Response.json({ error: err.message, code: err.code }, { status: err.status });
+      return secureJson({ error: err.message, code: err.code }, { status: err.status });
     }
 
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

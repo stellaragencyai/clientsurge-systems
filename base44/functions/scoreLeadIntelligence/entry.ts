@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * AI Function 1: scoreLeadIntelligence
  * Analyzes lead quality, engagement, fit using AI
@@ -15,7 +16,7 @@ Deno.serve(async (req) => {
     const { lead_id, project_id } = await req.json();
 
     if (!lead_id) {
-      return Response.json({ error: "lead_id required" }, { status: 400 });
+      return secureJson({ error: "lead_id required" }, { status: 400 });
     }
 
     // Get lead + interactions
@@ -114,7 +115,7 @@ Respond with JSON:
         }),
       });
 
-      return Response.json({
+      return secureJson({
         success: true,
         skipped: true,
         reason: "AI score confidence below 0.60 threshold",
@@ -135,7 +136,7 @@ Respond with JSON:
 
     console.log(`[ScoreLead] ${lead_id} scored ${result.score} (${result.tier})`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id,
       score: result.score,
@@ -147,7 +148,7 @@ Respond with JSON:
     });
   } catch (error) {
     console.error("[ScoreLead] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

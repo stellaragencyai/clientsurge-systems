@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * autoResolveInstallError — #498
  * Reads AgentLog entries with requires_nolan=false and attempts auto-resolution.
@@ -48,8 +49,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, auto_resolved: resolved, escalated: skipped, total_checked: (unresolvedLogs || []).length });
+    return secureJson({ success: true, auto_resolved: resolved, escalated: skipped, total_checked: (unresolvedLogs || []).length });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

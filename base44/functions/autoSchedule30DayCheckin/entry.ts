@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -8,11 +9,11 @@ Deno.serve(async (req) => {
 
     // Only fire when status just changed TO 'Live'
     if (client.status !== 'Live' || old_data?.status === 'Live') {
-      return Response.json({ skipped: true, reason: 'Status did not just change to Live' });
+      return secureJson({ skipped: true, reason: 'Status did not just change to Live' });
     }
 
     if (!client.email) {
-      return Response.json({ error: 'Client has no email address' }, { status: 400 });
+      return secureJson({ error: 'Client has no email address' }, { status: 400 });
     }
 
     // Calculate 30-day date from today
@@ -144,8 +145,8 @@ Deno.serve(async (req) => {
       body: nolanReminderEmail,
     });
 
-    return Response.json({ success: true, checkin_date: thirtyDaysOut.toISOString(), reminder_date: reminderDate.toISOString() });
+    return secureJson({ success: true, checkin_date: thirtyDaysOut.toISOString(), reminder_date: reminderDate.toISOString() });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

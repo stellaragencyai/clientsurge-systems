@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * sendWentLiveEmail — #278
  * Auto-triggered when ClientOnboarding.went_live = true.
@@ -11,11 +12,11 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
     const onboarding_id = body.onboarding_id || body.data?.id || body.event?.entity_id;
-    if (!onboarding_id) return Response.json({ error: "onboarding_id required" }, { status: 400 });
+    if (!onboarding_id) return secureJson({ error: "onboarding_id required" }, { status: 400 });
 
     const onboarding = await base44.asServiceRole.entities.ClientOnboarding.get(onboarding_id);
-    if (!onboarding?.email) return Response.json({ error: "No email on onboarding record" }, { status: 400 });
-    if (!onboarding.went_live) return Response.json({ skipped: true, reason: "went_live is not true" });
+    if (!onboarding?.email) return secureJson({ error: "No email on onboarding record" }, { status: 400 });
+    if (!onboarding.went_live) return secureJson({ skipped: true, reason: "went_live is not true" });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
     const portalUrl = "https://clientsurgesystems.com/client-portal";
@@ -67,8 +68,8 @@ Deno.serve(async (req) => {
       service: "sendWentLiveEmail", requires_nolan: false, resolved: true,
     });
 
-    return Response.json({ success: true, email: onboarding.email });
+    return secureJson({ success: true, email: onboarding.email });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * approveWebsiteCopy
  * Persists approved website copy sections to Order.install_configuration.website_copy
@@ -16,17 +17,17 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== 'admin') {
-      return Response.json({ error: 'Admin access required' }, { status: 403 });
+      return secureJson({ error: 'Admin access required' }, { status: 403 });
     }
 
     const { order_id, approved_sections } = await req.json();
     if (!order_id || !approved_sections || typeof approved_sections !== 'object') {
-      return Response.json({ error: 'order_id and approved_sections are required' }, { status: 400 });
+      return secureJson({ error: 'order_id and approved_sections are required' }, { status: 400 });
     }
 
     const order = await base44.asServiceRole.entities.Order.get(order_id);
     if (!order) {
-      return Response.json({ error: 'Order not found' }, { status: 404 });
+      return secureJson({ error: 'Order not found' }, { status: 404 });
     }
 
     // Merge approved sections into existing website_copy
@@ -58,10 +59,10 @@ Deno.serve(async (req) => {
       metadata_json: JSON.stringify({ saved_sections: savedSections, approved_by: user.email }),
     });
 
-    return Response.json({ success: true, saved_sections: savedSections });
+    return secureJson({ success: true, saved_sections: savedSections });
 
   } catch (error) {
     console.error('[approveWebsiteCopy] Error:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

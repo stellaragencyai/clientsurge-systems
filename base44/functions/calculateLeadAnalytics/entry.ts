@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
 
@@ -52,7 +53,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       analytics: analyticsData,
     });
@@ -62,6 +63,6 @@ Deno.serve(async (req) => {
     const message =
       error instanceof Error ? error.message : "Failed to calculate lead analytics";
 
-    return Response.json({ error: message, code }, { status });
+    return secureJson({ error: message, code }, { status });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * startDripCampaign — enrolls a lead into the drip campaign.
  *
@@ -26,25 +27,25 @@ Deno.serve(async (req) => {
     const leadData = body?.data ?? null; // may be pre-loaded from automation
 
     if (!leadId) {
-      return Response.json({ error: "lead_id is required" }, { status: 400 });
+      return secureJson({ error: "lead_id is required" }, { status: 400 });
     }
 
     // Load lead (use pre-loaded data if available to save a call)
     const lead = leadData?.id === leadId ? leadData : await base44.asServiceRole.entities.Leads.get(leadId);
     if (!lead) {
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     // Guard: skip if already at a terminal/qualified status
     if (SKIP_STATUSES.includes(lead.status)) {
       console.log(`[startDripCampaign] startDripCampaign: Lead ${leadId} is ${lead.status} — skipping enrollment.`);
-      return Response.json({ success: true, skipped: true, reason: `Lead status is ${lead.status}` });
+      return secureJson({ success: true, skipped: true, reason: `Lead status is ${lead.status}` });
     }
 
     // Guard: check for existing active campaign
     const existing = await base44.asServiceRole.entities.DripCampaign.filter({ lead_id: leadId, status: "active" }, "-created_date", 1);
     if (existing?.length > 0) {
-      return Response.json({ success: true, skipped: true, reason: "Active drip campaign already exists for this lead." });
+      return secureJson({ success: true, skipped: true, reason: "Active drip campaign already exists for this lead." });
     }
 
     // Create campaign record
@@ -72,10 +73,10 @@ Deno.serve(async (req) => {
       message_body: `Lead enrolled in 3-step drip campaign (Day 1 / Day 3 / Day 7). Campaign ID: ${campaign.id}`,
     });
 
-    return Response.json({ success: true, campaign_id: campaign.id, lead_id: leadId });
+    return secureJson({ success: true, campaign_id: campaign.id, lead_id: leadId });
 
   } catch (error) {
     console.error("[startDripCampaign] startDripCampaign error:", error);
-    return Response.json({ error: error.message || "Failed to start drip campaign" }, { status: 500 });
+    return secureJson({ error: error.message || "Failed to start drip campaign" }, { status: 500 });
   }
 });

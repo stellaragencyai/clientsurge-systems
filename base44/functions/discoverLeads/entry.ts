@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 // redeployed 2026-05-02
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { requireGoogleMapsKey } from "../shared/discoverLeadsGuard.ts";
@@ -10,14 +11,14 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+      return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
     }
 
     const { niche, city, state, radius = 25, require_website = false, min_rating = 0 } =
       await req.json();
 
     if (!niche || !city || !state) {
-      return Response.json(
+      return secureJson(
         { error: "Missing required fields: niche, city, state" },
         { status: 400 }
       );
@@ -86,7 +87,7 @@ Deno.serve(async (req) => {
 
     await updateAnalytics(base44, leadsNew);
 
-    return Response.json({
+    return secureJson({
       success: true,
       job_id: job.id,
       leads_discovered: discoveredLeads.length,
@@ -95,7 +96,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[discoverLeads] Fatal error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message || "Failed to discover leads" },
       { status: error.status || 500 },
     );

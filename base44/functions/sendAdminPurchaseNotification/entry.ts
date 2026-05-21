@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * sendAdminPurchaseNotification — #405 #405a
  * Fires on EVERY checkout.session.completed — sends Telegram to Nolan.
@@ -34,7 +35,7 @@ Deno.serve(async (req) => {
 
     if (!botToken) {
       console.warn("[sendAdminPurchaseNotification] No TELEGRAM_BOT_TOKEN set");
-      return Response.json({ success: false, error: "No bot token" }, { status: 503 });
+      return secureJson({ success: false, error: "No bot token" }, { status: 503 });
     }
 
     const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -56,9 +57,9 @@ Deno.serve(async (req) => {
     }).catch(() => {});
 
     console.log("[sendAdminPurchaseNotification] Sent:", result.ok);
-    return Response.json({ success: result.ok });
+    return secureJson({ success: result.ok });
   } catch (err) {
     console.error("[sendAdminPurchaseNotification]", err.message);
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

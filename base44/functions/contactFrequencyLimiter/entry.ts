@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * contactFrequencyLimiter.ts — #493
  * No single lead receives more than 3 AI-generated messages per day.
@@ -33,10 +34,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { lead_id } = await req.json();
-    if (!lead_id) return Response.json({ error: "lead_id required" }, { status: 400 });
+    if (!lead_id) return secureJson({ error: "lead_id required" }, { status: 400 });
     const result = await checkContactFrequency(base44, lead_id);
-    return Response.json({ success: true, ...result });
+    return secureJson({ success: true, ...result });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

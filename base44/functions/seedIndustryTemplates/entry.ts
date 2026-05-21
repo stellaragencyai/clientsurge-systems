@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Seed Industry Templates
  * Run once to populate default templates for each industry
@@ -146,13 +147,13 @@ Deno.serve(async (req) => {
 
     console.log(`[Seed] Created ${created}/${templates.length} templates`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       templates_created: created,
     });
   } catch (error) {
     console.error("[Seed] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

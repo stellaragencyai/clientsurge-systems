@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 function escapeHtml(value) {
@@ -12,28 +13,28 @@ function escapeHtml(value) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (!user || user.role !== 'admin') {
-      return Response.json({ error: 'Forbidden: Admin only' }, { status: 403 });
+      return secureJson({ error: 'Forbidden: Admin only' }, { status: 403 });
     }
 
     const { lead_id, lead_name, lead_email, business_name, client_email } = await req.json();
 
     if (!lead_id || !lead_email || !client_email) {
-      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+      return secureJson({ error: 'Missing required fields' }, { status: 400 });
     }
 
     const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
     if (!lead) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+      return secureJson({ error: 'Lead not found' }, { status: 404 });
     }
     if (lead.email !== lead_email) {
-      return Response.json({ error: 'lead_email does not match lead record' }, { status: 400 });
+      return secureJson({ error: 'lead_email does not match lead record' }, { status: 400 });
     }
 
     const subject = `✅ Appointment Booked: ${lead_name}`;
@@ -122,9 +123,9 @@ Deno.serve(async (req) => {
       }),
     });
 
-    return Response.json({ success: true, message: 'Appointment booked email sent' });
+    return secureJson({ success: true, message: 'Appointment booked email sent' });
   } catch (error) {
     console.error('[sendAppointmentBookedEmail] Error sending appointment email:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

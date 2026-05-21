@@ -8,7 +8,7 @@ const getAdminSettings = readFileSync("base44/functions/getAdminSettings/entry.t
 
 test("public read-only booking availability responses use short cache headers", () => {
   for (const source of [getBookedDemoSlots, demoBookingGuard]) {
-    assert.match(source, /import \{ cachedJson \} from "\.\.\/_shared\/response\.ts"/);
+    assert.match(source, /import \{[^}]*cachedJson[^}]*\} from "\.\.\/_shared\/response\.ts"/);
     assert.match(source, /return cachedJson\(.*,\s*60\)/s);
   }
 });

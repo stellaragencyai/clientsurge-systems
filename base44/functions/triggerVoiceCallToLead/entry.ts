@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 /**
@@ -31,30 +32,30 @@ Deno.serve(async (req) => {
     const { lead_id } = await req.json();
 
     if (!lead_id) {
-      return Response.json({ error: 'lead_id required' }, { status: 400 });
+      return secureJson({ error: 'lead_id required' }, { status: 400 });
     }
 
     // 1. Quiet hours guard
     if (isQuietHours()) {
       console.log('[triggerVoiceCallToLead] Quiet hours — skipping voice call');
-      return Response.json({ skipped: true, reason: 'quiet_hours' });
+      return secureJson({ skipped: true, reason: 'quiet_hours' });
     }
 
     // 2. Fetch lead
     const leads = await base44.asServiceRole.entities.Leads.filter({ id: lead_id });
     if (!leads || leads.length === 0) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+      return secureJson({ error: 'Lead not found' }, { status: 404 });
     }
     const lead = leads[0];
 
     if (!lead.phone) {
-      return Response.json({ skipped: true, reason: 'no_phone_number' });
+      return secureJson({ skipped: true, reason: 'no_phone_number' });
     }
 
     // 3. Check if already attempted
     if (lead.voice_call_attempted) {
       console.log('[triggerVoiceCallToLead] Voice call already attempted for lead', lead_id);
-      return Response.json({ skipped: true, reason: 'already_attempted' });
+      return secureJson({ skipped: true, reason: 'already_attempted' });
     }
 
     // 4. Load admin settings
@@ -63,7 +64,7 @@ Deno.serve(async (req) => {
 
     if (!adminSettings?.voice_calls_enabled) {
       console.log('[triggerVoiceCallToLead] Voice calls disabled in AdminSettings');
-      return Response.json({ skipped: true, reason: 'voice_calls_disabled' });
+      return secureJson({ skipped: true, reason: 'voice_calls_disabled' });
     }
 
     // 5. Determine industry → get ElevenLabs agent_id + phone_number_id
@@ -76,7 +77,7 @@ Deno.serve(async (req) => {
 
     if (!agentId) {
       console.error(`[triggerVoiceCallToLead] No ElevenLabs agent_id configured for industry: ${industryKey}`);
-      return Response.json({
+      return secureJson({
         skipped: true,
         reason: 'no_agent_id_configured',
         fix: `Go to ElevenLabs dashboard → Agents → create agent → save the agent_id to AdminSettings.elevenlabs_agent_ids.${industryKey}`,
@@ -85,7 +86,7 @@ Deno.serve(async (req) => {
 
     if (!phoneNumberId) {
       console.error('[triggerVoiceCallToLead] No ElevenLabs phone_number_id configured');
-      return Response.json({
+      return secureJson({
         skipped: true,
         reason: 'no_phone_number_id_configured',
         fix: 'Go to ElevenLabs dashboard → Phone Numbers → import your Twilio number → save the phone_number_id to AdminSettings.elevenlabs_phone_number_ids',
@@ -94,7 +95,7 @@ Deno.serve(async (req) => {
 
     const elevenLabsApiKey = Deno.env.get('ELEVENLABS_API_KEY');
     if (!elevenLabsApiKey) {
-      return Response.json({ error: 'ELEVENLABS_API_KEY not set' }, { status: 500 });
+      return secureJson({ error: 'ELEVENLABS_API_KEY not set' }, { status: 500 });
     }
 
     console.log(`[triggerVoiceCallToLead] Calling ${lead.phone} | Industry: ${industryKey} | Agent: ${agentId} | PhoneNumberId: ${phoneNumberId}`);
@@ -138,7 +139,7 @@ Deno.serve(async (req) => {
         error_message: result?.detail || JSON.stringify(result),
         metadata_json: JSON.stringify({ industry_key: industryKey, agent_id: agentId }),
       });
-      return Response.json({ error: 'ElevenLabs call failed', detail: result }, { status: 500 });
+      return secureJson({ error: 'ElevenLabs call failed', detail: result }, { status: 500 });
     }
 
     console.log('[triggerVoiceCallToLead] Call initiated successfully:', result);
@@ -167,7 +168,7 @@ Deno.serve(async (req) => {
       }),
     ]);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id,
       industry_key: industryKey,
@@ -177,6 +178,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('[triggerVoiceCallToLead] Error:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

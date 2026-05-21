@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * selfHealingMonitor — #496
  * Runs every 6 hours (scheduled automation).
@@ -91,9 +92,9 @@ Deno.serve(async (req) => {
     }
 
     console.log(`[selfHealingMonitor] Done — ${issues.length} issues, ${autoFixed} auto-fixed`);
-    return Response.json({ success: true, issues_found: issues.length, auto_fixed: autoFixed, issues });
+    return secureJson({ success: true, issues_found: issues.length, auto_fixed: autoFixed, issues });
   } catch (err) {
     console.error("[selfHealingMonitor] Fatal:", err.message);
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

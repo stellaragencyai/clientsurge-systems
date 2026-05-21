@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * DEPRECATED: enrichLeadWithAI
  * Consolidated into enrichLead — use that function instead.
@@ -17,8 +18,8 @@ Deno.serve(async (req) => {
       body: JSON.stringify(body),
     });
     const result = await response.json();
-    return Response.json({ ...result, _forwarded_from: "enrichLeadWithAI" });
+    return secureJson({ ...result, _forwarded_from: "enrichLeadWithAI" });
   } catch (err) {
-    return Response.json({ error: "Forwarding failed", detail: err.message }, { status: 500 });
+    return secureJson({ error: "Forwarding failed", detail: err.message }, { status: 500 });
   }
 });

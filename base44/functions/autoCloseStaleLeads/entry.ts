@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * autoCloseStaleLeads — #120
  * Find all SpaLead records with no contact in past 30 days.
@@ -57,8 +58,8 @@ Deno.serve(async (req) => {
       }).catch(() => {});
     }
 
-    return Response.json({ success: true, closed, stale_count: staleLeads.length });
+    return secureJson({ success: true, closed, stale_count: staleLeads.length });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

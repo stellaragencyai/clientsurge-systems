@@ -1,3 +1,4 @@
+import { secureJson } from "./secureJson.js";
 const LEGACY_ENDPOINTS = {
   createLeadAndDispatch: {
     replacement: [
@@ -97,5 +98,5 @@ export function getLegacyEndpointQuarantine(endpointName) {
 
 export function buildLegacyEndpointResponse(endpointName) {
   const payload = getLegacyEndpointQuarantine(endpointName);
-  return Response.json(payload, { status: payload.status });
+  return secureJson(payload, { status: payload.status });
 }

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * generateSmsTemplates — #413a #413b #413d
  * Uses OpenAI to generate custom SMS templates per industry + tone.
@@ -98,8 +99,8 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.Order.update(order_id, { sms_templates: generated }).catch(() => {});
     }
 
-    return Response.json({ success: true, templates: generated, industry, tone });
+    return secureJson({ success: true, templates: generated, industry, tone });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

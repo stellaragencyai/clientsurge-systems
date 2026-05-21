@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
@@ -7,26 +8,26 @@ const SEQUENCE_TYPES = ["instant_response", "missed_call_recovery", "day1_follow
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
 
     // Auth check
     const user = await base44.auth.me();
-    if (!user) return Response.json({ error: "Unauthorized" }, { status: 401 });
-    if (user.role !== "admin") return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+    if (!user) return secureJson({ error: "Unauthorized" }, { status: 401 });
+    if (user.role !== "admin") return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
 
     const payload = await req.json().catch(() => ({}));
     const { lead_id, sequence_type, custom_note } = payload;
 
-    if (!lead_id) return Response.json({ error: "lead_id is required" }, { status: 400 });
+    if (!lead_id) return secureJson({ error: "lead_id is required" }, { status: 400 });
     if (!SEQUENCE_TYPES.includes(sequence_type)) {
-      return Response.json({ error: `sequence_type must be one of: ${SEQUENCE_TYPES.join(", ")}` }, { status: 400 });
+      return secureJson({ error: `sequence_type must be one of: ${SEQUENCE_TYPES.join(", ")}` }, { status: 400 });
     }
 
     const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
-    if (!lead) return Response.json({ error: "Lead not found" }, { status: 404 });
+    if (!lead) return secureJson({ error: "Lead not found" }, { status: 404 });
 
     const now = new Date().toISOString();
 
@@ -116,7 +117,7 @@ Deno.serve(async (req) => {
       last_activity_at: now,
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       sequence_type,
       sms_sent: smsSent,
@@ -128,6 +129,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error("[triggerFollowUpSequence] triggerFollowUpSequence error:", error);
-    return Response.json({ error: error.message || "Failed to trigger sequence" }, { status: 500 });
+    return secureJson({ error: error.message || "Failed to trigger sequence" }, { status: 500 });
   }
 });

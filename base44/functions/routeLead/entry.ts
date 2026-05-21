@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * routeLead — assigns a new lead to the best available team member.
  *
@@ -30,18 +31,18 @@ Deno.serve(async (req) => {
     const leadId = body?.lead_id ?? body?.event?.entity_id ?? body?.data?.id ?? null;
 
     if (!leadId) {
-      return Response.json({ error: "lead_id is required" }, { status: 400 });
+      return secureJson({ error: "lead_id is required" }, { status: 400 });
     }
 
     // ── Load lead ─────────────────────────────────────────────────────────────
     const lead = await base44.asServiceRole.entities.Leads.get(leadId);
     if (!lead) {
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     // Skip if already assigned
     if (lead.assigned_to) {
-      return Response.json({ success: true, message: "Lead already assigned", assigned_to: lead.assigned_to });
+      return secureJson({ success: true, message: "Lead already assigned", assigned_to: lead.assigned_to });
     }
 
     const category = lead.lead_category || "Standard";
@@ -52,7 +53,7 @@ Deno.serve(async (req) => {
 
     if (!activeRouters.length) {
       console.log("[routeLead] routeLead: No active routers configured. Skipping assignment.");
-      return Response.json({ success: true, message: "No team members configured for routing." });
+      return secureJson({ success: true, message: "No team members configured for routing." });
     }
 
     // ── Filter by category eligibility ───────────────────────────────────────
@@ -84,7 +85,7 @@ Deno.serve(async (req) => {
 
     if (!ranked.length) {
       console.log("[routeLead] routeLead: All team members are at capacity.");
-      return Response.json({ success: true, message: "All team members at capacity. Lead unassigned." });
+      return secureJson({ success: true, message: "All team members at capacity. Lead unassigned." });
     }
 
     const assignee = ranked[0].user;
@@ -149,7 +150,7 @@ Deno.serve(async (req) => {
       metadata_json: JSON.stringify({ assigned_to: assignee.email, category, sms_sent: smsSent, sms_error: smsError }),
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: leadId,
       assigned_to: assignee.email,
@@ -162,6 +163,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error("[routeLead] routeLead error:", error);
-    return Response.json({ error: error.message || "Routing failed" }, { status: 500 });
+    return secureJson({ error: error.message || "Routing failed" }, { status: 500 });
   }
 });

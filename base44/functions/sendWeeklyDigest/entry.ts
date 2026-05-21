@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * sendWeeklyDigest — #298
  * Emails Nolan every Monday: new leads, MRR, conversions, pipeline summary.
@@ -74,9 +75,9 @@ Deno.serve(async (req) => {
     });
 
     console.log("[sendWeeklyDigest] Sent");
-    return Response.json({ success: true, new_leads: newLeads.length, mrr, new_clients: newClients.length });
+    return secureJson({ success: true, new_leads: newLeads.length, mrr, new_clients: newClients.length });
   } catch (err) {
     console.error("[sendWeeklyDigest]", err.message);
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

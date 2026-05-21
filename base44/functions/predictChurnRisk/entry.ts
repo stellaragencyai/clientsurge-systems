@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * predictChurnRisk — #253
  * Runs weekly on all active Orders. Scores churn risk 0-100.
@@ -48,8 +49,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, scored: orders?.length || 0, high_risk: highRisk.length });
+    return secureJson({ success: true, scored: orders?.length || 0, high_risk: highRisk.length });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

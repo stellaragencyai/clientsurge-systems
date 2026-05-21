@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Inlined install pipeline for Base44 legacy runtime.
  * The editor/runtime was resolving a stale installPipeline.shared.js module, so
@@ -2116,7 +2117,7 @@ function buildInstallPipelineErrorResponse(error: any) {
     details: error.details || {},
   });
 
-  return Response.json(
+  return secureJson(
     {
       error: error.message,
       code,
@@ -2140,18 +2141,18 @@ async function handleInstallPipelineRequest(req: Request) {
 
     if (action === "list_queue") {
       const orders = await listInstallQueueOrders(base44);
-      return Response.json({ orders });
+      return secureJson({ orders });
     }
 
     if (!order_id) {
-      return Response.json({ error: "order_id required" }, { status: 400 });
+      return secureJson({ error: "order_id required" }, { status: 400 });
     }
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(
       () => null
     );
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      return secureJson({ error: "Order not found" }, { status: 404 });
     }
 
     if (action === "initialize") {
@@ -2161,7 +2162,7 @@ async function handleInstallPipelineRequest(req: Request) {
       });
       const snapshot = buildInstallSnapshot(result.order);
 
-      return Response.json({
+      return secureJson({
         success: true,
         order: result.order,
         client: result.client,
@@ -2174,7 +2175,7 @@ async function handleInstallPipelineRequest(req: Request) {
 
     if (action === "update_status") {
       if (!service_key || !install_status) {
-        return Response.json(
+        return secureJson(
           { error: "service_key and install_status required" },
           { status: 400 }
         );
@@ -2189,7 +2190,7 @@ async function handleInstallPipelineRequest(req: Request) {
       });
       const snapshot = buildInstallSnapshot(updatedOrder);
 
-      return Response.json({
+      return secureJson({
         success: true,
         order: updatedOrder,
         trackedItems: snapshot.serviceStates,
@@ -2197,7 +2198,7 @@ async function handleInstallPipelineRequest(req: Request) {
       });
     }
 
-    return Response.json({ error: "Invalid action" }, { status: 400 });
+    return secureJson({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     return buildInstallPipelineErrorResponse(error);
   }

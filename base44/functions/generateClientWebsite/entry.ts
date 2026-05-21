@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * generateClientWebsite — #418
  * Elite tier: uses OpenAI to write hero headline, subheading, 3 proof points.
@@ -9,10 +10,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { order_id } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
 
     const package_key = order.package_key || "starter";
     const industry = order.industry || "default";
@@ -49,8 +50,8 @@ Return as JSON: { "headline": "...", "subheading": "...", "proof1": "...", "proo
 
     await base44.asServiceRole.entities.Order.update(order_id, { workflow_stage: "Website Copy Generated" });
 
-    return Response.json({ success: true, copy, package_key, industry });
+    return secureJson({ success: true, copy, package_key, industry });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

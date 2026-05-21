@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -7,14 +8,14 @@ Deno.serve(async (req) => {
 
     // Trigger: when Leads status is updated to "Qualified" OR when user replies with booking-related keywords
     if (event.type !== 'update' || event.entity_name !== 'Leads') {
-      return Response.json({ success: true });
+      return secureJson({ success: true });
     }
 
     const lead = event.data;
     const oldLead = event.old_data;
 
     if (!lead || !lead.id || !lead.phone) {
-      return Response.json({ success: true });
+      return secureJson({ success: true });
     }
 
     // Booking link from admin settings
@@ -23,7 +24,7 @@ Deno.serve(async (req) => {
 
     // Check if already sent booking link
     if (lead.booking_link_sent_at) {
-      return Response.json({ success: true, skipped: true });
+      return secureJson({ success: true, skipped: true });
     }
 
     // Trigger condition 1: Status manually set to "Qualified"
@@ -44,12 +45,12 @@ Deno.serve(async (req) => {
         booking_link_sent_at: new Date().toISOString(),
       });
 
-      return Response.json({ success: true, bookingLinkSent: true });
+      return secureJson({ success: true, bookingLinkSent: true });
     }
 
-    return Response.json({ success: true });
+    return secureJson({ success: true });
   } catch (error) {
     console.error('[sendBookingLinkSMS] sendBookingLinkSMS error:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

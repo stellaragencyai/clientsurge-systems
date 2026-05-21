@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
 
@@ -7,7 +8,7 @@ const MAX_EVENTS = 5000;
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -15,7 +16,7 @@ Deno.serve(async (req) => {
     let access = null;
 
     if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return secureJson({ error: 'Unauthorized' }, { status: 401 });
     }
 
     if (user.role !== 'admin') {
@@ -24,7 +25,7 @@ Deno.serve(async (req) => {
         userEmail: user.email,
       });
       if (access.status !== 'resolved') {
-        return Response.json({ error: 'Forbidden' }, { status: 403 });
+        return secureJson({ error: 'Forbidden' }, { status: 403 });
       }
     }
 
@@ -32,7 +33,7 @@ Deno.serve(async (req) => {
     const leads = await base44.asServiceRole.entities.Leads.list('-created_date', MAX_LEADS);
 
     if (!leads) {
-      return Response.json({ active_leads: 0, appointments_booked: 0, missed_calls_recovered: 0 });
+      return secureJson({ active_leads: 0, appointments_booked: 0, missed_calls_recovered: 0 });
     }
 
     // Filter leads - for now, show all leads (not filtered by user since we don't have user assignment)
@@ -61,7 +62,7 @@ Deno.serve(async (req) => {
       return !!(access?.order?.id && event.order_id === access.order.id);
     }).length;
 
-    return Response.json({
+    return secureJson({
       active_leads: activeLeads.length,
       appointments_booked: appointmentsBooked.length,
       missed_calls_recovered: missedCallsRecovered,
@@ -75,6 +76,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error('[getClientLeadFlowMetrics] Error fetching metrics:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

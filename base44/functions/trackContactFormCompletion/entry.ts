@@ -1,9 +1,10 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -11,7 +12,7 @@ Deno.serve(async (req) => {
     const { lead_id, contact_info } = payload;
 
     if (!lead_id || !contact_info) {
-      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+      return secureJson({ error: 'Missing required fields' }, { status: 400 });
     }
 
     // Log contact form completion to CommunicationEvent
@@ -42,9 +43,9 @@ Deno.serve(async (req) => {
       },
     });
 
-    return Response.json({ success: true });
+    return secureJson({ success: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to track form completion';
-    return Response.json({ error: message }, { status: 500 });
+    return secureJson({ error: message }, { status: 500 });
   }
 });

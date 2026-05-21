@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Send Instant Lead Response SMS
  * Triggered when a new WebsiteLead is created
@@ -145,7 +146,7 @@ async function sendResendEmail(base44, leadId, toEmail, firstName, businessName)
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -154,7 +155,7 @@ Deno.serve(async (req) => {
     console.log(`[InstantResponse] START — lead_id: ${lead_id}`);
 
     if (!lead_id) {
-      return Response.json({ error: "lead_id is required" }, { status: 400 });
+      return secureJson({ error: "lead_id is required" }, { status: 400 });
     }
 
     // Fetch lead — always fetch fresh from DB (ignore passed lead object to ensure idempotency check is against live data)
@@ -168,20 +169,20 @@ Deno.serve(async (req) => {
 
     if (!leadData) {
       console.error(`[InstantResponse] Lead not found: ${lead_id}`);
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     // IDEMPOTENCY — only condition: initial_response_sent_at already set
     if (leadData.initial_response_sent_at) {
       console.log(`[InstantResponse] SKIPPED — already sent for lead ${lead_id}`);
-      return Response.json({ success: false, reason: "Already sent" }, { status: 409 });
+      return secureJson({ success: false, reason: "Already sent" }, { status: 409 });
     }
 
     // Validate phone number
     if (!leadData.phone_number) {
       console.warn(`[InstantResponse] Lead ${lead_id} missing phone number`);
       await logSmsEvent(base44, lead_id, "failed", null, "Missing phone number");
-      return Response.json({ success: false, error: "Phone number missing" }, { status: 400 });
+      return secureJson({ success: false, error: "Phone number missing" }, { status: 400 });
     }
 
     // Load install configuration if order_id provided
@@ -214,7 +215,7 @@ Deno.serve(async (req) => {
     } catch (smsError) {
       console.error(`[InstantResponse] SMS send failed for lead ${lead_id}: ${smsError.message}`);
       await logSmsEvent(base44, lead_id, "failed", null, smsError.message);
-      return Response.json({ error: smsError.message }, { status: 500 });
+      return secureJson({ error: smsError.message }, { status: 500 });
     }
 
     // Update WebsiteLead — set contacted status and follow-up anchor
@@ -246,10 +247,10 @@ Deno.serve(async (req) => {
       console.log(`[InstantResponse] No email address on lead ${lead_id} — email skipped`);
     }
 
-    return Response.json({ success: true, message_id: messageSid });
+    return secureJson({ success: true, message_id: messageSid });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error(`[InstantResponse] Error: ${message}`);
-    return Response.json({ error: message }, { status: 500 });
+    return secureJson({ error: message }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Booking Confirmation Loop
  * Auto-confirms booking, feeds back to AI model
@@ -12,7 +13,7 @@ Deno.serve(async (req) => {
     const { lead_id, booking_date, booking_time, service_type } = await req.json();
 
     if (!lead_id || !booking_date) {
-      return Response.json(
+      return secureJson(
         { error: "lead_id and booking_date required" },
         { status: 400 }
       );
@@ -23,7 +24,7 @@ Deno.serve(async (req) => {
     // 1. Get lead
     const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
     if (!lead) {
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     // 2. Update lead status to Booked
@@ -98,7 +99,7 @@ See you soon!
       `[BookingLoop] Confirmed booking for ${lead_id}, queued confirmation messages`
     );
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id,
       status: "Booked",
@@ -110,7 +111,7 @@ See you soon!
     });
   } catch (error) {
     console.error("[BookingLoop] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

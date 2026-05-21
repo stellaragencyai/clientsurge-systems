@@ -1,5 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { cachedJson } from "../_shared/response.ts";
+import { cachedJson, secureJson } from "../_shared/response.ts";
 
 // #116: filter by scheduled_date to avoid fetching all records
 Deno.serve(async (req) => {
@@ -8,7 +8,7 @@ Deno.serve(async (req) => {
     const { date } = await req.json();
 
     if (!date) {
-      return Response.json({ error: 'Date required' }, { status: 400 });
+      return secureJson({ error: 'Date required' }, { status: 400 });
     }
 
     // #116: explicit date filter — don't load all DemoRequests
@@ -21,6 +21,9 @@ Deno.serve(async (req) => {
 
     return cachedJson({ booked_times: bookedTimes, date, count: bookedTimes.length }, 60);
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson(
+      { error: error instanceof Error ? error.message : "Failed to load booked demo slots" },
+      { status: 500 }
+    );
   }
 });

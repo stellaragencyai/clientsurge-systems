@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -6,7 +7,7 @@ Deno.serve(async (req) => {
     const { leadId, hoursDelay = 24 } = await req.json();
 
     if (!leadId) {
-      return Response.json({ error: 'Lead ID required' }, { status: 400 });
+      return secureJson({ error: 'Lead ID required' }, { status: 400 });
     }
 
     // Calculate next follow-up time
@@ -18,8 +19,8 @@ Deno.serve(async (req) => {
       next_follow_up_at: nextFollowUp.toISOString(),
     });
 
-    return Response.json({ success: true, nextFollowUp });
+    return secureJson({ success: true, nextFollowUp });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

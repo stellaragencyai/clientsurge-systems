@@ -1,10 +1,11 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!user) return secureJson({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json().catch(() => ({}));
     const { project_id, limit = 50 } = body;
@@ -13,14 +14,14 @@ Deno.serve(async (req) => {
     let projects = await base44.asServiceRole.entities.ClientProject.filter({ client_email: user.email });
     const project = projects?.[0];
 
-    if (!project) return Response.json({ error: 'No project found for this user' }, { status: 404 });
+    if (!project) return secureJson({ error: 'No project found for this user' }, { status: 404 });
 
     // Get leads associated with this client (filtered at DB level)
     const leads = await base44.asServiceRole.entities.Leads.filter({ created_by: user.email }, '-created_date', 200);
     const leadIds = leads.map(l => l.id);
 
     if (leadIds.length === 0) {
-      return Response.json({ jobs: [], stats: { total: 0, completed: 0, queued: 0, processing: 0, failed: 0 }, events: [] });
+      return secureJson({ jobs: [], stats: { total: 0, completed: 0, queued: 0, processing: 0, failed: 0 }, events: [] });
     }
 
     // Get all automation jobs then filter client-side (no bulk filter by array in SDK)
@@ -56,9 +57,9 @@ Deno.serve(async (req) => {
       lead_business: leadMap[e.lead_id]?.business_name || '',
     }));
 
-    return Response.json({ jobs: enrichedJobs, stats, events: clientEvents });
+    return secureJson({ jobs: enrichedJobs, stats, events: clientEvents });
   } catch (error) {
     console.error('[getClientTaskJobs] getClientTaskJobs error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * AI Function 5: decideNextAction
  * Determines the optimal next action for a lead based on AI analysis
@@ -14,7 +15,7 @@ Deno.serve(async (req) => {
     const { lead_id, intent, score, booking_probability, project_id } = await req.json();
 
     if (!lead_id || !intent || score === undefined) {
-      return Response.json(
+      return secureJson(
         { error: "lead_id, intent, and score required" },
         { status: 400 }
       );
@@ -94,7 +95,7 @@ Respond with JSON:
 
     console.log(`[DecideAction] ${lead_id} → ${result.action}`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id,
       action: result.action,
@@ -105,7 +106,7 @@ Respond with JSON:
     });
   } catch (error) {
     console.error("[DecideAction] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

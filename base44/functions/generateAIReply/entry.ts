@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -5,7 +6,7 @@ Deno.serve(async (req) => {
     const { intent, lead, inboundMessage } = await req.json();
 
     if (!intent || !lead) {
-      return Response.json(
+      return secureJson(
         { error: 'intent and lead required' },
         { status: 400 }
       );
@@ -46,12 +47,12 @@ Deno.serve(async (req) => {
         message = `Thanks for your message! Let me get you booked in with someone who can help. ${lead.booking_link || 'Click here'}`;
     }
 
-    return Response.json({
+    return secureJson({
       message,
       intent,
       should_send: intent !== 'other',
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

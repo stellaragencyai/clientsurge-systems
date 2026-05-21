@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * classifyInstallError — #497
  * Reads AgentLog entries with log_type="error" and classifies them.
@@ -45,8 +46,8 @@ Deno.serve(async (req) => {
       return acc;
     }, {});
 
-    return Response.json({ success: true, total: classified.length, breakdown, errors: classified });
+    return secureJson({ success: true, total: classified.length, breakdown, errors: classified });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

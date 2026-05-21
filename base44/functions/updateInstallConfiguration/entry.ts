@@ -1,27 +1,28 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== "admin") {
-      return Response.json({ error: "Admin access required" }, { status: 403 });
+      return secureJson({ error: "Admin access required" }, { status: 403 });
     }
 
     const payload = await req.json();
     const { order_id, shared, services } = payload || {};
 
     if (!order_id) {
-      return Response.json({ error: "order_id is required" }, { status: 400 });
+      return secureJson({ error: "order_id is required" }, { status: 400 });
     }
 
     const order = await base44.asServiceRole.entities.Order.get(order_id);
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      return secureJson({ error: "Order not found" }, { status: 404 });
     }
 
     // Merge patch into existing install_configuration
@@ -47,7 +48,7 @@ Deno.serve(async (req) => {
       install_configuration_updated_at: new Date().toISOString(),
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       order: {
         id: updatedOrder.id,
@@ -65,6 +66,6 @@ Deno.serve(async (req) => {
       message === "Admin access required" ? 403 :
       message === "Order not found" ? 404 :
       message === "order_id is required" ? 400 : 500;
-    return Response.json({ error: message }, { status });
+    return secureJson({ error: message }, { status });
   }
 });

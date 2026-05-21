@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * aiOnboardingIntelligence
  * Pre-flight gap detector + credential completeness check.
@@ -77,15 +78,15 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== "admin") {
-      return Response.json({ error: "Admin access required" }, { status: 403 });
+      return secureJson({ error: "Admin access required" }, { status: 403 });
     }
 
     const { order_id, package_key, service_keys } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     // Step 1: Load order data
     const order = await base44.asServiceRole.entities.Order.get(order_id);
-    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
 
     // Step 2: Resolve services
     const resolvedPackageKey = package_key || order.pricing_summary?.package_key || order.package_type;
@@ -137,7 +138,7 @@ Deno.serve(async (req) => {
 
     console.log(`[Intelligence] Pre-flight for ${order_id}: ready=${ready_to_activate}, blockers=${blockers.length}, auto_filled=${auto_filled.length}`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       ready_to_activate,
       blockers,
@@ -149,6 +150,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[aiOnboardingIntelligence] Error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * stalledCredentialsAlert
  * Runs daily at 9am MST.
@@ -32,7 +33,7 @@ Deno.serve(async (req) => {
 
     if (stalled.length === 0) {
       console.log("[stalledCredentialsAlert] No stalled orders found.");
-      return Response.json({ success: true, stalled_count: 0 });
+      return secureJson({ success: true, stalled_count: 0 });
     }
 
     const appUrl = getAppUrl();
@@ -85,9 +86,9 @@ Deno.serve(async (req) => {
     });
 
     console.log(`[stalledCredentialsAlert] Alert sent for ${stalled.length} stalled orders`);
-    return Response.json({ success: true, stalled_count: stalled.length });
+    return secureJson({ success: true, stalled_count: stalled.length });
   } catch (error) {
     console.error("[stalledCredentialsAlert] Error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

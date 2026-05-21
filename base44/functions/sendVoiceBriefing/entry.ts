@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * sendVoiceBriefing — USE CASE #7
  * Scheduled: Daily 7am MST (Phoenix)
@@ -45,23 +46,23 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== 'admin') {
-      return Response.json({ error: 'Forbidden' }, { status: 403 });
+      return secureJson({ error: 'Forbidden' }, { status: 403 });
     }
 
     const [settings] = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
 
     // Check if voice briefing enabled
     if (!settings?.voice_briefing_enabled) {
-      return Response.json({ skipped: true, reason: 'voice_briefing_disabled' });
+      return secureJson({ skipped: true, reason: 'voice_briefing_disabled' });
     }
 
     if (isQuietHours()) {
-      return Response.json({ skipped: true, reason: 'quiet_hours' });
+      return secureJson({ skipped: true, reason: 'quiet_hours' });
     }
 
     const nolanPhone = settings?.voice_briefing_phone || Deno.env.get('ADMIN_NOTIFICATION_PHONE');
     if (!nolanPhone) {
-      return Response.json({ error: 'No briefing phone number configured. Set AdminSettings.voice_briefing_phone or ADMIN_NOTIFICATION_PHONE.' }, { status: 400 });
+      return secureJson({ error: 'No briefing phone number configured. Set AdminSettings.voice_briefing_phone or ADMIN_NOTIFICATION_PHONE.' }, { status: 400 });
     }
 
     const elevenLabsKey = Deno.env.get('ELEVENLABS_API_KEY');
@@ -248,7 +249,7 @@ End with the single most important action to take first thing today.`;
       }),
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       call_method: callMethod,
       stats: {
@@ -262,6 +263,6 @@ End with the single most important action to take first thing today.`;
 
   } catch (error) {
     console.error('[sendVoiceBriefing] Fatal:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

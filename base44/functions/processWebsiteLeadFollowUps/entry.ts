@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Website Lead Follow-Up Processor
  * Sends 3-step sequence: 10min SMS, 1hr email, 24hr SMS
@@ -132,7 +133,7 @@ Deno.serve(async (req) => {
       user = await base44.auth.me();
     } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     // Find all website leads that are eligible for follow-ups
@@ -149,7 +150,7 @@ Deno.serve(async (req) => {
     );
 
     if (!leads?.length) {
-      return Response.json({
+      return secureJson({
         success: true,
         processed: 0,
         message: "No website leads to process",
@@ -473,13 +474,13 @@ Or reply to this email with any questions.
       }
     }
 
-    return Response.json({ success: true, ...results });
+    return secureJson({ success: true, ...results });
   } catch (error) {
     console.error(
       "[processWebsiteLeadFollowUps] Fatal error:",
       error.message
     );
-    return Response.json(
+    return secureJson(
       {
         error: error.message || "Failed to process website lead follow-ups",
       },

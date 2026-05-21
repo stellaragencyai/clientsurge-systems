@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 async function logCommunicationEvent(
@@ -28,20 +29,20 @@ async function logCommunicationEvent(
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
     const { lead_id } = await req.json();
 
     if (!lead_id) {
-      return Response.json({ error: 'lead_id is required' }, { status: 400 });
+      return secureJson({ error: 'lead_id is required' }, { status: 400 });
     }
 
     const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
 
     if (!lead) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+      return secureJson({ error: 'Lead not found' }, { status: 404 });
     }
 
     const webhookUrl = Deno.env.get('EXTERNAL_WEBHOOK_URL') || Deno.env.get('WEBHOOK_URL');
@@ -56,7 +57,7 @@ Deno.serve(async (req) => {
         metadata: { action: 'crm_sync', configured: false },
       });
 
-      return Response.json({ success: false, error: 'CRM webhook URL not configured' }, { status: 500 });
+      return secureJson({ success: false, error: 'CRM webhook URL not configured' }, { status: 500 });
     }
 
     const response = await fetch(webhookUrl, {
@@ -94,7 +95,7 @@ Deno.serve(async (req) => {
         metadata: { action: 'crm_sync', status_code: response.status },
       });
 
-      return Response.json({ success: false, error: 'CRM sync failed' }, { status: 502 });
+      return secureJson({ success: false, error: 'CRM sync failed' }, { status: 502 });
     }
 
     await logCommunicationEvent(base44, {
@@ -105,9 +106,9 @@ Deno.serve(async (req) => {
       metadata: { action: 'crm_sync', webhook_url_configured: true },
     });
 
-    return Response.json({ success: true, lead_id });
+    return secureJson({ success: true, lead_id });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'CRM sync failed';
-    return Response.json({ error: message }, { status: 500 });
+    return secureJson({ error: message }, { status: 500 });
   }
 });

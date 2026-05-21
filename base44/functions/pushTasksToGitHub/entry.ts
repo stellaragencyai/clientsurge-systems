@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * pushTasksToGitHub
  * Exports ALL tasks — from both the ProjectTask DB entity AND the MASTER_TASK_LIST_560.md file.
@@ -227,17 +228,17 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== 'admin') {
-      return Response.json({ error: 'Admin access required' }, { status: 403 });
+      return secureJson({ error: 'Admin access required' }, { status: 403 });
     }
 
     const body = await req.json().catch(() => ({}));
     const { owner, repo, dry_run = false, source = 'both' } = body;
 
     if (!owner || !repo) {
-      return Response.json({ error: 'Missing required fields: owner, repo' }, { status: 400 });
+      return secureJson({ error: 'Missing required fields: owner, repo' }, { status: 400 });
     }
     if (!GITHUB_TOKEN) {
-      return Response.json({ error: 'GITHUB_TOKEN secret not set' }, { status: 500 });
+      return secureJson({ error: 'GITHUB_TOKEN secret not set' }, { status: 500 });
     }
 
     // 1. Fetch DB tasks
@@ -262,7 +263,7 @@ Deno.serve(async (req) => {
     }
 
     if (dry_run) {
-      return Response.json({
+      return secureJson({
         success: true,
         dry_run: true,
         db_tasks: dbTasks.length,
@@ -322,7 +323,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       total_tasks: allTasks.length,
       db_tasks: dbTasks.length,
@@ -335,6 +336,6 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('[pushTasksToGitHub] Fatal error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

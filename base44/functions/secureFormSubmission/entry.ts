@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 // Rate limiting check
@@ -30,13 +31,13 @@ Deno.serve(async (req) => {
     // Rate limiting
     const clientId = req.headers.get('user-agent') || 'unknown';
     if (!checkRateLimit(clientId, 5, 60000)) {
-      return Response.json({ error: 'Too many requests. Try again later.' }, { status: 429 });
+      return secureJson({ error: 'Too many requests. Try again later.' }, { status: 429 });
     }
 
     // Check authentication
     const user = await base44.auth.me();
     if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return secureJson({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const data = await req.json();
@@ -49,16 +50,16 @@ Deno.serve(async (req) => {
 
     // Validate required fields
     if (!sanitized.email || !sanitized.full_name) {
-      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+      return secureJson({ error: 'Missing required fields' }, { status: 400 });
     }
 
     // Email validation
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitized.email)) {
-      return Response.json({ error: 'Invalid email' }, { status: 400 });
+      return secureJson({ error: 'Invalid email' }, { status: 400 });
     }
 
-    return Response.json({ success: true, data: sanitized });
+    return secureJson({ success: true, data: sanitized });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

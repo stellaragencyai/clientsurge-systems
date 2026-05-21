@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Missed-Call Follow-Up Processor (Minute-Precision)
  * Scheduled: Every 5 minutes
@@ -190,7 +191,7 @@ Deno.serve(async (req) => {
       user = await base44.auth.me();
     } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     // ─────────────────────────────────────────────────────
@@ -207,7 +208,7 @@ Deno.serve(async (req) => {
     );
 
     if (!leads?.length) {
-      return Response.json({
+      return secureJson({
         success: true,
         processed: 0,
         message: "No missed-call leads to process",
@@ -491,10 +492,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, ...results });
+    return secureJson({ success: true, ...results });
   } catch (error) {
     console.error("[processMissedCallFollowUps] Fatal error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message || "Failed to process missed-call follow-ups" },
       { status: 500 }
     );

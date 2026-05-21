@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * generateWebsiteSpec — #416a #416b #416c #416d
  * Generates a structured WebsiteSpec JSON for a client based on tier + industry.
@@ -99,10 +100,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { order_id } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
 
     const package_key = order.package_key || "starter";
     const industry = order.industry || "default";
@@ -131,8 +132,8 @@ Deno.serve(async (req) => {
     // Advance workflow stage
     await base44.asServiceRole.entities.Order.update(order_id, { workflow_stage: "Website Spec Generated" });
 
-    return Response.json({ success: true, spec_id: specId, spec, page_count: pages.length });
+    return secureJson({ success: true, spec_id: specId, spec, page_count: pages.length });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

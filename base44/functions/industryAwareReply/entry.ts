@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 // ─────────────────────────────────────────────
@@ -96,13 +97,13 @@ Deno.serve(async (req) => {
     const { lead_id, inbound_message } = await req.json();
 
     if (!lead_id || !inbound_message) {
-      return Response.json({ error: 'lead_id and inbound_message required' }, { status: 400 });
+      return secureJson({ error: 'lead_id and inbound_message required' }, { status: 400 });
     }
 
     // 1. Fetch lead
     const leads = await base44.asServiceRole.entities.Leads.filter({ id: lead_id });
     if (!leads || leads.length === 0) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+      return secureJson({ error: 'Lead not found' }, { status: 404 });
     }
     const lead = leads[0];
     const firstName = (lead.full_name || '').split(' ')[0] || 'there';
@@ -116,7 +117,7 @@ Deno.serve(async (req) => {
 
       await base44.asServiceRole.entities.Leads.update(lead_id, { status: 'Closed' });
 
-      return Response.json({ success: true, reply: optOutReply, action: 'opted_out' });
+      return secureJson({ success: true, reply: optOutReply, action: 'opted_out' });
     }
 
     // 3. Determine industry + agent config
@@ -216,7 +217,7 @@ Generate your next SMS reply. Under 160 characters. Be conversational.`;
     }
     await base44.asServiceRole.entities.Leads.update(lead_id, updates);
 
-    return Response.json({
+    return secureJson({
       success: true,
       reply,
       detected_intent: detectedIntent,
@@ -225,6 +226,6 @@ Generate your next SMS reply. Under 160 characters. Be conversational.`;
     });
   } catch (error) {
     console.error('[industryAwareReply] Error:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

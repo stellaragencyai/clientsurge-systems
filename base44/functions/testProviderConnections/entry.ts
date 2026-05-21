@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { resendFetch } from "../_shared/resendFetch.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 /**
@@ -11,7 +12,7 @@ Deno.serve(async (req) => {
     const sid = Deno.env.get("TWILIO_ACCOUNT_SID");
     const auth = Deno.env.get("TWILIO_AUTH_TOKEN");
     if (!sid || !auth) {
-      return Response.json(
+      return secureJson(
         { success: false, message: "Twilio credentials not configured" },
         { status: 503 }
       );
@@ -22,22 +23,22 @@ Deno.serve(async (req) => {
       });
       if (res.ok) {
         const d = await res.json();
-        return Response.json({ success: true, message: `Connected — Account: ${d.friendly_name || sid}` });
+        return secureJson({ success: true, message: `Connected — Account: ${d.friendly_name || sid}` });
       }
       const err = await res.json().catch(() => ({}));
-      return Response.json(
+      return secureJson(
         { success: false, message: `Error ${res.status}: ${err?.message || "unknown"}` },
         { status: 502 }
       );
     } catch (e) {
-      return Response.json({ success: false, message: e.message }, { status: 502 });
+      return secureJson({ success: false, message: e.message }, { status: 502 });
     }
   }
 
   if (provider === "resend") {
     const key = Deno.env.get("RESEND_API_KEY");
     if (!key) {
-      return Response.json(
+      return secureJson(
         { success: false, message: "Resend key not configured" },
         { status: 503 }
       );
@@ -47,17 +48,17 @@ Deno.serve(async (req) => {
       if (res.ok) {
         const d = await res.json();
         const domains = (d?.data || []).map((x) => x.name).join(", ") || "verified";
-        return Response.json({ success: true, message: `Connected — Domains: ${domains}` });
+        return secureJson({ success: true, message: `Connected — Domains: ${domains}` });
       }
       const err = await res.json().catch(() => ({}));
-      return Response.json(
+      return secureJson(
         { success: false, message: `Error ${res.status}: ${err?.message || "unknown"}` },
         { status: 502 }
       );
     } catch (e) {
-      return Response.json({ success: false, message: e.message }, { status: 502 });
+      return secureJson({ success: false, message: e.message }, { status: 502 });
     }
   }
 
-  return Response.json({ success: false, message: "Unknown provider — use 'twilio' or 'resend'" }, { status: 400 });
+  return secureJson({ success: false, message: "Unknown provider — use 'twilio' or 'resend'" }, { status: 400 });
 });

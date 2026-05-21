@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * createElevenLabsAgent — #542
  * Creates one ElevenLabs conversational AI agent per industry.
@@ -80,19 +81,19 @@ async function createAgent(config: typeof INDUSTRY_CONFIGS[string], order_id: st
 Deno.serve(async (req) => {
   try {
     if (!ELEVENLABS_API_KEY) {
-      return Response.json({ error: "ELEVENLABS_API_KEY not configured" }, { status: 500 });
+      return secureJson({ error: "ELEVENLABS_API_KEY not configured" }, { status: 500 });
     }
 
     const base44 = createClientFromRequest(req);
     const { order_id, industry, business_name, dry_run = false } = await req.json();
 
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const industryKey = industry?.toLowerCase().replace(/\s+/g, '_') || "general";
     const agentConfig = INDUSTRY_CONFIGS[industryKey] || INDUSTRY_CONFIGS.general;
 
     if (dry_run) {
-      return Response.json({
+      return secureJson({
         success: true, dry_run: true,
         would_create: { industry: industryKey, agent_name: `${business_name} — AI Receptionist`, voice_id: agentConfig.voice_id },
       });
@@ -117,9 +118,9 @@ Deno.serve(async (req) => {
     });
 
     console.log(`[createElevenLabsAgent] Created agent ${agent.agent_id} for order ${order_id}`);
-    return Response.json({ success: true, agent_id: agent.agent_id, industry: industryKey });
+    return secureJson({ success: true, agent_id: agent.agent_id, industry: industryKey });
   } catch (err) {
     console.error("[createElevenLabsAgent] Error:", err.message);
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

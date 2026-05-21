@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * calculateLeadScore
  *
@@ -115,7 +116,7 @@ function activationPriority(score, lead) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -126,17 +127,17 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden: Admin only" }, { status: 403 });
+      return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
     }
     if (!user && (!isAutomationPayload || !allowAnonymousAutomation(req))) {
-      return Response.json({ error: "Forbidden: Trusted automation only" }, { status: 403 });
+      return secureJson({ error: "Forbidden: Trusted automation only" }, { status: 403 });
     }
 
     // Support both entity automation payload and direct call
     const leadId = body?.lead_id || body?.event?.entity_id || body?.data?.id || null;
 
     if (!leadId) {
-      return Response.json({ error: "Missing lead_id" }, { status: 400 });
+      return secureJson({ error: "Missing lead_id" }, { status: 400 });
     }
 
     // Fetch lead + communication events + email engagement in parallel
@@ -147,7 +148,7 @@ Deno.serve(async (req) => {
     ]);
 
     if (!leadList?.length) {
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     const lead = leadList[0];
@@ -189,7 +190,7 @@ Deno.serve(async (req) => {
 
     console.log(`[calculateLeadScore] ${lead.full_name} → score=${finalScore} priority=${priority}`, breakdown);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: leadId,
       score: finalScore,
@@ -199,6 +200,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[calculateLeadScore] calculateLeadScore error:", error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

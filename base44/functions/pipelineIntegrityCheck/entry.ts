@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * pipelineIntegrityCheck — #161 #162 #163 #166
  * Verifies and auto-fixes pipeline data consistency after Order state changes.
@@ -7,13 +8,13 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
   const { order_id, fix = true } = await req.json().catch(() => ({}));
-  if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+  if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
   const issues: string[] = [];
   const fixes: string[] = [];
 
   const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-  if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+  if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
 
   // #161: client_id must be set
   if (!order.client_id && order.customer_email) {
@@ -73,5 +74,5 @@ Deno.serve(async (req) => {
     resolved: issues.length === fixes.length,
   });
 
-  return Response.json({ order_id, issues_found: issues.length, fixes_applied: fixes.length, issues, fixes });
+  return secureJson({ order_id, issues_found: issues.length, fixes_applied: fixes.length, issues, fixes });
 });

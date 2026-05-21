@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Dynamic Follow-Up Cadence Processor
  * Adjusts follow-up sequence based on lead engagement
@@ -145,7 +146,7 @@ Deno.serve(async (req) => {
     );
 
     if (!leads?.length) {
-      return Response.json({ success: true, processed: 0, message: "No leads to process" });
+      return secureJson({ success: true, processed: 0, message: "No leads to process" });
     }
 
     const results = { processed: 0, sent: 0, paused: 0, maxed: 0, failed: 0 };
@@ -244,9 +245,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, ...results });
+    return secureJson({ success: true, ...results });
   } catch (error) {
     console.error("[processDynamicFollowUps] Fatal error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

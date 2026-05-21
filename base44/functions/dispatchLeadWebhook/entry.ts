@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 // ─────────────────────────────────────────────
@@ -110,13 +111,13 @@ Deno.serve(async (req) => {
     const { leadId } = await req.json();
 
     if (!leadId) {
-      return Response.json({ error: 'Lead ID required' }, { status: 400 });
+      return secureJson({ error: 'Lead ID required' }, { status: 400 });
     }
 
     // Fetch lead
     const leads = await base44.asServiceRole.entities.Leads.filter({ id: leadId });
     if (!leads || leads.length === 0) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+      return secureJson({ error: 'Lead not found' }, { status: 404 });
     }
 
     const lead = leads[0];
@@ -178,9 +179,9 @@ Deno.serve(async (req) => {
       console.log(`[dispatchLeadWebhook] External webhook response: ${res.status}`);
     }
 
-    return Response.json({ success: true, payload: webhookPayload });
+    return secureJson({ success: true, payload: webhookPayload });
   } catch (error) {
     console.error('[dispatchLeadWebhook] Error:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

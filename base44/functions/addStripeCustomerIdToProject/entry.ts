@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * addStripeCustomerIdToProject.ts — #209
  * Ensures ClientOnboarding (ClientProject) has stripe_customer_id
@@ -12,7 +13,7 @@ Deno.serve(async (req) => {
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order?.stripe_customer_id || !order?.client_email) {
-      return Response.json({ skipped: true, reason: "No stripe_customer_id or email on order" });
+      return secureJson({ skipped: true, reason: "No stripe_customer_id or email on order" });
     }
 
     const projects = await base44.asServiceRole.entities.ClientOnboarding
@@ -28,8 +29,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, updated, order_id });
+    return secureJson({ success: true, updated, order_id });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

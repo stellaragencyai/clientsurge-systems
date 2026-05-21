@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Process Automation Jobs — Queued SMS/Email Reactivation Sender
  * Scheduled: Every 5 minutes
@@ -115,7 +116,7 @@ Deno.serve(async (req) => {
       user = await base44.auth.me();
     } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     console.log("[ProcessAutomationJobs] Starting job processor...");
@@ -136,7 +137,7 @@ Deno.serve(async (req) => {
 
     if (!dueJobs.length) {
       console.log("[ProcessAutomationJobs] No queued jobs found");
-      return Response.json({
+      return secureJson({
         success: true,
         jobs_found: queuedJobs?.length || 0,
         jobs_processed: 0,
@@ -313,10 +314,10 @@ Deno.serve(async (req) => {
 
     console.log(`[ProcessAutomationJobs] Complete — processed: ${results.jobs_processed}, failed: ${results.jobs_failed}, skipped: ${results.jobs_skipped}`);
 
-    return Response.json({ success: true, ...results });
+    return secureJson({ success: true, ...results });
   } catch (error) {
     console.error("[ProcessAutomationJobs] Fatal error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message || "Failed to process automation jobs" },
       { status: 500 }
     );

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * credentialsCompletionCheck — #480
  * Returns per-service readiness based on submitted credentials.
@@ -17,10 +18,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { order_id } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
 
     const creds = order.install_configuration || {};
     const services = order.selected_service_keys || [];
@@ -33,8 +34,8 @@ Deno.serve(async (req) => {
     }
 
     const allReady = Object.values(readiness).every((r: any) => r.ready);
-    return Response.json({ success: true, order_id, readiness, all_ready: allReady });
+    return secureJson({ success: true, order_id, readiness, all_ready: allReady });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

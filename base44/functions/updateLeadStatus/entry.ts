@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
 import { createAuditLog } from "../shared/auditLog.ts";
@@ -9,7 +10,7 @@ import {
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return secureJson({ error: "Method not allowed" }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -21,16 +22,16 @@ Deno.serve(async (req) => {
     const note = typeof payload?.note === "string" ? payload.note.trim() : "";
 
     if (!leadId) {
-      return Response.json({ error: "lead_id is required" }, { status: 400 });
+      return secureJson({ error: "lead_id is required" }, { status: 400 });
     }
 
     if (!LEAD_STATUSES.includes(nextStatus)) {
-      return Response.json({ error: "status is invalid" }, { status: 400 });
+      return secureJson({ error: "status is invalid" }, { status: 400 });
     }
 
     const lead = await base44.asServiceRole.entities.Leads.get(leadId);
     if (!lead) {
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     const now = new Date().toISOString();
@@ -82,14 +83,14 @@ Deno.serve(async (req) => {
       notes: note || "",
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead: updatedLead,
       event_id: event.id,
     });
   } catch (error) {
     if (error instanceof AuthGuardError) {
-      return Response.json(
+      return secureJson(
         {
           error: error.message,
           code: error.code,
@@ -104,6 +105,6 @@ Deno.serve(async (req) => {
       message === "lead_id is required" || message === "status is invalid" ? 400 :
       500;
 
-    return Response.json({ error: message }, { status });
+    return secureJson({ error: message }, { status });
   }
 });

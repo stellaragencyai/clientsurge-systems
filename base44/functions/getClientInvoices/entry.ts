@@ -1,24 +1,25 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resolveClientPortalAccess } from '../_shared/portalOwnership.js';
 
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
     if (!user) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return secureJson({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await req.json().catch(() => ({}));
     const projectId = body.project_id;
 
     if (!projectId) {
-      return Response.json({ error: 'Missing project_id' }, { status: 400 });
+      return secureJson({ error: 'Missing project_id' }, { status: 400 });
     }
 
     if (user.role !== 'admin') {
@@ -28,7 +29,7 @@ Deno.serve(async (req) => {
       });
 
       if (resolution.status !== 'resolved' || !resolution.project || resolution.project.id !== projectId) {
-        return Response.json({ error: 'Forbidden' }, { status: 403 });
+        return secureJson({ error: 'Forbidden' }, { status: 403 });
       }
     }
 
@@ -56,13 +57,13 @@ Deno.serve(async (req) => {
       overdue_count: invoices.filter(i => i.status === 'overdue').length,
     };
 
-    return Response.json({
+    return secureJson({
       success: true,
       invoices,
       summary,
     });
   } catch (error) {
     console.error('[getClientInvoices] Error fetching invoices:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

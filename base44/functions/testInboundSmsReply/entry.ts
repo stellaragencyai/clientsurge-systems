@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Admin test function for inbound SMS reply handler
  * Validates end-to-end SMS reply capture, lead matching, and automation stop
@@ -27,7 +28,7 @@ Deno.serve(async (req) => {
     } catch (_) {}
 
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     const payload = await req.json().catch(() => ({}));
@@ -130,7 +131,7 @@ Deno.serve(async (req) => {
       console.log("[testInboundSmsReply] Test 4 result:", results.test_4);
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       test: testCase,
       results,
@@ -138,6 +139,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[testInboundSmsReply] Error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

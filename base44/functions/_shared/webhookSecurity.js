@@ -1,3 +1,4 @@
+import { secureJson } from "./secureJson.js";
 const WEBHOOK_TIMESTAMP_TOLERANCE_SECONDS = 300;
 
 function getEnv(name) {
@@ -125,7 +126,7 @@ export function buildWebhookAuthErrorResponse({
   code = "webhook_signature_invalid",
   status = 401,
 }) {
-  return Response.json(
+  return secureJson(
     {
       error: "Untrusted webhook request",
       code,

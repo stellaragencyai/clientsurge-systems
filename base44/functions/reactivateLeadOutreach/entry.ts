@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Reactivate Lead Outreach
  * Sends SMS + Email with special offer to dormant leads
@@ -12,7 +13,7 @@ Deno.serve(async (req) => {
     const { reactivation_id } = await req.json();
 
     if (!reactivation_id) {
-      return Response.json({ error: "reactivation_id required" }, { status: 400 });
+      return secureJson({ error: "reactivation_id required" }, { status: 400 });
     }
 
     console.log(`[Reactivate] Processing reactivation ${reactivation_id}`);
@@ -23,7 +24,7 @@ Deno.serve(async (req) => {
         reactivation_id
       );
     if (!reactivation || reactivation.status === "unrecoverable") {
-      return Response.json(
+      return secureJson(
         { success: false, message: "Record not reactivatable" },
         { status: 409 }
       );
@@ -34,7 +35,7 @@ Deno.serve(async (req) => {
       reactivation.lead_id
     );
     if (!lead) {
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     // 3. Determine outreach based on attempt number
@@ -60,7 +61,7 @@ Deno.serve(async (req) => {
         }
       );
       console.log(`[Reactivate] Archived after ${attempt} attempts`);
-      return Response.json({
+      return secureJson({
         success: true,
         message: "Lead archived after max attempts",
       });
@@ -148,7 +149,7 @@ The {{business}} Team
 
     console.log(`[Reactivate] Outreach attempt ${attempt} queued for ${lead.id}`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: lead.id,
       attempt,
@@ -158,7 +159,7 @@ The {{business}} Team
     });
   } catch (error) {
     console.error("[Reactivate] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

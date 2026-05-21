@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * sendAdminLeadNotification
  * Triggered by entity automation on Leads create.
@@ -39,7 +40,7 @@ function escapeHtml(value) {
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -49,39 +50,39 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== 'admin') {
-      return Response.json({ error: 'Forbidden: Admin only' }, { status: 403 });
+      return secureJson({ error: 'Forbidden: Admin only' }, { status: 403 });
     }
     if (!user && (!isAutomationPayload || !allowAnonymousAutomation(req))) {
-      return Response.json({ error: 'Forbidden: Trusted automation only' }, { status: 403 });
+      return secureJson({ error: 'Forbidden: Trusted automation only' }, { status: 403 });
     }
 
     // Support both direct call (lead_id) and entity automation payload (event.entity_id)
     const lead_id = body?.lead_id || body?.event?.entity_id || body?.data?.id;
 
     if (!lead_id) {
-      return Response.json({ error: 'lead_id required' }, { status: 400 });
+      return secureJson({ error: 'lead_id required' }, { status: 400 });
     }
 
     const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
     if (!lead) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+      return secureJson({ error: 'Lead not found' }, { status: 404 });
     }
 
     const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
     const settings = settingsRecords?.[0] || {};
     if (!settings.resend_enabled) {
-      return Response.json({ skipped: true, reason: 'Resend is disabled in AdminSettings' });
+      return secureJson({ skipped: true, reason: 'Resend is disabled in AdminSettings' });
     }
 
     const toEmail = settings.lead_notification_email || Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || Deno.env.get('ADMIN_EMAIL');
     if (!toEmail) {
       console.warn('[sendAdminLeadNotification] No lead_notification_email configured in AdminSettings or env — skipping notification.');
-      return Response.json({ skipped: true, reason: 'No notification email configured' });
+      return secureJson({ skipped: true, reason: 'No notification email configured' });
     }
 
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) {
-      return Response.json({ error: 'RESEND_API_KEY not set' }, { status: 500 });
+      return secureJson({ error: 'RESEND_API_KEY not set' }, { status: 500 });
     }
 
     const submittedAt = new Date(lead.created_date).toLocaleString('en-US', {
@@ -144,7 +145,7 @@ Deno.serve(async (req) => {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       console.error('[sendAdminLeadNotification] Resend error:', err);
-      return Response.json({ error: err?.message || 'Resend failed' }, { status: 500 });
+      return secureJson({ error: err?.message || 'Resend failed' }, { status: 500 });
     }
 
     const resendData = await res.json().catch(() => ({}));
@@ -163,10 +164,10 @@ Deno.serve(async (req) => {
     });
 
     console.log(`[sendAdminLeadNotification] Lead notification sent to ${toEmail} for lead ${lead_id}`);
-    return Response.json({ success: true, sent_to: toEmail, email_id: resendData?.id || null });
+    return secureJson({ success: true, sent_to: toEmail, email_id: resendData?.id || null });
 
   } catch (error) {
     console.error('[sendAdminLeadNotification] sendAdminLeadNotification error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

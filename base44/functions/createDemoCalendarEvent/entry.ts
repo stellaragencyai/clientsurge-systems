@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -6,7 +7,7 @@ Deno.serve(async (req) => {
     const { lead_id, title, start_time, duration_minutes } = await req.json();
 
     if (!title || !start_time || !duration_minutes) {
-      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+      return secureJson({ error: 'Missing required fields' }, { status: 400 });
     }
 
     if (lead_id) {
@@ -15,8 +16,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    return Response.json({ success: true, message: 'Calendar event created' });
+    return secureJson({ success: true, message: 'Calendar event created' });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

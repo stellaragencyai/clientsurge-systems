@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * pauseSubscription — #529
  * Admin-only pause-collection wrapper for Stripe subscriptions plus local audit state.
@@ -65,21 +66,21 @@ Deno.serve(async (req) => {
     } = await req.json().catch(() => ({}));
 
     if (!order_id) {
-      return Response.json({ error: "order_id required" }, { status: 400 });
+      return secureJson({ error: "order_id required" }, { status: 400 });
     }
 
     const pauseBehavior = normalizePauseBehavior(behavior);
     if (!pauseBehavior) {
-      return Response.json({ error: "Invalid pause behavior" }, { status: 400 });
+      return secureJson({ error: "Invalid pause behavior" }, { status: 400 });
     }
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      return secureJson({ error: "Order not found" }, { status: 404 });
     }
 
     if (!order.stripe_subscription_id) {
-      return Response.json({ error: "No Stripe subscription on order" }, { status: 400 });
+      return secureJson({ error: "No Stripe subscription on order" }, { status: 400 });
     }
 
     const resumeAt = normalizeResumesAt(resumes_at);
@@ -137,7 +138,7 @@ Deno.serve(async (req) => {
       })
     );
 
-    return Response.json({
+    return secureJson({
       success: true,
       order_id: order.id,
       stripe_subscription_id: order.stripe_subscription_id,
@@ -149,9 +150,9 @@ Deno.serve(async (req) => {
     });
   } catch (err: any) {
     if (err instanceof AuthGuardError) {
-      return Response.json({ error: err.message, code: err.code }, { status: err.status });
+      return secureJson({ error: err.message, code: err.code }, { status: err.status });
     }
 
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

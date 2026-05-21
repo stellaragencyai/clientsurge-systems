@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * generateMonthlyPerformanceReport — #422 #422a #422b #422d
  * Elite perk #2. Runs 1st of month.
@@ -85,8 +86,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({ success: true, reports_sent: sent, total_orders: orders.length });
+    return secureJson({ success: true, reports_sent: sent, total_orders: orders.length });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

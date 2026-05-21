@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 const VALID_TRANSITIONS = {
@@ -66,10 +67,10 @@ Deno.serve(async (req) => {
       };
     });
 
-    return Response.json({ success: true, orders: mapped });
+    return secureJson({ success: true, orders: mapped });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to load install queue";
     const status = message === "Admin access required" ? 403 : 500;
-    return Response.json({ error: message }, { status });
+    return secureJson({ error: message }, { status });
   }
 });

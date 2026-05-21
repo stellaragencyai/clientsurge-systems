@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 // ─────────────────────────────────────────────
@@ -63,13 +64,13 @@ Deno.serve(async (req) => {
     const { lead_id, industry_key } = await req.json();
 
     if (!lead_id) {
-      return Response.json({ error: 'lead_id required' }, { status: 400 });
+      return secureJson({ error: 'lead_id required' }, { status: 400 });
     }
 
     // Fetch lead
     const leads = await base44.asServiceRole.entities.Leads.filter({ id: lead_id });
     if (!leads || leads.length === 0) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+      return secureJson({ error: 'Lead not found' }, { status: 404 });
     }
 
     const lead = leads[0];
@@ -143,9 +144,9 @@ Write a single SMS message (under 160 characters). Include their first name. End
       metadata_json: JSON.stringify({ industry_key: industryKey, agent: promptConfig.rep_name, char_count: sms.length }),
     });
 
-    return Response.json({ success: true, sms, industry_key: industryKey, char_count: sms.length });
+    return secureJson({ success: true, sms, industry_key: industryKey, char_count: sms.length });
   } catch (error) {
     console.error('[generateIndustryFirstSMS] Error:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

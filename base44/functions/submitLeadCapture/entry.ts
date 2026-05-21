@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Canonical website lead intake.
  * Stores top-of-funnel submissions in WebsiteLead only.
@@ -124,13 +125,13 @@ Deno.serve(async (req) => {
   try {
     const originGuard = validatePublicFormOrigin(req);
     if (!originGuard.ok) {
-      return Response.json({ error: originGuard.error }, { status: originGuard.status });
+      return secureJson({ error: originGuard.error }, { status: originGuard.status });
     }
 
     const base44 = createClientFromRequest(req);
     const ip = getClientIp(req);
     if (rateLimiter.isRateLimited(ip)) {
-      return Response.json(
+      return secureJson(
         { error: "Too many submissions. Please try again later." },
         { status: 429 }
       );
@@ -138,7 +139,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
 
     if (cleanString(body.website_url)) {
-      return Response.json({
+      return secureJson({
         success: true,
         deduplicated: true,
         reason: "bot_detected",
@@ -149,17 +150,17 @@ Deno.serve(async (req) => {
     const rawPhone = cleanString(body.phone || body.phone_number);
     const phone = normalizePhone(rawPhone);
     if (rawPhone && !phone) {
-      return Response.json({ error: "Invalid phone number" }, { status: 422 });
+      return secureJson({ error: "Invalid phone number" }, { status: 422 });
     }
     if (!email && !phone) {
-      return Response.json(
+      return secureJson(
         { error: "phone or email required" },
         { status: 400 }
       );
     }
 
     if (email && isDisposableEmail(email)) {
-      return Response.json({ error: "Invalid email address" }, { status: 422 });
+      return secureJson({ error: "Invalid email address" }, { status: 422 });
     }
 
     const recentWebsiteLeads = await base44.asServiceRole.entities.WebsiteLead.list(
@@ -173,7 +174,7 @@ Deno.serve(async (req) => {
     });
 
     if (duplicate) {
-      return Response.json({
+      return secureJson({
         success: true,
         deduplicated: true,
         reason: "duplicate_60min",
@@ -223,7 +224,7 @@ Deno.serve(async (req) => {
       triggerEvent: "new_website_lead",
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: lead.id,
       crm_lead_id: crmLead.id,
@@ -231,6 +232,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
-    return Response.json({ error: errorMsg }, { status: 500 });
+    return secureJson({ error: errorMsg }, { status: 500 });
   }
 });

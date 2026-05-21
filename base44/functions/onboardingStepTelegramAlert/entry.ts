@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * onboardingStepTelegramAlert — #279
  * Triggered when any key onboarding field changes on ClientOnboarding.
@@ -38,7 +39,7 @@ Deno.serve(async (req) => {
     }
 
     if (!changes.length) {
-      return Response.json({ skipped: true, reason: "No watched fields changed to true" });
+      return secureJson({ skipped: true, reason: "No watched fields changed to true" });
     }
 
     const msg = `📋 <b>Onboarding Update</b>: ${business}\n\n${changes.join("\n")}\n\n<i>View in admin: clientsurgesystems.com/admin</i>`;
@@ -52,8 +53,8 @@ Deno.serve(async (req) => {
       if (!res.ok) throw new Error(`Telegram error ${res.status}`);
     }
 
-    return Response.json({ success: true, changes });
+    return secureJson({ success: true, changes });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

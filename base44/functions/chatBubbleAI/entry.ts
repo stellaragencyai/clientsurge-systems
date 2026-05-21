@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import {
   buildChatConversationContext,
@@ -72,7 +73,7 @@ Deno.serve(async (req) => {
     const ip = getClientIp(req);
 
     if (isRateLimited(ip)) {
-      return Response.json(
+      return secureJson(
         { reply: "You're sending messages pretty fast! Take a breath — or book a free call and we'll answer everything live." },
         { status: 429 }
       );
@@ -83,12 +84,12 @@ Deno.serve(async (req) => {
     const { messages, installStatus, services, mode } = body;
 
     if (!messages || !Array.isArray(messages)) {
-      return Response.json({ error: 'messages array required' }, { status: 400 });
+      return secureJson({ error: 'messages array required' }, { status: 400 });
     }
 
     // Prompt injection guard — strip script tags and reject obvious injection attempts
     if (hasPromptInjectionAttempt(messages)) {
-      return Response.json({
+      return secureJson({
         reply: "I can help with ClientSurge pricing, demos, services, or installation support, but I can't follow requests to reveal or override internal instructions.",
       });
     }
@@ -120,10 +121,10 @@ Client context:
 
     const replyText = typeof reply === 'string' ? reply.trim() : String(reply).trim();
 
-    return Response.json({ reply: replyText });
+    return secureJson({ reply: replyText });
   } catch (error) {
     console.error('[chatBubbleAI] chatBubbleAI error:', error);
-    return Response.json({
+    return secureJson({
       reply: 'I\'m having trouble connecting right now. For urgent support, call (602) 587-4608 or email support@clientsurgesystems.com.',
     }, { status: 500 });
   }

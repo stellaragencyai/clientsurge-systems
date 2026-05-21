@@ -1,10 +1,11 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!user) return secureJson({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json().catch(() => ({}));
     const {
@@ -17,14 +18,14 @@ Deno.serve(async (req) => {
       email_confirmation_template,
     } = body;
 
-    if (!project_id) return Response.json({ error: 'project_id required' }, { status: 400 });
+    if (!project_id) return secureJson({ error: 'project_id required' }, { status: 400 });
 
     // Verify user owns this project
     const projects = await base44.asServiceRole.entities.ClientProject.filter({ id: project_id });
     const project = projects?.[0];
-    if (!project) return Response.json({ error: 'Project not found' }, { status: 404 });
+    if (!project) return secureJson({ error: 'Project not found' }, { status: 404 });
     if (project.client_email !== user.email && user.role !== 'admin') {
-      return Response.json({ error: 'Forbidden' }, { status: 403 });
+      return secureJson({ error: 'Forbidden' }, { status: 403 });
     }
 
     // Get or create AdminSettings record
@@ -51,9 +52,9 @@ Deno.serve(async (req) => {
     });
 
     console.log(`[saveQuickStartConfig] Quick start config saved for project ${project_id} by ${user.email}`);
-    return Response.json({ success: true });
+    return secureJson({ success: true });
   } catch (error) {
     console.error('[saveQuickStartConfig] saveQuickStartConfig error:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

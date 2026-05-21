@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * workflowStageManager.ts — #419
  * Auto-updates ClientInstallationOS.workflow_stage as website build progresses.
@@ -27,19 +28,19 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { order_id, stage, advance } = await req.json();
-    if (!order_id) return Response.json({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order) return Response.json({ error: "Order not found" }, { status: 404 });
+    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
 
     let new_stage = stage;
     if (advance) {
       new_stage = getNextStage(order.workflow_stage || "Paid");
-      if (!new_stage) return Response.json({ success: true, message: "Already at final stage", current: order.workflow_stage });
+      if (!new_stage) return secureJson({ success: true, message: "Already at final stage", current: order.workflow_stage });
     }
 
     if (!WORKFLOW_STAGES.includes(new_stage)) {
-      return Response.json({ error: `Invalid stage: ${new_stage}. Valid: ${WORKFLOW_STAGES.join(", ")}` }, { status: 400 });
+      return secureJson({ error: `Invalid stage: ${new_stage}. Valid: ${WORKFLOW_STAGES.join(", ")}` }, { status: 400 });
     }
 
     await base44.asServiceRole.entities.Order.update(order_id, {
@@ -48,8 +49,8 @@ Deno.serve(async (req) => {
     });
 
     console.log(`[workflowStageManager] ${order_id}: ${order.workflow_stage} → ${new_stage}`);
-    return Response.json({ success: true, previous: order.workflow_stage, current: new_stage });
+    return secureJson({ success: true, previous: order.workflow_stage, current: new_stage });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * getClientFollowUpLog
  * Returns real CommunicationEvent records for the authenticated client's portal.
@@ -9,7 +10,7 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user?.email) {
-      return Response.json({ error: "Authentication required" }, { status: 401 });
+      return secureJson({ error: "Authentication required" }, { status: 401 });
     }
 
     const email = user.email.toLowerCase().trim();
@@ -58,9 +59,9 @@ Deno.serve(async (req) => {
       events = await base44.asServiceRole.entities.CommunicationEvent.list("-created_date", 200);
     }
 
-    return Response.json({ success: true, events: events || [] });
+    return secureJson({ success: true, events: events || [] });
   } catch (error) {
     console.error("[getClientFollowUpLog] Error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

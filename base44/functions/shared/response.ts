@@ -7,7 +7,7 @@ export function okJson(data: Record<string, unknown>, status = 200): Response {
     status,
     headers: {
       "Content-Type": "application/json",
-      "X-Frame-Options": "DENY",          // #93
+      "X-Frame-Options": "DENY",
       "Cache-Control": "no-store",
     },
   });
@@ -16,7 +16,11 @@ export function okJson(data: Record<string, unknown>, status = 200): Response {
 export function errJson(message: string, status = 500, extra: Record<string, unknown> = {}): Response {
   return new Response(JSON.stringify({ success: false, error: message, ...extra }), {
     status,
-    headers: { "Content-Type": "application/json", "X-Frame-Options": "DENY" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Frame-Options": "DENY",
+      "Cache-Control": "no-store",
+    },
   });
 }
 

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Twilio SMS Delivery Status Callback
  * POST /api/receiveTwilioSmsStatusCallback
@@ -72,7 +73,7 @@ function mapTwilioStatus(twilioStatus) {
 
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
-    return Response.json({ error: "Method not allowed" }, { status: 405 });
+    return secureJson({ error: "Method not allowed" }, { status: 405 });
   }
 
   // Read raw body before any parsing (required for signature validation)
@@ -81,10 +82,10 @@ Deno.serve(async (req) => {
   // Validate Twilio signature
   const sigResult = await validateTwilioSignature(req, rawBody);
   if (sigResult.missing_token) {
-    return Response.json({ error: "Server configuration error" }, { status: 500 });
+    return secureJson({ error: "Server configuration error" }, { status: 500 });
   }
   if (!sigResult.valid) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return secureJson({ error: "Forbidden" }, { status: 403 });
   }
 
   const params = new URLSearchParams(rawBody);
@@ -98,14 +99,14 @@ Deno.serve(async (req) => {
   console.log(`[SmsStatusCallback] SID=${messageSid} status=${messageStatus} errorCode=${errorCode || "none"}`);
 
   if (!messageSid) {
-    return Response.json({ error: "Missing MessageSid" }, { status: 400 });
+    return secureJson({ error: "Missing MessageSid" }, { status: 400 });
   }
 
   const mappedStatus = mapTwilioStatus(messageStatus);
   if (!mappedStatus) {
     // Unknown/transitional status — acknowledge but take no action
     console.log(`[SmsStatusCallback] Unrecognised status "${messageStatus}" for SID ${messageSid} — no update`);
-    return Response.json({ status: "ok_noop" });
+    return secureJson({ status: "ok_noop" });
   }
 
   try {
@@ -121,7 +122,7 @@ Deno.serve(async (req) => {
     if (!matches || matches.length === 0) {
       console.warn(`[SmsStatusCallback] No CommunicationEvent found for SID ${messageSid}`);
       // Return 200 so Twilio does not keep retrying — we simply have no record to update
-      return Response.json({ status: "ok_no_match" });
+      return secureJson({ status: "ok_no_match" });
     }
 
     const event = matches[0];
@@ -130,7 +131,7 @@ Deno.serve(async (req) => {
     const terminalStatuses = new Set(["delivered", "failed"]);
     if (terminalStatuses.has(event.status) && event.status === mappedStatus) {
       console.log(`[SmsStatusCallback] Already at terminal status "${event.status}" for SID ${messageSid} — skipping`);
-      return Response.json({ status: "ok_idempotent" });
+      return secureJson({ status: "ok_idempotent" });
     }
 
     // Merge existing metadata with new status details
@@ -156,11 +157,11 @@ Deno.serve(async (req) => {
     });
 
     console.log(`[SmsStatusCallback] Updated CommunicationEvent ${event.id} → status=${mappedStatus} (SID=${messageSid})`);
-    return Response.json({ status: "ok_updated", event_id: event.id, mapped_status: mappedStatus });
+    return secureJson({ status: "ok_updated", event_id: event.id, mapped_status: mappedStatus });
 
   } catch (error) {
     console.error(`[SmsStatusCallback] Error processing SID ${messageSid}: ${error.message}`);
     // Return 500 so Twilio knows to retry (genuine processing failure)
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

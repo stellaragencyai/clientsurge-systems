@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { sendBackend5xxAlert } from "../_shared/backendErrorAlert.js";
 
 /**
@@ -26,7 +27,7 @@ export async function alertOn5xx(functionName: string, status: number, error: st
 
 // #212: UptimeRobot/Better Stack healthCheck
 Deno.serve(async (_req) => {
-  return Response.json({
+  return secureJson({
     status: "ok",
     service: "ClientSurge Systems",
     timestamp: new Date().toISOString(),

@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Seed Email Campaign Templates
  * Run once to populate default email sequences
@@ -175,14 +176,14 @@ Let me know if you'd like to explore further.
       }
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       templates_created: created,
       message: `${created} email templates seeded`,
     });
   } catch (error) {
     console.error("[Seed] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

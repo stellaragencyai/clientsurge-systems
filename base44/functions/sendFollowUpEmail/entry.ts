@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
 
@@ -7,19 +8,19 @@ Deno.serve(async (req) => {
     const { automation_job_id, follow_up_type } = await req.json();
 
     if (!automation_job_id || !follow_up_type) {
-      return Response.json({ error: 'Missing required fields' }, { status: 400 });
+      return secureJson({ error: 'Missing required fields' }, { status: 400 });
     }
 
     // Get automation job
     const job = await base44.entities.AutomationJob.get(automation_job_id);
     if (!job) {
-      return Response.json({ error: 'Job not found' }, { status: 404 });
+      return secureJson({ error: 'Job not found' }, { status: 404 });
     }
 
     // Get lead
     const lead = await base44.entities.Lead.get(job.lead_id);
     if (!lead || !lead.email) {
-      return Response.json({ error: 'Lead or email not found' }, { status: 404 });
+      return secureJson({ error: 'Lead or email not found' }, { status: 404 });
     }
 
     // Get admin settings for template
@@ -53,7 +54,7 @@ Deno.serve(async (req) => {
         }),
       });
 
-      emailResult = await resendResponse.json();
+      emailResult = await resendsecureJson();
     }
 
     // Create communication event
@@ -77,12 +78,12 @@ Deno.serve(async (req) => {
       result_metadata: JSON.stringify(emailResult),
     });
 
-    return Response.json({
+    return secureJson({
       success: true,
       email_sent: !!emailResult?.id,
       provider_id: emailResult?.id,
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

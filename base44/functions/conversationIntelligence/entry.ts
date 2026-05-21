@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * conversationIntelligence.ts — #532 #533 #537 #538 #539 #540
  * Shared AI conversation utilities:
@@ -102,8 +103,8 @@ Deno.serve(async (req) => {
     const system_prompt = buildSystemPrompt(industry, business_name || "our business", tone);
     const history_text = formatHistoryForPrompt(history);
 
-    return Response.json({ success: true, intent, history_length: history.length, system_prompt, history_text, should_stop: isDisqualified, should_book: isBooking });
+    return secureJson({ success: true, intent, history_length: history.length, system_prompt, history_text, should_stop: isDisqualified, should_book: isBooking });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

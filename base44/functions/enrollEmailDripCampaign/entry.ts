@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Enroll Lead in Email Drip Campaign
  * Triggered by lead intent classification
@@ -13,7 +14,7 @@ Deno.serve(async (req) => {
       await req.json();
 
     if (!lead_id || !trigger_intent) {
-      return Response.json(
+      return secureJson(
         { error: "lead_id and trigger_intent required" },
         { status: 400 }
       );
@@ -36,7 +37,7 @@ Deno.serve(async (req) => {
     // Prevent duplicate enrollments
     if (existingCampaign) {
       console.log(`[EmailDrip] ${lead_id} already enrolled, skipping`);
-      return Response.json(
+      return secureJson(
         {
           success: false,
           message: "Lead already in active campaign",
@@ -60,7 +61,7 @@ Deno.serve(async (req) => {
       console.log(
         `[EmailDrip] No template found for ${campaign_type}/${trigger_intent}`
       );
-      return Response.json(
+      return secureJson(
         {
           success: false,
           error: "No matching email template found",
@@ -132,7 +133,7 @@ Deno.serve(async (req) => {
 
     console.log(`[EmailDrip] Campaign ${campaign.id} enrolled for ${lead_id}`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       campaign_id: campaign.id,
       template_name: template.name,
@@ -140,7 +141,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[EmailDrip] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

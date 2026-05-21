@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { assertBookingDateAvailable } from "../shared/demoBookingGuard.ts";
 
@@ -203,7 +204,7 @@ async function logCommunicationEvent(
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
@@ -211,17 +212,17 @@ Deno.serve(async (req) => {
     const payload = normalizePayload(rawPayload);
 
     if (payload.website_url) {
-      return Response.json({ success: true, ignored: true });
+      return secureJson({ success: true, ignored: true });
     }
 
     const errors = validatePayload(payload);
 
     if (errors.length > 0) {
-      return Response.json({ error: errors[0], errors }, { status: 400 });
+      return secureJson({ error: errors[0], errors }, { status: 400 });
     }
 
     if (await isRateLimited(base44, payload)) {
-      return Response.json({ error: 'Please wait a moment before submitting again.' }, { status: 429 });
+      return secureJson({ error: 'Please wait a moment before submitting again.' }, { status: 429 });
     }
 
     await assertBookingDateAvailable(base44, payload.scheduled_date);
@@ -401,7 +402,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id: lead.id,
       message: 'Demo scheduled successfully',
@@ -409,6 +410,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to schedule demo';
-    return Response.json({ error: message }, { status: error.status || 500 });
+    return secureJson({ error: message }, { status: error.status || 500 });
   }
 });

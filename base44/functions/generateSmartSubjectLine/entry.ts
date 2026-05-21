@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Generate Smart Subject Line
  * AI-powered subject lines based on lead data + conversation context
@@ -12,7 +13,7 @@ Deno.serve(async (req) => {
     const { lead_id, campaign_type, intent, message_preview } = await req.json();
 
     if (!lead_id) {
-      return Response.json({ error: "lead_id required" }, { status: 400 });
+      return secureJson({ error: "lead_id required" }, { status: 400 });
     }
 
     console.log(`[SubjectLine] Generating for lead ${lead_id}`);
@@ -20,7 +21,7 @@ Deno.serve(async (req) => {
     // 1. Get lead data
     const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
     if (!lead) {
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     // 2. Get engagement history
@@ -103,7 +104,7 @@ Output JSON:
 
     console.log(`[SubjectLine] Generated for ${lead_id}: "${llmResult.recommended}"`);
 
-    return Response.json({
+    return secureJson({
       success: true,
       lead_id,
       recommended_subject: llmResult.recommended,
@@ -114,7 +115,7 @@ Output JSON:
     });
   } catch (error) {
     console.error("[SubjectLine] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

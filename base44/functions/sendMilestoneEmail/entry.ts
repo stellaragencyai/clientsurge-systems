@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * sendMilestoneEmail — #118 #231
  * Triggered by entity automation when ClientProject.workflow_stage changes.
@@ -43,19 +44,19 @@ Deno.serve(async (req) => {
     const new_stage = body.workflow_stage || body.data?.workflow_stage;
 
     if (!project_id || !new_stage) {
-      return Response.json({ error: "project_id and workflow_stage required" }, { status: 400 });
+      return secureJson({ error: "project_id and workflow_stage required" }, { status: 400 });
     }
 
     const template = MILESTONE_EMAILS[new_stage];
     if (!template) {
-      return Response.json({ skipped: true, reason: `No email defined for stage: ${new_stage}` });
+      return secureJson({ skipped: true, reason: `No email defined for stage: ${new_stage}` });
     }
 
     const project = await base44.asServiceRole.entities.ClientProject.get(project_id);
-    if (!project?.order_id) return Response.json({ error: "Project has no order_id" }, { status: 400 });
+    if (!project?.order_id) return secureJson({ error: "Project has no order_id" }, { status: 400 });
 
     const order = await base44.asServiceRole.entities.Order.get(project.order_id);
-    if (!order?.customer_email) return Response.json({ error: "No customer email on order" }, { status: 400 });
+    if (!order?.customer_email) return secureJson({ error: "No customer email on order" }, { status: 400 });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
     const portalUrl = `https://clientsurgesystems.com/client-portal?order_id=${project.order_id}`;
@@ -97,9 +98,9 @@ Deno.serve(async (req) => {
     });
 
     console.log(`[sendMilestoneEmail] Sent "${new_stage}" email to ${order.customer_email}`);
-    return Response.json({ success: true, stage: new_stage, email: order.customer_email });
+    return secureJson({ success: true, stage: new_stage, email: order.customer_email });
   } catch (err) {
     console.error("[sendMilestoneEmail]", err.message);
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

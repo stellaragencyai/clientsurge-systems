@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * processVoiceCallFollowUps — USE CASE #2
  * Scheduled: Hourly
@@ -47,11 +48,11 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== 'admin') {
-      return Response.json({ error: 'Forbidden' }, { status: 403 });
+      return secureJson({ error: 'Forbidden' }, { status: 403 });
     }
 
     if (isQuietHours()) {
-      return Response.json({ skipped: true, reason: 'quiet_hours' });
+      return secureJson({ skipped: true, reason: 'quiet_hours' });
     }
 
     // Load settings
@@ -64,7 +65,7 @@ Deno.serve(async (req) => {
     const resendKey = Deno.env.get('RESEND_API_KEY');
 
     if (!accountSid || !authToken || !fromNumber) {
-      return Response.json({ error: 'Twilio credentials not configured' }, { status: 500 });
+      return secureJson({ error: 'Twilio credentials not configured' }, { status: 500 });
     }
 
     // Find leads needing voice follow-up
@@ -246,10 +247,10 @@ Deno.serve(async (req) => {
     }
 
     console.log(`[processVoiceCallFollowUps] Done:`, results);
-    return Response.json({ success: true, ...results });
+    return secureJson({ success: true, ...results });
 
   } catch (error) {
     console.error('[processVoiceCallFollowUps] Fatal:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

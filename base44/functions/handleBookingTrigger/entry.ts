@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
@@ -6,7 +7,7 @@ Deno.serve(async (req) => {
     const { lead, classifiedReply } = await req.json();
 
     if (!lead || !classifiedReply) {
-      return Response.json(
+      return secureJson(
         { error: 'lead and classifiedReply required' },
         { status: 400 }
       );
@@ -21,7 +22,7 @@ Deno.serve(async (req) => {
       !lead.booking_link_sent_at;
 
     if (!shouldSendBooking) {
-      return Response.json({
+      return secureJson({
         triggered: false,
         reason: 'intent does not match booking criteria or already sent',
       });
@@ -32,7 +33,7 @@ Deno.serve(async (req) => {
       lead.booking_link || Deno.env.get('DEFAULT_BOOKING_LINK') || '';
 
     if (!bookingLink) {
-      return Response.json({
+      return secureJson({
         triggered: false,
         reason: 'no booking link configured',
       });
@@ -71,11 +72,11 @@ Deno.serve(async (req) => {
       booking_link_sent_at: new Date().toISOString(),
     });
 
-    return Response.json({
+    return secureJson({
       triggered: true,
       message: 'Booking link sent via SMS and email',
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

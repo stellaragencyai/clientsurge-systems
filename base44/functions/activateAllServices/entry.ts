@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Legacy orchestration path retired.
  * Service activation must flow through the canonical shared install pipeline
@@ -9,7 +10,7 @@ Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
   const { order_id } = await req.json().catch(() => ({}));
 
-  return Response.json(
+  return secureJson(
     {
       success: false,
       order_id: order_id || null,

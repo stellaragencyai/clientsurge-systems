@@ -40,7 +40,10 @@ function normalizePhone(phone) {
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
+    return new Response('Method not allowed', {
+      status: 405,
+      headers: { 'X-Frame-Options': 'DENY' },
+    });
   }
 
   const rawBody = await req.text();
@@ -49,7 +52,10 @@ Deno.serve(async (req) => {
   // Validate Twilio signature
   if (!validateTwilioSig(req, rawBody)) {
     console.warn('[receiveInboundVoiceCall] Invalid Twilio signature — rejected');
-    return new Response('Forbidden', { status: 403 });
+    return new Response('Forbidden', {
+      status: 403,
+      headers: { 'X-Frame-Options': 'DENY' },
+    });
   }
 
   const callSid = params.CallSid;
@@ -122,7 +128,7 @@ Deno.serve(async (req) => {
     // Return empty TwiML for status callbacks
     return new Response(
       '<?xml version="1.0" encoding="UTF-8"?><Response></Response>',
-      { headers: { 'Content-Type': 'text/xml' } }
+      { headers: { 'Content-Type': 'text/xml', 'X-Frame-Options': 'DENY' } }
     );
   }
 
@@ -148,7 +154,9 @@ Deno.serve(async (req) => {
   <Pause length="1"/>
   <Hangup/>
 </Response>`;
-    return new Response(fallbackTwiML, { headers: { 'Content-Type': 'text/xml' } });
+    return new Response(fallbackTwiML, {
+      headers: { 'Content-Type': 'text/xml', 'X-Frame-Options': 'DENY' },
+    });
   }
 
   // Connect call to ElevenLabs Conversational AI via <Connect>
@@ -160,5 +168,7 @@ Deno.serve(async (req) => {
 </Response>`;
 
   console.log(`[receiveInboundVoiceCall] Connecting inbound call to ElevenLabs agent ${agentId}`);
-  return new Response(twiml, { headers: { 'Content-Type': 'text/xml' } });
+  return new Response(twiml, {
+    headers: { 'Content-Type': 'text/xml', 'X-Frame-Options': 'DENY' },
+  });
 });

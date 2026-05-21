@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 const DEFAULT_LIMIT = 100;
@@ -134,14 +135,14 @@ function buildLeadPipelineSnapshot({ leads, filters = {}, limit = 100, offset = 
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
     }
 
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
 
     if (!user || user.role !== 'admin') {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+      return secureJson({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const filters = await req.json().catch(() => ({}));
@@ -157,9 +158,9 @@ Deno.serve(async (req) => {
       offset,
     });
 
-    return Response.json(snapshot);
+    return secureJson(snapshot);
   } catch (error) {
     console.error('[getLeadPipelineSummary] Error in getLeadPipelineSummary:', error);
-    return Response.json({ error: error.message || 'Failed to load lead pipeline summary' }, { status: 500 });
+    return secureJson({ error: error.message || 'Failed to load lead pipeline summary' }, { status: 500 });
   }
 });

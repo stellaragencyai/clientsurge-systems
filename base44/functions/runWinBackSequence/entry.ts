@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * runWinBackSequence — redeployed 2026-05-02
  * Scheduled: Daily at 5pm
@@ -142,12 +143,12 @@ Deno.serve(async (req) => {
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
+      return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!dryRun && !resendKey) {
-      return Response.json({ error: "RESEND_API_KEY not set" }, { status: 500 });
+      return secureJson({ error: "RESEND_API_KEY not set" }, { status: 500 });
     }
     const activeResendKey = resendKey || "";
 
@@ -165,7 +166,7 @@ Deno.serve(async (req) => {
     ).catch(() => []);
 
     if (!orders?.length) {
-      return Response.json({ success: true, processed: 0, message: "No churned orders found." });
+      return secureJson({ success: true, processed: 0, message: "No churned orders found." });
     }
 
     const results = { processed: 0, sent: 0, skipped: 0, failed: 0 };
@@ -261,11 +262,11 @@ Deno.serve(async (req) => {
     }
 
     console.log(`[runWinBackSequence] Done:`, results);
-    return Response.json({ success: true, dry_run: dryRun, ...results, preview });
+    return secureJson({ success: true, dry_run: dryRun, ...results, preview });
 
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     console.error("[runWinBackSequence] Fatal error:", errorMsg);
-    return Response.json({ error: errorMsg }, { status: 500 });
+    return secureJson({ error: errorMsg }, { status: 500 });
   }
 });

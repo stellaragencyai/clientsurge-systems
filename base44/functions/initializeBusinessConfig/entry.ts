@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * Initialize Business Config from Template
  * On service selection, auto-populate all configurations
@@ -11,7 +12,7 @@ Deno.serve(async (req) => {
     const { project_id, industry, mode = "full_automation" } = await req.json();
 
     if (!project_id || !industry) {
-      return Response.json(
+      return secureJson(
         { error: "project_id and industry required" },
         { status: 400 }
       );
@@ -29,7 +30,7 @@ Deno.serve(async (req) => {
     );
 
     if (!templates?.length) {
-      return Response.json(
+      return secureJson(
         { error: `No template found for industry: ${industry}` },
         { status: 404 }
       );
@@ -68,7 +69,7 @@ Deno.serve(async (req) => {
       `[InitConfig] ✅ Initialized ${industry} (${rules.length} rules created)`
     );
 
-    return Response.json({
+    return secureJson({
       success: true,
       project_id,
       industry,
@@ -78,7 +79,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[InitConfig] Error:", error.message);
-    return Response.json(
+    return secureJson(
       { error: error.message, success: false },
       { status: 500 }
     );

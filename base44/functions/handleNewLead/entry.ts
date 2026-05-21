@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * handleNewLead — redeployed 2026-05-02
  * Entity automation: triggered on Leads create
@@ -30,14 +31,14 @@ Deno.serve(async (req) => {
 
     if (!lead_id) {
       console.error("[handleNewLead] No lead_id found in payload:", JSON.stringify(body));
-      return Response.json({ error: "Lead data missing — payload keys: " + Object.keys(body || {}).join(", ") }, { status: 400 });
+      return secureJson({ error: "Lead data missing — payload keys: " + Object.keys(body || {}).join(", ") }, { status: 400 });
     }
 
     // Fetch fresh lead data from DB
     const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
     if (!lead) {
       console.error(`[handleNewLead] Lead not found: ${lead_id}`);
-      return Response.json({ error: "Lead not found" }, { status: 404 });
+      return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
     console.log(`[handleNewLead] Processing lead: ${lead_id} — ${lead.full_name}`);
@@ -138,9 +139,9 @@ Deno.serve(async (req) => {
       console.warn(`[handleNewLead] Admin notification failed (non-blocking): ${notifyErr.message}`);
     }
 
-    return Response.json({ success: true, lead_id, ...results });
+    return secureJson({ success: true, lead_id, ...results });
   } catch (error) {
     console.error("[handleNewLead] Fatal error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

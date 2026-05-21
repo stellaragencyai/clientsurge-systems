@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * detectAnalyticsAnomalies — #460
  * Daily anomaly detection: 30% lead drop WoW, churn spikes, stalled installs.
@@ -134,7 +135,7 @@ Deno.serve(async (req) => {
       service: "analytics", requires_nolan: highSeverity.length > 0, resolved: false,
     }).catch(() => {});
 
-    return Response.json({
+    return secureJson({
       success: true,
       timestamp: new Date().toISOString(),
       anomalies,
@@ -142,6 +143,6 @@ Deno.serve(async (req) => {
       alert_sent: highSeverity.length > 0,
     });
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

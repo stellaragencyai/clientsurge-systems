@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * sendDemoConfirmationEmail — #132
  * Formats scheduled_date/time in Arizona local time for all emails.
@@ -19,10 +20,10 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { lead_id, scheduled_datetime, business_name, email } = await req.json();
-    if (!email) return Response.json({ error: "email required" }, { status: 400 });
+    if (!email) return secureJson({ error: "email required" }, { status: 400 });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (!resendKey) return Response.json({ error: "No Resend key" }, { status: 500 });
+    if (!resendKey) return secureJson({ error: "No Resend key" }, { status: 500 });
 
     const formatted = formatAZTime(scheduled_datetime);
 
@@ -47,8 +48,8 @@ Deno.serve(async (req) => {
       }),
     });
 
-    return Response.json({ success: true, sent_to: email, formatted_time: formatted });
+    return secureJson({ success: true, sent_to: email, formatted_time: formatted });
   } catch (err: any) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });

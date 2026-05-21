@@ -1,3 +1,4 @@
+import { secureJson } from "../_shared/response.ts";
 /**
  * validateAIOutputs — #476
  * Safety net: every AI-generated string passes through this before being saved or sent.
@@ -89,14 +90,14 @@ Deno.serve(async (req) => {
         ...validateOutput(item.text, item.type as any, item.expected_biz),
       }));
       const all_valid = results.every(r => r.valid);
-      return Response.json({ all_valid, results });
+      return secureJson({ all_valid, results });
     }
 
-    if (!text) return Response.json({ error: 'text is required' }, { status: 400 });
+    if (!text) return secureJson({ error: 'text is required' }, { status: 400 });
 
     const result = validateOutput(text, type, expected_biz);
-    return Response.json(result);
+    return secureJson(result);
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return secureJson({ error: err.message }, { status: 500 });
   }
 });
