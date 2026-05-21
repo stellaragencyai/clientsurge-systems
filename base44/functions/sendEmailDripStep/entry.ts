@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     );
     if (!campaign || campaign.status !== "active") {
       console.log(`[SendEmailDrip] Campaign not active, skipping`);
-      return Response.json({ success: false, message: "Campaign not active" });
+      return Response.json({ success: false, message: "Campaign not active" }, { status: 409 });
     }
 
     // 2. Get step data

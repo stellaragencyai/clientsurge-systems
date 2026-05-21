@@ -23,7 +23,10 @@ Deno.serve(async (req) => {
         reactivation_id
       );
     if (!reactivation || reactivation.status === "unrecoverable") {
-      return Response.json({ success: false, message: "Record not reactivatable" });
+      return Response.json(
+        { success: false, message: "Record not reactivatable" },
+        { status: 409 }
+      );
     }
 
     // 2. Get lead

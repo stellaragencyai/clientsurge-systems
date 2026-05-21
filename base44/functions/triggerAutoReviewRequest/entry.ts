@@ -137,10 +137,13 @@ Deno.serve(async (req) => {
       console.warn(
         `[AutoReviewRequest] Review request failed for order ${order.id}: ${result.data?.error || "Unknown error"}`
       );
-      return Response.json({
-        success: false,
-        error: result.data?.error || "Failed to send review request",
-      });
+      return Response.json(
+        {
+          success: false,
+          error: result.data?.error || "Failed to send review request",
+        },
+        { status: 502 }
+      );
     }
   } catch (error) {
     console.error("[AutoReviewRequest] Fatal error:", error.message);

@@ -173,14 +173,14 @@ Deno.serve(async (req) => {
     // IDEMPOTENCY — only condition: initial_response_sent_at already set
     if (leadData.initial_response_sent_at) {
       console.log(`[InstantResponse] SKIPPED — already sent for lead ${lead_id}`);
-      return Response.json({ success: false, reason: "Already sent" });
+      return Response.json({ success: false, reason: "Already sent" }, { status: 409 });
     }
 
     // Validate phone number
     if (!leadData.phone_number) {
       console.warn(`[InstantResponse] Lead ${lead_id} missing phone number`);
       await logSmsEvent(base44, lead_id, "failed", null, "Missing phone number");
-      return Response.json({ success: false, error: "Phone number missing" });
+      return Response.json({ success: false, error: "Phone number missing" }, { status: 400 });
     }
 
     // Load install configuration if order_id provided

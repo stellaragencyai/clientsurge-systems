@@ -35,13 +35,16 @@ Deno.serve(async (req) => {
     
     if (qualityResult.data?.should_reject) {
       console.log(`[Orchestrator] Lead rejected due to low quality (score: ${qualityResult.data.quality_score})`);
-      return Response.json({
-        success: false,
-        lead_id,
-        reason: "Lead failed quality validation",
-        quality_score: qualityResult.data.quality_score,
-        flags: qualityResult.data.flags,
-      });
+      return Response.json(
+        {
+          success: false,
+          lead_id,
+          reason: "Lead failed quality validation",
+          quality_score: qualityResult.data.quality_score,
+          flags: qualityResult.data.flags,
+        },
+        { status: 422 }
+      );
     }
 
     // STEP 1: Score the lead

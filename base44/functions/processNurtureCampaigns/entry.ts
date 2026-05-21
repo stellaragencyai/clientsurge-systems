@@ -259,7 +259,10 @@ Deno.serve(async (req) => {
     const resendReady = !!(resendKey && settings.resend_enabled);
 
     if (!resendReady) {
-      return Response.json({ success: false, error: "Resend not configured. Enable Resend in Admin Settings." });
+      return Response.json(
+        { success: false, error: "Resend not configured. Enable Resend in Admin Settings." },
+        { status: 503 }
+      );
     }
 
     const results = { fired: 0, skipped: 0, stopped: 0, errors: 0 };

@@ -95,7 +95,7 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
         enriched_at: new Date().toISOString(),
         enrichment_notes: `Enrichment attempted but failed: ${message}`
       });
-      return Response.json({ success: false, error: message });
+      return Response.json({ success: false, error: message }, { status: 502 });
     }
 
     // Validate company_size against allowed enum values

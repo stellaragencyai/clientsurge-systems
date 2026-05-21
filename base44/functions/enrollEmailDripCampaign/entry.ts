@@ -36,10 +36,13 @@ Deno.serve(async (req) => {
     // Prevent duplicate enrollments
     if (existingCampaign) {
       console.log(`[EmailDrip] ${lead_id} already enrolled, skipping`);
-      return Response.json({
-        success: false,
-        message: "Lead already in active campaign",
-      });
+      return Response.json(
+        {
+          success: false,
+          message: "Lead already in active campaign",
+        },
+        { status: 409 }
+      );
     }
 
     // 2. Find matching template
@@ -57,10 +60,13 @@ Deno.serve(async (req) => {
       console.log(
         `[EmailDrip] No template found for ${campaign_type}/${trigger_intent}`
       );
-      return Response.json({
-        success: false,
-        error: "No matching email template found",
-      });
+      return Response.json(
+        {
+          success: false,
+          error: "No matching email template found",
+        },
+        { status: 404 }
+      );
     }
 
     const template = templates[0];

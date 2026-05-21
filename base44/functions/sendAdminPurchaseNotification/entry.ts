@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
 
     if (!botToken) {
       console.warn("[sendAdminPurchaseNotification] No TELEGRAM_BOT_TOKEN set");
-      return Response.json({ success: false, error: "No bot token" });
+      return Response.json({ success: false, error: "No bot token" }, { status: 503 });
     }
 
     const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {

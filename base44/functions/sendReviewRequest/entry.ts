@@ -198,11 +198,14 @@ Deno.serve(async (req) => {
         console.log(
           `[SendReviewRequest] Duplicate review request within 7 days for ${customer_phone || customer_email} — skipping`
         );
-        return Response.json({
-          success: false,
-          error: "Review request already sent in the last 7 days",
-          skipped: true,
-        });
+        return Response.json(
+          {
+            success: false,
+            error: "Review request already sent in the last 7 days",
+            skipped: true,
+          },
+          { status: 409 }
+        );
       }
     }
 
