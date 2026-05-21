@@ -11,6 +11,7 @@
     "test": "npm run test:node && npm run test:deno",
     "test:node": "node --test",
     "test:deno": "deno test --no-check base44/functions/__tests__/*.deno.ts",
+    "release:base44": "pwsh -File scripts/release-base44.ps1",
     "openclaw:validate-install": "node scripts/openclaw/run-install-validation.mjs",
     "openclaw:basic-package-check": "node scripts/openclaw/basic-package-activation-check.mjs",
     "openclaw:purchase-onboarding-smoke": "node scripts/openclaw/purchase-onboarding-smoke.mjs",

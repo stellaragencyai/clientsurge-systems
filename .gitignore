@@ -15,6 +15,7 @@ node_modules
 dist
 dist-ssr
 *.local
+base44/.app.jsonc
 
 # Editor directories and files
 .vscode/*

@@ -32,6 +32,34 @@ Run the app: `npm run dev`
 
 Open [Base44.com](http://Base44.com) and click on Publish.
 
+## Release flow
+
+This repo uses the **Base44 app-code / GitHub sync** release path.
+
+- Pushes to `main` sync code into Base44.
+- The live site still requires clicking **Publish** in the Base44 UI.
+- `base44 deploy` is only for Base44 **Backend Platform** apps and will fail for this repo.
+
+Helper command:
+
+```bash
+npm run release:base44
+```
+
+What it does:
+- runs the production build
+- runs the default regression test (`tests/seoBreadcrumb.test.js`)
+- pushes `main`
+- opens the Base44 dashboard so Publish is one click away
+
+Useful options:
+
+```powershell
+pwsh -File scripts/release-base44.ps1 -LintPaths src/App.jsx,index.html
+pwsh -File scripts/release-base44.ps1 -SkipPush
+pwsh -File scripts/release-base44.ps1 -PublishMode backend-platform
+```
+
 **Docs & Support**
 
 Documentation: [https://docs.base44.com/Integrations/Using-GitHub](https://docs.base44.com/Integrations/Using-GitHub)
