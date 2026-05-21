@@ -18,6 +18,7 @@
     "openclaw:basic-package-config": "node scripts/openclaw/build-basic-package-config.mjs",
     "openclaw:growth-package-config": "node scripts/openclaw/build-basic-package-config.mjs --growth",
     "openclaw:pro-package-config": "node scripts/openclaw/build-basic-package-config.mjs --pro",
+    "audit:seo-conversion": "node scripts/seo-conversion-audit.mjs --markdown",
     "load-test:leads": "node scripts/load-test-lead-submissions.mjs",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview"

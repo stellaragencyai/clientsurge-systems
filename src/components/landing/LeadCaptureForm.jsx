@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { trackLeadSubmitted } from "@/lib/analytics";
 
 const NICHES = [
   "Med Spas & Aesthetic Clinics",
@@ -91,6 +92,12 @@ export default function LeadCaptureForm() {
       if (!result.data?.success) {
         throw new Error("Lead submission failed");
       }
+
+      trackLeadSubmitted("landing_lead_capture_form", {
+        deduplicated: Boolean(result.data?.deduplicated),
+        business_type: formData.niche || "Other",
+        requested_channels: CONTACT_METHOD_CHANNELS[formData.contact_method] || [],
+      });
 
       setSubmitted(true);
     } catch (err) {
