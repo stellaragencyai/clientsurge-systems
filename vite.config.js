@@ -9,6 +9,13 @@ export default defineConfig({
     alias: { "@": path.resolve(__dirname, "./src") },
   },
   build: {
+    modulePreload: {
+      resolveDependencies(_filename, deps) {
+        return deps.filter(
+          (dep) => !dep.includes("vendor-framer") && !dep.includes("vendor-charts")
+        );
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks: {

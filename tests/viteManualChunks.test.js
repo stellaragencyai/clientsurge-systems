@@ -14,3 +14,10 @@ test("Vite manual chunks keep the active heavy UI libraries split", () => {
   assert.match(viteConfig, /"vendor-charts": \["recharts"\]/);
   assert.match(viteConfig, /"vendor-lucide": \["lucide-react"\]/);
 });
+
+test("Vite does not modulepreload below-fold heavy UI vendors on first paint", () => {
+  assert.match(viteConfig, /modulePreload:\s*\{/);
+  assert.match(viteConfig, /resolveDependencies/);
+  assert.match(viteConfig, /!dep\.includes\("vendor-framer"\)/);
+  assert.match(viteConfig, /!dep\.includes\("vendor-charts"\)/);
+});

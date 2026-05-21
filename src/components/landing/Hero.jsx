@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDemoBooking } from "./DemoBookingContext";
@@ -16,6 +16,187 @@ const checklist = [
   "Review requests",
   "Customer reactivation",
 ];
+
+function HeroDashboardStaticPreview({ onActivate }) {
+  return (
+    <button
+      type="button"
+      className="hero-dashboard-static-preview"
+      aria-label="Preview ClientSurge automation dashboard"
+      onClick={onActivate}
+      onFocus={onActivate}
+      onPointerEnter={onActivate}
+      style={{
+        position: "relative",
+        width: "100%",
+        maxWidth: "640px",
+        padding: "14px",
+        border: "none",
+        borderRadius: "30px",
+        background: "linear-gradient(160deg, #3a3a3e 0%, #1e1e21 48%, #171719 100%)",
+        boxShadow: "0 34px 90px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.08)",
+        cursor: "pointer",
+        textAlign: "left"
+      }}
+    >
+      <div
+        style={{
+          overflow: "hidden",
+          borderRadius: "20px",
+          background: "linear-gradient(150deg, #0d1f3c 0%, #0a2a5e 24%, #071535 58%, #061028 100%)",
+          minHeight: "520px",
+          color: "#ffffff",
+          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          position: "relative"
+        }}
+      >
+        <div
+          style={{
+            height: "32px",
+            background: "rgba(0,0,0,0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 18px",
+            fontSize: "12px",
+            fontWeight: 700
+          }}
+        >
+          <span>9:41 AM</span>
+          <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.76)" }}>71%</span>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 190px",
+            gap: "16px",
+            padding: "34px 18px 18px",
+            minHeight: "420px"
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px", justifyContent: "center" }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                alignSelf: "flex-start",
+                borderRadius: "999px",
+                padding: "5px 12px",
+                background: "rgba(0,174,239,0.16)",
+                border: "1px solid rgba(0,174,239,0.36)",
+                color: "#66d9ff",
+                fontSize: "10px",
+                fontWeight: 800,
+                letterSpacing: "0.1em"
+              }}
+            >
+              SPEED TO LEAD
+            </span>
+            <h2
+              style={{
+                margin: 0,
+                maxWidth: "320px",
+                fontSize: "clamp(1.3rem, 2.9vw, 2rem)",
+                lineHeight: 1.1,
+                fontWeight: 800,
+                letterSpacing: "-0.02em"
+              }}
+            >
+              AI follow-up visible from capture to booking.
+            </h2>
+            <p
+              style={{
+                margin: 0,
+                maxWidth: "300px",
+                fontSize: "12px",
+                lineHeight: 1.6,
+                color: "rgba(255,255,255,0.66)"
+              }}
+            >
+              Illustrative flow showing the automation path from new lead to booked appointment.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", maxWidth: "330px" }}>
+              {["Lead captured", "SMS sent", "Booking link shared"].map((label) => (
+                <span
+                  key={label}
+                  style={{
+                    borderRadius: "999px",
+                    padding: "5px 9px",
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.12)",
+                    color: "rgba(255,255,255,0.78)",
+                    fontSize: "10px",
+                    fontWeight: 700
+                  }}
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div
+            style={{
+              alignSelf: "center",
+              borderRadius: "18px",
+              padding: "14px",
+              background: "rgba(255,255,255,0.13)",
+              border: "1px solid rgba(255,255,255,0.18)",
+              boxShadow: "0 12px 32px rgba(0,0,0,0.24)"
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+              <div>
+                <p style={{ margin: 0, fontSize: "10px", fontWeight: 800 }}>Lead Conversion</p>
+                <p style={{ margin: "2px 0 0", fontSize: "9px", color: "rgba(255,255,255,0.52)" }}>Live workflow</p>
+              </div>
+              <span style={{ color: "#4ade80", fontSize: "9px", fontWeight: 800 }}>LIVE</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "12px" }}>
+              {[["Leads", "24"], ["Booked", "18"]].map(([label, value]) => (
+                <div key={label} style={{ borderRadius: "10px", padding: "8px", background: "rgba(255,255,255,0.09)" }}>
+                  <p style={{ margin: "0 0 3px", fontSize: "8px", color: "rgba(255,255,255,0.5)", fontWeight: 700 }}>{label}</p>
+                  <p style={{ margin: 0, fontSize: "22px", lineHeight: 1, fontWeight: 900 }}>{value}</p>
+                </div>
+              ))}
+            </div>
+            {["New lead", "AI reply", "Appointment booked"].map((label, index) => (
+              <div key={label} style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: index === 0 ? 0 : "8px" }}>
+                <span style={{ width: "12px", height: "12px", borderRadius: "999px", background: index < 2 ? "#00AEEF" : "#4ade80" }} />
+                <span style={{ fontSize: "10px", fontWeight: 700, color: "rgba(255,255,255,0.82)" }}>{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div
+          style={{
+            margin: "0 auto 12px",
+            width: "46px",
+            height: "5px",
+            borderRadius: "999px",
+            background: "rgba(255,255,255,0.28)"
+          }}
+        />
+      </div>
+    </button>
+  );
+}
+
+function DeferredHeroDashboard() {
+  const [isInteractive, setIsInteractive] = useState(false);
+
+  if (!isInteractive) {
+    return <HeroDashboardStaticPreview onActivate={() => setIsInteractive(true)} />;
+  }
+
+  return (
+    <Suspense fallback={<HeroDashboardStaticPreview onActivate={() => {}} />}>
+      <HeroDashboardScreen />
+    </Suspense>
+  );
+}
 
 
 export default function Hero() {
@@ -87,11 +268,11 @@ export default function Hero() {
           <h1
             className="landing-hero__headline"
             style={{
-              fontFamily: "Montserrat, sans-serif",
+              fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
               fontSize: "clamp(2rem, 5.2vw, 3.8rem)",
               fontWeight: "700",
               lineHeight: 1.1,
-              letterSpacing: "-0.03em",
+              letterSpacing: "0",
               color: "#1b140d",
               marginBottom: "16px"
             }}>
@@ -237,9 +418,7 @@ export default function Hero() {
 
 
           {/* Dashboard visual */}
-          <Suspense fallback={null}>
-            <HeroDashboardScreen />
-          </Suspense>
+          <DeferredHeroDashboard />
 
 
 

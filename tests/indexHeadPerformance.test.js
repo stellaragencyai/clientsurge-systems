@@ -22,11 +22,11 @@ test("index head includes payment and messaging resource hints", () => {
 test("index head loads only the approved Google Font subsets", () => {
   const fontUrls = [...indexHtml.matchAll(/https:\/\/fonts\.googleapis\.com\/css2\?[^"]+/g)].map((match) => match[0]);
 
-  assert.equal(fontUrls.length, 4);
+  assert.equal(fontUrls.length, 2);
   assert.equal(fontUrls.filter((url) => url.includes("family=Inter:wght@400;500;600;700")).length, 2);
   assert.equal(fontUrls.filter((url) => url.includes("family=Playfair+Display:wght@400;600")).length, 2);
-  assert.equal(fontUrls.filter((url) => url.includes("family=Bebas+Neue")).length, 2);
-  assert.equal(fontUrls.filter((url) => url.includes("family=Montserrat:wght@700;800;900")).length, 2);
+  assert.equal(fontUrls.filter((url) => url.includes("family=Bebas+Neue")).length, 0);
+  assert.equal(fontUrls.filter((url) => url.includes("family=Montserrat:wght@700;800;900")).length, 0);
   assert.ok(fontUrls.every((url) => url.includes("display=swap")));
   assert.ok(fontUrls.every((url) => !url.includes("ital")));
   assert.ok(fontUrls.every((url) => !url.includes("font-display")));
@@ -42,4 +42,10 @@ test("index head exposes a launch-ready social preview image", () => {
 
 test("css does not block rendering with Google Font imports", () => {
   assert.doesNotMatch(indexCss, /@import\s+url\(['"]?https:\/\/fonts\.googleapis\.com/);
+});
+
+test("first viewport avoids preloading or painting unused remote background art", () => {
+  assert.match(indexHtml, /<link rel="preload" as="image" href="https:\/\/media\.base44\.com\/images\/public\/69dc4a79656fdba136d413d3\/199305bd4_11\.png"/);
+  assert.doesNotMatch(indexHtml, /9d6ac5d22_989aaaff/);
+  assert.doesNotMatch(indexCss, /body::before\s*\{[^}]*url\(/);
 });

@@ -32,3 +32,5 @@ base44/.app.jsonc
 .vite
 .playwright-cli/
 output/playwright/
+lighthouse-*.json
+vite-preview-lighthouse.*.log

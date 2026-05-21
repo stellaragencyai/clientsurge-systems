@@ -1,12 +1,12 @@
 # DOMAIN 06 - Speed & Performance
 > **Business Area:** Bundle size, lazy loading, image optimization, caching, PWA, Lighthouse scores
-> **~16 tasks** | Last updated: 2026-05-21
+> **18 tasks** | Last updated: 2026-05-21
 > **Agents who touch this:** Agent A (frontend), Agent B (backend caching)
 
 ---
 
-## DOMAIN HEALTH: 94% Ready (17/18 done, 0 critical open, 0 hard-blocked)
-> **Fastest win:** #241 - Lighthouse audit target 90+ performance score (~1 hr) - Agent A
+## DOMAIN HEALTH: 100% Ready (18/18 done, 0 critical open, 0 hard-blocked)
+> **Fastest win:** None - Domain 06 complete
 > **No critical blockers** - all tasks independent, good domain to batch with other work
 
 ---
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 0 - no critical tasks in this domain |
-| Fastest Win | #241 - Lighthouse audit target 90+ performance score (~1 hr) |
+| Fastest Win | None - Domain 06 complete |
 | Longest Blocked Chain | None - all tasks independent |
-| Done This Week | 17 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10, #62, #64, #116, #153, #114, #160, #246, #219) |
-| Est. Hours to Domain Complete | ~1 hr |
+| Done This Week | 18 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10, #62, #64, #116, #153, #114, #160, #246, #219, #241) |
+| Est. Hours to Domain Complete | 0 |
 
 ---
 
@@ -26,7 +26,6 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 241 | Pending | Final: run Lighthouse audit - target 90+ performance score | A | - | ALL sign-off | - | ~1 hr |
 
 ---
 
@@ -65,3 +64,4 @@
 | 160 | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | Morpheus | 2026-05-21 | Added shared provider timeout wrappers and routed Base44 Twilio, Stripe, and Resend API fetches through timeout-aware helpers |
 | 246 | Final: verify admin panel loads in < 3 seconds with 100+ leads | Morpheus | 2026-05-21 | Added `npm run verify:admin-load`, exercising the admin lead row-prep path with a 120-lead fixture and enforcing a 3-second local budget |
 | 219 | Load test: simulate 50 concurrent lead submissions, measure response time | Morpheus | 2026-05-21 | Added `npm run verify:lead-load` loopback mode and measured 50 concurrent lead-submission payloads without touching production/staging |
+| 241 | Final: run Lighthouse audit - target 90+ performance score | Morpheus | 2026-05-21 | Lighthouse local production preview scored 93 after deferring first-viewport heavy dashboard hydration, deferring below-fold homepage chunks, removing unused first-paint remote art/font loads, and preventing below-fold framer/charts modulepreloads |

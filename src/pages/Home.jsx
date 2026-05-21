@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, lazy, Suspense, useRef, useState } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import HomepageConversionContent from "../components/landing/HomepageConversionContent";
@@ -48,6 +48,48 @@ function useHomepageWhiteCanvas() {
   }, []);
 }
 
+function LazyHomepageSection({ children, fallback, minHeight = 360 }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (isVisible) {
+      return undefined;
+    }
+
+    if (typeof IntersectionObserver === "undefined") {
+      setIsVisible(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isVisible]);
+
+  return (
+    <div ref={ref} style={{ minHeight: isVisible ? undefined : minHeight }}>
+      {isVisible ? (
+        <Suspense fallback={fallback}>{children}</Suspense>
+      ) : (
+        fallback
+      )}
+    </div>
+  );
+}
+
 export default function Home() {
   useHomepageWhiteCanvas();
 
@@ -94,25 +136,25 @@ export default function Home() {
         <Navbar />
         <Hero />
         <HomepageConversionContent />
-        <Suspense fallback={<SectionSkeleton />}>
+        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={900}>
           <SixAutomationSystems />
           <SectionBreak />
           <ProofBeforeLaunch />
           <SectionBreak />
           <Industries />
           <SectionBreak />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
+        </LazyHomepageSection>
+        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={420}>
           <TrustBar />
           <SectionBreak />
-        </Suspense>
-        <Suspense fallback={<LargeSectionSkeleton />}>
+        </LazyHomepageSection>
+        <LazyHomepageSection fallback={<LargeSectionSkeleton />} minHeight={900}>
           <CoreOffer />
           <SectionBreak />
           <Pricing />
           <SectionBreak />
-        </Suspense>
-        <Suspense fallback={<SectionSkeleton />}>
+        </LazyHomepageSection>
+        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={900}>
           <FAQ />
           <SectionBreak />
           <FounderSection />
@@ -120,7 +162,7 @@ export default function Home() {
           <Testimonials />
           <SectionBreak />
           <FinalCTA />
-        </Suspense>
+        </LazyHomepageSection>
         <Footer />
         <ChatBubble />
         <CookieConsent />
