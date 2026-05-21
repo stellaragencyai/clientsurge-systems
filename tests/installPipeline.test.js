@@ -310,6 +310,7 @@ test("paid order initializes canonical install pipeline and links existing struc
   });
   assert.equal(result.clientProject.step_payment, "complete");
   assert.equal(result.onboardingClient.status, "In Setup");
+  assert.equal(result.onboardingClient.pipeline_status, "Ready for Install");
   assert.equal(entities.Client.records.length, 1);
   assert.equal(entities.ClientProject.records.length, 1);
   assert.equal(entities.OnboardingClient.records.length, 1);

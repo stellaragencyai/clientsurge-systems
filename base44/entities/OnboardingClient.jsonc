@@ -94,6 +94,10 @@
       ],
       "default": "Onboarding"
     },
+    "pipeline_status": {
+      "type": "string",
+      "title": "Canonical Install Pipeline Status"
+    },
     "generated_messages": {
       "type": "string",
       "title": "AI Generated Messages (JSON)"

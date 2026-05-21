@@ -17,6 +17,7 @@ import {
 import { base44 } from "@/api/base44Client";
 import AIGenerateModal from "./AIGenerateModal";
 import PackageActivationPanel from "./PackageActivationPanel";
+import { PipelineStatusBadge } from "../AdminOnboardingBadges";
 
 const STEPS = [
   {
@@ -93,6 +94,7 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
   const completedCount = STEP_KEYS.filter((key) => client[key]).length;
   const pct = Math.round((completedCount / STEP_KEYS.length) * 100);
   const isLive = !!client.step_live || client.status === "Live";
+  const pipelineStatus = order?.pipeline_status || client.pipeline_status || client.status || "Onboarding";
 
   const toggleStep = async (step, current) => {
     if (step.mode !== "manual") {
@@ -161,6 +163,9 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
             <p className="text-xs text-muted-foreground truncate">
               {client.owner_name} · {client.industry || "-"}
             </p>
+            <div className="mt-2">
+              <PipelineStatusBadge status={pipelineStatus} />
+            </div>
           </div>
           <span
             className="hidden sm:inline text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0"

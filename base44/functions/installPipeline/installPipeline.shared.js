@@ -1510,6 +1510,7 @@ export function buildOnboardingClientPatch({ order, pipelineStatus }) {
 
   return {
     status: pipelineStatus === "Live" ? "Live" : "In Setup",
+    pipeline_status: pipelineStatus,
     monthly_rate: order.total_monthly || 0,
     setup_fee: order.total_setup || 0,
     twilio_number: snapshot.installConfiguration.shared.twilio_business_phone || undefined,
