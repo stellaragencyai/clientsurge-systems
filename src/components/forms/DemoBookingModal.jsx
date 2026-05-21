@@ -18,7 +18,11 @@ export default function DemoBookingModal({ onClose }) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto overscroll-contain p-4"
+      style={{
+        minHeight: "100svh",
+        WebkitOverflowScrolling: "touch"
+      }}
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="dialog"
