@@ -26,6 +26,26 @@ export async function fetchLeadPipelineSummary(filters = {}) {
   return data;
 }
 
+export function subscribeToLeadPipelineChanges({ onChange, onError } = {}) {
+  const subscribe = base44.entities?.Leads?.subscribe;
+  if (typeof subscribe !== "function") {
+    return null;
+  }
+
+  try {
+    const subscription = subscribe((event) => {
+      if (["create", "update", "delete"].includes(event?.type)) {
+        onChange?.(event);
+      }
+    });
+
+    return () => subscription?.unsubscribe?.();
+  } catch (error) {
+    onError?.(error);
+    return null;
+  }
+}
+
 export async function previewLeadImport({ rows, import_source = "manual_import" }) {
   const response = await base44.functions.invoke("importLeads", {
     rows,

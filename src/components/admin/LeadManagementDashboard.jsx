@@ -22,6 +22,7 @@ import {
   fetchLeadPipelineSummary, // #322: wired — called on load via leadPipelineApi
   getLeadPipelineError,
   previewLeadImport,
+  subscribeToLeadPipelineChanges,
   triggerLeadScoring,
 } from "@/lib/leadPipelineApi";
 import { buildAdminConversionFunnel } from "@/lib/adminConversionFunnel";
@@ -287,6 +288,15 @@ export default function LeadManagementDashboard() {
     }, 250);
 
     return () => clearTimeout(timer);
+  }, [filters.search, filters.status, filters.source, filters.intake_type, filters.stage_group, filters.segment]);
+
+  useEffect(() => {
+    const unsubscribe = subscribeToLeadPipelineChanges({
+      onChange: () => loadSnapshot({ append: false, nextOffset: 0, activeFilters: filters }),
+      onError: () => null,
+    });
+
+    return () => unsubscribe?.();
   }, [filters.search, filters.status, filters.source, filters.intake_type, filters.stage_group, filters.segment]);
 
   const handleFilterChange = (field, value) => {
