@@ -6,12 +6,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-
-// #126: business hours locked to America/Phoenix (no DST)
-function isPhoenixBusinessHours() {
-  const h = parseInt(new Date().toLocaleString("en-US", { timeZone: "America/Phoenix", hour: "numeric", hour12: false }), 10);
-  return h >= 8 && h < 20;
-}
+import { canSendFollowUpSms } from "../shared/followUpSmsHours.ts";
 
 function minutesSince(isoDate) {
   if (!isoDate) return 0;
@@ -75,10 +70,9 @@ Deno.serve(async (req) => {
         }
 
         // Business hours check — only send between 8am and 8pm (America/Phoenix)
-        const nowPhoenix = new Date().toLocaleString("en-US", { timeZone: "America/Phoenix" });
-        const currentHour = new Date(nowPhoenix).getHours();
-        if (currentHour < 8 || currentHour >= 20) {
-          console.log(`[scheduleFollowUpSMS] Outside business hours (hour=${currentHour}) — skipping lead ${lead.id}`);
+        const businessHours = canSendFollowUpSms();
+        if (!businessHours.allowed) {
+          console.log(`[scheduleFollowUpSMS] ${businessHours.reason} (hour=${businessHours.current_hour}) — skipping lead ${lead.id}`);
           results.skipped++;
           continue;
         }
