@@ -2,9 +2,9 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import {
   getPackageOffer,
   getPackageDisplayLabel,
-  getServiceProductByKey,
   normalizePackageKey,
 } from "../../../src/lib/salesCatalog.js";
+import { formatMoney, resolveServiceRows } from "./serviceRows.shared.js";
 
 function escapeHtml(value: unknown) {
   return String(value ?? "")
@@ -15,43 +15,12 @@ function escapeHtml(value: unknown) {
     .replace(/'/g, "&#39;");
 }
 
-function formatMoney(amount: unknown) {
-  return Number(amount || 0).toLocaleString();
-}
-
 function formatFromAddress(value: string | undefined | null) {
   const email = String(value || "noreply@clientsurgesystems.com").trim();
   if (email.includes("<") && email.includes(">")) {
     return email;
   }
   return `ClientSurge Systems <${email}>`;
-}
-
-type ServiceRow = {
-  name: string;
-  setup_fee: unknown;
-  monthly_fee: unknown;
-};
-
-function resolveServiceRows(order: any, packageOffer: any): ServiceRow[] {
-  const orderItems = Array.isArray(order?.items) ? order.items : [];
-  if (orderItems.length > 0) {
-    return orderItems.map((item: any) => ({
-      name:
-        item.product_name ||
-        getServiceProductByKey(item.service_key)?.name ||
-        item.service_key ||
-        "Service",
-      setup_fee: item.setup_fee ?? 0,
-      monthly_fee: item.monthly_fee ?? 0,
-    }));
-  }
-
-  return (packageOffer?.included_services || []).map((service: any) => ({
-    name: service.name,
-    setup_fee: service.setup_fee,
-    monthly_fee: service.monthly_fee,
-  }));
 }
 
 Deno.serve(async (req) => {
