@@ -11,6 +11,7 @@ import {
 import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import UserNotRegisteredError from "@/components/UserNotRegisteredError";
+import CookieConsent from "@/components/landing/CookieConsent";
 import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
@@ -292,6 +293,11 @@ function RouteIndexingGuard() {
   return null;
 }
 
+function PublicCookieConsent() {
+  const location = useLocation();
+  return isPublicPath(location.pathname) ? <CookieConsent /> : null;
+}
+
 function AuthRedirectFallback() {
   const { navigateToLogin } = useAuth();
 
@@ -466,6 +472,7 @@ function App() {
             <main id="main-content" tabIndex={-1}>
               <AuthenticatedApp />
             </main>
+            <PublicCookieConsent />
           </Router>
           <Toaster />
         </QueryClientProvider>

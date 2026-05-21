@@ -27,7 +27,6 @@ import {
   getServiceSchema,
   getWebsiteSchema,
 } from "../components/SEO/SchemaMarkup";
-import CookieConsent from "../components/landing/CookieConsent";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
 
 function useHomepageWhiteCanvas() {
@@ -165,7 +164,6 @@ export default function Home() {
         </LazyHomepageSection>
         <Footer />
         <ChatBubble />
-        <CookieConsent />
       </div>
     </DemoBookingProvider>
   );
