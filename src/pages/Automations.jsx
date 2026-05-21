@@ -318,9 +318,9 @@ export default function Automations() {
       >
         <Link to="/" className="flex items-center gap-2">
           <img
-            src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
+            src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/199305bd4_11.png"
             alt="ClientSurge Systems"
-            style={{ height: "48px", width: "auto", objectFit: "contain", filter: "brightness(10)" }}
+            style={{ height: "48px", width: "auto", objectFit: "contain", display: "block" }}
           />
         </Link>
         <Link
