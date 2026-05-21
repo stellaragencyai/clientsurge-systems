@@ -1,28 +1,42 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Mail, Phone, MessageSquare, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react';
+import {
+  WEBSITE_LEAD_SORT_OPTIONS,
+  buildWebsiteLeadQuery,
+  getWebsiteLeadFetchLimit,
+  getWebsiteLeadPage,
+  hasNextWebsiteLeadPage,
+  normalizeWebsiteLeadPage,
+} from '@/lib/websiteLeadsDashboard';
 
 export default function WebsiteLeadsDashboard() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [sort, setSort] = useState('-created_date');
+  const [page, setPage] = useState(1);
+  const [hasNextPage, setHasNextPage] = useState(false);
   const [selectedLead, setSelectedLead] = useState(null);
   const [logs, setLogs] = useState([]);
 
   useEffect(() => {
-    loadLeads();
-  }, [filter]);
+    loadLeads(1);
+  }, [filter, sort]);
 
-  const loadLeads = async () => {
+  const loadLeads = async (nextPage = page) => {
     try {
       setLoading(true);
-      const query = filter === 'all' ? {} : { lead_status: filter };
+      const safePage = normalizeWebsiteLeadPage(nextPage);
       const data = await base44.asServiceRole.entities.WebsiteLead.filter(
-        query,
-        '-created_date',
-        100
+        buildWebsiteLeadQuery(filter),
+        sort,
+        getWebsiteLeadFetchLimit(safePage)
       );
-      setLeads(data || []);
+      const nextLeads = data || [];
+      setLeads(getWebsiteLeadPage(nextLeads, safePage));
+      setHasNextPage(hasNextWebsiteLeadPage(nextLeads, safePage));
+      setPage(safePage);
     } catch (error) {
       console.error('Failed to load website leads:', error);
     } finally {
@@ -53,7 +67,7 @@ export default function WebsiteLeadsDashboard() {
       await base44.asServiceRole.entities.WebsiteLead.update(leadId, {
         [field]: value,
       });
-      loadLeads();
+      loadLeads(page);
       if (selectedLead?.id === leadId) {
         setSelectedLead({ ...selectedLead, [field]: value });
       }
@@ -101,22 +115,38 @@ export default function WebsiteLeadsDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
         <h2 className="text-2xl font-bold text-foreground">Website Leads</h2>
-        <div className="flex gap-2">
-          {['all', 'new', 'contacted', 'responded', 'booked', 'closed'].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-1 rounded text-sm font-medium transition ${
-                filter === f
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-border text-foreground hover:bg-muted'
-              }`}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="flex flex-wrap gap-2">
+            {['all', 'new', 'contacted', 'responded', 'booked', 'closed'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-3 py-1 rounded text-sm font-medium transition ${
+                  filter === f
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-border text-foreground hover:bg-muted'
+                }`}
+              >
+                {f.charAt(0).toUpperCase() + f.slice(1)}
+              </button>
+            ))}
+          </div>
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            Sort
+            <select
+              value={sort}
+              onChange={(event) => setSort(event.target.value)}
+              className="rounded border border-border bg-background px-3 py-1 text-sm font-medium text-foreground"
             >
-              {f.charAt(0).toUpperCase() + f.slice(1)}
-            </button>
-          ))}
+              {WEBSITE_LEAD_SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </div>
 
@@ -170,6 +200,25 @@ export default function WebsiteLeadsDashboard() {
                     </div>
                   </button>
                 ))}
+              </div>
+            )}
+            {!loading && leads.length > 0 && (
+              <div className="flex items-center justify-between border-t border-border px-4 py-3 text-sm">
+                <button
+                  onClick={() => loadLeads(page - 1)}
+                  disabled={page === 1}
+                  className="rounded border border-border px-3 py-1 font-medium text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="text-muted-foreground">Page {page}</span>
+                <button
+                  onClick={() => loadLeads(page + 1)}
+                  disabled={!hasNextPage}
+                  className="rounded border border-border px-3 py-1 font-medium text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Next
+                </button>
               </div>
             )}
           </div>
