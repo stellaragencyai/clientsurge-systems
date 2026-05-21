@@ -16,7 +16,6 @@ export default defineConfig({
           "vendor-framer": ["framer-motion"],
           "vendor-charts": ["recharts"],
           "vendor-lucide": ["lucide-react"],
-          "vendor-stripe": ["@stripe/stripe-js"],
         },
       },
     },
