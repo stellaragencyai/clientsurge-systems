@@ -5,8 +5,8 @@
 
 ---
 
-## DOMAIN HEALTH: 56% Ready (9/16 done, 4 critical open, 0 hard-blocked)
-> **Fastest win:** #152/#212 - external uptime monitor registration (~30 min each, approval required) - Agent C
+## DOMAIN HEALTH: 63% Ready (10/16 done, 4 critical open, 0 hard-blocked)
+> **Fastest internal win:** #112 - extend autoEndToEndTest full checkout/webhook/email/status cleanup (~2 hrs) - Agent B
 > **Critical path:** #152/#212 (monitoring registration) - healthCheck exists; external monitor registration still needs approval/action outside the repo
 
 ---
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 4 (#211 DNS, #213a Resend DKIM, #213b Twilio 10DLC, #218 secrets audit) |
-| Fastest Win (< 30 min, no deps) | #152/#212 - external uptime monitor registration (approval required) |
+| Fastest Internal Win | #112 - extend autoEndToEndTest full checkout/webhook/email/status cleanup (~2 hrs) |
 | Longest Blocked Chain | #152 -> monitoring live (1 deep; external registration) |
-| Done This Week | 9 tasks (#109, #107, #156, #103, #216, #159, #155, #158, #215) |
-| Est. Hours to Domain Complete | ~8.75 hrs |
+| Done This Week | 10 tasks (#109, #107, #156, #103, #216, #159, #155, #158, #215, #219) |
+| Est. Hours to Domain Complete | ~7.75 hrs |
 
 ---
 
@@ -48,9 +48,7 @@
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
 | 112 | pending | Extend autoEndToEndTest: full checkout -> webhook -> email -> status flow w/ cleanup | B | - | - | - | ~2 hrs |
-| 158 | pending | Add standardized console.log format to all functions: [functionName] msg {ctx} | B | - | - | - | ~1 hr |
 | 217 | done | Create runbook: Twilio down / Resend down / Stripe down scenarios | C | docs/RUNBOOK_OUTAGE.md | Morpheus | 2026-05-20 | ~1 hr |
-| 219 | pending | Load test: simulate 50 concurrent lead submissions, measure response time | C | - | - | - | ~1 hr |
 
 ---
 
@@ -73,3 +71,4 @@ No pending low-priority Domain 09 tasks.
 | 155 | getClientAnalytics: remove hardcoded mock data - replace with real entity queries | Morpheus | 2026-05-21 | Replaced legacy `SpaLead`/`ClientOnboarding` reads with scoped Order, Leads, and CommunicationEvent queries via a tested shared analytics builder that returns both portal and legacy metric shapes |
 | 158 | Add standardized console.log format to all functions: [functionName] msg {ctx} | Morpheus | 2026-05-21 | Repaired the shared function logger into an ASCII-safe structured helper, normalized known unprefixed function console messages, and added regression coverage for logger format and source hygiene |
 | 215 | Set up error alerting: admin email on any backend function 5xx error | Morpheus | 2026-05-21 | Replaced hardcoded 5xx alert recipients with a config-driven Resend admin email helper using `ADMIN_NOTIFICATION_EMAIL`/`ADMIN_EMAIL`, added a no-op path for missing config or non-5xx statuses, and added regression coverage |
+| 219 | Load test: simulate 50 concurrent lead submissions, measure response time | Morpheus | 2026-05-21 | Added a safe loopback load harness and `npm run verify:lead-load`; verified 50/50 local submissions without touching production or staging |
