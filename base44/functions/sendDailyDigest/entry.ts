@@ -170,7 +170,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ success: true, stats: { newToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length } });
   } catch (error) {
-    console.error('sendDailyDigest error:', error);
+    console.error('[sendDailyDigest] sendDailyDigest error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

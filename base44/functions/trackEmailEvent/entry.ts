@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
     }
 
     if (!recipient) {
-      console.log(`trackEmailEvent: No recipient found for event ${eventType}`);
+      console.log(`[trackEmailEvent] trackEmailEvent: No recipient found for event ${eventType}`);
       return Response.json({ success: true, skipped: true, reason: "Recipient not found" });
     }
 
@@ -143,7 +143,7 @@ Deno.serve(async (req) => {
         break;
 
       default:
-        console.log(`trackEmailEvent: Unhandled event type ${eventType}`);
+        console.log(`[trackEmailEvent] trackEmailEvent: Unhandled event type ${eventType}`);
         return Response.json({ success: true, skipped: true, reason: `Unhandled event: ${eventType}` });
     }
 
@@ -177,7 +177,7 @@ Deno.serve(async (req) => {
     return Response.json({ success: true, event: eventType, recipient_id: recipient.id });
 
   } catch (error) {
-    console.error("trackEmailEvent error:", error);
+    console.error("[trackEmailEvent] trackEmailEvent error:", error);
     return Response.json({ error: error.message || "Failed to process event" }, { status: 500 });
   }
 });

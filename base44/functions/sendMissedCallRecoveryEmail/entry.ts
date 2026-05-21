@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ success: true, message: 'Missed call recovery email sent' });
   } catch (error) {
-    console.error('Error sending missed call email:', error);
+    console.error('[sendMissedCallRecoveryEmail] Error sending missed call email:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

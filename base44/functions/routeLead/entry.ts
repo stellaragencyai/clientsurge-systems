@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
     const activeRouters = (allUsers || []).filter((u) => u.routing_active === true);
 
     if (!activeRouters.length) {
-      console.log("routeLead: No active routers configured. Skipping assignment.");
+      console.log("[routeLead] routeLead: No active routers configured. Skipping assignment.");
       return Response.json({ success: true, message: "No team members configured for routing." });
     }
 
@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
     });
 
     if (!eligible.length) {
-      console.log(`routeLead: No team member handles category "${category}". Falling back to all active routers.`);
+      console.log(`[routeLead] routeLead: No team member handles category "${category}". Falling back to all active routers.`);
     }
 
     const candidates = eligible.length ? eligible : activeRouters;
@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
       .sort((a, b) => a.load - b.load);
 
     if (!ranked.length) {
-      console.log("routeLead: All team members are at capacity.");
+      console.log("[routeLead] routeLead: All team members are at capacity.");
       return Response.json({ success: true, message: "All team members at capacity. Lead unassigned." });
     }
 
@@ -129,10 +129,10 @@ Deno.serve(async (req) => {
       } else {
         const err = await twilioRes.json().catch(() => ({}));
         smsError = err?.message || "Twilio error";
-        console.error("routeLead SMS error:", smsError);
+        console.error("[routeLead] routeLead SMS error:", smsError);
       }
     } else {
-      console.log("routeLead: Twilio not configured or assignee has no phone. SMS skipped.");
+      console.log("[routeLead] routeLead: Twilio not configured or assignee has no phone. SMS skipped.");
     }
 
     // ── Log CommunicationEvent ─────────────────────────────────────────────────
@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("routeLead error:", error);
+    console.error("[routeLead] routeLead error:", error);
     return Response.json({ error: error.message || "Routing failed" }, { status: 500 });
   }
 });

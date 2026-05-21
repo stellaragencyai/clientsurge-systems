@@ -159,7 +159,7 @@ Deno.serve(async (req) => {
 
     return Response.json(snapshot);
   } catch (error) {
-    console.error('Error in getLeadPipelineSummary:', error);
+    console.error('[getLeadPipelineSummary] Error in getLeadPipelineSummary:', error);
     return Response.json({ error: error.message || 'Failed to load lead pipeline summary' }, { status: 500 });
   }
 });

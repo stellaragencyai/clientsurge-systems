@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
 
     const toEmail = settings.lead_notification_email || Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || Deno.env.get('ADMIN_EMAIL');
     if (!toEmail) {
-      console.warn('No lead_notification_email configured in AdminSettings or env — skipping notification.');
+      console.warn('[sendAdminLeadNotification] No lead_notification_email configured in AdminSettings or env — skipping notification.');
       return Response.json({ skipped: true, reason: 'No notification email configured' });
     }
 
@@ -143,7 +143,7 @@ Deno.serve(async (req) => {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      console.error('Resend error:', err);
+      console.error('[sendAdminLeadNotification] Resend error:', err);
       return Response.json({ error: err?.message || 'Resend failed' }, { status: 500 });
     }
 
@@ -162,11 +162,11 @@ Deno.serve(async (req) => {
       metadata_json: JSON.stringify({ target: 'admin_notification', to_email: toEmail }),
     });
 
-    console.log(`Lead notification sent to ${toEmail} for lead ${lead_id}`);
+    console.log(`[sendAdminLeadNotification] Lead notification sent to ${toEmail} for lead ${lead_id}`);
     return Response.json({ success: true, sent_to: toEmail, email_id: resendData?.id || null });
 
   } catch (error) {
-    console.error('sendAdminLeadNotification error:', error);
+    console.error('[sendAdminLeadNotification] sendAdminLeadNotification error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

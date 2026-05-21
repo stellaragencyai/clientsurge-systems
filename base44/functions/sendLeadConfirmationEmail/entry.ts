@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
         from_name: 'ClientSurge Systems',
       });
     } catch (err) {
-      console.log('Email send failed:', err.message);
+      console.log('[sendLeadConfirmationEmail] Email send failed:', err.message);
       await base44.entities.CommunicationEvent.update(event.id, {
         status: 'failed',
         error_message: err.message,
@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
       event_id: event.id,
     });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('[sendLeadConfirmationEmail] Error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

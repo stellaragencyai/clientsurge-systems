@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
       const formData = await req.formData();
       const verification = await verifyTwilioWebhookRequest({ req, formData });
       if (!verification.ok) {
-        console.warn("Rejected untrusted Twilio recording webhook", verification);
+        console.warn("[processCallRecording] Rejected untrusted Twilio recording webhook", verification);
         return buildWebhookAuthErrorResponse({
           provider: "twilio",
           code: verification.code,
@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: "RecordingSid required" }, { status: 400 });
     }
 
-    console.log(`processCallRecording: duration=${durationSecs}s, verified=${verifiedTwilioWebhook}, directLead=${!!directLeadId}`);
+    console.log(`[processCallRecording] processCallRecording: duration=${durationSecs}s, verified=${verifiedTwilioWebhook}, directLead=${!!directLeadId}`);
 
     // Find matching lead by phone number
     let lead = null;
@@ -142,7 +142,7 @@ Deno.serve(async (req) => {
     }
 
     if (!leadId) {
-      console.warn(`processCallRecording: No lead found for caller ${callerRaw}`);
+      console.warn(`[processCallRecording] processCallRecording: No lead found for caller ${callerRaw}`);
       // Still log the recording so it's not lost
       return Response.json({
         success: true,
@@ -321,7 +321,7 @@ Short calls (< 60s) likely indicate voicemail or no answer.`;
     }
     await base44.asServiceRole.entities.Leads.update(leadId, leadUpdate);
 
-    console.log(`processCallRecording: Successfully processed for lead ${leadId}, sentiment=${aiSummary.overall_sentiment}`);
+    console.log(`[processCallRecording] processCallRecording: Successfully processed for lead ${leadId}, sentiment=${aiSummary.overall_sentiment}`);
 
     return Response.json({
       success: true,
@@ -336,7 +336,7 @@ Short calls (< 60s) likely indicate voicemail or no answer.`;
     });
 
   } catch (error) {
-    console.error("processCallRecording error:", error);
+    console.error("[processCallRecording] processCallRecording error:", error);
     return Response.json({ error: error.message || "Failed to process call recording" }, { status: 500 });
   }
 });

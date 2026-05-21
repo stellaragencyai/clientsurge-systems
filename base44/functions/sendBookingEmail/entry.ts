@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
         leadId: lead.id,
       });
     } catch (e) {
-      console.error('Error sending booking email:', e.message);
+      console.error('[sendBookingEmail] Error sending booking email:', e.message);
       throw e;
     }
 

@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ jobs: enrichedJobs, stats, events: clientEvents });
   } catch (error) {
-    console.error('getClientTaskJobs error:', error);
+    console.error('[getClientTaskJobs] getClientTaskJobs error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

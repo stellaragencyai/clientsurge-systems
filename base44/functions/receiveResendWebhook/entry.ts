@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
     });
 
     if (!verification.ok) {
-      console.warn("Rejected untrusted Resend webhook", {
+      console.warn("[receiveResendWebhook] Rejected untrusted Resend webhook", {
         code: verification.code,
         reason: verification.reason,
       });
@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: result.error }, { status: result.status || 400 });
     }
 
-    console.info("Accepted trusted Resend webhook", {
+    console.info("[receiveResendWebhook] Accepted trusted Resend webhook", {
       message_id: verification.messageId,
       updated_event_id: result?.updated_event_id || null,
       status: result?.status,
@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
 
     return Response.json(result);
   } catch (error) {
-    console.error("Error:", error);
+    console.error("[receiveResendWebhook] Error:", error);
     return Response.json({ error: error instanceof Error ? error.message : "Resend webhook processing failed" }, { status: 500 });
   }
 });

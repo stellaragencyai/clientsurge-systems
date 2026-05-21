@@ -338,7 +338,7 @@ Deno.serve(async (req) => {
             sent = true;
           } catch (err) {
             error = err.message;
-            console.error(`processNurtureCampaigns [step${step.num}] error for ${campaign.lead_id}:`, err.message);
+            console.error(`[processNurtureCampaigns] processNurtureCampaigns [step${step.num}] error for ${campaign.lead_id}:`, err.message);
           }
 
           updates[statusKey] = sent ? "sent" : "failed";
@@ -380,7 +380,7 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.entities.NurtureCampaign.update(campaign.id, updates);
 
       } catch (err) {
-        console.error(`processNurtureCampaigns error for campaign ${campaign.id}:`, err.message);
+        console.error(`[processNurtureCampaigns] processNurtureCampaigns error for campaign ${campaign.id}:`, err.message);
         results.errors++;
       }
     }
@@ -388,7 +388,7 @@ Deno.serve(async (req) => {
     return Response.json({ success: true, campaigns_checked: campaigns.length, ...results });
 
   } catch (error) {
-    console.error("processNurtureCampaigns error:", error);
+    console.error("[processNurtureCampaigns] processNurtureCampaigns error:", error);
     return Response.json({ error: error.message || "Failed to process nurture campaigns" }, { status: 500 });
   }
 });

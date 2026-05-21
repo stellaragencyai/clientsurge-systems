@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ success: true, message: 'Appointment booked email sent' });
   } catch (error) {
-    console.error('Error sending appointment email:', error);
+    console.error('[sendAppointmentBookedEmail] Error sending appointment email:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

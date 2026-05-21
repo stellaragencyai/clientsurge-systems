@@ -218,7 +218,7 @@ Deno.serve(async (req) => {
         });
         reportData.email_sent = !emailResult.error;
         reportData.email_error = emailResult.error?.message || null;
-        console.log(`Report sent to ${clientEmail}:`, emailResult.error || 'OK');
+        console.log(`[generateWeeklyReport] Report sent to ${clientEmail}:`, emailResult.error || 'OK');
       }
 
       results.push(reportData);
@@ -226,7 +226,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ success: true, reports: results, count: results.length });
   } catch (error) {
-    console.error('generateWeeklyReport error:', error);
+    console.error('[generateWeeklyReport] generateWeeklyReport error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

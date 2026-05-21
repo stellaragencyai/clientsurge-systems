@@ -190,7 +190,7 @@ Deno.serve(async (req) => {
               sent = true;
             } catch (err) {
               error = err.message;
-              console.error(`processDripCampaigns [${step.key}] SMS error for lead ${campaign.lead_id}:`, err.message);
+              console.error(`[processDripCampaigns] processDripCampaigns [${step.key}] SMS error for lead ${campaign.lead_id}:`, err.message);
             }
           }
 
@@ -208,7 +208,7 @@ Deno.serve(async (req) => {
               channel = "email";
             } catch (err) {
               error = err.message;
-              console.error(`processDripCampaigns [${step.key}] email error for lead ${campaign.lead_id}:`, err.message);
+              console.error(`[processDripCampaigns] processDripCampaigns [${step.key}] email error for lead ${campaign.lead_id}:`, err.message);
             }
           }
 
@@ -258,7 +258,7 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.entities.DripCampaign.update(campaign.id, campaignUpdates);
 
       } catch (err) {
-        console.error(`processDripCampaigns error for campaign ${campaign.id}:`, err.message);
+        console.error(`[processDripCampaigns] processDripCampaigns error for campaign ${campaign.id}:`, err.message);
         results.errors++;
       }
     }
@@ -266,7 +266,7 @@ Deno.serve(async (req) => {
     return Response.json({ success: true, campaigns_checked: campaigns.length, ...results });
 
   } catch (error) {
-    console.error("processDripCampaigns error:", error);
+    console.error("[processDripCampaigns] processDripCampaigns error:", error);
     return Response.json({ error: error.message || "Failed to process drip campaigns" }, { status: 500 });
   }
 });

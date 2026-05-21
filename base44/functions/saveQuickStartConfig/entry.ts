@@ -50,10 +50,10 @@ Deno.serve(async (req) => {
       quick_start_completed: true,
     });
 
-    console.log(`Quick start config saved for project ${project_id} by ${user.email}`);
+    console.log(`[saveQuickStartConfig] Quick start config saved for project ${project_id} by ${user.email}`);
     return Response.json({ success: true });
   } catch (error) {
-    console.error('saveQuickStartConfig error:', error);
+    console.error('[saveQuickStartConfig] saveQuickStartConfig error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

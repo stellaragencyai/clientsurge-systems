@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ url: portalSession.url });
   } catch (error) {
-    console.error("getStripePaymentUpdateUrl error:", error.message);
+    console.error("[getStripePaymentUpdateUrl] getStripePaymentUpdateUrl error:", error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

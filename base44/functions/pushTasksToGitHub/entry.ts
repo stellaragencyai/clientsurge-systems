@@ -102,7 +102,7 @@ async function ensureLabels(owner, repo, tasks) {
       try {
         await githubRequest(`/repos/${owner}/${repo}/labels`, 'POST', { name: label, color });
       } catch (e) {
-        console.warn(`Could not create label "${label}":`, e.message);
+        console.warn(`[pushTasksToGitHub] Could not create label "${label}":`, e.message);
       }
     }
   }

@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
         });
         closed++;
       } catch (e) {
-        console.error(`Failed to close lead ${lead.id}:`, e);
+        console.error(`[autoCloseStaleLeads] Failed to close lead ${lead.id}:`, e);
       }
     }
 

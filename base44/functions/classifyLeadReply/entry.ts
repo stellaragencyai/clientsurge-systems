@@ -48,7 +48,7 @@ Respond with JSON only: { "intent": "...", "confidence": 0.0-1.0, "recommended_n
         return Response.json(result);
       }
     } catch (llmErr) {
-      console.warn("classifyLeadReply LLM failed, falling back to keyword match:", llmErr.message);
+      console.warn("[classifyLeadReply] classifyLeadReply LLM failed, falling back to keyword match:", llmErr.message);
     }
 
     // Fallback: keyword-based classification

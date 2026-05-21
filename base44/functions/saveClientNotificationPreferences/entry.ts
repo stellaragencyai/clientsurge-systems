@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ success: true, message: 'Preferences saved' });
   } catch (error) {
-    console.error('Error saving preferences:', error);
+    console.error('[saveClientNotificationPreferences] Error saving preferences:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

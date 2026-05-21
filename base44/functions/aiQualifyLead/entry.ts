@@ -224,7 +224,7 @@ Based on ALL this data, provide a comprehensive lead qualification analysis. Ret
     });
 
   } catch (error) {
-    console.error("aiQualifyLead error:", error);
+    console.error("[aiQualifyLead] aiQualifyLead error:", error);
     return Response.json({ error: error.message || "Qualification failed" }, { status: 500 });
   }
 });

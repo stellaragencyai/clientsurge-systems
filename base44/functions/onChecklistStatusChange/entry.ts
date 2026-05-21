@@ -42,14 +42,14 @@ Deno.serve(async (req) => {
     const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@clientsurgesystems.com';
 
     if (!clientEmail) {
-      console.log('No client email on checklist, skipping notification');
+      console.log('[onChecklistStatusChange] No client email on checklist, skipping notification');
       return Response.json({ skipped: true, reason: 'No client_email on checklist' });
     }
 
     // Send email via Resend
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) {
-      console.error('RESEND_API_KEY not set');
+      console.error('[onChecklistStatusChange] RESEND_API_KEY not set');
       return Response.json({ error: 'RESEND_API_KEY not configured' }, { status: 500 });
     }
 
@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
     const emailResult = await emailRes.json();
 
     if (!emailRes.ok) {
-      console.error('Resend error:', emailResult);
+      console.error('[onChecklistStatusChange] Resend error:', emailResult);
       return Response.json({ error: 'Failed to send email', details: emailResult }, { status: 500 });
     }
 
@@ -145,11 +145,11 @@ Deno.serve(async (req) => {
       metadata_json: JSON.stringify({ service_key: serviceKey, checklist_id: checklist.id }),
     });
 
-    console.log(`Progress email sent to ${clientEmail} for service: ${serviceLabel}`);
+    console.log(`[onChecklistStatusChange] Progress email sent to ${clientEmail} for service: ${serviceLabel}`);
     return Response.json({ success: true, email_id: emailResult.id, sent_to: clientEmail });
 
   } catch (error) {
-    console.error('onChecklistStatusChange error:', error);
+    console.error('[onChecklistStatusChange] onChecklistStatusChange error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

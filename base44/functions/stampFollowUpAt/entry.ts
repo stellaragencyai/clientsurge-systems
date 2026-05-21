@@ -84,12 +84,12 @@ Deno.serve(async (req) => {
       next_follow_up_at: followUpAt,
     });
 
-    console.log(`stampFollowUpAt: Lead ${leadId} (${lead.status}) → next_follow_up_at = ${followUpAt}`);
+    console.log(`[stampFollowUpAt] stampFollowUpAt: Lead ${leadId} (${lead.status}) → next_follow_up_at = ${followUpAt}`);
 
     return Response.json({ success: true, lead_id: leadId, status: lead.status, next_follow_up_at: followUpAt });
 
   } catch (error) {
-    console.error("stampFollowUpAt error:", error);
+    console.error("[stampFollowUpAt] stampFollowUpAt error:", error);
     return Response.json({ error: error.message || "Failed to stamp follow-up" }, { status: 500 });
   }
 });

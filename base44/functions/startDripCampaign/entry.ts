@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
 
     // Guard: skip if already at a terminal/qualified status
     if (SKIP_STATUSES.includes(lead.status)) {
-      console.log(`startDripCampaign: Lead ${leadId} is ${lead.status} — skipping enrollment.`);
+      console.log(`[startDripCampaign] startDripCampaign: Lead ${leadId} is ${lead.status} — skipping enrollment.`);
       return Response.json({ success: true, skipped: true, reason: `Lead status is ${lead.status}` });
     }
 
@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
     return Response.json({ success: true, campaign_id: campaign.id, lead_id: leadId });
 
   } catch (error) {
-    console.error("startDripCampaign error:", error);
+    console.error("[startDripCampaign] startDripCampaign error:", error);
     return Response.json({ error: error.message || "Failed to start drip campaign" }, { status: 500 });
   }
 });

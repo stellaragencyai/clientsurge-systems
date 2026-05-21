@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
         } else {
           const err = await twilioRes.json().catch(() => ({}));
           smsError = err?.message || "Twilio error";
-          console.error("Twilio SMS error:", smsError);
+          console.error("[triggerFollowUpSequence] Twilio SMS error:", smsError);
         }
       }
     }
@@ -125,7 +125,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("triggerFollowUpSequence error:", error);
+    console.error("[triggerFollowUpSequence] triggerFollowUpSequence error:", error);
     return Response.json({ error: error.message || "Failed to trigger sequence" }, { status: 500 });
   }
 });

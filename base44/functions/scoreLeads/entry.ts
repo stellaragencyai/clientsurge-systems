@@ -226,7 +226,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("scoreLeads error:", error);
+    console.error("[scoreLeads] scoreLeads error:", error);
     return Response.json({ error: error.message || "Scoring failed" }, { status: 500 });
   }
 });

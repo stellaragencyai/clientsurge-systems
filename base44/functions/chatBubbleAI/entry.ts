@@ -122,7 +122,7 @@ Client context:
 
     return Response.json({ reply: replyText });
   } catch (error) {
-    console.error('chatBubbleAI error:', error);
+    console.error('[chatBubbleAI] chatBubbleAI error:', error);
     return Response.json({
       reply: 'I\'m having trouble connecting right now. For urgent support, call (602) 587-4608 or email support@clientsurgesystems.com.',
     }, { status: 500 });

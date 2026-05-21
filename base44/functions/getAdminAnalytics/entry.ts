@@ -228,7 +228,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("getAdminAnalytics error:", error);
+    console.error("[getAdminAnalytics] getAdminAnalytics error:", error);
     return Response.json({ error: error.message || "Failed to load analytics" }, { status: 500 });
   }
 });

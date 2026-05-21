@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
     return Response.json({ error: `Unknown action: ${action}` }, { status: 400 });
 
   } catch (error) {
-    console.error('fixAutomationAlert error:', error);
+    console.error('[fixAutomationAlert] fixAutomationAlert error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

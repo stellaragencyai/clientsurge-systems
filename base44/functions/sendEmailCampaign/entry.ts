@@ -243,7 +243,7 @@ Deno.serve(async (req) => {
               error_message: err.message,
             }).catch(() => null);
           }
-          console.error(`sendEmailCampaign error for ${lead.email}:`, err.message);
+          console.error(`[sendEmailCampaign] sendEmailCampaign error for ${lead.email}:`, err.message);
         }
       }
 
@@ -270,7 +270,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error("sendEmailCampaign error:", error);
+    console.error("[sendEmailCampaign] sendEmailCampaign error:", error);
     return Response.json({ error: error.message || "Failed to send campaign" }, { status: 500 });
   }
 });

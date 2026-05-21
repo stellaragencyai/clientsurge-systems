@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: error.message, code: error.code }, { status: error.status });
     }
 
-    console.error('Error:', error);
+    console.error('[submitClientOnboarding] Error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

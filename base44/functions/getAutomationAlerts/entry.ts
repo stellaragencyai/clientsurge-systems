@@ -144,7 +144,7 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('getAutomationAlerts error:', error);
+    console.error('[getAutomationAlerts] getAutomationAlerts error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

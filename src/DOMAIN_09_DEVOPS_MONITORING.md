@@ -5,8 +5,8 @@
 
 ---
 
-## DOMAIN HEALTH: 44% Ready (7/16 done, 4 critical open, 0 hard-blocked)
-> **Fastest win:** #158 - standardize console log format across functions (~1 hr, no deps) - Agent B
+## DOMAIN HEALTH: 50% Ready (8/16 done, 4 critical open, 0 hard-blocked)
+> **Fastest win:** #215 - set up backend 5xx alerting path (~1 hr, no deps) - Agent C
 > **Critical path:** #152/#212 (monitoring registration) - healthCheck exists; external monitor registration still needs approval/action outside the repo
 
 ---
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 4 (#211 DNS, #213a Resend DKIM, #213b Twilio 10DLC, #218 secrets audit) |
-| Fastest Win (< 30 min, no deps) | #158 - standardize console log format across functions (~1 hr) |
+| Fastest Win (< 30 min, no deps) | #215 - set up backend 5xx alerting path (~1 hr) |
 | Longest Blocked Chain | #152 -> monitoring live (1 deep; external registration) |
-| Done This Week | 7 tasks (#109, #107, #156, #103, #216, #159, #155) |
-| Est. Hours to Domain Complete | ~10.75 hrs |
+| Done This Week | 8 tasks (#109, #107, #156, #103, #216, #159, #155, #158) |
+| Est. Hours to Domain Complete | ~9.75 hrs |
 
 ---
 
@@ -39,8 +39,8 @@
 |---|---|---|---|---|---|---|---|
 | 152 | pending | Register healthCheck URL with UptimeRobot or Better Stack | C | #107 | - | Monitoring | ~30 min |
 | 154 | done | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | B | - | - | - | Done |
-| 212 | pending | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | C | #107 | - | Monitoring | ~30 min |
 | 215 | pending | Set up error alerting: admin email on any backend function 5xx error | C | - | - | Monitoring | ~1 hr |
+| 212 | pending | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | C | #107 | - | Monitoring | ~30 min |
 
 ---
 
@@ -72,3 +72,4 @@ No pending low-priority Domain 09 tasks.
 | 216 | Document all environment variables in README_ENV.md | Morpheus | 2026-05-21 | Rebuilt `src/README_ENV.md` and `docs/README_ENV.md` with runtime, webhook, public frontend, and local verification variables plus regression coverage against doc drift |
 | 159 | Verify all functions return proper HTTP status codes (not always 200) | Morpheus | 2026-05-21 | Audited backend failure payloads and patched known implicit-200 failure responses to explicit 400/404/409/422/502/503 statuses with regression coverage |
 | 155 | getClientAnalytics: remove hardcoded mock data - replace with real entity queries | Morpheus | 2026-05-21 | Replaced legacy `SpaLead`/`ClientOnboarding` reads with scoped Order, Leads, and CommunicationEvent queries via a tested shared analytics builder that returns both portal and legacy metric shapes |
+| 158 | Add standardized console.log format to all functions: [functionName] msg {ctx} | Morpheus | 2026-05-21 | Repaired the shared function logger into an ASCII-safe structured helper, normalized known unprefixed function console messages, and added regression coverage for logger format and source hygiene |

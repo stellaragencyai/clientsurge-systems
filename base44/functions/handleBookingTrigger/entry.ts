@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
           leadId: lead.id,
         });
       } catch (e) {
-        console.error('Error sending booking SMS:', e.message);
+        console.error('[handleBookingTrigger] Error sending booking SMS:', e.message);
       }
     }
 
@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
           bookingLink,
         });
       } catch (e) {
-        console.error('Error sending booking email:', e.message);
+        console.error('[handleBookingTrigger] Error sending booking email:', e.message);
       }
     }
 

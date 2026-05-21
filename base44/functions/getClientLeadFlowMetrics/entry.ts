@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
       },
     });
   } catch (error) {
-    console.error('Error fetching metrics:', error);
+    console.error('[getClientLeadFlowMetrics] Error fetching metrics:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

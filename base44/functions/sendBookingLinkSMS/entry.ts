@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ success: true });
   } catch (error) {
-    console.error('sendBookingLinkSMS error:', error.message);
+    console.error('[sendBookingLinkSMS] sendBookingLinkSMS error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

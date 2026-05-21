@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
         } catch (err) {
           results.failed++;
           results.errors.push({ lead_id, error: err.message });
-          console.error(`bulkLeadAction status_change error for ${lead_id}:`, err.message);
+          console.error(`[bulkLeadAction] bulkLeadAction status_change error for ${lead_id}:`, err.message);
         }
       }
 
@@ -146,7 +146,7 @@ Deno.serve(async (req) => {
               smsSent = true;
             } catch (err) {
               smsError = err.message;
-              console.error(`bulkLeadAction SMS error for ${lead_id}:`, err.message);
+              console.error(`[bulkLeadAction] bulkLeadAction SMS error for ${lead_id}:`, err.message);
             }
           }
 
@@ -171,7 +171,7 @@ Deno.serve(async (req) => {
         } catch (err) {
           results.failed++;
           results.errors.push({ lead_id, error: err.message });
-          console.error(`bulkLeadAction sequence error for ${lead_id}:`, err.message);
+          console.error(`[bulkLeadAction] bulkLeadAction sequence error for ${lead_id}:`, err.message);
         }
       }
 
@@ -195,7 +195,7 @@ Deno.serve(async (req) => {
         } catch (err) {
           results.failed++;
           results.errors.push({ lead_id, error: err.message });
-          console.error(`bulkLeadAction add_note error for ${lead_id}:`, err.message);
+          console.error(`[bulkLeadAction] bulkLeadAction add_note error for ${lead_id}:`, err.message);
         }
       }
 
@@ -211,7 +211,7 @@ Deno.serve(async (req) => {
         } catch (err) {
           results.failed++;
           results.errors.push({ lead_id, error: err.message });
-          console.error(`bulkLeadAction enrich error for ${lead_id}:`, err.message);
+          console.error(`[bulkLeadAction] bulkLeadAction enrich error for ${lead_id}:`, err.message);
         }
       }
       return Response.json({ success: true, action, ...results });
@@ -220,7 +220,7 @@ Deno.serve(async (req) => {
     return Response.json({ error: `Unknown action: ${action}. Must be status_change, trigger_sequence, add_note, or bulk_enrich.` }, { status: 400 });
 
   } catch (error) {
-    console.error("bulkLeadAction error:", error);
+    console.error("[bulkLeadAction] bulkLeadAction error:", error);
     return Response.json({ error: error.message || "Bulk action failed" }, { status: 500 });
   }
 });

@@ -198,7 +198,7 @@ Deno.serve(async (req) => {
       breakdown,
     });
   } catch (error) {
-    console.error("calculateLeadScore error:", error);
+    console.error("[calculateLeadScore] calculateLeadScore error:", error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

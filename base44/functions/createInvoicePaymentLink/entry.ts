@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
       amount: invoice.amount_outstanding || invoice.amount,
     });
   } catch (error) {
-    console.error('Error creating payment link:', error);
+    console.error('[createInvoicePaymentLink] Error creating payment link:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

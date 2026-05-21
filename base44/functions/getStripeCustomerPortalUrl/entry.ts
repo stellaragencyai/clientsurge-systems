@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ url: session.url });
   } catch (error) {
-    console.error('Stripe portal error:', error);
+    console.error('[getStripeCustomerPortalUrl] Stripe portal error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

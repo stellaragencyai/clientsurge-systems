@@ -89,7 +89,7 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
       );
     } catch (llmErr) {
       const message = llmErr instanceof Error ? llmErr.message : String(llmErr);
-      console.error("enrichLead LLM error:", message);
+      console.error("[enrichLead] enrichLead LLM error:", message);
       // Still write a partial enrichment record so we don't retry in a loop
       await base44.asServiceRole.entities.Leads.update(leadId, {
         enriched_at: new Date().toISOString(),
@@ -144,7 +144,7 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
     });
 
   } catch (error) {
-    console.error("enrichLead error:", error);
+    console.error("[enrichLead] enrichLead error:", error);
     const message = error instanceof Error ? error.message : "Enrichment failed";
     return Response.json({ error: message }, { status: 500 });
   }

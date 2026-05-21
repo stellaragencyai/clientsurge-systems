@@ -126,7 +126,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify(payload),
         });
       } catch (err) {
-        console.log('Webhook failed (non-blocking):', err.message);
+        console.log('[onLeadCreated] Webhook failed (non-blocking):', err.message);
       }
     }
 
@@ -140,7 +140,7 @@ Deno.serve(async (req) => {
           body: `A new lead has been submitted.\n\nName: ${data.name}\nEmail: ${data.email}\nPhone: ${data.phone}\nBusiness: ${data.business_name}`,
         });
       } catch (err) {
-        console.log('Email failed (non-blocking):', err.message);
+        console.log('[onLeadCreated] Email failed (non-blocking):', err.message);
       }
     }
 
@@ -160,7 +160,7 @@ Deno.serve(async (req) => {
 
         return Response.json({ success: true, payload });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('[onLeadCreated] Error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

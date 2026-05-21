@@ -62,7 +62,7 @@ Deno.serve(async (req) => {
       summary,
     });
   } catch (error) {
-    console.error('Error fetching invoices:', error);
+    console.error('[getClientInvoices] Error fetching invoices:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

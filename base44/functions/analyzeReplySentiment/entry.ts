@@ -148,7 +148,7 @@ Respond ONLY with valid JSON in this exact format:
       message_body: `Reply sentiment analyzed as "${finalSentiment}". Reason: ${reason}. Message analyzed: "${textToAnalyze.slice(0, 120)}${textToAnalyze.length > 120 ? "…" : ""}"`,
     });
 
-    console.log(`analyzeReplySentiment: Lead ${leadId} → ${finalSentiment} (${reason})`);
+    console.log(`[analyzeReplySentiment] analyzeReplySentiment: Lead ${leadId} → ${finalSentiment} (${reason})`);
 
     return Response.json({
       success: true,
@@ -158,7 +158,7 @@ Respond ONLY with valid JSON in this exact format:
     });
 
   } catch (error) {
-    console.error("analyzeReplySentiment error:", error);
+    console.error("[analyzeReplySentiment] analyzeReplySentiment error:", error);
     return Response.json({ error: error.message || "Sentiment analysis failed" }, { status: 500 });
   }
 });

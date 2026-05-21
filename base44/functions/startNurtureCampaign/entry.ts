@@ -130,7 +130,7 @@ Deno.serve(async (req) => {
     return Response.json({ success: true, campaign_id: campaign.id, lead_id: leadId });
 
   } catch (error) {
-    console.error("startNurtureCampaign error:", error);
+    console.error("[startNurtureCampaign] startNurtureCampaign error:", error);
     return Response.json({ error: error.message || "Failed to start nurture campaign" }, { status: 500 });
   }
 });

@@ -33,7 +33,7 @@ Deno.serve(async (req) => {
 
     return Response.json({ success: true, message: 'Job re-queued successfully' });
   } catch (error) {
-    console.error('retriggerTaskJob error:', error);
+    console.error('[retriggerTaskJob] retriggerTaskJob error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
