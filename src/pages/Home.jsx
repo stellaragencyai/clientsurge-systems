@@ -1,6 +1,7 @@
 import { useEffect, lazy, Suspense } from "react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
+import HomepageConversionContent from "../components/landing/HomepageConversionContent";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
 import { LargeSectionSkeleton, SectionSkeleton } from "../components/landing/SkeletonLoader";
@@ -23,6 +24,7 @@ import {
   getLocalBusinessSchema,
   getOrganizationSchema,
   getServiceSchema,
+  getWebsiteSchema,
 } from "../components/SEO/SchemaMarkup";
 import CookieConsent from "../components/landing/CookieConsent";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
@@ -53,21 +55,23 @@ export default function Home() {
     let cleanupOrg = () => {};
     let cleanupBusiness = () => {};
     let cleanupService = () => {};
+    let cleanupWebsite = () => {};
     let cleanupFaq = () => {};
 
     try {
       cleanupMetadata = setPageMetadata({
-        title: "ClientSurge Systems | AI Lead Response and Booking Automation",
+        title: "AI Automation Systems for Local Leads | ClientSurge Systems",
         description:
-          "ClientSurge Systems installs six done-for-you automations for service businesses: lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation.",
+          "six done-for-you automations, AI-powered websites, voice agents, missed-call recovery, lead follow-up, and booking automation for local service businesses that want more booked jobs.",
         canonicalPath: "/",
-        ogTitle: "ClientSurge Systems | AI Lead Response and Booking Automation",
+        ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
         ogDescription:
-          "See the six ClientSurge automation systems that help local service businesses capture leads, follow up faster, book appointments, and recover lost revenue.",
+          "ClientSurge builds AI voice-agent, follow-up, missed-call recovery, and booking automation systems for local service businesses.",
       });
       cleanupOrg = setJsonLd("organization", getOrganizationSchema());
       cleanupBusiness = setJsonLd("local-business", getLocalBusinessSchema());
       cleanupService = setJsonLd("service", getServiceSchema());
+      cleanupWebsite = setJsonLd("website", getWebsiteSchema());
       cleanupFaq = setJsonLd("faq", getFAQSchema(FAQ_ITEMS));
     } catch (error) {
       console.error("Homepage SEO bootstrap failed:", error);
@@ -78,6 +82,7 @@ export default function Home() {
       cleanupService();
       cleanupBusiness();
       cleanupOrg();
+      cleanupWebsite();
       cleanupMetadata();
     };
   }, []);
@@ -87,6 +92,7 @@ export default function Home() {
       <div className="min-h-screen">
         <Navbar />
         <Hero />
+        <HomepageConversionContent />
         <Suspense fallback={<SectionSkeleton />}>
           <SixAutomationSystems />
           <SectionBreak />

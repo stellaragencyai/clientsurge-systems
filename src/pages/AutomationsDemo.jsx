@@ -1,8 +1,29 @@
-import { useState } from "react";
-import { ArrowRight, Zap, Phone, Mail, Calendar, Star, RefreshCw, X, Play, CheckCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Zap, Phone, Mail, Calendar, Star, RefreshCw, X, Play, CheckCircle, Headphones } from "lucide-react";
 import { Link } from "react-router-dom";
+import { setPageMetadata } from "@/lib/seo";
 
 const SERVICES = [
+  {
+    id: "ai-voice-agent",
+    icon: Headphones,
+    title: "AI Voice Agent",
+    tagline: "AI phone receptionist for inbound calls, missed leads, and booking handoff.",
+    description:
+      "Your AI voice agent answers inbound calls, captures caller details, qualifies intent, and routes ready prospects toward the right next step. It gives local service businesses front-desk coverage for high-intent calls without adding another hire.",
+    stats: [
+      { value: "24/7", label: "phone coverage for new opportunities", source: "Our system" },
+      { value: "0", label: "voicemail-only lead capture gaps", source: "Target outcome" },
+      { value: "1st", label: "response advantage before competitors", source: "Speed-to-lead benchmark" },
+    ],
+    whatYouGet: [
+      "AI phone receptionist configured around your services and booking process",
+      "Caller intent capture with lead notes for your team",
+      "Booking or callback handoff for qualified prospects",
+      "Escalation rules for urgent or sensitive calls",
+    ],
+    poster: "https://images.unsplash.com/photo-1556745757-8d76bdb6984b?w=800&q=80",
+  },
   {
     id: "instant-lead-response",
     icon: Zap,
@@ -172,12 +193,12 @@ function VideoPlaceholder({ service, onClose }) {
               Full walkthrough video coming soon. Book a live demo to see this system in action with a real-world example from your industry.
             </p>
             <Link
-              to="/onboarding"
+              to="/book"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-white"
               style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
               onClick={onClose}
             >
-              Book a Live Demo <ArrowRight className="w-4 h-4" />
+              Book a Free Audit <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -293,7 +314,7 @@ function ServiceCard({ service }) {
 
           {/* CTA */}
           <Link
-            to="/onboarding"
+            to="/book"
             className="w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-bold text-white transition-all duration-200 hover:opacity-90 active:scale-95"
             style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
           >
@@ -308,6 +329,18 @@ function ServiceCard({ service }) {
 }
 
 export default function AutomationsDemo() {
+  useEffect(() => {
+    return setPageMetadata({
+      title: "AI Automations for Local Service Businesses | ClientSurge",
+      description:
+        "Explore ClientSurge AI voice agents, missed-call text-back, instant lead response, nurturing, booking automation, review requests, and lead reactivation.",
+      canonicalPath: "/automations",
+      ogTitle: "AI Automations That Turn Local Leads Into Booked Jobs",
+      ogDescription:
+        "Voice agents, missed-call recovery, instant response, follow-up, booking, review, and reactivation automation for local service businesses.",
+    });
+  }, []);
+
   return (
     <div className="min-h-screen" style={{ background: "#f8fafc" }}>
       {/* Header */}
@@ -323,11 +356,11 @@ export default function AutomationsDemo() {
           />
         </Link>
         <Link
-          to="/onboarding"
+          to="/book"
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-white"
           style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, #0050A0)` }}
         >
-          Get Started <ArrowRight className="w-4 h-4" />
+          Book Free Audit <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
 
@@ -337,7 +370,7 @@ export default function AutomationsDemo() {
           className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest"
           style={{ background: "rgba(0,136,204,0.08)", border: "1px solid rgba(0,136,204,0.2)", color: BRAND.color }}
         >
-          6 Core Automation Systems
+          AI Lead Conversion Systems
         </div>
         <h1
           className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-5"
@@ -348,14 +381,14 @@ export default function AutomationsDemo() {
           <span style={{ color: BRAND.color }}>Infrastructure for Service Businesses</span>
         </h1>
         <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed mb-8">
-          Each system below addresses a specific, documented failure point in the lead-to-booking journey. Together, they form a fully automated revenue engine — installed and operational within 24 to 48 hours.
+          Each system below addresses a specific failure point in the lead-to-booking journey: phone coverage, missed-call recovery, speed-to-lead, follow-up, booking, reviews, and old lead reactivation.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
           {[
-            { icon: "⚡", text: "Live in 24–48 hours" },
-            { icon: "🔒", text: "No long-term contracts" },
-            { icon: "🎯", text: "Fully done-for-you setup" },
-            { icon: "📊", text: "Results tracked in your dashboard" },
+            { icon: "AI", text: "Voice agents + lead follow-up" },
+            { icon: "60s", text: "Instant response workflows" },
+            { icon: "DFY", text: "Fully done-for-you setup" },
+            { icon: "ROI", text: "Results tracked in your dashboard" },
           ].map((b) => (
             <span
               key={b.text}
@@ -389,14 +422,14 @@ export default function AutomationsDemo() {
             Activate Your Systems in 24–48 Hours
           </h2>
           <p className="text-blue-100/80 text-base max-w-xl mx-auto mb-8 leading-relaxed">
-            Complete our onboarding form and our team will configure, test, and launch your selected automation systems — no technical knowledge required on your end.
+            Book a free automation audit and our team will map the right voice, lead response, follow-up, and booking systems for your business.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
-              to="/onboarding"
+              to="/book"
               className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-base font-bold text-slate-900 bg-white hover:bg-blue-50 transition-colors shadow-lg"
             >
-              Start Onboarding <ArrowRight className="w-5 h-5" />
+              Book Your Free Automation Audit <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               to="/book"

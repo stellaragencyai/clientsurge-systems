@@ -5,7 +5,9 @@ const DEFAULT_BASE_URL = "https://clientsurgesystems.com";
 const ROUTES = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/store", changefreq: "weekly", priority: "0.9" },
+  { path: "/automations", changefreq: "monthly", priority: "0.9" },
   { path: "/industries", changefreq: "monthly", priority: "0.8" },
+  { path: "/about", changefreq: "monthly", priority: "0.7" },
   { path: "/contact", changefreq: "monthly", priority: "0.8" },
   { path: "/med-spa", changefreq: "monthly", priority: "0.8" },
   { path: "/dental", changefreq: "monthly", priority: "0.8" },

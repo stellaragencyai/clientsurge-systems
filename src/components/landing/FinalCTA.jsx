@@ -106,7 +106,7 @@ export default function FinalCTA() {
                   textShadow: "0 1px 2px rgba(0,0,0,0.2)"
                 }}>
                 
-                Make the Leap
+                Book Your Free Automation Audit
                 <ArrowRight className="w-5 h-5" />
               </span>
             </button>

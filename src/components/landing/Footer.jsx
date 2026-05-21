@@ -1,15 +1,14 @@
-import { ArrowUp, Mail, Phone, Shield, Zap, MessageSquare, Calendar, RefreshCw, Star } from "lucide-react";
+import { ArrowUp, Mail, Phone, Shield, Zap, Calendar, RefreshCw, Star, Headphones } from "lucide-react";
 
 import { useLocation, useNavigate } from "react-router-dom";
-import { SIX_AUTOMATIONS } from "@/lib/sixAutomations";
 
 const AUTOMATIONS = [
-  { ...SIX_AUTOMATIONS[0], label: "Lead Capture", desc: SIX_AUTOMATIONS[0].summary, href: SIX_AUTOMATIONS[0].routePath, icon: Zap },
-  { ...SIX_AUTOMATIONS[1], label: "Missed Call Text-Back", desc: SIX_AUTOMATIONS[1].summary, href: SIX_AUTOMATIONS[1].routePath, icon: Phone },
-  { ...SIX_AUTOMATIONS[2], label: "AI Lead Follow-Up", desc: SIX_AUTOMATIONS[2].summary, href: SIX_AUTOMATIONS[2].routePath, icon: MessageSquare },
-  { ...SIX_AUTOMATIONS[3], label: "Appointment Booking", desc: SIX_AUTOMATIONS[3].summary, href: SIX_AUTOMATIONS[3].routePath, icon: Calendar },
-  { ...SIX_AUTOMATIONS[4], label: "Review Automation", desc: SIX_AUTOMATIONS[4].summary, href: SIX_AUTOMATIONS[4].routePath, icon: Star },
-  { ...SIX_AUTOMATIONS[5], label: "Customer Reactivation", desc: SIX_AUTOMATIONS[5].summary, href: SIX_AUTOMATIONS[5].routePath, icon: RefreshCw },
+  { label: "AI Voice Agents", desc: "AI phone receptionist for inbound lead capture.", href: "/automations", icon: Headphones },
+  { label: "Missed Call Text-Back", desc: "Recover missed calls automatically.", href: "/automations", icon: Phone },
+  { label: "Instant Lead Response", desc: "Reply to every lead in under 60 seconds.", href: "/automations", icon: Zap },
+  { label: "AI Booking Agent", desc: "Turns conversations into appointments.", href: "/automations", icon: Calendar },
+  { label: "Lead Reactivation", desc: "Wake up cold leads from up to 90 days.", href: "/automations", icon: RefreshCw },
+  { label: "Review Request System", desc: "Auto-request reviews after every appointment.", href: "/automations", icon: Star },
 ];
 
 const navColumns = [
@@ -18,11 +17,11 @@ const navColumns = [
     links: [
       { label: "How It Works", href: "/#problem-solution" },
       { label: "Our System", href: "/#services" },
-      { label: "6 Automations", href: "/#six-automations" },
+      { label: "AI Automations", href: "/automations" },
       { label: "Pricing", href: "/#pricing" },
       { label: "FAQ", href: "/#faq" },
-      { label: "AI Store", href: "/store" },
       { label: "Blog", href: "/blog" },
+      { label: "Book Free Audit", href: "/book" },
     ],
   },
   {
@@ -138,7 +137,7 @@ export default function Footer() {
               style={{ height: "60px", width: "auto", objectFit: "contain", mixBlendMode: "multiply" }}
             />
             <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", lineHeight: 1.65, margin: 0 }}>
-              Done-for-you AI automation that turns missed leads into booked appointments — built for service businesses.
+              AI voice agents, missed-call recovery, follow-up, and booking automation that turn more local leads into booked jobs.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               <a href="tel:+16025843227" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "rgba(10,22,40,0.6)", transition: "color 0.2s" }}

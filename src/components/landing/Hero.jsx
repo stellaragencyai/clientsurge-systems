@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useDemoBooking } from "./DemoBookingContext";
 import CascadingChecklistItem from "@/components/visual-effects/CascadingChecklistItem";
 import { BUTTON_TEXT } from "@/lib/constants";
@@ -8,11 +9,9 @@ import { BUTTON_TEXT } from "@/lib/constants";
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
 
 const checklist = [
-"Lead capture from forms, calls, ads, and landing pages",
-"Missed calls instantly turn into text conversations, not dead ends",
-"AI follow-up by SMS and email until the lead responds",
-"Appointment booking with reminders and confirmations",
-"Review generation and customer reactivation built in"];
+"Recover missed calls and after-hours leads",
+"Automatically follow up with every inquiry",
+"Book more appointments without hiring extra staff"];
 
 
 export default function Hero() {
@@ -93,14 +92,14 @@ export default function Hero() {
               marginBottom: "16px"
             }}>
             
-            AI Automation Systems That Help Local Businesses{" "}
+            AI Automation Systems That Turn More Local Leads Into{" "}
             <span
               style={{
                 color: "#00AEEF",
                 display: "inline"
               }}>
               
-              Capture Leads, Follow Up Faster, Book More Appointments, and Recover Lost Revenue.
+              Booked Jobs
             </span>
           </h1>
 
@@ -117,7 +116,7 @@ export default function Hero() {
               margin: "0 0 18px"
             }}>
             
-            ClientSurge Systems installs six done-for-you automations for service businesses: lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation.
+            ClientSurge Systems builds AI-powered websites, voice agents, and lead automation systems for local service businesses. Recover missed calls, respond instantly, nurture leads automatically, and book more appointments without adding staff.
           </p>
 
           <div
@@ -174,6 +173,24 @@ export default function Hero() {
               {BUTTON_TEXT.BOOK_DEMO}
               <ArrowRight style={{ width: "18px", height: "18px" }} />
             </button>
+            <Link
+              to="/automations"
+              className="inline-flex items-center justify-center"
+              style={{
+                minHeight: "58px",
+                padding: "0 28px",
+                borderRadius: "9999px",
+                border: "1.5px solid rgba(0,136,204,0.28)",
+                background: "rgba(255,255,255,0.86)",
+                color: "#0050A0",
+                fontSize: "0.95rem",
+                fontWeight: "700",
+                textDecoration: "none",
+                boxShadow: "0 4px 16px rgba(0,80,160,0.08)"
+              }}
+            >
+              View AI Automations
+            </Link>
           </div>
 
           <p

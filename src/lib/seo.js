@@ -129,6 +129,7 @@ export function setPageMetadata({
   ensureMeta("property", "og:image:height").setAttribute("content", "630");
 
   ensureMeta("property", "twitter:card").setAttribute("content", "summary_large_image");
+  ensureMeta("property", "twitter:url").setAttribute("content", canonicalUrl);
   ensureMeta("property", "twitter:title").setAttribute("content", ogTitle || title);
   ensureMeta("property", "twitter:description").setAttribute("content", ogDescription || description);
   ensureMeta("property", "twitter:image").setAttribute("content", ogImage);
@@ -150,6 +151,7 @@ export function setPageMetadata({
     ensureMeta("property", "twitter:title").setAttribute("content", previous.twitterTitle);
     ensureMeta("property", "twitter:description").setAttribute("content", previous.twitterDescription);
     ensureMeta("property", "twitter:image").setAttribute("content", previous.twitterImage);
+    ensureMeta("property", "twitter:url").setAttribute("content", previous.ogUrl);
   };
 }
 

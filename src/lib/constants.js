@@ -4,11 +4,11 @@
  */
 
 export const BUTTON_TEXT = {
-  BOOK_DEMO: "Make the Leap",
-  BOOK_DEMO_SHORT: "Make the Leap",
+  BOOK_DEMO: "Book Your Free Automation Audit",
+  BOOK_DEMO_SHORT: "Book Free Audit",
   GET_STARTED: "Get Started",
   VIEW_PRICING: "View Pricing",
-  SCHEDULE_DEMO: "Make the Leap",
+  SCHEDULE_DEMO: "Book Your Free Automation Audit",
   WATCH_DEMO: "See How It Works",
   SEE_IN_ACTION: "See this in action",
 };

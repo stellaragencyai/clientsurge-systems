@@ -3,10 +3,25 @@ Allow: /
 
 Disallow: /admin
 Disallow: /admin/
+Disallow: /dashboard
+Disallow: /dashboard/
 Disallow: /client-portal
 Disallow: /client-portal/
+Disallow: /client-dashboard
+Disallow: /client-dashboard/
+Disallow: /setup
+Disallow: /setup/
 Disallow: /setup/credentials
 Disallow: /setup/status
+Disallow: /onboarding
+Disallow: /onboarding/
+Disallow: /order-success
+Disallow: /thank-you
+Disallow: /lead-intelligence
+Disallow: /sam
+Disallow: /medspa-dashboard
+Disallow: /leads
+Disallow: /leads/
 Disallow: /api/
 Disallow: /base44/
 

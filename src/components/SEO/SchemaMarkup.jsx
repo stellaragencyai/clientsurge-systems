@@ -6,7 +6,7 @@ export function getOrganizationSchema() {
     url: 'https://clientsurgesystems.com',
     logo: 'https://media.base44.com/images/public/69d49a29c1974b32f46e8550/aaaacb19f_generated_image.png',
     description:
-      'Done-for-you automation systems that help med spas and appointment-based businesses respond faster and book more appointments.',
+      'AI-powered websites, voice agents, lead response, missed-call recovery, follow-up automation, and booking systems for local service businesses.',
     email: 'support@clientsurgesystems.com',
     telephone: '+1-602-584-3227',
     address: {
@@ -25,7 +25,7 @@ export function getLocalBusinessSchema() {
     name: 'ClientSurge Systems',
     url: 'https://clientsurgesystems.com',
     description:
-      'AI-powered lead response, follow-up automation, missed-call text-back, and booking systems for med spas and service businesses.',
+      'AI automation systems for local service businesses, including AI phone receptionist workflows, missed-call text-back, instant lead response, nurture automation, booking systems, and review request automation.',
     areaServed: 'United States',
     address: {
       '@type': 'PostalAddress',
@@ -42,8 +42,8 @@ export function getServiceSchema() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Service',
-    name: 'Lead Capture and Booking Automation',
-    serviceType: 'Lead management automation',
+    name: 'AI Lead Conversion Automation',
+    serviceType: 'AI automation, voice agent, and lead conversion systems',
     provider: {
       '@type': 'Organization',
       name: 'ClientSurge Systems',
@@ -57,7 +57,24 @@ export function getServiceSchema() {
       highPrice: '1997',
     },
     description:
-      'Done-for-you systems for instant lead response, automated follow-up, missed-call recovery, and appointment booking.',
+      'Done-for-you systems for AI voice agents, instant lead response, automated follow-up, missed-call recovery, appointment booking, review requests, and lead reactivation.',
+  };
+}
+
+export function getWebsiteSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'ClientSurge Systems',
+    url: 'https://clientsurgesystems.com',
+    description:
+      'Public website for ClientSurge Systems, an AI automation company helping local service businesses convert more leads into booked jobs.',
+    inLanguage: 'en-US',
+    publisher: {
+      '@type': 'Organization',
+      name: 'ClientSurge Systems',
+      url: 'https://clientsurgesystems.com',
+    },
   };
 }
 

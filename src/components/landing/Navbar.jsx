@@ -11,11 +11,10 @@ import { useAuth } from "@/lib/AuthContext";
 
 
 const sectionLinks = [
-{ label: "How It Works", href: "#problem-solution" },
-{ label: "6 Automations", href: "#six-automations" },
-{ label: "AI Store", href: "/store", isPage: true },
+{ label: "Automations", href: "/automations", isPage: true },
 { label: "Pricing", href: "#pricing" },
-{ label: "FAQ", href: "#faq" }];
+{ label: "About", href: "/about", isPage: true },
+{ label: "Contact", href: "/contact", isPage: true }];
 
 
 const industryLinks = [
@@ -183,10 +182,10 @@ export default function Navbar() {
           <a
             key={link.href}
             href={link.href}
-            onClick={() => {trackCTA("ai_store", "navbar");}}
-            className="text-xs lg:text-sm font-semibold text-primary hover:text-primary/80 transition-colors border border-primary/25 px-2 lg:px-3 py-1 rounded-full hover:bg-primary/5 whitespace-nowrap">
+            onClick={() => {trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar");}}
+            className="text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap">
             
-                {link.label} ✦
+                {link.label}
               </a> :
 
           <a
@@ -271,19 +270,22 @@ export default function Navbar() {
             Login
           </button>
           <button
-            onClick={() => {trackCTA("sign_up", "navbar");navigate("/client-portal");}}
+            onClick={() => {
+              trackCTA("book_free_audit", "navbar");
+              setShowBookingModal(true);
+            }}
             style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", backgroundSize: "200% 100%", animation: "rotateBorderGlow 4s ease-in-out infinite", boxShadow: "0 4px 14px rgba(0,174,239,0.4)", transition: "box-shadow 0.3s ease, transform 0.3s ease", border: "none", cursor: "pointer" }}
             onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,174,239,0.55)"}
             onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,174,239,0.4)"}
             className="hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded">
             <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 16px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "600", fontSize: "0.75rem", textShadow: "0 1px 2px rgba(0,0,0,0.2)" }}>
-              Sign Up
+              Book Free Audit
             </span>
           </button>
         </div>
 
         <button
-          className="md:hidden w-10 h-10 rounded-full border bg-background/90 backdrop-blur flex items-center justify-center text-foreground shadow-sm"
+          className="lg:hidden w-10 h-10 rounded-full border bg-background/90 backdrop-blur flex items-center justify-center text-foreground shadow-sm"
           onClick={() => setOpen(!open)}
           style={{ borderColor: "rgba(200,150,92,0.2)" }}
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
@@ -295,8 +297,8 @@ export default function Navbar() {
 
       {open &&
       <>
-          <div className="fixed inset-0 z-40 md:hidden" aria-hidden="true" onClick={() => setOpen(false)} />
-        <div className="md:hidden bg-background border-b border-border px-5 pb-safe-bottom pb-6 pt-2 space-y-1 relative z-50" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
+          <div className="fixed inset-0 z-40 lg:hidden" aria-hidden="true" onClick={() => setOpen(false)} />
+        <div className="lg:hidden bg-background border-b border-border px-5 pb-safe-bottom pb-6 pt-2 space-y-1 relative z-50" style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}>
           {sectionLinks.map((link) =>
           link.isPage ?
           <a
@@ -305,7 +307,7 @@ export default function Navbar() {
             className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-muted/50"
             style={{ minHeight: "44px" }}
             onClick={() => {
-              trackCTA("ai_store", "mobile_nav");
+              trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
               setOpen(false);
             }}>
             
