@@ -107,7 +107,7 @@ export default function Pricing() {
 
         {selectedIndustry ? (
           <div className="max-w-4xl mx-auto mb-10 rounded-3xl border border-primary/15 bg-primary/5 px-6 py-5 text-center">
-            <p className="text-xs font-semibold text-primary tracking-[0.22em] uppercase mb-2">
+            <p className="text-xs font-semibold text-[#005f99] tracking-[0.22em] uppercase mb-2">
               Recommended For {selectedIndustry.shortName}
             </p>
             <p className="text-lg font-semibold text-foreground">
@@ -238,6 +238,14 @@ export default function Pricing() {
       </div>
 
       <style>{`
+        .nebula-pricing .text-muted-foreground,
+        .nebula-pricing .text-foreground\\/70,
+        .nebula-pricing .text-foreground\\/75 {
+          color: rgba(10,22,40,0.74) !important;
+        }
+        .nebula-pricing .text-primary {
+          color: #005f99 !important;
+        }
         .pricing-card {
           transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease, background 0.35s ease;
           position: relative;

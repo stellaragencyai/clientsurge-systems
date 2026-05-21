@@ -99,7 +99,7 @@ export default function Hero() {
             AI Automation Systems That Help Local Businesses Capture Leads, Follow Up Faster, Book More Appointments, and{" "}
             <span
               style={{
-                color: "#00AEEF",
+                color: "#0063A3",
                 display: "inline"
               }}>
               
@@ -201,7 +201,7 @@ export default function Hero() {
             style={{
               marginTop: "18px",
               fontSize: "12px",
-              color: "rgba(27,20,13,0.48)",
+              color: "rgba(27,20,13,0.68)",
               letterSpacing: "0.04em"
             }}>
             No contracts · Most clients go live in 24–48 hours

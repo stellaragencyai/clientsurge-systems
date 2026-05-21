@@ -763,7 +763,7 @@ export default function LeadAutomationShowcase() {
             }}
           >
             <div className="flex flex-1 flex-col gap-3">
-              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary/80">
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#005f99]">
                 Preview the system flows
               </p>
               <div className="flex flex-wrap items-center gap-3">

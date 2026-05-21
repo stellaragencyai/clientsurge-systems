@@ -117,7 +117,7 @@ export default function HeroSMSDemo() {
           <div style={{ background: "#ffffff", borderBottom: "0.5px solid #e5e5ea", padding: "6px 12px 10px", display: "flex", flexDirection: "column", alignItems: "center" }}>
             <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "linear-gradient(135deg, #0088CC, #00AEEF)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: "800", color: "#ffffff", marginBottom: "4px", boxShadow: "0 2px 8px rgba(0,174,239,0.35)" }}>G</div>
             <p style={{ fontSize: "13px", fontWeight: "600", color: "#1c1c1e", margin: 0 }}>Glow Med Spa</p>
-            <p style={{ fontSize: "11px", color: "#8e8e93", margin: 0 }}>iMessage</p>
+            <p style={{ fontSize: "11px", color: "#636368", margin: 0 }}>iMessage</p>
           </div>
 
           {/* Messages */}
@@ -147,7 +147,7 @@ export default function HeroSMSDemo() {
                     {msg.text}
                   </div>
                 </div>
-                <div style={{ textAlign: msg.from === "lead" ? "right" : "left", fontSize: "9.5px", color: "#8e8e93", marginTop: "1px", padding: "0 4px" }}>
+                <div style={{ textAlign: msg.from === "lead" ? "right" : "left", fontSize: "9.5px", color: "#636368", marginTop: "1px", padding: "0 4px" }}>
                   {msg.time}
                 </div>
               </div>
@@ -157,7 +157,7 @@ export default function HeroSMSDemo() {
               <div style={{ display: "flex", justifyContent: "flex-start", animation: "smsBubbleIn 0.3s ease both" }}>
                 <div style={{ background: "#ffffff", borderRadius: "18px 18px 18px 4px", padding: "10px 14px", display: "flex", gap: "4px", alignItems: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
                   {[0, 1, 2].map((d) => (
-                    <div key={d} style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#8e8e93", animation: `smsTypingDot 1.2s ease-in-out ${d * 0.2}s infinite` }} />
+                    <div key={d} style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#636368", animation: `smsTypingDot 1.2s ease-in-out ${d * 0.2}s infinite` }} />
                   ))}
                 </div>
               </div>
@@ -176,7 +176,7 @@ export default function HeroSMSDemo() {
 
           {/* iMessage input bar */}
           <div style={{ background: "#ffffff", borderTop: "0.5px solid #e5e5ea", padding: "8px 10px", display: "flex", alignItems: "center", gap: "6px" }}>
-            <div style={{ flex: 1, background: "#f2f2f7", borderRadius: "18px", padding: "7px 12px", fontSize: "12px", color: "#8e8e93" }}>iMessage</div>
+            <div style={{ flex: 1, background: "#f2f2f7", borderRadius: "18px", padding: "7px 12px", fontSize: "12px", color: "#636368" }}>iMessage</div>
             <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #0088CC, #00AEEF)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M2 6h8M7 3l3 3-3 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

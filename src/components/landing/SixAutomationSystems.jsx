@@ -16,7 +16,7 @@ export default function SixAutomationSystems() {
     <section id="six-automations" className="px-4 py-16 md:px-6 md:py-24" style={{ background: "#ffffff" }}>
       <div className="mx-auto max-w-7xl">
         <div className="mb-10 max-w-3xl">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#0088CC" }}>
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#005f99" }}>
             The core offer
           </p>
           <h2 className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
@@ -47,7 +47,7 @@ export default function SixAutomationSystems() {
                       border: "1px solid rgba(0,174,239,0.18)",
                     }}
                   >
-                    <Icon className="h-5 w-5" style={{ color: "#0088CC" }} />
+                    <Icon className="h-5 w-5" style={{ color: "#005f99" }} />
                   </div>
                   <span className="text-xs font-bold text-muted-foreground">0{index + 1}</span>
                 </div>
@@ -58,13 +58,13 @@ export default function SixAutomationSystems() {
                 <ul className="mb-5 space-y-2">
                   {automation.bullets.map((bullet) => (
                     <li key={bullet} className="flex items-start gap-2 text-xs font-semibold text-slate-600">
-                      <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: "#0088CC" }} />
+                      <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: "#005f99" }} />
                       {bullet}
                     </li>
                   ))}
                 </ul>
 
-                <div className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: "#0088CC" }}>
+                <div className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: "#005f99" }}>
                   See how it works
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </div>

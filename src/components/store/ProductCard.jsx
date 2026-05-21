@@ -150,12 +150,15 @@ export default function ProductCard({ product }) {
         .price-highlight-box .price-value span {
           font-size: 10px;
           font-weight: 600;
-          color: rgba(0,174,239,0.7);
+          color: #005f99;
         }
         .price-highlight-box .setup-fee {
           font-size: 8px;
-          color: rgba(0,59,143,0.5);
+          color: #003B8F;
           font-weight: 600;
+        }
+        .pcard.coming-soon-card {
+          opacity: 1;
         }
       `}</style>
 
@@ -190,9 +193,9 @@ export default function ProductCard({ product }) {
 
         {/* Title */}
         <div>
-          <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#1b140d", margin: "0 0 3px", lineHeight: 1.2 }}>
+          <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#1b140d", margin: "0 0 3px", lineHeight: 1.2 }}>
             {product.name}
-          </h3>
+          </h2>
           <p style={{ fontSize: "9px", color: "rgba(0,174,239,0.8)", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
             {product.subtitle}
           </p>
@@ -262,7 +265,7 @@ export default function ProductCard({ product }) {
 
           {product.coming_soon && (
             <>
-              <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(0,59,143,0.6)", background: "rgba(0,174,239,0.06)", padding: "8px 12px", borderRadius: "9999px", border: "1px solid rgba(0,174,239,0.15)", whiteSpace: "nowrap", textAlign: "center" }}>
+              <span style={{ fontSize: "11px", fontWeight: "700", color: "#003B8F", background: "rgba(0,174,239,0.06)", padding: "8px 12px", borderRadius: "9999px", border: "1px solid rgba(0,174,239,0.15)", whiteSpace: "nowrap", textAlign: "center" }}>
                 <span style={{display:"inline-block",width:"7px",height:"7px",borderRadius:"50%",background:"#00AEEF",marginRight:"5px",animation:"cs-pulse 1.4s ease-in-out infinite"}} />
                 Coming Soon
               </span>

@@ -455,9 +455,9 @@ function App() {
             <ScrollToTop />
             <AutoCTAAnalytics />
             <RouteIndexingGuard />
-            <div id="main-content" tabIndex={-1}>
+            <main id="main-content" tabIndex={-1}>
               <AuthenticatedApp />
-            </div>
+            </main>
           </Router>
           <Toaster />
         </QueryClientProvider>

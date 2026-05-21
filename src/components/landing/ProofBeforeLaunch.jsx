@@ -30,7 +30,7 @@ export default function ProofBeforeLaunch() {
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           <div>
-            <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#0088CC" }}>
+            <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#005f99" }}>
               Proof before launch
             </p>
             <h2 className="font-display text-3xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
@@ -43,7 +43,7 @@ export default function ProofBeforeLaunch() {
             <div className="mt-7 space-y-3">
               {["Sample automation flows", "Example SMS language", "Before and after lead journey", "Admin install visibility"].map((item) => (
                 <div key={item} className="flex items-center gap-3 text-sm font-semibold text-slate-700">
-                  <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: "#0088CC" }} />
+                  <CheckCircle2 className="h-4 w-4 flex-shrink-0" style={{ color: "#005f99" }} />
                   {item}
                 </div>
               ))}
@@ -55,9 +55,9 @@ export default function ProofBeforeLaunch() {
               <article key={title} className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-50">
-                    <Icon className="h-5 w-5" style={{ color: "#0088CC" }} />
+                    <Icon className="h-5 w-5" style={{ color: "#005f99" }} />
                   </div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">{label}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-600">{label}</p>
                 </div>
                 <h3 className="text-lg font-bold text-foreground">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{body}</p>

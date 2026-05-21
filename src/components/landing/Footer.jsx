@@ -82,7 +82,7 @@ export default function Footer() {
       <div style={{ background: "linear-gradient(135deg, #003B8F 0%, #006BB0 50%, #00AEEF 100%)", padding: "40px 24px" }}>
         <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: "28px" }}>
-            <p style={{ fontSize: "10px", fontWeight: "800", color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 6px" }}>Our Full System Stack</p>
+            <p style={{ fontSize: "10px", fontWeight: "800", color: "rgba(255,255,255,0.82)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 6px" }}>Our Full System Stack</p>
             <h3 style={{ fontSize: "clamp(18px,3vw,26px)", fontWeight: "800", color: "#ffffff", margin: 0, lineHeight: 1.2 }}>
               Every automation you need to convert more leads — done for you.
             </h3>
@@ -117,7 +117,7 @@ export default function Footer() {
                 </div>
                 <div>
                   <div style={{ fontSize: "12px", fontWeight: "700", color: "#ffffff", marginBottom: "2px" }}>{label}</div>
-                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", lineHeight: 1.3 }}>{desc}</div>
+                  <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.86)", lineHeight: 1.3 }}>{desc}</div>
                 </div>
               </a>
             ))}
@@ -136,22 +136,22 @@ export default function Footer() {
               alt="ClientSurge Systems"
               style={{ height: "60px", width: "auto", objectFit: "contain", mixBlendMode: "multiply" }}
             />
-            <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", lineHeight: 1.65, margin: 0 }}>
+            <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.72)", lineHeight: 1.65, margin: 0 }}>
               AI voice agents, missed-call recovery, follow-up, and booking automation that turn more local leads into booked jobs.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <a href="tel:+16025843227" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "rgba(10,22,40,0.6)", transition: "color 0.2s" }}
-                onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
-                onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.6)"}
+              <a href="tel:+16025843227" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "rgba(10,22,40,0.74)", transition: "color 0.2s" }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#005f99"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.74)"}
               >
                 <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(0,136,204,0.08)", border: "1px solid rgba(0,136,204,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Phone style={{ width: "13px", height: "13px", color: "#0088CC" }} />
                 </div>
                 <span style={{ fontSize: "13px", fontWeight: "600" }}>(602) 584-3227</span>
               </a>
-              <a href="mailto:support@clientsurgesystems.com" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "rgba(10,22,40,0.6)", transition: "color 0.2s" }}
-                onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
-                onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.6)"}
+              <a href="mailto:support@clientsurgesystems.com" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none", color: "rgba(10,22,40,0.74)", transition: "color 0.2s" }}
+                onMouseEnter={(e) => e.currentTarget.style.color = "#005f99"}
+                onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.74)"}
               >
                 <div style={{ width: "30px", height: "30px", borderRadius: "8px", background: "rgba(0,136,204,0.08)", border: "1px solid rgba(0,136,204,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Mail style={{ width: "13px", height: "13px", color: "#0088CC" }} />
@@ -164,7 +164,7 @@ export default function Footer() {
           {/* Nav columns */}
           {navColumns.map((col) => (
             <div key={col.title} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <h4 style={{ fontSize: "10px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#0088CC", margin: 0 }}>
+              <h4 style={{ fontSize: "10px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#005f99", margin: 0 }}>
                 {col.title}
               </h4>
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -173,9 +173,9 @@ export default function Footer() {
                     key={link.label}
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", textDecoration: "none", fontWeight: "500", transition: "color 0.2s" }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
-                    onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.55)"}
+                    style={{ fontSize: "13px", color: "rgba(10,22,40,0.72)", textDecoration: "none", fontWeight: "500", transition: "color 0.2s" }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = "#005f99"}
+                    onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.72)"}
                   >
                     {link.label}
                   </a>
@@ -188,20 +188,20 @@ export default function Footer() {
         {/* Bottom bar */}
         <div style={{ marginTop: "48px", paddingTop: "24px", borderTop: "1px solid rgba(0,174,239,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.4)" }}>© {new Date().getFullYear()} ClientSurge Systems</span>
-            <a href="/privacy-policy" onClick={(e) => handleNavClick(e, "/privacy-policy")} style={{ fontSize: "12px", color: "rgba(10,22,40,0.4)", textDecoration: "none" }}
-              onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
-              onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.4)"}>
+            <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.68)" }}>© {new Date().getFullYear()} ClientSurge Systems</span>
+            <a href="/privacy-policy" onClick={(e) => handleNavClick(e, "/privacy-policy")} style={{ fontSize: "12px", color: "rgba(10,22,40,0.68)", textDecoration: "none" }}
+              onMouseEnter={(e) => e.currentTarget.style.color = "#005f99"}
+              onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.68)"}>
               Privacy
             </a>
-            <a href="/terms" onClick={(e) => handleNavClick(e, "/terms")} style={{ fontSize: "12px", color: "rgba(10,22,40,0.4)", textDecoration: "none" }}
-              onMouseEnter={(e) => e.currentTarget.style.color = "#0088CC"}
-              onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.4)"}>
+            <a href="/terms" onClick={(e) => handleNavClick(e, "/terms")} style={{ fontSize: "12px", color: "rgba(10,22,40,0.68)", textDecoration: "none" }}
+              onMouseEnter={(e) => e.currentTarget.style.color = "#005f99"}
+              onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.68)"}>
               Terms
             </a>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "rgba(10,22,40,0.4)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "12px", color: "rgba(10,22,40,0.68)" }}>
               <Shield style={{ width: "13px", height: "13px", color: "#0088CC" }} />
               <span>SSL Encrypted</span>
             </div>
