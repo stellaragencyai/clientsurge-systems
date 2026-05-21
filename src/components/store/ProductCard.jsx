@@ -160,6 +160,14 @@ export default function ProductCard({ product }) {
         .pcard.coming-soon-card {
           opacity: 1;
         }
+        .product-card-cta-label {
+          font-size: 11px;
+        }
+        @media (max-width: 480px) {
+          .product-card-cta-label {
+            font-size: 10px;
+          }
+        }
       `}</style>
 
       <motion.div
@@ -250,12 +258,12 @@ export default function ProductCard({ product }) {
                 boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 2px 8px rgba(0,0,0,0.08)",
               }}
             >
-              <span style={{
+              <span className="product-card-cta-label" style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
                 width: "100%",
                 height: "36px", paddingLeft: "16px", paddingRight: "16px", borderRadius: "9999px",
                 background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "#ffffff",
-                color: inCart ? "#fff" : "#111", fontWeight: "700", fontSize: "11px", whiteSpace: "nowrap",
+                color: inCart ? "#fff" : "#111", fontWeight: "700", whiteSpace: "nowrap",
                 pointerEvents: "none",
               }}>
                 {inCart ? <><Check style={{ width: "12px", height: "12px" }} /> Added to Cart</> : <><Plus style={{ width: "12px", height: "12px" }} /> Add to Cart</>}

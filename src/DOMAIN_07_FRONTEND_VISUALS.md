@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 69% Ready (24/35 done · 0 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** #42 — Store ProductCard mobile button font (~10 min, no deps) · Agent A
+## 📊 DOMAIN HEALTH: 🟡 71% Ready (25/35 done · 0 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** #54 — DemoBookingModal date/time input min-height check (~10 min, no deps) · Agent A
 > ⚠️ **Critical:** none currently open
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 24 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,45,51,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| ✅ Done This Week | 25 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,45,51,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | #42 (Store mobile cart font), M10 (modal scroll), M12 (Store mobile grid), M13 (Hero CTA touch targets), #55 (Calendly CSP frame check) |
+| 📱 Next 5 Priority Tasks | M10 (modal scroll), M12 (Store mobile grid), M13 (Hero CTA touch targets), #55 (Calendly CSP frame check), #54 (date/time input min-height check) |
 
 ---
 
@@ -66,7 +66,7 @@
 | 33 | ⏳ | Mobile sticky cart bar: add padding-top: 72px to main content when visible | A | — | — | 🧵 Mobile-UX | ~20 min |
 | 34 | ⏳ | AdminDashboard sidebar: add active-state highlight on current route | A | — | — | — | ~20 min |
 | 41 | ⏳ | Store page initial load: show 6 ProductCard skeletons for 300ms then reveal | A | — | — | — | ~45 min |
-| 42 | ⏳ | Store ProductCard on mobile (375px): reduce "Add to Cart" font to 10px | A | — | — | 🧵 Mobile-UX | ~10 min |
+| 42 | ✅ | Store ProductCard on mobile (375px): reduce "Add to Cart" font to 10px | Morpheus | — | — | 🧵 Mobile-UX | Done |
 | 44 | ⏳ | Mobile sticky cart bar: add circular badge with items.length count | A | — | — | 🧵 Mobile-UX | ~15 min |
 | 45 | ✅ | Store page: add "Talk to a Human" escape valve CTA below product grid | Morpheus | — | — | 🧵 CTA-Standards | Done |
 | 49 | ⏳ | Store: Guided mode no industry → show all non-coming-soon products | A | — | — | — | ~30 min |
