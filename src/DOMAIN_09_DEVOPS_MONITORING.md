@@ -5,8 +5,8 @@
 
 ---
 
-## DOMAIN HEALTH: 50% Ready (8/16 done, 4 critical open, 0 hard-blocked)
-> **Fastest win:** #215 - set up backend 5xx alerting path (~1 hr, no deps) - Agent C
+## DOMAIN HEALTH: 56% Ready (9/16 done, 4 critical open, 0 hard-blocked)
+> **Fastest win:** #152/#212 - external uptime monitor registration (~30 min each, approval required) - Agent C
 > **Critical path:** #152/#212 (monitoring registration) - healthCheck exists; external monitor registration still needs approval/action outside the repo
 
 ---
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 4 (#211 DNS, #213a Resend DKIM, #213b Twilio 10DLC, #218 secrets audit) |
-| Fastest Win (< 30 min, no deps) | #215 - set up backend 5xx alerting path (~1 hr) |
+| Fastest Win (< 30 min, no deps) | #152/#212 - external uptime monitor registration (approval required) |
 | Longest Blocked Chain | #152 -> monitoring live (1 deep; external registration) |
-| Done This Week | 8 tasks (#109, #107, #156, #103, #216, #159, #155, #158) |
-| Est. Hours to Domain Complete | ~9.75 hrs |
+| Done This Week | 9 tasks (#109, #107, #156, #103, #216, #159, #155, #158, #215) |
+| Est. Hours to Domain Complete | ~8.75 hrs |
 
 ---
 
@@ -39,7 +39,6 @@
 |---|---|---|---|---|---|---|---|
 | 152 | pending | Register healthCheck URL with UptimeRobot or Better Stack | C | #107 | - | Monitoring | ~30 min |
 | 154 | done | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | B | - | - | - | Done |
-| 215 | pending | Set up error alerting: admin email on any backend function 5xx error | C | - | - | Monitoring | ~1 hr |
 | 212 | pending | Set up UptimeRobot or Better Stack monitoring on healthCheck endpoint | C | #107 | - | Monitoring | ~30 min |
 
 ---
@@ -73,3 +72,4 @@ No pending low-priority Domain 09 tasks.
 | 159 | Verify all functions return proper HTTP status codes (not always 200) | Morpheus | 2026-05-21 | Audited backend failure payloads and patched known implicit-200 failure responses to explicit 400/404/409/422/502/503 statuses with regression coverage |
 | 155 | getClientAnalytics: remove hardcoded mock data - replace with real entity queries | Morpheus | 2026-05-21 | Replaced legacy `SpaLead`/`ClientOnboarding` reads with scoped Order, Leads, and CommunicationEvent queries via a tested shared analytics builder that returns both portal and legacy metric shapes |
 | 158 | Add standardized console.log format to all functions: [functionName] msg {ctx} | Morpheus | 2026-05-21 | Repaired the shared function logger into an ASCII-safe structured helper, normalized known unprefixed function console messages, and added regression coverage for logger format and source hygiene |
+| 215 | Set up error alerting: admin email on any backend function 5xx error | Morpheus | 2026-05-21 | Replaced hardcoded 5xx alert recipients with a config-driven Resend admin email helper using `ADMIN_NOTIFICATION_EMAIL`/`ADMIN_EMAIL`, added a no-op path for missing config or non-5xx statuses, and added regression coverage |
