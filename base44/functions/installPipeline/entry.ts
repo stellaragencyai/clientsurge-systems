@@ -2076,7 +2076,63 @@ export async function updateTrackedServiceInstallStatus({
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
-Deno.serve(async (req) => {
+const INSTALL_PIPELINE_TIMEOUT_MS = 30_000;
+
+function createInstallPipelineTimeoutError(timeoutMs: number) {
+  return Object.assign(
+    new Error(`installPipeline request timed out after ${timeoutMs}ms`),
+    {
+      code: "install_pipeline_timeout",
+      status: 504,
+      details: { timeout_ms: timeoutMs },
+    }
+  );
+}
+
+function withInstallPipelineTimeout(
+  promise: Promise<Response>,
+  timeoutMs: number = INSTALL_PIPELINE_TIMEOUT_MS
+): Promise<Response> {
+  let timeoutId: number | undefined;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      reject(createInstallPipelineTimeoutError(timeoutMs));
+    }, timeoutMs);
+  });
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    clearTimeout(timeoutId);
+  });
+}
+
+function buildInstallPipelineErrorResponse(error: any) {
+  const status = error.status || 500;
+  const code = error.code || "install_pipeline_error";
+
+  console.error("[installPipeline] request failed", {
+    status,
+    code,
+    message: error.message,
+    details: error.details || {},
+  });
+
+  return Response.json(
+    {
+      error: error.message,
+      code,
+      details: error.details || {},
+    },
+    { status }
+  );
+}
+
+Deno.serve((req) =>
+  withInstallPipelineTimeout(handleInstallPipelineRequest(req)).catch((error) =>
+    buildInstallPipelineErrorResponse(error)
+  )
+);
+
+async function handleInstallPipelineRequest(req: Request) {
   try {
     const base44 = createClientFromRequest(req);
     const payload = await req.json();
@@ -2143,13 +2199,6 @@ Deno.serve(async (req) => {
 
     return Response.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    return Response.json(
-      {
-        error: error.message,
-        code: error.code || "install_pipeline_error",
-        details: error.details || {},
-      },
-      { status: error.status || 500 }
-    );
+    return buildInstallPipelineErrorResponse(error);
   }
-});
+}
