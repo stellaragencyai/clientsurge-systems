@@ -1,17 +1,23 @@
 import { ArrowRight } from "lucide-react";
+import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 
 export default function IndustryHero({ image, eyebrow, headline, highlightedWord, sub, ctaLabel = "Book Your Free Demo", onBookDemo }) {
   // Split headline to highlight one word/phrase
   const headlineParts = highlightedWord
     ? headline.split(highlightedWord)
     : [headline];
+  const imageProps = buildResponsiveImageProps(image, {
+    widths: [768, 1200, 1600, 2000],
+    sizes: "100vw",
+    quality: 80,
+  });
 
   return (
     <section className="relative overflow-hidden" style={{ minHeight: "100svh", display: "flex", alignItems: "center" }}>
       {/* Full-bleed background image */}
       <div className="absolute inset-0 z-0">
         <img
-          src={image}
+          {...imageProps}
           alt={eyebrow}
           width="1600"
           height="1000"

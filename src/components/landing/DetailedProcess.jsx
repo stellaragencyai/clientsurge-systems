@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageSquare, Zap, Send, CalendarCheck, CheckCircle2 } from "lucide-react";
+import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 
 const steps = [
   {
@@ -75,6 +76,11 @@ function StepCard({ step, index, isLast }) {
   const [visible, setVisible] = useState(false);
   const [height, setHeight] = useState(0);
   const Icon = step.icon;
+  const imageProps = buildResponsiveImageProps(step.image, {
+    widths: [380, 640, 800],
+    sizes: "(max-width: 768px) 0px, 380px",
+    quality: 80,
+  });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -152,7 +158,7 @@ function StepCard({ step, index, isLast }) {
         {/* Right — Image */}
         <div className="hidden md:block h-72 rounded-3xl overflow-hidden flex-shrink-0 border-2" style={{ borderColor: "rgba(209,182,155,0.5)" }}>
           <img
-            src={step.image}
+            {...imageProps}
             alt={step.title}
             width="640"
             height="288"

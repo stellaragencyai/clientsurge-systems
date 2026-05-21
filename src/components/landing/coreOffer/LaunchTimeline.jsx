@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { launchTimelineSteps, iconMap } from "./coreOfferData";
 import { useDemoBooking } from "@/components/landing/DemoBookingContext";
+import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 
 const STEP_WEIGHTS = [1, 0.5, 0.5, 2.5, 0.5];
 const TOTAL_WEIGHT = STEP_WEIGHTS.reduce((a, b) => a + b, 0);
@@ -101,6 +102,11 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
 function StepRow({ step, idx }) {
   const isEven = idx % 2 === 0;
   const [ref, visible] = useInView(0.08);
+  const imageProps = buildResponsiveImageProps(step.image, {
+    widths: [480, 640, 960],
+    sizes: "(max-width: 768px) 100vw, 640px",
+    quality: 80,
+  });
 
   return (
     <div ref={ref} className="relative" style={{ opacity: visible ? 1 : 0, transition: "opacity 0.6s ease" }}>
@@ -159,7 +165,7 @@ function StepRow({ step, idx }) {
             className="rounded-2xl overflow-hidden w-full"
             style={{ border: "1.5px solid rgba(0,174,239,0.12)", boxShadow: "0 8px 24px rgba(0,120,200,0.1)", minHeight: "360px" }}
           >
-            <img src={step.image} alt={step.title} width="640" height="360" className="w-full h-full object-cover" />
+            <img {...imageProps} alt={step.title} width="640" height="360" className="w-full h-full object-cover" />
           </div>
         </div>
       </div>

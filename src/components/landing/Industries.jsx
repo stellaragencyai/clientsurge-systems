@@ -16,6 +16,7 @@ import {
   INDUSTRY_SELECTION_STORAGE_KEY } from
 "@/lib/industryRecommendations";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
+import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 
 // Unique SVG pattern per industry — lightweight, inline, no external deps
 const industryPatterns = {
@@ -352,6 +353,11 @@ export default function Industries() {
           const highlighted = hoveredIndustryId === industry.id;
           const isSelected = selectedIndustryId === industry.id;
           const accent = industry.accent;
+          const imageProps = buildResponsiveImageProps(industry.image, {
+            widths: [480, 720, 960, 1200],
+            sizes: "(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw",
+            quality: 80,
+          });
 
           return (
             <motion.button
@@ -380,7 +386,7 @@ export default function Industries() {
               }}>
               
               <img
-                src={industry.image}
+                {...imageProps}
                 alt={industry.name}
                 loading="lazy"
                 decoding="async"

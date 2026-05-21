@@ -1,5 +1,6 @@
 import { X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 
 const industryImages = {
   "Med Spas & Aesthetic Clinics": "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=800&q=80",
@@ -13,6 +14,11 @@ const industryImages = {
 export default function IndustryModal({ industry, onClose }) {
   const Icon = industry.icon;
   const imageUrl = industryImages[industry.name] || industryImages["Med Spas & Aesthetic Clinics"];
+  const imageProps = buildResponsiveImageProps(imageUrl, {
+    widths: [480, 800, 1000],
+    sizes: "(max-width: 768px) 100vw, 672px",
+    quality: 80,
+  });
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-lg z-50 flex items-center justify-center p-4 animate-fade-in" onClick={onClose}>
@@ -31,7 +37,7 @@ export default function IndustryModal({ industry, onClose }) {
         {/* Image section */}
         <div className="relative h-64 md:h-80 w-full overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5">
           <img
-            src={imageUrl}
+            {...imageProps}
             alt={industry.name}
             width="800"
             height="450"

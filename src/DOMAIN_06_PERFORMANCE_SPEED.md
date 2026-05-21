@@ -5,8 +5,8 @@
 
 ---
 
-## DOMAIN HEALTH: 69% Ready (11/16 done, 0 critical open, 0 hard-blocked)
-> **Fastest win:** #64 - add optimized Unsplash params + srcSet to hero/industry images (~45 min) - Agent A
+## DOMAIN HEALTH: 75% Ready (12/16 done, 0 critical open, 0 hard-blocked)
+> **Fastest win:** #153 - add Cache-Control to read-only functions (~30 min) - Agent B
 > **No critical blockers** - all tasks independent, good domain to batch with other work
 
 ---
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 0 - no critical tasks in this domain |
-| Fastest Win | #64 - optimized Unsplash params + srcSet (~45 min) |
+| Fastest Win | #153 - Cache-Control on read-only functions (~30 min) |
 | Longest Blocked Chain | None - all tasks independent |
-| Done This Week | 11 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10, #62, #116) |
-| Est. Hours to Domain Complete | ~4.5 hrs |
+| Done This Week | 12 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10, #62, #64, #116) |
+| Est. Hours to Domain Complete | ~3.75 hrs |
 
 ---
 
@@ -36,7 +36,6 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 64 | Pending | Add ?w=800&q=80 Unsplash query params + srcSet to all hero/industry images | A | - | - | - | ~45 min |
 | 114 | Pending | All Resend fetch calls: add retry once on 429/5xx with 2-second delay | B | - | - | - | ~45 min |
 | 153 | Pending | Add Cache-Control: public, max-age=60 to read-only functions | B | - | - | - | ~30 min |
 | 219 | Pending | Load test: simulate 50 concurrent lead submissions, measure response time | C | - | - | - | ~1 hr |
@@ -64,4 +63,5 @@
 | 9 | Add font-display: swap fallback for Inter/Playfair to prevent FOUT | Morpheus | 2026-05-21 | Verified all Google Font stylesheet URLs in `index.html` include `display=swap` and added test coverage |
 | 10 | Store page: intersection-observer lazy rendering for 8+ products | Morpheus | 2026-05-21 | Wired the store product grid through `LazyProductGrid` when 8+ products are visible, preserving `.store-grid` layout while deferring card rendering until viewport approach |
 | 62 | Add manifest.json + minimal service worker for PWA installability | Morpheus | 2026-05-21 | Added `public/manifest.json`, local SVG PWA icon, same-origin `public/sw.js`, and production-only service worker registration |
+| 64 | Add ?w=800&q=80 Unsplash query params + srcSet to all hero/industry images | Morpheus | 2026-05-21 | Added shared Unsplash optimization helpers and wired responsive `srcSet`/`sizes` into public industry hero/card/modal/process/timeline image surfaces |
 | 116 | getBookedDemoSlots: add {scheduled_date: selectedDate} filter (don't fetch all) | Morpheus | 2026-05-21 | Verified `getBookedDemoSlots` queries by `scheduled_date`, active booking statuses, and a bounded result count; guarded by `tests/demoBookingSchedulerGuards.test.js` |
