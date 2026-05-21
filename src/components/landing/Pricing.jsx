@@ -155,7 +155,7 @@ export default function Pricing() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-8 mb-4 w-full">
           {[
             { icon: "No lock-in", text: "No long-term contracts" },
-            { icon: "Fast launch", text: "Live in 24-48 Hours" },
+            { icon: "Launch plan", text: "Timeline confirmed after onboarding" },
             { icon: "Channels", text: "SMS + Email included" },
             { icon: "Managed", text: "Done-for-you setup" },
             { icon: "Protected", text: "30-day money-back guarantee" },
@@ -446,7 +446,7 @@ function PricingCard({ plan, selectedIndustry }) {
 
         <div className="mb-5 text-xs text-muted-foreground leading-relaxed px-3 py-2 rounded-xl bg-primary/5 border border-primary/10">
           {plan.highlight
-            ? "Most clients recover this bundle with a handful of extra bookings per month."
+            ? "Built for teams that need the full response, booking, review, and reactivation workflow."
             : plan.packageKey === "starter_system"
             ? "The entry bundle focused on speed-to-lead and booking handoff."
             : "Built for teams that need broader recovery and follow-up coverage."}

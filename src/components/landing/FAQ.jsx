@@ -25,12 +25,12 @@ export const FAQ_ITEMS = [
 },
 {
   q: "How fast can I get set up?",
-  a: "Most clients are fully live within 24-48 hours. We do the work. You just need to show up for one onboarding call.",
+  a: "The target setup window is 24-48 hours after onboarding for straightforward installs. More complex calendars, CRMs, phone routing, or approval steps can extend that timeline, and we confirm it during onboarding.",
   category: "setup"
 },
 {
   q: "What results should I expect?",
-  a: "Faster lead response, more booked appointments, and recovered revenue from leads that would otherwise go cold. Many clients see clear results in the first 30 days.",
+  a: "The first measurable goals are faster lead response, cleaner follow-up, fewer dropped calls, and more visible booking handoffs. We review performance after launch instead of promising a fixed revenue outcome.",
   category: "pricing"
 },
 {
@@ -45,17 +45,17 @@ export const FAQ_ITEMS = [
 },
 {
   q: "What happens on the demo call?",
-  a: "We spend 30 minutes understanding your business, your lead volume, and where you are losing bookings. Then we show you exactly what we would build and what you can expect.",
+  a: "We spend 30 minutes understanding your business, your lead volume, and where bookings may be leaking. Then we show the system we would build, the assumptions behind it, and the proof steps needed before go-live.",
   category: "integration"
 },
 {
   q: "Will this actually work for my specific business?",
-  a: "If you generate leads but lose conversions due to slow follow-up, the answer is almost always yes. We specialize in appointment-based industries and tailor every system to your specific lead flow. On your demo call, we will identify the exact gaps and show you the specific solution. If we do not think we can help, we will tell you upfront.",
+  a: "If you generate leads but lose conversions due to slow follow-up, the system is likely relevant. We specialize in appointment-based industries and tailor every setup to your actual lead flow. On your demo call, we identify the gaps and tell you upfront if the fit is weak.",
   category: "integration"
 },
 {
   q: "How much time will I need to spend managing this?",
-  a: "Almost none. The system runs on autopilot. You check in weekly to review results, and we handle all updates and optimization. No learning curve and no training required for your team.",
+  a: "Very little after launch. We handle setup and optimization, while your team reviews the pipeline and responds when a lead needs a human handoff. We keep the workflow simple instead of adding another tool to manage.",
   category: "support"
 },
 {
@@ -70,7 +70,7 @@ export const FAQ_ITEMS = [
 },
 {
   q: "How do I know if this is the right investment for my business?",
-  a: "We will walk you through the specific system we would build, what it costs, and the projected ROI based on your current lead volume and conversion rate. You will have concrete numbers before deciding.",
+  a: "We will walk you through the specific system we would build, what it costs, the assumptions behind the recommendation, and which metrics we would track after launch. You will have concrete operating numbers before deciding.",
   category: "support"
 }];
 

@@ -204,7 +204,7 @@ export default function Hero() {
               color: "rgba(27,20,13,0.68)",
               letterSpacing: "0.04em"
             }}>
-            No contracts · Most clients go live in 24–48 hours
+            No contracts - launch timeline confirmed after onboarding
           </p>
         </div>
 

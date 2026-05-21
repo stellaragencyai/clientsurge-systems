@@ -5,7 +5,7 @@ const messages = [
   { from: "system", text: "New lead from Google Ad — 'Botox near me'" },
   { from: "bot", text: "Hi! Thanks for reaching out to Glow Aesthetic Studio 👋 I'd love to help. Are you interested in a free consultation?", time: "0s" },
   { from: "lead", text: "Yes! How much does Botox cost?", time: "1m 12s" },
-  { from: "bot", text: "Great question! Our Botox consultations are complimentary, and treatment starts at $12/unit. Most clients need 20–40 units. Would you like to book a free consult this week?", time: "1m 12s" },
+  { from: "bot", text: "Great question! Consultations are complimentary, and treatment pricing depends on the plan your provider recommends. Would you like to book a free consult this week?", time: "1m 12s" },
   { from: "lead", text: "That works — do you have Thursday afternoon?", time: "3m 44s" },
   { from: "bot", text: "We do! I have Thursday at 2:00 PM or 4:30 PM available. Which works better?", time: "3m 44s" },
   { from: "lead", text: "2pm works!", time: "4m 02s" },
@@ -35,7 +35,7 @@ export default function ConversationModal({ onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
-            <p className="text-sm font-semibold text-gray-900">Real Example: Lead → Booked</p>
+            <p className="text-sm font-semibold text-gray-900">Example Flow: Lead to Booked</p>
             <p className="text-xs text-gray-400 mt-0.5">Glow Aesthetic Studio · 4 minutes start to finish</p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
@@ -72,7 +72,7 @@ export default function ConversationModal({ onClose }) {
         </div>
 
         <div className="px-6 py-4 border-t border-gray-100 bg-muted/30 text-center">
-          <p className="text-xs text-muted-foreground">This entire exchange was handled automatically. Zero staff involvement.</p>
+          <p className="text-xs text-muted-foreground">Illustrative flow showing the automation path from inquiry to booking handoff.</p>
         </div>
       </div>
     </div>

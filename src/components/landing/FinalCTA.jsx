@@ -26,9 +26,9 @@ export default function FinalCTA() {
           {/* Projection stats — clearly framed as targets not guarantees */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10">
             {[
-            { value: "3x", label: "typical booking rate lift" },
+            { value: "3", label: "core conversion workflows" },
             { value: "< 90s", label: "target first response time" },
-            { value: "30 days", label: "typical time to see ROI" }].
+            { value: "30 days", label: "first performance review" }].
             map((stat) =>
             <div key={stat.label} className="flex flex-col items-center">
                 <span className="font-display text-3xl font-black text-foreground">
@@ -39,7 +39,7 @@ export default function FinalCTA() {
             )}
           </div>
           <p className="mt-3 text-xs text-muted-foreground/60 italic">
-            Based on system capabilities — results vary by business volume and industry.
+            Targets are based on system design. Actual results depend on lead volume, offer, industry, and provider readiness.
           </p>
 
 
@@ -48,7 +48,7 @@ export default function FinalCTA() {
             {[
               { step: "01", title: "Book a 15-min slot", body: "Pick a time that works. No sales pressure, no fluff." },
               { step: "02", title: "We map your lead flow", body: "We show you exactly where bookings are leaking in your current setup." },
-              { step: "03", title: "See your system live", body: "We demo the full AI system built for your industry — ready to launch." },
+              { step: "03", title: "See your system live", body: "We show the AI workflow for your industry and the proof steps required before go-live." },
             ].map((item) => (
               <div key={item.step} className="flex flex-col gap-2">
                 <span className="font-display text-4xl font-black" style={{ color: "rgba(0,174,239,0.25)", lineHeight: 1 }}>{item.step}</span>
@@ -59,7 +59,7 @@ export default function FinalCTA() {
           </div>
 
           <p className="mt-6 text-xs text-muted-foreground/60">
-            Free 15-minute call · no commitment required · live in 24–48 hours
+            Free 15-minute call - no commitment required - launch timeline confirmed after onboarding
           </p>
         </div>
 

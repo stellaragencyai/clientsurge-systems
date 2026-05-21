@@ -42,28 +42,28 @@ const items = [
   },
   {
     icon: TrendingUp,
-    label: "Average booking lift",
-    display: "3x more bookings",
+    label: "Target booking lift",
+    display: "More booked leads",
     animatedValue: 3,
-    suffix: "x more bookings",
+    suffix: " workflows",
     story:
-      "Most clients feel the lift from consistent follow-up long before they need to hire more front-desk coverage.",
+      "The system is designed around three conversion moments: response, follow-up, and booking handoff.",
   },
   {
     icon: CalendarCheck,
-    label: "Average setup time",
+    label: "Launch setup target",
     display: "24–48 hours",
     animatedValue: null,
     story:
-      "We handle the full build and launch prep. Most clients are live within 24–48 hours of onboarding.",
+      "We handle the build and launch prep, then confirm the real timeline during onboarding based on required integrations.",
   },
   {
     icon: Building2,
-    label: "Average recovery window",
-    display: "30-day ROI",
+    label: "Measurement window",
+    display: "30-day review",
     animatedValue: null,
     story:
-      "A few additional booked appointments often cover the investment faster than teams expect.",
+      "Performance is reviewed after launch against response speed, booked leads, recovered calls, and follow-up completion.",
   },
   {
     icon: ShieldCheck,
@@ -81,7 +81,7 @@ function StatCard({ item, index, inView }) {
   const statText =
     typeof item.animatedValue === "number" ? `${count}${item.suffix || ""}` : item.display;
 
-  const isHighlighted = index === 1; // 3x more bookings stat
+  const isHighlighted = index === 1;
   
   return (
     <motion.article

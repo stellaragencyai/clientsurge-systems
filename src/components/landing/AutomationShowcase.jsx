@@ -110,7 +110,7 @@ const AUTOMATIONS = [
   "Old leads who never booked get a targeted re-engagement campaign. A single reactivation blast can recover thousands in dormant revenue.",
   before: "Old leads sit ignored — dormant revenue never recovered",
   after: "A targeted re-engagement campaign wakes up leads up to 90 days old",
-  stat: "Many clients recover $3k–$10k from their first reactivation run",
+  stat: "Reactivation value depends on dormant lead volume and offer strength",
   steps: [
   { icon: Clock, label: "Lead dormant 14–60 days", sub: "Daily scan detects it" },
   { icon: Brain, label: "Reactivation tier assigned", sub: "14d / 30d / 60d offer" },

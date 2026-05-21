@@ -129,7 +129,7 @@ export default function RevenueCalculator() {
 
                 <div className="p-4 rounded-xl border border-primary/20 bg-primary/5">
                   <p className="text-xs text-primary font-semibold mb-1">
-                    With ClientSurge Systems automation (avg. 61% conversion)
+                    With a stronger automated follow-up path
                   </p>
                   <p className="text-2xl font-bold text-primary tabular-nums">
                     +${potentialRevenue.toLocaleString()}
@@ -145,7 +145,7 @@ export default function RevenueCalculator() {
                 </Button>
               </a>
               <p className="text-xs text-muted-foreground text-center mt-3">
-                Based on average client results. Individual results vary.
+                Estimate only. Actual results depend on lead quality, close rate, offer, and response coverage.
               </p>
             </div>
           </div>

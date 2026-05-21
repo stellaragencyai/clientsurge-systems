@@ -321,7 +321,7 @@ function ScreenContent({ industry, fading, cardVisible }) {
         </button>
         <div style={{ height:"1px", background:"rgba(255,255,255,0.08)", borderRadius:"1px", margin:"2px 0" }}/>
         <div style={{ display:"flex", flexWrap:"wrap", gap:"5px" }}>
-          {["Pay-as-you-go","3x avg bookings","Live in 24–48 hrs"].map(item => <span key={item} style={{ display:"inline-flex", alignItems:"center", background:"rgba(0,0,0,0.2)", borderRadius:"999px", padding:"2px 8px", fontSize:"8px", fontWeight:"700", color:"rgba(255,255,255,0.45)", border:"1px solid rgba(255,255,255,0.07)" }}>{item}</span>)}
+          {["Pay-as-you-go","Booking workflow","Launch plan"].map(item => <span key={item} style={{ display:"inline-flex", alignItems:"center", background:"rgba(0,0,0,0.2)", borderRadius:"999px", padding:"2px 8px", fontSize:"8px", fontWeight:"700", color:"rgba(255,255,255,0.45)", border:"1px solid rgba(255,255,255,0.07)" }}>{item}</span>)}
         </div>
       </div>
       <DashboardCard industry={industry} visible={cardVisible}/>

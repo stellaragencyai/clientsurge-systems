@@ -42,7 +42,7 @@ export default function FounderSection() {
                 I am Nolan, founder of ClientSurge Systems
               </h3>
               <p className="text-base text-muted-foreground leading-relaxed mb-8">
-                I built this after watching local businesses spend thousands attracting leads and lose half of them to slow follow-up. Every system is custom, done-for-you, and designed to pay for itself within 30 days.
+                I built this after watching local businesses spend thousands attracting leads and lose too many opportunities to slow follow-up. Every system is custom, done-for-you, and measured against clear launch goals after onboarding.
               </p>
               <div className="pt-6" style={{ borderTop: "1px solid rgba(154,92,46,0.2)" }}>
                 <p className="text-sm font-semibold" style={{ color: "#9a5c2e" }}>
