@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 80% Ready (28/35 done · 0 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** #55 — Calendly CSP frame check (~30 min, no deps) · Agent A
+## 📊 DOMAIN HEALTH: 🟡 83% Ready (29/35 done · 0 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** #49 — Store guided mode no industry (~30 min, no deps) · Agent A
 > ⚠️ **Critical:** none currently open
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 28 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,44,45,51,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M12,M13,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| ✅ Done This Week | 29 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,44,45,51,55,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M12,M13,M15,M16,M17,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | #55 (Calendly CSP frame check), M10 (modal scroll), #54 (stale date/time input row), M14 (Safari portal modal check), #49 (guided mode no industry) |
+| 📱 Next 5 Priority Tasks | #49 (guided mode no industry), M10 (modal scroll), #54 (stale date/time input row), M14 (Safari portal modal check), #52 (MobileCallBar phone source) |
 
 ---
 
@@ -41,7 +41,7 @@
 | 36 | ✅ | Favicon + apple-touch-icon already present in index.html — verified | A | — | — | — | ~20 min |
 | 51 | ✅ | pages/Book Calendly iframe: set width:100%, height:700px, scrolling:yes | Morpheus | — | — | — | Done |
 | 53 | ✅ | Audit all form inputs for iOS zoom issue (font-size < 16px) | Morpheus | — | — | 🧵 Mobile-UX | Done |
-| 55 | ⏳ | pages/Book Calendly: test CSP allows calendly.com frames on live domain | A | — | — | — | ~30 min |
+| 55 | ✅ | pages/Book Calendly: test CSP allows calendly.com frames on live domain | Morpheus | — | — | — | Done |
 | 67 | ⏳ | ClientPortal: add "Get Help" tab with support ticket form → SupportMessage entity | A | — | — | — | ~1 hr |
 | 80 | ⏳ | Onboarding page: ensure form validates all required fields before submit | A | — | — | — | ~30 min |
 | 243 | ⏳ | Final: test all CTA buttons across mobile (375px, 390px, 414px) | A | — | → ALL sign-off | 🧵 Mobile-UX | ~1 hr |
