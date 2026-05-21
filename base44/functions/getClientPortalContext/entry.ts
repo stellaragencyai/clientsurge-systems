@@ -104,6 +104,49 @@ function buildProjectSummary(project) {
   };
 }
 
+function buildPortalLoginEvent({ user, email, linkStatus, order = null, client = null, project = null }) {
+  const clientId = client?.id || order?.client_id || null;
+  const clientProjectId = project?.id || order?.client_project_id || null;
+  const contextId = order?.id
+    ? `portal_login:${order.id}:${linkStatus}`
+    : `portal_login:${email}:${linkStatus}`;
+
+  return {
+    channel: "internal",
+    direction: "system",
+    event_type: "portal_login",
+    provider: "internal",
+    status: "processed",
+    subject: "Client portal login",
+    message_body: `Authenticated portal login resolved with status: ${linkStatus}.`,
+    description: `Authenticated portal login for ${email} resolved as ${linkStatus}.`,
+    order_id: order?.id,
+    client_id: clientId,
+    client_project_id: clientProjectId,
+    context_type: "client_portal",
+    context_id: contextId,
+    metadata_json: JSON.stringify({
+      link_status: linkStatus,
+      user_id: user?.id || null,
+      user_email: email,
+      order_id: order?.id || null,
+      client_id: clientId,
+      client_project_id: clientProjectId,
+      has_paid_order: Boolean(order?.id),
+    }),
+  };
+}
+
+async function logPortalLoginEvent(base44, args) {
+  try {
+    await base44.asServiceRole.entities.CommunicationEvent.create(
+      buildPortalLoginEvent(args)
+    );
+  } catch (error) {
+    console.error("[getClientPortalContext] portal login event failed:", error.message);
+  }
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -142,6 +185,12 @@ Deno.serve(async (req) => {
     );
 
     if (paidOrders.length === 0) {
+      await logPortalLoginEvent(base44, {
+        user,
+        email,
+        linkStatus: "no_paid_order",
+      });
+
       return Response.json({
         success: true,
         project: null,
@@ -158,6 +207,12 @@ Deno.serve(async (req) => {
       ...new Set(paidOrders.map((order) => cleanString(order.business_name)).filter(Boolean)),
     ];
     if (businessNames.length > 1) {
+      await logPortalLoginEvent(base44, {
+        user,
+        email,
+        linkStatus: "ambiguous_paid_orders",
+      });
+
       return Response.json({
         success: true,
         project: null,
@@ -174,6 +229,13 @@ Deno.serve(async (req) => {
     const orderSummary = buildOrderSummary(order);
 
     if (!order.client_project_id || !order.client_id) {
+      await logPortalLoginEvent(base44, {
+        user,
+        email,
+        linkStatus: "missing_canonical_links",
+        order,
+      });
+
       return Response.json({
         success: true,
         project: null,
@@ -194,6 +256,13 @@ Deno.serve(async (req) => {
     ]);
 
     if (!project || !client) {
+      await logPortalLoginEvent(base44, {
+        user,
+        email,
+        linkStatus: "linked_records_missing",
+        order,
+      });
+
       return Response.json({
         success: true,
         project: null,
@@ -208,6 +277,15 @@ Deno.serve(async (req) => {
 
     const projectSummary = buildProjectSummary(project);
     const subscription = buildSubscriptionSummary(order, projectSummary);
+
+    await logPortalLoginEvent(base44, {
+      user,
+      email,
+      linkStatus: "linked",
+      order,
+      client,
+      project: projectSummary,
+    });
 
     return Response.json({
       success: true,
