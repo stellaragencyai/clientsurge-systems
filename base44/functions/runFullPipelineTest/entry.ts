@@ -149,7 +149,26 @@ Deno.serve(async (req) => {
       steps.push({ step: "2. Canonical order created", passed: false, detail: e.message });
     }
 
-    // Step 3: Initialize activation pipeline
+    // Step 3: Verify checkout/session metadata on the paid order fixture.
+    if (order) {
+      const hasCheckoutShape =
+        order.payment_status === "paid" &&
+        Boolean(order.stripe_customer_id) &&
+        Boolean(order.stripe_session_id) &&
+        Boolean(order.pricing_summary?.package_key) &&
+        Array.isArray(order.items) &&
+        order.items.length > 0;
+
+      steps.push({
+        step: "3. Checkout session metadata",
+        passed: hasCheckoutShape,
+        detail: hasCheckoutShape
+          ? `session: ${order.stripe_session_id}; package: ${order.pricing_summary.package_key}`
+          : "missing paid checkout/session/package metadata",
+      });
+    }
+
+    // Step 4: Initialize activation pipeline
     let initializedOrder: any = null;
     if (order) {
       try {
@@ -167,67 +186,102 @@ Deno.serve(async (req) => {
 
         const snapshot = buildInstallSnapshot(initializedOrder);
         steps.push({
-          step: "3. Activation pipeline initialized",
+          step: "4. Activation pipeline initialized",
           passed: snapshot.trackedItems.length > 0 && Boolean(initializedOrder.purchase_onboarding_handoff),
           detail: `pipeline_status: ${snapshot.pipelineStatus}; tracked_services: ${snapshot.trackedItems.length}`,
         });
 
         try {
           const events = await base44.asServiceRole.entities.CommunicationEvent.filter({ order_id: initializedOrder.id });
+          const eventTypes = new Set((events || []).map((event: any) => event.event_type));
+          steps.push({
+            step: "4b. Webhook/order events",
+            passed:
+              eventTypes.has("order_paid") &&
+              eventTypes.has("install_initialized") &&
+              eventTypes.has("onboarding_handoff_initialized"),
+            detail: `events: ${[...eventTypes].sort().join(", ") || "none"}`,
+          });
+
           for (const event of events || []) {
             cleanupEntity("CommunicationEvent", event.id);
           }
         } catch {
-          // Event cleanup is best-effort; the main fixture cleanup still runs.
+          steps.push({
+            step: "4b. Webhook/order events",
+            passed: false,
+            detail: "CommunicationEvent lookup failed",
+          });
         }
       } catch (e: any) {
-        steps.push({ step: "3. Activation pipeline initialized", passed: false, detail: e.message });
+        steps.push({ step: "4. Activation pipeline initialized", passed: false, detail: e.message });
       }
     }
 
-    // Step 4: credentialsCompletionCheck
+    // Step 5: credentialsCompletionCheck
     if (order_id) {
       try {
         const check = await base44.asServiceRole.functions.invoke("credentialsCompletionCheck", { order_id });
-        steps.push({ step: "4. Credentials check", passed: !!check?.success, detail: `all_ready: ${check?.all_ready}` });
+        steps.push({ step: "5. Credentials check", passed: !!check?.success, detail: `all_ready: ${check?.all_ready}` });
       } catch (e: any) {
-        steps.push({ step: "4. Credentials check", passed: false, detail: e.message });
+        steps.push({ step: "5. Credentials check", passed: false, detail: e.message });
       }
     }
 
-    // Step 5: getActivationProgress
+    // Step 6: getActivationProgress
     if (order_id) {
       try {
         const prog = await base44.asServiceRole.functions.invoke("getActivationProgress", { order_id });
-        steps.push({ step: "5. Activation progress", passed: !!prog?.success, detail: `total: ${prog?.total_services}` });
+        steps.push({ step: "6. Activation progress", passed: !!prog?.success, detail: `total: ${prog?.total_services}` });
       } catch (e: any) {
-        steps.push({ step: "5. Activation progress", passed: false, detail: e.message });
+        steps.push({ step: "6. Activation progress", passed: false, detail: e.message });
       }
     }
 
-    // Step 6: AgentLog write
+    // Step 7: Email status/readiness without sending live email.
+    if (order) {
+      const emailReady = Boolean(order.customer_email) && Boolean(order.pricing_summary?.package_key);
+      steps.push({
+        step: "7. Confirmation email readiness",
+        passed: emailReady,
+        detail: emailReady ? `recipient: ${order.customer_email}` : "missing order recipient or package summary",
+      });
+    }
+
+    // Step 8: AgentLog write
     try {
       const log = await base44.asServiceRole.entities.AgentLog.create({
         agent_name: "runFullPipelineTest", log_type: "info",
-        summary: "Canonical lead→order→activate E2E test log entry",
+        summary: "Canonical checkout -> webhook -> email -> status E2E test log entry",
         service: "e2e_test", requires_nolan: false, resolved: true,
       });
       cleanupEntity("AgentLog", log.id);
-      steps.push({ step: "6. AgentLog write", passed: true, detail: `log_id: ${log.id}` });
+      steps.push({ step: "8. AgentLog write", passed: true, detail: `log_id: ${log.id}` });
     } catch (e: any) {
-      steps.push({ step: "6. AgentLog write", passed: false, detail: e.message });
+      steps.push({ step: "8. AgentLog write", passed: false, detail: e.message });
     }
 
-    // Step 7: getSystemHealthDashboard
+    // Step 9: getSystemHealthDashboard
     try {
       const health = await base44.asServiceRole.functions.invoke("getSystemHealthDashboard", {});
-      steps.push({ step: "7. System health check", passed: !!health?.success, detail: `status: ${health?.health?.overall_status}` });
+      steps.push({ step: "9. System health check", passed: !!health?.success, detail: `status: ${health?.health?.overall_status}` });
     } catch (e: any) {
-      steps.push({ step: "7. System health check", passed: false, detail: e.message });
+      steps.push({ step: "9. System health check", passed: false, detail: e.message });
     }
 
     // Cleanup test records
     const cleanup_results = persist_records ? [] : await cleanupRecords(base44, cleanup_ids);
+    if (!persist_records) {
+      const failedCleanups = cleanup_results.filter((result: any) => !result.cleaned);
+      steps.push({
+        step: "10. Fixture cleanup",
+        passed: failedCleanups.length === 0,
+        detail:
+          failedCleanups.length === 0
+            ? `cleaned: ${cleanup_results.length}`
+            : `failed cleanup: ${failedCleanups.map((result: any) => `${result.entity}:${result.id}`).join(", ")}`,
+      });
+    }
 
     const passed = steps.filter(s => s.passed).length;
     const total = steps.length;
@@ -240,9 +294,7 @@ Deno.serve(async (req) => {
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ chat_id: "-1003533494424",
-          text: `@trinity
-
-${all_passed ? "PASS" : "FAIL"} <b>Pipeline E2E Test</b>
+          text: `${all_passed ? "PASS" : "FAIL"} <b>Pipeline E2E Test</b>
 ${passed}/${total} passed
 
 ${lines}
