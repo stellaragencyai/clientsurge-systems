@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Loader2, CheckCircle2, AlertCircle, Clock } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, Clock, RefreshCw } from "lucide-react";
 import { getStalledInstallWarning } from "@/lib/installQueueStatus";
 
 const STATUS_COLORS = {
@@ -92,8 +92,12 @@ export default function InstallQueuePanel() {
         <h3 className="font-semibold text-foreground">Install Queue</h3>
         <button
           onClick={loadQueue}
-          className="text-xs font-medium px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-colors"
+          type="button"
+          title="Refresh install queue"
+          aria-label="Refresh install queue"
+          className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-colors"
         >
+          <RefreshCw className="h-3.5 w-3.5" />
           Refresh
         </button>
       </div>
