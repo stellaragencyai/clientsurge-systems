@@ -10,7 +10,7 @@ import {
 } from "../src/lib/demoBookings.js";
 
 const adminDashboard = readFileSync(
-  new URL("../src/pages/AdminDashboard.jsx", import.meta.url),
+  new URL("../src/internal-pages/AdminDashboard.jsx", import.meta.url),
   "utf8"
 );
 const demoBookingsTab = readFileSync(

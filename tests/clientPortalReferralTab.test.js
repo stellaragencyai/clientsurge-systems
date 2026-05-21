@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
-const portal = readFileSync(new URL("../src/pages/ClientPortal.jsx", import.meta.url), "utf8");
+const portal = readFileSync(new URL("../src/internal-pages/ClientPortal.jsx", import.meta.url), "utf8");
 const referral = readFileSync(new URL("../src/components/portal/ReferABusiness.jsx", import.meta.url), "utf8");
 
 test("client portal exposes a referrals tab that renders ReferABusiness", () => {

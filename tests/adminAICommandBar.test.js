@@ -7,7 +7,7 @@ const commandBarSource = readFileSync(
   "utf8"
 );
 const dashboardSource = readFileSync(
-  new URL("../src/pages/AdminDashboard.jsx", import.meta.url),
+  new URL("../src/internal-pages/AdminDashboard.jsx", import.meta.url),
   "utf8"
 );
 

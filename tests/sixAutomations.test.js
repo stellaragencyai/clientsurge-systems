@@ -23,17 +23,17 @@ test("the public offer is packaged around exactly six automation systems", () =>
   ]);
 });
 
-test("automation routes are public and declared before the catch-all industry route", () => {
+test("automation routes are public and no catch-all industry route advertises templates", () => {
   for (const route of getAutomationRoutes()) {
     assert.match(app, new RegExp(`"${route}"`));
-    assert.ok(app.indexOf(`path="${route}"`) < app.indexOf('path="/:slug"'));
   }
+  assert.doesNotMatch(app, /path="\/:slug"/);
 });
 
 test("blog route is public and wired for SEO", () => {
   assert.match(app, /import Blog from "\.\/pages\/Blog"/);
   assert.match(app, /"\/blog"/);
-  assert.ok(app.indexOf('path="/blog"') < app.indexOf('path="/:slug"'));
+  assert.doesNotMatch(app, /path="\/:slug"/);
   assert.match(sitemap, /https:\/\/clientsurgesystems\.com\/blog/);
 });
 

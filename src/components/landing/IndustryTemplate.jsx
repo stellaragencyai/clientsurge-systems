@@ -156,12 +156,13 @@ function IndustryTemplateInner({ industrySlug }) {
   );
 }
 
-export default function IndustryTemplate() {
+export default function IndustryTemplate({ industrySlug: explicitIndustrySlug }) {
   const { slug } = useParams();
+  const industrySlug = explicitIndustrySlug || slug;
 
   return (
     <DemoBookingProvider>
-      <IndustryTemplateInner industrySlug={slug} />
+      <IndustryTemplateInner industrySlug={industrySlug} />
     </DemoBookingProvider>
   );
 }

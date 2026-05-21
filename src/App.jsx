@@ -22,38 +22,38 @@ import { setPageMetadata } from "@/lib/seo";
 
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
-import Onboarding from "./pages/Onboarding";
-import CaptureLeads from "./pages/CaptureLeads";
 import Start from "./pages/Start";
 import Book from "./pages/Book";
-import Success from "./pages/Success";
-import LegalPage from "./pages/LegalPage";
 import Contact from "./pages/Contact";
 import Industries from "./pages/Industries";
-import AutomationServicePage from "./pages/AutomationServicePage";
 import Blog from "./pages/Blog";
-import OrderSuccess from "./pages/OrderSuccess";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
-import BusinessSetup from "./pages/BusinessSetup";
-import ThankYou from "./pages/ThankYou";
 import About from "./pages/About";
-import CredentialsSetup from "./pages/CredentialsSetup";
-import SetupStatus from "./pages/SetupStatus";
-import WebsitePreview from "./pages/WebsitePreview";
-import AdminInstallGuide from "./pages/AdminInstallGuide";
-import AISalesCommandCenter from "./pages/AISalesCommandCenter";
-import PerformanceWars from "./pages/PerformanceWars";
 import AutomationsDemo from "./pages/AutomationsDemo";
+import Onboarding from "./internal-pages/Onboarding";
+import CaptureLeads from "./internal-pages/CaptureLeads";
+import Success from "./internal-pages/Success";
+import LegalPage from "./internal-pages/LegalPage";
+import AutomationServicePage from "./internal-pages/AutomationServicePage";
+import OrderSuccess from "./internal-pages/OrderSuccess";
+import BusinessSetup from "./internal-pages/BusinessSetup";
+import ThankYou from "./internal-pages/ThankYou";
+import CredentialsSetup from "./internal-pages/CredentialsSetup";
+import SetupStatus from "./internal-pages/SetupStatus";
+import WebsitePreview from "./internal-pages/WebsitePreview";
+import AdminInstallGuide from "./internal-pages/AdminInstallGuide";
+import AISalesCommandCenter from "./internal-pages/AISalesCommandCenter";
+import PerformanceWars from "./internal-pages/PerformanceWars";
 
 
 const Store = lazy(() => import("./pages/Store"));
-const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
-const AdminLeads = lazy(() => import("./pages/AdminLeads"));
-const AdminLeadDetail = lazy(() => import("./pages/AdminLeadDetail"));
-const AdminAutomation = lazy(() => import("./pages/AdminAutomation"));
-const AdminOnboarding = lazy(() => import("./pages/AdminOnboarding"));
-const ClientPortal = lazy(() => import("./pages/ClientPortal"));
-const ClientDashboard = lazy(() => import("./pages/ClientDashboard"));
+const AdminDashboard = lazy(() => import("./internal-pages/AdminDashboard"));
+const AdminLeads = lazy(() => import("./internal-pages/AdminLeads"));
+const AdminLeadDetail = lazy(() => import("./internal-pages/AdminLeadDetail"));
+const AdminAutomation = lazy(() => import("./internal-pages/AdminAutomation"));
+const AdminOnboarding = lazy(() => import("./internal-pages/AdminOnboarding"));
+const ClientPortal = lazy(() => import("./internal-pages/ClientPortal"));
+const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
 
 const PUBLIC_PATHS = [
   "/",
@@ -138,6 +138,39 @@ const LEGACY_REDIRECTS = [
   { from: "/Sam", to: "/admin" },
   { from: "/MedSpaDashboard", to: "/admin" },
   { from: "/WebsiteSpecPreview", to: "/admin" },
+];
+
+const AUTOMATION_SERVICE_ROUTES = [
+  "/lead-capture-automation",
+  "/missed-call-text-back",
+  "/ai-lead-follow-up",
+  "/appointment-booking-automation",
+  "/review-automation",
+  "/customer-reactivation",
+];
+
+const INDUSTRY_ROUTE_SLUGS = [
+  "med-spa",
+  "dental",
+  "hvac",
+  "roofing",
+  "chiropractic",
+  "contractors",
+];
+
+const HIDDEN_PUBLIC_ROUTES = [
+  { path: "/success", element: <Success /> },
+  { path: "/onboarding", element: <Onboarding /> },
+  { path: "/leads/capture", element: <CaptureLeads /> },
+  { path: "/legal/:type", element: <LegalPage /> },
+  { path: "/order-success", element: <OrderSuccess /> },
+  { path: "/setup", element: <BusinessSetup /> },
+  { path: "/thank-you", element: <ThankYou /> },
+  { path: "/setup/credentials", element: <CredentialsSetup /> },
+  { path: "/setup/status/:orderId", element: <SetupStatus /> },
+  { path: "/setup/status", element: <SetupStatus /> },
+  { path: "/setup/preview/:specId", element: <WebsitePreview /> },
+  { path: "/setup/preview", element: <WebsitePreview /> },
 ];
 
 const isPublicPath = (pathname) =>
@@ -303,10 +336,6 @@ const AuthenticatedApp = () => {
       <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
       <Route path="/login" element={<Navigate to="/client-portal" replace />} />
       <Route path="/ClientPortal" element={<Navigate to="/client-portal" replace />} />
-      <Route path="/success" element={<Success />} />
-      <Route path="/onboarding" element={<Onboarding />} />
-      <Route path="/leads/capture" element={<CaptureLeads />} />
-      <Route path="/legal/:type" element={<LegalPage />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/blog" element={<Blog />} />
       <Route
@@ -323,32 +352,42 @@ const AuthenticatedApp = () => {
           </Suspense>
         }
       />
-      <Route path="/order-success" element={<OrderSuccess />} />
-      <Route path="/setup" element={<BusinessSetup />} />
-      <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/about" element={<About />} />
       <Route path="/automations" element={<AutomationsDemo />} />
-      <Route path="/lead-capture-automation" element={<AutomationServicePage />} />
-      <Route path="/missed-call-text-back" element={<AutomationServicePage />} />
-      <Route path="/ai-lead-follow-up" element={<AutomationServicePage />} />
-      <Route path="/appointment-booking-automation" element={<AutomationServicePage />} />
-      <Route path="/review-automation" element={<AutomationServicePage />} />
-      <Route path="/customer-reactivation" element={<AutomationServicePage />} />
-      <Route path="/setup/credentials" element={<CredentialsSetup />} />
-      <Route path="/setup/status/:orderId" element={<SetupStatus />} />
-      <Route path="/setup/status" element={<SetupStatus />} />
-      <Route path="/setup/preview/:specId" element={<WebsitePreview />} />
-      <Route path="/setup/preview" element={<WebsitePreview />} />
+      {AUTOMATION_SERVICE_ROUTES.map((path) => (
+        <Route key={path} path={path} element={<AutomationServicePage />} />
+      ))}
+      {INDUSTRY_ROUTE_SLUGS.map((slug) => (
+        <Route
+          key={slug}
+          path={`/${slug}`}
+          element={<IndustryTemplate industrySlug={slug} />}
+        />
+      ))}
+      {HIDDEN_PUBLIC_ROUTES.map(({ path, element }) => (
+        <Route key={path} path={path} element={element} />
+      ))}
       <Route path="/services/:serviceSlug" element={<Navigate to="/store" replace />} />
-      <Route path="/:slug" element={<IndustryTemplate />} />
 
       <Route
         element={
           <ProtectedRoute unauthenticatedElement={<AuthRedirectFallback />} />
         }
       >
-        <Route path="/client-portal" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><ClientPortal /></Suspense>} />
-        <Route path="/client-dashboard" element={<Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><ClientDashboard /></Suspense>} />
+        {[
+          { path: "/client-portal", Component: ClientPortal },
+          { path: "/client-dashboard", Component: ClientDashboard },
+        ].map(({ path, Component }) => (
+          <Route
+            key={path}
+            path={path}
+            element={
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}>
+                <Component />
+              </Suspense>
+            }
+          />
+        ))}
       </Route>
 
       <Route
@@ -360,20 +399,35 @@ const AuthenticatedApp = () => {
           />
         }
       >
-        <Route path="/dashboard" element={<Navigate to="/admin" replace />} />
-        <Route path="/admin-settings" element={<Navigate to="/admin" replace />} />
-        <Route path="/admin" element={<Suspense fallback={<AdminLoadingSkeleton />}><AdminDashboard /></Suspense>} />
-        <Route path="/admin/leads" element={<Suspense fallback={<AdminLoadingSkeleton />}><AdminLeads /></Suspense>} />
-        <Route path="/admin/leads/:leadId" element={<Suspense fallback={<AdminLoadingSkeleton />}><AdminLeadDetail /></Suspense>} />
-        <Route path="/admin/automations" element={<Suspense fallback={<AdminLoadingSkeleton />}><AdminAutomation /></Suspense>} />
-        <Route path="/lead-intelligence" element={<Navigate to="/admin" replace />} />
-        <Route path="/sam" element={<Navigate to="/admin" replace />} />
-        <Route path="/medspa-dashboard" element={<Navigate to="/admin" replace />} />
-        <Route path="/admin/onboarding" element={<Suspense fallback={<AdminLoadingSkeleton />}><AdminOnboarding /></Suspense>} />
-        <Route path="/admin/install-guide" element={<AdminInstallGuide />} />
-        <Route path="/admin/ai-sales" element={<AISalesCommandCenter />} />
-        <Route path="/admin/AIStatusDashboard" caseSensitive element={<Navigate to="/admin" replace />} />
-        <Route path="/admin/performance-wars" element={<PerformanceWars />} />
+        {[
+          { path: "/dashboard", element: <Navigate to="/admin" replace /> },
+          { path: "/admin-settings", element: <Navigate to="/admin" replace /> },
+          { path: "/admin", Component: AdminDashboard },
+          { path: "/admin/leads", Component: AdminLeads },
+          { path: "/admin/leads/:leadId", Component: AdminLeadDetail },
+          { path: "/admin/automations", Component: AdminAutomation },
+          { path: "/lead-intelligence", element: <Navigate to="/admin" replace /> },
+          { path: "/sam", element: <Navigate to="/admin" replace /> },
+          { path: "/medspa-dashboard", element: <Navigate to="/admin" replace /> },
+          { path: "/admin/onboarding", Component: AdminOnboarding },
+          { path: "/admin/install-guide", element: <AdminInstallGuide /> },
+          { path: "/admin/ai-sales", element: <AISalesCommandCenter /> },
+          { path: "/admin/AIStatusDashboard", caseSensitive: true, element: <Navigate to="/admin" replace /> },
+          { path: "/admin/performance-wars", element: <PerformanceWars /> },
+        ].map(({ path, Component, element, caseSensitive }) => (
+          <Route
+            key={path}
+            caseSensitive={caseSensitive}
+            path={path}
+            element={
+              element || (
+                <Suspense fallback={<AdminLoadingSkeleton />}>
+                  <Component />
+                </Suspense>
+              )
+            }
+          />
+        ))}
       </Route>
 
       <Route path="*" element={<PageNotFound />} />
