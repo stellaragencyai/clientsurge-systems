@@ -42,7 +42,7 @@ test("automation routes are public and no catch-all industry route advertises te
 });
 
 test("blog route is public and wired for SEO", () => {
-  assert.match(app, /import Blog from "\.\/pages\/Blog"/);
+  assert.match(app, /const Blog = lazy\(\(\) => import\("\.\/pages\/Blog"\)\)/);
   assert.match(app, /"\/blog"/);
   assert.doesNotMatch(app, /path="\/:slug"/);
   assert.match(sitemap, /https:\/\/clientsurgesystems\.com\/blog/);

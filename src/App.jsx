@@ -23,36 +23,35 @@ import { setPageMetadata } from "@/lib/seo";
 
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
-import Start from "./pages/Start";
-import Book from "./pages/Book";
-import Contact from "./pages/Contact";
-import Industries from "./pages/Industries";
-import Blog from "./pages/Blog";
-import IndustryTemplate from "./components/landing/IndustryTemplate";
-import About from "./pages/About";
-import Automations from "./pages/Automations";
-import Onboarding from "./internal-pages/Onboarding";
-import CaptureLeads from "./internal-pages/CaptureLeads";
-import Success from "./internal-pages/Success";
-import LegalPage from "./internal-pages/LegalPage";
-import AutomationServicePage from "./internal-pages/AutomationServicePage";
-import OrderSuccess from "./internal-pages/OrderSuccess";
-import BusinessSetup from "./internal-pages/BusinessSetup";
-import ThankYou from "./internal-pages/ThankYou";
-import CredentialsSetup from "./internal-pages/CredentialsSetup";
-import SetupStatus from "./internal-pages/SetupStatus";
-import WebsitePreview from "./internal-pages/WebsitePreview";
-import AdminInstallGuide from "./internal-pages/AdminInstallGuide";
-import AISalesCommandCenter from "./internal-pages/AISalesCommandCenter";
-import PerformanceWars from "./internal-pages/PerformanceWars";
 
-
+const Start = lazy(() => import("./pages/Start"));
+const Book = lazy(() => import("./pages/Book"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Industries = lazy(() => import("./pages/Industries"));
+const Blog = lazy(() => import("./pages/Blog"));
 const Store = lazy(() => import("./pages/Store"));
+const IndustryTemplate = lazy(() => import("./components/landing/IndustryTemplate"));
+const About = lazy(() => import("./pages/About"));
+const Automations = lazy(() => import("./pages/Automations"));
+const Onboarding = lazy(() => import("./internal-pages/Onboarding"));
+const CaptureLeads = lazy(() => import("./internal-pages/CaptureLeads"));
+const Success = lazy(() => import("./internal-pages/Success"));
+const LegalPage = lazy(() => import("./internal-pages/LegalPage"));
+const AutomationServicePage = lazy(() => import("./internal-pages/AutomationServicePage"));
+const OrderSuccess = lazy(() => import("./internal-pages/OrderSuccess"));
+const BusinessSetup = lazy(() => import("./internal-pages/BusinessSetup"));
+const ThankYou = lazy(() => import("./internal-pages/ThankYou"));
+const CredentialsSetup = lazy(() => import("./internal-pages/CredentialsSetup"));
+const SetupStatus = lazy(() => import("./internal-pages/SetupStatus"));
+const WebsitePreview = lazy(() => import("./internal-pages/WebsitePreview"));
 const AdminDashboard = lazy(() => import("./internal-pages/AdminDashboard"));
 const AdminLeads = lazy(() => import("./internal-pages/AdminLeads"));
 const AdminLeadDetail = lazy(() => import("./internal-pages/AdminLeadDetail"));
 const AdminAutomation = lazy(() => import("./internal-pages/AdminAutomation"));
 const AdminOnboarding = lazy(() => import("./internal-pages/AdminOnboarding"));
+const AdminInstallGuide = lazy(() => import("./internal-pages/AdminInstallGuide"));
+const AISalesCommandCenter = lazy(() => import("./internal-pages/AISalesCommandCenter"));
+const PerformanceWars = lazy(() => import("./internal-pages/PerformanceWars"));
 const ClientPortal = lazy(() => import("./internal-pages/ClientPortal"));
 const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
 
@@ -165,18 +164,18 @@ const INDUSTRY_ROUTE_SLUGS = [
 ];
 
 const HIDDEN_PUBLIC_ROUTES = [
-  { route: routePath("success"), element: <Success /> },
-  { route: routePath("onboarding"), element: <Onboarding /> },
-  { route: routePath("leads", "capture"), element: <CaptureLeads /> },
-  { route: routePath("legal", dynamicParam("type")), element: <LegalPage /> },
-  { route: routePath("order-success"), element: <OrderSuccess /> },
-  { route: routePath("setup"), element: <BusinessSetup /> },
-  { route: routePath("thank-you"), element: <ThankYou /> },
-  { route: routePath("setup", "credentials"), element: <CredentialsSetup /> },
-  { route: routePath("setup", "status", dynamicParam("orderId")), element: <SetupStatus /> },
-  { route: routePath("setup", "status"), element: <SetupStatus /> },
-  { route: routePath("setup", "preview", dynamicParam("specId")), element: <WebsitePreview /> },
-  { route: routePath("setup", "preview"), element: <WebsitePreview /> },
+  { route: routePath("success"), Component: Success },
+  { route: routePath("onboarding"), Component: Onboarding },
+  { route: routePath("leads", "capture"), Component: CaptureLeads },
+  { route: routePath("legal", dynamicParam("type")), Component: LegalPage },
+  { route: routePath("order-success"), Component: OrderSuccess },
+  { route: routePath("setup"), Component: BusinessSetup },
+  { route: routePath("thank-you"), Component: ThankYou },
+  { route: routePath("setup", "credentials"), Component: CredentialsSetup },
+  { route: routePath("setup", "status", dynamicParam("orderId")), Component: SetupStatus },
+  { route: routePath("setup", "status"), Component: SetupStatus },
+  { route: routePath("setup", "preview", dynamicParam("specId")), Component: WebsitePreview },
+  { route: routePath("setup", "preview"), Component: WebsitePreview },
 ];
 
 const isPublicPath = (pathname) =>
@@ -248,6 +247,22 @@ function AdminLoadingSkeleton() {
         <div className="mt-6 h-80 rounded-xl border border-border bg-muted/30" />
       </div>
     </div>
+  );
+}
+
+function RouteLoadingSkeleton() {
+  return (
+    <div className="fixed inset-0 flex items-center justify-center">
+      <div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
+    </div>
+  );
+}
+
+function LazyRoute({ Component, ...props }) {
+  return (
+    <Suspense fallback={<RouteLoadingSkeleton />}>
+      <Component {...props} />
+    </Suspense>
   );
 }
 
@@ -331,48 +346,38 @@ const AuthenticatedApp = () => {
       ))}
       <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
-      <Route path="/start" element={<Start />} />
-      <Route path="/book" element={<Book />} />
+      <Route path="/start" element={<LazyRoute Component={Start} />} />
+      <Route path="/book" element={<LazyRoute Component={Book} />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
-      <Route path="/industries" element={<Industries />} />
+      <Route path="/industries" element={<LazyRoute Component={Industries} />} />
       <Route path={routePath("pricing")} element={<SectionRedirect hash="#pricing" />} />
       <Route path={routePath("faq")} element={<SectionRedirect hash="#faq" />} />
       <Route path={routePath("our-system")} element={<SectionRedirect hash="#services" />} />
       <Route path={routePath("testimonials")} element={<SectionRedirect hash="#testimonials" />} />
-      <Route path="/privacy-policy" element={<LegalPage fixedType="privacy" canonicalPath="/privacy-policy" />} />
-      <Route path={routePath("terms")} element={<LegalPage fixedType="terms" canonicalPath="/terms" />} />
+      <Route path="/privacy-policy" element={<LazyRoute Component={LegalPage} fixedType="privacy" canonicalPath="/privacy-policy" />} />
+      <Route path={routePath("terms")} element={<LazyRoute Component={LegalPage} fixedType="terms" canonicalPath="/terms" />} />
       <Route path="/login" element={<Navigate to="/client-portal" replace />} />
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/blog" element={<Blog />} />
+      <Route path="/contact" element={<LazyRoute Component={Contact} />} />
+      <Route path="/blog" element={<LazyRoute Component={Blog} />} />
       <Route
         path="/store"
-        element={
-          <Suspense
-            fallback={
-              <div className="fixed inset-0 flex items-center justify-center">
-                <div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
-              </div>
-            }
-          >
-            <Store />
-          </Suspense>
-        }
+        element={<LazyRoute Component={Store} />}
       />
-      <Route path="/about" element={<About />} />
-      <Route path="/automations" element={<Automations />} />
+      <Route path="/about" element={<LazyRoute Component={About} />} />
+      <Route path="/automations" element={<LazyRoute Component={Automations} />} />
       {AUTOMATION_SERVICE_ROUTES.map((path) => (
-        <Route key={path} path={path} element={<AutomationServicePage />} />
+        <Route key={path} path={path} element={<LazyRoute Component={AutomationServicePage} />} />
       ))}
       {INDUSTRY_ROUTE_SLUGS.map((slug) => (
         <Route
           key={slug}
           path={`/${slug}`}
-          element={<IndustryTemplate industrySlug={slug} />}
+          element={<LazyRoute Component={IndustryTemplate} industrySlug={slug} />}
         />
       ))}
-      {HIDDEN_PUBLIC_ROUTES.map(({ route, element }) => (
-        <Route key={route} path={route} element={element} />
+      {HIDDEN_PUBLIC_ROUTES.map(({ route, Component }) => (
+        <Route key={route} path={route} element={<LazyRoute Component={Component} />} />
       ))}
       <Route path={routePath("services", dynamicParam("serviceSlug"))} element={<Navigate to="/store" replace />} />
 
@@ -389,7 +394,7 @@ const AuthenticatedApp = () => {
             key={route}
             path={route}
             element={
-              <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}>
+              <Suspense fallback={<RouteLoadingSkeleton />}>
                 <Component />
               </Suspense>
             }
@@ -417,10 +422,10 @@ const AuthenticatedApp = () => {
           { route: routePath("sam"), element: <Navigate to={routePath("admin")} replace /> },
           { route: routePath("medspa-dashboard"), element: <Navigate to={routePath("admin")} replace /> },
           { route: routePath("admin", "onboarding"), Component: AdminOnboarding },
-          { route: routePath("admin", "install-guide"), element: <AdminInstallGuide /> },
-          { route: routePath("admin", "ai-sales"), element: <AISalesCommandCenter /> },
+          { route: routePath("admin", "install-guide"), Component: AdminInstallGuide },
+          { route: routePath("admin", "ai-sales"), Component: AISalesCommandCenter },
           { route: routePath("admin", "AIStatusDashboard"), caseSensitive: true, element: <Navigate to={routePath("admin")} replace /> },
-          { route: routePath("admin", "performance-wars"), element: <PerformanceWars /> },
+          { route: routePath("admin", "performance-wars"), Component: PerformanceWars },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
