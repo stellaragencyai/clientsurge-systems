@@ -74,6 +74,35 @@ function cleanString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+const PRODUCTION_APP_URL = "https://clientsurgesystems.com";
+const LOCALHOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
+
+function normalizeAppUrl(value) {
+  const raw = String(value || "").trim();
+  if (!raw) {
+    return PRODUCTION_APP_URL;
+  }
+
+  try {
+    const url = new URL(raw);
+    const host = url.hostname.toLowerCase();
+    if (LOCALHOSTS.has(host) || host.endsWith(".local") || url.protocol !== "https:") {
+      return PRODUCTION_APP_URL;
+    }
+    return url.origin;
+  } catch {
+    return PRODUCTION_APP_URL;
+  }
+}
+
+function getAppUrl() {
+  try {
+    return normalizeAppUrl(Deno.env.get("APP_URL"));
+  } catch {
+    return PRODUCTION_APP_URL;
+  }
+}
+
 function shouldIgnoreInviteError(error) {
   const message = String(error?.message || "").toLowerCase();
   return (
@@ -138,7 +167,7 @@ async function createCommunicationEvent(base44, payload) {
 function buildPortalUrl(activationLink) {
   return (
     cleanString(activationLink) ||
-    `${Deno.env.get("APP_URL") || "https://clientsurgesystems.com"}/client-portal`
+    `${getAppUrl()}/client-portal`
   );
 }
 

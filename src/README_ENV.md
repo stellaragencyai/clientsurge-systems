@@ -53,8 +53,11 @@ Never commit real secret values to source control.
 2. Replace `STRIPE_PUBLISHABLE_KEY` with `pk_live_...`
 3. Update `STRIPE_WEBHOOK_SECRET` with the live webhook's signing secret
 4. Update the Stripe webhook endpoint URL to the production domain
-5. Verify Twilio number is A2P 10DLC registered for US commercial SMS
-6. Confirm `RESEND_FROM_EMAIL` domain is DKIM/DMARC authenticated
+5. Confirm `APP_URL=https://clientsurgesystems.com`
+6. Verify Twilio number is A2P 10DLC registered for US commercial SMS
+7. Confirm `RESEND_FROM_EMAIL` domain is DKIM/DMARC authenticated
+
+Production APP_URL must be `https://clientsurgesystems.com`. Customer and admin email links are guarded in source so localhost values fall back to the production domain, but the live Base44 environment should still be configured explicitly before launch.
 
 ---
 
@@ -73,4 +76,6 @@ RESEND_API_KEY=re_...
 RESEND_FROM_EMAIL=test@yourdomain.com
 APP_URL=http://localhost:5173
 ADMIN_EMAIL=you@youremail.com
-``
+```
+
+`APP_URL=http://localhost:5173` is local development only. Do not use localhost values in Base44 production environment variables.

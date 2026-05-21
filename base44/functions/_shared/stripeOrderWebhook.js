@@ -1,6 +1,7 @@
 import { initializePaidOrderInstallPipeline } from "./installPipeline.js";
 import { normalizePackageKey } from "../../../src/lib/salesCatalog.js";
 import { buildPaymentRecoveryEmail } from "./paymentRecoveryEmail.js";
+import { buildAppUrl } from "./appUrl.js";
 
 function getStripeSecretKey() {
   try {
@@ -148,7 +149,7 @@ async function sendPaymentRecoveryEmail({ base44, order, invoice }) {
 function buildPortalUrl(activationLink) {
   return (
     cleanString(activationLink) ||
-    `${Deno.env.get("APP_URL") || "https://clientsurgesystems.com"}/client-portal`
+    buildAppUrl("/client-portal")
   );
 }
 

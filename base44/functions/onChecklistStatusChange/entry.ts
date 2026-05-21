@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { getAppUrl } from '../_shared/appUrl.js';
 
 const SERVICE_LABELS = {
   instant_lead_response: 'Instant Lead Response',
@@ -36,7 +37,7 @@ Deno.serve(async (req) => {
     const serviceKey = checklist.service_key;
     const serviceLabel = SERVICE_LABELS[serviceKey] || serviceKey;
     const serviceDescription = SERVICE_DESCRIPTIONS[serviceKey] || 'Your automation service is now live.';
-    const appUrl = Deno.env.get('APP_URL') || 'https://clientsurgesystems.com';
+    const appUrl = getAppUrl();
     const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@clientsurgesystems.com';
 
     if (!clientEmail) {

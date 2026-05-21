@@ -1,9 +1,10 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { getAppUrl } from "../_shared/appUrl.js";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL");
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") || "nolan@clientsurgesystems.com";
-const APP_URL = Deno.env.get("APP_URL") || "https://clientsurgesystems.com";
+const APP_URL = getAppUrl();
 
 async function sendEmail({ to, subject, html, fromName = "ClientSurge Systems" }) {
   const res = await fetch("https://api.resend.com/emails", {

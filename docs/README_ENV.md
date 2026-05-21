@@ -29,6 +29,7 @@ For pre-launch QA, use `docs/STAGING_ENVIRONMENT.md` and the Base44 test databas
 
 ## Notes
 - Never commit secret keys to source control
+- Production `APP_URL` must be `https://clientsurgesystems.com`; localhost values are local development only
 - All `sk_live_` keys must be kept server-side only — run `python3 scripts/scanSecretKeyExposure.py` to verify
 - Stripe test keys (`sk_test_`) are safe for staging only
 - Staging must use test-mode provider credentials, test-safe recipients, and the Base44 test database / test workspace
