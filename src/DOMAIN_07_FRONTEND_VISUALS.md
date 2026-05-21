@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟢 97% Ready (34/35 done · 0 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** M04 — Hero headline 375px audit (~20 min, no deps) · Agent A
+## 📊 DOMAIN HEALTH: 🟢 100% Ready (35/35 done · 0 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** M20 — full Apple-device pass (~2 hrs, no deps) · Agent A
 > ⚠️ **Critical:** none currently open
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 34 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,44,45,49,51,52,55,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M10,M11,M12,M13,M14,M15,M16,M17,M18,M19) + CTA pass (28a–28d) |
+| ✅ Done This Week | 35 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,42,43,44,45,49,51,52,55,76,77 + M01,M02,M03,M04,M05,M06,M07,M08,M09,M10,M11,M12,M13,M14,M15,M16,M17,M18,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | M04 (Hero headline 375px), #54 (stale date/time input row), M20 (full device pass), #15 (stale time slot grid), #12 (LegalPage navbar) |
+| 📱 Next 5 Priority Tasks | M20 (full device pass), #54 (stale date/time input row), #15 (stale time slot grid), #12 (LegalPage navbar), #14 (ClientPortal skeleton) |
 
 ---
 
@@ -87,7 +87,7 @@
 | M01 | ✅ | iOS Safari: audit all `min-height: 100vh` — replace with `100svh` (Dynamic Island safe) | A | iPhone 15, 17 Pro Max | 🧵 Mobile-UX | ~20 min |
 | M02 | ✅ | iPhone notch/Dynamic Island: verify `padding-top: env(safe-area-inset-top)` on Navbar — added via @supports in index.css | A | iPhone 15, 17 Pro Max | 🧵 Mobile-UX | ~15 min |
 | M03 | ✅ | iOS Safari: test body scroll lock — `position: fixed` + `top: -scrollY` pattern (current `acquireBodyScrollLock` may not work on Safari 17) | Morpheus | All iPhone / Safari | 🧵 Mobile-UX | Done |
-| M04 | ⏳ | iPhone 12 (375px): audit Hero headline — ensure `clamp()` font doesn't overflow or wrap awkwardly at 375px | A | iPhone 12 | 🧵 Mobile-UX | ~20 min |
+| M04 | ✅ | iPhone 12 (375px): audit Hero headline — ensure `clamp()` font doesn't overflow or wrap awkwardly at 375px | Morpheus | iPhone 12 | 🧵 Mobile-UX | Done |
 | M05 | ✅ | iPhone 17 Pro Max (430px): MobileCallBar safe-area bottom padding — `.safe-area-bottom-bar` class + inline style applied | A | iPhone 17 Pro Max | 🧵 Mobile-UX | ~15 min |
 | M06 | ✅ | iPad (768px / 1024px): pricing cards grid — `.pricing-cards-grid` class + CSS 2-col override at 768–1023px | A | iPad | 🧵 Mobile-UX | ~20 min |
 | M07 | ✅ | iPad landscape (1024px): Navbar desktop links too cramped — audit at 1024px breakpoint | Morpheus | iPad landscape | 🧵 Mobile-UX | Done |

@@ -507,6 +507,11 @@ export default function Hero() {
             font-size: clamp(2rem, 8.5vw, 3.4rem) !important;
             line-height: 1.05 !important;
             letter-spacing: -0.025em !important;
+            max-width: 680px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            overflow-wrap: normal !important;
+            text-wrap: balance !important;
           }
           .landing-hero__body {
             font-size: 1rem !important;
@@ -542,6 +547,7 @@ export default function Hero() {
           }
           .landing-hero__headline {
             font-size: clamp(1.85rem, 9vw, 2.4rem) !important;
+            max-width: 22rem !important;
           }
           .landing-hero__body {
             font-size: 0.95rem !important;
