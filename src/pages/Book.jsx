@@ -1,14 +1,13 @@
 import { useEffect } from 'react';
 import { ArrowRight, CalendarCheck2, ClipboardList, MessagesSquare } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { setPageMetadata } from '@/lib/seo';
 import { trackCTA } from '@/lib/analytics';
 import MobileCallBar from '@/components/landing/MobileCallBar';
-import DemoBookingModal from '@/components/forms/DemoBookingModal';
+
+const BOOKING_EMBED_URL = "https://calendly.com/nolan-clientsurgesystems";
 
 export default function Book() {
-  const navigate = useNavigate();
-
   useEffect(() => {
     const cleanupMetadata = setPageMetadata({
       title: 'Book Your Free ClientSurge Automation Audit | ClientSurge Systems',
@@ -23,20 +22,9 @@ export default function Book() {
     return cleanupMetadata;
   }, []);
 
-  const handleClose = () => {
-    const cameFromThisSite = document.referrer.startsWith(window.location.origin);
-
-    if (cameFromThisSite && window.history.length > 1) {
-      navigate(-1);
-      return;
-    }
-
-    navigate('/', { replace: true });
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-background flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-3xl">
+      <div className="w-full max-w-4xl">
         <div className="text-center mb-12">
           <h1 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-4">
             Book Your Free ClientSurge Automation Audit
@@ -111,6 +99,17 @@ export default function Book() {
             })}
           </div>
 
+          <div id="scheduler" className="mt-8 overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
+            <iframe
+              src={BOOKING_EMBED_URL}
+              title="ClientSurge audit scheduler"
+              width="100%"
+              height="700"
+              scrolling="yes"
+              className="block w-full border-0"
+            />
+          </div>
+
           <p className="mt-6 text-center text-xs text-muted-foreground">
             If the embedded scheduler fails to load, use the contact page or email support@clientsurgesystems.com and we will help schedule manually.
           </p>
@@ -118,7 +117,10 @@ export default function Book() {
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               type="button"
-              onClick={() => trackCTA('schedule_your_audit', 'book_page')}
+              onClick={() => {
+                trackCTA('schedule_your_audit', 'book_page');
+                document.getElementById('scheduler')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
               className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
               Schedule Your Audit
@@ -133,7 +135,6 @@ export default function Book() {
           </div>
         </div>
       </div>
-      <DemoBookingModal onClose={handleClose} />
       <MobileCallBar />
     </div>
   );

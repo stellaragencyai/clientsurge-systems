@@ -6,8 +6,8 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 66% Ready (23/35 done · 0 critical open · 1 dep-blocked)
-> ⚡ **Fastest win:** #51 — Book Calendly iframe mobile sizing (~20 min, no deps) · Agent A
+## 📊 DOMAIN HEALTH: 🟡 69% Ready (24/35 done · 0 critical open · 1 dep-blocked)
+> ⚡ **Fastest win:** #42 — Store ProductCard mobile button font (~10 min, no deps) · Agent A
 > ⚠️ **Critical:** none currently open
 
 ---
@@ -18,9 +18,9 @@
 | 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
-| ✅ Done This Week | 23 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,45,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
+| ✅ Done This Week | 24 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,45,51,76,77 + M01,M02,M03,M05,M06,M07,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | #51 (Book iframe mobile sizing), M10 (modal scroll), #42 (Store mobile cart font), M12 (Store mobile grid), M13 (Hero CTA touch targets) |
+| 📱 Next 5 Priority Tasks | #42 (Store mobile cart font), M10 (modal scroll), M12 (Store mobile grid), M13 (Hero CTA touch targets), #55 (Calendly CSP frame check) |
 
 ---
 
@@ -39,7 +39,7 @@
 | 11 | ✅ | Build out pages/ThankYou — fully built with animated checkmark, plan card, next-steps, contact | A | — | — | — | ~1 hr |
 | 35 | ✅ | Testimonials: replaced broken Unsplash URLs with initials-based gradient avatars | A | — | — | — | ~30 min |
 | 36 | ✅ | Favicon + apple-touch-icon already present in index.html — verified | A | — | — | — | ~20 min |
-| 51 | ⏳ | pages/Book Calendly iframe: set width:100%, height:700px, scrolling:yes | A | — | — | — | ~20 min |
+| 51 | ✅ | pages/Book Calendly iframe: set width:100%, height:700px, scrolling:yes | Morpheus | — | — | — | Done |
 | 53 | ✅ | Audit all form inputs for iOS zoom issue (font-size < 16px) | Morpheus | — | — | 🧵 Mobile-UX | Done |
 | 55 | ⏳ | pages/Book Calendly: test CSP allows calendly.com frames on live domain | A | — | — | — | ~30 min |
 | 67 | ⏳ | ClientPortal: add "Get Help" tab with support ticket form → SupportMessage entity | A | — | — | — | ~1 hr |
