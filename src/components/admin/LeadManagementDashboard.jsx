@@ -201,6 +201,7 @@ export default function LeadManagementDashboard() {
   const [importLoading, setImportLoading] = useState(false);
   const [importError, setImportError] = useState("");
   const [importSuccess, setImportSuccess] = useState("");
+  const [sortConfig, setSortConfig] = useState({ field: "lead_score", direction: "desc" });
 
   const loadSnapshot = async ({ append = false, nextOffset = 0, activeFilters = filters } = {}) => {
     const setLoadingState = append ? setLoadingMore : setLoading;
@@ -324,7 +325,26 @@ export default function LeadManagementDashboard() {
   };
 
   const sourceOptions = useMemo(() => snapshot.filter_options?.sources || [], [snapshot.filter_options]);
-  const leads = snapshot.leads || [];
+  const rawLeads = snapshot.leads || [];
+  const leads = useMemo(() => {
+    const multiplier = sortConfig.direction === "asc" ? 1 : -1;
+    return [...rawLeads].sort((left, right) => {
+      if (sortConfig.field === "lead_score") {
+        return ((left.lead_score ?? -1) - (right.lead_score ?? -1)) * multiplier;
+      }
+
+      const leftValue = new Date(left.updated_date || left.created_date || 0).getTime();
+      const rightValue = new Date(right.updated_date || right.created_date || 0).getTime();
+      return (leftValue - rightValue) * multiplier;
+    });
+  }, [rawLeads, sortConfig]);
+
+  const toggleLeadScoreSort = () => {
+    setSortConfig((current) => ({
+      field: "lead_score",
+      direction: current.field === "lead_score" && current.direction === "desc" ? "asc" : "desc",
+    }));
+  };
 
   const toggleSelect = (id) => {
     setSelectedIds((prev) => {
@@ -841,7 +861,19 @@ export default function LeadManagementDashboard() {
                         className="w-4 h-4 rounded border-border accent-primary cursor-pointer"
                       />
                     </th>
-                    <th className="px-4 py-3 text-left font-semibold text-foreground">Lead</th>
+                    <th className="px-4 py-3 text-left font-semibold text-foreground">
+                      <div className="flex items-center gap-2">
+                        <span>Lead</span>
+                        <button
+                          type="button"
+                          onClick={toggleLeadScoreSort}
+                          className="inline-flex items-center gap-1 rounded-full border border-border bg-white px-2 py-1 text-[11px] font-bold text-muted-foreground transition hover:border-primary hover:text-primary"
+                          title="Sort by lead score"
+                        >
+                          Score {sortConfig.field === "lead_score" && sortConfig.direction === "desc" ? "↓" : "↑"}
+                        </button>
+                      </div>
+                    </th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Why Now</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Next Action</th>
                     <th className="px-4 py-3 text-left font-semibold text-foreground">Recommended Offer</th>
