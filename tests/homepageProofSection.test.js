@@ -1,0 +1,19 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+
+const proofSection = readFileSync(
+  new URL("../src/components/landing/ProofBeforeLaunch.jsx", import.meta.url),
+  "utf8"
+);
+const home = readFileSync(new URL("../src/pages/Home.jsx", import.meta.url), "utf8");
+
+test("homepage proof section gives concrete launch proof without fake case studies", () => {
+  assert.match(home, /ProofBeforeLaunch/);
+  assert.match(proofSection, /Proof before launch/);
+  assert.match(proofSection, /Example SMS conversation/);
+  assert.match(proofSection, /Before and after workflow/);
+  assert.match(proofSection, /Dashboard visibility/);
+  assert.match(proofSection, /Paid order -> install workspace -> tested services -> live status/);
+  assert.doesNotMatch(proofSection, /case stud/i);
+});
