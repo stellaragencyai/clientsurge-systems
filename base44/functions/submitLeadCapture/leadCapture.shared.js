@@ -32,7 +32,13 @@ export function normalizeEmail(value) {
 
 export function normalizePhone(value) {
   const digits = cleanString(value).replace(/\D/g, "");
-  return digits.length === 11 && digits.startsWith("1") ? digits.slice(1) : digits;
+  if (digits.length === 10) {
+    return `+1${digits}`;
+  }
+  if (digits.length === 11 && digits.startsWith("1")) {
+    return `+${digits}`;
+  }
+  return "";
 }
 
 export function isDisposableEmail(email) {

@@ -134,7 +134,11 @@ Deno.serve(async (req) => {
     }
 
     const email = normalizeEmail(body.email);
-    const phone = normalizePhone(body.phone || body.phone_number);
+    const rawPhone = cleanString(body.phone || body.phone_number);
+    const phone = normalizePhone(rawPhone);
+    if (rawPhone && !phone) {
+      return Response.json({ error: "Invalid phone number" }, { status: 422 });
+    }
     if (!email && !phone) {
       return Response.json(
         { error: "phone or email required" },

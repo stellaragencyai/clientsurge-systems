@@ -65,6 +65,17 @@ test("submitLeadCapture deduplicates by normalized phone inside the 60-minute wi
   assert.equal(duplicate.id, "lead-phone");
 });
 
+test("submitLeadCapture normalizes US phone numbers to E.164", () => {
+  assert.equal(normalizePhone("(602) 555-0199"), "+16025550199");
+  assert.equal(normalizePhone("1-602-555-0199"), "+16025550199");
+  assert.equal(normalizePhone("+1 602 555 0199"), "+16025550199");
+});
+
+test("submitLeadCapture rejects phone numbers shorter than 10 digits", () => {
+  assert.equal(normalizePhone("602-555-019"), "");
+  assert.equal(normalizePhone("5550199"), "");
+});
+
 test("submitLeadCapture blocks disposable email domains after normalization", () => {
   assert.equal(normalizeEmail("  PERSON@Mailinator.com "), "person@mailinator.com");
   assert.equal(isDisposableEmail("PERSON@Mailinator.com"), true);
