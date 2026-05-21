@@ -25,6 +25,7 @@ import {
   subscribeToLeadPipelineChanges,
   triggerLeadScoring,
 } from "@/lib/leadPipelineApi";
+import { buildAdminLeadRows } from "@/lib/adminLeadLoadModel";
 import { buildAdminConversionFunnel } from "@/lib/adminConversionFunnel";
 import { buildLeadsCsv, downloadCsvFile } from "@/lib/leadCsvExport";
 import LeadCRMDrawer from "./LeadCRMDrawer";
@@ -199,9 +200,12 @@ function ConversionFunnelChart({ summary }) {
   );
 }
 
-export default function LeadManagementDashboard() {
+export default function LeadManagementDashboard({
+  initialSnapshot = null,
+  initialLoading = true,
+} = {}) {
   const navigate = useNavigate();
-  const [snapshot, setSnapshot] = useState({
+  const [snapshot, setSnapshot] = useState(initialSnapshot || {
     generated_at: null,
     summary: {
       total_leads: 0,
@@ -244,7 +248,7 @@ export default function LeadManagementDashboard() {
     segment: "all",
     priority: "all",
   });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialLoading);
   const [loadingMore, setLoadingMore] = useState(false);
   const [scoringLoading, setScoringLoading] = useState(false);
   const [error, setError] = useState("");
@@ -391,18 +395,7 @@ export default function LeadManagementDashboard() {
 
   const sourceOptions = useMemo(() => snapshot.filter_options?.sources || [], [snapshot.filter_options]);
   const rawLeads = snapshot.leads || [];
-  const leads = useMemo(() => {
-    const multiplier = sortConfig.direction === "asc" ? 1 : -1;
-    return [...rawLeads].sort((left, right) => {
-      if (sortConfig.field === "lead_score") {
-        return ((left.lead_score ?? -1) - (right.lead_score ?? -1)) * multiplier;
-      }
-
-      const leftValue = new Date(left.updated_date || left.created_date || 0).getTime();
-      const rightValue = new Date(right.updated_date || right.created_date || 0).getTime();
-      return (leftValue - rightValue) * multiplier;
-    });
-  }, [rawLeads, sortConfig]);
+  const leads = useMemo(() => buildAdminLeadRows(rawLeads, sortConfig), [rawLeads, sortConfig]);
 
   const toggleLeadScoreSort = () => {
     setSortConfig((current) => ({

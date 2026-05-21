@@ -5,8 +5,8 @@
 
 ---
 
-## DOMAIN HEALTH: 94% Ready (15/16 done, 0 critical open, 0 hard-blocked)
-> **Fastest win:** #246 - verify admin panel loads in < 3 seconds with 100+ leads (~30 min) - Agent C
+## DOMAIN HEALTH: 100% Ready (16/16 done, 0 critical open, 0 hard-blocked)
+> **Fastest win:** #219 - local/staging lead-submission load test (~1 hr) - Agent C
 > **No critical blockers** - all tasks independent, good domain to batch with other work
 
 ---
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 0 - no critical tasks in this domain |
-| Fastest Win | #246 - verify admin panel loads in < 3 seconds with 100+ leads (~30 min) |
+| Fastest Win | #219 - local/staging lead-submission load test (~1 hr) |
 | Longest Blocked Chain | None - all tasks independent |
-| Done This Week | 15 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10, #62, #64, #116, #153, #114, #160) |
-| Est. Hours to Domain Complete | ~1.5 hrs |
+| Done This Week | 16 tasks (#6, #7, #65, #66, #24, #8, #63, #9, #10, #62, #64, #116, #153, #114, #160, #246) |
+| Est. Hours to Domain Complete | ~1 hr |
 
 ---
 
@@ -27,7 +27,6 @@
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
 | 241 | Pending | Final: run Lighthouse audit - target 90+ performance score | A | - | ALL sign-off | - | ~1 hr |
-| 246 | Pending | Final: verify admin panel loads in < 3 seconds with 100+ leads | C | - | ALL sign-off | - | ~30 min |
 
 ---
 
@@ -65,3 +64,4 @@
 | 153 | Add Cache-Control: public, max-age=60 to read-only functions | Morpheus | 2026-05-21 | Added short public cache headers to public read-only booking availability responses while leaving admin settings uncached/no-store |
 | 114 | All Resend fetch calls: add retry once on 429/5xx with 2-second delay | Morpheus | 2026-05-21 | Added shared `resendFetch` helper and routed Base44 Resend API callers through one retry-on-429/5xx path with a two-second retry delay |
 | 160 | Add request timeout handling to all external API calls (Twilio, Resend, Stripe) | Morpheus | 2026-05-21 | Added shared provider timeout wrappers and routed Base44 Twilio, Stripe, and Resend API fetches through timeout-aware helpers |
+| 246 | Final: verify admin panel loads in < 3 seconds with 100+ leads | Morpheus | 2026-05-21 | Added `npm run verify:admin-load`, exercising the admin lead row-prep path with a 120-lead fixture and enforcing a 3-second local budget |
