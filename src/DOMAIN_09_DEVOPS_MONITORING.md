@@ -5,9 +5,9 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🔴 6% Ready (1/16 done · 4 critical open · 0 hard-blocked)
-> ⚡ **Fastest win:** #107 — healthCheck function (~20 min, no deps) · Agent B  
-> ⚠️ **Critical path:** #107 → #152/#212 (monitoring) — healthCheck must exist before UptimeRobot can be registered
+## 📊 DOMAIN HEALTH: 🔴 13% Ready (2/16 done · 4 critical open · 0 hard-blocked)
+> ⚡ **Fastest win:** #156 — portal login CommunicationEvent (~20 min, no deps) · Agent B
+> ⚠️ **Critical path:** #152/#212 (monitoring registration) — healthCheck exists; external monitor registration still needs approval/action outside the repo
 
 ---
 
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | 🔴 Unblocked Critical | 4 (#211 DNS, #213a Resend DKIM, #213b Twilio 10DLC, #218 secrets audit) |
-| 🟠 Fastest Win (< 30 min, no deps) | #107 — healthCheck function (~20 min) |
-| 🧱 Longest Blocked Chain | #107 → #152 → monitoring live (2 deep) |
-| ✅ Done This Week | 1 task (#109) |
-| 🎯 Est. Hours to Domain Complete | ~14 hrs |
+| 🟠 Fastest Win (< 30 min, no deps) | #156 — portal login CommunicationEvent (~20 min) |
+| 🧱 Longest Blocked Chain | #152 → monitoring live (1 deep; external registration) |
+| ✅ Done This Week | 2 tasks (#109, #107) |
+| 🎯 Est. Hours to Domain Complete | ~13.5 hrs |
 
 ---
 
@@ -37,7 +37,6 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 107 | ⏳ | Create healthCheck function: returns {status:"ok", timestamp, version} — no auth | B | — | → C (#152 register with UptimeRobot) | 🧵 Monitoring | ~20 min |
 | 152 | ⏳ | Register healthCheck URL with UptimeRobot or Better Stack | C | #107 | — | 🧵 Monitoring | ~30 min |
 | 154 | ✅ | getAdminAnalytics: fix MRR to sum total_monthly from paid Orders | B | — | — | — | Done |
 | 155 | ⏳ | getClientAnalytics: remove hardcoded mock data — replace with real entity queries | B | — | — | — | ~1 hr |
@@ -73,3 +72,4 @@
 | # | Task | Completed By | Date | Change Note |
 |---|---|---|---|---|
 | 109 | OrderSuccess: add noindex meta tag | Agent B | 2026-05-03 | Added `<meta name="robots" content="noindex">` in `pages/OrderSuccess.jsx` via `setPageMetadata` |
+| 107 | Create healthCheck function: returns {status:"ok", timestamp, version} — no auth | Morpheus | 2026-05-21 | Verified existing public `base44/functions/healthCheck/entry.ts` endpoint and added source regression coverage for no-auth monitoring payload shape |
