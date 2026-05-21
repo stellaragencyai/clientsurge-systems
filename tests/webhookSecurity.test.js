@@ -328,8 +328,10 @@ test("canonical runtime and message-status behavior still works for trusted Twil
     },
   };
 
-  globalThis.fetch = async () =>
-    new Response(
+  let sendCount = 0;
+  globalThis.fetch = async () => {
+    sendCount += 1;
+    return new Response(
       JSON.stringify({
         sid: "SM_missed_call_live",
         status: "queued",
@@ -341,10 +343,16 @@ test("canonical runtime and message-status behavior still works for trusted Twil
         },
       }
     );
+  };
 
   let callResult;
+  let duplicateCallResult;
   try {
     callResult = await handleTrustedTwilioStatusWebhook({
+      base44,
+      formData: callStatusData,
+    });
+    duplicateCallResult = await handleTrustedTwilioStatusWebhook({
       base44,
       formData: callStatusData,
     });
@@ -356,7 +364,25 @@ test("canonical runtime and message-status behavior still works for trusted Twil
   assert.equal(callResult.success, true);
   assert.equal(callResult.runtime_result.service_key, "missed_call_text_back");
   assert.equal(callResult.runtime_result.recipient_phone, "+16025550066");
+  assert.equal(duplicateCallResult.success, true);
+  assert.equal(duplicateCallResult.duplicate, true);
+  assert.equal(duplicateCallResult.call_sid, "CA123");
+  assert.equal(sendCount, 1);
   assert.ok(entities.CommunicationEvent.records.length > runtimeEventsBefore);
+  assert.equal(
+    entities.CommunicationEvent.records.filter(
+      (event) =>
+        event.event_type === "missed_call_webhook_received" &&
+        event.provider_message_id === "CA123"
+    ).length,
+    1
+  );
+  assert.equal(
+    entities.CommunicationEvent.records.filter(
+      (event) => event.event_type === "provider_send_succeeded" && event.service_key === "missed_call_text_back"
+    ).length,
+    1
+  );
   assert.ok(
     entities.CommunicationEvent.records.some(
       (event) => event.event_type === "provider_send_succeeded" && event.service_key === "missed_call_text_back"

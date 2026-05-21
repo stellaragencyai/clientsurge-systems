@@ -4,6 +4,7 @@ import {
   MISSED_CALL_TRIGGER_STATUSES,
   RuntimeExecutionError,
 } from "./installRuntime.js";
+import { buildCommunicationEvent } from "./installPipeline.js";
 
 export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
   const messageId = formData.get("MessageSid");
@@ -46,7 +47,7 @@ export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
     };
   }
 
-  const callSid = formData.get("CallSid");
+  const callSid = String(formData.get("CallSid") || "");
   const callStatus = String(formData.get("CallStatus") || "");
   const toPhone = String(formData.get("To") || "");
   const fromPhone = String(formData.get("From") || "");
@@ -83,6 +84,44 @@ export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
     };
   }
 
+  const existingCallEvents = await base44.asServiceRole.entities.CommunicationEvent.filter({
+    provider: "twilio",
+    event_type: "missed_call_webhook_received",
+    provider_message_id: callSid,
+  });
+
+  if (existingCallEvents.length > 0) {
+    return {
+      success: true,
+      duplicate: true,
+      call_sid: callSid,
+      handled_as: "call_status",
+      existing_event_id: existingCallEvents[0].id,
+    };
+  }
+
+  const callReceivedEvent = await base44.asServiceRole.entities.CommunicationEvent.create(
+    buildCommunicationEvent({
+      order,
+      channel: "phone",
+      direction: "inbound",
+      event_type: "missed_call_webhook_received",
+      provider: "twilio",
+      provider_message_id: callSid,
+      status: "received",
+      subject: "Missed call webhook received",
+      message_body: `Missed call webhook received from ${fromPhone} with status ${callStatus}.`,
+      service_key: "missed_call_text_back",
+      metadata: {
+        call_sid: callSid,
+        call_status: callStatus,
+        to_phone: toPhone,
+        from_phone: fromPhone,
+        caller_name: callerName,
+      },
+    })
+  );
+
   try {
     const result = await executeOrderServiceRuntime({
       base44,
@@ -103,6 +142,7 @@ export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
       success: true,
       runtime_result: result,
       handled_as: "call_status",
+      call_event_id: callReceivedEvent.id,
     };
   } catch (error) {
     if (error instanceof RuntimeExecutionError) {
