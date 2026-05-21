@@ -328,7 +328,7 @@ function ServiceCard({ service }) {
   );
 }
 
-export default function AutomationsDemo() {
+export default function Automations() {
   useEffect(() => {
     return setPageMetadata({
       title: "AI Automations for Local Service Businesses | ClientSurge",

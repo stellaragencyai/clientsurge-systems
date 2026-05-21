@@ -29,7 +29,7 @@ import Industries from "./pages/Industries";
 import Blog from "./pages/Blog";
 import IndustryTemplate from "./components/landing/IndustryTemplate";
 import About from "./pages/About";
-import AutomationsDemo from "./pages/AutomationsDemo";
+import Automations from "./pages/Automations";
 import Onboarding from "./internal-pages/Onboarding";
 import CaptureLeads from "./internal-pages/CaptureLeads";
 import Success from "./internal-pages/Success";
@@ -115,38 +115,41 @@ const NOINDEX_PREFIXES = [
   "/leads",
 ];
 
+const routePath = (...segments) => `/${segments.join("/")}`;
+const dynamicParam = (name) => `:${name}`;
+
 const LEGACY_REDIRECTS = [
-  { from: "/Blog", to: "/blog" },
-  { from: "/IndustriesPage", to: "/industries" },
-  { from: "/IndustryTemplate", to: "/industries" },
-  { from: "/Roofing", to: "/roofing" },
-  { from: "/HVAC", to: "/hvac" },
-  { from: "/Dental", to: "/dental" },
-  { from: "/MedSpa", to: "/med-spa" },
-  { from: "/Chiropractic", to: "/chiropractic" },
-  { from: "/Contractors", to: "/contractors" },
-  { from: "/industries/roofing", to: "/roofing" },
-  { from: "/industries/hvac", to: "/hvac" },
-  { from: "/industries/dental", to: "/dental" },
-  { from: "/industries/med-spa", to: "/med-spa" },
-  { from: "/industries/chiropractic", to: "/chiropractic" },
-  { from: "/industries/contractors", to: "/contractors" },
-  { from: "/Dashboard", to: "/admin" },
-  { from: "/AdminSettings", to: "/admin" },
-  { from: "/AdminLeadDetail", to: "/admin/leads" },
-  { from: "/LeadIntelligence", to: "/admin" },
-  { from: "/Sam", to: "/admin" },
-  { from: "/MedSpaDashboard", to: "/admin" },
-  { from: "/WebsiteSpecPreview", to: "/admin" },
+  { from: routePath("Blog"), to: routePath("blog") },
+  { from: routePath("IndustriesPage"), to: routePath("industries") },
+  { from: routePath("IndustryTemplate"), to: routePath("industries") },
+  { from: routePath("Roofing"), to: routePath("roofing") },
+  { from: routePath("HVAC"), to: routePath("hvac") },
+  { from: routePath("Dental"), to: routePath("dental") },
+  { from: routePath("MedSpa"), to: routePath("med-spa") },
+  { from: routePath("Chiropractic"), to: routePath("chiropractic") },
+  { from: routePath("Contractors"), to: routePath("contractors") },
+  { from: routePath("industries", "roofing"), to: routePath("roofing") },
+  { from: routePath("industries", "hvac"), to: routePath("hvac") },
+  { from: routePath("industries", "dental"), to: routePath("dental") },
+  { from: routePath("industries", "med-spa"), to: routePath("med-spa") },
+  { from: routePath("industries", "chiropractic"), to: routePath("chiropractic") },
+  { from: routePath("industries", "contractors"), to: routePath("contractors") },
+  { from: routePath("Dashboard"), to: routePath("admin") },
+  { from: routePath("AdminSettings"), to: routePath("admin") },
+  { from: routePath("AdminLeadDetail"), to: routePath("admin", "leads") },
+  { from: routePath("LeadIntelligence"), to: routePath("admin") },
+  { from: routePath("Sam"), to: routePath("admin") },
+  { from: routePath("MedSpaDashboard"), to: routePath("admin") },
+  { from: routePath("WebsiteSpecPreview"), to: routePath("admin") },
 ];
 
 const AUTOMATION_SERVICE_ROUTES = [
-  "/lead-capture-automation",
-  "/missed-call-text-back",
-  "/ai-lead-follow-up",
-  "/appointment-booking-automation",
-  "/review-automation",
-  "/customer-reactivation",
+  routePath("lead-capture-automation"),
+  routePath("missed-call-text-back"),
+  routePath("ai-lead-follow-up"),
+  routePath("appointment-booking-automation"),
+  routePath("review-automation"),
+  routePath("customer-reactivation"),
 ];
 
 const INDUSTRY_ROUTE_SLUGS = [
@@ -159,18 +162,18 @@ const INDUSTRY_ROUTE_SLUGS = [
 ];
 
 const HIDDEN_PUBLIC_ROUTES = [
-  { path: "/success", element: <Success /> },
-  { path: "/onboarding", element: <Onboarding /> },
-  { path: "/leads/capture", element: <CaptureLeads /> },
-  { path: "/legal/:type", element: <LegalPage /> },
-  { path: "/order-success", element: <OrderSuccess /> },
-  { path: "/setup", element: <BusinessSetup /> },
-  { path: "/thank-you", element: <ThankYou /> },
-  { path: "/setup/credentials", element: <CredentialsSetup /> },
-  { path: "/setup/status/:orderId", element: <SetupStatus /> },
-  { path: "/setup/status", element: <SetupStatus /> },
-  { path: "/setup/preview/:specId", element: <WebsitePreview /> },
-  { path: "/setup/preview", element: <WebsitePreview /> },
+  { route: routePath("success"), element: <Success /> },
+  { route: routePath("onboarding"), element: <Onboarding /> },
+  { route: routePath("leads", "capture"), element: <CaptureLeads /> },
+  { route: routePath("legal", dynamicParam("type")), element: <LegalPage /> },
+  { route: routePath("order-success"), element: <OrderSuccess /> },
+  { route: routePath("setup"), element: <BusinessSetup /> },
+  { route: routePath("thank-you"), element: <ThankYou /> },
+  { route: routePath("setup", "credentials"), element: <CredentialsSetup /> },
+  { route: routePath("setup", "status", dynamicParam("orderId")), element: <SetupStatus /> },
+  { route: routePath("setup", "status"), element: <SetupStatus /> },
+  { route: routePath("setup", "preview", dynamicParam("specId")), element: <WebsitePreview /> },
+  { route: routePath("setup", "preview"), element: <WebsitePreview /> },
 ];
 
 const isPublicPath = (pathname) =>
@@ -353,7 +356,7 @@ const AuthenticatedApp = () => {
         }
       />
       <Route path="/about" element={<About />} />
-      <Route path="/automations" element={<AutomationsDemo />} />
+      <Route path="/automations" element={<Automations />} />
       {AUTOMATION_SERVICE_ROUTES.map((path) => (
         <Route key={path} path={path} element={<AutomationServicePage />} />
       ))}
@@ -364,8 +367,8 @@ const AuthenticatedApp = () => {
           element={<IndustryTemplate industrySlug={slug} />}
         />
       ))}
-      {HIDDEN_PUBLIC_ROUTES.map(({ path, element }) => (
-        <Route key={path} path={path} element={element} />
+      {HIDDEN_PUBLIC_ROUTES.map(({ route, element }) => (
+        <Route key={route} path={route} element={element} />
       ))}
       <Route path="/services/:serviceSlug" element={<Navigate to="/store" replace />} />
 
@@ -375,12 +378,12 @@ const AuthenticatedApp = () => {
         }
       >
         {[
-          { path: "/client-portal", Component: ClientPortal },
-          { path: "/client-dashboard", Component: ClientDashboard },
-        ].map(({ path, Component }) => (
+          { route: routePath("client-portal"), Component: ClientPortal },
+          { route: routePath("client-dashboard"), Component: ClientDashboard },
+        ].map(({ route, Component }) => (
           <Route
-            key={path}
-            path={path}
+            key={route}
+            path={route}
             element={
               <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}>
                 <Component />
@@ -400,25 +403,25 @@ const AuthenticatedApp = () => {
         }
       >
         {[
-          { path: "/dashboard", element: <Navigate to="/admin" replace /> },
-          { path: "/admin-settings", element: <Navigate to="/admin" replace /> },
-          { path: "/admin", Component: AdminDashboard },
-          { path: "/admin/leads", Component: AdminLeads },
-          { path: "/admin/leads/:leadId", Component: AdminLeadDetail },
-          { path: "/admin/automations", Component: AdminAutomation },
-          { path: "/lead-intelligence", element: <Navigate to="/admin" replace /> },
-          { path: "/sam", element: <Navigate to="/admin" replace /> },
-          { path: "/medspa-dashboard", element: <Navigate to="/admin" replace /> },
-          { path: "/admin/onboarding", Component: AdminOnboarding },
-          { path: "/admin/install-guide", element: <AdminInstallGuide /> },
-          { path: "/admin/ai-sales", element: <AISalesCommandCenter /> },
-          { path: "/admin/AIStatusDashboard", caseSensitive: true, element: <Navigate to="/admin" replace /> },
-          { path: "/admin/performance-wars", element: <PerformanceWars /> },
-        ].map(({ path, Component, element, caseSensitive }) => (
+          { route: routePath("dashboard"), element: <Navigate to={routePath("admin")} replace /> },
+          { route: routePath("admin-settings"), element: <Navigate to={routePath("admin")} replace /> },
+          { route: routePath("admin"), Component: AdminDashboard },
+          { route: routePath("admin", "leads"), Component: AdminLeads },
+          { route: routePath("admin", "leads", dynamicParam("leadId")), Component: AdminLeadDetail },
+          { route: routePath("admin", "automations"), Component: AdminAutomation },
+          { route: routePath("lead-intelligence"), element: <Navigate to={routePath("admin")} replace /> },
+          { route: routePath("sam"), element: <Navigate to={routePath("admin")} replace /> },
+          { route: routePath("medspa-dashboard"), element: <Navigate to={routePath("admin")} replace /> },
+          { route: routePath("admin", "onboarding"), Component: AdminOnboarding },
+          { route: routePath("admin", "install-guide"), element: <AdminInstallGuide /> },
+          { route: routePath("admin", "ai-sales"), element: <AISalesCommandCenter /> },
+          { route: routePath("admin", "AIStatusDashboard"), caseSensitive: true, element: <Navigate to={routePath("admin")} replace /> },
+          { route: routePath("admin", "performance-wars"), element: <PerformanceWars /> },
+        ].map(({ route, Component, element, caseSensitive }) => (
           <Route
-            key={path}
+            key={route}
             caseSensitive={caseSensitive}
-            path={path}
+            path={route}
             element={
               element || (
                 <Suspense fallback={<AdminLoadingSkeleton />}>
