@@ -48,14 +48,14 @@ export default function CookieConsent() {
 
   return (
     <div
-      className="fixed inset-x-3 z-50 mx-auto max-w-3xl md:inset-x-auto md:left-6 md:max-w-md"
-      style={{ bottom: "max(76px, calc(76px + env(safe-area-inset-bottom, 0px)))" }}
+      className="fixed inset-x-3 z-50 mx-auto max-w-sm md:inset-x-auto md:left-5 md:mx-0"
+      style={{ bottom: "max(16px, calc(16px + env(safe-area-inset-bottom, 0px)))" }}
       aria-live="polite"
       role="dialog"
       aria-label="Cookie preferences"
     >
       <div 
-        className="rounded-2xl shadow-lg border backdrop-blur-md p-4 space-y-3 md:p-5 md:space-y-4"
+        className="rounded-2xl shadow-lg border backdrop-blur-md p-4 space-y-3"
         style={{
           background: 'rgba(255,255,255,0.95)',
           borderColor: 'rgba(0,0,0,0.1)',
@@ -85,16 +85,8 @@ export default function CookieConsent() {
           </a>
           .
         </p>
-        <div className="hidden rounded-xl bg-background/70 border border-border p-3 sm:block">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-foreground mb-2">Cookie categories</p>
-          <div className="space-y-1 text-[11px] text-muted-foreground">
-            <p><span className="font-semibold text-foreground">Essential:</span> keeps forms and navigation working properly.</p>
-            <p><span className="font-semibold text-foreground">Analytics:</span> helps us understand which pages and CTAs are performing.</p>
-          </div>
-        </div>
-
         {/* Actions */}
-        <div className="flex gap-3 pt-1 md:pt-2">
+        <div className="flex gap-3 pt-1">
           <button
             onClick={handleDecline}
             className="flex-1 px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground border border-border rounded-lg transition-colors"

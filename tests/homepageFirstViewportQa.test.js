@@ -9,8 +9,10 @@ const heroSection = readFileSync("src/components/landing/HeroSection.jsx", "utf8
 
 test("cookie consent stays compact on mobile first viewport", () => {
   assert.match(cookieConsent, /inset-x-3/);
-  assert.match(cookieConsent, /max-w-3xl/);
-  assert.match(cookieConsent, /hidden rounded-xl[\s\S]+sm:block/);
+  assert.match(cookieConsent, /max-w-sm/);
+  assert.match(cookieConsent, /bottom: "max\(16px/);
+  assert.doesNotMatch(cookieConsent, /Cookie categories/);
+  assert.doesNotMatch(cookieConsent, /sm:block/);
   assert.doesNotMatch(cookieConsent, /fixed left-6 z-50 max-w-sm/);
 });
 
