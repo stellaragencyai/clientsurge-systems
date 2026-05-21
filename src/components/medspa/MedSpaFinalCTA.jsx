@@ -12,6 +12,8 @@ export default function MedSpaFinalCTA() {
         <img
           src="https://images.unsplash.com/photo-1552693673-1bf958298935?w=1000&q=60&auto=format"
           alt="Med spa ambiance"
+          width="1000"
+          height="667"
           className="w-full h-full object-cover opacity-20"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-muted via-primary/5 to-muted" />

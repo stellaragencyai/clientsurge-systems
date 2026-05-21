@@ -147,6 +147,8 @@ function VideoPlaceholder({ service, onClose }) {
           <img
             src={service.poster}
             alt={service.title}
+            width="960"
+            height="540"
             className="w-full h-full object-cover opacity-30"
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-8">
@@ -204,6 +206,8 @@ function ServiceCard({ service }) {
           <img
             src={service.poster}
             alt={service.title}
+            width="640"
+            height="360"
             className="w-full h-full object-cover transition-transform duration-500"
             style={{ transform: hovered ? "scale(1.05)" : "scale(1)" }}
           />
@@ -320,6 +324,8 @@ export default function Automations() {
           <img
             src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/199305bd4_11.png"
             alt="ClientSurge Systems"
+            width="192"
+            height="48"
             style={{ height: "48px", width: "auto", objectFit: "contain", display: "block" }}
           />
         </Link>

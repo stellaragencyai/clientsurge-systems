@@ -167,7 +167,7 @@ function BrandCard({ brand }) {
         {brand.logo_url && (
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.5)" }}>Logo</span>
-            <img src={brand.logo_url} alt="logo" style={{ height: 28, objectFit: "contain", borderRadius: 4 }} />
+            <img src={brand.logo_url} alt="logo" width="112" height="28" style={{ height: 28, objectFit: "contain", borderRadius: 4 }} />
           </div>
         )}
       </div>

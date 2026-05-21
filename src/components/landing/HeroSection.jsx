@@ -52,6 +52,8 @@ export default function HeroSection({
           <img
             src={backgroundImage}
             alt={backgroundImageAlt || `${title}${titleHighlight ? ` ${titleHighlight}` : ""} hero background`}
+            width="1600"
+            height="1000"
             className="w-full h-full object-cover object-top"
             loading="eager"
             fetchPriority="high"

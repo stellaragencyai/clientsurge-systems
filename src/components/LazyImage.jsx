@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function LazyImage({ src, alt, className, placeholderSrc }) {
+export default function LazyImage({ src, alt, className, placeholderSrc, width = 1200, height = 675 }) {
   const [imageSrc, setImageSrc] = useState(placeholderSrc || null);
   const [imageRef, setImageRef] = useState(null);
 
@@ -37,6 +37,8 @@ export default function LazyImage({ src, alt, className, placeholderSrc }) {
       ref={setImageRef}
       src={imageSrc}
       alt={alt}
+      width={width}
+      height={height}
       className={className}
       loading="lazy"
     />

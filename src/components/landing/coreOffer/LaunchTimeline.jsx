@@ -159,7 +159,7 @@ function StepRow({ step, idx }) {
             className="rounded-2xl overflow-hidden w-full"
             style={{ border: "1.5px solid rgba(0,174,239,0.12)", boxShadow: "0 8px 24px rgba(0,120,200,0.1)", minHeight: "360px" }}
           >
-            <img src={step.image} alt={step.title} className="w-full h-full object-cover" />
+            <img src={step.image} alt={step.title} width="640" height="360" className="w-full h-full object-cover" />
           </div>
         </div>
       </div>

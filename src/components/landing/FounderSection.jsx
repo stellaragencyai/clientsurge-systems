@@ -29,6 +29,8 @@ export default function FounderSection() {
                 <img
                   src="/founder-photo.jpg" onError={(e) => { e.target.src = "https://placehold.co/400x480/f5e6d0/9a5c2e?text=Photo+Coming+Soon"; }}
                   alt="Nolan Strommer, founder of ClientSurge Systems"
+                  width="400"
+                  height="480"
                   className="w-full h-full object-cover object-top"
                   loading="lazy"
                 />

@@ -134,6 +134,8 @@ export default function IntegrationPartners() {
                 <img
                 src={integration.logo}
                 alt={integration.name}
+                width={ITEM_WIDTH}
+                height="72"
                 loading="eager"
                 decoding="async"
                 style={{

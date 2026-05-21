@@ -165,6 +165,8 @@ export default function Navbar() {
           <img
             src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/199305bd4_11.png"
             alt="ClientSurge Systems"
+            width="240"
+            height="72"
             fetchPriority="high"
             decoding="async"
             style={{

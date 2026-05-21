@@ -24,10 +24,12 @@ export function patchLazyImages() {
 }
 
 // JSX component wrapper
-export function LazyImg({ src, alt, style, className, ...props }) {
+export function LazyImg({ src, alt, style, className, width = 1200, height = 675, ...props }) {
   return createElement("img", {
     src,
     alt: alt || "",
+    width,
+    height,
     loading: "lazy",
     decoding: "async",
     style,

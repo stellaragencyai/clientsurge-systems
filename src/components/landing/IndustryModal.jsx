@@ -33,6 +33,8 @@ export default function IndustryModal({ industry, onClose }) {
           <img
             src={imageUrl}
             alt={industry.name}
+            width="800"
+            height="450"
             className="w-full h-full object-cover"
           />
           {/* Overlay gradient */}

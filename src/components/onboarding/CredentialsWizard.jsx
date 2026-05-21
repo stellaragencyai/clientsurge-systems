@@ -156,7 +156,7 @@ function BrandStep({ data, onChange, onLogoUpload, logoUploading }) {
             {logoUploading ? (
               <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
             ) : data.logo_url ? (
-              <img src={data.logo_url} alt="Logo" className="w-full h-full object-contain rounded-xl p-2" />
+              <img src={data.logo_url} alt="Logo" width="128" height="128" className="w-full h-full object-contain rounded-xl p-2" />
             ) : (
               <>
                 <div className="text-2xl">🖼️</div>
@@ -596,6 +596,8 @@ export default function CredentialsWizard({ order, onComplete }) {
         <img
           src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
           alt="ClientSurge"
+          width="200"
+          height="50"
           style={{ height: 50, objectFit: "contain", mixBlendMode: "luminosity", opacity: 0.85 }}
         />
       </div>

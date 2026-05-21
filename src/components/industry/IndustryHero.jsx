@@ -13,6 +13,8 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
         <img
           src={image}
           alt={eyebrow}
+          width="1600"
+          height="1000"
           className="w-full h-full object-cover object-center"
           loading="eager"
           fetchPriority="high"

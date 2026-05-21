@@ -28,6 +28,8 @@ export default function IntegrationsBadges() {
               <img 
                 src={int.logo} 
                 alt={`${int.name} logo`}
+                width="120"
+                height={int.height}
                 loading="lazy"
                 style={{ height: `${int.height}px`, maxWidth: '120px', objectFit: 'contain' }}
                 className="grayscale hover:grayscale-0 transition-all"

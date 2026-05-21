@@ -38,6 +38,8 @@ export default function TestimonialAvatar({ src, name, size = 56 }) {
   return (
     <img
       src={src} alt={name}
+      width={size}
+      height={size}
       onError={() => setFailed(true)}
       style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
     />

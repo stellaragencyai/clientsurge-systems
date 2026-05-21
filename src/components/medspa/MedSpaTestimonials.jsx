@@ -114,6 +114,8 @@ export default function MedSpaTestimonials() {
                 <img
                   src={t.avatar}
                   alt={t.name}
+                  width="64"
+                  height="64"
                   loading="lazy"
                   className="w-16 h-16 rounded-full object-cover ring-2 ring-white shadow-md"
                 />
@@ -146,5 +148,4 @@ export default function MedSpaTestimonials() {
     </section>
   );
 }
-
 

@@ -134,6 +134,8 @@ export default function Footer() {
             <img
               src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
               alt="ClientSurge Systems"
+              width="240"
+              height="60"
               style={{ height: "60px", width: "auto", objectFit: "contain", mixBlendMode: "multiply" }}
             />
             <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.72)", lineHeight: 1.65, margin: 0 }}>
