@@ -5,8 +5,8 @@
 
 ---
 
-## DOMAIN HEALTH: 19% Ready (3/16 done, 4 critical open, 0 hard-blocked)
-> **Fastest win:** #103 - discoverLeads missing-key 503 guard (~15 min, no deps) - Agent B
+## DOMAIN HEALTH: 25% Ready (4/16 done, 4 critical open, 0 hard-blocked)
+> **Fastest win:** #216 - document all environment variables in README_ENV.md (~30 min, no deps) - Agent C
 > **Critical path:** #152/#212 (monitoring registration) - healthCheck exists; external monitor registration still needs approval/action outside the repo
 
 ---
@@ -15,10 +15,10 @@
 | Metric | Value |
 |---|---|
 | Unblocked Critical | 4 (#211 DNS, #213a Resend DKIM, #213b Twilio 10DLC, #218 secrets audit) |
-| Fastest Win (< 30 min, no deps) | #103 - discoverLeads missing-key 503 guard (~15 min) |
+| Fastest Win (< 30 min, no deps) | #216 - document all environment variables in README_ENV.md (~30 min) |
 | Longest Blocked Chain | #152 -> monitoring live (1 deep; external registration) |
-| Done This Week | 3 tasks (#109, #107, #156) |
-| Est. Hours to Domain Complete | ~13.25 hrs |
+| Done This Week | 4 tasks (#109, #107, #156, #103) |
+| Est. Hours to Domain Complete | ~13 hrs |
 
 ---
 
@@ -49,7 +49,6 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 103 | pending | discoverLeads: return 503 with clear error if Google Maps API key is missing | B | - | - | - | ~15 min |
 | 112 | pending | Extend autoEndToEndTest: full checkout -> webhook -> email -> status flow w/ cleanup | B | - | - | - | ~2 hrs |
 | 158 | pending | Add standardized console.log format to all functions: [functionName] msg {ctx} | B | - | - | - | ~1 hr |
 | 159 | pending | Verify all functions return proper HTTP status codes (not always 200) | B | - | - | - | ~45 min |
@@ -72,3 +71,4 @@ No pending low-priority Domain 09 tasks.
 | 109 | OrderSuccess: add noindex meta tag | Agent B | 2026-05-03 | Added `<meta name="robots" content="noindex">` in `pages/OrderSuccess.jsx` via `setPageMetadata` |
 | 107 | Create healthCheck function: returns `{status:"ok", timestamp, version}` - no auth | Morpheus | 2026-05-21 | Verified existing public `base44/functions/healthCheck/entry.ts` endpoint and added source regression coverage for no-auth monitoring payload shape |
 | 156 | getClientPortalContext: on auth, write portal_login CommunicationEvent | Morpheus | 2026-05-21 | Added best-effort authenticated portal login audit events for linked and empty/error portal states, plus schema/test coverage for `portal_login` |
+| 103 | discoverLeads: return 503 with clear error if Google Maps API key is missing | Morpheus | 2026-05-21 | Verified existing `discoverLeadsGuard` integration, server-side `GOOGLE_MAPS_API_KEY` docs, and Deno/source regression coverage for launch-safe 503 behavior |
