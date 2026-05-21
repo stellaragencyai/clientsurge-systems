@@ -39,6 +39,7 @@ This repo uses the **Base44 app-code / GitHub sync** release path.
 - Pushes to `main` sync code into Base44.
 - The live site still requires clicking **Publish** in the Base44 UI.
 - `base44 deploy` is only for Base44 **Backend Platform** apps and will fail for this repo.
+- Pre-launch QA belongs in the Base44 test database / test workspace; see `docs/STAGING_ENVIRONMENT.md` before running checkout, SMS, email, or activation smoke tests.
 
 Helper command:
 
