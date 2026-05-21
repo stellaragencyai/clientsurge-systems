@@ -19,6 +19,7 @@
     "openclaw:growth-package-config": "node scripts/openclaw/build-basic-package-config.mjs --growth",
     "openclaw:pro-package-config": "node scripts/openclaw/build-basic-package-config.mjs --pro",
     "load-test:leads": "node scripts/load-test-lead-submissions.mjs",
+    "verify:lead-load": "node scripts/load-test-lead-submissions.mjs --self-test",
     "verify:admin-load": "node scripts/verify-admin-load-budget.mjs",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview"
