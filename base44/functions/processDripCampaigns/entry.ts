@@ -13,6 +13,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const STOP_STATUSES = ["Qualified", "Booking Prompt Sent", "Booked", "Closed", "Won", "Lost", "opted_out"]; // #96
 
@@ -55,7 +56,7 @@ async function sendSMS(phone, body, accountSid, authToken, fromNumber) {
 }
 
 async function sendEmail(to, subject, body, resendKey, fromEmail) {
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendKey}`,

@@ -7,6 +7,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const FOLLOW_UP_STEPS = [
   { step: 1, minutesAfter: 2, channel: "sms", key: "missed_call_sms_2min" },
@@ -147,7 +148,7 @@ async function sendEmail(base44, lead, subject, body, fromEmail, stepKey) {
     throw new Error("Resend API key missing");
   }
 
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendKey}`,

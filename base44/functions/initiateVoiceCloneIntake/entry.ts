@@ -4,6 +4,7 @@
  * Instructs them to record 3 sentences for voice cloning.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -23,7 +24,7 @@ Deno.serve(async (req) => {
 
     const retellLink = "https://app.retellai.com/voice-clone"; // Retell voice clone intake URL
 
-    await fetch("https://api.resend.com/emails", {
+    await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({

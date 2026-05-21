@@ -2,6 +2,7 @@ import { initializePaidOrderInstallPipeline } from "./installPipeline.js";
 import { normalizePackageKey } from "../../../src/lib/salesCatalog.js";
 import { buildPaymentRecoveryEmail } from "./paymentRecoveryEmail.js";
 import { buildAppUrl } from "./appUrl.js";
+import { resendFetch } from "./resendFetch.js";
 
 function getStripeSecretKey() {
   try {
@@ -125,7 +126,7 @@ async function sendPaymentRecoveryEmail({ base44, order, invoice }) {
     replyToEmail: Deno.env.get("ADMIN_EMAIL"),
   });
 
-  const response = await fetch("https://api.resend.com/emails", {
+  const response = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendKey}`,

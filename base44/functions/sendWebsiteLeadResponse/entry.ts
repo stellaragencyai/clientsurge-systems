@@ -6,6 +6,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { buildFailedSendRetryJob } from "../_shared/automationRetry.js";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 async function sendSMS(base44, lead, messageBody, fromNumber) {
   const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -51,7 +52,7 @@ async function sendEmail(base44, lead, subject, body, fromEmail) {
 
   const idempotencyKey = `website-lead/${lead.id}/initial-email`;
 
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendKey}`,

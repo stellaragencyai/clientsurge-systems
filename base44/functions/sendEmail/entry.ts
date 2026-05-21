@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resendFetch } from "../_shared/resendFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -13,7 +14,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Resend API key not configured' }, { status: 500 });
     }
 
-    const response = await fetch('https://api.resend.com/emails', {
+    const response = await resendFetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,

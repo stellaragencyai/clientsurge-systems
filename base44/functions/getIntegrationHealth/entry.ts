@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 async function pingTwilio() {
   const sid = Deno.env.get('TWILIO_ACCOUNT_SID');
@@ -16,7 +17,7 @@ async function pingResend() {
   const key = Deno.env.get('RESEND_API_KEY');
   if (!key) return { ok: false, error: 'RESEND_API_KEY not set' };
   try {
-    const res = await fetch('https://api.resend.com/domains', {
+    const res = await resendFetch('https://api.resend.com/domains', {
       headers: { 'Authorization': `Bearer ${key}` },
     });
     return res.ok ? { ok: true } : { ok: false, error: `HTTP ${res.status}` };

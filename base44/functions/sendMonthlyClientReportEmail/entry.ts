@@ -3,6 +3,7 @@
  * After generating monthly report, emails it to the client.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -22,7 +23,7 @@ Deno.serve(async (req) => {
     const month = new Date().toLocaleString("en-US", { month: "long", year: "numeric", timeZone: "America/Phoenix" });
     const metrics = report?.metrics || {};
 
-    await fetch("https://api.resend.com/emails", {
+    await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({

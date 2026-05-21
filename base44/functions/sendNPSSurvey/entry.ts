@@ -4,6 +4,7 @@
  * Sends 1-question NPS email.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -22,7 +23,7 @@ Deno.serve(async (req) => {
       `<a href="https://clientsurgesystems.com/nps?order_id=${order_id}&score=${s}" style="display:inline-block;width:36px;height:36px;line-height:36px;text-align:center;border-radius:50%;background:${s >= 9 ? '#00FFB3' : s >= 7 ? '#F59E0B' : '#EF4444'}22;border:1.5px solid ${s >= 9 ? '#00FFB3' : s >= 7 ? '#F59E0B' : '#EF4444'}60;color:#0A0F1E;font-weight:800;font-size:13px;text-decoration:none;margin:2px;">${s}</a>`
     ).join(" ");
 
-    await fetch("https://api.resend.com/emails", {
+    await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({

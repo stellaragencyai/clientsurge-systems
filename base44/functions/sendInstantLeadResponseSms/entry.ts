@@ -4,6 +4,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
 const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
@@ -92,7 +93,7 @@ async function sendResendEmail(base44, leadId, toEmail, firstName, businessName)
   console.log(`[InstantResponse] Sending email to ${toEmail} — lead: ${leadId}`);
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${resendKey}`,

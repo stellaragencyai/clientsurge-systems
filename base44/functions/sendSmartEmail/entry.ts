@@ -5,6 +5,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -49,7 +50,7 @@ Deno.serve(async (req) => {
     const subject = subjectResult.data.recommended_subject;
 
     // 3. Send via Resend
-    const emailResponse = await fetch("https://api.resend.com/emails", {
+    const emailResponse = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${RESEND_API_KEY}`,

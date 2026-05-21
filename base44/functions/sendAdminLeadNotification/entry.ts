@@ -4,6 +4,7 @@
  * Sends a rich HTML email to the admin via Resend.
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resendFetch } from "../_shared/resendFetch.js";
 // Inlined from _shared/automationSecurity.js (relative imports not supported in deployed Deno runtime)
 function constantTimeEqual(left, right) {
   if (typeof left !== "string" || typeof right !== "string" || left.length !== right.length) return false;
@@ -126,7 +127,7 @@ Deno.serve(async (req) => {
 </body>
 </html>`;
 
-    const res = await fetch('https://api.resend.com/emails', {
+    const res = await resendFetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${resendKey}`,

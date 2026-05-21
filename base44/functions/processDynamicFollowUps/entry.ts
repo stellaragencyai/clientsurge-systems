@@ -9,6 +9,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const CHANNELS = {
   SMS: "sms",
@@ -90,7 +91,7 @@ async function sendFollowUp(base44, lead, channel, stepNumber, templates) {
       // Send email via Resend
       const resendKey = Deno.env.get("RESEND_API_KEY");
       if (resendKey && lead.email) {
-        const res = await fetch("https://api.resend.com/emails", {
+        const res = await resendFetch("https://api.resend.com/emails", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${resendKey}`,

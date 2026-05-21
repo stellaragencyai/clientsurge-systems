@@ -6,6 +6,7 @@
  * Payload: { event_id: string }
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resendFetch } from "../_shared/resendFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -84,7 +85,7 @@ Deno.serve(async (req) => {
       }
       if (!toEmail) return Response.json({ error: 'Cannot determine destination email' }, { status: 400 });
 
-      const res = await fetch('https://api.resend.com/emails', {
+      const res = await resendFetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${RESEND_KEY}`,

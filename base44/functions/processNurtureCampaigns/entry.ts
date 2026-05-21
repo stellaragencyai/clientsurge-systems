@@ -16,6 +16,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 // #97: 23-hour idempotency guard — prevents duplicate nurture sends
 const IDEMPOTENCY_WINDOW_MS = 23 * 3600000;
@@ -208,7 +209,7 @@ function daysSince(isoDate) {
 }
 
 async function sendEmail(to, subject, html, resendKey, fromEmail) {
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendKey}`,

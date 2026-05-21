@@ -4,6 +4,7 @@
  * Sends them an email showing what they're missing at the next tier.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const TIER_BENEFITS = {
   starter: {
@@ -74,7 +75,7 @@ Deno.serve(async (req) => {
       const html = buildComparisonEmail(order.client_name || "there", order.package_key, benefits);
 
       if (resendKey) {
-        await fetch("https://api.resend.com/emails", {
+        await resendFetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { Authorization: \`Bearer \${resendKey}\`, "Content-Type": "application/json" },
           body: JSON.stringify({

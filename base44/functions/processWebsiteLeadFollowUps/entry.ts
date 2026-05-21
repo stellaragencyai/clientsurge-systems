@@ -8,6 +8,7 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { buildFailedSendRetryJob } from "../_shared/automationRetry.js";
 import {
+import { resendFetch } from "../_shared/resendFetch.js";
   getNextDueWebsiteLeadFollowUpStep,
   shouldStopWebsiteLeadFollowUp,
   WEBSITE_LEAD_FOLLOW_UP_STEPS,
@@ -78,7 +79,7 @@ async function sendEmail(base44, lead, subject, body, fromEmail, stepKey) {
 
   const idempotencyKey = `website-lead/${lead.id}/${stepKey}`;
 
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendKey}`,

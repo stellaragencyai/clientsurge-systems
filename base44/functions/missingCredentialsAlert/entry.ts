@@ -4,6 +4,7 @@
  * Sends warm reminder email to client.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 // #409a: warm reminder email template
 function buildReminderEmail(client_name, portal_link) {
@@ -49,7 +50,7 @@ Deno.serve(async (req) => {
 
       const resendKey = Deno.env.get("RESEND_API_KEY");
       if (order.client_email && resendKey) {
-        await fetch("https://api.resend.com/emails", {
+        await resendFetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { Authorization: \`Bearer \${resendKey}\`, "Content-Type": "application/json" },
           body: JSON.stringify({

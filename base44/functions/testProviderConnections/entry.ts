@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 /**
  * testProviderConnections — #172
  * Tests Twilio and Resend credentials live. Returns {success, message}.
@@ -26,7 +27,7 @@ Deno.serve(async (req) => {
     const key = Deno.env.get("RESEND_API_KEY");
     if (!key) return Response.json({ success: false, message: "Resend key not configured" });
     try {
-      const res = await fetch("https://api.resend.com/domains", { headers: { Authorization: `Bearer ${key}` } });
+      const res = await resendFetch("https://api.resend.com/domains", { headers: { Authorization: `Bearer ${key}` } });
       if (res.ok) {
         const d = await res.json();
         const domains = (d?.data || []).map((x) => x.name).join(", ") || "verified";

@@ -1,5 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { getAppUrl } from "../_shared/appUrl.js";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL");
@@ -7,7 +8,7 @@ const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") || "nolan@clientsurgesystems.com
 const APP_URL = getAppUrl();
 
 async function sendEmail({ to, subject, html, fromName = "ClientSurge Systems" }) {
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${RESEND_API_KEY}`,

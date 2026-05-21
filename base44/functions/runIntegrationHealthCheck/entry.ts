@@ -7,6 +7,7 @@
  * 4. Deduplicates tasks so the same issue doesn't spawn duplicate tickets
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resendFetch } from "../_shared/resendFetch.js";
 
 // Thresholds for auto-task creation
 const FAILURE_THRESHOLD = 3;       // failures in window
@@ -33,7 +34,7 @@ async function pingResend() {
   const key = Deno.env.get('RESEND_API_KEY');
   if (!key) return { ok: false, error: 'RESEND_API_KEY not set' };
   try {
-    const res = await fetch('https://api.resend.com/domains', {
+    const res = await resendFetch('https://api.resend.com/domains', {
       headers: { 'Authorization': `Bearer ${key}` },
     });
     if (res.ok) return { ok: true };

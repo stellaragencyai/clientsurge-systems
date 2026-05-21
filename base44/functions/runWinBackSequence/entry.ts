@@ -9,6 +9,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const STEPS = [
   { key: "win_back_day30", daysRequired: 30, label: "Day 30 — Special Offer" },
@@ -110,7 +111,7 @@ async function sendEmail(
   resendKey: string,
   fromEmail: string
 ) {
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendKey}`,

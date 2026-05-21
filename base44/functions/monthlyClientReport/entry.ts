@@ -5,6 +5,7 @@
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { buildCommunicationEvent } from "../_shared/installPipeline.js";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const REPORT_STATUSES = new Set(["Live", "live"]);
 
@@ -115,7 +116,7 @@ async function sendReportEmail({ resendKey, fromEmail, to, report }: {
   to: string;
   report: ReturnType<typeof buildReport>;
 }) {
-  const response = await fetch("https://api.resend.com/emails", {
+  const response = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendKey}`,

@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 /**
  * healthCheck + errorAlerting — #212 #215
  * UptimeRobot/Better Stack compatible endpoint.
@@ -19,7 +20,7 @@ export async function alertOn5xx(functionName: string, status: number, error: st
     }).catch(console.warn);
   }
   if (RESEND_KEY) {
-    await fetch("https://api.resend.com/emails", {
+    await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({

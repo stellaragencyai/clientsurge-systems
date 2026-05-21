@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resendFetch } from "../_shared/resendFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -38,7 +39,7 @@ Deno.serve(async (req) => {
     // Send via Resend if configured
     let emailResult = null;
     if (adminSettings.resend_enabled && Deno.env.get('RESEND_API_KEY')) {
-      const resendResponse = await fetch('https://api.resend.com/emails', {
+      const resendResponse = await resendFetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,

@@ -3,6 +3,7 @@
  * Formats scheduled_date/time in Arizona local time for all emails.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 function formatAZTime(isoStr: string): string {
   if (!isoStr) return "TBD";
@@ -25,7 +26,7 @@ Deno.serve(async (req) => {
 
     const formatted = formatAZTime(scheduled_datetime);
 
-    await fetch("https://api.resend.com/emails", {
+    await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({

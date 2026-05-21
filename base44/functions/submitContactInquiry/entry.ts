@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const MAX_FIELD_LENGTH = 500;
 const MAX_MESSAGE_LENGTH = 1500;
@@ -199,7 +200,7 @@ async function sendAdminNotification(contact: ReturnType<typeof normalizeContact
     </table>
   `;
 
-  const response = await fetch('https://api.resend.com/emails', {
+  const response = await resendFetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${RESEND_API_KEY}`,
@@ -254,7 +255,7 @@ async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContact
     </div>
   `;
 
-  const response = await fetch('https://api.resend.com/emails', {
+  const response = await resendFetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${RESEND_API_KEY}`,

@@ -17,6 +17,7 @@
  */
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const QUIET_START = 20; // 8pm Phoenix
 const QUIET_END = 8;   // 8am Phoenix
@@ -195,7 +196,7 @@ Deno.serve(async (req) => {
 </div>`;
 
           try {
-            const emailRes = await fetch('https://api.resend.com/emails', {
+            const emailRes = await resendFetch('https://api.resend.com/emails', {
               method: 'POST',
               headers: {
                 Authorization: `Bearer ${resendKey}`,

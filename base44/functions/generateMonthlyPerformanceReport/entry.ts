@@ -4,6 +4,7 @@
  * Queries real entity data + sends HTML report to client.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 // #422a: data queries per metric
 async function gatherMetrics(base44: any, order_id: string, order: any) {
@@ -69,7 +70,7 @@ Deno.serve(async (req) => {
       const html = buildReportHtml(order.client_name || "Client", metrics);
 
       if (order.client_email && resendKey) {
-        await fetch("https://api.resend.com/emails", {
+        await resendFetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({

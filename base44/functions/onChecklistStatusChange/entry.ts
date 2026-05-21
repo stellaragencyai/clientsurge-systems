@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { getAppUrl } from '../_shared/appUrl.js';
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const SERVICE_LABELS = {
   instant_lead_response: 'Instant Lead Response',
@@ -108,7 +109,7 @@ Deno.serve(async (req) => {
 </body>
 </html>`;
 
-    const emailRes = await fetch('https://api.resend.com/emails', {
+    const emailRes = await resendFetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${resendKey}`,

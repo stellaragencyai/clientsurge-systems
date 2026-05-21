@@ -3,6 +3,7 @@
  * On subscription.deleted: generates personalized 3-email win-back sequence.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 Deno.serve(async (req) => {
   try {
@@ -23,7 +24,7 @@ Deno.serve(async (req) => {
 
     // Day 0: immediate "We're sorry to see you go"
     if (order.client_email && resendKey) {
-      await fetch("https://api.resend.com/emails", {
+      await resendFetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({

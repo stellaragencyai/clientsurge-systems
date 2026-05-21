@@ -9,6 +9,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import {
+import { resendFetch } from "../_shared/resendFetch.js";
   buildRetrySchedulePatch,
   isAutomationJobDue,
 } from "../_shared/automationRetry.js";
@@ -16,7 +17,7 @@ import {
 // #114: Resend with retry on 429/5xx
 async function resendWithRetry(payload, apiKey, retries = 1) {
   for (let attempt = 0; attempt <= retries; attempt++) {
-    const res = await fetch("https://api.resend.com/emails", {
+    const res = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -94,7 +95,7 @@ async function sendResendEmail(to, subject, body, fromEmail) {
     throw new Error("Resend API key missing");
   }
 
-  const response = await fetch("https://api.resend.com/emails", {
+  const response = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${RESEND_API_KEY}`,

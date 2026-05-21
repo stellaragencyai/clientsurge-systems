@@ -14,6 +14,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const BATCH_SIZE = 50; // Resend recommends batching
 const MAX_LEADS = 5000;
@@ -56,7 +57,7 @@ async function sendViaResend(to, subject, html, text, fromEmail, resendKey, camp
   const trackingPixel = `<img src="https://clientsurge.base44.app/api/track/open/${campaignId}/${recipientId}" width="1" height="1" style="display:none" />`;
   const htmlWithTracking = html ? `${html}${trackingPixel}` : undefined;
 
-  const res = await fetch("https://api.resend.com/emails", {
+  const res = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendKey}`,

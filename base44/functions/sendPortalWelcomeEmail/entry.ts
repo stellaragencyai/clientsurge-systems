@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const ADMIN_EMAIL = "system@clientsurgesystems.com";
@@ -102,7 +103,7 @@ Deno.serve(async (req) => {
 
     // Send both emails in parallel via Resend
     const [clientRes, adminRes] = await Promise.all([
-      fetch("https://api.resend.com/emails", {
+      resendFetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${RESEND_API_KEY}`,
@@ -115,7 +116,7 @@ Deno.serve(async (req) => {
           html: clientHtml,
         }),
       }),
-      fetch("https://api.resend.com/emails", {
+      resendFetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${RESEND_API_KEY}`,

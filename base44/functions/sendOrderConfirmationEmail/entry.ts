@@ -1,5 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import {
+import { resendFetch } from "../_shared/resendFetch.js";
   getPackageOffer,
   getPackageDisplayLabel,
   normalizePackageKey,
@@ -120,7 +121,7 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    const response = await fetch("https://api.resend.com/emails", {
+    const response = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${resendKey}`,
