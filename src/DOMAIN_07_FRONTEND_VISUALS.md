@@ -6,21 +6,21 @@
 
 ---
 
-## 📊 DOMAIN HEALTH: 🟡 52% Ready (18/35 done · 1 critical open · 1 dep-blocked)
+## 📊 DOMAIN HEALTH: 🟡 54% Ready (19/35 done · 0 critical open · 1 dep-blocked)
 > ⚡ **Fastest win:** #53 — audit form inputs iOS zoom (~45 min, no deps) · Agent A  
-> ⚠️ **Critical:** #76 — verify sk_live_ key exposure (~20 min, zero deps — do this first every session)
+> ⚠️ **Critical:** none currently open
 
 ---
 
 ## ⏱️ SPRINT SNAPSHOT — updated each session
 | Metric | Value |
 |---|---|
-| 🔴 Unblocked Critical | 1 (#76 — Stripe key audit, ~20 min) |
+| 🔴 Unblocked Critical | 0 |
 | 🟠 Fastest Win (< 30 min, no deps) | #M09 iOS input zoom (30 min), #M01 100svh fix (20 min), #M08 Safari blur flicker (15 min) |
 | 🧱 Longest Blocked Chain | #27 (ThemeProvider) → #26 (dark mode toggle) |
 | ✅ Done This Week | 18 tasks (#1,2,3,5,11,16,17,25,29,35,36,38,43,77 + M01,M02,M05,M06,M08,M09,M11,M15,M16,M17,M19) + CTA pass (28a–28d) |
 | 🎯 Est. Hours to Domain Complete | ~18 hrs |
-| 📱 Next 5 Priority Tasks | #76 (Stripe key audit), #53 (form input audit), M03 (iOS scroll lock), M07 (iPad nav), M10 (modal scroll) |
+| 📱 Next 5 Priority Tasks | #53 (form input audit), M03 (iOS scroll lock), M07 (iPad nav), M10 (modal scroll), #45 (Store human CTA) |
 
 ---
 
@@ -28,7 +28,7 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 76 | ⏳ | Verify Stripe publishable key is ONLY in frontend (not sk_live_ anywhere) | A | — | — | 🧵 Stripe-Live | ~20 min |
+| 76 | ✅ | Verify Stripe publishable key is ONLY in frontend (not sk_live_ anywhere) | Morpheus | — | — | 🧵 Stripe-Live | Done |
 
 ---
 
@@ -141,3 +141,4 @@
 | 38 | ClientPortal: "Setup Progress" is first/default tab | Agent A | 2026-05-03 | Changed default `activeTab` state to `"progress"` in `ClientPortal.jsx` |
 | 43 | CartSidebar: acquireBodyScrollLock on open/close | Agent A (🔄) | 2026-05-03 | Confirmed `bodyScrollLock` properly acquired/released in `CartSidebar` useEffect |
 | 77 | Portal graceful empty state — no nav errors on null project | Agent A | 2026-05-03 | Added null-guards and empty state UI in `ClientPortal.jsx` when `project === null` |
+| 76 | Stripe frontend secret exposure audit | Morpheus | 2026-05-21 | Added `tests/frontendSecretExposure.test.js` to scan frontend source/public assets for real Stripe/server-side secret key formats and verified no `sk_live_` exposure in frontend code |

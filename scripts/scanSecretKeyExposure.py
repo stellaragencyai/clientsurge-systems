@@ -10,9 +10,9 @@ DANGER_PATTERNS = [
     r"sk_test_[a-zA-Z0-9]{20,}",
     r"rk_live_[a-zA-Z0-9]{20,}",
     r"whsec_[a-zA-Z0-9+/=]{20,}",
-    r"RESEND_API_KEY\s*=\s*["']re_[a-zA-Z0-9]{20,}",
-    r"TWILIO_AUTH_TOKEN\s*=\s*["'][a-zA-Z0-9]{30,}",
-    r"OPENAI_API_KEY\s*=\s*["']sk-[a-zA-Z0-9]{20,}",
+    r"RESEND_API_KEY\s*=\s*[\"']re_[a-zA-Z0-9]{20,}",
+    r"TWILIO_AUTH_TOKEN\s*=\s*[\"'][a-zA-Z0-9]{30,}",
+    r"OPENAI_API_KEY\s*=\s*[\"']sk-[a-zA-Z0-9]{20,}",
 ]
 
 SCAN_DIRS = ["src", "public", "dist"]
@@ -41,10 +41,10 @@ for scan_dir in SCAN_DIRS:
                 pass
 
 if found:
-    print(f"🚨 SECRET KEY EXPOSURE DETECTED — {len(found)} file(s):")
+    print(f"SECRET KEY EXPOSURE DETECTED - {len(found)} file(s):")
     for item in found:
-        print(f"  {item['file']} — {item['count']} match(es) for pattern: {item['pattern'][:40]}")
+        print(f"  {item['file']} - {item['count']} match(es) for pattern: {item['pattern'][:40]}")
     sys.exit(1)
 else:
-    print("✅ No secret key exposure detected in frontend source.")
+    print("No secret key exposure detected in frontend source.")
     sys.exit(0)
