@@ -2,6 +2,53 @@
 // #341: OG image hosted on clientsurgesystems.com — no Base44 CDN dependency
 const DEFAULT_OG_IMAGE = "https://clientsurgesystems.com/og-image.png";
 
+function prettifySegment(segment) {
+  return segment
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function stripSiteSuffix(title = "") {
+  return title.replace(/\s*\|\s*ClientSurge Systems\s*$/i, "").trim();
+}
+
+export function buildBreadcrumbSchema({ canonicalPath = "/", title = "" }) {
+  const normalizedPath = canonicalPath.startsWith("/") ? canonicalPath : `/${canonicalPath}`;
+  const segments = normalizedPath.split("/").filter(Boolean);
+
+  if (segments.length === 0) return null;
+
+  const items = [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "Home",
+      item: "https://clientsurgesystems.com/",
+    },
+  ];
+
+  let runningPath = "";
+  segments.forEach((segment, index) => {
+    runningPath += `/${segment}`;
+    const isLast = index === segments.length - 1;
+    const fallbackName = prettifySegment(segment);
+    const name = isLast ? stripSiteSuffix(title) || fallbackName : fallbackName;
+
+    items.push({
+      "@type": "ListItem",
+      position: index + 2,
+      name,
+      item: `https://clientsurgesystems.com${runningPath}`,
+    });
+  });
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: items,
+  };
+}
+
 function ensureMeta(attribute, key) {
   const selector =
     attribute === "name"
@@ -66,6 +113,7 @@ export function setPageMetadata({
   };
 
   const canonicalUrl = `https://clientsurgesystems.com${canonicalPath}`;
+  const breadcrumbSchema = buildBreadcrumbSchema({ canonicalPath, title });
 
   document.title = title;
   ensureMeta("name", "description").setAttribute("content", description);
@@ -85,7 +133,12 @@ export function setPageMetadata({
   ensureMeta("property", "twitter:description").setAttribute("content", ogDescription || description);
   ensureMeta("property", "twitter:image").setAttribute("content", ogImage);
 
+  const cleanupBreadcrumb = breadcrumbSchema
+    ? setJsonLd(`breadcrumb-${canonicalPath.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "home"}`, breadcrumbSchema)
+    : null;
+
   return () => {
+    cleanupBreadcrumb?.();
     document.title = previous.title;
     ensureMeta("name", "description").setAttribute("content", previous.description);
     ensureMeta("name", "robots").setAttribute("content", previous.robots || "index,follow");

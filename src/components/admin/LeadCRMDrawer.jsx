@@ -54,6 +54,34 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
   const [whatsappMessage, setWhatsappMessage] = useState("");
   const [whatsappSending, setWhatsappSending] = useState(false);
   const [toast, setToast] = useState(null);
+  const [orchestratorLoading, setOrchestratorLoading] = useState(false);
+
+  const needsAiEnrichment = !lead?.ai_summary && !lead?.next_action && !lead?.booking_probability;
+
+  useEffect(() => {
+    if (!lead?.id || !needsAiEnrichment) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const hydrateLead = async () => {
+      try {
+        await base44.functions.invoke("enrichLeadWithAI", { lead_id: lead.id });
+        if (!cancelled) {
+          showToast("AI enrichment started for this lead");
+        }
+      } catch {
+        // Best-effort only.
+      }
+    };
+
+    hydrateLead();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lead?.id, needsAiEnrichment]);
 
   useEffect(() => {
     if (activeTab === "notes") loadNotes();
@@ -119,7 +147,7 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
       setNotes((prev) => [note, ...prev]);
       setNewNote("");
       showToast("Note saved");
-    } catch (err) {
+    } catch {
       showToast("Failed to save note", "error");
     } finally {
       setNoteSaving(false);
@@ -161,7 +189,7 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
     if (!whatsappMessage.trim() || whatsappSending) return;
     setWhatsappSending(true);
     try {
-      const res = await base44.functions.invoke("sendWhatsAppMessage", {
+      await base44.functions.invoke("sendWhatsAppMessage", {
         lead_id: lead.id,
         message: whatsappMessage.trim(),
       });
@@ -172,6 +200,22 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
       showToast(err?.response?.data?.error || "Failed to send WhatsApp message", "error");
     } finally {
       setWhatsappSending(false);
+    }
+  };
+
+  const handleRunOrchestrator = async () => {
+    if (!lead?.id || orchestratorLoading) return;
+    setOrchestratorLoading(true);
+    try {
+      await base44.functions.invoke("automationOrchestrator", {
+        lead_id: lead.id,
+        trigger_event: "manual_admin_trigger",
+      });
+      showToast("Automation orchestrator started");
+    } catch (err) {
+      showToast(err?.response?.data?.error || "Failed to run orchestrator", "error");
+    } finally {
+      setOrchestratorLoading(false);
     }
   };
 
@@ -201,6 +245,14 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
             </div>
             <p className="font-semibold text-foreground text-base">{lead.full_name}</p>
             <p className="text-xs text-muted-foreground">{lead.business_name} · {lead.phone || lead.email}</p>
+            <button
+              onClick={handleRunOrchestrator}
+              disabled={orchestratorLoading}
+              className="mt-3 inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+            >
+              {orchestratorLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+              Run AI Orchestrator
+            </button>
           </div>
           <button onClick={onClose} className="p-1.5 hover:bg-muted rounded-lg transition-colors mt-0.5">
             <X className="w-4 h-4 text-muted-foreground" />

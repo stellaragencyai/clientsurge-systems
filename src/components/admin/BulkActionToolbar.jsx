@@ -5,19 +5,10 @@
 
 import { useState, useEffect } from "react";
 
-// #323: Clean Duplicates action
-async function handleDeduplicateSelected(selectedIds, base44Client) {
-  const results = await Promise.allSettled(
-    selectedIds.map(id => base44Client.functions.invoke("deduplicateLeads", { lead_id: id }))
-  );
-  const merged = results.filter(r => r.status === "fulfilled" && r.value?.duplicates_merged > 0).length;
-  return { merged, total: selectedIds.length };
-}
-
 
 import {
-  X, ChevronDown, CheckCircle, Loader2, MessageSquare, StickyNote, Tag, AlertCircle, Sparkles,
-  Download, Phone, BookOpen
+  X, ChevronDown, CheckCircle, Loader2, MessageSquare, StickyNote, Tag, AlertCircle,
+  Download, Phone, BookOpen, BrainCircuit
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -190,7 +181,26 @@ export default function BulkActionToolbar({ selectedIds, leads = [], onClearSele
     await runAction("add_note", { note });
     setShowNoteModal(false);
   };
-  const handleBulkEnrich = () => runAction("bulk_enrich");
+  const handleRescore = async () => {
+    setLoading(true);
+    setResult(null);
+    let successCount = 0;
+    let failedCount = 0;
+    for (const leadId of selectedIds) {
+      try {
+        await base44.functions.invoke("scoreLeadIntelligence", { lead_id: leadId });
+        successCount++;
+      } catch {
+        failedCount++;
+      }
+    }
+    setResult({
+      success: failedCount === 0,
+      message: `${successCount} rescored${failedCount > 0 ? ` · ${failedCount} failed` : ""}`,
+    });
+    onActionComplete?.();
+    setLoading(false);
+  };
 
   const handleMarkContacted = () => runAction("status_change", { status: "Contacted" });
 
@@ -300,13 +310,13 @@ export default function BulkActionToolbar({ selectedIds, leads = [], onClearSele
 
           {/* Bulk enrich */}
           <button
-            onClick={handleBulkEnrich}
+            onClick={handleRescore}
             disabled={loading}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors disabled:opacity-50"
-            title="Run AI enrichment on selected leads"
+            title="Re-score selected leads with AI"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            Enrich
+            <BrainCircuit className="w-3.5 h-3.5" />
+            Rescore with AI
           </button>
 
           {/* Nurture Campaign enroll */}

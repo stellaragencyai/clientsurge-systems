@@ -10,7 +10,7 @@ import {
 } from "recharts";
 import {
   RefreshCw, TrendingUp, Target, Star, AlertTriangle,
-  ArrowUpRight, ArrowDownRight, Minus, Filter,
+  ArrowUpRight, ArrowDownRight, Minus, Filter, MessageSquare,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -21,16 +21,6 @@ const SOURCE_COLORS = [
   "#f59e0b", "#ef4444", "#06b6d4", "#ec4899", "#6366f1",
 ];
 
-const STATUS_COLORS = {
-  New: "bg-blue-100 text-blue-700",
-  Contacted: "bg-purple-100 text-purple-700",
-  Replied: "bg-indigo-100 text-indigo-700",
-  Qualified: "bg-green-100 text-green-700",
-  "Booking Prompt Sent": "bg-amber-100 text-amber-700",
-  Booked: "bg-emerald-100 text-emerald-700",
-  Closed: "bg-gray-100 text-gray-700",
-};
-
 function pct(num, den) {
   if (!den) return 0;
   return Math.round((num / den) * 100);
@@ -39,6 +29,16 @@ function pct(num, den) {
 function avg(arr) {
   if (!arr.length) return 0;
   return Math.round(arr.reduce((s, n) => s + n, 0) / arr.length);
+}
+
+function buildEventBuckets(events) {
+  return (events || []).reduce((acc, event) => {
+    const leadId = event.lead_id || event.context_id;
+    if (!leadId) return acc;
+    if (!acc[leadId]) acc[leadId] = [];
+    acc[leadId].push(event);
+    return acc;
+  }, {});
 }
 
 function PerformanceBadge({ rate, label }) {
@@ -117,6 +117,12 @@ function SourceRow({ source, data, rank, color, isSelected, onSelect }) {
             <span className="text-xs text-muted-foreground">
               Avg score <span className="font-bold text-foreground">{avgScore}</span>
             </span>
+            <span className="text-xs text-muted-foreground">
+              <span className="font-bold text-foreground">{data.communication_count}</span> touches
+            </span>
+            <span className="text-xs text-muted-foreground">
+              <span className="font-bold text-foreground">{data.reply_count}</span> replies
+            </span>
             {data.high_score_count > 0 && (
               <span className="text-xs text-amber-700 font-semibold">
                 ★ {data.high_score_count} high-score
@@ -163,6 +169,20 @@ function DrillDown({ source, data, color }) {
           { label: "Booked Rate",    value: `${bookedRate}%`,       color: "emerald" },
           { label: "Avg Lead Score", value: avgScore,               color: "amber" },
         ].map(k => (
+          <div key={k.label} className={`rounded-lg border border-border p-3 bg-${k.color}-50`}>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{k.label}</p>
+            <p className={`text-xl font-bold mt-1 text-${k.color}-700`}>{k.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: "Live Touches", value: data.communication_count, color: "blue" },
+          { label: "Outbound", value: data.outbound_count, color: "purple" },
+          { label: "Replies", value: data.reply_count, color: "green" },
+          { label: "Failures", value: data.failed_count, color: "amber" },
+        ].map((k) => (
           <div key={k.label} className={`rounded-lg border border-border p-3 bg-${k.color}-50`}>
             <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{k.label}</p>
             <p className={`text-xl font-bold mt-1 text-${k.color}-700`}>{k.value}</p>
@@ -219,6 +239,7 @@ function DrillDown({ source, data, color }) {
 
 export default function LeadSourceAttribution() {
   const [leads, setLeads] = useState([]);
+  const [eventsByLead, setEventsByLead] = useState({});
   const [loading, setLoading] = useState(true);
   const [selectedSource, setSelectedSource] = useState(null);
   const [sortBy, setSortBy] = useState("total"); // total | qualified | booked | score
@@ -228,8 +249,19 @@ export default function LeadSourceAttribution() {
   const loadLeads = async () => {
     setLoading(true);
     try {
-      const data = await base44.entities.Leads.list("-created_date", 2000);
-      setLeads(data || []);
+      const data = await base44.entities.Leads.list("-created_date", 1000);
+      const nextLeads = data || [];
+      const leadIds = nextLeads.map((lead) => lead.id).filter(Boolean);
+      const communicationEvents = leadIds.length
+        ? await base44.asServiceRole.entities.CommunicationEvent.filter(
+            { lead_id: { $in: leadIds } },
+            "-created_date",
+            2000
+          ).catch(() => [])
+        : [];
+
+      setLeads(nextLeads);
+      setEventsByLead(buildEventBuckets(communicationEvents));
     } finally {
       setLoading(false);
     }
@@ -243,9 +275,11 @@ export default function LeadSourceAttribution() {
       attribution[src] = {
         total: 0, qualified: 0, booked: 0, closed: 0,
         by_status: {}, scores: [], high_score_count: 0,
+        communication_count: 0, outbound_count: 0, reply_count: 0, failed_count: 0,
       };
     }
     const d = attribution[src];
+    const events = eventsByLead[lead.id] || [];
     d.total++;
     d.by_status[lead.status] = (d.by_status[lead.status] || 0) + 1;
     if (lead.lead_score != null) d.scores.push(lead.lead_score);
@@ -253,6 +287,11 @@ export default function LeadSourceAttribution() {
     if (["Qualified", "Booking Prompt Sent"].includes(lead.status)) d.qualified++;
     if (lead.status === "Booked") d.booked++;
     if (lead.status === "Closed") d.closed++;
+
+    d.communication_count += events.length;
+    d.outbound_count += events.filter((event) => event.direction === "outbound").length;
+    d.reply_count += events.filter((event) => event.direction === "inbound" || event.status === "received").length;
+    d.failed_count += events.filter((event) => event.status === "failed").length;
   }
 
   // Sort sources
@@ -274,6 +313,8 @@ export default function LeadSourceAttribution() {
 
   const totalLeads = leads.length;
   const totalSources = sortedSources.length;
+  const totalTouches = Object.values(attribution).reduce((sum, data) => sum + data.communication_count, 0);
+  const totalReplies = Object.values(attribution).reduce((sum, data) => sum + data.reply_count, 0);
   const topSource = sortedSources[0]?.[0] || "—";
   const bestConvSource = [...sortedSources]
     .filter(([, d]) => d.total >= 3)
@@ -284,9 +325,9 @@ export default function LeadSourceAttribution() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-foreground">Lead Source Attribution</h2>
+        <h2 className="text-2xl font-semibold text-foreground">Lead Source Attribution</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Which marketing channels drive the most qualified traffic — and which are underperforming.
+            Which marketing channels drive the most qualified traffic — with live CommunicationEvent touches and replies layered in by source.
           </p>
         </div>
         <button
@@ -304,8 +345,10 @@ export default function LeadSourceAttribution() {
         {[
           { icon: TrendingUp, label: "Total Leads",    value: totalLeads,   color: "blue"    },
           { icon: Filter,     label: "Sources",        value: totalSources, color: "purple"  },
-          { icon: Star,       label: "Top Volume",     value: topSource,    color: "amber"   },
+          { icon: MessageSquare, label: "Live Touches", value: totalTouches, color: "amber"   },
+          { icon: Star,       label: "Top Volume",     value: topSource,    color: "blue"   },
           { icon: Target,     label: "Best Conv.",     value: bestConvSource, color: "green" },
+          { icon: RefreshCw,  label: "Replies",        value: totalReplies, color: "emerald" },
         ].map(k => {
           const Icon = k.icon;
           return (

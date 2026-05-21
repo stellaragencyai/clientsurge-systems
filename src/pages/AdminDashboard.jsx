@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
-  Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw, Plus,
+  Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw,
   Server, RotateCcw, BookOpen, Wand2, Sparkles, Crosshair, Trophy,
   CalendarCheck2,
 } from 'lucide-react';
@@ -43,6 +43,7 @@ import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 import SniperDashboard from '../components/admin/SniperDashboard';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
+import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 
 const NAV_GROUPS = [
   {
@@ -102,13 +103,6 @@ const NAV_GROUPS = [
 ];
 
 const ALL_NAV = NAV_GROUPS.flatMap(g => g.items);
-
-// Top bar contextual actions per tab
-const TAB_ACTIONS = {
-  leads: [{ label: 'Import Leads', icon: Plus, action: 'import' }],
-  nurture: [{ label: 'Enroll Lead', icon: Plus, action: 'enroll' }],
-  revenue: [{ label: 'Refresh', icon: RefreshCw, action: 'refresh' }],
-};
 
 export default function AdminDashboard() {
   const { user, isLoadingAuth } = useAuth();
@@ -585,6 +579,8 @@ function OverviewDashboard({ onNavigate }) {
           </div>
         </div>
       </div>
+
+      <SessionTimeoutModal onLogout={handleLogout} logoutAfterMs={45 * 60 * 1000} />
     </div>
   );
 }

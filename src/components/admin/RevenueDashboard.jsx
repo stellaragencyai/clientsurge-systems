@@ -53,6 +53,8 @@ export default function RevenueDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [invoiceFilter, setInvoiceFilter] = useState("all");
+  const [runningWinBack, setRunningWinBack] = useState(false);
+  const [winBackMessage, setWinBackMessage] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -74,6 +76,21 @@ export default function RevenueDashboard() {
   };
 
   useEffect(() => { load(); }, []);
+
+  const triggerWinBackSequence = async () => {
+    setRunningWinBack(true);
+    setWinBackMessage("");
+    try {
+      const result = await base44.functions.invoke("runWinBackSequence", {});
+      const payload = result?.data || result || {};
+      setWinBackMessage(`Win-back run complete: ${payload.sent || 0} sent, ${payload.skipped || 0} skipped, ${payload.failed || 0} failed.`);
+      await load();
+    } catch (err) {
+      setWinBackMessage(err?.response?.data?.error || err?.message || "Failed to trigger win-back sequence.");
+    } finally {
+      setRunningWinBack(false);
+    }
+  };
 
   // Derived metrics
   const activeSubs = subs.filter(s => s.status === "active");
@@ -195,9 +212,29 @@ export default function RevenueDashboard() {
       {/* Failed subs */}
       {failedSubs.length > 0 && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-6">
-          <h3 className="font-semibold text-red-900 mb-4 flex items-center gap-2">
-            <AlertCircle className="h-4 w-4" /> Churn Risk — Failed / Past Due Subscriptions
-          </h3>
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h3 className="font-semibold text-red-900 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4" /> Churn Risk — Failed / Past Due Subscriptions
+              </h3>
+              <p className="mt-1 text-xs text-red-700">
+                Trigger the deployed win-back flow for churned clients whose sequence steps are currently due.
+              </p>
+            </div>
+            <button
+              onClick={triggerWinBackSequence}
+              disabled={runningWinBack}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-red-300 bg-white px-3 py-2 text-xs font-semibold text-red-800 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${runningWinBack ? "animate-spin" : ""}`} />
+              {runningWinBack ? "Running…" : "Run Win-Back Sequence"}
+            </button>
+          </div>
+          {winBackMessage && (
+            <div className="mb-4 rounded-lg border border-red-200 bg-white/80 px-3 py-2 text-xs text-red-800">
+              {winBackMessage}
+            </div>
+          )}
           <div className="space-y-2">
             {failedSubs.map(sub => (
               <div key={sub.id} className="flex items-center justify-between rounded-lg bg-white border border-red-200 px-4 py-3">

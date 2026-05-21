@@ -6,9 +6,9 @@ import { setPageMetadata } from "@/lib/seo";
  * 3 placeholder posts for organic SEO. Stubs only — no CMS needed yet.
  */
 const POSTS = [
-  { slug: "ai-automation-med-spas-phoenix", title: "How Phoenix Med Spas Are Filling Schedules with AI Automation", date: "May 2026", excerpt: "Med spas in Scottsdale and Phoenix are responding to every inquiry in under 60 seconds — without adding staff. Here's how.", tag: "Med Spa" },
-  { slug: "missed-call-text-back-local-business", title: "The $0 Fix That Recovers 40% of Missed Calls for Local Businesses", date: "April 2026", excerpt: "Every unanswered call is a potential customer gone. Missed call text-back changes that instantly — and it takes 10 minutes to set up.", tag: "Lead Capture" },
-  { slug: "ai-follow-up-dental-offices", title: "Dental Offices That Follow Up With AI Book 3x More New Patients", date: "April 2026", excerpt: "Most dental practices follow up with new patient leads once — then stop. AI follow-up sequences change the math completely.", tag: "Dental" },
+  { slug: "ai-automation-med-spas", title: "AI Automation for Med Spas", date: "May 2026", excerpt: "How med spas can respond faster, nurture every inquiry, and book more treatments without hiring another front-desk rep.", tag: "Med Spa" },
+  { slug: "missed-call-text-back-guide", title: "Missed Call Text-Back Guide", date: "May 2026", excerpt: "A practical guide to turning missed calls into booked conversations with fast automated follow-up.", tag: "Lead Capture" },
+  { slug: "how-ai-books-appointments", title: "How AI Books Appointments", date: "May 2026", excerpt: "A simple breakdown of the lead-response, follow-up, and scheduling automations that move prospects to booked appointments.", tag: "Automation" },
 ];
 
 export default function Blog() {

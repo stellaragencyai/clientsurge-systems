@@ -6,7 +6,7 @@ import {
   formatAutomatedBusinessesStat,
 } from "@/lib/socialProofStats";
 
-const fallbackStats = [
+const BASE_STATS = [
   "Under 60 sec lead response",
   "24-48 hr setup time",
   "100% done-for-you",
@@ -16,27 +16,20 @@ const fallbackStats = [
 
 export default function SocialProofTicker() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [automatedBusinessesStat, setAutomatedBusinessesStat] = useState(null);
-  const stats = automatedBusinessesStat ? [automatedBusinessesStat, ...fallbackStats] : fallbackStats;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % stats.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [stats.length]);
+  const [stats, setStats] = useState(BASE_STATS);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadOrderCount() {
       try {
-        const orders = await base44.entities.Order.filter({ payment_status: "paid" }, "-created_date", 200);
+        const orders = await base44.entities.Order.filter({ payment_status: "paid" }, "-created_date", 2000);
         if (!cancelled) {
-          setAutomatedBusinessesStat(formatAutomatedBusinessesStat(countAutomatedBusinesses(orders)));
+          const automatedBusinessesStat = formatAutomatedBusinessesStat(countAutomatedBusinesses(orders));
+          setStats([automatedBusinessesStat, ...BASE_STATS]);
         }
       } catch {
-        if (!cancelled) setAutomatedBusinessesStat(null);
+        if (!cancelled) setStats(BASE_STATS);
       }
     }
 
@@ -46,6 +39,13 @@ export default function SocialProofTicker() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % stats.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [stats.length]);
 
   return (
     <div

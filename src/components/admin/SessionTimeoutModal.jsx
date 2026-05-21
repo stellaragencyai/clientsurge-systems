@@ -1,22 +1,22 @@
 /**
  * SessionTimeoutModal.jsx — #75
- * Shows warning modal after 30min admin inactivity. Auto-logout at 35min.
+ * Shows warning modal after 30min admin inactivity. Auto-logout after the configured limit.
  */
 import { useEffect, useRef, useState } from "react";
 
 const WARNING_MS  = 30 * 60 * 1000; // 30 min
-const LOGOUT_MS   = 35 * 60 * 1000; // 35 min
+const DEFAULT_LOGOUT_MS = 45 * 60 * 1000; // 45 min
 
-export default function SessionTimeoutModal({ onLogout }) {
+export default function SessionTimeoutModal({ onLogout, logoutAfterMs = DEFAULT_LOGOUT_MS }) {
   const [visible, setVisible] = useState(false);
-  const [countdown, setCountdown] = useState(300); // 5 min to act
+  const [countdown, setCountdown] = useState(Math.max(0, Math.floor((logoutAfterMs - WARNING_MS) / 1000)));
   const warnTimer  = useRef(null);
   const logoutTimer = useRef(null);
   const countdownInterval = useRef(null);
 
   const resetTimers = () => {
     setVisible(false);
-    setCountdown(300);
+    setCountdown(Math.max(0, Math.floor((logoutAfterMs - WARNING_MS) / 1000)));
     clearTimeout(warnTimer.current);
     clearTimeout(logoutTimer.current);
     clearInterval(countdownInterval.current);
@@ -28,7 +28,7 @@ export default function SessionTimeoutModal({ onLogout }) {
 
     logoutTimer.current = setTimeout(() => {
       onLogout?.();
-    }, LOGOUT_MS);
+    }, logoutAfterMs);
   };
 
   useEffect(() => {
@@ -41,7 +41,7 @@ export default function SessionTimeoutModal({ onLogout }) {
       clearTimeout(logoutTimer.current);
       clearInterval(countdownInterval.current);
     };
-  }, []);
+  }, [logoutAfterMs, onLogout]);
 
   if (!visible) return null;
 

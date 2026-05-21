@@ -147,7 +147,7 @@ export default function AnalyticsDashboard() {
         avg_time_to_contact_hours: null,
         top_sources: []
       });
-    } catch (err) {
+    } catch {
       setError("Analytics data unavailable. Build is in progress.");
       setData({
         users: 0,
@@ -180,7 +180,7 @@ export default function AnalyticsDashboard() {
     );
   }
 
-  const { users, leads, last30Days, recent_activity, avg_time_to_contact_hours, top_sources, funnel } = data || {};
+  const { leads, revenue, last30Days, recent_activity, avg_time_to_contact_hours, top_sources } = data || {};
 
   const pipelineData = Object.entries(leads?.status_counts || {}).map(([name, value]) => ({
     name,
@@ -210,7 +210,7 @@ export default function AnalyticsDashboard() {
       </div>
 
       {/* ── KPI Row ──────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <MetricCard
           icon={TrendingUp}
           label="Leads This Month"
@@ -231,6 +231,13 @@ export default function AnalyticsDashboard() {
           value={avg_time_to_contact_hours != null ? `${avg_time_to_contact_hours} hrs` : "N/A"}
           sub="Create to first contact"
           color="amber"
+        />
+        <MetricCard
+          icon={Star}
+          label="MRR"
+          value={`$${Number(revenue?.mrr || 0).toLocaleString()}`}
+          sub={`${revenue?.paid_orders ?? 0} paid orders`}
+          color="emerald"
         />
         <MetricCard
           icon={Star}
