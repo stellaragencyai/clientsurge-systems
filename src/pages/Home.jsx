@@ -13,6 +13,7 @@ const SixAutomationSystems = lazy(() => import("../components/landing/SixAutomat
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const FAQ = lazy(() => import("../components/landing/FAQ"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
+const ProofBeforeLaunch = lazy(() => import("../components/landing/ProofBeforeLaunch"));
 const FounderSection = lazy(() => import("../components/landing/FounderSection"));
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
@@ -67,11 +68,11 @@ export default function Home() {
       cleanupMetadata = setPageMetadata({
         title: "AI Automation Systems for Local Leads | ClientSurge Systems",
         description:
-          "six done-for-you automations, AI-powered websites, voice agents, missed-call recovery, lead follow-up, and booking automation for local service businesses that want more booked jobs.",
+          "six done-for-you automations for local service businesses: lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation.",
         canonicalPath: "/",
         ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
         ogDescription:
-          "ClientSurge builds AI voice-agent, follow-up, missed-call recovery, and booking automation systems for local service businesses.",
+          "ClientSurge builds six done-for-you automations: lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation.",
       });
       cleanupOrg = setJsonLd("organization", getOrganizationSchema());
       cleanupBusiness = setJsonLd("local-business", getLocalBusinessSchema());
@@ -116,6 +117,11 @@ export default function Home() {
         <Suspense fallback={<SectionSkeleton />}>
           <MotionSection>
             <TrustBar />
+          </MotionSection>
+          <CinematicSectionDivider />
+          <SectionBreak />
+          <MotionSection>
+            <ProofBeforeLaunch />
           </MotionSection>
           <CinematicSectionDivider />
           <SectionBreak />

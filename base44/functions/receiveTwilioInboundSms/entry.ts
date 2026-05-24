@@ -263,6 +263,19 @@ Deno.serve(async (req) => {
     if (matchedLead) {
       console.log("[receiveTwilioInboundSms] Matched Leads record:", matchedLead.id, "| Agent:", matchedLead.assigned_agent_name);
 
+      let intentResult = null;
+      try {
+        intentResult = await base44.asServiceRole.functions.invoke("classifyLeadIntent", {
+          lead_id: matchedLead.id,
+          message_text: smsEvent.body,
+        });
+        console.log(
+          `[receiveTwilioInboundSms] Intent classified | Legacy: ${intentResult?.intent} | Canonical: ${intentResult?.canonical_intent}`
+        );
+      } catch (intentErr) {
+        console.error("[receiveTwilioInboundSms] classifyLeadIntent failed:", intentErr.message);
+      }
+
       // Generate industry-aware AI reply
       try {
         const replyResult = await base44.asServiceRole.functions.invoke('industryAwareReply', {
@@ -282,7 +295,10 @@ Deno.serve(async (req) => {
         }
 
         // If booking intent detected, also send booking link
-        if (replyResult?.action === 'send_booking_link') {
+        if (
+          replyResult?.action === 'send_booking_link' ||
+          intentResult?.should_send_booking_link
+        ) {
           const bookingLink = Deno.env.get('DEFAULT_BOOKING_LINK');
           if (bookingLink) {
             await base44.asServiceRole.functions.invoke('sendSMS', {

@@ -69,14 +69,28 @@ export default function AdminSettings() {
   const handleTestProvider = async (providerType) => {
     setTestingProvider(providerType);
     try {
+      const provider = providerType === "email" ? "resend" : providerType;
       const result = await base44.functions.invoke("testProviderConnections", {
-        provider_type: providerType,
+        provider,
       });
-      setTestResults(result.data.results);
+      const payload = result?.data || result || {};
+      const resultKey = providerType === "email" ? "email" : providerType;
+      setTestResults((prev) => ({
+        ...(prev || {}),
+        [resultKey]: {
+          status: payload.success ? "Connected" : "Failed",
+          message: payload.message || payload.error || "Unknown result",
+        },
+      }));
     } catch (err) {
-      setTestResults({
-        error: err.message,
-      });
+      const resultKey = providerType === "email" ? "email" : providerType;
+      setTestResults((prev) => ({
+        ...(prev || {}),
+        [resultKey]: {
+          status: "Failed",
+          message: err.message,
+        },
+      }));
     }
     setTestingProvider(null);
   };
