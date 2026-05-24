@@ -12,10 +12,59 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+const REQUIRED_FIELDS_BY_TIER = {
+  starter: [
+    ["brand.business_name", "Business name is required for setup."],
+    ["shared.twilio_business_phone", "Business phone is required for Twilio SMS setup."],
+    ["messaging.booking_link", "Booking link is required for appointment automation."],
+  ],
+  growth: [
+    ["brand.business_name", "Business name is required for setup."],
+    ["shared.twilio_business_phone", "Business phone is required for Twilio SMS setup."],
+    ["messaging.booking_link", "Booking link is required for appointment automation."],
+    ["brand.google_business_url", "Google Business Profile URL is required for Growth setup."],
+    ["brand.website", "Existing website URL is required for Growth setup."],
+    ["integrations.crm_system", "Marketing platform or CRM is required for Growth setup."],
+  ],
+  elite: [
+    ["brand.business_name", "Business name is required for setup."],
+    ["shared.twilio_business_phone", "Business phone is required for Twilio SMS setup."],
+    ["messaging.booking_link", "Booking link is required for appointment automation."],
+    ["brand.google_business_url", "Google Business Profile URL is required for Elite setup."],
+    ["brand.website", "Existing website URL is required for Elite setup."],
+    ["integrations.crm_system", "Marketing platform or CRM is required for Elite setup."],
+    ["brand.logo_url", "Logo upload is required for Elite website build."],
+    ["brand.primary_color", "Primary brand color is required for Elite website build."],
+    ["brand.secondary_color", "Secondary brand color is required for Elite website build."],
+    ["brand.brand_voice", "AI tone is required for Elite automation copy."],
+  ],
+};
+
+function getPathValue(source, path) {
+  return path.split(".").reduce((value, key) => value?.[key], source);
+}
+
+function normalizeTier(order) {
+  const raw = String(order.package_key || order.package_type || order.plan_type || "starter").toLowerCase();
+  if (raw.includes("elite") || raw.includes("pro")) return "elite";
+  if (raw.includes("growth")) return "growth";
+  return "starter";
+}
+
+function validateInstallConfiguration(config, tier) {
+  const rules = REQUIRED_FIELDS_BY_TIER[tier] || REQUIRED_FIELDS_BY_TIER.starter;
+  return rules
+    .filter(([path]) => {
+      const value = getPathValue(config, path);
+      return value === undefined || value === null || String(value).trim() === "";
+    })
+    .map(([field, message]) => ({ field, message }));
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { order_id, install_configuration } = await req.json();
+    const { order_id, install_configuration, admin_bypass = false } = await req.json();
 
     if (!order_id) {
       return Response.json({ error: "order_id required" }, { status: 400 });
@@ -29,8 +78,38 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Order not found" }, { status: 404 });
     }
 
+    let user = null;
+    try {
+      user = await base44.auth.me();
+    } catch (_) {}
+
+    const tier = normalizeTier(order);
+    const normalizedConfiguration = {
+      ...install_configuration,
+      shared: {
+        ...(install_configuration.shared || {}),
+        twilio_business_phone:
+          install_configuration.shared?.twilio_business_phone ||
+          install_configuration.business_phone ||
+          install_configuration.brand?.business_phone ||
+          order.customer_phone ||
+          "",
+      },
+    };
+
+    if (admin_bypass && user?.role !== "admin") {
+      return Response.json({ error: "admin_bypass requires admin role" }, { status: 403 });
+    }
+
+    if (!admin_bypass) {
+      const validationErrors = validateInstallConfiguration(normalizedConfiguration, tier);
+      if (validationErrors.length > 0) {
+        return Response.json({ errors: validationErrors, tier }, { status: 400 });
+      }
+    }
+
     await base44.asServiceRole.entities.Order.update(order_id, {
-      install_configuration,
+      install_configuration: normalizedConfiguration,
       install_configuration_updated_at: new Date().toISOString(),
     });
     console.log(`[saveClientCredentials] install_configuration saved for order ${order_id}`);

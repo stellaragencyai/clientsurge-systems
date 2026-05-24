@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   ArrowLeft, ArrowRight, Loader2, CheckCircle2,
@@ -15,6 +15,67 @@ const STEPS = [
   { id: "connection",   icon: Plug,           title: "Connection Check",    desc: "Verify your integrations are live" },
   { id: "review",       icon: Rocket,         title: "Review & Submit",     desc: "Confirm everything looks good" },
 ];
+
+function isValidGoogleBusinessUrl(value = "") {
+  if (!value.trim()) return true;
+  try {
+    const url = new URL(value);
+    const host = url.hostname.replace(/^www\./, "");
+    return host === "g.page" || (host === "google.com" && url.pathname.startsWith("/maps"));
+  } catch {
+    return false;
+  }
+}
+
+function buildInitialCredentialsData(order) {
+  return {
+    // Business
+    business_name: order?.business_name || "",
+    industry: "",
+    contact_name: order?.customer_name || "",
+    business_phone: order?.customer_phone || "",
+    business_email: order?.customer_email || "",
+    website: "",
+    address: "",
+    brand_voice: "",
+    business_hours: "",
+    // Brand
+    logo_url: "",
+    primary_color: "#00AEEF",
+    secondary_color: "#003B8F",
+    tagline: "",
+    google_business_url: "",
+    // Messaging
+    twilio_business_phone: "",
+    booking_link: "",
+    lead_notification_email: order?.customer_email || "",
+    requires_consultation: "",
+    after_hours_behavior: "",
+    customer_questions: "",
+    // Integrations
+    facebook_page_id: "",
+    google_ads_id: "",
+    other_lead_sources: "",
+    crm_system: "",
+    crm_api_key: "",
+    google_review_link: "",
+    other_review_link: "",
+    special_notes: "",
+  };
+}
+
+function readSessionDraft(storageKey, fallback) {
+  if (!storageKey || typeof window === "undefined") return { currentStep: 0, data: fallback };
+  try {
+    const parsed = JSON.parse(window.sessionStorage.getItem(storageKey) || "{}");
+    return {
+      currentStep: Number.isInteger(parsed.currentStep) ? parsed.currentStep : 0,
+      data: parsed.data && typeof parsed.data === "object" ? { ...fallback, ...parsed.data } : fallback,
+    };
+  } catch {
+    return { currentStep: 0, data: fallback };
+  }
+}
 
 // ── Reusable field components ────────────────────────────────────────────────
 function Field({ label, hint, children, required }) {
@@ -156,7 +217,7 @@ function BrandStep({ data, onChange, onLogoUpload, logoUploading }) {
             {logoUploading ? (
               <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
             ) : data.logo_url ? (
-              <img src={data.logo_url} alt="Logo" className="w-full h-full object-contain rounded-xl p-2" />
+              <img src={data.logo_url} alt="Logo" width="128" height="128" className="w-full h-full object-contain rounded-xl p-2" />
             ) : (
               <>
                 <div className="text-2xl">🖼️</div>
@@ -265,7 +326,7 @@ function MessagingStep({ data, onChange }) {
 function IntegrationsStep({ data, onChange }) {
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
         <strong>Optional:</strong> Fill in whatever applies to your business. If you're not sure, leave it blank — our team will follow up.
       </div>
 
@@ -395,22 +456,27 @@ function ReviewStep({ data, order }) {
 // ── Progress bar ─────────────────────────────────────────────────────────────
 function StepIndicator({ steps, currentStep }) {
   return (
-    <div className="flex items-center gap-0">
+    <div className="flex items-start justify-center gap-0">
       {steps.map((step, i) => {
         const done = i < currentStep;
         const active = i === currentStep;
         return (
-          <div key={step.id} className="flex items-center">
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                done ? "bg-green-500 text-white" : active ? "text-white" : "bg-muted text-muted-foreground"
-              }`}
-              style={active ? { background: "linear-gradient(135deg,#00AEEF,#003B8F)" } : {}}
-            >
-              {done ? "✓" : i + 1}
+          <div key={step.id} className="flex items-start">
+            <div className="flex w-20 flex-col items-center gap-2">
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                  done ? "bg-green-500 text-white" : active ? "text-white" : "bg-muted text-muted-foreground"
+                }`}
+                style={active ? { background: "linear-gradient(135deg,#00AEEF,#003B8F)" } : {}}
+              >
+                {done ? "✓" : i + 1}
+              </div>
+              <span className={`hidden sm:block text-center text-[10px] leading-tight ${active ? "text-primary font-semibold" : "text-muted-foreground"}`}>
+                Step {i + 1}: {step.title}
+              </span>
             </div>
             {i < steps.length - 1 && (
-              <div className={`h-0.5 w-8 sm:w-12 transition-all ${done ? "bg-green-400" : "bg-border"}`} />
+              <div className={`mt-4 h-0.5 w-3 sm:w-8 transition-all ${done ? "bg-green-400" : "bg-border"}`} />
             )}
           </div>
         );
@@ -429,45 +495,24 @@ export default function CredentialsWizard({ order, onComplete }) {
     ? "growth"
     : "starter";
 
-  const [currentStep, setCurrentStep] = useState(0);
+  const storageKey = useMemo(
+    () => (order?.id ? `clientsurge:elite-intake:${order.id}` : null),
+    [order?.id]
+  );
+  const initialData = useMemo(() => buildInitialCredentialsData(order), [order]);
+  const initialDraft = useMemo(() => readSessionDraft(storageKey, initialData), [storageKey, initialData]);
+
+  const [currentStep, setCurrentStep] = useState(initialDraft.currentStep);
   const [saving, setSaving] = useState(false);
   const [logoUploading, setLogoUploading] = useState(false);
   const [error, setError] = useState("");
 
-  const [data, setData] = useState({
-    // Business
-    business_name: order?.business_name || "",
-    industry: "",
-    contact_name: order?.customer_name || "",
-    business_phone: order?.customer_phone || "",
-    business_email: order?.customer_email || "",
-    website: "",
-    address: "",
-    brand_voice: "",
-    business_hours: "",
-    // Brand
-    logo_url: "",
-    primary_color: "#00AEEF",
-    secondary_color: "#003B8F",
-    tagline: "",
-    google_business_url: "",
-    // Messaging
-    twilio_business_phone: "",
-    booking_link: "",
-    lead_notification_email: order?.customer_email || "",
-    requires_consultation: "",
-    after_hours_behavior: "",
-    customer_questions: "",
-    // Integrations
-    facebook_page_id: "",
-    google_ads_id: "",
-    other_lead_sources: "",
-    crm_system: "",
-    crm_api_key: "",
-    google_review_link: "",
-    other_review_link: "",
-    special_notes: "",
-  });
+  const [data, setData] = useState(initialDraft.data);
+
+  useEffect(() => {
+    if (!storageKey || typeof window === "undefined") return;
+    window.sessionStorage.setItem(storageKey, JSON.stringify({ currentStep, data }));
+  }, [storageKey, currentStep, data]);
 
   const onChange = (field, value) => setData(prev => ({ ...prev, [field]: value }));
 
@@ -503,6 +548,9 @@ export default function CredentialsWizard({ order, onComplete }) {
       if (!data.booking_link.trim()) return "Booking link is required.";
       if (!data.lead_notification_email.trim()) return "Lead notification email is required.";
     }
+    if (step.id === "brand" && !isValidGoogleBusinessUrl(data.google_business_url)) {
+      return "Google Business Profile URL must be a google.com/maps or g.page link.";
+    }
     return null;
   };
 
@@ -524,7 +572,7 @@ export default function CredentialsWizard({ order, onComplete }) {
     try {
       const installConfig = {
         shared: {
-          twilio_business_phone: data.twilio_business_phone,
+          twilio_business_phone: data.twilio_business_phone || data.business_phone,
           business_hours: data.business_hours,
           after_hours_behavior: data.after_hours_behavior === "Hold until we open"
             ? "hold_until_open"
@@ -571,6 +619,9 @@ export default function CredentialsWizard({ order, onComplete }) {
 
       // #408d — Advance workflow_stage to "Ready for Install" via saveClientCredentials response
       // saveClientCredentials already handles this internally — confirmed in backend function
+      if (storageKey && typeof window !== "undefined") {
+        window.sessionStorage.removeItem(storageKey);
+      }
       onComplete?.();
     } catch (err) {
       setError("Failed to save your information. Please try again.");
@@ -596,6 +647,8 @@ export default function CredentialsWizard({ order, onComplete }) {
         <img
           src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
           alt="ClientSurge"
+          width="220"
+          height="80"
           style={{ height: 50, objectFit: "contain", mixBlendMode: "luminosity", opacity: 0.85 }}
         />
       </div>
@@ -605,7 +658,7 @@ export default function CredentialsWizard({ order, onComplete }) {
         <div
           className="h-full transition-all duration-500"
           style={{
-            width: `${((currentStep + 1) / STEPS.length) * 100}%`,
+            width: `${((currentStep + 1) / ACTIVE_STEPS.length) * 100}%`,
             background: "linear-gradient(90deg,#00AEEF,#003B8F)",
           }}
         />
@@ -615,7 +668,7 @@ export default function CredentialsWizard({ order, onComplete }) {
       <div className="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
         {/* Step indicator */}
         <div className="flex items-center justify-center mb-8">
-          <StepIndicator steps={STEPS} currentStep={currentStep} />
+          <StepIndicator steps={ACTIVE_STEPS} currentStep={currentStep} />
         </div>
 
         {/* Step header */}
@@ -628,7 +681,7 @@ export default function CredentialsWizard({ order, onComplete }) {
             <p className="text-sm text-muted-foreground">{step.desc}</p>
           </div>
           <span className="ml-auto text-xs text-muted-foreground">
-            Step {currentStep + 1} of {STEPS.length}
+            Step {currentStep + 1} of {ACTIVE_STEPS.length}
           </span>
         </div>
 

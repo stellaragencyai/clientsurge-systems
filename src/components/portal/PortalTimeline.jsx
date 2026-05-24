@@ -21,7 +21,7 @@ const EVENT_TYPE_LABELS = {
   email_sent:        { label: "Email Sent",          icon: Mail,          color: "#8b5cf6" },
   email_failed:      { label: "Email Failed",        icon: AlertCircle,   color: "#ef4444" },
   order_paid:        { label: "Payment Received",    icon: CheckCircle2,  color: "#22c55e" },
-  install_initialized: { label: "Setup Started",    icon: Zap,           color: "#f59e0b" },
+  install_initialized: { label: "Setup Started",    icon: Zap,           color: "#00AEEF" },
   service_status_changed: { label: "Status Updated", icon: Zap,          color: "#0ea5e9" },
   status_update:     { label: "Status Updated",      icon: Zap,           color: "#0ea5e9" },
   lead_created:      { label: "New Lead Captured",   icon: CheckCircle2,  color: "#22c55e" },
@@ -136,18 +136,18 @@ function UpcomingTaskRow({ service }) {
   return (
     <div style={{
       display: "flex", alignItems: "center", gap: "10px", padding: "10px 14px",
-      borderRadius: "10px", background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)",
+      borderRadius: "10px", background: "rgba(0,174,239,0.06)", border: "1px solid rgba(0,174,239,0.2)",
       marginBottom: "8px",
     }}>
       <div style={{
         width: "28px", height: "28px", borderRadius: "50%", flexShrink: 0,
-        background: "rgba(245,158,11,0.15)", border: "1px solid rgba(245,158,11,0.3)",
+        background: "rgba(0,174,239,0.15)", border: "1px solid rgba(0,174,239,0.3)",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>
-        <Clock style={{ width: "13px", height: "13px", color: "#d97706" }} />
+        <Clock style={{ width: "13px", height: "13px", color: "#0077B6" }} />
       </div>
       <div>
-        <p style={{ fontSize: "12px", fontWeight: "700", color: "#92400e", margin: 0 }}>
+        <p style={{ fontSize: "12px", fontWeight: "700", color: "#005B99", margin: 0 }}>
           Up Next: {nextStage.label}
         </p>
         <p style={{ fontSize: "11px", color: "rgba(0,0,0,0.45)", margin: 0 }}>
@@ -297,7 +297,7 @@ export default function PortalTimeline({ order, project }) {
           border: "1px solid rgba(0,0,0,0.08)", padding: "24px",
           boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
         }}>
-          <p style={{ fontSize: "10px", fontWeight: "800", color: "#d97706", textTransform: "uppercase", letterSpacing: "0.15em", margin: "0 0 14px" }}>
+          <p style={{ fontSize: "10px", fontWeight: "800", color: "#0077B6", textTransform: "uppercase", letterSpacing: "0.15em", margin: "0 0 14px" }}>
             What Happens Next
           </p>
           {services.map((svc, i) => <UpcomingTaskRow key={i} service={svc} />)}
@@ -310,12 +310,12 @@ export default function PortalTimeline({ order, project }) {
         border: "1px solid rgba(0,0,0,0.08)", padding: "24px",
         boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
       }}>
-        <p style={{ fontSize: "10px", fontWeight: "800", color: "#9a5c2e", textTransform: "uppercase", letterSpacing: "0.15em", margin: "0 0 14px" }}>
+        <p style={{ fontSize: "10px", fontWeight: "800", color: "#0077B6", textTransform: "uppercase", letterSpacing: "0.15em", margin: "0 0 14px" }}>
           Activity Log
         </p>
         {loadingEvents ? (
           <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "16px 0" }}>
-            <Loader2 style={{ width: "14px", height: "14px", color: "#9a5c2e", animation: "spin 1s linear infinite" }} />
+            <Loader2 style={{ width: "14px", height: "14px", color: "#0077B6", animation: "spin 1s linear infinite" }} />
             <span style={{ fontSize: "12px", color: "rgba(0,0,0,0.4)" }}>Loading activity…</span>
           </div>
         ) : events.length === 0 ? (

@@ -19,7 +19,7 @@ function hasPattern(content, pattern) {
 }
 
 function extractSitemapPaths(sitemap = "") {
-  const matches = [...sitemap.matchAll(/<loc>https:\/\/clientsurgesystems\.com([^<]*)<\/loc>/g)];
+  const matches = [...sitemap.matchAll(/<loc>https:\/\/(?:www\.)?clientsurgesystems\.com([^<]*)<\/loc>/g)];
   return matches.map((match) => match[1] || "/");
 }
 
@@ -84,9 +84,9 @@ export function buildSeoConversionAudit(files = {}) {
       category: "technical_seo",
       severity: "high",
       passed:
-        hasPattern(robots, /Sitemap:\s*https:\/\/clientsurgesystems\.com\/sitemap\.xml/) &&
+        hasPattern(robots, /Sitemap:\s*https:\/\/(?:www\.)?clientsurgesystems\.com\/sitemap\.xml/) &&
         hasPattern(robots, /Disallow:\s*\/admin/) &&
-        hasPattern(app, /NOINDEX_PREFIXES/),
+        hasPattern(app, /shouldNoindexRoute|NOINDEX_PREFIXES/),
       title: "Robots and noindex protections cover internal surfaces",
       evidence: "Checks robots.txt and App.jsx noindex guard.",
       recommendation: "Keep admin, setup, portal, dashboard, and internal lead routes out of search indexes.",

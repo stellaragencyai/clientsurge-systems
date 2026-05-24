@@ -1,4 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { requireAdminUser } from "../_shared/authGuards.js";
+import { createAuditLog } from "../shared/auditLog.ts";
 
 Deno.serve(async (req) => {
   try {
@@ -7,10 +9,7 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    if (!user || user.role !== "admin") {
-      return Response.json({ error: "Admin access required" }, { status: 403 });
-    }
+    const user = await requireAdminUser(base44);
 
     const payload = await req.json();
     const { order_id, shared, services } = payload || {};
@@ -47,6 +46,15 @@ Deno.serve(async (req) => {
       install_configuration_updated_at: new Date().toISOString(),
     });
 
+    await createAuditLog(base44, {
+      admin_email: user.email,
+      action: "update_install_configuration",
+      entity_name: "Order",
+      record_id: order_id,
+      before: { install_configuration: existing },
+      after: { install_configuration: updatedConfig },
+    });
+
     return Response.json({
       success: true,
       order: {
@@ -61,10 +69,15 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to update install configuration";
-    const status =
-      message === "Admin access required" ? 403 :
-      message === "Order not found" ? 404 :
-      message === "order_id is required" ? 400 : 500;
-    return Response.json({ error: message }, { status });
+    const status = error.status ||
+      (message === "Order not found" ? 404 :
+      message === "order_id is required" ? 400 : 500);
+    return Response.json(
+      {
+        error: message,
+        code: error.code || "update_install_configuration_error",
+      },
+      { status }
+    );
   }
 });

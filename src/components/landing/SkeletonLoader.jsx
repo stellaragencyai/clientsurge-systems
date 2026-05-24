@@ -1,6 +1,6 @@
 export function SectionSkeleton({ height = "400px" }) {
   return (
-    <div style={{ height }} className="bg-gradient-to-r from-muted via-card to-muted animate-pulse rounded-xl" />
+    <div style={{ minHeight: height }} className="bg-gradient-to-r from-muted via-card to-muted animate-pulse rounded-xl" />
   );
 }
 

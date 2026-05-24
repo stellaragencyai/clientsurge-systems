@@ -73,7 +73,7 @@ export default function DeploymentSummaryPanel({
       </div>
 
       {hasUnsavedConfigChanges ? (
-        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
           Save install configuration before running the assisted setup sequence.
         </div>
       ) : null}
@@ -122,7 +122,7 @@ export default function DeploymentSummaryPanel({
           ) : (
             <div className="mt-3 space-y-2">
               {(summary.will_remain_manual || summary.services_requiring_manual_input || []).map((item, index) => (
-                <div key={`${item.field || item.service_key || "manual"}:${index}`} className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-900">
+                <div key={`${item.field || item.service_key || "manual"}:${index}`} className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-3 text-xs text-blue-900">
                   <p className="font-semibold">{item.service_display_name ? `${item.service_display_name}: ${item.label || item.display_name}` : item.label || item.display_name || "Manual input required"}</p>
                   <p className="mt-1">{item.reason || item.detail || "Operator review is still required."}</p>
                 </div>

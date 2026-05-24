@@ -50,7 +50,7 @@ export default function ExpectationsChecklist() {
       </div>
 
       {/* Timeline */}
-      <div className="mt-6 rounded-2xl p-6" style={{ background: 'rgba(154,92,46,0.06)', border: '1px solid rgba(154,92,46,0.15)' }}>
+      <div className="mt-6 rounded-2xl p-6" style={{ background: 'rgba(0,136,204,0.06)', border: '1px solid rgba(0,136,204,0.15)' }}>
         <h4 className="font-semibold text-foreground text-sm mb-4">Typical Timeline</h4>
         <div className="space-y-3">
           <div className="flex gap-4">

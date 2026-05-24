@@ -23,73 +23,66 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-
-const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
-const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
-const TWILIO_FROM_NUMBER = Deno.env.get("TWILIO_PHONE_NUMBER");
-const TWILIO_API_URL = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 // ─────────────────────────────────────────────────────────
 // TWILIO SMS SENDER
 // ─────────────────────────────────────────────────────────
-async function sendTwilioSms(toNumber, messageBody) {
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_FROM_NUMBER) {
-    throw new Error("Twilio credentials missing");
-  }
-
-  const auth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
-  const response = await fetch(TWILIO_API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      From: TWILIO_FROM_NUMBER,
-      To: toNumber,
-      Body: messageBody,
-    }).toString(),
+async function sendTwilioSms(base44, toNumber, messageBody, context) {
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "sms",
+    provider: "twilio",
+    recipient: toNumber,
+    body: messageBody,
+    source: "sendReviewRequest",
+    sourceRecordId: context.source_record_id,
+    templateKey: "review_request_sms",
+    messageType: "marketing",
+    consentBasis: context.sms_consent_basis || "review_request_consent",
+    consentSnapshot: context.consent_snapshot,
+    enforceQuietHours: true,
+    metadata: context,
+    providerSend: (providerPayload) => sendTwilioSmsProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
   });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Twilio error: ${response.status} - ${error}`);
-  }
-
-  const data = await response.json();
-  return data.sid;
+  if (!result.success) throw new Error(result.reason || result.error || "Review SMS was not sent");
+  return result.provider_message_id;
 }
 
 // ─────────────────────────────────────────────────────────
 // RESEND EMAIL SENDER
 // ─────────────────────────────────────────────────────────
-async function sendResendEmail(to, subject, body, fromEmail) {
-  if (!RESEND_API_KEY) {
-    throw new Error("Resend API key missing");
-  }
-
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurge.com",
-      to,
-      subject,
-      text: body,
+async function sendResendEmail(base44, to, subject, body, fromEmail, context) {
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: to,
+    subject,
+    body,
+    from: fromEmail,
+    source: "sendReviewRequest",
+    sourceRecordId: context.source_record_id,
+    templateKey: "review_request_email",
+    messageType: "marketing",
+    consentBasis: "review_request_consent",
+    metadata: context,
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
     }),
   });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(`Resend error: ${error?.message || response.status}`);
-  }
-
-  const data = await response.json();
-  return data.id;
+  if (!result.success) throw new Error(result.reason || result.error || "Review email was not sent");
+  return result.provider_message_id;
 }
 
 // ─────────────────────────────────────────────────────────
@@ -239,27 +232,16 @@ ${business_name} Team`;
 
     if (preferred_channel === "sms" || preferred_channel === "both") {
       try {
-        smsId = await sendTwilioSms(customer_phone, smsBody);
+        smsId = await sendTwilioSms(base44, customer_phone, smsBody, {
+          source_record_id: `${customer_phone || customer_email}:${google_review_link}`,
+          customer_name,
+          business_name,
+          google_review_link,
+          yelp_review_link,
+          consent_snapshot: { consent_given: true, consent_source: "review_request_trigger" },
+        });
         smsSent = true;
         console.log(`[SendReviewRequest] SMS sent to ${customer_phone} (SID: ${smsId})`);
-
-        await base44.asServiceRole.entities.CommunicationEvent.create({
-          channel: "sms",
-          direction: "outbound",
-          event_type: "review_request",
-          provider: "twilio",
-          status: "sent",
-          subject: customer_phone,
-          message_body: smsBody,
-          provider_message_id: smsId,
-          metadata_json: JSON.stringify({
-            customer_name,
-            business_name,
-            google_review_link,
-            yelp_review_link,
-            timestamp: now,
-          }),
-        });
       } catch (err) {
         smsError = err.message;
         console.error(`[SendReviewRequest] SMS send failed: ${err.message}`);
@@ -296,32 +278,23 @@ ${business_name} Team`;
     if (preferred_channel === "email" || preferred_channel === "both") {
       try {
         emailId = await sendResendEmail(
+          base44,
           customer_email,
           emailSubject,
           emailBody,
-          fromEmail
-        );
-        emailSent = true;
-        console.log(`[SendReviewRequest] Email sent to ${customer_email} (ID: ${emailId})`);
-
-        await base44.asServiceRole.entities.CommunicationEvent.create({
-          channel: "email",
-          direction: "outbound",
-          event_type: "review_request",
-          provider: "resend",
-          status: "sent",
-          subject: emailSubject,
-          message_body: emailBody,
-          provider_message_id: emailId,
-          metadata_json: JSON.stringify({
+          fromEmail,
+          {
+            source_record_id: `${customer_email || customer_phone}:${google_review_link}`,
             customer_name,
             customer_email,
             business_name,
             google_review_link,
             yelp_review_link,
             timestamp: now,
-          }),
-        });
+          }
+        );
+        emailSent = true;
+        console.log(`[SendReviewRequest] Email sent to ${customer_email} (ID: ${emailId})`);
       } catch (err) {
         emailError = err.message;
         console.error(`[SendReviewRequest] Email send failed: ${err.message}`);

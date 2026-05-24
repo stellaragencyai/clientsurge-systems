@@ -18,7 +18,7 @@ const SERVICE_DEFINITIONS = {
       { id: "twilio_phone", section: "Twilio", label: "TWILIO_PHONE_NUMBER secret set (E.164 format)" },
       { id: "resend_key", section: "Resend", label: "RESEND_API_KEY secret set" },
       { id: "resend_from", section: "Resend", label: "RESEND_FROM_EMAIL secret set (verified domain)" },
-      { id: "lead_form", section: "Lead Form", label: "Lead capture form submits to /leads/capture or createLeadAndDispatch" },
+      { id: "lead_form", section: "Lead Form", label: "Lead capture form submits to /leads/capture or submitLeadCapture" },
       { id: "sms_template", section: "Configuration", label: "SMS template configured in Admin Settings" },
       { id: "webhook_automation", section: "Configuration", label: "Entity automation on WebsiteLead create → sendInstantLeadResponseSms" },
       { id: "test_lead", section: "Test", label: "Test lead submitted with real phone number" },
@@ -122,15 +122,15 @@ const STATUS_CONFIG = {
   in_progress: { label: "In Progress", color: "bg-blue-100 text-blue-700", icon: RefreshCw },
   active: { label: "Active", color: "bg-green-100 text-green-700", icon: CheckCircle2 },
   failed: { label: "Failed", color: "bg-red-100 text-red-700", icon: XCircle },
-  paused: { label: "Paused", color: "bg-yellow-100 text-yellow-700", icon: PauseCircle },
+  paused: { label: "Paused", color: "bg-sky-100 text-sky-700", icon: PauseCircle },
 };
 
 const SECTION_COLORS = {
   Twilio: "text-blue-700 bg-blue-50",
   Resend: "text-purple-700 bg-purple-50",
   Booking: "text-green-700 bg-green-50",
-  "Review Links": "text-yellow-700 bg-yellow-50",
-  "Lead Form": "text-orange-700 bg-orange-50",
+  "Review Links": "text-sky-700 bg-sky-50",
+  "Lead Form": "text-sky-700 bg-sky-50",
   Configuration: "text-slate-700 bg-slate-100",
   Data: "text-teal-700 bg-teal-50",
   Test: "text-indigo-700 bg-indigo-50",
@@ -449,7 +449,7 @@ function ChecklistCard({ checklist, onUpdate, onDelete }) {
             <button
               onClick={() => setStatus("paused")}
               disabled={checklist.status === "paused"}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-yellow-50 text-yellow-700 text-xs font-semibold border border-yellow-200 hover:bg-yellow-100 transition-colors disabled:opacity-40"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-50 text-sky-700 text-xs font-semibold border border-sky-200 hover:bg-sky-100 transition-colors disabled:opacity-40"
             >
               <PauseCircle className="w-3 h-3" /> Pause
             </button>

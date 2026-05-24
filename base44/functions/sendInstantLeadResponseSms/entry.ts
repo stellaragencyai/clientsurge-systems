@@ -4,12 +4,11 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-
-const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
-const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
-const TWILIO_FROM_NUMBER = Deno.env.get("TWILIO_PHONE_NUMBER");
-
-const TWILIO_API_URL = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 // Default SMS template if none provided in config
 const DEFAULT_SMS_TEMPLATE = "Hi {first_name}, thanks for reaching out! We received your message about {service_interest}. A member of our team will be in touch shortly.";
@@ -19,42 +18,6 @@ function formatSmsTemplate(template, lead) {
     .replace("{first_name}", lead.first_name || lead.full_name.split(" ")[0] || "there")
     .replace("{service_interest}", lead.service_interest || "your inquiry")
     .replace("{business_name}", lead.business_name || "your business");
-}
-
-async function sendTwilioSms(toNumber, messageBody) {
-  const auth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
-  const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
-  if (!statusCallbackUrl) {
-    console.warn("[Twilio] TWILIO_SMS_STATUS_CALLBACK_URL not set — delivery tracking disabled");
-  }
-
-  console.log(`[Twilio] Sending SMS to ${toNumber} from ${TWILIO_FROM_NUMBER}`);
-
-  const params = {
-    From: TWILIO_FROM_NUMBER,
-    To: toNumber,
-    Body: messageBody,
-  };
-  if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
-
-  const response = await fetch(TWILIO_API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams(params).toString(),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    console.error(`[Twilio] Error response: ${response.status} - ${error}`);
-    throw new Error(`Twilio API error: ${response.status} - ${error}`);
-  }
-
-  const data = await response.json();
-  console.log(`[Twilio] SMS sent successfully. SID: ${data.sid}`);
-  return data.sid; // Twilio message SID
 }
 
 async function logSmsEvent(base44, leadId, status, messageId, errorMessage = null) {
@@ -83,7 +46,6 @@ async function logSmsEvent(base44, leadId, status, messageId, errorMessage = nul
 }
 
 async function sendResendEmail(base44, leadId, toEmail, firstName, businessName) {
-  const resendKey = Deno.env.get("RESEND_API_KEY");
   const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "noreply@clientsurgesystems.com";
 
   const subject = "We received your request";
@@ -92,36 +54,33 @@ async function sendResendEmail(base44, leadId, toEmail, firstName, businessName)
   console.log(`[InstantResponse] Sending email to ${toEmail} — lead: ${leadId}`);
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        "Content-Type": "application/json",
-        "Idempotency-Key": `instant-response/${leadId}/initial-email`,
-      },
-      body: JSON.stringify({ from: fromEmail, to: toEmail, subject, text: body }),
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(`Resend error: ${err?.message || res.status}`);
-    }
-
-    const result = await res.json();
-    console.log(`[InstantResponse] Email send success — id: ${result.id}, lead: ${leadId}`);
-
-    await base44.asServiceRole.entities.CommunicationEvent.create({
-      lead_id: leadId,
-      context_id: leadId,
-      context_type: "WebsiteLead",
+    const result = await sendCommunicationViaOutbox({
+      base44,
       channel: "email",
-      direction: "outbound",
-      event_type: "instant_email_sent",
       provider: "resend",
-      status: "sent",
-      provider_message_id: result.id || null,
-      metadata_json: JSON.stringify({ service_key: "instant_lead_response", timestamp: new Date().toISOString() }),
+      recipient: toEmail,
+      subject,
+      body,
+      from: fromEmail,
+      leadId,
+      source: "sendInstantLeadResponseSms",
+      sourceRecordId: leadId,
+      templateKey: "instant_lead_response_email",
+      messageType: "transactional",
+      consentBasis: "transactional_relationship",
+      idempotencyKey: `resend:email:instant-response:${toEmail}:initial-email:${leadId}`,
+      metadata: { service_key: "instant_lead_response" },
+      providerSend: (providerPayload) => sendResendEmailProvider({
+        ...providerPayload,
+        env: (name) => Deno.env.get(name),
+        fetchImpl: fetch,
+      }),
     });
+
+    if (!result.success && !result.suppressed) {
+      throw new Error(result.error || result.reason || "Resend outbox send failed");
+    }
+    console.log(`[InstantResponse] Email outbox status — status: ${result.status}, id: ${result.provider_message_id || "n/a"}, lead: ${leadId}`);
   } catch (emailError) {
     console.error(`[InstantResponse] Email send failed for lead ${leadId}: ${emailError.message}`);
     await base44.asServiceRole.entities.CommunicationEvent.create({
@@ -206,7 +165,35 @@ Deno.serve(async (req) => {
     const messageBody = formatSmsTemplate(smsTemplate, leadData);
     let messageSid;
     try {
-      messageSid = await sendTwilioSms(leadData.phone_number, messageBody);
+      const smsResult = await sendCommunicationViaOutbox({
+        base44,
+        channel: "sms",
+        provider: "twilio",
+        recipient: leadData.phone_number,
+        body: messageBody,
+        lead: leadData,
+        leadId: lead_id,
+        orderId: order_id,
+        source: "sendInstantLeadResponseSms",
+        sourceRecordId: lead_id,
+        templateKey: "instant_lead_response_sms",
+        messageType: "transactional",
+        consentBasis: "transactional_relationship",
+        idempotencyKey: `twilio:sms:instant-response:${leadData.phone_number}:initial-sms:${lead_id}`,
+        metadata: { service_key: "instant_lead_response" },
+        providerSend: (providerPayload) => sendTwilioSmsProvider({
+          ...providerPayload,
+          env: (name) => Deno.env.get(name),
+          fetchImpl: fetch,
+        }),
+      });
+      if (!smsResult.success && !smsResult.suppressed) {
+        throw new Error(smsResult.error || smsResult.reason || "Twilio outbox send failed");
+      }
+      if (smsResult.suppressed) {
+        return Response.json({ success: false, suppressed: true, reason: smsResult.reason, outbox_id: smsResult.outbox?.id });
+      }
+      messageSid = smsResult.provider_message_id;
       console.log(`[InstantResponse] SMS send success — SID: ${messageSid}, lead: ${lead_id}`);
     } catch (smsError) {
       console.error(`[InstantResponse] SMS send failed for lead ${lead_id}: ${smsError.message}`);

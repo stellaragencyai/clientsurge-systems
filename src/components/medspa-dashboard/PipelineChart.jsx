@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 const STAGE_COLORS = {
   New: "#94a3b8",
   Qualified: "#60a5fa",
-  Contacted: "#fbbf24",
+  Contacted: "#67D8FF",
   Responded: "#34d399",
   Booked: "#22c55e",
   Closed: "#16a34a",

@@ -1,8 +1,9 @@
 import { X, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import LazyImage from "@/components/LazyImage";
 
 const industryImages = {
-  "Med Spas & Aesthetic Clinics": "https://images.unsplash.com/photo-1552820728-8ac41f1ce891?w=800&q=80",
+  "Med Spas & Aesthetic Clinics": "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=80&auto=format&fit=crop",
   "Dental & Orthodontics": "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800&q=80",
   "Chiropractic & Physical Therapy": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80",
   "HVAC, Plumbing & Home Services": "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=800&q=80",
@@ -30,9 +31,11 @@ export default function IndustryModal({ industry, onClose }) {
 
         {/* Image section */}
         <div className="relative h-64 md:h-80 w-full overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5">
-          <img
+          <LazyImage
             src={imageUrl}
             alt={industry.name}
+            width="640"
+            height="420"
             className="w-full h-full object-cover"
           />
           {/* Overlay gradient */}

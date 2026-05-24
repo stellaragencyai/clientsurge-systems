@@ -27,11 +27,11 @@ export default function MedSpaPricingPreview() {
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg" style={{background:"linear-gradient(135deg, #ffffff 0%, #fefdfb 100%)", boxShadow:"0 20px 60px -20px rgba(120,70,20,0.15), 0 0 1px rgba(120,70,20,0.2)", border:"2px solid transparent", backgroundImage:"linear-gradient(135deg, #ffffff 0%, #fefdfb 100%), linear-gradient(135deg, rgba(160,113,79,0.3) 0%, rgba(200,150,92,0.1) 100%)", backgroundOrigin:"border-box", backgroundClip:"padding-box, border-box"}}>
+        <div className="bg-white rounded-2xl p-8 md:p-12 shadow-lg" style={{background:"linear-gradient(135deg, #ffffff 0%, #fefdfb 100%)", boxShadow:"0 20px 60px -20px rgba(0,92,153,0.15), 0 0 1px rgba(0,92,153,0.2)", border:"2px solid transparent", backgroundImage:"linear-gradient(135deg, #ffffff 0%, #fefdfb 100%), linear-gradient(135deg, rgba(160,113,79,0.3) 0%, rgba(0,174,239,0.1) 100%)", backgroundOrigin:"border-box", backgroundClip:"padding-box, border-box"}}>
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div>
 
-              <p className="text-sm font-semibold text-foreground mb-4">Starting from $497/mo · One-time setup fee · No long-term contracts · Cancel anytime</p>
+              <p className="text-sm font-semibold text-foreground mb-4">Starting from $497/mo ï¿½ One-time setup fee ï¿½ No long-term contracts ï¿½ Cancel anytime</p>
               <p className="text-sm font-semibold text-foreground mb-6">Every system includes:</p>
               <ul className="space-y-3">
                 {includes.map((item, i) => (
@@ -49,13 +49,13 @@ export default function MedSpaPricingPreview() {
               <p className="text-sm text-muted-foreground leading-relaxed mb-8">
                 Plans are tailored based on your lead volume and growth stage. No two systems are the same.
               </p>
-              <button onClick={() => setShowModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",border:"none",cursor:"pointer"}}>
-                <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 28px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"0.9rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
+              <button onClick={() => setShowModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#0088CC 0%,#00AEEF 30%,#DDF4FF 50%,#00AEEF 70%,#005B99 100%)",boxShadow:"0 4px 18px rgba(0,92,153,0.35)",border:"none",cursor:"pointer"}}>
+                <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 28px",borderRadius:"9999px",background:"linear-gradient(135deg,#005B99 0%,#0077B6 40%,#005B99 100%)",color:"#EAF8FF",fontWeight:"700",fontSize:"0.9rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
                   Book Your Free Demo
                   <ArrowRight className="w-4 h-4" />
                 </span>
               </button>
-              <p className="text-xs text-muted-foreground mt-4">Free 15-min call · No commitment · Live in 5-7 days</p>
+              <p className="text-xs text-muted-foreground mt-4">Free 15-min call ï¿½ No commitment ï¿½ Live in 5-7 days</p>
             </div>
           </div>
         </div>
@@ -73,8 +73,8 @@ export default function MedSpaPricingPreview() {
           <p className="text-sm text-muted-foreground mb-6">
             Book a quick 10-minute demo and we'll recommend the best setup for your business.
           </p>
-          <button onClick={() => setShowModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",border:"none",cursor:"pointer"}}>
-            <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 28px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"0.9rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
+          <button onClick={() => setShowModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#0088CC 0%,#00AEEF 30%,#DDF4FF 50%,#00AEEF 70%,#005B99 100%)",boxShadow:"0 4px 18px rgba(0,92,153,0.35)",border:"none",cursor:"pointer"}}>
+            <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 28px",borderRadius:"9999px",background:"linear-gradient(135deg,#005B99 0%,#0077B6 40%,#005B99 100%)",color:"#EAF8FF",fontWeight:"700",fontSize:"0.9rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
               Book Your Free Demo
               <ArrowRight className="w-4 h-4" />
             </span>

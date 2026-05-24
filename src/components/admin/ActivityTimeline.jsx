@@ -27,11 +27,11 @@ const EVENT_TYPE_CONFIG = {
   whatsapp_failed:    { icon: AlertCircle,    label: "WhatsApp Failed",    color: "bg-red-100 text-red-700",      dot: "bg-red-400" },
   whatsapp_delivered: { icon: CheckCircle2,   label: "WhatsApp Delivered", color: "bg-green-100 text-green-700",  dot: "bg-green-400" },
   webhook_sent:       { icon: Globe,          label: "Webhook Sent",       color: "bg-slate-100 text-slate-700",  dot: "bg-slate-400" },
-  workflow_triggered: { icon: Zap,            label: "Workflow",           color: "bg-amber-100 text-amber-700",  dot: "bg-amber-400" },
+  workflow_triggered: { icon: Zap,            label: "Workflow",           color: "bg-blue-100 text-blue-700",  dot: "bg-blue-400" },
   status_update:      { icon: ArrowUpCircle,  label: "Status Update",      color: "bg-cyan-100 text-cyan-700",    dot: "bg-cyan-400" },
   lead_created:       { icon: CheckCircle2,   label: "Lead Created",       color: "bg-emerald-100 text-emerald-700", dot: "bg-emerald-400" },
   // Events entity event_types
-  note:               { icon: StickyNote,     label: "Note",               color: "bg-yellow-100 text-yellow-700", dot: "bg-yellow-400" },
+  note:               { icon: StickyNote,     label: "Note",               color: "bg-sky-100 text-sky-700", dot: "bg-sky-400" },
   status_changed:     { icon: ArrowUpCircle,  label: "Status Changed",     color: "bg-cyan-100 text-cyan-700",    dot: "bg-cyan-400" },
   follow_up_scheduled:{ icon: Activity,       label: "Follow-Up Scheduled",color: "bg-blue-100 text-blue-700",    dot: "bg-blue-300" },
 };
@@ -56,7 +56,7 @@ function CallSummaryCard({ item }) {
 
   const sentimentColor = {
     Positive: "bg-green-50 border-green-200 text-green-700",
-    Neutral: "bg-amber-50 border-amber-200 text-amber-700",
+    Neutral: "bg-blue-50 border-blue-200 text-blue-700",
     Negative: "bg-red-50 border-red-200 text-red-700",
   }[aiSummary?.overall_sentiment] || "bg-slate-50 border-slate-200 text-slate-600";
 
@@ -139,7 +139,7 @@ function CallSummaryCard({ item }) {
               <ul className="space-y-0.5">
                 {aiSummary.objections_raised.map((o, i) => (
                   <li key={i} className="text-[11px] text-foreground flex gap-1.5">
-                    <span className="text-amber-500 flex-shrink-0">⚠</span> {o}
+                    <span className="text-blue-500 flex-shrink-0">⚠</span> {o}
                   </li>
                 ))}
               </ul>

@@ -14,6 +14,12 @@ import {
   updateTrackedServiceInstallStatus,
 } from "../base44/functions/_shared/installPipeline.js";
 import {
+  InstallStateTransitionError,
+  buildCanonicalInstallStatePatch,
+  deriveCanonicalInstallState,
+  validateCanonicalInstallTransition,
+} from "../base44/functions/_shared/installStateMachine.js";
+import {
   executeBookingSimulation,
   executeLeadReactivationTest,
   executeOrderServiceRuntime,
@@ -291,6 +297,10 @@ test("paid order initializes canonical install pipeline and links existing struc
 
   assert.equal(result.order.payment_status, "paid");
   assert.equal(result.order.pipeline_status, "Ready for Install");
+  assert.equal(result.order.canonical_install_state, "CONFIG_REQUIRED");
+  assert.equal(result.order.install_last_successful_milestone, "CONFIG_REQUIRED");
+  assert.equal(result.order.install_lock_status, "released");
+  assert.equal(result.order.install_orchestration_attempts, 1);
   assert.equal(result.order.client_id, result.client.id);
   assert.equal(result.order.client_project_id, result.clientProject.id);
   assert.equal(result.order.onboarding_client_id, result.onboardingClient.id);
@@ -314,7 +324,14 @@ test("paid order initializes canonical install pipeline and links existing struc
   assert.equal(entities.Client.records.length, 1);
   assert.equal(entities.ClientProject.records.length, 1);
   assert.equal(entities.OnboardingClient.records.length, 1);
-  assert.equal(entities.CommunicationEvent.records.length, 4);
+  assert.equal(entities.CommunicationEvent.records.length, 5);
+  assert.ok(
+    entities.CommunicationEvent.records.some(
+      (event) =>
+        event.event_type === "install_state_changed" &&
+        getEventMetadata(event).next_state === "CONFIG_REQUIRED"
+    )
+  );
   assert.equal(result.order.activation_package_tier, "basic");
   assert.equal(result.order.purchase_onboarding_handoff.next_missing_field, "business_hours");
   assert.equal(result.onboardingClient.activation_package_tier, "basic");
@@ -475,6 +492,7 @@ test("duplicate paid-order initialization is idempotent for records and audit ev
   });
 
   assert.equal(secondResult.order.install_initialized_at, "2026-04-22T12:05:00.000Z");
+  assert.equal(secondResult.order.install_orchestration_attempts, 1);
   assert.deepEqual(
     {
       clients: entities.Client.records.length,
@@ -483,6 +501,46 @@ test("duplicate paid-order initialization is idempotent for records and audit ev
       events: entities.CommunicationEvent.records.length,
     },
     countsAfterFirstRun
+  );
+});
+
+test("canonical install state machine allows valid deterministic progression", () => {
+  validateCanonicalInstallTransition({
+    currentState: "PENDING_PAYMENT",
+    nextState: "PAYMENT_VERIFIED",
+    summary: { configuration_complete: false, all_live: false },
+  });
+  validateCanonicalInstallTransition({
+    currentState: "CONFIG_REQUIRED",
+    nextState: "CONFIG_VALIDATED",
+    summary: { configuration_complete: true, all_live: false },
+  });
+  validateCanonicalInstallTransition({
+    currentState: "AUTOMATION_TESTING",
+    nextState: "LIVE",
+    summary: { configuration_complete: true, all_live: true },
+  });
+});
+
+test("canonical install state machine blocks impossible transitions", () => {
+  assert.throws(
+    () =>
+      validateCanonicalInstallTransition({
+        currentState: "LIVE",
+        nextState: "PENDING_PAYMENT",
+        summary: { configuration_complete: true, all_live: true },
+      }),
+    InstallStateTransitionError
+  );
+
+  assert.throws(
+    () =>
+      validateCanonicalInstallTransition({
+        currentState: "CONFIG_REQUIRED",
+        nextState: "WORKFLOW_DEPLOYED",
+        summary: { configuration_complete: false, all_live: false },
+      }),
+    InstallStateTransitionError
   );
 });
 
@@ -574,6 +632,9 @@ test("paid order initialization fails closed when heuristic linking is ambiguous
   const updatedOrder = await entities.Order.get("order_1");
   assert.equal(updatedOrder.payment_status, "paid");
   assert.equal(updatedOrder.pipeline_status, "Paid");
+  assert.equal(updatedOrder.canonical_install_state, "RECOVERY_REQUIRED");
+  assert.equal(updatedOrder.install_failed_subsystem, "install_pipeline");
+  assert.equal(updatedOrder.install_lock_status, "failed");
   assert.match(updatedOrder.pipeline_error, /Multiple client records match paid order/);
   assert.equal(updatedOrder.client_id, undefined);
   assert.equal(entities.ClientProject.records.length, 0);
@@ -658,6 +719,111 @@ test("mirror records resync from order truth instead of preserving drift", async
   assert.equal(syncedOnboarding.step_messages_customized, true);
   assert.equal(syncedOnboarding.step_instant_response, true);
   assert.equal(syncedOnboarding.step_missed_call, false);
+});
+
+test("configuration completion advances canonical state and records timeline history", async () => {
+  const { base44, entities } = createFakeBase44();
+  const order = await entities.Order.get("order_1");
+
+  await initializePaidOrderInstallPipeline({
+    base44,
+    order,
+    stripeCustomerId: "cus_123",
+    now: "2026-04-22T12:05:00.000Z",
+  });
+
+  const initializedOrder = await entities.Order.get("order_1");
+  const configuredOrder = await updateOrderInstallConfiguration({
+    base44,
+    order: initializedOrder,
+    patch: buildCompleteConfigPatch(),
+    note: "All required install config submitted",
+    now: "2026-04-22T12:08:00.000Z",
+  });
+
+  assert.equal(configuredOrder.canonical_install_state, "CONFIG_VALIDATED");
+  assert.equal(configuredOrder.previous_install_state, "CONFIG_REQUIRED");
+  assert.equal(configuredOrder.install_last_successful_milestone, "CONFIG_VALIDATED");
+  assert.equal(configuredOrder.install_state_history.length, 2);
+  assert.deepEqual(
+    configuredOrder.install_state_history.map((entry) => entry.state),
+    ["CONFIG_REQUIRED", "CONFIG_VALIDATED"]
+  );
+  assert.ok(
+    entities.CommunicationEvent.records.some(
+      (event) =>
+        event.event_type === "install_state_changed" &&
+        getEventMetadata(event).next_state === "CONFIG_VALIDATED"
+    )
+  );
+});
+
+test("recovery flow resumes from failed install state without losing milestones", async () => {
+  const { base44, entities } = createFakeBase44();
+  const order = await entities.Order.get("order_1");
+
+  await initializePaidOrderInstallPipeline({
+    base44,
+    order,
+    stripeCustomerId: "cus_123",
+    now: "2026-04-22T12:05:00.000Z",
+  });
+
+  let currentOrder = await entities.Order.get("order_1");
+  currentOrder = await updateOrderInstallConfiguration({
+    base44,
+    order: currentOrder,
+    patch: buildCompleteConfigPatch(),
+    note: "Config complete",
+    now: "2026-04-22T12:08:00.000Z",
+  });
+
+  currentOrder = await updateTrackedServiceInstallStatus({
+    base44,
+    order: currentOrder,
+    serviceKey: "instant_lead_response",
+    nextStatus: "Error",
+    note: "Twilio provisioning timeout",
+    now: "2026-04-22T12:10:00.000Z",
+  });
+
+  assert.equal(currentOrder.canonical_install_state, "RECOVERY_REQUIRED");
+  assert.equal(currentOrder.install_failed_subsystem, "install_pipeline");
+  assert.equal(currentOrder.install_last_successful_milestone, "CONFIG_VALIDATED");
+
+  currentOrder = await updateTrackedServiceInstallStatus({
+    base44,
+    order: currentOrder,
+    serviceKey: "instant_lead_response",
+    nextStatus: "Configuring",
+    note: "Retry after provider recovery",
+    now: "2026-04-22T12:20:00.000Z",
+  });
+
+  assert.equal(currentOrder.canonical_install_state, "CONFIG_VALIDATED");
+  assert.equal(currentOrder.install_blocking_issue, "");
+  assert.ok(
+    currentOrder.install_state_history.some(
+      (entry) => entry.state === "RECOVERY_REQUIRED" && entry.failed_subsystem === "install_pipeline"
+    )
+  );
+});
+
+test("state patch helper derives pending payment for unpaid orders", () => {
+  const patch = buildCanonicalInstallStatePatch({
+    order: { id: "order_pending", payment_status: "pending" },
+    snapshot: { serviceStates: [], trackedItems: [] },
+    now: "2026-04-22T12:00:00.000Z",
+  });
+
+  assert.equal(patch.canonical_install_state, "PENDING_PAYMENT");
+  assert.equal(
+    deriveCanonicalInstallState({
+      order: { payment_status: "pending" },
+      snapshot: { serviceStates: [], trackedItems: [] },
+    }),
+    "PENDING_PAYMENT"
+  );
 });
 
 test("required configuration blocks invalid transitions and logs the blocked attempt", async () => {
@@ -761,6 +927,7 @@ test("config-backed transitions stay per-service and successful updates are logg
   const queue = await listInstallQueueOrders(base44);
   assert.equal(queue.length, 1);
   assert.equal(queue[0].pipeline_status, "Configuring");
+  assert.equal(queue[0].canonical_install_state, "CONFIG_REQUIRED");
 
   const instantService = queue[0].trackedItems.find((item) => item.service_key === "instant_lead_response");
   const missedService = queue[0].trackedItems.find((item) => item.service_key === "missed_call_text_back");
@@ -775,6 +942,59 @@ test("config-backed transitions stay per-service and successful updates are logg
   assert.ok(eventTypes.includes("service_configuration_updated"));
   assert.ok(eventTypes.includes("service_status_changed"));
   assert.ok(eventTypes.includes("status_update"));
+});
+
+test("full tested install reaches LIVE canonical state only after all services pass prerequisites", async () => {
+  const { base44, entities } = createFakeBase44();
+  const order = await entities.Order.get("order_1");
+
+  await initializePaidOrderInstallPipeline({
+    base44,
+    order,
+    stripeCustomerId: "cus_123",
+    now: "2026-04-22T12:05:00.000Z",
+  });
+
+  let currentOrder = await entities.Order.get("order_1");
+  currentOrder = await updateOrderInstallConfiguration({
+    base44,
+    order: currentOrder,
+    patch: buildCompleteConfigPatch(),
+    note: "Config complete",
+    now: "2026-04-22T12:08:00.000Z",
+  });
+  assert.equal(currentOrder.canonical_install_state, "CONFIG_VALIDATED");
+
+  for (const serviceKey of ["instant_lead_response", "missed_call_text_back"]) {
+    currentOrder = await updateTrackedServiceInstallStatus({
+      base44,
+      order: currentOrder,
+      serviceKey,
+      nextStatus: "Configuring",
+      now: "2026-04-22T12:10:00.000Z",
+    });
+    currentOrder = await updateTrackedServiceInstallStatus({
+      base44,
+      order: currentOrder,
+      serviceKey,
+      nextStatus: "Testing",
+      now: "2026-04-22T12:12:00.000Z",
+    });
+    assert.equal(currentOrder.canonical_install_state, "AUTOMATION_TESTING");
+    await recordSuccessfulRuntimeTest(base44, currentOrder, serviceKey);
+    currentOrder = await updateTrackedServiceInstallStatus({
+      base44,
+      order: currentOrder,
+      serviceKey,
+      nextStatus: "Live",
+      now: "2026-04-22T12:14:00.000Z",
+    });
+  }
+
+  assert.equal(currentOrder.pipeline_status, "Live");
+  assert.equal(currentOrder.canonical_install_state, "LIVE");
+  assert.equal(currentOrder.order_status, "fully_live");
+  assert.equal(currentOrder.install_last_successful_milestone, "LIVE");
 });
 
 test("live transition stays blocked until a successful remote test exists", async () => {

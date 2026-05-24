@@ -2,18 +2,22 @@ import { useEffect, useState } from "react";
 import { ShoppingCart, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
-function formatOrderSignal(order) {
-  const firstItem = Array.isArray(order?.items) ? order.items[0] : null;
-  const service =
-    firstItem?.product_name ||
-    order?.pricing_summary?.package_name ||
-    order?.plan_type ||
-    "AI automation stack";
+function timeAgo(value) {
+  const timestamp = value ? new Date(value).getTime() : Date.now();
+  const minutes = Math.max(1, Math.round((Date.now() - timestamp) / 60000));
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} hr ago`;
+  return `${Math.round(hours / 24)} day ago`;
+}
 
+function toPurchaseSignal(order) {
+  const firstItem = Array.isArray(order.items) ? order.items[0] : null;
   return {
-    name: order?.business_name || "A ClientSurge customer",
-    service,
-    time: "recently",
+    id: order.id,
+    name: order.business_name || order.customer_name || "Local business",
+    service: firstItem?.product_name || firstItem?.name || order.plan_type || "AI automation system",
+    time: timeAgo(order.created_date || order.paid_at),
   };
 }
 
@@ -28,25 +32,15 @@ export default function SocialProofTicker() {
 
   useEffect(() => {
     let cancelled = false;
-
-    async function loadRecentOrders() {
-      try {
-        const orders = await base44.entities.Order.filter(
-          { payment_status: "paid" },
-          "-created_date",
-          5
-        );
+    base44.entities.Order.filter({ payment_status: "paid" }, "-created_date", 12)
+      .then((orders = []) => {
         if (!cancelled) {
-          setPurchaseSignals((orders || []).map(formatOrderSignal));
+          setPurchaseSignals(orders.map(toPurchaseSignal).filter((signal) => signal.id));
         }
-      } catch {
-        if (!cancelled) {
-          setPurchaseSignals([]);
-        }
-      }
-    }
-
-    loadRecentOrders();
+      })
+      .catch(() => {
+        if (!cancelled) setPurchaseSignals([]);
+      });
 
     return () => {
       cancelled = true;
@@ -78,11 +72,11 @@ export default function SocialProofTicker() {
       <div
         style={{
           background: "linear-gradient(135deg, rgba(26,18,9,0.95) 0%, rgba(65,35,15,0.95) 100%)",
-          border: "1px solid rgba(200,150,92,0.3)",
+          border: "1px solid rgba(0,174,239,0.3)",
           borderRadius: "12px",
           padding: "14px 16px",
           backdropFilter: "blur(12px)",
-          boxShadow: "0 12px 32px rgba(0,0,0,0.3), 0 0 1px rgba(200,150,92,0.4)",
+          boxShadow: "0 12px 32px rgba(0,0,0,0.3), 0 0 1px rgba(0,174,239,0.4)",
           minWidth: "280px",
           display: "flex",
           alignItems: "center",
@@ -94,12 +88,12 @@ export default function SocialProofTicker() {
             width: "36px",
             height: "36px",
             borderRadius: "8px",
-            background: "linear-gradient(135deg, #9a5c2e, #c8965c)",
+            background: "linear-gradient(135deg, #0077B6, #00AEEF)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
-            boxShadow: "0 4px 12px rgba(154,92,46,0.4)",
+            boxShadow: "0 4px 12px rgba(0,136,204,0.4)",
           }}
         >
           <ShoppingCart style={{ width: "18px", height: "18px", color: "#fff" }} />
@@ -111,7 +105,7 @@ export default function SocialProofTicker() {
               margin: "0 0 3px",
               fontSize: "13px",
               fontWeight: "700",
-              color: "#f5e6d0",
+              color: "#EAF8FF",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -123,7 +117,7 @@ export default function SocialProofTicker() {
             style={{
               margin: "0 0 2px",
               fontSize: "11px",
-              color: "rgba(200,150,92,0.9)",
+              color: "rgba(0,174,239,0.9)",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -135,7 +129,7 @@ export default function SocialProofTicker() {
             style={{
               margin: 0,
               fontSize: "10px",
-              color: "rgba(200,150,92,0.6)",
+              color: "rgba(0,174,239,0.6)",
               fontWeight: "600",
             }}
           >
@@ -150,14 +144,14 @@ export default function SocialProofTicker() {
             border: "none",
             cursor: "pointer",
             padding: "4px",
-            color: "rgba(200,150,92,0.7)",
+            color: "rgba(0,174,239,0.7)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(200,150,92,1)")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(200,150,92,0.7)")}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(0,174,239,1)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(0,174,239,0.7)")}
         >
           <X style={{ width: "14px", height: "14px" }} />
         </button>

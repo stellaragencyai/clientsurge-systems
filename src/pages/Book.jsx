@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
 import { ArrowRight, CalendarCheck2, ClipboardList, MessagesSquare } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { setPageMetadata } from '@/lib/seo';
 import { trackCTA } from '@/lib/analytics';
 import MobileCallBar from '@/components/landing/MobileCallBar';
-import DemoBookingModal from '@/components/forms/DemoBookingModal';
+import { getPublicBookingLink } from '@/lib/publicEnv';
+
+const CALENDLY_URL = getPublicBookingLink();
+const CONTACT_FALLBACK = '/contact';
 
 export default function Book() {
-  const navigate = useNavigate();
-
   useEffect(() => {
     const cleanupMetadata = setPageMetadata({
       title: 'Book Your Free ClientSurge Automation Audit | ClientSurge Systems',
@@ -22,17 +23,6 @@ export default function Book() {
 
     return cleanupMetadata;
   }, []);
-
-  const handleClose = () => {
-    const cameFromThisSite = document.referrer.startsWith(window.location.origin);
-
-    if (cameFromThisSite && window.history.length > 1) {
-      navigate(-1);
-      return;
-    }
-
-    navigate('/', { replace: true });
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-card to-background flex items-center justify-center px-6 py-12">
@@ -116,13 +106,25 @@ export default function Book() {
           </p>
 
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => trackCTA('schedule_your_audit', 'book_page')}
-              className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
-            >
-              Schedule Your Audit
-            </button>
+            {CALENDLY_URL ? (
+              <a
+                href={CALENDLY_URL}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => trackCTA('schedule_your_audit', 'book_page')}
+                className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+              >
+                Open Scheduler
+              </a>
+            ) : (
+              <Link
+                to={CONTACT_FALLBACK}
+                onClick={() => trackCTA('contact_to_schedule_audit', 'book_page')}
+                className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+              >
+                Request Scheduling Help
+              </Link>
+            )}
             <Link
               to="/contact"
               onClick={() => trackCTA('contact_us_instead', 'book_page')}
@@ -132,8 +134,33 @@ export default function Book() {
             </Link>
           </div>
         </div>
+        {CALENDLY_URL ? (
+          <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+            <iframe
+              src={CALENDLY_URL}
+              title="Schedule your ClientSurge automation audit"
+              width="100%"
+              height="700"
+              scrolling="yes"
+              className="block w-full border-0"
+            />
+          </div>
+        ) : (
+          <div className="mt-6 rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
+            <h2 className="font-display text-xl font-semibold text-foreground">Scheduler setup needed</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              The public scheduler link is not configured yet. Use the contact page and we will schedule the audit manually.
+            </p>
+            <Link
+              to={CONTACT_FALLBACK}
+              onClick={() => trackCTA('contact_to_schedule_audit_panel', 'book_page')}
+              className="mt-4 inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+            >
+              Contact ClientSurge
+            </Link>
+          </div>
+        )}
       </div>
-      <DemoBookingModal onClose={handleClose} />
       <MobileCallBar />
     </div>
   );

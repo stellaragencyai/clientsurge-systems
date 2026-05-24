@@ -31,18 +31,18 @@ test("automation routes are public and no catch-all industry route advertises te
 });
 
 test("blog route is public and wired for SEO", () => {
-  assert.match(app, /import Blog from "\.\/pages\/Blog"/);
+  assert.match(app, /const Blog = lazy\(\(\) => import\("\.\/pages\/Blog"\)\)/);
   assert.match(app, /"\/blog"/);
   assert.doesNotMatch(app, /path="\/:slug"/);
-  assert.match(sitemap, /https:\/\/clientsurgesystems\.com\/blog/);
+  assert.match(sitemap, /https:\/\/(?:www\.)?clientsurgesystems\.com\/blog/);
 });
 
 test("sitemap prioritizes canonical public marketing pages", () => {
   for (const route of ["/automations", "/industries", "/roofing", "/hvac", "/dental", "/med-spa", "/chiropractic", "/contractors", "/book", "/contact", "/blog", "/privacy-policy"]) {
-    assert.match(sitemap, new RegExp(`https://clientsurgesystems\\.com${route}`));
+    assert.match(sitemap, new RegExp(`https://(?:www\\.)?clientsurgesystems\\.com${route}`));
   }
   for (const route of getAutomationRoutes()) {
-    assert.doesNotMatch(sitemap, new RegExp(`https://clientsurgesystems\\.com${route}`));
+    assert.doesNotMatch(sitemap, new RegExp(`https://(?:www\\.)?clientsurgesystems\\.com${route}`));
   }
 });
 

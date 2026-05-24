@@ -5,6 +5,8 @@
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+const APP_URL = (Deno.env.get("APP_URL") || "https://clientsurgesystems.com").replace(/\/+$/, "");
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -17,7 +19,7 @@ Deno.serve(async (req) => {
     if (!onboarding.went_live) return Response.json({ skipped: true, reason: "went_live is not true" });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    const portalUrl = "https://clientsurgesystems.com/client-portal";
+    const portalUrl = `${APP_URL}/client-portal`;
 
     const html = `
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;padding:40px 20px;">

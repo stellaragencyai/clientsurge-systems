@@ -7,6 +7,11 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 const FOLLOW_UP_STEPS = [
   { step: 1, minutesAfter: 2, channel: "sms", key: "missed_call_sms_2min" },
@@ -105,69 +110,60 @@ function getNextDueStep({ lead, minutesElapsed }) {
 }
 
 async function sendSMS(base44, lead, messageBody, fromNumber, stepKey) {
-  const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-  const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-  const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
-  if (!statusCallbackUrl) {
-    console.warn("[processMissedCallFollowUps] TWILIO_SMS_STATUS_CALLBACK_URL missing — SMS delivery tracking disabled");
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "sms",
+    provider: "twilio",
+    recipient: lead.phone,
+    body: messageBody,
+    from: fromNumber,
+    lead,
+    leadId: lead.id,
+    source: "processMissedCallFollowUps",
+    sourceRecordId: lead.id,
+    templateKey: stepKey,
+    messageType: "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { missed_call_step: stepKey, key: stepKey },
+    providerSend: (providerPayload) => sendTwilioSmsProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
+  });
+  if (!result.success && !result.suppressed) {
+    throw new Error(result.error || result.reason || "Twilio outbox send failed");
   }
-
-  if (!accountSid || !authToken || !fromNumber) {
-    throw new Error("Twilio credentials missing");
-  }
-
-  const params = { To: lead.phone, From: fromNumber, Body: messageBody };
-  if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
-
-  const res = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams(params),
-    }
-  );
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Twilio error: ${err?.message || res.status}`);
-  }
-
-  const result = await res.json();
-  return { success: true, messageId: result.sid };
+  return { success: result.success, suppressed: result.suppressed, messageId: result.provider_message_id };
 }
 
 async function sendEmail(base44, lead, subject, body, fromEmail, stepKey) {
-  const resendKey = Deno.env.get("RESEND_API_KEY");
-
-  if (!resendKey) {
-    throw new Error("Resend API key missing");
-  }
-
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurge.com",
-      to: lead.email,
-      subject,
-      text: body,
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: lead.email,
+    subject,
+    body,
+    from: fromEmail || "noreply@clientsurge.com",
+    lead,
+    leadId: lead.id,
+    source: "processMissedCallFollowUps",
+    sourceRecordId: lead.id,
+    templateKey: stepKey,
+    messageType: "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { missed_call_step: stepKey, key: stepKey },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
     }),
   });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Resend error: ${err?.message || res.status}`);
+  if (!result.success && !result.suppressed) {
+    throw new Error(result.error || result.reason || "Resend outbox send failed");
   }
-
-  const result = await res.json();
-  return { success: true, messageId: result.id };
+  return { success: result.success, suppressed: result.suppressed, messageId: result.provider_message_id };
 }
 
 function renderTemplate(template, lead, bookingLink) {

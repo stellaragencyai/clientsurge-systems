@@ -153,19 +153,26 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50"
       style={{
         paddingTop: "env(safe-area-inset-top)",
-        background: "transparent",
+        background: "rgba(255,255,255,0.92)",
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
+        borderBottom: "1px solid rgba(0,107,176,0.12)",
+        boxShadow: scrolled ? "0 10px 30px rgba(10,22,40,0.08)" : "0 4px 18px rgba(10,22,40,0.04)",
         overflow: "visible",
       }}>
       
       <div className="w-full flex items-center justify-between px-4 md:px-6" style={{ height: "clamp(64px, 7vw, 82px)", paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
         <button
+          type="button"
+          aria-label="Go to ClientSurge Systems home"
           onClick={handleLogoClick}
           className="shrink-0 bg-none border-none cursor-pointer transition-transform duration-300 hover:-translate-y-0.5"
           style={{ minHeight: "unset", minWidth: "unset", background: "none", padding: 0, overflow: "visible" }}>
           <img
             src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/199305bd4_11.png"
             alt="ClientSurge Systems"
-            fetchPriority="high"
+            width="220"
+            height="80"
             decoding="async"
             style={{
               height: "clamp(52px, 6vw, 72px)",
@@ -204,7 +211,7 @@ export default function Navbar() {
                 left: 0,
                 height: "2px",
                 width: "100%",
-                background: "linear-gradient(90deg, #c8965c, #f5d9a8, #c8965c)",
+                background: "linear-gradient(90deg, #00AEEF, #DDF4FF, #00AEEF)",
                 borderRadius: "1px",
                 transform: "scaleX(0)",
                 transformOrigin: "left",
@@ -223,6 +230,8 @@ export default function Navbar() {
             onKeyDown={(e) => {if (e.key === "Escape") setIndustriesOpen(false);}}>
             
             <button
+              type="button"
+              aria-expanded={industriesOpen}
               onClick={() => setIndustriesOpen((prev) => !prev)}
               className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap">
               
@@ -243,6 +252,7 @@ export default function Navbar() {
                   <div className="grid grid-cols-2 gap-1">
                     {industryLinks.map((item) =>
                   <button
+                    type="button"
                     key={item.label}
                     onClick={() => {
                       trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
@@ -262,6 +272,7 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
           <button
+            type="button"
             onClick={() => {
               trackCTA("login", "navbar");
               setShowLoginModal(true);
@@ -270,6 +281,7 @@ export default function Navbar() {
             Login
           </button>
           <button
+            type="button"
             onClick={() => {
               trackCTA("book_free_audit", "navbar");
               setShowBookingModal(true);
@@ -285,9 +297,10 @@ export default function Navbar() {
         </div>
 
         <button
+          type="button"
           className="lg:hidden w-10 h-10 rounded-full border bg-background/90 backdrop-blur flex items-center justify-center text-foreground shadow-sm"
           onClick={() => setOpen(!open)}
-          style={{ borderColor: "rgba(200,150,92,0.2)" }}
+          style={{ borderColor: "rgba(0,174,239,0.2)" }}
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={open}>
           
@@ -330,10 +343,11 @@ export default function Navbar() {
           )}
 
           <div className="pt-2 border-t border-border">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-primary mb-2" style={{ color: "#00AEEF" }}>Industries</p>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-primary mb-2" style={{ color: "#006BB0" }}>Industries</p>
             <div className="space-y-1">
               {industryLinks.map((item) =>
               <button
+                type="button"
                 key={item.label}
                 onClick={() => {
                   trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
@@ -358,6 +372,7 @@ export default function Navbar() {
           )}
 
           <button
+            type="button"
             onClick={() => {
               trackCTA("book_demo", "mobile_nav");
               setOpen(false);

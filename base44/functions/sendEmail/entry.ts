@@ -1,51 +1,74 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+} from "../_shared/communicationOutbox.js";
 
 Deno.serve(async (req) => {
   try {
-    const { email, subject, body, leadId } = await req.json();
+    const payload = await req.json();
+    const email = payload.email || payload.to;
+    const subject = payload.subject;
+    const body = payload.body || payload.html || payload.text;
+    const leadId = payload.leadId || payload.lead_id;
 
     if (!email || !subject || !body) {
       return Response.json({ error: 'Email, subject, and body required' }, { status: 400 });
     }
 
-    const apiKey = Deno.env.get('RESEND_API_KEY');
-    if (!apiKey) {
-      return Response.json({ error: 'Resend API key not configured' }, { status: 500 });
+    const base44 = createClientFromRequest(req);
+    const settings = await base44.asServiceRole.entities.AdminSettings.list()
+      .then((records: Record<string, unknown>[]) => records?.[0] || null)
+      .catch(() => null);
+    const settingsFromEmail =
+      typeof settings?.resend_from_email === 'string' ? settings.resend_from_email.trim() : '';
+    const envFromEmail = Deno.env.get('RESEND_FROM_EMAIL') || '';
+    const fromEmail = settingsFromEmail || envFromEmail || 'system@clientsurgesystems.com';
+    let lead = null;
+    if (leadId) {
+      lead = await base44.asServiceRole.entities.WebsiteLead.get(leadId).catch(() => null);
     }
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'noreply@apexflow.com',
-        to: email,
-        subject,
-        html: body,
+    const result = await sendCommunicationViaOutbox({
+      base44,
+      channel: "email",
+      provider: "resend",
+      recipient: email,
+      subject,
+      body,
+      html: payload.html || body,
+      from: `ClientSurge Systems <${fromEmail}>`,
+      lead,
+      leadId,
+      orderId: payload.order_id,
+      clientProjectId: payload.client_project_id,
+      source: payload.source || "sendEmail",
+      sourceRecordId: payload.source_record_id || leadId || payload.event_id,
+      templateKey: payload.template_key || "manual_email",
+      messageType: payload.message_type || "transactional",
+      consentBasis: payload.consent_basis,
+      consentSnapshot: payload.consent_snapshot,
+      metadata: payload.metadata || {},
+      idempotencyKey: payload.idempotency_key,
+      providerSend: (providerPayload) => sendResendEmailProvider({
+        ...providerPayload,
+        env: (name) => Deno.env.get(name),
+        fetchImpl: fetch,
       }),
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return Response.json({ error: 'Failed to send email', details: data }, { status: 500 });
+    if (!result.success && !result.suppressed && result.failed) {
+      return Response.json({ error: 'Failed to send email', details: result }, { status: 500 });
     }
 
-    // Log email in database
-    const base44 = createClientFromRequest(req);
-    if (leadId) {
-      await base44.entities.Emails.create({
-        lead_id: leadId,
-        email_address: email,
-        subject,
-        body,
-        status: 'sent',
-      });
-    }
-
-    return Response.json({ success: true, emailId: data.id });
+    return Response.json({
+      success: result.success,
+      suppressed: result.suppressed || false,
+      duplicate: result.duplicate || false,
+      reason: result.reason,
+      emailId: result.provider_message_id,
+      outbox_id: result.outbox?.id,
+    });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }

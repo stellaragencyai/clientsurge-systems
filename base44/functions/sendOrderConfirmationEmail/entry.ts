@@ -5,6 +5,10 @@ import {
   normalizePackageKey,
 } from "../../../src/lib/salesCatalog.js";
 import { formatMoney, resolveServiceRows } from "./serviceRows.shared.js";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+} from "../_shared/communicationOutbox.js";
 
 function escapeHtml(value: unknown) {
   return String(value ?? "")
@@ -37,10 +41,6 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Order not found" }, { status: 404 });
     }
 
-    const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (!resendKey) {
-      return Response.json({ error: "RESEND_API_KEY missing" }, { status: 500 });
-    }
     const from = formatFromAddress(Deno.env.get("RESEND_FROM_EMAIL"));
     const replyTo = Deno.env.get("ADMIN_EMAIL") || "system@clientsurgesystems.com";
 
@@ -119,35 +119,40 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from,
-        reply_to: replyTo,
-        to: customerEmail,
-        subject: `Order confirmed - ${packageLabel}`,
-        text,
-        html,
+    const result = await sendCommunicationViaOutbox({
+      base44,
+      channel: "email",
+      provider: "resend",
+      recipient: customerEmail,
+      subject: `Order confirmed - ${packageLabel}`,
+      body: text,
+      html,
+      from,
+      orderId: order.id,
+      source: "sendOrderConfirmationEmail",
+      sourceRecordId: order.id,
+      templateKey: "order_confirmation",
+      messageType: "transactional",
+      consentBasis: "transactional_relationship",
+      metadata: { reply_to: replyTo, package_label: packageLabel, portal_activation_url_present: Boolean(portal_activation_url) },
+      providerSend: (providerPayload) => sendResendEmailProvider({
+        ...providerPayload,
+        env: (name) => Deno.env.get(name),
+        fetchImpl: fetch,
       }),
     });
 
-    if (!response.ok) {
-      const body = await response.text();
+    if (!result.success) {
       console.error("[sendOrderConfirmationEmail] Resend request failed", {
-        status: response.status,
-        body,
+        reason: result.reason || result.error || result.status,
         from,
         reply_to: replyTo,
         to: customerEmail,
       });
-      throw new Error(`Resend request failed: ${response.status} ${body}`);
+      throw new Error(`Resend request failed: ${result.reason || result.error || result.status}`);
     }
 
-    return Response.json({ success: true, sent_to: customerEmail });
+    return Response.json({ success: true, sent_to: customerEmail, email_id: result.provider_message_id, outbox_id: result.outbox?.id });
   } catch (err: any) {
     return Response.json({ error: err.message }, { status: 500 });
   }

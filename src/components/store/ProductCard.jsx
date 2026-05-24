@@ -12,7 +12,7 @@ export default function ProductCard({ product }) {
 
   const toggle = (e) => {
     e.stopPropagation();
-    // Coming soon products cannot be added to cart
+    // Early-access products cannot be added to cart until checkout is enabled.
     if (product.coming_soon || !product.checkout_enabled) return;
     if (inCart) removeItem(product.product_id);
     else addItem(product);
@@ -60,7 +60,7 @@ export default function ProductCard({ product }) {
           right: 14px;
           font-size: 9px;
           font-weight: 700;
-          color: rgba(154,92,46,0.35);
+          color: rgba(0,136,204,0.35);
           letter-spacing: 0.1em;
           text-transform: uppercase;
           opacity: 0;
@@ -88,7 +88,7 @@ export default function ProductCard({ product }) {
           border: 1px solid rgba(0,174,239,0.15);
           font-size: 10px;
           font-weight: 600;
-          color: rgba(27,20,13,0.72);
+          color: rgba(10,22,40,0.72);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -115,7 +115,7 @@ export default function ProductCard({ product }) {
         .see-more-btn {
           background: none;
           border: none;
-          color: #9a5c2e;
+          color: #7a421d;
           font-size: 10px;
           font-weight: 700;
           cursor: pointer;
@@ -126,7 +126,7 @@ export default function ProductCard({ product }) {
           transition: color 0.2s ease;
         }
         .see-more-btn:hover {
-          color: #c8965c;
+          color: #8b4b22;
         }
         .price-highlight-box {
           background: #ffffff;
@@ -150,11 +150,11 @@ export default function ProductCard({ product }) {
         .price-highlight-box .price-value span {
           font-size: 10px;
           font-weight: 600;
-          color: rgba(0,174,239,0.7);
+          color: #006BB0;
         }
         .price-highlight-box .setup-fee {
           font-size: 8px;
-          color: rgba(0,59,143,0.5);
+          color: #405B7A;
           font-weight: 600;
         }
       `}</style>
@@ -181,7 +181,7 @@ export default function ProductCard({ product }) {
           </div>
           <span style={{
             fontSize: "8px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.16em",
-            color: "rgba(0,174,239,0.9)", background: "rgba(0,174,239,0.07)",
+            color: "#006BB0", background: "rgba(0,107,176,0.08)",
             padding: "4px 10px", borderRadius: "999px", border: "1px solid rgba(0,174,239,0.14)",
           }}>
             {product.category}
@@ -193,13 +193,13 @@ export default function ProductCard({ product }) {
           <h3 style={{ fontSize: "16px", fontWeight: "700", color: "#1b140d", margin: "0 0 3px", lineHeight: 1.2 }}>
             {product.name}
           </h3>
-          <p style={{ fontSize: "9px", color: "rgba(0,174,239,0.8)", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          <p style={{ fontSize: "9px", color: "#006BB0", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
             {product.subtitle}
           </p>
         </div>
 
         {/* Description */}
-        <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.62)", lineHeight: 1.65, margin: 0, flex: 1 }}>
+        <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.62)", lineHeight: 1.65, margin: 0, flex: 1 }}>
           {product.description}
         </p>
 
@@ -233,11 +233,11 @@ export default function ProductCard({ product }) {
 
         {/* Full-Width CTA Footer */}
         <div style={{ marginTop: "auto", paddingTop: "2px", display: "flex", flexDirection: "column", gap: "8px" }}>
-          {!product.coming_soon && (
+          {product.checkout_enabled && (
             <motion.button
               onClick={toggle}
               whileTap={{ scale: 0.94, rotateY: 6, rotateX: -2 }}
-              whileHover={{ y: -2, boxShadow: inCart ? "0 8px 20px rgba(34,197,94,0.4)" : "0 8px 20px rgba(120,70,20,0.38)" }}
+              whileHover={{ y: -2, boxShadow: inCart ? "0 8px 20px rgba(34,197,94,0.4)" : "0 8px 20px rgba(0,92,153,0.38)" }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
               style={{
                 width: "100%",
@@ -260,11 +260,11 @@ export default function ProductCard({ product }) {
             </motion.button>
           )}
 
-          {product.coming_soon && (
+          {!product.checkout_enabled && (
             <>
-              <span style={{ fontSize: "11px", fontWeight: "700", color: "rgba(0,59,143,0.6)", background: "rgba(0,174,239,0.06)", padding: "8px 12px", borderRadius: "9999px", border: "1px solid rgba(0,174,239,0.15)", whiteSpace: "nowrap", textAlign: "center" }}>
+              <span style={{ fontSize: "11px", fontWeight: "700", color: "#003B8F", background: "rgba(0,107,176,0.08)", padding: "8px 12px", borderRadius: "9999px", border: "1px solid rgba(0,107,176,0.18)", whiteSpace: "nowrap", textAlign: "center" }}>
                 <span style={{display:"inline-block",width:"7px",height:"7px",borderRadius:"50%",background:"#00AEEF",marginRight:"5px",animation:"cs-pulse 1.4s ease-in-out infinite"}} />
-                Coming Soon
+                Request Access
               </span>
               <style>{`@keyframes cs-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}`}</style>
             </>

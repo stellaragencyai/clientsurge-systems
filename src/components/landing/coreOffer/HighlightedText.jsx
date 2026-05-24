@@ -24,7 +24,7 @@ export function highlightKeyTerms(text) {
     const isMatch = HIGHLIGHT_TERMS.some((term) => term.toLowerCase() === part.toLowerCase());
     if (!isMatch) return part;
 
-    return `<span style="background: linear-gradient(135deg, rgba(212,174,115,0.15) 0%, rgba(154,92,46,0.1) 100%); padding: 2px 4px; border-radius: 3px; text-decoration: underline; text-decoration-color: rgba(212,174,115,0.4); text-underline-offset: 3px; text-decoration-thickness: 2px;">${part}</span>`;
+    return `<span style="background: linear-gradient(135deg, rgba(212,174,115,0.15) 0%, rgba(0,136,204,0.1) 100%); padding: 2px 4px; border-radius: 3px; text-decoration: underline; text-decoration-color: rgba(212,174,115,0.4); text-underline-offset: 3px; text-decoration-thickness: 2px;">${part}</span>`;
   }).join("");
 }
 

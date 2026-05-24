@@ -91,13 +91,13 @@ function IndustryTemplateInner({ industrySlug }) {
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <Navbar />
 
-      <main style={{ flex: 1 }}>
+      <div style={{ flex: 1 }}>
         {/* Hero Section */}
         <IndustryHero
           eyebrow={industry.hero.eyebrow}
           headline={seo?.h1 || industry.hero.headline}
           subheadline={seo?.description || industry.hero.subheadline}
-          image={industry.hero.image || `https://via.placeholder.com/1200x600?text=${industry.name}`}
+          image={industry.hero.image || "/og-image.png"}
           cta={industry.hero.cta}
           onBookDemo={() => demoBooking?.openDemoBooking?.()}
         />
@@ -150,8 +150,8 @@ function IndustryTemplateInner({ industrySlug }) {
                       background: "rgba(255,255,255,0.55)",
                       backdropFilter: "blur(18px)",
                       WebkitBackdropFilter: "blur(18px)",
-                      border: "1px solid rgba(154,92,46,0.2)",
-                      boxShadow: "0 4px 20px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.9)",
+                      border: "1px solid rgba(0,136,204,0.2)",
+                      boxShadow: "0 4px 20px rgba(0,136,204,0.07), inset 0 1px 0 rgba(255,255,255,0.9)",
                     }}
                   >
                     <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -189,7 +189,7 @@ function IndustryTemplateInner({ industrySlug }) {
 
         {/* FAQ */}
         <IndustryFAQ faqs={industry.faqs} />
-      </main>
+      </div>
 
       <Footer />
     </div>

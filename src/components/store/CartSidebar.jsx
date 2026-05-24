@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingCart, Trash2, ArrowRight, Lock } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
 import { base44 } from "@/api/base44Client";
 import { AI_PRODUCTS } from "@/lib/aiProducts";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 const COMPLEMENTARY_SERVICES = {
   instant_lead_response: ["missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent"],
@@ -32,6 +33,12 @@ export default function CartSidebar() {
   });
   const [smsConsent, setSmsConsent] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!cartOpen) return undefined;
+    return acquireBodyScrollLock("cart-sidebar");
+  }, [cartOpen]);
+
   const suggestedAddon = useMemo(() => {
     if (!items.length) return null;
 
@@ -79,13 +86,14 @@ export default function CartSidebar() {
 
     if (window.self !== window.top) {
       // Silently redirect to the live site if inside iframe preview
+      clearTimeout(timeoutId);
       window.open(window.location.href, "_blank");
       setStep("cart");
       return;
     }
 
     try {
-      const response = await base44.functions.invoke("createCheckoutSession", {
+      const checkoutPayload = {
         items,
         customer_name: form.name,
         customer_email: form.email,
@@ -93,9 +101,20 @@ export default function CartSidebar() {
         business_name: form.business,
         success_url: `${window.location.origin}/client-portal?session_id={CHECKOUT_SESSION_ID}&new=1`, // #309: redirect to portal post-checkout,
         cancel_url: `${window.location.origin}/store`,
+      };
+      const response = await base44.functions.fetch("/createCheckoutSession", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(checkoutPayload),
       });
+      const responseText = await response.text();
+      const responseData = responseText ? JSON.parse(responseText) : {};
 
-      if (response.data?.url) {
+      if (!response.ok) {
+        throw new Error(responseData?.error || responseText || "Checkout failed.");
+      }
+
+      if (responseData?.url) {
         clearTimeout(timeoutId);
         // Save order summary so OrderSuccess can display what was purchased
         try {
@@ -105,7 +124,7 @@ export default function CartSidebar() {
             totalMonthly,
           }));
         } catch {}
-        window.location.href = response.data.url;
+        window.location.href = responseData.url;
         return;
       }
 
@@ -150,7 +169,7 @@ export default function CartSidebar() {
           bottom: 0,
           width: "min(430px, 100vw)",
           background: "linear-gradient(180deg, #fdfbf8 0%, #f6efe5 100%)",
-          borderLeft: "1px solid rgba(154,92,46,0.14)",
+          borderLeft: "1px solid rgba(0,136,204,0.14)",
           boxShadow: "-20px 0 60px rgba(0,0,0,0.18)",
           zIndex: 101,
           display: "flex",
@@ -164,14 +183,14 @@ export default function CartSidebar() {
             alignItems: "center",
             justifyContent: "space-between",
             padding: "20px 22px",
-            borderBottom: "1px solid rgba(154,92,46,0.1)",
+            borderBottom: "1px solid rgba(0,136,204,0.1)",
             background: "rgba(255,255,255,0.56)",
             backdropFilter: "blur(12px)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <ShoppingCart
-              style={{ width: "20px", height: "20px", color: "#9a5c2e" }}
+              style={{ width: "20px", height: "20px", color: "#0077B6" }}
             />
             <span
               style={{ fontWeight: "700", fontSize: "16px", color: "#1a1209" }}
@@ -181,7 +200,7 @@ export default function CartSidebar() {
             {items.length > 0 ? (
               <span
                 style={{
-                  background: "#9a5c2e",
+                  background: "#0077B6",
                   color: "#fff",
                   borderRadius: "9999px",
                   width: "20px",
@@ -215,12 +234,12 @@ export default function CartSidebar() {
             <div style={{ textAlign: "center", padding: "36px 16px 24px" }}>
               <div style={{
                 width: "56px", height: "56px", borderRadius: "16px",
-                background: "linear-gradient(135deg, rgba(154,92,46,0.1), rgba(200,150,92,0.05))",
-                border: "1px solid rgba(154,92,46,0.14)",
+                background: "linear-gradient(135deg, rgba(0,136,204,0.1), rgba(0,174,239,0.05))",
+                border: "1px solid rgba(0,136,204,0.14)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 margin: "0 auto 14px",
               }}>
-                <ShoppingCart style={{ width: "26px", height: "26px", color: "#9a5c2e", opacity: 0.6 }} />
+                <ShoppingCart style={{ width: "26px", height: "26px", color: "#0077B6", opacity: 0.6 }} />
               </div>
               <p style={{ fontSize: "14px", fontWeight: "700", color: "#1a1209", margin: "0 0 6px" }}>
                 Your stack is empty
@@ -237,11 +256,11 @@ export default function CartSidebar() {
                 <div key={s.name} style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   padding: "10px 12px", marginBottom: "6px", borderRadius: "12px",
-                  background: "rgba(255,255,255,0.7)", border: "1px solid rgba(154,92,46,0.1)",
+                  background: "rgba(255,255,255,0.7)", border: "1px solid rgba(0,136,204,0.1)",
                   cursor: "pointer",
                 }} onClick={() => setCartOpen(false)}>
                   <span style={{ fontSize: "13px" }}>{s.icon} {s.name}</span>
-                  <span style={{ fontSize: "11px", color: "#9a5c2e", fontWeight: "700" }}>{s.price}</span>
+                  <span style={{ fontSize: "11px", color: "#0077B6", fontWeight: "700" }}>{s.price}</span>
                 </div>
               ))}
               <p style={{ fontSize: "11px", color: "rgba(26,18,9,0.35)", marginTop: "10px" }}>
@@ -258,10 +277,10 @@ export default function CartSidebar() {
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: 40, scale: 0.92 }}
                   transition={{ type: "spring", stiffness: 320, damping: 30, delay: idx * 0.05 }}
-                  whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(154,92,46,0.13)" }}
+                  whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(0,136,204,0.13)" }}
                   style={{
                     background: "rgba(255,255,255,0.8)",
-                    border: "1px solid rgba(154,92,46,0.1)",
+                    border: "1px solid rgba(0,136,204,0.1)",
                     borderRadius: "16px",
                     padding: "14px 16px",
                     display: "flex",
@@ -368,8 +387,8 @@ export default function CartSidebar() {
               <div
                 style={{
                   borderRadius: "14px",
-                  background: "rgba(154,92,46,0.06)",
-                  border: "1px solid rgba(154,92,46,0.1)",
+                  background: "rgba(0,136,204,0.06)",
+                  border: "1px solid rgba(0,136,204,0.1)",
                   padding: "12px 14px",
                 }}
               >
@@ -428,7 +447,7 @@ export default function CartSidebar() {
                     style={{
                       width: "100%",
                       borderRadius: "12px",
-                      border: "1.5px solid rgba(154,92,46,0.18)",
+                      border: "1.5px solid rgba(0,136,204,0.18)",
                       padding: "11px 14px",
                       fontSize: "13px",
                       background: "rgba(255,255,255,0.86)",
@@ -445,11 +464,11 @@ export default function CartSidebar() {
                     type="checkbox"
                     checked={smsConsent}
                     onChange={(e) => setSmsConsent(e.target.checked)}
-                    style={{ marginTop: "2px", flexShrink: 0, accentColor: "#9a5c2e", width: "14px", height: "14px" }}
+                    style={{ marginTop: "2px", flexShrink: 0, accentColor: "#0077B6", width: "14px", height: "14px" }}
                   />
                   <span style={{ fontSize: "11px", color: "rgba(26,18,9,0.6)", lineHeight: 1.5 }}>
                     I agree to receive SMS messages from ClientSurge Systems about my order and service updates. Message & data rates may apply. Reply STOP to unsubscribe at any time.{" "}
-                    <a href="/privacy-policy" target="_blank" style={{ color: "#9a5c2e", fontWeight: "600" }}>Privacy Policy</a>
+                    <a href="/privacy-policy" target="_blank" style={{ color: "#0077B6", fontWeight: "600" }}>Privacy Policy</a>
                   </span>
                 </label>
               )}
@@ -474,7 +493,7 @@ export default function CartSidebar() {
           <div
             style={{
               padding: "16px 20px 18px",
-              borderTop: "1px solid rgba(154,92,46,0.1)",
+              borderTop: "1px solid rgba(0,136,204,0.1)",
               background: "rgba(255,255,255,0.7)",
               backdropFilter: "blur(12px)",
             }}
@@ -483,7 +502,7 @@ export default function CartSidebar() {
               style={{
                 borderRadius: "16px",
                 background: "rgba(255,255,255,0.74)",
-                border: "1px solid rgba(154,92,46,0.1)",
+                border: "1px solid rgba(0,136,204,0.1)",
                 padding: "14px 14px 12px",
                 marginBottom: "14px",
               }}
@@ -516,7 +535,7 @@ export default function CartSidebar() {
                   style={{
                     fontSize: "14px",
                     fontWeight: "800",
-                    color: "#9a5c2e",
+                    color: "#0077B6",
                   }}
                 >
                   ${totalMonthly}/mo

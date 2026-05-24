@@ -13,6 +13,8 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
         <img
           src={image}
           alt={eyebrow}
+          width="1280"
+          height="720"
           className="w-full h-full object-cover object-center"
           loading="eager"
           fetchPriority="high"
@@ -67,7 +69,7 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
                 {headlineParts[0]}
                 <span
                   style={{
-                    background: "linear-gradient(135deg, #f5d9a8 0%, #c8965c 50%, #f5d9a8 100%)",
+                    background: "linear-gradient(135deg, #DDF4FF 0%, #00AEEF 50%, #DDF4FF 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",

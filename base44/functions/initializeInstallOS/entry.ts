@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { requireAdminUser } from "../_shared/authGuards.js";
 
 /**
  * Initialize ClientInstallationOS for a new order
@@ -131,6 +132,8 @@ async function createChecklistSteps(base44, checklistId, orderId, serviceKey) {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    await requireAdminUser(base44);
+
     const { order_id, frontend_template_version } = await req.json();
 
     // ─── Template version drift detection ────────────────────────────────────
@@ -259,6 +262,12 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[Install OS] Error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return Response.json(
+      {
+        error: error.message,
+        code: error.code || "initialize_install_os_error",
+      },
+      { status: error.status || 500 }
+    );
   }
 });

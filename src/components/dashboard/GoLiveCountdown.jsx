@@ -65,7 +65,7 @@ export default function GoLiveCountdown({ installStatus, createdDate }) {
         <div style={{ width:"44px",height:"44px",borderRadius:"12px",flexShrink:0,background:"rgba(34,197,94,0.15)",border:"1px solid rgba(34,197,94,0.3)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"22px" }}>🚀</div>
         <div>
           <p style={{ fontSize:"14px",fontWeight:"800",color:"#16a34a",margin:"0 0 3px" }}>Your System is Live!</p>
-          <p style={{ fontSize:"12px",color:"rgba(27,20,13,0.55)",margin:0 }}>Your automation is running and responding to leads 24/7.</p>
+          <p style={{ fontSize:"12px",color:"rgba(10,22,40,0.55)",margin:0 }}>Your automation is running and responding to leads 24/7.</p>
         </div>
       </div>
     );
@@ -82,7 +82,7 @@ export default function GoLiveCountdown({ installStatus, createdDate }) {
         <div style={{ width:"44px",height:"44px",borderRadius:"12px",flexShrink:0,background:"rgba(239,68,68,0.1)",border:"1px solid rgba(239,68,68,0.25)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"22px" }}>⚠️</div>
         <div>
           <p style={{ fontSize:"14px",fontWeight:"800",color:"#dc2626",margin:"0 0 3px" }}>Action Needed</p>
-          <p style={{ fontSize:"12px",color:"rgba(27,20,13,0.55)",margin:0 }}>Our team has been notified and is working on a fix. We\'ll update you shortly.</p>
+          <p style={{ fontSize:"12px",color:"rgba(10,22,40,0.55)",margin:0 }}>Our team has been notified and is working on a fix. We\'ll update you shortly.</p>
         </div>
       </div>
     );
@@ -98,15 +98,15 @@ export default function GoLiveCountdown({ installStatus, createdDate }) {
       borderRadius: "14px",
       background: overdue
         ? "linear-gradient(135deg, rgba(239,68,68,0.06), rgba(239,68,68,0.03))"
-        : "linear-gradient(135deg, rgba(154,92,46,0.07), rgba(200,150,92,0.04))",
-      border: overdue ? "1px solid rgba(239,68,68,0.2)" : "1px solid rgba(154,92,46,0.14)",
+        : "linear-gradient(135deg, rgba(0,136,204,0.07), rgba(0,174,239,0.04))",
+      border: overdue ? "1px solid rgba(239,68,68,0.2)" : "1px solid rgba(0,136,204,0.14)",
       padding: "18px 20px", marginBottom: "20px",
       display: "flex", alignItems: "center", gap: "14px",
     }}>
       <div style={{
         width:"44px",height:"44px",borderRadius:"12px",flexShrink:0,
-        background: overdue ? "rgba(239,68,68,0.1)" : "rgba(154,92,46,0.1)",
-        border: overdue ? "1px solid rgba(239,68,68,0.2)" : "1px solid rgba(154,92,46,0.15)",
+        background: overdue ? "rgba(239,68,68,0.1)" : "rgba(0,136,204,0.1)",
+        border: overdue ? "1px solid rgba(239,68,68,0.2)" : "1px solid rgba(0,136,204,0.15)",
         display:"flex",alignItems:"center",justifyContent:"center",fontSize:"22px",
       }}>
         {overdue ? "⏰" : "🔧"}
@@ -119,10 +119,10 @@ export default function GoLiveCountdown({ installStatus, createdDate }) {
               ? "Going live today!"
               : `${daysRemaining} business day${daysRemaining === 1 ? "" : "s"} remaining`}
         </p>
-        <p style={{ fontSize:"12px",color:"rgba(27,20,13,0.55)",margin:0 }}>
+        <p style={{ fontSize:"12px",color:"rgba(10,22,40,0.55)",margin:0 }}>
           {message}
           {friendlyTarget && !overdue && (
-            <span style={{ color:"rgba(27,20,13,0.4)" }}> · Target: {friendlyTarget}</span>
+            <span style={{ color:"rgba(10,22,40,0.4)" }}> · Target: {friendlyTarget}</span>
           )}
         </p>
       </div>

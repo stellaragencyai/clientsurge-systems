@@ -13,9 +13,9 @@ const INDUSTRIES = [
   { key: 'med_spa', label: 'Med Spa & Aesthetics', color: 'bg-pink-100 text-pink-800' },
   { key: 'dental', label: 'Dental & Orthodontics', color: 'bg-cyan-100 text-cyan-800' },
   { key: 'chiropractic', label: 'Chiropractic & PT', color: 'bg-purple-100 text-purple-800' },
-  { key: 'hvac', label: 'HVAC & Home Services', color: 'bg-orange-100 text-orange-800' },
+  { key: 'hvac', label: 'HVAC & Home Services', color: 'bg-sky-100 text-sky-800' },
   { key: 'roofing', label: 'Roofing & Restoration', color: 'bg-slate-100 text-slate-800' },
-  { key: 'contractors', label: 'General Contractors', color: 'bg-amber-100 text-amber-800' },
+  { key: 'contractors', label: 'General Contractors', color: 'bg-blue-100 text-blue-800' },
 ];
 
 const CONTENT_TYPES = [
@@ -28,7 +28,7 @@ const CONTENT_TYPES = [
 ];
 
 const STATUS_STYLES = {
-  draft: 'bg-yellow-50 text-yellow-700 border-yellow-200',
+  draft: 'bg-sky-50 text-sky-700 border-sky-200',
   approved: 'bg-green-50 text-green-700 border-green-200',
   scheduled: 'bg-blue-50 text-blue-700 border-blue-200',
   posted: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -241,7 +241,7 @@ export default function SocialMediaEngine() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Total Generated', value: stats.total, color: 'bg-blue-50 text-blue-700' },
-          { label: 'Drafts', value: stats.drafts, color: 'bg-yellow-50 text-yellow-700' },
+          { label: 'Drafts', value: stats.drafts, color: 'bg-sky-50 text-sky-700' },
           { label: 'Approved', value: stats.approved, color: 'bg-green-50 text-green-700' },
           { label: 'Posted', value: stats.posted, color: 'bg-emerald-50 text-emerald-700' },
         ].map(s => (
@@ -418,7 +418,7 @@ export default function SocialMediaEngine() {
             <span><strong>Chiropractic:</strong> Every Thursday — Instagram + LinkedIn + Blog</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-orange-400 flex-shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-sky-400 flex-shrink-0" />
             <span><strong>HVAC:</strong> Every Friday — Facebook + LinkedIn + Blog</span>
           </div>
           <div className="flex items-center gap-2">
@@ -426,7 +426,7 @@ export default function SocialMediaEngine() {
             <span><strong>Roofing:</strong> Bi-weekly Monday — Facebook + Instagram + Blog</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+            <span className="w-2 h-2 rounded-full bg-blue-400 flex-shrink-0" />
             <span><strong>Contractors:</strong> Bi-weekly Wednesday — Facebook + LinkedIn + Blog</span>
           </div>
         </div>

@@ -77,7 +77,7 @@ export default function LeadsTable() {
   const getStatusColor = (status) => {
     const colors = {
       "New": "bg-blue-100 text-blue-800",
-      "Contacted": "bg-yellow-100 text-yellow-800",
+      "Contacted": "bg-sky-100 text-sky-800",
       "Replied": "bg-purple-100 text-purple-800",
       "Qualified": "bg-green-100 text-green-800",
       "Booked": "bg-pink-100 text-pink-800",

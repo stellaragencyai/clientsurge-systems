@@ -1,5 +1,5 @@
 /**
- * generateMonthlyPerformanceReport — #422 #422a #422b #422d
+ * generateMonthlyPerformanceReport — #422 #422a #422b #422c #422d
  * Elite perk #2. Runs 1st of month.
  * Queries real entity data + sends HTML report to client.
  */
@@ -67,21 +67,50 @@ Deno.serve(async (req) => {
     for (const order of (orders || [])) {
       const metrics = await gatherMetrics(base44, order.id, order);
       const html = buildReportHtml(order.client_name || "Client", metrics);
+      let reportStatus = "draft";
+      let sentAt = "";
 
       if (order.client_email && resendKey) {
         await fetch("https://api.resend.com/emails", {
           method: "POST",
           headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            from: "system@clientsurgesystems.com",
+            from: "ClientSurge Systems <system@clientsurgesystems.com>",
             reply_to: "nolan@clientsurgesystems.com",
             to: order.client_email,
             subject: `📊 Your ${metrics.period} Performance Report — ${order.client_name}`,
+            text: `Monthly Performance Report - ${metrics.period}
+
+Total leads: ${metrics.totalLeads}
+Leads contacted: ${metrics.contacted}
+Demos booked: ${metrics.booked}
+Response rate: ${metrics.responseRate}%
+
+Questions about your results? Reply to this email or contact ClientSurge Systems.`,
             html,
           }),
         }).catch(() => {});
         sent++;
+        reportStatus = "sent";
+        sentAt = new Date().toISOString();
       }
+
+      await base44.asServiceRole.entities.Reports.create({
+        order_id: order.id,
+        client_id: order.client_id || "",
+        client_project_id: order.client_project_id || "",
+        report_type: "monthly_performance",
+        period: metrics.period,
+        title: `${metrics.period} Performance Report`,
+        status: reportStatus,
+        metrics_json: JSON.stringify(metrics),
+        html,
+        sent_to: order.client_email || "",
+        sent_at: sentAt,
+        metadata_json: JSON.stringify({ source: "generateMonthlyPerformanceReport" }),
+      }).catch((error) => {
+        console.warn("[generateMonthlyPerformanceReport] Reports record create failed:", error.message);
+      });
     }
 
     return Response.json({ success: true, reports_sent: sent, total_orders: orders.length });

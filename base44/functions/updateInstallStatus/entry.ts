@@ -60,17 +60,24 @@ Deno.serve(async (req) => {
       if (i.service_key !== service_key) return i;
       const updates = { ...i, install_status };
       if (install_status === "Configuring" && !i.install_started_at) updates.install_started_at = timestamp;
+      if (install_status === "Testing" && !i.install_started_at) updates.install_started_at = timestamp;
       if (install_status === "Live") updates.install_completed_at = timestamp;
       if (install_status === "Error") updates.install_error = note || "";
       return updates;
     });
 
     const newPipelineStatus = calculatePipelineStatus(updatedItems);
+    const anyActivationStarted = updatedItems.some((i) =>
+      ["Configuring", "Testing", "Live"].includes(i.install_status)
+    );
+    const allServicesLive = updatedItems.every((i) => i.install_status === "Live");
     const updatedOrder = await base44.asServiceRole.entities.Order.update(order_id, {
       items: updatedItems,
       pipeline_status: newPipelineStatus,
       last_install_event_at: timestamp,
-      ...(updatedItems.every((i) => i.install_status === "Live") ? { order_status: "fully_live" } : {}),
+      ...(anyActivationStarted && !order.activation_started_at ? { activation_started_at: timestamp } : {}),
+      ...(allServicesLive && !order.activation_completed_at ? { activation_completed_at: timestamp } : {}),
+      ...(allServicesLive ? { order_status: "fully_live" } : {}),
     });
     await createAuditLog(base44, {
       admin_email: user.email || "unknown_admin",

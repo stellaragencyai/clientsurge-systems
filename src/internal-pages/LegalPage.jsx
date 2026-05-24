@@ -61,13 +61,13 @@ export default function LegalPage({ fixedType, canonicalPath }) {
           <span style={{ fontSize: 11, fontWeight: 700, color: "#00D4FF", background: "rgba(0,212,255,0.1)", border: "1px solid rgba(0,212,255,0.2)", padding: "2px 8px", borderRadius: 9999 }}>Systems</span>
         </a>
         <span style={{ flex: 1 }} />
-        <a href="/automations" style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, textDecoration: "none" }}>Automations</a>
-        <a href="/book" style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, textDecoration: "none", marginLeft: 16 }}>Book Audit</a>
+        <a href="/automations" style={{ color: "rgba(255,255,255,0.78)", fontSize: 13, textDecoration: "none" }}>Automations</a>
+        <a href="/book" style={{ color: "rgba(255,255,255,0.78)", fontSize: 13, textDecoration: "none", marginLeft: 16 }}>Book Audit</a>
       </nav>
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "48px 24px 80px" }}>
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, marginBottom: 8 }}>Last updated: {content.updated}</p>
+        <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 11, marginBottom: 8 }}>Last updated: {content.updated}</p>
         <h1 style={{ color: "#fff", fontSize: 32, fontWeight: 900, margin: "0 0 32px" }}>{content.title}</h1>
-        <div style={{ color: "rgba(255,255,255,0.65)", fontSize: 14, lineHeight: 1.9 }}
+        <div style={{ color: "rgba(255,255,255,0.78)", fontSize: 14, lineHeight: 1.9 }}
           dangerouslySetInnerHTML={{ __html: content.body }} />
       </div>
     </div>

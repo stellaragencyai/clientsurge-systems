@@ -68,7 +68,7 @@ function UserRoutingCard({ user, onSave }) {
         </div>
         <div className="flex items-center gap-2">
           {user.role === "admin" && (
-            <span className="flex items-center gap-1 rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-bold">
+            <span className="flex items-center gap-1 rounded-full bg-blue-100 text-blue-700 px-2 py-0.5 text-[10px] font-bold">
               <Shield className="w-2.5 h-2.5" /> Admin
             </span>
           )}
@@ -236,8 +236,8 @@ export default function LeadRoutingPanel() {
           <Users className="w-4 h-4" />
           {users.length} total users
         </span>
-        <span className={`flex items-center gap-1.5 font-semibold ${activeCount > 0 ? "text-green-700" : "text-amber-600"}`}>
-          <div className={`w-2 h-2 rounded-full ${activeCount > 0 ? "bg-green-500" : "bg-amber-400"}`} />
+        <span className={`flex items-center gap-1.5 font-semibold ${activeCount > 0 ? "text-green-700" : "text-blue-600"}`}>
+          <div className={`w-2 h-2 rounded-full ${activeCount > 0 ? "bg-green-500" : "bg-blue-400"}`} />
           {activeCount} active in routing
         </span>
       </div>

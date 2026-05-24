@@ -43,13 +43,13 @@ function AutomationServicePageInner() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <main>
+      <div>
         <section className="px-4 pb-16 pt-32 md:px-6 md:pb-24 md:pt-40" style={{ background: "#ffffff" }}>
           <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
             <div>
               <div
                 className="mb-6 inline-flex items-center gap-3 rounded-full border px-4 py-2 text-xs font-bold uppercase tracking-[0.16em]"
-                style={{ borderColor: "rgba(0,174,239,0.18)", color: "#0088CC" }}
+                style={{ borderColor: "rgba(0,107,176,0.2)", color: "#006BB0" }}
               >
                 <Icon className="h-4 w-4" />
                 ClientSurge automation
@@ -71,7 +71,7 @@ function AutomationServicePageInner() {
                 <Link
                   to="/#six-automations"
                   className="inline-flex min-h-12 items-center justify-center rounded-full border px-6 text-sm font-bold no-underline"
-                  style={{ borderColor: "rgba(0,174,239,0.22)", color: "#0088CC" }}
+                  style={{ borderColor: "rgba(0,107,176,0.24)", color: "#006BB0" }}
                 >
                   View all 6 systems
                 </Link>
@@ -79,16 +79,16 @@ function AutomationServicePageInner() {
             </div>
 
             <div className="rounded-lg border p-5 shadow-xl" style={{ borderColor: "rgba(0,174,239,0.16)" }}>
-              <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#0088CC" }}>
+              <p className="mb-4 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#006BB0" }}>
                 Before and after workflow
               </p>
               <div className="space-y-4">
                 <div className="rounded-lg border border-red-100 bg-red-50 p-4">
-                  <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-red-600">Before</p>
+                  <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "#b91c1c" }}>Before</p>
                   <p className="text-sm leading-6 text-red-900">{automation.before}</p>
                 </div>
                 <div className="rounded-lg border border-sky-100 bg-sky-50 p-4">
-                  <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "#0088CC" }}>
+                  <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "#006BB0" }}>
                     After ClientSurge
                   </p>
                   <p className="text-sm leading-6 text-slate-800">{automation.after}</p>
@@ -107,7 +107,7 @@ function AutomationServicePageInner() {
               <ul className="space-y-3">
                 {automation.triggers.map((trigger) => (
                   <li key={trigger} className="flex gap-3 text-sm leading-6 text-muted-foreground">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "#0088CC" }} />
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" style={{ color: "#006BB0" }} />
                     {trigger}
                   </li>
                 ))}
@@ -119,7 +119,7 @@ function AutomationServicePageInner() {
         <section className="px-4 py-16 md:px-6 md:py-24" style={{ background: "#ffffff" }}>
           <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#0088CC" }}>
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#006BB0" }}>
                 Example messages
               </p>
               <h2 className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground">
@@ -175,7 +175,7 @@ function AutomationServicePageInner() {
             </button>
           </div>
         </section>
-      </main>
+      </div>
       <Footer />
     </div>
   );

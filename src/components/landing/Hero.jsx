@@ -1,9 +1,16 @@
 import { lazy, Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useDemoBooking } from "./DemoBookingContext";
 import CascadingChecklistItem from "@/components/visual-effects/CascadingChecklistItem";
 import { BUTTON_TEXT } from "@/lib/constants";
+import {
+  premiumEase,
+  revealContainer,
+  revealItem,
+  useMagneticMotion,
+} from "./PremiumHomepageMotion";
 
 
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
@@ -13,9 +20,16 @@ const checklist = [
 "Automatically follow up with every inquiry",
 "Book more appointments without hiring extra staff"];
 
+const MotionLink = motion(Link);
+const headlineWords = ["AI", "Automation", "Systems", "That", "Turn", "More", "Local", "Leads", "Into"];
 
 export default function Hero() {
   const demoBooking = useDemoBooking();
+  const primaryCta = useMagneticMotion(0.14);
+  const secondaryCta = useMagneticMotion(0.1);
+  const { scrollYProgress } = useScroll();
+  const gridY = useTransform(scrollYProgress, [0, 0.35], [0, 120]);
+  const gridOpacity = useTransform(scrollYProgress, [0, 0.22], [0.55, 0.08]);
 
   return (
     <section
@@ -62,6 +76,24 @@ export default function Hero() {
         
       </div>
 
+      <motion.div
+        aria-hidden="true"
+        className="landing-hero__motionGrid"
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          y: gridY,
+          opacity: gridOpacity,
+          backgroundImage:
+            "linear-gradient(rgba(0,174,239,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(0,174,239,0.1) 1px, transparent 1px), radial-gradient(circle at 72% 30%, rgba(0,174,239,0.12), transparent 30%)",
+          backgroundSize: "56px 56px, 56px 56px, 100% 100%",
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 18%, black 72%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 18%, black 72%, transparent 100%)",
+          zIndex: 1,
+        }}
+      />
+
       <div
         className="landing-hero__inner"
         style={{
@@ -77,10 +109,17 @@ export default function Hero() {
           minHeight: "100svh"
         }}>
         
-        <div className="landing-hero__copy" style={{ gridColumn: "1", marginBottom: "0px", textAlign: "left", maxWidth: "100%", position: "relative", zIndex: 10 }}>
+        <motion.div
+          className="landing-hero__copy"
+          variants={revealContainer}
+          initial="hidden"
+          animate="visible"
+          style={{ gridColumn: "1", marginBottom: "0px", textAlign: "left", maxWidth: "100%", position: "relative", zIndex: 10 }}
+        >
 
 
-          <h1
+          <motion.h1
+            variants={revealItem}
             className="landing-hero__headline"
             style={{
               fontFamily: "Montserrat, sans-serif",
@@ -92,43 +131,56 @@ export default function Hero() {
               marginBottom: "16px"
             }}>
             
-            AI Automation Systems That Turn More Local Leads Into{" "}
-            <span
+            {headlineWords.map((word) => (
+              <motion.span
+                key={word}
+                variants={revealItem}
+                style={{ display: "inline-block", marginRight: "0.32em" }}
+              >
+                {word}
+              </motion.span>
+            ))}
+            <motion.span
+              variants={revealItem}
+              className="cinematic-text-sheen"
               style={{
-                color: "#00AEEF",
-                display: "inline"
+                display: "inline-block",
+                filter: "drop-shadow(0 10px 22px rgba(0,174,239,0.22))"
               }}>
               
               Booked Jobs
-            </span>
-          </h1>
+            </motion.span>
+          </motion.h1>
 
           {/* Visual enhancement: shimmer divider under headline */}
 
 
-          <p
+          <motion.p
+            variants={revealItem}
             className="landing-hero__body"
             style={{
               fontSize: "clamp(0.95rem, 2.2vw, 1.05rem)",
-              color: "rgba(27,20,13,0.74)",
+              color: "rgba(10,22,40,0.74)",
               lineHeight: 1.65,
               maxWidth: "560px",
               margin: "0 0 18px"
             }}>
             
             ClientSurge Systems builds AI-powered websites, voice agents, and lead automation systems for local service businesses. Recover missed calls, respond instantly, nurture leads automatically, and book more appointments without adding staff.
-          </p>
+          </motion.p>
 
-          <div
+          <motion.div
+            variants={revealContainer}
             className="landing-hero__checklist hero-checklist"
             style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px", maxWidth: "640px", margin: "0 0 32px" }}>
             
             {checklist.map((item, i) =>
             <CascadingChecklistItem key={item} item={item} index={i} />
             )}
-          </div>
+          </motion.div>
 
-          <div
+          <motion.div
+            variants={revealItem}
             className="landing-hero__actions"
             style={{
               display: "flex",
@@ -140,10 +192,14 @@ export default function Hero() {
               marginTop: "32px"
             }}>
             
-            <button
+            <motion.button
+              ref={primaryCta.ref}
               type="button"
               onClick={demoBooking?.openDemoBooking}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.98 }}
               style={{
+                ...primaryCta.motionStyle,
                 display: "inline-flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -159,24 +215,36 @@ export default function Hero() {
                 fontWeight: "700",
                 boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
                 cursor: "pointer",
-                transition: "all 0.3s ease"
+                position: "relative",
+                overflow: "hidden"
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "scale(1.05)";
-                e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,174,239,0.6)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,174,239,0.4)";
-              }}>
-              
-              {BUTTON_TEXT.BOOK_DEMO}
-              <ArrowRight style={{ width: "18px", height: "18px" }} />
-            </button>
-            <Link
+              {...primaryCta.magneticHandlers}>
+              <span className="cinematic-pulse-rings" aria-hidden="true" />
+              <motion.span
+                aria-hidden="true"
+                animate={{ x: ["-140%", "140%"] }}
+                transition={{ duration: 2.6, repeat: Infinity, repeatDelay: 1.2, ease: "easeInOut" }}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.32), transparent)",
+                  transform: "skewX(-18deg)",
+                }}
+              />
+              <span style={{ position: "relative", zIndex: 1 }}>{BUTTON_TEXT.BOOK_DEMO}</span>
+              <ArrowRight style={{ width: "18px", height: "18px", position: "relative", zIndex: 1 }} />
+            </motion.button>
+            <MotionLink
+              ref={secondaryCta.ref}
               to="/automations"
               className="inline-flex items-center justify-center"
+              whileHover={{ scale: 1.035, borderColor: "rgba(0,136,204,0.46)" }}
+              whileTap={{ scale: 0.98 }}
               style={{
+                ...secondaryCta.motionStyle,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
                 minHeight: "58px",
                 padding: "0 28px",
                 borderRadius: "9999px",
@@ -188,31 +256,37 @@ export default function Hero() {
                 textDecoration: "none",
                 boxShadow: "0 4px 16px rgba(0,80,160,0.08)"
               }}
+              {...secondaryCta.magneticHandlers}
             >
               View AI Automations
-            </Link>
-          </div>
+            </MotionLink>
+          </motion.div>
 
-          <p
+          <motion.p
+            variants={revealItem}
             style={{
               marginTop: "18px",
               fontSize: "12px",
-              color: "rgba(27,20,13,0.48)",
+              color: "rgba(10,22,40,0.48)",
               letterSpacing: "0.04em"
             }}>
             No contracts · Most clients go live in 24–48 hours
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <div
+        <motion.div
           className="landing-hero__visualWrap"
+          initial={{ opacity: 0, y: 36, rotateX: 8 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
+          transition={{ duration: 0.9, delay: 0.28, ease: premiumEase }}
           style={{
             position: "relative",
             minHeight: "520px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            gridColumn: "2"
+            gridColumn: "2",
+            perspective: "1200px"
           }}>
           
           <div
@@ -233,9 +307,17 @@ export default function Hero() {
 
 
           {/* Dashboard visual */}
-          <Suspense fallback={null}>
-            <HeroDashboardScreen />
-          </Suspense>
+          <motion.div
+            animate={{ y: [0, -12, 0], rotateZ: [0, 0.35, 0] }}
+            transition={{ duration: 7.5, repeat: Infinity, ease: "easeInOut" }}
+            style={{ width: "100%", transformStyle: "preserve-3d", position: "relative" }}
+          >
+            <span className="cinematic-orbit-ring" aria-hidden="true" />
+            <span className="cinematic-orbit-ring cinematic-orbit-ring--two" aria-hidden="true" />
+            <Suspense fallback={null}>
+              <HeroDashboardScreen />
+            </Suspense>
+          </motion.div>
 
 
 
@@ -285,7 +367,7 @@ export default function Hero() {
 
 
           
-        </div>
+        </motion.div>
       </div>
 
       <style>{`

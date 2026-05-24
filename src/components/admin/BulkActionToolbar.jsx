@@ -300,7 +300,7 @@ export default function BulkActionToolbar({ selectedIds, leads = [], onClearSele
           <button
             onClick={handleRescore}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors disabled:opacity-50"
             title="Re-score selected leads with AI"
           >
             <BrainCircuit className="w-3.5 h-3.5" />

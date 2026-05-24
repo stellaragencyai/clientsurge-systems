@@ -12,6 +12,8 @@ export default function MedSpaFinalCTA() {
         <img
           src="https://images.unsplash.com/photo-1552693673-1bf958298935?w=1000&q=60&auto=format"
           alt="Med spa ambiance"
+          width="1000"
+          height="560"
           className="w-full h-full object-cover opacity-20"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-muted via-primary/5 to-muted" />
@@ -38,9 +40,9 @@ export default function MedSpaFinalCTA() {
             <button
               onClick={() => setShowForm(true)}
               className="focus:outline-none focus:ring-2 focus:ring-primary rounded-full"
-              style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 6px 24px rgba(120,70,20,0.4)",border:"none",cursor:"pointer"}}
+              style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#0088CC 0%,#00AEEF 30%,#DDF4FF 50%,#00AEEF 70%,#005B99 100%)",boxShadow:"0 6px 24px rgba(0,92,153,0.4)",border:"none",cursor:"pointer"}}
             >
-              <span style={{display:"flex",alignItems:"center",gap:"10px",height:"58px",padding:"0 44px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1.05rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
+              <span style={{display:"flex",alignItems:"center",gap:"10px",height:"58px",padding:"0 44px",borderRadius:"9999px",background:"linear-gradient(135deg,#005B99 0%,#0077B6 40%,#005B99 100%)",color:"#EAF8FF",fontWeight:"700",fontSize:"1.05rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
                 Book Your Free Demo
                 <ArrowRight className="w-5 h-5" />
               </span>
@@ -55,11 +57,11 @@ export default function MedSpaFinalCTA() {
             </div>
           </>
         ) : (
-          <div className="max-w-2xl mx-auto mt-4 rounded-3xl overflow-hidden text-left" style={{background:"linear-gradient(135deg,rgba(26,21,16,0.97) 0%,rgba(40,30,18,0.97) 100%)",border:"1px solid rgba(200,150,92,0.15)",boxShadow:"0 8px 40px rgba(0,0,0,0.4)"}}>
+          <div className="max-w-2xl mx-auto mt-4 rounded-3xl overflow-hidden text-left" style={{background:"linear-gradient(135deg,rgba(26,21,16,0.97) 0%,rgba(40,30,18,0.97) 100%)",border:"1px solid rgba(0,174,239,0.15)",boxShadow:"0 8px 40px rgba(0,0,0,0.4)"}}>
             <div className="px-8 pt-8 pb-4 border-b border-white/5 text-center">
-              <div className="inline-flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-full px-3 py-1 mb-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                <span className="text-xs font-semibold text-amber-400 uppercase tracking-wide">Free 15-Min Demo</span>
+              <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-3 py-1 mb-3">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <span className="text-xs font-semibold text-blue-400 uppercase tracking-wide">Free 15-Min Demo</span>
               </div>
               <h3 className="font-display text-xl font-semibold text-white">Tell us about your med spa</h3>
               <p className="text-sm text-white/40 mt-1">We'll tailor the demo to your exact situation.</p>

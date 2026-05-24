@@ -12,17 +12,17 @@ const STATUSES = ["New", "Contacted", "Replied", "Qualified", "Booking Prompt Se
 
 const STATUS_COLORS = {
   New: "bg-blue-100 text-blue-700 border-blue-200",
-  Contacted: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  Contacted: "bg-sky-100 text-sky-700 border-sky-200",
   Replied: "bg-indigo-100 text-indigo-700 border-indigo-200",
   Qualified: "bg-green-100 text-green-700 border-green-200",
-  "Booking Prompt Sent": "bg-amber-100 text-amber-700 border-amber-200",
+  "Booking Prompt Sent": "bg-blue-100 text-blue-700 border-blue-200",
   Booked: "bg-emerald-100 text-emerald-700 border-emerald-200",
   Closed: "bg-gray-100 text-gray-700 border-gray-200",
 };
 
 const SEQUENCES = [
   { key: "instant_response", label: "Instant Response", icon: Zap, color: "text-blue-600 bg-blue-50 border-blue-200", desc: "Send the first-contact SMS template" },
-  { key: "missed_call_recovery", label: "Missed Call Recovery", icon: PhoneCall, color: "text-amber-600 bg-amber-50 border-amber-200", desc: "Missed call text-back template" },
+  { key: "missed_call_recovery", label: "Missed Call Recovery", icon: PhoneCall, color: "text-blue-600 bg-blue-50 border-blue-200", desc: "Missed call text-back template" },
   { key: "day1_followup", label: "Day 1 Follow-Up", icon: MessageSquare, color: "text-purple-600 bg-purple-50 border-purple-200", desc: "24-hour follow-up SMS" },
   { key: "day3_followup", label: "Day 3 Follow-Up", icon: MessageSquare, color: "text-purple-600 bg-purple-50 border-purple-200", desc: "3-day nurture SMS" },
   { key: "day7_followup", label: "Day 7 Follow-Up", icon: MessageSquare, color: "text-purple-600 bg-purple-50 border-purple-200", desc: "7-day re-engagement SMS" },
@@ -422,7 +422,7 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
                 </button>
               </form>
               {!lead.phone && (
-                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                <p className="text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
                   This lead has no phone number — WhatsApp cannot be sent.
                 </p>
               )}

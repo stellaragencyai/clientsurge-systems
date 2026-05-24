@@ -1,9 +1,9 @@
 const STATUS_CONFIG = {
   draft:     { label: "Draft",     color: "bg-gray-100 text-gray-600" },
-  scheduled: { label: "Scheduled", color: "bg-amber-100 text-amber-700" },
+  scheduled: { label: "Scheduled", color: "bg-blue-100 text-blue-700" },
   sending:   { label: "Sending…",  color: "bg-blue-100 text-blue-700" },
   sent:      { label: "Sent",      color: "bg-green-100 text-green-700" },
-  paused:    { label: "Paused",    color: "bg-orange-100 text-orange-700" },
+  paused:    { label: "Paused",    color: "bg-sky-100 text-sky-700" },
   cancelled: { label: "Cancelled", color: "bg-red-100 text-red-600" },
 };
 

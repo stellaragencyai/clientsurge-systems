@@ -1,3 +1,10 @@
+/**
+ * Deprecated checkout compatibility copy.
+ * Canonical install orchestration now lives in ../_shared/installPipeline.js
+ * and canonical lifecycle transitions live in ../_shared/installStateMachine.js.
+ * Checkout should not grow independent install lifecycle behavior.
+ */
+
 export const PIPELINE_STATUSES = [
   "Paid",
   "Ready for Install",
@@ -1690,6 +1697,7 @@ export async function initializePaidOrderInstallPipeline({
     onboarding_client_id: onboardingClient.id,
     items: initializedItems,
     install_initialized_at: alreadyInitialized ? order.install_initialized_at : now,
+    activation_started_at: order.activation_started_at || (alreadyInitialized ? order.install_initialized_at : now),
     install_configuration: installConfiguration,
     activation_package_tier: purchaseOnboardingHandoff.package_tier,
     activation_package_key: purchaseOnboardingHandoff.package_key,
@@ -2011,6 +2019,8 @@ export async function updateTrackedServiceInstallStatus({
 
   const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, {
     items: updatedItems,
+    install_initialized_at: order.install_initialized_at || now,
+    activation_started_at: order.activation_started_at || order.install_initialized_at || now,
     pipeline_status: nextPipelineStatus,
     pipeline_error: nextPipelineStatus === "Error" ? note || "Service install error" : undefined,
     order_status: mapPipelineStatusToOrderStatus({
@@ -2018,6 +2028,7 @@ export async function updateTrackedServiceInstallStatus({
       trackedItems,
       paymentStatus: order.payment_status || "paid",
     }),
+    ...(nextPipelineStatus === "Live" && !order.activation_completed_at ? { activation_completed_at: now } : {}),
     last_install_event_at: now,
   });
 

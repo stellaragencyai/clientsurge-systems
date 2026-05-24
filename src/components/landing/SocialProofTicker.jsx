@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { base44 } from "@/api/base44Client";
-import {
-  countAutomatedBusinesses,
-  formatAutomatedBusinessesStat,
-} from "@/lib/socialProofStats";
 
 const BASE_STATS = [
   "Under 60 sec lead response",
@@ -16,29 +11,7 @@ const BASE_STATS = [
 
 export default function SocialProofTicker() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [stats, setStats] = useState(BASE_STATS);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadOrderCount() {
-      try {
-        const orders = await base44.entities.Order.filter({ payment_status: "paid" }, "-created_date", 2000);
-        if (!cancelled) {
-          const automatedBusinessesStat = formatAutomatedBusinessesStat(countAutomatedBusinesses(orders));
-          setStats([automatedBusinessesStat, ...BASE_STATS]);
-        }
-      } catch {
-        if (!cancelled) setStats(BASE_STATS);
-      }
-    }
-
-    loadOrderCount();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const stats = BASE_STATS;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -55,7 +28,7 @@ export default function SocialProofTicker() {
         background: "rgba(255,255,255,0.92)",
         backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
-        borderBottom: "1px solid rgba(154,92,46,0.12)",
+        borderBottom: "1px solid rgba(0,136,204,0.12)",
         padding: "12px 24px",
         zIndex: 40,
         display: "flex",
@@ -69,7 +42,7 @@ export default function SocialProofTicker() {
           width: "8px",
           height: "8px",
           borderRadius: "50%",
-          background: "#c8965c",
+          background: "#00AEEF",
           animation: "pulse 2s ease-in-out infinite",
         }}
       />
@@ -96,7 +69,7 @@ export default function SocialProofTicker() {
           width: "8px",
           height: "8px",
           borderRadius: "50%",
-          background: "#c8965c",
+          background: "#00AEEF",
           animation: "pulse 2s ease-in-out infinite 0.3s",
         }}
       />

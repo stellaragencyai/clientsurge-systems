@@ -30,7 +30,7 @@ const PIPELINE_COLORS = {
   Contacted: "#8b5cf6",
   Replied: "#6366f1",
   Qualified: "#10b981",
-  "Booking Prompt Sent": "#f59e0b",
+  "Booking Prompt Sent": "#00AEEF",
   Booked: "#059669",
   Closed: "#6b7280",
 };
@@ -47,7 +47,7 @@ const STATUS_BADGE = {
   delivered: "bg-emerald-100 text-emerald-700",
   failed: "bg-red-100 text-red-700",
   received: "bg-blue-100 text-blue-700",
-  pending: "bg-amber-100 text-amber-700",
+  pending: "bg-blue-100 text-blue-700",
   processed: "bg-purple-100 text-purple-700",
 };
 
@@ -69,7 +69,6 @@ function MetricCard({ icon: Icon, label, value, sub, color = "blue", trend }) {
     green: "bg-green-50 text-green-700 border-green-100",
     purple: "bg-purple-50 text-purple-700 border-purple-100",
     emerald: "bg-emerald-50 text-emerald-700 border-emerald-100",
-    amber: "bg-amber-50 text-amber-700 border-amber-100",
     slate: "bg-slate-50 text-slate-700 border-slate-100",
   };
 
@@ -230,7 +229,7 @@ export default function AnalyticsDashboard() {
           label="Avg Response Time"
           value={avg_time_to_contact_hours != null ? `${avg_time_to_contact_hours} hrs` : "N/A"}
           sub="Create to first contact"
-          color="amber"
+          color="blue"
         />
         <MetricCard
           icon={Star}
@@ -322,7 +321,7 @@ export default function AnalyticsDashboard() {
         <MetricCard icon={Target} label="Qualified" value={leads?.status_counts?.Qualified ?? 0} color="purple" />
         <MetricCard icon={MessageSquare} label="Contacted" value={leads?.status_counts?.Contacted ?? 0} color="slate" />
         <MetricCard icon={Zap} label="Replied" value={leads?.status_counts?.Replied ?? 0} color="blue" />
-        <MetricCard icon={Activity} label="High Intent" value={leads?.high_intent_count ?? 0} sub="Score ≥ 60" color="amber" />
+        <MetricCard icon={Activity} label="High Intent" value={leads?.high_intent_count ?? 0} sub="Score ≥ 60" color="blue" />
       </div>
 
       {/* ── Recent Activity Log ───────────────────────────────────────────── */}

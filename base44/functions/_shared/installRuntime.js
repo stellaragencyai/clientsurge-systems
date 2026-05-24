@@ -7,6 +7,11 @@ import {
   validateServiceConfiguration,
 } from "./installPipeline.js";
 import { listLeadReactivationTargets as listLeadReactivationTargetsFromPipeline } from "./leadPipeline.js";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "./communicationOutbox.js";
 
 export const ALLOWED_RUNTIME_INSTALL_STATUSES = ["Testing", "Live"];
 export const MISSED_CALL_TRIGGER_STATUSES = ["busy", "canceled", "failed", "no-answer"];
@@ -515,23 +520,7 @@ export async function findPaidOrderByConfiguredPhone({ base44, businessPhone, se
   return matches[0] || null;
 }
 
-export async function sendTwilioSms({ to, from, body, fetchImpl = fetch }) {
-  const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-  const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-
-  if (!accountSid || !authToken) {
-    throw new RuntimeExecutionError("Twilio credentials not configured", {
-      status: 500,
-      code: "twilio_not_configured",
-      details: {
-        missing_credentials: [
-          ...(!accountSid ? ["TWILIO_ACCOUNT_SID"] : []),
-          ...(!authToken ? ["TWILIO_AUTH_TOKEN"] : []),
-        ],
-      },
-    });
-  }
-
+export async function sendTwilioSms({ base44, to, from, body, serviceKey, orderId, runtimeType, fetchImpl = fetch }) {
   if (!from) {
     throw new RuntimeExecutionError("Twilio business phone is not configured for runtime sending", {
       status: 409,
@@ -539,36 +528,41 @@ export async function sendTwilioSms({ to, from, body, fetchImpl = fetch }) {
     });
   }
 
-  const authHeader = btoa(`${accountSid}:${authToken}`);
-
-  const response = await fetchImpl(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${authHeader}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      From: from,
-      To: to,
-      Body: body,
-    }).toString(),
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "sms",
+    provider: "twilio",
+    recipient: to,
+    body,
+    from,
+    orderId,
+    source: "installRuntime",
+    sourceRecordId: orderId || to,
+    templateKey: serviceKey || "runtime_sms",
+    messageType: "transactional",
+    consentBasis: "runtime_test_or_service_execution",
+    metadata: { service_key: serviceKey, runtime_type: runtimeType },
+    providerSend: (providerPayload) => sendTwilioSmsProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl,
+    }),
   });
-
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
+  if (!result.success) {
     throw new RuntimeExecutionError("Failed to send SMS via Twilio", {
       status: 502,
       code: "provider_send_failed",
       details: {
-        provider_response: data,
+        reason: result.reason || result.error || result.status,
+        outbox_id: result.outbox?.id,
       },
     });
   }
 
   return {
-    provider_message_id: data.sid,
-    provider_status: data.status || "queued",
-    raw: data,
+    provider_message_id: result.provider_message_id,
+    provider_status: result.provider_status || "queued",
+    raw: result,
   };
 }
 
@@ -580,15 +574,40 @@ export async function sendEmailMessage({ base44, to, subject, body }) {
     });
   }
 
-  const result = await base44.integrations.Core.SendEmail({
-    to,
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: to,
     subject,
     body,
+    html: body,
+    source: "installRuntime",
+    sourceRecordId: to,
+    templateKey: "runtime_email",
+    messageType: "transactional",
+    consentBasis: "runtime_test_or_service_execution",
+    metadata: { runtime_email: true },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
   });
+  if (!result.success) {
+    throw new RuntimeExecutionError("Failed to send email via outbox", {
+      status: 502,
+      code: "provider_send_failed",
+      details: {
+        reason: result.reason || result.error || result.status,
+        outbox_id: result.outbox?.id,
+      },
+    });
+  }
 
   return {
-    provider_message_id: result?.id || result?.messageId || null,
-    provider_status: result?.status || "processed",
+    provider_message_id: result.provider_message_id || null,
+    provider_status: result.provider_status || "processed",
     raw: result,
   };
 }
@@ -1594,6 +1613,7 @@ export async function executeOrderServiceRuntime({
 
   try {
     const sendResult = await sendSms({
+      base44,
       to: normalizedRecipientPhone,
       from: sharedConfig.twilio_business_phone,
       body: messageBody,

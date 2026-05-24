@@ -7,6 +7,7 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
 
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY"));
+const APP_URL = (Deno.env.get("APP_URL") || "https://clientsurgesystems.com").replace(/\/+$/, "");
 
 Deno.serve(async (req) => {
   try {
@@ -34,7 +35,7 @@ Deno.serve(async (req) => {
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: order.stripe_customer_id,
-      return_url: "https://clientsurgesystems.com/client-portal",
+      return_url: `${APP_URL}/client-portal`,
     });
 
     return Response.json({ url: portalSession.url });

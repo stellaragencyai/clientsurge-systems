@@ -41,9 +41,34 @@ Never commit real secret values to source control.
 | `ADMIN_NOTIFICATION_EMAIL` | Email that receives admin lead/order alerts | `nolan@clientsurgesystems.com` |
 | `ADMIN_NOTIFICATION_PHONE` | Phone for admin SMS alerts | `+16025843227` |
 | `DEFAULT_BOOKING_LINK` | Default Calendly/booking link | `https://calendly.com/...` |
+| `VITE_DEFAULT_BOOKING_LINK` | Public browser booking/scheduler link used by `/book` | `https://calendly.com/...` |
+| `VITE_TAWK_TO_PROPERTY_ID` | Optional public Tawk.to property ID for live chat | Tawk.to dashboard |
+| `VITE_TAWK_TO_WIDGET_ID` | Optional public Tawk.to widget ID for live chat | Tawk.to dashboard |
 | `DEFAULT_BUSINESS_NAME` | Fallback business name in templates | `ClientSurge Systems` |
 | `AUTOMATION_SHARED_SECRET` | Shared secret for internal automation calls | Random 32-char string |
+| `GOOGLE_MAPS_API_KEY` | Google Maps/Places key used by `discoverLeads`; missing keys return a clear 503 instead of failing silently | Google Cloud Console |
+| `INSTALL_PIPELINE_TIMEOUT_MS` | Optional installPipeline action timeout override; defaults to 30000ms | `30000` |
 | `ELEVENLABS_API_KEY` | ElevenLabs voice API key (if used) | From ElevenLabs dashboard |
+
+### Launch Verification Inputs
+
+These are operator-only inputs used by `npm run launch:external-blockers`; they are not app runtime requirements unless noted above.
+
+| Variable | Description | Example Value |
+|---|---|---|
+| `CLIENTSURGE_HEALTHCHECK_URL` | Deployed healthCheck function URL to probe and register in uptime monitoring | `https://.../healthCheck` |
+| `STRIPE_LIVE_SECRET_KEY` | Live Stripe secret key used to verify live-mode readiness | `sk_live_...` |
+| `STRIPE_LIVE_PUBLISHABLE_KEY` | Live Stripe publishable key used to verify live-mode readiness | `pk_live_...` |
+| `STRIPE_WEBHOOK_PROOF_URL` | Production Stripe webhook endpoint for signed proof tests | `https://clientsurgesystems.com/api/functions/stripeWebhookOrders` |
+| `CLIENTSURGE_LIVE_PURCHASE_URL` | Production purchase URL for an approved real-card smoke test | `https://clientsurgesystems.com/store` |
+| `CLIENTSURGE_LIVE_TEST_EMAIL` | Inbox used for approved real purchase verification | `qa@example.com` |
+| `CLIENTSURGE_PAID_CUSTOMER_EMAIL` | Real paid customer email for billing portal smoke verification | `customer@example.com` |
+| `CLIENTSURGE_LEAD_TEST_URL` | Local or staging lead endpoint for the 50-concurrent load-test harness | `https://staging.../submitLeadCapture` |
+| `CLIENTSURGE_TWILIO_TEST_RECIPIENT` | Consented phone number for Twilio live SMS/voice tests | `+16025551234` |
+| `CLIENTSURGE_TWILIO_SMS_WEBHOOK_URL` | Production inbound SMS webhook URL to configure in Twilio | `https://.../receiveInboundSms` |
+| `CLIENTSURGE_TWILIO_VOICE_WEBHOOK_URL` | Production inbound voice webhook URL to configure in Twilio | `https://.../receiveInboundCall` |
+| `CLIENTSURGE_RESEND_TEST_INBOX` | Inbox used for Resend delivery/bounce validation | `qa@example.com` |
+| `CLIENTSURGE_SMS_VOLUME_TEST_AUTHORIZED` | Must be `true` before any high-volume SMS simulation | `true` |
 
 ---
 
@@ -73,4 +98,8 @@ RESEND_API_KEY=re_...
 RESEND_FROM_EMAIL=test@yourdomain.com
 APP_URL=http://localhost:5173
 ADMIN_EMAIL=you@youremail.com
-``
+GOOGLE_MAPS_API_KEY=
+INSTALL_PIPELINE_TIMEOUT_MS=30000
+VITE_TAWK_TO_PROPERTY_ID=
+VITE_TAWK_TO_WIDGET_ID=
+```

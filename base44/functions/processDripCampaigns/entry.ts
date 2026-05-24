@@ -13,6 +13,11 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 const STOP_STATUSES = ["Qualified", "Booking Prompt Sent", "Booked", "Closed", "Won", "Lost", "opted_out"]; // #96
 
@@ -35,43 +40,56 @@ function renderTemplate(template, lead, bookingLink) {
     .replace(/{date}/g, new Date().toLocaleDateString());
 }
 
-async function sendSMS(phone, body, accountSid, authToken, fromNumber) {
-  const res = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({ To: phone, From: fromNumber, Body: body }),
-    }
-  );
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Twilio error");
-  }
+async function sendSMS(base44, lead, phone, body, fromNumber, campaign, stepKey) {
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "sms",
+    provider: "twilio",
+    recipient: phone,
+    body,
+    from: fromNumber,
+    lead,
+    leadId: lead.id,
+    source: "processDripCampaigns",
+    sourceRecordId: `${campaign.id}:${stepKey}:sms`,
+    templateKey: stepKey,
+    messageType: "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { drip_step: stepKey, campaign_id: campaign.id, auto: true },
+    providerSend: (providerPayload) => sendTwilioSmsProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
+  });
+  if (!result.success) throw new Error(result.reason || result.error || "SMS was not sent");
   return true;
 }
 
-async function sendEmail(to, subject, body, resendKey, fromEmail) {
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurge.com",
-      to,
-      subject,
-      text: body,
+async function sendEmail(base44, lead, to, subject, body, fromEmail, campaign, stepKey) {
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: to,
+    subject,
+    body,
+    from: fromEmail,
+    lead,
+    leadId: lead.id,
+    source: "processDripCampaigns",
+    sourceRecordId: `${campaign.id}:${stepKey}:email`,
+    templateKey: stepKey,
+    messageType: "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { drip_step: stepKey, campaign_id: campaign.id, auto: true },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
     }),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Resend error");
-  }
+  if (!result.success) throw new Error(result.reason || result.error || "Email was not sent");
   return true;
 }
 
@@ -100,14 +118,11 @@ Deno.serve(async (req) => {
     const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
     const settings = settingsRecords?.[0] || {};
 
-    const accountSid  = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const authToken   = Deno.env.get("TWILIO_AUTH_TOKEN");
     const fromNumber  = settings.twilio_from_number || Deno.env.get("TWILIO_PHONE_NUMBER");
-    const twilioReady = !!(accountSid && authToken && fromNumber && settings.twilio_enabled);
+    const twilioReady = !!(fromNumber && settings.twilio_enabled);
 
-    const resendKey   = Deno.env.get("RESEND_API_KEY");
     const fromEmail   = settings.resend_from_email || "noreply@clientsurge.com";
-    const resendReady = !!(resendKey && settings.resend_enabled);
+    const resendReady = !!(Deno.env.get("RESEND_API_KEY") && settings.resend_enabled);
 
     // Support both generic drip templates and missed-call-specific ones
     const templateMap = {
@@ -185,7 +200,7 @@ Deno.serve(async (req) => {
 
           if (twilioReady && lead.phone && messageBody) {
             try {
-              await sendSMS(lead.phone, messageBody, accountSid, authToken, fromNumber);
+              await sendSMS(base44, lead, lead.phone, messageBody, fromNumber, campaign, step.key);
               sent = true;
             } catch (err) {
               error = err.message;
@@ -197,11 +212,14 @@ Deno.serve(async (req) => {
           if (!sent && resendReady && lead.email) {
             try {
               await sendEmail(
+                base44,
+                lead,
                 lead.email,
                 `Following up — ${lead.business_name || "your inquiry"}`,
                 messageBody || `Hi ${lead.full_name || "there"}, just following up on your recent inquiry. We'd love to help!`,
-                resendKey,
-                fromEmail
+                fromEmail,
+                campaign,
+                step.key
               );
               sent = true;
               channel = "email";

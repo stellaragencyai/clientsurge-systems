@@ -12,7 +12,7 @@ const STATUS_DOT = {
   failed:    "bg-red-500",
   received:  "bg-blue-500",
   processed: "bg-purple-500",
-  pending:   "bg-amber-500",
+  pending:   "bg-blue-500",
 };
 
 function formatDate(iso) {

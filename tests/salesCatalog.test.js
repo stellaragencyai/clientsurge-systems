@@ -109,6 +109,17 @@ test("package checkout uses the live Stripe package price ids", () => {
   ]);
 });
 
+test("package checkout can use mirrored Stripe test price ids", () => {
+  const summary = buildPricingSummaryForProducts(
+    getPackageServices("starter_system").map((service) => service.product_id)
+  );
+
+  assert.deepEqual(buildStripeLineItemsForPricingSummary(summary, { livemode: false }), [
+    { price: "price_1TZaTKBVGjsISdG0FYZuolxJ", quantity: 1 },
+    { price: "price_1TZaTLBVGjsISdG0dj7Y62fu", quantity: 1 },
+  ]);
+});
+
 test("add-on checkout is blocked until live Stripe add-on prices exist", () => {
   const summary = buildPricingSummaryForProducts([
     ...getPackageServices("starter_system").map((service) => service.product_id),

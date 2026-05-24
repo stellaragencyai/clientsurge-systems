@@ -34,8 +34,8 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
           <div
             className="rounded-3xl px-8 py-8 mb-10 relative overflow-hidden"
             style={{
-              background: "linear-gradient(135deg, #7a4825 0%, #9a5c2e 46%, #c8965c 100%)",
-              boxShadow: "0 12px 40px rgba(122,72,37,0.25)",
+              background: "linear-gradient(135deg, #005B99 0%, #0077B6 46%, #00AEEF 100%)",
+              boxShadow: "0 12px 40px rgba(0,91,153,0.25)",
             }}
           >
             <div

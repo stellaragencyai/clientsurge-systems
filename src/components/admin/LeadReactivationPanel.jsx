@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 const STATUS_COLORS = {
-  queued:     "bg-amber-100 text-amber-700",
+  queued:     "bg-blue-100 text-blue-700",
   processing: "bg-blue-100 text-blue-700",
   completed:  "bg-green-100 text-green-700",
   failed:     "bg-red-100 text-red-700",
@@ -68,7 +68,7 @@ function LeadRow({ lead, selected, onToggle }) {
       </div>
       <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${
         lead.activation_priority === "Hot" ? "bg-red-100 text-red-700" :
-        lead.activation_priority === "High" ? "bg-orange-100 text-orange-700" :
+        lead.activation_priority === "High" ? "bg-sky-100 text-sky-700" :
         "bg-gray-100 text-gray-600"
       }`}>
         {lead.activation_priority || "Low"}
@@ -244,7 +244,7 @@ export default function LeadReactivationPanel() {
       {/* Result Banner */}
       {results && (
         <div className={`flex items-start gap-3 rounded-xl border p-4 text-sm ${
-          results.errors.length ? "border-amber-200 bg-amber-50 text-amber-800" : "border-green-200 bg-green-50 text-green-800"
+          results.errors.length ? "border-blue-200 bg-blue-50 text-blue-800" : "border-green-200 bg-green-50 text-green-800"
         }`}>
           {results.errors.length ? <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" /> : <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" />}
           <div>
@@ -333,7 +333,7 @@ export default function LeadReactivationPanel() {
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-muted-foreground" />
             Automation Job Queue
-            <span className="rounded-full bg-amber-100 text-amber-700 px-2 py-0.5 text-[10px] font-bold">{jobCounts.queued} queued</span>
+            <span className="rounded-full bg-blue-100 text-blue-700 px-2 py-0.5 text-[10px] font-bold">{jobCounts.queued} queued</span>
             <span className="rounded-full bg-green-100 text-green-700 px-2 py-0.5 text-[10px] font-bold">{jobCounts.completed} done</span>
             {jobCounts.failed > 0 && (
               <span className="rounded-full bg-red-100 text-red-700 px-2 py-0.5 text-[10px] font-bold">{jobCounts.failed} failed</span>

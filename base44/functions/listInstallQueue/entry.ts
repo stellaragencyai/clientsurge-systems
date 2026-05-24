@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { requireAdminUser } from "../_shared/authGuards.js";
 
 const VALID_TRANSITIONS = {
   "Paid": ["Ready for Install"],
@@ -12,6 +13,7 @@ const VALID_TRANSITIONS = {
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    await requireAdminUser(base44);
 
     const payload = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const includeLive = Boolean(payload?.include_live);
@@ -69,7 +71,12 @@ Deno.serve(async (req) => {
     return Response.json({ success: true, orders: mapped });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to load install queue";
-    const status = message === "Admin access required" ? 403 : 500;
-    return Response.json({ error: message }, { status });
+    return Response.json(
+      {
+        error: message,
+        code: error.code || "list_install_queue_error",
+      },
+      { status: error.status || 500 }
+    );
   }
 });

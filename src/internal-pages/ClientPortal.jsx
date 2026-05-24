@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { LogOut, LayoutDashboard } from "lucide-react";
+import { AlertCircle, LogOut, LayoutDashboard } from "lucide-react";
 import SetupProgressHub from "../components/portal/SetupProgressHub";
 import SupportChat from "../components/portal/SupportChat";
 import PlanManager from "../components/portal/PlanManager";
@@ -43,6 +43,24 @@ const TABS = [
   { id: "settings", label: "Settings" },
 ];
 
+const TAB_IDS = new Set(TABS.map((tab) => tab.id));
+
+function getInitialPortalTab() {
+  if (typeof window === "undefined") return "progress";
+  const requestedTab = new URLSearchParams(window.location.search).get("tab");
+  return TAB_IDS.has(requestedTab) ? requestedTab : "progress";
+}
+
+function isEmailExplicitlyUnverified(user) {
+  const verificationFields = [
+    user?.email_verified,
+    user?.emailVerified,
+    user?.verified_email,
+    user?.is_email_verified,
+  ];
+  return verificationFields.some((value) => value === false);
+}
+
 export default function ClientPortal() {
   const [user, setUser] = useState(null);
   const [project, setProject] = useState(null);
@@ -51,7 +69,7 @@ export default function ClientPortal() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [portalError, setPortalError] = useState("");
-  const [activeTab, setActiveTab] = useState("progress");
+  const [activeTab, setActiveTab] = useState(getInitialPortalTab);
   const [showQuickStart, setShowQuickStart] = useState(false);
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useLeadNotifications();
 
@@ -69,7 +87,11 @@ export default function ClientPortal() {
         setProject(context.project || null);
         setPortalOrder(context.order || null);
         setSubscription(context.subscription || null);
-        setShowQuickStart(context.project?.quick_start_completed !== true);
+        const needsOnboarding = context.project?.onboarding_wizard_completed === false || context.project?.quick_start_completed !== true;
+        setShowQuickStart(needsOnboarding);
+        if (needsOnboarding) {
+          setActiveTab("quickstart");
+        }
         setNotFound(!context.project);
         setPortalError(context.message || "");
       } catch (error) {
@@ -97,6 +119,11 @@ export default function ClientPortal() {
         setProject(context.project);
         setPortalOrder(context.order || null);
         setSubscription(context.subscription || null);
+        const needsOnboarding = context.project.onboarding_wizard_completed === false || context.project.quick_start_completed !== true;
+        setShowQuickStart(needsOnboarding);
+        if (needsOnboarding) {
+          setActiveTab("quickstart");
+        }
         setNotFound(false);
         setPortalError(context.message || "");
       } else {
@@ -224,6 +251,20 @@ export default function ClientPortal() {
           </button>
         </div>
       </div>
+
+      {isEmailExplicitlyUnverified(user) && (
+        <div className="border-b border-blue-200 bg-blue-50 px-6 py-3">
+          <div className="mx-auto flex max-w-4xl items-start gap-3 text-sm text-blue-900">
+            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+            <div>
+              <p className="font-semibold">Verify your email to keep portal access secure.</p>
+              <p className="text-xs text-blue-800/80">
+                Check your inbox for the Base44 verification email before sharing credentials or billing changes.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero greeting */}
       <div

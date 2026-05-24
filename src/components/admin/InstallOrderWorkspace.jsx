@@ -6,12 +6,13 @@ import {
 } from "@/lib/basicPackageActivation";
 import ServiceConfigEditor from "@/components/admin/install/ServiceConfigEditor";
 import DeploymentSummaryPanel from "@/components/admin/install/DeploymentSummaryPanel";
+import DeleteConfirmModal from "@/components/admin/DeleteConfirmModal";
 import { CheckCircle2, Clock3, Loader2, Save, ShieldAlert, Sparkles, TestTube2, TriangleAlert, Wrench } from "lucide-react";
 
 const STATUS_STYLES = {
   Paid: "bg-slate-100 text-slate-700",
   "Ready for Install": "bg-blue-50 text-blue-700",
-  Configuring: "bg-amber-50 text-amber-700",
+  Configuring: "bg-blue-50 text-blue-700",
   Testing: "bg-purple-50 text-purple-700",
   Live: "bg-green-50 text-green-700",
   Error: "bg-red-50 text-red-700",
@@ -87,7 +88,7 @@ function getEventTone(eventType, status) {
   }
 
   if (eventType === "service_status_changed" || eventType === "status_update" || eventType === "provider_send_attempted") {
-    return "border-amber-200 bg-amber-50";
+    return "border-blue-200 bg-blue-50";
   }
 
   if (eventType === "order_paid" || eventType === "install_initialized" || eventType === "provider_send_succeeded" || eventType === "booking_simulation_created" || eventType === "review_request_trigger_simulated") {
@@ -161,7 +162,7 @@ function MirrorStatusBadge({ value }) {
   const tone = value === "complete"
     ? "bg-green-50 text-green-700"
     : value === "in_progress"
-    ? "bg-amber-50 text-amber-700"
+    ? "bg-blue-50 text-blue-700"
     : "bg-slate-100 text-slate-600";
 
   return (
@@ -513,11 +514,11 @@ function BasicPackageActivationPanel({ detail, form, onApplyConfig }) {
       </div>
 
       {missingFields.length > 0 ? (
-        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm font-semibold text-amber-900">Missing client details</p>
+        <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4">
+          <p className="text-sm font-semibold text-blue-900">Missing client details</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {missingFields.map((field) => (
-              <span key={field} className="rounded-md border border-amber-200 bg-white px-2.5 py-1 text-xs font-semibold text-amber-800">
+              <span key={field} className="rounded-md border border-blue-200 bg-white px-2.5 py-1 text-xs font-semibold text-blue-800">
                 {field.replaceAll("_", " ")}
               </span>
             ))}
@@ -645,7 +646,7 @@ function OperatorFocusPanel({ workspaceSummary }) {
           {(workspaceSummary?.shared_configuration?.missing_fields || []).length > 0 ? (
             <div className="mt-3 space-y-2">
               {workspaceSummary.shared_configuration.missing_fields.map((field) => (
-                <div key={field.field} className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-900">
+                <div key={field.field} className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-3 text-xs text-blue-900">
                   <p className="font-semibold">{field.label}</p>
                   <p className="mt-1">
                     Needed for {field.applies_to_services.map((service) => service.display_name).join(", ")}.
@@ -706,7 +707,7 @@ function SetupAssistPanel({ workspaceSummary }) {
           ) : (
             <div className="mt-3 space-y-2">
               {assist.manual_required.map((item) => (
-                <div key={`${item.field}:${item.service_key || "shared"}`} className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-900">
+                <div key={`${item.field}:${item.service_key || "shared"}`} className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-3 text-xs text-blue-900">
                   <p className="font-semibold">{item.service_display_name ? `${item.service_display_name}: ${item.label}` : item.label}</p>
                   <p className="mt-1">{item.reason}</p>
                 </div>
@@ -727,7 +728,7 @@ function getSuggestionField(suggestions, field) {
 function SuggestionCard({ suggestion, actionLabel = "Use suggestion", onApply }) {
   if (!suggestion) return null;
   return (
-    <div className={`rounded-xl border p-3 ${suggestion.available ? "border-blue-200 bg-blue-50/60" : "border-amber-200 bg-amber-50/70"}`}>
+    <div className={`rounded-xl border p-3 ${suggestion.available ? "border-blue-200 bg-blue-50/60" : "border-blue-200 bg-blue-50/70"}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-foreground">{suggestion.label}</p>
@@ -1058,6 +1059,7 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
   const [runtimeFeedback, setRuntimeFeedback] = useState({});
   const [runtimeSavingKey, setRuntimeSavingKey] = useState("");
   const [serviceFilter, setServiceFilter] = useState("all");
+  const [setupSequenceConfirmOpen, setSetupSequenceConfirmOpen] = useState(false);
 
   const loadDetail = async ({ preserveFeedback = true } = {}) => {
     if (!orderId) {
@@ -1347,7 +1349,7 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
     }
   };
 
-  const handleRunSetupSequence = async () => {
+  const handleRunSetupSequenceRequest = () => {
     if (!detail) return;
 
     if (hasUnsavedConfigChanges) {
@@ -1355,15 +1357,13 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
       return;
     }
 
-    const confirmed = window.confirm(
-      "Run the assisted setup sequence for the currently visible services? This will move eligible services through Configuring and Testing, then run their guarded test actions. It will not move anything Live automatically."
-    );
+    setSetupSequenceConfirmOpen(true);
+  };
 
-    if (!confirmed) {
-      return;
-    }
-
+  const handleRunSetupSequence = async () => {
+    if (!detail) return;
     try {
+      setSetupSequenceConfirmOpen(false);
       setSequenceLoading(true);
       setSequenceFeedback("");
       setPrepareFeedback("");
@@ -1720,7 +1720,7 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
         onPrepare={handlePrepareSetup}
         onApplyProposal={handleApplyPreparedSetup}
         onClearProposal={handleClearPreparedSetup}
-        onRunSequence={handleRunSetupSequence}
+        onRunSequence={handleRunSetupSequenceRequest}
       />
       <CommandViewPanel workspaceSummary={workspaceSummary} />
       <ServiceNavigation
@@ -1811,7 +1811,7 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
                 {(sharedConfigurationSummary?.missing_fields || []).length > 0 ? (
                   <div className="mt-3 space-y-2">
                     {sharedConfigurationSummary.missing_fields.map((field) => (
-                      <div key={field.field} className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-900">
+                      <div key={field.field} className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-3 text-xs text-blue-900">
                         <p className="font-semibold">{field.label}</p>
                         <p className="mt-1">{field.helper}</p>
                       </div>
@@ -2290,12 +2290,12 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+          <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 shadow-sm">
             <div className="flex items-start gap-3">
-              <ShieldAlert className="h-5 w-5 flex-shrink-0 text-amber-700" />
+              <ShieldAlert className="h-5 w-5 flex-shrink-0 text-blue-700" />
               <div>
-                <p className="text-sm font-semibold text-amber-900">Install truth guardrail</p>
-                <p className="mt-1 text-sm text-amber-800">
+                <p className="text-sm font-semibold text-blue-900">Install truth guardrail</p>
+                <p className="mt-1 text-sm text-blue-800">
                   Do not edit install progress through mirrored ClientProject or OnboardingClient records. Use this order workspace for configuration, state transitions, runtime tests, and timeline review.
                 </p>
               </div>
@@ -2313,6 +2313,16 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
           ) : null}
         </div>
       </div>
+      {setupSequenceConfirmOpen && (
+        <DeleteConfirmModal
+          title="Run Assisted Setup"
+          description="Run the assisted setup sequence for the currently visible services? This will move eligible services through Configuring and Testing, then run their guarded test actions. It will not move anything Live automatically."
+          confirmLabel={sequenceLoading ? "Running..." : "Run Setup"}
+          danger={false}
+          onConfirm={handleRunSetupSequence}
+          onCancel={() => setSetupSequenceConfirmOpen(false)}
+        />
+      )}
     </div>
   );
 }

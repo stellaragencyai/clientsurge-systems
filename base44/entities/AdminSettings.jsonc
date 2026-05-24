@@ -58,9 +58,28 @@
       "type": "string",
       "title": "Admin Notification Email"
     },
+    "super_admin_emails": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Super Admin Emails"
+    },
     "booking_link_default": {
       "type": "string",
       "title": "Default Booking Link"
+    },
+    "timezone": {
+      "type": "string",
+      "title": "Default Timezone",
+      "default": "America/Phoenix"
+    },
+    "admin_ip_allowlist": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Admin IP Allowlist"
     },
     "webhook_enabled": {
       "type": "boolean",

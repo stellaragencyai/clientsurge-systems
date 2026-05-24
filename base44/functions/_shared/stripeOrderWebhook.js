@@ -1,9 +1,18 @@
 import { initializePaidOrderInstallPipeline } from "./installPipeline.js";
 import { normalizePackageKey } from "../../../src/lib/salesCatalog.js";
 import { buildPaymentRecoveryEmail } from "./paymentRecoveryEmail.js";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "./communicationOutbox.js";
 
-function getStripeSecretKey() {
+function getStripeSecretKey({ livemode = null } = {}) {
   try {
+    if (livemode === false) {
+      return Deno.env.get("STRIPE_SECRET_KEY") || "";
+    }
+
     return (
       Deno.env.get("STRIPE_LIVE_SECRET_KEY") ||
       Deno.env.get("STRIPE_SECRET_KEY") ||
@@ -30,8 +39,8 @@ async function getBase44Client(req) {
   return createClientFromRequest(req);
 }
 
-async function getStripeClient() {
-  const stripeSecretKey = getStripeSecretKey();
+async function getStripeClient(options = {}) {
+  const stripeSecretKey = getStripeSecretKey(options);
   if (!stripeSecretKey) {
     return null;
   }
@@ -42,6 +51,22 @@ async function getStripeClient() {
 
 function cleanString(value) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+function asConsentBoolean(value) {
+  return value === true || String(value || "").toLowerCase() === "true";
+}
+
+function encodeBasicAuth(value) {
+  if (typeof btoa === "function") {
+    return btoa(value);
+  }
+
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(value).toString("base64");
+  }
+
+  throw new Error("No base64 encoder available");
 }
 
 function shouldIgnoreInviteError(error) {
@@ -105,14 +130,252 @@ async function createCommunicationEvent(base44, payload) {
   );
 }
 
+function getEntity(base44, name) {
+  return base44?.asServiceRole?.entities?.[name] || null;
+}
+
+function safeErrorMessage(error) {
+  return error instanceof Error ? error.message : String(error || "Unknown error");
+}
+
+function computeNextRetryAt(attempts, now = new Date()) {
+  const delayMinutes = Math.min(60, Math.max(1, Number(attempts || 1) * 5));
+  return new Date(now.getTime() + delayMinutes * 60 * 1000).toISOString();
+}
+
+function buildSafeStripeEventSummary(event) {
+  const object = event?.data?.object || {};
+
+  return {
+    event_id: event?.id || "",
+    event_type: event?.type || "",
+    livemode: Boolean(event?.livemode),
+    object_id: object?.id || "",
+    object_type: object?.object || "",
+    checkout_session_id: event?.type === "checkout.session.completed" ? object?.id || "" : "",
+    subscription_id: cleanString(object?.subscription || object?.id),
+    payment_intent_id: cleanString(object?.payment_intent || object?.id),
+    customer: cleanString(object?.customer),
+    customer_email: cleanString(
+      object?.customer_details?.email ||
+        object?.customer_email ||
+        object?.receipt_email
+    ),
+    metadata_order_id: cleanString(object?.metadata?.order_id),
+  };
+}
+
+async function findPaymentEvent(base44, eventId) {
+  const PaymentEvent = getEntity(base44, "PaymentEvent");
+  if (!PaymentEvent || !eventId) {
+    return null;
+  }
+
+  const matches = await PaymentEvent.filter(
+    { provider: "stripe", event_id: eventId },
+    "-created_date",
+    5
+  ).catch(() => []);
+
+  return matches?.[0] || null;
+}
+
+async function writePaymentEvent(base44, event, patch = {}) {
+  const PaymentEvent = getEntity(base44, "PaymentEvent");
+  if (!PaymentEvent || !event?.id) {
+    return null;
+  }
+
+  const existing = await findPaymentEvent(base44, event.id);
+  const summary = buildSafeStripeEventSummary(event);
+  const payload = {
+    event_id: event.id,
+    provider: "stripe",
+    event_type: event.type,
+    customer_email: patch.customer_email || summary.customer_email || "",
+    checkout_session_id:
+      patch.checkout_session_id || summary.checkout_session_id || "",
+    subscription_id: patch.subscription_id || summary.subscription_id || "",
+    payment_intent_id:
+      patch.payment_intent_id || summary.payment_intent_id || "",
+    raw_event_summary: summary,
+    ...patch,
+  };
+
+  if (existing) {
+    return PaymentEvent.update(existing.id, {
+      ...payload,
+      attempts:
+        typeof patch.attempts === "number"
+          ? patch.attempts
+          : Number(existing.attempts || 0),
+      retry_count:
+        typeof patch.retry_count === "number"
+          ? patch.retry_count
+          : Number(existing.retry_count || 0),
+    }).catch(() => existing);
+  }
+
+  return PaymentEvent.create({
+    status: "received",
+    fulfillment_status: "pending",
+    attempts: 0,
+    retry_count: 0,
+    recovery_required: false,
+    ...payload,
+  }).catch(() => null);
+}
+
+async function markPaymentEventProcessing(base44, event, patch = {}) {
+  const existing = await findPaymentEvent(base44, event.id);
+  const attempts = Number(existing?.attempts || 0) + 1;
+
+  return writePaymentEvent(base44, event, {
+    ...patch,
+    status: "processing",
+    attempts,
+    retry_count: Math.max(0, attempts - 1),
+    last_error: "",
+    next_retry_at: "",
+    failed_at: "",
+    recovery_required: false,
+  });
+}
+
+async function markPaymentEventProcessed(base44, event, patch = {}) {
+  return writePaymentEvent(base44, event, {
+    ...patch,
+    status: "processed",
+    fulfillment_status: patch.fulfillment_status || "completed",
+    install_job_status: patch.install_job_status || "completed",
+    processed_at: new Date().toISOString(),
+    last_error: "",
+    next_retry_at: "",
+    recovery_required: false,
+  });
+}
+
+async function markPaymentEventFailed(base44, event, error, patch = {}) {
+  const existing = await findPaymentEvent(base44, event.id);
+  const attempts = Number(existing?.attempts || patch.attempts || 1);
+  const now = new Date();
+
+  return writePaymentEvent(base44, event, {
+    ...patch,
+    status: "failed",
+    fulfillment_status: patch.fulfillment_status || "failed",
+    install_job_status: patch.install_job_status || "failed",
+    attempts,
+    retry_count: Math.max(0, attempts - 1),
+    last_error: safeErrorMessage(error),
+    next_retry_at: computeNextRetryAt(attempts, now),
+    failed_at: now.toISOString(),
+    recovery_required: true,
+    recommended_next_action:
+      patch.recommended_next_action ||
+      "Retry the Stripe webhook after confirming the install pipeline is available. If retry fails again, inspect linked resources before manual fulfillment.",
+  });
+}
+
+async function findFulfillmentJob(base44, lockKey) {
+  const FulfillmentJob = getEntity(base44, "FulfillmentJob");
+  if (!FulfillmentJob || !lockKey) {
+    return null;
+  }
+
+  const matches = await FulfillmentJob.filter({ lock_key: lockKey }, "-created_date", 10).catch(() => []);
+  return matches?.[0] || null;
+}
+
+async function writeFulfillmentJob(base44, job, patch = {}) {
+  const FulfillmentJob = getEntity(base44, "FulfillmentJob");
+  if (!FulfillmentJob) {
+    return null;
+  }
+
+  const now = new Date().toISOString();
+  if (job?.id) {
+    return FulfillmentJob.update(job.id, {
+      ...patch,
+      updated_at: now,
+    }).catch(() => job);
+  }
+
+  return FulfillmentJob.create({
+    ...patch,
+    created_at: patch.created_at || now,
+    updated_at: now,
+  }).catch(() => null);
+}
+
+async function getOrCreateFulfillmentJob(base44, { order, event, lockKey }) {
+  const existing = await findFulfillmentJob(base44, lockKey);
+  if (existing) {
+    return writeFulfillmentJob(base44, existing, {
+      status: existing.status === "completed" ? "completed" : "running",
+      attempts: Number(existing.attempts || 0) + (existing.status === "completed" ? 0 : 1),
+      recovery_required: false,
+      last_error: "",
+    });
+  }
+
+  return writeFulfillmentJob(base44, null, {
+    job_id: `fulfillment:${lockKey}`,
+    order_id: order.id,
+    source_event_id: event.id,
+    job_type: "install_pipeline_start",
+    status: "running",
+    attempts: 1,
+    lock_key: lockKey,
+    recovery_required: false,
+  });
+}
+
+async function markFulfillmentJobCompleted(base44, job, result) {
+  if (!job) {
+    return null;
+  }
+
+  return writeFulfillmentJob(base44, job, {
+    status: "completed",
+    completed_at: new Date().toISOString(),
+    recovery_required: false,
+    last_error: "",
+    result_summary: {
+      order_id: result?.order?.id || job.order_id,
+      client_id: result?.client?.id || "",
+      client_project_id: result?.clientProject?.id || "",
+      onboarding_client_id: result?.onboardingClient?.id || "",
+    },
+  });
+}
+
+async function markFulfillmentJobFailed(base44, job, error) {
+  if (!job) {
+    return null;
+  }
+
+  return writeFulfillmentJob(base44, job, {
+    status: "failed",
+    failed_at: new Date().toISOString(),
+    recovery_required: true,
+    last_error: safeErrorMessage(error),
+    recommended_next_action:
+      "Retry webhook fulfillment after checking the order, ClientProject, OnboardingClient, portal invite, and install pipeline logs.",
+  });
+}
+
+async function markOrderFulfillmentState(base44, orderId, patch) {
+  if (!orderId) {
+    return null;
+  }
+
+  return base44.asServiceRole.entities.Order.update(orderId, patch).catch(() => null);
+}
+
 async function sendPaymentRecoveryEmail({ base44, order, invoice }) {
   if (!order?.customer_email) {
     return { sent: false, reason: "missing_customer_email" };
-  }
-
-  const resendKey = Deno.env.get("RESEND_API_KEY");
-  if (!resendKey) {
-    return { sent: false, reason: "missing_resend_key" };
   }
 
   const paymentUpdateUrl = cleanString(invoice?.hosted_invoice_url || invoice?.invoice_pdf);
@@ -124,18 +387,31 @@ async function sendPaymentRecoveryEmail({ base44, order, invoice }) {
     replyToEmail: Deno.env.get("ADMIN_EMAIL"),
   });
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: Array.isArray(payload.to) ? payload.to[0] : payload.to,
+    subject: payload.subject,
+    body: payload.html || payload.text || "",
+    html: payload.html,
+    from: payload.from,
+    orderId: order.id,
+    source: "stripeOrderWebhook",
+    sourceRecordId: order.id,
+    templateKey: "payment_recovery_email",
+    messageType: "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { invoice_id: invoice?.id, payment_update_url_present: Boolean(paymentUpdateUrl) },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
   });
 
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Resend payment recovery failed: ${response.status} ${body}`);
+  if (!result.success) {
+    throw new Error(`Resend payment recovery failed: ${result.reason || result.error || result.status}`);
   }
 
   return {
@@ -399,6 +675,168 @@ export async function ensureConfirmationEmail(base44, order, portalActivationUrl
   return { alreadyRecorded: false };
 }
 
+function buildCheckoutConfirmationSms(order, portalActivationUrl) {
+  const planName = cleanString(
+    order.pricing_summary?.package_name || order.plan_type || "ClientSurge system"
+  );
+  const businessName = cleanString(order.business_name || order.customer_name);
+  const portalUrl = buildPortalUrl(portalActivationUrl);
+  const businessSuffix = businessName ? ` for ${businessName}` : "";
+
+  return `ClientSurge received your ${planName} order${businessSuffix}. Setup details are on the way: ${portalUrl}. Reply STOP to opt out.`;
+}
+
+function resolveCheckoutSmsConsent({ order, session }) {
+  const orderConsent = asConsentBoolean(order?.sms_consent_granted);
+  const metadataConsent = asConsentBoolean(session?.metadata?.sms_consent_granted);
+
+  return {
+    granted: orderConsent || metadataConsent,
+    source:
+      cleanString(order?.sms_consent_source) ||
+      cleanString(session?.metadata?.sms_consent_source) ||
+      "",
+  };
+}
+
+export async function ensureCheckoutConfirmationSms({
+  base44,
+  order,
+  session,
+  portalActivationUrl,
+}) {
+  const providerMessageId = `checkout_sms_confirmation:${order.id}`;
+  const existingEvent = await findCommunicationEvent(base44, providerMessageId);
+  if (existingEvent) {
+    return { alreadyRecorded: true };
+  }
+
+  const toPhone = cleanString(order.customer_phone || session?.metadata?.customer_phone);
+  const consent = resolveCheckoutSmsConsent({ order, session });
+  const fromPhone = Deno.env.get("TWILIO_PHONE_NUMBER") || "";
+  const skippedReason = !toPhone
+    ? "missing_customer_phone"
+    : !consent.granted
+    ? "sms_consent_not_granted"
+    : !fromPhone
+    ? "twilio_not_configured"
+    : "";
+
+  if (skippedReason) {
+    await base44.asServiceRole.entities.Order.update(order.id, {
+      checkout_sms_confirmation_status: "skipped",
+      checkout_sms_confirmation_skipped_reason: skippedReason,
+    }).catch(() => null);
+
+    await createCommunicationEvent(
+      base44,
+      buildCommunicationEvent({
+        provider: "twilio",
+        channel: "sms",
+        direction: "system",
+        eventType: "workflow_triggered",
+        status: "processed",
+        providerMessageId,
+        subject: "Checkout SMS confirmation skipped",
+        messageBody: `Checkout SMS confirmation skipped: ${skippedReason}.`,
+        order,
+        metadata: {
+          order_id: order.id,
+          reason: skippedReason,
+          consent_source: consent.source,
+        },
+      })
+    );
+
+    return { sent: false, reason: skippedReason };
+  }
+
+  const messageBody = buildCheckoutConfirmationSms(order, portalActivationUrl);
+  const smsResult = await sendCommunicationViaOutbox({
+    base44,
+    channel: "sms",
+    provider: "twilio",
+    recipient: toPhone,
+    body: messageBody,
+    from: fromPhone,
+    orderId: order.id,
+    source: "stripeOrderWebhook",
+    sourceRecordId: order.id,
+    templateKey: "checkout_sms_confirmation",
+    messageType: "transactional",
+    consentBasis: "checkout_sms_consent",
+    consentSnapshot: {
+      consent_given: true,
+      consent_source: consent.source,
+    },
+    metadata: { order_id: order.id, consent_source: consent.source },
+    providerSend: (providerPayload) => sendTwilioSmsProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
+  });
+
+  if (!smsResult.success) {
+    await base44.asServiceRole.entities.Order.update(order.id, {
+      checkout_sms_confirmation_status: "failed",
+      checkout_sms_confirmation_skipped_reason: smsResult.reason || smsResult.error || "twilio_send_failed",
+    }).catch(() => null);
+
+    await createCommunicationEvent(
+      base44,
+      buildCommunicationEvent({
+        provider: "twilio",
+        channel: "sms",
+        direction: "outbound",
+        eventType: "sms_failed",
+        status: "failed",
+        providerMessageId,
+        subject: "Checkout SMS confirmation failed",
+        messageBody: smsResult.reason || smsResult.error || "Twilio outbox send failed",
+        order,
+        metadata: {
+          order_id: order.id,
+          outbox_id: smsResult.outbox?.id || "",
+        },
+      })
+    );
+
+    return { sent: false, reason: smsResult.reason || smsResult.error || "twilio_send_failed" };
+  }
+
+  const sentAt = new Date().toISOString();
+  await base44.asServiceRole.entities.Order.update(order.id, {
+    checkout_sms_confirmation_sent_at: sentAt,
+    checkout_sms_confirmation_message_sid: cleanString(smsResult.provider_message_id),
+    checkout_sms_confirmation_status: "sent",
+    checkout_sms_confirmation_skipped_reason: "",
+  }).catch(() => null);
+
+  await createCommunicationEvent(
+    base44,
+    buildCommunicationEvent({
+      provider: "twilio",
+      channel: "sms",
+      direction: "outbound",
+      eventType: "sms_sent",
+      status: "sent",
+      providerMessageId,
+      subject: "Checkout SMS confirmation sent",
+      messageBody,
+      order,
+      metadata: {
+        order_id: order.id,
+        twilio_message_sid: cleanString(smsResult.provider_message_id),
+        outbox_id: smsResult.outbox?.id || "",
+        consent_source: consent.source,
+      },
+    })
+  );
+
+  return { sent: true, message_sid: cleanString(smsResult.provider_message_id), outbox_id: smsResult.outbox?.id };
+}
+
 export async function ensureAdminPurchaseNotification(base44, order) {
   const providerMessageId = `admin_purchase_notification:${order.id}`;
   const existingEvent = await findCommunicationEvent(base44, providerMessageId);
@@ -442,9 +880,47 @@ export async function processCheckoutSessionCompleted({
   source,
 }) {
   const session = event.data.object;
+  const existingPaymentEvent = await findPaymentEvent(base44, event.id);
+  if (existingPaymentEvent?.status === "processed") {
+    await markPaymentEventProcessed(base44, event, {
+      fulfillment_status: existingPaymentEvent.fulfillment_status || "completed",
+      install_job_status: existingPaymentEvent.install_job_status || "completed",
+      order_id: existingPaymentEvent.order_id || "",
+      customer_email: existingPaymentEvent.customer_email || "",
+      processed_at: existingPaymentEvent.processed_at || new Date().toISOString(),
+      recovery_required: false,
+    });
+    return {
+      success: true,
+      duplicate: true,
+      order_id: existingPaymentEvent.order_id,
+    };
+  }
+
+  await markPaymentEventProcessing(base44, event, {
+    fulfillment_status: "pending",
+    install_job_status: "pending",
+    checkout_session_id: cleanString(session?.id),
+    customer_email: cleanString(
+      session?.customer_details?.email || session?.customer_email
+    ),
+    subscription_id: cleanString(session?.subscription),
+    payment_intent_id: cleanString(session?.payment_intent),
+  });
+
   const order = await resolveOrderFromCheckoutSession(base44, session);
 
   if (!order) {
+    await markPaymentEventFailed(base44, event, "checkout.session.completed did not match a pre-created Order.", {
+      fulfillment_status: "needs_manual_review",
+      install_job_status: "needs_manual_review",
+      checkout_session_id: session?.id || "",
+      customer_email: cleanString(session?.customer_details?.email || session?.customer_email),
+      subscription_id: cleanString(session?.subscription),
+      payment_intent_id: cleanString(session?.payment_intent),
+      recommended_next_action:
+        "Find or recreate the Order for this paid checkout session, then replay the Stripe event or manually initialize fulfillment.",
+    });
     await createCommunicationEvent(
       base44,
       buildCommunicationEvent({
@@ -466,24 +942,109 @@ export async function processCheckoutSessionCompleted({
   }
 
   const existingEvent = await findCommunicationEvent(base44, event.id);
-  if (existingEvent) {
+  if (existingEvent && !existingPaymentEvent?.recovery_required) {
+    await markPaymentEventProcessed(base44, event, {
+      order_id: order.id,
+      customer_email: order.customer_email,
+      checkout_session_id: cleanString(session?.id),
+      subscription_id: cleanString(session?.subscription),
+      payment_intent_id: cleanString(session?.payment_intent),
+    });
     return { success: true, duplicate: true, order_id: order.id };
   }
 
   const now = new Date().toISOString();
   const subscriptionId = cleanString(session?.subscription);
-  const stripe = subscriptionId ? await getStripeClient() : null;
+  const stripe = subscriptionId ? await getStripeClient({ livemode: event.livemode }) : null;
   const subscription = subscriptionId
     ? await stripe?.subscriptions.retrieve(subscriptionId)
     : null;
 
-  const initialized = await initializePaidOrderInstallPipeline({
-    base44,
-    order,
-    stripeCustomerId: cleanString(session?.customer),
-    eventSource: `${source}:${event.type}`,
-    now,
+  const lockKey = `stripe:${event.type}:${session?.id || event.id}:${order.id}`;
+  const job = await getOrCreateFulfillmentJob(base44, { order, event, lockKey });
+  if (job?.status === "completed") {
+    await markPaymentEventProcessed(base44, event, {
+      order_id: order.id,
+      customer_email: order.customer_email,
+      checkout_session_id: cleanString(session?.id),
+      subscription_id: subscriptionId,
+      payment_intent_id: cleanString(session?.payment_intent),
+      fulfillment_status: "completed",
+      install_job_status: "completed",
+    });
+    return { success: true, duplicate: true, order_id: order.id };
+  }
+
+  await markOrderFulfillmentState(base44, order.id, {
+    payment_status: "paid",
+    stripe_event_id: event.id,
+    stripe_session_id: cleanString(session?.id) || order.stripe_session_id,
+    stripe_customer_id: cleanString(session?.customer) || order.stripe_customer_id,
+    stripe_subscription_id: subscriptionId || order.stripe_subscription_id,
+    stripe_payment_intent_id:
+      cleanString(session?.payment_intent) || order.stripe_payment_intent_id,
+    fulfillment_status: "running",
+    fulfillment_job_id: job?.job_id || "",
+    fulfillment_lock_key: lockKey,
+    fulfillment_source_event_id: event.id,
+    fulfillment_attempts: Number(order.fulfillment_attempts || 0) + 1,
+    fulfillment_last_error: "",
+    fulfillment_recovery_required: false,
   });
+
+  let initialized;
+  try {
+    initialized = await initializePaidOrderInstallPipeline({
+      base44,
+      order: {
+        ...order,
+        payment_status: "paid",
+        stripe_event_id: event.id,
+        stripe_session_id: cleanString(session?.id) || order.stripe_session_id,
+        stripe_customer_id: cleanString(session?.customer) || order.stripe_customer_id,
+        stripe_subscription_id: subscriptionId || order.stripe_subscription_id,
+        stripe_payment_intent_id:
+          cleanString(session?.payment_intent) || order.stripe_payment_intent_id,
+      },
+      stripeCustomerId: cleanString(session?.customer),
+      eventSource: `${source}:${event.type}`,
+      now,
+    });
+  } catch (error) {
+    const message = safeErrorMessage(error);
+    await markFulfillmentJobFailed(base44, job, error);
+    await markOrderFulfillmentState(base44, order.id, {
+      payment_status: "paid",
+      stripe_event_id: event.id,
+      stripe_session_id: cleanString(session?.id) || order.stripe_session_id,
+      stripe_customer_id: cleanString(session?.customer) || order.stripe_customer_id,
+      stripe_subscription_id: subscriptionId || order.stripe_subscription_id,
+      stripe_payment_intent_id:
+        cleanString(session?.payment_intent) || order.stripe_payment_intent_id,
+      fulfillment_status: "failed",
+      fulfillment_job_id: job?.job_id || "",
+      fulfillment_lock_key: lockKey,
+      fulfillment_source_event_id: event.id,
+      fulfillment_last_error: message,
+      fulfillment_failed_at: new Date().toISOString(),
+      fulfillment_recovery_required: true,
+      fulfillment_recommended_next_action:
+        "Retry the Stripe webhook. If it fails again, inspect linked Client, ClientProject, OnboardingClient, and install pipeline records before manual activation.",
+      pipeline_status: order.pipeline_status || "Error",
+      pipeline_error: message,
+      last_install_event_at: now,
+    });
+    await markPaymentEventFailed(base44, event, error, {
+      order_id: order.id,
+      customer_email: order.customer_email,
+      checkout_session_id: cleanString(session?.id),
+      subscription_id: subscriptionId,
+      payment_intent_id: cleanString(session?.payment_intent),
+      fulfillment_status: "failed",
+      install_job_status: "failed",
+    });
+    throw error;
+  }
 
   const packageKey = normalizePackageKey(
     order.pricing_summary?.package_key ||
@@ -496,7 +1057,16 @@ export async function processCheckoutSessionCompleted({
     stripe_session_id: cleanString(session?.id) || initialized.order.stripe_session_id,
     stripe_customer_id:
       cleanString(session?.customer) || initialized.order.stripe_customer_id,
+    stripe_payment_intent_id:
+      cleanString(session?.payment_intent) || initialized.order.stripe_payment_intent_id,
     payment_status: "paid",
+    fulfillment_status: "completed",
+    fulfillment_job_id: job?.job_id || initialized.order.fulfillment_job_id,
+    fulfillment_lock_key: lockKey,
+    fulfillment_source_event_id: event.id,
+    fulfillment_completed_at: now,
+    fulfillment_last_error: "",
+    fulfillment_recovery_required: false,
     selected_package_type: packageKey || initialized.order.selected_package_type,
     package_type: packageKey || initialized.order.package_type,
     plan_type:
@@ -517,7 +1087,14 @@ export async function processCheckoutSessionCompleted({
     updatedOrder,
     portalInvite.activation_link
   );
+  await ensureCheckoutConfirmationSms({
+    base44,
+    order: updatedOrder,
+    session,
+    portalActivationUrl: portalInvite.activation_link,
+  });
   await ensureAdminPurchaseNotification(base44, updatedOrder);
+  await markFulfillmentJobCompleted(base44, job, initialized);
 
   await createCommunicationEvent(
     base44,
@@ -535,6 +1112,15 @@ export async function processCheckoutSessionCompleted({
       },
     })
   );
+  await markPaymentEventProcessed(base44, event, {
+    order_id: updatedOrder.id,
+    customer_email: updatedOrder.customer_email,
+    checkout_session_id: cleanString(session?.id),
+    subscription_id: subscriptionId,
+    payment_intent_id: cleanString(session?.payment_intent),
+    fulfillment_status: "completed",
+    install_job_status: "completed",
+  });
 
   return { success: true, order_id: updatedOrder.id };
 }
@@ -839,13 +1425,28 @@ export async function handleCanonicalStripeWebhook(
       result = await processPaymentIntentFailed({ base44, event, source });
     }
 
-    return Response.json({
-      received: true,
-      source,
-      event_type: event.type,
-      result,
-    });
+    const shouldRetry =
+      result?.success === false &&
+      (event.type === "checkout.session.completed" ||
+        event.type === "invoice.payment_failed" ||
+        event.type === "payment_intent.payment_failed");
+
+    return Response.json(
+      {
+        received: true,
+        source,
+        event_type: event.type,
+        result,
+      },
+      { status: shouldRetry ? 500 : 200 }
+    );
   } catch (error) {
+    await markPaymentEventFailed(base44, event, error, {
+      fulfillment_status:
+        event.type === "checkout.session.completed" ? "failed" : "not_required",
+      install_job_status:
+        event.type === "checkout.session.completed" ? "failed" : "not_required",
+    });
     await createCommunicationEvent(
       base44,
       buildCommunicationEvent({
@@ -861,11 +1462,14 @@ export async function handleCanonicalStripeWebhook(
       })
     );
 
-    return Response.json({
-      received: true,
-      source,
-      event_type: event.type,
-      error: error instanceof Error ? error.message : String(error),
-    });
+    return Response.json(
+      {
+        received: true,
+        source,
+        event_type: event.type,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
   }
 }

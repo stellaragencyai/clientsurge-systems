@@ -36,6 +36,31 @@
       ],
       "default": "active"
     },
+    "ab_test_variant": {
+      "type": "string",
+      "title": "A/B Test Variant",
+      "enum": [
+        "A",
+        "B",
+        "control",
+        "winner"
+      ]
+    },
+    "variant_sends": {
+      "type": "integer",
+      "title": "Variant Sends",
+      "default": 0
+    },
+    "variant_replies": {
+      "type": "integer",
+      "title": "Variant Replies",
+      "default": 0
+    },
+    "reply_rate": {
+      "type": "number",
+      "title": "Reply Rate",
+      "default": 0
+    },
     "variables": {
       "type": "array",
       "items": {

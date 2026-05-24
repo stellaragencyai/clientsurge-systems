@@ -4,7 +4,7 @@ import { Loader2, CheckCircle2, AlertCircle, Clock } from "lucide-react";
 
 const STATUS_COLORS = {
   "Paid": "bg-blue-50 border-blue-200",
-  "Ready for Install": "bg-amber-50 border-amber-200",
+  "Ready for Install": "bg-blue-50 border-blue-200",
   "Configuring": "bg-purple-50 border-purple-200",
   "Testing": "bg-cyan-50 border-cyan-200",
   "Live": "bg-green-50 border-green-200",

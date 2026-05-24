@@ -7,6 +7,11 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 function hoursSince(isoDate) {
   if (!isoDate) return 0;
@@ -26,58 +31,62 @@ async function checkAlreadySent(base44, leadId, stepKey) {
   return events?.length > 0;
 }
 
-async function sendSMS(toNumber, messageBody) {
-  const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-  const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-  const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
-  const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
-
-  if (!accountSid || !authToken || !fromNumber) throw new Error("Twilio credentials missing");
-
-  const params = { To: toNumber, From: fromNumber, Body: messageBody };
-  if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
-
-  const res = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams(params),
-    }
-  );
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Twilio error: ${err?.message || res.status}`);
+async function sendSMS(base44, lead, messageBody, stepKey) {
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "sms",
+    provider: "twilio",
+    recipient: lead.phone,
+    body: messageBody,
+    lead,
+    leadId: lead.id,
+    source: "processQualifiedFollowUps",
+    sourceRecordId: lead.id,
+    templateKey: stepKey,
+    messageType: "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { step_key: stepKey },
+    providerSend: (providerPayload) => sendTwilioSmsProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
+  });
+  if (!result.success && !result.suppressed) {
+    throw new Error(result.error || result.reason || "Twilio outbox send failed");
   }
-  const data = await res.json();
-  return data.sid;
+  return result.provider_message_id;
 }
 
-async function sendEmail(toEmail, subject, body) {
-  const resendKey = Deno.env.get("RESEND_API_KEY");
+async function sendEmail(base44, lead, toEmail, subject, body, stepKey, target = null) {
   const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "noreply@clientsurgesystems.com";
 
-  if (!resendKey) throw new Error("RESEND_API_KEY missing");
-
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ from: fromEmail, to: toEmail, subject, text: body }),
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: toEmail,
+    subject,
+    body,
+    from: fromEmail,
+    lead,
+    leadId: lead.id,
+    source: "processQualifiedFollowUps",
+    sourceRecordId: lead.id,
+    templateKey: stepKey,
+    messageType: "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { step_key: stepKey, target },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
   });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Resend error: ${err?.message || res.status}`);
+  if (!result.success && !result.suppressed) {
+    throw new Error(result.error || result.reason || "Resend outbox send failed");
   }
-  const data = await res.json();
-  return data.id;
+  return result.provider_message_id;
 }
 
 Deno.serve(async (req) => {
@@ -128,7 +137,7 @@ Deno.serve(async (req) => {
         // SMS
         if (lead.phone) {
           try {
-            const sid = await sendSMS(lead.phone, renderMsg(bookingSmsTemplate));
+            const sid = await sendSMS(base44, lead, renderMsg(bookingSmsTemplate), stepKey);
             await base44.asServiceRole.entities.CommunicationEvent.create({
               lead_id: lead.id,
               channel: "sms",
@@ -152,9 +161,12 @@ Deno.serve(async (req) => {
         if (lead.email) {
           try {
             const emailId = await sendEmail(
+              base44,
+              lead,
               lead.email,
               "Still interested in booking?",
-              renderMsg(bookingEmailTemplate)
+              renderMsg(bookingEmailTemplate),
+              stepKey
             );
             await base44.asServiceRole.entities.CommunicationEvent.create({
               lead_id: lead.id,
@@ -213,7 +225,7 @@ Deno.serve(async (req) => {
         const body = `Hi,\n\n${lead.full_name} (${lead.business_name || "unknown business"}) replied to your outreach over 48 hours ago and hasn't been followed up with yet.\n\nPhone: ${lead.phone || "—"}\nEmail: ${lead.email || "—"}\nStatus: ${lead.status}\n\nPlease reach out as soon as possible.\n\n– ClientSurge Automation`;
 
         try {
-          const emailId = await sendEmail(repEmail, subject, body);
+          const emailId = await sendEmail(base44, lead, repEmail, subject, body, stepKey, repEmail);
           await base44.asServiceRole.entities.CommunicationEvent.create({
             lead_id: lead.id,
             channel: "email",

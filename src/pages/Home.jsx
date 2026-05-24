@@ -4,8 +4,9 @@ import Hero from "../components/landing/Hero.jsx";
 import HomepageConversionContent from "../components/landing/HomepageConversionContent";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
+import TawkLiveChat from "../components/landing/TawkLiveChat";
 import { LargeSectionSkeleton, SectionSkeleton } from "../components/landing/SkeletonLoader";
-import { FAQ_ITEMS } from "../components/landing/FAQ";
+import { FAQ_ITEMS } from "@/lib/faqItems";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
@@ -28,6 +29,11 @@ import {
 } from "../components/SEO/SchemaMarkup";
 import CookieConsent from "../components/landing/CookieConsent";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
+import {
+  CinematicSectionDivider,
+  HomepageMotionShell,
+  MotionSection,
+} from "@/components/landing/PremiumHomepageMotion";
 
 function useHomepageWhiteCanvas() {
   useEffect(() => {
@@ -89,41 +95,72 @@ export default function Home() {
 
   return (
     <DemoBookingProvider>
+      <HomepageMotionShell>
       <div className="min-h-screen">
         <Navbar />
         <Hero />
-        <HomepageConversionContent />
+        <MotionSection>
+          <HomepageConversionContent />
+        </MotionSection>
         <Suspense fallback={<SectionSkeleton />}>
-          <SixAutomationSystems />
+          <MotionSection>
+            <SixAutomationSystems />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
-          <Industries />
+          <MotionSection>
+            <Industries />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
-          <TrustBar />
+          <MotionSection>
+            <TrustBar />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
         </Suspense>
         <Suspense fallback={<LargeSectionSkeleton />}>
-          <CoreOffer />
+          <MotionSection>
+            <CoreOffer />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
-          <Pricing />
+          <MotionSection>
+            <Pricing />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
         </Suspense>
         <Suspense fallback={<SectionSkeleton />}>
-          <FAQ />
+          <MotionSection>
+            <FAQ />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
-          <FounderSection />
+          <MotionSection>
+            <FounderSection />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
-          <Testimonials />
+          <MotionSection>
+            <Testimonials />
+          </MotionSection>
+          <CinematicSectionDivider />
           <SectionBreak />
-          <FinalCTA />
+          <MotionSection>
+            <FinalCTA />
+          </MotionSection>
         </Suspense>
         <Suspense fallback={null}>
           <Footer />
         </Suspense>
         <ChatBubble />
+        <TawkLiveChat />
         <CookieConsent />
       </div>
+      </HomepageMotionShell>
     </DemoBookingProvider>
   );
 }

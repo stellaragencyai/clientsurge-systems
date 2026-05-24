@@ -231,7 +231,7 @@ export default function ExitIntentPopup({ pathname }) {
                 value={form.full_name}
                 onChange={(event) => setForm((prev) => ({ ...prev, full_name: event.target.value }))}
                 required
-                className="h-12 w-full rounded-2xl border border-amber-200/80 bg-white/92 px-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="h-12 w-full rounded-2xl border border-blue-200/80 bg-white/92 px-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="Jane Smith"
               />
             </div>
@@ -242,7 +242,7 @@ export default function ExitIntentPopup({ pathname }) {
                 value={form.email}
                 onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
                 required
-                className="h-12 w-full rounded-2xl border border-amber-200/80 bg-white/92 px-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="h-12 w-full rounded-2xl border border-blue-200/80 bg-white/92 px-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="jane@business.com"
               />
             </div>
@@ -251,7 +251,7 @@ export default function ExitIntentPopup({ pathname }) {
               <select
                 value={form.business_type}
                 onChange={(event) => setForm((prev) => ({ ...prev, business_type: event.target.value }))}
-                className="h-12 w-full rounded-2xl border border-amber-200/80 bg-white/92 px-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="h-12 w-full rounded-2xl border border-blue-200/80 bg-white/92 px-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
                 <option>Med Spas & Aesthetic Clinics</option>
                 <option>Dental & Orthodontics</option>
@@ -266,7 +266,7 @@ export default function ExitIntentPopup({ pathname }) {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#8b5b34_0%,#b77b47_55%,#7a4f2e_100%)] px-5 py-3 text-sm font-semibold text-amber-50 shadow-[0_14px_34px_rgba(154,92,46,0.24)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(154,92,46,0.3)] disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[linear-gradient(135deg,#006CA8_0%,#00AEEF_55%,#005B99_100%)] px-5 py-3 text-sm font-semibold text-blue-50 shadow-[0_14px_34px_rgba(0,136,204,0.24)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,136,204,0.3)] disabled:opacity-60"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
               Get My Free Audit

@@ -28,7 +28,7 @@ function Step({ step, index, inView }) {
   return (
     <motion.div
       className="flex items-start gap-3"
-      initial={{ opacity: 0, x: -20 }}
+      initial={false}
       animate={inView ? { opacity: 1, x: 0 } : {}}
       transition={{ duration: 0.4, delay: 0.12 + index * 0.15, ease: "easeOut" }}
     >

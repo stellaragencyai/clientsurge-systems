@@ -10,9 +10,13 @@ const asJson = process.argv.includes("--json");
 
 const EXPECTED_TWILIO_NUMBER = process.env.CLIENTSURGE_AUTOMATION_NUMBER || "+18778123630";
 const EXPECTED_BASE44_HOST =
-  process.env.CLIENTSURGE_BASE44_HOST || "client-surge-systems-copy-a9653cae.base44.app";
-const EXPECTED_WEBHOOK_FUNCTION =
-  process.env.CLIENTSURGE_TWILIO_WEBHOOK_FUNCTION || "receiveTwilioMissedCallWebhook";
+  process.env.CLIENTSURGE_BASE44_HOST || "clientsurgesystems.com";
+const EXPECTED_SMS_WEBHOOK_FUNCTION =
+  process.env.CLIENTSURGE_TWILIO_SMS_WEBHOOK_FUNCTION || "receiveTwilioInboundSms";
+const EXPECTED_VOICE_WEBHOOK_FUNCTION =
+  process.env.CLIENTSURGE_TWILIO_VOICE_WEBHOOK_FUNCTION || "receiveTwilioMissedCallWebhook";
+const REQUIRE_TWILIO_WEBHOOK_KEY =
+  process.env.CLIENTSURGE_REQUIRE_TWILIO_WEBHOOK_KEY === "true";
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -146,23 +150,28 @@ function checkTwilioNumberRouting() {
 
   const smsShape = sanitizeUrlShape(number.smsUrl);
   const voiceShape = sanitizeUrlShape(number.voiceUrl);
-  const expectedPath = `/api/functions/${EXPECTED_WEBHOOK_FUNCTION}`;
+  const expectedSmsPath = `/api/functions/${EXPECTED_SMS_WEBHOOK_FUNCTION}`;
+  const expectedVoicePath = `/api/functions/${EXPECTED_VOICE_WEBHOOK_FUNCTION}`;
 
   const checks = {
     sms_method_post: number.smsMethod === "POST",
     voice_method_post: number.voiceMethod === "POST",
     sms_host_ok: smsShape?.host === EXPECTED_BASE44_HOST,
     voice_host_ok: voiceShape?.host === EXPECTED_BASE44_HOST,
-    sms_path_ok: smsShape?.pathname === expectedPath,
-    voice_path_ok: voiceShape?.pathname === expectedPath,
-    sms_has_webhook_key: smsShape?.has_twilio_webhook_key === true,
-    voice_has_webhook_key: voiceShape?.has_twilio_webhook_key === true,
+    sms_path_ok: smsShape?.pathname === expectedSmsPath,
+    voice_path_ok: voiceShape?.pathname === expectedVoicePath,
+    sms_auth_shape_ok: REQUIRE_TWILIO_WEBHOOK_KEY ? smsShape?.has_twilio_webhook_key === true : true,
+    voice_auth_shape_ok: REQUIRE_TWILIO_WEBHOOK_KEY ? voiceShape?.has_twilio_webhook_key === true : true,
   };
 
   return {
     name: "twilio_automation_number_routing",
     passed: Object.values(checks).every(Boolean),
     expected_number: EXPECTED_TWILIO_NUMBER,
+    expected_host: EXPECTED_BASE44_HOST,
+    expected_sms_path: expectedSmsPath,
+    expected_voice_path: expectedVoicePath,
+    require_twilio_webhook_key: REQUIRE_TWILIO_WEBHOOK_KEY,
     checks,
     sms_url_shape: smsShape,
     voice_url_shape: voiceShape,

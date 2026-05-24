@@ -101,8 +101,8 @@ export default function AIGenerateModal({ stepKey, client, onClose }) {
             <button
               onClick={generate}
               disabled={loading}
-              style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", borderRadius: "9999px" }}
-              className="flex-1 h-11 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 disabled:opacity-60"
+              style={{ background: "linear-gradient(135deg,#005B99 0%,#0077B6 40%,#005B99 100%)", borderRadius: "9999px" }}
+              className="flex-1 h-11 flex items-center justify-center gap-2 text-sm font-bold text-blue-100 disabled:opacity-60"
             >
               <Sparkles className="w-4 h-4" />
               {content ? "Regenerate" : "Generate"}

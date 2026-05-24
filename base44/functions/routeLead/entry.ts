@@ -18,6 +18,10 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 Deno.serve(async (req) => {
   try {
@@ -99,11 +103,9 @@ Deno.serve(async (req) => {
     let smsError = null;
 
     const phone = assignee.phone;
-    const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
     const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
 
-    if (phone && accountSid && authToken && fromNumber) {
+    if (phone) {
       const message =
         `🔔 New ${category} lead assigned to you!\n` +
         `Name: ${lead.full_name}\n` +
@@ -112,23 +114,32 @@ Deno.serve(async (req) => {
         `Score: ${lead.lead_score || 0}/100\n` +
         `Problem: ${(lead.problem || "").slice(0, 80)}`;
 
-      const twilioRes = await fetch(
-        `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({ To: phone, From: fromNumber, Body: message }),
-        }
-      );
+      const smsResult = await sendCommunicationViaOutbox({
+        base44,
+        channel: "sms",
+        provider: "twilio",
+        recipient: phone,
+        body: message,
+        from: fromNumber,
+        lead,
+        leadId,
+        source: "routeLead",
+        sourceRecordId: leadId,
+        templateKey: "lead_assignment_sms",
+        messageType: "transactional",
+        consentBasis: "internal_notification",
+        metadata: { assigned_to: assignee.email, category },
+        providerSend: (providerPayload) => sendTwilioSmsProvider({
+          ...providerPayload,
+          env: (name) => Deno.env.get(name),
+          fetchImpl: fetch,
+        }),
+      });
 
-      if (twilioRes.ok) {
+      if (smsResult.success) {
         smsSent = true;
       } else {
-        const err = await twilioRes.json().catch(() => ({}));
-        smsError = err?.message || "Twilio error";
+        smsError = smsResult.reason || smsResult.error || "Twilio outbox send failed";
         console.error("routeLead SMS error:", smsError);
       }
     } else {

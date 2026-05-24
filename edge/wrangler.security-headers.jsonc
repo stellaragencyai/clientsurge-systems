@@ -1,0 +1,19 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "clientsurge-security-headers",
+  "main": "./clientsurge-security-headers-worker.mjs",
+  "compatibility_date": "2026-05-24",
+  "routes": [
+    {
+      "pattern": "clientsurgesystems.com/*",
+      "zone_name": "clientsurgesystems.com"
+    },
+    {
+      "pattern": "www.clientsurgesystems.com/*",
+      "zone_name": "clientsurgesystems.com"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

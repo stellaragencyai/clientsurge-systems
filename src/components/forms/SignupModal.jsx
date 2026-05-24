@@ -90,8 +90,8 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             </p>
             <button
               onClick={onClose}
-              style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", borderRadius: "9999px", boxShadow: "0 4px 18px rgba(120,70,20,0.35)" }}
-              className="h-11 px-8 flex items-center gap-2 text-sm font-bold text-amber-100 hover:opacity-90 transition"
+              style={{ background: "linear-gradient(135deg,#005B99 0%,#0077B6 40%,#005B99 100%)", borderRadius: "9999px", boxShadow: "0 4px 18px rgba(0,92,153,0.35)" }}
+              className="h-11 px-8 flex items-center gap-2 text-sm font-bold text-blue-100 hover:opacity-90 transition"
             >
               Done
             </button>

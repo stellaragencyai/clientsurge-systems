@@ -19,7 +19,7 @@ export default function SystemProgressTracker({ serviceKey, currentStage = 0, in
         <h4 style={{ fontSize: "14px", fontWeight: "700", color: "#1b140d", margin: 0 }}>
           {config.label}
         </h4>
-        <span style={{ fontSize: "11px", fontWeight: "600", color: "rgba(27,20,13,0.6)" }}>
+        <span style={{ fontSize: "11px", fontWeight: "600", color: "rgba(10,22,40,0.6)" }}>
           {config.stages[currentStage] || "Pending"}
         </span>
       </div>
@@ -30,7 +30,7 @@ export default function SystemProgressTracker({ serviceKey, currentStage = 0, in
           width: "100%",
           height: "8px",
           borderRadius: "4px",
-          background: "rgba(154,92,46,0.12)",
+          background: "rgba(0,136,204,0.12)",
           overflow: "hidden",
           marginBottom: "8px",
         }}
@@ -39,7 +39,7 @@ export default function SystemProgressTracker({ serviceKey, currentStage = 0, in
           style={{
             height: "100%",
             width: `${progress}%`,
-            background: "linear-gradient(90deg, #9a5c2e, #c8965c)",
+            background: "linear-gradient(90deg, #0077B6, #00AEEF)",
             transition: "width 0.6s ease",
           }}
         />
@@ -55,7 +55,7 @@ export default function SystemProgressTracker({ serviceKey, currentStage = 0, in
               fontSize: "9px",
               fontWeight: "600",
               textAlign: "center",
-              color: idx <= currentStage ? "#9a5c2e" : "rgba(27,20,13,0.35)",
+              color: idx <= currentStage ? "#0077B6" : "rgba(10,22,40,0.35)",
               opacity: idx <= currentStage ? 1 : 0.5,
             }}
           >

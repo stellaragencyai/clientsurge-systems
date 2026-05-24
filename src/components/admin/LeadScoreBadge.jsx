@@ -3,7 +3,7 @@
  *
  * 80–100  High intent   → emerald
  * 60–79   Good intent   → green
- * 40–59   Moderate      → amber
+ * 40–59   Moderate      → blue
  * 20–39   Low           → orange
  *  1–19   Very low      → slate
  */
@@ -14,8 +14,8 @@ export default function LeadScoreBadge({ score, size = "sm" }) {
   const tier =
     score >= 80 ? { label: "High", ring: "bg-emerald-100 text-emerald-800 border-emerald-300", dot: "bg-emerald-500" } :
     score >= 60 ? { label: "Good", ring: "bg-green-100 text-green-800 border-green-300", dot: "bg-green-500" } :
-    score >= 40 ? { label: "Mid", ring: "bg-amber-100 text-amber-800 border-amber-300", dot: "bg-amber-500" } :
-    score >= 20 ? { label: "Low", ring: "bg-orange-100 text-orange-800 border-orange-300", dot: "bg-orange-400" } :
+    score >= 40 ? { label: "Mid", ring: "bg-blue-100 text-blue-800 border-blue-300", dot: "bg-blue-500" } :
+    score >= 20 ? { label: "Low", ring: "bg-sky-100 text-sky-800 border-sky-300", dot: "bg-sky-400" } :
                   { label: "Cold", ring: "bg-slate-100 text-slate-600 border-slate-300", dot: "bg-slate-400" };
 
   if (size === "lg") {

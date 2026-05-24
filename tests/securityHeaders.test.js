@@ -39,6 +39,19 @@ test("public headers include browser hardening and noindex protections", () => {
   assert.match(headers, /X-Frame-Options: SAMEORIGIN/);
   assert.match(headers, /\/admin\/\*[\s\S]*X-Robots-Tag: noindex, nofollow, noarchive/);
   assert.match(headers, /\/client-portal\/\*[\s\S]*Cache-Control: no-store/);
+  assert.match(headers, /\/onboarding\*[\s\S]*Cache-Control: no-store/);
+  assert.match(headers, /\/setup\/preview\*[\s\S]*Cache-Control: no-store/);
+  assert.match(headers, /\/motion-lab\*[\s\S]*Cache-Control: no-store/);
+});
+
+test("robots blocks sensitive operational surfaces from discovery", () => {
+  const robots = readProjectFile("public/robots.txt");
+
+  assert.match(robots, /Disallow: \/admin/);
+  assert.match(robots, /Disallow: \/client-portal/);
+  assert.match(robots, /Disallow: \/setup\/preview/);
+  assert.match(robots, /Disallow: \/onboarding/);
+  assert.match(robots, /Disallow: \/motion-lab/);
 });
 
 test("security.txt gives researchers a clear defensive disclosure path", () => {

@@ -30,7 +30,7 @@ export default function AIStatusDashboard() {
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  const STATUS_COLOR = { healthy: "#00FFB3", warning: "#F59E0B", degraded: "#EF4444" };
+  const STATUS_COLOR = { healthy: "#00FFB3", warning: "#00AEEF", degraded: "#EF4444" };
   const status = health?.overall_status || "unknown";
 
   if (loading) return <div style={{ color: "#9CA3AF", padding: 40 }}>Loading AI status...</div>;
@@ -51,9 +51,9 @@ export default function AIStatusDashboard() {
             ["Live Clients", health.clients?.live, "#00FFB3"],
             ["Active Installs", health.clients?.active_installs, "#00D4FF"],
             ["Stalled", health.clients?.stalled, health.clients?.stalled > 2 ? "#EF4444" : "#6B7280"],
-            ["Past Due", health.clients?.past_due, health.clients?.past_due > 0 ? "#F59E0B" : "#6B7280"],
+            ["Past Due", health.clients?.past_due, health.clients?.past_due > 0 ? "#00AEEF" : "#6B7280"],
             ["Errors 24h", health.errors_24h?.total, health.errors_24h?.total > 3 ? "#EF4444" : "#6B7280"],
-            ["Unresolved", health.errors_24h?.unresolved, health.errors_24h?.unresolved > 0 ? "#F59E0B" : "#00FFB3"],
+            ["Unresolved", health.errors_24h?.unresolved, health.errors_24h?.unresolved > 0 ? "#00AEEF" : "#00FFB3"],
           ].map(([label, val, color]) => (
             <div key={label} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 10, padding: "14px 16px" }}>
               <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 6px" }}>{label}</p>

@@ -10,7 +10,7 @@ const SERVICE_META = {
   instant_lead_response: { icon: Zap, label: "Instant Lead Response", color: "#0088CC" },
   missed_call_text_back: { icon: Phone, label: "Missed Call Text-Back", color: "#7C3AED" },
   nurture_sequence_14d: { icon: Mail, label: "14-Day Nurture Sequence", color: "#059669" },
-  ai_booking_agent: { icon: Calendar, label: "AI Booking Agent", color: "#D97706" },
+  ai_booking_agent: { icon: Calendar, label: "AI Booking Agent", color: "#0077B6" },
   review_request: { icon: Star, label: "Review Request", color: "#DC2626" },
   lead_reactivation: { icon: RefreshCw, label: "Lead Reactivation", color: "#DB2777" },
 };
@@ -134,7 +134,7 @@ export default function PackageActivationPanel({ order }) {
               <div className="flex items-center gap-2">
                 <Brain className="w-4 h-4 text-primary" />
                 <p className="text-xs font-bold text-primary uppercase tracking-wider">AI Pre-Flight Analysis</p>
-                <span className={`ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full ${aiCheck.ready_to_activate ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
+                <span className={`ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full ${aiCheck.ready_to_activate ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700"}`}>
                   {aiCheck.ready_to_activate ? "✓ Ready" : "⚠ Blockers Found"}
                 </span>
               </div>
@@ -165,9 +165,9 @@ export default function PackageActivationPanel({ order }) {
 
               {aiCheck.warnings?.length > 0 && (
                 <div className="space-y-1.5">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700">Warnings</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-blue-700">Warnings</p>
                   {aiCheck.warnings.map((warning, index) => (
-                    <div key={index} className="flex items-start gap-2 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                    <div key={index} className="flex items-start gap-2 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2">
                       <AlertCircle className="w-3 h-3 mt-0.5 flex-shrink-0" />
                       <span>{warning}</span>
                     </div>
@@ -222,7 +222,7 @@ export default function PackageActivationPanel({ order }) {
             )}
           </div>
 
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800 space-y-1.5">
+          <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-xs text-blue-800 space-y-1.5">
             <p className="font-semibold">Legacy bulk activation is retired.</p>
             <p>
               The old <code>aiPackageOrchestrator</code> path is intentionally disabled. Use the canonical install workspace and per-service order status updates instead of trying to auto-activate from this panel.

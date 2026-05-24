@@ -48,7 +48,7 @@ function ErrorState({ message, onRetry }) {
       borderRadius: "16px", padding: "32px", textAlign: "center",
     }}>
       <p style={{ fontSize: "16px", fontWeight: "700", color: "#dc2626", margin: "0 0 8px" }}>⚠ Unable to Load Dashboard</p>
-      <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.6)", margin: "0 0 16px" }}>{message}</p>
+      <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.6)", margin: "0 0 16px" }}>{message}</p>
       {onRetry && (
         <button onClick={onRetry} style={{
           display: "inline-flex", alignItems: "center", gap: "6px",
@@ -144,7 +144,7 @@ function LiveIndicator({ lastUpdated, onRefresh, isRefreshing }) {
       marginBottom: "20px", justifyContent: "flex-end",
     }}>
       <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px #22c55e", flexShrink: 0 }} />
-      <span style={{ fontSize: "11px", color: "rgba(27,20,13,0.45)", fontWeight: "500" }}>
+      <span style={{ fontSize: "11px", color: "rgba(10,22,40,0.45)", fontWeight: "500" }}>
         Live — updates every 30s
       </span>
       <button onClick={onRefresh} disabled={isRefreshing} style={{

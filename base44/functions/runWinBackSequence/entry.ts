@@ -9,6 +9,10 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+} from "../_shared/communicationOutbox.js";
 
 const STEPS = [
   { key: "win_back_day30", daysRequired: 30, label: "Day 30 — Special Offer" },
@@ -104,26 +108,40 @@ async function checkAlreadySent(base44: any, orderId: string, stepKey: string) {
 }
 
 async function sendEmail(
+  base44: any,
+  order: any,
   toEmail: string,
   subject: string,
   html: string,
-  resendKey: string,
-  fromEmail: string
+  fromEmail: string,
+  stepKey: string
 ) {
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ from: fromEmail, to: toEmail, subject, html }),
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: toEmail,
+    subject,
+    body: html,
+    html,
+    from: fromEmail,
+    orderId: order.id,
+    source: "runWinBackSequence",
+    sourceRecordId: order.id,
+    templateKey: stepKey,
+    messageType: "marketing",
+    consentBasis: "customer_reactivation",
+    metadata: { step_key: stepKey, order_id: order.id },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
   });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || `Resend error ${res.status}`);
+  if (!result.success && !result.suppressed) {
+    throw new Error(result.error || result.reason || "Resend outbox send failed");
   }
-  const data = await res.json();
-  return data.id;
+  return result.provider_message_id;
 }
 
 Deno.serve(async (req) => {
@@ -148,7 +166,6 @@ Deno.serve(async (req) => {
     if (!dryRun && !resendKey) {
       return Response.json({ error: "RESEND_API_KEY not set" }, { status: 500 });
     }
-    const activeResendKey = resendKey || "";
 
     // Load settings
     const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
@@ -218,7 +235,7 @@ Deno.serve(async (req) => {
           }
 
           try {
-            emailId = await sendEmail(toEmail, subject, html, activeResendKey, fromEmail);
+            emailId = await sendEmail(base44, order, toEmail, subject, html, fromEmail, step.key);
             success = true;
           } catch (err) {
             errorMsg = err instanceof Error ? err.message : String(err);

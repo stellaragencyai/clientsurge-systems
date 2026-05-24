@@ -12,109 +12,101 @@ import {
   buildRetrySchedulePatch,
   isAutomationJobDue,
 } from "../_shared/automationRetry.js";
-
-// #114: Resend with retry on 429/5xx
-async function resendWithRetry(payload, apiKey, retries = 1) {
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) return res.json();
-    if ((res.status === 429 || res.status >= 500) && attempt < retries) {
-      await new Promise(r => setTimeout(r, 2000));
-      continue;
-    }
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Resend ${res.status}: ${err?.message || "unknown"}`);
-  }
-}
-
-// #123: exponential backoff retry wrapper for jobs
-const MAX_RETRIES_JOB = 3;
-async function withRetry(fn, label = "job") {
-  for (let attempt = 1; attempt <= MAX_RETRIES_JOB; attempt++) {
-    try { return await fn(); }
-    catch (err) {
-      const delay = Math.pow(2, attempt - 1) * 1000;
-      console.warn(`[AutomationJobs] ${label} attempt ${attempt}/${MAX_RETRIES_JOB} failed: ${err.message}${attempt < MAX_RETRIES_JOB ? `, retrying in ${delay}ms` : " — giving up"}`);
-      if (attempt === MAX_RETRIES_JOB) throw err;
-      await new Promise(r => setTimeout(r, delay));
-    }
-  }
-}
-
-
+import {
+  buildClientCheckinEmail,
+  CLIENT_CHECKIN_JOB_TYPE,
+} from "../_shared/clientCheckinScheduler.js";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 const MAX_JOBS_PER_RUN = 25;
-const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
-const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
-const TWILIO_FROM_NUMBER = Deno.env.get("TWILIO_PHONE_NUMBER");
-const TWILIO_API_URL = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
 // ─────────────────────────────────────────────────────────
 // TWILIO SMS SENDER
 // ─────────────────────────────────────────────────────────
-async function sendTwilioSms(toNumber, messageBody) {
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_FROM_NUMBER) {
-    throw new Error("Twilio credentials missing");
-  }
-
-  const auth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
-  const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
-
-  const params = { From: TWILIO_FROM_NUMBER, To: toNumber, Body: messageBody };
-  if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
-
-  const response = await fetch(TWILIO_API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams(params).toString(),
+async function sendTwilioSms(base44, lead, toNumber, messageBody, job, metadata) {
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "sms",
+    provider: "twilio",
+    recipient: toNumber,
+    body: messageBody,
+    lead,
+    leadId: lead?.id || job.lead_id,
+    source: "processAutomationJobs",
+    sourceRecordId: job.id,
+    templateKey: job.job_type,
+    messageType: job.job_type?.includes("reactivation") ? "marketing" : "transactional",
+    consentBasis: lead?.consent_given ? "explicit_sms_consent" : "transactional_relationship",
+    metadata: { ...(metadata || {}), job_id: job.id, job_type: job.job_type },
+    providerSend: (providerPayload) => sendTwilioSmsProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
   });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Twilio error: ${response.status} - ${error}`);
-  }
-
-  const data = await response.json();
-  return data.sid;
+  if (!result.success) throw new Error(result.reason || result.error || "SMS was not sent");
+  return result.provider_message_id;
 }
 
 // ─────────────────────────────────────────────────────────
 // RESEND EMAIL SENDER
 // ─────────────────────────────────────────────────────────
-async function sendResendEmail(to, subject, body, fromEmail) {
-  if (!RESEND_API_KEY) {
-    throw new Error("Resend API key missing");
-  }
-
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurge.com",
-      to,
-      subject,
-      text: body,
+async function sendResendEmail(base44, lead, to, subject, body, fromEmail, job, metadata = {}) {
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: to,
+    subject,
+    body,
+    from: fromEmail,
+    lead,
+    leadId: lead?.id || job.lead_id,
+    source: "processAutomationJobs",
+    sourceRecordId: job.id,
+    templateKey: job.job_type,
+    messageType: job.job_type?.includes("reactivation") ? "marketing" : "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { ...metadata, job_id: job.id, job_type: job.job_type },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
     }),
   });
+  if (!result.success) throw new Error(result.reason || result.error || "Email was not sent");
+  return result.provider_message_id;
+}
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(`Resend error: ${error?.message || response.status}`);
-  }
-
-  const data = await response.json();
-  return data.id;
+async function sendResendHtmlEmail(base44, client, to, subject, html, text, fromEmail, job, metadata = {}) {
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: to,
+    subject,
+    body: text,
+    html,
+    from: fromEmail,
+    clientProjectId: client?.client_project_id,
+    source: "processAutomationJobs",
+    sourceRecordId: job.id,
+    templateKey: job.job_type,
+    messageType: "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { ...metadata, job_id: job.id, job_type: job.job_type, client_id: client?.id },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
+  });
+  if (!result.success) throw new Error(result.reason || result.error || "Email was not sent");
+  return result.provider_message_id;
 }
 
 // ─────────────────────────────────────────────────────────
@@ -178,6 +170,102 @@ Deno.serve(async (req) => {
     // ─────────────────────────────────────────────────────────
     for (const job of dueJobs) {
       try {
+        let metadata = {};
+        try {
+          metadata = JSON.parse(job.result_metadata || "{}");
+        } catch (_) {}
+
+        if (job.job_type === CLIENT_CHECKIN_JOB_TYPE) {
+          const client = metadata.client || await base44.asServiceRole.entities.Client.get(
+            job.context_id || job.client_id || job.lead_id
+          ).catch(() => null);
+          if (!client?.email) {
+            console.warn(`[ProcessAutomationJobs] Client check-in ${job.id} missing client email`);
+            const retryPatch = buildRetrySchedulePatch({
+              attempts: job.attempts || 0,
+              error: "Client email missing",
+              now: new Date(now),
+            });
+            await base44.asServiceRole.entities.AutomationJob.update(job.id, retryPatch);
+            results.jobs_requeued += retryPatch.status === "queued" ? 1 : 0;
+            results.jobs_failed += retryPatch.status === "failed" ? 1 : 0;
+            continue;
+          }
+
+          let messageId = null;
+          let error = null;
+          try {
+            const html = buildClientCheckinEmail({
+              client,
+              activeSystems: metadata.active_systems,
+            });
+            messageId = await sendResendHtmlEmail(
+              base44,
+              client,
+              client.email,
+              "Your ClientSurge 30-Day Check-In",
+              html,
+              "Your ClientSurge system has been live for 30 days. Book your check-in at https://calendly.com/nolan-clientsurgesystems",
+              fromEmail,
+              job,
+              metadata
+            );
+          } catch (err) {
+            error = err.message;
+            console.error(`[ProcessAutomationJobs] 30-day check-in email failed for job ${job.id}: ${err.message}`);
+          }
+
+          const retryPatch = error
+            ? buildRetrySchedulePatch({ attempts: job.attempts || 0, error, now: new Date(now) })
+            : null;
+
+          await base44.asServiceRole.entities.AutomationJob.update(
+            job.id,
+            error
+              ? retryPatch
+              : { status: "completed", processed_at: now, last_error: null }
+          );
+
+          await base44.asServiceRole.entities.Client.update(
+            job.context_id || job.client_id || job.lead_id,
+            error
+              ? { checkin_30_day_status: retryPatch?.status === "queued" ? "queued" : "failed" }
+              : { checkin_30_day_status: "sent", checkin_30_day_sent_at: now }
+          ).catch(() => null);
+
+          await base44.asServiceRole.entities.CommunicationEvent.create({
+            client_id: job.context_id || job.client_id || job.lead_id,
+            context_type: "Client",
+            context_id: job.context_id || job.client_id || job.lead_id,
+            channel: "email",
+            direction: "outbound",
+            event_type: error ? "email_failed" : "email_sent",
+            provider: "resend",
+            status: error ? "failed" : "sent",
+            subject: "Your ClientSurge 30-Day Check-In",
+            provider_message_id: messageId,
+            error_message: error,
+            metadata_json: JSON.stringify({
+              job_id: job.id,
+              job_type: job.job_type,
+              attempt: (job.attempts || 0) + 1,
+              requeued: retryPatch?.status === "queued",
+              next_retry_at: retryPatch?.scheduled_for || null,
+              timestamp: now,
+            }),
+          }).catch((logErr) => {
+            console.warn(`[ProcessAutomationJobs] Failed to log 30-day check-in event: ${logErr.message}`);
+          });
+
+          if (error) {
+            if (retryPatch?.status === "queued") results.jobs_requeued++;
+            else results.jobs_failed++;
+          } else {
+            results.jobs_processed++;
+          }
+          continue;
+        }
+
         // Get lead details
         const lead = await base44.asServiceRole.entities.Leads.get(job.lead_id).catch(
           () => null
@@ -191,12 +279,6 @@ Deno.serve(async (req) => {
         let sent = false;
         let messageId = null;
         let error = null;
-
-        // Parse metadata
-        let metadata = {};
-        try {
-          metadata = JSON.parse(job.result_metadata || "{}");
-        } catch (_) {}
 
         // ─────────────────────────────────────────────────────────
         // SEND SMS JOB
@@ -215,7 +297,7 @@ Deno.serve(async (req) => {
 
           try {
             const smsBody = metadata.message || "Hello! We'd love to reconnect.";
-            messageId = await sendTwilioSms(lead.phone, smsBody);
+            messageId = await sendTwilioSms(base44, lead, lead.phone, smsBody, job, metadata);
             sent = true;
             console.log(
               `[ProcessAutomationJobs] SMS sent to ${lead.phone} (SID: ${messageId})`
@@ -244,7 +326,7 @@ Deno.serve(async (req) => {
             const emailSubject = metadata.subject || "We miss you!";
             const emailBody =
               metadata.body || "We'd love to work with you again. Get in touch!";
-            messageId = await sendResendEmail(lead.email, emailSubject, emailBody, fromEmail);
+            messageId = await sendResendEmail(base44, lead, lead.email, emailSubject, emailBody, fromEmail, job, metadata);
             sent = true;
             console.log(`[ProcessAutomationJobs] Email sent to ${lead.email} (ID: ${messageId})`);
           } catch (err) {

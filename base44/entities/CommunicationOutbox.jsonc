@@ -1,0 +1,222 @@
+{
+  "name": "CommunicationOutbox",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "channel": {
+      "type": "string",
+      "title": "Channel",
+      "enum": [
+        "sms",
+        "email"
+      ]
+    },
+    "provider": {
+      "type": "string",
+      "title": "Provider",
+      "enum": [
+        "twilio",
+        "resend"
+      ]
+    },
+    "recipient": {
+      "type": "string",
+      "title": "Recipient"
+    },
+    "recipient_normalized": {
+      "type": "string",
+      "title": "Normalized Recipient"
+    },
+    "business_id": {
+      "type": "string",
+      "title": "Business ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "template_key": {
+      "type": "string",
+      "title": "Template Key"
+    },
+    "source": {
+      "type": "string",
+      "title": "Source"
+    },
+    "source_record_id": {
+      "type": "string",
+      "title": "Source Record ID"
+    },
+    "subject": {
+      "type": "string",
+      "title": "Subject"
+    },
+    "message_body": {
+      "type": "string",
+      "title": "Message Body"
+    },
+    "html_body": {
+      "type": "string",
+      "title": "HTML Body"
+    },
+    "from_address": {
+      "type": "string",
+      "title": "From Address"
+    },
+    "message_type": {
+      "type": "string",
+      "title": "Message Type",
+      "enum": [
+        "transactional",
+        "marketing",
+        "operational",
+        "internal"
+      ]
+    },
+    "consent_basis": {
+      "type": "string",
+      "title": "Consent Basis"
+    },
+    "consent_snapshot": {
+      "type": "string",
+      "title": "Consent Snapshot JSON"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "title": "Idempotency Key"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "queued",
+        "sending",
+        "sent",
+        "delivered",
+        "failed",
+        "suppressed",
+        "cancelled",
+        "duplicate",
+        "needs_manual_review"
+      ],
+      "default": "queued"
+    },
+    "provider_message_id": {
+      "type": "string",
+      "title": "Provider Message ID"
+    },
+    "provider_status": {
+      "type": "string",
+      "title": "Provider Status"
+    },
+    "attempts": {
+      "type": "integer",
+      "title": "Attempts",
+      "default": 0
+    },
+    "last_error": {
+      "type": "string",
+      "title": "Last Error"
+    },
+    "next_retry_at": {
+      "type": "string",
+      "title": "Next Retry At",
+      "format": "date-time"
+    },
+    "retryable": {
+      "type": "boolean",
+      "title": "Retryable",
+      "default": false
+    },
+    "max_attempts": {
+      "type": "integer",
+      "title": "Max Attempts",
+      "default": 3
+    },
+    "quiet_hours_blocked": {
+      "type": "boolean",
+      "title": "Quiet Hours Blocked",
+      "default": false
+    },
+    "unsubscribe_blocked": {
+      "type": "boolean",
+      "title": "Unsubscribe Blocked",
+      "default": false
+    },
+    "suppression_reason": {
+      "type": "string",
+      "title": "Suppression Reason"
+    },
+    "communication_event_id": {
+      "type": "string",
+      "title": "Communication Event ID"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Metadata JSON"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time"
+    },
+    "sent_at": {
+      "type": "string",
+      "title": "Sent At",
+      "format": "date-time"
+    },
+    "delivered_at": {
+      "type": "string",
+      "title": "Delivered At",
+      "format": "date-time"
+    },
+    "failed_at": {
+      "type": "string",
+      "title": "Failed At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "channel",
+    "provider",
+    "recipient",
+    "recipient_normalized",
+    "message_type",
+    "idempotency_key",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

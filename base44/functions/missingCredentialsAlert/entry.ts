@@ -5,6 +5,8 @@
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+const APP_URL = (Deno.env.get("APP_URL") || "https://clientsurgesystems.com").replace(/\/+$/, "");
+
 // #409a: warm reminder email template
 function buildReminderEmail(client_name, portal_link) {
   return `
@@ -44,7 +46,7 @@ Deno.serve(async (req) => {
         if (Date.now() - last.getTime() < 23 * 3600000) continue;
       }
 
-      const portalLink = \`https://clientsurgesystems.com/setup/credentials?order_id=\${order.id}\`;
+      const portalLink = `${APP_URL}/setup/credentials?order_id=${encodeURIComponent(order.id)}`;
       const html = buildReminderEmail(order.client_name, portalLink);
 
       const resendKey = Deno.env.get("RESEND_API_KEY");

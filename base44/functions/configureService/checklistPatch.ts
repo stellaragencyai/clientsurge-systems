@@ -1,5 +1,5 @@
 /**
- * configureServiceChecklistPatch.ts — #412 #412a
+ * configureServiceChecklistPatch.ts — #412 #412a #412b
  * After each successful configureService call, update AutomationChecklistStep.status = "completed".
  * Query by order_id + service_key to find the right record (#412a).
  */
@@ -16,6 +16,17 @@ export async function markChecklistStepComplete(base44, order_id, service_key) {
         completed_at: new Date().toISOString(),
       });
       console.log(`[configureService] Checklist step marked complete: ${service_key} for order ${order_id}`);
+    } else {
+      await base44.asServiceRole.entities.AutomationChecklistStep.create({
+        order_id,
+        service_key,
+        step_id: "manual_configuration_complete",
+        step_label: "Manual service configuration complete",
+        step_order: 999,
+        status: "completed",
+        completed_at: new Date().toISOString(),
+      });
+      console.log(`[configureService] Checklist step created complete: ${service_key} for order ${order_id}`);
     }
   } catch (e) {
     console.warn("[configureService] Failed to update checklist step:", e.message);

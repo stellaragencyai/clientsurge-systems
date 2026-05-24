@@ -1,6 +1,6 @@
 # ClientSurge Website Security Hardening - May 21, 2026
 
-Scope: passive white-hat review of `https://clientsurgesystems.com` plus local code hardening. The typo domain `https://clientsurgeystems.com` did not resolve during this check.
+Scope: passive white-hat review of `https://clientsurgesystems.com` plus local code hardening. The canonical public host is now `https://clientsurgesystems.com`. The typo domain `https://clientsurgeystems.com` did not resolve during this check.
 
 ## Passive Before Check
 

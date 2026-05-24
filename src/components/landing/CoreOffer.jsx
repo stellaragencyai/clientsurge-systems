@@ -296,7 +296,7 @@ export default function CoreOffer() {
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse 80% 100% at 50% 0%, rgba(154,92,46,0.08) 0%, transparent 70%)" }} />
+        style={{ background: "radial-gradient(ellipse 80% 100% at 50% 0%, rgba(0,136,204,0.08) 0%, transparent 70%)" }} />
       
 
       <div className="max-w-6xl mx-auto relative z-10 pt-10">

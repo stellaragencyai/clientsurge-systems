@@ -4,7 +4,7 @@ export default function OrderTracker() {
       className="rounded-3xl px-6 py-6 text-center"
       style={{
         background: "rgba(255,255,255,0.92)",
-        border: "1.5px solid rgba(154,92,46,0.12)",
+        border: "1.5px solid rgba(0,136,204,0.12)",
         boxShadow: "0 8px 32px rgba(111,67,31,0.08)",
       }}
     >

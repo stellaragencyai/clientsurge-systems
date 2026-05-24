@@ -6,9 +6,10 @@ import {
 import { processCheckoutSessionCompleted } from "../_shared/stripeOrderWebhook.js";
 
 class InMemoryCollection {
-  constructor(initialRecords = []) {
+  constructor(initialRecords = [], options = {}) {
     this.records = [...initialRecords];
     this.sequence = initialRecords.length + 1;
+    this.failCreateOnce = options.failCreateOnce || false;
   }
 
   async filter(query = {}) {
@@ -26,6 +27,11 @@ class InMemoryCollection {
   }
 
   async create(data) {
+    if (this.failCreateOnce) {
+      this.failCreateOnce = false;
+      throw new Error("Injected create failure");
+    }
+
     const record = {
       id: data.id || `rec_${this.sequence++}`,
       created_date: data.created_date || new Date().toISOString(),
@@ -59,7 +65,7 @@ function buildTrackedItem(product_id, product_name) {
   };
 }
 
-function createFakeBase44() {
+function createFakeBase44(options = {}) {
   const entities = {
     Order: new InMemoryCollection([
       {
@@ -89,8 +95,12 @@ function createFakeBase44() {
     ]),
     Client: new InMemoryCollection(),
     ClientProject: new InMemoryCollection(),
-    OnboardingClient: new InMemoryCollection(),
+    OnboardingClient: new InMemoryCollection([], {
+      failCreateOnce: options.failOnboardingCreateOnce,
+    }),
     CommunicationEvent: new InMemoryCollection(),
+    PaymentEvent: new InMemoryCollection(),
+    FulfillmentJob: new InMemoryCollection(),
   };
 
   const invited = [];
@@ -153,6 +163,8 @@ Deno.test("checkout.session.completed processing is idempotent across legacy wra
   assertEquals(updatedOrder.stripe_event_id, "evt_checkout_1");
   assertEquals(updatedOrder.stripe_session_id, "cs_test_1");
   assertEquals(updatedOrder.stripe_customer_id, "cus_123");
+  assertEquals(updatedOrder.payment_status, "paid");
+  assertEquals(updatedOrder.fulfillment_status, "completed");
   assert(updatedOrder.client_id);
   assert(updatedOrder.client_project_id);
   assert(updatedOrder.onboarding_client_id);
@@ -177,6 +189,13 @@ Deno.test("checkout.session.completed processing is idempotent across legacy wra
   assert(providerIds.includes("portal_invite:order_1"));
   assert(providerIds.includes("order_confirmation:order_1"));
 
+  assertEquals(entities.PaymentEvent.records.length, 1);
+  assertEquals(entities.PaymentEvent.records[0].event_id, "evt_checkout_1");
+  assertEquals(entities.PaymentEvent.records[0].status, "processed");
+  assertEquals(entities.PaymentEvent.records[0].fulfillment_status, "completed");
+  assertEquals(entities.FulfillmentJob.records.length, 1);
+  assertEquals(entities.FulfillmentJob.records[0].status, "completed");
+
   const secondResult = await processCheckoutSessionCompleted({
     base44,
     event,
@@ -187,4 +206,117 @@ Deno.test("checkout.session.completed processing is idempotent across legacy wra
   assertEquals(secondResult.duplicate, true);
   assertEquals(invited.length, 1);
   assertEquals(invoked.length, 2);
+  assertEquals(entities.Client.records.length, 1);
+  assertEquals(entities.ClientProject.records.length, 1);
+  assertEquals(entities.OnboardingClient.records.length, 1);
+  assertEquals(entities.PaymentEvent.records.length, 1);
+  assertEquals(entities.PaymentEvent.records[0].status, "processed");
+});
+
+Deno.test("checkout.session.completed fulfillment failure records retryable ledger and job", async () => {
+  const { base44, entities } = createFakeBase44({
+    failOnboardingCreateOnce: true,
+  });
+  const event = {
+    id: "evt_checkout_failure",
+    type: "checkout.session.completed",
+    data: {
+      object: {
+        id: "cs_test_failure",
+        customer: "cus_failure",
+        customer_email: "owner@example.com",
+        metadata: {
+          order_id: "order_1",
+          package_key: "growth_system",
+        },
+      },
+    },
+  };
+
+  let error = null;
+  try {
+    await processCheckoutSessionCompleted({
+      base44,
+      event,
+      source: "stripeWebhookOrders",
+    });
+  } catch (caught) {
+    error = caught;
+  }
+
+  assert(error);
+  const order = await entities.Order.get("order_1");
+  assertEquals(order.payment_status, "paid");
+  assertEquals(order.fulfillment_status, "failed");
+  assertEquals(order.fulfillment_recovery_required, true);
+  assertEquals(order.pipeline_status, "Error");
+  assert(String(order.fulfillment_last_error).includes("Injected create failure"));
+
+  assertEquals(entities.PaymentEvent.records.length, 1);
+  assertEquals(entities.PaymentEvent.records[0].event_id, "evt_checkout_failure");
+  assertEquals(entities.PaymentEvent.records[0].status, "failed");
+  assertEquals(entities.PaymentEvent.records[0].recovery_required, true);
+  assert(entities.PaymentEvent.records[0].next_retry_at);
+
+  assertEquals(entities.FulfillmentJob.records.length, 1);
+  assertEquals(entities.FulfillmentJob.records[0].status, "failed");
+  assertEquals(entities.FulfillmentJob.records[0].recovery_required, true);
+});
+
+Deno.test("retry after fulfillment failure resumes without duplicating created resources", async () => {
+  const { base44, entities, invited, invoked } = createFakeBase44({
+    failOnboardingCreateOnce: true,
+  });
+  const event = {
+    id: "evt_checkout_retry",
+    type: "checkout.session.completed",
+    data: {
+      object: {
+        id: "cs_test_retry",
+        customer: "cus_retry",
+        customer_email: "owner@example.com",
+        metadata: {
+          order_id: "order_1",
+          package_key: "growth_system",
+        },
+      },
+    },
+  };
+
+  await processCheckoutSessionCompleted({
+    base44,
+    event,
+    source: "stripeWebhookOrders",
+  }).catch(() => null);
+
+  assertEquals(entities.Client.records.length, 1);
+  assertEquals(entities.ClientProject.records.length, 1);
+  assertEquals(entities.OnboardingClient.records.length, 0);
+
+  const retryResult = await processCheckoutSessionCompleted({
+    base44,
+    event,
+    source: "stripeWebhookOrders",
+  });
+
+  assertEquals(retryResult.success, true);
+  assertEquals(entities.Client.records.length, 1);
+  assertEquals(entities.ClientProject.records.length, 1);
+  assertEquals(entities.OnboardingClient.records.length, 1);
+  assertEquals(invited.length, 1);
+  assertEquals(invoked.length, 2);
+
+  const order = await entities.Order.get("order_1");
+  assertEquals(order.payment_status, "paid");
+  assertEquals(order.fulfillment_status, "completed");
+  assertEquals(order.fulfillment_recovery_required, false);
+  assertEquals(order.pipeline_status, "Ready for Install");
+  assertEquals(order.order_status, "paid_setup_in_progress");
+
+  assertEquals(entities.PaymentEvent.records.length, 1);
+  assertEquals(entities.PaymentEvent.records[0].status, "processed");
+  assertEquals(entities.PaymentEvent.records[0].attempts, 2);
+  assertEquals(entities.FulfillmentJob.records.length, 1);
+  assertEquals(entities.FulfillmentJob.records[0].status, "completed");
+  assertEquals(entities.FulfillmentJob.records[0].attempts, 2);
 });

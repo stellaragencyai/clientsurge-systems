@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { createAuditLog } from "../shared/auditLog.ts";
 
 Deno.serve(async (req) => {
   try {
@@ -25,6 +26,15 @@ Deno.serve(async (req) => {
     } else {
       settings = await base44.asServiceRole.entities.AdminSettings.create(patch);
     }
+
+    await createAuditLog(base44, {
+      admin_email: user.email,
+      action: existing ? "update_admin_settings" : "create_admin_settings",
+      entity_name: "AdminSettings",
+      record_id: settings.id || existing?.id || null,
+      before: existing || null,
+      after: settings,
+    });
 
     return Response.json({ success: true, settings });
   } catch (error) {

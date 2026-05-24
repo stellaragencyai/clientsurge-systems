@@ -50,8 +50,8 @@ export default function MedSpaNavBar() {
           style={{
             borderRadius: "9999px",
             padding: "2px",
-            background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-            boxShadow: "0 3px 12px rgba(120,70,20,0.3)",
+            background: "linear-gradient(135deg,#0088CC 0%,#00AEEF 30%,#DDF4FF 50%,#00AEEF 70%,#005B99 100%)",
+            boxShadow: "0 3px 12px rgba(0,92,153,0.3)",
             border: "none",
             cursor: "pointer",
           }}
@@ -63,8 +63,8 @@ export default function MedSpaNavBar() {
               height: "32px",
               padding: "0 16px",
               borderRadius: "9999px",
-              background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-              color: "#f5e6d0",
+              background: "linear-gradient(135deg,#005B99 0%,#0077B6 40%,#005B99 100%)",
+              color: "#EAF8FF",
               fontWeight: "700",
               fontSize: "0.75rem",
             }}

@@ -116,6 +116,38 @@
       "type": "string",
       "title": "Consent Text Version"
     },
+    "sms_opted_out": {
+      "type": "boolean",
+      "title": "SMS Opted Out",
+      "default": false
+    },
+    "sms_opted_out_at": {
+      "type": "string",
+      "title": "SMS Opted Out At",
+      "format": "date-time"
+    },
+    "sms_opt_out_keyword": {
+      "type": "string",
+      "title": "SMS Opt-Out Keyword"
+    },
+    "sms_opt_out_source": {
+      "type": "string",
+      "title": "SMS Opt-Out Source"
+    },
+    "email_suppressed": {
+      "type": "boolean",
+      "title": "Email Suppressed",
+      "default": false
+    },
+    "email_suppressed_at": {
+      "type": "string",
+      "title": "Email Suppressed At",
+      "format": "date-time"
+    },
+    "email_suppression_reason": {
+      "type": "string",
+      "title": "Email Suppression Reason"
+    },
     "user_agent": {
       "type": "string",
       "title": "User Agent"
@@ -241,6 +273,10 @@
       "type": "string",
       "title": "Cadence Paused At",
       "format": "date-time"
+    },
+    "cadence_paused_reason": {
+      "type": "string",
+      "title": "Cadence Paused Reason"
     }
   },
   "required": [],

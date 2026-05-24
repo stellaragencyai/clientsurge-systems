@@ -28,6 +28,8 @@ export default function MedSpaSpecific() {
               <img
                 src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=600&q=70&auto=format"
                 alt="Luxury med spa interior"
+                width="600"
+                height="400"
                 loading="lazy"
                 className="w-full h-80 object-cover"
               />
@@ -36,6 +38,8 @@ export default function MedSpaSpecific() {
               <img
                 src="https://images.unsplash.com/photo-1552693673-1bf958298935?w=300&q=70&auto=format"
                 alt="Med spa treatment"
+                width="300"
+                height="300"
                 loading="lazy"
                 className="w-full h-full object-cover"
               />

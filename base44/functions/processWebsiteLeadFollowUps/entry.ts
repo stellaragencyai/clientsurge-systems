@@ -12,12 +12,11 @@ import {
   shouldStopWebsiteLeadFollowUp,
   WEBSITE_LEAD_FOLLOW_UP_STEPS,
 } from "../_shared/websiteLeadFollowUps.js";
-
-// #128: TCPA opt-out footer for all SMS
-function appendOptOut(msg) {
-  if ((msg || "").toLowerCase().includes("reply stop")) return msg;
-  return msg + "\n\nReply STOP to unsubscribe.";
-}
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 async function checkAlreadySent(base44, leadId, stepKey) {
   const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
@@ -34,72 +33,56 @@ async function checkAlreadySent(base44, leadId, stepKey) {
 }
 
 async function sendSMS(base44, lead, messageBody, fromNumber, stepKey) {
-  const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-  const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-  const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
-  if (!statusCallbackUrl) {
-    console.warn("[processWebsiteLeadFollowUps] TWILIO_SMS_STATUS_CALLBACK_URL missing — SMS delivery tracking disabled");
-  }
-
-  if (!accountSid || !authToken || !fromNumber) {
-    throw new Error("Twilio credentials missing");
-  }
-
-  const params = { To: lead.phone_number, From: fromNumber, Body: messageBody };
-  if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
-
-  const res = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams(params),
-    }
-  );
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Twilio error: ${err?.message || res.status}`);
-  }
-
-  const result = await res.json();
-  return { success: true, messageId: result.sid };
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "sms",
+    provider: "twilio",
+    recipient: lead.phone_number,
+    body: messageBody,
+    from: fromNumber,
+    lead,
+    leadId: lead.id,
+    source: "website_lead_followup",
+    sourceRecordId: `${lead.id}:${stepKey}`,
+    templateKey: stepKey,
+    messageType: "transactional",
+    consentBasis: lead.consent_given ? "web_form_consent" : "transactional_relationship",
+    metadata: { step_key: stepKey, website_lead_followup: true },
+    providerSend: (providerPayload) => sendTwilioSmsProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
+  });
+  if (!result.success) throw new Error(result.reason || result.error || "SMS was not sent");
+  return { success: true, messageId: result.provider_message_id, outboxId: result.outbox?.id };
 }
 
 async function sendEmail(base44, lead, subject, body, fromEmail, stepKey) {
-  const resendKey = Deno.env.get("RESEND_API_KEY");
-
-  if (!resendKey) {
-    throw new Error("Resend API key missing");
-  }
-
-  const idempotencyKey = `website-lead/${lead.id}/${stepKey}`;
-
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-      "Idempotency-Key": idempotencyKey,
-    },
-    body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurgesystems.com",
-      to: lead.email,
-      subject,
-      text: body,
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: lead.email,
+    subject,
+    body,
+    from: fromEmail || "noreply@clientsurgesystems.com",
+    lead,
+    leadId: lead.id,
+    source: "website_lead_followup",
+    sourceRecordId: `${lead.id}:${stepKey}`,
+    templateKey: stepKey,
+    messageType: "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { step_key: stepKey, website_lead_followup: true },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
     }),
   });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Resend error: ${err?.message || res.status}`);
-  }
-
-  const result = await res.json();
-  return { success: true, messageId: result.id };
+  if (!result.success) throw new Error(result.reason || result.error || "Email was not sent");
+  return { success: true, messageId: result.provider_message_id, outboxId: result.outbox?.id };
 }
 
 function renderTemplate(template, lead, bookingLink) {

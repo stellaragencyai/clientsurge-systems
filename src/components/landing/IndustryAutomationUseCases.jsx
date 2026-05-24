@@ -12,7 +12,7 @@ export default function IndustryAutomationUseCases({ industry }) {
     <section className="px-4 py-16 md:px-6 md:py-24" style={{ background: "#f8fbff" }}>
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 text-center">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#0088CC" }}>
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#006BB0" }}>
             Industry-specific workflows
           </p>
           <h2 className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
@@ -32,7 +32,7 @@ export default function IndustryAutomationUseCases({ industry }) {
             >
               <div
                 className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-                style={{ background: "rgba(0,174,239,0.1)", color: "#0088CC" }}
+                style={{ background: "rgba(0,107,176,0.1)", color: "#006BB0" }}
               >
                 <CheckCircle2 className="h-5 w-5" />
               </div>

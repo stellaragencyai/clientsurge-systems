@@ -39,14 +39,14 @@ export default function WhatHappensNext({ installStatus }) {
     <div style={{
       borderRadius: "14px",
       background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(253,251,248,0.9) 100%)",
-      border: "1px solid rgba(154,92,46,0.1)",
+      border: "1px solid rgba(0,136,204,0.1)",
       padding: "18px 20px",
       marginTop: "20px",
       display: "flex", gap: "14px", alignItems: "flex-start",
     }}>
       <div style={{
         width: "42px", height: "42px", borderRadius: "12px", flexShrink: 0,
-        background: "rgba(154,92,46,0.07)", border: "1px solid rgba(154,92,46,0.12)",
+        background: "rgba(0,136,204,0.07)", border: "1px solid rgba(0,136,204,0.12)",
         display: "flex", alignItems: "center", justifyContent: "center", fontSize: "20px",
       }}>
         {info.icon}
@@ -55,7 +55,7 @@ export default function WhatHappensNext({ installStatus }) {
         <p style={{ fontSize: "13px", fontWeight: "800", color: "#1b140d", margin: "0 0 5px" }}>
           {info.title}
         </p>
-        <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.6)", margin: 0, lineHeight: 1.6 }}>
+        <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.6)", margin: 0, lineHeight: 1.6 }}>
           {info.body}
         </p>
       </div>

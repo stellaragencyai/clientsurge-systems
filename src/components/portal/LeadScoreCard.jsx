@@ -6,7 +6,7 @@ export default function LeadScoreCard({ lead }) {
   const getColor = (s) => {
     if (s >= 80) return { bg: 'bg-green-50', border: 'border-green-200', text: 'text-green-700', icon: '🔥' };
     if (s >= 60) return { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', icon: '⭐' };
-    if (s >= 40) return { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700', icon: '👍' };
+    if (s >= 40) return { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-700', icon: '👍' };
     return { bg: 'bg-gray-50', border: 'border-gray-200', text: 'text-gray-700', icon: '❄️' };
   };
 

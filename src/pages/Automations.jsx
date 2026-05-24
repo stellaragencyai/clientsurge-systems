@@ -121,7 +121,7 @@ const SERVICES = [
 ];
 
 const BRAND = {
-  color: "#0088CC",
+  color: "#006BB0",
   gradientFrom: "#00AEEF",
   gradientTo: "#003B8F",
 };
@@ -147,6 +147,8 @@ function VideoPlaceholder({ service, onClose }) {
           <img
             src={service.poster}
             alt={service.title}
+            width="1280"
+            height="720"
             className="w-full h-full object-cover opacity-30"
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center p-8">
@@ -204,6 +206,8 @@ function ServiceCard({ service }) {
           <img
             src={service.poster}
             alt={service.title}
+            width="640"
+            height="360"
             className="w-full h-full object-cover transition-transform duration-500"
             style={{ transform: hovered ? "scale(1.05)" : "scale(1)" }}
           />
@@ -239,9 +243,9 @@ function ServiceCard({ service }) {
 
         {/* Content */}
         <div className="p-6 flex flex-col flex-1">
-          <h3 className="text-lg font-bold text-slate-900 mb-1" style={{ fontFamily: "Montserrat, sans-serif" }}>
+          <h2 className="text-lg font-bold text-slate-900 mb-1" style={{ fontFamily: "Montserrat, sans-serif" }}>
             {service.title}
-          </h3>
+          </h2>
           <p className="text-xs font-semibold mb-3" style={{ color: BRAND.color }}>
             {service.tagline}
           </p>
@@ -251,7 +255,7 @@ function ServiceCard({ service }) {
 
           {/* Stats */}
           <div className="rounded-xl p-4 mb-5" style={{ background: "#f0f8ff", border: "1px solid rgba(0,136,204,0.12)" }}>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Industry Benchmarks</p>
+            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-3">Industry Benchmarks</p>
             <div className="space-y-3">
               {service.stats.map((stat) => (
                 <div key={stat.label} className="flex items-start gap-3">
@@ -260,7 +264,7 @@ function ServiceCard({ service }) {
                   </span>
                   <div>
                     <p className="text-xs text-slate-700 font-medium leading-tight">{stat.label}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Source: {stat.source}</p>
+                    <p className="text-[10px] text-slate-600 mt-0.5">Source: {stat.source}</p>
                   </div>
                 </div>
               ))}
@@ -269,7 +273,7 @@ function ServiceCard({ service }) {
 
           {/* What you get */}
           <div className="mb-6 flex-1">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">What's included</p>
+            <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2">What's included</p>
             <ul className="space-y-2">
               {service.whatYouGet.map((item) => (
                 <li key={item} className="flex items-start gap-2">
@@ -320,6 +324,8 @@ export default function Automations() {
           <img
             src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/199305bd4_11.png"
             alt="ClientSurge Systems"
+            width="220"
+            height="80"
             style={{ height: "48px", width: "auto", objectFit: "contain", display: "block" }}
           />
         </Link>

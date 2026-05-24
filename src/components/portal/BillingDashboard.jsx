@@ -38,18 +38,18 @@ const SUB_STATUS = {
   past_due:          { cls: 'bg-red-100  border-red-300  text-red-800',     icon: AlertCircle,   label: 'Past Due' },
   canceled:          { cls: 'bg-gray-100 border-gray-300 text-gray-700',    icon: XCircle,       label: 'Canceled' },
   unpaid:            { cls: 'bg-red-100  border-red-300  text-red-800',     icon: AlertCircle,   label: 'Unpaid' },
-  incomplete:        { cls: 'bg-amber-100 border-amber-300 text-amber-800', icon: AlertTriangle, label: 'Incomplete' },
+  incomplete:        { cls: 'bg-blue-100 border-blue-300 text-blue-800', icon: AlertTriangle, label: 'Incomplete' },
   incomplete_expired:{ cls: 'bg-gray-100 border-gray-300 text-gray-700',    icon: XCircle,       label: 'Expired' },
 };
 
 const INV_STATUS = {
   paid:    { cls: 'bg-green-100 border-green-300 text-green-800',  icon: CheckCircle2, label: 'Paid' },
-  open:    { cls: 'bg-amber-100 border-amber-300 text-amber-800',  icon: Clock,        label: 'Open' },
+  open:    { cls: 'bg-blue-100 border-blue-300 text-blue-800',  icon: Clock,        label: 'Open' },
   draft:   { cls: 'bg-gray-100  border-gray-300  text-gray-700',   icon: FileText,     label: 'Draft' },
   void:    { cls: 'bg-gray-100  border-gray-300  text-gray-700',   icon: XCircle,      label: 'Void' },
   uncollectible: { cls: 'bg-red-100 border-red-300 text-red-800',  icon: AlertCircle,  label: 'Uncollectible' },
   // internal fallbacks
-  unpaid:  { cls: 'bg-amber-100 border-amber-300 text-amber-800',  icon: Clock,        label: 'Unpaid' },
+  unpaid:  { cls: 'bg-blue-100 border-blue-300 text-blue-800',  icon: Clock,        label: 'Unpaid' },
   overdue: { cls: 'bg-red-100   border-red-300   text-red-800',    icon: AlertCircle,  label: 'Overdue' },
 };
 
@@ -95,7 +95,7 @@ function SubscriptionCard({ sub, onManage, managing }) {
             <p className="font-semibold text-foreground text-sm">{sub.plan_name}</p>
             <StatusPill status={sub.status} map={SUB_STATUS} />
             {sub.cancel_at_period_end && (
-              <span className="text-[10px] font-bold bg-orange-100 text-orange-700 border border-orange-200 rounded-full px-2 py-0.5">
+              <span className="text-[10px] font-bold bg-sky-100 text-sky-700 border border-sky-200 rounded-full px-2 py-0.5">
                 Cancels {renewDate}
               </span>
             )}
@@ -268,7 +268,7 @@ function SubscriptionChangePanel({
         </div>
 
         {!orderId && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
             This portal account is missing a linked order ID, so package changes need support review.
           </div>
         )}

@@ -1,20 +1,19 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+} from "../_shared/communicationOutbox.js";
 
 Deno.serve(async (req) => {
   try {
-    createClientFromRequest(req);
+    const base44 = createClientFromRequest(req);
     const { full_name, business_name, email, phone, scheduled_date, scheduled_time, biggest_issue, industry } = await req.json();
 
     if (!full_name || !email || !scheduled_date || !scheduled_time) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
     const adminEmail = Deno.env.get('ADMIN_EMAIL') || 'system@clientsurgesystems.com';
-
-    if (!resendApiKey) {
-      return Response.json({ error: 'Resend credentials not configured' }, { status: 500 });
-    }
 
     const dateObj = new Date(`${scheduled_date}T12:00:00`);
     const formattedDate = dateObj.toLocaleDateString('en-US', {
@@ -51,24 +50,30 @@ Deno.serve(async (req) => {
 </body>
 </html>`;
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'ClientSurge Systems <system@clientsurgesystems.com>',
-        to: [adminEmail],
-        subject: `New Demo: ${business_name || full_name} - ${formattedDate} at ${formattedTime}`,
-        html: emailBody,
+    const result = await sendCommunicationViaOutbox({
+      base44,
+      channel: "email",
+      provider: "resend",
+      recipient: adminEmail,
+      subject: `New Demo: ${business_name || full_name} - ${formattedDate} at ${formattedTime}`,
+      body: emailBody,
+      html: emailBody,
+      from: 'ClientSurge Systems <system@clientsurgesystems.com>',
+      source: "sendAdminDemoNotification",
+      sourceRecordId: `${email}:${scheduled_date}:${scheduled_time}`,
+      templateKey: "admin_demo_notification",
+      messageType: "transactional",
+      consentBasis: "internal_notification",
+      metadata: { full_name, business_name, scheduled_date, scheduled_time, industry },
+      providerSend: (providerPayload) => sendResendEmailProvider({
+        ...providerPayload,
+        env: (name) => Deno.env.get(name),
+        fetchImpl: fetch,
       }),
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return Response.json({ error: data.message || 'Email send failed' }, { status: 500 });
+    if (!result.success) {
+      return Response.json({ error: result.reason || result.error || 'Email send failed' }, { status: 500 });
     }
 
     return Response.json({ success: true });

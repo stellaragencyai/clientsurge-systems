@@ -21,7 +21,7 @@ export default class ErrorBoundary extends Component {
           <div className="max-w-md">
             <div
               className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+              style={{ background: "linear-gradient(135deg,#005B99,#0077B6)" }}
             >
               <span className="text-white text-2xl">⚠️</span>
             </div>
@@ -33,7 +33,7 @@ export default class ErrorBoundary extends Component {
               <button
                 onClick={() => window.location.reload()}
                 className="px-5 py-2.5 rounded-full text-sm font-semibold text-white"
-                style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+                style={{ background: "linear-gradient(135deg,#005B99,#0077B6)" }}
               >
                 Refresh Page
               </button>

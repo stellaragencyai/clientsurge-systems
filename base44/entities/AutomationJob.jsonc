@@ -21,8 +21,25 @@
         "nurture_sequence",
         "webhook_dispatch",
         "reactivation_sms",
-        "reactivation_email"
+        "reactivation_email",
+        "client_30_day_checkin"
       ]
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "context_type": {
+      "type": "string",
+      "title": "Context Type"
+    },
+    "context_id": {
+      "type": "string",
+      "title": "Context ID"
     },
     "trigger_event": {
       "type": "string",

@@ -109,15 +109,15 @@ function ProgressSection({ project }) {
               {/* Icon */}
               <div style={{
                 width: "36px", height: "36px", borderRadius: "10px", flexShrink: 0,
-                background: isComplete ? "rgba(0,174,239,0.12)" : isInProgress ? "rgba(245,158,11,0.1)" : "rgba(0,0,0,0.04)",
-                border: `1.5px solid ${isComplete ? "rgba(0,174,239,0.4)" : isInProgress ? "rgba(245,158,11,0.4)" : "rgba(0,0,0,0.08)"}`,
+                background: isComplete ? "rgba(0,174,239,0.12)" : isInProgress ? "rgba(0,174,239,0.1)" : "rgba(0,0,0,0.04)",
+                border: `1.5px solid ${isComplete ? "rgba(0,174,239,0.4)" : isInProgress ? "rgba(0,174,239,0.4)" : "rgba(0,0,0,0.08)"}`,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 zIndex: 1,
               }}>
                 {isComplete
                   ? <CheckCircle2 style={{ width: "16px", height: "16px", color: "#0088CC" }} />
                   : isInProgress
-                    ? <Loader2 style={{ width: "14px", height: "14px", color: "#f59e0b", animation: "spin 1.2s linear infinite" }} />
+                    ? <Loader2 style={{ width: "14px", height: "14px", color: "#00AEEF", animation: "spin 1.2s linear infinite" }} />
                     : <span style={{ fontSize: "14px" }}>{step.icon}</span>
                 }
               </div>
@@ -125,7 +125,7 @@ function ProgressSection({ project }) {
               {/* Text */}
               <div style={{ flex: 1, opacity: step.status === "pending" ? 0.45 : 1 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ fontSize: "14px", fontWeight: "700", color: isComplete ? "#0A1628" : isInProgress ? "#d97706" : "rgba(10,22,40,0.6)" }}>
+                  <span style={{ fontSize: "14px", fontWeight: "700", color: isComplete ? "#0A1628" : isInProgress ? "#0077B6" : "rgba(10,22,40,0.6)" }}>
                     {step.label}
                   </span>
                   {isComplete && (
@@ -134,7 +134,7 @@ function ProgressSection({ project }) {
                     </span>
                   )}
                   {isInProgress && (
-                    <span style={{ fontSize: "10px", fontWeight: "700", background: "rgba(245,158,11,0.12)", color: "#d97706", padding: "2px 8px", borderRadius: "9999px" }}>
+                    <span style={{ fontSize: "10px", fontWeight: "700", background: "rgba(0,174,239,0.12)", color: "#0077B6", padding: "2px 8px", borderRadius: "9999px" }}>
                       In Progress
                     </span>
                   )}

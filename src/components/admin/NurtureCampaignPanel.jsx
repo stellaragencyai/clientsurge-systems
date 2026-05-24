@@ -15,17 +15,17 @@ import DeleteConfirmModal from "./DeleteConfirmModal";
 const STEP_DEFINITIONS = [
   { num: 1, day: 0,  label: "Welcome",       theme: "welcome",       icon: Heart,     color: "bg-blue-100 text-blue-700" },
   { num: 2, day: 3,  label: "Case Study",    theme: "case_study_1",  icon: BookOpen,  color: "bg-purple-100 text-purple-700" },
-  { num: 3, day: 7,  label: "Testimonial",   theme: "testimonial_1", icon: Star,      color: "bg-amber-100 text-amber-700" },
+  { num: 3, day: 7,  label: "Testimonial",   theme: "testimonial_1", icon: Star,      color: "bg-blue-100 text-blue-700" },
   { num: 4, day: 10, label: "Tip",           theme: "tip_1",         icon: Lightbulb, color: "bg-green-100 text-green-700" },
   { num: 5, day: 14, label: "Case Study 2",  theme: "case_study_2",  icon: BookOpen,  color: "bg-indigo-100 text-indigo-700" },
   { num: 6, day: 18, label: "Testimonial 2", theme: "testimonial_2", icon: Star,      color: "bg-rose-100 text-rose-700" },
-  { num: 7, day: 23, label: "Tip + Offer",   theme: "tip_offer",     icon: Zap,       color: "bg-orange-100 text-orange-700" },
+  { num: 7, day: 23, label: "Tip + Offer",   theme: "tip_offer",     icon: Zap,       color: "bg-sky-100 text-sky-700" },
   { num: 8, day: 30, label: "Final CTA",     theme: "final_cta",     icon: Send,      color: "bg-red-100 text-red-700" },
 ];
 
 const STATUS_CONFIG = {
   active:    { label: "Active",    color: "bg-green-100 text-green-700",  icon: Activity },
-  paused:    { label: "Paused",    color: "bg-amber-100 text-amber-700",  icon: Pause },
+  paused:    { label: "Paused",    color: "bg-blue-100 text-blue-700",  icon: Pause },
   completed: { label: "Completed", color: "bg-blue-100 text-blue-700",    icon: CheckCircle2 },
   stopped:   { label: "Stopped",   color: "bg-gray-100 text-gray-600",    icon: XCircle },
 };
@@ -107,7 +107,7 @@ function CampaignCard({ campaign, onPause, onResume, onStop, onRequestStop, acti
           </div>
           <p className="text-xs text-muted-foreground">{campaign.lead_email} · {campaign.lead_business}</p>
           {campaign.stop_reason && (
-            <p className="text-xs text-amber-700 mt-0.5 font-medium">
+            <p className="text-xs text-blue-700 mt-0.5 font-medium">
               Reason: {campaign.stop_reason.replace(/_/g, " ")}
             </p>
           )}
@@ -361,7 +361,7 @@ export default function NurtureCampaignPanel() {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { label: "Active", value: counts.active, color: "bg-green-50 text-green-700 border-green-100" },
-          { label: "Paused", value: counts.paused, color: "bg-amber-50 text-amber-700 border-amber-100" },
+          { label: "Paused", value: counts.paused, color: "bg-blue-50 text-blue-700 border-blue-100" },
           { label: "Completed", value: counts.completed, color: "bg-blue-50 text-blue-700 border-blue-100" },
           { label: "Emails Sent", value: totalEmailsSent, color: "bg-purple-50 text-purple-700 border-purple-100" },
         ].map(kpi => (

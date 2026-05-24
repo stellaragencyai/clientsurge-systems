@@ -3,6 +3,7 @@
  * Fetches Stripe invoice_pdf URL and opens in new tab.
  */
 import { useState } from "react";
+import { base44 } from "@/api/base44Client";
 
 export default function DownloadInvoiceButton({ order_id }) {
   const [loading, setLoading] = useState(false);
@@ -11,16 +12,13 @@ export default function DownloadInvoiceButton({ order_id }) {
   const handleDownload = async () => {
     setLoading(true); setError(null);
     try {
-      const res = await fetch("/api/functions/getStripeInvoice", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ order_id }),
-      });
-      const data = await res.json();
-      if (data.invoice_pdf) {
-        window.open(data.invoice_pdf, "_blank");
-      } else if (data.invoice_url) {
-        window.open(data.invoice_url, "_blank");
+      const res = await base44.functions.invoke("getStripeBillingData", { order_id });
+      const data = res?.data || res || {};
+      const invoice = (data.invoices || []).find((item) => item.invoice_pdf || item.hosted_invoice_url);
+      if (invoice?.invoice_pdf) {
+        window.open(invoice.invoice_pdf, "_blank");
+      } else if (invoice?.hosted_invoice_url) {
+        window.open(invoice.hosted_invoice_url, "_blank");
       } else {
         throw new Error(data.error || "Invoice not available yet");
       }

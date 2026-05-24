@@ -58,6 +58,8 @@ export default function MedSpaSolution() {
                   <img
                     src={item.image}
                     alt={item.title}
+                    width="600"
+                    height="400"
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />

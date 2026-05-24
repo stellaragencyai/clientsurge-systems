@@ -1,0 +1,73 @@
+{
+  "name": "Files",
+  "type": "object",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "title": {
+      "type": "string",
+      "title": "Title"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "category": {
+      "type": "string",
+      "title": "Category",
+      "enum": [
+        "lead_magnet",
+        "report",
+        "setup-guide",
+        "documentation",
+        "asset"
+      ],
+      "default": "documentation"
+    },
+    "file_url": {
+      "type": "string",
+      "title": "File URL"
+    },
+    "file_name": {
+      "type": "string",
+      "title": "File Name"
+    },
+    "mime_type": {
+      "type": "string",
+      "title": "MIME Type"
+    },
+    "file_base64": {
+      "type": "string",
+      "title": "File Base64"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "draft",
+        "ready",
+        "delivered",
+        "archived"
+      ],
+      "default": "ready"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Metadata JSON"
+    },
+    "delivered_at": {
+      "type": "string",
+      "title": "Delivered At"
+    }
+  }
+}

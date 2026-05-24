@@ -37,7 +37,7 @@ export default function LeadValueCalculator() {
           </p>
         </div>
 
-        <div className="rounded-3xl overflow-hidden" style={{ border: "1px solid rgba(154,92,46,0.2)", boxShadow: "0 20px 60px rgba(0,0,0,0.08)" }}>
+        <div className="rounded-3xl overflow-hidden" style={{ border: "1px solid rgba(0,136,204,0.2)", boxShadow: "0 20px 60px rgba(0,0,0,0.08)" }}>
           {/* Sliders */}
           <div className="bg-white p-8 md:p-10 grid md:grid-cols-3 gap-8">
             {[
@@ -58,7 +58,7 @@ export default function LeadValueCalculator() {
                   value={value}
                   onChange={e => set(Number(e.target.value))}
                   className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                  style={{ accentColor: "#9a5c2e" }}
+                  style={{ accentColor: "#0077B6" }}
                 />
                 <div className="flex justify-between text-xs text-foreground/30 mt-1">
                   <span>{format(min)}</span><span>{format(max)}</span>
@@ -68,7 +68,7 @@ export default function LeadValueCalculator() {
           </div>
 
           {/* Results */}
-          <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border/60" style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 60%,#7a4825 100%)" }}>
+          <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-border/60" style={{ background: "linear-gradient(135deg,#005B99 0%,#0077B6 60%,#005B99 100%)" }}>
             {[
               { label: "Current Monthly Revenue", value: formatCurrency(currentRevenue), sub: `At ${currentCloseRate}% close rate`, muted: true },
               { label: "With ClientSurge System", value: formatCurrency(newRevenue), sub: `At ~${Math.round(improvedClose)}% close rate`, muted: false },
@@ -80,7 +80,7 @@ export default function LeadValueCalculator() {
                   className="font-display font-bold mb-1 transition-all duration-500"
                   style={{
                     fontSize: highlight ? "2.4rem" : "1.9rem",
-                    color: highlight ? "#f5d9a8" : "rgba(245,230,208,0.85)",
+                    color: highlight ? "#DDF4FF" : "rgba(245,230,208,0.85)",
                     transform: animated ? "scale(1)" : "scale(0.92)",
                     transition: "transform 0.4s cubic-bezier(0.34,1.56,0.64,1), color 0.3s",
                   }}
@@ -99,9 +99,9 @@ export default function LeadValueCalculator() {
             </p>
             <button
               onClick={() => setShowDemoModal(true)}
-              style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "8px", height: "44px", padding: "0 24px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.875rem", border: "none", cursor: "pointer", boxShadow: "0 4px 14px rgba(120,70,20,0.35)" }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(120,70,20,0.5)"; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 14px rgba(120,70,20,0.35)"; }}
+              style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "8px", height: "44px", padding: "0 24px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.875rem", border: "none", cursor: "pointer", boxShadow: "0 4px 14px rgba(0,174,239,0.35)" }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,174,239,0.46)"; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,174,239,0.35)"; }}
             >
               Recover This Revenue
               <ArrowRight className="w-4 h-4" />

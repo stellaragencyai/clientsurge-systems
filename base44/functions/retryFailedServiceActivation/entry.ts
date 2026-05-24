@@ -4,10 +4,13 @@
  * from mutating install state outside the canonical install pipeline.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { requireAdminUser } from "../_shared/authGuards.js";
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    await requireAdminUser(base44);
+
     const { order_id, service_key, first_attempt_error } = await req.json();
 
     await base44.asServiceRole.entities.AgentLog.create({
@@ -37,6 +40,12 @@ Deno.serve(async (req) => {
       { status: 410 }
     );
   } catch (err) {
-    return Response.json({ error: err.message }, { status: 500 });
+    return Response.json(
+      {
+        error: err.message,
+        code: err.code || "retry_failed_service_activation_error",
+      },
+      { status: err.status || 500 }
+    );
   }
 });

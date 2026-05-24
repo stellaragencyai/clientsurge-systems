@@ -215,7 +215,7 @@ export const launchTimelineSteps = [
     title: "Quick Signup & Checkout",
     duration: "5 min",
     description: "Create account, add to cart, and pay securely.",
-    image: "https://images.unsplash.com/photo-1556742400-b5b7c512df18?w=800&q=85",
+    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=85&auto=format&fit=crop",
     bullets: [
       "Sign up with email and password in 60 seconds",
       "Add your selected automations to cart",

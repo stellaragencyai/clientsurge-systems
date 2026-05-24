@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
-const COLORS = ["#b45309", "#d97706", "#f59e0b", "#fbbf24", "#fcd34d", "#fde68a"];
+const COLORS = ["#005B99", "#0077B6", "#00AEEF", "#67D8FF", "#9BE8FF", "#DDF4FF"];
 
 export default function NicheBreakdown({ leads }) {
   const nicheMap = {};

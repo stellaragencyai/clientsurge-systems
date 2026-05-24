@@ -58,7 +58,7 @@ function SelectInput({ value, onChange, options }) {
   );
 }
 
-function OptionCard({ icon: Icon, title, desc, selected, onClick, color = '#9a5c2e' }) {
+function OptionCard({ icon: Icon, title, desc, selected, onClick, color = '#0077B6' }) {
   return (
     <button
       type="button"
@@ -85,7 +85,7 @@ function OptionCard({ icon: Icon, title, desc, selected, onClick, color = '#9a5c
 function WelcomeStep({ project }) {
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl p-6" style={{ background: 'rgba(154,92,46,0.06)', border: '1px solid rgba(154,92,46,0.15)' }}>
+      <div className="rounded-2xl p-6" style={{ background: 'rgba(0,136,204,0.06)', border: '1px solid rgba(0,136,204,0.15)' }}>
         <p className="font-semibold text-foreground mb-4">
           Hi {project.business_name} 👋 — let's get your system fully configured in 5 steps:
         </p>
@@ -97,8 +97,8 @@ function WelcomeStep({ project }) {
             { icon: Calendar, label: 'Booking Flow', desc: 'Booking link, calendar system & consultation settings' },
           ].map(({ icon: Icon, label, desc }) => (
             <div key={label} className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(154,92,46,0.12)' }}>
-                <Icon className="w-4 h-4" style={{ color: '#9a5c2e' }} />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,136,204,0.12)' }}>
+                <Icon className="w-4 h-4" style={{ color: '#0077B6' }} />
               </div>
               <div>
                 <p className="text-sm font-semibold text-foreground">{label}</p>
@@ -156,7 +156,7 @@ function BusinessStep({ data, onChange }) {
 function SmsStep({ data, onChange }) {
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
         <span className="font-semibold">📱 How SMS works:</span> When a new lead contacts you, your system sends an instant automated text within seconds. Provide your Twilio number and message template below.
       </div>
       <Field label="Twilio Phone Number" hint="The number your automated SMS messages are sent from">
@@ -290,11 +290,11 @@ function CompleteStep({ data }) {
     <div className="space-y-6">
       <div className="space-y-3">
         {completedSections.map(s => (
-          <div key={s.label} className={`flex items-center gap-3 p-3 rounded-xl border ${s.done ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
+          <div key={s.label} className={`flex items-center gap-3 p-3 rounded-xl border ${s.done ? 'border-green-200 bg-green-50' : 'border-blue-200 bg-blue-50'}`}>
             {s.done
               ? <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
-              : <span className="w-5 h-5 flex-shrink-0 text-amber-600 font-bold text-sm">!</span>}
-            <p className={`text-sm font-semibold ${s.done ? 'text-green-900' : 'text-amber-900'}`}>{s.label}</p>
+              : <span className="w-5 h-5 flex-shrink-0 text-blue-600 font-bold text-sm">!</span>}
+            <p className={`text-sm font-semibold ${s.done ? 'text-green-900' : 'text-blue-900'}`}>{s.label}</p>
             <span className="ml-auto text-xs font-medium">{s.done ? 'Configured ✓' : 'Incomplete'}</span>
           </div>
         ))}
@@ -302,7 +302,7 @@ function CompleteStep({ data }) {
 
       <div
         className="rounded-2xl p-6 text-center"
-        style={{ background: allDone ? 'rgba(16,185,129,0.06)' : 'rgba(154,92,46,0.06)', border: `1px solid ${allDone ? 'rgba(16,185,129,0.2)' : 'rgba(154,92,46,0.15)'}` }}
+        style={{ background: allDone ? 'rgba(16,185,129,0.06)' : 'rgba(0,136,204,0.06)', border: `1px solid ${allDone ? 'rgba(16,185,129,0.2)' : 'rgba(0,136,204,0.15)'}` }}
       >
         <p className="text-2xl mb-2">{allDone ? '🚀' : '🎯'}</p>
         <p className="font-semibold text-foreground">
@@ -330,7 +330,7 @@ function StepDot({ index, currentStep, total }) {
         className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
           done ? 'bg-green-500 text-white' : active ? 'text-white' : 'bg-muted text-muted-foreground'
         }`}
-        style={active ? { background: 'linear-gradient(135deg,#6b3f1f,#9a5c2e)' } : {}}
+        style={active ? { background: 'linear-gradient(135deg,#005B99,#0077B6)' } : {}}
       >
         {done ? '✓' : index + 1}
       </div>
@@ -429,9 +429,9 @@ export default function QuickStartWizard({ project, onComplete, onDismiss }) {
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
 
         {/* Top bar */}
-        <div style={{ background: 'linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 60%,#c8965c 100%)' }} className="px-6 py-4 flex items-center justify-between flex-shrink-0">
+        <div style={{ background: 'linear-gradient(135deg,#005B99 0%,#0077B6 60%,#00AEEF 100%)' }} className="px-6 py-4 flex items-center justify-between flex-shrink-0">
           <div>
-            <p className="text-xs font-bold text-amber-300/70 uppercase tracking-widest">Quick Start Setup</p>
+            <p className="text-xs font-bold text-blue-300/70 uppercase tracking-widest">Quick Start Setup</p>
             <p className="text-white font-semibold mt-0.5">{project.business_name}</p>
           </div>
           {onDismiss && (
@@ -445,7 +445,7 @@ export default function QuickStartWizard({ project, onComplete, onDismiss }) {
         <div className="h-1 bg-gray-100 flex-shrink-0">
           <div
             className="h-full transition-all duration-500"
-            style={{ width: `${((currentStep + 1) / STEPS.length) * 100}%`, background: 'linear-gradient(90deg,#6b3f1f,#c8965c)' }}
+            style={{ width: `${((currentStep + 1) / STEPS.length) * 100}%`, background: 'linear-gradient(90deg,#005B99,#00AEEF)' }}
           />
         </div>
 
@@ -459,8 +459,8 @@ export default function QuickStartWizard({ project, onComplete, onDismiss }) {
         {/* Step header */}
         <div className="px-8 pt-6 pb-2 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(154,92,46,0.1)' }}>
-              {(() => { const Icon = step.icon; return <Icon className="w-5 h-5" style={{ color: '#9a5c2e' }} />; })()}
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,136,204,0.1)' }}>
+              {(() => { const Icon = step.icon; return <Icon className="w-5 h-5" style={{ color: '#0077B6' }} />; })()}
             </div>
             <div>
               <h2 className="text-xl font-semibold text-foreground">{step.title}</h2>
@@ -501,7 +501,7 @@ export default function QuickStartWizard({ project, onComplete, onDismiss }) {
             onClick={handleNext}
             disabled={saving}
             className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-60"
-            style={{ background: isLast ? 'linear-gradient(135deg,#059669,#10b981)' : 'linear-gradient(135deg,#6b3f1f,#9a5c2e)' }}
+            style={{ background: isLast ? 'linear-gradient(135deg,#059669,#10b981)' : 'linear-gradient(135deg,#005B99,#0077B6)' }}
           >
             {saving ? (
               <Loader2 className="w-4 h-4 animate-spin" />

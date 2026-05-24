@@ -84,7 +84,7 @@ export default function CommunicationLogsPanel() {
     const colors = {
       failed: 'bg-red-100 text-red-800 border-red-300',
       received: 'bg-green-100 text-green-800 border-green-300',
-      unmatched: 'bg-yellow-100 text-yellow-800 border-yellow-300',
+      unmatched: 'bg-sky-100 text-sky-800 border-sky-300',
       skipped: 'bg-gray-100 text-gray-800 border-gray-300',
       sent: 'bg-blue-100 text-blue-800 border-blue-300',
       pending: 'bg-purple-100 text-purple-800 border-purple-300',
@@ -230,14 +230,14 @@ export default function CommunicationLogsPanel() {
                     )}
 
                     {log.context_type === 'inbound_sms_unmatched' && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
-                        <p className="text-xs font-semibold text-yellow-800 mb-2">⚠️ Unmatched Inbound</p>
-                        <p className="text-xs text-yellow-700 mb-3">
+                      <div className="bg-sky-50 border border-sky-200 rounded p-3">
+                        <p className="text-xs font-semibold text-sky-800 mb-2">⚠️ Unmatched Inbound</p>
+                        <p className="text-xs text-sky-700 mb-3">
                           This SMS did not match any active WebsiteLead. Manually assign it below.
                         </p>
                         <button
                           onClick={() => setReassignModal(log)}
-                          className="px-3 py-1.5 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700 transition"
+                          className="px-3 py-1.5 bg-sky-600 text-white text-xs rounded hover:bg-sky-700 transition"
                         >
                           Assign to Lead
                         </button>

@@ -5,6 +5,10 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 function renderTemplate(template, lead) {
   return template
@@ -44,84 +48,53 @@ Deno.serve(async (req) => {
 
     // ─── 1. Send instant SMS to lead ───────────────────────────
     if (lead.phone) {
-      const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-      const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
       const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
-      const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
+      const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+      const settings = settingsRecords?.[0] || {};
+      const template = settings.sms_template ||
+        "Hi {first_name}, thanks for reaching out! We'll be in touch with you shortly.";
 
-      if (accountSid && authToken && fromNumber) {
-        // Load custom SMS template from AdminSettings if available
-        const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
-        const settings = settingsRecords?.[0] || {};
-        const template = settings.sms_template ||
-          "Hi {first_name}, thanks for reaching out! We'll be in touch with you shortly.";
+      const messageBody = renderTemplate(template, lead);
 
-        const messageBody = renderTemplate(template, lead);
+      try {
+        const smsResult = await sendCommunicationViaOutbox({
+          base44,
+          channel: "sms",
+          provider: "twilio",
+          recipient: lead.phone,
+          body: messageBody,
+          from: fromNumber,
+          lead,
+          leadId: lead_id,
+          source: "handleNewLead",
+          sourceRecordId: lead_id,
+          templateKey: "instant_lead_response",
+          messageType: "transactional",
+          consentBasis: "transactional_relationship",
+          metadata: { service_key: "instant_lead_response" },
+          providerSend: (providerPayload) => sendTwilioSmsProvider({
+            ...providerPayload,
+            env: (name) => Deno.env.get(name),
+            fetchImpl: fetch,
+          }),
+        });
 
-        const params = { To: lead.phone, From: fromNumber, Body: messageBody };
-        if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
+        if (smsResult.success) {
+          results.sms = "sent";
+          console.log(`[handleNewLead] SMS sent — SID: ${smsResult.provider_message_id}`);
 
-        try {
-          const res = await fetch(
-            `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-                "Content-Type": "application/x-www-form-urlencoded",
-              },
-              body: new URLSearchParams(params),
-            }
-          );
-
-          if (res.ok) {
-            const twilioData = await res.json();
-            results.sms = "sent";
-            console.log(`[handleNewLead] SMS sent — SID: ${twilioData.sid}`);
-
-            await base44.asServiceRole.entities.CommunicationEvent.create({
-              lead_id,
-              channel: "sms",
-              direction: "outbound",
-              event_type: "sms_sent",
-              provider: "twilio",
-              status: "sent",
-              subject: "Instant lead response SMS",
-              message_body: messageBody,
-              provider_message_id: twilioData.sid,
-              metadata_json: JSON.stringify({ service_key: "instant_lead_response", timestamp: new Date().toISOString() }),
-            });
-
-            // Update lead to Contacted
-            await base44.asServiceRole.entities.Leads.update(lead_id, {
-              status: "Contacted",
-              last_contacted_at: new Date().toISOString(),
-            });
-          } else {
-            const err = await res.json().catch(() => ({}));
-            const errMsg = err?.message || `Twilio HTTP ${res.status}`;
-            console.error(`[handleNewLead] Twilio error: ${errMsg}`);
-            results.sms = `failed: ${errMsg}`;
-
-            await base44.asServiceRole.entities.CommunicationEvent.create({
-              lead_id,
-              channel: "sms",
-              direction: "outbound",
-              event_type: "sms_failed",
-              provider: "twilio",
-              status: "failed",
-              subject: "Instant lead response SMS failed",
-              error_message: errMsg,
-              metadata_json: JSON.stringify({ service_key: "instant_lead_response", timestamp: new Date().toISOString() }),
-            });
-          }
-        } catch (smsErr) {
-          console.error(`[handleNewLead] SMS exception: ${smsErr.message}`);
-          results.sms = `error: ${smsErr.message}`;
+          await base44.asServiceRole.entities.Leads.update(lead_id, {
+            status: "Contacted",
+            last_contacted_at: new Date().toISOString(),
+          });
+        } else {
+          const reason = smsResult.reason || smsResult.error || smsResult.status;
+          console.error(`[handleNewLead] SMS outbox send failed: ${reason}`);
+          results.sms = smsResult.suppressed ? `suppressed: ${reason}` : `failed: ${reason}`;
         }
-      } else {
-        console.warn("[handleNewLead] Twilio credentials not configured — SMS skipped");
-        results.sms = "skipped: missing credentials";
+      } catch (smsErr) {
+        console.error(`[handleNewLead] SMS exception: ${smsErr.message}`);
+        results.sms = `error: ${smsErr.message}`;
       }
     } else {
       console.warn(`[handleNewLead] Lead ${lead_id} has no phone number — SMS skipped`);

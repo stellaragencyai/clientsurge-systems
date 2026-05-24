@@ -193,7 +193,7 @@ export default function CreateCampaignModal({ onClose, onCreate }) {
                 </div>
               )}
               {previewResult.recipient_count === 0 && (
-                <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+                <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700">
                   No leads match your current filters. Adjust the audience or remove filters to reach all leads.
                 </div>
               )}

@@ -4,7 +4,7 @@ export function getOrganizationSchema() {
     '@type': 'Organization',
     name: 'ClientSurge Systems',
     url: 'https://clientsurgesystems.com',
-    logo: 'https://media.base44.com/images/public/69d49a29c1974b32f46e8550/aaaacb19f_generated_image.png',
+    logo: 'https://clientsurgesystems.com/og-image.png',
     description:
       'AI-powered websites, voice agents, lead response, missed-call recovery, follow-up automation, and booking systems for local service businesses.',
     email: 'support@clientsurgesystems.com',

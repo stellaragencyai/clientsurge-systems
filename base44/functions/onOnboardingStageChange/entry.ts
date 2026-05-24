@@ -3,7 +3,8 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL");
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") || "nolan@clientsurgesystems.com";
-const APP_URL = Deno.env.get("APP_URL") || "https://clientsurgesystems.com";
+const APP_URL = (Deno.env.get("APP_URL") || "https://clientsurgesystems.com").replace(/\/+$/, "");
+const PORTAL_URL = `${APP_URL}/client-portal`;
 
 async function sendEmail({ to, subject, html, fromName = "ClientSurge Systems" }) {
   const res = await fetch("https://api.resend.com/emails", {
@@ -41,7 +42,7 @@ const STAGE_EMAILS = {
           <strong>What's next:</strong> We'll confirm your payment and begin installing your systems within 1 business day.
         </p>
         <div style="text-align:center;margin:32px 0;">
-          <a href="${APP_URL}/client-dashboard" style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#f5e6d0;text-decoration:none;font-weight:700;font-size:15px;padding:14px 32px;border-radius:9999px;">
+          <a href="${PORTAL_URL}" style="display:inline-block;background:linear-gradient(135deg,#00D4FF,#00FFB3);color:#0A0F1E;text-decoration:none;font-weight:700;font-size:15px;padding:14px 32px;border-radius:9999px;">
             View Your Dashboard →
           </a>
         </div>
@@ -61,7 +62,7 @@ const STAGE_EMAILS = {
           You'll receive updates as each component goes live. This typically takes 1–3 business days.
         </p>
         <div style="text-align:center;margin:32px 0;">
-          <a href="${APP_URL}/client-dashboard" style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#f5e6d0;text-decoration:none;font-weight:700;font-size:15px;padding:14px 32px;border-radius:9999px;">
+          <a href="${PORTAL_URL}" style="display:inline-block;background:linear-gradient(135deg,#00D4FF,#00FFB3);color:#0A0F1E;text-decoration:none;font-weight:700;font-size:15px;padding:14px 32px;border-radius:9999px;">
             Track Your Install →
           </a>
         </div>
@@ -162,7 +163,7 @@ const STAGE_EMAILS = {
           In 30 days, we'll do a performance check-in to review your results and optimize from there.
         </p>
         <div style="text-align:center;margin:32px 0;">
-          <a href="${APP_URL}/client-dashboard" style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#f5e6d0;text-decoration:none;font-weight:700;font-size:15px;padding:14px 32px;border-radius:9999px;">
+          <a href="${PORTAL_URL}" style="display:inline-block;background:linear-gradient(135deg,#00D4FF,#00FFB3);color:#0A0F1E;text-decoration:none;font-weight:700;font-size:15px;padding:14px 32px;border-radius:9999px;">
             View Your Live Dashboard →
           </a>
         </div>

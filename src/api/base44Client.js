@@ -3,7 +3,9 @@ import { appParams } from '@/lib/app-params';
 
 const { appId, token, functionsVersion, appBaseUrl } = appParams;
 
-//Create a client with authentication required
+// Keep auth optional at the SDK bootstrap so public marketing and checkout
+// pages can render. Private routes and operational functions enforce auth
+// through routeSecurity, ProtectedRoute, entity rules, and function guards.
 export const base44 = createClient({
   appId,
   token,

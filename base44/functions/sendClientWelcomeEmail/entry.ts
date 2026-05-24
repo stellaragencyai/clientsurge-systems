@@ -17,7 +17,8 @@ Deno.serve(async (req) => {
     if (!resendKey) return Response.json({ error: "No Resend key" }, { status: 500 });
 
     // #502: correct portal URL + Reply-To fix
-    const portalUrl = `https://clientsurgesystems.com/client-portal?order_id=${order_id}`;
+    const appUrl = (Deno.env.get("APP_URL") || "https://clientsurgesystems.com").replace(/\/+$/, "");
+    const portalUrl = `${appUrl}/client-portal?order_id=${encodeURIComponent(order_id)}`;
 
     await fetch("https://api.resend.com/emails", {
       method: "POST",

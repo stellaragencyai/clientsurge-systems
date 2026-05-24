@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 
 const TYPE_CONFIG = {
   sms: { label: "SMS", icon: MessageSquare, bg: "bg-blue-50 text-blue-700" },
-  email: { label: "Email", icon: Mail, bg: "bg-amber-50 text-amber-700" },
+  email: { label: "Email", icon: Mail, bg: "bg-blue-50 text-blue-700" },
   webhook: { label: "Webhook", icon: CheckCircle2, bg: "bg-purple-50 text-purple-700" },
   internal: { label: "Internal", icon: CheckCircle2, bg: "bg-gray-50 text-gray-700" },
 };
@@ -14,7 +14,7 @@ const STATUS_CONFIG = {
   delivered: { label: "Delivered", color: "bg-green-50 text-green-700" },
   opened: { label: "Opened", color: "bg-blue-50 text-blue-700" },
   failed: { label: "Failed", color: "bg-red-50 text-red-700" },
-  pending: { label: "Pending", color: "bg-yellow-50 text-yellow-700" },
+  pending: { label: "Pending", color: "bg-sky-50 text-sky-700" },
   processed: { label: "Processed", color: "bg-green-50 text-green-700" },
   received: { label: "Received", color: "bg-purple-50 text-purple-700" },
 };

@@ -21,8 +21,8 @@ const STATUS_COLORS = {
   New: "#3b82f6",
   Contacted: "#8b5cf6",
   Replied: "#6366f1",
-  Qualified: "#f59e0b",
-  "Booking Prompt Sent": "#f97316",
+  Qualified: "#00AEEF",
+  "Booking Prompt Sent": "#00AEEF",
   Booked: "#10b981",
   Closed: "#9ca3af",
 };
@@ -31,7 +31,6 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
   const colors = {
     blue: "bg-blue-50 border-blue-100 text-blue-800",
     purple: "bg-purple-50 border-purple-100 text-purple-800",
-    amber: "bg-amber-50 border-amber-100 text-amber-800",
     green: "bg-emerald-50 border-emerald-100 text-emerald-800",
   };
   return (
@@ -54,7 +53,7 @@ function BuildProgressChart({ project }) {
   const completed = steps.filter(s => s.status === "complete").length;
   const pct = Math.round((completed / steps.length) * 100);
 
-  const chartData = [{ name: "Progress", value: pct, fill: "#9a5c2e" }];
+  const chartData = [{ name: "Progress", value: pct, fill: "#0077B6" }];
 
   return (
     <div className="bg-white rounded-2xl border border-border p-6">
@@ -85,7 +84,7 @@ function BuildProgressChart({ project }) {
             <div key={s.label} className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                 s.status === "complete" ? "bg-green-500" :
-                s.status === "in_progress" ? "bg-amber-500" : "bg-gray-200"
+                s.status === "in_progress" ? "bg-blue-500" : "bg-gray-200"
               }`} />
               <span className={`text-xs ${s.status === "complete" ? "text-foreground font-medium" : "text-muted-foreground"}`}>
                 {s.label}
@@ -209,7 +208,7 @@ export default function WeeklyReports({ project }) {
           onClick={handleSendReport}
           disabled={sending}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-60"
-          style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+          style={{ background: "linear-gradient(135deg,#005B99,#0077B6)" }}
         >
           {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
           {sending ? "Sending…" : "Email Report to Me"}
@@ -231,7 +230,7 @@ export default function WeeklyReports({ project }) {
       {/* Week label */}
       <div
         className="rounded-xl px-5 py-3 flex items-center gap-2 text-sm font-medium"
-        style={{ background: "rgba(154,92,46,0.07)", border: "1px solid rgba(154,92,46,0.15)", color: "#7a4825" }}
+        style={{ background: "rgba(0,136,204,0.07)", border: "1px solid rgba(0,136,204,0.15)", color: "#005B99" }}
       >
         <Calendar className="w-4 h-4" />
         Reporting period: {weekStart.toLocaleDateString("en-US",{month:"short",day:"numeric"})} – {new Date().toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})}
@@ -247,7 +246,7 @@ export default function WeeklyReports({ project }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <StatCard icon={Users} label="Total Leads" value={leads.length} sub="All time" color="blue" />
             <StatCard icon={TrendingUp} label="New This Week" value={newThisWeek} sub="Last 7 days" color="purple" />
-            <StatCard icon={BarChart3} label="Qualified" value={qualified} sub="High-intent" color="amber" />
+            <StatCard icon={BarChart3} label="Qualified" value={qualified} sub="High-intent" color="blue" />
             <StatCard icon={CheckCircle2} label="Booked" value={booked} sub="Appointments" color="green" />
           </div>
 

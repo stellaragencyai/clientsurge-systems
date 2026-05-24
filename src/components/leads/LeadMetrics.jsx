@@ -30,8 +30,8 @@ export default function LeadMetrics({ analytics }) {
       label: 'Avg Lead Score',
       value: analytics?.avg_lead_score || 0,
       subtext: '/100',
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
+      color: 'text-sky-600',
+      bgColor: 'bg-sky-100',
     },
   ];
 
@@ -39,7 +39,7 @@ export default function LeadMetrics({ analytics }) {
   const pipelineMetrics = [
     { label: 'New', value: analytics?.stage_new || 0, color: 'bg-slate-400' },
     { label: 'Qualified', value: analytics?.stage_qualified || 0, color: 'bg-blue-400' },
-    { label: 'Contacted', value: analytics?.stage_contacted || 0, color: 'bg-yellow-400' },
+    { label: 'Contacted', value: analytics?.stage_contacted || 0, color: 'bg-sky-400' },
     { label: 'Responded', value: analytics?.stage_responded || 0, color: 'bg-cyan-400' },
     { label: 'Booked', value: analytics?.stage_booked || 0, color: 'bg-green-400' },
     { label: 'Closed', value: analytics?.stage_closed || 0, color: 'bg-emerald-600' },

@@ -19,8 +19,8 @@ const workflowItems = [
     afterText: "Response sent in 12s",
     metric: "12s avg. response",
     icon: Send,
-    accent: "rgba(200,150,92,0.9)",
-    glow: "rgba(200,150,92,0.35)",
+    accent: "rgba(0,174,239,0.9)",
+    glow: "rgba(0,174,239,0.35)",
   },
   {
     id: "missed",
@@ -118,9 +118,9 @@ function BenefitItem({ item, active, onFocus }) {
         background: active
           ? "linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(252,247,242,0.94) 100%)"
           : "linear-gradient(135deg, rgba(255,255,255,0.72) 0%, rgba(252,247,242,0.8) 100%)",
-        borderColor: active ? "rgba(154,92,46,0.36)" : "rgba(154,92,46,0.15)",
+        borderColor: active ? "rgba(0,136,204,0.36)" : "rgba(0,136,204,0.15)",
         boxShadow: active
-          ? "0 18px 36px rgba(154,92,46,0.12), inset 0 1px 0 rgba(255,255,255,0.65)"
+          ? "0 18px 36px rgba(0,136,204,0.12), inset 0 1px 0 rgba(255,255,255,0.65)"
           : "0 8px 22px rgba(84,48,20,0.06), inset 0 1px 0 rgba(255,255,255,0.55)",
       }}
     >
@@ -128,11 +128,11 @@ function BenefitItem({ item, active, onFocus }) {
         <div
           className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl border transition-all duration-300"
           style={{
-            background: active ? "rgba(154,92,46,0.16)" : "rgba(154,92,46,0.08)",
-            borderColor: active ? "rgba(154,92,46,0.28)" : "rgba(154,92,46,0.14)",
+            background: active ? "rgba(0,136,204,0.16)" : "rgba(0,136,204,0.08)",
+            borderColor: active ? "rgba(0,136,204,0.28)" : "rgba(0,136,204,0.14)",
           }}
         >
-          <Icon className="h-[18px] w-[18px]" style={{ color: "#9a5c2e" }} />
+          <Icon className="h-[18px] w-[18px]" style={{ color: "#0077B6" }} />
         </div>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -140,8 +140,8 @@ function BenefitItem({ item, active, onFocus }) {
             <span
               className="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
               style={{
-                background: active ? "rgba(154,92,46,0.12)" : "rgba(154,92,46,0.06)",
-                borderColor: active ? "rgba(154,92,46,0.22)" : "rgba(154,92,46,0.12)",
+                background: active ? "rgba(0,136,204,0.12)" : "rgba(0,136,204,0.06)",
+                borderColor: active ? "rgba(0,136,204,0.22)" : "rgba(0,136,204,0.12)",
                 color: "#8a5229",
               }}
             >
@@ -186,7 +186,7 @@ function WorkflowCard({ item, active, expanded, delay }) {
           background: active
             ? "linear-gradient(155deg, rgba(255,255,255,0.98) 0%, rgba(250,243,236,0.96) 100%)"
             : "linear-gradient(155deg, rgba(255,255,255,0.92) 0%, rgba(251,246,240,0.88) 100%)",
-          borderColor: active ? "rgba(154,92,46,0.34)" : "rgba(154,92,46,0.16)",
+          borderColor: active ? "rgba(0,136,204,0.34)" : "rgba(0,136,204,0.16)",
           boxShadow: expanded
             ? active
               ? `0 24px 55px rgba(50, 28, 10, 0.18), 0 0 0 1px rgba(255,255,255,0.45), 0 0 26px ${item.glow}`
@@ -199,8 +199,8 @@ function WorkflowCard({ item, active, expanded, delay }) {
             <div
               className="flex h-9 w-9 items-center justify-center rounded-2xl border"
               style={{
-                background: active ? "rgba(154,92,46,0.14)" : "rgba(154,92,46,0.08)",
-                borderColor: "rgba(154,92,46,0.14)",
+                background: active ? "rgba(0,136,204,0.14)" : "rgba(0,136,204,0.08)",
+                borderColor: "rgba(0,136,204,0.14)",
               }}
             >
               <Icon className="h-4 w-4" style={{ color: "#8a5229" }} />
@@ -214,7 +214,7 @@ function WorkflowCard({ item, active, expanded, delay }) {
           </div>
           <Sparkles
             className={`h-4 w-4 ${active ? "lead-showcase-card-spark" : ""}`}
-            style={{ color: "#c8965c" }}
+            style={{ color: "#00AEEF" }}
           />
         </div>
 
@@ -226,8 +226,8 @@ function WorkflowCard({ item, active, expanded, delay }) {
           <span
             className="inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
             style={{
-              background: active ? "rgba(122,140,106,0.14)" : "rgba(154,92,46,0.07)",
-              borderColor: active ? "rgba(122,140,106,0.2)" : "rgba(154,92,46,0.14)",
+              background: active ? "rgba(122,140,106,0.14)" : "rgba(0,136,204,0.07)",
+              borderColor: active ? "rgba(122,140,106,0.2)" : "rgba(0,136,204,0.14)",
               color: active ? "#6f8462" : "#8a5229",
             }}
           >
@@ -408,7 +408,7 @@ export default function LeadAutomationShowcase() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse 70% 55% at 18% 24%, rgba(200,150,92,0.14) 0%, transparent 62%), radial-gradient(ellipse 52% 45% at 80% 20%, rgba(245,217,168,0.14) 0%, transparent 60%), linear-gradient(180deg, rgba(253,252,249,0.92) 0%, rgba(249,245,239,0.96) 54%, rgba(255,255,255,0.98) 100%)",
+            "radial-gradient(ellipse 70% 55% at 18% 24%, rgba(0,174,239,0.14) 0%, transparent 62%), radial-gradient(ellipse 52% 45% at 80% 20%, rgba(245,217,168,0.14) 0%, transparent 60%), linear-gradient(180deg, rgba(253,252,249,0.92) 0%, rgba(249,245,239,0.96) 54%, rgba(255,255,255,0.98) 100%)",
         }}
       />
 
@@ -417,7 +417,7 @@ export default function LeadAutomationShowcase() {
         className="absolute inset-x-0 bottom-8 mx-auto h-20 max-w-4xl rounded-full blur-3xl"
         style={{
           background:
-            "radial-gradient(circle at center, rgba(200,150,92,0.18) 0%, rgba(245,217,168,0.08) 48%, transparent 75%)",
+            "radial-gradient(circle at center, rgba(0,174,239,0.18) 0%, rgba(245,217,168,0.08) 48%, transparent 75%)",
         }}
       />
 
@@ -427,9 +427,9 @@ export default function LeadAutomationShowcase() {
             className={`lead-showcase-anchor-cue inline-flex items-center gap-3 rounded-full border px-5 py-2 text-[11px] font-bold uppercase tracking-[0.28em] text-primary ${focusPulse ? "lead-showcase-anchor-cue-active" : ""}`}
             style={{
               background: "linear-gradient(180deg, rgba(255,255,255,0.92) 0%, rgba(251,246,240,0.88) 100%)",
-              borderColor: "rgba(154,92,46,0.16)",
+              borderColor: "rgba(0,136,204,0.16)",
               boxShadow: focusPulse
-                ? "0 0 0 6px rgba(200,150,92,0.08), 0 16px 40px rgba(84,48,20,0.12)"
+                ? "0 0 0 6px rgba(0,174,239,0.08), 0 16px 40px rgba(84,48,20,0.12)"
                 : "0 10px 28px rgba(84,48,20,0.08)",
             }}
           >
@@ -446,7 +446,7 @@ export default function LeadAutomationShowcase() {
             className="mt-3 h-14 w-px rounded-full"
             style={{
               background:
-                "linear-gradient(180deg, rgba(200,150,92,0.75) 0%, rgba(200,150,92,0.22) 45%, transparent 100%)",
+                "linear-gradient(180deg, rgba(0,174,239,0.75) 0%, rgba(0,174,239,0.22) 45%, transparent 100%)",
             }}
           />
         </div>
@@ -455,7 +455,7 @@ export default function LeadAutomationShowcase() {
           className={`rounded-[36px] border px-6 py-8 shadow-[0_24px_70px_rgba(54,29,10,0.08)] md:px-10 md:py-10 ${focusPulse ? "lead-showcase-shell-active" : ""}`}
           style={{
             background: "linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(252,248,243,0.74) 100%)",
-            borderColor: "rgba(154,92,46,0.16)",
+            borderColor: "rgba(0,136,204,0.16)",
             backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
           }}
@@ -487,7 +487,7 @@ export default function LeadAutomationShowcase() {
                     style={{
                       background:
                         "linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(252,247,242,0.9) 100%)",
-                      borderColor: "rgba(154,92,46,0.14)",
+                      borderColor: "rgba(0,136,204,0.14)",
                       boxShadow: "0 10px 26px rgba(84,48,20,0.06)",
                     }}
                   >
@@ -528,7 +528,7 @@ export default function LeadAutomationShowcase() {
                         <path
                           d={`M ${line.x1} ${line.y1} C ${(line.x1 + line.x2) / 2} ${line.y1 - 2}, ${(line.x1 + line.x2) / 2} ${line.y2 + 2}, ${line.x2} ${line.y2}`}
                           fill="none"
-                          stroke="rgba(154,92,46,0.16)"
+                          stroke="rgba(0,136,204,0.16)"
                           strokeWidth="0.35"
                           strokeLinecap="round"
                         />
@@ -551,7 +551,7 @@ export default function LeadAutomationShowcase() {
                   className="absolute bottom-[8%] left-[28%] h-[14%] w-[48%] rounded-full blur-[28px]"
                   style={{
                     background:
-                      "radial-gradient(circle at center, rgba(200,150,92,0.18) 0%, rgba(245,217,168,0.08) 40%, transparent 76%)",
+                      "radial-gradient(circle at center, rgba(0,174,239,0.18) 0%, rgba(245,217,168,0.08) 40%, transparent 76%)",
                     transform: "translateY(10%) scaleY(0.52)",
                   }}
                 />
@@ -579,12 +579,12 @@ export default function LeadAutomationShowcase() {
                       className="absolute inset-0"
                       style={{
                         background:
-                          "radial-gradient(circle at 16% 16%, rgba(200,150,92,0.08) 0%, transparent 30%), radial-gradient(circle at 80% 18%, rgba(122,140,106,0.08) 0%, transparent 26%), linear-gradient(180deg, rgba(255,255,255,0.74) 0%, rgba(247,241,233,0.48) 100%)",
+                          "radial-gradient(circle at 16% 16%, rgba(0,174,239,0.08) 0%, transparent 30%), radial-gradient(circle at 80% 18%, rgba(122,140,106,0.08) 0%, transparent 26%), linear-gradient(180deg, rgba(255,255,255,0.74) 0%, rgba(247,241,233,0.48) 100%)",
                       }}
                     />
 
                     <div className="relative z-10 flex h-full flex-col">
-                      <div className="flex items-center justify-between border-b border-[rgba(154,92,46,0.08)] px-[7%] py-[5%]">
+                      <div className="flex items-center justify-between border-b border-[rgba(0,136,204,0.08)] px-[7%] py-[5%]">
                         <div>
                           <p className="text-[0.5rem] font-bold uppercase tracking-[0.28em] text-primary/70">
                             Lead Handling
@@ -623,14 +623,14 @@ export default function LeadAutomationShowcase() {
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
-                              <div className="rounded-[16px] border border-[rgba(154,92,46,0.1)] bg-white/65 px-3 py-3">
+                              <div className="rounded-[16px] border border-[rgba(0,136,204,0.1)] bg-white/65 px-3 py-3">
                                 <p className="text-[0.48rem] font-bold uppercase tracking-[0.22em] text-foreground/45">
                                   Missed Calls
                                 </p>
                                 <p className="mt-1 text-[1.18rem] font-semibold text-foreground/84">3</p>
                                 <p className="text-[0.62rem] text-foreground/48">No reply sent</p>
                               </div>
-                              <div className="rounded-[16px] border border-[rgba(154,92,46,0.1)] bg-white/65 px-3 py-3">
+                              <div className="rounded-[16px] border border-[rgba(0,136,204,0.1)] bg-white/65 px-3 py-3">
                                 <p className="text-[0.48rem] font-bold uppercase tracking-[0.22em] text-foreground/45">
                                   Pipeline
                                 </p>
@@ -639,7 +639,7 @@ export default function LeadAutomationShowcase() {
                               </div>
                             </div>
 
-                            <div className="rounded-[20px] border border-[rgba(154,92,46,0.1)] bg-white/55 px-4 py-3">
+                            <div className="rounded-[20px] border border-[rgba(0,136,204,0.1)] bg-white/55 px-4 py-3">
                               <p className="text-[0.48rem] font-bold uppercase tracking-[0.22em] text-foreground/45">
                                 Follow-Up Status
                               </p>
@@ -647,7 +647,7 @@ export default function LeadAutomationShowcase() {
                                 {workflowItems.map((item) => (
                                   <div
                                     key={`before-${item.id}`}
-                                    className="flex items-center justify-between rounded-[14px] border border-[rgba(154,92,46,0.08)] bg-[rgba(255,255,255,0.72)] px-3 py-2"
+                                    className="flex items-center justify-between rounded-[14px] border border-[rgba(0,136,204,0.08)] bg-[rgba(255,255,255,0.72)] px-3 py-2"
                                   >
                                     <span className="text-[0.68rem] font-medium text-foreground/72">{item.title}</span>
                                     <span className="text-[0.62rem] font-semibold text-[#b86149]">{item.beforeText}</span>
@@ -659,7 +659,7 @@ export default function LeadAutomationShowcase() {
                         </div>
 
                         <div
-                          className="absolute inset-y-0 right-0 overflow-hidden border-l border-[rgba(154,92,46,0.08)] transition-[width,opacity]"
+                          className="absolute inset-y-0 right-0 overflow-hidden border-l border-[rgba(0,136,204,0.08)] transition-[width,opacity]"
                           style={{
                             width: showAfter ? "56%" : "0%",
                             opacity: showAfter ? 1 : 0.22,
@@ -697,7 +697,7 @@ export default function LeadAutomationShowcase() {
                                       background: active
                                         ? "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(250,244,237,0.96) 100%)"
                                         : "rgba(255,255,255,0.82)",
-                                      borderColor: active ? "rgba(154,92,46,0.2)" : "rgba(154,92,46,0.1)",
+                                      borderColor: active ? "rgba(0,136,204,0.2)" : "rgba(0,136,204,0.1)",
                                       boxShadow: active ? `0 0 0 1px rgba(255,255,255,0.4), 0 0 20px ${item.glow}` : "none",
                                     }}
                                   >
@@ -709,8 +709,8 @@ export default function LeadAutomationShowcase() {
                                       <span
                                         className="rounded-full px-2 py-1 text-[0.46rem] font-bold uppercase tracking-[0.18em]"
                                         style={{
-                                          background: active ? `${item.glow}` : "rgba(154,92,46,0.08)",
-                                          color: active ? "#7a4825" : "rgba(122,80,41,0.82)",
+                                          background: active ? `${item.glow}` : "rgba(0,136,204,0.08)",
+                                          color: active ? "#005B99" : "rgba(122,80,41,0.82)",
                                         }}
                                       >
                                         Live
@@ -730,9 +730,9 @@ export default function LeadAutomationShowcase() {
                             left: showAfter ? "44%" : "98%",
                             width: "2px",
                             background:
-                              "linear-gradient(180deg, rgba(200,150,92,0.08) 0%, rgba(200,150,92,0.45) 48%, rgba(200,150,92,0.08) 100%)",
+                              "linear-gradient(180deg, rgba(0,174,239,0.08) 0%, rgba(0,174,239,0.45) 48%, rgba(0,174,239,0.08) 100%)",
                             opacity: showAfter ? 1 : 0,
-                            boxShadow: showAfter ? "0 0 18px rgba(200,150,92,0.22)" : "none",
+                            boxShadow: showAfter ? "0 0 18px rgba(0,174,239,0.22)" : "none",
                             transitionDuration: "850ms",
                           }}
                         />
@@ -758,7 +758,7 @@ export default function LeadAutomationShowcase() {
             className="mt-12 flex flex-col gap-4 rounded-[32px] border px-4 py-4 md:px-6 md:py-5 lg:flex-row lg:items-center lg:justify-between"
             style={{
               background: "linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(250,245,239,0.9) 100%)",
-              borderColor: "rgba(154,92,46,0.14)",
+              borderColor: "rgba(0,136,204,0.14)",
               boxShadow: "0 18px 42px rgba(84,48,20,0.08), inset 0 1px 0 rgba(255,255,255,0.52)",
             }}
           >
@@ -778,11 +778,11 @@ export default function LeadAutomationShowcase() {
                       className="rounded-full border px-4 py-2.5 text-sm font-semibold transition-all duration-300"
                       style={{
                         background: active
-                          ? "linear-gradient(135deg, rgba(154,92,46,0.14) 0%, rgba(245,217,168,0.24) 100%)"
+                          ? "linear-gradient(135deg, rgba(0,136,204,0.14) 0%, rgba(245,217,168,0.24) 100%)"
                           : "rgba(255,255,255,0.78)",
-                        borderColor: active ? "rgba(154,92,46,0.24)" : "rgba(154,92,46,0.12)",
-                        color: active ? "#7a4825" : "rgba(58,35,19,0.78)",
-                        boxShadow: active ? "0 12px 24px rgba(154,92,46,0.08)" : "none",
+                        borderColor: active ? "rgba(0,136,204,0.24)" : "rgba(0,136,204,0.12)",
+                        color: active ? "#005B99" : "rgba(58,35,19,0.78)",
+                        boxShadow: active ? "0 12px 24px rgba(0,136,204,0.08)" : "none",
                       }}
                     >
                       {item.label}
@@ -797,8 +797,8 @@ export default function LeadAutomationShowcase() {
               onClick={() => demoBooking?.openDemoBooking?.()}
               className="lead-showcase-cta inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white md:px-7"
               style={{
-                background: "linear-gradient(135deg, #8b572f 0%, #c8965c 48%, #9a5c2e 100%)",
-                boxShadow: "0 16px 32px rgba(122,72,37,0.22)",
+                background: "linear-gradient(135deg, #0088CC 0%, #006BB0 46%, #00AEEF 100%)",
+                boxShadow: "0 16px 32px rgba(0,80,160,0.22)",
               }}
             >
               Book Your Demo
@@ -813,11 +813,11 @@ export default function LeadAutomationShowcase() {
           font-family: var(--font-display);
           font-style: italic;
           font-weight: 600;
-          background: linear-gradient(135deg, #7a4825 0%, #c8965c 45%, #9a5c2e 100%);
+          background: linear-gradient(135deg, #005B99 0%, #00AEEF 45%, #0077B6 100%);
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent;
-          text-shadow: 0 10px 30px rgba(200, 150, 92, 0.18);
+          text-shadow: 0 10px 30px rgba(0, 174, 239, 0.18);
           position: relative;
           display: inline-block;
         }
@@ -830,14 +830,14 @@ export default function LeadAutomationShowcase() {
           bottom: 0.1em;
           height: 0.11em;
           border-radius: 999px;
-          background: linear-gradient(90deg, rgba(200,150,92,0.05) 0%, rgba(200,150,92,0.48) 50%, rgba(200,150,92,0.05) 100%);
+          background: linear-gradient(90deg, rgba(0,174,239,0.05) 0%, rgba(0,174,239,0.48) 50%, rgba(0,174,239,0.05) 100%);
           opacity: 0.9;
         }
 
         .lead-showcase-signal-path {
           stroke-dasharray: 2.4 7;
           animation: leadShowcaseSignal 1150ms ease-out forwards;
-          filter: drop-shadow(0 0 5px rgba(200,150,92,0.45));
+          filter: drop-shadow(0 0 5px rgba(0,174,239,0.45));
         }
 
         .lead-showcase-card-spark {
@@ -846,7 +846,7 @@ export default function LeadAutomationShowcase() {
 
         .lead-showcase-cta:hover {
           transform: translateY(-1px);
-          box-shadow: 0 18px 36px rgba(122,72,37,0.3);
+          box-shadow: 0 18px 36px rgba(0,91,153,0.3);
         }
 
         .lead-showcase-shell-active {
@@ -893,7 +893,7 @@ export default function LeadAutomationShowcase() {
           }
           45% {
             transform: translateY(0) scale(1.005);
-            box-shadow: 0 0 0 10px rgba(200,150,92,0.08), 0 30px 80px rgba(54,29,10,0.12);
+            box-shadow: 0 0 0 10px rgba(0,174,239,0.08), 0 30px 80px rgba(54,29,10,0.12);
           }
           100% {
             transform: translateY(0) scale(1);

@@ -35,6 +35,6 @@ export const CARD_STYLES = {
 };
 
 export const GRADIENT_TEXT = {
-  BROWN_GOLD: "linear-gradient(135deg, #7a3f1a 0%, #c8965c 52%, #9a5c2e 100%)",
-  BROWN_GOLD_DARK: "linear-gradient(135deg, #f5d9a8 0%, #e8c499 52%, #d4a570 100%)",
+  BLUE_CYAN: "linear-gradient(135deg, #7a3f1a 0%, #00AEEF 52%, #0077B6 100%)",
+  BLUE_CYAN_DARK: "linear-gradient(135deg, #DDF4FF 0%, #e8c499 52%, #d4a570 100%)",
 };

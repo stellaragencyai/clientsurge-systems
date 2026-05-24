@@ -7,6 +7,8 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf
 test("admin mutation functions write AuditLog records for task 385", () => {
   const leadStatus = read("base44/functions/updateLeadStatus/entry.ts");
   const installStatus = read("base44/functions/updateInstallStatus/entry.ts");
+  const adminSettings = read("base44/functions/updateAdminSettings/entry.ts");
+  const installConfiguration = read("base44/functions/updateInstallConfiguration/entry.ts");
 
   assert.match(leadStatus, /createAuditLog/);
   assert.match(leadStatus, /update_lead_status/);
@@ -15,6 +17,14 @@ test("admin mutation functions write AuditLog records for task 385", () => {
   assert.match(installStatus, /createAuditLog/);
   assert.match(installStatus, /update_install_status/);
   assert.match(installStatus, /entity_name:\s*"Order"/);
+
+  assert.match(adminSettings, /createAuditLog/);
+  assert.match(adminSettings, /update_admin_settings/);
+  assert.match(adminSettings, /entity_name:\s*"AdminSettings"/);
+
+  assert.match(installConfiguration, /createAuditLog/);
+  assert.match(installConfiguration, /update_install_configuration/);
+  assert.match(installConfiguration, /entity_name:\s*"Order"/);
 });
 
 test("shared audit helper writes fields that exist on the AuditLog entity", () => {

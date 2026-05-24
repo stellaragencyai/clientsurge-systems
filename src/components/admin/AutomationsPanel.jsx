@@ -43,7 +43,7 @@ function MirrorStatusBadge({ value }) {
     value === "complete"
       ? "bg-green-50 text-green-700"
       : value === "in_progress"
-        ? "bg-amber-50 text-amber-700"
+        ? "bg-blue-50 text-blue-700"
         : "bg-slate-100 text-slate-600";
 
   return (
@@ -58,14 +58,14 @@ function ClientProjectMirrorPanel({ project }) {
 
   return (
     <div className="mt-3 space-y-4 rounded-xl border border-border bg-muted/20 p-4">
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
         <div className="flex items-start gap-3">
-          <Lock className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-700" />
+          <Lock className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-700" />
           <div>
-            <p className="text-xs font-semibold text-amber-900">
+            <p className="text-xs font-semibold text-blue-900">
               Client project progress is mirrored here
             </p>
-            <p className="mt-1 text-xs text-amber-800">
+            <p className="mt-1 text-xs text-blue-800">
               These progress fields support the client portal and reflect the
               canonical order/install workflow. Use the paid install workspace
               for install truth instead of editing project steps here.
@@ -112,11 +112,11 @@ function StatusBadge({ state, stateLabel }) {
       Icon: TestTube2,
     },
     configuring: {
-      className: "bg-amber-50 text-amber-700 border-amber-200",
+      className: "bg-blue-50 text-blue-700 border-blue-200",
       Icon: Wrench,
     },
     ready_for_install: {
-      className: "bg-orange-50 text-orange-700 border-orange-200",
+      className: "bg-sky-50 text-sky-700 border-sky-200",
       Icon: ShoppingBag,
     },
     error: {
@@ -297,7 +297,7 @@ export default function AutomationsPanel() {
         </button>
       </div>
       {showInfoBanner && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <div className="rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
           Automation cards are derived only from canonical backend state. Status comes from paid orders, tracked service install states, and CommunicationEvent signals. If a workflow is not yet on the canonical order/install path, it is shown explicitly instead of being guessed.
         </div>
       )}
@@ -380,7 +380,7 @@ export default function AutomationsPanel() {
                     <Icon
                       className="h-4 w-4"
                       style={{
-                        color: automation.state === "live" ? "#fff" : "#9a5c2e",
+                        color: automation.state === "live" ? "#fff" : "#0077B6",
                       }}
                     />
                   </div>

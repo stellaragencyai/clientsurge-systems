@@ -16,6 +16,10 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+} from "../_shared/communicationOutbox.js";
 
 // #97: 23-hour idempotency guard — prevents duplicate nurture sends
 const IDEMPOTENCY_WINDOW_MS = 23 * 3600000;
@@ -207,20 +211,64 @@ function daysSince(isoDate) {
   return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60 * 60 * 24);
 }
 
-async function sendEmail(to, subject, html, resendKey, fromEmail) {
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ from: fromEmail, to, subject, html }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Resend send failed");
+function normalizeTimezone(value) {
+  const fallback = "America/Phoenix";
+  const timezone = String(value || fallback).trim();
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: timezone }).format(new Date());
+    return timezone;
+  } catch {
+    return fallback;
   }
-  return true;
+}
+
+function getLocalHour(timezone, date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: normalizeTimezone(timezone),
+    hour: "numeric",
+    hour12: false,
+  }).formatToParts(date);
+  return Number(parts.find((part) => part.type === "hour")?.value || 0);
+}
+
+export function isNurtureSendWindow(timezone, date = new Date()) {
+  const hour = getLocalHour(timezone, date);
+  return hour >= 8 && hour <= 20;
+}
+
+async function sendEmail(base44, campaign, lead, to, subject, html, fromEmail, step) {
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: to,
+    subject,
+    body: html,
+    html,
+    from: fromEmail,
+    lead,
+    leadId: lead?.id || campaign.lead_id,
+    source: "processNurtureCampaigns",
+    sourceRecordId: campaign.id,
+    templateKey: `nurture_step_${step.num}_${step.theme}`,
+    messageType: "marketing",
+    consentBasis: "lead_nurture_signup",
+    metadata: {
+      step_key: `nurture_step_${step.num}`,
+      nurture_step: step.num,
+      campaign_id: campaign.id,
+      theme: step.theme,
+    },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
+  });
+  if (!result.success && !result.suppressed) {
+    throw new Error(result.error || result.reason || "Resend outbox send failed");
+  }
+  return result;
 }
 
 Deno.serve(async (req) => {
@@ -253,15 +301,14 @@ Deno.serve(async (req) => {
 
     const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
     const settings = settingsRecords?.[0] || {};
-    const resendKey = Deno.env.get("RESEND_API_KEY");
     const fromEmail = settings.resend_from_email || "noreply@clientsurge.com";
-    const resendReady = !!(resendKey && settings.resend_enabled);
+    const resendReady = !!(Deno.env.get("RESEND_API_KEY") && settings.resend_enabled);
 
     if (!resendReady) {
       return Response.json({ success: false, error: "Resend not configured. Enable Resend in Admin Settings." });
     }
 
-    const results = { fired: 0, skipped: 0, stopped: 0, errors: 0 };
+    const results = { fired: 0, skipped: 0, stopped: 0, timezone_deferred: 0, errors: 0 };
 
     for (const campaign of campaigns) {
       try {
@@ -288,6 +335,17 @@ Deno.serve(async (req) => {
             notes: "Lead opted out via SMS STOP or cadence manually paused."
           });
           results.stopped++;
+          continue;
+        }
+
+        const timezone = normalizeTimezone(lead.timezone || campaign.timezone || settings.timezone);
+        if (!isNurtureSendWindow(timezone)) {
+          await base44.asServiceRole.entities.NurtureCampaign.update(campaign.id, {
+            timezone,
+            last_step_run_at: new Date().toISOString(),
+            notes: `Deferred because local send window is 8am-8pm in ${timezone}.`,
+          }).catch(() => {});
+          results.timezone_deferred++;
           continue;
         }
 
@@ -330,7 +388,10 @@ Deno.serve(async (req) => {
           let error = null;
 
           try {
-            await sendEmail(lead.email || campaign.lead_email, subject, html, resendKey, fromEmail);
+            const sendResult = await sendEmail(base44, campaign, lead, lead.email || campaign.lead_email, subject, html, fromEmail, step);
+            if (sendResult.suppressed) {
+              throw new Error(`suppressed: ${sendResult.reason}`);
+            }
             sent = true;
           } catch (err) {
             error = err.message;

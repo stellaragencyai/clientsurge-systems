@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const stages = [
   { key: "New", label: "New Leads", color: "bg-slate-400" },
   { key: "Qualified", label: "Qualified", color: "bg-blue-400" },
-  { key: "Contacted", label: "Contacted", color: "bg-yellow-400" },
+  { key: "Contacted", label: "Contacted", color: "bg-sky-400" },
   { key: "Responded", label: "Responded", color: "bg-cyan-400" },
   { key: "Booked", label: "Booked", color: "bg-green-500" },
   { key: "Closed", label: "Closed", color: "bg-emerald-600" },

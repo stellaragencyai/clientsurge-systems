@@ -9,7 +9,6 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
   const colors = {
     blue: "bg-blue-50 border-blue-100 text-blue-800",
     green: "bg-emerald-50 border-emerald-100 text-emerald-800",
-    amber: "bg-amber-50 border-amber-100 text-amber-800",
     purple: "bg-purple-50 border-purple-100 text-purple-800",
   };
   return (
@@ -116,7 +115,7 @@ export default function RevenueMetricsPanel() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard icon={Users} label="Total Leads" value={totals.totalLeads} sub="All time" color="blue" />
         <StatCard icon={CheckCircle2} label="Booked" value={totals.bookedLeads} sub={`${totals.conversionRate}% conversion`} color="green" />
-        <StatCard icon={Zap} label="Automations Fired" value={totals.totalAutomations} sub={`${totals.smsSent} SMS · ${totals.emailSent} email`} color="amber" />
+        <StatCard icon={Zap} label="Automations Fired" value={totals.totalAutomations} sub={`${totals.smsSent} SMS · ${totals.emailSent} email`} color="blue" />
         <StatCard icon={TrendingUp} label="Est. Revenue" value={formatCurrency(totals.estimatedRevenue)} sub="Based on bookings" color="purple" />
       </div>
 
@@ -134,7 +133,7 @@ export default function RevenueMetricsPanel() {
               />
               <Bar dataKey="leads" radius={[4, 4, 0, 0]}>
                 {weeksData.map((_, i) => (
-                  <Cell key={i} fill={i === weeksData.length - 1 ? "#9a5c2e" : "rgba(154,92,46,0.35)"} />
+                  <Cell key={i} fill={i === weeksData.length - 1 ? "#0077B6" : "rgba(0,136,204,0.35)"} />
                 ))}
               </Bar>
             </BarChart>

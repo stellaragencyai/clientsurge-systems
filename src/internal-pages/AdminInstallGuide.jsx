@@ -88,7 +88,7 @@ const STEPS = [
   {
     id: 5,
     icon: Zap,
-    color: "#D97706",
+    color: "#0077B6",
     title: "Activate the Service",
     time: "~2 min",
     auto: false,
@@ -212,9 +212,9 @@ function StepCard({ step, isOpen, onToggle, completed, onToggleComplete }) {
             ))}
           </div>
           {step.note && (
-            <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-              <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-amber-800">{step.note}</p>
+            <div className="flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+              <AlertCircle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-800">{step.note}</p>
             </div>
           )}
         </div>

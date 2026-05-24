@@ -14,6 +14,10 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+} from "../_shared/communicationOutbox.js";
 
 const BATCH_SIZE = 50; // Resend recommends batching
 const MAX_LEADS = 5000;
@@ -51,37 +55,43 @@ function personalizeContent(content, lead) {
     .replace(/{email}/g, lead.email || "");
 }
 
-async function sendViaResend(to, subject, html, text, fromEmail, resendKey, campaignId, recipientId) {
+async function sendViaResend(base44, lead, to, subject, html, text, fromEmail, campaignId, recipientId) {
   // Add tracking pixel for opens
   const trackingPixel = `<img src="https://clientsurge.base44.app/api/track/open/${campaignId}/${recipientId}" width="1" height="1" style="display:none" />`;
   const htmlWithTracking = html ? `${html}${trackingPixel}` : undefined;
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: fromEmail,
-      to,
-      subject,
-      html: htmlWithTracking,
-      text: text || undefined,
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: to,
+    subject,
+    body: text || html,
+    html: htmlWithTracking,
+    from: fromEmail,
+    lead,
+    leadId: lead?.id,
+    source: "sendEmailCampaign",
+    sourceRecordId: recipientId,
+    templateKey: campaignId,
+    messageType: "marketing",
+    consentBasis: "email_campaign_recipient",
+    metadata: {
+      campaign_id: campaignId,
+      recipient_id: recipientId,
       headers: {
         "X-Campaign-ID": campaignId,
         "X-Recipient-ID": recipientId,
       },
+    },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
     }),
   });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Resend API error");
-  }
-
-  const data = await res.json();
-  return data.id; // Resend message ID
+  if (!result.success) throw new Error(result.reason || result.error || "Email campaign was not sent");
+  return result.provider_message_id;
 }
 
 Deno.serve(async (req) => {
@@ -120,10 +130,9 @@ Deno.serve(async (req) => {
     const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
     const settings = settingsRecords?.[0] || {};
     
-    const resendKey = Deno.env.get("RESEND_API_KEY");
     const fromEmail = settings.resend_from_email || "noreply@clientsurge.com";
 
-    if (!preview_only && !resendKey) {
+    if (!preview_only && !Deno.env.get("RESEND_API_KEY")) {
       return Response.json({ error: "RESEND_API_KEY not configured" }, { status: 500 });
     }
 
@@ -201,12 +210,13 @@ Deno.serve(async (req) => {
 
           // Send email
           const messageId = await sendViaResend(
+            base44,
+            lead,
             lead.email,
             personalizedSubject,
             personalizedHtml,
             personalizedText,
             fromEmail,
-            resendKey,
             campaign_id,
             recipient.id
           );
@@ -217,19 +227,6 @@ Deno.serve(async (req) => {
             sent_at: new Date().toISOString(),
             resend_message_id: messageId,
             error_message: undefined,
-          });
-
-          // Log communication event
-          await base44.asServiceRole.entities.CommunicationEvent.create({
-            lead_id: lead.id,
-            channel: "email",
-            direction: "outbound",
-            event_type: "email_sent",
-            provider: "resend",
-            status: "sent",
-            subject: personalizedSubject,
-            message_body: personalizedText || personalizedHtml?.substring(0, 500),
-            metadata_json: JSON.stringify({ campaign_id, recipient_id: recipient.id }),
           });
 
           sent++;

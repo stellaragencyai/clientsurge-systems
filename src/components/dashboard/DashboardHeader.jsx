@@ -24,7 +24,7 @@ export default function DashboardHeader({ activeServices, project, order }) {
       {[
         { icon: MessageSquare, label: "Automation Systems", value: totalServices, sub: "in your account", color: "#1b140d" },
         { icon: CheckCircle, label: "Live & Running", value: liveCount, sub: "capturing leads now", color: "#16a34a" },
-        { icon: Clock, label: "Being Set Up", value: inProgressCount, sub: "our team is on it", color: "#d97706" },
+        { icon: Clock, label: "Being Set Up", value: inProgressCount, sub: "our team is on it", color: "#0077B6" },
       ].map(({ icon: Icon, label, value, sub, color }) => (
         <div key={label} style={{
           background: "#ffffff", border: "1px solid rgba(0,174,239,0.14)",

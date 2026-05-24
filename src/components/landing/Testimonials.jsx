@@ -54,7 +54,7 @@ export default function Testimonials() {
         <motion.div
           className="grid md:grid-cols-3 gap-6"
           variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
-          initial="hidden"
+          initial={false}
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
         >
@@ -63,7 +63,7 @@ export default function Testimonials() {
               key={testimonial.name}
               className="flex flex-col rounded-2xl p-6"
               variants={{
-                hidden: { opacity: 0, y: 36 },
+                hidden: { opacity: 1, y: 0 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
               }}
               whileHover={{

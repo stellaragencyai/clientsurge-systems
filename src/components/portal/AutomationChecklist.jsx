@@ -43,7 +43,7 @@ export default function AutomationChecklist({ order_id }) {
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
           <span style={{ color: "#9CA3AF", fontSize: 13 }}>Setup Progress</span>
-          <span style={{ color: pct === 100 ? "#00FFB3" : "#F59E0B", fontWeight: 700, fontSize: 13 }}>{pct}%</span>
+          <span style={{ color: pct === 100 ? "#00FFB3" : "#00AEEF", fontWeight: 700, fontSize: 13 }}>{pct}%</span>
         </div>
         <div style={{ background: "rgba(255,255,255,0.08)", borderRadius: 9999, height: 8, overflow: "hidden" }}>
           <div style={{

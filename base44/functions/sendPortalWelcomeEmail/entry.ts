@@ -3,6 +3,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const ADMIN_EMAIL = "system@clientsurgesystems.com";
 const FROM_EMAIL = "ClientSurge Systems <system@clientsurgesystems.com>";
+const APP_URL = (Deno.env.get("APP_URL") || "https://clientsurgesystems.com").replace(/\/+$/, "");
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -43,7 +44,7 @@ Deno.serve(async (req) => {
     const safeBusinessName = escapeHtml(business_name);
     const safeClientEmail = escapeHtml(client_email);
 
-    const portalUrl = `https://clientsurgesystems.com/client-portal`;
+    const portalUrl = `${APP_URL}/client-portal`;
 
     // Welcome email to the new client
     const clientHtml = `
@@ -66,7 +67,7 @@ Deno.serve(async (req) => {
             <li>Manage your plan</li>
           </ul>
           <div style="text-align: center; margin-bottom: 32px;">
-            <a href="${portalUrl}" style="display: inline-block; background: linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 100%); color: #f5e6d0; text-decoration: none; font-weight: 700; font-size: 16px; padding: 16px 40px; border-radius: 9999px;">
+            <a href="${portalUrl}" style="display: inline-block; background: linear-gradient(135deg, #00D4FF 0%, #00FFB3 100%); color: #0A0F1E; text-decoration: none; font-weight: 700; font-size: 16px; padding: 16px 40px; border-radius: 9999px;">
               Access Your Client Portal →
             </a>
           </div>

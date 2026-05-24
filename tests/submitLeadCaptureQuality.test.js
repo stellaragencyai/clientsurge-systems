@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 
 import {
   createLeadCaptureRateLimiter,
@@ -17,6 +18,10 @@ import {
 } from "../base44/functions/submitLeadCapture/leadCapture.shared.js";
 
 const NOW = Date.parse("2026-05-20T22:30:00.000Z");
+
+function read(path) {
+  return fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+}
 
 test("submitLeadCapture dedup window includes exactly 60 minutes", () => {
   const duplicate = findDuplicateWebsiteLead({
@@ -100,6 +105,19 @@ test("submitLeadCapture only accepts known requested channels", () => {
     "sms",
     "call",
   ]);
+});
+
+test("submitLeadCapture logs workflow events with CommunicationEvent schema enums", () => {
+  const source = read("base44/functions/submitLeadCapture/entry.ts");
+
+  assert.match(source, /channel: "internal"/);
+  assert.match(source, /direction: "system"/);
+  assert.match(source, /event_type: "workflow_triggered"/);
+  assert.match(source, /provider: "internal"/);
+  assert.match(source, /status: result\?\.success === false \? "failed" : "processed"/);
+  assert.doesNotMatch(source, /provider: "automationOrchestrator"/);
+  assert.doesNotMatch(source, /direction: "internal"/);
+  assert.doesNotMatch(source, /"completed"/);
 });
 
 test("submitLeadCapture rate limits after 3 submissions per IP per hour", () => {

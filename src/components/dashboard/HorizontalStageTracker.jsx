@@ -19,7 +19,7 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
 
   return (
     <div style={{
-      background: "linear-gradient(135deg, #3d1f0a 0%, #6b3f1f 40%, #4a2510 100%)",
+      background: "linear-gradient(135deg, #3d1f0a 0%, #005B99 40%, #4a2510 100%)",
       borderRadius: "18px",
       padding: "clamp(20px,3vw,28px)",
       marginBottom: "28px",
@@ -31,7 +31,7 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
       <div style={{
         position: "absolute", top: "-60%", right: "-5%",
         width: "300px", height: "300px", borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(200,150,92,0.1) 0%, transparent 70%)",
+        background: "radial-gradient(circle, rgba(0,174,239,0.1) 0%, transparent 70%)",
         pointerEvents: "none",
       }} />
 
@@ -48,10 +48,10 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
           </div>
           <div style={{
             padding: "6px 14px", borderRadius: "9999px",
-            background: installStatus === "Live" ? "rgba(34,197,94,0.2)" : installStatus === "Error" ? "rgba(239,68,68,0.18)" : "rgba(245,158,11,0.18)",
-            border: `1px solid ${installStatus === "Live" ? "rgba(34,197,94,0.4)" : installStatus === "Error" ? "rgba(239,68,68,0.35)" : "rgba(245,158,11,0.35)"}`,
+            background: installStatus === "Live" ? "rgba(34,197,94,0.2)" : installStatus === "Error" ? "rgba(239,68,68,0.18)" : "rgba(0,174,239,0.18)",
+            border: `1px solid ${installStatus === "Live" ? "rgba(34,197,94,0.4)" : installStatus === "Error" ? "rgba(239,68,68,0.35)" : "rgba(0,174,239,0.35)"}`,
             fontSize: "12px", fontWeight: "700",
-            color: installStatus === "Live" ? "#4ade80" : installStatus === "Error" ? "#f87171" : "#fbbf24",
+            color: installStatus === "Live" ? "#4ade80" : installStatus === "Error" ? "#f87171" : "#67D8FF",
           }}>
             {installStatus === "Live" ? "✦ Live" : installStatus === "Error" ? "⚠ Needs Attention" : `Step ${Math.min(safeStage + 1, stages.length)} of ${stages.length}`}
           </div>
@@ -69,7 +69,7 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
                   {/* Circle */}
                   <div style={{
                     width: "38px", height: "38px", borderRadius: "50%", flexShrink: 0,
-                    background: isComplete ? "linear-gradient(135deg,#22c55e,#16a34a)" : isCurrent ? "linear-gradient(135deg,#f5d9a8,#c8965c)" : "rgba(255,255,255,0.1)",
+                    background: isComplete ? "linear-gradient(135deg,#22c55e,#16a34a)" : isCurrent ? "linear-gradient(135deg,#DDF4FF,#00AEEF)" : "rgba(255,255,255,0.1)",
                     border: `2px solid ${isComplete ? "rgba(34,197,94,0.5)" : isCurrent ? "rgba(245,217,168,0.7)" : "rgba(255,255,255,0.2)"}`,
                     display: "flex", alignItems: "center", justifyContent: "center",
                     boxShadow: isCurrent ? "0 0 16px rgba(245,217,168,0.5)" : isComplete ? "0 0 10px rgba(34,197,94,0.3)" : "none",
@@ -78,7 +78,7 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
                     {isComplete ? (
                       <CheckCircle2 style={{ width: "18px", height: "18px", color: "#fff" }} />
                     ) : isCurrent ? (
-                      <Loader2 style={{ width: "16px", height: "16px", color: "#7a4825", animation: "spin 1.5s linear infinite" }} />
+                      <Loader2 style={{ width: "16px", height: "16px", color: "#005B99", animation: "spin 1.5s linear infinite" }} />
                     ) : (
                       <span style={{ fontSize: "12px", fontWeight: "800", color: "rgba(255,255,255,0.4)" }}>{idx + 1}</span>
                     )}

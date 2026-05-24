@@ -19,103 +19,49 @@ import PageNotFound from "./lib/PageNotFound";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
 import { scrollToTop } from "@/lib/scroll";
 import { setPageMetadata } from "@/lib/seo";
+import {
+  isPublicRoute,
+  routePath,
+  shouldNoindexRoute,
+} from "@/lib/routeSecurity";
 
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
-import Start from "./pages/Start";
-import Book from "./pages/Book";
-import Contact from "./pages/Contact";
-import Industries from "./pages/Industries";
-import Blog from "./pages/Blog";
-import IndustryTemplate from "./components/landing/IndustryTemplate";
-import About from "./pages/About";
-import Automations from "./pages/Automations";
-import Onboarding from "./internal-pages/Onboarding";
-import CaptureLeads from "./internal-pages/CaptureLeads";
-import Success from "./internal-pages/Success";
-import LegalPage from "./internal-pages/LegalPage";
-import AutomationServicePage from "./internal-pages/AutomationServicePage";
-import OrderSuccess from "./internal-pages/OrderSuccess";
-import BusinessSetup from "./internal-pages/BusinessSetup";
-import ThankYou from "./internal-pages/ThankYou";
-import CredentialsSetup from "./internal-pages/CredentialsSetup";
-import SetupStatus from "./internal-pages/SetupStatus";
-import WebsitePreview from "./internal-pages/WebsitePreview";
-import AdminInstallGuide from "./internal-pages/AdminInstallGuide";
-import AISalesCommandCenter from "./internal-pages/AISalesCommandCenter";
-import PerformanceWars from "./internal-pages/PerformanceWars";
 
 
+const Start = lazy(() => import("./pages/Start"));
+const Book = lazy(() => import("./pages/Book"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Industries = lazy(() => import("./pages/Industries"));
+const Blog = lazy(() => import("./pages/Blog"));
+const Login = lazy(() => import("./pages/Login"));
 const Store = lazy(() => import("./pages/Store"));
+const About = lazy(() => import("./pages/About"));
+const Automations = lazy(() => import("./pages/Automations"));
+const IndustryTemplate = lazy(() => import("./components/landing/IndustryTemplate"));
+const Success = lazy(() => import("./internal-pages/Success"));
+const CaptureLeads = lazy(() => import("./internal-pages/CaptureLeads"));
+const LegalPage = lazy(() => import("./internal-pages/LegalPage"));
+const AutomationServicePage = lazy(() => import("./internal-pages/AutomationServicePage"));
+const OrderSuccess = lazy(() => import("./internal-pages/OrderSuccess"));
+const ThankYou = lazy(() => import("./internal-pages/ThankYou"));
+const Onboarding = lazy(() => import("./internal-pages/Onboarding"));
+const BusinessSetup = lazy(() => import("./internal-pages/BusinessSetup"));
+const CredentialsSetup = lazy(() => import("./internal-pages/CredentialsSetup"));
+const SetupStatus = lazy(() => import("./internal-pages/SetupStatus"));
+const WebsitePreview = lazy(() => import("./internal-pages/WebsitePreview"));
 const AdminDashboard = lazy(() => import("./internal-pages/AdminDashboard"));
 const AdminLeads = lazy(() => import("./internal-pages/AdminLeads"));
 const AdminLeadDetail = lazy(() => import("./internal-pages/AdminLeadDetail"));
 const AdminAutomation = lazy(() => import("./internal-pages/AdminAutomation"));
 const AdminOnboarding = lazy(() => import("./internal-pages/AdminOnboarding"));
+const AdminInstallGuide = lazy(() => import("./internal-pages/AdminInstallGuide"));
+const AISalesCommandCenter = lazy(() => import("./internal-pages/AISalesCommandCenter"));
+const PerformanceWars = lazy(() => import("./internal-pages/PerformanceWars"));
 const ClientPortal = lazy(() => import("./internal-pages/ClientPortal"));
 const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
+const MotionLab = lazy(() => import("./internal-pages/MotionLab"));
 
-const PUBLIC_PATHS = [
-  "/",
-  "/store",
-  "/order-success",
-  "/med-spa",
-  "/dental",
-  "/hvac",
-  "/roofing",
-  "/contractors",
-  "/chiropractic",
-  "/lead-capture-automation",
-  "/missed-call-text-back",
-  "/ai-lead-follow-up",
-  "/appointment-booking-automation",
-  "/review-automation",
-  "/customer-reactivation",
-  "/start",
-  "/book",
-  "/book-demo",
-  "/industries",
-  "/pricing",
-  "/faq",
-  "/our-system",
-  "/testimonials",
-  "/privacy-policy",
-  "/terms",
-  "/login",
-  "/success",
-  "/legal",
-  "/contact",
-  "/blog",
-  "/about",
-  "/automations",
-  "/leads/capture",
-  "/onboarding",
-  "/setup/preview",
-  // test/preview routes removed
-];
-
-const NOINDEX_PREFIXES = [
-  "/admin",
-  "/adminleaddetail",
-  "/adminsettings",
-  "/dashboard",
-  "/client-portal",
-  "/client-dashboard",
-  "/industrytemplate",
-  "/lead-intelligence",
-  "/medspa-dashboard",
-  "/notfound",
-  "/sam",
-  "/success",
-  "/setup",
-  "/thank-you",
-  "/onboarding",
-  "/order-success",
-  "/websitespecpreview",
-  "/leads",
-];
-
-const routePath = (...segments) => `/${segments.join("/")}`;
 const dynamicParam = (name) => `:${name}`;
 
 const LEGACY_REDIRECTS = [
@@ -134,6 +80,12 @@ const LEGACY_REDIRECTS = [
   { from: routePath("industries", "med-spa"), to: routePath("med-spa") },
   { from: routePath("industries", "chiropractic"), to: routePath("chiropractic") },
   { from: routePath("industries", "contractors"), to: routePath("contractors") },
+  { from: routePath("roofing-automation"), to: routePath("roofing") },
+  { from: routePath("hvac-automation"), to: routePath("hvac") },
+  { from: routePath("dental-automation"), to: routePath("dental") },
+  { from: routePath("med-spa-automation"), to: routePath("med-spa") },
+  { from: routePath("chiropractic-automation"), to: routePath("chiropractic") },
+  { from: routePath("contractor-automation"), to: routePath("contractors") },
   { from: routePath("Dashboard"), to: routePath("admin") },
   { from: routePath("AdminSettings"), to: routePath("admin") },
   { from: routePath("AdminLeadDetail"), to: routePath("admin", "leads") },
@@ -164,29 +116,25 @@ const INDUSTRY_ROUTE_SLUGS = [
 ];
 
 const HIDDEN_PUBLIC_ROUTES = [
-  { route: routePath("success"), element: <Success /> },
-  { route: routePath("onboarding"), element: <Onboarding /> },
-  { route: routePath("leads", "capture"), element: <CaptureLeads /> },
-  { route: routePath("legal", dynamicParam("type")), element: <LegalPage /> },
-  { route: routePath("order-success"), element: <OrderSuccess /> },
-  { route: routePath("setup"), element: <BusinessSetup /> },
-  { route: routePath("thank-you"), element: <ThankYou /> },
-  { route: routePath("setup", "credentials"), element: <CredentialsSetup /> },
-  { route: routePath("setup", "status", dynamicParam("orderId")), element: <SetupStatus /> },
-  { route: routePath("setup", "status"), element: <SetupStatus /> },
-  { route: routePath("setup", "preview", dynamicParam("specId")), element: <WebsitePreview /> },
-  { route: routePath("setup", "preview"), element: <WebsitePreview /> },
+  { route: routePath("success"), Component: Success },
+  { route: routePath("leads", "capture"), Component: CaptureLeads },
+  { route: routePath("legal", dynamicParam("type")), Component: LegalPage },
+  { route: routePath("order-success"), Component: OrderSuccess },
+  { route: routePath("thank-you"), Component: ThankYou },
 ];
 
-const isPublicPath = (pathname) =>
-  PUBLIC_PATHS.some((path) => {
-    const normalizedPathname = pathname.toLowerCase();
-    const normalizedPath = path.toLowerCase();
-    return (
-      normalizedPathname === normalizedPath ||
-      normalizedPathname.startsWith(`${normalizedPath}/`)
-    );
-  });
+const CLIENT_PRIVATE_ROUTES = [
+  { route: routePath("onboarding"), Component: Onboarding },
+  { route: routePath("setup"), Component: BusinessSetup },
+  { route: routePath("setup", "credentials"), Component: CredentialsSetup },
+  { route: routePath("setup", "status", dynamicParam("orderId")), Component: SetupStatus },
+  { route: routePath("setup", "status"), Component: SetupStatus },
+];
+
+const INTERNAL_ADMIN_ROUTES = [
+  { route: routePath("setup", "preview", dynamicParam("specId")), Component: WebsitePreview },
+  { route: routePath("setup", "preview"), Component: WebsitePreview },
+];
 
 // Fix 1: ScrollToTop — resets scroll position on every route change
 function ScrollToTop() {
@@ -227,6 +175,30 @@ function SectionRedirect({ hash }) {
   return null;
 }
 
+function PortalRedirect() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const tab = params.get("tab");
+  const tabMap = {
+    services: "plan",
+    support: "support",
+    billing: "billing",
+    leads: "leads",
+    tasks: "tasks",
+  };
+  const nextParams = new URLSearchParams();
+  if (tabMap[tab]) {
+    nextParams.set("tab", tabMap[tab]);
+  }
+
+  return (
+    <Navigate
+      to={`${routePath("client-portal")}${nextParams.toString() ? `?${nextParams.toString()}` : ""}`}
+      replace
+    />
+  );
+}
+
 function AdminLoadingSkeleton() {
   return (
     <div className="min-h-screen bg-background flex">
@@ -249,6 +221,26 @@ function AdminLoadingSkeleton() {
   );
 }
 
+function RouteLoadingFallback() {
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
+    </div>
+  );
+}
+
+function SuspendedRoute({
+  Component,
+  componentProps = {},
+  fallback = <RouteLoadingFallback />,
+}) {
+  return (
+    <Suspense fallback={fallback}>
+      <Component {...componentProps} />
+    </Suspense>
+  );
+}
+
 function RouteIndexingGuard() {
   const location = useLocation();
 
@@ -257,18 +249,51 @@ function RouteIndexingGuard() {
     if (!robotsMeta) return;
 
     const previous = robotsMeta.getAttribute("content") || "index,follow";
-    const pathname = location.pathname.toLowerCase();
-    const shouldNoindex = NOINDEX_PREFIXES.some(
-      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
-    );
+    const previousCacheControl = document.head
+      .querySelector('meta[http-equiv="Cache-Control"]')
+      ?.getAttribute("content");
+    const previousPragma = document.head
+      .querySelector('meta[http-equiv="Pragma"]')
+      ?.getAttribute("content");
+    const previousExpires = document.head
+      .querySelector('meta[http-equiv="Expires"]')
+      ?.getAttribute("content");
+    const shouldNoindex = shouldNoindexRoute(location.pathname);
 
     robotsMeta.setAttribute(
       "content",
-      shouldNoindex ? "noindex,nofollow" : "index,follow"
+      shouldNoindex ? "noindex,nofollow,noarchive" : "index,follow"
     );
+
+    const cacheControlMeta =
+      document.head.querySelector('meta[http-equiv="Cache-Control"]') ||
+      document.head.appendChild(document.createElement("meta"));
+    const pragmaMeta =
+      document.head.querySelector('meta[http-equiv="Pragma"]') ||
+      document.head.appendChild(document.createElement("meta"));
+    const expiresMeta =
+      document.head.querySelector('meta[http-equiv="Expires"]') ||
+      document.head.appendChild(document.createElement("meta"));
+
+    cacheControlMeta.setAttribute("http-equiv", "Cache-Control");
+    pragmaMeta.setAttribute("http-equiv", "Pragma");
+    expiresMeta.setAttribute("http-equiv", "Expires");
+
+    if (shouldNoindex) {
+      cacheControlMeta.setAttribute("content", "no-store");
+      pragmaMeta.setAttribute("content", "no-cache");
+      expiresMeta.setAttribute("content", "0");
+    } else {
+      cacheControlMeta.setAttribute("content", previousCacheControl || "");
+      pragmaMeta.setAttribute("content", previousPragma || "");
+      expiresMeta.setAttribute("content", previousExpires || "");
+    }
 
     return () => {
       robotsMeta.setAttribute("content", previous);
+      cacheControlMeta.setAttribute("content", previousCacheControl || "");
+      pragmaMeta.setAttribute("content", previousPragma || "");
+      expiresMeta.setAttribute("content", previousExpires || "");
     };
   }, [location.pathname]);
 
@@ -303,7 +328,7 @@ function AccessDeniedPage() {
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
   const location = useLocation();
-  const publicRoute = isPublicPath(location.pathname);
+  const publicRoute = isPublicRoute(location.pathname);
 
   if ((isLoadingPublicSettings || isLoadingAuth) && !publicRoute) {
     return (
@@ -329,20 +354,39 @@ const AuthenticatedApp = () => {
       ))}
       <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
-      <Route path="/start" element={<Start />} />
-      <Route path="/book" element={<Book />} />
+      <Route path="/start" element={<SuspendedRoute Component={Start} />} />
+      <Route path="/book" element={<SuspendedRoute Component={Book} />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
-      <Route path="/industries" element={<Industries />} />
+      <Route path="/industries" element={<SuspendedRoute Component={Industries} />} />
       <Route path={routePath("pricing")} element={<SectionRedirect hash="#pricing" />} />
       <Route path={routePath("faq")} element={<SectionRedirect hash="#faq" />} />
       <Route path={routePath("our-system")} element={<SectionRedirect hash="#services" />} />
       <Route path={routePath("testimonials")} element={<SectionRedirect hash="#testimonials" />} />
-      <Route path="/privacy-policy" element={<LegalPage fixedType="privacy" canonicalPath="/privacy-policy" />} />
-      <Route path={routePath("terms")} element={<LegalPage fixedType="terms" canonicalPath="/terms" />} />
-      <Route path="/login" element={<Navigate to="/client-portal" replace />} />
+      <Route
+        path="/privacy-policy"
+        element={
+          <SuspendedRoute
+            Component={LegalPage}
+            componentProps={{
+              fixedType: "privacy",
+              canonicalPath: "/privacy-policy",
+            }}
+          />
+        }
+      />
+      <Route
+        path={routePath("terms")}
+        element={
+          <SuspendedRoute
+            Component={LegalPage}
+            componentProps={{ fixedType: "terms", canonicalPath: "/terms" }}
+          />
+        }
+      />
+      <Route path="/login" element={<SuspendedRoute Component={Login} />} />
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/blog" element={<Blog />} />
+      <Route path="/contact" element={<SuspendedRoute Component={Contact} />} />
+      <Route path="/blog" element={<SuspendedRoute Component={Blog} />} />
       <Route
         path="/store"
         element={
@@ -357,20 +401,33 @@ const AuthenticatedApp = () => {
           </Suspense>
         }
       />
-      <Route path="/about" element={<About />} />
-      <Route path="/automations" element={<Automations />} />
+      <Route path="/about" element={<SuspendedRoute Component={About} />} />
+      <Route path="/automations" element={<SuspendedRoute Component={Automations} />} />
       {AUTOMATION_SERVICE_ROUTES.map((path) => (
-        <Route key={path} path={path} element={<AutomationServicePage />} />
+        <Route
+          key={path}
+          path={path}
+          element={<SuspendedRoute Component={AutomationServicePage} />}
+        />
       ))}
       {INDUSTRY_ROUTE_SLUGS.map((slug) => (
         <Route
           key={slug}
           path={`/${slug}`}
-          element={<IndustryTemplate industrySlug={slug} />}
+          element={
+            <SuspendedRoute
+              Component={IndustryTemplate}
+              componentProps={{ industrySlug: slug }}
+            />
+          }
         />
       ))}
-      {HIDDEN_PUBLIC_ROUTES.map(({ route, element }) => (
-        <Route key={route} path={route} element={element} />
+      {HIDDEN_PUBLIC_ROUTES.map(({ route, Component, element }) => (
+        <Route
+          key={route}
+          path={route}
+          element={Component ? <SuspendedRoute Component={Component} /> : element}
+        />
       ))}
       <Route path={routePath("services", dynamicParam("serviceSlug"))} element={<Navigate to="/store" replace />} />
 
@@ -381,15 +438,18 @@ const AuthenticatedApp = () => {
       >
         {[
           { route: routePath("client-portal"), Component: ClientPortal },
-          { route: routePath("client-dashboard"), Component: ClientDashboard },
-        ].map(({ route, Component }) => (
+          { route: routePath("client-dashboard"), element: <PortalRedirect /> },
+          ...CLIENT_PRIVATE_ROUTES,
+        ].map(({ route, Component, element }) => (
           <Route
             key={route}
             path={route}
             element={
-              <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}>
-                <Component />
-              </Suspense>
+              Component ? (
+                <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}>
+                  <Component />
+                </Suspense>
+              ) : element
             }
           />
         ))}
@@ -415,10 +475,19 @@ const AuthenticatedApp = () => {
           { route: routePath("sam"), element: <Navigate to={routePath("admin")} replace /> },
           { route: routePath("medspa-dashboard"), element: <Navigate to={routePath("admin")} replace /> },
           { route: routePath("admin", "onboarding"), Component: AdminOnboarding },
-          { route: routePath("admin", "install-guide"), element: <AdminInstallGuide /> },
-          { route: routePath("admin", "ai-sales"), element: <AISalesCommandCenter /> },
+          { route: routePath("admin", "install-guide"), Component: AdminInstallGuide },
+          { route: routePath("admin", "ai-sales"), Component: AISalesCommandCenter },
           { route: routePath("admin", "AIStatusDashboard"), caseSensitive: true, element: <Navigate to={routePath("admin")} replace /> },
-          { route: routePath("admin", "performance-wars"), element: <PerformanceWars /> },
+          { route: routePath("admin", "performance-wars"), Component: PerformanceWars },
+          {
+            route: routePath("motion-lab"),
+            element: (
+              <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}>
+                <MotionLab />
+              </Suspense>
+            ),
+          },
+          ...INTERNAL_ADMIN_ROUTES,
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
@@ -455,9 +524,9 @@ function App() {
             <ScrollToTop />
             <AutoCTAAnalytics />
             <RouteIndexingGuard />
-            <div id="main-content" tabIndex={-1}>
+            <main id="main-content" tabIndex={-1}>
               <AuthenticatedApp />
-            </div>
+            </main>
           </Router>
           <Toaster />
         </QueryClientProvider>

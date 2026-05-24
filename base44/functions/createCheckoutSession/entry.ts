@@ -62,6 +62,9 @@ Deno.serve(async (req) => {
       customer_name,
       customer_email,
       customer_phone,
+      sms_consent_granted,
+      sms_consent_source,
+      sms_consent_text,
       business_name,
       success_url,
       cancel_url,
@@ -143,6 +146,10 @@ Deno.serve(async (req) => {
       customer_email,
       customer_name,
       customer_phone: customer_phone || "",
+      sms_consent_granted: sms_consent_granted === true,
+      sms_consent_source: sms_consent_granted === true ? sms_consent_source || "checkout" : "",
+      sms_consent_text: sms_consent_granted === true ? sms_consent_text || "" : "",
+      sms_consent_at: sms_consent_granted === true ? new Date().toISOString() : null,
       business_name,
       items: orderItems,
       total_setup: pricingSummary.total_setup,
@@ -156,13 +163,17 @@ Deno.serve(async (req) => {
       plan_type: pricingSummary.package_offer?.name || "Custom Service Bundle",
     });
 
-    const line_items = buildStripeLineItemsForPricingSummary(pricingSummary);
+    const line_items = buildStripeLineItemsForPricingSummary(pricingSummary, {
+      livemode: stripeAccount.livemode,
+    });
 
     const sessionMetadata = {
       order_id: order.id,
       base44_app_id: Deno.env.get("BASE44_APP_ID"),
       customer_name,
       customer_phone: customer_phone || "",
+      sms_consent_granted: sms_consent_granted === true ? "true" : "false",
+      sms_consent_source: sms_consent_granted === true ? sms_consent_source || "checkout" : "",
       business_name,
       items_json: JSON.stringify(
         pricingSummary.priced_items.map((item) => ({

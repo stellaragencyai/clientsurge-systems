@@ -16,6 +16,7 @@ import {
   INDUSTRY_SELECTION_STORAGE_KEY } from
 "@/lib/industryRecommendations";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
+import LazyImage from "@/components/LazyImage";
 
 // Unique SVG pattern per industry — lightweight, inline, no external deps
 const industryPatterns = {
@@ -131,7 +132,7 @@ const industries = [
   icon: Home,
   name: "Roofing & Restoration",
   accent: {
-    color: "#f97316",
+    color: "#00AEEF",
     soft: "rgba(249,115,22,0.18)",
     glow: "rgba(249,115,22,0.34)",
     iconBg: "rgba(249,115,22,0.18)"
@@ -172,7 +173,7 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
       className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[28px] mx-auto"
       style={{
         background: "linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,245,239,0.94) 100%)",
-        border: "1.5px solid rgba(154,92,46,0.22)",
+        border: "1.5px solid rgba(0,136,204,0.22)",
         boxShadow: "0 50px 130px rgba(0,0,0,0.45)"
       }}
       onClick={(e) => e.stopPropagation()}>
@@ -211,7 +212,7 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
           {/* Recommended package */}
           <div
           className="rounded-2xl px-5 py-5"
-          style={{ background: "rgba(255,255,255,0.78)", border: "1px solid rgba(154,92,46,0.14)" }}>
+          style={{ background: "rgba(255,255,255,0.78)", border: "1px solid rgba(0,136,204,0.14)" }}>
           
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-2">Recommended Package</p>
             <h4 className="text-xl font-semibold text-foreground">{recommendation.recommendedPackage?.name}</h4>
@@ -258,7 +259,7 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
         </div>
 
         {/* Footer CTAs */}
-        <div className="px-7 py-5 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end" style={{ borderTop: "1px solid rgba(154,92,46,0.12)", background: "rgba(255,255,255,0.6)" }}>
+        <div className="px-7 py-5 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end" style={{ borderTop: "1px solid rgba(0,136,204,0.12)", background: "rgba(255,255,255,0.6)" }}>
           <a href="/store" className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
             See The AI Store <ArrowRight className="w-4 h-4" />
           </a>
@@ -275,7 +276,7 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
 export default function Industries() {
   const sectionRef = useRef(null);
   const demoBooking = useDemoBooking();
-  const [sectionVisible, setSectionVisible] = useState(false);
+  const [sectionVisible, setSectionVisible] = useState(true);
   const [selectedIndustryId, setSelectedIndustryId] = useState(null);
   const [hoveredIndustryId, setHoveredIndustryId] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
@@ -379,7 +380,7 @@ export default function Industries() {
                 position: "relative",
               }}>
               
-              <img
+              <LazyImage
                 src={industry.image}
                 alt={industry.name}
                 loading="lazy"

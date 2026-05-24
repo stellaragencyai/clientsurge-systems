@@ -8,6 +8,7 @@ import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import DemoBookingModal from "../components/forms/DemoBookingModal";
 import { setPageMetadata } from "@/lib/seo";
+import { trackLeadSubmitted } from "@/lib/analytics";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
@@ -20,6 +21,7 @@ export default function Contact() {
     business_type: "",
     message: "",
     website_url: "",
+    website_hp: "",
     utm_source: "",
     utm_medium: "",
     utm_campaign: "",
@@ -123,6 +125,11 @@ export default function Contact() {
       if (!result.data?.success) {
         throw new Error(result.data?.error || "Contact submission failed");
       }
+
+      trackLeadSubmitted("contact_page", {
+        inquiry_type: "contact_inquiry",
+        business_type: form.business_type || "Not specified",
+      });
 
       setSuccess(true);
     } catch (error) {
@@ -270,8 +277,8 @@ export default function Contact() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <input
                     type="text"
-                    name="website_url"
-                    value={form.website_url}
+                    name="website_hp"
+                    value={form.website_hp}
                     onChange={handleChange}
                     tabIndex={-1}
                     autoComplete="off"

@@ -24,7 +24,24 @@
         "instagram",
         "facebook",
         "twitter",
-        "tiktok_script"
+        "tiktok_script",
+        "social_starter_pack"
+      ]
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "caption_category": {
+      "type": "string",
+      "title": "Caption Category",
+      "enum": [
+        "lead_gen",
+        "social_proof"
       ]
     },
     "platform": {
@@ -90,6 +107,14 @@
     "notes": {
       "type": "string",
       "title": "Editor Notes"
+    },
+    "file_base64": {
+      "type": "string",
+      "title": "Generated File Base64"
+    },
+    "file_mime_type": {
+      "type": "string",
+      "title": "Generated File MIME Type"
     }
   },
   "required": [

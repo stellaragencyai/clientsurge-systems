@@ -40,7 +40,7 @@ export default function OnboardingProgressTracker({ currentStep = 1, completedSt
               {idx < SETUP_STEPS.length - 1 && (
                 <div
                   className="absolute left-6 top-12 w-0.5 h-6"
-                  style={{ background: isPast ? '#9a5c2e' : '#e5e7eb' }}
+                  style={{ background: isPast ? '#0077B6' : '#e5e7eb' }}
                 />
               )}
 

@@ -33,9 +33,9 @@ function SimpleCheck() {
 }
 
 const STRIPE_LINKS = {
-  starter_system: "/store",
-  growth_system: "/store",
-  elite_system: "/store",
+  starter_system: "/store?package=starter_system",
+  growth_system: "/store?package=growth_system",
+  elite_system: "/store?package=elite_system",
 };
 
 function formatMoney(amount) {
@@ -244,12 +244,12 @@ export default function Pricing() {
           background: linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.58) 100%);
         }
         .dark .pricing-card {
-          background: linear-gradient(135deg, rgba(30,22,14,0.88) 0%, rgba(20,15,8,0.72) 100%) !important;
-          border-color: rgba(200,150,92,0.18) !important;
+          background: linear-gradient(135deg, rgba(7,18,34,0.88) 0%, rgba(6,29,58,0.72) 100%) !important;
+          border-color: rgba(0,174,239,0.18) !important;
         }
         .dark .pricing-card.highlight-glow {
-          background: linear-gradient(135deg, rgba(40,28,16,0.96) 0%, rgba(28,20,10,0.88) 100%) !important;
-          border-color: rgba(200,150,92,0.35) !important;
+          background: linear-gradient(135deg, rgba(9,28,50,0.96) 0%, rgba(4,36,70,0.88) 100%) !important;
+          border-color: rgba(0,174,239,0.35) !important;
         }
         .pricing-card.highlight-glow {
           background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.84) 100%);
@@ -265,7 +265,7 @@ export default function Pricing() {
           width: 120px;
           height: 120px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(200,150,92,0.15) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(0,174,239,0.15) 0%, transparent 70%);
           pointer-events: none;
           z-index: 0;
         }

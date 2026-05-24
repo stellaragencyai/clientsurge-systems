@@ -197,11 +197,11 @@ export default function AdminLeadDetail() {
       />
 
       {failedEvents.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-700 flex-shrink-0 mt-0.5" />
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-blue-700 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-semibold text-amber-900">Manual follow-up may be needed</p>
-            <p className="text-sm text-amber-800 mt-1">
+            <p className="text-sm font-semibold text-blue-900">Manual follow-up may be needed</p>
+            <p className="text-sm text-blue-800 mt-1">
               This lead has {failedEvents.length} failed notification or workflow event{failedEvents.length === 1 ? "" : "s"}.
               Review the timeline below and follow up manually if needed.
             </p>
@@ -212,8 +212,8 @@ export default function AdminLeadDetail() {
       {failedEvents.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {failedEvents.slice(0, 3).map((event) => (
-            <div key={event.id} className="rounded-lg border border-amber-200 bg-white p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-800 mb-2">
+            <div key={event.id} className="rounded-lg border border-blue-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-blue-800 mb-2">
                 {event.channel || "workflow"} failure
               </p>
               <p className="text-sm font-medium text-foreground mb-2">

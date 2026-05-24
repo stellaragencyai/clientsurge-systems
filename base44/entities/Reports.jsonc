@@ -1,0 +1,68 @@
+{
+  "name": "Reports",
+  "type": "object",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "report_type": {
+      "type": "string",
+      "title": "Report Type",
+      "enum": [
+        "monthly_performance",
+        "competitor_audit",
+        "lead_magnet_summary",
+        "custom"
+      ],
+      "default": "monthly_performance"
+    },
+    "period": {
+      "type": "string",
+      "title": "Period"
+    },
+    "title": {
+      "type": "string",
+      "title": "Title"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "draft",
+        "sent",
+        "delivered",
+        "failed"
+      ],
+      "default": "draft"
+    },
+    "metrics_json": {
+      "type": "string",
+      "title": "Metrics JSON"
+    },
+    "html": {
+      "type": "string",
+      "title": "HTML"
+    },
+    "sent_to": {
+      "type": "string",
+      "title": "Sent To"
+    },
+    "sent_at": {
+      "type": "string",
+      "title": "Sent At"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Metadata JSON"
+    }
+  }
+}

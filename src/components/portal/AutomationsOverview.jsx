@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 
 const STATUS_COLORS = {
-  active: "#00FFB3", paused: "#F59E0B", error: "#EF4444", pending: "#9CA3AF",
+  active: "#00FFB3", paused: "#00AEEF", error: "#EF4444", pending: "#9CA3AF",
 };
 
 export default function AutomationsOverview({ order_id }) {
