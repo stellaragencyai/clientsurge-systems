@@ -22,6 +22,23 @@ const ServiceComparisonModal = lazy(() => import("@/components/store/ServiceComp
 const BuildYourStackFlow = lazy(() => import("@/components/store/BuildYourStackFlow"));
 const BundleSavingsToast = lazy(() => import("@/components/store/BundleSavingsToast"));
 
+function StoreSuspenseFallback({ minHeight = 240 }) {
+  return (
+    <div
+      aria-hidden="true"
+      className="animate-pulse"
+      style={{
+        minHeight,
+        width: "100%",
+        borderRadius: "18px",
+        background:
+          "linear-gradient(90deg, rgba(0,174,239,0.07), rgba(255,255,255,0.86), rgba(0,119,182,0.07))",
+        border: "1px solid rgba(0,136,204,0.12)"
+      }}
+    />
+  );
+}
+
 function StoreInner() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
@@ -801,13 +818,13 @@ function StoreInner() {
             null}
 
             {items.length > 0 ?
-            <Suspense fallback={null}>
+            <Suspense fallback={<StoreSuspenseFallback minHeight={320} />}>
                 <InteractiveStackBuilder />
               </Suspense> :
             null}
           </div>
 
-          <Suspense fallback={null}>
+          <Suspense fallback={<StoreSuspenseFallback minHeight={360} />}>
             <BuildYourStackFlow />
             <BundleSavingsToast />
           </Suspense>
@@ -839,11 +856,11 @@ function StoreInner() {
              </p>
            </div>
            <Footer />
-           <Suspense fallback={null}>
+           <Suspense fallback={<StoreSuspenseFallback minHeight={96} />}>
              <SocialProofTicker />
            </Suspense>
            {showComparison &&
-          <Suspense fallback={null}>
+          <Suspense fallback={<StoreSuspenseFallback minHeight={360} />}>
                <ServiceComparisonModal onClose={() => setShowComparison(false)} />
              </Suspense>
           }

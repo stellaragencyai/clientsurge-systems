@@ -9,6 +9,7 @@ import {
   sendCommunicationViaOutbox,
   sendResendEmailProvider,
 } from "../_shared/communicationOutbox.js";
+import { buildAppUrl } from "../_shared/appUrl.js";
 
 function escapeHtml(value: unknown) {
   return String(value ?? "")
@@ -60,7 +61,7 @@ Deno.serve(async (req) => {
       "Custom Service Bundle";
     const portalUrl =
       portal_activation_url ||
-      `${Deno.env.get("APP_URL") || "https://clientsurgesystems.com"}/client-portal`;
+      buildAppUrl("/client-portal");
     const customerName = escapeHtml(order.customer_name || "there");
     const businessName = escapeHtml(order.business_name || "your business");
     const serviceRows = resolveServiceRows(order, packageOffer);

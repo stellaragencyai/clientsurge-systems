@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { DemoBookingProvider, useDemoBooking } from "./DemoBookingContext";
 import Navbar from "./Navbar";
@@ -12,40 +12,41 @@ import IndustryAutomationUseCases from "./IndustryAutomationUseCases";
 import { getIndustryBySlug } from "@/lib/industryData";
 import { getFAQSchema } from "../SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
+import { buildIndustryJsonLd } from "@/utils/industryJsonLd";
 
 const INDUSTRY_SEO = {
   roofing: {
-    title: "Roofing Automation Systems | ClientSurge Systems",
+    title: "Roofing Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for Roofing Companies",
     description:
       "AI automation for roofing companies: storm-season lead surges, missed-call recovery, inspection booking, estimate follow-up, insurance and storm-damage inquiry routing, and old estimate reactivation.",
   },
   hvac: {
-    title: "HVAC Automation Systems | ClientSurge Systems",
+    title: "HVAC Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for HVAC Companies",
     description:
       "AI automation for HVAC companies: emergency call handling, seasonal demand spikes, missed-call recovery, estimate follow-up, service-call reminders, and maintenance plan automation.",
   },
   dental: {
-    title: "Dental Automation Systems | ClientSurge Systems",
+    title: "Dental Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for Dental Practices",
     description:
       "AI automation for dental practices: new patient booking, emergency dental inquiries, missed appointment recovery, treatment-plan follow-up, and review automation.",
   },
   "med-spa": {
-    title: "Med Spa Automation Systems | ClientSurge Systems",
+    title: "Med Spa Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for Med Spas",
     description:
       "AI automation for med spas: consultation booking, package lead nurture, membership follow-up, no-show reduction, review requests, and old inquiry reactivation.",
   },
   chiropractic: {
-    title: "Chiropractic Automation Systems | ClientSurge Systems",
+    title: "Chiropractic Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for Chiropractic Clinics",
     description:
       "AI automation for chiropractic clinics: new patient intake, appointment reminders, unfinished care plan follow-up, reactivation campaigns, and review automation.",
   },
   contractors: {
-    title: "Contractor Automation Systems | ClientSurge Systems",
+    title: "Contractor Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
     h1: "AI Automation Systems for Contractors",
     description:
       "AI automation for contractors: project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation.",
@@ -56,7 +57,7 @@ function IndustryTemplateInner({ industrySlug }) {
   const industry = getIndustryBySlug(industrySlug);
   const seo = INDUSTRY_SEO[industrySlug];
   const demoBooking = useDemoBooking();
-  const [notFound, setNotFound] = useState(!industry);
+  const notFound = !industry;
 
   useEffect(() => {
     if (!industry) return;
@@ -69,8 +70,10 @@ function IndustryTemplateInner({ industrySlug }) {
       ogDescription: seo?.description || industry.hero?.subheadline || `AI automation built specifically for ${industry.name}.`,
     });
     const cleanupFaq = setJsonLd(`industry-faq-${industrySlug}`, getFAQSchema(industry.faqs || []));
+    const cleanupIndustryJsonLd = setJsonLd(`industry-local-business-${industrySlug}`, buildIndustryJsonLd(industrySlug));
 
     return () => {
+      cleanupIndustryJsonLd?.();
       cleanupFaq?.();
       cleanupMetadata?.();
     };

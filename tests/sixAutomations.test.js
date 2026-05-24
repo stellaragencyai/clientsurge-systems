@@ -13,6 +13,17 @@ const industryTemplate = readFileSync(
 
 test("the public offer is packaged around exactly six automation systems", () => {
   assert.equal(SIX_AUTOMATIONS.length, 6);
+  assert.deepEqual(
+    SIX_AUTOMATIONS.map((automation) => automation.title),
+    [
+      "Missed-Call Text-Back Automation",
+      "Lead Capture Automation",
+      "AI Lead Follow-Up Automation",
+      "Appointment Booking Automation",
+      "Review & Reputation Automation",
+      "Reactivation / Win-Back Automation",
+    ]
+  );
   assert.deepEqual(getAutomationRoutes(), [
     "/missed-call-text-back",
     "/lead-capture-automation",
@@ -48,7 +59,9 @@ test("sitemap prioritizes canonical public marketing pages", () => {
 
 test("homepage and industry pages surface the six-automation architecture", () => {
   assert.match(home, /SixAutomationSystems/);
+  assert.match(home, /ProofBeforeLaunch/);
   assert.match(home, /six done-for-you automations/);
+  assert.match(home, /lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation/);
   assert.match(industryTemplate, /IndustryAutomationUseCases/);
 });
 

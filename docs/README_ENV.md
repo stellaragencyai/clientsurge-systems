@@ -3,6 +3,8 @@
 
 All environment variables required for production. Set via Base44 → Settings → Environment Variables.
 
+For pre-launch QA, use `docs/STAGING_ENVIRONMENT.md` and the Base44 test database / test workspace. Do not point staging tests at production customer records, live Stripe charges, or real customer SMS/email recipients.
+
 ## Required (system won't function without these)
 
 | Variable | Used By | Description |
@@ -24,9 +26,12 @@ All environment variables required for production. Set via Base44 → Settings �
 | `RETELL_API_KEY` | triggerOutboundCall | Retell AI voice agent key |
 | `ELEVENLABS_API_KEY` | voice clone generation | ElevenLabs API key |
 | `APOLLO_API_KEY` | Apollo lead enrichment | Apollo.io API key |
+| `VITE_GA4_MEASUREMENT_ID` | frontend analytics bootstrap | Public GA4 web stream measurement ID (`G-...`); not a secret |
 
 ## Notes
 - Never commit secret keys to source control
+- Production `APP_URL` must be `https://clientsurgesystems.com`; localhost values are local development only
 - All `sk_live_` keys must be kept server-side only — run `python3 scripts/scanSecretKeyExposure.py` to verify
 - Stripe test keys (`sk_test_`) are safe for staging only
+- Staging must use test-mode provider credentials, test-safe recipients, and the Base44 test database / test workspace
 - Twilio messaging service SID must have A2P 10DLC brand registered before SMS goes live

@@ -18,6 +18,8 @@
     <link rel="preconnect" href="https://api.resend.com" crossorigin />
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;600&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;600&display=swap" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@700;800;900&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@700;800;900&display=swap" />
     <link rel="preload" as="image" href="/og-image.png" />
     <link rel="alternate" hreflang="en-US" href="https://clientsurgesystems.com/" />
     <link rel="icon" type="image/png" href="/favicon.ico" />
@@ -37,6 +39,8 @@
     <meta property="og:title" content="AI Automation Systems That Turn More Local Leads Into Booked Jobs" />
     <meta property="og:description" content="ClientSurge builds AI voice-agent, follow-up, missed-call recovery, and booking automation systems for local service businesses." />
     <meta property="og:image" content="https://clientsurgesystems.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:site" content="@clientsurge" />
     <meta property="twitter:url" content="https://clientsurgesystems.com/" />
@@ -176,13 +180,15 @@
         var aliases = {
           "/Blog": "/blog",
           "/IndustriesPage": "/industries",
+          "/IndustryTemplate": "/industries",
           "/Roofing": "/roofing",
           "/HVAC": "/hvac",
           "/Dental": "/dental",
           "/MedSpa": "/med-spa",
           "/Chiropractic": "/chiropractic",
           "/Contractors": "/contractors",
-          "/legal/privacy": "/privacy-policy"
+          "/legal/privacy": "/privacy-policy",
+          "/legal/terms": "/terms"
         };
         var noindexPrefixes = [
           "/admin",
@@ -728,13 +734,7 @@
         </div>
       </main>
     </div>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5D6B0X101F"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-5D6B0X101F');
-    </script>
+    <!-- GA4 loads from the React bootstrap when VITE_GA4_MEASUREMENT_ID is configured. -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

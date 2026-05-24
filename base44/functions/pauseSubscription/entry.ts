@@ -1,112 +1,157 @@
+/**
+ * pauseSubscription — #529
+ * Admin-only pause-collection wrapper for Stripe subscriptions plus local audit state.
+ */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { AuthGuardError, requireAuthenticatedUser } from "../_shared/authGuards.js";
-import {
-  buildPauseCollectionParams,
-  canManageBillingOrder,
-} from "../_shared/subscriptionPauseResume.js";
+import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
+import { buildCommunicationEvent } from "../_shared/installPipeline.js";
+import { stripeRequest } from "../shared/stripeInit.ts";
 
-async function stripeUpdateSubscription(subscriptionId, params) {
-  const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-  if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not configured");
+const PAUSE_BEHAVIORS = new Set(["void", "keep_as_draft", "mark_uncollectible"]);
 
-  const response = await fetch(`https://api.stripe.com/v1/subscriptions/${subscriptionId}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${stripeKey}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: params.toString(),
-  });
+function cleanString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
 
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data?.error?.message || `Stripe subscription pause failed (${response.status})`);
+function normalizePauseBehavior(value: unknown): string {
+  const normalized = cleanString(value) || "void";
+  return PAUSE_BEHAVIORS.has(normalized) ? normalized : "";
+}
+
+function normalizeResumesAt(value: unknown): { unix: string; iso: string | null } {
+  if (!value) {
+    return { unix: "", iso: null };
   }
-  return data;
+
+  const date = typeof value === "number"
+    ? new Date(value * 1000)
+    : new Date(String(value));
+
+  if (Number.isNaN(date.getTime())) {
+    return { unix: "", iso: null };
+  }
+
+  return {
+    unix: String(Math.floor(date.getTime() / 1000)),
+    iso: date.toISOString(),
+  };
+}
+
+async function findSubscriptionRecord(base44: any, order: any) {
+  if (order.subscription_id) {
+    const byId = await base44.asServiceRole.entities.Subscription.get(order.subscription_id).catch(() => null);
+    if (byId) return byId;
+  }
+
+  if (order.stripe_subscription_id) {
+    const matches = await base44.asServiceRole.entities.Subscription.filter({
+      stripe_subscription_id: order.stripe_subscription_id,
+    }).catch(() => []);
+    return matches?.[0] || null;
+  }
+
+  return null;
 }
 
 Deno.serve(async (req) => {
   try {
-    if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
-    }
-
     const base44 = createClientFromRequest(req);
-    const user = await requireAuthenticatedUser(base44);
-    const payload = await req.json().catch(() => ({}));
-    const { order_id, behavior = "void", resumes_at, reason = "client_request" } = payload;
+    const user = await requireAdminUser(base44);
+    const {
+      order_id,
+      reason = "operator_pause",
+      behavior,
+      resumes_at,
+    } = await req.json().catch(() => ({}));
 
     if (!order_id) {
       return Response.json({ error: "order_id required" }, { status: 400 });
+    }
+
+    const pauseBehavior = normalizePauseBehavior(behavior);
+    if (!pauseBehavior) {
+      return Response.json({ error: "Invalid pause behavior" }, { status: 400 });
     }
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order) {
       return Response.json({ error: "Order not found" }, { status: 404 });
     }
-    if (!canManageBillingOrder({ user, order })) {
-      return Response.json({ error: "Forbidden" }, { status: 403 });
-    }
+
     if (!order.stripe_subscription_id) {
-      return Response.json({ error: "Order has no Stripe subscription" }, { status: 400 });
+      return Response.json({ error: "No Stripe subscription on order" }, { status: 400 });
     }
 
-    const params = buildPauseCollectionParams({ behavior, resumes_at });
-    const stripeSubscription = await stripeUpdateSubscription(order.stripe_subscription_id, params);
+    const resumeAt = normalizeResumesAt(resumes_at);
+    const params = new URLSearchParams();
+    params.set("pause_collection[behavior]", pauseBehavior);
+    if (resumeAt.unix) {
+      params.set("pause_collection[resumes_at]", resumeAt.unix);
+    }
+
+    const stripeSubscription = await stripeRequest(
+      `/subscriptions/${order.stripe_subscription_id}`,
+      params.toString()
+    );
     const now = new Date().toISOString();
-    const resumeAtIso = stripeSubscription.pause_collection?.resumes_at
-      ? new Date(stripeSubscription.pause_collection.resumes_at * 1000).toISOString()
-      : null;
+    const subscriptionRecord = await findSubscriptionRecord(base44, order);
 
     const orderPatch = {
-      billing_status: "paused",
-      subscription_status: "paused",
+      billing_status: "paused_collection",
+      subscription_status: stripeSubscription.status || order.subscription_status || "active",
+      subscription_pause_behavior: pauseBehavior,
+      subscription_pause_reason: cleanString(reason) || "operator_pause",
       subscription_paused_at: now,
-      subscription_pause_resumes_at: resumeAtIso,
+      subscription_pause_resumes_at: resumeAt.iso,
+      last_billing_event_at: now,
     };
-    await base44.asServiceRole.entities.Order.update(order_id, orderPatch);
 
-    if (order.subscription_id) {
-      await base44.asServiceRole.entities.Subscription.update(order.subscription_id, {
-        status: "paused",
-        paused_at: now,
-        pause_resumes_at: resumeAtIso,
+    const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, orderPatch);
+
+    if (subscriptionRecord?.id) {
+      await base44.asServiceRole.entities.Subscription.update(subscriptionRecord.id, {
+        status: stripeSubscription.status || subscriptionRecord.status || "active",
+        pause_collection_behavior: pauseBehavior,
+        pause_collection_reason: cleanString(reason) || "operator_pause",
+        pause_collection_resumes_at: resumeAt.iso,
+        paused_collection_at: now,
         updated_at: now,
-      }).catch(() => null);
+      });
     }
 
-    await base44.asServiceRole.entities.CommunicationEvent.create({
-      order_id,
-      client_id: order.client_id || null,
-      context_type: "billing",
-      context_id: order_id,
-      channel: "internal",
-      direction: "system",
-      event_type: "status_update",
-      provider: "stripe",
-      status: "processed",
-      subject: "Subscription payment collection paused",
-      message_body: `Subscription payment collection paused with behavior ${params.get("pause_collection[behavior]")}.`,
-      metadata_json: JSON.stringify({
-        stripe_subscription_id: order.stripe_subscription_id,
-        pause_collection: stripeSubscription.pause_collection || null,
-        reason,
-        actor_email: user.email || null,
-      }),
-    }).catch(() => null);
+    await base44.asServiceRole.entities.CommunicationEvent.create(
+      buildCommunicationEvent({
+        order: updatedOrder,
+        event_type: "status_update",
+        provider: "stripe",
+        status: "processed",
+        subject: "Subscription payment collection paused",
+        message_body: `Admin ${user.email || user.id || "operator"} paused payment collection using ${pauseBehavior}.`,
+        metadata: {
+          context_type: "subscription_pause",
+          stripe_subscription_id: order.stripe_subscription_id,
+          behavior: pauseBehavior,
+          reason: cleanString(reason) || "operator_pause",
+          resumes_at: resumeAt.iso,
+        },
+      })
+    );
 
     return Response.json({
       success: true,
-      order_id,
+      order_id: order.id,
       stripe_subscription_id: order.stripe_subscription_id,
-      billing_status: orderPatch.billing_status,
-      pause_collection: stripeSubscription.pause_collection || null,
+      stripe_status: stripeSubscription.status || null,
+      pause_collection: stripeSubscription.pause_collection || {
+        behavior: pauseBehavior,
+        resumes_at: resumeAt.unix || null,
+      },
     });
-  } catch (error) {
-    if (error instanceof AuthGuardError) {
-      return Response.json({ error: error.message, code: error.code }, { status: error.status });
+  } catch (err: any) {
+    if (err instanceof AuthGuardError) {
+      return Response.json({ error: err.message, code: err.code }, { status: err.status });
     }
-    console.error("[pauseSubscription] Error:", error.message);
-    return Response.json({ error: error.message || "Failed to pause subscription" }, { status: 500 });
+
+    return Response.json({ error: err.message }, { status: 500 });
   }
 });

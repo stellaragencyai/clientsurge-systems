@@ -36,7 +36,7 @@ function buildReportHtml(client_name: string, metrics: any): string {
         ["Total Leads", metrics.totalLeads, "#00D4FF"],
         ["Leads Contacted", metrics.contacted, "#00FFB3"],
         ["Demos Booked", metrics.booked, "#A78BFA"],
-        ["Response Rate", `${metrics.responseRate}%`, "#F59E0B"],
+        ["Response Rate", `${metrics.responseRate}%`, "#0077B6"],
       ].map(([label, val, color]) => `<div style="border:1px solid #E5E7EB;border-radius:12px;padding:16px 18px">
         <p style="color:#6B7280;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 4px">${label}</p>
         <p style="color:${color};font-size:26px;font-weight:900;margin:0">${val}</p>

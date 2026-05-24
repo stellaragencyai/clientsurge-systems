@@ -164,6 +164,14 @@ Required fix:
 10. Confirm custom domain publish state for `clientsurgesystems.com`.
 11. Run final end-to-end production launch checklist.
 
+## Staging Requirement
+
+Use `docs/STAGING_ENVIRONMENT.md` before production launch proof. All pre-launch checkout, activation, SMS, email, and provider proof should run through local fixtures, the Base44 test database / test workspace, Stripe test mode, and test-safe Twilio/Resend paths before any production publish or live customer-facing action.
+
+## Rollback And 24-Hour Monitoring
+
+Before any production launch window, use `docs/POST_LAUNCH_ROLLBACK_PLAN.md` as the operator rollback plan. It defines the go-live proof order, rollback triggers, Stripe/email/SMS recovery steps, and 15-minute/1-hour/4-hour/12-hour/24-hour monitoring checks.
+
 ## Do Not Launch Until
 
 - Stripe webhook proof passes.

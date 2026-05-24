@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
 <html>
 <body style="font-family:sans-serif;background:#f5f5f5;padding:24px;">
   <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;border:1px solid #e5e5e5;overflow:hidden;">
-    <div style="background:linear-gradient(135deg,#6b3f1f,#9a5c2e);padding:24px 28px;">
+    <div style="background:linear-gradient(135deg,#005B99,#0077B6);padding:24px 28px;">
       <p style="margin:0;color:rgba(255,255,255,0.7);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">ClientSurge Systems</p>
       <h1 style="margin:8px 0 0;color:#fff;font-size:22px;font-weight:700;">New Lead Submitted 🎯</h1>
     </div>
@@ -116,7 +116,7 @@ Deno.serve(async (req) => {
         <tr style="background:#fafafa;"><td style="padding:8px 6px;color:#888;vertical-align:top;font-weight:600;">Submitted</td><td style="padding:8px 6px;color:#888;font-size:12px;">${submittedAt}</td></tr>
       </table>
       <div style="margin-top:24px;">
-        <a href="https://clientsurgesystems.com/admin/leads/${lead.id}" style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
+        <a href="https://clientsurgesystems.com/admin/leads/${lead.id}" style="display:inline-block;background:linear-gradient(135deg,#005B99,#0077B6);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
           View Lead in Dashboard →
         </a>
       </div>

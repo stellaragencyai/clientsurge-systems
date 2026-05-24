@@ -252,12 +252,12 @@ async function sendUserThankYouEmail(
       <h2>Thanks for Reaching Out, ${firstName}!</h2>
       <p style="color:#555;line-height:1.6;">We've received your message and we're excited to learn more about how we can help your business ${escapeHtml(businessTypeGreeting)}.</p>
       
-      <div style="background:#f9f9f9;border-left:4px solid #9a5c2e;padding:16px;margin:24px 0;border-radius:4px;">
+      <div style="background:#f9f9f9;border-left:4px solid #0077B6;padding:16px;margin:24px 0;border-radius:4px;">
         <p style="margin:0;color:#666;font-size:14px;"><strong>What happens next:</strong></p>
         <ul style="margin:8px 0 0 0;padding-left:20px;color:#666;font-size:14px;">
           <li>Our team will review your inquiry</li>
           <li>We'll get back to you within one business day</li>
-          <li>If you'd prefer to chat sooner, <a href="https://clientsurgesystems.com/book" style="color:#9a5c2e;text-decoration:none;">book a free 15-minute demo</a></li>
+          <li>If you'd prefer to chat sooner, <a href="https://clientsurgesystems.com/book" style="color:#0077B6;text-decoration:none;">book a free 15-minute demo</a></li>
         </ul>
       </div>
 
@@ -266,7 +266,7 @@ async function sendUserThankYouEmail(
       <p style="color:#999;font-size:12px;margin-top:32px;border-top:1px solid #eee;padding-top:16px;">
         <strong>ClientSurge Systems</strong><br>
         Phoenix, Arizona<br>
-        <a href="mailto:system@clientsurgesystems.com" style="color:#9a5c2e;text-decoration:none;">system@clientsurgesystems.com</a>
+        <a href="mailto:system@clientsurgesystems.com" style="color:#0077B6;text-decoration:none;">system@clientsurgesystems.com</a>
       </p>
     </div>
   `;

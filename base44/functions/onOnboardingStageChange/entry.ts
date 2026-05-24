@@ -1,9 +1,11 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { getAppUrl } from "../_shared/appUrl.js";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RESEND_FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL");
 const ADMIN_EMAIL = Deno.env.get("ADMIN_EMAIL") || "nolan@clientsurgesystems.com";
-const APP_URL = (Deno.env.get("APP_URL") || "https://clientsurgesystems.com").replace(/\/+$/, "");
+const PRODUCTION_APP_URL = "https://clientsurgesystems.com";
+const APP_URL = getAppUrl();
 const PORTAL_URL = `${APP_URL}/client-portal`;
 
 async function sendEmail({ to, subject, html, fromName = "ClientSurge Systems" }) {
@@ -78,8 +80,8 @@ const STAGE_EMAILS = {
         <p style="font-size:15px;line-height:1.7;">
           Great news — your <strong>SMS automation</strong> for ${project.business_name} is now live and active!
         </p>
-        <div style="background:#f9f4ef;border-left:4px solid #9a5c2e;border-radius:6px;padding:16px 20px;margin:20px 0;">
-          <p style="font-size:14px;font-weight:700;color:#9a5c2e;margin:0 0 8px;">What this means:</p>
+        <div style="background:#f8fbff;border-left:4px solid #0077B6;border-radius:6px;padding:16px 20px;margin:20px 0;">
+          <p style="font-size:14px;font-weight:700;color:#0077B6;margin:0 0 8px;">What this means:</p>
           <ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.8;">
             <li>New leads receive an instant SMS response within 60 seconds</li>
             <li>Missed calls trigger an automatic text-back</li>
@@ -142,7 +144,7 @@ const STAGE_EMAILS = {
     subject: "🚀 You're LIVE! Your full system is up and running",
     clientBody: (project) => `
       <div style="font-family:'Helvetica Neue',Arial,sans-serif;max-width:580px;margin:0 auto;color:#2d2d2d;">
-        <div style="background:linear-gradient(135deg,#6b3f1f,#9a5c2e);border-radius:12px;padding:28px;color:#fff;margin-bottom:28px;text-align:center;">
+        <div style="background:linear-gradient(135deg,#005B99,#0077B6);border-radius:12px;padding:28px;color:#fff;margin-bottom:28px;text-align:center;">
           <h1 style="font-size:28px;margin:0 0 8px;">🚀 You're LIVE!</h1>
           <p style="font-size:16px;margin:0;opacity:0.9;">Your full automation system is up and running for ${project.business_name}</p>
         </div>
@@ -150,7 +152,7 @@ const STAGE_EMAILS = {
         <p style="font-size:15px;line-height:1.7;">
           Your complete AI automation system is officially <strong>live and working</strong>. Here's what's running 24/7 for you:
         </p>
-        <div style="background:#f9f4ef;border-left:4px solid #9a5c2e;border-radius:6px;padding:16px 20px;margin:20px 0;">
+        <div style="background:#f8fbff;border-left:4px solid #0077B6;border-radius:6px;padding:16px 20px;margin:20px 0;">
           <ul style="margin:0;padding-left:18px;font-size:14px;line-height:2;">
             <li>✅ Instant SMS response to every new lead (under 60 seconds)</li>
             <li>✅ Missed call text-back running automatically</li>
@@ -170,7 +172,7 @@ const STAGE_EMAILS = {
         <p style="font-size:15px;line-height:1.7;">
           Thank you for trusting us to build this for you. Excited to see the results roll in! 🎉<br/><br/>
           — <strong>Nolan</strong><br/>
-          <span style="color:#9a5c2e;">ClientSurge Systems</span>
+          <span style="color:#0077B6;">ClientSurge Systems</span>
         </p>
       </div>
     `,

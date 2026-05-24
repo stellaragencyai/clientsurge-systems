@@ -76,7 +76,7 @@ export default function Industries() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <section className="text-center pr-2 pl-2 pt-24 pb-4" style={{ background: "linear-gradient(to bottom, hsl(40,8%,88%), hsl(0,0%,100%))" }}>
-        <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Industries</p>
+        <p className="text-xs font-semibold text-[#005f99] tracking-widest uppercase mb-4">Industries</p>
         <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
           Automation for Appointment-Based Businesses
         </h1>
@@ -101,7 +101,7 @@ export default function Industries() {
                   <span
                     className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${
                     isLive ?
-                    "bg-primary/10 text-primary border border-primary/20" :
+                    "bg-[#005f99]/10 text-[#005f99] border border-[#005f99]/25" :
                     "bg-muted text-muted-foreground border border-border"}`
                     }>
                     
@@ -113,7 +113,7 @@ export default function Industries() {
                 {isLive ?
                 <a
                   href={industry.href}
-                  className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors">
+                  className="inline-flex items-center gap-2 rounded-full border border-[#005f99]/25 bg-[#005f99]/5 px-4 py-2 text-sm font-semibold text-[#005f99] hover:bg-[#005f99]/10 transition-colors">
                   
                     Explore this industry
                     <ArrowRight className="w-4 h-4" />

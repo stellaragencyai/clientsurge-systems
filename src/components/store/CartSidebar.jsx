@@ -643,7 +643,7 @@ export default function CartSidebar() {
               }}
             >
               Secured by Stripe · Cancel anytime ·{" "}
-              <a href="/legal/terms" target="_blank" style={{ color: "rgba(26,18,9,0.45)", textDecoration: "underline" }}>
+              <a href="/terms" target="_blank" style={{ color: "rgba(26,18,9,0.45)", textDecoration: "underline" }}>
                 Refund Policy
               </a>
             </p>

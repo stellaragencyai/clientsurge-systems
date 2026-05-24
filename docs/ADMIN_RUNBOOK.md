@@ -101,6 +101,8 @@ Internal operating guide for setup, configuration, troubleshooting, escalation, 
 
 ## Backup And Restore
 
+Use `docs/DATA_BACKUP_STRATEGY.md` for the full Base44 entity backup cadence, monthly Google Sheets archive format, verification checklist, and restore-drill process.
+
 1. Before bulk imports or large admin mutations, export affected Leads, Orders, and CommunicationEvents.
 2. Preserve provider IDs: `MessageSid`, `CallSid`, Stripe event ID, invoice ID, and session ID.
 3. Restore by creating compensating records or targeted updates, not broad overwrite scripts.

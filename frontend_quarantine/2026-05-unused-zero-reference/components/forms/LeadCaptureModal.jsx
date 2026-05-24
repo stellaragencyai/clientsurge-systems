@@ -19,6 +19,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
     monthly_leads: '',
     biggest_issue: '',
     lead_source: [],
+    consent_given: false,
     website_url: '',
   });
 
@@ -103,6 +104,12 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
         phone: formData.phone,
         business_type: formData.business_type,
         problem: buildProblemSummary(),
+        source: "lead_capture_modal",
+        source_page: typeof window !== "undefined" ? window.location.pathname : "/",
+        requested_channels: ["sms", "email"],
+        consent_given: formData.consent_given === true,
+        consent_source: "lead_capture_modal",
+        consent_text_version: "lead_capture_explicit_checkbox_v1",
         website_url: formData.website_url,
       });
 
@@ -144,6 +151,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
       monthly_leads: '',
       biggest_issue: '',
       lead_source: [],
+      consent_given: false,
       website_url: '',
     });
     onClose();
@@ -151,7 +159,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
 
   const canProceedStep1 = formData.full_name && formData.business_name && formData.email && formData.phone;
   const canProceedStep2 = formData.business_type && formData.monthly_leads;
-  const canSubmit = canProceedStep2 && formData.biggest_issue && formData.lead_source.length > 0;
+  const canSubmit = canProceedStep2 && formData.biggest_issue && formData.lead_source.length > 0 && formData.consent_given;
 
   if (!isOpen) return null;
 
@@ -393,6 +401,25 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                      ))}
                    </div>
                  </div>
+
+                 <label className="flex items-start gap-2.5 rounded-lg border border-border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
+                   <input
+                     type="checkbox"
+                     name="consent_given"
+                     checked={formData.consent_given}
+                     onChange={(e) => setFormData(prev => ({ ...prev, consent_given: e.target.checked }))}
+                     disabled={loading}
+                     required
+                     className="mt-0.5 h-4 w-4 rounded accent-amber-600"
+                   />
+                   <span>
+                     I agree to receive automated SMS and email messages from ClientSurge Systems about my inquiry.
+                     Msg &amp; data rates may apply. Reply <strong>STOP</strong> to opt out. See our{" "}
+                     <a href="/privacy-policy" className="underline hover:text-foreground">Privacy Policy</a>
+                     {" "}and{" "}
+                     <a href="/terms" className="underline hover:text-foreground">Terms</a>.
+                   </span>
+                 </label>
                </div>
              )}
 
@@ -458,5 +485,4 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
             </div>
             );
             }
-
 

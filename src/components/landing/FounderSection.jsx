@@ -31,7 +31,7 @@ export default function FounderSection() {
                   alt="Nolan Strommer, founder of ClientSurge Systems"
                   width="400"
                   height="480"
-                  onError={(e) => { e.target.src = "https://placehold.co/400x480/f5e6d0/9a5c2e?text=Photo+Coming+Soon"; }}
+                  onError={(e) => { e.target.src = "https://placehold.co/400x480/e8f4ff/0077b6?text=Photo+Coming+Soon"; }}
                   className="w-full h-full object-cover object-top"
                   loading="lazy"
                 />

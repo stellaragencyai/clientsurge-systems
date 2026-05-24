@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     // Welcome email to the new client
     const clientHtml = `
       <div style="font-family: 'Inter', sans-serif; max-width: 560px; margin: 0 auto; background: #fff; border-radius: 16px; overflow: hidden; border: 1px solid #e5e0d8;">
-        <div style="background: linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 60%, #c8965c 100%); padding: 40px 40px 32px;">
+        <div style="background: linear-gradient(135deg, #005B99 0%, #0077B6 60%, #00AEEF 100%); padding: 40px 40px 32px;">
           <h1 style="color: #f5e6d0; font-size: 28px; font-weight: 700; margin: 0 0 8px;">Welcome to ClientSurge Systems</h1>
           <p style="color: rgba(245,230,208,0.75); font-size: 15px; margin: 0;">Your automation system is being built</p>
         </div>
@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
             Questions? Just reply to this email or message us in your portal. We typically respond within a few hours.
           </p>
         </div>
-        <div style="padding: 20px 40px; background: #faf8f5; border-top: 1px solid #e5e0d8; text-align: center;">
+        <div style="padding: 20px 40px; background: #f8fbff; border-top: 1px solid #e5e0d8; text-align: center;">
           <p style="font-size: 12px; color: #aaa; margin: 0;">© ${new Date().getFullYear()} ClientSurge Systems · Built for businesses that run on bookings</p>
         </div>
       </div>
@@ -91,10 +91,10 @@ Deno.serve(async (req) => {
           <table style="width: 100%; border-collapse: collapse; font-size: 14px; color: #333;">
             <tr><td style="padding: 8px 0; font-weight: 600; width: 140px;">Name</td><td style="padding: 8px 0;">${safeClientName}</td></tr>
             <tr><td style="padding: 8px 0; font-weight: 600;">Business</td><td style="padding: 8px 0;">${safeBusinessName}</td></tr>
-            <tr><td style="padding: 8px 0; font-weight: 600;">Email</td><td style="padding: 8px 0;"><a href="mailto:${safeClientEmail}" style="color: #9a5c2e;">${safeClientEmail}</a></td></tr>
+            <tr><td style="padding: 8px 0; font-weight: 600;">Email</td><td style="padding: 8px 0;"><a href="mailto:${safeClientEmail}" style="color: #0077B6;">${safeClientEmail}</a></td></tr>
             <tr><td style="padding: 8px 0; font-weight: 600;">Time</td><td style="padding: 8px 0;">${new Date().toLocaleString('en-US', { timeZone: 'America/Phoenix' })} (AZ)</td></tr>
           </table>
-          <div style="margin-top: 24px; padding: 16px; background: #faf8f5; border-radius: 8px; border-left: 4px solid #9a5c2e;">
+          <div style="margin-top: 24px; padding: 16px; background: #f8fbff; border-radius: 8px; border-left: 4px solid #0077B6;">
             <p style="margin: 0; font-size: 13px; color: #555;">A Client record, ClientProject, and portal invitation have been automatically created. Follow up within 24 hours.</p>
           </div>
         </div>

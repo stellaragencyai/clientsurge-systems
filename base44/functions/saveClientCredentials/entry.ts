@@ -11,6 +11,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { getAppUrl } from "../_shared/appUrl.js";
 
 const REQUIRED_FIELDS_BY_TIER = {
   starter: [
@@ -152,7 +153,7 @@ Deno.serve(async (req) => {
 
     try {
       const adminEmail = Deno.env.get("ADMIN_NOTIFICATION_EMAIL") || "nolan@clientsurgesystems.com";
-      const appUrl = Deno.env.get("APP_URL") || "https://clientsurgesystems.com";
+      const appUrl = getAppUrl();
       const blockers = intelligenceResult?.blockers || [];
       const autoFilled = intelligenceResult?.auto_filled || [];
 
@@ -166,10 +167,10 @@ Deno.serve(async (req) => {
   <p style="color:#555;margin:0 0 20px;"><strong>${order.business_name}</strong> (${order.customer_email}) just completed their setup intake form.</p>
 
   <div style="background:${intelligenceResult?.ready_to_activate ? "#f0fdf4" : "#fffbeb"};border:1px solid ${intelligenceResult?.ready_to_activate ? "#86efac" : "#fcd34d"};border-radius:10px;padding:16px;margin-bottom:20px;">
-    <p style="font-weight:700;color:${intelligenceResult?.ready_to_activate ? "#16a34a" : "#92400e"};margin:0 0 8px;">
+    <p style="font-weight:700;color:${intelligenceResult?.ready_to_activate ? "#16a34a" : "#005B99"};margin:0 0 8px;">
       ${intelligenceResult?.ready_to_activate ? "✅ Ready for Canonical Install Review" : "⚠️ Activation Deferred — Blockers Found"}
     </p>
-    ${blockers.length > 0 ? `<ul style="margin:0;padding-left:20px;color:#92400e;font-size:13px;">${blockers.map((blocker) => `<li>${blocker}</li>`).join("")}</ul>` : ""}
+    ${blockers.length > 0 ? `<ul style="margin:0;padding-left:20px;color:#005B99;font-size:13px;">${blockers.map((blocker) => `<li>${blocker}</li>`).join("")}</ul>` : ""}
     ${autoFilled.length > 0 ? `<p style="font-size:13px;color:#555;margin:8px 0 0;">Auto-filled: ${autoFilled.join(", ")}</p>` : ""}
     ${activationDeferredReason ? `<p style="font-size:13px;color:#166534;margin:8px 0 0;">${activationDeferredReason}</p>` : ""}
   </div>

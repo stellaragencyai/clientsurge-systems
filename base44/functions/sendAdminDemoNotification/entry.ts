@@ -30,11 +30,11 @@ Deno.serve(async (req) => {
 <html>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
   <div style="background: #1a1510; padding: 24px; border-radius: 12px 12px 0 0; text-align: center;">
-    <h1 style="color: #c8965c; margin: 0; font-size: 22px;">New Demo Booked</h1>
+    <h1 style="color: #00AEEF; margin: 0; font-size: 22px;">New Demo Booked</h1>
   </div>
   <div style="background: #fff; padding: 32px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-    <div style="background: #fdf8f0; border-left: 4px solid #c8965c; padding: 16px; margin-bottom: 24px; border-radius: 4px;">
-      <p style="margin: 0; font-size: 18px; font-weight: bold; color: #6b3f1f;">${formattedDate} at ${formattedTime}</p>
+    <div style="background: #fdf8f0; border-left: 4px solid #00AEEF; padding: 16px; margin-bottom: 24px; border-radius: 4px;">
+      <p style="margin: 0; font-size: 18px; font-weight: bold; color: #005B99;">${formattedDate} at ${formattedTime}</p>
     </div>
     <h3 style="color: #333; margin-top: 0;">Contact Info</h3>
     <table style="width: 100%; border-collapse: collapse;">

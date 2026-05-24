@@ -42,7 +42,7 @@ function buildEmailContent(
       subject: `${name}, we want to help you get back on track`,
       html: `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-  <h2 style="color:#9a5c2e">We noticed your account is on pause, ${name}</h2>
+  <h2 style="color:#0077B6">We noticed your account is on pause, ${name}</h2>
   <p>We understand that things come up — but we'd hate for <strong>${biz}</strong> to miss out on the leads and bookings that come from having an automated follow-up system in place.</p>
   <p><strong>For a limited time, we're offering a special reinstatement deal:</strong></p>
   <ul style="line-height:1.8">
@@ -51,7 +51,7 @@ function buildEmailContent(
     <li>✅ Full system audit included at no charge</li>
   </ul>
   <p>This offer is available for the next 7 days. Just reply to this email or book a quick call and we'll get you set back up immediately.</p>
-  <p style="margin-top:20px"><a href="${link}" style="background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Claim Your Offer →</a></p>
+  <p style="margin-top:20px"><a href="${link}" style="background:linear-gradient(135deg,#005B99,#0077B6);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Claim Your Offer →</a></p>
   <p style="margin-top:24px">— The ClientSurge Team</p>
 </div>`,
     };
@@ -62,7 +62,7 @@ function buildEmailContent(
       subject: `${name} — free diagnostic call to review what's working`,
       html: `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-  <h2 style="color:#9a5c2e">Let's figure out what's best for ${biz}, ${name}</h2>
+  <h2 style="color:#0077B6">Let's figure out what's best for ${biz}, ${name}</h2>
   <p>We know automation isn't one-size-fits-all. Sometimes systems need to be adjusted, simplified, or rebuilt based on how your business has changed.</p>
   <p>We'd like to offer you a <strong>free 20-minute diagnostic call</strong> — no sales pitch, just a look at:</p>
   <ul style="line-height:1.8">
@@ -71,7 +71,7 @@ function buildEmailContent(
     <li>💡 What we'd do differently if we rebuilt your system today</li>
   </ul>
   <p>If there's a fit to work together again, great. If not, you'll still walk away with clarity on your current process.</p>
-  <p style="margin-top:20px"><a href="${link}" style="background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Book Free Diagnostic →</a></p>
+  <p style="margin-top:20px"><a href="${link}" style="background:linear-gradient(135deg,#005B99,#0077B6);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Book Free Diagnostic →</a></p>
   <p style="margin-top:24px">— The ClientSurge Team</p>
 </div>`,
     };
@@ -82,11 +82,11 @@ function buildEmailContent(
     subject: `${name} — last message from us`,
     html: `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-  <h2 style="color:#9a5c2e">This is our last outreach, ${name}</h2>
+  <h2 style="color:#0077B6">This is our last outreach, ${name}</h2>
   <p>We've reached out a couple of times and we don't want to be a bother — so this will be our last message about reactivating your account.</p>
   <p>If <strong>${biz}</strong> is in a place where automated lead follow-up makes sense again, we're here. Setup takes less than a week, and most clients recover the cost within the first month.</p>
   <p>If now isn't the right time, no hard feelings. Just reply "not now" and we'll make a note for a later date.</p>
-  <p style="margin-top:20px"><a href="${link}" style="background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Reactivate My Account →</a></p>
+  <p style="margin-top:20px"><a href="${link}" style="background:linear-gradient(135deg,#005B99,#0077B6);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700">Reactivate My Account →</a></p>
   <p style="margin-top:24px">— The ClientSurge Team</p>
   <p style="font-size:11px;color:#999;margin-top:32px">Reply "unsubscribe" to stop receiving emails.</p>
 </div>`,

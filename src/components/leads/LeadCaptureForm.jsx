@@ -15,6 +15,7 @@ export default function LeadCaptureForm() {
     phone: "",
     business_type: "",
     problem: "",
+    consent_given: false,
     website_url: "",
   });
 
@@ -41,6 +42,12 @@ export default function LeadCaptureForm() {
     try {
       const result = await base44.functions.invoke("submitLeadCapture", {
         ...formData,
+        source: "lead_capture_page",
+        source_page: typeof window !== "undefined" ? window.location.pathname : "/capture-leads",
+        requested_channels: ["sms", "email"],
+        consent_given: formData.consent_given === true,
+        consent_source: "lead_capture_page",
+        consent_text_version: "lead_capture_explicit_checkbox_v1",
       });
 
       if (!result.data?.success) {
@@ -60,6 +67,8 @@ export default function LeadCaptureForm() {
         phone: "",
         business_type: "",
         problem: "",
+        consent_given: false,
+        website_url: "",
       });
 
       setTimeout(() => setSuccess(false), 5000);
@@ -204,12 +213,21 @@ export default function LeadCaptureForm() {
       </div>
 
       {/* TCPA SMS Consent */}
-      <p className="text-xs text-muted-foreground leading-relaxed border border-border rounded-lg p-3 bg-muted/30">
-        By submitting this form, you consent to receive automated SMS messages and emails from ClientSurge Systems regarding your inquiry. Message & data rates may apply. Reply <strong>STOP</strong> at any time to opt out.{" "}
-        <a href="/privacy-policy" className="underline hover:text-foreground">Privacy Policy</a>
-        {" · "}
-        <a href="/legal/terms" className="underline hover:text-foreground">Terms</a>
-      </p>
+      <label className="flex items-start gap-3 text-xs text-muted-foreground leading-relaxed border border-border rounded-lg p-3 bg-muted/30">
+        <input
+          type="checkbox"
+          checked={formData.consent_given}
+          onChange={(e) => setFormData((prev) => ({ ...prev, consent_given: e.target.checked }))}
+          required
+          className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
+        />
+        <span>
+          I agree to receive automated SMS and email messages from ClientSurge Systems about my inquiry. Message &amp; data rates may apply. Reply <strong>STOP</strong> at any time to opt out.{" "}
+          <a href="/privacy-policy" className="underline hover:text-foreground">Privacy Policy</a>
+          {" - "}
+          <a href="/terms" className="underline hover:text-foreground">Terms</a>
+        </span>
+      </label>
 
       {/* Submit */}
       <Button

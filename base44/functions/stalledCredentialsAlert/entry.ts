@@ -10,6 +10,7 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { getAppUrl } from "../_shared/appUrl.js";
 
 Deno.serve(async (req) => {
   try {
@@ -34,7 +35,7 @@ Deno.serve(async (req) => {
       return Response.json({ success: true, stalled_count: 0 });
     }
 
-    const appUrl = Deno.env.get("APP_URL") || "https://clientsurgesystems.com";
+    const appUrl = getAppUrl();
     const adminEmail = Deno.env.get("ADMIN_NOTIFICATION_EMAIL") || "nolan@clientsurgesystems.com";
 
     let rows = "";
