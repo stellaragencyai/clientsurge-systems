@@ -24,8 +24,8 @@ const STATUS_CONFIG = {
 
 const PRIORITY_COLOR = {
   critical: "bg-red-100 text-red-700",
-  high: "bg-orange-100 text-orange-700",
-  medium: "bg-yellow-100 text-yellow-700",
+  high: "bg-sky-100 text-sky-700",
+  medium: "bg-sky-100 text-sky-700",
   low: "bg-gray-100 text-gray-600",
 };
 

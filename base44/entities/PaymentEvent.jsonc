@@ -1,0 +1,139 @@
+{
+  "name": "PaymentEvent",
+  "type": "object",
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "title": "Provider Event ID"
+    },
+    "provider": {
+      "type": "string",
+      "title": "Provider",
+      "enum": [
+        "stripe"
+      ],
+      "default": "stripe"
+    },
+    "event_type": {
+      "type": "string",
+      "title": "Event Type"
+    },
+    "status": {
+      "type": "string",
+      "title": "Processing Status",
+      "enum": [
+        "received",
+        "processing",
+        "processed",
+        "failed",
+        "ignored",
+        "duplicate"
+      ],
+      "default": "received"
+    },
+    "fulfillment_status": {
+      "type": "string",
+      "title": "Fulfillment Status",
+      "enum": [
+        "not_required",
+        "pending",
+        "running",
+        "completed",
+        "failed",
+        "needs_manual_review"
+      ],
+      "default": "pending"
+    },
+    "install_job_status": {
+      "type": "string",
+      "title": "Install Job Status"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "customer_email": {
+      "type": "string",
+      "title": "Customer Email"
+    },
+    "checkout_session_id": {
+      "type": "string",
+      "title": "Stripe Checkout Session ID"
+    },
+    "subscription_id": {
+      "type": "string",
+      "title": "Stripe Subscription ID"
+    },
+    "payment_intent_id": {
+      "type": "string",
+      "title": "Stripe Payment Intent ID"
+    },
+    "attempts": {
+      "type": "integer",
+      "title": "Attempts",
+      "default": 0
+    },
+    "retry_count": {
+      "type": "integer",
+      "title": "Retry Count",
+      "default": 0
+    },
+    "last_error": {
+      "type": "string",
+      "title": "Last Error"
+    },
+    "next_retry_at": {
+      "type": "string",
+      "title": "Next Retry At"
+    },
+    "processed_at": {
+      "type": "string",
+      "title": "Processed At"
+    },
+    "failed_at": {
+      "type": "string",
+      "title": "Failed At"
+    },
+    "recovery_required": {
+      "type": "boolean",
+      "title": "Recovery Required",
+      "default": false
+    },
+    "raw_event_summary": {
+      "type": "object",
+      "title": "Safe Raw Event Summary"
+    },
+    "recommended_next_action": {
+      "type": "string",
+      "title": "Recommended Next Action"
+    }
+  },
+  "required": [
+    "event_id",
+    "provider",
+    "event_type",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

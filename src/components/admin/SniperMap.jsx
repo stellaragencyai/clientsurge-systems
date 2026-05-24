@@ -48,8 +48,8 @@ function guessCoords(city, state) {
 
 function scoreColor(score) {
   if (score >= 70) return '#ef4444'; // red-500
-  if (score >= 50) return '#f97316'; // orange-500
-  return '#eab308';                  // yellow-500
+  if (score >= 50) return '#00AEEF'; // sky/cyan
+  return '#67D8FF';                  // light sky
 }
 
 function haversineKm(lat1, lon1, lat2, lon2) {
@@ -215,9 +215,9 @@ export default function SniperMap({ leads, onSelectCity }) {
     med_spa: 'bg-pink-100 text-pink-800',
     dental: 'bg-cyan-100 text-cyan-800',
     chiropractic: 'bg-purple-100 text-purple-800',
-    hvac: 'bg-orange-100 text-orange-800',
+    hvac: 'bg-sky-100 text-sky-800',
     roofing: 'bg-slate-100 text-slate-800',
-    contractors: 'bg-amber-100 text-amber-800',
+    contractors: 'bg-blue-100 text-blue-800',
   };
 
   const inRadiusCount = leadsInRadius.length;
@@ -263,8 +263,8 @@ export default function SniperMap({ leads, onSelectCity }) {
         {/* Legend */}
         <div className="flex items-center gap-3 ml-auto text-[10px] font-semibold">
           <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-500 inline-block" /> 70+</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-orange-400 inline-block" /> 50–69</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-yellow-400 inline-block" /> &lt;50</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-sky-400 inline-block" /> 50–69</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-sky-400 inline-block" /> &lt;50</span>
         </div>
       </div>
 

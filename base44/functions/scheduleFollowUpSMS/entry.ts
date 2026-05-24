@@ -6,6 +6,10 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 // #126: business hours locked to America/Phoenix (no DST)
 function isPhoenixBusinessHours() {
@@ -27,14 +31,6 @@ Deno.serve(async (req) => {
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== "admin") {
       return Response.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
-
-    if (!accountSid || !authToken) {
-      return Response.json({ error: "Twilio credentials not configured" }, { status: 500 });
     }
 
     // Load admin settings for phone number and templates
@@ -117,25 +113,30 @@ Deno.serve(async (req) => {
           messageBody += "\n\nReply STOP to unsubscribe.";
         }
 
-        // Send via Twilio
-        const params = { To: lead.phone, From: fromNumber, Body: messageBody };
-        if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
+        const smsResult = await sendCommunicationViaOutbox({
+          base44,
+          channel: "sms",
+          provider: "twilio",
+          recipient: lead.phone,
+          body: messageBody,
+          from: fromNumber,
+          lead,
+          leadId: lead.id,
+          source: "scheduleFollowUpSMS",
+          sourceRecordId: lead.id,
+          templateKey: "15min_initial",
+          messageType: "transactional",
+          consentBasis: "transactional_relationship",
+          metadata: { step: "15min_initial" },
+          providerSend: (providerPayload) => sendTwilioSmsProvider({
+            ...providerPayload,
+            env: (name) => Deno.env.get(name),
+            fetchImpl: fetch,
+          }),
+        });
 
-        const res = await fetch(
-          `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams(params),
-          }
-        );
-
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          const errMsg = err?.message || `Twilio HTTP ${res.status}`;
+        if (!smsResult.success) {
+          const errMsg = smsResult.reason || smsResult.error || "Twilio outbox send failed";
           console.error(`[scheduleFollowUpSMS] Twilio error for lead ${lead.id}: ${errMsg}`);
 
           await base44.asServiceRole.entities.CommunicationEvent.create({
@@ -154,8 +155,6 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        const twilioResult = await res.json();
-
         // Log success
         await base44.asServiceRole.entities.CommunicationEvent.create({
           lead_id: lead.id,
@@ -166,7 +165,7 @@ Deno.serve(async (req) => {
           status: "sent",
           subject: "15-min follow-up SMS",
           message_body: messageBody,
-          provider_message_id: twilioResult.sid,
+          provider_message_id: smsResult.provider_message_id,
           metadata_json: JSON.stringify({ step: "15min_initial", timestamp: new Date().toISOString() }),
         });
 

@@ -52,7 +52,7 @@ export default function MedSpaBenefits() {
                 src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=800&q=85"
                 alt="Happy med spa client"
                 width="800"
-                height="512"
+                height="520"
                 loading="lazy"
                 className="w-full h-64 object-cover object-top"
               />

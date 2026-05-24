@@ -51,7 +51,7 @@ export function AdminWebsiteLeads() {
                 <p style={{ color: "#fff", fontSize: 13, fontWeight: 500, margin: 0 }}>{l.business_name}</p>
                 <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, margin: "2px 0 0" }}>{l.industry} · {l.city || "—"}</p>
               </div>
-              <span style={{ color: l.lead_score >= 80 ? "#00FFB3" : l.lead_score >= 60 ? "#F59E0B" : "#6B7280", fontSize: 12, fontWeight: 800 }}>{l.lead_score || "—"}</span>
+              <span style={{ color: l.lead_score >= 80 ? "#00FFB3" : l.lead_score >= 60 ? "#00AEEF" : "#6B7280", fontSize: 12, fontWeight: 800 }}>{l.lead_score || "—"}</span>
               <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>{l.status || "New"}</span>
             </div>
           ))}
@@ -79,7 +79,7 @@ export function AdminDemoBookings() {
   };
 
   const STATUS_OPTIONS = ["Booked", "Completed", "No-Show", "Reschedule"];
-  const statusColor = { Completed: "#00FFB3", "No-Show": "#EF4444", Reschedule: "#F59E0B", Booked: "#00D4FF" };
+  const statusColor = { Completed: "#00FFB3", "No-Show": "#EF4444", Reschedule: "#00AEEF", Booked: "#00D4FF" };
 
   return (
     <div>

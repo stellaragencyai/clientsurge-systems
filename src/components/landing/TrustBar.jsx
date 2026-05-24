@@ -88,7 +88,7 @@ function StatCard({ item, index, inView }) {
     <motion.article
       className="relative overflow-hidden rounded-2xl border border-border text-left shadow-sm"
       aria-label={`${statText} — ${item.label}`}
-      initial={{ opacity: 0, y: 28 }}
+      initial={false}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.55, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
@@ -124,7 +124,7 @@ function StatCard({ item, index, inView }) {
         <p className="font-display text-xl font-semibold text-foreground leading-tight" style={isHighlighted ? { fontSize: "1.35rem" } : {}}>
           {statText}
         </p>
-        <p className="text-[10px] uppercase tracking-[0.18em] text-primary/80 mt-1 mb-2">
+        <p className="text-[10px] uppercase tracking-[0.18em] text-primary mt-1 mb-2">
           {item.label}
         </p>
         <p className="text-xs text-foreground/60 leading-relaxed">{item.story}</p>
@@ -159,7 +159,7 @@ function StatCard({ item, index, inView }) {
 }
 
 export default function TrustBar() {
-  const [inView, setInView] = useState(false);
+  const [inView, setInView] = useState(true);
   const ref = useRef(null);
 
   useEffect(() => {

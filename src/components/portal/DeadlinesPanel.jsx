@@ -2,7 +2,7 @@ import { AlertCircle, Calendar, CheckCircle2, Clock, FileText, Zap } from 'lucid
 
 const CATEGORY_CONFIG = {
   setup: { icon: Zap, color: 'bg-blue-50 border-blue-200 text-blue-700', label: 'Setup' },
-  payment: { icon: FileText, color: 'bg-amber-50 border-amber-200 text-amber-700', label: 'Payment' },
+  payment: { icon: FileText, color: 'bg-blue-50 border-blue-200 text-blue-700', label: 'Payment' },
   testing: { icon: Clock, color: 'bg-purple-50 border-purple-200 text-purple-700', label: 'Testing' },
   launch: { icon: AlertCircle, color: 'bg-green-50 border-green-200 text-green-700', label: 'Launch' },
 };
@@ -45,7 +45,7 @@ export default function DeadlinesPanel({ project }) {
       case 'overdue':
         return <AlertCircle className="w-5 h-5 text-red-600" />;
       default:
-        return <Calendar className="w-5 h-5 text-amber-600" />;
+        return <Calendar className="w-5 h-5 text-blue-600" />;
     }
   };
 
@@ -97,7 +97,7 @@ export default function DeadlinesPanel({ project }) {
                           })}
                         </div>
                         <div className={`text-xs font-bold ${
-                          isOverdue ? 'text-red-700' : 'text-amber-700'
+                          isOverdue ? 'text-red-700' : 'text-blue-700'
                         }`}>
                           {daysUntil}
                         </div>

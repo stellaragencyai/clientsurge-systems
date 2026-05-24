@@ -15,7 +15,7 @@ export default function IndustrySMSDemo({
   triggerLabel = "Simulate",
   triggerEvent = "New lead detected",
   automationName = "AI Automation",
-  accentColor = "#9a5c2e",
+  accentColor = "#0077B6",
   businessName = "Your Business"
 }) {
   const [visible, setVisible] = useState([]);
@@ -92,7 +92,7 @@ export default function IndustrySMSDemo({
             className="rounded-3xl p-6"
             style={{
               background: "rgba(255,255,255,0.9)",
-              border: "1.5px solid rgba(212,184,142,0.35)",
+              border: "1.5px solid rgba(0,174,239,0.28)",
               boxShadow: "0 8px 28px rgba(111,67,31,0.09)"
             }}>
             
@@ -126,10 +126,10 @@ export default function IndustrySMSDemo({
                 padding: "2px",
                 background: done ?
                 "linear-gradient(135deg,#22c55e,#16a34a)" :
-                `linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)`,
+                `linear-gradient(135deg,#0088CC 0%,#00AEEF 30%,#DDF4FF 50%,#00AEEF 70%,#005B99 100%)`,
                 border: "none",
                 cursor: "pointer",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.28)"
+                boxShadow: "0 4px 18px rgba(0,92,153,0.28)"
               }}>
               
               <span
@@ -186,7 +186,7 @@ export default function IndustrySMSDemo({
               </div>
               <div className="ml-auto flex gap-1">
                 <span className="w-2 h-2 rounded-full" style={{ background: "#ff5f57" }} />
-                <span className="w-2 h-2 rounded-full" style={{ background: "#ffbd2e" }} />
+                <span className="w-2 h-2 rounded-full" style={{ background: "#00AEEF" }} />
                 <span className="w-2 h-2 rounded-full" style={{ background: "#28ca41" }} />
               </div>
             </div>

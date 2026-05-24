@@ -67,7 +67,7 @@ export default function Testimonials() {
             }}>
             <div style={{ display: "flex", gap: 6, marginBottom: 14 }}>
               {Array.from({ length: t.rating }).map((_, j) => (
-                <Star key={j} style={{ width: 13, height: 13, fill: "#F59E0B", color: "#F59E0B" }} />
+                <Star key={j} style={{ width: 13, height: 13, fill: "#00AEEF", color: "#00AEEF" }} />
               ))}
             </div>
             <p style={{ color: "rgba(255,255,255,0.75)", fontSize: 13, lineHeight: 1.7, margin: "0 0 18px" }}>

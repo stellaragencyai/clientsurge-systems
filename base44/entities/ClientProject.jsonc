@@ -227,6 +227,32 @@
       "type": "boolean",
       "title": "Onboarding Wizard Completed",
       "default": false
+    },
+    "optimal_send_hour": {
+      "type": "integer",
+      "title": "Optimal Send Hour (UTC)",
+      "minimum": 0,
+      "maximum": 23,
+      "default": 10
+    },
+    "optimal_send_hour_confidence": {
+      "type": "string",
+      "title": "Optimal Send Hour Confidence",
+      "enum": [
+        "fallback",
+        "medium",
+        "high"
+      ],
+      "default": "fallback"
+    },
+    "optimal_send_hour_sample_count": {
+      "type": "integer",
+      "title": "Optimal Send Hour Sample Count",
+      "default": 0
+    },
+    "optimal_send_hour_updated_at": {
+      "type": "string",
+      "title": "Optimal Send Hour Updated At"
     }
   },
   "required": [

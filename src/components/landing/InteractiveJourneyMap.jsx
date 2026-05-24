@@ -59,12 +59,16 @@ export default function InteractiveJourneyMap() {
           {journeySteps.map((step, idx) => (
             <motion.button
               key={step.id}
+              id={`journey-step-${step.id}`}
               type="button"
+              aria-expanded={expandedNode === step.id}
+              aria-controls={`journey-step-detail-${step.id}`}
+              aria-label={`${step.day}: ${step.label}. ${step.description}`}
               onClick={() => setExpandedNode(expandedNode === step.id ? null : step.id)}
               transition={{ delay: idx * 0.1 }}
               style={{
-                background: expandedNode === step.id ? "rgba(200,150,92,0.15)" : "transparent",
-                border: "2px solid rgba(200,150,92,0.3)",
+                background: expandedNode === step.id ? "rgba(0,174,239,0.15)" : "transparent",
+                border: "2px solid rgba(0,174,239,0.3)",
                 borderRadius: "12px",
                 padding: "16px",
                 cursor: "pointer",
@@ -77,7 +81,7 @@ export default function InteractiveJourneyMap() {
               }}
               onMouseLeave={(e) => {
                 if (expandedNode !== step.id) {
-                  e.currentTarget.style.borderColor = "rgba(200,150,92,0.3)";
+                  e.currentTarget.style.borderColor = "rgba(0,174,239,0.3)";
                   e.currentTarget.style.background = "transparent";
                 }
               }}
@@ -112,12 +116,13 @@ export default function InteractiveJourneyMap() {
               {/* Expanded Detail */}
               {expandedNode === step.id && (
                 <motion.div
+                  id={`journey-step-detail-${step.id}`}
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   style={{ marginTop: "12px", paddingTop: "12px", borderTop: "1px solid rgba(0,174,239,0.2)" }}
                 >
-                  <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.7)", margin: 0 }}>
+                  <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.7)", margin: 0 }}>
                     {step.description}
                   </p>
                 </motion.div>
@@ -145,7 +150,7 @@ export default function InteractiveJourneyMap() {
 
       {/* CTA */}
       <div style={{ textAlign: "center", marginTop: "40px" }}>
-        <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.6)", marginBottom: "16px" }}>
+        <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.6)", marginBottom: "16px" }}>
           Click any step to learn more about what happens
         </p>
         <a

@@ -107,7 +107,7 @@ export default function AddClientModal({ onClose, onSaved }) {
         </div>
 
         <form onSubmit={handleSave} className="px-8 py-6 space-y-5">
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
             This flow no longer creates standalone onboarding records. Admin onboarding must attach to an existing paid order so ownership stays canonical.
           </div>
 
@@ -213,8 +213,8 @@ export default function AddClientModal({ onClose, onSaved }) {
           <button
             type="submit"
             disabled={saving || loadingOrders || !form.order_id || attachableOrders.length === 0}
-            style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", borderRadius: "9999px" }}
-            className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-50 mt-2"
+            style={{ background: "linear-gradient(135deg,#005B99 0%,#0077B6 40%,#005B99 100%)", borderRadius: "9999px" }}
+            className="w-full h-12 flex items-center justify-center gap-2 text-sm font-bold text-blue-100 transition hover:opacity-90 disabled:opacity-50 mt-2"
           >
             {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Attaching...</> : "Attach Paid Order"}
           </button>

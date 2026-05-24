@@ -20,7 +20,7 @@ import {
 
 const STATUS_CONFIG = {
   active:    { label: "Active",    color: "bg-green-100 text-green-700",  icon: Activity },
-  paused:    { label: "Paused",    color: "bg-amber-100 text-amber-700",  icon: Pause },
+  paused:    { label: "Paused",    color: "bg-blue-100 text-blue-700",  icon: Pause },
   completed: { label: "Completed", color: "bg-blue-100 text-blue-700",    icon: CheckCircle },
   stopped:   { label: "Stopped",   color: "bg-gray-100 text-gray-600",    icon: XCircle },
 };
@@ -71,7 +71,7 @@ function CampaignRow({ campaign, onPause, onResume, pausing }) {
             </p>
           )}
           {campaign.stop_reason && (
-            <p className="text-xs text-amber-700 mt-0.5 font-medium">
+            <p className="text-xs text-blue-700 mt-0.5 font-medium">
               Stopped: {campaign.stop_reason.replace(/_/g, " ")}
             </p>
           )}

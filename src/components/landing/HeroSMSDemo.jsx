@@ -117,7 +117,7 @@ export default function HeroSMSDemo() {
           <div style={{ background: "#ffffff", borderBottom: "0.5px solid #e5e5ea", padding: "6px 12px 10px", display: "flex", flexDirection: "column", alignItems: "center" }}>
             <div style={{ width: "44px", height: "44px", borderRadius: "50%", background: "linear-gradient(135deg, #0088CC, #00AEEF)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: "800", color: "#ffffff", marginBottom: "4px", boxShadow: "0 2px 8px rgba(0,174,239,0.35)" }}>G</div>
             <p style={{ fontSize: "13px", fontWeight: "600", color: "#1c1c1e", margin: 0 }}>Glow Med Spa</p>
-            <p style={{ fontSize: "11px", color: "#636368", margin: 0 }}>iMessage</p>
+            <p style={{ fontSize: "11px", color: "#636366", margin: 0 }}>iMessage</p>
           </div>
 
           {/* Messages */}
@@ -129,8 +129,8 @@ export default function HeroSMSDemo() {
               <div key={i}>
                 {msg.label && (
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "3px", margin: "4px 0" }}>
-                    <Zap style={{ width: "9px", height: "9px", color: "#30d158" }} />
-                    <span style={{ fontSize: "10px", fontWeight: "700", color: "#30d158", letterSpacing: "0.02em" }}>{msg.label}</span>
+                    <Zap style={{ width: "9px", height: "9px", color: "#166534" }} />
+                    <span style={{ fontSize: "10px", fontWeight: "700", color: "#166534", letterSpacing: "0.02em" }}>{msg.label}</span>
                   </div>
                 )}
                 <div style={{ display: "flex", justifyContent: msg.from === "lead" ? "flex-end" : "flex-start", animation: "smsBubbleIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both" }}>
@@ -147,7 +147,7 @@ export default function HeroSMSDemo() {
                     {msg.text}
                   </div>
                 </div>
-                <div style={{ textAlign: msg.from === "lead" ? "right" : "left", fontSize: "9.5px", color: "#636368", marginTop: "1px", padding: "0 4px" }}>
+                <div style={{ textAlign: msg.from === "lead" ? "right" : "left", fontSize: "9.5px", color: "#636366", marginTop: "1px", padding: "0 4px" }}>
                   {msg.time}
                 </div>
               </div>
@@ -157,7 +157,7 @@ export default function HeroSMSDemo() {
               <div style={{ display: "flex", justifyContent: "flex-start", animation: "smsBubbleIn 0.3s ease both" }}>
                 <div style={{ background: "#ffffff", borderRadius: "18px 18px 18px 4px", padding: "10px 14px", display: "flex", gap: "4px", alignItems: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" }}>
                   {[0, 1, 2].map((d) => (
-                    <div key={d} style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#636368", animation: `smsTypingDot 1.2s ease-in-out ${d * 0.2}s infinite` }} />
+                    <div key={d} style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#636366", animation: `smsTypingDot 1.2s ease-in-out ${d * 0.2}s infinite` }} />
                   ))}
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function HeroSMSDemo() {
 
             {done && (
               <div style={{ textAlign: "center", marginTop: "6px", animation: "smsBubbleIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both" }}>
-                <span style={{ display: "inline-block", background: "rgba(48,209,88,0.12)", color: "#30d158", fontSize: "10.5px", fontWeight: "700", padding: "3px 12px", borderRadius: "20px", border: "1px solid rgba(48,209,88,0.3)" }}>
+                <span style={{ display: "inline-block", background: "rgba(22,101,52,0.12)", color: "#166534", fontSize: "10.5px", fontWeight: "700", padding: "3px 12px", borderRadius: "20px", border: "1px solid rgba(22,101,52,0.3)" }}>
                   \u2713 Appointment booked
                 </span>
               </div>
@@ -176,7 +176,7 @@ export default function HeroSMSDemo() {
 
           {/* iMessage input bar */}
           <div style={{ background: "#ffffff", borderTop: "0.5px solid #e5e5ea", padding: "8px 10px", display: "flex", alignItems: "center", gap: "6px" }}>
-            <div style={{ flex: 1, background: "#f2f2f7", borderRadius: "18px", padding: "7px 12px", fontSize: "12px", color: "#636368" }}>iMessage</div>
+            <div style={{ flex: 1, background: "#f2f2f7", borderRadius: "18px", padding: "7px 12px", fontSize: "12px", color: "#636366" }}>iMessage</div>
             <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #0088CC, #00AEEF)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M2 6h8M7 3l3 3-3 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -188,7 +188,7 @@ export default function HeroSMSDemo() {
 
       {/* Caption + Replay */}
       <div style={{ textAlign: "center", marginTop: "14px" }}>
-        <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.42)", letterSpacing: "0.04em", marginBottom: "6px" }}>
+        <p style={{ fontSize: "11px", color: "rgba(10,22,40,0.42)", letterSpacing: "0.04em", marginBottom: "6px" }}>
           Lead to booked appointment — fully automated
         </p>
         {done && (
@@ -196,8 +196,8 @@ export default function HeroSMSDemo() {
             onClick={runSequence}
             style={{
               display: "inline-flex", alignItems: "center", gap: "5px",
-              fontSize: "11px", fontWeight: "700", color: "#9a5c2e",
-              background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.25)",
+              fontSize: "11px", fontWeight: "700", color: "#0077B6",
+              background: "rgba(0,136,204,0.08)", border: "1px solid rgba(0,136,204,0.25)",
               borderRadius: "20px", padding: "5px 14px", cursor: "pointer",
             }}
           >

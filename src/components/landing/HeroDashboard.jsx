@@ -22,15 +22,15 @@ function useCounter(target, duration = 2000, startDelay = 0) {
 
 const PIPELINE = [
   { label: "New",       count: 24, color: "#6366f1", bg: "rgba(99,102,241,0.08)",  bar: 0.95 },
-  { label: "Contacted", count: 18, color: "#c8965c", bg: "rgba(200,150,92,0.1)",   bar: 0.72 },
+  { label: "Contacted", count: 18, color: "#00AEEF", bg: "rgba(0,174,239,0.1)",   bar: 0.72 },
   { label: "Replied",   count: 11, color: "#a78bfa", bg: "rgba(167,139,250,0.1)",  bar: 0.44 },
   { label: "Booked",    count: 7,  color: "#22c55e", bg: "rgba(34,197,94,0.1)",    bar: 0.28 },
-  { label: "Closed",   count: 4,  color: "#f59e0b", bg: "rgba(245,158,11,0.1)",   bar: 0.16 },
+  { label: "Closed",   count: 4,  color: "#00AEEF", bg: "rgba(0,174,239,0.1)",   bar: 0.16 },
 ];
 
 const RECENT_LEADS = [
   { name: "Sarah M.",   source: "Instagram", status: "Booked",    time: "2m ago",  dot: "#22c55e" },
-  { name: "Marcus D.",  source: "Google Ad", status: "Contacted", time: "7m ago",  dot: "#c8965c" },
+  { name: "Marcus D.",  source: "Google Ad", status: "Contacted", time: "7m ago",  dot: "#00AEEF" },
   { name: "Priya K.",   source: "Facebook",  status: "Replied",   time: "12m ago", dot: "#a78bfa" },
   { name: "Jordan T.",  source: "Referral",  status: "New",       time: "18m ago", dot: "#6366f1" },
   { name: "Alyssa R.",  source: "Instagram", status: "Booked",    time: "31m ago", dot: "#22c55e" },
@@ -69,9 +69,9 @@ export default function HeroDashboard() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px", marginBottom: "10px" }}>
         {[
           { label: "Total Leads",    val: leads,   suffix: "",   color: "#6366f1", icon: "👥" },
-          { label: "AI Replied",     val: replied,  suffix: "%",  color: "#c8965c", icon: "⚡" },
+          { label: "AI Replied",     val: replied,  suffix: "%",  color: "#00AEEF", icon: "⚡" },
           { label: "Booked",         val: booked,   suffix: "%",  color: "#22c55e", icon: "📅" },
-          { label: "Revenue Rec.",   val: `$${revenue.toLocaleString()}`, suffix: "", color: "#f59e0b", icon: "💰", raw: true },
+          { label: "Revenue Rec.",   val: `$${revenue.toLocaleString()}`, suffix: "", color: "#00AEEF", icon: "💰", raw: true },
         ].map((stat, i) => (
           <div key={i} style={{
             background: "rgba(255,255,255,0.9)",
@@ -141,7 +141,7 @@ export default function HeroDashboard() {
           flexDirection: "column",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-            <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "linear-gradient(135deg,#9a5c2e,#c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: "24px", height: "24px", borderRadius: "50%", background: "linear-gradient(135deg,#0077B6,#00AEEF)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ fontSize: "9px", fontWeight: "800", color: "#fff" }}>AI</span>
             </div>
             <div>

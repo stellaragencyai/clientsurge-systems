@@ -16,6 +16,10 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+} from "../_shared/communicationOutbox.js";
 
 // #97: 23-hour idempotency guard — prevents duplicate nurture sends
 const IDEMPOTENCY_WINDOW_MS = 23 * 3600000;
@@ -70,7 +74,7 @@ const EMAIL_CONTENT = {
     subject: (name, biz) => `Welcome, ${name} — here's what's coming your way`,
     html: (name, biz) => `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-  <h2 style="color:#9a5c2e">Hey ${name} 👋</h2>
+  <h2 style="color:#0077B6">Hey ${name} 👋</h2>
   <p>Thanks for your interest in <strong>ClientSurge Systems</strong>. Over the next 30 days, we'll be sharing real results, client stories, and practical tips that show exactly what automated lead follow-up can do for a business like <strong>${biz}</strong>.</p>
   <p>Most service businesses lose 60–80% of their leads simply because they respond too slowly or forget to follow up. We fix that — automatically.</p>
   <p><strong>Here's what's coming:</strong></p>
@@ -88,7 +92,7 @@ const EMAIL_CONTENT = {
     subject: (name) => `${name}, how a med spa went from 14% to 61% lead conversion`,
     html: (name, biz) => `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-  <h2 style="color:#9a5c2e">A real result, ${name}</h2>
+  <h2 style="color:#0077B6">A real result, ${name}</h2>
   <p>A med spa in Scottsdale was generating solid leads from Instagram ads — but converting less than 15% of them into consultations.</p>
   <p><strong>The problem?</strong> Leads were sitting uncontacted for 4–6 hours. By the time staff followed up, interest had cooled.</p>
   <hr style="border:none;border-top:1px solid #eee;margin:20px 0">
@@ -107,8 +111,8 @@ const EMAIL_CONTENT = {
     subject: (name) => `"I didn't realize how many leads I was losing" — ${name}, read this`,
     html: (name, biz) => `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-  <h2 style="color:#9a5c2e">A client said it best, ${name}</h2>
-  <blockquote style="border-left:4px solid #9a5c2e;padding-left:16px;margin:20px 0;font-style:italic;color:#555">
+  <h2 style="color:#0077B6">A client said it best, ${name}</h2>
+  <blockquote style="border-left:4px solid #0077B6;padding-left:16px;margin:20px 0;font-style:italic;color:#555">
     "Before ClientSurge, I had no idea how many leads were slipping through. I thought my front desk was handling it. Turns out leads were waiting 8+ hours for a callback. Now the system texts them instantly — and my booking rate has almost doubled."
     <br><br>
     <strong>— Owner, Aesthetic Wellness Clinic, Phoenix AZ</strong>
@@ -122,7 +126,7 @@ const EMAIL_CONTENT = {
     subject: (name) => `The 5-minute rule that recovers 30% more leads — for ${name}`,
     html: (name, biz) => `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-  <h2 style="color:#9a5c2e">Quick tip, ${name}</h2>
+  <h2 style="color:#0077B6">Quick tip, ${name}</h2>
   <p><strong>The 5-Minute Rule:</strong> Studies consistently show that responding to a new lead within 5 minutes makes you 100x more likely to reach them than responding after 30 minutes.</p>
   <p>After 30 minutes, most leads have already moved on — contacted a competitor, lost interest, or simply gotten distracted.</p>
   <p><strong>What most businesses do:</strong> Respond when staff are available (usually 1–6 hours later).</p>
@@ -136,7 +140,7 @@ const EMAIL_CONTENT = {
     subject: (name) => `${name} — how a home service company recovered $12k in lost leads`,
     html: (name, biz) => `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-  <h2 style="color:#9a5c2e">Another result worth sharing, ${name}</h2>
+  <h2 style="color:#0077B6">Another result worth sharing, ${name}</h2>
   <p>A residential HVAC company in Texas was running Google Ads and getting 40–60 leads per month. Their close rate was about 22%.</p>
   <p>After auditing their process, we found that 35% of leads never received a response at all — calls went to voicemail, forms sat unread on weekends.</p>
   <p><strong>We built:</strong></p>
@@ -154,8 +158,8 @@ const EMAIL_CONTENT = {
     subject: (name) => `${name}, this is what "set it and forget it" actually looks like`,
     html: (name, biz) => `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-  <h2 style="color:#9a5c2e">Another client story, ${name}</h2>
-  <blockquote style="border-left:4px solid #9a5c2e;padding-left:16px;margin:20px 0;font-style:italic;color:#555">
+  <h2 style="color:#0077B6">Another client story, ${name}</h2>
+  <blockquote style="border-left:4px solid #0077B6;padding-left:16px;margin:20px 0;font-style:italic;color:#555">
     "I was skeptical at first — I've tried other automation tools and they always required a ton of setup and babysitting. ClientSurge was different. They built everything, tested it, and handed it to me running. I check my dashboard once a week. That's it."
     <br><br>
     <strong>— Owner, Real Estate Investment Firm, Scottsdale AZ</strong>
@@ -170,7 +174,7 @@ const EMAIL_CONTENT = {
     subject: (name) => `${name} — 3 follow-up mistakes that kill conversions (+ a free offer)`,
     html: (name, biz) => `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-  <h2 style="color:#9a5c2e">3 mistakes we see constantly, ${name}</h2>
+  <h2 style="color:#0077B6">3 mistakes we see constantly, ${name}</h2>
   <p><strong>1. Following up only once.</strong> Most leads convert on the 2nd or 3rd touchpoint. A single "just checking in" message and then silence kills your chances.</p>
   <p><strong>2. Only calling, never texting.</strong> Over 90% of SMS messages are read within 3 minutes. Calls go to voicemail. Meet your leads where they are.</p>
   <p><strong>3. No urgency in the message.</strong> Generic follow-ups ("just wanted to touch base!") perform 3–5x worse than specific, value-driven messages tied to the lead's stated problem.</p>
@@ -185,7 +189,7 @@ const EMAIL_CONTENT = {
     subject: (name) => `${name} — last message from us (your call)`,
     html: (name, biz) => `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
-  <h2 style="color:#9a5c2e">This is our last scheduled email, ${name}</h2>
+  <h2 style="color:#0077B6">This is our last scheduled email, ${name}</h2>
   <p>Over the past 30 days, we've shared case studies, client results, and tips — all showing the same thing: businesses that automate their lead follow-up convert significantly more of the leads they're already generating.</p>
   <p>We don't know what's holding you back, but here's what we do know:</p>
   <ul style="line-height:1.8">
@@ -207,20 +211,64 @@ function daysSince(isoDate) {
   return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60 * 60 * 24);
 }
 
-async function sendEmail(to, subject, html, resendKey, fromEmail) {
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ from: fromEmail, to, subject, html }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Resend send failed");
+function normalizeTimezone(value) {
+  const fallback = "America/Phoenix";
+  const timezone = String(value || fallback).trim();
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: timezone }).format(new Date());
+    return timezone;
+  } catch {
+    return fallback;
   }
-  return true;
+}
+
+function getLocalHour(timezone, date = new Date()) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: normalizeTimezone(timezone),
+    hour: "numeric",
+    hour12: false,
+  }).formatToParts(date);
+  return Number(parts.find((part) => part.type === "hour")?.value || 0);
+}
+
+export function isNurtureSendWindow(timezone, date = new Date()) {
+  const hour = getLocalHour(timezone, date);
+  return hour >= 8 && hour <= 20;
+}
+
+async function sendEmail(base44, campaign, lead, to, subject, html, fromEmail, step) {
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: to,
+    subject,
+    body: html,
+    html,
+    from: fromEmail,
+    lead,
+    leadId: lead?.id || campaign.lead_id,
+    source: "processNurtureCampaigns",
+    sourceRecordId: campaign.id,
+    templateKey: `nurture_step_${step.num}_${step.theme}`,
+    messageType: "marketing",
+    consentBasis: "lead_nurture_signup",
+    metadata: {
+      step_key: `nurture_step_${step.num}`,
+      nurture_step: step.num,
+      campaign_id: campaign.id,
+      theme: step.theme,
+    },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
+  });
+  if (!result.success && !result.suppressed) {
+    throw new Error(result.error || result.reason || "Resend outbox send failed");
+  }
+  return result;
 }
 
 Deno.serve(async (req) => {
@@ -253,15 +301,14 @@ Deno.serve(async (req) => {
 
     const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
     const settings = settingsRecords?.[0] || {};
-    const resendKey = Deno.env.get("RESEND_API_KEY");
     const fromEmail = settings.resend_from_email || "noreply@clientsurge.com";
-    const resendReady = !!(resendKey && settings.resend_enabled);
+    const resendReady = !!(Deno.env.get("RESEND_API_KEY") && settings.resend_enabled);
 
     if (!resendReady) {
       return Response.json({ success: false, error: "Resend not configured. Enable Resend in Admin Settings." });
     }
 
-    const results = { fired: 0, skipped: 0, stopped: 0, errors: 0 };
+    const results = { fired: 0, skipped: 0, stopped: 0, timezone_deferred: 0, errors: 0 };
 
     for (const campaign of campaigns) {
       try {
@@ -288,6 +335,17 @@ Deno.serve(async (req) => {
             notes: "Lead opted out via SMS STOP or cadence manually paused."
           });
           results.stopped++;
+          continue;
+        }
+
+        const timezone = normalizeTimezone(lead.timezone || campaign.timezone || settings.timezone);
+        if (!isNurtureSendWindow(timezone)) {
+          await base44.asServiceRole.entities.NurtureCampaign.update(campaign.id, {
+            timezone,
+            last_step_run_at: new Date().toISOString(),
+            notes: `Deferred because local send window is 8am-8pm in ${timezone}.`,
+          }).catch(() => {});
+          results.timezone_deferred++;
           continue;
         }
 
@@ -330,7 +388,10 @@ Deno.serve(async (req) => {
           let error = null;
 
           try {
-            await sendEmail(lead.email || campaign.lead_email, subject, html, resendKey, fromEmail);
+            const sendResult = await sendEmail(base44, campaign, lead, lead.email || campaign.lead_email, subject, html, fromEmail, step);
+            if (sendResult.suppressed) {
+              throw new Error(`suppressed: ${sendResult.reason}`);
+            }
             sent = true;
           } catch (err) {
             error = err.message;

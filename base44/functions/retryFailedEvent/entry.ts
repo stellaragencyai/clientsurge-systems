@@ -6,6 +6,11 @@
  * Payload: { event_id: string }
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 Deno.serve(async (req) => {
   try {
@@ -30,19 +35,15 @@ Deno.serve(async (req) => {
 
     // --- SMS retry via Twilio ---
     if (evt.channel === 'sms' && evt.provider === 'twilio') {
-      const TWILIO_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
-      const TWILIO_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
       const TWILIO_FROM = Deno.env.get('TWILIO_PHONE_NUMBER');
-
-      if (!TWILIO_SID || !TWILIO_TOKEN || !TWILIO_FROM) {
-        return Response.json({ error: 'Twilio credentials not configured' }, { status: 500 });
-      }
 
       // Get phone from lead if linked
       let toPhone = null;
+      let lead = null;
       if (evt.lead_id) {
         const leads = await base44.asServiceRole.entities.Leads.filter({ id: evt.lead_id });
-        toPhone = leads?.[0]?.phone;
+        lead = leads?.[0] || null;
+        toPhone = lead?.phone;
       }
       if (!toPhone && evt.metadata_json) {
         try { toPhone = JSON.parse(evt.metadata_json)?.to; } catch {}
@@ -52,54 +53,72 @@ Deno.serve(async (req) => {
       const body = evt.message_body;
       if (!body) return Response.json({ error: 'No message body to retry' }, { status: 400 });
 
-      const formData = new URLSearchParams({ From: TWILIO_FROM, To: toPhone, Body: body });
-      const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Basic ' + btoa(`${TWILIO_SID}:${TWILIO_TOKEN}`),
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formData,
+      const result = await sendCommunicationViaOutbox({
+        base44,
+        channel: "sms",
+        provider: "twilio",
+        recipient: toPhone,
+        body,
+        from: TWILIO_FROM,
+        lead,
+        leadId: evt.lead_id,
+        source: "retryFailedEvent",
+        sourceRecordId: event_id,
+        templateKey: "retry_failed_event_sms",
+        messageType: "transactional",
+        consentBasis: "transactional_relationship",
+        metadata: { retried_event_id: event_id },
+        providerSend: (providerPayload) => sendTwilioSmsProvider({
+          ...providerPayload,
+          env: (name) => Deno.env.get(name),
+          fetchImpl: fetch,
+        }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(`Twilio error: ${data.message}`);
-      retryResult = { provider_message_id: data.sid, status: 'sent' };
+      if (!result.success) throw new Error(`Twilio outbox retry failed: ${result.reason || result.error || result.status}`);
+      retryResult = { provider_message_id: result.provider_message_id, status: 'sent', outbox_id: result.outbox?.id };
     }
 
     // --- Email retry via Resend ---
     else if (evt.channel === 'email' && evt.provider === 'resend') {
-      const RESEND_KEY = Deno.env.get('RESEND_API_KEY');
       const RESEND_FROM = Deno.env.get('RESEND_FROM_EMAIL');
-      if (!RESEND_KEY || !RESEND_FROM) {
-        return Response.json({ error: 'Resend credentials not configured' }, { status: 500 });
-      }
 
       let toEmail = null;
+      let lead = null;
       if (evt.lead_id) {
         const leads = await base44.asServiceRole.entities.Leads.filter({ id: evt.lead_id });
-        toEmail = leads?.[0]?.email;
+        lead = leads?.[0] || null;
+        toEmail = lead?.email;
       }
       if (!toEmail && evt.metadata_json) {
         try { toEmail = JSON.parse(evt.metadata_json)?.to; } catch {}
       }
       if (!toEmail) return Response.json({ error: 'Cannot determine destination email' }, { status: 400 });
 
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${RESEND_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: RESEND_FROM,
-          to: [toEmail],
-          subject: evt.subject || '(No subject)',
-          html: evt.message_body || '(No content)',
+      const result = await sendCommunicationViaOutbox({
+        base44,
+        channel: "email",
+        provider: "resend",
+        recipient: toEmail,
+        subject: evt.subject || '(No subject)',
+        body: evt.message_body || '(No content)',
+        html: evt.message_body || '(No content)',
+        from: RESEND_FROM,
+        lead,
+        leadId: evt.lead_id,
+        source: "retryFailedEvent",
+        sourceRecordId: event_id,
+        templateKey: "retry_failed_event_email",
+        messageType: "transactional",
+        consentBasis: "transactional_relationship",
+        metadata: { retried_event_id: event_id },
+        providerSend: (providerPayload) => sendResendEmailProvider({
+          ...providerPayload,
+          env: (name) => Deno.env.get(name),
+          fetchImpl: fetch,
         }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(`Resend error: ${data.message}`);
-      retryResult = { provider_message_id: data.id, status: 'sent' };
+      if (!result.success) throw new Error(`Resend outbox retry failed: ${result.reason || result.error || result.status}`);
+      retryResult = { provider_message_id: result.provider_message_id, status: 'sent', outbox_id: result.outbox?.id };
     }
 
     // --- Stripe event re-invoke (via stripeWebhookOrders) ---

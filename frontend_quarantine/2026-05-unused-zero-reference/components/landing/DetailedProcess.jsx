@@ -155,7 +155,7 @@ function StepCard({ step, index, isLast }) {
             src={step.image}
             alt={step.title}
             width="640"
-            height="288"
+            height="480"
             className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
           />
         </div>

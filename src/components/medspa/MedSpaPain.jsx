@@ -37,7 +37,7 @@ export default function MedSpaPain() {
                 src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&q=85"
                 alt="Med spa consultation"
                 width="800"
-                height="416"
+                height="520"
                 loading="lazy"
                 className="w-full h-52 object-cover object-top"
               />

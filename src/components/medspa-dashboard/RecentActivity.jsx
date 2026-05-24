@@ -4,7 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 const statusColors = {
   New: "bg-slate-100 text-slate-700",
   Qualified: "bg-blue-100 text-blue-700",
-  Contacted: "bg-yellow-100 text-yellow-700",
+  Contacted: "bg-sky-100 text-sky-700",
   Responded: "bg-cyan-100 text-cyan-700",
   Booked: "bg-green-100 text-green-700",
   Closed: "bg-emerald-100 text-emerald-700",

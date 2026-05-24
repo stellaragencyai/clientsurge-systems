@@ -6,9 +6,9 @@ export default function MobileBottomNav() {
   const navigate = useNavigate();
 
   const tabs = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/client-dashboard" },
-    { icon: Package, label: "Services", path: "/client-dashboard?tab=services" },
-    { icon: Headphones, label: "Support", path: "/client-dashboard?tab=support" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/client-portal" },
+    { icon: Package, label: "Services", path: "/client-portal?tab=plan" },
+    { icon: Headphones, label: "Support", path: "/client-portal?tab=support" },
     { icon: Home, label: "Home", path: "/" },
   ];
 
@@ -21,7 +21,7 @@ export default function MobileBottomNav() {
           bottom: 0;
           left: 0;
           right: 0;
-          border-top: 1px solid rgba(154,92,46,0.12);
+          border-top: 1px solid rgba(0,136,204,0.12);
           background: rgba(255,255,255,0.98);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
@@ -35,7 +35,7 @@ export default function MobileBottomNav() {
       <div className="mobile-bottom-nav">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = location.pathname === tab.path;
+          const isActive = `${location.pathname}${location.search}` === tab.path || location.pathname === tab.path;
           return (
             <button
               key={tab.label}
@@ -52,7 +52,7 @@ export default function MobileBottomNav() {
                 border: "none",
                 background: "transparent",
                 cursor: "pointer",
-                color: isActive ? "#9a5c2e" : "rgba(27,20,13,0.5)",
+                color: isActive ? "#0077B6" : "rgba(10,22,40,0.5)",
                 transition: "color 0.2s ease",
               }}
             >

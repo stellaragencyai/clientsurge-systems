@@ -33,7 +33,7 @@ export default function StardustOverlay({ seed = 42, opacity = 0.55 }) {
         ? `rgba(245, 217, 168,`   // warm gold
         : rand() > 0.4
           ? `rgba(255, 240, 200,`  // pale cream
-          : `rgba(200, 150, 92,`,  // amber
+          : `rgba(0, 174, 239,`,  // blue
     }));
 
     let w = 0, h = 0;

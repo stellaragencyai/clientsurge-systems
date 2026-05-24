@@ -1,16 +1,16 @@
 import { Zap, PhoneMissed, Mail, CalendarCheck, RotateCcw, Star } from "lucide-react";
 
 const iconMap = {
-  instant_lead_response: { Icon: Zap, color: "#f59e0b", bg: "rgba(245,158,11,0.15)" },
+  instant_lead_response: { Icon: Zap, color: "#00AEEF", bg: "rgba(0,174,239,0.15)" },
   missed_call_text_back: { Icon: PhoneMissed, color: "#ef4444", bg: "rgba(239,68,68,0.12)" },
   nurture_sequence_14d: { Icon: Mail, color: "#3b82f6", bg: "rgba(59,130,246,0.12)" },
   ai_booking_agent: { Icon: CalendarCheck, color: "#22c55e", bg: "rgba(34,197,94,0.12)" },
   lead_reactivation: { Icon: RotateCcw, color: "#a855f7", bg: "rgba(168,85,247,0.12)" },
-  review_request: { Icon: Star, color: "#f59e0b", bg: "rgba(245,158,11,0.12)" },
+  review_request: { Icon: Star, color: "#00AEEF", bg: "rgba(0,174,239,0.12)" },
 };
 
 export default function ServiceIcon({ serviceKey, size = 40 }) {
-  const cfg = iconMap[serviceKey] || { Icon: Zap, color: "#9a5c2e", bg: "rgba(154,92,46,0.12)" };
+  const cfg = iconMap[serviceKey] || { Icon: Zap, color: "#0077B6", bg: "rgba(0,136,204,0.12)" };
   const { Icon } = cfg;
   return (
     <div style={{

@@ -6,6 +6,41 @@ const EVENT_LIMIT = 5000;
 const LEAD_PIPELINE_MAX_FETCH = 5000;
 const PRIORITY_MAP = { Hot: 4, High: 3, Medium: 2, Low: 1 };
 
+function normalizeEmail(value) {
+  return typeof value === "string" ? value.trim().toLowerCase() : "";
+}
+
+function normalizeEmailList(values = []) {
+  return Array.isArray(values)
+    ? values.map(normalizeEmail).filter(Boolean)
+    : [];
+}
+
+function isSuperAdmin(user, settings = {}) {
+  const userEmail = normalizeEmail(user?.email);
+  const configuredSuperAdmins = new Set([
+    ...normalizeEmailList(settings.super_admin_emails),
+    normalizeEmail(settings.lead_notification_email),
+    normalizeEmail(Deno.env.get("ADMIN_EMAIL")),
+  ].filter(Boolean));
+
+  return configuredSuperAdmins.has(userEmail);
+}
+
+async function loadAdminSettings(base44) {
+  const records = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1).catch(() => []);
+  return records?.[0] || {};
+}
+
+function filterLeadsForAdmin(leads = [], user, settings = {}) {
+  if (isSuperAdmin(user, settings)) {
+    return leads;
+  }
+
+  const userEmail = normalizeEmail(user?.email);
+  return leads.filter((lead) => normalizeEmail(lead.assigned_to) === userEmail);
+}
+
 function getNextAction(lead) {
   const status = lead.status || "New";
   const actions = {
@@ -148,7 +183,11 @@ Deno.serve(async (req) => {
     const limit = Math.min(Math.max(Number(filters.limit) || DEFAULT_LIMIT, 1), MAX_LIMIT);
     const offset = Math.max(Number(filters.offset) || 0, 0);
 
-    const leads = await base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_PIPELINE_MAX_FETCH);
+    const [allLeads, settings] = await Promise.all([
+      base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_PIPELINE_MAX_FETCH),
+      loadAdminSettings(base44),
+    ]);
+    const leads = filterLeadsForAdmin(allLeads || [], user, settings);
 
     const snapshot = buildLeadPipelineSnapshot({
       leads: leads || [],

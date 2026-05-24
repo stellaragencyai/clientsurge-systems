@@ -2,6 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { trackLeadSubmitted } from "@/lib/analytics";
 
 export default function LeadCaptureForm() {
   const [loading, setLoading] = useState(false);
@@ -52,6 +53,11 @@ export default function LeadCaptureForm() {
       if (!result.data?.success) {
         throw new Error("Lead submission failed");
       }
+
+      trackLeadSubmitted("leads_capture_form", {
+        deduplicated: Boolean(result.data?.deduplicated),
+        business_type: formData.business_type,
+      });
 
       setSuccess(true);
       setFormData({

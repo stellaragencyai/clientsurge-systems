@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { ArrowRight, ChevronLeft, X, CheckCircle2, User, Building2, Mail, Phone, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { trackLeadSubmitted } from '@/lib/analytics';
 
 export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
   const [step, setStep] = useState(1);
@@ -115,6 +116,11 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
       if (!result.data?.success) {
         throw new Error('Lead submission failed');
       }
+
+      trackLeadSubmitted('lead_capture_modal', {
+        deduplicated: Boolean(result.data?.deduplicated),
+        business_type: formData.business_type,
+      });
 
       // Trigger confetti celebration
       confetti({

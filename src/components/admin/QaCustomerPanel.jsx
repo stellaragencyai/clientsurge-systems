@@ -60,6 +60,9 @@ export default function QaCustomerPanel() {
     try {
       const nextResult = await createQaCustomerFixture(form);
       setResult(nextResult);
+      if (nextResult?.invite_sent) {
+        setCopyNotice(`Invite sent to ${form.email}.`);
+      }
     } catch (requestError) {
       setError(getAdminQaError(requestError, "Unable to create a canonical QA customer fixture."));
     } finally {
@@ -86,7 +89,7 @@ export default function QaCustomerPanel() {
         </div>
       </div>
 
-      <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+      <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
         This does not auto-go-live anything. It creates a paid QA client state only. You still activate your own password from the Base44 invite and then sign in through the normal client portal.
       </div>
 

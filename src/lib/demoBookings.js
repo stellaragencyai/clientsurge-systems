@@ -1,5 +1,5 @@
 export const DEMO_BOOKING_STATUSES = [
-  { value: "requested", label: "Requested", tone: "#F59E0B" },
+  { value: "requested", label: "Requested", tone: "#00AEEF" },
   { value: "scheduled", label: "Scheduled", tone: "#00D4FF" },
   { value: "confirmed", label: "Confirmed", tone: "#00FFB3" },
   { value: "completed", label: "Completed", tone: "#6B7280" },

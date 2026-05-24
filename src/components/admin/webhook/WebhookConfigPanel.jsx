@@ -11,6 +11,7 @@ import {
   Webhook,
 } from "lucide-react";
 import WebhookRegistrationForm from "./WebhookRegistrationForm";
+import DeleteConfirmModal from "../DeleteConfirmModal";
 
 const STATUS_BADGE = {
   active: "bg-green-100 text-green-700",
@@ -26,6 +27,7 @@ export default function WebhookConfigPanel() {
   const [copiedId, setCopiedId] = useState(null);
   const [regenerating, setRegenerating] = useState(null);
   const [deleting, setDeleting] = useState(null);
+  const [deleteCandidate, setDeleteCandidate] = useState(null);
   const [revealedSecrets, setRevealedSecrets] = useState({});
 
   useEffect(() => {
@@ -65,9 +67,6 @@ export default function WebhookConfigPanel() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Delete this webhook registration?")) {
-      return;
-    }
     setDeleting(id);
     try {
       await base44.functions.invoke("manageWebhookRegistration", { action: "delete", id });
@@ -79,6 +78,7 @@ export default function WebhookConfigPanel() {
       });
     } finally {
       setDeleting(null);
+      setDeleteCandidate(null);
     }
   };
 
@@ -194,7 +194,7 @@ export default function WebhookConfigPanel() {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(registration.id)}
+                      onClick={() => setDeleteCandidate(registration)}
                       disabled={deleting === registration.id}
                       className="text-destructive hover:opacity-70 transition"
                     >
@@ -295,6 +295,15 @@ export default function WebhookConfigPanel() {
             setShowForm(false);
             setEditing(null);
           }}
+        />
+      )}
+      {deleteCandidate && (
+        <DeleteConfirmModal
+          title="Delete Webhook Source"
+          description={`Delete ${deleteCandidate.source_name || "this webhook source"}? Inbound leads signed with this webhook ID will be rejected immediately.`}
+          confirmLabel="Delete Source"
+          onCancel={() => setDeleteCandidate(null)}
+          onConfirm={() => handleDelete(deleteCandidate.id)}
         />
       )}
     </div>

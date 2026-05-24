@@ -13,10 +13,59 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { getAppUrl } from "../_shared/appUrl.js";
 
+const REQUIRED_FIELDS_BY_TIER = {
+  starter: [
+    ["brand.business_name", "Business name is required for setup."],
+    ["shared.twilio_business_phone", "Business phone is required for Twilio SMS setup."],
+    ["messaging.booking_link", "Booking link is required for appointment automation."],
+  ],
+  growth: [
+    ["brand.business_name", "Business name is required for setup."],
+    ["shared.twilio_business_phone", "Business phone is required for Twilio SMS setup."],
+    ["messaging.booking_link", "Booking link is required for appointment automation."],
+    ["brand.google_business_url", "Google Business Profile URL is required for Growth setup."],
+    ["brand.website", "Existing website URL is required for Growth setup."],
+    ["integrations.crm_system", "Marketing platform or CRM is required for Growth setup."],
+  ],
+  elite: [
+    ["brand.business_name", "Business name is required for setup."],
+    ["shared.twilio_business_phone", "Business phone is required for Twilio SMS setup."],
+    ["messaging.booking_link", "Booking link is required for appointment automation."],
+    ["brand.google_business_url", "Google Business Profile URL is required for Elite setup."],
+    ["brand.website", "Existing website URL is required for Elite setup."],
+    ["integrations.crm_system", "Marketing platform or CRM is required for Elite setup."],
+    ["brand.logo_url", "Logo upload is required for Elite website build."],
+    ["brand.primary_color", "Primary brand color is required for Elite website build."],
+    ["brand.secondary_color", "Secondary brand color is required for Elite website build."],
+    ["brand.brand_voice", "AI tone is required for Elite automation copy."],
+  ],
+};
+
+function getPathValue(source, path) {
+  return path.split(".").reduce((value, key) => value?.[key], source);
+}
+
+function normalizeTier(order) {
+  const raw = String(order.package_key || order.package_type || order.plan_type || "starter").toLowerCase();
+  if (raw.includes("elite") || raw.includes("pro")) return "elite";
+  if (raw.includes("growth")) return "growth";
+  return "starter";
+}
+
+function validateInstallConfiguration(config, tier) {
+  const rules = REQUIRED_FIELDS_BY_TIER[tier] || REQUIRED_FIELDS_BY_TIER.starter;
+  return rules
+    .filter(([path]) => {
+      const value = getPathValue(config, path);
+      return value === undefined || value === null || String(value).trim() === "";
+    })
+    .map(([field, message]) => ({ field, message }));
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { order_id, install_configuration } = await req.json();
+    const { order_id, install_configuration, admin_bypass = false } = await req.json();
 
     if (!order_id) {
       return Response.json({ error: "order_id required" }, { status: 400 });
@@ -30,8 +79,38 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Order not found" }, { status: 404 });
     }
 
+    let user = null;
+    try {
+      user = await base44.auth.me();
+    } catch (_) {}
+
+    const tier = normalizeTier(order);
+    const normalizedConfiguration = {
+      ...install_configuration,
+      shared: {
+        ...(install_configuration.shared || {}),
+        twilio_business_phone:
+          install_configuration.shared?.twilio_business_phone ||
+          install_configuration.business_phone ||
+          install_configuration.brand?.business_phone ||
+          order.customer_phone ||
+          "",
+      },
+    };
+
+    if (admin_bypass && user?.role !== "admin") {
+      return Response.json({ error: "admin_bypass requires admin role" }, { status: 403 });
+    }
+
+    if (!admin_bypass) {
+      const validationErrors = validateInstallConfiguration(normalizedConfiguration, tier);
+      if (validationErrors.length > 0) {
+        return Response.json({ errors: validationErrors, tier }, { status: 400 });
+      }
+    }
+
     await base44.asServiceRole.entities.Order.update(order_id, {
-      install_configuration,
+      install_configuration: normalizedConfiguration,
       install_configuration_updated_at: new Date().toISOString(),
     });
     console.log(`[saveClientCredentials] install_configuration saved for order ${order_id}`);
@@ -88,10 +167,10 @@ Deno.serve(async (req) => {
   <p style="color:#555;margin:0 0 20px;"><strong>${order.business_name}</strong> (${order.customer_email}) just completed their setup intake form.</p>
 
   <div style="background:${intelligenceResult?.ready_to_activate ? "#f0fdf4" : "#fffbeb"};border:1px solid ${intelligenceResult?.ready_to_activate ? "#86efac" : "#fcd34d"};border-radius:10px;padding:16px;margin-bottom:20px;">
-    <p style="font-weight:700;color:${intelligenceResult?.ready_to_activate ? "#16a34a" : "#92400e"};margin:0 0 8px;">
+    <p style="font-weight:700;color:${intelligenceResult?.ready_to_activate ? "#16a34a" : "#005B99"};margin:0 0 8px;">
       ${intelligenceResult?.ready_to_activate ? "✅ Ready for Canonical Install Review" : "⚠️ Activation Deferred — Blockers Found"}
     </p>
-    ${blockers.length > 0 ? `<ul style="margin:0;padding-left:20px;color:#92400e;font-size:13px;">${blockers.map((blocker) => `<li>${blocker}</li>`).join("")}</ul>` : ""}
+    ${blockers.length > 0 ? `<ul style="margin:0;padding-left:20px;color:#005B99;font-size:13px;">${blockers.map((blocker) => `<li>${blocker}</li>`).join("")}</ul>` : ""}
     ${autoFilled.length > 0 ? `<p style="font-size:13px;color:#555;margin:8px 0 0;">Auto-filled: ${autoFilled.join(", ")}</p>` : ""}
     ${activationDeferredReason ? `<p style="font-size:13px;color:#166534;margin:8px 0 0;">${activationDeferredReason}</p>` : ""}
   </div>

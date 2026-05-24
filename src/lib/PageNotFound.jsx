@@ -45,9 +45,9 @@ export default function PageNotFound() {
             onClick={() => navigate('/')}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm border"
             style={{
-              borderColor: "rgba(154,92,46,0.3)",
-              color: "#9a5c2e",
-              background: "rgba(154,92,46,0.06)",
+              borderColor: "rgba(0,136,204,0.3)",
+              color: "#0077B6",
+              background: "rgba(0,136,204,0.06)",
             }}
           >
             <ArrowLeft className="w-4 h-4" />

@@ -322,9 +322,9 @@ export default function RevenueRecoveryCounter() {
                 {/* Header */}
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "10px" }}>
                   <div>
-                    <p style={{ fontSize: "11px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#c8965c", marginBottom: "3px", fontFamily: SF }}>Revenue Recovered</p>
+                    <p style={{ fontSize: "11px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.18em", color: "#00AEEF", marginBottom: "3px", fontFamily: SF }}>Revenue Recovered</p>
                     {/* Enhancement 3: SF Pro Rounded for numerics — matches iOS Lock Screen/Live Activity */}
-                    <motion.p style={{ fontFamily: SF_ROUNDED, fontSize: "17px", fontWeight: "600", color: "#f5d9a8", lineHeight: 1, letterSpacing: "-0.02em", margin: 0, textShadow: "0 0 8px rgba(245,217,168,0.18)" }}>
+                    <motion.p style={{ fontFamily: SF_ROUNDED, fontSize: "17px", fontWeight: "600", color: "#DDF4FF", lineHeight: 1, letterSpacing: "-0.02em", margin: 0, textShadow: "0 0 8px rgba(245,217,168,0.18)" }}>
                       ${displayTotal.toLocaleString()}
                     </motion.p>
                   </div>
@@ -405,7 +405,7 @@ export default function RevenueRecoveryCounter() {
                 {/* Footer — frosted glass iOS widget */}
                 <div style={{ borderRadius: "12px", padding: "11px 15px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(255,255,255,0.07)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)", boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.1), inset 0 1px 0 rgba(255,255,255,0.14)" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <div style={{ width: "16px", height: "16px", borderRadius: "5px", background: "linear-gradient(135deg, #9a5c2e, #c8965c)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: "16px", height: "16px", borderRadius: "5px", background: "linear-gradient(135deg, #0077B6, #00AEEF)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M2 5.5L4 7.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
                     <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(255,255,255,0.5)", margin: 0, letterSpacing: "0.04em", fontFamily: SF }}>Automated by ClientSurge</p>

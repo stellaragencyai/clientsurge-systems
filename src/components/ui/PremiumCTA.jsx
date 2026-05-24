@@ -42,26 +42,26 @@ export default function PremiumCTA({
         border: "none",
         background: isInactive
           ? "linear-gradient(135deg, #9a7850 0%, #b89968 46%, #a08562 100%)"
-          : "linear-gradient(135deg, #7a4825 0%, #9a5c2e 46%, #c8965c 100%)",
+          : "linear-gradient(135deg, #005B99 0%, #0077B6 46%, #00AEEF 100%)",
         color: "#fff8ee",
         fontSize: "1rem",
         fontWeight: "700",
         boxShadow: isInactive
-          ? "0 10px 28px rgba(122,72,37,0.12)"
-          : "0 16px 36px rgba(122,72,37,0.24)",
+          ? "0 10px 28px rgba(0,91,153,0.12)"
+          : "0 16px 36px rgba(0,91,153,0.24)",
         cursor: isInactive ? "not-allowed" : "pointer",
         opacity: isInactive ? 0.7 : 1,
         transition: "all 0.3s ease",
       }}
       onMouseEnter={(e) => {
         if (!isInactive) {
-          e.currentTarget.style.boxShadow = "0 20px 48px rgba(122,72,37,0.32)";
+          e.currentTarget.style.boxShadow = "0 20px 48px rgba(0,91,153,0.32)";
           e.currentTarget.style.transform = "translateY(-2px)";
         }
       }}
       onMouseLeave={(e) => {
         if (!isInactive) {
-          e.currentTarget.style.boxShadow = "0 16px 36px rgba(122,72,37,0.24)";
+          e.currentTarget.style.boxShadow = "0 16px 36px rgba(0,91,153,0.24)";
           e.currentTarget.style.transform = "translateY(0)";
         }
       }}

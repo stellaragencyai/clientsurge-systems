@@ -9,19 +9,17 @@ import {
   createLeadCaptureRateLimiter,
   findDuplicateWebsiteLead,
   isDisposableEmail,
+  isValidEmail,
+  MAX_LEAD_CAPTURE_BYTES,
+  MAX_PROBLEM_LENGTH,
+  maskIpAddress,
   normalizeEmail,
   normalizePhone,
+  normalizeRequestedChannels,
+  normalizeSourcePage,
 } from "./leadCapture.shared.js";
 
 const rateLimiter = createLeadCaptureRateLimiter();
-
-function normalizeRequestedChannels(value: unknown) {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return [...new Set(value.map((entry) => cleanString(entry).toLowerCase()).filter(Boolean))];
-}
 
 function normalizeUtmParams(body: Record<string, unknown>) {
   return {
@@ -71,10 +69,10 @@ async function invokeAutomationOrchestrator(
       lead_id: leadId,
       client_project_id: projectId || undefined,
       channel: "internal",
-      direction: "internal",
+      direction: "system",
       event_type: "workflow_triggered",
-      provider: "automationOrchestrator",
-      status: result?.success === false ? "failed" : "completed",
+      provider: "internal",
+      status: result?.success === false ? "failed" : "processed",
       subject: "AI workflow triggered from website lead capture",
       message_body: triggerEvent,
       metadata_json: JSON.stringify({
@@ -90,9 +88,9 @@ async function invokeAutomationOrchestrator(
       lead_id: leadId,
       client_project_id: projectId || undefined,
       channel: "internal",
-      direction: "internal",
+      direction: "system",
       event_type: "workflow_triggered",
-      provider: "automationOrchestrator",
+      provider: "internal",
       status: "failed",
       subject: "AI workflow trigger failed",
       message_body: errorMsg,
@@ -115,6 +113,20 @@ function getClientIp(req: Request) {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
+    const contentLength = Number(req.headers.get("content-length") || "0");
+    if (contentLength > MAX_LEAD_CAPTURE_BYTES) {
+      return Response.json({ error: "Submission is too large" }, { status: 413 });
+    }
+
+    const contentType = req.headers.get("content-type") || "";
+    if (contentType && !contentType.toLowerCase().includes("application/json")) {
+      return Response.json({ error: "JSON body required" }, { status: 415 });
+    }
+
     const base44 = createClientFromRequest(req);
     const ip = getClientIp(req);
     if (rateLimiter.isRateLimited(ip)) {
@@ -123,7 +135,11 @@ Deno.serve(async (req) => {
         { status: 429 }
       );
     }
-    const body = await req.json();
+    const body = await req.json().catch(() => null);
+
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
 
     if (cleanString(body.website_url)) {
       return Response.json({
@@ -140,6 +156,10 @@ Deno.serve(async (req) => {
         { error: "phone or email required" },
         { status: 400 }
       );
+    }
+
+    if (email && !isValidEmail(email)) {
+      return Response.json({ error: "Invalid email address" }, { status: 422 });
     }
 
     if (email && isDisposableEmail(email)) {
@@ -176,9 +196,9 @@ Deno.serve(async (req) => {
       email,
       phone_number: phone,
       service_interest: cleanString(body.service_interest || "demo_request"),
-      message: cleanString(body.message || body.problem || ""),
-      problem: cleanString(body.problem || body.message || ""),
-      source: body.source || "website_form",
+      message: cleanString(body.message || body.problem || "", MAX_PROBLEM_LENGTH),
+      problem: cleanString(body.problem || body.message || "", MAX_PROBLEM_LENGTH),
+      source: cleanString(body.source || "website_form"),
       ...utmParams,
       lead_status: "new",
       dedup_key: buildDedupKey({ email, phone }),
@@ -187,9 +207,9 @@ Deno.serve(async (req) => {
       consent_given_at: consentGiven ? now : null,
       consent_source: cleanString(body.consent_source || "website_form"),
       consent_text_version: cleanString(body.consent_text_version || "lead_capture_v1"),
-      source_page: cleanString(body.source_page || req.headers.get("origin") || ""),
+      source_page: normalizeSourcePage(body.source_page),
       user_agent: cleanString(req.headers.get("user-agent") || ""),
-      ip_address: cleanString(
+      ip_address: maskIpAddress(
         req.headers.get("x-forwarded-for") ||
           req.headers.get("cf-connecting-ip") ||
           req.headers.get("x-real-ip") ||
@@ -213,7 +233,7 @@ Deno.serve(async (req) => {
       deduplicated: false,
     });
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error);
-    return Response.json({ error: errorMsg }, { status: 500 });
+    console.error("[submitLeadCapture] submission failed", error);
+    return Response.json({ error: "Lead submission failed" }, { status: 500 });
   }
 });

@@ -62,6 +62,10 @@ Deno.serve(async (req) => {
     }).catch(() => {});
     tasks.push("CommunicationEvent written");
 
+    await base44.asServiceRole.functions.invoke("autoSendWebhookInstructions", { order_id })
+      .then(() => tasks.push("setup instructions queued"))
+      .catch((error: any) => tasks.push(`setup instructions skipped: ${error?.message || "invoke failed"}`));
+
     return Response.json({ success: true, order_id, tasks });
   } catch (err: any) {
     return Response.json({ error: err.message }, { status: 500 });

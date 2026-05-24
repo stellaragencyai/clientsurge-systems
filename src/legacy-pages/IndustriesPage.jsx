@@ -31,7 +31,7 @@ const INDUSTRIES = [
     route: "/industries/tanning",
     icon: "☀️",
     label: "Tanning Salon",
-    accent: "#F59E0B",
+    accent: "#00AEEF",
     cta: "Turn Instagram DMs and website visitors into booked sessions automatically.",
     stat: "40% more sessions",
   },

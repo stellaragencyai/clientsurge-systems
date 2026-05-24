@@ -64,7 +64,7 @@ function HVACInner() {
         triggerLabel="Simulate Missed Call Text-Back"
         triggerEvent="Missed call detected → Text-back fires in under 60 seconds"
         automationName="Missed Call Text-Back"
-        accentColor="#f59e0b"
+        accentColor="#00AEEF"
         businessName="Elite HVAC"
       />
 

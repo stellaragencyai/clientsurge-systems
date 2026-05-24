@@ -5,6 +5,12 @@ import {
   RuntimeExecutionError,
 } from "./installRuntime.js";
 import { buildCommunicationEvent } from "./installPipeline.js";
+import {
+  applyEmailSuppression,
+  mapResendDeliveryStatus,
+  mapTwilioDeliveryStatus,
+  updateOutboxDeliveryStatus,
+} from "./communicationOutbox.js";
 
 export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
   const messageId = formData.get("MessageSid");
@@ -37,6 +43,14 @@ export async function handleTrustedTwilioStatusWebhook({ base44, formData }) {
 
     await base44.entities.CommunicationEvent.update(event.id, {
       status: mappedStatus,
+    });
+
+    await updateOutboxDeliveryStatus({
+      base44,
+      provider: "twilio",
+      providerMessageId: messageId,
+      providerStatus: String(messageStatus),
+      status: mapTwilioDeliveryStatus(messageStatus) || mappedStatus,
     });
 
     return {
@@ -180,7 +194,33 @@ export async function handleTrustedResendWebhook({ base44, payload }) {
   };
 
   const status = statusMap[type] || "processed";
+  const outboxStatus = mapResendDeliveryStatus(type);
   const engagementAt = new Date().toISOString();
+  const updateLeadEngagement = async ({ leadId, email }) => {
+    const candidateEntities = [
+      base44.asServiceRole.entities.SpaLead,
+      base44.asServiceRole.entities.WebsiteLead,
+      base44.asServiceRole.entities.Leads,
+      base44.asServiceRole.entities.Lead,
+    ].filter(Boolean);
+
+    for (const entity of candidateEntities) {
+      if (leadId) {
+        await entity.update?.(leadId, {
+          last_engagement_at: engagementAt,
+        }).catch(() => {});
+      }
+
+      if (!leadId && email) {
+        const leads = await entity.filter?.({ email }).catch(() => []);
+        if (leads?.[0]?.id) {
+          await entity.update?.(leads[0].id, {
+            last_engagement_at: engagementAt,
+          }).catch(() => {});
+        }
+      }
+    }
+  };
 
   const events = await base44.asServiceRole.entities.CommunicationEvent.filter({
     provider_message_id: email_id,
@@ -208,31 +248,64 @@ export async function handleTrustedResendWebhook({ base44, payload }) {
 
     await base44.asServiceRole.entities.CommunicationEvent.update(events[0].id, update);
 
+    await updateOutboxDeliveryStatus({
+      base44,
+      provider: "resend",
+      providerMessageId: email_id,
+      providerStatus: type,
+      status: outboxStatus,
+      failureReason: update.failure_reason || null,
+      metadata: {
+        resend_type: type,
+        to: data?.to?.[0] || null,
+      },
+      now: engagementAt,
+    });
+
     if (type === "email.opened" || type === "email.clicked") {
       const event = events[0];
       const leadEmail = data?.to?.[0] || null;
-
-      if (event?.lead_id) {
-        await base44.asServiceRole.entities.SpaLead.update(event.lead_id, {
-          last_engagement_at: engagementAt,
-        }).catch(() => {});
-      } else if (leadEmail) {
-        const leads = await base44.asServiceRole.entities.SpaLead.filter({
-          email: leadEmail,
-        }).catch(() => []);
-
-        if (leads?.[0]?.id) {
-          await base44.asServiceRole.entities.SpaLead.update(leads[0].id, {
-            last_engagement_at: engagementAt,
-          }).catch(() => {});
-        }
-      }
+      await updateLeadEngagement({ leadId: event?.lead_id, email: leadEmail });
     }
+  }
+
+  if (events.length === 0) {
+    await updateOutboxDeliveryStatus({
+      base44,
+      provider: "resend",
+      providerMessageId: email_id,
+      providerStatus: type,
+      status: outboxStatus,
+      failureReason:
+        type === "email.bounced"
+          ? data?.bounce?.message || data?.reason || "resend_email_bounced"
+          : type === "email.complained"
+            ? data?.complaint?.complaint_feedback_type || data?.reason || "resend_email_complaint"
+            : null,
+      metadata: {
+        resend_type: type,
+        to: data?.to?.[0] || null,
+      },
+      now: engagementAt,
+    });
+  }
+
+  if (type === "email.bounced" || type === "email.complained") {
+    await applyEmailSuppression({
+      base44,
+      email: data?.to?.[0] || data?.email || null,
+      reason: type === "email.complained" ? "complaint" : "bounce",
+      providerMessageId: email_id,
+      now: engagementAt,
+    }).catch((error) => {
+      console.warn("[receiveResendWebhook] Email suppression update failed:", error.message);
+    });
   }
 
   return {
     success: true,
     status,
+    outbox_status: outboxStatus,
     updated_event_id: events[0]?.id || null,
   };
 }

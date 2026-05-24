@@ -14,6 +14,39 @@
       "type": "string",
       "title": "Customer Phone"
     },
+    "sms_consent_granted": {
+      "type": "boolean",
+      "title": "Checkout SMS Consent Granted",
+      "default": false
+    },
+    "sms_consent_source": {
+      "type": "string",
+      "title": "Checkout SMS Consent Source"
+    },
+    "sms_consent_text": {
+      "type": "string",
+      "title": "Checkout SMS Consent Text"
+    },
+    "sms_consent_at": {
+      "type": "string",
+      "title": "Checkout SMS Consent Captured At"
+    },
+    "checkout_sms_confirmation_sent_at": {
+      "type": "string",
+      "title": "Checkout SMS Confirmation Sent At"
+    },
+    "checkout_sms_confirmation_message_sid": {
+      "type": "string",
+      "title": "Checkout SMS Confirmation Message SID"
+    },
+    "checkout_sms_confirmation_status": {
+      "type": "string",
+      "title": "Checkout SMS Confirmation Status"
+    },
+    "checkout_sms_confirmation_skipped_reason": {
+      "type": "string",
+      "title": "Checkout SMS Confirmation Skipped Reason"
+    },
     "business_name": {
       "type": "string",
       "title": "Business Name"
@@ -224,6 +257,10 @@
       "type": "string",
       "title": "Stripe Event ID (Idempotency Key)"
     },
+    "stripe_payment_intent_id": {
+      "type": "string",
+      "title": "Stripe Payment Intent ID"
+    },
     "subscription_id": {
       "type": "string",
       "title": "Linked Subscription ID"
@@ -247,6 +284,18 @@
     "current_period_end": {
       "type": "string",
       "title": "Current Period End"
+    },
+    "subscription_paused_at": {
+      "type": "string",
+      "title": "Subscription Paused At"
+    },
+    "subscription_pause_resumes_at": {
+      "type": "string",
+      "title": "Subscription Pause Resumes At"
+    },
+    "subscription_resumed_at": {
+      "type": "string",
+      "title": "Subscription Resumed At"
     },
     "plan_type": {
       "type": "string",
@@ -294,6 +343,148 @@
         "Error"
       ]
     },
+    "fulfillment_status": {
+      "type": "string",
+      "title": "Fulfillment Status",
+      "enum": [
+        "pending",
+        "running",
+        "completed",
+        "failed",
+        "needs_manual_review"
+      ]
+    },
+    "fulfillment_job_id": {
+      "type": "string",
+      "title": "Current Fulfillment Job ID"
+    },
+    "fulfillment_lock_key": {
+      "type": "string",
+      "title": "Fulfillment Lock Key"
+    },
+    "fulfillment_source_event_id": {
+      "type": "string",
+      "title": "Fulfillment Source Event ID"
+    },
+    "fulfillment_attempts": {
+      "type": "integer",
+      "title": "Fulfillment Attempts",
+      "default": 0
+    },
+    "fulfillment_last_error": {
+      "type": "string",
+      "title": "Fulfillment Last Error"
+    },
+    "fulfillment_failed_at": {
+      "type": "string",
+      "title": "Fulfillment Failed At"
+    },
+    "fulfillment_completed_at": {
+      "type": "string",
+      "title": "Fulfillment Completed At"
+    },
+    "fulfillment_recovery_required": {
+      "type": "boolean",
+      "title": "Fulfillment Recovery Required",
+      "default": false
+    },
+    "fulfillment_recommended_next_action": {
+      "type": "string",
+      "title": "Fulfillment Recommended Next Action"
+    },
+    "canonical_install_state": {
+      "type": "string",
+      "title": "Canonical Install State",
+      "enum": [
+        "PENDING_PAYMENT",
+        "PAYMENT_VERIFIED",
+        "ORDER_CREATED",
+        "ONBOARDING_STARTED",
+        "CONFIG_REQUIRED",
+        "CONFIG_SUBMITTED",
+        "CONFIG_VALIDATED",
+        "TWILIO_PENDING",
+        "TWILIO_READY",
+        "RESEND_PENDING",
+        "RESEND_READY",
+        "WORKFLOW_DEPLOY_PENDING",
+        "WORKFLOW_DEPLOYED",
+        "AUTOMATION_TESTING",
+        "AUTOMATION_TEST_FAILED",
+        "LIVE_READY",
+        "LIVE",
+        "PAUSED",
+        "RECOVERY_REQUIRED",
+        "FAILED",
+        "CANCELLED"
+      ]
+    },
+    "previous_install_state": {
+      "type": "string",
+      "title": "Previous Canonical Install State"
+    },
+    "install_state_entered_at": {
+      "type": "string",
+      "title": "Install State Entered At"
+    },
+    "install_state_updated_at": {
+      "type": "string",
+      "title": "Install State Updated At"
+    },
+    "install_blocking_issue": {
+      "type": "string",
+      "title": "Current Install Blocking Issue"
+    },
+    "install_failed_subsystem": {
+      "type": "string",
+      "title": "Failed Install Subsystem"
+    },
+    "install_retry_count": {
+      "type": "integer",
+      "title": "Install Retry Count",
+      "default": 0
+    },
+    "install_last_successful_milestone": {
+      "type": "string",
+      "title": "Last Successful Install Milestone"
+    },
+    "install_lock_key": {
+      "type": "string",
+      "title": "Install Lock Key"
+    },
+    "install_lock_status": {
+      "type": "string",
+      "title": "Install Lock Status",
+      "enum": [
+        "active",
+        "released",
+        "failed"
+      ]
+    },
+    "install_lock_owner": {
+      "type": "string",
+      "title": "Install Lock Owner"
+    },
+    "install_lock_acquired_at": {
+      "type": "string",
+      "title": "Install Lock Acquired At"
+    },
+    "install_lock_released_at": {
+      "type": "string",
+      "title": "Install Lock Released At"
+    },
+    "install_orchestration_attempts": {
+      "type": "integer",
+      "title": "Install Orchestration Attempts",
+      "default": 0
+    },
+    "install_state_history": {
+      "type": "array",
+      "title": "Install State History",
+      "items": {
+        "type": "object"
+      }
+    },
     "order_status": {
       "type": "string",
       "title": "Order Status",
@@ -320,6 +511,22 @@
     "install_initialized_at": {
       "type": "string",
       "title": "Install Initialized At"
+    },
+    "activation_started_at": {
+      "type": "string",
+      "title": "Activation Started At"
+    },
+    "activation_completed_at": {
+      "type": "string",
+      "title": "Activation Completed At"
+    },
+    "setup_instructions_sent_at": {
+      "type": "string",
+      "title": "Setup Instructions Sent At"
+    },
+    "webhook_instructions_sent_at": {
+      "type": "string",
+      "title": "Webhook Instructions Sent At"
     },
     "last_install_event_at": {
       "type": "string",

@@ -102,8 +102,8 @@ const ACTION_TYPE_CONFIG = {
   email: {
     label: "Email",
     icon: Mail,
-    color: "text-amber-600",
-    bgColor: "bg-amber-50 border-amber-200",
+    color: "text-blue-600",
+    bgColor: "bg-blue-50 border-blue-200",
   },
 };
 
@@ -123,8 +123,8 @@ const STATUS_CONFIG = {
   pending: {
     label: "Pending",
     icon: Clock,
-    color: "text-amber-600",
-    bgColor: "bg-amber-50",
+    color: "text-blue-600",
+    bgColor: "bg-blue-50",
   },
 };
 

@@ -15,7 +15,7 @@ const ENTITY_COLORS = {
   lead: "#00D4FF",
   client: "#00FFB3",
   order: "#A78BFA",
-  support: "#F59E0B",
+  support: "#00AEEF",
 };
 
 export default function AdminGlobalSearch({ onSelect, onNavigate }) {

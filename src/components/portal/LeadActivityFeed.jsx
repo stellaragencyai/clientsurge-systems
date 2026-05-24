@@ -37,7 +37,7 @@ const STATUS_COLORS = {
   Contacted: "bg-purple-100 text-purple-700",
   Replied: "bg-indigo-100 text-indigo-700",
   Qualified: "bg-green-100 text-green-700",
-  "Booking Prompt Sent": "bg-amber-100 text-amber-700",
+  "Booking Prompt Sent": "bg-blue-100 text-blue-700",
   Booked: "bg-emerald-100 text-emerald-700",
   Closed: "bg-gray-100 text-gray-700",
 };
@@ -53,7 +53,6 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
   const colors = {
     blue: "bg-blue-50 border-blue-100 text-blue-800",
     green: "bg-green-50 border-green-100 text-green-800",
-    amber: "bg-amber-50 border-amber-100 text-amber-800",
     emerald: "bg-emerald-50 border-emerald-100 text-emerald-800",
     purple: "bg-purple-50 border-purple-100 text-purple-800",
   };
@@ -123,7 +122,7 @@ function LeadRow({ lead, selected, onToggle }) {
           </p>
         )}
         {lead.last_contacted_at === null && (
-          <p className="text-[10px] text-amber-600 font-medium">Pending</p>
+          <p className="text-[10px] text-blue-600 font-medium">Pending</p>
         )}
       </div>
     </div>
@@ -220,7 +219,7 @@ export default function LeadActivityFeed({ project }) {
       {/* How it works banner */}
       <div
         className="rounded-2xl p-5 text-sm space-y-3"
-        style={{ background: "rgba(154,92,46,0.06)", border: "1px solid rgba(154,92,46,0.15)" }}
+        style={{ background: "rgba(0,136,204,0.06)", border: "1px solid rgba(0,136,204,0.15)" }}
       >
         <p className="font-semibold text-foreground">How your automated system works:</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -230,8 +229,8 @@ export default function LeadActivityFeed({ project }) {
             { Icon: PhoneCall, label: "Missed Call Recovery", desc: "Missed calls trigger an automatic text-back to recover the lead." },
           ].map(({ Icon, label, desc }) => (
             <div key={label} className="flex gap-3 items-start">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(154,92,46,0.12)" }}>
-                <Icon className="w-4 h-4" style={{ color: "#9a5c2e" }} />
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(0,136,204,0.12)" }}>
+                <Icon className="w-4 h-4" style={{ color: "#0077B6" }} />
               </div>
               <div>
                 <p className="text-xs font-semibold text-foreground">{label}</p>
@@ -254,7 +253,7 @@ export default function LeadActivityFeed({ project }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <StatCard icon={Users} label="Total Leads" value={total} sub="All time" color="blue" />
             <StatCard icon={MessageSquare} label="Contacted" value={contacted} sub="Reached by your system" color="purple" />
-            <StatCard icon={TrendingUp} label="Qualified" value={qualified} sub="High-intent leads" color="amber" />
+            <StatCard icon={TrendingUp} label="Qualified" value={qualified} sub="High-intent leads" color="blue" />
             <StatCard icon={CheckCircle2} label="Booked" value={booked} sub="Converted to appointment" color="emerald" />
           </div>
 
@@ -269,7 +268,7 @@ export default function LeadActivityFeed({ project }) {
                 className="h-full rounded-full transition-all duration-700"
                 style={{
                   width: `${Math.round((booked / total) * 100)}%`,
-                  background: "linear-gradient(90deg, #7a4825, #c8965c)",
+                  background: "linear-gradient(90deg, #005B99, #00AEEF)",
                 }}
               />
             </div>
@@ -283,7 +282,7 @@ export default function LeadActivityFeed({ project }) {
           {/* Leads table with bulk select */}
           <div
             className="rounded-2xl p-6"
-            style={{ background: "rgba(255,255,255,0.92)", border: "1px solid rgba(154,92,46,0.12)" }}
+            style={{ background: "rgba(255,255,255,0.92)", border: "1px solid rgba(0,136,204,0.12)" }}
           >
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -344,7 +343,7 @@ export default function LeadActivityFeed({ project }) {
                     <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
                       <div
                         className="h-full rounded-full"
-                        style={{ width: `${pct}%`, background: "linear-gradient(90deg,#9a5c2e,#c8965c)" }}
+                        style={{ width: `${pct}%`, background: "linear-gradient(90deg,#0077B6,#00AEEF)" }}
                       />
                     </div>
                     <span className="text-xs font-semibold text-foreground w-6 text-right">{count}</span>

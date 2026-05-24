@@ -1,20 +1,19 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+} from "../_shared/communicationOutbox.js";
 
 Deno.serve(async (req) => {
   try {
-    createClientFromRequest(req);
+    const base44 = createClientFromRequest(req);
     const { full_name, business_name, email, phone, scheduled_date, scheduled_time, biggest_issue, industry } = await req.json();
 
     if (!full_name || !email || !scheduled_date || !scheduled_time) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
     const adminEmail = Deno.env.get('ADMIN_EMAIL') || 'system@clientsurgesystems.com';
-
-    if (!resendApiKey) {
-      return Response.json({ error: 'Resend credentials not configured' }, { status: 500 });
-    }
 
     const dateObj = new Date(`${scheduled_date}T12:00:00`);
     const formattedDate = dateObj.toLocaleDateString('en-US', {
@@ -31,11 +30,11 @@ Deno.serve(async (req) => {
 <html>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
   <div style="background: #1a1510; padding: 24px; border-radius: 12px 12px 0 0; text-align: center;">
-    <h1 style="color: #c8965c; margin: 0; font-size: 22px;">New Demo Booked</h1>
+    <h1 style="color: #00AEEF; margin: 0; font-size: 22px;">New Demo Booked</h1>
   </div>
   <div style="background: #fff; padding: 32px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-    <div style="background: #fdf8f0; border-left: 4px solid #c8965c; padding: 16px; margin-bottom: 24px; border-radius: 4px;">
-      <p style="margin: 0; font-size: 18px; font-weight: bold; color: #6b3f1f;">${formattedDate} at ${formattedTime}</p>
+    <div style="background: #fdf8f0; border-left: 4px solid #00AEEF; padding: 16px; margin-bottom: 24px; border-radius: 4px;">
+      <p style="margin: 0; font-size: 18px; font-weight: bold; color: #005B99;">${formattedDate} at ${formattedTime}</p>
     </div>
     <h3 style="color: #333; margin-top: 0;">Contact Info</h3>
     <table style="width: 100%; border-collapse: collapse;">
@@ -51,24 +50,30 @@ Deno.serve(async (req) => {
 </body>
 </html>`;
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${resendApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: 'ClientSurge Systems <system@clientsurgesystems.com>',
-        to: [adminEmail],
-        subject: `New Demo: ${business_name || full_name} - ${formattedDate} at ${formattedTime}`,
-        html: emailBody,
+    const result = await sendCommunicationViaOutbox({
+      base44,
+      channel: "email",
+      provider: "resend",
+      recipient: adminEmail,
+      subject: `New Demo: ${business_name || full_name} - ${formattedDate} at ${formattedTime}`,
+      body: emailBody,
+      html: emailBody,
+      from: 'ClientSurge Systems <system@clientsurgesystems.com>',
+      source: "sendAdminDemoNotification",
+      sourceRecordId: `${email}:${scheduled_date}:${scheduled_time}`,
+      templateKey: "admin_demo_notification",
+      messageType: "transactional",
+      consentBasis: "internal_notification",
+      metadata: { full_name, business_name, scheduled_date, scheduled_time, industry },
+      providerSend: (providerPayload) => sendResendEmailProvider({
+        ...providerPayload,
+        env: (name) => Deno.env.get(name),
+        fetchImpl: fetch,
       }),
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      return Response.json({ error: data.message || 'Email send failed' }, { status: 500 });
+    if (!result.success) {
+      return Response.json({ error: result.reason || result.error || 'Email send failed' }, { status: 500 });
     }
 
     return Response.json({ success: true });

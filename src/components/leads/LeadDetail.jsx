@@ -36,7 +36,7 @@ export default function LeadDetail({ lead, onClose, onUpdate }) {
 
   const qualityColors = {
     'High': 'bg-green-100 text-green-800',
-    'Medium': 'bg-yellow-100 text-yellow-800',
+    'Medium': 'bg-sky-100 text-sky-800',
     'Low': 'bg-red-100 text-red-800',
   };
 
@@ -159,7 +159,7 @@ export default function LeadDetail({ lead, onClose, onUpdate }) {
               <div className="space-y-1">
                 {lead.missing_systems.map((system, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm text-foreground">
-                    <span className="text-yellow-600">→</span>
+                    <span className="text-sky-600">→</span>
                     {system}
                   </div>
                 ))}

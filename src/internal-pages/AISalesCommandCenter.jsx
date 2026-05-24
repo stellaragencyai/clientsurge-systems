@@ -15,9 +15,9 @@ const AGENT_COLORS = {
   sales_rep_med_spa:      { bg: 'bg-pink-50',   border: 'border-pink-200',   badge: 'bg-pink-100 text-pink-800',   chart: '#ec4899' },
   sales_rep_dental:       { bg: 'bg-cyan-50',    border: 'border-cyan-200',   badge: 'bg-cyan-100 text-cyan-800',   chart: '#06b6d4' },
   sales_rep_chiropractic: { bg: 'bg-purple-50',  border: 'border-purple-200', badge: 'bg-purple-100 text-purple-800', chart: '#8b5cf6' },
-  sales_rep_hvac:         { bg: 'bg-orange-50',  border: 'border-orange-200', badge: 'bg-orange-100 text-orange-800', chart: '#f97316' },
+  sales_rep_hvac:         { bg: 'bg-sky-50',  border: 'border-sky-200', badge: 'bg-sky-100 text-sky-800', chart: '#00AEEF' },
   sales_rep_roofing:      { bg: 'bg-slate-50',   border: 'border-slate-200',  badge: 'bg-slate-100 text-slate-700', chart: '#64748b' },
-  sales_rep_contractors:  { bg: 'bg-amber-50',   border: 'border-amber-200',  badge: 'bg-amber-100 text-amber-800', chart: '#f59e0b' },
+  sales_rep_contractors:  { bg: 'bg-blue-50',   border: 'border-blue-200',  badge: 'bg-blue-100 text-blue-800', chart: '#00AEEF' },
 };
 
 function fmt(date) {

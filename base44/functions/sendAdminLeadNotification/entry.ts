@@ -4,6 +4,10 @@
  * Sends a rich HTML email to the admin via Resend.
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+} from "../_shared/communicationOutbox.js";
 // Inlined from _shared/automationSecurity.js (relative imports not supported in deployed Deno runtime)
 function constantTimeEqual(left, right) {
   if (typeof left !== "string" || typeof right !== "string" || left.length !== right.length) return false;
@@ -78,11 +82,6 @@ Deno.serve(async (req) => {
       return Response.json({ skipped: true, reason: 'No notification email configured' });
     }
 
-    const resendKey = Deno.env.get('RESEND_API_KEY');
-    if (!resendKey) {
-      return Response.json({ error: 'RESEND_API_KEY not set' }, { status: 500 });
-    }
-
     const submittedAt = new Date(lead.created_date).toLocaleString('en-US', {
       timeZone: 'America/Phoenix',
       month: 'short', day: 'numeric', year: 'numeric',
@@ -101,7 +100,7 @@ Deno.serve(async (req) => {
 <html>
 <body style="font-family:sans-serif;background:#f5f5f5;padding:24px;">
   <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;border:1px solid #e5e5e5;overflow:hidden;">
-    <div style="background:linear-gradient(135deg,#6b3f1f,#9a5c2e);padding:24px 28px;">
+    <div style="background:linear-gradient(135deg,#005B99,#0077B6);padding:24px 28px;">
       <p style="margin:0;color:rgba(255,255,255,0.7);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">ClientSurge Systems</p>
       <h1 style="margin:8px 0 0;color:#fff;font-size:22px;font-weight:700;">New Lead Submitted 🎯</h1>
     </div>
@@ -117,7 +116,7 @@ Deno.serve(async (req) => {
         <tr style="background:#fafafa;"><td style="padding:8px 6px;color:#888;vertical-align:top;font-weight:600;">Submitted</td><td style="padding:8px 6px;color:#888;font-size:12px;">${submittedAt}</td></tr>
       </table>
       <div style="margin-top:24px;">
-        <a href="https://clientsurgesystems.com/admin/leads/${lead.id}" style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
+        <a href="https://clientsurgesystems.com/admin/leads/${lead.id}" style="display:inline-block;background:linear-gradient(135deg,#005B99,#0077B6);color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;">
           View Lead in Dashboard →
         </a>
       </div>
@@ -126,27 +125,35 @@ Deno.serve(async (req) => {
 </body>
 </html>`;
 
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${resendKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: `ClientSurge Systems <${settings.resend_from_email || 'notifications@clientsurgesystems.com'}>`,
-        to: toEmail,
-        subject: `🎯 New Lead: ${lead.full_name} — ${lead.business_name || lead.business_type || 'Unknown'}`,
-        html: htmlBody,
+    const sendResult = await sendCommunicationViaOutbox({
+      base44,
+      channel: "email",
+      provider: "resend",
+      recipient: toEmail,
+      subject: `🎯 New Lead: ${lead.full_name} — ${lead.business_name || lead.business_type || 'Unknown'}`,
+      body: htmlBody,
+      html: htmlBody,
+      from: `ClientSurge Systems <${settings.resend_from_email || 'notifications@clientsurgesystems.com'}>`,
+      lead,
+      leadId: lead_id,
+      source: "sendAdminLeadNotification",
+      sourceRecordId: lead_id,
+      templateKey: "admin_lead_notification",
+      messageType: "transactional",
+      consentBasis: "internal_notification",
+      metadata: { target: 'admin_notification', to_email: toEmail },
+      providerSend: (providerPayload) => sendResendEmailProvider({
+        ...providerPayload,
+        env: (name) => Deno.env.get(name),
+        fetchImpl: fetch,
       }),
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      console.error('Resend error:', err);
-      return Response.json({ error: err?.message || 'Resend failed' }, { status: 500 });
+    if (!sendResult.success) {
+      const err = sendResult.reason || sendResult.error || 'Resend failed';
+      console.error('Resend outbox error:', err);
+      return Response.json({ error: err }, { status: 500 });
     }
-
-    const resendData = await res.json().catch(() => ({}));
 
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id,
@@ -157,12 +164,12 @@ Deno.serve(async (req) => {
       status: 'sent',
       subject: `Lead notification sent to ${toEmail}`,
       message_body: 'Admin lead notification email sent successfully.',
-      provider_message_id: resendData?.id,
+      provider_message_id: sendResult.provider_message_id,
       metadata_json: JSON.stringify({ target: 'admin_notification', to_email: toEmail }),
     });
 
     console.log(`Lead notification sent to ${toEmail} for lead ${lead_id}`);
-    return Response.json({ success: true, sent_to: toEmail, email_id: resendData?.id || null });
+    return Response.json({ success: true, sent_to: toEmail, email_id: sendResult.provider_message_id || null, outbox_id: sendResult.outbox?.id || null });
 
   } catch (error) {
     console.error('sendAdminLeadNotification error:', error);

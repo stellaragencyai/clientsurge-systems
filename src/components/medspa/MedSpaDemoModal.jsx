@@ -124,8 +124,8 @@ export default function MedSpaDemoModal({ onClose }) {
               Keep an eye on your inbox for a confirmation email with all the details about your scheduled demo.
             </p>
             {submitWarnings.length > 0 && (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 w-full mb-4">
-                <p className="text-xs text-amber-800">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 w-full mb-4">
+                <p className="text-xs text-blue-800">
                   Your booking was saved, but one or more follow-up actions still need review on our side.
                 </p>
               </div>

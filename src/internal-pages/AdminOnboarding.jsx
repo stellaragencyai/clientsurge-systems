@@ -80,7 +80,7 @@ export default function AdminOnboarding() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <StatCard label="Total Clients" value={clients.length} color="primary" />
           <StatCard label="Live" value={liveCount} color="green" />
-          <StatCard label="In Setup" value={inSetupCount} color="amber" />
+          <StatCard label="In Setup" value={inSetupCount} color="blue" />
           <StatCard label="Onboarding" value={onboardingCount} color="gray" />
         </div>
 
@@ -140,7 +140,7 @@ function StatCard({ label, value, color }) {
   const colors = {
     primary: "bg-primary/8 text-primary border-primary/20",
     green: "bg-green-50 text-green-700 border-green-200",
-    amber: "bg-amber-50 text-amber-700 border-amber-200",
+    blue: "bg-blue-50 text-blue-700 border-blue-200",
     gray: "bg-gray-50 text-gray-600 border-gray-200",
   };
   return (

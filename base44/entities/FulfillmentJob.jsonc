@@ -1,0 +1,110 @@
+{
+  "name": "FulfillmentJob",
+  "type": "object",
+  "properties": {
+    "job_id": {
+      "type": "string",
+      "title": "Job ID"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "source_event_id": {
+      "type": "string",
+      "title": "Source Payment Event ID"
+    },
+    "job_type": {
+      "type": "string",
+      "title": "Job Type",
+      "enum": [
+        "install_pipeline_start",
+        "order_activation",
+        "client_project_create"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "pending",
+        "running",
+        "completed",
+        "failed",
+        "needs_manual_review"
+      ],
+      "default": "pending"
+    },
+    "attempts": {
+      "type": "integer",
+      "title": "Attempts",
+      "default": 0
+    },
+    "lock_key": {
+      "type": "string",
+      "title": "Lock Key"
+    },
+    "last_error": {
+      "type": "string",
+      "title": "Last Error"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At"
+    },
+    "updated_at": {
+      "type": "string",
+      "title": "Updated At"
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Completed At"
+    },
+    "failed_at": {
+      "type": "string",
+      "title": "Failed At"
+    },
+    "recovery_required": {
+      "type": "boolean",
+      "title": "Recovery Required",
+      "default": false
+    },
+    "result_summary": {
+      "type": "object",
+      "title": "Result Summary"
+    },
+    "recommended_next_action": {
+      "type": "string",
+      "title": "Recommended Next Action"
+    }
+  },
+  "required": [
+    "job_id",
+    "order_id",
+    "source_event_id",
+    "job_type",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

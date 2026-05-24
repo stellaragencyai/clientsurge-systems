@@ -89,20 +89,20 @@ function BenefitCard({ benefit, index, isVisible }) {
         background: "linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,248,235,0.4) 100%)",
         backdropFilter: "blur(14px)",
         WebkitBackdropFilter: "blur(14px)",
-        border: showBorder ? "1px solid rgba(154,92,46,0.22)" : "1px solid rgba(154,92,46,0.08)",
+        border: showBorder ? "1px solid rgba(0,136,204,0.22)" : "1px solid rgba(0,136,204,0.08)",
         boxShadow: "0 4px 20px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
         transitionDelay: `${index * 150}ms`,
         transition: `opacity 0.5s ease ${index * 150}ms, transform 0.5s ease ${index * 150}ms, box-shadow 0.3s ease, border-color 0.3s ease`,
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.boxShadow = "0 16px 40px rgba(154,92,46,0.14), inset 0 1px 0 rgba(255,255,255,0.8)";
+        e.currentTarget.style.boxShadow = "0 16px 40px rgba(0,136,204,0.14), inset 0 1px 0 rgba(255,255,255,0.8)";
         e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.borderColor = "rgba(154,92,46,0.38)";
+        e.currentTarget.style.borderColor = "rgba(0,136,204,0.38)";
       }}
       onMouseLeave={e => {
         e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7)";
         e.currentTarget.style.transform = showBorder ? "translateY(0)" : "translateY(16px)";
-        e.currentTarget.style.borderColor = "rgba(154,92,46,0.22)";
+        e.currentTarget.style.borderColor = "rgba(0,136,204,0.22)";
       }}
     >
       <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/10 border border-primary/15 flex items-center justify-center">
@@ -147,12 +147,12 @@ export default function Benefits() {
         </div>
 
         <div className="text-center mt-14">
-          <button onClick={() => setShowDemoModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",boxShadow:"0 4px 18px rgba(120,70,20,0.35)",transition:"box-shadow 0.5s ease, transform 0.3s ease", cursor:"pointer",border:"none"}} onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+          <button onClick={() => setShowDemoModal(true)} style={{display:"inline-block",borderRadius:"9999px",padding:"2px",background:"linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",boxShadow:"0 4px 18px rgba(0,174,239,0.4)",transition:"box-shadow 0.5s ease, transform 0.3s ease", cursor:"pointer",border:"none"}} onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = "0 8px 40px rgba(0,174,239,0.48), 0 4px 18px rgba(0,80,160,0.25)";
           }} onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
+            e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,174,239,0.4)";
           }}>
-            <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 32px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
+            <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 32px",borderRadius:"9999px",background:"linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",color:"#ffffff",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.25)"}}>
               Make the Leap
               <ArrowRight className="w-4 h-4" />
             </span>

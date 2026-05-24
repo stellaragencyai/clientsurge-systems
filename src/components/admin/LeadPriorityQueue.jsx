@@ -14,10 +14,10 @@ import LeadScoreBadge from "./LeadScoreBadge";
 
 const STATUS_COLORS = {
   New: "bg-blue-100 text-blue-700",
-  Contacted: "bg-yellow-100 text-yellow-700",
+  Contacted: "bg-sky-100 text-sky-700",
   Replied: "bg-indigo-100 text-indigo-700",
   Qualified: "bg-green-100 text-green-700",
-  "Booking Prompt Sent": "bg-amber-100 text-amber-700",
+  "Booking Prompt Sent": "bg-blue-100 text-blue-700",
   Booked: "bg-emerald-100 text-emerald-700",
   Closed: "bg-gray-100 text-gray-700",
 };
@@ -30,12 +30,12 @@ function urgencyReasons(lead) {
   const lastContact = daysSince(lead.last_contacted_at);
 
   if (age <= 1) reasons.push({ icon: Flame, label: "New today", color: "text-red-600" });
-  else if (age <= 3) reasons.push({ icon: Clock, label: `${Math.round(age)}d old`, color: "text-amber-600" });
+  else if (age <= 3) reasons.push({ icon: Clock, label: `${Math.round(age)}d old`, color: "text-blue-600" });
 
   if (lead.status === "Replied") reasons.push({ icon: Zap, label: "Replied — close now", color: "text-purple-700" });
   if (lead.status === "Qualified") reasons.push({ icon: Star, label: "Qualified", color: "text-green-700" });
   if (lead.status === "Booking Prompt Sent" && lastContact > 1)
-    reasons.push({ icon: AlertTriangle, label: "Booking prompt — no response", color: "text-amber-700" });
+    reasons.push({ icon: AlertTriangle, label: "Booking prompt — no response", color: "text-blue-700" });
 
   if (lead.lead_score >= 70) reasons.push({ icon: TrendingUp, label: `High score ${lead.lead_score}`, color: "text-emerald-700" });
 
@@ -45,7 +45,7 @@ function urgencyReasons(lead) {
   if (lead.industry_tags?.length) reasons.push({ icon: Tag, label: lead.industry_tags[0], color: "text-slate-600" });
 
   if (!lead.last_contacted_at) reasons.push({ icon: AlertTriangle, label: "Never contacted", color: "text-red-600" });
-  else if (lastContact > 7) reasons.push({ icon: Clock, label: `${Math.round(lastContact)}d since contact`, color: "text-amber-600" });
+  else if (lastContact > 7) reasons.push({ icon: Clock, label: `${Math.round(lastContact)}d since contact`, color: "text-blue-600" });
 
   return reasons.slice(0, 3);
 }
@@ -61,15 +61,15 @@ function nextAction(lead) {
 
 const SENTIMENT_CONFIG = {
   Positive: { label: "Positive", icon: ThumbsUp, color: "text-green-600", bg: "bg-green-50 border-green-200", boost: 40 },
-  Neutral:  { label: "Neutral",  icon: Minus,    color: "text-amber-600", bg: "bg-amber-50 border-amber-200",  boost: 0  },
+  Neutral:  { label: "Neutral",  icon: Minus,    color: "text-blue-600", bg: "bg-blue-50 border-blue-200",  boost: 0  },
   Negative: { label: "Negative", icon: ThumbsDown, color: "text-red-600", bg: "bg-red-50 border-red-200",      boost: -10 },
   Unknown:  { label: "Unknown",  icon: Minus,    color: "text-slate-400", bg: "bg-slate-50 border-slate-200",  boost: 0  },
 };
 
 const PRIORITY_STYLE = {
   Hot:    "bg-red-100 text-red-800 border-red-300",
-  High:   "bg-orange-100 text-orange-800 border-orange-300",
-  Medium: "bg-amber-100 text-amber-800 border-amber-300",
+  High:   "bg-sky-100 text-sky-800 border-sky-300",
+  Medium: "bg-blue-100 text-blue-800 border-blue-300",
   Low:    "bg-slate-100 text-slate-600 border-slate-300",
 };
 
@@ -310,9 +310,9 @@ export default function LeadPriorityQueue() {
               <div
                 key={lead.id}
                 className={`rounded-xl border p-4 transition-all hover:shadow-sm ${
-                  hot ? "border-red-300 bg-gradient-to-r from-red-50/60 to-orange-50/30 ring-1 ring-red-200" :
+                  hot ? "border-red-300 bg-gradient-to-r from-red-50/60 to-cyan-50/30 ring-1 ring-red-200" :
                   isUrgent ? "border-red-200 bg-red-50/30" :
-                  idx < 5 ? "border-amber-200 bg-amber-50/20" : "border-border bg-white"
+                  idx < 5 ? "border-blue-200 bg-blue-50/20" : "border-border bg-white"
                 }`}
               >
                 <div className="flex items-start gap-4">
@@ -320,7 +320,7 @@ export default function LeadPriorityQueue() {
                   <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
                     hot ? "bg-red-600 text-white" :
                     idx === 0 ? "bg-red-100 text-red-700" :
-                    idx < 3 ? "bg-amber-100 text-amber-700" :
+                    idx < 3 ? "bg-blue-100 text-blue-700" :
                     "bg-muted text-muted-foreground"
                   }`}>
                     {hot ? "🔥" : idx + 1}

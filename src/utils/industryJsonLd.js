@@ -1,9 +1,3 @@
-/**
- * industryJsonLd.js — #282
- * LocalBusiness + Service JSON-LD schema for all 6 industry pages.
- * Call injectIndustryJsonLd() in each industry page component.
- */
-
 const BASE_ADDRESS = {
   "@type": "PostalAddress",
   streetAddress: "653 W 10th St",
@@ -15,51 +9,45 @@ const BASE_ADDRESS = {
 
 const INDUSTRY_CONFIG = {
   medspa: {
-    name: "Med Spa AI Automation — ClientSurge Systems",
-    description: "AI lead response and appointment booking automation for med spas in Phoenix & Scottsdale, AZ.",
+    name: "Med Spa AI Automation - ClientSurge Systems",
+    description: "AI lead response and appointment booking automation for med spas in Phoenix and Scottsdale, AZ.",
     serviceType: "Med Spa Marketing Automation",
     areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Tempe, AZ", "Chandler, AZ"],
   },
   "med-spa": {
     name: "Med Spa AI Automation - ClientSurge Systems",
-    description: "AI lead response and appointment booking automation for med spas in Phoenix & Scottsdale, AZ.",
+    description: "AI lead response and appointment booking automation for med spas in Phoenix and Scottsdale, AZ.",
     serviceType: "Med Spa Marketing Automation",
     areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Tempe, AZ", "Chandler, AZ"],
   },
   dental: {
-    name: "Dental Practice AI Automation — ClientSurge Systems",
-    description: "AI lead response and patient follow-up automation for dental offices in Phoenix & Scottsdale, AZ.",
+    name: "Dental Practice AI Automation - ClientSurge Systems",
+    description: "AI lead response and patient follow-up automation for dental offices in Phoenix and Scottsdale, AZ.",
     serviceType: "Dental Practice Automation",
     areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Mesa, AZ", "Tempe, AZ"],
   },
-  tanning: {
-    name: "Tanning Salon AI Automation — ClientSurge Systems",
-    description: "AI lead capture and automated follow-up for tanning salons in the Phoenix valley.",
-    serviceType: "Tanning Salon Marketing Automation",
-    areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Gilbert, AZ"],
+  chiropractic: {
+    name: "Chiropractic Clinic AI Automation - ClientSurge Systems",
+    description: "AI lead response, appointment booking, and patient follow-up automation for chiropractic clinics.",
+    serviceType: "Chiropractic Clinic Automation",
+    areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Tempe, AZ", "Mesa, AZ"],
   },
   hvac: {
-    name: "HVAC Contractor AI Automation — ClientSurge Systems",
-    description: "AI lead response and booking automation for HVAC contractors in Phoenix & Scottsdale, AZ.",
+    name: "HVAC Contractor AI Automation - ClientSurge Systems",
+    description: "AI lead response and booking automation for HVAC contractors in Phoenix and Scottsdale, AZ.",
     serviceType: "HVAC Contractor Automation",
     areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Mesa, AZ", "Chandler, AZ", "Tempe, AZ"],
   },
   roofing: {
-    name: "Roofing Contractor AI Automation — ClientSurge Systems",
+    name: "Roofing Contractor AI Automation - ClientSurge Systems",
     description: "AI lead capture and instant response for roofing contractors in the Phoenix metropolitan area.",
     serviceType: "Roofing Contractor Automation",
     areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Glendale, AZ", "Peoria, AZ"],
   },
   contractors: {
-    name: "General Contractor AI Automation — ClientSurge Systems",
-    description: "AI lead response and follow-up automation for general contractors in Phoenix & Scottsdale.",
+    name: "General Contractor AI Automation - ClientSurge Systems",
+    description: "AI lead response and follow-up automation for general contractors in Phoenix and Scottsdale.",
     serviceType: "General Contractor Automation",
-    areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Tempe, AZ", "Mesa, AZ"],
-  },
-  chiropractic: {
-    name: "Chiropractic Clinic AI Automation - ClientSurge Systems",
-    description: "AI lead response, appointment booking, and patient follow-up automation for chiropractic clinics in Phoenix & Scottsdale.",
-    serviceType: "Chiropractic Clinic Automation",
     areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Tempe, AZ", "Mesa, AZ"],
   },
 };
@@ -67,6 +55,7 @@ const INDUSTRY_CONFIG = {
 export function buildIndustryJsonLd(industry) {
   const normalizedIndustry = String(industry || "medspa").toLowerCase().replace(/_/g, "-");
   const config = INDUSTRY_CONFIG[normalizedIndustry] || INDUSTRY_CONFIG.medspa;
+
   return {
     "@context": "https://schema.org",
     "@type": ["LocalBusiness", "ProfessionalService"],
@@ -92,8 +81,9 @@ export function buildIndustryJsonLd(industry) {
 
 export function injectIndustryJsonLd(industry) {
   const schema = buildIndustryJsonLd(industry);
-  const existing = document.head.querySelector('script[data-industry-jsonld]');
+  const existing = document.head.querySelector("script[data-industry-jsonld]");
   if (existing) existing.remove();
+
   const script = document.createElement("script");
   script.type = "application/ld+json";
   script.setAttribute("data-industry-jsonld", industry);

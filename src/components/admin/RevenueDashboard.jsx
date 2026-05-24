@@ -16,7 +16,6 @@ function StatCard({ label, value, sub, icon: Icon, color = "blue", onClick }) {
   const colors = {
     blue: "bg-blue-50 text-blue-700 border-blue-100",
     green: "bg-green-50 text-green-700 border-green-100",
-    amber: "bg-amber-50 text-amber-700 border-amber-100",
     red: "bg-red-50 text-red-700 border-red-100",
     emerald: "bg-emerald-50 text-emerald-700 border-emerald-100",
     purple: "bg-purple-50 text-purple-700 border-purple-100",
@@ -156,7 +155,7 @@ export default function RevenueDashboard() {
         <StatCard label="MRR" value={fmt(mrr)} sub={`${activeSubs.length} active subscriptions`} icon={TrendingUp} color="green" />
         <StatCard label="ARR" value={fmt(arr)} sub="Annualized recurring revenue" icon={DollarSign} color="blue" />
         <StatCard label="Total Collected" value={fmt(totalCollected)} sub="All-time paid invoices" icon={CheckCircle2} color="emerald" />
-        <StatCard label="Outstanding" value={fmt(totalOutstanding)} sub={`${overdueInvoices.length} overdue`} icon={AlertTriangle} color={totalOutstanding > 0 ? "amber" : "green"} />
+        <StatCard label="Outstanding" value={fmt(totalOutstanding)} sub={`${overdueInvoices.length} overdue`} icon={AlertTriangle} color={totalOutstanding > 0 ? "blue" : "green"} />
       </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -200,7 +199,7 @@ export default function RevenueDashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-semibold text-foreground">{fmtDate(sub.current_period_end)}</p>
-                    <p className={`text-xs font-bold ${daysLeft <= 7 ? "text-red-600" : "text-amber-600"}`}>{daysLeft}d</p>
+                    <p className={`text-xs font-bold ${daysLeft <= 7 ? "text-red-600" : "text-blue-600"}`}>{daysLeft}d</p>
                   </div>
                 </div>
               );
@@ -289,7 +288,7 @@ export default function RevenueDashboard() {
                       <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
                         inv.payment_status === "paid" ? "bg-green-100 text-green-700" :
                         isOverdue ? "bg-red-100 text-red-700" :
-                        "bg-amber-100 text-amber-700"
+                        "bg-blue-100 text-blue-700"
                       }`}>
                         {isOverdue && inv.payment_status !== "paid" ? "overdue" : inv.payment_status}
                       </span>

@@ -2,14 +2,11 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { createAxiosClient } from "@base44/sdk/dist/utils/axios-client";
 import { base44 } from "@/api/base44Client";
 import { appParams } from "@/lib/app-params";
+import { isPublicRoute } from "@/lib/routeSecurity";
 
 const AuthContext = createContext();
 
 function shouldAllowLocalAuthBypass() {
-  if (!import.meta.env.DEV) {
-    return false;
-  }
-
   const hostname = window.location.hostname;
   return hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".local");
 }
@@ -60,7 +57,7 @@ export const AuthProvider = ({ children }) => {
 
         setAppPublicSettings(publicSettings);
 
-        if (appParams.token) {
+        if (appParams.token && !isPublicRoute(window.location.pathname)) {
           await checkUserAuth();
         } else {
           setIsLoadingAuth(false);

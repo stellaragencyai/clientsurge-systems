@@ -6,10 +6,10 @@ const STATUSES = ["New", "Contacted", "Replied", "Qualified", "Booking Prompt Se
 
 const STATUS_COLORS = {
   "New": "bg-blue-100 text-blue-800 border-blue-300",
-  "Contacted": "bg-yellow-100 text-yellow-800 border-yellow-300",
+  "Contacted": "bg-sky-100 text-sky-800 border-sky-300",
   "Replied": "bg-purple-100 text-purple-800 border-purple-300",
   "Qualified": "bg-green-100 text-green-800 border-green-300",
-  "Booking Prompt Sent": "bg-amber-100 text-amber-800 border-amber-300",
+  "Booking Prompt Sent": "bg-blue-100 text-blue-800 border-blue-300",
   "Booked": "bg-pink-100 text-pink-800 border-pink-300",
   "Closed": "bg-gray-100 text-gray-800 border-gray-300",
 };

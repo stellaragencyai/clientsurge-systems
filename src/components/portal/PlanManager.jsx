@@ -134,7 +134,7 @@ export default function PlanManager({ project, subscription, onUpdated }) {
             onClick={() => submitRequest(selected)}
             disabled={saving}
             className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-50"
-            style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+            style={{ background: "linear-gradient(135deg,#005B99,#0077B6)" }}
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Request Change"}
             <ArrowRight className="w-4 h-4" />
@@ -142,19 +142,19 @@ export default function PlanManager({ project, subscription, onUpdated }) {
         </div>
       )}
 
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
         <div className="flex items-start gap-3">
-          <CircleAlert className="w-4 h-4 text-amber-700 mt-0.5" />
+          <CircleAlert className="w-4 h-4 text-blue-700 mt-0.5" />
           <div className="space-y-3">
             <div>
-              <p className="text-sm font-semibold text-amber-900">Billing changes</p>
-              <p className="text-xs text-amber-800 mt-1">
+              <p className="text-sm font-semibold text-blue-900">Billing changes</p>
+              <p className="text-xs text-blue-800 mt-1">
                 Package changes are operator-reviewed because these bundles provision multiple services. Cancellation and payment-method changes still need direct support help for now.
               </p>
             </div>
             <a
               href="mailto:support@clientsurgesystems.com?subject=ClientSurge%20billing%20change"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-amber-300 text-sm font-semibold text-amber-900 hover:bg-amber-100"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-blue-300 text-sm font-semibold text-blue-900 hover:bg-blue-100"
             >
               Contact Support
             </a>

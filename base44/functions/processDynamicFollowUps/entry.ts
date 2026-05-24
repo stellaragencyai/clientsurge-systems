@@ -9,6 +9,11 @@
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 const CHANNELS = {
   SMS: "sms",
@@ -52,34 +57,29 @@ async function sendFollowUp(base44, lead, channel, stepNumber, templates) {
       const body = template
         .replace(/{first_name}/g, lead.first_name || "there")
         .replace(/{service_interest}/g, lead.service_interest || "our services");
-
-      // Send SMS via Twilio
-      const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-      const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-      const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
-
-      if (accountSid && authToken && fromNumber && lead.phone_number) {
-        const res = await fetch(
-          `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-              To: lead.phone_number,
-              From: fromNumber,
-              Body: body,
-            }),
-          }
-        );
-
-        if (res.ok) {
-          const result = await res.json();
-          sent = true;
-          messageId = result.sid;
-        }
+      if (lead.phone_number) {
+        const result = await sendCommunicationViaOutbox({
+          base44,
+          channel: "sms",
+          provider: "twilio",
+          recipient: lead.phone_number,
+          body,
+          lead,
+          leadId: lead.id,
+          source: "processDynamicFollowUps",
+          sourceRecordId: `${lead.id}:step${stepNumber}:sms`,
+          templateKey: `step${stepNumber}_sms`,
+          messageType: "transactional",
+          consentBasis: lead.consent_given ? "web_form_consent" : "transactional_relationship",
+          metadata: { step: stepNumber, cadence_mode: lead.cadence_mode },
+          providerSend: (providerPayload) => sendTwilioSmsProvider({
+            ...providerPayload,
+            env: (name) => Deno.env.get(name),
+            fetchImpl: fetch,
+          }),
+        });
+        sent = Boolean(result.success);
+        messageId = result.provider_message_id;
       }
     } else if (channel === CHANNELS.EMAIL) {
       const template = templates[`step${stepNumber}_email`] || `Hi {first_name}, just wanted to follow up on {service_interest}. Let me know if you have any questions!`;
@@ -87,28 +87,31 @@ async function sendFollowUp(base44, lead, channel, stepNumber, templates) {
         .replace(/{first_name}/g, lead.first_name || "there")
         .replace(/{service_interest}/g, lead.service_interest || "our services");
 
-      // Send email via Resend
-      const resendKey = Deno.env.get("RESEND_API_KEY");
-      if (resendKey && lead.email) {
-        const res = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${resendKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: Deno.env.get("RESEND_FROM_EMAIL") || "noreply@clientsurge.com",
-            to: lead.email,
-            subject: `Follow-up on your interest`,
-            text: body,
+      if (lead.email) {
+        const result = await sendCommunicationViaOutbox({
+          base44,
+          channel: "email",
+          provider: "resend",
+          recipient: lead.email,
+          subject: "Follow-up on your interest",
+          body,
+          from: Deno.env.get("RESEND_FROM_EMAIL") || "noreply@clientsurge.com",
+          lead,
+          leadId: lead.id,
+          source: "processDynamicFollowUps",
+          sourceRecordId: `${lead.id}:step${stepNumber}:email`,
+          templateKey: `step${stepNumber}_email`,
+          messageType: "transactional",
+          consentBasis: "transactional_relationship",
+          metadata: { step: stepNumber, cadence_mode: lead.cadence_mode },
+          providerSend: (providerPayload) => sendResendEmailProvider({
+            ...providerPayload,
+            env: (name) => Deno.env.get(name),
+            fetchImpl: fetch,
           }),
         });
-
-        if (res.ok) {
-          const result = await res.json();
-          sent = true;
-          messageId = result.id;
-        }
+        sent = Boolean(result.success);
+        messageId = result.provider_message_id;
       }
     }
 
@@ -146,6 +149,7 @@ Deno.serve(async (req) => {
     }
 
     const results = { processed: 0, sent: 0, paused: 0, maxed: 0, failed: 0 };
+    const nowMs = Date.now();
 
     // Templates
     const templates = {
@@ -156,6 +160,29 @@ Deno.serve(async (req) => {
 
     for (const lead of leads) {
       try {
+        const nextDueAt = Date.parse(lead.next_follow_up_at || "");
+        if (Number.isFinite(nextDueAt) && nextDueAt > nowMs) {
+          continue;
+        }
+
+        const cadenceStartedAt = Date.parse(lead.initial_response_sent_at || lead.created_date || "");
+        const maxCadenceDays = Number(settings.cadence_max_days || 14);
+        const cadenceEndsAt = Number.isFinite(cadenceStartedAt)
+          ? cadenceStartedAt + maxCadenceDays * 24 * 60 * 60 * 1000
+          : null;
+
+        if (cadenceEndsAt && nowMs >= cadenceEndsAt) {
+          await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
+            cadence_paused: true,
+            cadence_paused_at: new Date(nowMs).toISOString(),
+            cadence_paused_reason: "cadence_max_days_reached",
+            next_follow_up_at: null,
+          });
+          results.maxed++;
+          results.processed++;
+          continue;
+        }
+
         // Calculate engagement
         const engagementScore = calculateEngagementScore(lead);
 
@@ -205,7 +232,10 @@ Deno.serve(async (req) => {
           const nextAttempt = totalAttempts + 1;
           if (nextAttempt < maxAttempts) {
             const delay = engagementScore > settings.cadence_engagement_threshold ? 30 : 60; // minutes
-            updateData.next_follow_up_at = new Date(Date.now() + delay * 60 * 1000).toISOString();
+            const proposedNext = nowMs + delay * 60 * 1000;
+            updateData.next_follow_up_at = new Date(
+              cadenceEndsAt ? Math.min(proposedNext, cadenceEndsAt) : proposedNext
+            ).toISOString();
           }
 
           await base44.asServiceRole.entities.WebsiteLead.update(lead.id, updateData);

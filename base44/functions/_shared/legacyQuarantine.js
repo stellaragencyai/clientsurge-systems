@@ -63,13 +63,6 @@ const LEGACY_ENDPOINTS = {
     reason:
       "This legacy E2E check validates createLeadAndDispatch-era behavior and no longer reflects the canonical install/runtime pipeline.",
   },
-  autoSendWebhookInstructions: {
-    replacement: [
-      "Canonical paid-order install workspace",
-    ],
-    reason:
-      "This legacy instruction flow distributes createLeadAndDispatch webhook URLs that bypass the canonical forward path.",
-  },
   autoProvisionTwilioNumber: {
     replacement: [
       "Canonical Twilio routing migration (pending)",

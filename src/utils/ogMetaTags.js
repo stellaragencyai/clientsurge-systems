@@ -4,7 +4,7 @@
  * Import and call setOgMeta() from any page component.
  */
 
-const DEFAULT_OG_IMAGE = "https://clientsurgesystems.com/og-image.jpg";
+const DEFAULT_OG_IMAGE = "https://clientsurgesystems.com/og-image.png";
 
 export function setOgMeta({ title, description, image, url } = {}) {
   const metas = {

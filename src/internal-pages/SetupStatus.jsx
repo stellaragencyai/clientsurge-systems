@@ -15,15 +15,18 @@ const STAGES = [
   { key: "Live", label: "Your system is live!" },
 ];
 
-export default function SetupStatus() {
+export default function SetupStatus({ orderIdOverride = "" }) {
   const params = useParams();
-  const orderId = params.order_id || params.orderId || "";
+  const orderId = orderIdOverride || params.order_id || params.orderId || "";
   const [order, setOrder] = useState(null);
   const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [supportOpen, setSupportOpen] = useState(false);
 
   const fetchStatus = async () => {
     try {
+      setError("");
       const [orderRes, progressRes] = await Promise.all([
         base44.functions.invoke("getOrderStatus", { order_id: orderId }),
         base44.functions.invoke("getActivationProgress", { order_id: orderId }),
@@ -31,7 +34,7 @@ export default function SetupStatus() {
       if (orderRes?.order) setOrder(orderRes.order);
       if (progressRes) setProgress(progressRes);
     } catch {
-      // Show empty state below if the order cannot be resolved.
+      setError("We could not load this setup status right now.");
     } finally {
       setLoading(false);
     }
@@ -79,6 +82,60 @@ export default function SetupStatus() {
             We&apos;ll email you the moment it&apos;s live.
           </p>
         </div>
+
+        {error && (
+          <div
+            style={{
+              marginBottom: 28,
+              background: "rgba(239,68,68,0.12)",
+              border: "1px solid rgba(239,68,68,0.28)",
+              borderRadius: 14,
+              padding: "16px 18px",
+              color: "#FCA5A5",
+            }}
+          >
+            <p style={{ margin: "0 0 10px", fontSize: 14, fontWeight: 700 }}>
+              Setup status needs attention
+            </p>
+            <p style={{ margin: "0 0 14px", fontSize: 13, color: "rgba(255,255,255,0.68)" }}>
+              {error}
+            </p>
+            <button
+              type="button"
+              onClick={() => setSupportOpen((value) => !value)}
+              style={{
+                border: "1px solid rgba(0,212,255,0.35)",
+                background: "rgba(0,212,255,0.12)",
+                color: "#67E8F9",
+                borderRadius: 999,
+                padding: "9px 16px",
+                fontSize: 12,
+                fontWeight: 800,
+                cursor: "pointer",
+              }}
+            >
+              Contact Support
+            </button>
+            {supportOpen && (
+              <div
+                style={{
+                  marginTop: 14,
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 12,
+                  padding: 14,
+                }}
+              >
+                <p style={{ margin: "0 0 8px", fontSize: 13, color: "#fff", fontWeight: 700 }}>
+                  SupportChat
+                </p>
+                <p style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: "rgba(255,255,255,0.68)" }}>
+                  Email <a href={`mailto:nolan@clientsurgesystems.com?subject=Setup%20status%20help%20${encodeURIComponent(orderId || "")}`} style={{ color: "#67E8F9" }}>nolan@clientsurgesystems.com</a> with this setup ID: {orderId || "not provided"}.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
           {STAGES.map((stage, index) => {

@@ -9,7 +9,7 @@ import { ExternalLink, Eye } from 'lucide-react';
 const statusColors = {
   'New': 'bg-slate-100 text-slate-800',
   'Qualified': 'bg-blue-100 text-blue-800',
-  'Contacted': 'bg-yellow-100 text-yellow-800',
+  'Contacted': 'bg-sky-100 text-sky-800',
   'Responded': 'bg-cyan-100 text-cyan-800',
   'Booked': 'bg-green-100 text-green-800',
   'Closed': 'bg-emerald-700 text-white',
@@ -18,7 +18,7 @@ const statusColors = {
 
 const qualityColors = {
   'High': 'text-green-700 bg-green-100',
-  'Medium': 'text-yellow-700 bg-yellow-100',
+  'Medium': 'text-sky-700 bg-sky-100',
   'Low': 'text-red-700 bg-red-100',
 };
 

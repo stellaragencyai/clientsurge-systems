@@ -7,6 +7,7 @@ export default function MessagingPanel({ leadId, leadPhone }) {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     loadMessages();
@@ -30,25 +31,25 @@ export default function MessagingPanel({ leadId, leadPhone }) {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim()) return;
+    if (!leadPhone) {
+      setError("Lead phone number is missing.");
+      return;
+    }
 
     setSending(true);
+    setError("");
     try {
-      // Create message record
-      const msg = await base44.entities.Messages.create({
-        lead_id: leadId,
-        direction: "outbound",
-        channel: "sms",
-        message_text: newMessage,
-        status: "sent",
+      const message = newMessage.trim();
+      await base44.functions.invoke("sendSMS", {
+        phone: leadPhone,
+        message,
+        leadId,
       });
-
-      // Add to UI immediately
-      setMessages((prev) => [msg, ...prev]);
       setNewMessage("");
-
-      // TODO: In STEP 5, integrate actual Twilio SMS sending here
+      await loadMessages();
     } catch (err) {
       console.error("Error sending message:", err);
+      setError(err?.response?.data?.error || err?.message || "Unable to send SMS.");
     } finally {
       setSending(false);
     }
@@ -71,6 +72,11 @@ export default function MessagingPanel({ leadId, leadPhone }) {
   return (
     <div className="bg-white rounded-lg border border-border p-6 flex flex-col h-full">
       <h3 className="text-lg font-semibold text-foreground mb-4">Messages</h3>
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </div>
+      )}
 
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto mb-4 space-y-4 min-h-[300px]">
@@ -112,12 +118,12 @@ export default function MessagingPanel({ leadId, leadPhone }) {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type a message..."
-          disabled={sending}
+          disabled={sending || !leadPhone}
           className="flex-1 px-4 py-2.5 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
         />
         <button
           type="submit"
-          disabled={sending || !newMessage.trim()}
+          disabled={sending || !newMessage.trim() || !leadPhone}
           className="px-4 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center gap-2"
         >
           {sending ? (

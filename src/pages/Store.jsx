@@ -8,7 +8,7 @@ import CartSidebar from "@/components/store/CartSidebar";
 import Navbar from "@/components/landing/Navbar";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
-import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
+import { formatCurrency, PACKAGE_OFFERS } from "@/lib/salesCatalog";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { setPageMetadata } from "@/lib/seo";
 import Footer from "@/components/landing/Footer";
@@ -32,7 +32,7 @@ function StoreSuspenseFallback({ minHeight = 240 }) {
         width: "100%",
         borderRadius: "18px",
         background:
-          "linear-gradient(90deg, rgba(0,174,239,0.07), rgba(255,255,255,0.86), rgba(154,92,46,0.07))",
+          "linear-gradient(90deg, rgba(0,174,239,0.07), rgba(255,255,255,0.86), rgba(0,119,182,0.07))",
         border: "1px solid rgba(0,136,204,0.12)"
       }}
     />
@@ -53,7 +53,8 @@ function StoreInner() {
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [showComparison, setShowComparison] = useState(false);
   const [pathMode, setPathMode] = useState("guided");
-  const { items, setCartOpen, totalSetup, totalMonthly } = useCart();
+  const preselectedPackageRef = useRef(false);
+  const { items, replaceItems, setCartOpen, totalSetup, totalMonthly } = useCart();
 
   useEffect(() => {
     const cleanupMeta = setPageMetadata({
@@ -71,19 +72,42 @@ function StoreInner() {
       return undefined;
     }
 
+    const getPackageFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const packageKey = params.get("package") || params.get("plan");
+      return PACKAGE_OFFERS.find((p) => p.package_key === packageKey) || null;
+    };
+
+    const applyRecommendedPackage = (pkg, { openCart = false } = {}) => {
+      setSelectedIndustry({
+        shortName: pkg.name,
+        recommendedPackage: pkg,
+        recommendedServiceKeys: pkg.included_service_keys,
+        recommendedServices: pkg.included_services.map((s) => ({ ...s, whyThisMatters: s.description })),
+        whyItWorks: pkg.fit
+      });
+
+      if (openCart && !preselectedPackageRef.current) {
+        preselectedPackageRef.current = true;
+        replaceItems(pkg.included_services);
+        setPathMode("guided");
+        setCartOpen(true);
+      }
+    };
+
     const syncIndustry = () => {
+      const urlPackage = getPackageFromUrl();
+      if (urlPackage) {
+        applyRecommendedPackage(urlPackage, { openCart: true });
+        return;
+      }
+
       // Check if quiz routed here with a package key
       const quizPackage = window.sessionStorage.getItem("clientsurge:quiz-package");
       if (quizPackage) {
         const pkg = PACKAGE_OFFERS.find((p) => p.package_key === quizPackage);
         if (pkg) {
-          setSelectedIndustry({
-            shortName: pkg.name,
-            recommendedPackage: pkg,
-            recommendedServiceKeys: pkg.included_service_keys,
-            recommendedServices: pkg.included_services.map((s) => ({ ...s, whyThisMatters: s.description })),
-            whyItWorks: pkg.fit
-          });
+          applyRecommendedPackage(pkg);
           return;
         }
       }
@@ -98,7 +122,7 @@ function StoreInner() {
       window.removeEventListener("storage", syncIndustry);
       window.removeEventListener("clientsurge:industry-selected", syncIndustry);
     };
-  }, []);
+  }, [replaceItems, setCartOpen]);
 
   const filtered = useMemo(() => {
     const recommendedKeys = new Set(
@@ -152,6 +176,14 @@ function StoreInner() {
   const resultLabel = `${filtered.length} service${
   filtered.length === 1 ? "" : "s"}`;
 
+  const choosePackage = (offer) => {
+    replaceItems(offer.included_services);
+    setCartOpen(true);
+  };
+
+  const packageDisplayName = (offer) =>
+    offer.package_key === "elite_system" ? "Pro System" : offer.name;
+
 
   return (
     <div
@@ -168,7 +200,7 @@ function StoreInner() {
         <style>{`
           .store-page nav {
             background: rgba(253,251,248,0.85) !important;
-            border-bottom-color: rgba(154,92,46,0.14) !important;
+            border-bottom-color: rgba(0,136,204,0.14) !important;
             backdrop-filter: blur(22px) !important;
             -webkit-backdrop-filter: blur(22px) !important;
           }
@@ -225,7 +257,7 @@ function StoreInner() {
             inset: 0;
             border-radius: 8px;
             opacity: 0;
-            background: radial-gradient(ellipse at center, rgba(200,150,92,0.25) 0%, transparent 70%);
+            background: radial-gradient(ellipse at center, rgba(0,174,239,0.25) 0%, transparent 70%);
             transition: opacity 0.3s ease;
           }
           .ai-module-btn:hover::after { opacity: 1; }
@@ -355,14 +387,14 @@ function StoreInner() {
               <p
                 style={{
                   fontSize: "0.9rem",
-                  color: "rgba(27,20,13,0.72)",
+                  color: "rgba(10,22,40,0.72)",
                   lineHeight: 1.6,
                   maxWidth: "620px",
                   margin: "0 auto 12px"
                 }}>
                 
-                Pick the services you need, add them to your cart, and we handle
-                the setup. Your automations go live in 5 to 7 business days.
+                Choose your package or pick individual AI services. We handle
+                the setup, testing, and launch so your automations go live in 5 to 7 business days.
               </p>
             </div>
 
@@ -375,7 +407,7 @@ function StoreInner() {
                 borderRadius: "12px",
                 background: "rgba(255,255,255,0.4)",
                 border: "none",
-                borderBottom: "1px solid rgba(154,92,46,0.1)",
+                borderBottom: "1px solid rgba(0,136,204,0.1)",
                 boxShadow: "none",
                 fontSize: "12px"
               }}>
@@ -447,7 +479,7 @@ function StoreInner() {
                     <p style={{ fontSize: "15px", fontWeight: "800", color: "#000000", margin: "0 0 2px" }}>
                       {val}
                     </p>
-                    <p style={{ fontSize: "10px", color: "rgba(27,20,13,0.6)", margin: 0, fontWeight: "600" }}>
+                    <p style={{ fontSize: "10px", color: "rgba(10,22,40,0.6)", margin: 0, fontWeight: "600" }}>
                       {label}
                     </p>
                   </div>
@@ -568,6 +600,109 @@ function StoreInner() {
               <GuidedPathToggle mode={pathMode} onModeChange={setPathMode} />
             </div>
 
+            <section
+              aria-labelledby="package-selection-heading"
+              style={{
+                margin: "0 0 28px",
+                padding: "22px",
+                borderRadius: "18px",
+                background: "#ffffff",
+                border: "1px solid rgba(0,136,204,0.14)",
+                boxShadow: "0 8px 28px rgba(0,59,143,0.06)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "18px", alignItems: "flex-end", flexWrap: "wrap", marginBottom: "16px" }}>
+                <div>
+                  <p style={{ margin: "0 0 5px", fontSize: "11px", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "#006BB0" }}>
+                    Choose Your Package
+                  </p>
+                  <h2 id="package-selection-heading" style={{ margin: 0, fontSize: "clamp(1.25rem, 3vw, 1.8rem)", lineHeight: 1.15, color: "#0A1628", fontWeight: 900 }}>
+                    Three clear AI service packages, then six feature systems underneath.
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowComparison(true)}
+                  style={{
+                    border: "1px solid rgba(0,136,204,0.22)",
+                    borderRadius: "999px",
+                    background: "rgba(0,174,239,0.07)",
+                    color: "#005FA3",
+                    fontSize: "12px",
+                    fontWeight: 800,
+                    padding: "9px 15px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Compare Packages
+                </button>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+                {PACKAGE_OFFERS.map((offer) => (
+                  <article
+                    key={offer.package_key}
+                    style={{
+                      borderRadius: "14px",
+                      border: offer.highlight ? "2px solid rgba(0,136,204,0.45)" : "1px solid rgba(10,22,40,0.12)",
+                      background: offer.highlight ? "linear-gradient(180deg, rgba(0,174,239,0.08), #ffffff)" : "#ffffff",
+                      padding: "16px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "12px",
+                    }}
+                  >
+                    <div>
+                      {offer.badge && (
+                        <span style={{ display: "inline-flex", marginBottom: "8px", borderRadius: "999px", background: "#003B8F", color: "#ffffff", padding: "4px 9px", fontSize: "10px", fontWeight: 800 }}>
+                          {offer.badge}
+                        </span>
+                      )}
+                      <h3 style={{ margin: "0 0 5px", color: "#0A1628", fontSize: "18px", fontWeight: 900 }}>
+                        {packageDisplayName(offer)}
+                      </h3>
+                      <p style={{ margin: 0, minHeight: "42px", color: "rgba(10,22,40,0.66)", fontSize: "12px", lineHeight: 1.55 }}>
+                        {offer.fit}
+                      </p>
+                    </div>
+                    <div>
+                      <p style={{ margin: 0, color: "#0A1628", fontSize: "22px", fontWeight: 900 }}>
+                        ${formatCurrency(offer.setup_total)} setup
+                      </p>
+                      <p style={{ margin: "2px 0 0", color: "#005FA3", fontSize: "13px", fontWeight: 800 }}>
+                        ${formatCurrency(offer.monthly_total)}/mo
+                      </p>
+                    </div>
+                    <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: "6px" }}>
+                      {offer.features.map((feature) => (
+                        <li key={feature} style={{ color: "rgba(10,22,40,0.72)", fontSize: "12px", lineHeight: 1.4 }}>
+                          <span aria-hidden="true" style={{ color: "#0088CC", fontWeight: 900 }}>✓</span>{" "}
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      type="button"
+                      onClick={() => choosePackage(offer)}
+                      style={{
+                        marginTop: "auto",
+                        border: "none",
+                        borderRadius: "999px",
+                        background: "linear-gradient(135deg,#0088CC,#00AEEF)",
+                        color: "#ffffff",
+                        fontSize: "12px",
+                        fontWeight: 900,
+                        padding: "10px 14px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Choose {packageDisplayName(offer)}
+                    </button>
+                  </article>
+                ))}
+              </div>
+            </section>
+
             <div className="store-toolbar">
               <div className="store-searchWrap">
                 <Search
@@ -606,7 +741,7 @@ function StoreInner() {
                   style={{
                     fontSize: "12px",
                     fontWeight: "700",
-                    color: "rgba(27,20,13,0.55)",
+                    color: "rgba(10,22,40,0.55)",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase"
                   }}>
@@ -638,7 +773,7 @@ function StoreInner() {
                       color:
                       activeCategory === category ?
                       "#ffffff" :
-                      "rgba(27,20,13,0.72)",
+                      "rgba(10,22,40,0.72)",
                       boxShadow:
                       activeCategory === category ?
                       "0 4px 14px rgba(0,174,239,0.35)" :
@@ -669,7 +804,7 @@ function StoreInner() {
               style={{
                 textAlign: "center",
                 padding: "48px",
-                color: "rgba(27,20,13,0.45)"
+                color: "rgba(10,22,40,0.45)"
               }}>
               
                 <p style={{ fontSize: "16px", fontWeight: "600" }}>
@@ -701,7 +836,7 @@ function StoreInner() {
             padding: "28px 24px",
             textAlign: "center"
           }}>
-             <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.6)", margin: "0 0 12px" }}>
+             <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.6)", margin: "0 0 12px" }}>
                Not sure what your business needs?
              </p>
              <a
@@ -716,7 +851,7 @@ function StoreInner() {
               
                📞 Make the Leap: free 15-min strategy call
              </a>
-             <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.35)", marginTop: "10px" }}>
+             <p style={{ fontSize: "11px", color: "rgba(10,22,40,0.35)", marginTop: "10px" }}>
                We'll tell you exactly which services will move the needle for your business.
              </p>
            </div>

@@ -108,7 +108,7 @@ export default function WebhookSettings({ project }) {
           </div>
         </div>
 
-        <div className="mt-5 p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-800 flex gap-2">
+        <div className="mt-5 p-4 rounded-xl bg-blue-50 border border-blue-200 text-sm text-blue-800 flex gap-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <span>Your endpoint must respond with a <strong>2xx status code</strong> within 5 seconds. Failed deliveries will be retried up to 3 times.</span>
         </div>

@@ -1,3 +1,8 @@
+import {
+  buildCanonicalInstallStatePatch,
+  deriveCanonicalInstallState,
+} from "./installStateMachine.js";
+
 export const PIPELINE_STATUSES = [
   "Paid",
   "Ready for Install",
@@ -967,6 +972,22 @@ export function buildOrderStatusEvent({ order, previousStatus, nextStatus, note,
   });
 }
 
+export function buildInstallStateChangedEvent({ order, previousState, nextState, note, metadata = {} }) {
+  return buildCommunicationEvent({
+    order,
+    event_type: "install_state_changed",
+    subject: `Canonical install state: ${nextState}`,
+    message_body: `Order ${order.id} canonical install state moved from ${previousState || "none"} to ${nextState}.${eventNoteSuffix(note)}`,
+    metadata: {
+      order_id: order.id,
+      previous_state: previousState || null,
+      next_state: nextState,
+      note,
+      ...metadata,
+    },
+  });
+}
+
 export function buildServiceStatusEvent({ order, serviceKey, previousStatus, nextStatus, note }) {
   return buildCommunicationEvent({
     order,
@@ -1575,6 +1596,21 @@ export async function initializePaidOrderInstallPipeline({
   const installConfiguration = normalizeInstallConfiguration(order.install_configuration, initializedItems);
 
   if (trackedItems.length === 0) {
+    const failedOrderDraft = {
+      ...order,
+      payment_status: "paid",
+      items: initializedItems,
+      install_configuration: installConfiguration,
+      pipeline_status: "Error",
+      pipeline_error: "Paid order has no tracked install services. Manual repair required before install can begin.",
+    };
+    const canonicalPatch = buildCanonicalInstallStatePatch({
+      order: failedOrderDraft,
+      snapshot: buildInstallSnapshot(failedOrderDraft),
+      requestedState: "RECOVERY_REQUIRED",
+      eventType: "install_initialize_blocked",
+      now,
+    });
     const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, {
       payment_status: "paid",
       stripe_customer_id: stripeCustomerId || order.stripe_customer_id,
@@ -1587,7 +1623,14 @@ export async function initializePaidOrderInstallPipeline({
         paymentStatus: "paid",
       }),
       pipeline_error: "Paid order has no tracked install services. Manual repair required before install can begin.",
+      install_lock_key: `install:${order.id}:initialize`,
+      install_lock_status: "failed",
+      install_lock_owner: eventSource,
+      install_lock_acquired_at: order.install_lock_acquired_at || now,
+      install_lock_released_at: now,
+      install_orchestration_attempts: Number(order.install_orchestration_attempts || 0) + 1,
       last_install_event_at: now,
+      ...canonicalPatch,
     });
 
     await createCommunicationEvent(
@@ -1647,6 +1690,22 @@ export async function initializePaidOrderInstallPipeline({
   } catch (error) {
     if (error instanceof InstallLinkingError) {
       const trackedItems = getTrackedInstallItems(initializedItems);
+      const failedOrderDraft = {
+        ...order,
+        payment_status: "paid",
+        items: initializedItems,
+        install_configuration: installConfiguration,
+        pipeline_status: order.pipeline_status || "Paid",
+        pipeline_error: error.message,
+      };
+      const canonicalPatch = buildCanonicalInstallStatePatch({
+        order: failedOrderDraft,
+        snapshot: buildInstallSnapshot(failedOrderDraft),
+        requestedState: "RECOVERY_REQUIRED",
+        eventType: "install_linking_blocked",
+        note: error.message,
+        now,
+      });
       const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, {
         payment_status: "paid",
         stripe_customer_id: stripeCustomerId || order.stripe_customer_id,
@@ -1659,7 +1718,14 @@ export async function initializePaidOrderInstallPipeline({
           paymentStatus: "paid",
         }),
         pipeline_error: error.message,
+        install_lock_key: `install:${order.id}:initialize`,
+        install_lock_status: "failed",
+        install_lock_owner: eventSource,
+        install_lock_acquired_at: order.install_lock_acquired_at || now,
+        install_lock_released_at: now,
+        install_orchestration_attempts: Number(order.install_orchestration_attempts || 0) + 1,
         last_install_event_at: now,
+        ...canonicalPatch,
       });
 
       if (order.pipeline_error !== error.message) {
@@ -1682,6 +1748,27 @@ export async function initializePaidOrderInstallPipeline({
     throw error;
   }
 
+  const installLockKey = `install:${order.id}:initialize`;
+  const orderDraftForState = {
+    ...order,
+    payment_status: "paid",
+    stripe_customer_id: stripeCustomerId || order.stripe_customer_id,
+    client_id: client.id,
+    client_project_id: clientProject.id,
+    onboarding_client_id: onboardingClient.id,
+    items: initializedItems,
+    install_initialized_at: alreadyInitialized ? order.install_initialized_at : now,
+    install_configuration: installConfiguration,
+    pipeline_status: pipelineStatus,
+    pipeline_error: undefined,
+  };
+  const canonicalPatch = buildCanonicalInstallStatePatch({
+    order: orderDraftForState,
+    snapshot: buildInstallSnapshot(orderDraftForState),
+    eventType: alreadyInitialized ? "install_initialize_idempotent" : "install_initialized",
+    now,
+  });
+
   const orderUpdate = {
     payment_status: "paid",
     stripe_customer_id: stripeCustomerId || order.stripe_customer_id,
@@ -1690,6 +1777,7 @@ export async function initializePaidOrderInstallPipeline({
     onboarding_client_id: onboardingClient.id,
     items: initializedItems,
     install_initialized_at: alreadyInitialized ? order.install_initialized_at : now,
+    activation_started_at: order.activation_started_at || (alreadyInitialized ? order.install_initialized_at : now),
     install_configuration: installConfiguration,
     activation_package_tier: purchaseOnboardingHandoff.package_tier,
     activation_package_key: purchaseOnboardingHandoff.package_key,
@@ -1702,7 +1790,15 @@ export async function initializePaidOrderInstallPipeline({
       paymentStatus: "paid",
     }),
     pipeline_error: undefined,
+    install_lock_key: installLockKey,
+    install_lock_status: "released",
+    install_lock_owner: eventSource,
+    install_lock_acquired_at: order.install_lock_acquired_at || now,
+    install_lock_released_at: now,
+    install_orchestration_attempts:
+      Number(order.install_orchestration_attempts || 0) + (alreadyInitialized ? 0 : 1),
     last_install_event_at: now,
+    ...canonicalPatch,
   };
 
   const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, orderUpdate);
@@ -1781,6 +1877,20 @@ export async function initializePaidOrderInstallPipeline({
     );
   }
 
+  if (order.canonical_install_state !== updatedOrder.canonical_install_state) {
+    events.push(
+      buildInstallStateChangedEvent({
+        order: updatedOrder,
+        previousState: order.canonical_install_state || null,
+        nextState: updatedOrder.canonical_install_state,
+        metadata: {
+          event_source: eventSource,
+          lock_key: installLockKey,
+        },
+      })
+    );
+  }
+
   for (const event of events) {
     await createCommunicationEvent(base44, event);
   }
@@ -1814,6 +1924,9 @@ export async function listInstallQueueOrders(base44, { includeLive = false } = {
         trackedItems: snapshot.serviceStates,
         install_configuration: snapshot.installConfiguration,
         pipeline_status: snapshot.pipelineStatus,
+        canonical_install_state:
+          order.canonical_install_state ||
+          deriveCanonicalInstallState({ order, snapshot }),
         configuration_summary: getOrderConfigurationSummary({
           ...order,
           items: snapshot.normalizedItems,
@@ -1839,11 +1952,25 @@ export async function updateOrderInstallConfiguration({
     snapshot.normalizedItems
   );
   const updatedServices = Object.keys(nextInstallConfiguration.services || {});
+  const orderDraftForState = {
+    ...order,
+    items: snapshot.normalizedItems,
+    install_configuration: nextInstallConfiguration,
+  };
+  const nextSnapshot = buildInstallSnapshot(orderDraftForState);
+  const canonicalPatch = buildCanonicalInstallStatePatch({
+    order: orderDraftForState,
+    snapshot: nextSnapshot,
+    eventType: "install_configuration_updated",
+    note,
+    now,
+  });
 
   const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, {
     install_configuration: nextInstallConfiguration,
     install_configuration_updated_at: now,
     last_install_event_at: now,
+    ...canonicalPatch,
   });
 
   await syncInstallMirrorsFromOrder({
@@ -1874,6 +2001,21 @@ export async function updateOrderInstallConfiguration({
     items: snapshot.normalizedItems,
     install_configuration: nextInstallConfiguration,
   });
+
+  if (order.canonical_install_state !== updatedOrder.canonical_install_state) {
+    await createCommunicationEvent(
+      base44,
+      buildInstallStateChangedEvent({
+        order: updatedOrder,
+        previousState: order.canonical_install_state || null,
+        nextState: updatedOrder.canonical_install_state,
+        note,
+        metadata: {
+          updated_services: updatedServices,
+        },
+      })
+    );
+  }
 
   return {
     ...updatedOrder,
@@ -2008,9 +2150,28 @@ export async function updateTrackedServiceInstallStatus({
     install_initialized_at: order.install_initialized_at || now,
   });
   const trackedItems = getTrackedInstallItems(updatedItems);
+  const orderDraftForState = {
+    ...order,
+    items: updatedItems,
+    install_configuration: snapshot.installConfiguration,
+    install_initialized_at: order.install_initialized_at || now,
+    activation_started_at: order.activation_started_at || order.install_initialized_at || now,
+    pipeline_status: nextPipelineStatus,
+    pipeline_error: nextPipelineStatus === "Error" ? note || "Service install error" : undefined,
+    payment_status: order.payment_status || "paid",
+  };
+  const canonicalPatch = buildCanonicalInstallStatePatch({
+    order: orderDraftForState,
+    snapshot: buildInstallSnapshot(orderDraftForState),
+    eventType: "service_status_changed",
+    note,
+    now,
+  });
 
   const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, {
     items: updatedItems,
+    install_initialized_at: order.install_initialized_at || now,
+    activation_started_at: order.activation_started_at || order.install_initialized_at || now,
     pipeline_status: nextPipelineStatus,
     pipeline_error: nextPipelineStatus === "Error" ? note || "Service install error" : undefined,
     order_status: mapPipelineStatusToOrderStatus({
@@ -2018,7 +2179,9 @@ export async function updateTrackedServiceInstallStatus({
       trackedItems,
       paymentStatus: order.payment_status || "paid",
     }),
+    ...(nextPipelineStatus === "Live" && !order.activation_completed_at ? { activation_completed_at: now } : {}),
     last_install_event_at: now,
+    ...canonicalPatch,
   });
 
   await syncInstallMirrorsFromOrder({
@@ -2051,6 +2214,23 @@ export async function updateTrackedServiceInstallStatus({
         previousStatus: previousPipelineStatus,
         nextStatus: nextPipelineStatus,
         note,
+      })
+    );
+  }
+
+  if (order.canonical_install_state !== updatedOrder.canonical_install_state) {
+    await createCommunicationEvent(
+      base44,
+      buildInstallStateChangedEvent({
+        order: updatedOrder,
+        previousState: order.canonical_install_state || null,
+        nextState: updatedOrder.canonical_install_state,
+        note,
+        metadata: {
+          service_key: serviceKey,
+          service_previous_status: previousServiceStatus,
+          service_next_status: nextStatus,
+        },
       })
     );
   }

@@ -8,6 +8,10 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import crypto from "node:crypto";
+import {
+  mapTwilioDeliveryStatus,
+  updateOutboxDeliveryStatus,
+} from "../_shared/communicationOutbox.js";
 
 async function validateTwilioSignature(req, rawBody) {
   const webhookKey = Deno.env.get("TWILIO_WEBHOOK_KEY");
@@ -29,31 +33,44 @@ async function validateTwilioSignature(req, rawBody) {
     return { valid: false, missing_signature: true };
   }
 
-  const originalUrl = new URL(req.url);
-  const forwardedProto = req.headers.get("x-forwarded-proto");
-  const forwardedHost = req.headers.get("x-forwarded-host");
-  const detectedHost = forwardedHost || req.headers.get("host") || originalUrl.host;
-  const host = /^(127\.0\.0\.1|localhost)(:\d+)?$/.test(detectedHost)
-    ? "client-surge-systems-copy-a9653cae.base44.app"
-    : detectedHost;
-  const protocol = forwardedProto || originalUrl.protocol.replace(":", "");
-  const url = `${protocol}://${host}${originalUrl.pathname}${originalUrl.search}`;
+  const signatureUrls = buildSignatureUrls(req);
   const params = new URLSearchParams(rawBody);
-  const toSign =
-    url +
-    Array.from(params.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([k, v]) => `${k}${v}`)
-      .join("");
+  const signedParams = Array.from(params.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, v]) => `${k}${v}`)
+    .join("");
 
-  const computed = crypto.createHmac("sha1", token).update(toSign).digest("base64");
+  const valid = signatureUrls.some((url) => {
+    const computed = crypto.createHmac("sha1", token).update(`${url}${signedParams}`).digest("base64");
+    return computed === signature;
+  });
 
-  if (computed !== signature) {
+  if (!valid) {
     console.warn("[SmsStatusCallback] Signature mismatch — request rejected");
     return { valid: false };
   }
 
   return { valid: true };
+}
+
+function buildSignatureUrls(req) {
+  const originalUrl = new URL(req.url);
+  const forwardedProto = req.headers.get("x-forwarded-proto");
+  const forwardedHost = req.headers.get("x-forwarded-host");
+  const detectedHost = forwardedHost || req.headers.get("host") || originalUrl.host;
+  const protocol = forwardedProto || originalUrl.protocol.replace(":", "");
+  const hosts = [
+    /^(127\.0\.0\.1|localhost)(:\d+)?$/.test(detectedHost)
+      ? "client-surge-systems-copy-a9653cae.base44.app"
+      : detectedHost,
+    "clientsurgesystems.com",
+    "www.clientsurgesystems.com",
+    "client-surge-systems-copy-a9653cae.base44.app",
+  ];
+
+  return [...new Set(hosts)]
+    .filter(Boolean)
+    .map((host) => `${protocol}://${host}${originalUrl.pathname}${originalUrl.search}`);
 }
 
 // Map Twilio MessageStatus to our CommunicationEvent status
@@ -120,6 +137,15 @@ Deno.serve(async (req) => {
 
     if (!matches || matches.length === 0) {
       console.warn(`[SmsStatusCallback] No CommunicationEvent found for SID ${messageSid}`);
+      await updateOutboxDeliveryStatus({
+        base44,
+        provider: "twilio",
+        providerMessageId: messageSid,
+        providerStatus: messageStatus,
+        status: mapTwilioDeliveryStatus(messageStatus) || mappedStatus,
+        failureReason: errorCode ? `Twilio ${messageStatus} (code ${errorCode}): ${errorMessage || ""}` : null,
+        metadata: { to, from, error_code: errorCode, error_message: errorMessage },
+      });
       // Return 200 so Twilio does not keep retrying — we simply have no record to update
       return Response.json({ status: "ok_no_match" });
     }
@@ -153,6 +179,16 @@ Deno.serve(async (req) => {
       status: mappedStatus,
       error_message: errorCode ? `Twilio ${messageStatus} (code ${errorCode}): ${errorMessage || ""}` : (mappedStatus === "delivered" ? null : event.error_message),
       metadata_json: JSON.stringify(updatedMeta),
+    });
+
+    await updateOutboxDeliveryStatus({
+      base44,
+      provider: "twilio",
+      providerMessageId: messageSid,
+      providerStatus: messageStatus,
+      status: mapTwilioDeliveryStatus(messageStatus) || mappedStatus,
+      failureReason: errorCode ? `Twilio ${messageStatus} (code ${errorCode}): ${errorMessage || ""}` : null,
+      metadata: { to, from, error_code: errorCode, error_message: errorMessage },
     });
 
     console.log(`[SmsStatusCallback] Updated CommunicationEvent ${event.id} → status=${mappedStatus} (SID=${messageSid})`);

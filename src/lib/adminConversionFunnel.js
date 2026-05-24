@@ -53,7 +53,7 @@ export function buildAdminConversionFunnel(summary = {}) {
       label: "Paid",
       helper: "Converted customer",
       count: resolveStageCount({ stageCounts, statusCounts, statusKey: "paid", stageKey: "paid" }),
-      tone: "amber",
+      tone: "blue",
     },
   ];
 

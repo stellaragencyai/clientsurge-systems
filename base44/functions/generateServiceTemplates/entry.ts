@@ -17,25 +17,39 @@ const TONE_MAP = {
   Energetic:    { greeting: "Hi", sign_off: "Let's go" },
 };
 
+const SMS_TEMPLATE_FIELDS = ["instant_lead_sms", "missed_call_sms", "review_request_sms", "appointment_reminder_sms"];
+const MAX_SMS_CHARS = 160;
+
 function buildTemplates(business_name: string, industry: string, tone: string, booking_link: string) {
   const t = TONE_MAP[tone] || TONE_MAP["Friendly"];
   const biz = business_name || "our business";
   const book = booking_link || "our booking page";
 
   return {
-    instant_lead_sms: `${t.greeting}! Thanks for reaching out to ${biz}. We received your inquiry and will be in touch within minutes. Book directly here: ${book} — ${t.sign_off}, ${biz} Team`,
+    instant_lead_sms: `${t.greeting}! Thanks for reaching out to ${biz}. We got your inquiry and will follow up shortly. Book here: ${book}`,
 
-    missed_call_sms: `Hi! You just called ${biz} and we missed you — sorry about that! Reply here or book online: ${book}. We'll get back to you ASAP. — ${biz}`,
+    missed_call_sms: `Hi! Sorry we missed your call at ${biz}. Reply here or book online: ${book}. We'll get back to you ASAP.`,
 
     nurture_day1_email: {
       subject: `Your inquiry to ${biz} — here's what happens next`,
       body: `${t.greeting},\n\nThank you for reaching out to ${biz}. We specialize in ${industry} services and we'd love to help.\n\nHere's what to expect:\n• We'll review your inquiry within 1 business day\n• A team member will reach out to discuss your needs\n• We'll get you scheduled at a time that works for you\n\nIn the meantime, feel free to book directly: ${book}\n\n${t.sign_off},\nThe ${biz} Team`,
     },
 
-    review_request_sms: `Hi! It was great working with you at ${biz}. If you had a positive experience, we'd really appreciate a quick Google review — it helps us a ton: [REVIEW_LINK]. Thank you! — ${biz}`,
+    review_request_sms: `Hi! Thanks for choosing ${biz}. If you had a great experience, would you leave us a quick Google review? [REVIEW_LINK]`,
 
     appointment_reminder_sms: `Reminder: You have an upcoming appointment with ${biz}. Reply CONFIRM to confirm or CANCEL to cancel. Book/reschedule: ${book}`,
   };
+}
+
+function validateSmsLengths(templates) {
+  return SMS_TEMPLATE_FIELDS
+    .filter((field) => String(templates[field] || "").length > MAX_SMS_CHARS)
+    .map((field) => ({
+      field,
+      length: String(templates[field] || "").length,
+      max: MAX_SMS_CHARS,
+      message: `${field} must be ${MAX_SMS_CHARS} characters or fewer before install_configuration is updated.`,
+    }));
 }
 
 Deno.serve(async (req) => {
@@ -62,6 +76,13 @@ Deno.serve(async (req) => {
     }
 
     const templates = buildTemplates(business_name, industry, tone, booking_link);
+    const smsLengthErrors = validateSmsLengths(templates);
+    if (smsLengthErrors.length > 0) {
+      return Response.json({
+        error: "Generated SMS templates exceeded the 160-character limit.",
+        errors: smsLengthErrors,
+      }, { status: 422 });
+    }
 
     // Write templates back into install_configuration
     const updated_cfg = {

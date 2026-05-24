@@ -13,15 +13,15 @@ export default function WhileWeSetUpCard({ installStatus }) {
     <div style={{
       borderRadius: "16px",
       background: "rgba(255,255,255,0.9)",
-      border: "1px solid rgba(154,92,46,0.1)",
+      border: "1px solid rgba(0,136,204,0.1)",
       padding: "20px 22px",
       marginTop: "24px",
       boxShadow: "0 2px 12px rgba(15,23,42,0.05)",
     }}>
-      <p style={{ fontSize: "11px", fontWeight: "800", color: "#9a5c2e", textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>
+      <p style={{ fontSize: "11px", fontWeight: "800", color: "#0077B6", textTransform: "uppercase", letterSpacing: "0.12em", margin: "0 0 4px" }}>
         While We Set Up
       </p>
-      <p style={{ fontSize: "13px", color: "rgba(27,20,13,0.55)", margin: "0 0 14px", lineHeight: 1.5 }}>
+      <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", margin: "0 0 14px", lineHeight: 1.5 }}>
         A few things you can do right now to prepare:
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -29,13 +29,13 @@ export default function WhileWeSetUpCard({ installStatus }) {
           <div key={i} style={{
             display: "flex", alignItems: "flex-start", gap: "12px",
             padding: "10px 12px", borderRadius: "10px",
-            background: "rgba(154,92,46,0.04)",
-            border: "1px solid rgba(154,92,46,0.08)",
+            background: "rgba(0,136,204,0.04)",
+            border: "1px solid rgba(0,136,204,0.08)",
           }}>
             <span style={{ fontSize: "18px", flexShrink: 0, lineHeight: 1.2 }}>{t.emoji}</span>
             <div>
               <p style={{ fontSize: "13px", fontWeight: "700", color: "#1b140d", margin: "0 0 2px" }}>{t.title}</p>
-              <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.5)", margin: 0, lineHeight: 1.4 }}>{t.detail}</p>
+              <p style={{ fontSize: "11px", color: "rgba(10,22,40,0.5)", margin: 0, lineHeight: 1.4 }}>{t.detail}</p>
             </div>
           </div>
         ))}

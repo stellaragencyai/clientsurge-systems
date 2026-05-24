@@ -160,7 +160,7 @@ export default function Hero() {
             className="landing-hero__body"
             style={{
               fontSize: "clamp(0.95rem, 2.2vw, 1.05rem)",
-              color: "rgba(27,20,13,0.74)",
+              color: "rgba(10,22,40,0.74)",
               lineHeight: 1.65,
               maxWidth: "560px",
               margin: "0 0 18px"
@@ -267,7 +267,7 @@ export default function Hero() {
             style={{
               marginTop: "18px",
               fontSize: "12px",
-              color: "rgba(27,20,13,0.48)",
+              color: "rgba(10,22,40,0.48)",
               letterSpacing: "0.04em"
             }}>
             No contracts · Most clients go live in 24–48 hours

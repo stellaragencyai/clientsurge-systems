@@ -11,8 +11,8 @@ export default function DownloadInvoicePDF({ order_id }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    base44.functions.invoke("getStripeInvoices", { order_id })
-      .then(r => setInvoices(r?.invoices || []))
+    base44.functions.invoke("getStripeBillingData", { order_id })
+      .then(r => setInvoices((r?.data || r || {})?.invoices || []))
       .catch(() => [])
       .finally(() => setLoading(false));
   }, [order_id]);

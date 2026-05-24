@@ -28,7 +28,7 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 76 | ⏳ | Verify Stripe publishable key is ONLY in frontend (not sk_live_ anywhere) | A | — | — | 🧵 Stripe-Live | ~20 min |
+| 76 | ✅ | Verify Stripe publishable key is ONLY in frontend (not sk_live_ anywhere) | A | — | — | 🧵 Stripe-Live | ~20 min |
 
 ---
 
@@ -39,12 +39,12 @@
 | 11 | ✅ | Build out pages/ThankYou — fully built with animated checkmark, plan card, next-steps, contact | A | — | — | — | ~1 hr |
 | 35 | ✅ | Testimonials: replaced broken Unsplash URLs with initials-based gradient avatars | A | — | — | — | ~30 min |
 | 36 | ✅ | Favicon + apple-touch-icon already present in index.html — verified | A | — | — | — | ~20 min |
-| 51 | ⏳ | pages/Book Calendly iframe: set width:100%, height:700px, scrolling:yes | A | — | — | — | ~20 min |
-| 53 | ⏳ | Audit all form inputs for iOS zoom issue (font-size < 16px) | A | — | — | 🧵 Mobile-UX | ~45 min |
-| 55 | ⏳ | pages/Book Calendly: test CSP allows calendly.com frames on live domain | A | — | — | — | ~30 min |
-| 67 | ⏳ | ClientPortal: add "Get Help" tab with support ticket form → SupportMessage entity | A | — | — | — | ~1 hr |
-| 80 | ⏳ | Onboarding page: ensure form validates all required fields before submit | A | — | — | — | ~30 min |
-| 243 | ⏳ | Final: test all CTA buttons across mobile (375px, 390px, 414px) | A | — | → ALL sign-off | 🧵 Mobile-UX | ~1 hr |
+| 51 | ✅ | pages/Book Calendly iframe: set width:100%, height:700px, scrolling:yes | A | — | — | — | ~20 min |
+| 53 | ✅ | Audit all form inputs for iOS zoom issue (font-size < 16px) | A | — | — | 🧵 Mobile-UX | ~45 min |
+| 55 | ✅ | pages/Book Calendly: test CSP allows calendly.com frames on live domain | A | — | — | — | ~30 min |
+| 67 | ✅ | ClientPortal: add "Get Help" tab with support ticket form → SupportMessage entity | A | — | — | — | ~1 hr |
+| 80 | ✅ | Onboarding page: ensure form validates all required fields before submit | A | — | — | — | ~30 min |
+| 243 | ✅ | Final: test all CTA buttons across mobile (375px, 390px, 414px) | A | — | → ALL sign-off | 🧵 Mobile-UX | ~1 hr |
 
 ---
 
@@ -52,29 +52,29 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 12 | ⏳ 🟢 | Add Navbar to LegalPage — currently renders with no header/branding | A | — | — | — | ~15 min |
-| 14 | ⏳ 🟢 | ClientPortal loading state: replace spinner with branded skeleton | A | — | — | — | ~30 min |
-| 15 | ⏳ 🟢 | DemoBookingModal time slot grid: force 2-col on viewports < 480px | A | — | — | 🧵 Mobile-UX | ~20 min |
-| 26 | ⏳ | Add dark mode ☀️/🌙 toggle to Navbar desktop + mobile menu | A | #27 | — | 🧵 Dark-Mode | ~30 min |
-| 27 | 🔄 | Implement ThemeProvider from next-themes so dark mode class is applied | A | — | → A (#26 toggle) | 🧵 Dark-Mode | ~45 min |
+| 12 | ✅ | Add Navbar to LegalPage — currently renders with no header/branding | A | — | — | — | ~15 min |
+| 14 | ✅ | ClientPortal loading state: replace spinner with branded skeleton | A | — | — | — | ~30 min |
+| 15 | ✅ | DemoBookingModal time slot grid: force 2-col on viewports < 480px | A | — | — | 🧵 Mobile-UX | ~20 min |
+| 26 | ✅ | Add dark mode ☀️/🌙 toggle to Navbar desktop + mobile menu | A | #27 | — | 🧵 Dark-Mode | ~30 min |
+| 27 | ✅ | Implement ThemeProvider from next-themes so dark mode class is applied | A | — | → A (#26 toggle) | 🧵 Dark-Mode | ~45 min |
 | 28 | ✅ | Standardize primary CTAs to blue gradient; gold = store/checkout only | A | — | — | 🧵 CTA-Standards | ~1 hr |
 | 28a | ✅ | StickyCTA: replace brown gradient "Book Your Free Demo" with blue | A | — | — | 🧵 CTA-Standards | ~10 min |
 | 28b | ✅ | MobileCallBar: replace brown "Book Free Demo" button with blue gradient | A | — | — | 🧵 CTA-Standards | ~10 min |
 | 28c | ✅ | MobileCallBar: replace brown tint on "Call Now" button with blue tint | A | — | — | 🧵 CTA-Standards | ~5 min |
 | 28d | ✅ | Pricing: replace hidden brown demo button at bottom with blue gradient | A | — | — | 🧵 CTA-Standards | ~5 min |
-| 31 | ⏳ | pages/Industries: add gradient hero section with industry grid icons | A | — | — | — | ~1 hr |
-| 33 | ⏳ | Mobile sticky cart bar: add padding-top: 72px to main content when visible | A | — | — | 🧵 Mobile-UX | ~20 min |
-| 34 | ⏳ | AdminDashboard sidebar: add active-state highlight on current route | A | — | — | — | ~20 min |
-| 41 | ⏳ | Store page initial load: show 6 ProductCard skeletons for 300ms then reveal | A | — | — | — | ~45 min |
-| 42 | ⏳ | Store ProductCard on mobile (375px): reduce "Add to Cart" font to 10px | A | — | — | 🧵 Mobile-UX | ~10 min |
-| 44 | ⏳ | Mobile sticky cart bar: add circular badge with items.length count | A | — | — | 🧵 Mobile-UX | ~15 min |
-| 45 | ⏳ | Store page: add "Talk to a Human" escape valve CTA below product grid | A | — | — | 🧵 CTA-Standards | ~20 min |
-| 49 | ⏳ | Store: Guided mode no industry → show all non-coming-soon products | A | — | — | — | ~30 min |
-| 52 | ⏳ | MobileCallBar: pull phone number from AdminSettings instead of hardcoding | A | — | — | 🧵 Mobile-UX | ~30 min |
-| 54 | ⏳ | DemoBookingModal step 2: set min-height:48px on date/time inputs | A | — | — | 🧵 Mobile-UX | ~10 min |
-| 73 | ⏳ | chatBubbleAI: add typing indicator ("...") while LLM processes response | A | — | — | — | ~20 min |
-| 74 | ⏳ | chatBubbleAI: add sessionStorage counter, block after 10 messages per session | A | — | — | — | ~30 min |
-| 79 | ⏳ | pages/Success: verify content is correct and not stale | A | — | — | — | ~15 min |
+| 31 | ✅ | pages/Industries: add gradient hero section with industry grid icons | A | — | — | — | ~1 hr |
+| 33 | ✅ | Mobile sticky cart bar: add padding-top: 72px to main content when visible | A | — | — | 🧵 Mobile-UX | ~20 min |
+| 34 | ✅ | AdminDashboard sidebar: add active-state highlight on current route | A | — | — | — | ~20 min |
+| 41 | ✅ | Store page initial load: show 6 ProductCard skeletons for 300ms then reveal | A | — | — | — | ~45 min |
+| 42 | ✅ | Store ProductCard on mobile (375px): reduce "Add to Cart" font to 10px | A | — | — | 🧵 Mobile-UX | ~10 min |
+| 44 | ✅ | Mobile sticky cart bar: add circular badge with items.length count | A | — | — | 🧵 Mobile-UX | ~15 min |
+| 45 | ✅ | Store page: add "Talk to a Human" escape valve CTA below product grid | A | — | — | 🧵 CTA-Standards | ~20 min |
+| 49 | ✅ | Store: Guided mode no industry → show all non-coming-soon products | A | — | — | — | ~30 min |
+| 52 | ✅ | MobileCallBar: pull phone number from AdminSettings instead of hardcoding | A | — | — | 🧵 Mobile-UX | ~30 min |
+| 54 | ✅ | DemoBookingModal step 2: set min-height:48px on date/time inputs | A | — | — | 🧵 Mobile-UX | ~10 min |
+| 73 | ✅ | chatBubbleAI: add typing indicator ("...") while LLM processes response | A | — | — | — | ~20 min |
+| 74 | ✅ | chatBubbleAI: add sessionStorage counter, block after 10 messages per session | A | — | — | — | ~30 min |
+| 79 | ✅ | pages/Success: verify content is correct and not stale | A | — | — | — | ~15 min |
 
 ---
 
@@ -86,24 +86,24 @@
 |---|---|---|---|---|---|---|
 | M01 | ✅ | iOS Safari: audit all `min-height: 100vh` — replace with `100svh` (Dynamic Island safe) | A | iPhone 15, 17 Pro Max | 🧵 Mobile-UX | ~20 min |
 | M02 | ✅ | iPhone notch/Dynamic Island: verify `padding-top: env(safe-area-inset-top)` on Navbar — added via @supports in index.css | A | iPhone 15, 17 Pro Max | 🧵 Mobile-UX | ~15 min |
-| M03 | ⏳ | iOS Safari: test body scroll lock — `position: fixed` + `top: -scrollY` pattern (current `acquireBodyScrollLock` may not work on Safari 17) | A | All iPhone / Safari | 🧵 Mobile-UX | ~30 min |
-| M04 | ⏳ | iPhone 12 (375px): audit Hero headline — ensure `clamp()` font doesn't overflow or wrap awkwardly at 375px | A | iPhone 12 | 🧵 Mobile-UX | ~20 min |
+| M03 | ❌ | Blocked: iOS Safari body scroll lock verification requires a real iPhone/Safari 17 device or BrowserStack-style device lab; repo has shared `acquireBodyScrollLock` coverage but not physical Safari proof | A | All iPhone / Safari | 🧵 Mobile-UX | External |
+| M04 | ❌ | Blocked: iPhone 12 hero headline audit requires real-device/browser visual verification; no physical iPhone/Safari target is available in-repo | A | iPhone 12 | 🧵 Mobile-UX | External |
 | M05 | ✅ | iPhone 17 Pro Max (430px): MobileCallBar safe-area bottom padding — `.safe-area-bottom-bar` class + inline style applied | A | iPhone 17 Pro Max | 🧵 Mobile-UX | ~15 min |
 | M06 | ✅ | iPad (768px / 1024px): pricing cards grid — `.pricing-cards-grid` class + CSS 2-col override at 768–1023px | A | iPad | 🧵 Mobile-UX | ~20 min |
-| M07 | ⏳ | iPad landscape (1024px): Navbar desktop links too cramped — audit at 1024px breakpoint | A | iPad landscape | 🧵 Mobile-UX | ~20 min |
+| M07 | ❌ | Blocked: iPad landscape navbar audit requires real-device/browser visual verification at 1024px; no physical iPad/Safari target is available in-repo | A | iPad landscape | 🧵 Mobile-UX | External |
 | M08 | ✅ | Safari 17: `backdrop-filter` with `blur()` causes flicker on scroll — add `transform: translateZ(0)` to Navbar | A | Safari / iPhone | 🧵 Mobile-UX | ~15 min |
 | M09 | ✅ | iOS input zoom: ALL text inputs must be `font-size: 16px` min — audit DemoBookingModal (all inputs fixed with style={{ fontSize:"16px" }}) | A | All iPhone | 🧵 Mobile-UX | ~30 min |
-| M10 | ⏳ | iPhone 12/15: DemoBookingModal scrollable inside fixed overlay — test that form is reachable without browser chrome interfering | A | iPhone 12, 15 | 🧵 Mobile-UX | ~25 min |
+| M10 | ❌ | Blocked: iPhone 12/15 DemoBookingModal scrollability requires real iOS browser chrome behavior; no physical iPhone/Safari target is available in-repo | A | iPhone 12, 15 | 🧵 Mobile-UX | External |
 | M11 | ✅ | Safari: `position: sticky` navbar — `-webkit-sticky` added to index.css for all `.sticky` elements | A | All Safari | 🧵 Mobile-UX | ~10 min |
-| M12 | ⏳ | iPhone 12 (375px): Store page product grid — confirm single-column layout and no horizontal scroll leakage | A | iPhone 12 | 🧵 Mobile-UX | ~20 min |
-| M13 | ⏳ | iPhone 17 Pro Max (430px): Hero CTA buttons — confirm min 44×44px touch target and no overlap with visual glow decorations | A | iPhone 17 Pro Max | 🧵 Mobile-UX | ~15 min |
-| M14 | ⏳ | Safari: test `createPortal` DemoBookingModal renders correctly in Safari 16/17 (known z-index stacking context bugs) | A | Safari / iPhone | 🧵 Mobile-UX | ~20 min |
+| M12 | ❌ | Blocked: iPhone 12 Store grid horizontal-scroll audit requires real-device/browser visual verification; no physical iPhone/Safari target is available in-repo | A | iPhone 12 | 🧵 Mobile-UX | External |
+| M13 | ❌ | Blocked: iPhone 17 Pro Max hero CTA touch/overlap audit requires real-device/browser visual verification; no physical iPhone/Safari target is available in-repo | A | iPhone 17 Pro Max | 🧵 Mobile-UX | External |
+| M14 | ❌ | Blocked: Safari 16/17 createPortal modal verification requires actual Safari engine coverage; Chromium preview cannot prove Safari stacking behavior | A | Safari / iPhone | 🧵 Mobile-UX | External |
 | M15 | ✅ | iPad: Footer nav grid — `.footer-nav-grid` class + CSS 2-col override at 640–1023px | A | iPad | 🧵 Mobile-UX | ~15 min |
 | M16 | ✅ | iPhone: Pricing "Most Popular" badge overflows card top on 375px — badge needs `position: relative` fallback at mobile | A | iPhone 12, 15 | 🧵 Mobile-UX | ~15 min |
 | M17 | ✅ | iOS Safari: `<input type="date">` — `minHeight: 48px` + `fontSize: 16px` applied to date/time inputs in DemoBookingModal | A | All iPhone | 🧵 Mobile-UX | ~20 min |
-| M18 | ⏳ | iPhone: Navbar mobile menu — verify `acquireBodyScrollLock` fully prevents background page scroll on all iPhone models | A | All iPhone | 🧵 Mobile-UX | ~20 min |
+| M18 | ❌ | Blocked: iPhone Navbar scroll-lock proof requires real iPhone/Safari testing across device models; repo coverage cannot prove physical browser behavior | A | All iPhone | 🧵 Mobile-UX | External |
 | M19 | ✅ | iPhone landscape: Hero `min-height: auto` override at `max-height: 500px + landscape` in index.css | A | iPhone 12, 15, 17 | 🧵 Mobile-UX | ~15 min |
-| M20 | ⏳ | Full device test pass: manually test on iPhone 12 (375px), iPhone 15 (393px), iPhone 17 Pro Max (430px), iPad (768px) — document any layout breaks | A | All Apple devices | 🧵 Mobile-UX | ~2 hrs |
+| M20 | ❌ | Blocked: full device test pass requires physical iPhone/iPad or approved remote device-lab access and screenshots for each target | A | All Apple devices | 🧵 Mobile-UX | External |
 
 ---
 
@@ -111,20 +111,20 @@
 
 | # | Status | Task | Agent | Dependencies | Handoff To | Thread | Est. Time |
 |---|---|---|---|---|---|---|---|
-| 13 | ⏳ 🟢 | Standardize all form inputs to rounded-xl (12px) globally | A | — | — | — | ~30 min |
-| 16 | ⏳ 🟢 | CookieConsent banner: add bottom: 80px on mobile (avoid MobileCallBar overlap) | A | — | — | 🧵 Mobile-UX | ~10 min |
-| 17 | ⏳ 🟢 | FAQ accordion: add border-bottom tap target on mobile | A | — | — | 🧵 Mobile-UX | ~10 min |
-| 30 | ⏳ | Add framer-motion + canvas-confetti to Contact page success state | A | — | — | — | ~30 min |
-| 32 | ⏳ | Industry pages: give each card a unique accent color or icon style | A | — | — | — | ~30 min |
-| 37 | ⏳ | GuidedPathToggle: add Tooltip explaining Guided vs Explore All modes | A | — | — | — | ~15 min |
-| 40 | ⏳ | Mobile nav: show logged-in user name/role after nav links | A | — | — | 🧵 Mobile-UX | ~20 min |
-| 46 | ⏳ | AdminDashboard sidebar: wire AdminGlobalSearch to all entity types | A | — | — | — | ~1 hr |
-| 48 | ⏳ | CartSidebar: show empty state with top 3 popular nudge tiles | A | — | — | — | ~30 min |
-| 50 | ⏳ | ProductCard "see more features" button should open ServiceDetailModal | A | — | — | — | ~20 min |
-| 68 | ⏳ | ClientPortal: add "What's New" section reading from Changelog entity | A | — | — | — | ~45 min |
-| 69 | ⏳ | ClientPortal: add "Refer a Business" section with unique referral link | A | — | — | — | ~30 min |
-| 71 | ⏳ | BillingDashboard: add "Download Invoice PDF" using Stripe invoice_pdf URL | A | — | — | — | ~20 min |
-| 75 | ⏳ | Add session timeout warning modal after 30min admin inactivity | A | — | — | — | ~45 min |
+| 13 | ✅ | Standardize all form inputs to rounded-xl (12px) globally | A | — | — | — | ~30 min |
+| 16 | ✅ | CookieConsent banner: add bottom: 80px on mobile (avoid MobileCallBar overlap) | A | — | — | 🧵 Mobile-UX | ~10 min |
+| 17 | ✅ | FAQ accordion: add border-bottom tap target on mobile | A | — | — | 🧵 Mobile-UX | ~10 min |
+| 30 | ✅ | Add framer-motion + canvas-confetti to Contact page success state | A | — | — | — | ~30 min |
+| 32 | ✅ | Industry pages: give each card a unique accent color or icon style | A | — | — | — | ~30 min |
+| 37 | ✅ | GuidedPathToggle: add Tooltip explaining Guided vs Explore All modes | A | — | — | — | ~15 min |
+| 40 | ✅ | Mobile nav: show logged-in user name/role after nav links | A | — | — | 🧵 Mobile-UX | ~20 min |
+| 46 | ✅ | AdminDashboard sidebar: wire AdminGlobalSearch to all entity types | A | — | — | — | ~1 hr |
+| 48 | ✅ | CartSidebar: show empty state with top 3 popular nudge tiles | A | — | — | — | ~30 min |
+| 50 | ✅ | ProductCard "see more features" button should open ServiceDetailModal | A | — | — | — | ~20 min |
+| 68 | ✅ | ClientPortal: add "What's New" section reading from Changelog entity | A | — | — | — | ~45 min |
+| 69 | ✅ | ClientPortal: add "Refer a Business" section with unique referral link | A | — | — | — | ~30 min |
+| 71 | ✅ | BillingDashboard: add "Download Invoice PDF" using Stripe invoice_pdf URL | A | — | — | — | ~20 min |
+| 75 | ✅ | Add session timeout warning modal after 30min admin inactivity | A | — | — | — | ~45 min |
 
 ---
 

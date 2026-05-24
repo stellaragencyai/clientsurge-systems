@@ -3,12 +3,17 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import QuickSetupWizard from "@/components/onboarding/QuickSetupWizard";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
+import SetupStatus from "@/internal-pages/SetupStatus";
 
 export default function BusinessSetup() {
   const navigate = useNavigate();
   const [projectId] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("project_id") || null;
+  });
+  const [orderId] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("order_id") || params.get("orderId") || null;
   });
 
   const handleSetupComplete = () => {
@@ -19,6 +24,10 @@ export default function BusinessSetup() {
       navigate("/admin");
     }
   };
+
+  if (orderId && !projectId) {
+    return <SetupStatus orderIdOverride={orderId} />;
+  }
 
   if (!projectId) {
     return (

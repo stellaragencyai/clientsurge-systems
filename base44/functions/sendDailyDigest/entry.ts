@@ -96,7 +96,7 @@ Deno.serve(async (req) => {
 
     const body = `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-  <h2 style="color:#9a5c2e;">📊 Daily Lead Digest — ${formatPhoenixDate()}</h2>
+  <h2 style="color:#0077B6;">📊 Daily Lead Digest — ${formatPhoenixDate()}</h2>
   
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;">
     <div style="background:#eff6ff;border-radius:8px;padding:16px;text-align:center;">
@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
     </div>
     <div style="background:#fffbeb;border-radius:8px;padding:16px;text-align:center;">
       <div style="font-size:32px;font-weight:bold;color:#d97706;">${overdueFollowUp.length}</div>
-      <div style="font-size:12px;color:#f59e0b;">Overdue follow-ups</div>
+      <div style="font-size:12px;color:#0077B6;">Overdue follow-ups</div>
     </div>
     <div style="background:#f0fdf4;border-radius:8px;padding:16px;text-align:center;">
       <div style="font-size:32px;font-weight:bold;color:#16a34a;">${replied.length}</div>

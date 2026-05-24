@@ -62,10 +62,10 @@ export default function SystemStatusBadge({ project }) {
       icon: <CheckCircle2 className="w-3 h-3" />,
     },
     slow: {
-      dot: "bg-yellow-400",
-      pulse: "bg-yellow-400",
+      dot: "bg-sky-400",
+      pulse: "bg-sky-400",
       text: "Awaiting Activity",
-      textColor: "text-yellow-200",
+      textColor: "text-sky-200",
       icon: <Clock className="w-3 h-3" />,
     },
     issue: {

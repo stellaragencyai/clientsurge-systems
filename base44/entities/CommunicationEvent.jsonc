@@ -47,7 +47,9 @@
         "email",
         "webhook",
         "internal",
-        "voice"
+        "voice",
+        "phone",
+        "multi"
       ]
     },
     "direction": {
@@ -68,11 +70,25 @@
         "sms_failed",
         "sms_received",
         "sms_delivered",
+        "sms_suppressed",
+        "sms_skipped",
+        "sms_opt_out",
         "email_sent",
         "email_failed",
+        "email_suppressed",
+        "email_skipped",
+        "instant_email_sent",
+        "review_request",
+        "reactivation_attempt",
+        "delivery_status_updated",
+        "provider_bounce_received",
+        "provider_complaint_received",
+        "missed_call_webhook_received",
+        "webhook_error",
         "webhook_sent",
         "order_paid",
         "install_initialized",
+        "install_state_changed",
         "service_configuration_updated",
         "service_status_changed",
         "service_transition_blocked",
@@ -87,6 +103,7 @@
         "review_request_trigger_simulated",
         "workflow_triggered",
         "status_update",
+        "portal_notification",
         "ai_generated",
         "voice_call_initiated",
         "voice_call_answered",
@@ -113,10 +130,16 @@
       "title": "Status",
       "enum": [
         "pending",
+        "queued",
         "sent",
         "delivered",
         "failed",
+        "suppressed",
+        "skipped",
+        "stopped",
+        "unmatched",
         "opened",
+        "clicked",
         "received",
         "processed"
       ]
@@ -136,6 +159,26 @@
     "error_message": {
       "type": "string",
       "title": "Error Message"
+    },
+    "failure_reason": {
+      "type": "string",
+      "title": "Failure Reason"
+    },
+    "failed_at": {
+      "type": "string",
+      "title": "Failed At"
+    },
+    "last_engagement_at": {
+      "type": "string",
+      "title": "Last Engagement At"
+    },
+    "engagement_type": {
+      "type": "string",
+      "title": "Engagement Type",
+      "enum": [
+        "opened",
+        "clicked"
+      ]
     },
     "metadata_json": {
       "type": "string",

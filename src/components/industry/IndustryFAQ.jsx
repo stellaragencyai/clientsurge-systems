@@ -22,8 +22,8 @@ export default function IndustryFAQ({ faqs }) {
               style={{
                 background: "rgba(255,255,255,0.9)",
                 border: open === i
-                  ? "1.5px solid rgba(154,92,46,0.35)"
-                  : "1.5px solid rgba(154,92,46,0.14)",
+                  ? "1.5px solid rgba(0,136,204,0.35)"
+                  : "1.5px solid rgba(0,136,204,0.14)",
                 boxShadow: open === i
                   ? "0 6px 22px rgba(111,67,31,0.1)"
                   : "0 2px 8px rgba(111,67,31,0.05)",
@@ -41,7 +41,7 @@ export default function IndustryFAQ({ faqs }) {
                   style={{
                     width: "18px",
                     height: "18px",
-                    color: "#9a5c2e",
+                    color: "#0077B6",
                     transform: open === i ? "rotate(180deg)" : "rotate(0deg)",
                   }}
                 />

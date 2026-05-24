@@ -4,12 +4,14 @@ import Hero from "../components/landing/Hero.jsx";
 import HomepageConversionContent from "../components/landing/HomepageConversionContent";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
+import TawkLiveChat from "../components/landing/TawkLiveChat";
 import { LargeSectionSkeleton, SectionSkeleton } from "../components/landing/SkeletonLoader";
-import { FAQ_ITEMS } from "../components/landing/FAQ";
+import { FAQ_ITEMS } from "@/lib/faqItems";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
 const SixAutomationSystems = lazy(() => import("../components/landing/SixAutomationSystems"));
+const ProofBeforeLaunch = lazy(() => import("../components/landing/ProofBeforeLaunch"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const FAQ = lazy(() => import("../components/landing/FAQ"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
@@ -67,7 +69,7 @@ export default function Home() {
       cleanupMetadata = setPageMetadata({
         title: "AI Automation Systems for Local Leads | ClientSurge Systems",
         description:
-          "six done-for-you automations, AI-powered websites, voice agents, missed-call recovery, lead follow-up, and booking automation for local service businesses that want more booked jobs.",
+          "six done-for-you automations for lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation.",
         canonicalPath: "/",
         ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
         ogDescription:
@@ -102,6 +104,11 @@ export default function Home() {
           <HomepageConversionContent />
         </MotionSection>
         <Suspense fallback={<SectionSkeleton />}>
+          <MotionSection>
+            <ProofBeforeLaunch />
+          </MotionSection>
+          <CinematicSectionDivider />
+          <SectionBreak />
           <MotionSection>
             <SixAutomationSystems />
           </MotionSection>
@@ -156,6 +163,7 @@ export default function Home() {
           <Footer />
         </Suspense>
         <ChatBubble />
+        <TawkLiveChat />
         <CookieConsent />
       </div>
       </HomepageMotionShell>

@@ -53,7 +53,7 @@ function TimelineEndpoint({ title, date, align }) {
     <div className={`relative z-10 flex w-28 flex-col ${align === "right" ? "items-end text-right" : "items-start text-left"}`}>
       <div
         className="mb-3 h-7 w-7 rounded-full border-[6px] bg-white"
-        style={{ borderColor: "#c8965c" }}
+        style={{ borderColor: "#00AEEF" }}
       />
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary/70">
         {title}
@@ -76,7 +76,7 @@ function TimelineVisualization({ values }) {
       className="rounded-[28px] border p-6 md:p-8"
       style={{
         background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,245,240,0.94) 100%)",
-        borderColor: "rgba(154,92,46,0.18)",
+        borderColor: "rgba(0,136,204,0.18)",
         minHeight: "380px",
       }}
     >
@@ -94,7 +94,7 @@ function TimelineVisualization({ values }) {
         </div>
         <div
           className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-semibold"
-          style={{ background: "rgba(154,92,46,0.08)", color: "#7a4825" }}
+          style={{ background: "rgba(0,136,204,0.08)", color: "#005B99" }}
         >
           <HeartPulse className="h-4 w-4" />
           {lifeSpanLabel}
@@ -107,8 +107,8 @@ function TimelineVisualization({ values }) {
             className="absolute left-6 right-6 top-1/2 h-[6px] -translate-y-1/2 rounded-full"
             style={{
               background:
-                "linear-gradient(90deg, rgba(122,72,37,0.95) 0%, rgba(200,150,92,0.95) 50%, rgba(122,72,37,0.95) 100%)",
-              boxShadow: "0 10px 30px rgba(122,72,37,0.18)",
+                "linear-gradient(90deg, rgba(0,91,153,0.95) 0%, rgba(0,174,239,0.95) 50%, rgba(0,91,153,0.95) 100%)",
+              boxShadow: "0 10px 30px rgba(0,91,153,0.18)",
             }}
           />
 
@@ -123,14 +123,14 @@ function TimelineVisualization({ values }) {
                 className="mb-3 rounded-full border px-4 py-2 text-xs font-semibold text-foreground"
                 style={{
                   background: "rgba(255,255,255,0.92)",
-                  borderColor: "rgba(154,92,46,0.18)",
+                  borderColor: "rgba(0,136,204,0.18)",
                 }}
               >
                 {lifeSpanLabel}
               </div>
               <div
                 className="h-6 w-6 rounded-full border-[5px] bg-white"
-                style={{ borderColor: "#9a5c2e" }}
+                style={{ borderColor: "#0077B6" }}
               />
             </div>
             <TimelineEndpoint
@@ -270,8 +270,8 @@ export default function PortalSettings({ project, user, onUpdated }) {
                 style={
                   isActive
                     ? {
-                        background: "rgba(154,92,46,0.08)",
-                        boxShadow: "inset 0 0 0 1px rgba(154,92,46,0.14)",
+                        background: "rgba(0,136,204,0.08)",
+                        boxShadow: "inset 0 0 0 1px rgba(0,136,204,0.14)",
                       }
                     : undefined
                 }
@@ -334,8 +334,8 @@ export default function PortalSettings({ project, user, onUpdated }) {
               <div
                 className="mt-6 rounded-2xl border px-4 py-3 text-sm"
                 style={{
-                  background: "rgba(154,92,46,0.06)",
-                  borderColor: "rgba(154,92,46,0.12)",
+                  background: "rgba(0,136,204,0.06)",
+                  borderColor: "rgba(0,136,204,0.12)",
                 }}
               >
                 <p className="font-semibold text-foreground">Life line status</p>
@@ -359,7 +359,7 @@ export default function PortalSettings({ project, user, onUpdated }) {
                 onClick={handleSave}
                 disabled={saving}
                 className="mt-6 inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white transition-opacity disabled:opacity-60"
-                style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+                style={{ background: "linear-gradient(135deg,#005B99,#0077B6)" }}
               >
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
                 {saving ? "Saving..." : "Save Timeline"}

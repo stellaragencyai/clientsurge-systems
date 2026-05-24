@@ -33,6 +33,7 @@
       "enum": [
         "active",
         "past_due",
+        "paused",
         "canceled"
       ],
       "default": "active"
@@ -67,6 +68,18 @@
     "cancel_requested_at": {
       "type": "string",
       "title": "Cancel Requested At"
+    },
+    "paused_at": {
+      "type": "string",
+      "title": "Paused At"
+    },
+    "pause_resumes_at": {
+      "type": "string",
+      "title": "Pause Resumes At"
+    },
+    "resumed_at": {
+      "type": "string",
+      "title": "Resumed At"
     },
     "metadata_json": {
       "type": "string",

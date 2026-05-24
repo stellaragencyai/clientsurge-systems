@@ -14,6 +14,7 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import crypto from "node:crypto";
+import { applySmsOptOut, isSmsStopKeyword } from "../_shared/communicationOutbox.js";
 
 function normalizePhoneNumber(phone) {
   if (!phone) return "";
@@ -28,6 +29,24 @@ function normalizePhoneNumber(phone) {
 function normalizeMessageBody(body) {
   if (!body) return "";
   return String(body).trim().substring(0, 1000); // Limit to 1000 chars
+}
+
+function buildSignatureUrl(req) {
+  const originalUrl = new URL(req.url);
+  const forwardedProto = req.headers.get("x-forwarded-proto");
+  const forwardedHost = req.headers.get("x-forwarded-host");
+  const detectedHost = forwardedHost || req.headers.get("host") || originalUrl.host;
+  const host = /^(127\.0\.0\.1|localhost)(:\d+)?$/.test(detectedHost)
+    ? "client-surge-systems-copy-a9653cae.base44.app"
+    : detectedHost;
+  const protocol = forwardedProto || originalUrl.protocol.replace(":", "");
+  return `${protocol}://${host}${originalUrl.pathname}${originalUrl.search}`;
+}
+
+function hasValidWebhookKey(req) {
+  const webhookKey = Deno.env.get("TWILIO_WEBHOOK_KEY");
+  const providedWebhookKey = new URL(req.url).searchParams.get("twilio_webhook_key");
+  return Boolean(webhookKey && providedWebhookKey && webhookKey === providedWebhookKey);
 }
 
 async function findWebsiteLeadByPhone(base44, phoneNumber) {
@@ -116,34 +135,38 @@ Deno.serve(async (req) => {
     // STEP 1: Validate Twilio signature (hard gate)
     // ─────────────────────────────────────────────────────
     console.log("[receiveTwilioInboundSms] Validating Twilio signature...");
-    const token = Deno.env.get("TWILIO_AUTH_TOKEN");
-    if (!token) {
-      console.error("[receiveTwilioInboundSms] TWILIO_AUTH_TOKEN is not set — rejecting");
-      return Response.json({ error: "Server configuration error" }, { status: 500 });
+    if (hasValidWebhookKey(req)) {
+      console.log("[receiveTwilioInboundSms] Twilio webhook key valid");
+    } else {
+      const token = Deno.env.get("TWILIO_AUTH_TOKEN");
+      if (!token) {
+        console.error("[receiveTwilioInboundSms] TWILIO_AUTH_TOKEN is not set — rejecting");
+        return Response.json({ error: "Server configuration error" }, { status: 500 });
+      }
+
+      const signature = req.headers.get("X-Twilio-Signature");
+      if (!signature) {
+        console.warn("[receiveTwilioInboundSms] X-Twilio-Signature header is missing — rejecting");
+        return Response.json({ error: "Forbidden" }, { status: 403 });
+      }
+
+      const url = buildSignatureUrl(req);
+      const data = new URLSearchParams(formData);
+      const toSign =
+        url +
+        Array.from(data.entries())
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([k, v]) => `${k}${v}`)
+          .join("");
+      const computed = crypto.createHmac("sha1", token).update(toSign).digest("base64");
+
+      if (computed !== signature) {
+        console.warn("[receiveTwilioInboundSms] Signature invalid — rejecting");
+        return Response.json({ error: "Forbidden" }, { status: 403 });
+      }
+
+      console.log("[receiveTwilioInboundSms] Signature valid");
     }
-
-    const signature = req.headers.get("X-Twilio-Signature");
-    if (!signature) {
-      console.warn("[receiveTwilioInboundSms] X-Twilio-Signature header is missing — rejecting");
-      return Response.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    const url = new URL(req.url).toString();
-    const data = new URLSearchParams(formData);
-    const toSign =
-      url +
-      Array.from(data.entries())
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([k, v]) => `${k}${v}`)
-        .join("");
-    const computed = crypto.createHmac("sha1", token).update(toSign).digest("base64");
-
-    if (computed !== signature) {
-      console.warn("[receiveTwilioInboundSms] Signature invalid — rejecting");
-      return Response.json({ error: "Forbidden" }, { status: 403 });
-    }
-
-    console.log("[receiveTwilioInboundSms] Signature valid");
 
     // ─────────────────────────────────────────────────────
     // STEP 2: Validate required fields
@@ -197,37 +220,17 @@ Deno.serve(async (req) => {
     // STEP 5: Handle STOP / UNSTOP / HELP keywords (TCPA)
     // ─────────────────────────────────────────────────────
     const bodyUpper = smsEvent.body.trim().toUpperCase();
-    const stopKeywords = ["STOP", "STOPALL", "UNSUBSCRIBE", "CANCEL", "END", "QUIT"];
     const startKeywords = ["START", "UNSTOP", "YES"];
 
-    if (stopKeywords.includes(bodyUpper)) {
+    if (isSmsStopKeyword(bodyUpper)) {
       console.log("[receiveTwilioInboundSms] STOP received from", smsEvent.from_number);
-      // Find any active leads and disable automation
-      const stopMatches = await base44.asServiceRole.entities.WebsiteLead.filter(
-        { phone_number: smsEvent.from_number },
-        "-created_date",
-        10
-      ).catch(() => []);
-      for (const lead of (stopMatches || [])) {
-        await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
-          automation_enabled: false,
-          cadence_paused: true,
-          follow_up_step: 999,
-          next_follow_up_at: null,
-        }).catch(() => {});
-      }
-      await base44.asServiceRole.entities.CommunicationEvent.create({
-        context_type: "sms_opt_out",
-        channel: "sms",
-        direction: "inbound",
-        event_type: "sms_received",
-        provider: "twilio",
-        status: "received",
-        subject: `[STOP] Opt-out from ${smsEvent.from_number}`,
-        message_body: smsEvent.body,
-        provider_message_id: smsEvent.message_sid,
-        metadata_json: JSON.stringify({ from: smsEvent.from_number, keyword: bodyUpper, leads_updated: (stopMatches || []).length }),
-      }).catch(() => {});
+      await applySmsOptOut({
+        base44,
+        phone: smsEvent.from_number,
+        keyword: bodyUpper,
+        providerMessageId: smsEvent.message_sid,
+        now: smsEvent.timestamp,
+      });
       return new Response(`<?xml version="1.0" encoding="UTF-8"?><Response></Response>`, {
         headers: { "Content-Type": "text/xml" },
       });

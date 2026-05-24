@@ -325,7 +325,7 @@ export function CinematicButton({
   return (
     <motion.button
       ref={magnetic.ref}
-      type={type}
+      type={type === "submit" || type === "reset" ? type : "button"}
       whileHover={{ scale: 1.04 }}
       whileTap={{ scale: 0.98 }}
       className={`cinematic-gradient-button focus:outline-none focus:ring-2 focus:ring-primary ${className}`}
@@ -361,7 +361,7 @@ export function MotionSection({ children, delay = 0, className = "" }) {
   return (
     <motion.div
       className={className}
-      initial={reduceMotion ? false : { opacity: 0, y: 34 }}
+      initial={false}
       whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.12, margin: "-80px" }}
       transition={{ duration: 0.75, delay, ease: premiumEase }}
@@ -399,7 +399,7 @@ export function useMagneticMotion(strength = 0.16) {
 }
 
 export const revealContainer = {
-  hidden: { opacity: 0 },
+  hidden: { opacity: 1 },
   visible: {
     opacity: 1,
     transition: {
@@ -410,7 +410,7 @@ export const revealContainer = {
 };
 
 export const revealItem = {
-  hidden: { opacity: 0, y: 22 },
+  hidden: { opacity: 1, y: 0 },
   visible: {
     opacity: 1,
     y: 0,

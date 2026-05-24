@@ -160,9 +160,9 @@ export default function WelcomeBanner({ user, order, hasSetupInfo }) {
             borderRadius: "12px", padding: "14px 18px",
             display: "flex", alignItems: "center", gap: "12px",
           }}>
-            <Zap style={{ width: "18px", height: "18px", color: "#fbbf24", flexShrink: 0 }} />
+            <Zap style={{ width: "18px", height: "18px", color: "#67D8FF", flexShrink: 0 }} />
             <div>
-              <p style={{ fontSize: "13px", fontWeight: "700", color: "#fbbf24", margin: "0 0 2px" }}>
+              <p style={{ fontSize: "13px", fontWeight: "700", color: "#67D8FF", margin: "0 0 2px" }}>
                 We're actively building your system
               </p>
               <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", margin: 0 }}>

@@ -8,7 +8,7 @@
 import { useState } from "react";
 
 const STATUS_STYLES = {
-  "Pending":       { bg: "#F59E0B20", color: "#F59E0B", border: "#F59E0B40" },
+  "Pending":       { bg: "#00AEEF20", color: "#00AEEF", border: "#00AEEF40" },
   "Configuring":   { bg: "#00AEEF20", color: "#00AEEF", border: "#00AEEF40" },
   "Ready for Install": { bg: "#7C3AED20", color: "#C4B5FD", border: "#7C3AED40" },
   "Active":        { bg: "#00FFB320", color: "#00FFB3", border: "#00FFB340" },

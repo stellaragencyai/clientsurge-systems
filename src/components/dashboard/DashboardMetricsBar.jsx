@@ -7,7 +7,7 @@ export default function DashboardMetricsBar({ activeServices, project }) {
   const errorServices = activeServices.filter(s => s.installStatus === "Error").length;
 
   const metrics = [
-    { icon: TrendingUp, label: "Total Services", value: totalServices, color: "#9a5c2e", bgColor: "rgba(154,92,46,0.08)" },
+    { icon: TrendingUp, label: "Total Services", value: totalServices, color: "#0077B6", bgColor: "rgba(0,136,204,0.08)" },
     { icon: CheckCircle2, label: "Live & Running", value: completedServices, color: "#22c55e", bgColor: "rgba(34,197,94,0.08)" },
     { icon: Clock, label: "In Progress", value: inProgressServices, color: "#3b82f6", bgColor: "rgba(59,130,246,0.08)" },
     { icon: AlertCircle, label: "Need Attention", value: errorServices, color: "#ef4444", bgColor: "rgba(239,68,68,0.08)", hidden: errorServices === 0 },
@@ -50,7 +50,7 @@ export default function DashboardMetricsBar({ activeServices, project }) {
               <Icon style={{ width: "18px", height: "18px", color: metric.color }} />
             </div>
             <div>
-              <p style={{ fontSize: "11px", fontWeight: "600", color: "rgba(27,20,13,0.5)", margin: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <p style={{ fontSize: "11px", fontWeight: "600", color: "rgba(10,22,40,0.5)", margin: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 {metric.label}
               </p>
               <p style={{ fontSize: "20px", fontWeight: "800", color: metric.color, margin: "2px 0 0" }}>

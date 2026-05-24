@@ -169,7 +169,7 @@ export default function HomepageConversionContent() {
 
         <div className="mt-16 grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <motion.div
-            initial={{ opacity: 0, x: -28 }}
+            initial={false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.28 }}
             transition={{ duration: 0.7, ease: premiumEase }}

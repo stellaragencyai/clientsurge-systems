@@ -17,6 +17,11 @@
  */
 
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 const QUIET_START = 20; // 8pm Phoenix
 const QUIET_END = 8;   // 8am Phoenix
@@ -57,13 +62,7 @@ Deno.serve(async (req) => {
     const fromNumber = settings?.twilio_from_number || Deno.env.get('TWILIO_PHONE_NUMBER');
     const fromEmail = settings?.resend_from_email || Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@clientsurgesystems.com';
     const bookingLink = settings?.booking_link_default || Deno.env.get('DEFAULT_BOOKING_LINK') || '';
-    const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
-    const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
     const resendKey = Deno.env.get('RESEND_API_KEY');
-
-    if (!accountSid || !authToken || !fromNumber) {
-      return Response.json({ error: 'Twilio credentials not configured' }, { status: 500 });
-    }
 
     // Find leads needing voice follow-up
     // voice_call_attempted=true, bad outcome, next_follow_up_at in the past, not already followed up
@@ -131,20 +130,29 @@ Deno.serve(async (req) => {
           }
 
           try {
-            const twilioRes = await fetch(
-              `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-              {
-                method: 'POST',
-                headers: {
-                  Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({ To: lead.phone, From: fromNumber, Body: smsBody }),
-              }
-            );
+            const smsResult = await sendCommunicationViaOutbox({
+              base44,
+              channel: "sms",
+              provider: "twilio",
+              recipient: lead.phone,
+              body: smsBody,
+              from: fromNumber,
+              lead,
+              leadId: lead.id,
+              source: "processVoiceCallFollowUps",
+              sourceRecordId: lead.id,
+              templateKey: "voice_call_followup_sms",
+              messageType: "transactional",
+              consentBasis: "transactional_relationship",
+              metadata: { trigger: 'voice_call_followup', outcome: lead.voice_call_outcome },
+              providerSend: (providerPayload) => sendTwilioSmsProvider({
+                ...providerPayload,
+                env: (name) => Deno.env.get(name),
+                fetchImpl: fetch,
+              }),
+            });
 
-            if (twilioRes.ok) {
-              const twilioData = await twilioRes.json();
+            if (smsResult.success) {
               await base44.asServiceRole.entities.CommunicationEvent.create({
                 lead_id: lead.id,
                 channel: 'sms',
@@ -154,14 +162,13 @@ Deno.serve(async (req) => {
                 status: 'sent',
                 subject: 'Voice Call Follow-Up SMS',
                 message_body: smsBody,
-                provider_message_id: twilioData.sid,
+                provider_message_id: smsResult.provider_message_id,
                 metadata_json: JSON.stringify({ trigger: 'voice_call_followup', outcome: lead.voice_call_outcome }),
               });
               results.sms_sent++;
               console.log(`[processVoiceCallFollowUps] SMS sent to lead ${lead.id}`);
             } else {
-              const err = await twilioRes.json().catch(() => ({}));
-              console.error(`[processVoiceCallFollowUps] SMS failed for ${lead.id}: ${err?.message}`);
+              console.error(`[processVoiceCallFollowUps] SMS failed for ${lead.id}: ${smsResult.reason || smsResult.error || smsResult.status}`);
               results.failed++;
             }
           } catch (smsErr) {
@@ -195,22 +202,31 @@ Deno.serve(async (req) => {
 </div>`;
 
           try {
-            const emailRes = await fetch('https://api.resend.com/emails', {
-              method: 'POST',
-              headers: {
-                Authorization: `Bearer ${resendKey}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                from: fromEmail,
-                to: lead.email,
-                subject: emailSubject,
-                html: emailHtml,
+            const emailResult = await sendCommunicationViaOutbox({
+              base44,
+              channel: "email",
+              provider: "resend",
+              recipient: lead.email,
+              subject: emailSubject,
+              body: emailHtml,
+              html: emailHtml,
+              from: fromEmail,
+              lead,
+              leadId: lead.id,
+              source: "processVoiceCallFollowUps",
+              sourceRecordId: lead.id,
+              templateKey: "voice_call_followup_email",
+              messageType: "transactional",
+              consentBasis: "transactional_relationship",
+              metadata: { trigger: 'voice_call_followup', outcome: lead.voice_call_outcome },
+              providerSend: (providerPayload) => sendResendEmailProvider({
+                ...providerPayload,
+                env: (name) => Deno.env.get(name),
+                fetchImpl: fetch,
               }),
             });
 
-            if (emailRes.ok) {
-              const emailData = await emailRes.json();
+            if (emailResult.success) {
               await base44.asServiceRole.entities.CommunicationEvent.create({
                 lead_id: lead.id,
                 channel: 'email',
@@ -220,7 +236,7 @@ Deno.serve(async (req) => {
                 status: 'sent',
                 subject: emailSubject,
                 message_body: emailHtml,
-                provider_message_id: emailData.id,
+                provider_message_id: emailResult.provider_message_id,
                 metadata_json: JSON.stringify({ trigger: 'voice_call_followup', outcome: lead.voice_call_outcome }),
               });
               results.email_sent++;

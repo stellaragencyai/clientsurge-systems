@@ -44,14 +44,14 @@ Deno.serve(async (req) => {
   <style>
     body { font-family: Arial, sans-serif; color: #2d2d2d; }
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
+    .header { background: linear-gradient(135deg, #005B99 0%, #0077B6 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
     .content { padding: 20px; background: #f9f7f5; margin: 20px 0; border-radius: 8px; }
     .metric { display: inline-block; margin: 10px 20px 10px 0; }
-    .metric-value { font-size: 24px; font-weight: bold; color: #9a5c2e; }
+    .metric-value { font-size: 24px; font-weight: bold; color: #0077B6; }
     .metric-label { font-size: 12px; color: #666; text-transform: uppercase; }
     .footer { text-align: center; font-size: 12px; color: #999; margin-top: 30px; }
-    .alert-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; border-radius: 6px; margin: 15px 0; }
-    a { color: #9a5c2e; text-decoration: none; }
+    .alert-box { background: #fef3c7; border-left: 4px solid #0077B6; padding: 15px; border-radius: 6px; margin: 15px 0; }
+    a { color: #0077B6; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -67,10 +67,10 @@ Deno.serve(async (req) => {
       <p>A missed call from <strong>${escapeHtml(lead_name)}</strong> (${escapeHtml(business_name)}) was automatically recovered before the lead was lost.</p>
       
       <div class="alert-box">
-        <p style="margin: 0; color: #92400e;"><strong>⚡ What happened:</strong> When the call was missed, your system immediately sent an SMS follow-up, bringing the lead back into the conversation.</p>
+        <p style="margin: 0; color: #005B99;"><strong>⚡ What happened:</strong> When the call was missed, your system immediately sent an SMS follow-up, bringing the lead back into the conversation.</p>
       </div>
 
-      <div style="background: white; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #f59e0b;">
+      <div style="background: white; padding: 15px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #0077B6;">
         <div class="metric">
           <div class="metric-label">Lead Name</div>
           <div class="metric-value" style="color: #2d2d2d; font-size: 16px;">${escapeHtml(lead_name)}</div>
@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
       <p style="margin-top: 20px;">This lead would have been lost without automatic text-back recovery. Your system is working to prevent dropped opportunities.</p>
 
       <p style="text-align: center; margin-top: 30px;">
-        <a href="#" style="background: linear-gradient(135deg, #6b3f1f, #9a5c2e); color: white; padding: 10px 20px; border-radius: 6px; display: inline-block;">
+        <a href="#" style="background: linear-gradient(135deg, #005B99, #0077B6); color: white; padding: 10px 20px; border-radius: 6px; display: inline-block;">
           Follow Up with Lead
         </a>
       </p>

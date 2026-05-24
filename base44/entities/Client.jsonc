@@ -93,6 +93,11 @@
       "type": "string",
       "title": "Business Hours"
     },
+    "timezone": {
+      "type": "string",
+      "title": "Timezone",
+      "default": "America/Phoenix"
+    },
     "has_old_leads": {
       "type": "string",
       "title": "Has Old Leads",
@@ -115,10 +120,35 @@
       "enum": [
         "Onboarding",
         "In Setup",
+        "Installing",
+        "Pending",
+        "Setup",
         "Active",
+        "Live",
         "Completed"
       ],
       "default": "Onboarding"
+    },
+    "checkin_30_day_scheduled_for": {
+      "type": "string",
+      "title": "30-Day Check-In Scheduled For"
+    },
+    "checkin_30_day_operator_reminder_at": {
+      "type": "string",
+      "title": "30-Day Check-In Operator Reminder At"
+    },
+    "checkin_30_day_status": {
+      "type": "string",
+      "title": "30-Day Check-In Status",
+      "enum": [
+        "queued",
+        "sent",
+        "failed"
+      ]
+    },
+    "checkin_30_day_sent_at": {
+      "type": "string",
+      "title": "30-Day Check-In Sent At"
     },
     "tags": {
       "type": "array",

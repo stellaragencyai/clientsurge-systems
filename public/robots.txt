@@ -20,6 +20,8 @@ Disallow: /setup/preview
 Disallow: /setup/status
 Disallow: /onboarding
 Disallow: /onboarding/
+Disallow: /motion-lab
+Disallow: /motion-lab/
 Disallow: /order-success
 Disallow: /success
 Disallow: /thank-you

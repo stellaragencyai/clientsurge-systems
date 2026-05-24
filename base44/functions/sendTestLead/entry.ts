@@ -1,12 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
 import { executeOrderServiceRuntime, RuntimeExecutionError } from "../_shared/installRuntime.js";
-
-async function requireAdmin(base44: ReturnType<typeof createClientFromRequest>) {
-  const user = await base44.auth.me();
-  if (!user || user.role !== "admin") {
-    throw new Error("Admin access required");
-  }
-}
 
 Deno.serve(async (req) => {
   try {
@@ -15,7 +9,7 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    await requireAdmin(base44);
+    await requireAdminUser(base44);
 
     const payload = await req.json().catch(() => ({}));
     const {
@@ -57,7 +51,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to send test lead";
     const status =
-      message === "Admin access required" ? 403 :
+      error instanceof AuthGuardError ? error.status :
       message === "Order not found" ? 404 :
       message === "order_id is required" ? 400 :
       error instanceof RuntimeExecutionError ? error.status || 409 :

@@ -144,6 +144,9 @@ export default function PerformancePod() {
           {METRICS.map((_, idx) => (
             <button
               key={idx}
+              type="button"
+              aria-label={`Show ${METRICS[idx].label} metric`}
+              aria-current={idx === activeMetric ? "true" : undefined}
               onClick={() => setActiveMetric(idx)}
               style={{
                 width: idx === activeMetric ? "12px" : "6px",

@@ -278,6 +278,9 @@ const PACKAGE_DEFINITIONS = [
     stripe_product_id: "prod_UReWMpnZsCnfcL",
     setup_price_id: "price_1TSlDWBVGjsISdG0SyoWzAm3",
     monthly_price_id: "price_1TSlDWBVGjsISdG0Ej1O16ov",
+    test_stripe_product_id: "prod_UYhtwNW8eVqQdI",
+    test_setup_price_id: "price_1TZaTKBVGjsISdG0FYZuolxJ",
+    test_monthly_price_id: "price_1TZaTLBVGjsISdG0dj7Y62fu",
     included_service_keys: ["instant_lead_response", "missed_call_text_back"],
     setup_total: 797,
     monthly_total: 497,
@@ -290,6 +293,9 @@ const PACKAGE_DEFINITIONS = [
     stripe_product_id: "prod_UReWhZsWks1HuA",
     setup_price_id: "price_1TSlDXBVGjsISdG0eTWcARLM",
     monthly_price_id: "price_1TSlDXBVGjsISdG0X9unS4Qf",
+    test_stripe_product_id: "prod_UYhtW1TiATAaSS",
+    test_setup_price_id: "price_1TZaTLBVGjsISdG0OLeOUdAH",
+    test_monthly_price_id: "price_1TZaTMBVGjsISdG0FlG2VVWG",
     included_service_keys: [
       "instant_lead_response",
       "missed_call_text_back",
@@ -309,6 +315,9 @@ const PACKAGE_DEFINITIONS = [
     stripe_product_id: "prod_UReW1LmsVbn4BZ",
     setup_price_id: "price_1TSlDYBVGjsISdG0l2rHzet1",
     monthly_price_id: "price_1TSlDXBVGjsISdG0Abdx85z3",
+    test_stripe_product_id: "prod_UYhtICcoNgWC9d",
+    test_setup_price_id: "price_1TZaTMBVGjsISdG0TtdrSHRP",
+    test_monthly_price_id: "price_1TZaTNBVGjsISdG0t7w5I7gM",
     included_service_keys: [
       "instant_lead_response",
       "missed_call_text_back",
@@ -665,11 +674,17 @@ export function buildStoredPricingSummary(items = []) {
   };
 }
 
-export function buildStripeLineItemsForPricingSummary(pricingSummary) {
+export function buildStripeLineItemsForPricingSummary(pricingSummary, { livemode = true } = {}) {
   const packageOffer = pricingSummary?.package_offer || null;
   const addOnServiceKeys = pricingSummary?.add_on_service_keys || [];
+  const setupPriceId = livemode === false
+    ? packageOffer?.test_setup_price_id
+    : packageOffer?.setup_price_id;
+  const monthlyPriceId = livemode === false
+    ? packageOffer?.test_monthly_price_id
+    : packageOffer?.monthly_price_id;
 
-  if (!packageOffer?.setup_price_id || !packageOffer?.monthly_price_id) {
+  if (!setupPriceId || !monthlyPriceId) {
     throw new Error("Live checkout currently requires a Starter, Growth, or Elite package bundle.");
   }
 
@@ -679,11 +694,11 @@ export function buildStripeLineItemsForPricingSummary(pricingSummary) {
 
   return [
     {
-      price: packageOffer.setup_price_id,
+      price: setupPriceId,
       quantity: 1,
     },
     {
-      price: packageOffer.monthly_price_id,
+      price: monthlyPriceId,
       quantity: 1,
     },
   ];

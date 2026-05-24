@@ -12,7 +12,7 @@ export default function StaggeredFadeUp({
   blur = 7
 }) {
   const ref = useRef(null);
-  const [inView, setInView] = useState(false);
+  const [inView, setInView] = useState(true);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -64,7 +64,7 @@ export default function StaggeredFadeUp({
     <motion.div
       ref={ref}
       variants={containerVariants}
-      initial="hidden"
+      initial="visible"
       animate={inView ? "visible" : "hidden"}
       style={{ width: "100%" }}
     >

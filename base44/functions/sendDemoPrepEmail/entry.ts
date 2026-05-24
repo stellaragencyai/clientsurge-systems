@@ -29,14 +29,14 @@ Deno.serve(async (req) => {
     const emailBody = `<!DOCTYPE html>
 <html>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-  <div style="background: linear-gradient(135deg, #6b3f1f, #9a5c2e); padding: 32px; border-radius: 12px 12px 0 0; text-align: center;">
+  <div style="background: linear-gradient(135deg, #005B99, #0077B6); padding: 32px; border-radius: 12px 12px 0 0; text-align: center;">
     <h1 style="color: #f5e6d0; margin: 0; font-size: 24px;">How To Prepare For Your Demo</h1>
     <p style="color: rgba(245,230,208,0.75); margin: 8px 0 0;">ClientSurge Systems</p>
   </div>
   <div style="background: #fff; padding: 32px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
     <p style="font-size: 16px;">Hi <strong>${full_name}</strong>,</p>
     <p>Before we meet on <strong>${formattedDate}</strong> at <strong>${formattedTime}</strong>, here are the three most helpful things to bring to the call.</p>
-    <div style="background: #fdf8f0; border: 1px solid #c8965c; border-radius: 8px; padding: 20px; margin: 20px 0;">
+    <div style="background: #fdf8f0; border: 1px solid #00AEEF; border-radius: 8px; padding: 20px; margin: 20px 0;">
       <ol style="margin: 0; padding-left: 18px; line-height: 1.8; color: #444;">
         <li>Your current booking link or scheduling process</li>
         <li>A rough sense of how many leads you receive in a typical month</li>

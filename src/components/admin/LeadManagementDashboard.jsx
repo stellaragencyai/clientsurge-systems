@@ -69,7 +69,7 @@ function getStatusColor(status) {
     Contacted: "bg-purple-100 text-purple-800",
     Replied: "bg-indigo-100 text-indigo-800",
     Qualified: "bg-green-100 text-green-800",
-    "Booking Prompt Sent": "bg-amber-100 text-amber-800",
+    "Booking Prompt Sent": "bg-blue-100 text-blue-800",
     Booked: "bg-emerald-100 text-emerald-800",
     Closed: "bg-gray-100 text-gray-800",
   };
@@ -131,7 +131,6 @@ function SummaryCard({ label, value, helper, tone = "default" }) {
     default: "bg-white text-foreground",
     blue: "bg-blue-50 text-blue-900",
     green: "bg-green-50 text-green-900",
-    amber: "bg-amber-50 text-amber-900",
     purple: "bg-purple-50 text-purple-900",
     emerald: "bg-emerald-50 text-emerald-900",
   };
@@ -151,7 +150,6 @@ function ConversionFunnelChart({ summary }) {
     blue: "bg-blue-500",
     purple: "bg-purple-500",
     emerald: "bg-emerald-500",
-    amber: "bg-amber-500",
   };
 
   return (
@@ -518,7 +516,7 @@ export default function LeadManagementDashboard() {
           label="Reactivation Ready"
           value={snapshot.summary.segment_counts?.reactivation || 0}
           helper="Dormant leads usable by Old Lead Reactivation."
-          tone="amber"
+          tone="blue"
         />
         <SummaryCard
           label="Nurture Ready"
@@ -666,7 +664,7 @@ export default function LeadManagementDashboard() {
                 label="Single Service"
                 value={offerMix.single_service || 0}
                 helper="Leads with one clear first-service fit."
-                tone="amber"
+                tone="blue"
               />
             </div>
           </div>
@@ -752,7 +750,7 @@ export default function LeadManagementDashboard() {
                 <SummaryCard label="Rows" value={importPreview.counts.total_rows} tone="default" />
                 <SummaryCard label="Create" value={importPreview.counts.creates} tone="green" />
                 <SummaryCard label="Update" value={importPreview.counts.updates} tone="blue" />
-                <SummaryCard label="Ambiguous" value={importPreview.counts.ambiguous} tone="amber" />
+                <SummaryCard label="Ambiguous" value={importPreview.counts.ambiguous} tone="blue" />
                 <SummaryCard label="Invalid" value={importPreview.counts.invalid} tone="purple" />
               </div>
 
@@ -769,7 +767,7 @@ export default function LeadManagementDashboard() {
                         <span className="text-muted-foreground">{action.reason}</span>
                       </div>
                       {action.warnings?.length ? (
-                        <p className="mt-2 text-xs text-amber-700">{action.warnings.join(" ")}</p>
+                        <p className="mt-2 text-xs text-blue-700">{action.warnings.join(" ")}</p>
                       ) : null}
                       <p className="mt-2 text-xs text-muted-foreground">
                         {action.normalized_lead?.full_name || "Unknown"} • {action.normalized_lead?.business_name || "Unknown Business"} •{" "}
@@ -988,8 +986,8 @@ export default function LeadManagementDashboard() {
                               {lead.activation_priority && lead.activation_priority !== 'Low' && (
                                 <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${
                                   lead.activation_priority === 'Hot' ? 'bg-red-100 text-red-700' :
-                                  lead.activation_priority === 'High' ? 'bg-orange-100 text-orange-700' :
-                                  'bg-amber-100 text-amber-700'
+                                  lead.activation_priority === 'High' ? 'bg-sky-100 text-sky-700' :
+                                  'bg-blue-100 text-blue-700'
                                 }`}>
                                   {lead.activation_priority === 'Hot' ? '🔥' : ''} {lead.activation_priority}
                                 </span>

@@ -124,10 +124,10 @@ const AUTOMATIONS = [
 // Accent colors per automation
 const AUTOMATION_ACCENTS = [
   "#00AEEF", // Instant Lead — electric blue
-  "#f97316", // Missed Call — orange
+  "#00AEEF", // Missed Call — cyan
   "#a855f7", // Nurture — purple
   "#10b981", // Booking — emerald
-  "#f59e0b", // Review — amber
+  "#00AEEF", // Review — blue
   "#ef4444", // Reactivation — red
 ];
 

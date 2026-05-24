@@ -24,3 +24,10 @@ test("legacy endpoint response returns HTTP 410 with structured body", async () 
   assert.equal(body.endpoint, "createLeadAndDispatch");
   assert.ok(body.replacement.includes("submitLeadCapture"));
 });
+
+test("autoSendWebhookInstructions is no longer quarantined", () => {
+  assert.throws(
+    () => getLegacyEndpointQuarantine("autoSendWebhookInstructions"),
+    /Unknown legacy endpoint/
+  );
+});

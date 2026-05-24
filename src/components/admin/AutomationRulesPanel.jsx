@@ -8,12 +8,14 @@ import {
   ChevronDown,
   AlertCircle,
 } from "lucide-react";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 export default function AutomationRulesPanel({ projectId }) {
   const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedRule, setExpandedRule] = useState(null);
+  const [deleteCandidate, setDeleteCandidate] = useState(null);
 
   useEffect(() => {
     loadRules();
@@ -49,13 +51,12 @@ export default function AutomationRulesPanel({ projectId }) {
   };
 
   const deleteRule = async (ruleId) => {
-    if (confirm("Delete this rule? This cannot be undone.")) {
-      try {
-        await base44.entities.AutomationRule.delete(ruleId);
-        await loadRules();
-      } catch (err) {
-        setError(err.message);
-      }
+    try {
+      await base44.entities.AutomationRule.delete(ruleId);
+      setDeleteCandidate(null);
+      await loadRules();
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -198,7 +199,7 @@ export default function AutomationRulesPanel({ projectId }) {
 
                   <div className="flex gap-2 pt-2">
                     <button
-                      onClick={() => deleteRule(rule.id)}
+                      onClick={() => setDeleteCandidate(rule)}
                       className="flex items-center gap-1 px-3 py-1 text-xs text-red-600 border border-red-200 rounded hover:bg-red-50"
                     >
                       <Trash2 className="w-3 h-3" />
@@ -210,6 +211,15 @@ export default function AutomationRulesPanel({ projectId }) {
             </div>
           ))}
         </div>
+      )}
+      {deleteCandidate && (
+        <DeleteConfirmModal
+          title="Delete Automation Rule"
+          description={`Delete "${deleteCandidate.rule_name}"? This cannot be undone.`}
+          confirmLabel="Delete Rule"
+          onConfirm={() => deleteRule(deleteCandidate.id)}
+          onCancel={() => setDeleteCandidate(null)}
+        />
       )}
     </div>
   );

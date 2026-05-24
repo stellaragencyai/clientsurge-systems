@@ -63,7 +63,7 @@ export default function CascadingChecklistItem({ item }) {
       </span>
       <span
         style={{
-          color: "rgba(27,20,13,0.78)",
+          color: "rgba(10,22,40,0.78)",
           fontSize: "13px",
           fontWeight: 700,
           lineHeight: 1.25,

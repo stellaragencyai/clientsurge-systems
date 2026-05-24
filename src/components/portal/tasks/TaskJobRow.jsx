@@ -3,7 +3,7 @@ import { CheckCircle2, Clock, Loader2, AlertCircle, RotateCcw } from "lucide-rea
 const STATUS_CONFIG = {
   completed:  { icon: CheckCircle2, color: "text-green-600",  bg: "bg-green-50 border-green-200",  label: "Completed" },
   processing: { icon: Loader2,      color: "text-blue-600",   bg: "bg-blue-50 border-blue-200",    label: "Processing", spin: true },
-  queued:     { icon: Clock,        color: "text-amber-600",  bg: "bg-amber-50 border-amber-200",  label: "Queued" },
+  queued:     { icon: Clock,        color: "text-blue-600",  bg: "bg-blue-50 border-blue-200",  label: "Queued" },
   failed:     { icon: AlertCircle,  color: "text-red-600",    bg: "bg-red-50 border-red-200",      label: "Failed" },
 };
 

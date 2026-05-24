@@ -1,18 +1,27 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 
 import {
   createLeadCaptureRateLimiter,
   findDuplicateWebsiteLead,
   isDisposableEmail,
+  isValidEmail,
+  maskIpAddress,
   normalizeEmail,
   normalizePhone,
+  normalizeRequestedChannels,
+  normalizeSourcePage,
   RATE_LIMIT_MAX,
   RATE_LIMIT_WINDOW_MS,
   SIXTY_MINUTES,
 } from "../base44/functions/submitLeadCapture/leadCapture.shared.js";
 
 const NOW = Date.parse("2026-05-20T22:30:00.000Z");
+
+function read(path) {
+  return fs.readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+}
 
 test("submitLeadCapture dedup window includes exactly 60 minutes", () => {
   const duplicate = findDuplicateWebsiteLead({
@@ -69,6 +78,46 @@ test("submitLeadCapture blocks disposable email domains after normalization", ()
   assert.equal(normalizeEmail("  PERSON@Mailinator.com "), "person@mailinator.com");
   assert.equal(isDisposableEmail("PERSON@Mailinator.com"), true);
   assert.equal(isDisposableEmail("person@realbusiness.com"), false);
+});
+
+test("submitLeadCapture rejects malformed email and phone inputs", () => {
+  assert.equal(isValidEmail("lead@realbusiness.com"), true);
+  assert.equal(isValidEmail("lead@"), false);
+  assert.equal(normalizePhone("555"), "");
+  assert.equal(normalizePhone("+1 (602) 555-0199"), "6025550199");
+});
+
+test("submitLeadCapture normalizes public source page to local paths only", () => {
+  assert.equal(normalizeSourcePage("/book?utm_source=test"), "/book?utm_source=test");
+  assert.equal(normalizeSourcePage("https://evil.example/book"), "/");
+  assert.equal(normalizeSourcePage("//evil.example/book"), "/");
+  assert.equal(normalizeSourcePage(""), "/");
+});
+
+test("submitLeadCapture stores masked IPs for privacy while preserving rate-limit usefulness", () => {
+  assert.equal(maskIpAddress("203.0.113.42"), "203.0.113.0");
+  assert.equal(maskIpAddress("2001:db8:abcd:0012:0000:0000:0000:0001"), "2001:db8:abcd:0012::");
+});
+
+test("submitLeadCapture only accepts known requested channels", () => {
+  assert.deepEqual(normalizeRequestedChannels(["Email", "sms", "CALL", "fax", "email"]), [
+    "email",
+    "sms",
+    "call",
+  ]);
+});
+
+test("submitLeadCapture logs workflow events with CommunicationEvent schema enums", () => {
+  const source = read("base44/functions/submitLeadCapture/entry.ts");
+
+  assert.match(source, /channel: "internal"/);
+  assert.match(source, /direction: "system"/);
+  assert.match(source, /event_type: "workflow_triggered"/);
+  assert.match(source, /provider: "internal"/);
+  assert.match(source, /status: result\?\.success === false \? "failed" : "processed"/);
+  assert.doesNotMatch(source, /provider: "automationOrchestrator"/);
+  assert.doesNotMatch(source, /direction: "internal"/);
+  assert.doesNotMatch(source, /"completed"/);
 });
 
 test("submitLeadCapture rate limits after 3 submissions per IP per hour", () => {

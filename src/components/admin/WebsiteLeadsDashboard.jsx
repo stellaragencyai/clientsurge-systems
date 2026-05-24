@@ -90,7 +90,7 @@ export default function WebsiteLeadsDashboard() {
   const getStatusColor = (status) => {
     const colors = {
       new: 'bg-blue-50 border-blue-200',
-      contacted: 'bg-yellow-50 border-yellow-200',
+      contacted: 'bg-sky-50 border-sky-200',
       responded: 'bg-green-50 border-green-200',
       hot: 'bg-red-50 border-red-200',
       booked: 'bg-purple-50 border-purple-200',
@@ -103,7 +103,7 @@ export default function WebsiteLeadsDashboard() {
   const getStatusIcon = (status) => {
     const icons = {
       new: <Clock className="w-4 h-4 text-blue-600" />,
-      contacted: <MessageSquare className="w-4 h-4 text-yellow-600" />,
+      contacted: <MessageSquare className="w-4 h-4 text-sky-600" />,
       responded: <CheckCircle2 className="w-4 h-4 text-green-600" />,
       hot: <AlertCircle className="w-4 h-4 text-red-600" />,
       booked: <CheckCircle2 className="w-4 h-4 text-purple-600" />,
@@ -307,7 +307,7 @@ export default function WebsiteLeadsDashboard() {
                           <span className={`text-xs px-2 py-1 rounded-full ${
                             log.status === 'sent' ? 'bg-green-50 text-green-700' :
                             log.status === 'failed' ? 'bg-red-50 text-red-700' :
-                            log.status === 'skipped' ? 'bg-yellow-50 text-yellow-700' :
+                            log.status === 'skipped' ? 'bg-sky-50 text-sky-700' :
                             'bg-muted'
                           }`}>
                             {log.status}

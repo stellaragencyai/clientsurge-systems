@@ -80,7 +80,7 @@ function AnimatedStat({ value, label, delay }) {
       className="text-center"
       style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(16px)", transition: `opacity 0.6s ease ${delay}ms, transform 0.6s ease ${delay}ms` }}
     >
-      <div className="font-display text-3xl md:text-4xl font-bold mb-1" style={{ color: "#9a5c2e" }}>{value}</div>
+      <div className="font-display text-3xl md:text-4xl font-bold mb-1" style={{ color: "#0077B6" }}>{value}</div>
       <div className="text-xs font-semibold uppercase tracking-widest text-foreground/50">{label}</div>
     </div>
   );
@@ -125,21 +125,21 @@ export default function WhyUs() {
 
           {/* Arrow */}
           <div className="hidden md:flex items-center justify-center px-4">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-md flex-shrink-0" style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)", border: "2px solid white" }}>
-              <ArrowRight className="w-4 h-4 text-amber-100" />
+            <div className="w-9 h-9 rounded-full flex items-center justify-center shadow-md flex-shrink-0" style={{ background: "linear-gradient(135deg,#0077B6,#005B99)", border: "2px solid white" }}>
+              <ArrowRight className="w-4 h-4 text-blue-100" />
             </div>
           </div>
 
           {/* Right - Our System */}
-          <div className="rounded-2xl p-7 flex flex-col gap-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,248,235,0.4) 100%)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", border: "1.5px solid rgba(154,92,46,0.28)", boxShadow: "0 4px 20px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.7)" }}>
+          <div className="rounded-2xl p-7 flex flex-col gap-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.55) 0%, rgba(255,248,235,0.4) 100%)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", border: "1.5px solid rgba(0,136,204,0.28)", boxShadow: "0 4px 20px rgba(0,136,204,0.07), inset 0 1px 0 rgba(255,255,255,0.7)" }}>
             <div className="flex items-center gap-2 mb-1">
-              <span className="w-2 h-2 rounded-full" style={{ background: "#9a5c2e" }} />
-              <p className="text-xs font-black uppercase tracking-widest" style={{ color: "#9a5c2e" }}>ClientSurge Systems</p>
+              <span className="w-2 h-2 rounded-full" style={{ background: "#0077B6" }} />
+              <p className="text-xs font-black uppercase tracking-widest" style={{ color: "#0077B6" }}>ClientSurge Systems</p>
             </div>
             {systemItems.map((t, i) => (
               <div key={i} className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5" style={{ background: "rgba(154,92,46,0.14)" }}>
-                  <CheckCircle2 className="w-3 h-3" style={{ color: "#9a5c2e" }} strokeWidth={2.5} />
+                <div className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center mt-0.5" style={{ background: "rgba(0,136,204,0.14)" }}>
+                  <CheckCircle2 className="w-3 h-3" style={{ color: "#0077B6" }} strokeWidth={2.5} />
                 </div>
                 <span className="text-sm font-medium text-foreground/80 leading-snug">{t}</span>
               </div>
@@ -148,7 +148,7 @@ export default function WhyUs() {
         </div>
 
         {/* ── Animated Stats Bar ── */}
-        <div className="rounded-2xl mb-14 py-8 px-6 grid grid-cols-2 md:grid-cols-4 gap-8" style={{ background: "rgba(154,92,46,0.06)", border: "1px solid rgba(154,92,46,0.2)" }}>
+        <div className="rounded-2xl mb-14 py-8 px-6 grid grid-cols-2 md:grid-cols-4 gap-8" style={{ background: "rgba(0,136,204,0.06)", border: "1px solid rgba(0,136,204,0.2)" }}>
           {stats.map((s, i) => <AnimatedStat key={i} value={s.value} label={s.label} delay={i * 100} />)}
         </div>
 
@@ -165,16 +165,16 @@ export default function WhyUs() {
                   backdropFilter: "blur(14px)",
                   WebkitBackdropFilter: "blur(14px)",
                   boxShadow: "0 3px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7)",
-                  border: "1px solid rgba(154,92,46,0.15)",
+                  border: "1px solid rgba(0,136,204,0.15)",
                   opacity: sectionVisible ? 1 : 0,
                   transform: sectionVisible ? "translateY(0)" : "translateY(20px)",
                   transition: `opacity 0.5s ease ${i * 80}ms, transform 0.5s ease ${i * 80}ms, box-shadow 0.3s ease, border-color 0.3s ease`,
                 }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.4)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(154,92,46,0.14), inset 0 1px 0 rgba(255,255,255,0.8)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(154,92,46,0.15)"; e.currentTarget.style.boxShadow = "0 3px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7)"; e.currentTarget.style.transform = "translateY(0)"; }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(0,136,204,0.4)"; e.currentTarget.style.boxShadow = "0 12px 32px rgba(0,136,204,0.14), inset 0 1px 0 rgba(255,255,255,0.8)"; e.currentTarget.style.transform = "translateY(-4px)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(0,136,204,0.15)"; e.currentTarget.style.boxShadow = "0 3px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.7)"; e.currentTarget.style.transform = "translateY(0)"; }}
               >
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110" style={{ backgroundColor: "rgba(154,92,46,0.1)", border: "1.5px solid rgba(154,92,46,0.25)" }}>
-                  <Icon className="w-4 h-4" style={{ color: "#9a5c2e" }} strokeWidth={1.75} />
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110" style={{ backgroundColor: "rgba(0,136,204,0.1)", border: "1.5px solid rgba(0,136,204,0.25)" }}>
+                  <Icon className="w-4 h-4" style={{ color: "#0077B6" }} strokeWidth={1.75} />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-foreground mb-1">{r.title}</h3>
@@ -186,23 +186,23 @@ export default function WhyUs() {
         </div>
 
         {/* ── Timeline Strip ── */}
-        <div className="rounded-2xl overflow-hidden mb-12" style={{ border: "1px solid rgba(154,92,46,0.18)" }}>
+        <div className="rounded-2xl overflow-hidden mb-12" style={{ border: "1px solid rgba(0,136,204,0.18)" }}>
           <div className="grid grid-cols-2 md:grid-cols-4">
             {["Day 1: Kickoff Call", "Days 2-4: Build & Integrate", "Days 5-7: Test & Launch", "Day 30+: Ongoing Optimization"].map((step, i) => (
-              <div key={i} className={`px-5 py-5 text-center relative ${i < 3 ? "border-r border-primary/10" : ""}`} style={{ background: "rgba(154,92,46,0.04)" }}>
+              <div key={i} className={`px-5 py-5 text-center relative ${i < 3 ? "border-r border-primary/10" : ""}`} style={{ background: "rgba(0,136,204,0.04)" }}>
                 {i < 3 && (
                   <div className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-6 h-6 rounded-full bg-white border border-primary/20 items-center justify-center">
                     <ArrowRight className="w-2.5 h-2.5 text-primary" />
                   </div>
                 )}
-                <div className="w-7 h-7 rounded-full flex items-center justify-center mx-auto mb-2 text-xs font-black" style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)", color: "#f5e6d0" }}>{i + 1}</div>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center mx-auto mb-2 text-xs font-black" style={{ background: "linear-gradient(135deg,#0077B6,#005B99)", color: "#EAF8FF" }}>{i + 1}</div>
                 <p className="text-xs font-semibold text-foreground/80 leading-snug">{step}</p>
               </div>
             ))}
           </div>
-          <div className="px-6 py-4 text-center" style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 60%,#7a4825 100%)" }}>
-            <p className="text-xs font-bold uppercase tracking-widest text-amber-200/60 mb-0.5">After That</p>
-            <p className="text-sm font-bold text-amber-100">Everything Runs on Autopilot</p>
+          <div className="px-6 py-4 text-center" style={{ background: "linear-gradient(135deg,#005B99 0%,#0077B6 60%,#005B99 100%)" }}>
+            <p className="text-xs font-bold uppercase tracking-widest text-blue-200/60 mb-0.5">After That</p>
+            <p className="text-sm font-bold text-blue-100">Everything Runs on Autopilot</p>
           </div>
         </div>
 
@@ -211,11 +211,11 @@ export default function WhyUs() {
           <p className="text-sm font-semibold text-foreground/70 mb-5">Ready to replace guesswork with a system that actually produces results?</p>
           <button
             onClick={() => setShowDemoModal(true)}
-            style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.35)", border: "none", cursor: "pointer", transition: "box-shadow 0.4s ease" }}
-            onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)"; }}
-            onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"; }}
+            style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#0088CC 0%,#00AEEF 30%,#DDF4FF 50%,#00AEEF 70%,#005B99 100%)", boxShadow: "0 4px 18px rgba(0,92,153,0.35)", border: "none", cursor: "pointer", transition: "box-shadow 0.4s ease" }}
+            onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(0,92,153,0.35)"; }}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,92,153,0.35)"; }}
           >
-            <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 32px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.95rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 32px", borderRadius: "9999px", background: "linear-gradient(135deg,#005B99 0%,#0077B6 40%,#005B99 100%)", color: "#EAF8FF", fontWeight: "700", fontSize: "0.95rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
               Make the Leap
               <ArrowRight className="w-4 h-4" />
             </span>

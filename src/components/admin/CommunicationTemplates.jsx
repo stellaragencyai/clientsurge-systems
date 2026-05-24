@@ -193,7 +193,7 @@ function CharCount({ text, type }) {
   if (type !== "sms") return null;
   const len = text?.length || 0;
   const segments = Math.ceil(len / 160) || 1;
-  const color = len > 320 ? "text-red-500" : len > 160 ? "text-amber-500" : "text-muted-foreground";
+  const color = len > 320 ? "text-red-500" : len > 160 ? "text-blue-500" : "text-muted-foreground";
   return (
     <span className={`text-xs tabular-nums ${color}`}>
       {len} chars · {segments} segment{segments !== 1 ? "s" : ""}
@@ -229,7 +229,7 @@ function TemplateEditor({ template, value, onChange, onPreview }) {
             className="p-1.5 rounded hover:bg-muted transition-colors"
             title="Show tip"
           >
-            <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+            <Lightbulb className="w-3.5 h-3.5 text-blue-500" />
           </button>
           <button
             onClick={() => onPreview(template, value)}
@@ -242,8 +242,8 @@ function TemplateEditor({ template, value, onChange, onPreview }) {
 
       {/* Tip */}
       {showTip && (
-        <div className="flex items-start gap-2 px-4 py-2.5 bg-amber-50 border-b border-amber-100 text-xs text-amber-800">
-          <Lightbulb className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-amber-500" />
+        <div className="flex items-start gap-2 px-4 py-2.5 bg-blue-50 border-b border-blue-100 text-xs text-blue-800">
+          <Lightbulb className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-blue-500" />
           {template.tip}
         </div>
       )}

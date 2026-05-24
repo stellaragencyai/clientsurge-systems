@@ -6,6 +6,10 @@
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import crypto from "node:crypto";
+import {
+  sendCommunicationViaOutbox,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 async function validateTwilioSignature(req, rawBody) {
   const webhookKey = Deno.env.get("TWILIO_WEBHOOK_KEY");
@@ -57,10 +61,7 @@ async function validateTwilioSignature(req, rawBody) {
   return { valid: true };
 }
 
-const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
-const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
 const TWILIO_FROM_NUMBER = Deno.env.get("TWILIO_PHONE_NUMBER");
-const TWILIO_API_URL = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`;
 
 const DEFAULT_MISSED_CALL_SMS = "Hi {first_name}, we missed your call! Text back or reply to this message and we'll get right back to you.";
 
@@ -295,36 +296,39 @@ function formatSmsTemplate(template, lead) {
     .replace("{business_name}", lead.business_name || "our business");
 }
 
-async function sendTwilioSms(toNumber, messageBody) {
-  const auth = btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`);
-  const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
-  if (!statusCallbackUrl) {
-    console.warn("[MissedCall] TWILIO_SMS_STATUS_CALLBACK_URL missing — SMS delivery tracking disabled");
-  }
-
+async function sendTwilioSms(base44, toNumber, messageBody, lead, callSid) {
   console.log(`[MissedCall] Sending SMS to ${toNumber}`);
 
-  const params = { From: TWILIO_FROM_NUMBER, To: toNumber, Body: messageBody };
-  if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
-
-  const response = await fetch(TWILIO_API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${auth}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams(params).toString(),
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "sms",
+    provider: "twilio",
+    recipient: toNumber,
+    body: messageBody,
+    from: TWILIO_FROM_NUMBER,
+    lead,
+    leadId: lead?.id,
+    source: "receiveTwilioMissedCallWebhook",
+    sourceRecordId: callSid || lead?.id || toNumber,
+    templateKey: "missed_call_text_back",
+    messageType: "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { service_key: "missed_call_text_back", trigger: "missed_call_webhook", inbound_call_sid: callSid },
+    providerSend: (providerPayload) => sendTwilioSmsProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
   });
 
-  if (!response.ok) {
-    const error = await response.text();
-    console.error(`[Twilio] Error: ${response.status} - ${error}`);
-    throw new Error(`Twilio SMS failed: ${response.status}`);
+  if (!result.success) {
+    const reason = result.reason || result.error || "Twilio outbox send failed";
+    console.error(`[Twilio] Error: ${reason}`);
+    throw new Error(`Twilio SMS failed: ${reason}`);
   }
 
-  const data = await response.json();
-  console.log(`[MissedCall] SMS sent. SID: ${data.sid}`);
-  return data.sid;
+  console.log(`[MissedCall] SMS sent. SID: ${result.provider_message_id}`);
+  return result.provider_message_id;
 }
 
 Deno.serve(async (req) => {
@@ -465,7 +469,7 @@ Deno.serve(async (req) => {
       : smsTemplate.replace("{first_name}", "there").replace("{business_name}", "our business");
 
     // Send SMS
-    const messageSid = await sendTwilioSms(normalizedPhone, messageBody);
+    const messageSid = await sendTwilioSms(base44, normalizedPhone, messageBody, lead, callSid);
 
     // ─────────────────────────────────────────────────────────
     // STEP 2: Update lead and log missed-call inbound event

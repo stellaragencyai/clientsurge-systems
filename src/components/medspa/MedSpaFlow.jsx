@@ -56,7 +56,7 @@ export default function MedSpaFlow() {
                     src={step.image}
                     alt={step.title}
                     width="600"
-                    height="320"
+                    height="400"
                     loading="lazy"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />

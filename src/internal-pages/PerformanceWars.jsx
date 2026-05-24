@@ -14,9 +14,9 @@ const AGENTS = [
   { key: 'sales_rep_med_spa',      name: 'Sarah',  industry: 'Med Spa',       emoji: '💆',  avgDealValue: 800,  color: '#ec4899' },
   { key: 'sales_rep_dental',       name: 'Marcus', industry: 'Dental',        emoji: '🦷',  avgDealValue: 1200, color: '#06b6d4' },
   { key: 'sales_rep_chiropractic', name: 'Jordan', industry: 'Chiropractic',  emoji: '🦴',  avgDealValue: 600,  color: '#8b5cf6' },
-  { key: 'sales_rep_hvac',         name: 'Tyler',  industry: 'HVAC',          emoji: '❄️',  avgDealValue: 950,  color: '#f97316' },
+  { key: 'sales_rep_hvac',         name: 'Tyler',  industry: 'HVAC',          emoji: '❄️',  avgDealValue: 950,  color: '#00AEEF' },
   { key: 'sales_rep_roofing',      name: 'Derek',  industry: 'Roofing',       emoji: '🏠',  avgDealValue: 2200, color: '#64748b' },
-  { key: 'sales_rep_contractors',  name: 'Alex',   industry: 'Contractors',   emoji: '🔨',  avgDealValue: 1500, color: '#f59e0b' },
+  { key: 'sales_rep_contractors',  name: 'Alex',   industry: 'Contractors',   emoji: '🔨',  avgDealValue: 1500, color: '#00AEEF' },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -56,8 +56,8 @@ function fmtUSD(n) {
 
 function RankBadge({ rank }) {
   if (rank === 1) return (
-    <div className="w-9 h-9 rounded-full bg-yellow-400 flex items-center justify-center flex-shrink-0 shadow-md">
-      <Crown className="w-4 h-4 text-yellow-900" />
+    <div className="w-9 h-9 rounded-full bg-sky-400 flex items-center justify-center flex-shrink-0 shadow-md">
+      <Crown className="w-4 h-4 text-sky-900" />
     </div>
   );
   if (rank === 2) return (
@@ -66,8 +66,8 @@ function RankBadge({ rank }) {
     </div>
   );
   if (rank === 3) return (
-    <div className="w-9 h-9 rounded-full bg-amber-600 flex items-center justify-center flex-shrink-0">
-      <Medal className="w-4 h-4 text-amber-100" />
+    <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+      <Medal className="w-4 h-4 text-blue-100" />
     </div>
   );
   return (
@@ -96,7 +96,7 @@ function AgentRow({ agent, rank, maxRoi, maxLeads, maxConversion, isTop }) {
   return (
     <div className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
       isTop
-        ? 'border-yellow-400 bg-yellow-50 shadow-md'
+        ? 'border-sky-400 bg-sky-50 shadow-md'
         : rank <= 3
           ? 'border-border bg-white shadow-sm'
           : 'border-border/60 bg-white/60'
@@ -108,7 +108,7 @@ function AgentRow({ agent, rank, maxRoi, maxLeads, maxConversion, isTop }) {
         <div className="flex items-center gap-1">
           <span className="text-base">{agent.meta.emoji}</span>
           <p className="font-bold text-foreground text-sm leading-tight">{agent.meta.name}</p>
-          {isTop && <Crown className="w-3 h-3 text-yellow-500 flex-shrink-0" />}
+          {isTop && <Crown className="w-3 h-3 text-sky-500 flex-shrink-0" />}
         </div>
         <p className="text-[10px] text-muted-foreground">{agent.meta.industry}</p>
       </div>
@@ -277,7 +277,7 @@ export default function PerformanceWars() {
           <div>
             <Link to="/admin" className="text-xs text-muted-foreground hover:text-foreground transition-colors">← Admin</Link>
             <h1 className="text-3xl font-black text-foreground mt-1 flex items-center gap-3">
-              <Trophy className="w-7 h-7 text-yellow-500" />
+              <Trophy className="w-7 h-7 text-sky-500" />
               Performance Wars
             </h1>
             <p className="text-sm text-muted-foreground mt-1">
@@ -308,7 +308,7 @@ export default function PerformanceWars() {
           {[
             { label: 'Weekly Revenue Est.', value: fmtUSD(totalWeeklyRoi), icon: TrendingUp, color: 'text-green-700' },
             { label: 'Weekly Leads', value: totalWeeklyLeads.toString(), icon: Users, color: 'text-primary' },
-            { label: 'Avg Conversion', value: `${avgConversion}%`, icon: Zap, color: 'text-yellow-600' },
+            { label: 'Avg Conversion', value: `${avgConversion}%`, icon: Zap, color: 'text-sky-600' },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="bg-white rounded-xl border border-border p-5 text-center">
               <Icon className={`w-5 h-5 mx-auto mb-1 ${color}`} />
@@ -353,7 +353,7 @@ export default function PerformanceWars() {
         {/* Leaderboard */}
         <div>
           <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-            <Flame className="w-5 h-5 text-orange-500" />
+            <Flame className="w-5 h-5 text-sky-500" />
             Agent Leaderboard
             <span className="text-xs font-normal text-muted-foreground">This week vs. last week</span>
           </h2>

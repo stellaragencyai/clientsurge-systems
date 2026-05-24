@@ -1,0 +1,14 @@
+{
+  "id": "seo_content_weekly_audit",
+  "name": "Weekly SEO + Conversion Content Audit",
+  "trigger": {
+    "entity": "Admin",
+    "event": "weekly_schedule",
+    "cadence": "weekly_monday_0700"
+  },
+  "task": "Weekly approved automation. Run the SEO/conversion audit, review priority recommendations, then generate draft blog/social content through generateSocialContent for approved topics only. Do not auto-edit public Base44 page structure or publish social posts without approval.",
+  "function": "generateSocialContent",
+  "task_refs": ["seo-conversion-growth-engine"],
+  "priority": "MEDIUM",
+  "active": true
+}

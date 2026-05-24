@@ -100,7 +100,7 @@ export default function SupportChat({ project, user }) {
             <div
               className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                 msg.role === "client"
-                  ? "text-amber-50"
+                  ? "text-blue-50"
                   : "text-foreground"
               }`}
               style={
@@ -145,7 +145,7 @@ export default function SupportChat({ project, user }) {
           onClick={sendMessage}
           disabled={!input.trim() || sending}
           className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 disabled:opacity-40 transition-opacity"
-          style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+          style={{ background: "linear-gradient(135deg,#005B99,#0077B6)" }}
         >
           {sending ? (
             <Loader2 className="w-4 h-4 text-white animate-spin" />

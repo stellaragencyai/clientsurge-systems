@@ -19,3 +19,24 @@ export function trackCTA(label, location, extra = {}) {
     ...extra,
   });
 }
+
+export function trackLeadSubmitted(location, extra = {}) {
+  trackEvent("lead_submitted", {
+    form_location: location,
+    ...extra,
+  });
+}
+
+export function trackDemoBooked(location, extra = {}) {
+  trackEvent("demo_booked", {
+    form_location: location,
+    ...extra,
+  });
+}
+
+export function trackPurchase(extra = {}) {
+  trackEvent("purchase", {
+    currency: "USD",
+    ...extra,
+  });
+}

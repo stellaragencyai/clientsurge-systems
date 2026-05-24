@@ -33,12 +33,12 @@ function severityConfig(severity) {
     btnStyle: "bg-red-600 hover:bg-red-700 text-white",
   };
   return {
-    border: "border-amber-300",
-    bg: "bg-amber-50",
-    badge: "bg-amber-100 text-amber-700",
-    icon: <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />,
-    dot: "bg-amber-400",
-    btnStyle: "bg-amber-500 hover:bg-amber-600 text-white",
+    border: "border-blue-300",
+    bg: "bg-blue-50",
+    badge: "bg-blue-100 text-blue-700",
+    icon: <AlertTriangle className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />,
+    dot: "bg-blue-400",
+    btnStyle: "bg-blue-500 hover:bg-blue-600 text-white",
   };
 }
 
@@ -318,7 +318,7 @@ export default function AutomationAlertsPanel({ onNavigate, compact = false }) {
         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${
           criticalCount > 0
             ? "bg-red-50 border-red-300 text-red-700 hover:bg-red-100"
-            : "bg-amber-50 border-amber-300 text-amber-700 hover:bg-amber-100"
+            : "bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100"
         }`}
       >
         {criticalCount > 0
@@ -340,7 +340,7 @@ export default function AutomationAlertsPanel({ onNavigate, compact = false }) {
               Automation Alerts
               {hasAlerts && !loading && (
                 <span className={`inline-flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-full ${
-                  criticalCount > 0 ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+                  criticalCount > 0 ? "bg-red-100 text-red-700" : "bg-blue-100 text-blue-700"
                 }`}>
                   {visibleAlerts.length}
                 </span>

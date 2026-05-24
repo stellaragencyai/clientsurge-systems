@@ -6,7 +6,7 @@ function HealthDot({ project, unreadCount }) {
   const isLive = project.step_live === "complete";
   const hasUnread = unreadCount > 0;
   if (isLive && !hasUnread) return <span title="Healthy" className="w-2.5 h-2.5 rounded-full bg-green-500 flex-shrink-0" />;
-  if (hasUnread) return <span title="Unread messages" className="w-2.5 h-2.5 rounded-full bg-amber-400 flex-shrink-0" />;
+  if (hasUnread) return <span title="Unread messages" className="w-2.5 h-2.5 rounded-full bg-blue-400 flex-shrink-0" />;
   return <span title="In setup" className="w-2.5 h-2.5 rounded-full bg-blue-400 flex-shrink-0" />;
 }
 import InstallQueuePanel from "./InstallQueuePanel";
@@ -38,7 +38,7 @@ function MirrorStatusBadge({ value }) {
     value === "complete"
       ? "bg-green-50 text-green-700"
       : value === "in_progress"
-      ? "bg-amber-50 text-amber-700"
+      ? "bg-blue-50 text-blue-700"
       : "bg-slate-100 text-slate-600";
 
   return (
@@ -182,7 +182,7 @@ export default function ClientProjectsPanel() {
                   </span>
                 )}
                 {project.plan_change_request && project.plan_change_request !== "None" && (
-                  <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">
+                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-800">
                     Plan change: {project.plan_change_request}
                   </span>
                 )}
@@ -192,7 +192,7 @@ export default function ClientProjectsPanel() {
                   <div className="h-1.5 w-24 overflow-hidden rounded-full bg-muted">
                     <div
                       className="h-full rounded-full"
-                      style={{ width: `${(completedSteps / 8) * 100}%`, background: "linear-gradient(90deg,#9a5c2e,#c8965c)" }}
+                      style={{ width: `${(completedSteps / 8) * 100}%`, background: "linear-gradient(90deg,#0077B6,#00AEEF)" }}
                     />
                   </div>
                   <span className="text-xs text-muted-foreground">{completedSteps}/8</span>
@@ -207,12 +207,12 @@ export default function ClientProjectsPanel() {
 
             {isExpanded && (
               <div className="space-y-8 border-t border-border px-6 py-6">
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5">
                   <div className="flex items-start gap-3">
-                    <Lock className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700" />
+                    <Lock className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-700" />
                     <div>
-                      <p className="text-sm font-semibold text-amber-900">Mirrored project progress</p>
-                      <p className="mt-1 text-sm text-amber-800">
+                      <p className="text-sm font-semibold text-blue-900">Mirrored project progress</p>
+                      <p className="mt-1 text-sm text-blue-800">
                         These project steps are supporting context for the client portal. They are synced from the canonical paid-order install workflow and are not editable here.
                       </p>
                     </div>
@@ -245,7 +245,7 @@ export default function ClientProjectsPanel() {
                           className="max-w-[80%] rounded-xl px-4 py-2.5 text-xs"
                           style={
                             message.role === "admin"
-                              ? { background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)", color: "#f5e6d0" }
+                              ? { background: "linear-gradient(135deg,#005B99,#0077B6)", color: "#EAF8FF" }
                               : { background: "#fff", border: "1px solid hsl(var(--border))", color: "hsl(var(--foreground))" }
                           }
                         >
@@ -267,7 +267,7 @@ export default function ClientProjectsPanel() {
                       onClick={() => sendReply(project)}
                       disabled={saving[`reply_${project.id}`]}
                       className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl disabled:opacity-40"
-                      style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+                      style={{ background: "linear-gradient(135deg,#005B99,#0077B6)" }}
                     >
                       <Send className="h-4 w-4 text-white" />
                     </button>

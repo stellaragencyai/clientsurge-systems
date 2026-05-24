@@ -151,7 +151,7 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
             style={{
               background: isLive
                 ? "linear-gradient(135deg,#16a34a,#22c55e)"
-                : "linear-gradient(135deg,#9a5c2e,#c8965c)",
+                : "linear-gradient(135deg,#0077B6,#00AEEF)",
             }}
           >
             {client.business_name?.[0]?.toUpperCase() || "C"}
@@ -173,12 +173,12 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
               background: isLive
                 ? "rgba(34,197,94,0.12)"
                 : client.status === "In Setup"
-                  ? "rgba(154,92,46,0.1)"
+                  ? "rgba(0,136,204,0.1)"
                   : "rgba(0,0,0,0.05)",
               color: isLive
                 ? "#16a34a"
                 : client.status === "In Setup"
-                  ? "#9a5c2e"
+                  ? "#0077B6"
                   : "#6b7280",
             }}
           >
@@ -195,7 +195,7 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
                   width: `${pct}%`,
                   background: isLive
                     ? "linear-gradient(90deg,#16a34a,#22c55e)"
-                    : "linear-gradient(90deg,#9a5c2e,#c8965c)",
+                    : "linear-gradient(90deg,#0077B6,#00AEEF)",
                 }}
               />
             </div>
@@ -213,11 +213,11 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
 
       {expanded && (
         <div className="border-t border-border px-6 py-6 space-y-8">
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
-            <p className="text-sm font-semibold text-amber-900">
+          <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3">
+            <p className="text-sm font-semibold text-blue-900">
               Canonical install steps are read-only here
             </p>
-            <p className="text-xs text-amber-800 mt-1">
+            <p className="text-xs text-blue-800 mt-1">
               Twilio, Instant Lead Response, Missed Call Text-Back, testing,
               message customization, and go-live status mirror the paid order
               install pipeline. Use the install workspace to change install

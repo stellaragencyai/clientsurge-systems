@@ -15,12 +15,12 @@ import { base44 } from "@/api/base44Client";
 import CampaignStatusBadge from "./email-campaigns/CampaignStatusBadge";
 import CampaignMetricsBar from "./email-campaigns/CampaignMetricsBar";
 import CreateCampaignModal from "./email-campaigns/CreateCampaignModal";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 
 function SummaryKPI({ icon: Icon, label, value, sub, color = "blue" }) {
   const colors = {
     blue:   "bg-blue-50 text-blue-700 border-blue-100",
     green:  "bg-green-50 text-green-700 border-green-100",
-    amber:  "bg-amber-50 text-amber-700 border-amber-100",
     red:    "bg-red-50 text-red-700 border-red-100",
   };
   return (
@@ -37,6 +37,7 @@ function SummaryKPI({ icon: Icon, label, value, sub, color = "blue" }) {
 
 function CampaignCard({ campaign, onDelete, onResend }) {
   const [deleting, setDeleting] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [recipients, setRecipients] = useState([]);
   const [loadingRecipients, setLoadingRecipients] = useState(false);
@@ -61,11 +62,11 @@ function CampaignCard({ campaign, onDelete, onResend }) {
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Delete campaign "${campaign.name}"? This cannot be undone.`)) return;
     setDeleting(true);
     try {
       await base44.entities.EmailCampaign.delete(campaign.id);
       onDelete(campaign.id);
+      setDeleteConfirmOpen(false);
     } finally {
       setDeleting(false);
     }
@@ -107,7 +108,7 @@ function CampaignCard({ campaign, onDelete, onResend }) {
               Recipients
             </button>
             <button
-              onClick={handleDelete}
+              onClick={() => setDeleteConfirmOpen(true)}
               disabled={deleting}
               className="p-1.5 text-muted-foreground hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >
@@ -151,7 +152,7 @@ function CampaignCard({ campaign, onDelete, onResend }) {
                         r.status === "opened" ? "bg-blue-100 text-blue-700"
                         : r.status === "clicked" ? "bg-green-100 text-green-700"
                         : r.status === "bounced" ? "bg-red-100 text-red-700"
-                        : r.status === "unsubscribed" ? "bg-orange-100 text-orange-700"
+                        : r.status === "unsubscribed" ? "bg-sky-100 text-sky-700"
                         : r.status === "sent" ? "bg-gray-100 text-gray-600"
                         : "bg-muted text-muted-foreground"
                       }`}>{r.status}</span>
@@ -171,6 +172,15 @@ function CampaignCard({ campaign, onDelete, onResend }) {
           </div>
         </div>
       )}
+      {deleteConfirmOpen && (
+        <DeleteConfirmModal
+          title="Delete Campaign"
+          description={`Delete "${campaign.name}"? This cannot be undone.`}
+          confirmLabel={deleting ? "Deleting..." : "Delete Campaign"}
+          onConfirm={handleDelete}
+          onCancel={() => setDeleteConfirmOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -183,6 +193,7 @@ export default function EmailCampaignPanel() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sendingId, setSendingId] = useState(null);
   const [sendResult, setSendResult] = useState(null);
+  const [sendCandidate, setSendCandidate] = useState(null);
 
   useEffect(() => { loadCampaigns(); }, []);
 
@@ -200,7 +211,6 @@ export default function EmailCampaignPanel() {
   };
 
   const handleSendDraft = async (campaign) => {
-    if (!confirm(`Send "${campaign.name}" now to all matching leads?`)) return;
     setSendingId(campaign.id);
     setSendResult(null);
     try {
@@ -214,6 +224,7 @@ export default function EmailCampaignPanel() {
       setSendResult({ error: err?.response?.data?.error || err?.message || "Send failed" });
     } finally {
       setSendingId(null);
+      setSendCandidate(null);
     }
   };
 
@@ -291,7 +302,7 @@ export default function EmailCampaignPanel() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <SummaryKPI icon={Mail} label="Total Campaigns" value={campaigns.length} sub={`${sentCampaigns.length} sent`} color="blue" />
         <SummaryKPI icon={Users} label="Total Sent" value={totalSent.toLocaleString()} sub="across all campaigns" color="green" />
-        <SummaryKPI icon={TrendingUp} label="Avg Open Rate" value={`${avgOpenRate}%`} sub={`${totalOpened} opens`} color="amber" />
+        <SummaryKPI icon={TrendingUp} label="Avg Open Rate" value={`${avgOpenRate}%`} sub={`${totalOpened} opens`} color="blue" />
         <SummaryKPI icon={MousePointerClick} label="Avg Click Rate" value={`${avgCTR}%`} sub={`${totalClicked} clicks · ${totalUnsub} unsub`} color="red" />
       </div>
 
@@ -359,7 +370,7 @@ export default function EmailCampaignPanel() {
               key={c.id}
               campaign={c}
               onDelete={handleDelete}
-              onResend={handleSendDraft}
+              onResend={setSendCandidate}
             />
           ))}
         </div>
@@ -370,6 +381,16 @@ export default function EmailCampaignPanel() {
         <CreateCampaignModal
           onClose={() => setShowCreate(false)}
           onCreate={() => { setShowCreate(false); loadCampaigns(); }}
+        />
+      )}
+      {sendCandidate && (
+        <DeleteConfirmModal
+          title="Send Campaign"
+          description={`Send "${sendCandidate.name}" now to all matching leads?`}
+          confirmLabel={sendingId === sendCandidate.id ? "Sending..." : "Send Campaign"}
+          danger={false}
+          onConfirm={() => handleSendDraft(sendCandidate)}
+          onCancel={() => setSendCandidate(null)}
         />
       )}
     </div>

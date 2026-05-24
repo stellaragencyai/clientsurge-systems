@@ -271,7 +271,7 @@ export default function AdminInbox() {
                           className="max-w-[75%] rounded-2xl px-4 py-2.5 text-sm"
                           style={
                             msg.role === "admin"
-                              ? { background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)", color: "#f5e6d0", borderBottomRightRadius: "4px" }
+                              ? { background: "linear-gradient(135deg,#005B99,#0077B6)", color: "#EAF8FF", borderBottomRightRadius: "4px" }
                               : { background: "hsl(var(--muted))", borderBottomLeftRadius: "4px" }
                           }
                         >
@@ -294,7 +294,7 @@ export default function AdminInbox() {
                     </div>
                   )}
                   {aiDraftMeta && (
-                    <div className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                    <div className="mb-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800">
                       AI draft loaded as editable text. Intent: {aiDraftMeta.intent.replaceAll("_", " ")}.
                     </div>
                   )}
@@ -321,7 +321,7 @@ export default function AdminInbox() {
                       onClick={handleSend}
                       disabled={!input.trim() || sending}
                       className="flex h-10 w-10 items-center justify-center rounded-xl disabled:opacity-40"
-                      style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+                      style={{ background: "linear-gradient(135deg,#005B99,#0077B6)" }}
                     >
                       {sending ? <Loader2 className="h-4 w-4 text-white animate-spin" /> : <Send className="h-4 w-4 text-white" />}
                     </button>

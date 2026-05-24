@@ -1,4 +1,8 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import {
+  sendCommunicationViaOutbox,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 const SEQUENCE_TYPES = ["instant_response", "missed_call_recovery", "day1_followup", "day3_followup", "day7_followup", "reactivation"];
 
@@ -62,30 +66,35 @@ Deno.serve(async (req) => {
 
     // Attempt SMS via Twilio if configured
     if (settings.twilio_enabled && lead.phone && rendered) {
-      const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-      const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
       const fromNumber = settings.twilio_from_number || Deno.env.get("TWILIO_PHONE_NUMBER");
 
-      if (accountSid && authToken && fromNumber) {
-        const twilioRes = await fetch(
-          `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({ To: lead.phone, From: fromNumber, Body: rendered }),
-          }
-        );
+      const smsResult = await sendCommunicationViaOutbox({
+        base44,
+        channel: "sms",
+        provider: "twilio",
+        recipient: lead.phone,
+        body: rendered,
+        from: fromNumber,
+        lead,
+        leadId: lead_id,
+        source: "triggerFollowUpSequence",
+        sourceRecordId: lead_id,
+        templateKey: sequence_type,
+        messageType: sequence_type === "reactivation" ? "marketing" : "transactional",
+        consentBasis: sequence_type === "reactivation" ? "explicit_sms_consent" : "transactional_relationship",
+        metadata: { sequence_type, triggered_by: user.email },
+        providerSend: (providerPayload) => sendTwilioSmsProvider({
+          ...providerPayload,
+          env: (name) => Deno.env.get(name),
+          fetchImpl: fetch,
+        }),
+      });
 
-        if (twilioRes.ok) {
-          smsSent = true;
-        } else {
-          const err = await twilioRes.json().catch(() => ({}));
-          smsError = err?.message || "Twilio error";
-          console.error("Twilio SMS error:", smsError);
-        }
+      if (smsResult.success) {
+        smsSent = true;
+      } else {
+        smsError = smsResult.reason || smsResult.error || "Twilio outbox send failed";
+        console.error("Twilio SMS error:", smsError);
       }
     }
 

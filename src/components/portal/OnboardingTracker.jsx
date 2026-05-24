@@ -89,7 +89,7 @@ const PROVIDER_TRACKS = [
     id: "review_request",
     label: "Review Request System",
     icon: Star,
-    color: "#f59e0b",
+    color: "#00AEEF",
     description: "Automatic review requests are configured to fire after completed appointments.",
     derives_from_service: "review_request",
     group: "Automations",

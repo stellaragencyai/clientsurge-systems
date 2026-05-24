@@ -5,6 +5,8 @@
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+const APP_URL = (Deno.env.get("APP_URL") || "https://clientsurgesystems.com").replace(/\/+$/, "");
+
 const MILESTONE_EMAILS: Record<string, { subject: string; headline: string; body: string }> = {
   "In Progress": {
     subject: "Your ClientSurge setup is underway! 🚀",
@@ -57,7 +59,7 @@ Deno.serve(async (req) => {
     if (!order?.customer_email) return Response.json({ error: "No customer email on order" }, { status: 400 });
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    const portalUrl = `https://clientsurgesystems.com/client-portal?order_id=${project.order_id}`;
+    const portalUrl = `${APP_URL}/client-portal?order_id=${encodeURIComponent(project.order_id)}`;
 
     const html = `
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:600px;margin:0 auto;padding:40px 20px;">

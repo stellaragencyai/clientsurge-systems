@@ -27,9 +27,9 @@ const TIER_CONFIG = {
   },
   Warm: {
     label: "☀️ Warm Lead",
-    color: "bg-amber-50 border-amber-300 text-amber-800",
-    badge: "bg-amber-100 text-amber-700",
-    dot: "bg-amber-400",
+    color: "bg-blue-50 border-blue-300 text-blue-800",
+    badge: "bg-blue-100 text-blue-700",
+    dot: "bg-blue-400",
   },
   Cold: {
     label: "🧊 Cold Lead",
@@ -54,14 +54,14 @@ const CHANNEL_ICONS = {
 
 const TIMING_COLOR = {
   now: "text-red-600 font-bold",
-  "within 24h": "text-amber-600 font-semibold",
+  "within 24h": "text-blue-600 font-semibold",
   "within 48h": "text-blue-600",
   "this week": "text-muted-foreground",
 };
 
 function ScoreBar({ score }) {
   const pct = Math.min(100, Math.max(0, score || 0));
-  const color = pct >= 70 ? "bg-emerald-500" : pct >= 45 ? "bg-amber-400" : "bg-slate-300";
+  const color = pct >= 70 ? "bg-emerald-500" : pct >= 45 ? "bg-blue-400" : "bg-slate-300";
   return (
     <div className="flex items-center gap-3">
       <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
@@ -227,7 +227,7 @@ export default function AILeadInsightPanel({ lead, onLeadUpdated }) {
             <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold border ${
               lead.reply_sentiment === "Positive" ? "bg-green-50 border-green-200 text-green-700"
               : lead.reply_sentiment === "Negative" ? "bg-red-50 border-red-200 text-red-700"
-              : "bg-amber-50 border-amber-200 text-amber-700"
+              : "bg-blue-50 border-blue-200 text-blue-700"
             }`}>
               {lead.reply_sentiment === "Positive" ? "😊" : lead.reply_sentiment === "Negative" ? "😟" : "😐"} {lead.reply_sentiment} Sentiment
             </span>
@@ -323,7 +323,7 @@ export default function AILeadInsightPanel({ lead, onLeadUpdated }) {
                         <div key={i} className="rounded-xl border border-border bg-white px-4 py-4 hover:border-primary/30 transition-colors">
                           <div className="flex items-start gap-3">
                             <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                              i === 0 ? "bg-red-100" : i === 1 ? "bg-amber-100" : "bg-muted"
+                              i === 0 ? "bg-red-100" : i === 1 ? "bg-blue-100" : "bg-muted"
                             }`}>
                               <span className="text-xs font-black text-foreground/70">#{i + 1}</span>
                             </div>

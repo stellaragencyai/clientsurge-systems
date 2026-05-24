@@ -15,8 +15,8 @@ export default function CTAButton({ onClick, children, disabled = false, classNa
         display: "inline-block",
         borderRadius: "9999px",
         padding: "2px",
-        background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-        boxShadow: "0 4px 18px rgba(120,70,20,0.35)",
+        background: "linear-gradient(135deg,#0088CC 0%,#00AEEF 30%,#DDF4FF 50%,#00AEEF 70%,#005B99 100%)",
+        boxShadow: "0 4px 18px rgba(0,92,153,0.35)",
         border: "none",
         cursor: disabled ? "not-allowed" : "pointer",
         transition: "box-shadow 0.3s ease, transform 0.3s ease",
@@ -24,10 +24,10 @@ export default function CTAButton({ onClick, children, disabled = false, classNa
       }}
       className={`focus:ring-2 focus:ring-primary focus:outline-none ${className}`}
       onMouseEnter={(e) => {
-        if (!disabled) e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(120,70,20,0.35)";
+        if (!disabled) e.currentTarget.style.boxShadow = "0 8px 40px rgba(161,120,35,0.6), 0 4px 18px rgba(0,92,153,0.35)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
+        e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,92,153,0.35)";
       }}
       {...props}
     >
@@ -37,8 +37,8 @@ export default function CTAButton({ onClick, children, disabled = false, classNa
           alignItems: "center",
           gap: "8px",
           borderRadius: "9999px",
-          background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-          color: "#f5e6d0",
+          background: "linear-gradient(135deg,#005B99 0%,#0077B6 40%,#005B99 100%)",
+          color: "#EAF8FF",
           fontWeight: "700",
           textShadow: "0 1px 2px rgba(0,0,0,0.3)",
           justifyContent: "center",

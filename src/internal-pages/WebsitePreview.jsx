@@ -167,7 +167,7 @@ function BrandCard({ brand }) {
         {brand.logo_url && (
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.5)" }}>Logo</span>
-            <img src={brand.logo_url} alt="logo" width="112" height="28" style={{ height: 28, objectFit: "contain", borderRadius: 4 }} />
+            <img src={brand.logo_url} alt="logo" width="160" height="56" style={{ height: 28, objectFit: "contain", borderRadius: 4 }} />
           </div>
         )}
       </div>
@@ -314,7 +314,7 @@ export default function WebsitePreview() {
 
         {spec?.ai_generated && (
           <div style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
-            <Zap style={{ width: 12, height: 12, color: "#f59e0b" }} />
+            <Zap style={{ width: 12, height: 12, color: "#00AEEF" }} />
             AI-generated copy
           </div>
         )}
@@ -342,12 +342,12 @@ export default function WebsitePreview() {
         {revisionSubmitted && !approved && (
           <div style={{
             display: "flex", alignItems: "center", gap: "12px",
-            background: "rgba(245,158,11,0.08)", border: "1.5px solid rgba(245,158,11,0.25)",
+            background: "rgba(0,174,239,0.08)", border: "1.5px solid rgba(0,174,239,0.25)",
             borderRadius: "14px", padding: "14px 18px", marginBottom: "24px",
           }}>
-            <Edit3 style={{ width: 20, height: 20, color: "#f59e0b", flexShrink: 0 }} />
+            <Edit3 style={{ width: 20, height: 20, color: "#00AEEF", flexShrink: 0 }} />
             <div>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#92400e" }}>Revision Request Submitted</p>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#005B99" }}>Revision Request Submitted</p>
               <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(146,64,14,0.7)" }}>
                 Our team will review your notes and update the spec within 24 hours.
               </p>
@@ -434,10 +434,10 @@ export default function WebsitePreview() {
             {/* Revision form */}
             {showRevisionForm && !revisionSubmitted && !approved && (
               <div style={{
-                borderRadius: "16px", border: "1.5px solid rgba(245,158,11,0.25)",
-                background: "rgba(245,158,11,0.04)", padding: "18px",
+                borderRadius: "16px", border: "1.5px solid rgba(0,174,239,0.25)",
+                background: "rgba(0,174,239,0.04)", padding: "18px",
               }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: "#92400e", margin: "0 0 4px" }}>What would you like changed?</p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: "#005B99", margin: "0 0 4px" }}>What would you like changed?</p>
                 <p style={{ fontSize: 11, color: "rgba(146,64,14,0.65)", margin: "0 0 12px" }}>
                   Describe any copy, structure, or brand changes needed.
                 </p>
@@ -448,7 +448,7 @@ export default function WebsitePreview() {
                   rows={4}
                   style={{
                     width: "100%", padding: "10px 12px", borderRadius: "10px",
-                    border: "1.5px solid rgba(245,158,11,0.3)", background: "#fff",
+                    border: "1.5px solid rgba(0,174,239,0.3)", background: "#fff",
                     fontSize: 12, color: "#0a1628", resize: "vertical",
                     fontFamily: "'Inter', sans-serif", outline: "none", boxSizing: "border-box",
                   }}
@@ -459,7 +459,7 @@ export default function WebsitePreview() {
                   style={{
                     width: "100%", marginTop: "10px", display: "flex", alignItems: "center", justifyContent: "center", gap: "7px",
                     padding: "10px", borderRadius: "10px", border: "none", cursor: !revisionNotes.trim() ? "not-allowed" : "pointer",
-                    background: revisionNotes.trim() ? "#f59e0b" : "rgba(0,0,0,0.08)",
+                    background: revisionNotes.trim() ? "#00AEEF" : "rgba(0,0,0,0.08)",
                     color: revisionNotes.trim() ? "#fff" : "rgba(0,0,0,0.35)",
                     fontWeight: 700, fontSize: 13, opacity: submittingRevision ? 0.7 : 1,
                   }}
@@ -473,10 +473,10 @@ export default function WebsitePreview() {
             {/* Status chip */}
             <div style={{
               borderRadius: "12px", padding: "12px 16px",
-              background: approved ? "rgba(16,185,129,0.08)" : revisionSubmitted ? "rgba(245,158,11,0.08)" : "rgba(0,136,204,0.06)",
-              border: `1px solid ${approved ? "rgba(16,185,129,0.2)" : revisionSubmitted ? "rgba(245,158,11,0.2)" : "rgba(0,136,204,0.15)"}`,
+              background: approved ? "rgba(16,185,129,0.08)" : revisionSubmitted ? "rgba(0,174,239,0.08)" : "rgba(0,136,204,0.06)",
+              border: `1px solid ${approved ? "rgba(16,185,129,0.2)" : revisionSubmitted ? "rgba(0,174,239,0.2)" : "rgba(0,136,204,0.15)"}`,
             }}>
-              <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", margin: "0 0 2px", color: approved ? "#065f46" : revisionSubmitted ? "#92400e" : "#0088CC" }}>
+              <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", margin: "0 0 2px", color: approved ? "#065f46" : revisionSubmitted ? "#005B99" : "#0088CC" }}>
                 Status
               </p>
               <p style={{ fontSize: 13, fontWeight: 600, color: "#0a1628", margin: 0, textTransform: "capitalize" }}>

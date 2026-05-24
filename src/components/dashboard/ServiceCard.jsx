@@ -14,9 +14,9 @@ const TOTAL_STAGES = 5;
 function getGoLiveLabel(installStatus) {
   if (installStatus === "Live") return { text: "Live ✦", color: "#22c55e" };
   if (installStatus === "Testing") return { text: "Est. 1–2 days", color: "#3b82f6" };
-  if (installStatus === "Configuring") return { text: "Est. 3–4 days", color: "#f59e0b" };
+  if (installStatus === "Configuring") return { text: "Est. 3–4 days", color: "#00AEEF" };
   if (installStatus === "Error") return { text: "Action needed", color: "#ef4444" };
-  return { text: "Est. 5–7 days", color: "#9a5c2e" };
+  return { text: "Est. 5–7 days", color: "#0077B6" };
 }
 
 export default function ServiceCard({ service }) {
@@ -29,7 +29,7 @@ export default function ServiceCard({ service }) {
     <div style={{
       borderRadius: "18px",
       background: "rgba(255,255,255,0.92)",
-      border: "1px solid rgba(154,92,46,0.1)",
+      border: "1px solid rgba(0,136,204,0.1)",
       boxShadow: "0 4px 24px rgba(15,23,42,0.07), 0 1px 4px rgba(0,0,0,0.04)",
       overflow: "hidden",
       transition: "box-shadow 0.2s ease, transform 0.2s ease",
@@ -38,7 +38,7 @@ export default function ServiceCard({ service }) {
     onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(15,23,42,0.07)"; e.currentTarget.style.transform = "translateY(0)"; }}
     >
       {/* Card top accent bar */}
-      <div style={{ height: "3px", background: "linear-gradient(90deg, #9a5c2e, #c8965c, #f5d9a8)" }} />
+      <div style={{ height: "3px", background: "linear-gradient(90deg, #0077B6, #00AEEF, #DDF4FF)" }} />
 
       <div style={{ padding: "22px 22px 20px" }}>
         {/* Header row */}
@@ -50,14 +50,14 @@ export default function ServiceCard({ service }) {
                 {productName}
               </h3>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span style={{ fontSize: "12px", fontWeight: "700", color: "#9a5c2e", background: "rgba(154,92,46,0.08)", padding: "2px 8px", borderRadius: "9999px" }}>
+                <span style={{ fontSize: "12px", fontWeight: "700", color: "#0077B6", background: "rgba(0,136,204,0.08)", padding: "2px 8px", borderRadius: "9999px" }}>
                   {Math.round((currentStage / totalStages) * 100)}%
                 </span>
                 <ServiceStatusBadge installStatus={installStatus} />
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-              <span style={{ fontSize: "11px", color: "rgba(27,20,13,0.45)", fontFamily: "monospace" }}>
+              <span style={{ fontSize: "11px", color: "rgba(10,22,40,0.45)", fontFamily: "monospace" }}>
                 #{orderId.slice(0, 8)}
               </span>
               <span style={{ fontSize: "11px", color: goLive.color, fontWeight: "600" }}>

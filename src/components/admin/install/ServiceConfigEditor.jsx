@@ -55,7 +55,7 @@ function LabeledField({ label, children, helper }) {
 function SuggestionCard({ suggestion, actionLabel = "Use suggestion", onApply }) {
   if (!suggestion) return null;
   return (
-    <div className={`rounded-xl border p-3 ${suggestion.available ? "border-blue-200 bg-blue-50/60" : "border-amber-200 bg-amber-50/70"}`}>
+    <div className={`rounded-xl border p-3 ${suggestion.available ? "border-blue-200 bg-blue-50/60" : "border-blue-200 bg-blue-50/70"}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-foreground">{suggestion.label}</p>

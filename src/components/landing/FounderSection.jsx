@@ -13,24 +13,25 @@ export default function FounderSection() {
           className="rounded-3xl overflow-hidden"
           style={{
             background: "linear-gradient(135deg, #ffffff 0%, #fefdfb 100%)",
-            border: "1.5px solid rgba(154,92,46,0.25)",
-            boxShadow: "0 20px 60px rgba(120,70,20,0.10), 0 2px 8px rgba(0,0,0,0.05)",
+            border: "1.5px solid rgba(0,136,204,0.25)",
+            boxShadow: "0 20px 60px rgba(0,92,153,0.10), 0 2px 8px rgba(0,0,0,0.05)",
           }}
         >
           <div className="grid md:grid-cols-2 gap-0 items-stretch">
             <div
               className="relative flex items-center justify-center p-10 md:p-12"
-              style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.06) 0%, rgba(200,150,92,0.04) 100%)" }}
+              style={{ background: "linear-gradient(135deg, rgba(0,136,204,0.06) 0%, rgba(0,174,239,0.04) 100%)" }}
             >
               <div
                 className="w-64 h-72 rounded-2xl overflow-hidden"
-                style={{ border: "2px solid rgba(154,92,46,0.2)", boxShadow: "0 8px 32px rgba(120,70,20,0.12)" }}
+                style={{ border: "2px solid rgba(0,136,204,0.2)", boxShadow: "0 8px 32px rgba(0,92,153,0.12)" }}
               >
                 <img
-                  src="/founder-photo.jpg" onError={(e) => { e.target.src = "https://placehold.co/400x480/f5e6d0/9a5c2e?text=Photo+Coming+Soon"; }}
+                  src="/founder-photo.jpg"
                   alt="Nolan Strommer, founder of ClientSurge Systems"
                   width="400"
                   height="480"
+                  onError={(e) => { e.target.src = "https://placehold.co/400x480/e8f4ff/0077b6?text=Photo+Coming+Soon"; }}
                   className="w-full h-full object-cover object-top"
                   loading="lazy"
                 />
@@ -44,8 +45,8 @@ export default function FounderSection() {
               <p className="text-base text-muted-foreground leading-relaxed mb-8">
                 I built this after watching local businesses spend thousands attracting leads and lose half of them to slow follow-up. Every system is custom, done-for-you, and designed to pay for itself within 30 days.
               </p>
-              <div className="pt-6" style={{ borderTop: "1px solid rgba(154,92,46,0.2)" }}>
-                <p className="text-sm font-semibold" style={{ color: "#9a5c2e" }}>
+              <div className="pt-6" style={{ borderTop: "1px solid rgba(0,136,204,0.2)" }}>
+                <p className="text-sm font-semibold" style={{ color: "#0077B6" }}>
                   Nolan, Founder | ClientSurge Systems | Phoenix, AZ
                 </p>
               </div>

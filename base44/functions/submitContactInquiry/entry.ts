@@ -1,7 +1,14 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { escapeAttribute, escapeHtml } from '../_shared/htmlEscape.js';
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+  sendTwilioSmsProvider,
+} from "../_shared/communicationOutbox.js";
 
 const MAX_FIELD_LENGTH = 500;
 const MAX_MESSAGE_LENGTH = 1500;
+const MAX_CONTACT_BODY_BYTES = 12 * 1024;
 const DUPLICATE_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
 const CONTACT_PREFIX = 'Contact form inquiry: ';
@@ -10,7 +17,12 @@ const INTAKE_TYPE = 'contact_inquiry';
 
 function sanitizeString(value: unknown, maxLength = MAX_FIELD_LENGTH) {
   if (typeof value !== 'string') return '';
-  return value.replace(/[<>]/g, '').trim().slice(0, maxLength);
+  return value
+    .replace(/[\u0000-\u001F\u007F]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/[<>]/g, '')
+    .trim()
+    .slice(0, maxLength);
 }
 
 function normalizeContactInput(payload: Record<string, unknown>) {
@@ -135,16 +147,13 @@ function isRecentContactInquiry(existingLead: Record<string, unknown>, contact: 
   return isWithinWindow && sameName && sameInquiryType;
 }
 
-async function sendAdminSMS(contact: ReturnType<typeof normalizeContactInput>) {
-  const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
-  const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
+async function sendAdminSMS(
+  base44: ReturnType<typeof createClientFromRequest>,
+  contact: ReturnType<typeof normalizeContactInput>,
+  leadId: string
+) {
   const TWILIO_FROM = Deno.env.get('TWILIO_PHONE_NUMBER') || '+16025843227';
   const NOLAN_CELL = '+16025874608'; // (602) 587-4608
-
-  if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
-    console.warn('[submitContactInquiry] Twilio not configured — skipping SMS alert');
-    return { sent: false, reason: 'missing_twilio_credentials' };
-  }
 
   const body = `🔥 New Lead — ClientSurge
 Name: ${contact.full_name}
@@ -153,127 +162,143 @@ Email: ${contact.email}
 Biz: ${contact.business_type}
 Msg: ${contact.message.slice(0, 100)}${contact.message.length > 100 ? '...' : ''}`;
 
-  const params = new URLSearchParams({
-    To: NOLAN_CELL,
-    From: TWILIO_FROM,
-    Body: body,
-  });
-
-  const response = await fetch(
-    `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${btoa(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`)}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params.toString(),
-    }
-  );
-
-  if (!response.ok) {
-    const err = await response.text();
-    console.warn('[submitContactInquiry] SMS alert failed:', err);
-    return { sent: false, reason: err };
-  }
-
-  console.info('[submitContactInquiry] SMS alert sent to Nolan');
-  return { sent: true };
-}
-
-async function sendAdminNotification(contact: ReturnType<typeof normalizeContactInput>) {
-  const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
-
-  if (!RESEND_API_KEY) {
-    return { sent: false, reason: 'missing_resend_api_key' };
-  }
-
-  const emailBody = `
-    <h2>New Contact Form Submission</h2>
-    <table cellpadding="8" style="border-collapse:collapse;width:100%;max-width:600px;">
-      <tr><td style="font-weight:bold;width:160px;">Name</td><td>${contact.full_name}</td></tr>
-      <tr style="background:#f9f9f9"><td style="font-weight:bold;">Email</td><td><a href="mailto:${contact.email}">${contact.email}</a></td></tr>
-      <tr><td style="font-weight:bold;">Phone</td><td>${contact.phone || 'Not provided'}</td></tr>
-      <tr style="background:#f9f9f9"><td style="font-weight:bold;">Business Type</td><td>${contact.business_type}</td></tr>
-      <tr><td style="font-weight:bold;vertical-align:top;padding-top:12px;">Message</td><td style="padding-top:12px;">${contact.message}</td></tr>
-    </table>
-  `;
-
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: 'ClientSurge Systems <system@clientsurgesystems.com>',
-      to: ['nolan@clientsurgesystems.com'],
-      reply_to: contact.email,
-      subject: `New Contact: ${contact.full_name} - ${contact.business_type}`,
-      html: emailBody,
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "sms",
+    provider: "twilio",
+    recipient: NOLAN_CELL,
+    body,
+    from: TWILIO_FROM,
+    leadId,
+    source: "submitContactInquiry",
+    sourceRecordId: leadId,
+    templateKey: "contact_inquiry_admin_sms",
+    messageType: "transactional",
+    consentBasis: "internal_notification",
+    metadata: { target: "admin_sms", source: LEAD_SOURCE, intake_type: INTAKE_TYPE },
+    providerSend: (providerPayload) => sendTwilioSmsProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
     }),
   });
 
-  if (!response.ok) {
-    const details = await response.text();
-    return { sent: false, reason: details || 'notification_failed' };
+  if (!result.success) {
+    const reason = result.reason || result.error || "sms_alert_failed";
+    console.warn('[submitContactInquiry] SMS alert failed:', reason);
+    return { sent: false, reason };
   }
 
-  return { sent: true };
+  console.info('[submitContactInquiry] SMS alert sent to Nolan');
+  return { sent: true, provider_message_id: result.provider_message_id, outbox_id: result.outbox?.id };
 }
 
-async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContactInput>) {
-  const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
+async function sendAdminNotification(
+  base44: ReturnType<typeof createClientFromRequest>,
+  contact: ReturnType<typeof normalizeContactInput>,
+  leadId: string
+) {
+  const emailBody = `
+    <h2>New Contact Form Submission</h2>
+    <table cellpadding="8" style="border-collapse:collapse;width:100%;max-width:600px;">
+      <tr><td style="font-weight:bold;width:160px;">Name</td><td>${escapeHtml(contact.full_name)}</td></tr>
+      <tr style="background:#f9f9f9"><td style="font-weight:bold;">Email</td><td><a href="mailto:${escapeAttribute(contact.email)}">${escapeHtml(contact.email)}</a></td></tr>
+      <tr><td style="font-weight:bold;">Phone</td><td>${escapeHtml(contact.phone || 'Not provided')}</td></tr>
+      <tr style="background:#f9f9f9"><td style="font-weight:bold;">Business Type</td><td>${escapeHtml(contact.business_type)}</td></tr>
+      <tr><td style="font-weight:bold;vertical-align:top;padding-top:12px;">Message</td><td style="padding-top:12px;">${escapeHtml(contact.message)}</td></tr>
+    </table>
+  `;
 
-  if (!RESEND_API_KEY) {
-    return { sent: false, reason: 'missing_resend_api_key' };
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: "nolan@clientsurgesystems.com",
+    subject: `New Contact: ${contact.full_name} - ${contact.business_type}`,
+    body: emailBody,
+    html: emailBody,
+    from: 'ClientSurge Systems <system@clientsurgesystems.com>',
+    leadId,
+    source: "submitContactInquiry",
+    sourceRecordId: leadId,
+    templateKey: "contact_inquiry_admin_notification",
+    messageType: "transactional",
+    consentBasis: "internal_notification",
+    metadata: { reply_to: contact.email, target: "admin_notification", source: LEAD_SOURCE, intake_type: INTAKE_TYPE },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
+    }),
+  });
+
+  if (!result.success) {
+    return { sent: false, reason: result.reason || result.error || 'notification_failed' };
   }
 
+  return { sent: true, provider_message_id: result.provider_message_id, outbox_id: result.outbox?.id };
+}
+
+async function sendUserThankYouEmail(
+  base44: ReturnType<typeof createClientFromRequest>,
+  contact: ReturnType<typeof normalizeContactInput>,
+  leadId: string
+) {
   const businessTypeGreeting = `for ${contact.business_type}s`;
+  const firstName = escapeHtml(contact.full_name.split(' ')[0] || 'there');
+  const businessType = escapeHtml(contact.business_type);
   const emailBody = `
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;">
-      <h2>Thanks for Reaching Out, ${contact.full_name.split(' ')[0]}!</h2>
-      <p style="color:#555;line-height:1.6;">We've received your message and we're excited to learn more about how we can help your business ${businessTypeGreeting}.</p>
+      <h2>Thanks for Reaching Out, ${firstName}!</h2>
+      <p style="color:#555;line-height:1.6;">We've received your message and we're excited to learn more about how we can help your business ${escapeHtml(businessTypeGreeting)}.</p>
       
-      <div style="background:#f9f9f9;border-left:4px solid #9a5c2e;padding:16px;margin:24px 0;border-radius:4px;">
+      <div style="background:#f9f9f9;border-left:4px solid #0077B6;padding:16px;margin:24px 0;border-radius:4px;">
         <p style="margin:0;color:#666;font-size:14px;"><strong>What happens next:</strong></p>
         <ul style="margin:8px 0 0 0;padding-left:20px;color:#666;font-size:14px;">
           <li>Our team will review your inquiry</li>
           <li>We'll get back to you within one business day</li>
-          <li>If you'd prefer to chat sooner, <a href="https://clientsurgesystems.com/book" style="color:#9a5c2e;text-decoration:none;">book a free 15-minute demo</a></li>
+          <li>If you'd prefer to chat sooner, <a href="https://clientsurgesystems.com/book" style="color:#0077B6;text-decoration:none;">book a free 15-minute demo</a></li>
         </ul>
       </div>
 
-      <p style="color:#666;line-height:1.6;">In the meantime, feel free to explore how our automation system works for ${contact.business_type.toLowerCase()}. We're here to help.</p>
+      <p style="color:#666;line-height:1.6;">In the meantime, feel free to explore how our automation system works for ${businessType.toLowerCase()}. We're here to help.</p>
       
       <p style="color:#999;font-size:12px;margin-top:32px;border-top:1px solid #eee;padding-top:16px;">
         <strong>ClientSurge Systems</strong><br>
         Phoenix, Arizona<br>
-        <a href="mailto:system@clientsurgesystems.com" style="color:#9a5c2e;text-decoration:none;">system@clientsurgesystems.com</a>
+        <a href="mailto:system@clientsurgesystems.com" style="color:#0077B6;text-decoration:none;">system@clientsurgesystems.com</a>
       </p>
     </div>
   `;
 
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: 'ClientSurge Systems <system@clientsurgesystems.com>',
-      to: [contact.email],
-      subject: `Thank You for Your Message, ${contact.full_name.split(' ')[0]}!`,
-      html: emailBody,
+  const result = await sendCommunicationViaOutbox({
+    base44,
+    channel: "email",
+    provider: "resend",
+    recipient: contact.email,
+    subject: `Thank You for Your Message, ${contact.full_name.split(' ')[0] || 'there'}!`,
+    body: emailBody,
+    html: emailBody,
+    from: 'ClientSurge Systems <system@clientsurgesystems.com>',
+    leadId,
+    source: "submitContactInquiry",
+    sourceRecordId: leadId,
+    templateKey: "contact_inquiry_thank_you",
+    messageType: "transactional",
+    consentBasis: "transactional_relationship",
+    metadata: { target: "user_thank_you", source: LEAD_SOURCE, intake_type: INTAKE_TYPE, business_type: contact.business_type },
+    providerSend: (providerPayload) => sendResendEmailProvider({
+      ...providerPayload,
+      env: (name) => Deno.env.get(name),
+      fetchImpl: fetch,
     }),
   });
 
-  if (!response.ok) {
-    const details = await response.text();
-    return { sent: false, reason: details || 'thank_you_email_failed' };
+  if (!result.success) {
+    return { sent: false, reason: result.reason || result.error || 'thank_you_email_failed' };
   }
 
-  return { sent: true };
+  return { sent: true, provider_message_id: result.provider_message_id, outbox_id: result.outbox?.id };
 }
 
 Deno.serve(async (req) => {
@@ -282,8 +307,23 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Method not allowed' }, { status: 405 });
     }
 
+    const contentLength = Number(req.headers.get('content-length') || '0');
+    if (contentLength > MAX_CONTACT_BODY_BYTES) {
+      return Response.json({ error: 'Submission is too large' }, { status: 413 });
+    }
+
+    const contentType = req.headers.get('content-type') || '';
+    if (contentType && !contentType.toLowerCase().includes('application/json')) {
+      return Response.json({ error: 'JSON body required' }, { status: 415 });
+    }
+
     const base44 = createClientFromRequest(req);
-    const payload = await req.json();
+    const payload = await req.json().catch(() => null);
+
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+      return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
     const contact = normalizeContactInput(payload);
 
     if (contact.honeypot) {
@@ -358,12 +398,12 @@ Deno.serve(async (req) => {
       },
     });
 
-    const notification = await sendAdminNotification(contact);
+    const notification = await sendAdminNotification(base44, contact, leadId);
     // Fire SMS to Nolan's cell immediately — non-blocking
-    sendAdminSMS(contact).catch((err) =>
+    sendAdminSMS(base44, contact, leadId).catch((err) =>
       console.warn('[submitContactInquiry] SMS alert error (non-blocking):', err)
     );
-    const thankYouEmail = await sendUserThankYouEmail(contact);
+    const thankYouEmail = await sendUserThankYouEmail(base44, contact, leadId);
 
     await logCommunicationEvent(base44, {
       lead_id: leadId,
@@ -421,7 +461,7 @@ Deno.serve(async (req) => {
       thank_you_sent: thankYouEmail.sent,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to submit contact inquiry';
-    return Response.json({ error: message }, { status: 500 });
+    console.error('[submitContactInquiry] submission failed', error);
+    return Response.json({ error: 'Failed to submit contact inquiry' }, { status: 500 });
   }
 });

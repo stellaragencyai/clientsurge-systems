@@ -5,7 +5,7 @@ import { getStalledInstallWarning } from "@/lib/installQueueStatus";
 
 const STATUS_COLORS = {
   "Paid": "bg-blue-50 border-blue-200",
-  "Ready for Install": "bg-amber-50 border-amber-200",
+  "Ready for Install": "bg-blue-50 border-blue-200",
   "Configuring": "bg-purple-50 border-purple-200",
   "Testing": "bg-cyan-50 border-cyan-200",
   "Live": "bg-green-50 border-green-200",
@@ -128,11 +128,11 @@ export default function InstallQueuePanel() {
             {stalledWarning && (
               <div
                 title={stalledWarning.title}
-                className="inline-flex w-fit items-center gap-2 rounded-full border border-amber-300 bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800"
+                className="inline-flex w-fit items-center gap-2 rounded-full border border-sky-300 bg-sky-100 px-2.5 py-1 text-xs font-bold text-sky-800"
               >
                 <AlertCircle className="h-3.5 w-3.5" />
                 {stalledWarning.label}
-                <span className="font-medium text-amber-700">{stalledWarning.hoursSincePaid}h</span>
+                <span className="font-medium text-sky-700">{stalledWarning.hoursSincePaid}h</span>
               </div>
             )}
 

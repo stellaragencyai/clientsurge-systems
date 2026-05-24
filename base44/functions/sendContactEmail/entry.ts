@@ -1,4 +1,8 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import {
+  sendCommunicationViaOutbox,
+  sendResendEmailProvider,
+} from "../_shared/communicationOutbox.js";
 
 Deno.serve(async (req) => {
   try {
@@ -8,8 +12,6 @@ Deno.serve(async (req) => {
     if (!full_name || !email || !message) {
       return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
-
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
     const emailBody = `
       <h2>New Contact Form Submission</h2>
@@ -22,24 +24,30 @@ Deno.serve(async (req) => {
       </table>
     `;
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "ClientSurge Systems <system@clientsurgesystems.com>",
-        to: ["system@clientsurgesystems.com"],
-        reply_to: email,
-        subject: `New Contact: ${full_name} — ${business_type || "General Inquiry"}`,
-        html: emailBody,
+    const result = await sendCommunicationViaOutbox({
+      base44,
+      channel: "email",
+      provider: "resend",
+      recipient: "system@clientsurgesystems.com",
+      subject: `New Contact: ${full_name} — ${business_type || "General Inquiry"}`,
+      body: emailBody,
+      html: emailBody,
+      from: "ClientSurge Systems <system@clientsurgesystems.com>",
+      source: "sendContactEmail",
+      sourceRecordId: email,
+      templateKey: "contact_form_admin_notification",
+      messageType: "transactional",
+      consentBasis: "internal_notification",
+      metadata: { reply_to: email, full_name, business_type },
+      providerSend: (providerPayload) => sendResendEmailProvider({
+        ...providerPayload,
+        env: (name) => Deno.env.get(name),
+        fetchImpl: fetch,
       }),
     });
 
-    if (!res.ok) {
-      const err = await res.text();
-      return Response.json({ error: err }, { status: 500 });
+    if (!result.success) {
+      return Response.json({ error: result.reason || result.error || "Email send failed" }, { status: 500 });
     }
 
     return Response.json({ success: true });

@@ -20,7 +20,7 @@ export default function PortalLoadingSkeleton() {
       </div>
 
       {/* Hero */}
-      <div className="px-6 py-10 bg-gradient-to-r from-amber-900/20 to-amber-700/20">
+      <div className="px-6 py-10 bg-gradient-to-r from-blue-900/20 to-sky-700/20">
         <div className="max-w-4xl mx-auto space-y-2">
           <div className="h-2.5 w-24 rounded bg-white/20" />
           <div className="h-7 w-64 rounded bg-white/20" />

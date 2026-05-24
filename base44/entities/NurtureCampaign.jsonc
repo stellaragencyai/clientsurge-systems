@@ -18,6 +18,11 @@
       "type": "string",
       "title": "Lead Business"
     },
+    "timezone": {
+      "type": "string",
+      "title": "Timezone",
+      "default": "America/Phoenix"
+    },
     "status": {
       "type": "string",
       "title": "Campaign Status",

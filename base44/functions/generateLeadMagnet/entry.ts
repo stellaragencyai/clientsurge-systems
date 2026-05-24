@@ -1,5 +1,5 @@
 /**
- * generateLeadMagnet — #421 #421a #421b
+ * generateLeadMagnet — #421 #421a #421b #421c
  * Elite perk #1: generates 3 lead magnets (600-800 words each) per industry pain point.
  * Converts markdown to PDF and uploads to Base44 private storage.
  */
@@ -20,6 +20,21 @@ function buildMarkdown(business_name: string, industry: string, pain_point: stri
   return `# ${pain_point}\n## A Free Guide for ${industry.replace("_", " ")} Businesses\n*By ${business_name}*\n\n---\n\n${content}\n\n---\n*This guide was prepared by ${business_name}. Questions? Call or text us anytime.*`;
 }
 
+function toBase64(value: string): string {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+  return btoa(binary);
+}
+
+function slugify(value: string): string {
+  return String(value || "lead-magnet")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -35,7 +50,7 @@ Deno.serve(async (req) => {
     const business_name = order.client_name || "Your Business";
     const openaiKey = Deno.env.get("OPENAI_API_KEY");
     const painPoints = PAIN_POINTS[industry] || PAIN_POINTS.default;
-    const magnets: { pain_point: string; content: string; word_count: number }[] = [];
+    const magnets: { pain_point: string; content: string; word_count: number; file_id?: string }[] = [];
 
     // #421a: generate 3 lead magnets
     for (const pain_point of painPoints.slice(0, 3)) {
@@ -53,7 +68,27 @@ Deno.serve(async (req) => {
 
       const markdown = buildMarkdown(business_name, industry, pain_point, content || `[Content for: ${pain_point}]`);
       const words = content.split(" ").length;
-      magnets.push({ pain_point, content: markdown, word_count: words });
+      let fileId = null;
+      try {
+        const file = await base44.asServiceRole.entities.Files.create({
+          order_id,
+          client_id: order.client_id || "",
+          client_project_id: order.client_project_id || "",
+          title: pain_point,
+          description: `Elite lead magnet for ${business_name}`,
+          category: "lead_magnet",
+          file_name: `${slugify(pain_point)}.md`,
+          mime_type: "text/markdown",
+          file_base64: toBase64(markdown),
+          status: "delivered",
+          delivered_at: new Date().toISOString(),
+          metadata_json: JSON.stringify({ industry, word_count: words, source: "generateLeadMagnet" }),
+        });
+        fileId = file?.id || null;
+      } catch (error) {
+        console.warn("[generateLeadMagnet] Files record create failed:", error.message);
+      }
+      magnets.push({ pain_point, content: markdown, word_count: words, file_id: fileId || undefined });
     }
 
     // #421b: note — PDF conversion requires a separate PDF service (wkhtmltopdf / puppeteer)
@@ -70,7 +105,26 @@ Deno.serve(async (req) => {
       service: "elite_perks", requires_nolan: false, resolved: true,
     }).catch(() => {});
 
-    return Response.json({ success: true, magnets: magnets.map(m => ({ pain_point: m.pain_point, word_count: m.word_count })), order_id });
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      order_id,
+      client_id: order.client_id || "",
+      client_project_id: order.client_project_id || "",
+      channel: "internal",
+      direction: "system",
+      event_type: "portal_notification",
+      provider: "internal",
+      status: "processed",
+      subject: "Lead magnets ready",
+      message_body: `${magnets.length} Elite lead magnets are ready in the client portal.`,
+      context_type: "elite_lead_magnet",
+      context_id: order_id,
+      metadata_json: JSON.stringify({
+        file_ids: magnets.map((m) => m.file_id).filter(Boolean),
+        pain_points: magnets.map((m) => m.pain_point),
+      }),
+    }).catch(() => {});
+
+    return Response.json({ success: true, magnets: magnets.map(m => ({ pain_point: m.pain_point, word_count: m.word_count, file_id: m.file_id || null })), order_id });
   } catch (err) {
     return Response.json({ error: err.message }, { status: 500 });
   }

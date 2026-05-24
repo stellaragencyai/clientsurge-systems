@@ -77,7 +77,7 @@ export default function BundleSavingsToast() {
       <span style={{ fontSize: "16px" }}>🎯</span>
       <span style={{ fontSize: "13px", fontWeight: "600", color: "#1b140d" }}>
         {toast.message}{" "}
-        <strong style={{ color: "#9a5c2e" }}>{toast.bundle}</strong>
+        <strong style={{ color: "#0077B6" }}>{toast.bundle}</strong>
         {toast.savings > 0 && (
           <span style={{ color: "#16a34a", marginLeft: "6px" }}>
             — save ${toast.savings}
@@ -86,7 +86,7 @@ export default function BundleSavingsToast() {
       </span>
       <button
         onClick={() => setVisible(false)}
-        style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(27,20,13,0.4)", fontSize: "14px", padding: "0 0 0 4px" }}
+        style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(10,22,40,0.4)", fontSize: "14px", padding: "0 0 0 4px" }}
       >
         ✕
       </button>

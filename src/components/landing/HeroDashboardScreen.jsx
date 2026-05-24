@@ -210,7 +210,14 @@ function PageIndicator({ activeIdx, total, onSelect }) {
   return (
     <div style={{ display:"flex", alignItems:"center", gap:"7px", justifyContent:"center", padding:"6px 0", position:"relative", zIndex:10 }}>
       {Array.from({ length: total }).map((_,i) => (
-        <button key={i} type="button" aria-label={`Show dashboard panel ${i + 1}`} onClick={() => onSelect(i)} style={{ width: i===activeIdx?"20px":"6px", height:"6px", borderRadius:"9999px", background: i===activeIdx?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.3)", border:"none", cursor:"pointer", padding:0, transition:"width 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease" }}/>
+        <button
+          key={i}
+          type="button"
+          aria-label={`Show dashboard slide ${i + 1}`}
+          aria-current={i === activeIdx ? "true" : undefined}
+          onClick={() => onSelect(i)}
+          style={{ width: i===activeIdx?"20px":"6px", height:"6px", borderRadius:"9999px", background: i===activeIdx?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.3)", border:"none", cursor:"pointer", padding:0, transition:"width 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease" }}
+        />
       ))}
     </div>
   );

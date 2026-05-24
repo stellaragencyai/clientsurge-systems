@@ -162,7 +162,7 @@ export default function InstallChecklistPanel({ orderId }) {
                               : step.status === "failed"
                               ? "border-red-500 bg-red-50"
                               : step.status === "in_progress"
-                              ? "border-amber-500 bg-amber-50"
+                              ? "border-blue-500 bg-blue-50"
                               : "border-border bg-white"
                           }`}
                         >
@@ -183,7 +183,7 @@ export default function InstallChecklistPanel({ orderId }) {
                                 : step.status === "failed"
                                 ? "text-red-700"
                                 : step.status === "in_progress"
-                                ? "text-amber-700"
+                                ? "text-blue-700"
                                 : "text-foreground"
                             }`}
                           >
@@ -210,7 +210,7 @@ export default function InstallChecklistPanel({ orderId }) {
                               : step.status === "failed"
                               ? "bg-red-100 text-red-700"
                               : step.status === "in_progress"
-                              ? "bg-amber-100 text-amber-700"
+                              ? "bg-blue-100 text-blue-700"
                               : "bg-gray-100 text-gray-600"
                           }`}
                         >

@@ -50,11 +50,11 @@ export default function SessionTimeoutModal({ onLogout, logoutAfterMs = DEFAULT_
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ background: "#0D1B2E", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 18, padding: "32px 28px", maxWidth: 400, width: "100%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
+      <div style={{ background: "#0D1B2E", border: "1px solid rgba(0,174,239,0.4)", borderRadius: 18, padding: "32px 28px", maxWidth: 400, width: "100%", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}>
         <div style={{ fontSize: 36, marginBottom: 12 }}>⏱️</div>
         <h3 style={{ color: "#fff", fontSize: 18, fontWeight: 800, margin: "0 0 8px" }}>Session expiring soon</h3>
         <p style={{ color: "rgba(255,255,255,0.55)", fontSize: 13, margin: "0 0 20px", lineHeight: 1.6 }}>
-          You'll be logged out in <b style={{ color: "#F59E0B" }}>{mins}:{String(secs).padStart(2,"0")}</b> due to inactivity.
+          You'll be logged out in <b style={{ color: "#00AEEF" }}>{mins}:{String(secs).padStart(2,"0")}</b> due to inactivity.
         </p>
         <button onClick={resetTimers} style={{ background: "linear-gradient(135deg,#00D4FF,#00FFB3)", border: "none", borderRadius: 9999, padding: "11px 28px", color: "#0A0F1E", fontSize: 14, fontWeight: 800, cursor: "pointer", width: "100%" }}>
           Keep me logged in

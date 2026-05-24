@@ -30,21 +30,21 @@ const NICHES = [
   { key: 'med_spa',      label: 'Med Spa',        color: 'bg-pink-100 text-pink-800' },
   { key: 'dental',       label: 'Dental',          color: 'bg-cyan-100 text-cyan-800' },
   { key: 'chiropractic', label: 'Chiropractic',    color: 'bg-purple-100 text-purple-800' },
-  { key: 'hvac',         label: 'HVAC',            color: 'bg-orange-100 text-orange-800' },
+  { key: 'hvac',         label: 'HVAC',            color: 'bg-sky-100 text-sky-800' },
   { key: 'roofing',      label: 'Roofing',         color: 'bg-slate-100 text-slate-800' },
-  { key: 'contractors',  label: 'Contractors',     color: 'bg-amber-100 text-amber-800' },
+  { key: 'contractors',  label: 'Contractors',     color: 'bg-blue-100 text-blue-800' },
 ];
 
 const QUALITY_CONFIG = {
   none:    { label: 'No Website', color: 'bg-red-100 text-red-700 border-red-200',       dot: 'bg-red-500' },
-  low:     { label: 'Bad Website', color: 'bg-orange-100 text-orange-700 border-orange-200', dot: 'bg-orange-500' },
-  medium:  { label: 'Mediocre',   color: 'bg-yellow-100 text-yellow-700 border-yellow-200', dot: 'bg-yellow-500' },
+  low:     { label: 'Bad Website', color: 'bg-sky-100 text-sky-700 border-sky-200', dot: 'bg-sky-500' },
+  medium:  { label: 'Mediocre',   color: 'bg-sky-100 text-sky-700 border-sky-200', dot: 'bg-sky-500' },
   high:    { label: 'Good Site',  color: 'bg-green-100 text-green-700 border-green-200',  dot: 'bg-green-500' },
   unknown: { label: 'Unknown',    color: 'bg-gray-100 text-gray-600 border-gray-200',     dot: 'bg-gray-400' },
 };
 
 function SniperScoreBadge({ score }) {
-  const color = score >= 70 ? 'bg-red-500' : score >= 50 ? 'bg-orange-400' : 'bg-yellow-400';
+  const color = score >= 70 ? 'bg-red-500' : score >= 50 ? 'bg-sky-400' : 'bg-sky-400';
   return (
     <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
       <span className="text-white font-black text-sm">{score}</span>
@@ -78,8 +78,8 @@ function LeadCard({ lead }) {
 
           <div className="flex items-center gap-4 mt-2 flex-wrap">
             {lead.review_count > 0 && (
-              <span className="flex items-center gap-1 text-xs text-amber-700 font-semibold">
-                <Star className="w-3 h-3 fill-amber-400 stroke-amber-400" />
+              <span className="flex items-center gap-1 text-xs text-blue-700 font-semibold">
+                <Star className="w-3 h-3 fill-blue-400 stroke-blue-400" />
                 {lead.review_rating?.toFixed(1)} ({lead.review_count} reviews)
               </span>
             )}
@@ -308,9 +308,9 @@ function RunHuntModal({ onClose, onComplete }) {
                 <p className="text-2xl font-black text-gray-600">{result.skipped_duplicate}</p>
                 <p className="text-xs text-gray-600">Duplicates</p>
               </div>
-              <div className="rounded-xl bg-amber-50 border border-amber-200 p-3">
-                <p className="text-2xl font-black text-amber-700">{result.skipped_low_score}</p>
-                <p className="text-xs text-amber-700">Low Score</p>
+              <div className="rounded-xl bg-blue-50 border border-blue-200 p-3">
+                <p className="text-2xl font-black text-blue-700">{result.skipped_low_score}</p>
+                <p className="text-xs text-blue-700">Low Score</p>
               </div>
             </div>
             <button onClick={onClose} className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-bold text-sm hover:bg-primary/90 transition-colors">
@@ -406,7 +406,7 @@ export default function SniperDashboard() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Total Targets', value: totalTargets, color: 'bg-red-50 text-red-700', icon: Target },
-          { label: 'High Priority (70+)', value: highPriority, color: 'bg-orange-50 text-orange-700', icon: Zap },
+          { label: 'High Priority (70+)', value: highPriority, color: 'bg-sky-50 text-sky-700', icon: Zap },
           { label: 'No Website', value: noWebsite, color: 'bg-purple-50 text-purple-700', icon: Globe },
           { label: 'Avg Sniper Score', value: avgScore, color: 'bg-blue-50 text-blue-700', icon: TrendingUp },
         ].map(stat => {

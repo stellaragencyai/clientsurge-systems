@@ -24,7 +24,7 @@ export default function SixAutomationSystems() {
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
         >
-          <motion.p variants={revealItem} className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#0088CC" }}>
+          <motion.p variants={revealItem} className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#006CA8" }}>
             The core offer
           </motion.p>
           <motion.h2 variants={revealItem} className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
@@ -74,7 +74,7 @@ export default function SixAutomationSystems() {
                 >
                   <div className="mb-5 flex items-start justify-between gap-4">
                     <MotionIconBadge className="h-11 w-11 rounded-lg">
-                      <Icon className="h-5 w-5" style={{ color: "#0088CC" }} />
+                      <Icon className="h-5 w-5" style={{ color: "#006CA8" }} />
                     </MotionIconBadge>
                     <span className="text-xs font-bold text-muted-foreground">0{index + 1}</span>
                   </div>
@@ -82,7 +82,7 @@ export default function SixAutomationSystems() {
                   <h3 className="mb-3 text-xl font-bold leading-tight text-foreground">{automation.title}</h3>
                   <p className="mb-5 text-sm leading-6 text-muted-foreground">{automation.summary}</p>
 
-                  <div className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: "#0088CC" }}>
+                  <div className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: "#006CA8" }}>
                     See how it works
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </div>

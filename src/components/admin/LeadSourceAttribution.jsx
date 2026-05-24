@@ -17,8 +17,8 @@ import { base44 } from "@/api/base44Client";
 const STATUS_ORDER = ["New", "Contacted", "Replied", "Qualified", "Booking Prompt Sent", "Booked", "Closed"];
 
 const SOURCE_COLORS = [
-  "#9a5c2e", "#c8965c", "#3b82f6", "#10b981", "#8b5cf6",
-  "#f59e0b", "#ef4444", "#06b6d4", "#ec4899", "#6366f1",
+  "#0077B6", "#00AEEF", "#3b82f6", "#10b981", "#8b5cf6",
+  "#00AEEF", "#ef4444", "#06b6d4", "#ec4899", "#6366f1",
 ];
 
 function pct(num, den) {
@@ -48,7 +48,7 @@ function PerformanceBadge({ rate, label }) {
   const cls    = isHigh
     ? "bg-green-50 text-green-700 border-green-200"
     : isMid
-    ? "bg-amber-50 text-amber-700 border-amber-200"
+    ? "bg-blue-50 text-blue-700 border-blue-200"
     : "bg-red-50 text-red-700 border-red-200";
   return (
     <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-bold ${cls}`}>
@@ -124,7 +124,7 @@ function SourceRow({ source, data, rank, color, isSelected, onSelect }) {
               <span className="font-bold text-foreground">{data.reply_count}</span> replies
             </span>
             {data.high_score_count > 0 && (
-              <span className="text-xs text-amber-700 font-semibold">
+              <span className="text-xs text-blue-700 font-semibold">
                 ★ {data.high_score_count} high-score
               </span>
             )}
@@ -167,7 +167,7 @@ function DrillDown({ source, data, color }) {
           { label: "Total Leads",    value: data.total,             color: "blue" },
           { label: "Qual. Rate",     value: `${qualRate}%`,         color: "green" },
           { label: "Booked Rate",    value: `${bookedRate}%`,       color: "emerald" },
-          { label: "Avg Lead Score", value: avgScore,               color: "amber" },
+          { label: "Avg Lead Score", value: avgScore,               color: "blue" },
         ].map(k => (
           <div key={k.label} className={`rounded-lg border border-border p-3 bg-${k.color}-50`}>
             <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{k.label}</p>
@@ -181,7 +181,7 @@ function DrillDown({ source, data, color }) {
           { label: "Live Touches", value: data.communication_count, color: "blue" },
           { label: "Outbound", value: data.outbound_count, color: "purple" },
           { label: "Replies", value: data.reply_count, color: "green" },
-          { label: "Failures", value: data.failed_count, color: "amber" },
+          { label: "Failures", value: data.failed_count, color: "blue" },
         ].map((k) => (
           <div key={k.label} className={`rounded-lg border border-border p-3 bg-${k.color}-50`}>
             <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">{k.label}</p>
@@ -218,9 +218,9 @@ function DrillDown({ source, data, color }) {
 
       {/* Underperformance alert */}
       {bookedRate < 10 && data.total >= 5 && (
-        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
-          <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-amber-800">
+        <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-3">
+          <AlertTriangle className="h-4 w-4 text-blue-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-blue-800">
             <strong>Underperforming channel.</strong> Less than 10% of leads from <em>{source}</em> have booked. Consider reviewing messaging or qualification criteria for this source.
           </p>
         </div>
@@ -345,7 +345,7 @@ export default function LeadSourceAttribution() {
         {[
           { icon: TrendingUp, label: "Total Leads",    value: totalLeads,   color: "blue"    },
           { icon: Filter,     label: "Sources",        value: totalSources, color: "purple"  },
-          { icon: MessageSquare, label: "Live Touches", value: totalTouches, color: "amber"   },
+          { icon: MessageSquare, label: "Live Touches", value: totalTouches, color: "blue"   },
           { icon: Star,       label: "Top Volume",     value: topSource,    color: "blue"   },
           { icon: Target,     label: "Best Conv.",     value: bestConvSource, color: "green" },
           { icon: RefreshCw,  label: "Replies",        value: totalReplies, color: "emerald" },
@@ -373,14 +373,14 @@ export default function LeadSourceAttribution() {
               <XAxis dataKey="source" tick={{ fontSize: 11 }} tickLine={false} />
               <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} width={24} />
               <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
-              <Bar dataKey="total"     name="Total"     fill="#9a5c2e" radius={[4,4,0,0]} opacity={0.4} />
-              <Bar dataKey="qualified" name="Qualified+" fill="#9a5c2e" radius={[4,4,0,0]} opacity={0.75} />
+              <Bar dataKey="total"     name="Total"     fill="#0077B6" radius={[4,4,0,0]} opacity={0.4} />
+              <Bar dataKey="qualified" name="Qualified+" fill="#0077B6" radius={[4,4,0,0]} opacity={0.75} />
               <Bar dataKey="booked"    name="Booked"    fill="#10b981" radius={[4,4,0,0]} />
             </BarChart>
           </ResponsiveContainer>
           <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground flex-wrap">
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#9a5c2e] opacity-40 inline-block" />Total</span>
-            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#9a5c2e] opacity-75 inline-block" />Qualified+</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#0077B6] opacity-40 inline-block" />Total</span>
+            <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-[#0077B6] opacity-75 inline-block" />Qualified+</span>
             <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-emerald-500 inline-block" />Booked</span>
           </div>
         </div>
