@@ -19,13 +19,17 @@ export function InstallCompletionDate({ install_initialized_at }) {
 }
 
 // #171: Resend Welcome Email button
-export function ResendWelcomeButton({ order_id, client_email }) {
+export function ResendWelcomeButton({ client_name, client_email, business_name }) {
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const send = async () => {
     setLoading(true);
     try {
-      await base44.functions.invoke("sendClientWelcomeEmail", { order_id });
+      await base44.functions.invoke("sendPortalWelcomeEmail", {
+        client_name,
+        client_email,
+        business_name,
+      });
       setSent(true);
     } catch {} finally { setLoading(false); }
   };

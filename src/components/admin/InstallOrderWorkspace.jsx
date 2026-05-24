@@ -4,6 +4,7 @@ import { formatCurrency, getPackageDisplayLabel } from "@/lib/aiProducts";
 import {
   buildPackageActivationBrief,
 } from "@/lib/basicPackageActivation";
+import { ResendWelcomeButton } from "@/components/admin/AdminQueueEnhancements";
 import ServiceConfigEditor from "@/components/admin/install/ServiceConfigEditor";
 import DeploymentSummaryPanel from "@/components/admin/install/DeploymentSummaryPanel";
 import { CheckCircle2, Clock3, Loader2, Save, ShieldAlert, Sparkles, TestTube2, TriangleAlert, Wrench } from "lucide-react";
@@ -1599,6 +1600,13 @@ export default function InstallOrderWorkspace({ orderId, onQueueRefresh }) {
             <p className="text-xs text-muted-foreground">
               Order {detail.id} | Payment {detail.payment_status} | Setup ${detail.total_setup} | Monthly ${detail.total_monthly}/mo
             </p>
+            <div className="pt-1">
+              <ResendWelcomeButton
+                client_name={detail.customer_name || detail.client?.full_name || "Client"}
+                client_email={detail.customer_email || detail.client?.email}
+                business_name={detail.business_name || detail.client_project?.business_name || "ClientSurge client"}
+              />
+            </div>
             {detail.subscription ? (
               <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900">
                 <p className="font-semibold">
