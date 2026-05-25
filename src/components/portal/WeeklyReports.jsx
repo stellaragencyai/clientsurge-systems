@@ -5,17 +5,7 @@ import {
   TrendingUp, Users, Calendar, Zap, AlertCircle,
 } from "lucide-react";
 import { RadialBarChart, RadialBar, ResponsiveContainer } from "recharts";
-
-const BUILD_STEPS = [
-  { key: "step_onboarding", label: "Onboarding Form" },
-  { key: "step_payment", label: "Payment Confirmed" },
-  { key: "step_system_setup", label: "System Setup" },
-  { key: "step_sms", label: "SMS Connected" },
-  { key: "step_email", label: "Email Connected" },
-  { key: "step_booking", label: "Booking Flow Setup" },
-  { key: "step_followup", label: "Follow-Up Setup" },
-  { key: "step_live", label: "System Live" },
-];
+import { BUILD_STEPS } from "@/utils/weeklyReportsBuildSteps";
 
 const STATUS_COLORS = {
   New: "#3b82f6",
@@ -47,9 +37,9 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
 }
 
 function BuildProgressChart({ project }) {
-  const steps = BUILD_STEPS.map(s => ({
-    label: s.label,
-    status: project[s.key] || "pending",
+  const steps = Object.values(BUILD_STEPS).map((step) => ({
+    label: step.label,
+    status: project?.[step.field] ? "complete" : "pending",
   }));
   const completed = steps.filter(s => s.status === "complete").length;
   const pct = Math.round((completed / steps.length) * 100);

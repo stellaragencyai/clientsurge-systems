@@ -13,6 +13,7 @@ import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { setPageMetadata } from "@/lib/seo";
 import Footer from "@/components/landing/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { LazyProductGrid } from "@/components/store/StorePageEnhancements";
 
 const INDUSTRY_LINKS = [
   { label: "Med Spa", href: "/med-spa" },
@@ -698,15 +699,15 @@ function StoreInner() {
             </div>
 
             <motion.div
-              className="store-grid"
               variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
               initial="hidden"
               animate="visible"
               key={activeCategory + search + pathMode}
             >
-              {filtered.map((product) =>
-              <ProductCard key={product.product_id} product={product} />
-              )}
+              <LazyProductGrid
+                products={filtered}
+                renderCard={(product) => <ProductCard key={product.product_id} product={product} />}
+              />
             </motion.div>
 
             {filtered.length === 0 ?

@@ -41,7 +41,8 @@ import TaskBoardPanel from '../components/admin/TaskBoardPanel';
 import AutomationAlertsPanel from '../components/admin/AutomationAlertsPanel';
 import AdminFailedJobsPanel from '../components/admin/AdminFailedJobsPanel';
 import AuditLogPanel from '../components/admin/AuditLogPanel';
-import { ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
+import AIAgentsDashboard from '../components/admin/AIAgentsDashboard';
+import { AdminQuickActions, ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 import SniperDashboard from '../components/admin/SniperDashboard';
@@ -83,6 +84,7 @@ const NAV_GROUPS = [
     items: [
       { id: 'analytics', label: 'Analytics', icon: BarChart3 },
       { id: 'revenue', label: 'Revenue & MRR', icon: DollarSign },
+      { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
       { id: 'priority', label: 'Priority Queue', icon: Star },
       { id: 'attribution', label: 'Source Attribution', icon: PieChart },
     ],
@@ -204,6 +206,7 @@ export default function AdminDashboard() {
       case 'templates': return <CommunicationTemplates />;
       case 'health': return <IntegrationHealth />;
       case 'client-projects': return <ClientProjectsPanel />;
+      case 'ai-sales-reps': return <AIAgentsDashboard />;
       case 'automations': return <AutomationsPanel />;
       case 'drip': return <DripCampaignPanel />;
       case 'nurture': return <NurtureCampaignPanel />;
@@ -525,6 +528,30 @@ function OverviewDashboard({ onNavigate }) {
         </div>
         <div className="rounded-xl border border-border bg-[#081120] p-5">
           <InstallStatusTable onboardings={onboardings.slice(0, 20)} />
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-border p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-semibold text-foreground">Recent Paid Orders</h3>
+            <p className="text-sm text-muted-foreground">Run the common operator actions against the latest paid orders.</p>
+          </div>
+          <button onClick={fetchOverviewData} className="text-xs font-semibold text-primary hover:text-primary/80">Refresh</button>
+        </div>
+        <div className="space-y-3">
+          {orders.slice(0, 5).map((order) => (
+            <div key={order.id} className="flex flex-col gap-3 rounded-lg border border-border bg-muted/10 p-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-foreground">{order.business_name || order.customer_name || "Unnamed client"}</p>
+                <p className="text-xs text-muted-foreground">
+                  {order.customer_email || "No email"} · {order.selected_package_type || order.package_type || "single_service"}
+                </p>
+              </div>
+              <AdminQuickActions order={order} onRefresh={fetchOverviewData} />
+            </div>
+          ))}
+          {orders.length === 0 && <p className="text-sm text-muted-foreground">No paid orders available yet.</p>}
         </div>
       </div>
 

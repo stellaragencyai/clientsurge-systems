@@ -21,6 +21,7 @@ export default function Onboarding() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -46,6 +47,28 @@ export default function Onboarding() {
 
   const update = (field, value) => setFormData((prev) => ({ ...prev, [field]: value }));
 
+  const validateRequiredFields = () => {
+    const nextErrors = {};
+
+    if (!formData.full_name.trim()) nextErrors.full_name = "Please enter your full name.";
+    if (!formData.business_name.trim()) nextErrors.business_name = "Please enter your business name.";
+
+    if (!formData.email.trim()) {
+      nextErrors.email = "Please enter your email address.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+      nextErrors.email = "Please enter a valid email address.";
+    }
+
+    if (!formData.phone.trim()) {
+      nextErrors.phone = "Please enter your phone number.";
+    } else if (!/^[\d\s()+-]{10,}$/.test(formData.phone.trim())) {
+      nextErrors.phone = "Please enter a valid phone number.";
+    }
+
+    setFieldErrors(nextErrors);
+    return nextErrors;
+  };
+
   const toggleChip = (field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -56,6 +79,13 @@ export default function Onboarding() {
   };
 
   const handleSubmit = async () => {
+    const nextErrors = validateRequiredFields();
+    if (Object.keys(nextErrors).length > 0) {
+      setStep(1);
+      setError("Please complete the required onboarding fields before submitting.");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
@@ -135,16 +165,20 @@ export default function Onboarding() {
               <StepWrapper title="Tell us about you" subtitle="We'll use this to personalize your setup">
                 <Field label="Your Full Name" required>
                   <Input value={formData.full_name} onChange={v => update("full_name", v)} placeholder="Jane Smith" />
+                  {fieldErrors.full_name && <FieldError message={fieldErrors.full_name} />}
                 </Field>
                 <Field label="Business Name" required>
                   <Input value={formData.business_name} onChange={v => update("business_name", v)} placeholder="Luxe Med Spa" />
+                  {fieldErrors.business_name && <FieldError message={fieldErrors.business_name} />}
                 </Field>
                 <div className="grid grid-cols-2 gap-4">
                   <Field label="Email" required>
                     <Input type="email" value={formData.email} onChange={v => update("email", v)} placeholder="you@spa.com" />
+                    {fieldErrors.email && <FieldError message={fieldErrors.email} />}
                   </Field>
                   <Field label="Phone" required>
                     <Input type="tel" value={formData.phone} onChange={v => update("phone", v)} placeholder="(602) 555-0100" />
+                    {fieldErrors.phone && <FieldError message={fieldErrors.phone} />}
                   </Field>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -319,6 +353,10 @@ function Textarea({ value, onChange, placeholder, rows = 3 }) {
       className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm resize-none transition-all"
     />
   );
+}
+
+function FieldError({ message }) {
+  return <p className="text-xs font-medium text-red-500">{message}</p>;
 }
 
 function ChipGrid({ options, selected, onToggle }) {

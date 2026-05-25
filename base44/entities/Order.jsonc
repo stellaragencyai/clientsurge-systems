@@ -547,6 +547,10 @@
     "notes": {
       "type": "string",
       "title": "Admin Notes"
+    },
+    "assigned_admin": {
+      "type": "string",
+      "title": "Assigned Admin"
     }
   },
   "required": [

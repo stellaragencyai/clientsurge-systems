@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Mail, MessageSquare, Key, Save, AlertCircle, CheckCircle, MessageCircle } from 'lucide-react';
 import { fetchAdminSettings, getAdminSettingsError, saveAdminSettings } from '@/lib/adminSettingsApi';
+import EmailTemplatePreviewModal from './EmailTemplatePreviewModal';
 
 const TABS = [
   { id: "channels", label: "Channels" },
@@ -48,6 +49,20 @@ function TextArea({ value, onChange, placeholder, rows = 3 }) {
 }
 
 const VAR_HINT = "Variables: {name}, {business_name}, {booking_link}, {date}";
+const PREVIEW_SAMPLE_VALUES = {
+  "{name}": "Maria Rodriguez",
+  "{business_name}": "Sculpt Med Spa",
+  "{booking_link}": "https://vagaro.com/sculptmedspa",
+  "{date}": "May 24, 2026",
+  "{phone}": "(602) 555-0184",
+};
+
+function renderPreviewTemplate(template = "") {
+  return Object.entries(PREVIEW_SAMPLE_VALUES).reduce(
+    (output, [token, value]) => output.replaceAll(token, value),
+    template,
+  );
+}
 
 export default function AdminSettingsPanel() {
   const [settings, setSettings] = useState({});
@@ -55,6 +70,7 @@ export default function AdminSettingsPanel() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState("channels");
+  const [previewModal, setPreviewModal] = useState(null);
 
   useEffect(() => {
     fetchSettings();
@@ -90,6 +106,13 @@ export default function AdminSettingsPanel() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openPreview = (templateName, templateValue) => {
+    setPreviewModal({
+      template_name: templateName,
+      template_html: `<div style="font-family: Inter, Arial, sans-serif; line-height: 1.6; padding: 24px; color: #0f172a; white-space: pre-wrap;">${renderPreviewTemplate(templateValue || "")}</div>`,
+    });
   };
 
   return (
@@ -205,6 +228,13 @@ export default function AdminSettingsPanel() {
               </Field>
               <Field label="Email Confirmation Template" helper="Sent as the email confirmation to new leads">
                 <TextArea value={settings.email_confirmation_template} onChange={v => set('email_confirmation_template', v)} placeholder="Hi {name}, thanks for your interest. We'll be in touch soon..." rows={4} />
+                <button
+                  type="button"
+                  onClick={() => openPreview("Email Confirmation Template", settings.email_confirmation_template)}
+                  className="mt-2 text-xs font-semibold text-primary hover:text-primary/80"
+                >
+                  Preview template
+                </button>
               </Field>
               <Field label="Missed Call SMS" helper="Sent automatically when a call is missed">
                 <TextArea value={settings.missed_call_sms_template} onChange={v => set('missed_call_sms_template', v)} placeholder="Hi! We missed your call. Reply here or book a time: {booking_link}" rows={3} />
@@ -217,6 +247,13 @@ export default function AdminSettingsPanel() {
               </Field>
               <Field label="Booking Prompt Email Body (24h after Qualified)">
                 <TextArea value={settings.follow_up_booking_prompt_email} onChange={v => set('follow_up_booking_prompt_email', v)} placeholder="Hi {name}, we'd love to connect..." rows={4} />
+                <button
+                  type="button"
+                  onClick={() => openPreview("Booking Prompt Email", settings.follow_up_booking_prompt_email)}
+                  className="mt-2 text-xs font-semibold text-primary hover:text-primary/80"
+                >
+                  Preview template
+                </button>
               </Field>
             </div>
           </div>
@@ -272,6 +309,13 @@ export default function AdminSettingsPanel() {
                   </Field>
                   <Field label="Email Body">
                     <TextArea value={settings[step.bodyKey]} onChange={v => set(step.bodyKey, v)} placeholder={`Email body for step ${step.num}...`} rows={4} />
+                    <button
+                      type="button"
+                      onClick={() => openPreview(`Nurture Step ${step.num}`, settings[step.bodyKey])}
+                      className="mt-2 text-xs font-semibold text-primary hover:text-primary/80"
+                    >
+                      Preview template
+                    </button>
                   </Field>
                 </div>
               ))}
@@ -290,6 +334,14 @@ export default function AdminSettingsPanel() {
           {loading ? 'Saving...' : 'Save Settings'}
         </button>
       </div>
+
+      {previewModal ? (
+        <EmailTemplatePreviewModal
+          template_name={previewModal.template_name}
+          template_html={previewModal.template_html}
+          onClose={() => setPreviewModal(null)}
+        />
+      ) : null}
     </div>
   );
 }

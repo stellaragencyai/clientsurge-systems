@@ -18,6 +18,7 @@ import { base44 } from "@/api/base44Client";
 import AIGenerateModal from "./AIGenerateModal";
 import PackageActivationPanel from "./PackageActivationPanel";
 import { InitializeInstallButton, PipelineStatusBadge } from "../AdminOnboardingBadges";
+import OnboardingFieldsPanel from "../OnboardingFieldsPanel";
 
 const STEPS = [
   {
@@ -288,6 +289,13 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
                 value={client.start_date}
               />
             </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-bold text-primary uppercase tracking-widest mb-4">
+              Onboarding Visibility
+            </p>
+            <OnboardingFieldsPanel onboarding={client} onUpdate={onUpdate} />
           </div>
 
           {/* Package Activation Panel — wired to live order */}

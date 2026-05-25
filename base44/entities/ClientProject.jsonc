@@ -236,6 +236,16 @@
       "type": "boolean",
       "title": "Onboarding Wizard Completed",
       "default": false
+    },
+    "quick_start_completed": {
+      "type": "boolean",
+      "title": "Quick Start Completed",
+      "default": false
+    },
+    "quick_start_completed_at": {
+      "type": "string",
+      "title": "Quick Start Completed At",
+      "format": "date-time"
     }
   },
   "required": [

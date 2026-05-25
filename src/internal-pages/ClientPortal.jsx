@@ -22,6 +22,7 @@ import RevenueMetricsPanel from "../components/portal/RevenueMetricsPanel";
 import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
 import AutomationChecklist from "../components/portal/AutomationChecklist";
 import PortalWhatsNew from "../components/portal/PortalWhatsNew";
+import ClientOrderStatusTab from "../components/portal/ClientOrderStatusTab";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalTimeline from "../components/portal/PortalTimeline";
@@ -47,6 +48,8 @@ const TABS = [
   { id: "updates", label: "What's New" },
   { id: "settings", label: "Settings" },
 ];
+
+TABS.splice(1, 0, { id: "order-status", label: "Order Status" });
 
 export default function ClientPortal() {
   const [user, setUser] = useState(null);
@@ -315,6 +318,9 @@ export default function ClientPortal() {
             <SetupProgressHub project={project} order={portalOrder} user={user} />
             <OrderTracker />
           </div>
+        )}
+        {activeTab === "order-status" && (
+          <ClientOrderStatusTab order_id={portalOrder?.id} />
         )}
         {activeTab === "timeline" && (
           <PortalTimeline order={portalOrder} project={project} />

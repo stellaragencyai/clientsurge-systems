@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, Moon, Sun, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
 import DemoBookingModal from "../forms/DemoBookingModal";
@@ -80,6 +80,21 @@ function safeSetThemePreference(value) {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [isDark, setIsDark] = useState(true);
+
+  useEffect(() => {
+    const savedPreference = safeGetThemePreference();
+    const prefersDark = savedPreference == null ? true : savedPreference !== "light";
+    setIsDark(prefersDark);
+    safeApplyTheme(prefersDark);
+  }, []);
+
+  const toggleTheme = () => {
+    const next = !isDark;
+    setIsDark(next);
+    safeSetThemePreference(next ? "dark" : "light");
+    safeApplyTheme(next);
+  };
 
   useEffect(() => {
     if (!open) {
@@ -263,6 +278,14 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
           <button
+            onClick={toggleTheme}
+            className="hidden md:inline-flex items-center justify-center rounded-full border border-border bg-background/70 text-foreground hover:text-primary hover:border-primary/30 transition-colors"
+            style={{ width: 40, height: 40 }}
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}>
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          <button
             onClick={() => {
               trackCTA("login", "navbar");
               setShowLoginModal(true);
@@ -357,6 +380,15 @@ export default function Navbar() {
               <p className="text-xs text-muted-foreground capitalize">{mobileUserRole || "client"}</p>
             </div>
           )}
+
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center justify-between rounded-xl border border-border bg-background px-3 py-3 text-sm font-medium text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none transition-colors"
+            style={{ minHeight: "44px" }}
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}>
+            <span>{isDark ? "Switch to light mode" : "Switch to dark mode"}</span>
+            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
 
           <button
             onClick={() => {

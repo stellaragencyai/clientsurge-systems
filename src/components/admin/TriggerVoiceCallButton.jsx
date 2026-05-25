@@ -1,7 +1,7 @@
 /**
  * TriggerVoiceCallButton — #555
  * Admin lead detail: "Trigger Voice Call Now" button for HOT leads only.
- * Calls triggerOutboundCall backend function.
+ * Calls triggerVoiceCallToLead backend function.
  */
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
@@ -20,7 +20,7 @@ export default function TriggerVoiceCallButton({ lead }) {
     if (!lead?.phone) return alert("No phone number for this lead.");
     setCalling(true); setError(null);
     try {
-      await base44.functions.invoke("triggerOutboundCall", { lead_id: lead.id, phone: lead.phone, business_name: lead.business_name });
+      await base44.functions.invoke("triggerVoiceCallToLead", { lead_id: lead.id });
       setDone(true);
     } catch (e) {
       setError("Failed to trigger call. Check Retell/Twilio config.");

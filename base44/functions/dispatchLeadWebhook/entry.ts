@@ -127,6 +127,7 @@ Deno.serve(async (req) => {
     const priorityTier = getPriorityTier(leadScore);
     const businessSize = getBusinessSize(lead);
     const followUp = getFollowUpUrgency(priorityTier, businessSize);
+    const agentName = industryKey === "general" ? "sales_rep_general" : `sales_rep_${industryKey}`;
 
     console.log(`[dispatchLeadWebhook] Lead: ${lead.full_name} | Industry: ${industryKey} | Score: ${leadScore} | Tier: ${priorityTier} | Size: ${businessSize} | Rep: ${rep.rep_name}`);
 
@@ -144,6 +145,7 @@ Deno.serve(async (req) => {
       // Routing metadata
       routing: {
         industry_key: industryKey,
+        agent_name: agentName,
         industry_label: rep.industry_label,
         assigned_rep: rep.rep_name,
         rep_email: rep.rep_email,
@@ -156,11 +158,13 @@ Deno.serve(async (req) => {
         qualified: priorityTier !== "COLD",
         requires_priority_follow_up: priorityTier === "HOT",
       },
+      agent_name: agentName,
     };
 
     // ── UPDATE LEAD with routing info ──────────
     await base44.asServiceRole.entities.Leads.update(lead.id, {
       assigned_to: rep.rep_email,
+      assigned_agent_name: agentName,
       assigned_at: new Date().toISOString(),
       activation_priority: priorityTier === "HOT" ? "Hot" : priorityTier === "WARM" ? "High" : "Medium",
     });

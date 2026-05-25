@@ -45,10 +45,63 @@ Deno.serve(async (req) => {
       await base44.asServiceRole.entities.AdminSettings.create(updates);
     }
 
+    const completionTimestamp = new Date().toISOString();
+
     // Also stamp the project
     await base44.asServiceRole.entities.ClientProject.update(project_id, {
       quick_start_completed: true,
+      quick_start_completed_at: completionTimestamp,
     });
+
+    try {
+      const adminSettings = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
+      const settingsRecord = adminSettings?.[0] || null;
+      const adminEmail =
+        settingsRecord?.lead_notification_email ||
+        Deno.env.get('ADMIN_NOTIFICATION_EMAIL') ||
+        Deno.env.get('ADMIN_EMAIL');
+
+      if (adminEmail) {
+        await base44.asServiceRole.integrations.Core.SendEmail({
+          to: adminEmail,
+          from_name: 'ClientSurge Systems',
+          subject: `Quick Start Complete — ${project.business_name || project.client_email || project.id}`,
+          body: `
+<div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:600px;margin:0 auto;padding:32px 20px;">
+  <h2 style="color:#0A1628;margin:0 0 16px;">Client Quick Start Complete</h2>
+  <p style="color:#555;margin:0 0 20px;">
+    <strong>${project.business_name || 'A client'}</strong> finished the portal quick-start checklist.
+  </p>
+  <div style="background:#f8fafc;border:1px solid #dbeafe;border-radius:12px;padding:16px;margin-bottom:20px;">
+    <p style="margin:0 0 8px;color:#0A1628;"><strong>Project ID:</strong> ${project.id}</p>
+    <p style="margin:0 0 8px;color:#0A1628;"><strong>Client Email:</strong> ${project.client_email || user.email}</p>
+    <p style="margin:0;color:#0A1628;"><strong>Completed At:</strong> ${completionTimestamp}</p>
+  </div>
+  <p style="color:#555;margin:0;">Review the client portal and install queue to confirm the next setup steps are in motion.</p>
+</div>`,
+        });
+      }
+
+      await base44.asServiceRole.entities.CommunicationEvent.create({
+        client_project_id: project_id,
+        channel: 'internal',
+        direction: 'system',
+        event_type: 'quick_start_completed',
+        provider: 'internal',
+        status: 'processed',
+        subject: 'Client quick start completed',
+        message_body: `${project.business_name || project.client_email || project.id} completed quick start.`,
+        context_type: 'client_quick_start',
+        context_id: `quick_start_completed:${project_id}`,
+        metadata_json: JSON.stringify({
+          project_id,
+          completed_at: completionTimestamp,
+          completed_by: user.email,
+        }),
+      }).catch(() => null);
+    } catch (error) {
+      console.warn(`[saveQuickStartConfig] admin notification failed: ${error.message}`);
+    }
 
     console.log(`Quick start config saved for project ${project_id} by ${user.email}`);
     return Response.json({ success: true });

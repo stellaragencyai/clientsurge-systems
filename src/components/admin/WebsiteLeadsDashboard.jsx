@@ -192,6 +192,11 @@ export default function WebsiteLeadsDashboard() {
                           Replied
                         </span>
                       )}
+                      {lead.initial_response_sent_at && (
+                        <span className="text-xs px-2 py-1 rounded-full border border-blue-200 bg-blue-50 text-blue-700">
+                          AI Reply Sent
+                        </span>
+                      )}
                       {lead.booking_status === 'booked' && (
                         <span className="text-xs px-2 py-1 rounded-full border border-purple-200 bg-purple-50">
                           Booked

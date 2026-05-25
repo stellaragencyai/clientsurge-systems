@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Loader2, CheckCircle2, AlertCircle, Clock, RefreshCw } from "lucide-react";
 import { getStalledInstallWarning } from "@/lib/installQueueStatus";
+import { AssignToAdminDropdown, InstallCompletionDate } from "./AdminQueueEnhancements";
 
 const STATUS_COLORS = {
   "Paid": "bg-blue-50 border-blue-200",
@@ -58,6 +59,14 @@ export default function InstallQueuePanel() {
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const handleAssignAdmin = (orderId, admin) => {
+    setOrders((prev) =>
+      prev.map((order) =>
+        order.id === orderId ? { ...order, assigned_admin: admin || "" } : order
+      )
+    );
   };
 
   if (loading) {
@@ -168,6 +177,18 @@ export default function InstallQueuePanel() {
             <div className="text-xs text-foreground/50 border-t border-current/10 pt-2">
               <p>Order: {order.id.slice(0, 8)}</p>
               <p>Created: {new Date(order.created_date).toLocaleDateString()}</p>
+              <p>
+                Estimated completion:{" "}
+                <InstallCompletionDate install_initialized_at={order.install_initialized_at} />
+              </p>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="font-medium text-foreground/70">Assigned admin:</span>
+                <AssignToAdminDropdown
+                  order_id={order.id}
+                  current_admin={order.assigned_admin || ""}
+                  onAssign={(admin) => handleAssignAdmin(order.id, admin)}
+                />
+              </div>
             </div>
           </div>
         );

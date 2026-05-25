@@ -139,8 +139,9 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
+    const isSuperAdmin = user?.role === "super_admin";
 
-    if (!user || user.role !== 'admin') {
+    if (!user || !["admin", "super_admin"].includes(user.role)) {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -149,9 +150,12 @@ Deno.serve(async (req) => {
     const offset = Math.max(Number(filters.offset) || 0, 0);
 
     const leads = await base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_PIPELINE_MAX_FETCH);
+    const scopedLeads = isSuperAdmin
+      ? leads || []
+      : (leads || []).filter((lead) => lead.assigned_to === user.email);
 
     const snapshot = buildLeadPipelineSnapshot({
-      leads: leads || [],
+      leads: scopedLeads,
       filters,
       limit,
       offset,

@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ShoppingCart, Trash2, ArrowRight, Lock } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
 import { base44 } from "@/api/base44Client";
 import { AI_PRODUCTS } from "@/lib/aiProducts";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 const COMPLEMENTARY_SERVICES = {
   instant_lead_response: ["missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent"],
@@ -32,6 +33,15 @@ export default function CartSidebar() {
   });
   const [smsConsent, setSmsConsent] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!cartOpen) {
+      return undefined;
+    }
+
+    return acquireBodyScrollLock("cart-sidebar");
+  }, [cartOpen]);
+
   const suggestedAddon = useMemo(() => {
     if (!items.length) return null;
 

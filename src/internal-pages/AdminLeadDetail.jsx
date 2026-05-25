@@ -11,6 +11,17 @@ import EmailHistoryPanel from "../components/dashboard/EmailHistoryPanel";
 import NotesSection from "../components/dashboard/NotesSection";
 import LeadTimeline from "../components/dashboard/LeadTimeline";
 import AILeadInsightPanel from "../components/admin/AILeadInsightPanel";
+import TriggerVoiceCallButton from "../components/admin/TriggerVoiceCallButton";
+
+const AGENT_OPTIONS = [
+  { value: "sales_rep_general", label: "General" },
+  { value: "sales_rep_med_spa", label: "Med Spa" },
+  { value: "sales_rep_dental", label: "Dental" },
+  { value: "sales_rep_chiropractic", label: "Chiropractic" },
+  { value: "sales_rep_hvac", label: "HVAC" },
+  { value: "sales_rep_roofing", label: "Roofing" },
+  { value: "sales_rep_contractors", label: "Contractors" },
+];
 
 const intakeTypeLabels = {
   lead_capture: "Lead Capture",
@@ -32,6 +43,7 @@ export default function AdminLeadDetail() {
   const [campaigns, setCampaigns] = useState([]);
   const [enrolling, setEnrolling] = useState(false);
   const [enrollSuccess, setEnrollSuccess] = useState("");
+  const [agentSaving, setAgentSaving] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== "admin") {
@@ -74,6 +86,24 @@ export default function AdminLeadDetail() {
 
   const handleStatusChange = (newStatus) => {
     setLead((prev) => ({ ...prev, status: newStatus }));
+  };
+
+  const handleAgentChange = async (nextAgent) => {
+    if (!lead?.id || !nextAgent || nextAgent === lead.assigned_agent_name) {
+      return;
+    }
+
+    setAgentSaving(true);
+    try {
+      const updated = await base44.entities.Leads.update(lead.id, {
+        assigned_agent_name: nextAgent,
+      });
+      setLead((prev) => ({ ...prev, ...updated, assigned_agent_name: nextAgent }));
+    } catch (err) {
+      console.error("Error updating assigned agent:", err);
+    } finally {
+      setAgentSaving(false);
+    }
   };
 
   const formatDate = (date) => {
@@ -166,6 +196,23 @@ export default function AdminLeadDetail() {
               </p>
               <p className="text-sm text-foreground">{formatSource(lead.source)}</p>
             </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase font-semibold">
+                Assigned Agent
+              </p>
+              <select
+                value={lead.assigned_agent_name || "sales_rep_general"}
+                onChange={(event) => handleAgentChange(event.target.value)}
+                disabled={agentSaving}
+                className="mt-1 w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60"
+              >
+                {AGENT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
           </div>
         </div>
@@ -231,6 +278,8 @@ export default function AdminLeadDetail() {
 
       {/* AI Lead Qualification Panel */}
       <AILeadInsightPanel lead={lead} onLeadUpdated={loadLead} />
+
+      <TriggerVoiceCallButton lead={lead} />
 
       {/* Timeline with AI Classification */}
       <LeadTimeline leadId={leadId} lead={lead} />
