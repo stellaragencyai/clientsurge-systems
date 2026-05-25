@@ -189,7 +189,7 @@ export default function HomepageConversionContent() {
                 strength={0.1}
                 innerClassName="text-sm"
               >
-                Book Your Free Automation Audit
+                Get Your Free Audit
               </CinematicButton>
               <Link
                 to="/automations"

@@ -48,7 +48,6 @@ function fmtDate(iso) {
 
 export default function RevenueDashboard() {
   const [subs, setSubs] = useState([]);
-  const [orders, setOrders] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -60,13 +59,11 @@ export default function RevenueDashboard() {
     setLoading(true);
     setError("");
     try {
-      const [subsData, ordersData, invData] = await Promise.all([
+      const [subsData, invData] = await Promise.all([
         base44.entities.Subscription.list("-created_date", 200),
-        base44.entities.Order.list("-created_date", 200),
         base44.entities.Invoice.list("-created_date", 300),
       ]);
       setSubs(subsData || []);
-      setOrders(ordersData || []);
       setInvoices(invData || []);
     } catch (err) {
       setError(err?.message || "Failed to load revenue data.");
@@ -110,6 +107,8 @@ export default function RevenueDashboard() {
   );
 
   const failedSubs = subs.filter(s => s.status === "past_due" || s.status === "unpaid");
+  const averageRevenuePerClient = activeSubs.length ? Math.round(totalCollected / activeSubs.length) : 0;
+  const churnRate = subs.length ? Math.round((failedSubs.length / subs.length) * 100) : 0;
 
   // Upcoming renewals in next 30 days
   const now = Date.now();
@@ -161,9 +160,9 @@ export default function RevenueDashboard() {
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Active Subscriptions" value={activeSubs.length} icon={CreditCard} color="blue" />
-        <StatCard label="Failed / Past Due" value={failedSubs.length} sub="Churn risk" icon={AlertCircle} color={failedSubs.length > 0 ? "red" : "green"} />
+        <StatCard label="Churn Rate" value={`${churnRate}%`} sub={`${failedSubs.length} failed / past due`} icon={AlertCircle} color={failedSubs.length > 0 ? "red" : "green"} />
         <StatCard label="Upcoming Renewals" value={upcomingRenewals.length} sub="Next 30 days" icon={Calendar} color="purple" />
-        <StatCard label="Total Orders" value={orders.length} icon={DollarSign} color="blue" />
+        <StatCard label="LTV / Client" value={fmt(averageRevenuePerClient)} sub={`${activeSubs.length} active subscriptions`} icon={DollarSign} color="blue" />
       </div>
 
       {/* Revenue chart */}

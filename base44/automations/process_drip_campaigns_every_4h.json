@@ -1,0 +1,15 @@
+{
+  "id": "process_drip_campaigns_every_4h",
+  "name": "Drip campaigns every 4 hours",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 */4 * * *",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run processDripCampaigns every four hours so overdue drip steps send automatically throughout the day.",
+  "function": "processDripCampaigns",
+  "task_refs": ["#395"],
+  "priority": "HIGH",
+  "active": true
+}

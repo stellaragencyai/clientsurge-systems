@@ -403,7 +403,7 @@ export default function Automations() {
               to="/book"
               className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-base font-bold text-slate-900 bg-white hover:bg-blue-50 transition-colors shadow-lg"
             >
-              Book Your Free Automation Audit <ArrowRight className="w-5 h-5" />
+              Get Your Free Audit <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               to="/book"

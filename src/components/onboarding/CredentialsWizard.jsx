@@ -105,6 +105,17 @@ function ChipSelect({ options, value, onChange }) {
   );
 }
 
+function isValidGoogleBusinessUrl(value) {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    const hostname = url.hostname.replace(/^www\./, "").toLowerCase();
+    return hostname === "g.page" || hostname.endsWith("google.com");
+  } catch {
+    return false;
+  }
+}
+
 // ── Step: Business Info ──────────────────────────────────────────────────────
 function BusinessStep({ data, onChange }) {
   return (
@@ -499,6 +510,13 @@ export default function CredentialsWizard({ order, onComplete }) {
       if (!data.business_name.trim()) return "Business name is required.";
       if (!data.business_phone.trim()) return "Business phone is required.";
     }
+    if (
+      step.id === "brand" &&
+      data.google_business_url.trim() &&
+      !isValidGoogleBusinessUrl(data.google_business_url.trim())
+    ) {
+      return "Google Business Profile URL must use a google.com or g.page link.";
+    }
     if (step.id === "messaging") {
       if (!data.booking_link.trim()) return "Booking link is required.";
       if (!data.lead_notification_email.trim()) return "Lead notification email is required.";
@@ -572,7 +590,7 @@ export default function CredentialsWizard({ order, onComplete }) {
       // #408d — Advance workflow_stage to "Ready for Install" via saveClientCredentials response
       // saveClientCredentials already handles this internally — confirmed in backend function
       onComplete?.();
-    } catch (err) {
+    } catch {
       setError("Failed to save your information. Please try again.");
     } finally {
       setSaving(false);

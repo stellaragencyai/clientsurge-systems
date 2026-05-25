@@ -33,6 +33,7 @@ const navColumns = [
       { label: "HVAC & Home Services", href: "/hvac" },
       { label: "Roofing & Restoration", href: "/roofing" },
       { label: "Contractors & Trades", href: "/contractors" },
+      { label: "Tanning Salons", href: "/tanning" },
     ],
   },
   {

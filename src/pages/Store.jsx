@@ -12,6 +12,7 @@ import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { setPageMetadata } from "@/lib/seo";
 import Footer from "@/components/landing/Footer";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 // Lazy load heavy store components
 const InteractiveStackBuilder = lazy(() =>
@@ -118,6 +119,13 @@ function StoreInner() {
       const rightRecommended = recommendedKeys.has(right.service_key);
 
       if (leftRecommended === rightRecommended) {
+        if (pathMode === "explore") {
+          const leftPopular = Boolean(left.popular);
+          const rightPopular = Boolean(right.popular);
+          if (leftPopular !== rightPopular) {
+            return leftPopular ? -1 : 1;
+          }
+        }
         return 0;
       }
 
@@ -137,17 +145,6 @@ function StoreInner() {
 
     return results;
   }, [activeCategory, search, selectedIndustry, pathMode]);
-
-  const recommendedPreview = useMemo(
-    () => selectedIndustry?.recommendedServices?.slice(0, 4) || [],
-    [selectedIndustry]
-  );
-
-  const recommendedOverflow = Math.max(
-    (selectedIndustry?.recommendedServices?.length || 0) -
-    recommendedPreview.length,
-    0
-  );
 
   const resultLabel = `${filtered.length} service${
   filtered.length === 1 ? "" : "s"}`;
@@ -726,7 +723,9 @@ function StoreInner() {
            </Suspense>
            {showComparison &&
           <Suspense fallback={<StoreSuspenseFallback minHeight={360} />}>
-               <ServiceComparisonModal onClose={() => setShowComparison(false)} />
+               <ErrorBoundary>
+                 <ServiceComparisonModal onClose={() => setShowComparison(false)} />
+               </ErrorBoundary>
              </Suspense>
           }
         </div>

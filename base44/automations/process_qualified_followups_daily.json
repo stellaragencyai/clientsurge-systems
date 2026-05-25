@@ -1,0 +1,15 @@
+{
+  "id": "process_qualified_followups_daily",
+  "name": "Qualified follow-ups daily runner",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 10 * * *",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run processQualifiedFollowUps daily to send due qualified-lead nudges, rep alerts, and follow-up emails without relying on manual execution.",
+  "function": "processQualifiedFollowUps",
+  "task_refs": ["#394"],
+  "priority": "HIGH",
+  "active": true
+}

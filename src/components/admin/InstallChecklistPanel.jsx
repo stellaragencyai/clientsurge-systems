@@ -11,8 +11,36 @@ const SERVICE_LABELS = {
   review_request: "Review Request Automation",
 };
 
+function ProgressRing({ complete, total }) {
+  const safeTotal = Math.max(total, 1);
+  const radius = 18;
+  const circumference = 2 * Math.PI * radius;
+  const progress = Math.min(Math.max(complete / safeTotal, 0), 1);
+  const offset = circumference * (1 - progress);
+
+  return (
+    <svg width="44" height="44" viewBox="0 0 44 44" className="flex-shrink-0">
+      <circle cx="22" cy="22" r={radius} fill="none" stroke="rgba(148, 163, 184, 0.22)" strokeWidth="4" />
+      <circle
+        cx="22"
+        cy="22"
+        r={radius}
+        fill="none"
+        stroke="#22c55e"
+        strokeWidth="4"
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        transform="rotate(-90 22 22)"
+      />
+      <text x="22" y="25" textAnchor="middle" className="fill-foreground text-[10px] font-bold">
+        {complete}/{total}
+      </text>
+    </svg>
+  );
+}
+
 export default function InstallChecklistPanel({ orderId }) {
-  const [checklist, setChecklist] = useState(null);
   const [steps, setSteps] = useState({});
   const [loading, setLoading] = useState(true);
   const [expandedServices, setExpandedServices] = useState({});
@@ -39,7 +67,6 @@ export default function InstallChecklistPanel({ orderId }) {
         });
 
         if (checklists?.[0]) {
-          setChecklist(checklists[0]);
           const stepRecords = await base44.asServiceRole.entities.AutomationChecklistStep.filter({
             automation_checklist_id: checklists[0].id,
           });
@@ -123,11 +150,14 @@ export default function InstallChecklistPanel({ orderId }) {
                 }
                 className="w-full flex items-center justify-between gap-3 p-4 hover:bg-muted/50 transition-colors text-left"
               >
-                <div className="flex-1">
-                  <p className="font-semibold text-foreground">{SERVICE_LABELS[serviceKey]}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {completedCount}/{totalCount} steps complete
-                  </p>
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <ProgressRing complete={completedCount} total={totalCount} />
+                  <div className="min-w-0">
+                    <p className="font-semibold text-foreground">{SERVICE_LABELS[serviceKey]}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {completedCount}/{totalCount} steps complete
+                    </p>
+                  </div>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-32 h-2 rounded-full bg-muted overflow-hidden">

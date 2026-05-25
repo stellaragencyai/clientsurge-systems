@@ -44,6 +44,7 @@ import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 import SniperDashboard from '../components/admin/SniperDashboard';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
+import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
 
 const NAV_GROUPS = [
   {
@@ -236,6 +237,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background flex">
+      <StripeTestModeBanner />
       {/* Sidebar */}
       <div
         className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-background border-r border-border transition-transform duration-300 lg:translate-x-0 ${

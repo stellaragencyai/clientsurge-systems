@@ -101,7 +101,7 @@ export default function FinalCTA() {
               }}
               innerClassName="h-14 px-10 text-base"
             >
-              Book Your Free Automation Audit
+              Get Your Free Audit
               <ArrowRight className="w-5 h-5" />
             </CinematicButton>
             <a
