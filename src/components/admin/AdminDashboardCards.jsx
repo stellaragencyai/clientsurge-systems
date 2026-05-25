@@ -7,10 +7,13 @@ import { useState, useEffect } from "react";
 // #269: LTV Card
 export function LTVCard({ orders = [] }) {
   const totalLTV = orders.reduce((sum, o) => {
-    const months = o.start_date
-      ? Math.max(1, Math.round((Date.now() - new Date(o.start_date).getTime()) / (30 * 24 * 3600000)))
+    const startedAt = o.went_live_at || o.current_period_start || o.paid_at || o.created_date;
+    const months = startedAt
+      ? Math.max(1, Math.round((Date.now() - new Date(startedAt).getTime()) / (30 * 24 * 3600000)))
       : 1;
-    return sum + ((o.monthly_rate || 0) * months);
+    const monthly = o.total_monthly ?? o.pricing_summary?.total_monthly ?? 0;
+    const setup = o.total_setup ?? o.pricing_summary?.total_setup ?? 0;
+    return sum + setup + (monthly * months);
   }, 0);
   const avgLTV = orders.length > 0 ? Math.round(totalLTV / orders.length) : 0;
 
@@ -28,11 +31,9 @@ export function ChurnRiskPanel({ orders = [] }) {
   const [risks, setRisks] = useState([]);
 
   useEffect(() => {
-    // Flag orders that are past_due or haven't had activity in >30 days
-    const flagged = orders.filter(o =>
-      o.billing_status === "past_due" ||
-      (o.updated_date && (Date.now() - new Date(o.updated_date).getTime()) > 30 * 24 * 3600000 && o.payment_status === "active")
-    );
+    const flagged = orders
+      .filter((o) => Number(o.churn_risk_score || 0) > 70)
+      .sort((a, b) => Number(b.churn_risk_score || 0) - Number(a.churn_risk_score || 0));
     setRisks(flagged);
   }, [orders]);
 
@@ -49,8 +50,8 @@ export function ChurnRiskPanel({ orders = [] }) {
       </p>
       {risks.map(o => (
         <div key={o.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-          <span style={{ color: "#D1D5DB", fontSize: 13 }}>{o.business_name}</span>
-          <span style={{ color: "#EF4444", fontSize: 12 }}>{o.billing_status === "past_due" ? "Past Due" : "No activity 30d+"}</span>
+          <span style={{ color: "#D1D5DB", fontSize: 13 }}>{o.business_name || o.customer_name || "Unknown client"}</span>
+          <span style={{ color: "#EF4444", fontSize: 12 }}>Score {o.churn_risk_score}</span>
         </div>
       ))}
     </div>

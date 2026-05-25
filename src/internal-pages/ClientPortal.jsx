@@ -20,10 +20,13 @@ import WeeklyReports from "../components/portal/WeeklyReports";
 import AutomationsOverview from "../components/portal/AutomationsOverview";
 import RevenueMetricsPanel from "../components/portal/RevenueMetricsPanel";
 import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
+import AutomationChecklist from "../components/portal/AutomationChecklist";
+import PortalWhatsNew from "../components/portal/PortalWhatsNew";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalTimeline from "../components/portal/PortalTimeline";
 import SystemStatusBadge from "../components/portal/SystemStatusBadge";
+import OrderTracker from "../components/landing/OrderTracker";
 
 const TABS = [
   { id: "progress", label: "🚀 Setup Progress" },
@@ -32,6 +35,7 @@ const TABS = [
   { id: "performance", label: "🎯 Performance" },
   { id: "metrics", label: "Lead Flow" },
   { id: "tasks", label: "Tasks" },
+  { id: "checklist", label: "Checklist" },
   { id: "leads", label: "My Leads" },
   { id: "deadlines", label: "Deadlines" },
   { id: "files", label: "Files & Docs" },
@@ -40,6 +44,7 @@ const TABS = [
   { id: "support", label: "Support & Messaging" },
   { id: "plan", label: "My Plan" },
   { id: "reports", label: "Weekly Report" },
+  { id: "updates", label: "What's New" },
   { id: "settings", label: "Settings" },
 ];
 
@@ -299,11 +304,17 @@ export default function ClientPortal() {
         {activeTab === "tasks" && (
           <TasksDashboard project={project} />
         )}
+        {activeTab === "checklist" && (
+          <AutomationChecklist order_id={portalOrder?.id} />
+        )}
         {activeTab === "leads" && (
           <LeadActivityFeed project={project} />
         )}
         {activeTab === "progress" && (
-          <SetupProgressHub project={project} order={portalOrder} user={user} />
+          <div className="space-y-6">
+            <SetupProgressHub project={project} order={portalOrder} user={user} />
+            <OrderTracker />
+          </div>
         )}
         {activeTab === "timeline" && (
           <PortalTimeline order={portalOrder} project={project} />
@@ -331,6 +342,9 @@ export default function ClientPortal() {
         )}
         {activeTab === "reports" && (
           <WeeklyReports project={project} />
+        )}
+        {activeTab === "updates" && (
+          <PortalWhatsNew />
         )}
         {activeTab === "settings" && (
           <PortalSettings project={project} user={user} onUpdated={refreshProject} />

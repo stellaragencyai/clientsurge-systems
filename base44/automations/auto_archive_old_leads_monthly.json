@@ -1,0 +1,15 @@
+{
+  "id": "auto_archive_old_leads_monthly",
+  "name": "Auto archive old leads monthly",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 8 1 * *",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run autoArchiveOldLeads on the first day of each month at 8:00 AM Phoenix time to anonymize WebsiteLead records older than 365 days.",
+  "function": "autoArchiveOldLeads",
+  "task_refs": ["#91", "#122"],
+  "priority": "MEDIUM",
+  "active": true
+}

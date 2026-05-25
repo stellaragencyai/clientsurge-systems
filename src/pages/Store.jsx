@@ -14,6 +14,16 @@ import { setPageMetadata } from "@/lib/seo";
 import Footer from "@/components/landing/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
+const INDUSTRY_LINKS = [
+  { label: "Med Spa", href: "/med-spa" },
+  { label: "Dental", href: "/dental" },
+  { label: "Chiropractic", href: "/chiropractic" },
+  { label: "HVAC", href: "/hvac" },
+  { label: "Roofing", href: "/roofing" },
+  { label: "Contractors", href: "/contractors" },
+  { label: "Tanning", href: "/tanning" },
+];
+
 // Lazy load heavy store components
 const InteractiveStackBuilder = lazy(() =>
 import("@/components/store/InteractiveStackBuilder")
@@ -139,6 +149,8 @@ function StoreInner() {
           selectedIndustry?.recommendedServices?.map((s) => s.name) || []
         );
         results = results.filter((p) => recommendedNames.has(p.name)).slice(0, 6);
+      } else {
+        results = results.filter((product) => !product.coming_soon);
       }
       // No industry selected in guided mode — show all 12 products (live + coming soon)
     }
@@ -315,6 +327,9 @@ function StoreInner() {
               width: 100%;
               justify-content: space-between;
             }
+            .store-page .store-industry-links {
+              gap: 8px;
+            }
           }
         `}</style>
         <div className="store-page">
@@ -451,6 +466,39 @@ function StoreInner() {
                 </motion.div>
               )}
             </div>
+            <div
+              className="store-industry-links"
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: "10px",
+                marginTop: "12px",
+              }}
+            >
+              {INDUSTRY_LINKS.map((industry) => (
+                <a
+                  key={industry.href}
+                  href={industry.href}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "8px 14px",
+                    borderRadius: "999px",
+                    fontSize: "12px",
+                    fontWeight: "700",
+                    color: "#003B8F",
+                    background: "rgba(255,255,255,0.8)",
+                    border: "1px solid rgba(0,136,204,0.16)",
+                    textDecoration: "none",
+                    boxShadow: "0 4px 12px rgba(0,59,143,0.06)"
+                  }}
+                >
+                  {industry.label} Systems
+                </a>
+              ))}
+            </div>
           </div>
 
           {items.length > 0 ?
@@ -532,7 +580,7 @@ function StoreInner() {
             style={{
               maxWidth: "1300px",
               margin: "0 auto",
-              padding: "0 24px 24px"
+              padding: items.length > 0 ? "72px 24px 24px" : "0 24px 24px"
             }}>
             
 

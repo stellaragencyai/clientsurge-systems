@@ -72,12 +72,16 @@ Deno.serve(async (req) => {
       'ADMIN_EMAIL env';
     console.log(`[sendDailyDigest] Resolved notification email from: ${emailSource}`);
 
-    const allLeads = await base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_LIMIT);
+    const [allLeads, allOrders] = await Promise.all([
+      base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_LIMIT),
+      base44.asServiceRole.entities.Order.list('-created_date', 1000).catch(() => []),
+    ]);
     const now = Date.now();
     const dayMs = 86400000;
     const startOfToday = getPhoenixDayStart();
 
     const newToday = allLeads.filter(l => new Date(l.created_date).getTime() >= startOfToday.getTime()).length;
+    const ordersToday = allOrders.filter(order => new Date(order.created_date).getTime() >= startOfToday.getTime()).length;
     const hotLeads = allLeads.filter(l => l.activation_priority === 'Hot' && l.status !== 'Booked' && l.status !== 'Closed');
     const overdueFollowUp = allLeads.filter(l => {
       const isActive = !['Booked', 'Closed'].includes(l.status);
@@ -89,6 +93,16 @@ Deno.serve(async (req) => {
       return isActive && noContact;
     });
     const replied = allLeads.filter(l => l.status === 'Replied');
+
+    if (newToday === 0 && ordersToday === 0) {
+      console.log('[sendDailyDigest] Skipping send because leads_today and orders_today are both 0');
+      return Response.json({
+        success: true,
+        skipped: true,
+        reason: 'No new leads or orders today.',
+        stats: { newToday, ordersToday },
+      });
+    }
 
     const hotRows = hotLeads.slice(0, 5).map(l =>
       `<tr><td style="padding:6px 12px;">${l.full_name}</td><td style="padding:6px 12px;">${l.business_name}</td><td style="padding:6px 12px;">${l.status}</td><td style="padding:6px 12px;">${l.lead_score ?? 0}</td></tr>`
@@ -153,7 +167,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           from: fromEmail,
           to: notificationEmail,
-          subject: `Daily Lead Digest — ${newToday} new, ${hotLeads.length} hot, ${overdueFollowUp.length} overdue`,
+          subject: `Daily Lead Digest — ${newToday} new, ${ordersToday} orders, ${hotLeads.length} hot`,
           html: body,
         }),
       });
@@ -167,7 +181,7 @@ Deno.serve(async (req) => {
       throw emailError;
     }
 
-    return Response.json({ success: true, stats: { newToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length } });
+    return Response.json({ success: true, stats: { newToday, ordersToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length } });
   } catch (error) {
     console.error('sendDailyDigest error:', error);
     return Response.json({ error: error.message }, { status: 500 });

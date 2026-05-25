@@ -14,6 +14,7 @@ export default function AdminOnboarding() {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
   const loadClients = async () => {
     const data = await base44.entities.OnboardingClient.list("-created_date", 100);
@@ -41,13 +42,22 @@ export default function AdminOnboarding() {
   const inSetupCount = clients.filter(c => c.status === "In Setup").length;
   const onboardingCount = clients.filter(c => c.status === "Onboarding" || !c.status).length;
 
-  const filtered = filter === "all" ? clients
-    : clients.filter(c => {
-        if (filter === "live") return c.status === "Live";
-        if (filter === "setup") return c.status === "In Setup";
-        if (filter === "onboarding") return c.status === "Onboarding" || !c.status;
-        return true;
-      });
+  const filtered = clients.filter((client) => {
+    const statusMatch = filter === "all"
+      ? true
+      : filter === "live"
+        ? client.status === "Live"
+        : filter === "setup"
+          ? client.status === "In Setup"
+          : client.status === "Onboarding" || !client.status;
+
+    const query = search.trim().toLowerCase();
+    const searchMatch = !query || [client.business_name, client.email, client.owner_name]
+      .filter(Boolean)
+      .some((value) => String(value).toLowerCase().includes(query));
+
+    return statusMatch && searchMatch;
+  });
 
   if (loading) {
     return (
@@ -104,6 +114,15 @@ export default function AdminOnboarding() {
               {f.label}
             </button>
           ))}
+        </div>
+        <div className="max-w-md">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search business name or email..."
+            className="h-10 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          />
         </div>
 
         {/* Client Cards */}

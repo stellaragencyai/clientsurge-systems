@@ -58,6 +58,25 @@
       "type": "string",
       "title": "Admin Notification Email"
     },
+    "max_active_onboarding": {
+      "type": "integer",
+      "title": "Max Active Onboarding",
+      "default": 0
+    },
+    "blocked_dates": {
+      "type": "array",
+      "title": "Blocked Booking Dates",
+      "items": {
+        "type": "string"
+      }
+    },
+    "allowed_admin_ips": {
+      "type": "array",
+      "title": "Allowed Admin IPs",
+      "items": {
+        "type": "string"
+      }
+    },
     "booking_link_default": {
       "type": "string",
       "title": "Default Booking Link"

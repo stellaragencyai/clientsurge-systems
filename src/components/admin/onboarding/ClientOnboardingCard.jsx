@@ -17,7 +17,7 @@ import {
 import { base44 } from "@/api/base44Client";
 import AIGenerateModal from "./AIGenerateModal";
 import PackageActivationPanel from "./PackageActivationPanel";
-import { PipelineStatusBadge } from "../AdminOnboardingBadges";
+import { InitializeInstallButton, PipelineStatusBadge } from "../AdminOnboardingBadges";
 
 const STEPS = [
   {
@@ -292,11 +292,28 @@ export default function ClientOnboardingCard({ client, onUpdate }) {
 
           {/* Package Activation Panel — wired to live order */}
           {client.order_id && (
-            <PackageActivationPanel
-              client={client}
-              order={order}
-              onUpdate={onUpdate}
-            />
+            <div className="space-y-4">
+              {order && !order.install_configuration && (
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-4">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">
+                        Initialize Install OS
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        This paid order is linked, but its canonical install configuration has not been initialized yet.
+                      </p>
+                    </div>
+                    <InitializeInstallButton orderId={client.order_id} onSuccess={onUpdate} />
+                  </div>
+                </div>
+              )}
+              <PackageActivationPanel
+                client={client}
+                order={order}
+                onUpdate={onUpdate}
+              />
+            </div>
           )}
 
           <div>

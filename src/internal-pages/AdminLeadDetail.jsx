@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useAuth } from "@/lib/AuthContext";
+import { maskPhone } from "@/utils/adminPrivacy";
 import { AlertTriangle, ArrowLeft, Loader2, Mail, Zap } from "lucide-react";
 import AdminShell from "@/components/admin/AdminShell";
 import StatusControl from "../components/dashboard/StatusControl";
@@ -87,6 +88,7 @@ export default function AdminLeadDetail() {
 
   const formatIntakeType = (value) => intakeTypeLabels[value] || value || "Unknown";
   const formatSource = (value) => sourceLabels[value] || value || "Unknown";
+  const isSuperAdmin = user?.role === "super_admin";
 
   if (loading) {
     return (
@@ -144,7 +146,7 @@ export default function AdminLeadDetail() {
               <p className="text-xs text-muted-foreground uppercase font-semibold">
                 Phone
               </p>
-              <p className="text-sm text-foreground">{lead.phone}</p>
+              <p className="text-sm text-foreground">{maskPhone(lead.phone, isSuperAdmin)}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground uppercase font-semibold">

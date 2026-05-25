@@ -1,0 +1,15 @@
+{
+  "id": "predict_churn_risk_weekly_monday_7am",
+  "name": "Predict churn risk weekly Monday 7am",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 7 * * 1",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run predictChurnRisk every Monday at 7:00 AM Phoenix time so active orders are rescored weekly and Nolan receives Telegram alerts for risk scores above 70.",
+  "function": "predictChurnRisk",
+  "task_refs": ["#253"],
+  "priority": "MEDIUM",
+  "active": true
+}

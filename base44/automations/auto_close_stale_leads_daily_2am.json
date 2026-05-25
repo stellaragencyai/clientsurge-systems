@@ -1,0 +1,15 @@
+{
+  "id": "auto_close_stale_leads_daily_2am",
+  "name": "Auto close stale leads daily 2am",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 2 * * *",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run autoCloseStaleLeads every day at 2:00 AM Phoenix time to close leads with no contact activity for 30+ days.",
+  "function": "autoCloseStaleLeads",
+  "task_refs": ["#108", "#120"],
+  "priority": "MEDIUM",
+  "active": true
+}

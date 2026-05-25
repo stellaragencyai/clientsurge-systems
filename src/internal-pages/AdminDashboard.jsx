@@ -39,6 +39,9 @@ import ReviewRequestPanel from '../components/admin/ReviewRequestPanel';
 import LeadReactivationPanel from '../components/admin/LeadReactivationPanel';
 import TaskBoardPanel from '../components/admin/TaskBoardPanel';
 import AutomationAlertsPanel from '../components/admin/AutomationAlertsPanel';
+import AdminFailedJobsPanel from '../components/admin/AdminFailedJobsPanel';
+import AuditLogPanel from '../components/admin/AuditLogPanel';
+import { ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 import SniperDashboard from '../components/admin/SniperDashboard';
@@ -72,6 +75,7 @@ const NAV_GROUPS = [
       { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
       { id: 'reactivation', label: 'Lead Reactivation', icon: RotateCcw },
       { id: 'routing', label: 'Lead Routing', icon: Target },
+      { id: 'failed-jobs', label: 'Failed Jobs', icon: Loader2 },
     ],
   },
   {
@@ -94,6 +98,7 @@ const NAV_GROUPS = [
       { id: 'task-board', label: 'Task Board', icon: ClipboardList },
       { id: 'health', label: 'Integration Health', icon: Activity },
       { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
+      { id: 'audit-log', label: 'Audit Log', icon: Activity },
       { id: 'templates', label: 'Templates', icon: MessageSquare },
       { id: 'review-request', label: 'Review Requests', icon: Star },
       { id: 'settings', label: 'Settings', icon: Settings },
@@ -214,6 +219,8 @@ export default function AdminDashboard() {
       case 'website-leads': return <WebsiteLeadsDashboard />;
       case 'demo-bookings': return <AdminDemoBookingsTab />;
       case 'logs': return <CommunicationLogsPanel />;
+      case 'failed-jobs': return <AdminFailedJobsPanel />;
+      case 'audit-log': return <AuditLogPanel />;
       case 'cadence': return <DynamicCadencePanel />;
       case 'reactivation': return <LeadReactivationPanel />;
       case 'review-request': return <ReviewRequestPanel />;
@@ -379,6 +386,8 @@ function OverviewDashboard({ onNavigate }) {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [orders, setOrders] = useState([]);
+  const [onboardings, setOnboardings] = useState([]);
 
   useEffect(() => {
     fetchOverviewData();
@@ -386,8 +395,14 @@ function OverviewDashboard({ onNavigate }) {
 
   const fetchOverviewData = async () => {
     try {
-      const response = await fetchLeadPipelineSummary({ limit: 10, offset: 0 });
+      const [response, orderRecords, onboardingRecords] = await Promise.all([
+        fetchLeadPipelineSummary({ limit: 10, offset: 0 }),
+        base44.asServiceRole.entities.Order.filter({ payment_status: "paid" }, "-created_date", 200).catch(() => []),
+        base44.entities.OnboardingClient.list("-created_date", 100).catch(() => []),
+      ]);
       setSnapshot(response);
+      setOrders(orderRecords || []);
+      setOnboardings(onboardingRecords || []);
       setError("");
     } catch (err) {
       setError(getLeadPipelineError(err, "Unable to load lead overview right now."));
@@ -498,6 +513,18 @@ function OverviewDashboard({ onNavigate }) {
               </button>
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div className="rounded-xl border border-border bg-[#081120] p-5">
+          <LTVCard orders={orders} />
+        </div>
+        <div className="rounded-xl border border-border bg-[#081120] p-5">
+          <ChurnRiskPanel orders={orders} />
+        </div>
+        <div className="rounded-xl border border-border bg-[#081120] p-5">
+          <InstallStatusTable onboardings={onboardings.slice(0, 20)} />
         </div>
       </div>
 

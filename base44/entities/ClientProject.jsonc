@@ -148,6 +148,15 @@
       "type": "string",
       "title": "Go-Live Date"
     },
+    "nps_score": {
+      "type": "integer",
+      "title": "NPS Score"
+    },
+    "nps_responded_at": {
+      "type": "string",
+      "title": "NPS Responded At",
+      "format": "date-time"
+    },
     "deadlines": {
       "type": "array",
       "items": {

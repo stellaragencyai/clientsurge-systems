@@ -1,0 +1,17 @@
+{
+  "name": "ClientSurge Systems",
+  "short_name": "ClientSurge",
+  "description": "AI automation systems for local service businesses.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A1628",
+  "theme_color": "#0A1628",
+  "icons": [
+    {
+      "src": "/og-image.png",
+      "sizes": "1200x630",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

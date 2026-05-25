@@ -54,6 +54,18 @@ export default function AdminSettings() {
     }));
   };
 
+  const listValue = (value) =>
+    Array.isArray(value) ? value.join("\n") : value || "";
+
+  const handleListSettingChange = (field, value) => {
+    const parsed = value
+      .split(/\r?\n|,/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    handleSettingChange(field, parsed);
+  };
+
   const handleSaveSettings = async () => {
     setSaving(true);
     try {
@@ -128,6 +140,7 @@ export default function AdminSettings() {
             { id: "twilio", label: "Twilio SMS", icon: Zap },
             { id: "email", label: "Email", icon: Mail },
             { id: "webhooks", label: "Webhooks", icon: Link2 },
+            { id: "security", label: "Security", icon: Settings },
             { id: "templates", label: "Templates", icon: Settings },
           ].map((tab) => (
             <button
@@ -366,6 +379,59 @@ export default function AdminSettings() {
                     </p>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === "security" && (
+            <div className="space-y-6">
+              <SettingInput
+                label="Max Active Onboarding Clients"
+                type="number"
+                value={settings.max_active_onboarding ?? ""}
+                onChange={(e) =>
+                  handleSettingChange(
+                    "max_active_onboarding",
+                    e.target.value === "" ? null : Number(e.target.value)
+                  )
+                }
+                placeholder="25"
+              />
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Blocked Booking Dates
+                </label>
+                <textarea
+                  value={listValue(settings.blocked_dates)}
+                  onChange={(e) =>
+                    handleListSettingChange("blocked_dates", e.target.value)
+                  }
+                  placeholder={"2026-12-25\n2026-01-01"}
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Enter one `YYYY-MM-DD` date per line to block demo-booking availability.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Admin IP Allowlist
+                </label>
+                <textarea
+                  value={listValue(settings.allowed_admin_ips)}
+                  onChange={(e) =>
+                    handleListSettingChange("allowed_admin_ips", e.target.value)
+                  }
+                  placeholder={"203.0.113.10\n198.51.100.0/24"}
+                  rows={5}
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  One IP or CIDR block per line. Leave blank to disable IP restrictions for admins.
+                </p>
               </div>
             </div>
           )}

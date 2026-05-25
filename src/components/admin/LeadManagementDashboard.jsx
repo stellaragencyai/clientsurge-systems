@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/AuthContext";
 import {
   AlertCircle,
   ArrowRight,
@@ -27,6 +28,7 @@ import {
 } from "@/lib/leadPipelineApi";
 import { buildAdminConversionFunnel } from "@/lib/adminConversionFunnel";
 import { buildLeadsCsv, downloadCsvFile } from "@/lib/leadCsvExport";
+import { maskPhone } from "@/utils/adminPrivacy";
 import LeadCRMDrawer from "./LeadCRMDrawer";
 import LeadScoreBadge from "./LeadScoreBadge";
 import BulkActionToolbar from "./BulkActionToolbar";
@@ -200,6 +202,7 @@ function ConversionFunnelChart({ summary }) {
 }
 
 export default function LeadManagementDashboard() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [snapshot, setSnapshot] = useState({
     generated_at: null,
@@ -258,6 +261,7 @@ export default function LeadManagementDashboard() {
   const [importError, setImportError] = useState("");
   const [importSuccess, setImportSuccess] = useState("");
   const [sortConfig, setSortConfig] = useState({ field: "lead_score", direction: "desc" });
+  const isSuperAdmin = user?.role === "super_admin";
 
   const loadSnapshot = async ({ append = false, nextOffset = 0, activeFilters = filters } = {}) => {
     const setLoadingState = append ? setLoadingMore : setLoading;
@@ -1007,7 +1011,7 @@ export default function LeadManagementDashboard() {
                             </div>
                             <p className="mt-1 text-xs text-muted-foreground">{lead.business_name}</p>
                             <p className="mt-1 text-xs text-muted-foreground">
-                              {lead.email || "No email"} • {lead.phone || "No phone"}
+                              {lead.email || "No email"} • {maskPhone(lead.phone || "No phone", isSuperAdmin)}
                             </p>
                             <p className="mt-2 text-[11px] text-muted-foreground">
                               {lead.source || "unknown"} • {intakeTypeLabels[lead.intake_type] || lead.intake_type || "Legacy"}
