@@ -62,6 +62,19 @@ const NAV_GROUPS = [
       { id: "settings",         label: "Settings",          icon: Settings,        path: "/admin", tab: "settings" },
       { id: "qa",               label: "QA Tools",          icon: RefreshCw,       path: "/admin", tab: "qa" },
       { id: "install-guide",    label: "Install Guide",     icon: BookOpen,        path: "/admin/install-guide" },
+      { id: "audit-log",        label: "Audit Log",         icon: ClipboardList,   path: "/admin", tab: "audit-log" },
+    ],
+  },
+  {
+    group: "Tools",
+    items: [
+      { id: "demo-bookings",    label: "Demo Bookings",     icon: MessageSquare,   path: "/admin", tab: "demo-bookings" },
+      { id: "failed-jobs",      label: "Failed Jobs",       icon: Activity,        path: "/admin", tab: "failed-jobs" },
+      { id: "sniper",           label: "Lead Sniper",       icon: Target,          path: "/admin", tab: "sniper" },
+      { id: "social-engine",    label: "Social Engine",     icon: Send,            path: "/admin", tab: "social-engine" },
+      { id: "website-copy",     label: "Website Copy",      icon: BookOpen,        path: "/admin", tab: "website-copy" },
+      { id: "ai-sales",         label: "AI Sales Reps",     icon: Flame,           path: "/admin/ai-sales" },
+      { id: "performance-wars", label: "Performance Wars",  icon: BarChart3,       path: "/admin/performance-wars" },
     ],
   },
 ];
@@ -107,9 +120,11 @@ export default function AdminShell({ children, title, activeId }) {
   };
 
   const isActive = (item) => {
+    // Exact path match for non-/admin standalone pages
     if (item.path !== "/admin" && !item.tab) {
       return location.pathname === item.path;
     }
+    // Tab-based items and /admin root: match by activeId prop
     return activeId === item.id;
   };
 
@@ -194,7 +209,7 @@ export default function AdminShell({ children, title, activeId }) {
             className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors text-sm disabled:opacity-60"
           >
             {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
-            {loggingOut ? "Signing out…" : "Logout"}
+            {loggingOut ? "Signing out..." : "Logout"}
           </button>
         </div>
       </div>

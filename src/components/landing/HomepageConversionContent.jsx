@@ -47,7 +47,6 @@ const services = [
 const industries = [
   "roofing",
   "HVAC",
-  "plumbing",
   "dental",
   "med spa",
   "chiropractic",

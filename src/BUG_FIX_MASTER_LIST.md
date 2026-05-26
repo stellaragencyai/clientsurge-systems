@@ -247,4 +247,36 @@
 
 ---
 
-## STATUS: All 200 issues documented. Fixes applied in BATCH_1_FIXES below.
+## FIX STATUS SUMMARY (updated 2026-05-26)
+
+### ✅ COMPLETE (22 issues fixed)
+- #7 scheduleDemoBooking dead `if (false...)` code removed
+- #8 scheduleDemoBooking double `optimisticLockSlot` call removed
+- #12 AdminDashboard SessionTimeoutModal `handleLogout` scope fix
+- #19 SectionRedirect canonical path fix
+- #22 AdminQuickActions switched to `base44.functions.invoke`
+- #25 seo.js twitter:card `property` → `name` attribute
+- #26 seo.js twitter:url `property` → `name` attribute
+- #28 index.css duplicate focus ring rules removed
+- #29 index.css duplicate `.sticky` rule removed (second occurrence)
+- #30 HomepageConversionContent "plumbing" industry tag removed (no route exists)
+- #35 Pricing card duplicate badge text fixed
+- #36 Pricing card duplicate isRecommended text fixed
+- #42 AdminOnboarding redundant role guard removed
+- #43 AdminDashboard redundant role guard removed
+- #44 AdminDashboard hardcoded `bg-[#081120]` dark card color fixed
+- #46 AdminShell logout text standardized to "Signing out..."
+- #47 AdminDashboard/AdminShell SupportMessage filter fixed (no `role` field)
+- #49 AdminOnboarding status filter fixed to use `activation_status`/`workflow_stage`
+- #51 AdminShell missing nav items added (demo-bookings, failed-jobs, sniper, social-engine, website-copy, ai-sales, performance-wars, audit-log)
+- #13 AdminShell isActive logic documented/clarified
+- #LeadScoreCell missing React import added (`useState` imported, `React.useState` fixed)
+- #smsCompliance `module.exports` → ES `export` syntax
+
+### ⚠️ SKIPPED / BLOCKED
+- #50 pages/Login `<a href="/contact">` → `<Link>` — login page is platform-protected, cannot be edited
+
+### ⏳ PENDING (178 remaining)
+- Batch 2 architectural issues (51–100): orphaned components, data duplication, multiple analytics systems
+- Batch 3 entity schema issues (101–150): duplicate entities, field mismatches
+- Batch 4 function duplication (151–200): consolidation of duplicate backend functions
