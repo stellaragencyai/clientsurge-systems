@@ -310,7 +310,7 @@ export default function AdminDashboard() {
             className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors text-sm disabled:opacity-60"
           >
             {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
-            {loggingOut ? 'Signing out…' : 'Logout'}
+            {loggingOut ? 'Signing out...' : 'Logout'}
           </button>
         </div>
       </div>
@@ -448,7 +448,7 @@ function OverviewDashboard({ onNavigate }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr,1fr]">
-        <div className="bg-white rounded-xl border border-border p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           <h3 className="text-lg font-semibold text-foreground mb-4">Priority Outreach Queue</h3>
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {loading ? (
@@ -484,7 +484,7 @@ function OverviewDashboard({ onNavigate }) {
         </div>
 
         {/* Offer Mix — clickable */}
-        <div className="bg-white rounded-xl border border-border p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           <h3 className="text-lg font-semibold text-foreground mb-4">Offer Mix</h3>
           <div className="space-y-3">
             {[
@@ -521,7 +521,7 @@ function OverviewDashboard({ onNavigate }) {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-border p-6">
+      <div className="bg-card rounded-xl border border-border p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-lg font-semibold text-foreground">Recent Paid Orders</h3>
@@ -546,7 +546,7 @@ function OverviewDashboard({ onNavigate }) {
       </div>
 
       {/* Recent Leads */}
-      <div className="bg-white rounded-xl border border-border p-6">
+      <div className="bg-card rounded-xl border border-border p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">Recent Lead Movement</h3>
           <button onClick={() => onNavigate('leads')} className="text-xs font-semibold text-primary hover:text-primary/80">View all →</button>
@@ -584,7 +584,7 @@ function OverviewDashboard({ onNavigate }) {
 
       {/* Activation Snapshot */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-xl border border-border p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           <h3 className="font-semibold text-foreground mb-3">Actionability Snapshot</h3>
           <div className="space-y-3 text-sm">
             {[
@@ -607,7 +607,7 @@ function OverviewDashboard({ onNavigate }) {
             ))}
           </div>
         </div>
-        <div className="bg-white rounded-xl border border-border p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           <h3 className="font-semibold text-foreground mb-3">Operator Guidance</h3>
           <div className="space-y-2 text-sm text-muted-foreground">
             <p>✓ Work the priority queue before broad list scanning.</p>

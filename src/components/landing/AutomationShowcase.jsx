@@ -6,7 +6,7 @@ import {
 "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const BRAND_COLOR = "#00D4FF";
+const BRAND_COLOR = "#00AEEF"; // #33: unified with site brand blue
 const BRAND_GRADIENT_FROM = "#003B8F";
 const BRAND_GRADIENT_TO = "#0066CC";
 

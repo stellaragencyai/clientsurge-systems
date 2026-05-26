@@ -841,11 +841,7 @@ select {
   font-size: max(16px, 1rem) !important;
 }
 
-/* 6. Fix `position: sticky` on iOS Safari */
-.sticky, [class*="sticky"] {
-  position: -webkit-sticky;
-  position: sticky;
-}
+/* 6. Fix `position: sticky` on iOS Safari — canonical rule is M11 above; this duplicate removed (#29) */
 
 /* 7. Better tap area for small icon buttons without changing visual size */
 .icon-btn-tap {

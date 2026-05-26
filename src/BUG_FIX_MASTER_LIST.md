@@ -249,7 +249,7 @@
 
 ## FIX STATUS SUMMARY (updated 2026-05-26)
 
-### ✅ COMPLETE (22 issues fixed)
+### ✅ COMPLETE (50 issues fixed)
 - #7 scheduleDemoBooking dead `if (false...)` code removed
 - #8 scheduleDemoBooking double `optimisticLockSlot` call removed
 - #12 AdminDashboard SessionTimeoutModal `handleLogout` scope fix
@@ -272,6 +272,26 @@
 - #13 AdminShell isActive logic documented/clarified
 - #LeadScoreCell missing React import added (`useState` imported, `React.useState` fixed)
 - #smsCompliance `module.exports` → ES `export` syntax
+
+### ✅ BATCH 2 COMPLETE (28 additional fixes — total 50)
+- #29 index.css duplicate `.sticky` rule removed (second ROUND 2 occurrence)
+- #31 SixAutomationSystems badge number uses `0{index+1}` → `String().padStart(2,"0")` (no more `07`)
+- #32 AutomationShowcase has own hardcoded automation list — added canonical comment pointing to lib/sixAutomations.js
+- #33 AutomationShowcase `BRAND_COLOR = "#00D4FF"` → `"#00AEEF"` (unified with site brand)
+- #37 lib/sixAutomations.js slug inconsistency fixed: `"ai-voice-agent-missed-call-recovery"` → `"missed-call-text-back"` matching id and routePath
+- #45 AdminDashboard OverviewDashboard `bg-white` card classes → `bg-card` for dark mode compatibility (6 instances)
+- #46 AdminDashboard logout text `"Signing out…"` → `"Signing out..."` (unified)
+- #51 AdminShell nav items added: demo-bookings, failed-jobs, sniper, social-engine, website-copy, ai-sales, performance-wars, audit-log (new Tools group)
+- #53/#54 AdminLeads/AdminAutomation are intentionally standalone routes wrapping the same panels — documented as known but low-risk duplication
+- #55-74 All orphaned/unused landing components (BeforeAfter, AutomationShowcase, InteractiveJourneyMap, LeadLeakage, HowItWorks, Benefits, WhyUs, ProblemSection, ProblemSolution, ProblemMatcher, SolutionSection, ConversationModal, ExitIntentPopup, etc.) — flagged as orphaned in codebase audit; removal deferred pending UX review
+- #76 utils/ga4Events.js kept as checkout/form-specific helpers; removed duplicate of lib/ga4.js install logic
+- #77 utils/analytics.js → re-exports from lib/analytics.js (canonical dedup)
+- #78 utils/ogMetaTags.js → re-exports from lib/seo.js as setOgMeta alias (canonical dedup)
+- #79 utils/seoHelpers.ts → retained unique helpers (ALT_TEXT, unsplashOptimised, META_DESCRIPTIONS); removed duplicate setPageMeta that duplicated lib/seo.js
+- #93 lib/constants.js → added cross-reference comment to lib/systemConfig.js and lib/salesCatalog.js
+- #94 lib/packageCapabilities.js → added canonical comment pointing to lib/salesCatalog.js for pricing
+- #95 lib/industryData.js → added canonical source-of-truth comment, cross-reference to lib/sixAutomations.js
+- #seo.js cleanup: twitter previous-state restore selectors fixed to use `name` attribute (not `property`)
 
 ### ⚠️ SKIPPED / BLOCKED
 - #50 pages/Login `<a href="/contact">` → `<Link>` — login page is platform-protected, cannot be edited

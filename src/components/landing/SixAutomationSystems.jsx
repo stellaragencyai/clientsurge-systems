@@ -76,7 +76,7 @@ export default function SixAutomationSystems() {
                     <MotionIconBadge className="h-11 w-11 rounded-lg">
                       <Icon className="h-5 w-5" style={{ color: "#0088CC" }} />
                     </MotionIconBadge>
-                    <span className="text-xs font-bold text-muted-foreground">0{index + 1}</span>
+                    <span className="text-xs font-bold text-muted-foreground">{String(index + 1).padStart(2, "0")}</span>
                   </div>
 
                   <h3 className="mb-3 text-xl font-bold leading-tight text-foreground">{automation.title}</h3>

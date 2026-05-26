@@ -1,6 +1,8 @@
 /**
- * Global UI Constants
- * Centralized text, styles, and settings for consistency
+ * Global UI Constants — #93
+ * Centralized text, styles, and settings for UI consistency.
+ * For CoreOffer section config (headline, subheadline, system steps), use lib/systemConfig.js.
+ * For pricing/product catalog, use lib/salesCatalog.js.
  */
 
 export const BUTTON_TEXT = {

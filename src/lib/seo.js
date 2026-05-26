@@ -105,11 +105,11 @@ export function setPageMetadata({
     ogUrl: document.head.querySelector('meta[property="og:url"]')?.getAttribute("content") || "",
     ogImage: document.head.querySelector('meta[property="og:image"]')?.getAttribute("content") || "",
     twitterTitle:
-      document.head.querySelector('meta[property="twitter:title"]')?.getAttribute("content") || "",
+      document.head.querySelector('meta[name="twitter:title"]')?.getAttribute("content") || "",
     twitterDescription:
-      document.head.querySelector('meta[property="twitter:description"]')?.getAttribute("content") || "",
+      document.head.querySelector('meta[name="twitter:description"]')?.getAttribute("content") || "",
     twitterImage:
-      document.head.querySelector('meta[property="twitter:image"]')?.getAttribute("content") || "",
+      document.head.querySelector('meta[name="twitter:image"]')?.getAttribute("content") || "",
   };
 
   const canonicalUrl = `https://clientsurgesystems.com${canonicalPath}`;

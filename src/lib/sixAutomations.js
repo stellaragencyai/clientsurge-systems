@@ -1,7 +1,9 @@
+// Canonical automation definitions — single source of truth.
+// id = stable internal key, slug = URL segment used in routes, routePath = full route path.
 export const SIX_AUTOMATIONS = [
   {
     id: "missed-call-text-back",
-    slug: "ai-voice-agent-missed-call-recovery",
+    slug: "missed-call-text-back",
     routePath: "/missed-call-text-back",
     title: "Missed-Call Text-Back Automation",
     shortTitle: "Missed-Call Text-Back",
