@@ -1,5 +1,19 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { assertBookingDateAvailable } from "../shared/demoBookingGuard.ts";
+
+// Inline guard: verify a booking date has not exceeded the max daily slot count
+async function assertBookingDateAvailable(base44, scheduled_date) {
+  const MAX_PER_DAY = 8;
+  const existing = await base44.asServiceRole.entities.DemoRequest.filter({
+    scheduled_date,
+    status: { $in: ['requested', 'scheduled', 'confirmed'] },
+  });
+  if (existing && existing.length >= MAX_PER_DAY) {
+    throw Object.assign(
+      new Error(`No more slots available on ${scheduled_date}. Please choose another date.`),
+      { status: 409 }
+    );
+  }
+}
 
 // #99: optimistic lock - re-fetch available slots right before confirming
 async function optimisticLockSlot(base44, scheduled_date, scheduled_time) {
@@ -71,10 +85,6 @@ function validatePayload(payload: ReturnType<typeof normalizePayload>) {
       errors.push('Scheduled date must be in the future');
     }
   }
-  if (false && !payload.scheduled_date) { // suppress duplicate below
-    errors.push('Scheduled date is required');
-  }
-
   if (!payload.scheduled_time || !/^\d{2}:\d{2}$/.test(payload.scheduled_time)) {
     errors.push('Scheduled time is required');
   }
@@ -265,7 +275,6 @@ Deno.serve(async (req) => {
       },
     });
 
-    await optimisticLockSlot(base44, payload.scheduled_date, payload.scheduled_time);
     await ensureDemoRequest(base44, lead.id, payload);
 
     const warnings: string[] = [];

@@ -1,8 +1,5 @@
-/**
- * AdminDashboardCards — #269 #270 #273 #274
- * LTV card, Churn Risk panel, Install Status table, Quick Actions
- */
 import { useState, useEffect } from "react";
+import { base44 } from "@/api/base44Client";
 
 // #269: LTV Card
 export function LTVCard({ orders = [] }) {
@@ -18,10 +15,10 @@ export function LTVCard({ orders = [] }) {
   const avgLTV = orders.length > 0 ? Math.round(totalLTV / orders.length) : 0;
 
   return (
-    <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 20 }}>
-      <p style={{ color: "#9CA3AF", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.05em", margin: "0 0 6px" }}>Total LTV</p>
-      <p style={{ color: "#00FFB3", fontSize: 28, fontWeight: 800, margin: "0 0 4px" }}>${totalLTV.toLocaleString()}</p>
-      <p style={{ color: "#6B7280", fontSize: 12, margin: 0 }}>Avg ${avgLTV.toLocaleString()} / client · {orders.length} clients</p>
+    <div className="rounded-2xl border border-border bg-background p-5">
+      <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">Total LTV</p>
+      <p className="text-3xl font-extrabold text-emerald-500 mb-1">${totalLTV.toLocaleString()}</p>
+      <p className="text-xs text-muted-foreground">Avg ${avgLTV.toLocaleString()} / client · {orders.length} clients</p>
     </div>
   );
 }
@@ -38,29 +35,34 @@ export function ChurnRiskPanel({ orders = [] }) {
   }, [orders]);
 
   if (!risks.length) return (
-    <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, padding: 20 }}>
-      <p style={{ color: "#00FFB3", fontSize: 14, margin: 0 }}>✅ No churn risk detected</p>
+    <div className="rounded-2xl border border-border bg-background p-5">
+      <p className="text-sm font-semibold text-emerald-600">✅ No churn risk detected</p>
     </div>
   );
 
   return (
-    <div style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 16, padding: 20 }}>
-      <p style={{ color: "#FCA5A5", fontWeight: 700, fontSize: 14, margin: "0 0 12px" }}>
+    <div className="rounded-2xl border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900 p-5">
+      <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-3">
         ⚠️ Churn Risk ({risks.length})
       </p>
       {risks.map(o => (
-        <div key={o.id} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-          <span style={{ color: "#D1D5DB", fontSize: 13 }}>{o.business_name || o.customer_name || "Unknown client"}</span>
-          <span style={{ color: "#EF4444", fontSize: 12 }}>Score {o.churn_risk_score}</span>
+        <div key={o.id} className="flex items-center justify-between py-2 border-b border-red-100 dark:border-red-900 last:border-0">
+          <span className="text-sm text-foreground">{o.business_name || o.customer_name || "Unknown client"}</span>
+          <span className="text-xs font-semibold text-red-600">Score {o.churn_risk_score}</span>
         </div>
       ))}
     </div>
   );
 }
 
-// #273: Install Status Table
+// Install Status Table — uses actual OnboardingClient entity fields
 export function InstallStatusTable({ onboardings = [] }) {
-  const fields = ["twilio_configured","instant_response_built","missed_call_textback","followup_sequence_built","went_live"];
+  // Use real entity fields from OnboardingClient schema
+  const cols = [
+    { key: "website_status", label: "Website" },
+    { key: "activation_status", label: "Activation" },
+    { key: "workflow_stage", label: "Stage" },
+  ];
   return (
     <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
       <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
@@ -71,18 +73,23 @@ export function InstallStatusTable({ onboardings = [] }) {
           <thead>
             <tr style={{ background: "rgba(255,255,255,0.02)" }}>
               <th style={{ padding: "8px 16px", color: "#9CA3AF", textAlign: "left", fontWeight: 600 }}>Client</th>
-              {["Twilio","Instant","Missed Call","Follow-Up","Live"].map(h => (
-                <th key={h} style={{ padding: "8px 10px", color: "#9CA3AF", textAlign: "center", fontWeight: 600 }}>{h}</th>
+              {cols.map(c => (
+                <th key={c.key} style={{ padding: "8px 10px", color: "#9CA3AF", textAlign: "center", fontWeight: 600 }}>{c.label}</th>
               ))}
             </tr>
           </thead>
           <tbody>
+            {onboardings.length === 0 && (
+              <tr><td colSpan={cols.length + 1} style={{ padding: "16px", color: "#6B7280", textAlign: "center" }}>No onboarding records yet</td></tr>
+            )}
             {onboardings.map(o => (
               <tr key={o.id} style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-                <td style={{ padding: "10px 16px", color: "#D1D5DB" }}>{o.business_name || o.client_name}</td>
-                {fields.map(f => (
-                  <td key={f} style={{ padding: "10px", textAlign: "center" }}>
-                    <span style={{ color: o[f] ? "#00FFB3" : "#374151", fontSize: 14 }}>{o[f] ? "✓" : "○"}</span>
+                <td style={{ padding: "10px 16px", color: "#D1D5DB" }}>{o.business_name || o.client_name || "Unknown"}</td>
+                {cols.map(c => (
+                  <td key={c.key} style={{ padding: "10px", textAlign: "center" }}>
+                    <span style={{ color: o[c.key] && o[c.key] !== "not_started" ? "#00FFB3" : "#374151", fontSize: 11 }}>
+                      {o[c.key] || "—"}
+                    </span>
                   </td>
                 ))}
               </tr>
@@ -94,27 +101,26 @@ export function InstallStatusTable({ onboardings = [] }) {
   );
 }
 
-// #274: Quick Actions
+// Quick Actions
 export function AdminQuickActions({ order, onRefresh }) {
   const [loading, setLoading] = useState({});
 
-  const act = async (key, endpoint, body) => {
+  const act = async (key, fnName, body) => {
     setLoading(l => ({ ...l, [key]: true }));
     try {
-      await fetch(`/api/functions/${endpoint}`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      await base44.functions.invoke(fnName, body);
       onRefresh?.();
+    } catch (err) {
+      console.error(`AdminQuickActions: ${fnName} failed`, err);
     } finally {
       setLoading(l => ({ ...l, [key]: false }));
     }
   };
 
   const actions = [
-    { key: "day1",    label: "Send Day 1 Email",  fn: () => act("day1", "sendDripEmail", { order_id: order.id, step: "day1" }) },
+    { key: "day1",    label: "Send Day 1 Email",  fn: () => act("day1", "sendEmailDripStep", { order_id: order.id, step: "day1" }) },
     { key: "followup",label: "Trigger Follow-Up", fn: () => act("followup", "processAutomationJobs", { order_id: order.id, force: true }) },
-    { key: "live",    label: "Mark as Live",       fn: () => act("live", "markClientLive", { order_id: order.id }) },
+    { key: "live",    label: "Mark as Live",       fn: () => act("live", "sendWentLiveEmail", { order_id: order.id }) },
   ];
 
   return (

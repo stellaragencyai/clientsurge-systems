@@ -128,11 +128,11 @@ export function setPageMetadata({
   ensureMeta("property", "og:image:width").setAttribute("content", "1200");
   ensureMeta("property", "og:image:height").setAttribute("content", "630");
 
-  ensureMeta("property", "twitter:card").setAttribute("content", "summary_large_image");
-  ensureMeta("property", "twitter:url").setAttribute("content", canonicalUrl);
-  ensureMeta("property", "twitter:title").setAttribute("content", ogTitle || title);
-  ensureMeta("property", "twitter:description").setAttribute("content", ogDescription || description);
-  ensureMeta("property", "twitter:image").setAttribute("content", ogImage);
+  ensureMeta("name", "twitter:card").setAttribute("content", "summary_large_image");
+  ensureMeta("name", "twitter:url").setAttribute("content", canonicalUrl);
+  ensureMeta("name", "twitter:title").setAttribute("content", ogTitle || title);
+  ensureMeta("name", "twitter:description").setAttribute("content", ogDescription || description);
+  ensureMeta("name", "twitter:image").setAttribute("content", ogImage);
 
   const cleanupBreadcrumb = breadcrumbSchema
     ? setJsonLd(`breadcrumb-${canonicalPath.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "home"}`, breadcrumbSchema)
@@ -148,10 +148,10 @@ export function setPageMetadata({
     ensureMeta("property", "og:description").setAttribute("content", previous.ogDescription);
     ensureMeta("property", "og:url").setAttribute("content", previous.ogUrl);
     ensureMeta("property", "og:image").setAttribute("content", previous.ogImage);
-    ensureMeta("property", "twitter:title").setAttribute("content", previous.twitterTitle);
-    ensureMeta("property", "twitter:description").setAttribute("content", previous.twitterDescription);
-    ensureMeta("property", "twitter:image").setAttribute("content", previous.twitterImage);
-    ensureMeta("property", "twitter:url").setAttribute("content", previous.ogUrl);
+    ensureMeta("name", "twitter:title").setAttribute("content", previous.twitterTitle);
+    ensureMeta("name", "twitter:description").setAttribute("content", previous.twitterDescription);
+    ensureMeta("name", "twitter:image").setAttribute("content", previous.twitterImage);
+    ensureMeta("name", "twitter:url").setAttribute("content", previous.ogUrl);
   };
 }
 

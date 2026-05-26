@@ -145,16 +145,6 @@ a[role="button"],
   animation: rotateBorderGlow 3s ease-in-out infinite;
 }
 
-/* Focus for all interactive elements */
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
-}
-
 /* Enhanced focus ring for CTAs */
 button[type="button"]:focus-visible,
 button[type="submit"]:focus-visible,

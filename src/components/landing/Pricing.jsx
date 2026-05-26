@@ -431,13 +431,13 @@ function PricingCard({ plan, selectedIndustry }) {
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">
             {plan.name}
           </h3>
-          {plan.badge ? (
-            <p className="text-xs font-bold text-primary mb-2">{plan.badge}</p>
-          ) : null}
-          {isRecommended ? (
+          {/* Badge label shown once inline, floating badge shown above card */}
+          {isRecommended && selectedIndustry?.shortName ? (
             <p className="text-xs font-bold text-primary mb-2">
               Recommended for {selectedIndustry.shortName}
             </p>
+          ) : plan.badge ? (
+            <p className="text-xs font-bold text-primary mb-2">{plan.badge}</p>
           ) : null}
           <p className="text-xs font-semibold text-foreground/70 leading-snug">
             {plan.fit}

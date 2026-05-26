@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
 import { Link2, Loader2, Users } from "lucide-react";
@@ -9,7 +8,6 @@ import AdminShell from "@/components/admin/AdminShell";
 
 export default function AdminOnboarding() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
@@ -24,32 +22,20 @@ export default function AdminOnboarding() {
 
   useEffect(() => { loadClients(); }, []);
 
-  // Admin-only guard
-  if (user && user.role !== "admin") {
-    return (
-      <AdminShell title="Access Denied" activeId="">
-        <div className="flex items-center justify-center py-24">
-          <div className="text-center">
-            <h1 className="text-2xl font-semibold text-foreground mb-2">Access Denied</h1>
-            <p className="text-muted-foreground">Admin access required.</p>
-          </div>
-        </div>
-      </AdminShell>
-    );
-  }
-
-  const liveCount = clients.filter(c => c.status === "Live").length;
-  const inSetupCount = clients.filter(c => c.status === "In Setup").length;
-  const onboardingCount = clients.filter(c => c.status === "Onboarding" || !c.status).length;
+  // Role guard handled by ProtectedRoute in App.jsx
+  // Use OnboardingClient real fields: activation_status and workflow_stage
+  const liveCount = clients.filter(c => c.activation_status === "activated").length;
+  const inSetupCount = clients.filter(c => c.activation_status === "ready_for_approval" || c.workflow_stage === "automation_setup" || c.workflow_stage === "automation_testing").length;
+  const onboardingCount = clients.filter(c => !c.activation_status || c.activation_status === "not_ready").length;
 
   const filtered = clients.filter((client) => {
     const statusMatch = filter === "all"
       ? true
       : filter === "live"
-        ? client.status === "Live"
+        ? client.activation_status === "activated"
         : filter === "setup"
-          ? client.status === "In Setup"
-          : client.status === "Onboarding" || !client.status;
+          ? (client.activation_status === "ready_for_approval" || client.workflow_stage?.includes("setup") || client.workflow_stage?.includes("testing"))
+          : (!client.activation_status || client.activation_status === "not_ready");
 
     const query = search.trim().toLowerCase();
     const searchMatch = !query || [client.business_name, client.email, client.owner_name]

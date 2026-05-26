@@ -217,18 +217,12 @@ function AppInner() {
   return null;
 }
 
-// SectionRedirect — just navigate to home, no auto-scroll
+// SectionRedirect — navigate to home. No metadata override needed since page is redirected immediately.
 function SectionRedirect({ hash }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const cleanupMetadata = setPageMetadata({
-      title: "ClientSurge Systems | AI Lead Response and Booking Automation",
-      description: "Done-for-you automation that helps appointment-based businesses respond faster, follow up consistently, and book more appointments.",
-      canonicalPath: "/",
-    });
     navigate("/", { replace: true });
-    return cleanupMetadata;
   }, [hash, navigate]);
 
   return null;

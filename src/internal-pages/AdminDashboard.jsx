@@ -137,11 +137,10 @@ export default function AdminDashboard() {
     const loadUnread = async () => {
       try {
         const [msgs, failedEvents] = await Promise.all([
-          base44.entities.SupportMessage.filter({ read: false }, "-created_date", 200),
+          base44.asServiceRole.entities.SupportMessage.filter({ read: false }, "-created_date", 200),
           base44.asServiceRole.entities.CommunicationEvent.filter({ status: "failed" }, "-created_date", 200),
         ]);
-        const clientMsgs = (msgs || []).filter(m => m.role === "client");
-        setInboxUnread(clientMsgs.length);
+        setInboxUnread((msgs || []).length);
         setWebhookErrorCount(countWebhookErrorEvents(failedEvents || []));
       } catch {}
     };
@@ -172,16 +171,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!user || user.role !== 'admin') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Access Denied</h1>
-          <p className="text-muted-foreground">Admin access required</p>
-        </div>
-      </div>
-    );
-  }
+  // Role guard is handled by ProtectedRoute in App.jsx — no redundant check needed here
 
   const handleLogout = () => {
     setLoggingOut(true);
@@ -320,7 +310,7 @@ export default function AdminDashboard() {
             className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors text-sm disabled:opacity-60"
           >
             {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
-            {loggingOut ? 'Signing out...' : 'Logout'}
+            {loggingOut ? 'Signing out…' : 'Logout'}
           </button>
         </div>
       </div>
@@ -520,13 +510,13 @@ function OverviewDashboard({ onNavigate }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="rounded-xl border border-border bg-[#081120] p-5">
+        <div className="rounded-xl border border-border bg-muted/30 p-5">
           <LTVCard orders={orders} />
         </div>
-        <div className="rounded-xl border border-border bg-[#081120] p-5">
+        <div className="rounded-xl border border-border bg-muted/30 p-5">
           <ChurnRiskPanel orders={orders} />
         </div>
-        <div className="rounded-xl border border-border bg-[#081120] p-5">
+        <div className="rounded-xl border border-border bg-muted/30 p-5">
           <InstallStatusTable onboardings={onboardings.slice(0, 20)} />
         </div>
       </div>
@@ -636,7 +626,7 @@ function OverviewDashboard({ onNavigate }) {
         </div>
       </div>
 
-      <SessionTimeoutModal onLogout={handleLogout} logoutAfterMs={45 * 60 * 1000} />
+      <SessionTimeoutModal onLogout={() => base44.auth.logout('/')} logoutAfterMs={45 * 60 * 1000} />
     </div>
   );
 }
