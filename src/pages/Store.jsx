@@ -8,22 +8,10 @@ import CartSidebar from "@/components/store/CartSidebar";
 import Navbar from "@/components/landing/Navbar";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
-import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
+import { formatCurrency, PACKAGE_OFFERS } from "@/lib/salesCatalog";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { setPageMetadata } from "@/lib/seo";
 import Footer from "@/components/landing/Footer";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import { LazyProductGrid } from "@/components/store/StorePageEnhancements";
-
-const INDUSTRY_LINKS = [
-  { label: "Med Spa", href: "/med-spa" },
-  { label: "Dental", href: "/dental" },
-  { label: "Chiropractic", href: "/chiropractic" },
-  { label: "HVAC", href: "/hvac" },
-  { label: "Roofing", href: "/roofing" },
-  { label: "Contractors", href: "/contractors" },
-  { label: "Tanning", href: "/tanning" },
-];
 
 // Lazy load heavy store components
 const InteractiveStackBuilder = lazy(() =>
@@ -44,7 +32,7 @@ function StoreSuspenseFallback({ minHeight = 240 }) {
         width: "100%",
         borderRadius: "18px",
         background:
-          "linear-gradient(90deg, rgba(0,174,239,0.07), rgba(255,255,255,0.86), rgba(154,92,46,0.07))",
+          "linear-gradient(90deg, rgba(0,174,239,0.07), rgba(255,255,255,0.86), rgba(0,119,182,0.07))",
         border: "1px solid rgba(0,136,204,0.12)"
       }}
     />
@@ -65,15 +53,16 @@ function StoreInner() {
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [showComparison, setShowComparison] = useState(false);
   const [pathMode, setPathMode] = useState("guided");
-  const { items, setCartOpen, totalSetup, totalMonthly } = useCart();
+  const preselectedPackageRef = useRef(false);
+  const { items, replaceItems, setCartOpen, totalSetup, totalMonthly } = useCart();
 
   useEffect(() => {
     const cleanupMeta = setPageMetadata({
       title: "AI Automation Store | ClientSurge Systems",
-      description: "Build your custom AI automation stack for your local business. Instant lead response, missed call text-back, 14-day nurture sequences, and more. Start for $97/month.",
+      description: "Build your custom AI automation stack for your local business. Instant lead response, missed call text-back, 14-day nurture sequences, and more. Plans start at $497/month.",
       canonicalPath: "/store",
       ogTitle: "AI Automation Store | ClientSurge Systems",
-      ogDescription: "Pick the AI automations your business needs. Done-for-you setup in 5–7 business days. No contracts."
+      ogDescription: "Pick the AI automations your business needs. Done-for-you setup, clear packages, and no long-term contracts."
     });
     return cleanupMeta;
   }, []);
@@ -83,19 +72,42 @@ function StoreInner() {
       return undefined;
     }
 
+    const getPackageFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const packageKey = params.get("package") || params.get("plan");
+      return PACKAGE_OFFERS.find((p) => p.package_key === packageKey) || null;
+    };
+
+    const applyRecommendedPackage = (pkg, { openCart = false } = {}) => {
+      setSelectedIndustry({
+        shortName: pkg.name,
+        recommendedPackage: pkg,
+        recommendedServiceKeys: pkg.included_service_keys,
+        recommendedServices: pkg.included_services.map((s) => ({ ...s, whyThisMatters: s.description })),
+        whyItWorks: pkg.fit
+      });
+
+      if (openCart && !preselectedPackageRef.current) {
+        preselectedPackageRef.current = true;
+        replaceItems(pkg.included_services);
+        setPathMode("guided");
+        setCartOpen(true);
+      }
+    };
+
     const syncIndustry = () => {
+      const urlPackage = getPackageFromUrl();
+      if (urlPackage) {
+        applyRecommendedPackage(urlPackage, { openCart: true });
+        return;
+      }
+
       // Check if quiz routed here with a package key
       const quizPackage = window.sessionStorage.getItem("clientsurge:quiz-package");
       if (quizPackage) {
         const pkg = PACKAGE_OFFERS.find((p) => p.package_key === quizPackage);
         if (pkg) {
-          setSelectedIndustry({
-            shortName: pkg.name,
-            recommendedPackage: pkg,
-            recommendedServiceKeys: pkg.included_service_keys,
-            recommendedServices: pkg.included_services.map((s) => ({ ...s, whyThisMatters: s.description })),
-            whyItWorks: pkg.fit
-          });
+          applyRecommendedPackage(pkg);
           return;
         }
       }
@@ -110,7 +122,7 @@ function StoreInner() {
       window.removeEventListener("storage", syncIndustry);
       window.removeEventListener("clientsurge:industry-selected", syncIndustry);
     };
-  }, []);
+  }, [replaceItems, setCartOpen]);
 
   const filtered = useMemo(() => {
     const recommendedKeys = new Set(
@@ -130,13 +142,6 @@ function StoreInner() {
       const rightRecommended = recommendedKeys.has(right.service_key);
 
       if (leftRecommended === rightRecommended) {
-        if (pathMode === "explore") {
-          const leftPopular = Boolean(left.popular);
-          const rightPopular = Boolean(right.popular);
-          if (leftPopular !== rightPopular) {
-            return leftPopular ? -1 : 1;
-          }
-        }
         return 0;
       }
 
@@ -150,8 +155,6 @@ function StoreInner() {
           selectedIndustry?.recommendedServices?.map((s) => s.name) || []
         );
         results = results.filter((p) => recommendedNames.has(p.name)).slice(0, 6);
-      } else {
-        results = results.filter((product) => !product.coming_soon);
       }
       // No industry selected in guided mode — show all 12 products (live + coming soon)
     }
@@ -159,9 +162,24 @@ function StoreInner() {
     return results;
   }, [activeCategory, search, selectedIndustry, pathMode]);
 
+  const recommendedPreview = useMemo(
+    () => selectedIndustry?.recommendedServices?.slice(0, 4) || [],
+    [selectedIndustry]
+  );
+
+  const recommendedOverflow = Math.max(
+    (selectedIndustry?.recommendedServices?.length || 0) -
+    recommendedPreview.length,
+    0
+  );
+
   const resultLabel = `${filtered.length} service${
   filtered.length === 1 ? "" : "s"}`;
 
+  const choosePackage = (offer) => {
+    replaceItems(offer.included_services);
+    setCartOpen(true);
+  };
 
   return (
     <div
@@ -169,7 +187,8 @@ function StoreInner() {
         minHeight: "100vh",
         fontFamily: "'Inter', sans-serif",
         position: "relative",
-        background: "linear-gradient(180deg, #fdfbf8 0%, #ffffff 42%, #fdfbf8 100%)"
+        background:
+          "radial-gradient(circle at 12% 5%, rgba(0,174,239,0.12), transparent 28%), radial-gradient(circle at 88% 12%, rgba(0,59,143,0.10), transparent 34%), linear-gradient(180deg, #F8FBFF 0%, #FFFFFF 42%, #F3F8FC 100%)"
       }}>
       
       
@@ -177,14 +196,18 @@ function StoreInner() {
       <div style={{ position: "relative", zIndex: 2 }}>
         <style>{`
           .store-page nav {
-            background: rgba(253,251,248,0.85) !important;
-            border-bottom-color: rgba(154,92,46,0.14) !important;
+            background: rgba(248,251,255,0.88) !important;
+            border-bottom-color: rgba(0,136,204,0.14) !important;
             backdrop-filter: blur(22px) !important;
             -webkit-backdrop-filter: blur(22px) !important;
           }
+          .store-page nav .text-foreground,
+          .store-page nav .text-muted-foreground {
+            color: #0A1628 !important;
+          }
           .store-page .store-hero {
             text-align: center;
-            padding: 24px 24px 14px;
+            padding: clamp(5.5rem, 10vw, 7rem) 24px 14px;
             position: relative;
           }
           .store-page .store-hero-copy {
@@ -235,7 +258,7 @@ function StoreInner() {
             inset: 0;
             border-radius: 8px;
             opacity: 0;
-            background: radial-gradient(ellipse at center, rgba(200,150,92,0.25) 0%, transparent 70%);
+            background: radial-gradient(ellipse at center, rgba(0,174,239,0.25) 0%, transparent 70%);
             transition: opacity 0.3s ease;
           }
           .ai-module-btn:hover::after { opacity: 1; }
@@ -295,7 +318,7 @@ function StoreInner() {
           }
           @media (max-width: 720px) {
             .store-page .store-hero {
-              padding: 18px 16px 10px;
+              padding: 5rem 16px 10px;
             }
             .store-page .store-stat-grid {
               grid-template-columns: 1fr;
@@ -328,9 +351,6 @@ function StoreInner() {
               width: 100%;
               justify-content: space-between;
             }
-            .store-page .store-industry-links {
-              gap: 8px;
-            }
           }
         `}</style>
         <div className="store-page">
@@ -346,18 +366,15 @@ function StoreInner() {
                   fontSize: "clamp(1.5rem, 4.5vw, 2.6rem)",
                   fontWeight: "800",
                   lineHeight: 1.08,
-                  letterSpacing: "-0.035em",
-                  color: "hsl(var(--foreground))",
+                  letterSpacing: 0,
+                  color: "#071426",
                   marginBottom: "8px"
                 }}>
                 
                 Build Your{" "}
                 <span
                 style={{
-                  background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 52%, #003B8F 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
+                  color: "#0088CC",
                   filter: "drop-shadow(0 0 18px rgba(0,174,239,0.4))"
                 }}>
 
@@ -368,14 +385,14 @@ function StoreInner() {
               <p
                 style={{
                   fontSize: "0.9rem",
-                  color: "rgba(27,20,13,0.72)",
+                  color: "rgba(10,22,40,0.72)",
                   lineHeight: 1.6,
                   maxWidth: "620px",
                   margin: "0 auto 12px"
                 }}>
                 
-                Pick the services you need, add them to your cart, and we handle
-                the setup. Your automations go live in 5 to 7 business days.
+                Choose your package or pick individual AI services. We handle
+                the setup, testing, and launch so your follow-up system is ready fast.
               </p>
             </div>
 
@@ -386,10 +403,9 @@ function StoreInner() {
                 margin: "0 auto 10px",
                 padding: "8px 12px",
                 borderRadius: "12px",
-                background: "rgba(255,255,255,0.4)",
-                border: "none",
-                borderBottom: "1px solid rgba(154,92,46,0.1)",
-                boxShadow: "none",
+                  background: "rgba(255,255,255,0.76)",
+                border: "1px solid rgba(0,136,204,0.14)",
+                boxShadow: "0 10px 26px rgba(7,20,38,0.06)",
                 fontSize: "12px"
               }}>
               
@@ -408,7 +424,7 @@ function StoreInner() {
                 <p
                 style={{
                   fontSize: "13px",
-                  color: "#1b140d",
+                  color: "#071426",
                   fontWeight: "600",
                   margin: "0 0 2px",
                   lineHeight: 1.4
@@ -437,9 +453,9 @@ function StoreInner() {
                   gap: "14px",
                   borderRadius: "14px",
                   padding: "14px 18px",
-                  background: "#ffffff",
-                  border: "1.5px solid rgba(0,0,0,0.1)",
-                  boxShadow: "0 4px 14px rgba(0,0,0,0.07)",
+                  background: "rgba(255,255,255,0.9)",
+                  border: "1px solid rgba(0,136,204,0.16)",
+                  boxShadow: "0 12px 32px rgba(7,20,38,0.08)",
                   cursor: "default"
                 }}>
                 
@@ -460,45 +476,12 @@ function StoreInner() {
                     <p style={{ fontSize: "15px", fontWeight: "800", color: "#000000", margin: "0 0 2px" }}>
                       {val}
                     </p>
-                    <p style={{ fontSize: "10px", color: "rgba(27,20,13,0.6)", margin: 0, fontWeight: "600" }}>
+                    <p style={{ fontSize: "10px", color: "rgba(10,22,40,0.6)", margin: 0, fontWeight: "600" }}>
                       {label}
                     </p>
                   </div>
                 </motion.div>
               )}
-            </div>
-            <div
-              className="store-industry-links"
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "center",
-                gap: "10px",
-                marginTop: "12px",
-              }}
-            >
-              {INDUSTRY_LINKS.map((industry) => (
-                <a
-                  key={industry.href}
-                  href={industry.href}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: "8px 14px",
-                    borderRadius: "999px",
-                    fontSize: "12px",
-                    fontWeight: "700",
-                    color: "#003B8F",
-                    background: "rgba(255,255,255,0.8)",
-                    border: "1px solid rgba(0,136,204,0.16)",
-                    textDecoration: "none",
-                    boxShadow: "0 4px 12px rgba(0,59,143,0.06)"
-                  }}
-                >
-                  {industry.label} Systems
-                </a>
-              ))}
             </div>
           </div>
 
@@ -581,7 +564,7 @@ function StoreInner() {
             style={{
               maxWidth: "1300px",
               margin: "0 auto",
-              padding: items.length > 0 ? "72px 24px 24px" : "0 24px 24px"
+              padding: "0 24px 24px"
             }}>
             
 
@@ -614,6 +597,112 @@ function StoreInner() {
               <GuidedPathToggle mode={pathMode} onModeChange={setPathMode} />
             </div>
 
+            <section
+              aria-labelledby="package-selection-heading"
+              style={{
+                margin: "0 0 28px",
+                padding: "22px",
+                borderRadius: "18px",
+                background: "rgba(255,255,255,0.86)",
+                border: "1px solid rgba(0,136,204,0.18)",
+                boxShadow: "0 20px 60px rgba(7,20,38,0.10), inset 0 1px 0 rgba(255,255,255,0.88)",
+                backdropFilter: "blur(18px)",
+                WebkitBackdropFilter: "blur(18px)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "18px", alignItems: "flex-end", flexWrap: "wrap", marginBottom: "16px" }}>
+                <div>
+                  <p style={{ margin: "0 0 5px", fontSize: "11px", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "#006BB0" }}>
+                    Choose Your Package
+                  </p>
+                  <h2 id="package-selection-heading" style={{ margin: 0, fontSize: "clamp(1.25rem, 3vw, 1.8rem)", lineHeight: 1.15, color: "#0A1628", fontWeight: 900 }}>
+                    Three clear systems, then six feature automations underneath.
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowComparison(true)}
+                  style={{
+                    border: "1px solid rgba(0,136,204,0.22)",
+                    borderRadius: "999px",
+                    background: "rgba(0,174,239,0.07)",
+                    color: "#005FA3",
+                    fontSize: "12px",
+                    fontWeight: 800,
+                    padding: "9px 15px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Compare Packages
+                </button>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "14px" }}>
+                {PACKAGE_OFFERS.map((offer) => (
+                  <article
+                    key={offer.package_key}
+                    style={{
+                      borderRadius: "14px",
+                      border: offer.highlight ? "2px solid rgba(0,136,204,0.44)" : "1px solid rgba(0,136,204,0.14)",
+                      background: offer.highlight ? "linear-gradient(145deg, rgba(255,255,255,0.98), rgba(229,247,255,0.92))" : "linear-gradient(145deg, rgba(255,255,255,0.94), rgba(244,249,252,0.84))",
+                      boxShadow: offer.highlight ? "0 18px 46px rgba(0,80,160,0.12)" : "0 10px 28px rgba(7,20,38,0.06)",
+                      padding: "16px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "12px",
+                    }}
+                  >
+                    <div>
+                      {offer.badge && (
+                        <span style={{ display: "inline-flex", marginBottom: "8px", borderRadius: "999px", background: "#003B8F", color: "#ffffff", padding: "4px 9px", fontSize: "10px", fontWeight: 800 }}>
+                          {offer.badge}
+                        </span>
+                      )}
+                      <h3 style={{ margin: "0 0 5px", color: "#0A1628", fontSize: "18px", fontWeight: 900 }}>
+                        {offer.name}
+                      </h3>
+                      <p style={{ margin: 0, minHeight: "42px", color: "rgba(10,22,40,0.66)", fontSize: "12px", lineHeight: 1.55 }}>
+                        {offer.fit}
+                      </p>
+                    </div>
+                    <div>
+                      <p style={{ margin: 0, color: "#0A1628", fontSize: "22px", fontWeight: 900 }}>
+                        ${formatCurrency(offer.setup_total)} setup
+                      </p>
+                      <p style={{ margin: "2px 0 0", color: "#005FA3", fontSize: "13px", fontWeight: 800 }}>
+                        ${formatCurrency(offer.monthly_total)}/mo
+                      </p>
+                    </div>
+                    <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: "6px" }}>
+                      {offer.features.map((feature) => (
+                        <li key={feature} style={{ color: "rgba(10,22,40,0.72)", fontSize: "12px", lineHeight: 1.4 }}>
+                          <span aria-hidden="true" style={{ color: "#0088CC", fontWeight: 900 }}>✓</span>{" "}
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      type="button"
+                      onClick={() => choosePackage(offer)}
+                      style={{
+                        marginTop: "auto",
+                        border: "none",
+                        borderRadius: "999px",
+                        background: "linear-gradient(135deg,#003B8F,#0077B6 48%,#00AEEF)",
+                        color: "#ffffff",
+                        fontSize: "12px",
+                        fontWeight: 900,
+                        padding: "10px 14px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Choose {offer.name}
+                    </button>
+                  </article>
+                ))}
+              </div>
+            </section>
+
             <div className="store-toolbar">
               <div className="store-searchWrap">
                 <Search
@@ -638,11 +727,11 @@ function StoreInner() {
                     border: "1.5px solid rgba(0,136,204,0.22)",
                     padding: "11px 16px 11px 38px",
                     fontSize: "13px",
-                    background: "rgba(255,255,255,0.85)",
+                    background: "rgba(255,255,255,0.9)",
                     outline: "none",
                     boxSizing: "border-box",
-                    color: "#1b140d",
-                    boxShadow: "0 2px 8px rgba(0,136,204,0.07)"
+                    color: "#071426",
+                    boxShadow: "0 8px 22px rgba(7,20,38,0.06)"
                   }} />
                 
               </div>
@@ -652,7 +741,7 @@ function StoreInner() {
                   style={{
                     fontSize: "12px",
                     fontWeight: "700",
-                    color: "rgba(27,20,13,0.55)",
+                    color: "rgba(10,22,40,0.55)",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase"
                   }}>
@@ -684,7 +773,7 @@ function StoreInner() {
                       color:
                       activeCategory === category ?
                       "#ffffff" :
-                      "rgba(27,20,13,0.72)",
+                      "rgba(10,22,40,0.72)",
                       boxShadow:
                       activeCategory === category ?
                       "0 4px 14px rgba(0,174,239,0.35)" :
@@ -699,15 +788,15 @@ function StoreInner() {
             </div>
 
             <motion.div
+              className="store-grid"
               variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
               initial="hidden"
               animate="visible"
               key={activeCategory + search + pathMode}
             >
-              <LazyProductGrid
-                products={filtered}
-                renderCard={(product) => <ProductCard key={product.product_id} product={product} />}
-              />
+              {filtered.map((product) =>
+              <ProductCard key={product.product_id} product={product} />
+              )}
             </motion.div>
 
             {filtered.length === 0 ?
@@ -715,7 +804,7 @@ function StoreInner() {
               style={{
                 textAlign: "center",
                 padding: "48px",
-                color: "rgba(27,20,13,0.45)"
+                color: "rgba(10,22,40,0.45)"
               }}>
               
                 <p style={{ fontSize: "16px", fontWeight: "600" }}>
@@ -747,7 +836,7 @@ function StoreInner() {
             padding: "28px 24px",
             textAlign: "center"
           }}>
-             <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.6)", margin: "0 0 12px" }}>
+             <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.6)", margin: "0 0 12px" }}>
                Not sure what your business needs?
              </p>
              <a
@@ -762,7 +851,7 @@ function StoreInner() {
               
                📞 Make the Leap: free 15-min strategy call
              </a>
-             <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.35)", marginTop: "10px" }}>
+             <p style={{ fontSize: "11px", color: "rgba(10,22,40,0.35)", marginTop: "10px" }}>
                We'll tell you exactly which services will move the needle for your business.
              </p>
            </div>
@@ -772,9 +861,7 @@ function StoreInner() {
            </Suspense>
            {showComparison &&
           <Suspense fallback={<StoreSuspenseFallback minHeight={360} />}>
-               <ErrorBoundary>
-                 <ServiceComparisonModal onClose={() => setShowComparison(false)} />
-               </ErrorBoundary>
+               <ServiceComparisonModal onClose={() => setShowComparison(false)} />
              </Suspense>
           }
         </div>

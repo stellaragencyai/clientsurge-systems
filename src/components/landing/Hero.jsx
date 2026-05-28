@@ -1,10 +1,10 @@
-import { lazy, Suspense } from "react";
+import { Fragment, lazy, Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useDemoBooking } from "./DemoBookingContext";
 import CascadingChecklistItem from "@/components/visual-effects/CascadingChecklistItem";
 import { BUTTON_TEXT } from "@/lib/constants";
+import { trackCTA } from "@/lib/analytics";
 import {
   premiumEase,
   revealContainer,
@@ -17,14 +17,13 @@ const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
 
 const checklist = [
 "Recover missed calls and after-hours leads",
-"Automatically follow up with every inquiry",
-"Book more appointments without hiring extra staff"];
+"Respond instantly by SMS and email",
+"Book appointments and reactivate old leads"];
 
 const MotionLink = motion(Link);
 const headlineWords = ["AI", "Automation", "Systems", "That", "Turn", "More", "Local", "Leads", "Into"];
 
 export default function Hero() {
-  const demoBooking = useDemoBooking();
   const primaryCta = useMagneticMotion(0.14);
   const secondaryCta = useMagneticMotion(0.1);
   const { scrollYProgress } = useScroll();
@@ -37,6 +36,7 @@ export default function Hero() {
       style={{
         position: "relative",
         overflow: "visible",
+        overflowX: "hidden",
         background: "#ffffff",
         paddingBottom: "clamp(5rem, 8vw, 7rem)"
       }}>
@@ -117,6 +117,28 @@ export default function Hero() {
           style={{ gridColumn: "1", marginBottom: "0px", textAlign: "left", maxWidth: "100%", position: "relative", zIndex: 10 }}
         >
 
+          <motion.p
+            variants={revealItem}
+            className="landing-hero__eyebrow"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              margin: "0 0 16px",
+              border: "1px solid rgba(0,107,176,0.16)",
+              borderRadius: "9999px",
+              background: "rgba(0,174,239,0.08)",
+              color: "#006BB0",
+              fontSize: "0.72rem",
+              fontWeight: 800,
+              letterSpacing: "0.16em",
+              lineHeight: 1,
+              padding: "10px 14px",
+              textTransform: "uppercase"
+            }}
+          >
+            AI lead conversion for local service businesses
+          </motion.p>
 
           <motion.h1
             variants={revealItem}
@@ -126,25 +148,30 @@ export default function Hero() {
               fontSize: "clamp(2rem, 5.2vw, 3.8rem)",
               fontWeight: "700",
               lineHeight: 1.1,
-              letterSpacing: "-0.03em",
+              letterSpacing: 0,
               color: "#1b140d",
-              marginBottom: "16px"
+              marginBottom: "16px",
+              maxWidth: "100%",
+              overflowWrap: "normal",
+              wordBreak: "normal"
             }}>
             
-            {headlineWords.map((word) => (
-              <motion.span
-                key={word}
-                variants={revealItem}
-                style={{ display: "inline-block", marginRight: "0.32em" }}
-              >
-                {word}
-              </motion.span>
+            {headlineWords.map((word, index) => (
+              <Fragment key={word}>
+                <motion.span
+                  variants={revealItem}
+                  style={{ display: "inline" }}
+                >
+                  {word}
+                </motion.span>
+                {" "}
+              </Fragment>
             ))}
             <motion.span
               variants={revealItem}
               className="cinematic-text-sheen"
               style={{
-                display: "inline-block",
+                display: "inline",
                 filter: "drop-shadow(0 10px 22px rgba(0,174,239,0.22))"
               }}>
               
@@ -160,13 +187,13 @@ export default function Hero() {
             className="landing-hero__body"
             style={{
               fontSize: "clamp(0.95rem, 2.2vw, 1.05rem)",
-              color: "rgba(27,20,13,0.74)",
+              color: "rgba(10,22,40,0.74)",
               lineHeight: 1.65,
               maxWidth: "560px",
               margin: "0 0 18px"
             }}>
             
-            ClientSurge Systems builds AI-powered websites, voice agents, and lead automation systems for local service businesses. Recover missed calls, respond instantly, nurture leads automatically, and book more appointments without adding staff.
+            ClientSurge Systems builds website lead capture, AI voice agents, instant SMS/email response, missed-call recovery, booking follow-up, review requests, and old-lead reactivation for local service businesses.
           </motion.p>
 
           <motion.div
@@ -192,10 +219,10 @@ export default function Hero() {
               marginTop: "32px"
             }}>
             
-            <motion.button
+            <MotionLink
               ref={primaryCta.ref}
-              type="button"
-              onClick={demoBooking?.openDemoBooking}
+              to="/book"
+              onClick={() => trackCTA("book_free_automation_audit", "home_hero")}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.98 }}
               style={{
@@ -216,7 +243,8 @@ export default function Hero() {
                 boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
                 cursor: "pointer",
                 position: "relative",
-                overflow: "hidden"
+                overflow: "hidden",
+                textDecoration: "none"
               }}
               {...primaryCta.magneticHandlers}>
               <span className="cinematic-pulse-rings" aria-hidden="true" />
@@ -233,7 +261,7 @@ export default function Hero() {
               />
               <span style={{ position: "relative", zIndex: 1 }}>{BUTTON_TEXT.BOOK_DEMO}</span>
               <ArrowRight style={{ width: "18px", height: "18px", position: "relative", zIndex: 1 }} />
-            </motion.button>
+            </MotionLink>
             <MotionLink
               ref={secondaryCta.ref}
               to="/automations"
@@ -267,10 +295,10 @@ export default function Hero() {
             style={{
               marginTop: "18px",
               fontSize: "12px",
-              color: "rgba(27,20,13,0.48)",
+              color: "rgba(10,22,40,0.48)",
               letterSpacing: "0.04em"
             }}>
-            No contracts · Most clients go live in 24–48 hours
+            Free automation audit · Clear recommendations · Done-for-you implementation plan
           </motion.p>
         </motion.div>
 
@@ -378,6 +406,9 @@ export default function Hero() {
             gap: 32px !important;
             min-height: auto !important;
             padding-top: clamp(5rem, 12vw, 7rem) !important;
+            max-width: 100vw !important;
+            min-width: 0 !important;
+            overflow-x: hidden !important;
           }
           .landing-hero__visualWrap {
             display: flex !important;
@@ -386,8 +417,11 @@ export default function Hero() {
           }
           .landing-hero__copy {
             max-width: 100% !important;
+            width: 100% !important;
+            min-width: 0 !important;
             text-align: center !important;
             grid-column: 1 !important;
+            overflow: hidden !important;
           }
           .landing-hero__checklist {
             margin: 0 auto 32px !important;
@@ -403,16 +437,26 @@ export default function Hero() {
             display: none !important;
           }
           .landing-hero__headline {
-            font-size: clamp(2rem, 8.5vw, 3.4rem) !important;
-            line-height: 1.05 !important;
-            letter-spacing: -0.025em !important;
+            font-size: clamp(1.75rem, 6.8vw, 2.8rem) !important;
+            line-height: 1.12 !important;
+            letter-spacing: 0 !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
           }
           .landing-hero__body {
             font-size: 1rem !important;
             line-height: 1.7 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            box-sizing: border-box !important;
+            overflow-wrap: break-word !important;
           }
           .landing-hero__checklist {
+            grid-template-columns: 1fr !important;
             gap: 8px !important;
+            max-width: 100% !important;
+            width: 100% !important;
           }
           .landing-hero__actions {
             flex-direction: column !important;
@@ -422,6 +466,11 @@ export default function Hero() {
           .landing-hero__actions > * {
             width: 100% !important;
             justify-content: center !important;
+            gap: 8px !important;
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+            font-size: 0.92rem !important;
+            white-space: nowrap !important;
           }
           .hero-check-item {
             width: 100% !important;
@@ -440,7 +489,8 @@ export default function Hero() {
             padding-right: 1rem !important;
           }
           .landing-hero__headline {
-            font-size: clamp(1.85rem, 9vw, 2.4rem) !important;
+            font-size: clamp(1.42rem, 6.4vw, 1.72rem) !important;
+            line-height: 1.16 !important;
           }
           .landing-hero__body {
             font-size: 0.95rem !important;
@@ -450,8 +500,8 @@ export default function Hero() {
         /* iPhone SE specific (320px) */
         @media (max-width: 360px) {
           .landing-hero__headline {
-            font-size: 1.75rem !important;
-            letter-spacing: -0.02em !important;
+            font-size: 1.35rem !important;
+            letter-spacing: 0 !important;
           }
         }
       `}</style>
