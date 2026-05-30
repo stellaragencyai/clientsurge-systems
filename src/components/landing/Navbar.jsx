@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, Menu, Moon, Sun, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
 import DemoBookingModal from "../forms/DemoBookingModal";
@@ -26,75 +26,18 @@ const industryLinks = [
 { label: "Contractors & Trades", href: "/contractors", live: true }];
 
 
-const SAFE_SECTION_HASHES = new Set([
-"#problem-solution",
-"#six-automations",
-"#services",
-"#pricing",
-"#faq",
-"#testimonials",
-"#industries",
-"#book-demo"]
-);
-
-function safeGetThemePreference() {
-  try {
-    return window.localStorage.getItem("theme-preference");
-  } catch {
-    return null;
-  }
-}
-
-function safeSetThemePreference(value) {
-  try {
-    window.localStorage.setItem("theme-preference", value);
-  } catch {
-
-
-
-
-    // Ignore storage failures in embedded preview environments.
-  }}function safeApplyTheme(isDark) {try {
-    document.documentElement.classList.toggle("dark", isDark);
-  } catch {
-
-
-
-
-    // Ignore DOM theme failures in preview environments.
-  }}function getSafeHashTarget(hash) {if (!hash || !SAFE_SECTION_HASHES.has(hash)) {
-    return null;
-  }
-
-  const elementId = hash.startsWith("#") ? hash.slice(1) : hash;
-  if (!elementId) {
-    return null;
-  }
-
-  try {
-    return document.getElementById(elementId);
-  } catch {
-    return null;
-  }
-}
-
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [isDark, setIsDark] = useState(true);
 
   useEffect(() => {
-    const savedPreference = safeGetThemePreference();
-    const prefersDark = savedPreference == null ? true : savedPreference !== "light";
-    setIsDark(prefersDark);
-    safeApplyTheme(prefersDark);
+    try {
+      document.documentElement.classList.remove("dark");
+      window.localStorage.setItem("theme-preference", "light");
+      window.localStorage.setItem("cs_theme", "light");
+    } catch {
+      document.documentElement.classList.remove("dark");
+    }
   }, []);
-
-  const toggleTheme = () => {
-    const next = !isDark;
-    setIsDark(next);
-    safeSetThemePreference(next ? "dark" : "light");
-    safeApplyTheme(next);
-  };
 
   useEffect(() => {
     if (!open) {
@@ -106,7 +49,6 @@ export default function Navbar() {
 
     return acquireBodyScrollLock("landing-mobile-nav");
   }, [open]);
-  const [scrolled, setScrolled] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
@@ -122,22 +64,10 @@ export default function Navbar() {
 
 
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      // Safety: always remove scroll lock on unmount
-      document.body.classList.remove("nav-open");
-      document.body.style.removeProperty("--scroll-lock-top");
-    };
+  useEffect(() => () => {
+    document.body.classList.remove("nav-open");
+    document.body.style.removeProperty("--scroll-lock-top");
   }, []);
-
-
-
-
-
-
 
   const handleSectionNavigation = (e, href) => {
     e.preventDefault();
@@ -278,14 +208,6 @@ export default function Navbar() {
 
         <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
           <button
-            onClick={toggleTheme}
-            className="hidden md:inline-flex items-center justify-center rounded-full border border-border bg-background/70 text-foreground hover:text-primary hover:border-primary/30 transition-colors"
-            style={{ width: 40, height: 40 }}
-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            title={isDark ? "Switch to light mode" : "Switch to dark mode"}>
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
-          <button
             onClick={() => {
               trackCTA("login", "navbar");
               setShowLoginModal(true);
@@ -380,15 +302,6 @@ export default function Navbar() {
               <p className="text-xs text-muted-foreground capitalize">{mobileUserRole || "client"}</p>
             </div>
           )}
-
-          <button
-            onClick={toggleTheme}
-            className="w-full flex items-center justify-between rounded-xl border border-border bg-background px-3 py-3 text-sm font-medium text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none transition-colors"
-            style={{ minHeight: "44px" }}
-            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}>
-            <span>{isDark ? "Switch to light mode" : "Switch to dark mode"}</span>
-            {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
 
           <button
             onClick={() => {

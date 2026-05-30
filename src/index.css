@@ -44,40 +44,6 @@
     --sidebar-ring: 199 100% 47%;
   }
 
-  .dark {
-    --background: 220 50% 8%;
-    --foreground: 210 40% 92%;
-    --card: 220 45% 11%;
-    --card-foreground: 210 40% 92%;
-    --popover: 220 45% 11%;
-    --popover-foreground: 210 40% 92%;
-    --primary: 199 100% 50%;
-    --primary-foreground: 220 50% 8%;
-    --secondary: 220 35% 16%;
-    --secondary-foreground: 210 40% 92%;
-    --muted: 220 35% 13%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 199 100% 50%;
-    --accent-foreground: 220 50% 8%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 30% 18%;
-    --input: 220 30% 18%;
-    --ring: 199 100% 50%;
-    --chart-1: 199 100% 50%;
-    --chart-2: 217 90% 55%;
-    --chart-3: 199 80% 65%;
-    --chart-4: 220 70% 60%;
-    --chart-5: 195 85% 50%;
-    --sidebar-background: 220 50% 8%;
-    --sidebar-foreground: 210 40% 92%;
-    --sidebar-primary: 199 100% 50%;
-    --sidebar-primary-foreground: 220 50% 8%;
-    --sidebar-accent: 220 35% 16%;
-    --sidebar-accent-foreground: 210 40% 92%;
-    --sidebar-border: 220 30% 18%;
-    --sidebar-ring: 199 100% 50%;
-  }
 }
 
 @layer base {
@@ -506,10 +472,6 @@ body > * {
   z-index: 1;
 }
 
-.dark body::before {
-  display: none;
-}
-
 /* Sophisticated Container Effects */
 .glass-card {
   @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl;
@@ -570,150 +532,6 @@ body > * {
 
 .animate-fade-out {
   animation: fadeOut 0.4s ease-out forwards;
-}
-
-/* ============================================
-   DARK MODE OVERRIDES
-   Handles components with hardcoded inline styles
-   Only active when .dark is on <html>
-   ============================================ */
-
-/* Body / background */
-.dark body {
-  background-image: none !important;
-  background-color: hsl(220, 50%, 8%) !important;
-}
-
-/* Navbar */
-.dark nav {
-  background: rgba(5, 10, 25, 0.9) !important;
-  border-bottom-color: rgba(0, 174, 239, 0.15) !important;
-}
-
-/* Hero section — force dark bg so text is visible */
-.dark section {
-  background: transparent;
-}
-
-/* Cards with white/cream hardcoded backgrounds */
-.dark [style*="rgba(255,255,255"] {
-  background: rgba(20, 22, 30, 0.85) !important;
-}
-
-/* Problem/Solution section background blobs */
-.dark .absolute.inset-0.bg-gradient-to-b {
-  background: linear-gradient(to bottom, transparent, rgba(42, 30, 10, 0.15), transparent) !important;
-}
-
-/* WhyUs comparison cards — override hardcoded inline styles */
-.dark [style*="rgba(255,255,255,0.55)"] {
-  background: rgba(10, 18, 35, 0.9) !important;
-  border-color: rgba(0, 174, 239, 0.2) !important;
-}
-.dark [style*="rgba(255,235,235"] {
-  background: rgba(10, 18, 35, 0.8) !important;
-}
-.dark [style*="rgba(255,248,235"] {
-  background: rgba(8, 14, 28, 0.8) !important;
-}
-
-/* HowItWorks mobile cards */
-.dark [style*="rgba(255,255,255,0.6)"] {
-  background: rgba(18, 20, 28, 0.9) !important;
-}
-
-/* WhyUs reason cards */
-.dark [style*="rgba(255,255,255,0.6) 0%, rgba(255,248,235"] {
-  background: rgba(18, 20, 28, 0.9) !important;
-}
-
-/* Timeline strips */
-.dark [style*="rgba(154,92,46,0.04)"] {
-  background: rgba(0, 30, 60, 0.5) !important;
-}
-
-/* Arrow connector circles */
-.dark [style*="border: 2px solid white"] {
-  border-color: rgba(0, 174, 239, 0.4) !important;
-}
-
-/* Stats bar */
-.dark [style*="rgba(154,92,46,0.06)"] {
-  background: rgba(0, 20, 50, 0.7) !important;
-  border-color: rgba(0, 174, 239, 0.25) !important;
-}
-
-/* TrustBar */
-.dark .border-y {
-  border-color: rgba(0, 174, 239, 0.15) !important;
-}
-
-/* Footer */
-.dark footer {
-  background: hsl(220, 50%, 5%) !important;
-  border-top-color: rgba(0, 174, 239, 0.15) !important;
-}
-
-/* White text on gold gradient CTAs — keep them as-is (they look great in dark) */
-
-/* Modals */
-.dark [class*="bg-white rounded-3xl"] {
-  background: hsl(220, 20%, 8%) !important;
-}
-.dark .bg-white {
-  background-color: hsl(220, 20%, 8%) !important;
-}
-.dark [class*="bg-card"] {
-  background: hsl(var(--card)) !important;
-}
-
-/* Input fields in forms */
-.dark input, .dark select, .dark textarea {
-  background: hsl(220, 40%, 10%) !important;
-  border-color: rgba(0, 174, 239, 0.2) !important;
-  color: hsl(210, 40%, 90%) !important;
-}
-.dark input::placeholder, .dark textarea::placeholder {
-  color: rgba(100, 180, 230, 0.4) !important;
-}
-
-/* Borders */
-.dark .border-border {
-  border-color: hsl(var(--border)) !important;
-}
-
-/* Sticky navbar scrolled state */
-.dark [class*="bg-white/40"] {
-  background: rgba(10, 12, 20, 0.92) !important;
-}
-.dark [class*="bg-white/15"] {
-  background: rgba(10, 12, 20, 0.6) !important;
-}
-
-/* Mobile nav dropdown */
-.dark .bg-background {
-  background-color: hsl(var(--background)) !important;
-}
-
-/* Client portal & dashboard pages */
-.dark .bg-white\/80 {
-  background: rgba(10, 12, 20, 0.85) !important;
-}
-
-/* Overlay cards */
-.dark .overlay-card {
-  background: rgba(0, 20, 50, 0.6) !important;
-  border-color: rgba(0, 174, 239, 0.18) !important;
-}
-
-/* SectionDivider & other gradient strips */
-.dark [style*="background: linear-gradient(135deg,#6b3f1f"] {
-  opacity: 0.9;
-}
-
-/* Ensure text on dark stays legible */
-.dark p, .dark h1, .dark h2, .dark h3, .dark h4, .dark span:not([style*="color"]) {
-  color: inherit;
 }
 
 /* ============================================
@@ -878,13 +696,7 @@ button, [role="button"] {
   }
 }
 
-/* Dark mode gradient text fix */
-.dark span[style*="background"] {
-  background: linear-gradient(135deg, #00AEEF 0%, #009DFF 52%, #003B8F 100%) !important;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
+
 
 /* ============================================
    ANIMATION: SVG Path Drawing (strokeDashoffset)

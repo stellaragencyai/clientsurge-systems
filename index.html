@@ -32,9 +32,9 @@
     <link rel="icon" type="image/png" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0A1628" />
+    <meta name="theme-color" content="#ffffff" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="format-detection" content="telephone=no" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="description" content="AI-powered websites, voice agents, missed-call recovery, lead follow-up, and booking automation for local service businesses that want more booked jobs." />
@@ -57,6 +57,17 @@
     <link rel="canonical" href="https://clientsurgesystems.com/" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https: https://assets.calendly.com https://calendly.com; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; frame-src https://calendly.com https://assets.calendly.com https://www.googletagmanager.com;" />
+    <script>
+      (function () {
+        try {
+          document.documentElement.classList.remove("dark");
+          localStorage.setItem("theme-preference", "light");
+          localStorage.setItem("cs_theme", "light");
+        } catch (error) {
+          document.documentElement.classList.remove("dark");
+        }
+      })();
+    </script>
     <script type="application/ld+json" data-schema-id="static-homepage">
       {
         "@context": "https://schema.org",
@@ -357,7 +368,7 @@
         min-height: 44px;
         border-radius: 999px;
         padding: 0 18px;
-        background: #0f172a;
+        background: #0088cc;
         color: #ffffff !important;
         text-decoration: none !important;
       }
@@ -424,13 +435,13 @@
         border-radius: 24px;
         margin: 56px 0;
         padding: 42px;
-        background: #0f172a;
-        color: #ffffff;
+        background: #eaf8ff;
+        color: #0f172a;
       }
 
       .static-cta h2,
       .static-cta p {
-        color: #ffffff;
+        color: #0f172a;
       }
 
       .static-cta p {
@@ -474,7 +485,7 @@
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     <noscript>
-      <div style="padding:16px;background:#0f172a;color:#ffffff;font-family:Inter,system-ui,sans-serif;text-align:center;">
+      <div style="padding:16px;background:#ffffff;color:#0f172a;font-family:Inter,system-ui,sans-serif;text-align:center;">
         JavaScript is required for the live ClientSurge experience. You can still
         <a href="/book" style="color:#7dd3fc;font-weight:700;">book a free automation audit</a>
         or email

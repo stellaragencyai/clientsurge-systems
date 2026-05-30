@@ -210,6 +210,13 @@ function AppInner() {
   useEffect(() => {
     // Initialize auto-tracking after React mounts — safe for SSR/pre-render
     if (typeof window !== "undefined") {
+      try {
+        document.documentElement.classList.remove("dark");
+        window.localStorage.setItem("theme-preference", "light");
+        window.localStorage.setItem("cs_theme", "light");
+      } catch {
+        document.documentElement.classList.remove("dark");
+      }
       installGa4();
       initializeAnalyticsObserver();
     }

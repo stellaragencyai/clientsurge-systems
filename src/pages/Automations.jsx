@@ -318,7 +318,7 @@ export default function Automations() {
       {/* Header */}
       <div
         className="px-6 py-5 flex items-center justify-between"
-        style={{ background: "linear-gradient(135deg,#0A1628 0%,#003B8F 100%)" }}
+        style={{ background: "#ffffff", borderBottom: "1px solid rgba(10,22,40,0.08)" }}
       >
         <Link to="/" className="flex items-center gap-2">
           <img
@@ -386,33 +386,34 @@ export default function Automations() {
         {/* Bottom CTA */}
         <div
           className="mt-16 rounded-3xl p-10 md:p-14 text-center"
-          style={{ background: "linear-gradient(135deg,#003B8F 0%,#0070B8 60%,#00AEEF 100%)" }}
+          style={{ background: "linear-gradient(135deg,#eaf8ff 0%,#dff5ff 60%,#f8fbff 100%)", border: "1px solid rgba(0,136,204,0.14)" }}
         >
-          <p className="text-xs font-bold text-blue-200/70 uppercase tracking-widest mb-3">Ready to Begin?</p>
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "rgba(0,80,160,0.62)" }}>Ready to Begin?</p>
           <h2
-            className="text-3xl md:text-4xl font-bold text-white mb-4"
+            className="text-3xl md:text-4xl font-bold text-slate-900 mb-4"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
             Activate Your Systems in 24–48 Hours
           </h2>
-          <p className="text-blue-100/80 text-base max-w-xl mx-auto mb-8 leading-relaxed">
+          <p className="text-slate-600 text-base max-w-xl mx-auto mb-8 leading-relaxed">
             Book a free automation audit and our team will map the right voice, lead response, follow-up, and booking systems for your business.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/book"
-              className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-base font-bold text-slate-900 bg-white hover:bg-blue-50 transition-colors shadow-lg"
+              className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-base font-bold text-white transition-colors shadow-lg"
+              style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
             >
               Get Your Free Audit <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               to="/book"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-white border-2 border-white/30 hover:border-white/60 transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-slate-700 border-2 border-slate-200 hover:border-blue-300 transition-colors"
             >
               Book a Live Demo
             </Link>
           </div>
-          <p className="mt-5 text-xs text-blue-200/50">No credit card required · Typical setup time: 24–48 hours</p>
+          <p className="mt-5 text-xs text-slate-500">No credit card required · Typical setup time: 24–48 hours</p>
         </div>
       </div>
     </div>
