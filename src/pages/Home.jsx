@@ -9,6 +9,7 @@ import { FAQ_ITEMS } from "../components/landing/FAQ";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
+const LeadJourneyDiagram = lazy(() => import("../components/landing/LeadJourneyDiagram"));
 const SixAutomationSystems = lazy(() => import("../components/landing/SixAutomationSystems"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const FAQ = lazy(() => import("../components/landing/FAQ"));
@@ -117,6 +118,11 @@ export default function Home() {
         <Suspense fallback={<SectionSkeleton />}>
           <MotionSection>
             <TrustBar />
+          </MotionSection>
+          <CinematicSectionDivider />
+          <SectionBreak />
+          <MotionSection>
+            <LeadJourneyDiagram />
           </MotionSection>
           <CinematicSectionDivider />
           <SectionBreak />
