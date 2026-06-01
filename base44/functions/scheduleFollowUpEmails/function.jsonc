@@ -1,0 +1,4 @@
+{
+  "name": "scheduleFollowUpEmails",
+  "entry": "entry.ts"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "routeLead",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "entity",
+      "description": "When a new Leads record is created, automatically assign it to the best available team member based on workload and lead category, then send an SMS notification.",
+      "entity_name": "Leads",
+      "event_types": [
+        "create"
+      ],
+      "is_active": true,
+      "name": "Auto Route New Lead"
+    }
+  ]
+}

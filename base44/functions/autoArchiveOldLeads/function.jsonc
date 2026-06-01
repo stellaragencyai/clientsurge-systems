@@ -1,0 +1,4 @@
+{
+  "name": "autoArchiveOldLeads",
+  "entry": "entry.ts"
+}

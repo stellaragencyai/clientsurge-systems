@@ -1,0 +1,4 @@
+{
+  "name": "receiveTwilioSmsStatusCallback",
+  "entry": "entry.ts"
+}

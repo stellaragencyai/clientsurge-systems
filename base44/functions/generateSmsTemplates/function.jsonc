@@ -1,0 +1,4 @@
+{
+  "name": "generateSmsTemplates",
+  "entry": "entry.ts"
+}

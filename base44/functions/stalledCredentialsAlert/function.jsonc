@@ -1,0 +1,18 @@
+{
+  "name": "stalledCredentialsAlert",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "scheduled",
+      "description": "Runs every morning at 9am MST. Checks for paid orders where the client hasn't submitted their setup credentials within 24 hours and emails admin.",
+      "ends_type": "never",
+      "is_active": true,
+      "name": "Stalled Credentials Alert — Daily 9am",
+      "repeat_interval": 1,
+      "repeat_unit": "days",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "start_time": "16:00"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "autoSchedule30DayCheckin",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "entity",
+      "description": "When a client's status changes to Live, email the client a 30-day check-in with Calendly link and email Nolan a prep reminder with call notes.",
+      "entity_name": "OnboardingClient",
+      "event_types": [
+        "update"
+      ],
+      "is_active": true,
+      "name": "Auto 30-Day Check-In Scheduler — Client Goes Live"
+    }
+  ]
+}

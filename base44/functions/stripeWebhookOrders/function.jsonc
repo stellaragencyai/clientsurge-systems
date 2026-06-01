@@ -1,0 +1,4 @@
+{
+  "name": "stripeWebhookOrders",
+  "entry": "entry.ts"
+}

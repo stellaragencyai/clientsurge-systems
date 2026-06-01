@@ -1,0 +1,17 @@
+{
+  "name": "processDripCampaigns",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "scheduled",
+      "description": "Hourly runner that checks all active drip campaigns, fires overdue Day 1/3/7 steps via SMS or email, and auto-stops campaigns when leads reach Qualified/Booked/Closed.",
+      "ends_type": "never",
+      "is_active": true,
+      "name": "Drip Campaign Processor — Every Hour",
+      "repeat_interval": 1,
+      "repeat_unit": "hours",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple"
+    }
+  ]
+}

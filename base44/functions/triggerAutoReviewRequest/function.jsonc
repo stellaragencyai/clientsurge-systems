@@ -1,0 +1,16 @@
+{
+  "name": "triggerAutoReviewRequest",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "entity",
+      "description": "Automatically sends SMS and email review requests when an order transitions to fully_live status. Includes 7-day duplicate prevention and intelligently selects SMS or email based on available contact data.",
+      "entity_name": "Order",
+      "event_types": [
+        "update"
+      ],
+      "is_active": true,
+      "name": "Send Auto Review Request on Order Live"
+    }
+  ]
+}

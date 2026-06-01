@@ -1,0 +1,4 @@
+{
+  "name": "_shared/integrationHealth",
+  "entry": "entry.ts"
+}

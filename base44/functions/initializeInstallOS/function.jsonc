@@ -1,0 +1,4 @@
+{
+  "name": "initializeInstallOS",
+  "entry": "entry.ts"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "enrollMissedCallDrip",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "entity",
+      "description": "Auto-enrolls a missed-call lead into the 4-step follow-up drip sequence (2min SMS, 10min email, 1hr SMS, 24hr email) after initial SMS is sent",
+      "entity_name": "CommunicationEvent",
+      "event_types": [
+        "create"
+      ],
+      "is_active": true,
+      "name": "Enroll Missed-Call Leads in Follow-Up Drip"
+    }
+  ]
+}

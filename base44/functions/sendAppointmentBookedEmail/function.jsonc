@@ -1,0 +1,15 @@
+{
+  "name": "sendAppointmentBookedEmail",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "entity",
+      "entity_name": "Leads",
+      "event_types": [
+        "update"
+      ],
+      "is_active": true,
+      "name": "Send Appointment Booked Email"
+    }
+  ]
+}

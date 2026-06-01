@@ -1,0 +1,4 @@
+{
+  "name": "saveClientCredentials",
+  "entry": "entry.ts"
+}

@@ -1,0 +1,4 @@
+{
+  "name": "pushTasksToGitHub",
+  "entry": "entry.ts"
+}

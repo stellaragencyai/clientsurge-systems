@@ -1,0 +1,4 @@
+{
+  "name": "sendAdminPurchaseNotification",
+  "entry": "entry.ts"
+}

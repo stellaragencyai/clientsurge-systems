@@ -1,0 +1,4 @@
+{
+  "name": "getAutomationAlerts",
+  "entry": "entry.ts"
+}

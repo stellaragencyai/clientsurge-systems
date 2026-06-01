@@ -1,0 +1,38 @@
+{
+  "name": "generateWeeklyReport",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "scheduled",
+      "description": "Auto-sends weekly performance report to all clients every Monday at 8am MST. Task #564.",
+      "ends_type": "never",
+      "is_active": true,
+      "name": "Weekly Client Reports — Monday 8am",
+      "repeat_on_days": [
+        1
+      ],
+      "repeat_unit": "weeks",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "start_time": "15:00"
+    },
+    {
+      "type": "scheduled",
+      "description": "Sends automated weekly performance report emails to all active clients every Monday morning.",
+      "ends_type": "never",
+      "function_args": {
+        "send_email": true
+      },
+      "is_active": true,
+      "name": "Weekly Client Performance Reports",
+      "repeat_interval": 1,
+      "repeat_on_days": [
+        1
+      ],
+      "repeat_unit": "weeks",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "start_time": "16:00"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "name": "validateAIOutputs",
+  "entry": "entry.ts"
+}

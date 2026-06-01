@@ -1,0 +1,4 @@
+{
+  "name": "retryFailedServiceActivation",
+  "entry": "entry.ts"
+}

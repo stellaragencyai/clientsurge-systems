@@ -1,0 +1,4 @@
+{
+  "name": "sendDemoConfirmationEmail",
+  "entry": "entry.ts"
+}

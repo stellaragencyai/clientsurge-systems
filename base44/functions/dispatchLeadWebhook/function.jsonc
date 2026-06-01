@@ -1,0 +1,4 @@
+{
+  "name": "dispatchLeadWebhook",
+  "entry": "entry.ts"
+}

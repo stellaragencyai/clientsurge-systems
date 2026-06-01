@@ -1,0 +1,4 @@
+{
+  "name": "generateMonthlyPerformanceReport",
+  "entry": "entry.ts"
+}

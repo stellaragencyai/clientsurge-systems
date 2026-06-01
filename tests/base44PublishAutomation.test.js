@@ -1,9 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+}
+
+function walkFiles(root) {
+  const files = [];
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    const entryPath = path.join(root, entry.name);
+    if (entry.isDirectory()) files.push(...walkFiles(entryPath));
+    else files.push(entryPath);
+  }
+  return files;
 }
 
 test("backend publish helper gates Base44 UI publish behind checks", () => {
@@ -71,6 +83,35 @@ test("Base44 app access and multi-app publish helpers keep production required",
   assert.match(publishAll, /sourceSha/);
   assert.match(packageJson, /"base44:check-app": "node scripts\/base44\/check-app-access\.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https:\/\/clientsurgesystems\.com"/);
   assert.match(packageJson, /"base44:publish-all": "node scripts\/base44\/publish-all-apps\.mjs"/);
+});
+
+test("Base44 function metadata is complete for every source entry", () => {
+  const repoRoot = fileURLToPath(new URL("../", import.meta.url));
+  const functionsRoot = path.join(repoRoot, "base44", "functions");
+  const entryFiles = walkFiles(functionsRoot).filter((file) => file.endsWith(`${path.sep}entry.ts`));
+  const missing = [];
+
+  for (const entryFile of entryFiles) {
+    const functionDir = path.dirname(entryFile);
+    const metadataPath = path.join(functionDir, "function.jsonc");
+    if (!existsSync(metadataPath)) {
+      missing.push(path.relative(repoRoot, metadataPath));
+      continue;
+    }
+
+    const relName = path.relative(functionsRoot, functionDir).split(path.sep).join("/");
+    const metadata = JSON.parse(read(path.relative(repoRoot, metadataPath).replaceAll("\\", "/")));
+    assert.equal(metadata.name, relName);
+    assert.equal(metadata.entry, "entry.ts");
+  }
+
+  assert.deepEqual(missing, []);
+
+  const packageJson = read("package.json");
+  const syncScript = read("scripts/base44/sync-function-metadata.mjs");
+  assert.match(packageJson, /"base44:sync-metadata": "node scripts\/base44\/sync-function-metadata\.mjs"/);
+  assert.match(syncScript, /Donor-backed metadata/);
+  assert.match(syncScript, /Generated metadata/);
 });
 
 test("Base44 auto sync watcher commits pushes and optionally publishes filtered changes", () => {

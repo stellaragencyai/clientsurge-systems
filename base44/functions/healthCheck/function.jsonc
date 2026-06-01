@@ -1,0 +1,4 @@
+{
+  "name": "healthCheck",
+  "entry": "entry.ts"
+}

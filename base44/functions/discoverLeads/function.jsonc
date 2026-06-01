@@ -1,0 +1,24 @@
+{
+  "name": "discoverLeads",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "scheduled",
+      "description": "Automatically discover and enrich new leads daily at 8 AM. Adjust niche, location, and radius in function_args to customize.",
+      "ends_type": "never",
+      "function_args": {
+        "niche": "med spa",
+        "city": "Phoenix",
+        "state": "AZ",
+        "radius": 25
+      },
+      "is_active": false,
+      "name": "Daily Lead Discovery & Enrichment",
+      "repeat_interval": 1,
+      "repeat_unit": "days",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "start_time": "15:00"
+    }
+  ]
+}

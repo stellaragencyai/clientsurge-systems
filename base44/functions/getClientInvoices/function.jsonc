@@ -1,0 +1,4 @@
+{
+  "name": "getClientInvoices",
+  "entry": "entry.ts"
+}

@@ -1,0 +1,4 @@
+{
+  "name": "getStripeMode",
+  "entry": "entry.ts"
+}

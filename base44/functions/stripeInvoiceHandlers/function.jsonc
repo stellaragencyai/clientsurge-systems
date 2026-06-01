@@ -1,0 +1,4 @@
+{
+  "name": "stripeInvoiceHandlers",
+  "entry": "entry.ts"
+}

@@ -1,0 +1,4 @@
+{
+  "name": "getLeadPipelineSummary",
+  "entry": "entry.ts"
+}

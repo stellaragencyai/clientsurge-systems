@@ -1,0 +1,4 @@
+{
+  "name": "deduplicateLeads",
+  "entry": "entry.ts"
+}

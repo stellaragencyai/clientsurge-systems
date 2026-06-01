@@ -23,6 +23,14 @@ Keep these production assets authoritative:
 
 Import from the donor app only when a complete feature slice can be validated: entity/function metadata, backend function, UI route or component, dependency, and test coverage. Do not import donor files that downgrade tests, remove production security gates, change the app ID, or route production traffic to the donor app.
 
+Donor merge audit:
+
+```powershell
+npm run base44:sync-metadata
+```
+
+See `docs/BASE44_DONOR_MERGE_AUDIT.md` for the current donor-vs-production inventory, imported metadata, and donor-only files that are intentionally not copied because production already owns the safer implementation.
+
 ## Desktop and laptop setup
 
 Each machine should have one active clone and one clean mirror:

@@ -1,0 +1,4 @@
+{
+  "name": "predictChurnRisk",
+  "entry": "entry.ts"
+}

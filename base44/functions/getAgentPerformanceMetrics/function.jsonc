@@ -1,0 +1,4 @@
+{
+  "name": "getAgentPerformanceMetrics",
+  "entry": "entry.ts"
+}

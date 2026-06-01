@@ -1,0 +1,16 @@
+{
+  "name": "autoProvisionTwilioNumber",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "entity",
+      "description": "When a new OnboardingClient is created, automatically purchase a local AZ phone number (480/602), save it to the client record, and email Nolan confirmation.",
+      "entity_name": "OnboardingClient",
+      "event_types": [
+        "create"
+      ],
+      "is_active": true,
+      "name": "Auto Provision Twilio Number — New Client"
+    }
+  ]
+}

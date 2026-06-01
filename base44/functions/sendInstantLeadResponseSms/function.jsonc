@@ -1,0 +1,4 @@
+{
+  "name": "sendInstantLeadResponseSms",
+  "entry": "entry.ts"
+}

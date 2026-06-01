@@ -1,0 +1,4 @@
+{
+  "name": "workflowStageManager",
+  "entry": "entry.ts"
+}

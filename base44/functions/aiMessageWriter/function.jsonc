@@ -1,0 +1,16 @@
+{
+  "name": "aiMessageWriter",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "entity",
+      "description": "When a new OnboardingClient is created, auto-generate 6 personalized SMS messages using AI and save them to the client record.",
+      "entity_name": "OnboardingClient",
+      "event_types": [
+        "create"
+      ],
+      "is_active": true,
+      "name": "AI Message Writer — New Client"
+    }
+  ]
+}

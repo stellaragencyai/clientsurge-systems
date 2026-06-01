@@ -1,0 +1,4 @@
+{
+  "name": "runFullPipelineTest",
+  "entry": "entry.ts"
+}

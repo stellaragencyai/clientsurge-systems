@@ -1,0 +1,42 @@
+{
+  "name": "sendDailyDigest",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "scheduled",
+      "description": "Sends daily operational digest to admin every morning at 7am MST. Task #589.",
+      "ends_type": "never",
+      "is_active": true,
+      "name": "Daily Digest — 7am MST",
+      "repeat_interval": 1,
+      "repeat_unit": "days",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "start_time": "14:00"
+    },
+    {
+      "type": "scheduled",
+      "description": "Sends admin a daily email digest with new leads, hot leads, overdue follow-ups, and replied leads counts.",
+      "ends_type": "never",
+      "is_active": true,
+      "name": "Daily Lead Digest — 8 AM",
+      "repeat_interval": 1,
+      "repeat_unit": "days",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "start_time": "15:00"
+    },
+    {
+      "type": "scheduled",
+      "description": "Sends a morning summary email with new leads, hot leads, and overdue follow-ups",
+      "ends_type": "never",
+      "is_active": false,
+      "name": "Daily Lead Digest Email",
+      "repeat_interval": 1,
+      "repeat_unit": "days",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "start_time": "15:00"
+    }
+  ]
+}

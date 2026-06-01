@@ -1,0 +1,4 @@
+{
+  "name": "getStripeCustomerPortalUrl",
+  "entry": "entry.ts"
+}

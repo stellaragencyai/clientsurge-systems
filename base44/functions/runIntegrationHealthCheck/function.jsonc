@@ -1,0 +1,4 @@
+{
+  "name": "runIntegrationHealthCheck",
+  "entry": "entry.ts"
+}

@@ -1,0 +1,4 @@
+{
+  "name": "getIntegrationHealth",
+  "entry": "entry.ts"
+}

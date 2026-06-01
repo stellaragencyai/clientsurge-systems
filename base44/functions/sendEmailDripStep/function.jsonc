@@ -1,0 +1,4 @@
+{
+  "name": "sendEmailDripStep",
+  "entry": "entry.ts"
+}

@@ -1,0 +1,4 @@
+{
+  "name": "generateAIReply",
+  "entry": "entry.ts"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "enrichLead",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "entity",
+      "description": "When a new Leads record is created, automatically scrape the business website and web search to extract industry tags, company size, and social profiles, then write them back to the lead record.",
+      "entity_name": "Leads",
+      "event_types": [
+        "create"
+      ],
+      "is_active": true,
+      "name": "Auto Enrich Lead on Create"
+    }
+  ]
+}

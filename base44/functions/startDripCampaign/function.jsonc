@@ -1,0 +1,16 @@
+{
+  "name": "startDripCampaign",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "entity",
+      "description": "When a lead's status changes to Contacted, enroll them in the 3-step drip campaign (Day 1 / Day 3 / Day 7) if they're not already Qualified/Booked/Closed.",
+      "entity_name": "Leads",
+      "event_types": [
+        "update"
+      ],
+      "is_active": true,
+      "name": "Enroll Lead in Drip — Status → Contacted"
+    }
+  ]
+}

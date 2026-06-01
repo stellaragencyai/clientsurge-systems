@@ -1,0 +1,4 @@
+{
+  "name": "createElevenLabsAgent",
+  "entry": "entry.ts"
+}

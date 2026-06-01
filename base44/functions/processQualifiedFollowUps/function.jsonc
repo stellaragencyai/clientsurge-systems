@@ -1,0 +1,17 @@
+{
+  "name": "processQualifiedFollowUps",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "scheduled",
+      "description": "Hourly: sends booking prompt SMS+email to Qualified leads after 24h with no progress; emails assigned rep for Replied leads after 48h with no action.",
+      "ends_type": "never",
+      "is_active": false,
+      "name": "Qualified & Replied Follow-Up Runner — Every Hour",
+      "repeat_interval": 1,
+      "repeat_unit": "hours",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple"
+    }
+  ]
+}

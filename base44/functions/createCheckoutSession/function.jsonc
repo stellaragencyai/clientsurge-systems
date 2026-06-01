@@ -1,0 +1,4 @@
+{
+  "name": "createCheckoutSession",
+  "entry": "entry.ts"
+}

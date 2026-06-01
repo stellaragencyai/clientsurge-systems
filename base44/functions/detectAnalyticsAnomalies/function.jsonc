@@ -1,0 +1,4 @@
+{
+  "name": "detectAnalyticsAnomalies",
+  "entry": "entry.ts"
+}

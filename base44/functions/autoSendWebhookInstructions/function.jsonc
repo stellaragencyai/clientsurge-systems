@@ -1,0 +1,16 @@
+{
+  "name": "autoSendWebhookInstructions",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "entity",
+      "description": "When a new OnboardingClient is created, generate their unique webhook URL and email it to the client with friendly setup instructions.",
+      "entity_name": "OnboardingClient",
+      "event_types": [
+        "create"
+      ],
+      "is_active": true,
+      "name": "Auto Send Webhook Instructions — New Client"
+    }
+  ]
+}

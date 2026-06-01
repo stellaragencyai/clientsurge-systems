@@ -1,0 +1,17 @@
+{
+  "name": "processWebsiteLeadFollowUps",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "scheduled",
+      "description": "Runs the 3-step website lead follow-up sequence (10min SMS, 1hr email, 24hr SMS) every 5 minutes for leads with no reply and no booking",
+      "ends_type": "never",
+      "is_active": true,
+      "name": "Website Lead Follow-Up Processor — Every 5 Minutes",
+      "repeat_interval": 5,
+      "repeat_unit": "minutes",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple"
+    }
+  ]
+}

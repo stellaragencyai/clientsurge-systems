@@ -1,0 +1,4 @@
+{
+  "name": "receiveInboundVoiceCall",
+  "entry": "entry.ts"
+}

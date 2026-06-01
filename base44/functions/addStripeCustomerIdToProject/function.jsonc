@@ -1,0 +1,4 @@
+{
+  "name": "addStripeCustomerIdToProject",
+  "entry": "entry.ts"
+}

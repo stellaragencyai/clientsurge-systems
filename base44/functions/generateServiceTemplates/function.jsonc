@@ -1,0 +1,4 @@
+{
+  "name": "generateServiceTemplates",
+  "entry": "entry.ts"
+}

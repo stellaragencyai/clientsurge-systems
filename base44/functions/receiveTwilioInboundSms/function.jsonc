@@ -1,0 +1,4 @@
+{
+  "name": "receiveTwilioInboundSms",
+  "entry": "entry.ts"
+}

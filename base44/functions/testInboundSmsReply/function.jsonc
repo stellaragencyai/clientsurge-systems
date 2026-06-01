@@ -1,0 +1,4 @@
+{
+  "name": "testInboundSmsReply",
+  "entry": "entry.ts"
+}

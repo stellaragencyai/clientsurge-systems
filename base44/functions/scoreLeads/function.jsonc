@@ -1,0 +1,36 @@
+{
+  "name": "scoreLeads",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "type": "scheduled",
+      "description": "Recalculates lead_score (1–100) for all leads every hour based on status, activity, and engagement recency.",
+      "ends_type": "never",
+      "is_active": false,
+      "name": "Hourly Lead Scoring",
+      "repeat_interval": 1,
+      "repeat_unit": "hours",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple"
+    },
+    {
+      "type": "entity",
+      "entity_name": "CommunicationEvent",
+      "event_types": [
+        "create"
+      ],
+      "is_active": true,
+      "name": "Recalculate Score on Communication Events"
+    },
+    {
+      "type": "entity",
+      "entity_name": "Leads",
+      "event_types": [
+        "create",
+        "update"
+      ],
+      "is_active": true,
+      "name": "Auto-Calculate Lead Score on Update"
+    }
+  ]
+}
