@@ -141,6 +141,7 @@ test("mirror scheduler supports bootstrap plus primary and failover publisher ro
   const updater = read("scripts/sync/update-base44-sync-mirror.ps1");
   const bootstrap = read("scripts/sync/bootstrap-base44-machine.ps1");
   const repair = read("scripts/sync/repair-base44-automation.ps1");
+  const doctor = read("scripts/sync/doctor-base44-machine.ps1");
   const packageJson = read("package.json");
 
   assert.match(installer, /\[ValidateSet\('Primary', 'Failover', 'MirrorOnly'\)\]/);
@@ -166,7 +167,16 @@ test("mirror scheduler supports bootstrap plus primary and failover publisher ro
   assert.match(repair, /install-security-edge-monitor-task\.ps1/);
   assert.match(repair, /automation-repair-latest\.json/);
   assert.match(repair, /npm @\('run', 'sync:status'\)/);
+
+  assert.match(doctor, /ClientSurge Machine Doctor/);
+  assert.match(doctor, /machine-doctor-latest\.json/);
+  assert.match(doctor, /base44 @\('whoami'\)/);
+  assert.match(doctor, /gh @\('auth', 'status'\)/);
+  assert.match(doctor, /npx @\('wrangler', 'whoami'\)/);
+  assert.match(doctor, /npm @\('run', 'sync:status', '--', '--json'\)/);
+  assert.match(doctor, /ExpectedPublisherRole/);
   assert.match(packageJson, /"sync:bootstrap-machine": "pwsh -File scripts\/sync\/bootstrap-base44-machine\.ps1"/);
+  assert.match(packageJson, /"sync:doctor": "pwsh -File scripts\/sync\/doctor-base44-machine\.ps1"/);
   assert.match(packageJson, /"sync:repair-automation": "pwsh -File scripts\/sync\/repair-base44-automation\.ps1"/);
 });
 

@@ -75,10 +75,11 @@ The status audit compares GitHub `origin/main`, the active checkout, the clean m
 Repair local automation on either computer:
 
 ```powershell
+npm run sync:doctor -- -ExpectedPublisherRole Primary
 npm run sync:repair-automation -- -PublishAfterUpdate -PublisherRole Primary -StartTasks
 ```
 
-On the laptop, use `-PublisherRole Failover -FailoverDelayMinutes 3` instead of `Primary`. The repair command reinstalls the Base44 sync/publish task, reinstalls the Cloudflare monitor, optionally starts both tasks to refresh Task Scheduler health, writes `logs/base44-sync/automation-repair-latest.json`, and runs `npm run sync:status`.
+On the laptop, use `-ExpectedPublisherRole Failover` for the doctor and `-PublisherRole Failover -FailoverDelayMinutes 3` for repair. The doctor writes `logs/base44-sync/<machine>/machine-doctor-latest.json` with tool versions, GitHub/Base44/Cloudflare auth state, active and mirror checkout state, scheduled task state, and sync-status evidence. The repair command reinstalls the Base44 sync/publish task, reinstalls the Cloudflare monitor, optionally starts both tasks to refresh Task Scheduler health, writes `logs/base44-sync/automation-repair-latest.json`, and runs `npm run sync:status`.
 
 ## Immediate production publish
 
