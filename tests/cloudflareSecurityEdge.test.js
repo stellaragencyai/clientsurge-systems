@@ -7,16 +7,23 @@ import worker, {
   EDGE_HEALTH_HEADER,
   EDGE_HEALTH_PATH,
   isSensitivePath,
+  originRequestFor,
+  SENSITIVE_HEADERS,
   SECURITY_TXT,
 } from "../cloudflare/clientsurge-security-edge-worker.mjs";
 import {
   evaluateEdgeHealthProbe,
   isCloudflareAnycastAddress,
+  TRANSFORM_FALLBACK_HEADER,
 } from "../scripts/verify-production-security.mjs";
 import {
   diagnoseRouteBypass,
   formatRouteBypassDiagnosis,
 } from "../scripts/cloudflare/diagnose-route-bypass.mjs";
+import {
+  buildSecurityHeaderRules,
+  TRANSFORM_HEADER,
+} from "../scripts/cloudflare/upsert-security-header-transform.mjs";
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
@@ -76,7 +83,16 @@ test("Cloudflare security edge worker serves a Worker-only health probe", async 
   assert.equal(body.edge, "clientsurge-security-edge");
 });
 
-test("production security verifier checks the Worker-only edge probe", () => {
+test("Cloudflare security edge worker proxies application traffic to the Base44 origin host", () => {
+  const originRequest = originRequestFor(new Request("https://clientsurgesystems.com/store?plan=starter"));
+  const originUrl = new URL(originRequest.url);
+
+  assert.equal(originUrl.hostname, "grinning-apex-flow-growth.base44.app");
+  assert.equal(originUrl.pathname, "/store");
+  assert.equal(originUrl.search, "?plan=starter");
+});
+
+test("production security verifier checks the Cloudflare security layer probe", () => {
   const pass = evaluateEdgeHealthProbe({
     target: `https://clientsurgesystems.com${EDGE_HEALTH_PATH}`,
     status: 200,
@@ -90,6 +106,37 @@ test("production security verifier checks the Worker-only edge probe", () => {
     headers: { "content-type": "text/html" },
   });
   assert.equal(fail.status, "fail");
+});
+
+test("production security verifier accepts Cloudflare transform fallback when Worker route is bypassed", () => {
+  const pass = evaluateEdgeHealthProbe({
+    target: `https://clientsurgesystems.com${EDGE_HEALTH_PATH}`,
+    status: 200,
+    headers: { [TRANSFORM_FALLBACK_HEADER]: "active" },
+  });
+  assert.equal(pass.status, "pass");
+  assert.match(pass.message, /transform fallback is active/);
+});
+
+test("Cloudflare transform fallback rule mirrors Worker security headers", () => {
+  const [globalRule, sensitiveRule] = buildSecurityHeaderRules("clientsurgesystems.com");
+
+  assert.equal(globalRule.action, "rewrite");
+  assert.equal(globalRule.action_parameters.headers[TRANSFORM_HEADER].value, "active");
+  assert.equal(
+    globalRule.action_parameters.headers["Content-Security-Policy"].value,
+    applySecurityHeaders(new Headers(), "/").get("content-security-policy")
+  );
+  assert.equal(
+    globalRule.action_parameters.headers["Permissions-Policy"].value,
+    applySecurityHeaders(new Headers(), "/").get("permissions-policy")
+  );
+  assert.match(globalRule.expression, /clientsurgesystems\.com/);
+
+  assert.equal(sensitiveRule.action, "rewrite");
+  assert.match(sensitiveRule.expression, /\/client-portal/);
+  assert.equal(sensitiveRule.action_parameters.headers["X-Robots-Tag"].value, SENSITIVE_HEADERS["X-Robots-Tag"]);
+  assert.equal(sensitiveRule.action_parameters.headers["Cache-Control"].value, SENSITIVE_HEADERS["Cache-Control"]);
 });
 
 test("Cloudflare security release and monitor scripts keep auth and verification guarded", () => {
@@ -112,7 +159,7 @@ test("Cloudflare security release and monitor scripts keep auth and verification
   assert.match(monitor, /auth_required/);
   assert.match(monitor, /route_bypassed/);
   assert.match(monitor, /orange-to-orange/);
-  assert.match(monitor, /edge-probe:worker/);
+  assert.match(monitor, /edge-probe:worker|edge-probe:security-layer/);
   assert.match(monitor, /Test-RouteBypassFailure/);
   assert.match(monitor, /npm run cloudflare:security:release/);
   assert.match(monitor, /npm run cloudflare:security:diagnose-route -- --json/);

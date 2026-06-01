@@ -23,6 +23,7 @@ export const DOCUMENT_PATHS = [
 ];
 export const EDGE_HEALTH_PATH = "/.well-known/clientsurge-edge-health.json";
 export const EDGE_HEALTH_HEADER = "x-clientsurge-security-edge";
+export const TRANSFORM_FALLBACK_HEADER = "x-clientsurge-security-transform";
 
 const REQUIRED_PUBLIC_HEADERS = [
   "content-security-policy",
@@ -235,15 +236,23 @@ export function evaluateCanonicalText({
 
 export function evaluateEdgeHealthProbe({ target, status, headers }) {
   const headerValue = getHeader(headers, EDGE_HEALTH_HEADER).toLowerCase();
-  const isActive = status === 200 && headerValue === "active";
+  const transformValue = getHeader(headers, TRANSFORM_FALLBACK_HEADER).toLowerCase();
+  const isWorkerActive = status === 200 && headerValue === "active";
+  const isTransformFallbackActive = status === 200 && transformValue === "active";
   return createCheck({
-    id: "edge-probe:worker",
+    id: "edge-probe:security-layer",
     target,
-    status: isActive ? "pass" : "fail",
-    message: isActive
+    status: isWorkerActive || isTransformFallbackActive ? "pass" : "fail",
+    message: isWorkerActive
       ? "Cloudflare Worker edge health probe responded"
-      : "Cloudflare Worker edge health probe did not respond; live traffic is likely bypassing the Worker route",
-    details: { status, header: headerValue || null },
+      : isTransformFallbackActive
+        ? "Cloudflare response header transform fallback is active"
+        : "Cloudflare security layer did not respond; live traffic is likely bypassing the Worker route and transform fallback",
+    details: {
+      status,
+      worker_header: headerValue || null,
+      transform_header: transformValue || null,
+    },
   });
 }
 

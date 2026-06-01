@@ -1,6 +1,7 @@
 const CANONICAL_ORIGIN = "https://clientsurgesystems.com";
 const CANONICAL_HOST = "clientsurgesystems.com";
 const ALTERNATE_HOST = "www.clientsurgesystems.com";
+const BASE44_ORIGIN_HOST = "grinning-apex-flow-growth.base44.app";
 export const EDGE_HEALTH_PATH = "/.well-known/clientsurge-edge-health.json";
 export const EDGE_HEALTH_HEADER = "x-clientsurge-security-edge";
 
@@ -87,6 +88,13 @@ function edgeHealthResponse() {
   }), { status: 200, headers });
 }
 
+export function originRequestFor(request, url = new URL(request.url)) {
+  const originUrl = new URL(url.toString());
+  originUrl.protocol = "https:";
+  originUrl.hostname = BASE44_ORIGIN_HOST;
+  return new Request(originUrl.toString(), request);
+}
+
 export default {
   async fetch(request) {
     const url = new URL(request.url);
@@ -103,7 +111,7 @@ export default {
       return edgeHealthResponse();
     }
 
-    const originResponse = await fetch(request);
+    const originResponse = await fetch(originRequestFor(request, url));
     const headers = applySecurityHeaders(new Headers(originResponse.headers), url.pathname);
 
     return new Response(originResponse.body, {

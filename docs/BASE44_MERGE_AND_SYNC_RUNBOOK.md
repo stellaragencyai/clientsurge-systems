@@ -154,7 +154,8 @@ Base44 does not currently apply `public/_headers` or serve `/.well-known/securit
 
 - Worker source: `cloudflare/clientsurge-security-edge-worker.mjs`
 - Wrangler config: `wrangler.clientsurge-security.toml`
-- Routes: `clientsurgesystems.com/*` and `www.clientsurgesystems.com/*`
+- Routes: `*clientsurgesystems.com/*`, `clientsurgesystems.com/*`, and `www.clientsurgesystems.com/*`
+- Header-transform fallback: `npm run cloudflare:security:upsert-headers`
 
 Dry-run the Worker package:
 
@@ -178,7 +179,15 @@ npm run cloudflare:security:monitor
 
 The monitor writes its latest state to `logs/cloudflare-security/<machine>/latest-security-edge-status.json`. If production security already passes it records `verified`; if Wrangler is not logged in it records `auth_required` without marking the scheduled task failed; if Wrangler is logged in it runs the guarded release and verification sequence.
 
-The Worker proxies Base44, injects CSP/Permissions-Policy/COOP, keeps Base44 editor `frame-ancestors` allowed, marks sensitive app routes `noindex` and `no-store`, serves `/.well-known/security.txt`, and redirects `www` to the canonical host.
+The Worker proxies the production Base44 app host `https://grinning-apex-flow-growth.base44.app`, injects CSP/Permissions-Policy/COOP, keeps Base44 editor `frame-ancestors` allowed, marks sensitive app routes `noindex` and `no-store`, serves `/.well-known/security.txt`, and redirects `www` to the canonical host.
+
+If production security verifies as `route_bypassed`, the public domain is likely flowing through a Cloudflare orange-to-orange SaaS/custom-hostname path before this zone's Worker routes or Transform Rules. The durable fix is to make the Worker the front door for the production domain:
+
+1. Keep the Worker deployed with the Base44 origin proxy above.
+2. In Cloudflare DNS, delete the existing CNAME/custom-hostname records for `clientsurgesystems.com` and `www` that point into the Base44/Render/O2O path.
+3. Attach Worker Custom Domains for `clientsurgesystems.com` and `www.clientsurgesystems.com` to `clientsurge-security-edge`.
+4. Re-run `npm run verify:production-security` and `npm run smoke:public-routes -- --base-url=https://clientsurgesystems.com`.
+5. Keep Base44 publishing to app `69dc4a79656fdba136d413d3`; Cloudflare should proxy the public domain to the Base44 app host, not make Base44 own the public domain path directly.
 
 ## Required verification
 
