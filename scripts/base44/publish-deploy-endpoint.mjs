@@ -28,6 +28,7 @@ function parseArgs(argv) {
     verifyUrl: "",
     showBrowser: false,
     dryRun: false,
+    summary: false,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -38,6 +39,7 @@ function parseArgs(argv) {
     else if (arg === "--verify-url") args.verifyUrl = argv[++i] || "";
     else if (arg === "--show-browser") args.showBrowser = true;
     else if (arg === "--dry-run") args.dryRun = true;
+    else if (arg === "--summary") args.summary = true;
     else if (arg === "--help" || arg === "-h") {
       printHelp();
       process.exit(0);
@@ -57,6 +59,7 @@ Options:
   --timeout-ms MS     Navigation timeout.
   --verify-url URL    Live URL to fetch after deploy.
   --show-browser      Open a visible browser, useful for first-time login.
+  --summary           Print a compact JSON result without the full app payload.
   --dry-run           Verify auth and print the deploy endpoint without POSTing.`);
 }
 
@@ -143,6 +146,21 @@ async function postDeployWithBearer(appId, accessToken) {
   return { ok: response.ok, status: response.status, body };
 }
 
+function buildSummary({ ok, appId, beforeSignal, deployResult, afterSignal }) {
+  return {
+    ok,
+    appId,
+    beforeSignal,
+    deploy: {
+      ok: deployResult?.ok ?? null,
+      status: deployResult?.status ?? null,
+      updatedDate: deployResult?.body?.updated_date || null,
+      appName: deployResult?.body?.name || null,
+    },
+    afterSignal,
+  };
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const appId = args.appId || readBase44AppId();
@@ -164,7 +182,8 @@ async function main() {
   if (cliDeployResult?.ok) {
     await new Promise((resolvePromise) => setTimeout(resolvePromise, 5000));
     const afterSignal = await fetchLiveSignal(args.verifyUrl);
-    console.log(JSON.stringify({ ok: true, appId, beforeSignal, deployResult: cliDeployResult, afterSignal }, null, 2));
+    const result = { ok: true, appId, beforeSignal, deployResult: cliDeployResult, afterSignal };
+    console.log(JSON.stringify(args.summary ? buildSummary(result) : result, null, 2));
     return;
   }
 
@@ -208,7 +227,8 @@ async function main() {
 
     await page.waitForTimeout(5000);
     const afterSignal = await fetchLiveSignal(args.verifyUrl);
-    console.log(JSON.stringify({ ok: true, appId, beforeSignal, deployResult, afterSignal }, null, 2));
+    const result = { ok: true, appId, beforeSignal, deployResult, afterSignal };
+    console.log(JSON.stringify(args.summary ? buildSummary(result) : result, null, 2));
   } finally {
     await context.close();
   }

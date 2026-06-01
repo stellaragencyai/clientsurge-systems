@@ -40,6 +40,8 @@ test("Base44 deploy endpoint publisher targets the production app with authentic
   assert.match(publisher, /\/api\/apps\/\$\{appId\}\/deploy/);
   assert.match(publisher, /fileURLToPath/);
   assert.match(publisher, /credentials: "include"/);
+  assert.match(publisher, /--summary/);
+  assert.match(publisher, /buildSummary/);
   assert.match(publisher, /69dc4a79656fdba136d413d3/);
   assert.match(publisher, /69f959e2bc665e019e19840c/);
   assert.match(publisher, /--show-browser/);
@@ -63,6 +65,7 @@ test("Base44 app access and multi-app publish helpers keep production required",
   assert.match(publishAll, /appId: "69f959e2bc665e019e19840c"/);
   assert.match(publishAll, /appId: "6a15f1424f4856ba4e9ed90b"/);
   assert.match(publishAll, /publish-deploy-endpoint\.mjs/);
+  assert.match(publishAll, /"--summary"/);
   assert.match(packageJson, /"base44:check-app": "node scripts\/base44\/check-app-access\.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https:\/\/clientsurgesystems\.com"/);
   assert.match(packageJson, /"base44:publish-all": "node scripts\/base44\/publish-all-apps\.mjs"/);
 });

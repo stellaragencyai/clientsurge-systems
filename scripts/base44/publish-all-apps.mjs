@@ -92,6 +92,7 @@ function main() {
       app.appId,
       "--verify-url",
       app.verifyUrl,
+      "--summary",
     ];
     if (args.dryRun) scriptArgs.push("--dry-run");
 
