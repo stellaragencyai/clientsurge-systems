@@ -62,6 +62,16 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/sync/bootstrap-base44-mach
 
 Active feature branches never auto-pull. Use the overlap report in `logs/base44-sync/<machine>/` before merging `origin/main` into active work.
 
+Check the whole sync/publish posture from either machine:
+
+```powershell
+npm run sync:status
+npm run sync:status -- --json
+npm run sync:status -- --live-security
+```
+
+The status audit compares GitHub `origin/main`, the active checkout, the clean mirror, Base44 last-published SHA, production app access, scheduled task results, Cloudflare monitor state, and donor-app-ID leakage.
+
 ## Immediate production publish
 
 The guarded production publisher is:

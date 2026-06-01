@@ -127,3 +127,18 @@ test("mirror scheduler supports bootstrap plus primary and failover publisher ro
   assert.match(bootstrap, /69dc4a79656fdba136d413d3/);
   assert.match(packageJson, /"sync:bootstrap-machine": "pwsh -File scripts\/sync\/bootstrap-base44-machine\.ps1"/);
 });
+
+test("sync status audit covers GitHub mirror Base44 tasks and Cloudflare readiness", () => {
+  const status = read("scripts/sync/audit-sync-status.mjs");
+  const packageJson = read("package.json");
+
+  assert.match(status, /ClientSurge Sync Status/);
+  assert.match(status, /ClientSurge-Base44-SyncMirror/);
+  assert.match(status, /ClientSurge-Cloudflare-Security-Edge/);
+  assert.match(status, /check-app-access\.mjs/);
+  assert.match(status, /last-published-main\.txt/);
+  assert.match(status, /npx", \["wrangler", "whoami"\]/);
+  assert.match(status, /Cloudflare edge release is waiting on Wrangler authentication/);
+  assert.match(status, /hasDonorAppId/);
+  assert.match(packageJson, /"sync:status": "node scripts\/sync\/audit-sync-status\.mjs"/);
+});
