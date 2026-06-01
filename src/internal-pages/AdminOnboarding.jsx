@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
 import { Link2, Loader2, Users } from "lucide-react";
@@ -9,11 +8,11 @@ import AdminShell from "@/components/admin/AdminShell";
 
 export default function AdminOnboarding() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
   const loadClients = async () => {
     const data = await base44.entities.OnboardingClient.list("-created_date", 100);
@@ -23,31 +22,28 @@ export default function AdminOnboarding() {
 
   useEffect(() => { loadClients(); }, []);
 
-  // Admin-only guard
-  if (user && user.role !== "admin") {
-    return (
-      <AdminShell title="Access Denied" activeId="">
-        <div className="flex items-center justify-center py-24">
-          <div className="text-center">
-            <h1 className="text-2xl font-semibold text-foreground mb-2">Access Denied</h1>
-            <p className="text-muted-foreground">Admin access required.</p>
-          </div>
-        </div>
-      </AdminShell>
-    );
-  }
+  // Role guard handled by ProtectedRoute in App.jsx
+  // Use OnboardingClient real fields: activation_status and workflow_stage
+  const liveCount = clients.filter(c => c.activation_status === "activated").length;
+  const inSetupCount = clients.filter(c => c.activation_status === "ready_for_approval" || c.workflow_stage === "automation_setup" || c.workflow_stage === "automation_testing").length;
+  const onboardingCount = clients.filter(c => !c.activation_status || c.activation_status === "not_ready").length;
 
-  const liveCount = clients.filter(c => c.status === "Live").length;
-  const inSetupCount = clients.filter(c => c.status === "In Setup").length;
-  const onboardingCount = clients.filter(c => c.status === "Onboarding" || !c.status).length;
+  const filtered = clients.filter((client) => {
+    const statusMatch = filter === "all"
+      ? true
+      : filter === "live"
+        ? client.activation_status === "activated"
+        : filter === "setup"
+          ? (client.activation_status === "ready_for_approval" || client.workflow_stage?.includes("setup") || client.workflow_stage?.includes("testing"))
+          : (!client.activation_status || client.activation_status === "not_ready");
 
-  const filtered = filter === "all" ? clients
-    : clients.filter(c => {
-        if (filter === "live") return c.status === "Live";
-        if (filter === "setup") return c.status === "In Setup";
-        if (filter === "onboarding") return c.status === "Onboarding" || !c.status;
-        return true;
-      });
+    const query = search.trim().toLowerCase();
+    const searchMatch = !query || [client.business_name, client.email, client.owner_name]
+      .filter(Boolean)
+      .some((value) => String(value).toLowerCase().includes(query));
+
+    return statusMatch && searchMatch;
+  });
 
   if (loading) {
     return (
@@ -104,6 +100,15 @@ export default function AdminOnboarding() {
               {f.label}
             </button>
           ))}
+        </div>
+        <div className="max-w-md">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search business name or email..."
+            className="h-10 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          />
         </div>
 
         {/* Client Cards */}

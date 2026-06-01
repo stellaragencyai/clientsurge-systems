@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, CheckCircle2, Clock3 } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Clock3,
+  HeartPulse,
+  SmilePlus,
+  Activity,
+  Wrench,
+  Hammer,
+  HardHat,
+} from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
@@ -11,6 +21,10 @@ const industries = [
   id: "med-spas-clinics",
   title: "Med Spas & Aesthetic Clinics",
   status: "Live",
+  icon: HeartPulse,
+  accent: "text-rose-700",
+  accentBg: "bg-rose-50 border-rose-200",
+  ctaClass: "border-rose-300/60 bg-rose-50 text-rose-700 hover:bg-rose-100",
   description:
   "Our flagship industry page. See how we automate lead response, follow-up, and consultation booking for med spas and aesthetic clinics.",
   href: "/med-spa"
@@ -19,6 +33,10 @@ const industries = [
   id: "dental",
   title: "Dental & Orthodontics",
   status: "Live",
+  icon: SmilePlus,
+  accent: "text-cyan-700",
+  accentBg: "bg-cyan-50 border-cyan-200",
+  ctaClass: "border-cyan-300/60 bg-cyan-50 text-cyan-700 hover:bg-cyan-100",
   description:
   "Best for practices that need faster response to new patient inquiries, missed-call text-back, and more booked consults.",
   href: "/dental"
@@ -27,6 +45,10 @@ const industries = [
   id: "chiropractic",
   title: "Chiropractic & Physical Therapy",
   status: "Live",
+  icon: Activity,
+  accent: "text-emerald-700",
+  accentBg: "bg-emerald-50 border-emerald-200",
+  ctaClass: "border-emerald-300/60 bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
   description:
   "Built for practices that need more evaluations booked, cleaner follow-up, and less admin drag after the first inquiry.",
   href: "/chiropractic"
@@ -35,6 +57,10 @@ const industries = [
   id: "hvac",
   title: "HVAC, Plumbing & Home Services",
   status: "Live",
+  icon: Wrench,
+  accent: "text-sky-700",
+  accentBg: "bg-sky-50 border-sky-200",
+  ctaClass: "border-sky-300/60 bg-sky-50 text-sky-700 hover:bg-sky-100",
   description:
   "Ideal for service businesses losing jobs to missed calls, slow follow-up, and manual lead management.",
   href: "/hvac"
@@ -43,6 +69,10 @@ const industries = [
   id: "roofing",
   title: "Roofing & Restoration",
   status: "Live",
+  icon: Hammer,
+  accent: "text-amber-700",
+  accentBg: "bg-amber-50 border-amber-200",
+  ctaClass: "border-amber-300/60 bg-amber-50 text-amber-700 hover:bg-amber-100",
   description:
   "Designed for teams that need faster estimate response, better urgency handling, and more booked inspections.",
   href: "/roofing"
@@ -51,6 +81,10 @@ const industries = [
   id: "contractors",
   title: "Contractors & Trades",
   status: "Live",
+  icon: HardHat,
+  accent: "text-violet-700",
+  accentBg: "bg-violet-50 border-violet-200",
+  ctaClass: "border-violet-300/60 bg-violet-50 text-violet-700 hover:bg-violet-100",
   description:
   "Great for teams that need to respond quickly, follow up on quote requests, and convert more web leads into booked jobs.",
   href: "/contractors"
@@ -90,6 +124,7 @@ export default function Industries() {
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 xl:grid-cols-3 gap-6">
           {industries.map((industry) => {
             const isLive = industry.status === "Live";
+            const IndustryIcon = industry.icon;
             return (
               <article
                 key={industry.id}
@@ -97,7 +132,12 @@ export default function Industries() {
                 className="rounded-3xl border border-border bg-card p-6 shadow-sm scroll-mt-24">
                 
                 <div className="flex items-center justify-between gap-3 mb-4">
-                  <h2 className="font-display text-2xl font-semibold text-foreground">{industry.title}</h2>
+                  <div className="flex items-center gap-3">
+                    <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl border ${industry.accentBg}`}>
+                      <IndustryIcon className={`h-5 w-5 ${industry.accent}`} />
+                    </div>
+                    <h2 className="font-display text-2xl font-semibold text-foreground">{industry.title}</h2>
+                  </div>
                   <span
                     className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${
                     isLive ?
@@ -113,7 +153,7 @@ export default function Industries() {
                 {isLive ?
                 <a
                   href={industry.href}
-                  className="inline-flex items-center gap-2 rounded-full border border-[#005f99]/25 bg-[#005f99]/5 px-4 py-2 text-sm font-semibold text-[#005f99] hover:bg-[#005f99]/10 transition-colors">
+                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${industry.ctaClass}`}>
                   
                     Explore this industry
                     <ArrowRight className="w-4 h-4" />

@@ -1,0 +1,15 @@
+{
+  "id": "generate_weekly_report_monday_8am",
+  "name": "Generate weekly report Monday 8am",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 8 * * 1",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run generateWeeklyReport every Monday at 8:00 AM Phoenix time so the portal and operator reporting cadence starts the week with fresh metrics.",
+  "function": "generateWeeklyReport",
+  "task_refs": ["#398"],
+  "priority": "HIGH",
+  "active": true
+}

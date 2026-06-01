@@ -1,11 +1,13 @@
 /**
- * seoHelpers.ts — #19 #64 #81
- * #19: descriptive alt text constants for all images
- * #64: Unsplash srcSet with ?w=800&q=80 params
- * #81: unique meta descriptions per page
+ * utils/seoHelpers.ts — #79 dedup
+ * Core SEO management is in lib/seo.js (setPageMetadata, setJsonLd).
+ * This file retains unique helpers not present in lib/seo.js:
+ * - ALT_TEXT registry
+ * - unsplashOptimised URL builder
+ * - META_DESCRIPTIONS per-page map
  */
 
-// #19: alt text registry
+// Alt text registry for all images (#19)
 export const ALT_TEXT = {
   hero_main: "AI automation dashboard showing lead capture and response statistics for Phoenix local businesses",
   testimonial_maria: "Maria R., owner of Sculpt Med Spa in Scottsdale, AZ",
@@ -19,7 +21,7 @@ export const ALT_TEXT = {
   industry_tanning: "Tanning salon representing AI booking automation",
 };
 
-// #64: Unsplash optimised URL builder
+// Unsplash optimised URL builder (#64)
 export function unsplashOptimised(photoId: string, width = 800, quality = 80): { src: string; srcSet: string } {
   const base = `https://images.unsplash.com/photo-${photoId}`;
   return {
@@ -28,26 +30,13 @@ export function unsplashOptimised(photoId: string, width = 800, quality = 80): {
   };
 }
 
-// #81: unique meta descriptions per page
+// Unique meta descriptions per page (#81)
 export const META_DESCRIPTIONS: Record<string, string> = {
   "/": "ClientSurge Systems builds AI-powered lead capture and automation systems for Phoenix and Scottsdale local businesses. Respond to every inquiry in under 60 seconds — automatically.",
   "/pricing": "Simple, transparent pricing for AI automation. Starter from $497/mo — no contracts. Built for med spas, dental offices, and service businesses in Phoenix, AZ.",
   "/store": "Browse AI automation services for local businesses. Instant lead response, missed call text-back, follow-up sequences, and more. Starting at $497/month.",
-  "/industries/med-spa": "AI lead capture and automation for med spas in Phoenix and Scottsdale. Respond to Botox and filler inquiries in under 60 seconds, 24/7.",
-  "/industries/dental": "AI patient communication for dental offices. Never miss a new patient inquiry — automated responses, booking, and follow-up for Arizona dental practices.",
-  "/industries/tanning": "AI booking automation for tanning salons. Turn website visitors and DMs into booked sessions automatically — no staff required.",
+  "/med-spa": "AI lead capture and automation for med spas in Phoenix and Scottsdale. Respond to Botox and filler inquiries in under 60 seconds, 24/7.",
+  "/dental": "AI patient communication for dental offices. Never miss a new patient inquiry — automated responses, booking, and follow-up for Arizona dental practices.",
   "/blog": "AI automation insights and guides for Phoenix and Scottsdale local business owners. Learn how to capture more leads and book more appointments.",
   "/contact": "Contact ClientSurge Systems — AI automation for local businesses in Phoenix, AZ. Talk to Nolan about building your automated lead capture system.",
 };
-
-export function setPageMeta(pathname: string): void {
-  if (typeof document === "undefined") return;
-  const desc = META_DESCRIPTIONS[pathname] || META_DESCRIPTIONS["/"];
-  let tag = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
-  if (!tag) {
-    tag = document.createElement("meta");
-    tag.setAttribute("name", "description");
-    document.head.appendChild(tag);
-  }
-  tag.setAttribute("content", desc);
-}

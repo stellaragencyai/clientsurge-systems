@@ -163,13 +163,16 @@ Deno.test("checkout.session.completed processing is idempotent across legacy wra
   );
 
   assertEquals(invited.length, 1);
-  assertEquals(invoked.length, 2);
+  assertEquals(invoked.length, 3);
   const confirmationInvoke = invoked.find((entry) => entry.name === "sendOrderConfirmationEmail");
   assert(confirmationInvoke);
   assertEquals(confirmationInvoke.payload.order_id, "order_1");
   assert(
     String(confirmationInvoke.payload.portal_activation_url).includes("/activate/owner@example.com"),
   );
+  const smsInvoke = invoked.find((entry) => entry.name === "sendSMS");
+  assert(smsInvoke);
+  assertEquals(smsInvoke.payload.phone, "+16025550123");
   assert(invoked.some((entry) => entry.name === "sendAdminPurchaseNotification"));
 
   const providerIds = entities.CommunicationEvent.records.map((entry) => entry.provider_message_id);
@@ -186,5 +189,5 @@ Deno.test("checkout.session.completed processing is idempotent across legacy wra
   assertEquals(secondResult.success, true);
   assertEquals(secondResult.duplicate, true);
   assertEquals(invited.length, 1);
-  assertEquals(invoked.length, 2);
+  assertEquals(invoked.length, 3);
 });

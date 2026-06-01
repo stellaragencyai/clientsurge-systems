@@ -114,7 +114,7 @@ export default function CookieConsent() {
             onClick={handleAccept}
             className="flex-1 px-4 py-2 text-xs font-medium text-white rounded-lg transition-all"
             style={{
-              background: 'linear-gradient(135deg,#0a1628 0%,#00aaff 100%)',
+              background: 'linear-gradient(135deg,#0088cc 0%,#00aaff 100%)',
               boxShadow: '0 4px 12px rgba(0,170,255,0.25)'
             }}
             onMouseEnter={(e) => {

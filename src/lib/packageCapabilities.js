@@ -1,3 +1,6 @@
+// #94: Package tier/capability matrix for install runtime gates.
+// For pricing and Stripe product IDs, use PACKAGE_DEFINITIONS / PACKAGE_OFFERS from lib/salesCatalog.js.
+// These two files are complementary: salesCatalog = pricing; packageCapabilities = install runtime.
 export const PACKAGE_CAPABILITY_MATRIX = {
   basic: {
     package_key: "basic_website_plus_two_automations",

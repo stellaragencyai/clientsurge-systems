@@ -402,6 +402,77 @@ export async function ensureConfirmationEmail(base44, order, portalActivationUrl
   return { alreadyRecorded: false };
 }
 
+export async function ensureConfirmationSms(base44, order) {
+  const providerMessageId = `order_confirmation_sms:${order.id}`;
+  const existingEvent = await findCommunicationEvent(base44, providerMessageId);
+  if (existingEvent) {
+    return { alreadyRecorded: true };
+  }
+
+  if (!cleanString(order?.customer_phone)) {
+    return { alreadyRecorded: false, skipped: true, reason: "missing_customer_phone" };
+  }
+
+  const packageName =
+    cleanString(order?.pricing_summary?.package_name) ||
+    cleanString(order?.activation_package_name) ||
+    cleanString(order?.plan_type) ||
+    "your automation system";
+  const portalUrl = buildAppUrl("/client-portal");
+  const message =
+    `You're officially in for ${packageName}. ` +
+    `Your ClientSurge order is paid and your setup is underway. ` +
+    `Portal access: ${portalUrl}`;
+
+  try {
+    await base44.asServiceRole.functions.invoke("sendSMS", {
+      phone: order.customer_phone,
+      message,
+    });
+  } catch (error) {
+    await createCommunicationEvent(
+      base44,
+      buildCommunicationEvent({
+        provider: "twilio",
+        channel: "sms",
+        direction: "outbound",
+        eventType: "sms_failed",
+        status: "failed",
+        providerMessageId,
+        subject: "Order confirmation SMS failed",
+        messageBody: error instanceof Error ? error.message : String(error),
+        order,
+        metadata: {
+          order_id: order.id,
+          phone: order.customer_phone,
+        },
+      })
+    );
+
+    return { alreadyRecorded: false, sms_failed: true };
+  }
+
+  await createCommunicationEvent(
+    base44,
+    buildCommunicationEvent({
+      provider: "twilio",
+      channel: "sms",
+      direction: "outbound",
+      eventType: "sms_sent",
+      providerMessageId,
+      subject: "Order confirmation SMS sent",
+      messageBody: `Order confirmation SMS sent to ${order.customer_phone}.`,
+      order,
+      metadata: {
+        order_id: order.id,
+        phone: order.customer_phone,
+      },
+    })
+  );
+
+  return { alreadyRecorded: false };
+}
+
 export async function ensureAdminPurchaseNotification(base44, order) {
   const providerMessageId = `admin_purchase_notification:${order.id}`;
   const existingEvent = await findCommunicationEvent(base44, providerMessageId);
@@ -520,6 +591,7 @@ export async function processCheckoutSessionCompleted({
     updatedOrder,
     portalInvite.activation_link
   );
+  await ensureConfirmationSms(base44, updatedOrder);
   await ensureAdminPurchaseNotification(base44, updatedOrder);
 
   await createCommunicationEvent(

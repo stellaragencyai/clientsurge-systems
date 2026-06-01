@@ -1,0 +1,15 @@
+{
+  "id": "send_weekly_digest_monday_8am",
+  "name": "Send weekly digest Monday 8am",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 8 * * 1",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run sendWeeklyDigest every Monday at 8:00 AM Phoenix time so Nolan receives weekly leads, MRR, and conversion summaries.",
+  "function": "sendWeeklyDigest",
+  "task_refs": ["#298"],
+  "priority": "HIGH",
+  "active": true
+}

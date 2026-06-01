@@ -1,0 +1,15 @@
+{
+  "id": "health_check_every_6_hours",
+  "name": "Health check every 6 hours",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 */6 * * *",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run runIntegrationHealthCheck every six hours to live-ping providers, create fix-it tasks for persistent failures, and record the outcome in CommunicationEvent.",
+  "function": "runIntegrationHealthCheck",
+  "task_refs": ["#400", "#473"],
+  "priority": "HIGH",
+  "active": true
+}

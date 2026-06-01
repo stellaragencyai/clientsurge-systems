@@ -1,0 +1,15 @@
+{
+  "id": "stalled_onboarding_alert_daily_9am",
+  "name": "Stalled onboarding alert daily 9am",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 9 * * *",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run stalledOnboardingAlert every day at 9:00 AM Phoenix time so stalled onboarding records are surfaced to operators.",
+  "function": "stalledOnboardingAlert",
+  "task_refs": ["#324"],
+  "priority": "HIGH",
+  "active": true
+}

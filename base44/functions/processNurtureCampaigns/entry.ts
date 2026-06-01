@@ -19,8 +19,8 @@ import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
 
-// #97: 23-hour idempotency guard — prevents duplicate nurture sends
-const IDEMPOTENCY_WINDOW_MS = 23 * 3600000;
+// #97 / #495: 24-hour idempotency guard — prevents duplicate nurture sends inside the same daily window
+const IDEMPOTENCY_WINDOW_MS = 24 * 3600000;
 async function wasRecentlySent(base44, leadId, stepKey) {
   const since = new Date(Date.now() - IDEMPOTENCY_WINDOW_MS).toISOString();
   const events = await base44.asServiceRole.entities.CommunicationEvent.filter(

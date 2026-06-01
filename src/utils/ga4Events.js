@@ -1,7 +1,7 @@
 /**
- * ga4Events.js — #295 #296
- * GA4 event tracking for: checkout clicks, form submissions, demo bookings, lead submits.
- * Uses gtag() — requires GA4 snippet in index.html.
+ * utils/ga4Events.js — #76 dedup
+ * GA4 event helpers live in lib/ga4.js (installGa4, etc.) and lib/analytics.js (trackCTA etc.).
+ * Specific conversion events below remain here as they are checkout/form-specific.
  */
 
 function gtag(...args) {
@@ -10,7 +10,7 @@ function gtag(...args) {
   }
 }
 
-// #295: Checkout button click → GA4 purchase-intent event
+// Checkout button click → GA4 purchase-intent event
 export function trackCheckoutClick({ package_key, monthly_rate, setup_fee }) {
   gtag("event", "begin_checkout", {
     currency: "USD",
@@ -19,7 +19,7 @@ export function trackCheckoutClick({ package_key, monthly_rate, setup_fee }) {
   });
 }
 
-// #295: Stripe checkout completed (called from order-success page)
+// Stripe checkout completed (called from order-success page)
 export function trackPurchase({ order_id, package_key, monthly_rate, setup_fee }) {
   gtag("event", "purchase", {
     transaction_id: order_id,
@@ -29,7 +29,7 @@ export function trackPurchase({ order_id, package_key, monthly_rate, setup_fee }
   });
 }
 
-// #296: Lead capture form submitted
+// Lead capture form submitted
 export function trackLeadSubmit({ industry, has_website }) {
   gtag("event", "generate_lead", {
     currency: "USD",
@@ -39,7 +39,7 @@ export function trackLeadSubmit({ industry, has_website }) {
   });
 }
 
-// #296: Demo booking form submitted
+// Demo booking form submitted
 export function trackDemoBooked({ industry, scheduled_date }) {
   gtag("event", "demo_booked", {
     category: "conversion",
@@ -48,12 +48,12 @@ export function trackDemoBooked({ industry, scheduled_date }) {
   });
 }
 
-// #296: Contact form submitted
+// Contact form submitted
 export function trackContactSubmit({ source }) {
   gtag("event", "contact_form_submit", { source: source || "homepage" });
 }
 
-// #296: Onboarding form submitted
+// Onboarding form submitted
 export function trackOnboardingSubmit({ package_key }) {
   gtag("event", "onboarding_complete", { package_key });
 }

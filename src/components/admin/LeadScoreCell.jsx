@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 /**
  * LeadScoreCell — #179
  * Drop-in cell component for AdminLeads table.
@@ -28,7 +30,7 @@ export function LeadScoreCell({ score }) {
  * Renders above the leads table when rows are selected.
  */
 export function BulkActionToolbar({ selectedIds = [], onBulkUpdate, onClear }) {
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = useState(false);
 
   if (!selectedIds.length) return null;
 

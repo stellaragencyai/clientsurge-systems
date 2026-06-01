@@ -1,0 +1,19 @@
+{
+  "name": "clientsurge-browser-audit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Safe rendered-browser audit tooling for ClientSurge Systems public websites.",
+  "scripts": {
+    "install:browsers": "playwright install chromium",
+    "crawl": "node scripts/crawl-site.js",
+    "audit:page": "node scripts/audit-page.js",
+    "screenshot": "node scripts/screenshot-page.js",
+    "audit:all": "node scripts/audit-all-public-pages.js",
+    "audit:site": "node scripts/audit-site.js"
+  },
+  "dependencies": {
+    "axe-core": "^4.11.0",
+    "playwright": "^1.60.0"
+  }
+}

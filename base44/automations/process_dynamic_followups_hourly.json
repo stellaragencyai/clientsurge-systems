@@ -1,0 +1,15 @@
+{
+  "id": "process_dynamic_followups_hourly",
+  "name": "Dynamic follow-ups hourly runner",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 * * * *",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run processDynamicFollowUps at the top of every hour so active follow-up sequences continue without operator intervention.",
+  "function": "processDynamicFollowUps",
+  "task_refs": ["#396"],
+  "priority": "HIGH",
+  "active": true
+}

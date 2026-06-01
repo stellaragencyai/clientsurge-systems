@@ -93,4 +93,4 @@ function appendOptOutFooter(message) {
   return message + footer;
 }
 
-module.exports = { checkSMSCompliance, handleInboundReply, appendOptOutFooter, isBusinessHours };
+export { checkSMSCompliance, handleInboundReply, appendOptOutFooter, isBusinessHours };

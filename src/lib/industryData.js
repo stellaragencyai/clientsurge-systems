@@ -1,4 +1,6 @@
 // Centralized industry data - single source of truth for all 6 industries
+// #95: Canonical industry data. Do NOT duplicate industry definitions inline in components.
+// Components should import from here. Industry-specific automation use cases: lib/sixAutomations.js INDUSTRY_AUTOMATION_USE_CASES.
 // Structure allows easy addition of new industries with minimal code
 // Variations: images, pain points, SMS demo, metrics, testimonials, FAQs are industry-specific
 // Shared sections: layout, component structure, CTA flow

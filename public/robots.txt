@@ -32,8 +32,7 @@ Disallow: /MedSpaDashboard
 Disallow: /WebsiteSpecPreview
 Disallow: /NotFound
 Disallow: /medspa-dashboard
-Disallow: /leads
-Disallow: /leads/
+Disallow: /leads/admin
 Disallow: /api/
 Disallow: /base44/
 

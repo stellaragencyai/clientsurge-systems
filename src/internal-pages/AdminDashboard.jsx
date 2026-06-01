@@ -35,12 +35,16 @@ import ReviewRequestPanel from '../components/admin/ReviewRequestPanel';
 import LeadReactivationPanel from '../components/admin/LeadReactivationPanel';
 import TaskBoardPanel from '../components/admin/TaskBoardPanel';
 import AutomationAlertsPanel from '../components/admin/AutomationAlertsPanel';
+import AdminFailedJobsPanel from '../components/admin/AdminFailedJobsPanel';
+import AuditLogPanel from '../components/admin/AuditLogPanel';
+import AIAgentsDashboard from '../components/admin/AIAgentsDashboard';
+import { AdminQuickActions, ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 import SniperDashboard from '../components/admin/SniperDashboard';
-import AuditLogPanel from '../components/admin/AuditLogPanel';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
+import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -91,6 +95,7 @@ const NAV_GROUPS = [
       { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
       { id: 'reactivation', label: 'Lead Reactivation', icon: RotateCcw },
       { id: 'routing', label: 'Lead Routing', icon: Target },
+      { id: 'failed-jobs', label: 'Failed Jobs', icon: Loader2 },
     ],
   },
   {
@@ -98,6 +103,7 @@ const NAV_GROUPS = [
     items: [
       { id: 'analytics', label: 'Analytics', icon: BarChart3 },
       { id: 'revenue', label: 'Revenue & MRR', icon: DollarSign },
+      { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
       { id: 'priority', label: 'Priority Queue', icon: Star },
       { id: 'attribution', label: 'Source Attribution', icon: PieChart },
     ],
@@ -114,6 +120,7 @@ const NAV_GROUPS = [
       { id: 'health', label: 'Integration Health', icon: Activity },
       { id: 'audit-log', label: 'Audit Log', icon: ShieldCheck },
       { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
+      { id: 'audit-log', label: 'Audit Log', icon: Activity },
       { id: 'templates', label: 'Templates', icon: MessageSquare },
       { id: 'review-request', label: 'Review Requests', icon: Star },
       { id: 'settings', label: 'Settings', icon: Settings },
@@ -151,11 +158,10 @@ export default function AdminDashboard() {
     const loadUnread = async () => {
       try {
         const [msgs, failedEvents] = await Promise.all([
-          base44.entities.SupportMessage.filter({ read: false }, "-created_date", 200),
+          base44.asServiceRole.entities.SupportMessage.filter({ read: false }, "-created_date", 200),
           base44.asServiceRole.entities.CommunicationEvent.filter({ status: "failed" }, "-created_date", 200),
         ]);
-        const clientMsgs = (msgs || []).filter(m => m.role === "client");
-        setInboxUnread(clientMsgs.length);
+        setInboxUnread((msgs || []).length);
         setWebhookErrorCount(countWebhookErrorEvents(failedEvents || []));
       } catch {}
     };
@@ -186,16 +192,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!user || user.role !== 'admin') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold text-foreground mb-4">Access Denied</h1>
-          <p className="text-muted-foreground">Admin access required</p>
-        </div>
-      </div>
-    );
-  }
+  // Role guard is handled by ProtectedRoute in App.jsx — no redundant check needed here
 
   const handleLogout = () => {
     setLoggingOut(true);
@@ -223,6 +220,7 @@ export default function AdminDashboard() {
       case 'templates': return <CommunicationTemplates />;
       case 'health': return <IntegrationHealth />;
       case 'client-projects': return <ClientProjectsPanel />;
+      case 'ai-sales-reps': return <AIAgentsDashboard />;
       case 'automations': return <AutomationsPanel />;
       case 'drip': return <DripCampaignPanel />;
       case 'nurture': return <NurtureCampaignPanel />;
@@ -238,6 +236,8 @@ export default function AdminDashboard() {
       case 'website-leads': return <WebsiteLeadsDashboard />;
       case 'demo-bookings': return <AdminDemoBookingsTab />;
       case 'logs': return <CommunicationLogsPanel />;
+      case 'failed-jobs': return <AdminFailedJobsPanel />;
+      case 'audit-log': return <AuditLogPanel />;
       case 'cadence': return <DynamicCadencePanel />;
       case 'reactivation': return <LeadReactivationPanel />;
       case 'review-request': return <ReviewRequestPanel />;
@@ -245,7 +245,6 @@ export default function AdminDashboard() {
       case 'social-engine': return <SocialMediaEngine />;
       case 'website-copy': return <WebsiteCopyPanel />;
       case 'task-board': return <TaskBoardPanel />;
-      case 'audit-log': return <AuditLogPanel />;
       case 'qa': return (
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">QA Tools</h2>
@@ -262,6 +261,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-background flex">
+      <StripeTestModeBanner />
       {/* Sidebar */}
       <div
         className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-background border-r border-border transition-transform duration-300 lg:translate-x-0 ${
@@ -403,6 +403,8 @@ function OverviewDashboard({ onNavigate }) {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [orders, setOrders] = useState([]);
+  const [onboardings, setOnboardings] = useState([]);
 
   useEffect(() => {
     fetchOverviewData();
@@ -410,8 +412,14 @@ function OverviewDashboard({ onNavigate }) {
 
   const fetchOverviewData = async () => {
     try {
-      const response = await fetchLeadPipelineSummary({ limit: 10, offset: 0 });
+      const [response, orderRecords, onboardingRecords] = await Promise.all([
+        fetchLeadPipelineSummary({ limit: 10, offset: 0 }),
+        base44.asServiceRole.entities.Order.filter({ payment_status: "paid" }, "-created_date", 200).catch(() => []),
+        base44.entities.OnboardingClient.list("-created_date", 100).catch(() => []),
+      ]);
       setSnapshot(response);
+      setOrders(orderRecords || []);
+      setOnboardings(onboardingRecords || []);
       setError("");
     } catch (err) {
       setError(getLeadPipelineError(err, "Unable to load lead overview right now."));
@@ -464,7 +472,7 @@ function OverviewDashboard({ onNavigate }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr,1fr]">
-        <div className="bg-white rounded-xl border border-border p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           <h3 className="text-lg font-semibold text-foreground mb-4">Priority Outreach Queue</h3>
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {loading ? (
@@ -500,7 +508,7 @@ function OverviewDashboard({ onNavigate }) {
         </div>
 
         {/* Offer Mix — clickable */}
-        <div className="bg-white rounded-xl border border-border p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           <h3 className="text-lg font-semibold text-foreground mb-4">Offer Mix</h3>
           <div className="space-y-3">
             {[
@@ -525,8 +533,44 @@ function OverviewDashboard({ onNavigate }) {
         </div>
       </div>
 
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div className="rounded-xl border border-border bg-muted/30 p-5">
+          <LTVCard orders={orders} />
+        </div>
+        <div className="rounded-xl border border-border bg-muted/30 p-5">
+          <ChurnRiskPanel orders={orders} />
+        </div>
+        <div className="rounded-xl border border-border bg-muted/30 p-5">
+          <InstallStatusTable onboardings={onboardings.slice(0, 20)} />
+        </div>
+      </div>
+
+      <div className="bg-card rounded-xl border border-border p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-semibold text-foreground">Recent Paid Orders</h3>
+            <p className="text-sm text-muted-foreground">Run the common operator actions against the latest paid orders.</p>
+          </div>
+          <button onClick={fetchOverviewData} className="text-xs font-semibold text-primary hover:text-primary/80">Refresh</button>
+        </div>
+        <div className="space-y-3">
+          {orders.slice(0, 5).map((order) => (
+            <div key={order.id} className="flex flex-col gap-3 rounded-lg border border-border bg-muted/10 p-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <p className="text-sm font-semibold text-foreground">{order.business_name || order.customer_name || "Unnamed client"}</p>
+                <p className="text-xs text-muted-foreground">
+                  {order.customer_email || "No email"} · {order.selected_package_type || order.package_type || "single_service"}
+                </p>
+              </div>
+              <AdminQuickActions order={order} onRefresh={fetchOverviewData} />
+            </div>
+          ))}
+          {orders.length === 0 && <p className="text-sm text-muted-foreground">No paid orders available yet.</p>}
+        </div>
+      </div>
+
       {/* Recent Leads */}
-      <div className="bg-white rounded-xl border border-border p-6">
+      <div className="bg-card rounded-xl border border-border p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-foreground">Recent Lead Movement</h3>
           <button onClick={() => onNavigate('leads')} className="text-xs font-semibold text-primary hover:text-primary/80">View all →</button>
@@ -564,7 +608,7 @@ function OverviewDashboard({ onNavigate }) {
 
       {/* Activation Snapshot */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-xl border border-border p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           <h3 className="font-semibold text-foreground mb-3">Actionability Snapshot</h3>
           <div className="space-y-3 text-sm">
             {[
@@ -587,7 +631,7 @@ function OverviewDashboard({ onNavigate }) {
             ))}
           </div>
         </div>
-        <div className="bg-white rounded-xl border border-border p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           <h3 className="font-semibold text-foreground mb-3">Operator Guidance</h3>
           <div className="space-y-2 text-sm text-muted-foreground">
             <p>✓ Work the priority queue before broad list scanning.</p>
@@ -606,7 +650,7 @@ function OverviewDashboard({ onNavigate }) {
         </div>
       </div>
 
-      <SessionTimeoutModal onLogout={handleLogout} logoutAfterMs={45 * 60 * 1000} />
+      <SessionTimeoutModal onLogout={() => base44.auth.logout('/')} logoutAfterMs={45 * 60 * 1000} />
     </div>
   );
 }

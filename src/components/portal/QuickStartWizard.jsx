@@ -16,6 +16,25 @@ const STEPS = [
   { id: 'complete',       icon: Rocket,        title: 'You\'re All Set!',               desc: 'Your system is configured and ready to capture leads.' },
 ];
 
+const STEP_HELP_RESOURCES = {
+  business: [
+    { label: "Brand voice examples", href: "/contact" },
+    { label: "Need help with business hours?", href: "mailto:support@clientsurgesystems.com?subject=Quick%20Start%20Help%20-%20Business%20Details" },
+  ],
+  sms: [
+    { label: "Get Twilio setup help", href: "mailto:support@clientsurgesystems.com?subject=Quick%20Start%20Help%20-%20SMS%20Setup" },
+    { label: "Book a setup walkthrough", href: "/book" },
+  ],
+  email: [
+    { label: "Email template examples", href: "mailto:support@clientsurgesystems.com?subject=Quick%20Start%20Help%20-%20Email%20Templates" },
+    { label: "Verify your sending domain with us", href: "/contact" },
+  ],
+  booking: [
+    { label: "Calendar integration help", href: "mailto:support@clientsurgesystems.com?subject=Quick%20Start%20Help%20-%20Booking%20Flow" },
+    { label: "Review your booking flow live", href: "/book" },
+  ],
+};
+
 // ── Field helpers ─────────────────────────────────────────────────────────────
 
 function Field({ label, hint, children }) {
@@ -378,6 +397,7 @@ export default function QuickStartWizard({ project, onComplete, onDismiss }) {
   const step = STEPS[currentStep];
   const isLast = currentStep === STEPS.length - 1;
   const isFirst = currentStep === 0;
+  const helpLinks = STEP_HELP_RESOURCES[step.id] || [];
 
   const saveAndAdvance = async () => {
     setError('');
@@ -477,6 +497,23 @@ export default function QuickStartWizard({ project, onComplete, onDismiss }) {
           {step.id === 'email'    && <EmailStep data={data} onChange={onChange} />}
           {step.id === 'booking'  && <BookingStep data={data} onChange={onChange} />}
           {step.id === 'complete' && <CompleteStep data={data} />}
+
+          {helpLinks.length > 0 && (
+            <div className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-700">Need help?</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {helpLinks.map((item) => (
+                  <a
+                    key={`${step.id}-${item.label}`}
+                    href={item.href}
+                    className="inline-flex items-center rounded-full border border-blue-200 bg-white px-3 py-2 text-xs font-semibold text-blue-800 transition-colors hover:bg-blue-100"
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{error}</div>

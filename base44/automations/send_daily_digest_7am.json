@@ -1,0 +1,15 @@
+{
+  "id": "send_daily_digest_8am",
+  "name": "Send daily digest 8am",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 8 * * *",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run sendDailyDigest every day at 8:00 AM Phoenix time so Nolan receives the daily lead and orders digest at the start of the workday.",
+  "function": "sendDailyDigest",
+  "task_refs": ["#399"],
+  "priority": "HIGH",
+  "active": true
+}

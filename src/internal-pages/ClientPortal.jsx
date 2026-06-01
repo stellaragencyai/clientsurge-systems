@@ -18,10 +18,14 @@ import PortalSettings from "../components/portal/PortalSettings";
 import TasksDashboard from "../components/portal/TasksDashboard";
 import AutomationsOverview from "../components/portal/AutomationsOverview";
 import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
+import AutomationChecklist from "../components/portal/AutomationChecklist";
+import PortalWhatsNew from "../components/portal/PortalWhatsNew";
+import ClientOrderStatusTab from "../components/portal/ClientOrderStatusTab";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalTimeline from "../components/portal/PortalTimeline";
 import SystemStatusBadge from "../components/portal/SystemStatusBadge";
+import OrderTracker from "../components/landing/OrderTracker";
 
 const RevenueMetricsPanel = lazy(() => import("../components/portal/RevenueMetricsPanel"));
 const WeeklyReports = lazy(() => import("../components/portal/WeeklyReports"));
@@ -51,6 +55,7 @@ const TABS = [
   { id: "performance", label: "🎯 Performance" },
   { id: "metrics", label: "Lead Flow" },
   { id: "tasks", label: "Tasks" },
+  { id: "checklist", label: "Checklist" },
   { id: "leads", label: "My Leads" },
   { id: "deadlines", label: "Deadlines" },
   { id: "files", label: "Files & Docs" },
@@ -59,8 +64,11 @@ const TABS = [
   { id: "support", label: "Support & Messaging" },
   { id: "plan", label: "My Plan" },
   { id: "reports", label: "Weekly Report" },
+  { id: "updates", label: "What's New" },
   { id: "settings", label: "Settings" },
 ];
+
+TABS.splice(1, 0, { id: "order-status", label: "Order Status" });
 
 export default function ClientPortal() {
   const [user, setUser] = useState(null);
@@ -320,11 +328,20 @@ export default function ClientPortal() {
         {activeTab === "tasks" && (
           <TasksDashboard project={project} />
         )}
+        {activeTab === "checklist" && (
+          <AutomationChecklist order_id={portalOrder?.id} />
+        )}
         {activeTab === "leads" && (
           <LeadActivityFeed project={project} />
         )}
         {activeTab === "progress" && (
-          <SetupProgressHub project={project} order={portalOrder} user={user} />
+          <div className="space-y-6">
+            <SetupProgressHub project={project} order={portalOrder} user={user} />
+            <OrderTracker />
+          </div>
+        )}
+        {activeTab === "order-status" && (
+          <ClientOrderStatusTab order_id={portalOrder?.id} />
         )}
         {activeTab === "timeline" && (
           <PortalTimeline order={portalOrder} project={project} />
@@ -354,6 +371,9 @@ export default function ClientPortal() {
           <LazyPortalPanel>
             <WeeklyReports project={project} />
           </LazyPortalPanel>
+        )}
+        {activeTab === "updates" && (
+          <PortalWhatsNew />
         )}
         {activeTab === "settings" && (
           <PortalSettings project={project} user={user} onUpdated={refreshProject} />

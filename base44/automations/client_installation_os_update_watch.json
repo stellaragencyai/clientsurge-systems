@@ -1,0 +1,14 @@
+{
+  "id": "client_installation_os_update_watch",
+  "name": "ClientInstallationOS update stall watch",
+  "trigger": {
+    "entity": "ClientInstallationOS",
+    "event": "update",
+    "watch_field": "workflow_stage"
+  },
+  "task": "When ClientInstallationOS workflow_stage changes, evaluate whether stalledOnboardingAlert should surface the client in the next daily stall review.",
+  "function": "stalledOnboardingAlert",
+  "task_refs": ["#392"],
+  "priority": "HIGH",
+  "active": true
+}

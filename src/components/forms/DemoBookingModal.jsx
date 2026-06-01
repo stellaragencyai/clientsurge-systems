@@ -48,6 +48,9 @@ export default function DemoBookingModal({ onClose }) {
           <iframe
             src={DEMO_VIDEO_URL}
             title="ClientSurge Systems Demo"
+            width="100%"
+            height="700"
+            scrolling="yes"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             className="absolute inset-0 w-full h-full border-0"

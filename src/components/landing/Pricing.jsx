@@ -251,14 +251,6 @@ export default function Pricing() {
           position: relative;
           background: linear-gradient(135deg, rgba(255,255,255,0.78) 0%, rgba(255,255,255,0.58) 100%);
         }
-        .dark .pricing-card {
-          background: linear-gradient(135deg, rgba(30,22,14,0.88) 0%, rgba(20,15,8,0.72) 100%) !important;
-          border-color: rgba(200,150,92,0.18) !important;
-        }
-        .dark .pricing-card.highlight-glow {
-          background: linear-gradient(135deg, rgba(40,28,16,0.96) 0%, rgba(28,20,10,0.88) 100%) !important;
-          border-color: rgba(200,150,92,0.35) !important;
-        }
         .pricing-card.highlight-glow {
           background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.84) 100%);
         }
@@ -431,13 +423,13 @@ function PricingCard({ plan, selectedIndustry }) {
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">
             {plan.name}
           </h3>
-          {plan.badge ? (
-            <p className="text-xs font-bold text-primary mb-2">{plan.badge}</p>
-          ) : null}
-          {isRecommended ? (
+          {/* Badge label shown once inline, floating badge shown above card */}
+          {isRecommended && selectedIndustry?.shortName ? (
             <p className="text-xs font-bold text-primary mb-2">
               Recommended for {selectedIndustry.shortName}
             </p>
+          ) : plan.badge ? (
+            <p className="text-xs font-bold text-primary mb-2">{plan.badge}</p>
           ) : null}
           <p className="text-xs font-semibold text-foreground/70 leading-snug">
             {plan.fit}

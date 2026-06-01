@@ -1,0 +1,15 @@
+{
+  "id": "monthly_client_report_first_of_month_8am",
+  "name": "Monthly client report first of month 8am",
+  "trigger": {
+    "entity": "Scheduler",
+    "event": "cron",
+    "schedule": "0 8 1 * *",
+    "timezone": "America/Phoenix"
+  },
+  "task": "Run monthlyClientReport on the first day of each month at 8:00 AM Phoenix time so monthly client reports are generated on schedule.",
+  "function": "monthlyClientReport",
+  "task_refs": ["#325"],
+  "priority": "HIGH",
+  "active": true
+}

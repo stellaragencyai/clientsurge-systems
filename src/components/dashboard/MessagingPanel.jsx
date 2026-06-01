@@ -29,24 +29,17 @@ export default function MessagingPanel({ leadId, leadPhone }) {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !leadPhone) return;
 
     setSending(true);
     try {
-      // Create message record
-      const msg = await base44.entities.Messages.create({
-        lead_id: leadId,
-        direction: "outbound",
-        channel: "sms",
-        message_text: newMessage,
-        status: "sent",
+      await base44.functions.invoke("sendSMS", {
+        phone: leadPhone,
+        message: newMessage.trim(),
+        leadId,
       });
-
-      // Add to UI immediately
-      setMessages((prev) => [msg, ...prev]);
       setNewMessage("");
-
-      // TODO: In STEP 5, integrate actual Twilio SMS sending here
+      await loadMessages();
     } catch (err) {
       console.error("Error sending message:", err);
     } finally {
@@ -117,7 +110,7 @@ export default function MessagingPanel({ leadId, leadPhone }) {
         />
         <button
           type="submit"
-          disabled={sending || !newMessage.trim()}
+          disabled={sending || !newMessage.trim() || !leadPhone}
           className="px-4 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors flex items-center gap-2"
         >
           {sending ? (

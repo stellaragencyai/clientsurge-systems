@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
 
     if (type === "leads") {
       // #110: leads CSV
-      const all = await base44.asServiceRole.entities.SpaLead.list().catch(() => []);
+      const all = await base44.asServiceRole.entities.Leads.list().catch(() => []);
       rows = (all || []).filter((l: any) => {
         if (industry && l.industry !== industry) return false;
         if (status && l.status !== status) return false;
