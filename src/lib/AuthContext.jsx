@@ -67,20 +67,19 @@ export const AuthProvider = ({ children }) => {
   const checkAppState = async () => {
     const currentPath = window.location.pathname;
 
-    if (shouldAllowLocalAuthBypass()) {
-      const localAdmin = getLocalDevAdminUser();
-      if (localAdmin) {
-        setUser(localAdmin);
-        setIsAuthenticated(true);
-      } else if (isPublicRoute(currentPath)) {
-        setUser(null);
-        setIsAuthenticated(false);
-      } else {
-        await checkUserAuth();
-        setIsLoadingPublicSettings(false);
-        setAuthError(null);
-        return;
-      }
+    const localAdmin = getLocalDevAdminUser();
+    if (localAdmin) {
+      setUser(localAdmin);
+      setIsAuthenticated(true);
+      setIsLoadingPublicSettings(false);
+      setIsLoadingAuth(false);
+      setAuthError(null);
+      return;
+    }
+
+    if (shouldAllowLocalAuthBypass() && isPublicRoute(currentPath)) {
+      setUser(null);
+      setIsAuthenticated(false);
       setIsLoadingPublicSettings(false);
       setIsLoadingAuth(false);
       setAuthError(null);
