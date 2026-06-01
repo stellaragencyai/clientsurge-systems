@@ -411,7 +411,7 @@ const AuthenticatedApp = () => {
       <Route
         element={
           <ProtectedRoute
-            allowedRoles={["admin"]}
+            allowedRoles={["admin", "super_admin"]}
             unauthenticatedElement={<AuthRedirectFallback />}
             unauthorizedElement={<AccessDeniedPage />}
           />

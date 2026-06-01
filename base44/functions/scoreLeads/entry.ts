@@ -44,9 +44,9 @@ function allowAnonymousAutomation(req) {
   return constantTimeEqual(candidateSecret || "", configuredSecret);
 }
 
-const LEAD_LIMIT = 10000;
-const EVENT_LIMIT = 10000;
-const EMAIL_RECIPIENT_LIMIT = 10000;
+const LEAD_LIMIT = 25000;
+const EVENT_LIMIT = 25000;
+const EMAIL_RECIPIENT_LIMIT = 25000;
 
 const STATUS_SCORE = {
   New: 5, Contacted: 10, Replied: 18, Qualified: 22,
@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
 
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
-    if (user && user.role !== "admin") {
+    if (user && !["admin", "super_admin"].includes(user.role)) {
       return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
     }
     if (!user && !allowAnonymousAutomation(req)) {

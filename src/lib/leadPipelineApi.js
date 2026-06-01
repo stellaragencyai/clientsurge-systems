@@ -71,6 +71,17 @@ export async function triggerLeadScoring(lead_id = null) {
   return response?.data || {};
 }
 
+export async function runLeadDeduplication({ dry_run = true } = {}) {
+  const response = await base44.functions.invoke("deduplicateLeads", { dry_run });
+  return response?.data || {};
+}
+
+export async function prepareLeadOutreachQueue() {
+  const dedupe = await runLeadDeduplication({ dry_run: false });
+  const scoring = await triggerLeadScoring();
+  return { dedupe, scoring };
+}
+
 export async function saveLeadStatus({ lead_id, status, note = "" }) {
   const response = await base44.functions.invoke("updateLeadStatus", {
     lead_id,

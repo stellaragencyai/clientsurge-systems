@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 
 import {
   getLeadDedupKey,
@@ -42,4 +43,12 @@ test("deduplicateLeads keeps highest score and then newest lead", () => {
   ]);
 
   assert.equal(keeper.id, "newer");
+});
+
+test("deduplicateLeads entry runs against canonical Leads, not legacy SpaLead", () => {
+  const entry = fs.readFileSync("base44/functions/deduplicateLeads/entry.ts", "utf8");
+
+  assert.match(entry, /entities\.Leads/);
+  assert.doesNotMatch(entry, /entities\.SpaLead/);
+  assert.match(entry, /dry_run = true/);
 });

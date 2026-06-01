@@ -5,6 +5,7 @@ import {
   applyLeadImport,
   buildLeadPipelineSnapshot,
   enrichLeadForPipeline,
+  LEAD_PIPELINE_MAX_FETCH,
   listLeadReactivationTargets,
   prepareLeadImport,
 } from "../base44/functions/_shared/leadPipeline.js";
@@ -215,7 +216,8 @@ test("enrichLeadForPipeline derives advisory recommended offer, demo stage, and 
   assert.equal(enriched.next_action.code, "work_demo_request");
   assert.equal(enriched.recommended_offer.primary_service_key, "ai_booking_agent");
   assert.equal(enriched.recommended_offer.package_key, "growth_system");
-  assert.equal(enriched.activation_priority > 0, true);
+  assert.equal(enriched.activation_priority_score > 0, true);
+  assert.equal(["Hot", "High", "Medium", "Low"].includes(enriched.activation_priority), true);
 });
 
 test("buildLeadPipelineSnapshot counts demo-stage leads and recommended package mix without fake pipeline math", async () => {
@@ -358,4 +360,42 @@ test("listLeadReactivationTargets reuses canonical dormant-segment rules against
 
   assert.equal(targets.length, 1);
   assert.equal(targets[0].id, "lead_1");
+});
+
+test("buildLeadPipelineSnapshot handles a 5000+ lead dashboard page with rich filters and pagination metadata", async () => {
+  const leads = Array.from({ length: 5200 }, (_, index) => ({
+    id: `lead_scale_${index}`,
+    created_date: `2026-04-${String((index % 28) + 1).padStart(2, "0")}T00:00:00.000Z`,
+    full_name: `Scale Lead ${index}`,
+    business_name: index % 2 === 0 ? "Signal Med Spa" : "Glow Dental",
+    email: `scale${index}@example.com`,
+    phone: `+1602555${String(index).padStart(4, "0")}`,
+    business_type: index % 2 === 0 ? "med_spa" : "dental",
+    problem: "Imported scale test lead",
+    source: index % 3 === 0 ? "csv_import" : "website",
+    intake_type: index % 5 === 0 ? "demo_booking" : "lead_capture",
+    status: index % 7 === 0 ? "Booked" : index % 3 === 0 ? "Qualified" : "New",
+    lead_score: index % 100,
+    activation_priority: index % 11 === 0 ? "Hot" : index % 4 === 0 ? "High" : "Low",
+  }));
+
+  const snapshot = buildLeadPipelineSnapshot({
+    leads,
+    events: [],
+    filters: { source: "csv_import", priority: "Hot" },
+    limit: 100,
+    offset: 100,
+    now: "2026-05-01T12:00:00.000Z",
+  });
+
+  assert.equal(LEAD_PIPELINE_MAX_FETCH >= 25000, true);
+  assert.equal(snapshot.summary.total_leads, 5200);
+  assert.equal(snapshot.summary.actionable_leads > 0, true);
+  assert.equal(snapshot.pagination.returned, 58);
+  assert.equal(snapshot.pagination.offset, 100);
+  assert.equal(snapshot.pagination.total_filtered, 158);
+  assert.equal(snapshot.pagination.has_more, false);
+  assert.equal(snapshot.filter_options.sources.includes("csv_import"), true);
+  assert.equal(snapshot.filter_options.stage_groups.includes("booked"), true);
+  assert.equal(snapshot.summary.activation_segments.length >= 7, true);
 });

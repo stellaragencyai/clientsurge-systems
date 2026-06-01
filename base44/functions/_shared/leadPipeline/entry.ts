@@ -3,7 +3,7 @@
  * Shared module used by getLeadPipelineSummary backend function
  */
 
-export const LEAD_PIPELINE_MAX_FETCH = 10000;
+export const LEAD_PIPELINE_MAX_FETCH = 25000;
 
 const PRIORITY_MAP = { Hot: 4, High: 3, Medium: 2, Low: 1 };
 

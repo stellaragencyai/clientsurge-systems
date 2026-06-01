@@ -48,3 +48,11 @@ test("requireAdminUser rejects authenticated non-admin users", async () => {
     }
   );
 });
+
+test("requireAdminUser accepts super admins for admin-only functions", async () => {
+  const user = await requireAdminUser(
+    createBase44WithUser({ id: "user_2", role: "super_admin", email: "owner@example.com" })
+  );
+
+  assert.equal(user.role, "super_admin");
+});

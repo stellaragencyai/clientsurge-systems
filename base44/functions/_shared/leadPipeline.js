@@ -4,7 +4,7 @@ import {
   getServiceProductByKey,
 } from "../../../src/lib/salesCatalog.js";
 
-export const LEAD_PIPELINE_MAX_FETCH = 10000;
+export const LEAD_PIPELINE_MAX_FETCH = 25000;
 
 export const LEAD_STATUSES = [
   "New",
@@ -829,6 +829,24 @@ function deriveActivationPriority(lead, segments, nextAction) {
   return Math.max(0, Math.min(100, priority));
 }
 
+function deriveActivationPriorityLabel(lead, priorityScore) {
+  const existing = cleanString(lead.activation_priority);
+  if (["Hot", "High", "Medium", "Low"].includes(existing)) {
+    return existing;
+  }
+
+  if (priorityScore >= 85) {
+    return "Hot";
+  }
+  if (priorityScore >= 70) {
+    return "High";
+  }
+  if (priorityScore >= 45) {
+    return "Medium";
+  }
+  return "Low";
+}
+
 export function enrichLeadForPipeline(lead, now = new Date().toISOString()) {
   const normalizedLead = {
     ...lead,
@@ -849,7 +867,8 @@ export function enrichLeadForPipeline(lead, now = new Date().toISOString()) {
   const nextAction = deriveLeadNextAction(normalizedLead, segments, now);
   const recommendedOffer = deriveLeadRecommendedOffer(normalizedLead, segments);
   const recentMovement = deriveLeadMovementSummary(normalizedLead, now);
-  const activationPriority = deriveActivationPriority(normalizedLead, segments, nextAction);
+  const activationPriorityScore = deriveActivationPriority(normalizedLead, segments, nextAction);
+  const activationPriority = deriveActivationPriorityLabel(normalizedLead, activationPriorityScore);
 
   return {
     ...normalizedLead,
@@ -864,6 +883,7 @@ export function enrichLeadForPipeline(lead, now = new Date().toISOString()) {
     next_action: nextAction,
     recommended_offer: recommendedOffer,
     activation_priority: activationPriority,
+    activation_priority_score: activationPriorityScore,
     dedupe_key:
       normalizedLead.dedupe_key ||
       buildLeadDedupeKey({
@@ -934,6 +954,7 @@ function applyLeadFilters(records, filters = {}) {
   const intakeType = cleanString(filters.intake_type);
   const stageGroup = cleanString(filters.stage_group);
   const segment = cleanString(filters.segment);
+  const priority = cleanString(filters.priority);
 
   return records.filter((record) => {
     if (!recordMatchesLead(record, search)) {
@@ -960,13 +981,17 @@ function applyLeadFilters(records, filters = {}) {
       return false;
     }
 
+    if (priority && priority !== "all" && record.activation_priority !== priority) {
+      return false;
+    }
+
     return true;
   });
 }
 
 function sortLeadRecords(records) {
   return [...records].sort((left, right) => {
-    const priorityDifference = (right.activation_priority || 0) - (left.activation_priority || 0);
+    const priorityDifference = (right.activation_priority_score || 0) - (left.activation_priority_score || 0);
     if (priorityDifference !== 0) {
       return priorityDifference;
     }
@@ -1105,6 +1130,7 @@ export function buildLeadPipelineSnapshot({
       recommended_offer: lead.recommended_offer,
       recent_movement: lead.recent_movement,
       activation_priority: lead.activation_priority,
+      activation_priority_score: lead.activation_priority_score,
     }));
 
   const last7Days = [];

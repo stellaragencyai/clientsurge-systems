@@ -4,6 +4,7 @@ import {
   AlertCircle,
   ArrowRight,
   BrainCircuit,
+  CheckCircle,
   Download,
   Flame,
   Loader2,
@@ -21,6 +22,7 @@ import {
   executeLeadImport,
   fetchLeadPipelineSummary, // #322: wired — called on load via leadPipelineApi
   getLeadPipelineError,
+  prepareLeadOutreachQueue,
   previewLeadImport,
   subscribeToLeadPipelineChanges,
   triggerLeadScoring,
@@ -28,6 +30,7 @@ import {
 import { buildAdminLeadRows } from "@/lib/adminLeadLoadModel";
 import { buildAdminConversionFunnel } from "@/lib/adminConversionFunnel";
 import { buildLeadsCsv, downloadCsvFile } from "@/lib/leadCsvExport";
+import { parseLeadImportRows } from "@/lib/leadImportParser";
 import LeadCRMDrawer from "./LeadCRMDrawer";
 import LeadScoreBadge from "./LeadScoreBadge";
 import BulkActionToolbar from "./BulkActionToolbar";
@@ -103,28 +106,6 @@ function renderActionabilityChips(lead) {
       {segmentLabels[segment] || segment}
     </span>
   ));
-}
-
-function parseImportRows(rawValue) {
-  const trimmed = rawValue.trim();
-  if (!trimmed) {
-    return [];
-  }
-
-  const parsed = JSON.parse(trimmed);
-  if (Array.isArray(parsed)) {
-    return parsed;
-  }
-
-  if (Array.isArray(parsed?.rows)) {
-    return parsed.rows;
-  }
-
-  if (Array.isArray(parsed?.leads)) {
-    return parsed.leads;
-  }
-
-  throw new Error("Paste a JSON array of lead objects or an object with rows/leads.");
 }
 
 function SummaryCard({ label, value, helper, tone = "default" }) {
@@ -251,6 +232,8 @@ export default function LeadManagementDashboard({
   const [loading, setLoading] = useState(initialLoading);
   const [loadingMore, setLoadingMore] = useState(false);
   const [scoringLoading, setScoringLoading] = useState(false);
+  const [prepLoading, setPrepLoading] = useState(false);
+  const [prepResult, setPrepResult] = useState(null);
   const [error, setError] = useState("");
   const [importOpen, setImportOpen] = useState(false);
   const [drawerLead, setDrawerLead] = useState(null);
@@ -292,7 +275,7 @@ export default function LeadManagementDashboard({
     }, 250);
 
     return () => clearTimeout(timer);
-  }, [filters.search, filters.status, filters.source, filters.intake_type, filters.stage_group, filters.segment]);
+  }, [filters.search, filters.status, filters.source, filters.intake_type, filters.stage_group, filters.segment, filters.priority]);
 
   useEffect(() => {
     const unsubscribe = subscribeToLeadPipelineChanges({
@@ -301,7 +284,7 @@ export default function LeadManagementDashboard({
     });
 
     return () => unsubscribe?.();
-  }, [filters.search, filters.status, filters.source, filters.intake_type, filters.stage_group, filters.segment]);
+  }, [filters.search, filters.status, filters.source, filters.intake_type, filters.stage_group, filters.segment, filters.priority]);
 
   const handleFilterChange = (field, value) => {
     setFilters((current) => ({
@@ -322,6 +305,26 @@ export default function LeadManagementDashboard({
     }
   };
 
+  const handlePrepareOutreach = async () => {
+    setPrepLoading(true);
+    setPrepResult(null);
+    try {
+      const result = await prepareLeadOutreachQueue();
+      setPrepResult({
+        type: "success",
+        message: `Prepared outreach queue: merged ${result.dedupe?.merged || 0} duplicates and scored ${result.scoring?.scored || 0} leads.`,
+      });
+      await loadSnapshot({ append: false, nextOffset: 0 });
+    } catch (err) {
+      setPrepResult({
+        type: "error",
+        message: getLeadPipelineError(err, "Failed to prepare outreach queue."),
+      });
+    } finally {
+      setPrepLoading(false);
+    }
+  };
+
   const handleLoadMore = () => {
     if (!snapshot.pagination?.has_more || loadingMore) {
       return;
@@ -338,7 +341,7 @@ export default function LeadManagementDashboard({
       setImportLoading(true);
       setImportError("");
       setImportSuccess("");
-      const rows = parseImportRows(importRaw);
+      const rows = parseLeadImportRows(importRaw);
       const preview = await previewLeadImport({
         rows,
         import_source: importSource,
@@ -356,7 +359,7 @@ export default function LeadManagementDashboard({
     try {
       setImportLoading(true);
       setImportError("");
-      const rows = parseImportRows(importRaw);
+      const rows = parseLeadImportRows(importRaw);
       const result = await executeLeadImport({
         rows,
         import_source: importSource,
@@ -387,7 +390,7 @@ export default function LeadManagementDashboard({
       setImportError("");
       setImportSuccess("");
     } catch {
-      setImportError("Unable to read the selected JSON file.");
+      setImportError("Unable to read the selected import file.");
     } finally {
       event.target.value = "";
     }
@@ -469,6 +472,15 @@ export default function LeadManagementDashboard({
             Score Leads
           </button>
           <button
+            onClick={handlePrepareOutreach}
+            disabled={prepLoading || scoringLoading || loading}
+            className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100 disabled:opacity-50"
+            title="Merge duplicate Leads, recalculate scores, and refresh the ranked outreach queue"
+          >
+            {prepLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
+            Prep Outreach
+          </button>
+          <button
             onClick={handleExportVisibleLeads}
             disabled={loading || leads.length === 0}
             className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-50"
@@ -491,6 +503,17 @@ export default function LeadManagementDashboard({
         <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
           <AlertCircle className="h-5 w-5" />
           {error}
+        </div>
+      ) : null}
+
+      {prepResult ? (
+        <div className={`flex items-center gap-3 rounded-lg border p-4 text-sm ${
+          prepResult.type === "success"
+            ? "border-green-200 bg-green-50 text-green-700"
+            : "border-red-200 bg-red-50 text-red-700"
+        }`}>
+          {prepResult.type === "success" ? <CheckCircle className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
+          {prepResult.message}
         </div>
       ) : null}
 
@@ -672,13 +695,13 @@ export default function LeadManagementDashboard({
             <div>
               <h3 className="text-lg font-semibold text-foreground">Structured Lead Import</h3>
               <p className="text-sm text-muted-foreground">
-                Paste a JSON array of lead objects or upload a JSON file. The import previews exact email/phone dedupe before writing.
+                Paste CSV/TSV or JSON lead rows. The import previews exact email/phone dedupe before writing.
               </p>
             </div>
             <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
               <Download className="h-4 w-4" />
-              Load JSON File
-              <input type="file" accept=".json,application/json" className="hidden" onChange={handleImportFile} />
+              Load Import File
+              <input type="file" accept=".csv,.tsv,.json,text/csv,text/tab-separated-values,application/json" className="hidden" onChange={handleImportFile} />
             </label>
           </div>
 
@@ -709,13 +732,13 @@ export default function LeadManagementDashboard({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-foreground">Lead Rows JSON</label>
+              <label className="mb-2 block text-sm font-medium text-foreground">Lead Rows</label>
               <textarea
                 value={importRaw}
                 onChange={(event) => setImportRaw(event.target.value)}
                 rows={10}
                 className="w-full rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder='[{"full_name":"Alex Doe","business_name":"Signal Med Spa","email":"alex@example.com","phone":"6025550101","status":"Contacted"}]'
+                placeholder={"full_name,business_name,email,phone,status\nAlex Doe,Signal Med Spa,alex@example.com,6025550101,Contacted"}
               />
             </div>
           </div>

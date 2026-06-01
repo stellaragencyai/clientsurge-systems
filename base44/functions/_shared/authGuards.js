@@ -23,7 +23,7 @@ export async function requireAuthenticatedUser(base44) {
 export async function requireAdminUser(base44) {
   const user = await requireAuthenticatedUser(base44);
 
-  if (user.role !== "admin") {
+  if (!["admin", "super_admin"].includes(user.role)) {
     throw new AuthGuardError("Admin access required", {
       status: 403,
       code: "admin_access_required",

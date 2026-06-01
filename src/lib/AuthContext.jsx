@@ -14,6 +14,44 @@ function shouldAllowLocalAuthBypass() {
   return import.meta.env.DEV && isLocalHost;
 }
 
+function getLocalDevAdminUser() {
+  if (!shouldAllowLocalAuthBypass()) {
+    return null;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const enabled =
+    params.get("local_admin") === "true" ||
+    params.get("local_admin") === "1" ||
+    window.localStorage.getItem("clientsurge_local_admin") === "true";
+
+  if (!enabled) {
+    return null;
+  }
+
+  if (params.get("local_admin")) {
+    window.localStorage.setItem("clientsurge_local_admin", "true");
+  }
+
+  const role =
+    params.get("local_super_admin") === "true" ||
+    params.get("local_super_admin") === "1" ||
+    window.localStorage.getItem("clientsurge_local_super_admin") === "true"
+      ? "super_admin"
+      : "admin";
+
+  if (params.get("local_super_admin")) {
+    window.localStorage.setItem("clientsurge_local_super_admin", "true");
+  }
+
+  return {
+    id: "local-admin",
+    email: "local-admin@clientsurge.test",
+    full_name: role === "super_admin" ? "Local Super Admin" : "Local Admin",
+    role,
+  };
+}
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -29,10 +67,22 @@ export const AuthProvider = ({ children }) => {
   const checkAppState = async () => {
     const currentPath = window.location.pathname;
 
-    if (shouldAllowLocalAuthBypass() && isPublicRoute(currentPath)) {
+    if (shouldAllowLocalAuthBypass()) {
+      const localAdmin = getLocalDevAdminUser();
+      if (localAdmin) {
+        setUser(localAdmin);
+        setIsAuthenticated(true);
+      } else if (isPublicRoute(currentPath)) {
+        setUser(null);
+        setIsAuthenticated(false);
+      } else {
+        await checkUserAuth();
+        setIsLoadingPublicSettings(false);
+        setAuthError(null);
+        return;
+      }
       setIsLoadingPublicSettings(false);
       setIsLoadingAuth(false);
-      setIsAuthenticated(false);
       setAuthError(null);
       return;
     }
