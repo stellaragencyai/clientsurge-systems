@@ -108,6 +108,9 @@ test("main publish watcher preserves build test and production-app guardrails", 
   assert.match(watcher, /SkipStagingMirrors/);
   assert.match(watcher, /wait-for-main-ci\.ps1/);
   assert.match(watcher, /publish-all-apps\.mjs --staging-only/);
+  assert.match(watcher, /Invoke-ProductionSecurityVerification/);
+  assert.match(watcher, /Test-WranglerAuthenticated/);
+  assert.match(watcher, /Base44 publish remains successful/);
   assert.match(watcher, /check-app-access\.mjs/);
   assert.match(watcher, /Run this watcher from a clean \$TargetBranch mirror/);
   assert.match(watcher, /git merge --ff-only origin\/\$TargetBranch/);
