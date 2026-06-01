@@ -27,6 +27,7 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
 import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
+import { getReviewFromEmail, getSupportReplyTo } from "../_shared/emailConfig.js";
 
 const TWILIO_ACCOUNT_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
 const TWILIO_AUTH_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
@@ -80,7 +81,8 @@ async function sendResendEmail(to, subject, body, fromEmail) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurge.com",
+      from: fromEmail || getReviewFromEmail(),
+      reply_to: getSupportReplyTo(),
       to,
       subject,
       text: body,
@@ -215,7 +217,7 @@ Deno.serve(async (req) => {
     // BUILD MESSAGE CONTENT
     // ─────────────────────────────────────────────────────────
     const now = new Date().toISOString();
-    const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "noreply@clientsurge.com";
+    const fromEmail = Deno.env.get("RESEND_FROM_REVIEWS") || getReviewFromEmail();
 
     const smsBodies = [
       `Hi ${customer_name.split(" ")[0]}, we'd love your feedback! Share your experience with ${business_name}: ${google_review_link}`,

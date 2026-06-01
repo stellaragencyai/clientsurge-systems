@@ -5,6 +5,7 @@ import { secureJson } from "../_shared/response.ts";
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { formatFromAddress, getLeadFromEmail, getLeadReplyTo } from "../_shared/emailConfig.js";
 
 function formatAZTime(isoStr: string): string {
   if (!isoStr) return "TBD";
@@ -31,8 +32,8 @@ Deno.serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "system@clientsurgesystems.com",
-        reply_to: "nolan@clientsurgesystems.com",
+        from: formatFromAddress(getLeadFromEmail()),
+        reply_to: getLeadReplyTo(),
         to: email,
         subject: `✅ Demo confirmed — ${formatted}`,
         html: `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 20px;background:#fff">

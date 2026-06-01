@@ -6,6 +6,7 @@ import { secureJson } from "../_shared/response.ts";
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { formatFromAddress, getReviewFromEmail, getSupportReplyTo } from "../_shared/emailConfig.js";
 
 Deno.serve(async (req) => {
   try {
@@ -28,8 +29,8 @@ Deno.serve(async (req) => {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "system@clientsurgesystems.com",
-        reply_to: "nolan@clientsurgesystems.com",
+        from: formatFromAddress(getReviewFromEmail()),
+        reply_to: getSupportReplyTo(),
         to: order.client_email,
         subject: "Quick question about your ClientSurge experience 🙏",
         html: `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px 20px;background:#fff">
@@ -38,7 +39,7 @@ Deno.serve(async (req) => {
           <p style="color:#374151;font-size:14px"><b>On a scale of 1–10, how likely are you to recommend ClientSurge Systems to another business owner?</b></p>
           <div style="margin:24px 0;display:flex;flex-wrap:wrap;gap:4px">${scoreLinks}</div>
           <p style="color:#6B7280;font-size:11px;margin-top:16px">1 = Not at all · 10 = Definitely would</p>
-          <p style="color:#6B7280;font-size:13px;margin-top:24px">Reply to this email with any feedback — Nolan reads every response.</p>
+          <p style="color:#6B7280;font-size:13px;margin-top:24px">Reply to this email with any feedback and our support team will review it.</p>
         </div>`,
       }),
     });

@@ -1,10 +1,14 @@
 import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
+import {
+  formatFromAddress,
+  getOnboardingFromEmail,
+  getSupportReplyTo,
+  getSystemInboxEmail,
+} from "../_shared/emailConfig.js";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const ADMIN_EMAIL = "system@clientsurgesystems.com";
-const FROM_EMAIL = "ClientSurge Systems <system@clientsurgesystems.com>";
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -111,7 +115,8 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: FROM_EMAIL,
+          from: formatFromAddress(getOnboardingFromEmail()),
+          reply_to: getSupportReplyTo(),
           to: [client_email],
           subject: `Welcome to ClientSurge Systems, ${safeClientName} 🚀`,
           html: clientHtml,
@@ -124,8 +129,8 @@ Deno.serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: FROM_EMAIL,
-          to: [ADMIN_EMAIL],
+          from: formatFromAddress(getOnboardingFromEmail()),
+          to: [getSystemInboxEmail()],
           subject: `🆕 New Account: ${safeClientName} — ${safeBusinessName}`,
           html: adminHtml,
         }),
