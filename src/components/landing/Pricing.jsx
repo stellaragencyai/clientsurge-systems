@@ -12,6 +12,7 @@ import {
 } from "@/lib/salesCatalog";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import StaggeredFadeUp from "@/components/visual-effects/StaggeredFadeUp";
+import TrustedLogoMarquee from "./TrustedLogoMarquee";
 
 function SimpleCheck() {
   return (
@@ -235,6 +236,8 @@ export default function Pricing() {
             ))}
           </div>
         </div>
+
+        <TrustedLogoMarquee />
       </div>
 
       <style>{`
