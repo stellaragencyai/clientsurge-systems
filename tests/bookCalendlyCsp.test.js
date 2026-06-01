@@ -9,5 +9,6 @@ test("book page avoids broken Calendly scheduler frames", () => {
   assert.doesNotMatch(bookSource, /https:\/\/calendly\.com\/nolan-clientsurgesystems/);
   assert.doesNotMatch(bookSource, /<iframe/);
   assert.match(indexSource, /http-equiv="Content-Security-Policy"/);
-  assert.match(bookSource, /window\.location\.href = '\/contact'/);
+  assert.match(bookSource, /DemoBookingInline/);
+  assert.doesNotMatch(bookSource, /window\.location\.href = '\/contact'/);
 });

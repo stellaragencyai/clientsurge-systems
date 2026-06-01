@@ -1,14 +1,12 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { CalendarCheck2, X } from "lucide-react";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
+import DemoBookingInline from "./DemoBookingInline";
 
-// Replace VIDEO_URL with your actual demo video embed URL
-const DEMO_VIDEO_URL = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0";
-
-export default function DemoBookingModal({ onClose }) {
+export default function DemoBookingModal({ onClose, prefillIndustry = "" }) {
   useEffect(() => {
-    const release = acquireBodyScrollLock("demo-video-modal");
+    const release = acquireBodyScrollLock("demo-booking-modal");
     return () => release();
   }, []);
 
@@ -21,40 +19,41 @@ export default function DemoBookingModal({ onClose }) {
       className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto overscroll-contain p-4"
       style={{
         minHeight: "100svh",
-        WebkitOverflowScrolling: "touch"
+        WebkitOverflowScrolling: "touch",
       }}
       onKeyDown={handleKeyDown}
       tabIndex={0}
       role="dialog"
       aria-modal="true"
-      aria-label="Demo video"
+      aria-label="Book a free ClientSurge demo"
     >
-      {/* Backdrop */}
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
 
-      {/* Modal */}
-      <div className="relative w-full max-w-4xl z-50">
-        {/* Close button */}
+      <div className="relative z-50 w-full max-w-xl">
         <button
           onClick={onClose}
-          className="absolute -top-10 right-0 w-9 h-9 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors focus:outline-none focus:ring-2 focus:ring-white"
-          aria-label="Close video"
+          className="absolute -top-10 right-0 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white transition-colors hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white"
+          aria-label="Close booking form"
         >
-          <X className="w-4 h-4" />
+          <X className="h-4 w-4" />
         </button>
 
-        {/* Video container — 16:9 */}
-        <div className="relative w-full rounded-2xl overflow-hidden shadow-2xl" style={{ paddingBottom: "56.25%" }}>
-          <iframe
-            src={DEMO_VIDEO_URL}
-            title="ClientSurge Systems Demo"
-            width="100%"
-            height="700"
-            scrolling="yes"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="absolute inset-0 w-full h-full border-0"
-          />
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl">
+          <div className="border-b border-white/10 px-6 py-5">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-300/20 bg-amber-300/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-amber-200">
+              <CalendarCheck2 className="h-3.5 w-3.5" />
+              Free Automation Audit
+            </div>
+            <h2 className="font-display text-2xl font-semibold text-white">
+              Book your free ClientSurge walkthrough
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-white/60">
+              Tell us about your business, choose a time, and we will confirm the best next slot.
+            </p>
+          </div>
+          <div className="max-h-[min(72vh,720px)] overflow-y-auto px-6 py-5">
+            <DemoBookingInline prefillIndustry={prefillIndustry} />
+          </div>
         </div>
       </div>
     </div>,

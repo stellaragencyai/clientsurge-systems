@@ -4,6 +4,7 @@ import { normalizePackageKey } from "../../../src/lib/salesCatalog.js";
 import { buildPaymentRecoveryEmail } from "./paymentRecoveryEmail.js";
 import { buildAppUrl } from "./appUrl.js";
 import { resendFetch } from "./resendFetch.js";
+import { getBillingFromEmail, getBillingReplyTo } from "./emailConfig.js";
 
 function getStripeSecretKey() {
   try {
@@ -123,8 +124,8 @@ async function sendPaymentRecoveryEmail({ base44, order, invoice }) {
     order,
     invoice,
     paymentUpdateUrl,
-    fromEmail: Deno.env.get("RESEND_FROM_EMAIL"),
-    replyToEmail: Deno.env.get("ADMIN_EMAIL"),
+    fromEmail: Deno.env.get("RESEND_FROM_BILLING") || getBillingFromEmail(),
+    replyToEmail: Deno.env.get("RESEND_REPLY_TO_BILLING") || getBillingReplyTo(),
   });
 
   const response = await resendFetch("https://api.resend.com/emails", {

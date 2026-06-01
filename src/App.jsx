@@ -74,6 +74,7 @@ const PUBLIC_PATHS = [
   "/start",
   "/book",
   "/book-demo",
+  "/tanning",
   "/industries",
   "/pricing",
   "/faq",
@@ -128,6 +129,7 @@ const LEGACY_REDIRECTS = [
   { from: routePath("MedSpa"), to: routePath("med-spa") },
   { from: routePath("Chiropractic"), to: routePath("chiropractic") },
   { from: routePath("Contractors"), to: routePath("contractors") },
+  { from: routePath("tanning"), to: routePath("industries") },
   { from: routePath("industries", "roofing"), to: routePath("roofing") },
   { from: routePath("industries", "hvac"), to: routePath("hvac") },
   { from: routePath("industries", "dental"), to: routePath("dental") },
@@ -191,12 +193,47 @@ const isPublicPath = (pathname) =>
 // Fix 1: ScrollToTop — resets scroll position on every route change
 function ScrollToTop() {
   const location = useLocation();
+
   useEffect(() => {
     // Don't scroll to top if navigating to a hash anchor
     if (!location.hash) {
       scrollToTop();
     }
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!location.hash) {
+      return undefined;
+    }
+
+    const targetId = location.hash.slice(1);
+    if (!targetId) {
+      return undefined;
+    }
+
+    let attempts = 0;
+    let timeoutId;
+
+    const scrollToHash = () => {
+      attempts += 1;
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      if (attempts < 30) {
+        timeoutId = window.setTimeout(scrollToHash, 100);
+      }
+    };
+
+    timeoutId = window.setTimeout(scrollToHash, 0);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [location.hash, location.pathname]);
+
   return null;
 }
 
@@ -221,7 +258,7 @@ function SectionRedirect({ hash }) {
       description: "Done-for-you automation that helps appointment-based businesses respond faster, follow up consistently, and book more appointments.",
       canonicalPath: "/",
     });
-    navigate("/", { replace: true });
+    navigate(`/${hash}`, { replace: true });
     return cleanupMetadata;
   }, [hash, navigate]);
 

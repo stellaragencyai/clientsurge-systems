@@ -38,5 +38,5 @@ test("in-app section redirects publish the homepage canonical before navigation"
   assert.match(appSource, /function SectionRedirect\(\{ hash \}\)/);
   assert.match(appSource, /setPageMetadata\(\{/);
   assert.match(appSource, /canonicalPath: "\/"/);
-  assert.match(appSource, /navigate\("\/", \{ replace: true \}\)/);
+  assert.match(appSource, /navigate\(`\/\$\{hash\}`, \{ replace: true \}\)/);
 });

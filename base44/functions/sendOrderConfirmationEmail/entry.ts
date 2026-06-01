@@ -8,6 +8,7 @@ import {
 } from "../../../src/lib/salesCatalog.js";
 import { formatMoney, resolveServiceRows } from "./serviceRows.shared.js";
 import { buildAppUrl } from "../_shared/appUrl.js";
+import { getBillingFromEmail, getBillingReplyTo } from "../_shared/emailConfig.js";
 
 function escapeHtml(value: unknown) {
   return String(value ?? "")
@@ -44,8 +45,8 @@ Deno.serve(async (req) => {
     if (!resendKey) {
       return secureJson({ error: "RESEND_API_KEY missing" }, { status: 500 });
     }
-    const from = formatFromAddress(Deno.env.get("RESEND_FROM_EMAIL"));
-    const replyTo = Deno.env.get("ADMIN_EMAIL") || "system@clientsurgesystems.com";
+    const from = formatFromAddress(Deno.env.get("RESEND_FROM_BILLING") || getBillingFromEmail());
+    const replyTo = Deno.env.get("RESEND_REPLY_TO_BILLING") || getBillingReplyTo();
 
     const customerEmail = order.customer_email || "";
     if (!customerEmail) {

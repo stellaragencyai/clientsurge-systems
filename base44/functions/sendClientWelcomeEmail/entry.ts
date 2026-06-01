@@ -1,10 +1,11 @@
 import { secureJson } from "../_shared/response.ts";
 /**
  * sendClientWelcomeEmail — #502
- * Fixed: correct /client-portal link + Reply-To: nolan@clientsurgesystems.com header.
+ * Fixed: correct /client-portal link + monitored support Reply-To header.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { formatFromAddress, getOnboardingFromEmail, getSupportReplyTo } from "../_shared/emailConfig.js";
 
 Deno.serve(async (req) => {
   try {
@@ -18,15 +19,15 @@ Deno.serve(async (req) => {
     const resendKey = Deno.env.get("RESEND_API_KEY");
     if (!resendKey) return secureJson({ error: "No Resend key" }, { status: 500 });
 
-    // #502: correct portal URL + Reply-To fix
+    // #502: correct portal URL + monitored Reply-To fix
     const portalUrl = `https://clientsurgesystems.com/client-portal?order_id=${order_id}`;
 
     await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "system@clientsurgesystems.com",
-        reply_to: "nolan@clientsurgesystems.com",   // #502: fixed Reply-To
+        from: formatFromAddress(getOnboardingFromEmail()),
+        reply_to: getSupportReplyTo(),
         to: order.client_email,
         subject: `Welcome to ClientSurge, ${order.client_name || ""}! 👋`,
         html: `<div style="font-family:sans-serif;max-width:560px;margin:0 auto;padding:32px 20px;background:#fff">
@@ -38,7 +39,7 @@ Deno.serve(async (req) => {
               View My Client Portal →
             </a>
           </div>
-          <p style="color:#374151;font-size:14px;line-height:1.6">Have questions at any point? Reply directly to this email — Nolan will respond personally.</p>
+          <p style="color:#374151;font-size:14px;line-height:1.6">Have questions at any point? Reply directly to this email and our support team will help.</p>
           <p style="color:#6B7280;font-size:13px">— Nolan @ ClientSurge Systems</p>
         </div>`,
       }),

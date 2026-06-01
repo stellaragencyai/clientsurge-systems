@@ -1,8 +1,7 @@
 import { Phone, CalendarCheck } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import DemoBookingModal from "../forms/DemoBookingModal";
 import { trackCTA } from "@/lib/analytics";
-import { fetchAdminSettings } from "@/lib/adminSettingsApi";
 
 const FALLBACK_PHONE = "+16025843227";
 
@@ -19,28 +18,7 @@ function formatPhoneLabel(phone) {
 
 export default function MobileCallBar() {
   const [showModal, setShowModal] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState(FALLBACK_PHONE);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    fetchAdminSettings()
-      .then((settings) => {
-        if (cancelled) {
-          return;
-        }
-        if (settings?.twilio_from_number) {
-          setPhoneNumber(settings.twilio_from_number);
-        }
-      })
-      .catch(() => {
-        // Keep the known-good fallback when public settings are unavailable.
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const phoneNumber = FALLBACK_PHONE;
 
   const phoneLabel = useMemo(() => formatPhoneLabel(phoneNumber), [phoneNumber]);
 

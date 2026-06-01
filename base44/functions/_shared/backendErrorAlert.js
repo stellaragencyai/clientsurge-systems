@@ -1,4 +1,5 @@
 import { resendFetch } from "./resendFetch.js";
+import { EMAILS } from "./emailConfig.js";
 
 export function shouldAlertOnStatus(status) {
   return Number(status) >= 500 && Number(status) <= 599;
@@ -7,8 +8,8 @@ export function shouldAlertOnStatus(status) {
 export function resolveBackendErrorAlertConfig(env = {}) {
   return {
     resendKey: env.RESEND_API_KEY || "",
-    fromEmail: env.RESEND_FROM_EMAIL || "system@clientsurgesystems.com",
-    toEmail: env.ADMIN_NOTIFICATION_EMAIL || env.ADMIN_EMAIL || "",
+    fromEmail: env.RESEND_FROM_ALERTS || env.RESEND_FROM_EMAIL || EMAILS.alerts,
+    toEmail: env.SYSTEM_EMAIL || env.ADMIN_NOTIFICATION_EMAIL || EMAILS.system,
   };
 }
 

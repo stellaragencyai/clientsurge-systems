@@ -74,6 +74,7 @@ export default function HomepageConversionContent() {
 
   return (
     <section
+      id="problem-solution"
       aria-labelledby="ai-automation-overview"
       className="px-4 md:px-6 py-16 md:py-24"
       style={{ background: "#ffffff" }}

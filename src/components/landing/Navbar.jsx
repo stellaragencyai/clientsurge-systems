@@ -130,8 +130,7 @@ export default function Navbar() {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
     } else {
-      // Navigate to home only — no auto-scroll
-      navigate("/");
+      navigate({ pathname: "/", hash: href });
     }
   };
 
