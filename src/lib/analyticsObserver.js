@@ -1,5 +1,21 @@
 import { base44 } from "@/api/base44Client";
 
+function shouldSkipBase44Analytics() {
+  if (typeof window === "undefined") return true;
+  if (!import.meta.env.DEV) return false;
+
+  const { hostname } = window.location;
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".local");
+}
+
+function trackBase44Event(payload, label) {
+  if (shouldSkipBase44Analytics()) return;
+
+  Promise.resolve(base44.analytics.track(payload)).catch((error) => {
+    console.warn(`Base44 analytics unavailable: ${label}`, error);
+  });
+}
+
 /**
  * Initialize auto-tracking via data-track attributes
  * Call this once in your main app initialization
@@ -28,8 +44,8 @@ export function initializeAnalyticsObserver() {
       if (trackingId) {
         const eventName = `${trackingSection}-${trackingId}`;
 
-        try {
-          base44.analytics.track({
+        trackBase44Event(
+          {
             eventName,
             properties: {
               element: target.tagName,
@@ -37,10 +53,9 @@ export function initializeAnalyticsObserver() {
               section: trackingSection,
               timestamp: new Date().toISOString(),
             },
-          });
-        } catch (error) {
-          console.error(`Failed to track click: ${eventName}`, error);
-        }
+          },
+          eventName
+        );
       }
     },
     true
@@ -59,18 +74,17 @@ export function initializeAnalyticsObserver() {
       if (trackingId) {
         const eventName = `${trackingSection}-${trackingId}-submit`;
 
-        try {
-          base44.analytics.track({
+        trackBase44Event(
+          {
             eventName,
             properties: {
               formName: form.name || form.id,
               section: trackingSection,
               timestamp: new Date().toISOString(),
             },
-          });
-        } catch (error) {
-          console.error(`Failed to track form submission: ${eventName}`, error);
-        }
+          },
+          eventName
+        );
       }
     },
     true
@@ -87,8 +101,8 @@ export function initializeAnalyticsObserver() {
 export function trackEvent(section, component, action = "click") {
   const eventName = `${section}-${component}-${action}`;
 
-  try {
-    base44.analytics.track({
+  trackBase44Event(
+    {
       eventName,
       properties: {
         section,
@@ -96,8 +110,7 @@ export function trackEvent(section, component, action = "click") {
         action,
         timestamp: new Date().toISOString(),
       },
-    });
-  } catch (error) {
-    console.error(`Failed to track event: ${eventName}`, error);
-  }
+    },
+    eventName
+  );
 }

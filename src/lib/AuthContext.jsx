@@ -6,12 +6,11 @@ import { appParams } from "@/lib/app-params";
 const AuthContext = createContext();
 
 function shouldAllowLocalAuthBypass() {
-  if (!import.meta.env.DEV) {
-    return false;
-  }
-
   const hostname = window.location.hostname;
-  return hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".local");
+  const isLocalHost =
+    hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".local");
+
+  return import.meta.env.DEV && isLocalHost;
 }
 
 export const AuthProvider = ({ children }) => {

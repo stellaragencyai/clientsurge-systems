@@ -1,15 +1,15 @@
 import { Star } from "lucide-react";
 
 const testimonials = [
-  { name: "Med Spa Owner", clinic: "Phoenix, AZ", text: "We went from missing leads to booking consultations same-day.", rating: 5 },
-  { name: "Aesthetic Clinic", clinic: "Scottsdale, AZ", text: "Our front desk was overwhelmed. Now follow-up is fully automated.", rating: 5 },
-  { name: "Aesthetic Clinic", clinic: "Gilbert, AZ", text: "Paid for itself in the first month.", rating: 5 },
+  { name: "Consultation flow", clinic: "Phoenix, AZ", text: "Example workflow: a missed inquiry gets captured, answered, and routed toward a consult.", rating: 5 },
+  { name: "Front-desk support", clinic: "Scottsdale, AZ", text: "Example workflow: repetitive follow-up runs automatically while sensitive questions stay human-reviewed.", rating: 5 },
+  { name: "Reactivation path", clinic: "Gilbert, AZ", text: "Example workflow: older inquiries receive a respectful check-in with clear stop conditions.", rating: 5 },
 ];
 
 const metrics = [
-  { label: "Built for Med Spas & Aesthetic Clinics", value: "Proven" },
-  { label: "Avg Booking Increase", value: "2-3x" },
-  { label: "ROI Timeline", value: "14-30 days" },
+  { label: "Built for med spas and aesthetic clinics", value: "Niche" },
+  { label: "Lead paths covered", value: "6" },
+  { label: "Proof needed before live claims", value: "Provider QA" },
 ];
 
 export default function MedSpaSocialProof() {

@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { SIX_AUTOMATIONS, getAutomationRoutes, getIndustryAutomationUseCases } from "../src/lib/sixAutomations.js";
 
 const app = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+const blog = readFileSync(new URL("../src/pages/Blog.jsx", import.meta.url), "utf8");
 const home = readFileSync(new URL("../src/pages/Home.jsx", import.meta.url), "utf8");
 const sitemap = readFileSync(new URL("../public/sitemap.xml", import.meta.url), "utf8");
 const industryTemplate = readFileSync(
@@ -44,8 +45,30 @@ test("automation routes are public and no catch-all industry route advertises te
 test("blog route is public and wired for SEO", () => {
   assert.match(app, /const Blog = lazy\(\(\) => import\("\.\/pages\/Blog"\)\)/);
   assert.match(app, /"\/blog"/);
+  assert.match(app, /path="\/blog\/:slug"/);
   assert.doesNotMatch(app, /path="\/:slug"/);
   assert.match(sitemap, /https:\/\/clientsurgesystems\.com\/blog/);
+});
+
+test("launch blog articles have routes, sitemap entries, and schema hooks", () => {
+  for (const slug of [
+    "missed-call-text-back-guide",
+    "ai-lead-follow-up-automation",
+    "med-spa-lead-response-automation",
+    "dental-missed-call-automation",
+    "contractor-lead-follow-up-system",
+    "hvac-missed-call-text-back",
+    "roofing-lead-response-automation",
+    "ai-appointment-booking-local-business",
+    "lead-response-speed-to-lead",
+    "automation-package-comparison",
+  ]) {
+    assert.match(blog, new RegExp(`slug: "${slug}"`));
+    assert.match(sitemap, new RegExp(`https://clientsurgesystems\\.com/blog/${slug}`));
+  }
+
+  assert.match(blog, /setJsonLd\(`article-\$\{post\.slug\}`/);
+  assert.match(blog, /setJsonLd\(`article-faq-\$\{post\.slug\}`/);
 });
 
 test("sitemap prioritizes canonical public marketing pages", () => {

@@ -45,7 +45,8 @@ test("css does not block rendering with Google Font imports", () => {
 });
 
 test("first viewport avoids preloading or painting unused remote background art", () => {
-  assert.match(indexHtml, /<link rel="preload" as="image" href="https:\/\/media\.base44\.com\/images\/public\/69dc4a79656fdba136d413d3\/199305bd4_11\.png"/);
+  assert.doesNotMatch(indexHtml, /rel="preload" as="image"/);
+  assert.doesNotMatch(indexHtml, /199305bd4_11/);
   assert.doesNotMatch(indexHtml, /9d6ac5d22_989aaaff/);
   assert.doesNotMatch(indexCss, /body::before\s*\{[^}]*url\(/);
 });

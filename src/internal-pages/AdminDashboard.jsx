@@ -124,15 +124,18 @@ const NAV_GROUPS = [
 ];
 
 const ALL_NAV = NAV_GROUPS.flatMap(g => g.items);
+const VALID_TAB_IDS = new Set(ALL_NAV.filter(item => !item.external).map(item => item.id));
+
+function getActiveTabFromSearch(search) {
+  const tab = new URLSearchParams(search).get('tab');
+  return tab && VALID_TAB_IDS.has(tab) ? tab : 'overview';
+}
 
 export default function AdminDashboard() {
   const { user, isLoadingAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState(() => {
-    const params = new URLSearchParams(location.search);
-    return params.get('tab') || 'overview';
-  });
+  const [activeTab, setActiveTab] = useState(() => getActiveTabFromSearch(location.search));
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
   const [inboxUnread, setInboxUnread] = useState(0);
@@ -140,9 +143,7 @@ export default function AdminDashboard() {
 
   // Sync tab from URL param (e.g. when navigating back from sub-pages)
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const tab = params.get('tab');
-    if (tab) setActiveTab(tab);
+    setActiveTab(getActiveTabFromSearch(location.search));
   }, [location.search]);
 
   // Load unread counts for nav badges
@@ -206,7 +207,10 @@ export default function AdminDashboard() {
       navigate(externalPath || '/admin/onboarding');
       return;
     }
-    setActiveTab(tabId);
+    const nextTab = VALID_TAB_IDS.has(tabId) ? tabId : 'overview';
+    const nextPath = nextTab === 'overview' ? '/admin' : `/admin?tab=${encodeURIComponent(nextTab)}`;
+    navigate(nextPath);
+    setActiveTab(nextTab);
     if (window.innerWidth < 1024) setSidebarOpen(false);
   };
 
@@ -273,7 +277,7 @@ export default function AdminDashboard() {
 
         {/* Global Search */}
         <div className="px-3 py-2 border-b border-border">
-          <AdminGlobalSearch onNavigate={(tab) => { setActiveTab(tab); if (window.innerWidth < 1024) setSidebarOpen(false); }} />
+          <AdminGlobalSearch onNavigate={(tab) => handleTabChange(tab)} />
         </div>
 
         {/* Navigation */}
@@ -352,7 +356,7 @@ export default function AdminDashboard() {
             {/* Inbox quick badge */}
             {inboxUnread > 0 && activeTab !== 'inbox' && (
               <button
-                onClick={() => setActiveTab('inbox')}
+                onClick={() => handleTabChange('inbox')}
                 className="flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
               >
                 <Inbox className="w-3.5 h-3.5" />

@@ -5,13 +5,12 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
     <section id="results" className="py-16 md:py-20 px-4 md:px-6" style={{ background: "#ffffff", overflowX: "hidden" }}>
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-12">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary mb-3">Real Results</p>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary mb-3">Launch Targets</p>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-            What Businesses Like Yours See
+            What This System Is Designed To Improve
           </h2>
         </div>
 
-        {/* Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10">
           {metrics.map((m, i) => (
             <div
@@ -29,7 +28,6 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
           ))}
         </div>
 
-        {/* Testimonial */}
         {testimonial && (
           <div
             className="rounded-3xl px-8 py-8 mb-10 relative overflow-hidden"
@@ -62,7 +60,6 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
           </div>
         )}
 
-        {/* CTA */}
         <div className="text-center">
           <button
             type="button"
@@ -95,7 +92,7 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
               <ArrowRight style={{ width: "18px", height: "18px" }} />
             </span>
           </button>
-          <p className="text-xs text-muted-foreground mt-3">Free demo · No contracts · Live in 5–7 days</p>
+          <p className="text-xs text-muted-foreground mt-3">Free demo - Month-to-month after setup - Launch timing depends on onboarding and provider access</p>
         </div>
       </div>
     </section>

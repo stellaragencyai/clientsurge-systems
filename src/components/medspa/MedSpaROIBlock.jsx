@@ -10,7 +10,7 @@ const scenarios = [
   {
     title: "Recover 1 extra booking a week",
     value: "$1,200+/mo",
-    detail: "A small lift in response speed and follow-up can easily cover the system cost.",
+    detail: "A small lift in response speed and follow-up can help offset the system cost when lead volume and offer economics support it.",
     icon: TrendingUp,
   },
   {
@@ -31,7 +31,7 @@ export default function MedSpaROIBlock() {
             Small follow-up improvements create meaningful monthly lift
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
-            Med spas do not need huge lead volume for automation to pay off. They need fewer missed opportunities.
+            Med spas do not need huge lead volume for automation to make financial sense. They need fewer missed opportunities and a repeatable follow-up path.
           </p>
         </div>
 

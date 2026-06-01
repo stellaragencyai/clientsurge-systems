@@ -13,11 +13,12 @@ The next launch-critical blocker is not source code. The local repo is ahead of 
   - `npm run test:deno` passed `11/11`
   - `npm run build` passed with existing Vite warnings only
 - `base44 whoami` works for `nolanfstrommer@gmail.com`.
-- `base44 functions list` still fails before listing deployed functions because deployed function automation metadata is malformed.
+- `base44 functions list` now succeeds after the 2026-05-22 automation metadata repair.
+- 2026-05-22 07:16 America/Phoenix: pulled the deployed `installPipeline` function into a throwaway temp Base44 project, not the repo, and inspected the remote bundle. The deployed function now includes the required `ClientProject` create/update fields: `client_email`, `contact_email`, `client_name`, and `business_name`.
 
-## Current CLI Failure
+## Resolved CLI Auditability Failure
 
-`base44 functions list` fails with:
+Before the repair, `base44 functions list` failed with:
 
 ```text
 Invalid input
@@ -32,24 +33,42 @@ Invalid input
   -> at functions[176].automations[6]
 ```
 
-Based on local alphabetical function order, those likely correspond to:
+Raw authenticated API inspection on 2026-05-22 confirmed those indices correspond to:
 
-- `createDemoCalendarEvent`
-- `initializeInstallOS`
-- `sendInstantLeadResponseSms`
+- `functions[37]`: `monthlyClientReport`
+- `functions[99]`: `generateWeeklyReport`
+- `functions[176]`: `generateSocialContent`
 
-This mapping is an inference from local ordering, not Base44 server confirmation, because the CLI fails before returning the function list.
+The malformed field was the scheduled-simple automation payload shape. The deployed records included `repeat_interval: null`, while Base44 CLI `0.0.51` validates `repeat_interval` as optional but, when present, requires a positive integer.
+
+Resolved on 2026-05-22 04:27 America/Phoenix through the Base44 editor automation API, not the Backend Platform `backend-functions` deploy endpoint:
+
+- `monthlyClientReport`: monthly schedule set to interval `1`.
+- `generateWeeklyReport`: weekly null schedule set to interval `1`; existing valid weekly schedule stayed interval `1`.
+- `generateSocialContent`: weekly schedules set to interval `1`; the two "Bi-Weekly" schedules set to interval `2`.
+
+Verification:
+
+- `base44 functions list` completed and listed 237 remote functions.
+- Raw authenticated backend-functions read confirmed no remaining `repeat_interval: null` scheduled-simple automations on `monthlyClientReport`, `generateWeeklyReport`, or `generateSocialContent`.
 
 ## Why This Blocks Launch
 
-The purchase-to-onboarding smoke previously failed because production backend behavior appeared stale against the current source. The local code has fixed and proven the activation path, but production needs the updated backend/entity behavior before Stripe checkout/webhook proof can be trusted.
+The purchase-to-onboarding smoke previously failed because production backend behavior appeared stale against the current source. The latest deployed-code inspection suggested the specific `ClientProject` required-field mismatch may now be fixed remotely, and the controlled behavioral proof has now confirmed it.
+
+2026-05-22 07:38 America/Phoenix: `npm run openclaw:purchase-onboarding-smoke -- --json` passed 7/7 production handoff checks. The smoke created temporary QA Order, Client, ClientProject, OnboardingClient, and CommunicationEvent records, then deleted all eight created records successfully in the same run.
 
 ## Safe Internal Work Completed
 
 - Verified the CLI/auth state.
 - Reconfirmed the deployed function listing blocker.
 - Reconfirmed the production app ID.
-- Identified the likely malformed automation attachment targets.
+- Identified the exact malformed automation attachment targets via raw authenticated Base44 API read.
+- Repaired only the invalid automation `repeat_interval` metadata through the editor automation endpoint.
+- Verified `base44 functions list` succeeds.
+- Pulled deployed `installPipeline` into a temp project for read-only comparison and confirmed the remote bundle contains the required `ClientProject` fields.
+- Revised the OpenClaw purchase-to-onboarding smoke runner so cleanup is enabled by default and can be disabled with `--no-cleanup`.
+- Ran the cleanup-safe production purchase-to-onboarding smoke and confirmed the deployed Order -> Client -> ClientProject -> OnboardingClient handoff passes.
 - Documented the exact production decision required before live deploy proof.
 
 ## Required Production Decision
@@ -63,12 +82,10 @@ Choose one path:
 
 These are production-facing and should be executed as one explicit deploy packet:
 
-1. Fix or remove malformed Base44 automation metadata for the affected deployed functions.
-2. Re-run `base44 functions list` until it succeeds.
-3. Publish backend/entity changes through the chosen Base44 production workflow.
-4. Re-run `npm run openclaw:purchase-onboarding-smoke`.
-5. Only after that passes, proceed to Stripe test-mode catalog/webhook proof.
+1. Keep the current Base44 production deploy decision documented for future backend/entity changes.
+2. Proceed to Stripe test-mode checkout/webhook proof in a confirmed staging/test Base44 target.
+3. Do not run a live payment proof until Nolan approves package, amount, card owner, test contact details, and refund/no-refund plan.
 
 ## Recommended Next Move
 
-Use the Base44 UI first to inspect the automation attachments for `createDemoCalendarEvent`, `initializeInstallOS`, and `sendInstantLeadResponseSms`. The goal is to repair invalid automation metadata without changing runtime business logic. Once `base44 functions list` succeeds, the team can confirm the actual deploy surface instead of guessing.
+Proceed to Stripe test-mode checkout/webhook proof in a confirmed staging/test Base44 target. CLI auditability is restored and the deployed `installPipeline` behavior has been proven, so the remaining launch proof is provider-path validation rather than another Base44 source inspection.

@@ -46,6 +46,7 @@ For pre-launch QA, use `docs/STAGING_ENVIRONMENT.md` and the Base44 test databas
 | `DEFAULT_BUSINESS_NAME` | SMS/email templates | Fallback business name. |
 | `ADMIN_NOTIFICATION_PHONE` | Voice briefing / admin SMS paths | Admin phone in E.164 format. |
 | `CLIENTSURGE_CHECKOUT_CAPACITY_LIMIT` | Checkout capacity guard | Optional numeric capacity cap. |
+| `STRIPE_PACKAGE_PRICE_OVERRIDES_JSON` | Staging Stripe checkout proof | Optional staging/test-only JSON map for package product/setup/monthly test price IDs. Each package override must include product, setup price, and monthly price IDs or checkout fails closed. Do not set in production. |
 | `EXTERNAL_WEBHOOK_URL` | CRM / automation handoff | Preferred outbound webhook target. |
 | `WEBHOOK_URL` | Legacy webhook handoff | Legacy fallback outbound webhook target. |
 | `N8N_WEBHOOK_URL` | Client onboarding handoff | Optional n8n webhook target. |

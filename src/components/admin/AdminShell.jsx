@@ -20,7 +20,7 @@ const NAV_GROUPS = [
     group: "Main",
     items: [
       { id: "overview",         label: "Overview",          icon: LayoutDashboard, path: "/admin" },
-      { id: "leads",            label: "Leads",             icon: Users,           path: "/admin/leads" },
+      { id: "leads",            label: "Leads",             icon: Users,           path: "/admin", tab: "leads" },
       { id: "client-projects",  label: "Client Projects",   icon: FolderKanban,    path: "/admin", tab: "client-projects" },
       { id: "inbox",            label: "Inbox",             icon: Inbox,           path: "/admin", tab: "inbox", badge: "inbox" },
       { id: "onboarding",       label: "Client Onboarding", icon: ClipboardList,   path: "/admin/onboarding" },
@@ -108,6 +108,10 @@ export default function AdminShell({ children, title, activeId }) {
   };
 
   const isActive = (item) => {
+    const currentTab = new URLSearchParams(location.search).get("tab");
+    if (item.tab) {
+      return activeId === item.id || (location.pathname === item.path && currentTab === item.tab);
+    }
     if (item.path !== "/admin" && !item.tab) {
       return location.pathname === item.path;
     }

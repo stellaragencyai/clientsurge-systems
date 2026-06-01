@@ -20,7 +20,7 @@ export const MEDSPA_FAQ_ITEMS = [
   },
   {
     q: "How quickly can this be set up?",
-    a: "Most med spa systems are fully live within 5-7 business days. We do the entire build - messaging, sequences, integrations, testing. You attend one short onboarding call. That's it.",
+    a: "The launch target is usually 5-7 business days after onboarding, access, messaging, and provider setup are complete. We handle the build, sequences, integrations, and testing, then confirm the timeline against your actual setup needs.",
   },
   {
     q: "We mostly get leads from Instagram DMs. Does this work for that?",
@@ -32,11 +32,11 @@ export const MEDSPA_FAQ_ITEMS = [
   },
   {
     q: "How much does it cost - and is it worth it?",
-    a: "Plans start at $497/month with a one-time setup fee. A single recovered consultation typically covers the monthly cost. Most med spas see ROI within the first 2-3 weeks. Book the demo and we'll show you the exact math for your lead volume.",
+    a: "Plans start at $497/month with a one-time setup fee. Whether it is worth it depends on your lead volume, treatment value, response gaps, and follow-through process. Book the demo and we'll walk through the math for your actual business instead of giving a generic ROI promise.",
   },
   {
     q: "What happens after I book a demo?",
-    a: "We review your current lead flow, show you exactly where bookings are being lost, and walk you through how the system would work for your specific med spa. It's 30 minutes, zero obligation, and most people leave with clarity they didn't have before.",
+    a: "We review your current lead flow, identify likely response and follow-up gaps, and walk you through how the system would work for your specific med spa. It's 30 minutes, zero obligation, and designed to give you a clearer next step.",
   },
 ];
 
@@ -50,7 +50,7 @@ export default function MedSpaFAQ() {
             Frequently Asked Questions
           </h2>
           <p className="mt-4 text-muted-foreground text-base">
-            Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message →</a>
+            Still have questions? <a href="/contact" className="text-primary font-semibold hover:underline">Send us a message â†’</a>
           </p>
         </div>
 

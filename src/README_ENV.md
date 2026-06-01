@@ -50,6 +50,7 @@ Never commit real secret values to source control.
 | `DEFAULT_BUSINESS_NAME` | Fallback business name in templates. | Defaults in code should not be treated as production configuration. |
 | `ADMIN_NOTIFICATION_PHONE` | Admin phone for voice/SMS notification workflows. | E.164 format. |
 | `CLIENTSURGE_CHECKOUT_CAPACITY_LIMIT` | Optional checkout capacity gate. | Leave unset for no capacity cap. |
+| `STRIPE_PACKAGE_PRICE_OVERRIDES_JSON` | Optional package Stripe ID override map. | Staging/test only; each package override must include product, setup price, and monthly price IDs or checkout fails closed. Do not set in production. |
 | `EXTERNAL_WEBHOOK_URL` | Optional outbound CRM/automation webhook target. | External delivery should be configured deliberately. |
 | `WEBHOOK_URL` | Legacy/fallback outbound webhook target. | Prefer `EXTERNAL_WEBHOOK_URL` for new setup. |
 | `N8N_WEBHOOK_URL` | Optional n8n onboarding webhook target. | Used by client onboarding access flow when configured. |

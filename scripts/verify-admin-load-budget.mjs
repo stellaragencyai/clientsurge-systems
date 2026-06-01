@@ -2,7 +2,7 @@
 
 import { buildAdminLeadRows } from "../src/lib/adminLeadLoadModel.js";
 
-const leadCount = Number.parseInt(process.env.CLIENTSURGE_ADMIN_LOAD_LEADS || "120", 10);
+const leadCount = Number.parseInt(process.env.CLIENTSURGE_ADMIN_LOAD_LEADS || "5000", 10);
 const budgetMs = Number.parseInt(process.env.CLIENTSURGE_ADMIN_LOAD_BUDGET_MS || "3000", 10);
 
 function buildLead(index) {

@@ -10,6 +10,11 @@ const cartSidebarSource = readFileSync(
   new URL("../src/components/store/CartSidebar.jsx", import.meta.url),
   "utf8"
 );
+const guaranteeSources = [
+  "../src/components/landing/Guarantee.jsx",
+  "../src/components/landing/GuaranteeBanner.jsx",
+  "../src/components/landing/MoneyBackGuarantee.jsx",
+].map((file) => readFileSync(new URL(file, import.meta.url), "utf8")).join("\n");
 
 test("privacy policy covers SMS, email, AI automation, and service-provider data sharing", () => {
   for (const phrase of [
@@ -47,4 +52,13 @@ test("terms cover recurring subscriptions, cancellation, payment failures, and A
 test("checkout legal link uses canonical terms route", () => {
   assert.match(cartSidebarSource, /href="\/terms"/);
   assert.doesNotMatch(cartSidebarSource, /href="\/legal\/terms"/);
+});
+
+test("public guarantee copy aligns with setup-fee and cancellation terms", () => {
+  assert.match(guaranteeSources, /30-Day Setup-Fee Guarantee/);
+  assert.match(guaranteeSources, /setup cost when the guarantee terms are met/);
+  assert.match(guaranteeSources, /Cancellation takes effect at the end of the current billing period/);
+  assert.doesNotMatch(guaranteeSources, /No questions asked/i);
+  assert.doesNotMatch(guaranteeSources, /You only pay monthly if it's working/i);
+  assert.doesNotMatch(guaranteeSources, /Zero risk/i);
 });

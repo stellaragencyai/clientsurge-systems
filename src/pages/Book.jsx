@@ -5,8 +5,6 @@ import { setPageMetadata } from '@/lib/seo';
 import { trackCTA } from '@/lib/analytics';
 import MobileCallBar from '@/components/landing/MobileCallBar';
 
-const BOOKING_EMBED_URL = "https://calendly.com/nolan-clientsurgesystems";
-
 export default function Book() {
   useEffect(() => {
     const cleanupMetadata = setPageMetadata({
@@ -99,27 +97,24 @@ export default function Book() {
             })}
           </div>
 
-          <div id="scheduler" className="mt-8 overflow-hidden rounded-2xl border border-border bg-background shadow-sm">
-            <iframe
-              src={BOOKING_EMBED_URL}
-              title="ClientSurge audit scheduler"
-              width="100%"
-              height="700"
-              scrolling="yes"
-              className="block w-full border-0"
-            />
+          <div id="scheduler" className="mt-8 rounded-2xl border border-primary/15 bg-primary/5 p-6 text-center shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">
+              Fast scheduling
+            </p>
+            <h3 className="text-xl font-semibold text-foreground mb-3">
+              Tell us what you want reviewed and we will send the next available audit times.
+            </h3>
+            <p className="mx-auto max-w-2xl text-sm text-muted-foreground leading-relaxed">
+              The direct scheduler is temporarily unavailable in this preview, so the contact form is the clean path for audit requests.
+            </p>
           </div>
-
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            If the embedded scheduler fails to load, use the contact page or email support@clientsurgesystems.com and we will help schedule manually.
-          </p>
 
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               type="button"
               onClick={() => {
                 trackCTA('schedule_your_audit', 'book_page');
-                document.getElementById('scheduler')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                window.location.href = '/contact';
               }}
               className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >

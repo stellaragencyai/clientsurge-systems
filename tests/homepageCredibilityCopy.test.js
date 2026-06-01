@@ -11,6 +11,7 @@ const files = [
   "src/components/landing/FounderSection.jsx",
   "src/components/landing/Hero.jsx",
   "src/components/landing/HeroDashboardScreen.jsx",
+  "src/components/landing/IndustryTemplate.jsx",
   "src/components/landing/IndustryBlueprintModal.jsx",
   "src/components/landing/InstantLeadResponseAnimation.jsx",
   "src/components/landing/MissedCallAnimation.jsx",
@@ -69,4 +70,10 @@ test("homepage launch copy uses proof-oriented language instead", () => {
   assert.match(copy, /Actual results depend on lead volume/);
   assert.match(copy, /Performance is reviewed after launch/);
   assert.match(copy, /Illustrative flow showing the automation path/);
+});
+
+test("public credibility surfaces avoid generic third-party placeholder media", () => {
+  assert.match(copy, /Founder photo pending/);
+  assert.match(copy, /INDUSTRY_HERO_FALLBACKS/);
+  assert.doesNotMatch(copy, /placehold\.co|placeholder\.com|via\.placeholder/);
 });

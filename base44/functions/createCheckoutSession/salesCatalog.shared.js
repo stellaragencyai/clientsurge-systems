@@ -333,6 +333,86 @@ export const PACKAGE_KEY_ALIASES = {
   pro_system: "elite_system",
 };
 
+const PACKAGE_STRIPE_OVERRIDE_ENV = "STRIPE_PACKAGE_PRICE_OVERRIDES_JSON";
+
+function readPackageStripeOverrideConfig() {
+  try {
+    if (typeof Deno !== "undefined" && Deno?.env?.get) {
+      return Deno.env.get(PACKAGE_STRIPE_OVERRIDE_ENV) || "";
+    }
+  } catch {
+    // Browser builds and restricted runtimes do not expose Deno.env.
+  }
+
+  try {
+    if (typeof process !== "undefined" && process?.env) {
+      return process.env[PACKAGE_STRIPE_OVERRIDE_ENV] || "";
+    }
+  } catch {
+    // Frontend bundles may not expose process.env.
+  }
+
+  return "";
+}
+
+function getPackageStripeOverrides() {
+  const raw = readPackageStripeOverrideConfig().trim();
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error(`${PACKAGE_STRIPE_OVERRIDE_ENV} must be a JSON object.`);
+    }
+    return parsed;
+  } catch (error) {
+    throw new Error(`Invalid ${PACKAGE_STRIPE_OVERRIDE_ENV}: ${error.message}`);
+  }
+}
+
+export function resolvePackageStripeIds(packageOffer) {
+  if (!packageOffer?.package_key) {
+    return {
+      stripe_product_id: null,
+      setup_price_id: null,
+      monthly_price_id: null,
+    };
+  }
+
+  const overrides = getPackageStripeOverrides();
+  const override = overrides[packageOffer.package_key] || null;
+
+  if (override) {
+    const hasCompleteOverride =
+      typeof override.stripe_product_id === "string" &&
+      override.stripe_product_id.trim() &&
+      typeof override.setup_price_id === "string" &&
+      override.setup_price_id.trim() &&
+      typeof override.monthly_price_id === "string" &&
+      override.monthly_price_id.trim();
+
+    if (!hasCompleteOverride) {
+      throw new Error(
+        `${PACKAGE_STRIPE_OVERRIDE_ENV} must include stripe_product_id, setup_price_id, and monthly_price_id for ${packageOffer.package_key}.`
+      );
+    }
+
+    return {
+      stripe_product_id: override.stripe_product_id,
+      setup_price_id: override.setup_price_id,
+      monthly_price_id: override.monthly_price_id,
+    };
+  }
+
+  return {
+    stripe_product_id: packageOffer.stripe_product_id || null,
+    setup_price_id: packageOffer.setup_price_id || null,
+    monthly_price_id: packageOffer.monthly_price_id || null,
+  };
+}
+
 const SERVICE_BY_PRODUCT_ID = Object.fromEntries(
   CANONICAL_SERVICE_PRODUCTS.map((product) => [product.product_id, product])
 );
@@ -642,14 +722,15 @@ export function buildPricingSummaryForProducts(items = []) {
 export function buildStoredPricingSummary(items = []) {
   const summary = buildPricingSummaryForProducts(items);
   const packageOffer = summary.package_offer;
+  const packageStripeIds = resolvePackageStripeIds(packageOffer);
 
   return {
     pricing_version: "canonical_sales_catalog_v1",
     package_key: packageOffer?.package_key || null,
     package_name: packageOffer?.name || null,
-    package_stripe_product_id: packageOffer?.stripe_product_id || null,
-    package_setup_price_id: packageOffer?.setup_price_id || null,
-    package_monthly_price_id: packageOffer?.monthly_price_id || null,
+    package_stripe_product_id: packageStripeIds.stripe_product_id,
+    package_setup_price_id: packageStripeIds.setup_price_id,
+    package_monthly_price_id: packageStripeIds.monthly_price_id,
     package_service_keys: summary.package_service_keys,
     add_on_service_keys: summary.add_on_service_keys,
     selected_service_keys: summary.selected_service_keys,
@@ -668,8 +749,9 @@ export function buildStoredPricingSummary(items = []) {
 export function buildStripeLineItemsForPricingSummary(pricingSummary) {
   const packageOffer = pricingSummary?.package_offer || null;
   const addOnServiceKeys = pricingSummary?.add_on_service_keys || [];
+  const packageStripeIds = resolvePackageStripeIds(packageOffer);
 
-  if (!packageOffer?.setup_price_id || !packageOffer?.monthly_price_id) {
+  if (!packageStripeIds.setup_price_id || !packageStripeIds.monthly_price_id) {
     throw new Error("Live checkout currently requires a Starter, Growth, or Elite package bundle.");
   }
 
@@ -679,11 +761,11 @@ export function buildStripeLineItemsForPricingSummary(pricingSummary) {
 
   return [
     {
-      price: packageOffer.setup_price_id,
+      price: packageStripeIds.setup_price_id,
       quantity: 1,
     },
     {
-      price: packageOffer.monthly_price_id,
+      price: packageStripeIds.monthly_price_id,
       quantity: 1,
     },
   ];

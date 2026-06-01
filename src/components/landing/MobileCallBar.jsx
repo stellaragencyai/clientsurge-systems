@@ -46,7 +46,7 @@ export default function MobileCallBar() {
 
   return (
     <>
-      <div className="fixed bottom-0 inset-x-0 z-40 border-t border-primary/20 bg-background/95 backdrop-blur-sm md:hidden safe-area-bottom-bar">
+      <div data-mobile-call-bar className="fixed bottom-0 inset-x-0 z-40 border-t border-primary/20 bg-background/95 backdrop-blur-sm md:hidden safe-area-bottom-bar">
         <div className="px-3 py-2.5 flex gap-2" style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 10px))" }}>
           <a
             href={`tel:${phoneNumber}`}

@@ -4,7 +4,7 @@ import {
   getServiceProductByKey,
 } from "../../../src/lib/salesCatalog.js";
 
-export const LEAD_PIPELINE_MAX_FETCH = 5000;
+export const LEAD_PIPELINE_MAX_FETCH = 10000;
 
 export const LEAD_STATUSES = [
   "New",

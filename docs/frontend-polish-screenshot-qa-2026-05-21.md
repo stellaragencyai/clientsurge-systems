@@ -109,3 +109,106 @@ Capture screenshots at:
 2. Screenshot-test the homepage first viewport and pricing/store flow on mobile.
 3. Fix any sticky CTA overlap found at `360x780` and `390x844`.
 4. Verify that `/store` checkout CTAs are clear but do not imply live provider proof is complete.
+
+## 2026-05-22 Blog/Store/Book QA Pass
+
+Local server: `http://127.0.0.1:5174`
+
+Evidence captured under `qa/results/frontend-polish/`:
+
+- `store-mobile-390x844-wait10s.png`
+- `store-desktop-1440x1000.png`
+- `blog-index-mobile-390x844-wait10s.png`
+- `blog-index-desktop-1440x1000-wait10s.png`
+- `book-mobile-390x844-wait10s.png`
+- `blog-index-mobile-390x844-filtered-cookie-normal.png`
+- `book-mobile-390x844-cookie-offset-targeted.png`
+
+Findings:
+
+- Initial no-wait screenshots captured the Suspense loader and cookie banner before the page settled; rerunning with a 10-second wait showed the routes rendering correctly.
+- `/store` mobile and desktop rendered package cards, pricing, automation labels, checkout/support CTAs, footer links, and no obvious horizontal overflow at `390x844`.
+- `/blog` mobile rendered all 10 launch articles, but the index was a long undifferentiated list. Added topic filters for All, Lead Capture, Industries, Booking, and Strategy.
+- `/book` mobile rendered the audit path and fallback contact CTAs, but the cookie banner competed with the fixed mobile call/demo bar. Cookie banner offset is now raised only when the mobile call bar is present on a mobile viewport.
+
+Verification:
+
+- `npx eslint src/pages/Blog.jsx src/components/landing/CookieConsent.jsx src/components/landing/MobileCallBar.jsx --quiet`
+- `npm run build`
+
+## 2026-05-22 Mobile Traffic Destination QA Add-On
+
+Local server: `http://127.0.0.1:5176`
+
+Evidence captured under `qa/results/frontend-polish/`:
+
+- `med-spa-mobile-390x844-traffic-path.png`
+- `book-mobile-390x844-traffic-path.png`
+- `store-mobile-390x844-traffic-path.png`
+
+Findings:
+
+- `/store` mobile renders the package entry path with clear AI services count, setup timing, contract reassurance, and Guided Path/Explore All controls above the cookie banner.
+- `/book` mobile renders the audit headline, audit-scope copy, review link, and bottom call/demo bar. The cookie banner is raised above the mobile CTA bar and does not hide the fixed buttons.
+- `/med-spa` mobile renders the niche automation cards and menu access. The cookie banner covers part of the lower first viewport until accepted, but does not overlap the navbar/menu.
+
+Verification:
+
+- `npx --yes playwright@latest screenshot --wait-for-timeout=10000 --viewport-size=390,844 http://127.0.0.1:5176/med-spa qa/results/frontend-polish/med-spa-mobile-390x844-traffic-path.png`
+- `npx --yes playwright@latest screenshot --wait-for-timeout=10000 --viewport-size=390,844 http://127.0.0.1:5176/book qa/results/frontend-polish/book-mobile-390x844-traffic-path.png`
+- `npx --yes playwright@latest screenshot --wait-for-timeout=10000 --viewport-size=390,844 http://127.0.0.1:5176/store qa/results/frontend-polish/store-mobile-390x844-traffic-path.png`
+
+## 2026-05-22 Credibility Media Fallback Patch
+
+Finding:
+
+- `public/founder-photo.jpg` is not present locally, so the founder section previously depended on a third-party placeholder image fallback.
+- Industry template pages also had a generic `via.placeholder.com` hero fallback even though launch pages should avoid placeholder-looking media.
+
+Fix:
+
+- Replaced the founder image error path with an honest in-app founder placeholder that says the approved founder image is pending.
+- Replaced the industry template placeholder URL with industry-specific Unsplash image fallbacks for med spa, dental, chiropractic, HVAC, roofing, and contractor pages.
+- Added source tests so public credibility surfaces avoid generic placeholder media.
+
+Verification:
+
+- `node --test tests/homeFounderSection.test.js tests/homepageCredibilityCopy.test.js tests/homepageTestimonialsCredibility.test.js tests/homepageSimulatedProofCopy.test.js`
+- `npx eslint src/components/landing/FounderSection.jsx src/components/landing/IndustryTemplate.jsx tests/homeFounderSection.test.js tests/homepageCredibilityCopy.test.js --quiet`
+- `npm run build`
+- `git diff --check` returned only existing CRLF warnings.
+
+## 2026-05-22 Blog Launch Regression Guard
+
+Finding:
+
+- The blog index now has all 10 launch articles and topic filters, but that mobile-scannability work needed explicit regression coverage so it does not silently fall back to a long undifferentiated list.
+
+Fix:
+
+- Added `tests/blogLaunch.test.js` to verify all 10 launch article slugs stay present, every article URL remains in `public/sitemap.xml`, the blog index keeps the All/Lead Capture/Industries/Booking/Strategy filters, and article/FAQ schema hooks remain wired.
+
+Verification:
+
+- `node --test tests/blogLaunch.test.js tests/sixAutomations.test.js tests/seoBreadcrumb.test.js` passed 12/12.
+- `npx eslint src/pages/Blog.jsx tests/blogLaunch.test.js --quiet` passed.
+- `npm run build` passed.
+
+## 2026-05-23 Med Spa Credibility Copy Pass
+
+Finding:
+
+- Legacy med-spa testimonial/social-proof components still used launch-visible language that looked like verified customer proof before approved case studies exist.
+- The shared industry results component also used "Real Results" framing and a hard launch-timing line that should stay conditional until onboarding and provider access are confirmed.
+
+Fix:
+
+- Reframed med-spa testimonials/social proof as illustrative launch scenarios and removed customer-like names, stock-photo avatars, hard ROI/payback claims, and no-setup-fee copy.
+- Reframed shared industry results as launch targets and changed the CTA note to make timing dependent on onboarding and provider access.
+- Expanded `tests/medSpaLaunchCopy.test.js` to guard against the removed claims.
+
+Verification:
+
+- `node --test tests/medSpaLaunchCopy.test.js tests/homepageTestimonialsCredibility.test.js tests/homepageCredibilityCopy.test.js` passed 7/7.
+- `npx eslint src/components/industry/IndustryResults.jsx src/components/medspa/MedSpaSocialProof.jsx src/components/medspa/MedSpaTestimonials.jsx src/components/medspa/MedSpaFinalCTA.jsx src/components/medspa/MedSpaPricingPreview.jsx tests/medSpaLaunchCopy.test.js --quiet` passed.
+- `npm run build` passed.

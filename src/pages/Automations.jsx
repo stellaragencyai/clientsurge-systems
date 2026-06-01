@@ -322,7 +322,7 @@ export default function Automations() {
       >
         <Link to="/" className="flex items-center gap-2">
           <img
-            src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/199305bd4_11.png"
+            src="/clientsurge-logo.svg"
             alt="ClientSurge Systems"
             width="192"
             height="48"

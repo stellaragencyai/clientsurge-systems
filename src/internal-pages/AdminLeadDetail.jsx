@@ -114,7 +114,7 @@ export default function AdminLeadDetail() {
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <button
-          onClick={() => navigate("/admin/leads")}
+          onClick={() => navigate("/admin?tab=leads")}
           className="flex items-center gap-1.5 p-2 hover:bg-muted rounded-lg transition-colors text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Leads

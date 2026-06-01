@@ -234,7 +234,7 @@ function StoreInner() {
           }
           .store-page .store-hero {
             text-align: center;
-            padding: 24px 24px 14px;
+            padding: 96px 24px 14px;
             position: relative;
           }
           .store-page .store-hero-copy {
@@ -345,7 +345,7 @@ function StoreInner() {
           }
           @media (max-width: 720px) {
             .store-page .store-hero {
-              padding: 18px 16px 10px;
+              padding: 88px 16px 10px;
             }
             .store-page .store-stat-grid {
               grid-template-columns: 1fr;
@@ -393,7 +393,7 @@ function StoreInner() {
                   fontSize: "clamp(1.5rem, 4.5vw, 2.6rem)",
                   fontWeight: "800",
                   lineHeight: 1.08,
-                  letterSpacing: "-0.035em",
+                  letterSpacing: 0,
                   color: "hsl(var(--foreground))",
                   marginBottom: "8px"
                 }}>

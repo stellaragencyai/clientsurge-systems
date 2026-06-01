@@ -20,10 +20,23 @@ function safeSetCookieConsent(value) {
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const [offsetForMobileCallBar, setOffsetForMobileCallBar] = useState(false);
 
   useEffect(() => {
     const consent = safeGetCookieConsent();
     if (!consent) setVisible(true);
+  }, []);
+
+  useEffect(() => {
+    const updateOffset = () => {
+      const hasMobileCallBar = Boolean(document.querySelector('[data-mobile-call-bar]'));
+      const isMobile = window.matchMedia?.('(max-width: 767px)').matches ?? false;
+      setOffsetForMobileCallBar(hasMobileCallBar && isMobile);
+    };
+
+    updateOffset();
+    window.addEventListener('resize', updateOffset);
+    return () => window.removeEventListener('resize', updateOffset);
   }, []);
 
   const handleAccept = () => {
@@ -49,7 +62,11 @@ export default function CookieConsent() {
   return (
     <div
       className="fixed inset-x-3 z-50 mx-auto max-w-sm md:inset-x-auto md:left-5 md:mx-0"
-      style={{ bottom: "max(16px, calc(16px + env(safe-area-inset-bottom, 0px)))" }}
+      style={{
+        bottom: offsetForMobileCallBar
+          ? "max(96px, calc(96px + env(safe-area-inset-bottom, 0px)))"
+          : "max(16px, calc(16px + env(safe-area-inset-bottom, 0px)))",
+      }}
       aria-live="polite"
       role="dialog"
       aria-label="Cookie preferences"

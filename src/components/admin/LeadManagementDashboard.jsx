@@ -498,7 +498,7 @@ export default function LeadManagementDashboard({
         <SummaryCard
           label="Total Leads"
           value={snapshot.summary.total_leads}
-          helper="All canonical Leads records available for daily operator work."
+          helper="Canonical Leads records loaded for daily operator work, including 5,000+ lead import batches."
           tone="blue"
         />
         <SummaryCard

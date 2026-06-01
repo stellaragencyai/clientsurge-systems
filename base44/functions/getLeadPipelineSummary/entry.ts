@@ -4,7 +4,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 const DEFAULT_LIMIT = 100;
 const MAX_LIMIT = 250;
 const EVENT_LIMIT = 5000;
-const LEAD_PIPELINE_MAX_FETCH = 5000;
+const LEAD_PIPELINE_MAX_FETCH = 10000;
 const PRIORITY_MAP = { Hot: 4, High: 3, Medium: 2, Low: 1 };
 
 function getNextAction(lead) {

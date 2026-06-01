@@ -157,7 +157,7 @@ export default function Navbar() {
           className="shrink-0 bg-none border-none cursor-pointer transition-transform duration-300 hover:-translate-y-0.5"
           style={{ minHeight: "unset", minWidth: "unset", background: "none", padding: 0, overflow: "visible" }}>
           <img
-            src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/199305bd4_11.png"
+            src="/clientsurge-logo.svg"
             alt="ClientSurge Systems"
             width="240"
             height="72"

@@ -12,10 +12,10 @@ export default function GuaranteeBanner() {
             </div>
             <div>
               <h3 className="text-lg md:text-xl font-semibold text-foreground mb-1">
-                30-Day Money-Back Guarantee
+                30-Day Setup-Fee Guarantee
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Not seeing results? We'll refund your setup cost, no questions asked. We're confident because our systems work—this guarantee is just our promise to you.
+                If the installed system is not producing measurable lead-capture, response, or booking improvements in the first 30 days, we review the account and refund the setup cost when the guarantee terms are met.
               </p>
             </div>
           </div>
@@ -24,15 +24,15 @@ export default function GuaranteeBanner() {
           <div className="flex flex-col gap-2 md:border-l md:border-primary/20 md:pl-8">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-              <span className="text-xs font-medium text-foreground">Zero risk guarantee</span>
+              <span className="text-xs font-medium text-foreground">Setup-fee protection</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-              <span className="text-xs font-medium text-foreground">No questions asked</span>
+              <span className="text-xs font-medium text-foreground">30-day review window</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-              <span className="text-xs font-medium text-foreground">30 days to decide</span>
+              <span className="text-xs font-medium text-foreground">Terms-linked policy</span>
             </div>
           </div>
         </div>

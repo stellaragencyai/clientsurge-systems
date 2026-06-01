@@ -3,8 +3,8 @@ import { CheckCircle2, Shield, RotateCcw, Zap } from "lucide-react";
 const guarantees = [
   {
     icon: Shield,
-    title: "30-Day Money-Back Guarantee",
-    desc: "If you're not seeing measurable results by day 30, we refund your setup cost. No questions asked."
+    title: "30-Day Setup-Fee Guarantee",
+    desc: "If the installed system is not producing measurable lead-capture, response, or booking improvements by day 30, we review the account and refund the setup cost when the guarantee terms are met."
   },
   {
     icon: Zap,
@@ -14,7 +14,7 @@ const guarantees = [
   {
     icon: RotateCcw,
     title: "Easy Exit",
-    desc: "Month-to-month contracts only. No long-term lock-in. Cancel anytime, but you won't want to."
+    desc: "Month-to-month service. Cancellation takes effect at the end of the current billing period unless otherwise agreed in writing."
   },
   {
     icon: CheckCircle2,

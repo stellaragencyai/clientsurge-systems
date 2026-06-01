@@ -10,7 +10,10 @@ import {
   buildStripeLineItemsForPricingSummary,
   getPackageOffer,
   getPackageServices,
+  resolvePackageStripeIds,
 } from "../src/lib/salesCatalog.js";
+
+const PACKAGE_STRIPE_OVERRIDE_ENV = "STRIPE_PACKAGE_PRICE_OVERRIDES_JSON";
 
 test("public store catalog exposes all 12 offers while checkout stays canonical", () => {
   assert.equal(AI_PRODUCTS.length, 12);
@@ -99,6 +102,7 @@ test("stored pricing summary keeps package and discount visibility for admin", (
 });
 
 test("package checkout uses the live Stripe package price ids", () => {
+  delete process.env[PACKAGE_STRIPE_OVERRIDE_ENV];
   const summary = buildPricingSummaryForProducts(
     getPackageServices("starter_system").map((service) => service.product_id)
   );
@@ -107,6 +111,76 @@ test("package checkout uses the live Stripe package price ids", () => {
     { price: "price_1TSlDWBVGjsISdG0SyoWzAm3", quantity: 1 },
     { price: "price_1TSlDWBVGjsISdG0Ej1O16ov", quantity: 1 },
   ]);
+});
+
+test("package checkout can use staging/test Stripe package price overrides", () => {
+  process.env[PACKAGE_STRIPE_OVERRIDE_ENV] = JSON.stringify({
+    starter_system: {
+      stripe_product_id: "prod_test_starter",
+      setup_price_id: "price_test_starter_setup",
+      monthly_price_id: "price_test_starter_monthly",
+    },
+  });
+
+  try {
+    const summary = buildPricingSummaryForProducts(
+      getPackageServices("starter_system").map((service) => service.product_id)
+    );
+    const stored = buildStoredPricingSummary(summary.priced_items);
+
+    assert.deepEqual(resolvePackageStripeIds(summary.package_offer), {
+      stripe_product_id: "prod_test_starter",
+      setup_price_id: "price_test_starter_setup",
+      monthly_price_id: "price_test_starter_monthly",
+    });
+    assert.equal(stored.package_stripe_product_id, "prod_test_starter");
+    assert.equal(stored.package_setup_price_id, "price_test_starter_setup");
+    assert.equal(stored.package_monthly_price_id, "price_test_starter_monthly");
+    assert.deepEqual(buildStripeLineItemsForPricingSummary(summary), [
+      { price: "price_test_starter_setup", quantity: 1 },
+      { price: "price_test_starter_monthly", quantity: 1 },
+    ]);
+  } finally {
+    delete process.env[PACKAGE_STRIPE_OVERRIDE_ENV];
+  }
+});
+
+test("package checkout rejects incomplete staging/test Stripe package price overrides", () => {
+  process.env[PACKAGE_STRIPE_OVERRIDE_ENV] = JSON.stringify({
+    starter_system: {
+      setup_price_id: "price_test_starter_setup",
+    },
+  });
+
+  try {
+    const summary = buildPricingSummaryForProducts(
+      getPackageServices("starter_system").map((service) => service.product_id)
+    );
+
+    assert.throws(
+      () => buildStripeLineItemsForPricingSummary(summary),
+      /must include stripe_product_id, setup_price_id, and monthly_price_id/
+    );
+  } finally {
+    delete process.env[PACKAGE_STRIPE_OVERRIDE_ENV];
+  }
+});
+
+test("package checkout rejects malformed staging/test Stripe package override JSON", () => {
+  process.env[PACKAGE_STRIPE_OVERRIDE_ENV] = "{not-json";
+
+  try {
+    const summary = buildPricingSummaryForProducts(
+      getPackageServices("starter_system").map((service) => service.product_id)
+    );
+
+    assert.throws(
+      () => buildStripeLineItemsForPricingSummary(summary),
+      /Invalid STRIPE_PACKAGE_PRICE_OVERRIDES_JSON/
+    );
+  } finally {
+    delete process.env[PACKAGE_STRIPE_OVERRIDE_ENV];
+  }
 });
 
 test("add-on checkout is blocked until live Stripe add-on prices exist", () => {

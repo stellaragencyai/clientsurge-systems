@@ -3,34 +3,34 @@ import MedSpaDemoModal from "./MedSpaDemoModal";
 
 const testimonials = [
   {
-    name: "Jessica M.",
-    businessType: "Med Spa",
+    name: "Missed inquiry flow",
+    businessType: "Med Spa Scenario",
     location: "Phoenix, AZ",
-    before: "Missing 60% of after-hours inquiries",
-    after: "10+ consultations booked/week",
-    result: "5x booking increase",
-    quote: "We went from missing leads to booking consultations same-day. The system just runs.",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=65&auto=format",
+    before: "After-hours inquiries wait for manual follow-up",
+    after: "Lead receives a prompt text-back and booking path",
+    result: "Target outcome: faster consult capture",
+    quote: "Example workflow: missed inquiry captured, reply sent, booking handoff started.",
+    initials: "MI",
   },
   {
-    name: "Sarah K.",
-    businessType: "Aesthetic Clinic",
+    name: "Front desk support",
+    businessType: "Aesthetic Clinic Scenario",
     location: "Scottsdale, AZ",
-    before: "Front desk overwhelmed, leads slipping",
-    after: "Fully automated follow-up",
-    result: "Zero leads dropped",
-    quote: "Our front desk was overwhelmed. Now follow-up is fully automated and nothing slips through.",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&q=65&auto=format",
+    before: "Staff juggles consult requests between calls",
+    after: "Routine follow-up runs with human-review boundaries",
+    result: "Target outcome: cleaner follow-up queue",
+    quote: "Example workflow: inquiry qualified, nurture started, owner-visible status updated.",
+    initials: "FD",
   },
   {
-    name: "Amanda T.",
-    businessType: "Aesthetic Clinic",
+    name: "Old lead reactivation",
+    businessType: "Aesthetic Clinic Scenario",
     location: "Gilbert, AZ",
-    before: "Spending on ads, not converting",
-    after: "ROI recovered in first month",
-    result: "Paid for itself in 30 days",
-    quote: "Paid for itself in the first month. Recovered revenue we thought was gone.",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=65&auto=format",
+    before: "Older leads are left in a cold list",
+    after: "Dormant inquiries receive a respectful check-in sequence",
+    result: "Target outcome: recovered conversations",
+    quote: "Example workflow: old lead segment selected, message sent, replies stop the sequence.",
+    initials: "OL",
   },
 ];
 
@@ -41,10 +41,13 @@ export default function MedSpaTestimonials() {
     <section className="py-24 md:py-32 px-6 bg-muted">
       <div className="max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Proven Results</p>
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Launch Scenarios</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            Real Results From Med Spas Using Our System
+            Example Med Spa Workflows This System Is Built To Support
           </h2>
+          <p className="mt-4 text-sm leading-6 text-muted-foreground">
+            Illustrative scenarios until verified customer case studies are approved for launch use.
+          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
@@ -111,14 +114,12 @@ export default function MedSpaTestimonials() {
 
               {/* Author */}
               <div className="flex items-center gap-4">
-                <img
-                  src={t.avatar}
-                  alt={t.name}
-                  width="64"
-                  height="64"
-                  loading="lazy"
-                  className="w-16 h-16 rounded-full object-cover ring-2 ring-white shadow-md"
-                />
+                <div
+                  className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center ring-2 ring-white shadow-md text-sm font-black"
+                  aria-label={`${t.name} scenario`}
+                >
+                  {t.initials}
+                </div>
                 <div>
                   <p className="text-sm font-bold text-foreground">{t.name}</p>
                   <p className="text-xs text-muted-foreground">{t.location}</p>
@@ -148,4 +149,3 @@ export default function MedSpaTestimonials() {
     </section>
   );
 }
-

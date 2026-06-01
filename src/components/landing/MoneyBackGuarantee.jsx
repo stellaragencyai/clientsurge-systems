@@ -1,5 +1,5 @@
 /**
- * Money-Back Guarantee Banner
+ * Setup-fee guarantee banner
  * Risk reversal to reduce purchase hesitation
  */
 
@@ -24,24 +24,24 @@ export default function MoneyBackGuarantee() {
 
         <div className="flex-1">
           <h3 className="font-semibold text-foreground text-lg mb-2">
-            30-Day Money-Back Guarantee
+            30-Day Setup-Fee Guarantee
           </h3>
           <p className="text-muted-foreground mb-4">
-            If you don't see measurable results in your first 30 days — more leads captured, faster response times, or scheduled bookings — we refund your setup cost. No questions asked. You only pay monthly if it's working.
+            If the installed system is not producing measurable lead-capture, response, or booking improvements in your first 30 days, we review the account and refund the setup cost when the guarantee terms are met. Monthly service cancellation follows the terms shown before checkout.
           </p>
 
           <div className="flex flex-wrap gap-3">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary" />
-              <span className="text-sm text-foreground font-medium">No risk trial period</span>
+              <span className="text-sm text-foreground font-medium">30-day review window</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary" />
-              <span className="text-sm text-foreground font-medium">Full setup refund if unsatisfied</span>
+              <span className="text-sm text-foreground font-medium">Setup-fee refund when terms are met</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-primary" />
-              <span className="text-sm text-foreground font-medium">Cancel anytime, no contracts</span>
+              <span className="text-sm text-foreground font-medium">Month-to-month service terms</span>
             </div>
           </div>
         </div>

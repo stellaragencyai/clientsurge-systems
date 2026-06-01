@@ -1,4 +1,8 @@
+import { useState } from "react";
+
 export default function FounderSection() {
+  const [photoUnavailable, setPhotoUnavailable] = useState(false);
+
   return (
     <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-card to-background">
       <div className="max-w-4xl mx-auto">
@@ -22,19 +26,47 @@ export default function FounderSection() {
               className="relative flex items-center justify-center p-10 md:p-12"
               style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.06) 0%, rgba(200,150,92,0.04) 100%)" }}
             >
-              <div
-                className="w-64 h-72 rounded-2xl overflow-hidden"
-                style={{ border: "2px solid rgba(154,92,46,0.2)", boxShadow: "0 8px 32px rgba(120,70,20,0.12)" }}
-              >
-                <img
-                  src="/founder-photo.jpg" onError={(e) => { e.target.src = "https://placehold.co/400x480/f5e6d0/9a5c2e?text=Photo+Coming+Soon"; }}
-                  alt="Nolan Strommer, founder of ClientSurge Systems"
-                  width="400"
-                  height="480"
-                  className="w-full h-full object-cover object-top"
-                  loading="lazy"
-                />
-              </div>
+              {photoUnavailable ? (
+                <div
+                  className="w-64 h-72 rounded-2xl overflow-hidden flex flex-col items-center justify-center text-center px-8"
+                  style={{
+                    border: "2px solid rgba(154,92,46,0.2)",
+                    boxShadow: "0 8px 32px rgba(120,70,20,0.12)",
+                    background: "linear-gradient(135deg, #f9efe1 0%, #fffaf3 100%)",
+                  }}
+                  aria-label="Nolan Strommer founder profile"
+                >
+                  <div
+                    className="mb-5 flex h-20 w-20 items-center justify-center rounded-full text-2xl font-bold"
+                    style={{
+                      background: "linear-gradient(135deg, #9a5c2e 0%, #c9945c 100%)",
+                      color: "#ffffff",
+                      boxShadow: "0 10px 26px rgba(120,70,20,0.18)",
+                    }}
+                  >
+                    NS
+                  </div>
+                  <p className="text-sm font-semibold text-foreground">Founder photo pending</p>
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                    Launch-safe placeholder until the approved founder image is added.
+                  </p>
+                </div>
+              ) : (
+                <div
+                  className="w-64 h-72 rounded-2xl overflow-hidden"
+                  style={{ border: "2px solid rgba(154,92,46,0.2)", boxShadow: "0 8px 32px rgba(120,70,20,0.12)" }}
+                >
+                  <img
+                    src="/founder-photo.jpg"
+                    onError={() => setPhotoUnavailable(true)}
+                    alt="Nolan Strommer, founder of ClientSurge Systems"
+                    width="400"
+                    height="480"
+                    className="w-full h-full object-cover object-top"
+                    loading="lazy"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col justify-center p-10 md:p-12">

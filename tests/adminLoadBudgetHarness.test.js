@@ -15,9 +15,9 @@ test("admin lead dashboard supports fixture injection for local load verificatio
   assert.match(dashboard, /buildAdminLeadRows\(rawLeads, sortConfig\)/);
 });
 
-test("admin load budget harness verifies 100 plus leads under a 3s budget", () => {
+test("admin load budget harness verifies 5,000 plus leads under a 3s budget", () => {
   assert.equal(packageJson.scripts["verify:admin-load"], "node scripts/verify-admin-load-budget.mjs");
-  assert.match(harness, /CLIENTSURGE_ADMIN_LOAD_LEADS \|\| "120"/);
+  assert.match(harness, /CLIENTSURGE_ADMIN_LOAD_LEADS \|\| "5000"/);
   assert.match(harness, /CLIENTSURGE_ADMIN_LOAD_BUDGET_MS \|\| "3000"/);
   assert.match(harness, /buildAdminLeadRows/);
   assert.match(harness, /tableProjection/);

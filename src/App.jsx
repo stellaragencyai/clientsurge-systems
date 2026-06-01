@@ -46,7 +46,6 @@ const CredentialsSetup = lazy(() => import("./internal-pages/CredentialsSetup"))
 const SetupStatus = lazy(() => import("./internal-pages/SetupStatus"));
 const WebsitePreview = lazy(() => import("./internal-pages/WebsitePreview"));
 const AdminDashboard = lazy(() => import("./internal-pages/AdminDashboard"));
-const AdminLeads = lazy(() => import("./internal-pages/AdminLeads"));
 const AdminLeadDetail = lazy(() => import("./internal-pages/AdminLeadDetail"));
 const AdminAutomation = lazy(() => import("./internal-pages/AdminAutomation"));
 const AdminOnboarding = lazy(() => import("./internal-pages/AdminOnboarding"));
@@ -85,8 +84,8 @@ const PUBLIC_PATHS = [
   "/login",
   "/success",
   "/legal",
-  "/contact",
-  "/blog",
+      "/contact",
+      "/blog",
   "/about",
   "/automations",
   "/leads/capture",
@@ -137,7 +136,7 @@ const LEGACY_REDIRECTS = [
   { from: routePath("industries", "contractors"), to: routePath("contractors") },
   { from: routePath("Dashboard"), to: routePath("admin") },
   { from: routePath("AdminSettings"), to: routePath("admin") },
-  { from: routePath("AdminLeadDetail"), to: routePath("admin", "leads") },
+  { from: routePath("AdminLeadDetail"), to: `${routePath("admin")}?tab=leads` },
   { from: routePath("LeadIntelligence"), to: routePath("admin") },
   { from: routePath("Sam"), to: routePath("admin") },
   { from: routePath("MedSpaDashboard"), to: routePath("admin") },
@@ -366,6 +365,7 @@ const AuthenticatedApp = () => {
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
       <Route path="/contact" element={<LazyRoute Component={Contact} />} />
       <Route path="/blog" element={<LazyRoute Component={Blog} />} />
+      <Route path="/blog/:slug" element={<LazyRoute Component={Blog} />} />
       <Route
         path="/store"
         element={<LazyRoute Component={Store} />}
@@ -421,7 +421,7 @@ const AuthenticatedApp = () => {
           { route: routePath("dashboard"), element: <Navigate to={routePath("admin")} replace /> },
           { route: routePath("admin-settings"), element: <Navigate to={routePath("admin")} replace /> },
           { route: routePath("admin"), Component: AdminDashboard },
-          { route: routePath("admin", "leads"), Component: AdminLeads },
+          { route: routePath("admin", "leads"), element: <Navigate to={`${routePath("admin")}?tab=leads`} replace /> },
           { route: routePath("admin", "leads", dynamicParam("leadId")), Component: AdminLeadDetail },
           { route: routePath("admin", "automations"), Component: AdminAutomation },
           { route: routePath("lead-intelligence"), element: <Navigate to={routePath("admin")} replace /> },
@@ -458,7 +458,10 @@ function App() {
     <ErrorBoundary>
       <AuthProvider>
         <QueryClientProvider client={queryClientInstance}>
-          <Router style={{ overflowX: "hidden" }}>
+          <Router
+            style={{ overflowX: "hidden" }}
+            future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+          >
             <a
               href="#main-content"
               className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-lg"
