@@ -1,4 +1,3 @@
-import { createRequire } from "node:module";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, resolve } from "node:path";
@@ -6,10 +5,20 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "../..");
-const requireFromBrowserAudit = createRequire(
-  new URL("../../tools/browser-audit/package.json", import.meta.url)
-);
-const { chromium } = requireFromBrowserAudit("playwright");
+
+async function loadChromium() {
+  try {
+    const { createRequire } = await import("node:module");
+    const requireFromBrowserAudit = createRequire(
+      new URL("../../tools/browser-audit/package.json", import.meta.url)
+    );
+    return requireFromBrowserAudit("playwright").chromium;
+  } catch (error) {
+    throw new Error(
+      `Playwright browser fallback is unavailable. CLI bearer deploy failed, and browser fallback could not load: ${error.message}`
+    );
+  }
+}
 
 function parseArgs(argv) {
   const args = {
@@ -159,6 +168,7 @@ async function main() {
     return;
   }
 
+  const chromium = await loadChromium();
   const context = await chromium.launchPersistentContext(args.profileDir, {
     headless: !args.showBrowser,
     viewport: { width: 1440, height: 960 },
