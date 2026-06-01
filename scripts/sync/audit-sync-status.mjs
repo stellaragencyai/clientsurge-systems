@@ -196,6 +196,72 @@ function getCloudflareState(repoPath, liveSecurity) {
   return state;
 }
 
+function getGitHubReleaseGate(repoPath, sha) {
+  const workflow = "clientsurge-release-gate.yml";
+  if (!sha) {
+    return {
+      workflow,
+      ok: false,
+      status: "missing_sha",
+    };
+  }
+
+  const result = run("gh", [
+    "run",
+    "list",
+    "--workflow",
+    workflow,
+    "--branch",
+    "main",
+    "--commit",
+    sha,
+    "--limit",
+    "5",
+    "--json",
+    "status,conclusion,url,headSha,workflowName,createdAt,updatedAt",
+  ], { cwd: repoPath });
+
+  if (!result.ok) {
+    return {
+      workflow,
+      ok: false,
+      status: "unavailable",
+      error: result.stderr || result.stdout,
+    };
+  }
+
+  try {
+    const runs = JSON.parse(result.stdout || "[]");
+    const run = runs
+      .filter((candidate) => candidate.headSha === sha)
+      .sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")))[0];
+
+    if (!run) {
+      return {
+        workflow,
+        ok: false,
+        status: "missing",
+      };
+    }
+
+    return {
+      workflow,
+      ok: run.status === "completed" && run.conclusion === "success",
+      status: run.status,
+      conclusion: run.conclusion,
+      url: run.url,
+      updated_at: run.updatedAt,
+    };
+  } catch {
+    return {
+      workflow,
+      ok: false,
+      status: "parse_error",
+      raw: result.stdout,
+    };
+  }
+}
+
 function evaluate(report) {
   const failures = [];
   const warnings = [];
@@ -205,6 +271,7 @@ function evaluate(report) {
   if (!report.git.mirror_clean) failures.push("Clean mirror is dirty.");
   if (!report.git.active_matches_origin_main) warnings.push("Active branch HEAD is not origin/main; this is expected when working on a merge branch but should be intentional.");
   if (!report.git.mirror_matches_origin_main) failures.push("Clean mirror is not at origin/main.");
+  if (!report.github.release_gate.ok) failures.push("GitHub release gate has not passed for origin/main.");
   if (!report.base44.matches_origin_main) failures.push("Base44 last published SHA does not match origin/main.");
   if (report.base44.app && report.base44.app.ok === false) failures.push("Base44 production app access check failed.");
   if (report.base44.app?.live_signal?.hasDonorAppId) failures.push("Production live signal contains donor app ID.");
@@ -237,6 +304,7 @@ function format(report) {
     `Overall: ${report.summary.ok ? "OK" : "ATTENTION"}`,
     "",
     `GitHub main: ${report.git.origin_main_sha}`,
+    `GitHub release gate: ${report.github.release_gate.status || "unknown"} conclusion=${report.github.release_gate.conclusion || "unknown"} ok=${report.github.release_gate.ok}`,
     `Active: ${report.git.branch} ${report.git.active_sha} clean=${report.git.active_clean}`,
     `Mirror: ${report.git.mirror_branch || "missing"} ${report.git.mirror_sha || "missing"} clean=${report.git.mirror_clean}`,
     `Base44 published: ${report.base44.last_published_sha || "unknown"} matches_main=${report.base44.matches_origin_main}`,
@@ -275,6 +343,9 @@ async function main() {
     tasks: {
       base44: getScheduledTask("ClientSurge-Base44-SyncMirror"),
       cloudflare: getScheduledTask("ClientSurge-Cloudflare-Security-Edge"),
+    },
+    github: {
+      release_gate: getGitHubReleaseGate(repoPath, gitState.origin_main_sha),
     },
     cloudflare: getCloudflareState(repoPath, args.liveSecurity),
   };

@@ -8,7 +8,8 @@ param(
     [ValidateSet('Primary', 'Failover', 'MirrorOnly')]
     [string]$PublisherRole = 'MirrorOnly',
     [int]$FailoverDelayMinutes = 3,
-    [switch]$SkipPublishTests
+    [switch]$SkipPublishTests,
+    [switch]$SkipGitHubChecks
 )
 
 Set-StrictMode -Version Latest
@@ -58,6 +59,9 @@ if ($PublishAfterUpdate) {
     )
     if ($SkipPublishTests) {
         $watchArgs += '-SkipTests'
+    }
+    if ($SkipGitHubChecks) {
+        $watchArgs += '-SkipGitHubChecks'
     }
 
     & pwsh @watchArgs

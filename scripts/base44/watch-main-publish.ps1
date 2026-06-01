@@ -9,6 +9,8 @@ param(
     [switch]$SkipBuild,
     [switch]$DryRun,
     [switch]$FallbackToUiClick,
+    [switch]$SkipGitHubChecks,
+    [int]$GitHubCheckTimeoutSeconds = 1800,
     [ValidateSet('Primary', 'Failover', 'MirrorOnly')]
     [string]$PublisherRole = 'Primary',
     [int]$FailoverDelayMinutes = 3
@@ -106,6 +108,10 @@ function Invoke-ProductionPublish {
 
     if ($PublisherRole -eq 'Failover' -and (Test-AppAlreadyPublishedByPrimary -Sha $Sha)) {
         return
+    }
+
+    if (-not $SkipGitHubChecks) {
+        Invoke-Step "pwsh -NoProfile -File scripts/github/wait-for-main-ci.ps1 -Sha $Sha -Branch $TargetBranch -TimeoutSeconds $GitHubCheckTimeoutSeconds"
     }
 
     if (-not $SkipBuild) {

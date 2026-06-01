@@ -98,11 +98,32 @@ test("main publish watcher preserves build test and production-app guardrails", 
   assert.match(watcher, /npm run verify:production-security/);
   assert.match(watcher, /\[ValidateSet\('Primary', 'Failover', 'MirrorOnly'\)\]/);
   assert.match(watcher, /FailoverDelayMinutes/);
+  assert.match(watcher, /SkipGitHubChecks/);
+  assert.match(watcher, /wait-for-main-ci\.ps1/);
   assert.match(watcher, /check-app-access\.mjs/);
   assert.match(watcher, /Run this watcher from a clean \$TargetBranch mirror/);
   assert.match(watcher, /git merge --ff-only origin\/\$TargetBranch/);
   assert.match(watcher, /publish-deploy-endpoint\.mjs/);
   assert.match(packageJson, /"base44:watch-main-publish": "pwsh -File scripts\/base44\/watch-main-publish\.ps1"/);
+});
+
+test("GitHub release gate verifies main before automatic publish", () => {
+  const workflow = read(".github/workflows/clientsurge-release-gate.yml");
+  const waiter = read("scripts/github/wait-for-main-ci.ps1");
+  const packageJson = read("package.json");
+
+  assert.match(workflow, /name: ClientSurge Release Gate/);
+  assert.match(workflow, /branches:\s*\n\s*- main/);
+  assert.match(workflow, /npm run build/);
+  assert.match(workflow, /npm run test:node/);
+  assert.match(workflow, /npm run test:deno/);
+  assert.match(workflow, /npm run smoke:public-routes/);
+
+  assert.match(waiter, /gh run list/);
+  assert.match(waiter, /clientsurge-release-gate\.yml/);
+  assert.match(waiter, /--commit \$Sha/);
+  assert.match(waiter, /conclusion -eq 'success'/);
+  assert.match(packageJson, /"github:wait-main-ci": "pwsh -File scripts\/github\/wait-for-main-ci\.ps1"/);
 });
 
 test("mirror scheduler supports bootstrap plus primary and failover publisher roles", () => {
@@ -115,11 +136,13 @@ test("mirror scheduler supports bootstrap plus primary and failover publisher ro
   assert.match(installer, /PublisherRole/);
   assert.match(installer, /FailoverDelayMinutes/);
   assert.match(installer, /SkipPublishTests/);
+  assert.match(installer, /SkipGitHubChecks/);
 
   assert.match(updater, /watch-main-publish\.ps1/);
   assert.match(updater, /'-PublisherRole'/);
   assert.match(updater, /'-FailoverDelayMinutes'/);
   assert.match(updater, /'-SkipTests'/);
+  assert.match(updater, /'-SkipGitHubChecks'/);
 
   assert.match(bootstrap, /ensure-base44-sync-mirror\.ps1/);
   assert.match(bootstrap, /check-app-access\.mjs/);
@@ -135,6 +158,9 @@ test("sync status audit covers GitHub mirror Base44 tasks and Cloudflare readine
   assert.match(status, /ClientSurge Sync Status/);
   assert.match(status, /ClientSurge-Base44-SyncMirror/);
   assert.match(status, /ClientSurge-Cloudflare-Security-Edge/);
+  assert.match(status, /getGitHubReleaseGate/);
+  assert.match(status, /clientsurge-release-gate\.yml/);
+  assert.match(status, /GitHub release gate has not passed for origin\/main/);
   assert.match(status, /check-app-access\.mjs/);
   assert.match(status, /last-published-main\.txt/);
   assert.match(status, /npx", \["wrangler", "whoami"\]/);

@@ -12,7 +12,8 @@ param(
     [int]$FailoverDelayMinutes = 3,
     [switch]$InstallDependencies,
     [switch]$PublishAfterUpdate,
-    [switch]$SkipPublishTests
+    [switch]$SkipPublishTests,
+    [switch]$SkipGitHubChecks
 )
 
 Set-StrictMode -Version Latest
@@ -99,6 +100,9 @@ if ($PublishAfterUpdate) {
 }
 if ($SkipPublishTests) {
     $installArgs += '-SkipPublishTests'
+}
+if ($SkipGitHubChecks) {
+    $installArgs += '-SkipGitHubChecks'
 }
 
 Invoke-Native pwsh $installArgs $repoRoot

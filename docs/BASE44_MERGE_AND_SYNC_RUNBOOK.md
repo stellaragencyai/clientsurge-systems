@@ -74,6 +74,14 @@ The status audit compares GitHub `origin/main`, the active checkout, the clean m
 
 ## Immediate production publish
 
+Every push to GitHub `main` runs the `ClientSurge Release Gate` workflow. The desktop/laptop Base44 publisher waits for that workflow to pass for the exact `main` commit before it publishes production. This keeps GitHub `main` as the single source of truth while still allowing near-immediate Base44 deployment after CI is green.
+
+Check the release gate for a specific commit:
+
+```powershell
+npm run github:wait-main-ci -- -Sha <main-commit-sha>
+```
+
 The guarded production publisher is:
 
 ```powershell
@@ -98,6 +106,8 @@ node scripts/base44/publish-deploy-endpoint.mjs `
 ```
 
 Only one machine should publish immediately. Desktop runs `PublisherRole Primary`; laptop runs `PublisherRole Failover`, waits three minutes, checks the Base44 app `updated_date`, and only publishes if the primary did not already move production.
+
+For emergency manual publishing only, the watcher accepts `-SkipGitHubChecks`. Keep the scheduled desktop and laptop publishers on the default GitHub-gated path.
 
 Check the production app/auth connection at any time:
 

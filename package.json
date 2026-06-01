@@ -23,6 +23,7 @@
     "sync:mirror": "pwsh -File scripts/sync/update-base44-sync-mirror.ps1",
     "sync:classify-overlap": "pwsh -File scripts/sync/classify-base44-overlap.ps1",
     "sync:status": "node scripts/sync/audit-sync-status.mjs",
+    "github:wait-main-ci": "pwsh -File scripts/github/wait-for-main-ci.ps1",
     "cloudflare:security:login": "npx wrangler login",
     "cloudflare:security:deploy": "npx wrangler deploy --config wrangler.clientsurge-security.toml",
     "cloudflare:security:dry-run": "npx wrangler deploy --config wrangler.clientsurge-security.toml --dry-run",
