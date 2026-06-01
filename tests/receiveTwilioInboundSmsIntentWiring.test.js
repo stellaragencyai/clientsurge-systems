@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const source = fs.readFileSync(
-  "C:/Base44Projects/clientsurge-systems-audit-20260509/base44/functions/receiveTwilioInboundSms/entry.ts",
+  new URL("../base44/functions/receiveTwilioInboundSms/entry.ts", import.meta.url),
   "utf8",
 );
 

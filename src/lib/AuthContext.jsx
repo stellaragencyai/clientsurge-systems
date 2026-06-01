@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { createAxiosClient } from "@base44/sdk/dist/utils/axios-client";
 import { base44 } from "@/api/base44Client";
 import { appParams } from "@/lib/app-params";
+import { isPublicRoute } from "@/lib/routeSecurity";
 
 const AuthContext = createContext();
 
@@ -26,7 +27,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAppState = async () => {
-    if (shouldAllowLocalAuthBypass()) {
+    const currentPath = window.location.pathname;
+
+    if (shouldAllowLocalAuthBypass() && isPublicRoute(currentPath)) {
       setIsLoadingPublicSettings(false);
       setIsLoadingAuth(false);
       setIsAuthenticated(false);
@@ -59,7 +62,7 @@ export const AuthProvider = ({ children }) => {
 
         setAppPublicSettings(publicSettings);
 
-        if (appParams.token) {
+        if (!isPublicRoute(currentPath)) {
           await checkUserAuth();
         } else {
           setIsLoadingAuth(false);
@@ -114,13 +117,14 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoadingAuth(true);
       const currentUser = await base44.auth.me();
-      setUser(currentUser);
-      setIsAuthenticated(true);
+      applyAuthenticatedUser(currentUser);
       setIsLoadingAuth(false);
+      return currentUser;
     } catch (error) {
       console.error("User auth check failed:", error);
       setIsLoadingAuth(false);
       setIsAuthenticated(false);
+      setUser(null);
 
       if (error.status === 401 || error.status === 403) {
         setAuthError({
@@ -128,12 +132,22 @@ export const AuthProvider = ({ children }) => {
           message: "Authentication required",
         });
       }
+
+      return null;
     }
+  };
+
+  const applyAuthenticatedUser = (currentUser) => {
+    setUser(currentUser || null);
+    setIsAuthenticated(Boolean(currentUser));
+    setAuthError(null);
+    setIsLoadingAuth(false);
   };
 
   const logout = (shouldRedirect = true) => {
     setUser(null);
     setIsAuthenticated(false);
+    setAuthError(null);
 
     if (shouldRedirect) {
       base44.auth.logout(window.location.href);
@@ -158,6 +172,8 @@ export const AuthProvider = ({ children }) => {
         logout,
         navigateToLogin,
         checkAppState,
+        checkUserAuth,
+        applyAuthenticatedUser,
       }}
     >
       {children}

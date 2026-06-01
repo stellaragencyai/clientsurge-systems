@@ -3,12 +3,12 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const queueEnhancements = fs.readFileSync(
-  "C:/Base44Projects/clientsurge-systems-audit-20260509/src/components/admin/AdminQueueEnhancements.jsx",
+  new URL("../src/components/admin/AdminQueueEnhancements.jsx", import.meta.url),
   "utf8",
 );
 
 const installWorkspace = fs.readFileSync(
-  "C:/Base44Projects/clientsurge-systems-audit-20260509/src/components/admin/InstallOrderWorkspace.jsx",
+  new URL("../src/components/admin/InstallOrderWorkspace.jsx", import.meta.url),
   "utf8",
 );
 

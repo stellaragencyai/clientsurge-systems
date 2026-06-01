@@ -5,9 +5,11 @@ import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import SignupModal from "./SignupModal";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function PortalLoginModal({ onClose }) {
   const navigate = useNavigate();
+  const { applyAuthenticatedUser } = useAuth();
   const dialogRef = useRef(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,6 +47,7 @@ export default function PortalLoginModal({ onClose }) {
     try {
       await base44.auth.loginViaEmailPassword(email.trim(), password);
       const currentUser = await base44.auth.me();
+      applyAuthenticatedUser(currentUser);
       onClose();
       navigate(currentUser?.role === "admin" ? "/admin" : "/client-portal");
     } catch (err) {

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 const source = fs.readFileSync(
-  "C:/Base44Projects/clientsurge-systems-audit-20260509/src/legacy-pages/AdminSettings.jsx",
+  new URL("../src/legacy-pages/AdminSettings.jsx", import.meta.url),
   "utf8",
 );
 
