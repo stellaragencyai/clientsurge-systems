@@ -1,11 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import worker, {
   applySecurityHeaders,
   isSensitivePath,
   SECURITY_TXT,
 } from "../cloudflare/clientsurge-security-edge-worker.mjs";
+
+function read(path) {
+  return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+}
 
 test("Cloudflare security edge worker identifies sensitive app routes", () => {
   for (const path of ["/admin", "/admin/leads", "/onboarding", "/setup/preview/security-check", "/motion-lab", "/client-portal"]) {
@@ -49,4 +54,29 @@ test("Cloudflare security edge worker redirects alternate host to canonical", as
 
   assert.equal(response.status, 301);
   assert.equal(response.headers.get("location"), "https://clientsurgesystems.com/store");
+});
+
+test("Cloudflare security release and monitor scripts keep auth and verification guarded", () => {
+  const packageJson = read("package.json");
+  const release = read("scripts/cloudflare/deploy-security-edge.ps1");
+  const monitor = read("scripts/cloudflare/monitor-security-edge.ps1");
+  const installer = read("scripts/cloudflare/install-security-edge-monitor-task.ps1");
+
+  assert.match(packageJson, /"cloudflare:security:release": "pwsh -File scripts\/cloudflare\/deploy-security-edge\.ps1"/);
+  assert.match(packageJson, /"cloudflare:security:monitor": "pwsh -File scripts\/cloudflare\/monitor-security-edge\.ps1"/);
+  assert.match(packageJson, /"cloudflare:security:install-monitor": "pwsh -File scripts\/cloudflare\/install-security-edge-monitor-task\.ps1"/);
+
+  assert.match(release, /npx wrangler whoami/);
+  assert.match(release, /npm run verify:production-security/);
+  assert.match(release, /wrangler deploy --config \$ConfigPath --dry-run/);
+
+  assert.match(monitor, /npm run verify:production-security/);
+  assert.match(monitor, /npx wrangler whoami/);
+  assert.match(monitor, /auth_required/);
+  assert.match(monitor, /npm run cloudflare:security:release/);
+  assert.match(monitor, /latest-security-edge-status\.json/);
+
+  assert.match(installer, /New-ScheduledTaskTrigger/);
+  assert.match(installer, /monitor-security-edge\.ps1/);
+  assert.match(installer, /MultipleInstances IgnoreNew/);
 });

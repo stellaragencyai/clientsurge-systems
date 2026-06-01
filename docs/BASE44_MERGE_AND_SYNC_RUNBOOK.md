@@ -125,6 +125,15 @@ npm run cloudflare:security:login
 npm run cloudflare:security:release
 ```
 
+Or install the monitor so this machine keeps checking and auto-releases as soon as Wrangler auth exists:
+
+```powershell
+npm run cloudflare:security:install-monitor
+npm run cloudflare:security:monitor
+```
+
+The monitor writes its latest state to `logs/cloudflare-security/<machine>/latest-security-edge-status.json`. If production security already passes it records `verified`; if Wrangler is not logged in it records `auth_required` without marking the scheduled task failed; if Wrangler is logged in it runs the guarded release and verification sequence.
+
 The Worker proxies Base44, injects CSP/Permissions-Policy/COOP, keeps Base44 editor `frame-ancestors` allowed, marks sensitive app routes `noindex` and `no-store`, serves `/.well-known/security.txt`, and redirects `www` to the canonical host.
 
 ## Required verification
