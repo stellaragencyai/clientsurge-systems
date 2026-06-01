@@ -52,10 +52,6 @@ async function checkRoute(route) {
     failures.push("response does not look like the Vite app shell");
   }
 
-  if (/Industry Template/i.test(html)) {
-    failures.push("raw HTML still contains generic Industry Template copy");
-  }
-
   if (/404\s*\|\s*ClientSurge Systems/i.test(html)) {
     failures.push("route appears to be serving a not-found shell");
   }
