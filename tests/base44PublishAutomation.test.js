@@ -114,6 +114,8 @@ test("GitHub release gate verifies main before automatic publish", () => {
 
   assert.match(workflow, /name: ClientSurge Release Gate/);
   assert.match(workflow, /branches:\s*\n\s*- main/);
+  assert.match(workflow, /apt-get install -y ripgrep/);
+  assert.match(workflow, /cp \.env\.example \.env\.local/);
   assert.match(workflow, /npm run build/);
   assert.match(workflow, /npm run test:node/);
   assert.match(workflow, /npm run test:deno/);

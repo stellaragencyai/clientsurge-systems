@@ -36,6 +36,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Prepare CI runtime tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ripgrep
+
+      - name: Prepare production app env
+        run: cp .env.example .env.local
+
       - name: Build app
         run: npm run build
 
@@ -60,4 +68,3 @@ jobs:
 
       - name: Smoke public routes
         run: npm run smoke:public-routes
-
