@@ -27,6 +27,7 @@ Donor merge audit:
 
 ```powershell
 npm run base44:sync-metadata
+npm run base44:audit-donor
 ```
 
 See `docs/BASE44_DONOR_MERGE_AUDIT.md` for the current donor-vs-production inventory, imported metadata, and donor-only files that are intentionally not copied because production already owns the safer implementation.

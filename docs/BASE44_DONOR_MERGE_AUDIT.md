@@ -23,6 +23,8 @@ Production remains authoritative for source code, tests, release scripts, docs, 
 - Repeatable sync command:
   - `npm run base44:sync-metadata`
   - `npm run base44:sync-metadata -- --write`
+- Repeatable donor audit command:
+  - `npm run base44:audit-donor`
 
 This keeps the richer production function implementations while making the Base44 source inventory explicit and reproducible across both apps and both computers.
 
@@ -85,6 +87,6 @@ These are audit-tracked, not silently ignored. Import them only as scoped featur
 ## Current Verification
 
 - `npm run base44:sync-metadata`
+- `npm run base44:audit-donor`
 - `node --test tests/base44PublishAutomation.test.js`
 - `npm run sync:status`
-

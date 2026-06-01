@@ -17,6 +17,7 @@
     "base44:check-app": "node scripts/base44/check-app-access.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https://clientsurgesystems.com",
     "base44:publish-all": "node scripts/base44/publish-all-apps.mjs",
     "base44:sync-metadata": "node scripts/base44/sync-function-metadata.mjs",
+    "base44:audit-donor": "node scripts/base44/audit-donor-merge.mjs",
     "base44:publish-ui": "node scripts/base44/publish-ui-clicker.mjs",
     "base44:auto-sync": "pwsh -File scripts/base44/watch-sync-publish.ps1",
     "base44:watch-main-publish": "pwsh -File scripts/base44/watch-main-publish.ps1",

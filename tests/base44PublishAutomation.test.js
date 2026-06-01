@@ -114,6 +114,20 @@ test("Base44 function metadata is complete for every source entry", () => {
   assert.match(syncScript, /Generated metadata/);
 });
 
+test("donor merge audit keeps leftover donor files classified", () => {
+  const packageJson = read("package.json");
+  const audit = read("scripts/base44/audit-donor-merge.mjs");
+  const docs = read("docs/BASE44_DONOR_MERGE_AUDIT.md");
+
+  assert.match(packageJson, /"base44:audit-donor": "node scripts\/base44\/audit-donor-merge\.mjs"/);
+  assert.match(audit, /EXPECTED_DONOR_ONLY/);
+  assert.match(audit, /DONOR_APP_ID/);
+  assert.match(audit, /donor_app_id_runtime_leaks/);
+  assert.match(audit, /base44\/functions\/_shared\/installPipeline\/entry\.ts/);
+  assert.match(audit, /src\/pages\/AdminDashboard\.jsx/);
+  assert.match(docs, /npm run base44:audit-donor/);
+});
+
 test("Base44 auto sync watcher commits pushes and optionally publishes filtered changes", () => {
   const watcher = read("scripts/base44/watch-sync-publish.ps1");
   const packageJson = read("package.json");
