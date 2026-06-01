@@ -104,6 +104,29 @@ npm run base44:publish-all -- --dry-run --include-stellar-mirror
 
 Production app `69dc4a79656fdba136d413d3` is required. Donor/staging app `69f959e2bc665e019e19840c` and Stellar mirror app `6a15f1424f4856ba4e9ed90b` are optional by default so a staging permission issue cannot block the live site.
 
+## Cloudflare edge security
+
+Base44 does not currently apply `public/_headers` or serve `/.well-known/security.txt` for this managed-source app. Cloudflare owns those production edge controls:
+
+- Worker source: `cloudflare/clientsurge-security-edge-worker.mjs`
+- Wrangler config: `wrangler.clientsurge-security.toml`
+- Routes: `clientsurgesystems.com/*` and `www.clientsurgesystems.com/*`
+
+Dry-run the Worker package:
+
+```powershell
+npm run cloudflare:security:dry-run
+```
+
+Deploy after `wrangler login` has access to the `clientsurgesystems.com` zone:
+
+```powershell
+npm run cloudflare:security:deploy
+npm run verify:production-security
+```
+
+The Worker proxies Base44, injects CSP/Permissions-Policy/COOP, keeps Base44 editor `frame-ancestors` allowed, marks sensitive app routes `noindex` and `no-store`, serves `/.well-known/security.txt`, and redirects `www` to the canonical host.
+
 ## Required verification
 
 Before publishing:

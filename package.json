@@ -22,6 +22,8 @@
     "sync:bootstrap-machine": "pwsh -File scripts/sync/bootstrap-base44-machine.ps1",
     "sync:mirror": "pwsh -File scripts/sync/update-base44-sync-mirror.ps1",
     "sync:classify-overlap": "pwsh -File scripts/sync/classify-base44-overlap.ps1",
+    "cloudflare:security:deploy": "npx wrangler deploy --config wrangler.clientsurge-security.toml",
+    "cloudflare:security:dry-run": "npx wrangler deploy --config wrangler.clientsurge-security.toml --dry-run",
     "smoke:public-routes": "node scripts/public-route-smoke.mjs",
     "verify:production-security": "node scripts/verify-production-security.mjs",
     "openclaw:validate-install": "node scripts/openclaw/run-install-validation.mjs",
