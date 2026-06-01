@@ -140,6 +140,7 @@ test("mirror scheduler supports bootstrap plus primary and failover publisher ro
   const installer = read("scripts/sync/install-base44-sync-task.ps1");
   const updater = read("scripts/sync/update-base44-sync-mirror.ps1");
   const bootstrap = read("scripts/sync/bootstrap-base44-machine.ps1");
+  const repair = read("scripts/sync/repair-base44-automation.ps1");
   const packageJson = read("package.json");
 
   assert.match(installer, /\[ValidateSet\('Primary', 'Failover', 'MirrorOnly'\)\]/);
@@ -158,7 +159,15 @@ test("mirror scheduler supports bootstrap plus primary and failover publisher ro
   assert.match(bootstrap, /check-app-access\.mjs/);
   assert.match(bootstrap, /install-base44-sync-task\.ps1/);
   assert.match(bootstrap, /69dc4a79656fdba136d413d3/);
+
+  assert.match(repair, /ClientSurge-Base44-SyncMirror/);
+  assert.match(repair, /ClientSurge-Cloudflare-Security-Edge/);
+  assert.match(repair, /install-base44-sync-task\.ps1/);
+  assert.match(repair, /install-security-edge-monitor-task\.ps1/);
+  assert.match(repair, /automation-repair-latest\.json/);
+  assert.match(repair, /npm @\('run', 'sync:status'\)/);
   assert.match(packageJson, /"sync:bootstrap-machine": "pwsh -File scripts\/sync\/bootstrap-base44-machine\.ps1"/);
+  assert.match(packageJson, /"sync:repair-automation": "pwsh -File scripts\/sync\/repair-base44-automation\.ps1"/);
 });
 
 test("sync status audit covers GitHub mirror Base44 tasks and Cloudflare readiness", () => {

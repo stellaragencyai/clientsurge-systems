@@ -72,6 +72,14 @@ npm run sync:status -- --live-security
 
 The status audit compares GitHub `origin/main`, the active checkout, the clean mirror, Base44 last-published SHA, production app access, scheduled task results, Cloudflare monitor state, and donor-app-ID leakage.
 
+Repair local automation on either computer:
+
+```powershell
+npm run sync:repair-automation -- -PublishAfterUpdate -PublisherRole Primary -StartTasks
+```
+
+On the laptop, use `-PublisherRole Failover -FailoverDelayMinutes 3` instead of `Primary`. The repair command reinstalls the Base44 sync/publish task, reinstalls the Cloudflare monitor, optionally starts both tasks to refresh Task Scheduler health, writes `logs/base44-sync/automation-repair-latest.json`, and runs `npm run sync:status`.
+
 ## Immediate production publish
 
 Every push to GitHub `main` runs the `ClientSurge Release Gate` workflow. The desktop/laptop Base44 publisher waits for that workflow to pass for the exact `main` commit before it publishes production. This keeps GitHub `main` as the single source of truth while still allowing near-immediate Base44 deployment after CI is green.
