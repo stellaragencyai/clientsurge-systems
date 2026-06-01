@@ -52,6 +52,24 @@ function Invoke-ProductionSecurityVerification {
     throw 'Production security verification failed after Base44 publish.'
 }
 
+function Ensure-LocalProductionEnv {
+    $envPath = Join-Path $repoRoot '.env.local'
+    $examplePath = Join-Path $repoRoot '.env.example'
+
+    if (-not (Test-Path $envPath)) {
+        if (-not (Test-Path $examplePath)) {
+            throw 'Missing .env.local and .env.example; cannot prepare production publish environment.'
+        }
+        Copy-Item -Path $examplePath -Destination $envPath
+        Write-Host 'Created mirror .env.local from .env.example for production publish checks.' -ForegroundColor Yellow
+    }
+
+    $envText = Get-Content -Path $envPath -Raw
+    if ($envText -notmatch 'VITE_BASE44_APP_ID=69dc4a79656fdba136d413d3' -or $envText -notmatch 'VITE_BASE44_APP_BASE_URL=https://clientsurgesystems\.com') {
+        throw '.env.local is not configured for the production Base44 app and clientsurgesystems.com.'
+    }
+}
+
 $repoRoot = (& git rev-parse --show-toplevel).Trim()
 if (-not $repoRoot) {
     throw 'Not inside a git repository.'
@@ -136,6 +154,8 @@ function Invoke-ProductionPublish {
     if (-not $SkipGitHubChecks) {
         Invoke-Step "pwsh -NoProfile -File scripts/github/wait-for-main-ci.ps1 -Sha $Sha -Branch $TargetBranch -TimeoutSeconds $GitHubCheckTimeoutSeconds"
     }
+
+    Ensure-LocalProductionEnv
 
     if (-not $SkipBuild) {
         Invoke-Step 'npm run build'
