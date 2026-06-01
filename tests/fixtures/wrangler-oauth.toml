@@ -1,0 +1,4 @@
+oauth_token = "test-token"
+expiration_time = "2026-06-02T09:09:00.849Z"
+refresh_token = "test-refresh-token"
+scopes = [ "account:read", "user:read", "workers_routes:write", "workers_scripts:write", "zone:read" ]

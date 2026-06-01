@@ -98,13 +98,16 @@ catch {
     $postReleaseVerify = Invoke-Captured 'npm run verify:production-security' -AllowFailure
     $postReleaseVerifyText = $postReleaseVerify.Output -join "`n"
     if (Test-RouteBypassFailure $postReleaseVerifyText) {
+        $routeDiagnosis = Invoke-Captured 'npm run cloudflare:security:diagnose-route -- --json' -AllowFailure
         Write-State -Status 'route_bypassed' -Message 'Wrangler is authenticated and deploy was attempted, but production traffic is still missing Worker security headers. Public DNS/orange-to-orange or custom-domain routing is likely bypassing the zone Worker route for clientsurgesystems.com.' -Details @{
             verify_before = $verify.Output -join "`n"
             verify_after = $postReleaseVerifyText
             release_error = $releaseText
             wrangler = $whoamiText
+            route_diagnosis_exit_code = $routeDiagnosis.ExitCode
+            route_diagnosis = $routeDiagnosis.Output -join "`n"
         }
-        Write-Warning "Cloudflare Worker route appears bypassed by live traffic after deploy. Check Cloudflare DNS/proxy/custom-domain routing for an orange-to-orange or externally managed apex record."
+        Write-Warning "Cloudflare Worker route appears bypassed by live traffic after deploy. Check Cloudflare DNS/proxy/custom-domain routing for an orange-to-orange or externally managed apex record. Run npm run cloudflare:security:diagnose-route for the exact management-plane probe."
         exit 0
     }
 

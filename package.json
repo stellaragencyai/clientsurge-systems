@@ -36,6 +36,7 @@
     "cloudflare:security:release": "pwsh -File scripts/cloudflare/deploy-security-edge.ps1",
     "cloudflare:security:monitor": "pwsh -File scripts/cloudflare/monitor-security-edge.ps1",
     "cloudflare:security:install-monitor": "pwsh -File scripts/cloudflare/install-security-edge-monitor-task.ps1",
+    "cloudflare:security:diagnose-route": "node scripts/cloudflare/diagnose-route-bypass.mjs",
     "smoke:public-routes": "node scripts/public-route-smoke.mjs",
     "verify:production-security": "node scripts/verify-production-security.mjs",
     "openclaw:validate-install": "node scripts/openclaw/run-install-validation.mjs",
