@@ -1,6 +1,7 @@
 import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
+import { formatFromAddress, getAlertFromEmail, getPublicInboxEmail } from "../_shared/emailConfig.js";
 
 Deno.serve(async (req) => {
   try {
@@ -31,8 +32,8 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "ClientSurge Systems <system@clientsurgesystems.com>",
-        to: ["system@clientsurgesystems.com"],
+        from: formatFromAddress(getAlertFromEmail(), "ClientSurge Lead Intake"),
+        to: [getPublicInboxEmail()],
         reply_to: email,
         subject: `New Contact: ${full_name} — ${business_type || "General Inquiry"}`,
         html: emailBody,

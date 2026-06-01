@@ -8,7 +8,7 @@ function escapeHtml(value) {
 }
 
 function formatFromAddress(value) {
-  const email = String(value || "noreply@clientsurgesystems.com").trim();
+  const email = String(value || "billing@clientsurgesystems.com").trim();
   if (email.includes("<") && email.includes(">")) {
     return email;
   }
@@ -69,7 +69,7 @@ export function buildPaymentRecoveryEmail({
 
   return {
     from: formatFromAddress(fromEmail),
-    reply_to: replyToEmail || "system@clientsurgesystems.com",
+    reply_to: replyToEmail || "billing@clientsurgesystems.com",
     to: customerEmail,
     subject: "Payment update needed for your ClientSurge account",
     text,

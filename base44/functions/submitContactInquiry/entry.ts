@@ -3,6 +3,13 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { validatePublicFormOrigin } from "../_shared/publicFormOriginGuard.js";
 import { resendFetch } from "../_shared/resendFetch.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
+import {
+  formatFromAddress,
+  getAlertFromEmail,
+  getLeadFromEmail,
+  getLeadReplyTo,
+  getPublicInboxEmail,
+} from "../_shared/emailConfig.js";
 
 const MAX_FIELD_LENGTH = 500;
 const MAX_MESSAGE_LENGTH = 1500;
@@ -209,8 +216,8 @@ async function sendAdminNotification(contact: ReturnType<typeof normalizeContact
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'ClientSurge Systems <system@clientsurgesystems.com>',
-      to: ['nolan@clientsurgesystems.com'],
+      from: formatFromAddress(getAlertFromEmail(), 'ClientSurge Lead Intake'),
+      to: [getPublicInboxEmail()],
       reply_to: contact.email,
       subject: `New Contact: ${contact.full_name} - ${contact.business_type}`,
       html: emailBody,
@@ -252,7 +259,7 @@ async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContact
       <p style="color:#999;font-size:12px;margin-top:32px;border-top:1px solid #eee;padding-top:16px;">
         <strong>ClientSurge Systems</strong><br>
         Phoenix, Arizona<br>
-        <a href="mailto:system@clientsurgesystems.com" style="color:#9a5c2e;text-decoration:none;">system@clientsurgesystems.com</a>
+        <a href="mailto:${getLeadReplyTo()}" style="color:#9a5c2e;text-decoration:none;">${getLeadReplyTo()}</a>
       </p>
     </div>
   `;
@@ -264,7 +271,8 @@ async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContact
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'ClientSurge Systems <system@clientsurgesystems.com>',
+      from: formatFromAddress(getLeadFromEmail()),
+      reply_to: getLeadReplyTo(),
       to: [contact.email],
       subject: `Thank You for Your Message, ${contact.full_name.split(' ')[0]}!`,
       html: emailBody,
