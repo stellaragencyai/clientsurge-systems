@@ -130,7 +130,7 @@ function Invoke-ProductionPublish {
     }
 
     try {
-        Invoke-Step "node scripts/base44/publish-deploy-endpoint.mjs --app-id $AppId --verify-url $VerifyUrl"
+        Invoke-Step "node scripts/base44/publish-deploy-endpoint.mjs --app-id $AppId --verify-url $VerifyUrl --summary"
     }
     catch {
         if (-not $FallbackToUiClick) {

@@ -111,7 +111,7 @@ test("main publish watcher preserves build test and production-app guardrails", 
   assert.match(watcher, /check-app-access\.mjs/);
   assert.match(watcher, /Run this watcher from a clean \$TargetBranch mirror/);
   assert.match(watcher, /git merge --ff-only origin\/\$TargetBranch/);
-  assert.match(watcher, /publish-deploy-endpoint\.mjs/);
+  assert.match(watcher, /publish-deploy-endpoint\.mjs --app-id \$AppId --verify-url \$VerifyUrl --summary/);
   assert.match(packageJson, /"base44:watch-main-publish": "pwsh -File scripts\/base44\/watch-main-publish\.ps1"/);
 });
 
