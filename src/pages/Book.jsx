@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { setPageMetadata } from '@/lib/seo';
 import { trackCTA } from '@/lib/analytics';
 import MobileCallBar from '@/components/landing/MobileCallBar';
+import DemoBookingInline from '@/components/forms/DemoBookingInline';
 
 export default function Book() {
   useEffect(() => {
@@ -97,29 +98,31 @@ export default function Book() {
             })}
           </div>
 
-          <div id="scheduler" className="mt-8 rounded-2xl border border-primary/15 bg-primary/5 p-6 text-center shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">
-              Fast scheduling
-            </p>
-            <h3 className="text-xl font-semibold text-foreground mb-3">
-              Tell us what you want reviewed and we will send the next available audit times.
-            </h3>
-            <p className="mx-auto max-w-2xl text-sm text-muted-foreground leading-relaxed">
-              The direct scheduler is temporarily unavailable in this preview, so the contact form is the clean path for audit requests.
-            </p>
+          <div id="scheduler" className="mt-8 overflow-hidden rounded-3xl border border-slate-800 bg-slate-950 text-left shadow-xl">
+            <div className="border-b border-white/10 px-6 py-5 text-center">
+              <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">
+                Fast scheduling
+              </p>
+              <h3 className="text-xl font-semibold text-white mb-3">
+                Choose your audit time
+              </h3>
+              <p className="mx-auto max-w-2xl text-sm text-white/60 leading-relaxed">
+                Share the basics, pick a time, and we will confirm your free automation audit.
+              </p>
+            </div>
+            <div className="mx-auto max-w-2xl p-6">
+              <DemoBookingInline />
+            </div>
           </div>
 
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                trackCTA('schedule_your_audit', 'book_page');
-                window.location.href = '/contact';
-              }}
+            <a
+              href="#scheduler"
+              onClick={() => trackCTA('schedule_your_audit', 'book_page')}
               className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
               Schedule Your Audit
-            </button>
+            </a>
             <Link
               to="/contact"
               onClick={() => trackCTA('contact_us_instead', 'book_page')}

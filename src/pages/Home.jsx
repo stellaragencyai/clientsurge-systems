@@ -1,4 +1,5 @@
 import { useEffect, lazy, Suspense, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import HomepageConversionContent from "../components/landing/HomepageConversionContent";
@@ -47,11 +48,16 @@ function useHomepageWhiteCanvas() {
   }, []);
 }
 
-function LazyHomepageSection({ children, fallback, minHeight = 360 }) {
-  const [isVisible, setIsVisible] = useState(false);
+function LazyHomepageSection({ children, fallback, minHeight = 360, forceVisible = false }) {
+  const [isVisible, setIsVisible] = useState(forceVisible);
   const ref = useRef(null);
 
   useEffect(() => {
+    if (forceVisible) {
+      setIsVisible(true);
+      return undefined;
+    }
+
     if (isVisible) {
       return undefined;
     }
@@ -76,7 +82,7 @@ function LazyHomepageSection({ children, fallback, minHeight = 360 }) {
     }
 
     return () => observer.disconnect();
-  }, [isVisible]);
+  }, [forceVisible, isVisible]);
 
   return (
     <div ref={ref} style={{ minHeight: isVisible ? undefined : minHeight }}>
@@ -90,6 +96,9 @@ function LazyHomepageSection({ children, fallback, minHeight = 360 }) {
 }
 
 export default function Home() {
+  const location = useLocation();
+  const forceVisibleSections = Boolean(location.hash);
+
   useHomepageWhiteCanvas();
 
   useEffect(() => {
@@ -135,7 +144,7 @@ export default function Home() {
         <Navbar />
         <Hero />
         <HomepageConversionContent />
-        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={900}>
+        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={900} forceVisible={forceVisibleSections}>
           <SixAutomationSystems />
           <SectionBreak />
           <ProofBeforeLaunch />
@@ -143,17 +152,17 @@ export default function Home() {
           <Industries />
           <SectionBreak />
         </LazyHomepageSection>
-        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={420}>
+        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={420} forceVisible={forceVisibleSections}>
           <TrustBar />
           <SectionBreak />
         </LazyHomepageSection>
-        <LazyHomepageSection fallback={<LargeSectionSkeleton />} minHeight={900}>
+        <LazyHomepageSection fallback={<LargeSectionSkeleton />} minHeight={900} forceVisible={forceVisibleSections}>
           <CoreOffer />
           <SectionBreak />
           <Pricing />
           <SectionBreak />
         </LazyHomepageSection>
-        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={900}>
+        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={900} forceVisible={forceVisibleSections}>
           <FAQ />
           <SectionBreak />
           <FounderSection />

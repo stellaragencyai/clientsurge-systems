@@ -738,3 +738,10 @@ button, [role="button"] {
 .clip-delay-5 { animation-delay: 0.5s; }
 .clip-delay-6 { animation-delay: 0.6s; }
 .clip-delay-7 { animation-delay: 0.7s; }
+
+/* Hide editor-only Base44 chrome if it is injected into the public site. */
+#base44-edit-badge {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
