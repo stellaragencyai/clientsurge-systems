@@ -19,6 +19,7 @@ function parseArgs(argv) {
     json: false,
     liveSecurity: false,
     skipBase44: false,
+    ignoreActiveWorktree: false,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -28,9 +29,10 @@ function parseArgs(argv) {
     else if (arg === "--json") args.json = true;
     else if (arg === "--live-security") args.liveSecurity = true;
     else if (arg === "--skip-base44") args.skipBase44 = true;
+    else if (arg === "--ignore-active-worktree") args.ignoreActiveWorktree = true;
     else if (arg === "--help" || arg === "-h") {
       console.log(`Usage:
-  node scripts/sync/audit-sync-status.mjs [--json] [--live-security] [--skip-base44]
+  node scripts/sync/audit-sync-status.mjs [--json] [--live-security] [--skip-base44] [--ignore-active-worktree]
 
 Checks GitHub main, active repo, clean mirror, Base44 publish state, scheduled tasks,
 and Cloudflare edge readiness without changing live infrastructure.`);
@@ -306,7 +308,10 @@ function evaluate(report) {
   const failures = [];
   const warnings = [];
 
-  if (!report.git.active_clean) failures.push("Active repo is dirty.");
+  if (!report.git.active_clean) {
+    if (report.config.ignore_active_worktree) warnings.push("Active repo is dirty; ignored for automation watchdog mode.");
+    else failures.push("Active repo is dirty.");
+  }
   if (!report.git.mirror_exists) failures.push("Clean mirror is missing.");
   if (!report.git.mirror_clean) failures.push("Clean mirror is dirty.");
   if (!report.git.active_matches_origin_main) warnings.push("Active branch HEAD is not origin/main; this is expected when working on a merge branch but should be intentional.");
@@ -335,6 +340,16 @@ function evaluate(report) {
       warnings.push("Cloudflare security scheduled task last result indicates an overlapping/running tick.");
     } else {
       failures.push("Cloudflare security scheduled task is failing.");
+    }
+  }
+
+  if (!report.tasks.watchdog.installed) {
+    warnings.push("Automation watchdog scheduled task is missing.");
+  } else if (Number(report.tasks.watchdog.LastTaskResult) !== 0) {
+    if (isTaskOverlapResult(report.tasks.watchdog)) {
+      warnings.push("Automation watchdog scheduled task last result indicates an overlapping/running tick.");
+    } else {
+      warnings.push("Automation watchdog scheduled task last result is non-zero.");
     }
   }
 
@@ -374,6 +389,7 @@ function format(report) {
     `Base44 staging donor: ${report.base44.staging_donor_app?.app_name || "unknown"} ok=${report.base44.staging_donor_app?.ok ?? "unknown"} asset=${report.base44.staging_donor_app?.live_signal?.asset || "unknown"}`,
     `Task Base44: installed=${report.tasks.base44.installed} state=${report.tasks.base44.State || "unknown"} last=${report.tasks.base44.LastTaskResult ?? "unknown"} next=${report.tasks.base44.NextRunTime ?? "unknown"}`,
     `Task Cloudflare: installed=${report.tasks.cloudflare.installed} state=${report.tasks.cloudflare.State || "unknown"} last=${report.tasks.cloudflare.LastTaskResult ?? "unknown"} next=${report.tasks.cloudflare.NextRunTime ?? "unknown"}`,
+    `Task Watchdog: installed=${report.tasks.watchdog.installed} state=${report.tasks.watchdog.State || "unknown"} last=${report.tasks.watchdog.LastTaskResult ?? "unknown"} next=${report.tasks.watchdog.NextRunTime ?? "unknown"}`,
     `Cloudflare: authenticated=${report.cloudflare.authenticated} monitor=${report.cloudflare.monitor?.status || "missing"}`,
   ];
 
@@ -400,11 +416,15 @@ async function main() {
     machine: hostname(),
     repo_path: repoPath,
     mirror_path: mirrorPath,
+    config: {
+      ignore_active_worktree: args.ignoreActiveWorktree,
+    },
     git: gitState,
     base44: getBase44PublishState(repoPath, mirrorPath, gitState.origin_main_sha, args.skipBase44),
     tasks: {
       base44: getScheduledTask("ClientSurge-Base44-SyncMirror"),
       cloudflare: getScheduledTask("ClientSurge-Cloudflare-Security-Edge"),
+      watchdog: getScheduledTask("ClientSurge-Automation-Watchdog"),
     },
     github: {
       release_gate: getGitHubReleaseGate(repoPath, gitState.origin_main_sha),

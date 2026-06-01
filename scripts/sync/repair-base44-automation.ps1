@@ -8,10 +8,12 @@ param(
     [int]$FailoverDelayMinutes = 3,
     [int]$Base44IntervalMinutes = 1,
     [int]$CloudflareIntervalMinutes = 5,
+    [int]$WatchdogIntervalMinutes = 5,
     [switch]$PublishAfterUpdate,
     [switch]$StartTasks,
     [switch]$SkipPublishTests,
-    [switch]$SkipGitHubChecks
+    [switch]$SkipGitHubChecks,
+    [switch]$SkipWatchdog
 )
 
 Set-StrictMode -Version Latest
@@ -66,6 +68,17 @@ function Get-TaskHealth {
     }
 }
 
+function Test-TaskHealthy {
+    param($Task)
+
+    if (-not $Task.installed) {
+        return $false
+    }
+
+    $result = [int]$Task.last_task_result
+    return ($result -eq 0 -or $result -eq 267009 -or $result -eq 2147946720)
+}
+
 $repoRoot = (& git -C $RepoPath rev-parse --show-toplevel).Trim()
 if (-not $repoRoot) {
     throw "RepoPath is not a git repository: $RepoPath"
@@ -102,23 +115,46 @@ Invoke-Native pwsh @(
     '-IntervalMinutes', $CloudflareIntervalMinutes
 ) $RepoPath
 
+if (-not $SkipWatchdog) {
+    $watchdogInstallArgs = @(
+        '-NoProfile',
+        '-ExecutionPolicy', 'Bypass',
+        '-File', (Join-Path $RepoPath 'scripts/sync/install-base44-watchdog-task.ps1'),
+        '-RepoPath', $RepoPath,
+        '-MirrorPath', $MirrorPath,
+        '-ActiveRef', $ActiveRef,
+        '-PublisherRole', $PublisherRole,
+        '-FailoverDelayMinutes', $FailoverDelayMinutes,
+        '-IntervalMinutes', $WatchdogIntervalMinutes
+    )
+    if ($SkipPublishTests) { $watchdogInstallArgs += '-SkipPublishTests' }
+    if ($SkipGitHubChecks) { $watchdogInstallArgs += '-SkipGitHubChecks' }
+
+    Invoke-Native pwsh $watchdogInstallArgs $RepoPath
+}
+
 if ($StartTasks) {
     Write-Host "Starting repaired scheduled tasks for health refresh." -ForegroundColor Yellow
     Start-ScheduledTask -TaskName $base44TaskName
     Start-ScheduledTask -TaskName $cloudflareTaskName
+    if (-not $SkipWatchdog) {
+        Start-ScheduledTask -TaskName 'ClientSurge-Automation-Watchdog'
+    }
     Start-Sleep -Seconds 20
 }
 
 $base44 = Get-TaskHealth -TaskName $base44TaskName
 $cloudflare = Get-TaskHealth -TaskName $cloudflareTaskName
+$watchdog = if ($SkipWatchdog) { $null } else { Get-TaskHealth -TaskName 'ClientSurge-Automation-Watchdog' }
 $report = [pscustomobject]@{
-    ok = ($base44.installed -and $cloudflare.installed -and [int]$base44.last_task_result -eq 0 -and [int]$cloudflare.last_task_result -eq 0)
+    ok = ((Test-TaskHealthy -Task $base44) -and (Test-TaskHealthy -Task $cloudflare) -and ($SkipWatchdog -or (Test-TaskHealthy -Task $watchdog)))
     checked_at = (Get-Date).ToUniversalTime().ToString('o')
     repo_path = $RepoPath
     mirror_path = $MirrorPath
     tasks = [pscustomobject]@{
         base44 = $base44
         cloudflare = $cloudflare
+        watchdog = $watchdog
     }
 }
 
@@ -135,4 +171,3 @@ Invoke-Native npm @('run', 'sync:status') $RepoPath -AllowFailure
 if (-not $report.ok) {
     exit 1
 }
-

@@ -7,13 +7,15 @@ param(
     [string]$ActiveRef = '',
     [string]$TaskName = 'ClientSurge-Base44-SyncMirror',
     [int]$IntervalMinutes = 1,
+    [int]$WatchdogIntervalMinutes = 5,
     [ValidateSet('Primary', 'Failover', 'MirrorOnly')]
     [string]$PublisherRole = 'MirrorOnly',
     [int]$FailoverDelayMinutes = 3,
     [switch]$InstallDependencies,
     [switch]$PublishAfterUpdate,
     [switch]$SkipPublishTests,
-    [switch]$SkipGitHubChecks
+    [switch]$SkipGitHubChecks,
+    [switch]$SkipWatchdog
 )
 
 Set-StrictMode -Version Latest
@@ -107,8 +109,33 @@ if ($SkipGitHubChecks) {
 
 Invoke-Native pwsh $installArgs $repoRoot
 
+if (-not $SkipWatchdog) {
+    $watchdogArgs = @(
+        '-NoProfile',
+        '-ExecutionPolicy', 'Bypass',
+        '-File', (Join-Path $repoRoot 'scripts/sync/install-base44-watchdog-task.ps1'),
+        '-RepoPath', $repoRoot,
+        '-MirrorPath', $MirrorPath,
+        '-ActiveRef', $(if ($ActiveRef) { $ActiveRef } else { '' }),
+        '-PublisherRole', $PublisherRole,
+        '-FailoverDelayMinutes', $FailoverDelayMinutes,
+        '-IntervalMinutes', $WatchdogIntervalMinutes
+    )
+    if ($SkipPublishTests) {
+        $watchdogArgs += '-SkipPublishTests'
+    }
+    if ($SkipGitHubChecks) {
+        $watchdogArgs += '-SkipGitHubChecks'
+    }
+
+    Invoke-Native pwsh $watchdogArgs $repoRoot
+}
+
 Write-Host "ClientSurge sync bootstrap complete." -ForegroundColor Green
 Write-Host "Role: $PublisherRole"
 Write-Host "Active repo: $repoRoot"
 Write-Host "Clean mirror: $MirrorPath"
 Write-Host "Task: $TaskName every $IntervalMinutes minute(s)"
+if (-not $SkipWatchdog) {
+    Write-Host "Watchdog: ClientSurge-Automation-Watchdog every $WatchdogIntervalMinutes minute(s)"
+}

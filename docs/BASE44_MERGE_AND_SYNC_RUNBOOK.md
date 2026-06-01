@@ -77,9 +77,13 @@ Repair local automation on either computer:
 ```powershell
 npm run sync:doctor -- -ExpectedPublisherRole Primary
 npm run sync:repair-automation -- -PublishAfterUpdate -PublisherRole Primary -StartTasks
+npm run sync:install-watchdog -- -PublisherRole Primary
+npm run sync:watchdog -- -PublisherRole Primary
 ```
 
-On the laptop, use `-ExpectedPublisherRole Failover` for the doctor and `-PublisherRole Failover -FailoverDelayMinutes 3` for repair. The doctor writes `logs/base44-sync/<machine>/machine-doctor-latest.json` with tool versions, GitHub/Base44/Cloudflare auth state, active and mirror checkout state, scheduled task state, and sync-status evidence. The repair command reinstalls the Base44 sync/publish task, reinstalls the Cloudflare monitor, optionally starts both tasks to refresh Task Scheduler health, writes `logs/base44-sync/automation-repair-latest.json`, and runs `npm run sync:status`.
+On the laptop, use `-ExpectedPublisherRole Failover` for the doctor and `-PublisherRole Failover -FailoverDelayMinutes 3` for repair/watchdog. The doctor writes `logs/base44-sync/<machine>/machine-doctor-latest.json` with tool versions, GitHub/Base44/Cloudflare auth state, active and mirror checkout state, scheduled task state, and sync-status evidence. The repair command reinstalls the Base44 sync/publish task, reinstalls the Cloudflare monitor, installs the automation watchdog, optionally starts the tasks to refresh Task Scheduler health, writes `logs/base44-sync/automation-repair-latest.json`, and runs `npm run sync:status`.
+
+The watchdog is the self-healing layer for the desktop/laptop sync system. It runs `sync:status`, updates the clean mirror, publishes if GitHub `main` is newer and the release gate passes, repairs missing/failing scheduled tasks when needed, and writes `logs/base44-sync/<machine>/automation-watchdog-latest.json`. Install it on the desktop as `Primary` and on the laptop as `Failover`.
 
 ## Immediate production publish
 

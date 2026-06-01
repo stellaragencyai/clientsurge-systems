@@ -141,6 +141,8 @@ test("mirror scheduler supports bootstrap plus primary and failover publisher ro
   const updater = read("scripts/sync/update-base44-sync-mirror.ps1");
   const bootstrap = read("scripts/sync/bootstrap-base44-machine.ps1");
   const repair = read("scripts/sync/repair-base44-automation.ps1");
+  const watchdog = read("scripts/sync/watchdog-base44-automation.ps1");
+  const watchdogInstaller = read("scripts/sync/install-base44-watchdog-task.ps1");
   const doctor = read("scripts/sync/doctor-base44-machine.ps1");
   const packageJson = read("package.json");
 
@@ -159,14 +161,22 @@ test("mirror scheduler supports bootstrap plus primary and failover publisher ro
   assert.match(bootstrap, /ensure-base44-sync-mirror\.ps1/);
   assert.match(bootstrap, /check-app-access\.mjs/);
   assert.match(bootstrap, /install-base44-sync-task\.ps1/);
+  assert.match(bootstrap, /install-base44-watchdog-task\.ps1/);
   assert.match(bootstrap, /69dc4a79656fdba136d413d3/);
 
   assert.match(repair, /ClientSurge-Base44-SyncMirror/);
   assert.match(repair, /ClientSurge-Cloudflare-Security-Edge/);
   assert.match(repair, /install-base44-sync-task\.ps1/);
   assert.match(repair, /install-security-edge-monitor-task\.ps1/);
+  assert.match(repair, /install-base44-watchdog-task\.ps1/);
   assert.match(repair, /automation-repair-latest\.json/);
   assert.match(repair, /npm @\('run', 'sync:status'\)/);
+
+  assert.match(watchdog, /audit-sync-status\.mjs --json --ignore-active-worktree/);
+  assert.match(watchdog, /update-base44-sync-mirror\.ps1/);
+  assert.match(watchdog, /repair-base44-automation\.ps1/);
+  assert.match(watchdog, /automation-watchdog-latest\.json/);
+  assert.match(watchdogInstaller, /ClientSurge-Automation-Watchdog/);
 
   assert.match(doctor, /ClientSurge Machine Doctor/);
   assert.match(doctor, /machine-doctor-latest\.json/);
@@ -180,6 +190,8 @@ test("mirror scheduler supports bootstrap plus primary and failover publisher ro
   assert.match(packageJson, /"sync:bootstrap-machine": "pwsh -File scripts\/sync\/bootstrap-base44-machine\.ps1"/);
   assert.match(packageJson, /"sync:doctor": "pwsh -File scripts\/sync\/doctor-base44-machine\.ps1"/);
   assert.match(packageJson, /"sync:repair-automation": "pwsh -File scripts\/sync\/repair-base44-automation\.ps1"/);
+  assert.match(packageJson, /"sync:watchdog": "pwsh -File scripts\/sync\/watchdog-base44-automation\.ps1"/);
+  assert.match(packageJson, /"sync:install-watchdog": "pwsh -File scripts\/sync\/install-base44-watchdog-task\.ps1"/);
 });
 
 test("sync status audit covers GitHub mirror Base44 tasks and Cloudflare readiness", () => {
@@ -189,6 +201,8 @@ test("sync status audit covers GitHub mirror Base44 tasks and Cloudflare readine
   assert.match(status, /ClientSurge Sync Status/);
   assert.match(status, /ClientSurge-Base44-SyncMirror/);
   assert.match(status, /ClientSurge-Cloudflare-Security-Edge/);
+  assert.match(status, /ClientSurge-Automation-Watchdog/);
+  assert.match(status, /ignore-active-worktree/);
   assert.match(status, /getGitHubReleaseGate/);
   assert.match(status, /clientsurge-release-gate\.yml/);
   assert.match(status, /GitHub release gate has not passed for origin\/main/);
