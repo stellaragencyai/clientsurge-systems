@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import dns from "node:dns/promises";
 import { pathToFileURL } from "node:url";
 
 export const DEFAULT_CANONICAL_ORIGIN =
@@ -29,6 +30,37 @@ const REQUIRED_PUBLIC_HEADERS = [
   "cross-origin-opener-policy",
   "strict-transport-security",
 ];
+
+export function isCloudflareAnycastAddress(address) {
+  const value = String(address || "").toLowerCase();
+  return (
+    value.startsWith("104.16.") ||
+    value.startsWith("104.17.") ||
+    value.startsWith("104.18.") ||
+    value.startsWith("104.19.") ||
+    value.startsWith("104.20.") ||
+    value.startsWith("104.21.") ||
+    value.startsWith("104.22.") ||
+    value.startsWith("104.23.") ||
+    value.startsWith("104.24.") ||
+    value.startsWith("104.25.") ||
+    value.startsWith("104.26.") ||
+    value.startsWith("104.27.") ||
+    value.startsWith("104.28.") ||
+    value.startsWith("104.29.") ||
+    value.startsWith("104.30.") ||
+    value.startsWith("104.31.") ||
+    value.startsWith("172.64.") ||
+    value.startsWith("172.65.") ||
+    value.startsWith("172.66.") ||
+    value.startsWith("172.67.") ||
+    value.startsWith("172.68.") ||
+    value.startsWith("172.69.") ||
+    value.startsWith("172.70.") ||
+    value.startsWith("172.71.") ||
+    value.startsWith("2606:4700:")
+  );
+}
 
 function normalizeOrigin(origin) {
   return String(origin || "").replace(/\/+$/, "");
@@ -210,6 +242,61 @@ function summarize(checks) {
   );
 }
 
+async function resolveHostAddresses(hostname) {
+  const results = [];
+  try {
+    results.push(...(await dns.resolve4(hostname)));
+  } catch {
+    // DNS diagnostics are best-effort; the HTTP checks remain authoritative.
+  }
+  try {
+    results.push(...(await dns.resolve6(hostname)));
+  } catch {
+    // DNS diagnostics are best-effort; the HTTP checks remain authoritative.
+  }
+  return [...new Set(results)].sort();
+}
+
+async function buildRoutingDiagnostics({ canonical, checks }) {
+  const host = new URL(canonical).hostname;
+  const addresses = await resolveHostAddresses(host);
+  const missingWorkerHeaders = checks.some((check) =>
+    check.status === "fail" &&
+    ["header:content-security-policy", "header:permissions-policy", "header:cross-origin-opener-policy"].includes(check.id)
+  );
+  const cloudflareAnycastAddresses = addresses.filter(isCloudflareAnycastAddress);
+
+  if (!missingWorkerHeaders) {
+    return {
+      status: "headers_present",
+      message: "Required edge security headers are present.",
+      host,
+      addresses,
+      cloudflare_anycast_addresses: cloudflareAnycastAddresses,
+    };
+  }
+
+  if (cloudflareAnycastAddresses.length > 0) {
+    return {
+      status: "suspected_orange_to_orange_route_bypass",
+      message:
+        "Public DNS resolves the apex to Cloudflare anycast addresses, but Worker-applied headers are missing. Inspect Cloudflare DNS/proxy/custom-domain routing for an orange-to-orange or externally managed apex record.",
+      host,
+      addresses,
+      cloudflare_anycast_addresses: cloudflareAnycastAddresses,
+    };
+  }
+
+  return {
+    status: "missing_worker_headers",
+    message:
+      "Worker-applied headers are missing, but public DNS did not resolve to a known Cloudflare anycast address from this machine.",
+    host,
+    addresses,
+    cloudflare_anycast_addresses: cloudflareAnycastAddresses,
+  };
+}
+
 async function fetchWithTimeout(fetchImpl, url, options = {}) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), options.timeoutMs || 15000);
@@ -317,6 +404,9 @@ export async function verifyProductionSecurity({
     allow_platform_header_drift: allowPlatformHeaderDrift,
     checked_at: new Date().toISOString(),
     summary: summarize(checks),
+    diagnostics: {
+      routing: await buildRoutingDiagnostics({ canonical, checks }),
+    },
     checks,
   };
 }
@@ -327,8 +417,11 @@ export function formatReport(report) {
     `Canonical: ${report.canonical_origin}`,
     `Alternate: ${report.alternate_origin}`,
     `Summary: ${report.summary.pass} pass, ${report.summary.warn} warn, ${report.summary.fail} fail`,
+    report.diagnostics?.routing
+      ? `Routing diagnostic: ${report.diagnostics.routing.status} - ${report.diagnostics.routing.message}`
+      : null,
     "",
-  ];
+  ].filter((line) => line !== null);
 
   for (const check of report.checks) {
     const marker = check.status === "pass" ? "PASS" : check.status === "warn" ? "WARN" : "FAIL";

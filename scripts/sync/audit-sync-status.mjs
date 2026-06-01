@@ -219,6 +219,10 @@ function isTaskOverlapResult(task) {
   return result === 267009 || result === 2147946720;
 }
 
+function isClassifiedCloudflareMonitorState(status) {
+  return ["route_bypassed", "auth_required"].includes(status || "");
+}
+
 function getCloudflareState(repoPath, liveSecurity) {
   const machine = hostname();
   const statusPath = join(repoPath, "logs", "cloudflare-security", machine, "latest-security-edge-status.json");
@@ -338,11 +342,14 @@ function evaluate(report) {
     }
   }
 
+  const cloudflareStatus = report.cloudflare.monitor?.status || "";
   if (!report.tasks.cloudflare.installed) {
     failures.push("Cloudflare security scheduled task is missing.");
   } else if (Number(report.tasks.cloudflare.LastTaskResult) !== 0) {
     if (isTaskOverlapResult(report.tasks.cloudflare)) {
       warnings.push("Cloudflare security scheduled task last result indicates an overlapping/running tick.");
+    } else if (isClassifiedCloudflareMonitorState(cloudflareStatus)) {
+      warnings.push(`Cloudflare security scheduled task last result is stale/non-zero, but monitor state is classified as ${cloudflareStatus}.`);
     } else {
       failures.push("Cloudflare security scheduled task is failing.");
     }
@@ -358,11 +365,10 @@ function evaluate(report) {
     }
   }
 
-  const cloudflareStatus = report.cloudflare.monitor?.status || "";
   if (cloudflareStatus === "auth_required" || !report.cloudflare.authenticated) {
     warnings.push("Cloudflare edge release is waiting on Wrangler authentication.");
   } else if (cloudflareStatus === "route_bypassed") {
-    failures.push("Cloudflare Worker is authenticated/deployed, but live production traffic is missing edge security headers.");
+    failures.push("Cloudflare Worker is authenticated/deployed, but live production traffic is missing edge security headers; inspect DNS/proxy/custom-domain routing for orange-to-orange bypass.");
   } else if (cloudflareStatus && !["verified", "released"].includes(cloudflareStatus)) {
     failures.push(`Cloudflare monitor status is ${cloudflareStatus}.`);
   }

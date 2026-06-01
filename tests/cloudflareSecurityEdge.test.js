@@ -7,6 +7,7 @@ import worker, {
   isSensitivePath,
   SECURITY_TXT,
 } from "../cloudflare/clientsurge-security-edge-worker.mjs";
+import { isCloudflareAnycastAddress } from "../scripts/verify-production-security.mjs";
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
@@ -74,6 +75,7 @@ test("Cloudflare security release and monitor scripts keep auth and verification
   assert.match(monitor, /npx wrangler whoami/);
   assert.match(monitor, /auth_required/);
   assert.match(monitor, /route_bypassed/);
+  assert.match(monitor, /orange-to-orange/);
   assert.match(monitor, /Test-RouteBypassFailure/);
   assert.match(monitor, /npm run cloudflare:security:release/);
   assert.match(monitor, /latest-security-edge-status\.json/);
@@ -81,4 +83,11 @@ test("Cloudflare security release and monitor scripts keep auth and verification
   assert.match(installer, /New-ScheduledTaskTrigger/);
   assert.match(installer, /monitor-security-edge\.ps1/);
   assert.match(installer, /MultipleInstances IgnoreNew/);
+});
+
+test("production security verifier recognizes Cloudflare anycast DNS evidence", () => {
+  assert.equal(isCloudflareAnycastAddress("104.21.24.127"), true);
+  assert.equal(isCloudflareAnycastAddress("172.67.218.204"), true);
+  assert.equal(isCloudflareAnycastAddress("2606:4700:3032::ac43:dacc"), true);
+  assert.equal(isCloudflareAnycastAddress("203.0.113.10"), false);
 });
