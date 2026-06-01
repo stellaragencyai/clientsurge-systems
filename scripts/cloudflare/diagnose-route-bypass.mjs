@@ -111,7 +111,134 @@ function summarizeRoutes(routes, { zoneName = DEFAULT_ZONE_NAME, workerScript = 
   });
 }
 
-function buildNextAction({ routeSummary, dnsProbe, customHostnamesProbe, rulesetsProbe }) {
+function isRelevantHost(name, zoneName = DEFAULT_ZONE_NAME) {
+  const value = String(name || "").toLowerCase().replace(/\.$/, "");
+  const zone = String(zoneName || "").toLowerCase();
+  return value === zone || value === `www.${zone}`;
+}
+
+function mentionsDomain(value, zoneName = DEFAULT_ZONE_NAME) {
+  const text = JSON.stringify(value || {}).toLowerCase();
+  const zone = String(zoneName || "").toLowerCase();
+  return text.includes(zone) || text.includes(`www.${zone}`) || text.includes("base44");
+}
+
+function riskFlagsForDnsRecord(record = {}) {
+  const content = String(record.content || "").toLowerCase();
+  const flags = [];
+  if (record.proxied === true) flags.push("proxied");
+  if (record.type === "CNAME" && record.proxied === true) flags.push("proxied_cname");
+  if (content.includes("base44")) flags.push("base44_target");
+  if (content.includes("cloudflare") || content.includes("workers.dev")) flags.push("cloudflare_or_worker_target");
+  if (content.includes("render.com") || content.includes("onrender.com")) flags.push("render_target");
+  return flags;
+}
+
+function summarizeDnsRecords(records = [], zoneName = DEFAULT_ZONE_NAME) {
+  return records
+    .filter((record) => isRelevantHost(record.name, zoneName))
+    .map((record) => ({
+      id: record.id || null,
+      type: record.type || null,
+      name: record.name || null,
+      content: record.content || null,
+      proxied: record.proxied ?? null,
+      ttl: record.ttl ?? null,
+      risk_flags: riskFlagsForDnsRecord(record),
+    }));
+}
+
+function summarizeCustomHostnames(hostnames = [], zoneName = DEFAULT_ZONE_NAME) {
+  return hostnames
+    .filter((hostname) => mentionsDomain(hostname, zoneName))
+    .map((hostname) => ({
+      id: hostname.id || null,
+      hostname: hostname.hostname || null,
+      status: hostname.status || null,
+      ssl_status: hostname.ssl?.status || null,
+      custom_origin_server: hostname.custom_origin_server || null,
+      risk_flags: hostname.custom_origin_server ? ["custom_origin_server"] : [],
+    }));
+}
+
+function summarizeRulesets(rulesets = [], zoneName = DEFAULT_ZONE_NAME) {
+  const summaries = [];
+  for (const ruleset of rulesets) {
+    const matchingRules = (ruleset.rules || []).filter((rule) => mentionsDomain(rule, zoneName));
+    if (!mentionsDomain(ruleset, zoneName) && matchingRules.length === 0) continue;
+
+    summaries.push({
+      id: ruleset.id || null,
+      name: ruleset.name || null,
+      kind: ruleset.kind || null,
+      phase: ruleset.phase || null,
+      matching_rules: matchingRules.map((rule) => ({
+        id: rule.id || null,
+        description: rule.description || null,
+        action: rule.action || null,
+        expression: rule.expression || null,
+        enabled: rule.enabled ?? null,
+      })),
+    });
+  }
+  return summaries;
+}
+
+function buildManagementPlaneAnalysis({
+  zoneName = DEFAULT_ZONE_NAME,
+  dnsProbe,
+  customHostnamesProbe,
+  rulesetsProbe,
+}) {
+  const dns_records = dnsProbe.ok
+    ? summarizeDnsRecords(dnsProbe.result?.result || [], zoneName)
+    : [];
+  const custom_hostnames = customHostnamesProbe.ok
+    ? summarizeCustomHostnames(customHostnamesProbe.result?.result || [], zoneName)
+    : [];
+  const rulesets = rulesetsProbe.ok
+    ? summarizeRulesets(rulesetsProbe.result?.result || [], zoneName)
+    : [];
+
+  const candidates = [];
+  for (const record of dns_records) {
+    if (record.risk_flags.length > 0) {
+      candidates.push({
+        source: "dns_records",
+        id: record.id,
+        label: `${record.type} ${record.name} -> ${record.content}`,
+        risk_flags: record.risk_flags,
+      });
+    }
+  }
+  for (const hostname of custom_hostnames) {
+    candidates.push({
+      source: "custom_hostnames",
+      id: hostname.id,
+      label: hostname.hostname,
+      risk_flags: hostname.risk_flags.length ? hostname.risk_flags : ["custom_hostname"],
+    });
+  }
+  for (const ruleset of rulesets) {
+    for (const rule of ruleset.matching_rules) {
+      candidates.push({
+        source: "rulesets",
+        id: rule.id || ruleset.id,
+        label: `${ruleset.phase || "ruleset"}: ${rule.description || rule.expression || ruleset.name}`,
+        risk_flags: [rule.action || "rule_reference"],
+      });
+    }
+  }
+
+  return {
+    dns_records,
+    custom_hostnames,
+    rulesets,
+    candidates,
+  };
+}
+
+function buildNextAction({ routeSummary, dnsProbe, customHostnamesProbe, rulesetsProbe, analysis }) {
   const routeMissing = routeSummary.some((route) => !route.present || !route.matches_worker);
   if (routeMissing) {
     return {
@@ -135,10 +262,21 @@ function buildNextAction({ routeSummary, dnsProbe, customHostnamesProbe, ruleset
     };
   }
 
+  if (analysis?.candidates?.length > 0) {
+    return {
+      status: "inspect_bypass_candidates",
+      message:
+        "Worker routes are installed and management-plane reads are available. Inspect the listed DNS/custom-hostname/ruleset candidates for the path bypassing the Worker.",
+      candidate_count: analysis.candidates.length,
+      dashboard_path:
+        "Cloudflare Dashboard -> clientsurgesystems.com -> DNS -> Records, Custom Hostnames for SaaS, and Rules/Redirect Rules.",
+    };
+  }
+
   return {
-    status: "inspect_dns_custom_hostname_rulesets",
+    status: "management_plane_access_available",
     message:
-      "Worker routes are installed and management-plane reads are available. Inspect DNS/custom-hostnames/rulesets for an orange-to-orange or externally managed apex path.",
+      "Worker routes are installed and management-plane reads are available, but no obvious DNS/custom-hostname/ruleset bypass candidate was found by the automated scan.",
   };
 }
 
@@ -229,15 +367,22 @@ export async function diagnoseRouteBypass({
 
   const routes = routesProbe.result?.result || [];
   const routeSummary = routesProbe.ok ? summarizeRoutes(routes, { zoneName, workerScript }) : [];
+  const analysis = buildManagementPlaneAnalysis({
+    zoneName,
+    dnsProbe,
+    customHostnamesProbe,
+    rulesetsProbe,
+  });
   const nextAction = buildNextAction({
     routeSummary,
     dnsProbe,
     customHostnamesProbe,
     rulesetsProbe,
+    analysis,
   });
 
   return {
-    ok: nextAction.status === "inspect_dns_custom_hostname_rulesets",
+    ok: ["inspect_bypass_candidates", "management_plane_access_available"].includes(nextAction.status),
     checked_at: new Date().toISOString(),
     zone_name: zoneName,
     zone_id: zone.id,
@@ -250,6 +395,7 @@ export async function diagnoseRouteBypass({
       has_oauth_token: true,
     },
     routes: routeSummary,
+    analysis,
     probes: {
       zone: {
         name: zoneProbe.name,
@@ -312,6 +458,14 @@ export function formatRouteBypassDiagnosis(report) {
     for (const [label, probeResult] of Object.entries(report.probes)) {
       const status = probeResult.ok ? `ok count=${probeResult.count}` : `denied ${probeResult.error?.message || ""}`;
       lines.push(`- ${label}: ${status}`);
+    }
+    lines.push("");
+  }
+
+  if (report.analysis?.candidates?.length > 0) {
+    lines.push("Bypass candidates:");
+    for (const candidate of report.analysis.candidates) {
+      lines.push(`- ${candidate.source}: ${candidate.label} [${candidate.risk_flags.join(", ")}]`);
     }
     lines.push("");
   }

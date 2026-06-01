@@ -174,3 +174,98 @@ test("Cloudflare route-bypass diagnostic identifies missing DNS/custom-hostname 
   assert.match(formatted, /dns_records: denied/);
   assert.doesNotMatch(formatted, /test-token/);
 });
+
+test("Cloudflare route-bypass diagnostic surfaces concrete DNS custom-hostname and ruleset candidates when readable", async () => {
+  const report = await diagnoseRouteBypass({
+    configPath: new URL("./fixtures/wrangler-oauth.toml", import.meta.url),
+    fetchImpl: async (url) => {
+      const requestUrl = new URL(url);
+      const path = requestUrl.pathname;
+      if (path === "/client/v4/zones") {
+        return Response.json({ success: true, result: [{ id: "zone-123", name: "clientsurgesystems.com" }] });
+      }
+      if (path === "/client/v4/zones/zone-123/workers/routes") {
+        return Response.json({
+          success: true,
+          result: [
+            { id: "route-1", pattern: "clientsurgesystems.com/*", script: "clientsurge-security-edge" },
+            { id: "route-2", pattern: "www.clientsurgesystems.com/*", script: "clientsurge-security-edge" },
+          ],
+        });
+      }
+      if (path === "/client/v4/zones/zone-123/dns_records") {
+        return Response.json({
+          success: true,
+          result: [
+            {
+              id: "dns-1",
+              type: "CNAME",
+              name: "clientsurgesystems.com",
+              content: "client-surge.base44.app",
+              proxied: true,
+              ttl: 1,
+            },
+            {
+              id: "dns-2",
+              type: "TXT",
+              name: "_verification.clientsurgesystems.com",
+              content: "safe-to-ignore",
+              proxied: false,
+            },
+          ],
+        });
+      }
+      if (path === "/client/v4/zones/zone-123/custom_hostnames") {
+        return Response.json({
+          success: true,
+          result: [
+            {
+              id: "host-1",
+              hostname: "clientsurgesystems.com",
+              status: "active",
+              ssl: { status: "active" },
+              custom_origin_server: "client-surge.base44.app",
+            },
+          ],
+        });
+      }
+      if (path === "/client/v4/zones/zone-123/rulesets") {
+        return Response.json({
+          success: true,
+          result: [
+            {
+              id: "ruleset-1",
+              name: "redirects",
+              phase: "http_request_dynamic_redirect",
+              rules: [
+                {
+                  id: "rule-1",
+                  description: "www canonical redirect for clientsurgesystems.com",
+                  action: "redirect",
+                  expression: '(http.host eq "www.clientsurgesystems.com")',
+                  enabled: true,
+                },
+              ],
+            },
+          ],
+        });
+      }
+      return Response.json({ success: true, result: [] });
+    },
+  });
+
+  assert.equal(report.ok, true);
+  assert.equal(report.next_action.status, "inspect_bypass_candidates");
+  assert.equal(report.analysis.dns_records.length, 1);
+  assert.deepEqual(report.analysis.dns_records[0].risk_flags, ["proxied", "proxied_cname", "base44_target"]);
+  assert.equal(report.analysis.custom_hostnames.length, 1);
+  assert.equal(report.analysis.rulesets.length, 1);
+  assert.ok(report.analysis.candidates.some((candidate) => candidate.source === "dns_records"));
+  assert.ok(report.analysis.candidates.some((candidate) => candidate.source === "custom_hostnames"));
+  assert.ok(report.analysis.candidates.some((candidate) => candidate.source === "rulesets"));
+
+  const formatted = formatRouteBypassDiagnosis(report);
+  assert.match(formatted, /Bypass candidates:/);
+  assert.match(formatted, /CNAME clientsurgesystems\.com -> client-surge\.base44\.app/);
+  assert.match(formatted, /http_request_dynamic_redirect/);
+});
