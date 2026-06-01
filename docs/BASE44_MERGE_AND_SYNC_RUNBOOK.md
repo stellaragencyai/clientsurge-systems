@@ -28,19 +28,36 @@ Import from the donor app only when a complete feature slice can be validated: e
 Each machine should have one active clone and one clean mirror:
 
 ```powershell
-pwsh -NoProfile -File scripts/sync/ensure-base44-sync-mirror.ps1 `
-  -RepoUrl "https://github.com/stellaragencyai/clientsurge-systems.git" `
-  -MirrorPath "C:\Users\nolan\Code\ClientSurge\clientsurge-systems-main-mirror"
-```
-
-Install the mirror updater:
-
-```powershell
-pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/sync/install-base44-sync-task.ps1 `
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/sync/bootstrap-base44-machine.ps1 `
   -RepoPath "C:\Users\nolan\Code\ClientSurge\clientsurge-systems" `
   -MirrorPath "C:\Users\nolan\Code\ClientSurge\clientsurge-systems-main-mirror" `
-  -ActiveRef "merge/base44-69f-into-production-69dc" `
-  -IntervalMinutes 15
+  -PublisherRole MirrorOnly `
+  -IntervalMinutes 1
+```
+
+Install the desktop as the primary publisher:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/sync/bootstrap-base44-machine.ps1 `
+  -RepoPath "C:\Users\nolan\Code\ClientSurge\clientsurge-systems" `
+  -MirrorPath "C:\Users\nolan\Code\ClientSurge\clientsurge-systems-main-mirror" `
+  -ActiveRef "merge/base44-69f-into-production-69dc-pushable" `
+  -PublisherRole Primary `
+  -PublishAfterUpdate `
+  -IntervalMinutes 1
+```
+
+Install the laptop as failover, after `base44 login` succeeds on that laptop:
+
+```powershell
+pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/sync/bootstrap-base44-machine.ps1 `
+  -RepoPath "C:\Users\nolan\Code\ClientSurge\clientsurge-systems" `
+  -MirrorPath "C:\Users\nolan\Code\ClientSurge\clientsurge-systems-main-mirror" `
+  -ActiveRef "merge/base44-69f-into-production-69dc-pushable" `
+  -PublisherRole Failover `
+  -PublishAfterUpdate `
+  -FailoverDelayMinutes 3 `
+  -IntervalMinutes 1
 ```
 
 Active feature branches never auto-pull. Use the overlap report in `logs/base44-sync/<machine>/` before merging `origin/main` into active work.
@@ -70,7 +87,22 @@ node scripts/base44/publish-deploy-endpoint.mjs `
   --dry-run
 ```
 
-Only one machine should run the production publisher. Desktop is primary; laptop is failover.
+Only one machine should publish immediately. Desktop runs `PublisherRole Primary`; laptop runs `PublisherRole Failover`, waits three minutes, checks the Base44 app `updated_date`, and only publishes if the primary did not already move production.
+
+Check the production app/auth connection at any time:
+
+```powershell
+npm run base44:check-app -- --json
+```
+
+Publish production plus optional staging mirrors from the same source when you intentionally want both Base44 apps refreshed:
+
+```powershell
+npm run base44:publish-all
+npm run base44:publish-all -- --dry-run --include-stellar-mirror
+```
+
+Production app `69dc4a79656fdba136d413d3` is required. Donor/staging app `69f959e2bc665e019e19840c` and Stellar mirror app `6a15f1424f4856ba4e9ed90b` are optional by default so a staging permission issue cannot block the live site.
 
 ## Required verification
 

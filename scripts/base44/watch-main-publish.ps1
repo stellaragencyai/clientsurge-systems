@@ -8,7 +8,10 @@ param(
     [switch]$SkipTests,
     [switch]$SkipBuild,
     [switch]$DryRun,
-    [switch]$FallbackToUiClick
+    [switch]$FallbackToUiClick,
+    [ValidateSet('Primary', 'Failover', 'MirrorOnly')]
+    [string]$PublisherRole = 'Primary',
+    [int]$FailoverDelayMinutes = 3
 )
 
 Set-StrictMode -Version Latest
@@ -39,6 +42,44 @@ function Get-RemoteSha {
     return (& git rev-parse "origin/$TargetBranch").Trim()
 }
 
+function Test-AppAlreadyPublishedByPrimary {
+    param([Parameter(Mandatory = $true)][string]$Sha)
+
+    if ($FailoverDelayMinutes -gt 0) {
+        Write-Host "Failover publisher waiting $FailoverDelayMinutes minute(s) for primary desktop." -ForegroundColor Yellow
+        Start-Sleep -Seconds ($FailoverDelayMinutes * 60)
+    }
+
+    $commitDateRaw = (& git show -s --format=%cI $Sha).Trim()
+    if (-not $commitDateRaw) {
+        Write-Host "Could not read commit time for $Sha; failover will publish." -ForegroundColor Yellow
+        return $false
+    }
+    $commitDate = Convert-ToDateTimeOffset -Value $commitDateRaw
+
+    $accessJson = & node scripts/base44/check-app-access.mjs --app-id $AppId --verify-url $VerifyUrl --json
+    if ($LASTEXITCODE -ne 0 -or -not $accessJson) {
+        Write-Host "Could not confirm Base44 app access; failover will publish." -ForegroundColor Yellow
+        return $false
+    }
+
+    $status = $accessJson | ConvertFrom-Json
+    if (-not $status.updated_date) {
+        Write-Host "Base44 app updated_date was unavailable; failover will publish." -ForegroundColor Yellow
+        return $false
+    }
+
+    $appUpdated = Convert-ToDateTimeOffset -Value $status.updated_date
+    if ($appUpdated -ge $commitDate) {
+        Set-Content -Path $statePath -Value $Sha -Encoding UTF8
+        Write-Host "Primary appears to have published $Sha at $($status.updated_date); failover recorded the SHA and stood down." -ForegroundColor Green
+        return $true
+    }
+
+    Write-Host "Base44 app updated at $($status.updated_date), before commit $commitDateRaw; failover will publish." -ForegroundColor Yellow
+    return $false
+}
+
 function Invoke-ProductionPublish {
     param([Parameter(Mandatory = $true)][string]$Sha)
 
@@ -55,6 +96,16 @@ function Invoke-ProductionPublish {
     $localSha = (& git rev-parse HEAD).Trim()
     if ($localSha -ne $Sha) {
         throw "Local $TargetBranch is at $localSha after fast-forward, expected $Sha."
+    }
+
+    if ($PublisherRole -eq 'MirrorOnly') {
+        Write-Host "Publisher role is MirrorOnly; synced $Sha without publishing." -ForegroundColor Yellow
+        Set-Content -Path $statePath -Value $Sha -Encoding UTF8
+        return
+    }
+
+    if ($PublisherRole -eq 'Failover' -and (Test-AppAlreadyPublishedByPrimary -Sha $Sha)) {
+        return
     }
 
     if (-not $SkipBuild) {
@@ -91,9 +142,20 @@ function Invoke-ProductionPublish {
     }
 }
 
+function Convert-ToDateTimeOffset {
+    param([Parameter(Mandatory = $true)][string]$Value)
+
+    $normalized = $Value.Trim()
+    if ($normalized -notmatch '(Z|[+-]\d{2}:\d{2})$') {
+        $normalized = "${normalized}Z"
+    }
+    return [DateTimeOffset]::Parse($normalized)
+}
+
 Write-Host "Watching origin/$TargetBranch for production Base44 publish." -ForegroundColor Green
 Write-Host "App:    $AppId"
 Write-Host "Verify: $VerifyUrl"
+Write-Host "Role:   $PublisherRole"
 
 do {
     try {

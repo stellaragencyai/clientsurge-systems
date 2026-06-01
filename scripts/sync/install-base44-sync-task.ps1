@@ -5,7 +5,11 @@ param(
     [string]$TaskName = 'ClientSurge Base44 Main Mirror Sync',
     [string]$ActiveRef = '',
     [int]$IntervalMinutes = 15,
-    [switch]$PublishAfterUpdate
+    [switch]$PublishAfterUpdate,
+    [ValidateSet('Primary', 'Failover', 'MirrorOnly')]
+    [string]$PublisherRole = 'MirrorOnly',
+    [int]$FailoverDelayMinutes = 3,
+    [switch]$SkipPublishTests
 )
 
 Set-StrictMode -Version Latest
@@ -24,6 +28,11 @@ if ($ActiveRef) {
 }
 if ($PublishAfterUpdate) {
     $args += '-PublishAfterUpdate'
+    $args += @('-PublisherRole', $PublisherRole)
+    $args += @('-FailoverDelayMinutes', $FailoverDelayMinutes)
+}
+if ($SkipPublishTests) {
+    $args += '-SkipPublishTests'
 }
 
 $pwshPath = (Get-Command pwsh.exe).Source

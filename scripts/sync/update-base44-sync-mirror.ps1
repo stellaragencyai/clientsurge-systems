@@ -4,7 +4,11 @@ param(
     [string]$MirrorPath = 'C:\Users\nolan\Code\ClientSurge\clientsurge-systems-main-mirror',
     [string]$Branch = 'main',
     [string]$ActiveRef = '',
-    [switch]$PublishAfterUpdate
+    [switch]$PublishAfterUpdate,
+    [ValidateSet('Primary', 'Failover', 'MirrorOnly')]
+    [string]$PublisherRole = 'MirrorOnly',
+    [int]$FailoverDelayMinutes = 3,
+    [switch]$SkipPublishTests
 )
 
 Set-StrictMode -Version Latest
@@ -42,7 +46,21 @@ if ($ActiveRef) {
 }
 
 if ($PublishAfterUpdate) {
-    & pwsh -NoProfile -File (Join-Path $MirrorPath 'scripts/base44/watch-main-publish.ps1') -Once
+    $watchArgs = @(
+        '-NoProfile',
+        '-File',
+        (Join-Path $MirrorPath 'scripts/base44/watch-main-publish.ps1'),
+        '-Once',
+        '-PublisherRole',
+        $PublisherRole,
+        '-FailoverDelayMinutes',
+        $FailoverDelayMinutes
+    )
+    if ($SkipPublishTests) {
+        $watchArgs += '-SkipTests'
+    }
+
+    & pwsh @watchArgs
 }
 
 Write-Host "Mirror updated to $sha $title" -ForegroundColor Green

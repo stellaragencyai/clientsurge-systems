@@ -46,6 +46,27 @@ test("Base44 deploy endpoint publisher targets the production app with authentic
   assert.match(packageJson, /"base44:publish-api": "node scripts\/base44\/publish-deploy-endpoint\.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https:\/\/clientsurgesystems\.com"/);
 });
 
+test("Base44 app access and multi-app publish helpers keep production required", () => {
+  const access = read("scripts/base44/check-app-access.mjs");
+  const publishAll = read("scripts/base44/publish-all-apps.mjs");
+  const packageJson = read("package.json");
+
+  assert.match(access, /\.base44\/auth\/auth\.json/);
+  assert.match(access, /api\/apps\/\$\{args\.appId\}/);
+  assert.match(access, /api\/apps\/platform\/\$\{args\.appId\}\/published-url/);
+  assert.match(access, /--json/);
+  assert.match(access, /69dc4a79656fdba136d413d3/);
+
+  assert.match(publishAll, /role: "production"/);
+  assert.match(publishAll, /appId: "69dc4a79656fdba136d413d3"/);
+  assert.match(publishAll, /required: true/);
+  assert.match(publishAll, /appId: "69f959e2bc665e019e19840c"/);
+  assert.match(publishAll, /appId: "6a15f1424f4856ba4e9ed90b"/);
+  assert.match(publishAll, /publish-deploy-endpoint\.mjs/);
+  assert.match(packageJson, /"base44:check-app": "node scripts\/base44\/check-app-access\.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https:\/\/clientsurgesystems\.com"/);
+  assert.match(packageJson, /"base44:publish-all": "node scripts\/base44\/publish-all-apps\.mjs"/);
+});
+
 test("Base44 auto sync watcher commits pushes and optionally publishes filtered changes", () => {
   const watcher = read("scripts/base44/watch-sync-publish.ps1");
   const packageJson = read("package.json");
@@ -75,8 +96,34 @@ test("main publish watcher preserves build test and production-app guardrails", 
   assert.match(watcher, /npm run test:deno/);
   assert.match(watcher, /npm run smoke:public-routes/);
   assert.match(watcher, /npm run verify:production-security/);
+  assert.match(watcher, /\[ValidateSet\('Primary', 'Failover', 'MirrorOnly'\)\]/);
+  assert.match(watcher, /FailoverDelayMinutes/);
+  assert.match(watcher, /check-app-access\.mjs/);
   assert.match(watcher, /Run this watcher from a clean \$TargetBranch mirror/);
   assert.match(watcher, /git merge --ff-only origin\/\$TargetBranch/);
   assert.match(watcher, /publish-deploy-endpoint\.mjs/);
   assert.match(packageJson, /"base44:watch-main-publish": "pwsh -File scripts\/base44\/watch-main-publish\.ps1"/);
+});
+
+test("mirror scheduler supports bootstrap plus primary and failover publisher roles", () => {
+  const installer = read("scripts/sync/install-base44-sync-task.ps1");
+  const updater = read("scripts/sync/update-base44-sync-mirror.ps1");
+  const bootstrap = read("scripts/sync/bootstrap-base44-machine.ps1");
+  const packageJson = read("package.json");
+
+  assert.match(installer, /\[ValidateSet\('Primary', 'Failover', 'MirrorOnly'\)\]/);
+  assert.match(installer, /PublisherRole/);
+  assert.match(installer, /FailoverDelayMinutes/);
+  assert.match(installer, /SkipPublishTests/);
+
+  assert.match(updater, /watch-main-publish\.ps1/);
+  assert.match(updater, /'-PublisherRole'/);
+  assert.match(updater, /'-FailoverDelayMinutes'/);
+  assert.match(updater, /'-SkipTests'/);
+
+  assert.match(bootstrap, /ensure-base44-sync-mirror\.ps1/);
+  assert.match(bootstrap, /check-app-access\.mjs/);
+  assert.match(bootstrap, /install-base44-sync-task\.ps1/);
+  assert.match(bootstrap, /69dc4a79656fdba136d413d3/);
+  assert.match(packageJson, /"sync:bootstrap-machine": "pwsh -File scripts\/sync\/bootstrap-base44-machine\.ps1"/);
 });
