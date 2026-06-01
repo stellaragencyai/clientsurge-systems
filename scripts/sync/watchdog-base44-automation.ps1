@@ -100,6 +100,24 @@ function Test-NeedsTaskRepair {
     return $false
 }
 
+function Test-OnlyClassifiedExternalCloudflareBlocker {
+    param($Status)
+
+    $failures = @(Get-Failures -Status $Status)
+    if ($failures.Count -ne 1) {
+        return $false
+    }
+
+    $cloudflareStatus = $Status.report.cloudflare.monitor.status
+    return (
+        $cloudflareStatus -eq 'route_bypassed' -and
+        $failures[0] -match 'Cloudflare Worker is authenticated/deployed' -and
+        $Status.report.git.mirror_matches_origin_main -and
+        $Status.report.base44.matches_origin_main -and
+        $Status.report.base44.multi_app_matches_origin_main
+    )
+}
+
 $repoRoot = (& git -C $RepoPath rev-parse --show-toplevel).Trim()
 if (-not $repoRoot) {
     throw "RepoPath is not a git repository: $RepoPath"
@@ -181,15 +199,20 @@ $report = [ordered]@{
 $reportPath = Join-Path $logDir 'automation-watchdog-latest.json'
 Set-Content -Path $reportPath -Value ($report | ConvertTo-Json -Depth 12) -Encoding UTF8
 
+$onlyExternalCloudflareBlocker = Test-OnlyClassifiedExternalCloudflareBlocker -Status $after
+
 Write-Host "Automation watchdog report: $reportPath" -ForegroundColor Green
 if ($after.ok) {
     Write-Host "ClientSurge sync automation is healthy." -ForegroundColor Green
+}
+elseif ($onlyExternalCloudflareBlocker) {
+    Write-Host "ClientSurge sync automation is healthy; Cloudflare edge is waiting on external DNS/custom-hostname/ruleset access." -ForegroundColor Yellow
 }
 else {
     Write-Host "ClientSurge sync automation still needs attention." -ForegroundColor Yellow
 }
 
 $report | ConvertTo-Json -Depth 12
-if (-not $after.ok) {
+if (-not $after.ok -and -not $onlyExternalCloudflareBlocker) {
     exit 1
 }

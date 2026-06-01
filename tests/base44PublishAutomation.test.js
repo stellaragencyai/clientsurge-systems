@@ -236,6 +236,8 @@ test("mirror scheduler supports bootstrap plus primary and failover publisher ro
   assert.match(watchdog, /audit-sync-status\.mjs --json --ignore-active-worktree/);
   assert.match(watchdog, /update-base44-sync-mirror\.ps1/);
   assert.match(watchdog, /repair-base44-automation\.ps1/);
+  assert.match(watchdog, /Test-OnlyClassifiedExternalCloudflareBlocker/);
+  assert.match(watchdog, /Cloudflare edge is waiting on external DNS\/custom-hostname\/ruleset access/);
   assert.match(watchdog, /automation-watchdog-latest\.json/);
   assert.match(watchdogInstaller, /ClientSurge-Automation-Watchdog/);
 
