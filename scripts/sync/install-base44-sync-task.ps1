@@ -26,7 +26,8 @@ if ($PublishAfterUpdate) {
     $args += '-PublishAfterUpdate'
 }
 
-$action = New-ScheduledTaskAction -Execute 'pwsh.exe' -Argument ($args -join ' ')
+$pwshPath = (Get-Command pwsh.exe).Source
+$action = New-ScheduledTaskAction -Execute $pwshPath -Argument ($args -join ' ')
 $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes $IntervalMinutes)
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew
 Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null
