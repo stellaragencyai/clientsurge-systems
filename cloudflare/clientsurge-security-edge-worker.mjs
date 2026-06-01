@@ -1,6 +1,8 @@
 const CANONICAL_ORIGIN = "https://clientsurgesystems.com";
 const CANONICAL_HOST = "clientsurgesystems.com";
 const ALTERNATE_HOST = "www.clientsurgesystems.com";
+export const EDGE_HEALTH_PATH = "/.well-known/clientsurge-edge-health.json";
+export const EDGE_HEALTH_HEADER = "x-clientsurge-security-edge";
 
 export const SECURITY_TXT = `Contact: mailto:system@clientsurgesystems.com
 Preferred-Languages: en
@@ -72,6 +74,19 @@ function securityTxtResponse() {
   return new Response(SECURITY_TXT, { status: 200, headers });
 }
 
+function edgeHealthResponse() {
+  const headers = applySecurityHeaders(new Headers({
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    [EDGE_HEALTH_HEADER]: "active",
+  }), EDGE_HEALTH_PATH);
+  return new Response(JSON.stringify({
+    ok: true,
+    edge: "clientsurge-security-edge",
+    canonical: CANONICAL_ORIGIN,
+  }), { status: 200, headers });
+}
+
 export default {
   async fetch(request) {
     const url = new URL(request.url);
@@ -82,6 +97,10 @@ export default {
 
     if (url.pathname === "/.well-known/security.txt") {
       return securityTxtResponse();
+    }
+
+    if (url.pathname === EDGE_HEALTH_PATH) {
+      return edgeHealthResponse();
     }
 
     const originResponse = await fetch(request);

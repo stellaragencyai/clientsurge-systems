@@ -21,6 +21,8 @@ export const DOCUMENT_PATHS = [
   "/sitemap.xml",
   "/.well-known/security.txt",
 ];
+export const EDGE_HEALTH_PATH = "/.well-known/clientsurge-edge-health.json";
+export const EDGE_HEALTH_HEADER = "x-clientsurge-security-edge";
 
 const REQUIRED_PUBLIC_HEADERS = [
   "content-security-policy",
@@ -231,6 +233,20 @@ export function evaluateCanonicalText({
   });
 }
 
+export function evaluateEdgeHealthProbe({ target, status, headers }) {
+  const headerValue = getHeader(headers, EDGE_HEALTH_HEADER).toLowerCase();
+  const isActive = status === 200 && headerValue === "active";
+  return createCheck({
+    id: "edge-probe:worker",
+    target,
+    status: isActive ? "pass" : "fail",
+    message: isActive
+      ? "Cloudflare Worker edge health probe responded"
+      : "Cloudflare Worker edge health probe did not respond; live traffic is likely bypassing the Worker route",
+    details: { status, header: headerValue || null },
+  });
+}
+
 function summarize(checks) {
   return checks.reduce(
     (summary, check) => {
@@ -344,6 +360,16 @@ export async function verifyProductionSecurity({
     status: httpResponse.status,
     location: httpResponse.headers.get("location"),
     expectedUrl: `${canonical}/`,
+  }));
+
+  const edgeProbeTarget = absoluteUrl(canonical, EDGE_HEALTH_PATH);
+  const edgeProbeResponse = await fetchWithTimeout(fetchImpl, edgeProbeTarget, {
+    redirect: "follow",
+  });
+  checks.push(evaluateEdgeHealthProbe({
+    target: edgeProbeTarget,
+    status: edgeProbeResponse.status,
+    headers: edgeProbeResponse.headers,
   }));
 
   for (const path of PUBLIC_PAGE_PATHS) {

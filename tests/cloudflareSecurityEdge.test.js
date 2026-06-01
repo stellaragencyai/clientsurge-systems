@@ -4,10 +4,15 @@ import { readFileSync } from "node:fs";
 
 import worker, {
   applySecurityHeaders,
+  EDGE_HEALTH_HEADER,
+  EDGE_HEALTH_PATH,
   isSensitivePath,
   SECURITY_TXT,
 } from "../cloudflare/clientsurge-security-edge-worker.mjs";
-import { isCloudflareAnycastAddress } from "../scripts/verify-production-security.mjs";
+import {
+  evaluateEdgeHealthProbe,
+  isCloudflareAnycastAddress,
+} from "../scripts/verify-production-security.mjs";
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
@@ -57,6 +62,32 @@ test("Cloudflare security edge worker redirects alternate host to canonical", as
   assert.equal(response.headers.get("location"), "https://clientsurgesystems.com/store");
 });
 
+test("Cloudflare security edge worker serves a Worker-only health probe", async () => {
+  const response = await worker.fetch(new Request(`https://clientsurgesystems.com${EDGE_HEALTH_PATH}`));
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get(EDGE_HEALTH_HEADER), "active");
+  assert.equal(body.ok, true);
+  assert.equal(body.edge, "clientsurge-security-edge");
+});
+
+test("production security verifier checks the Worker-only edge probe", () => {
+  const pass = evaluateEdgeHealthProbe({
+    target: `https://clientsurgesystems.com${EDGE_HEALTH_PATH}`,
+    status: 200,
+    headers: { [EDGE_HEALTH_HEADER]: "active" },
+  });
+  assert.equal(pass.status, "pass");
+
+  const fail = evaluateEdgeHealthProbe({
+    target: `https://clientsurgesystems.com${EDGE_HEALTH_PATH}`,
+    status: 200,
+    headers: { "content-type": "text/html" },
+  });
+  assert.equal(fail.status, "fail");
+});
+
 test("Cloudflare security release and monitor scripts keep auth and verification guarded", () => {
   const packageJson = read("package.json");
   const release = read("scripts/cloudflare/deploy-security-edge.ps1");
@@ -76,6 +107,7 @@ test("Cloudflare security release and monitor scripts keep auth and verification
   assert.match(monitor, /auth_required/);
   assert.match(monitor, /route_bypassed/);
   assert.match(monitor, /orange-to-orange/);
+  assert.match(monitor, /edge-probe:worker/);
   assert.match(monitor, /Test-RouteBypassFailure/);
   assert.match(monitor, /npm run cloudflare:security:release/);
   assert.match(monitor, /latest-security-edge-status\.json/);
