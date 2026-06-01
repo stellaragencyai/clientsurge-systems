@@ -123,11 +123,16 @@ function Get-TaskCheck {
 function Read-JsonCommand {
     param([Parameter(Mandatory = $true)][pscustomobject]$CommandResult)
 
-    if (-not $CommandResult.ok -or [string]::IsNullOrWhiteSpace($CommandResult.output)) {
+    if ([string]::IsNullOrWhiteSpace($CommandResult.output)) {
         return $null
     }
+    $text = $CommandResult.output.Trim()
+    $jsonStart = $text.IndexOf('{')
+    if ($jsonStart -gt 0) {
+        $text = $text.Substring($jsonStart)
+    }
     try {
-        return $CommandResult.output | ConvertFrom-Json
+        return $text | ConvertFrom-Json
     }
     catch {
         return [pscustomobject]@{
@@ -135,6 +140,15 @@ function Read-JsonCommand {
             raw = $CommandResult.output
         }
     }
+}
+
+$acceptableOverlapResults = @(267009, 2147946720)
+function Test-TaskResultHealthy {
+    param([Parameter(Mandatory = $true)]$Task)
+
+    if (-not $Task.installed) { return $false }
+    $result = [int]($Task.last_task_result ?? 1)
+    return ($result -eq 0 -or $acceptableOverlapResults -contains $result)
 }
 
 $repoRoot = (& git -C $RepoPath rev-parse --show-toplevel 2>$null).Trim()
@@ -164,18 +178,18 @@ if (-not $deno.installed) { $recommendations.Add('Install Deno so npm run test:d
 if (-not $ghAuth.ok) { $recommendations.Add('Run gh auth login or gh auth refresh -h github.com -s workflow.') }
 if (-not $base44Whoami.ok) { $recommendations.Add('Run base44 login for the Base44 account that can access both ClientSurge apps.') }
 if ($wrangler.output -match 'not authenticated') { $recommendations.Add('Run npm run cloudflare:security:login when ready to release the Cloudflare edge Worker.') }
-if (-not $tasks.base44.installed -or [int]($tasks.base44.last_task_result ?? 1) -ne 0) { $recommendations.Add('Run npm run sync:repair-automation -- -PublishAfterUpdate -PublisherRole ' + $ExpectedPublisherRole + ' -StartTasks.') }
-if (-not $tasks.cloudflare.installed -or [int]($tasks.cloudflare.last_task_result ?? 1) -ne 0) { $recommendations.Add('Run npm run sync:repair-automation -- -PublishAfterUpdate -PublisherRole ' + $ExpectedPublisherRole + ' -StartTasks.') }
+if (-not (Test-TaskResultHealthy $tasks.base44)) { $recommendations.Add('Run npm run sync:repair-automation -- -PublishAfterUpdate -PublisherRole ' + $ExpectedPublisherRole + ' -StartTasks.') }
+if (-not (Test-TaskResultHealthy $tasks.cloudflare)) { $recommendations.Add('Run npm run sync:repair-automation -- -PublishAfterUpdate -PublisherRole ' + $ExpectedPublisherRole + ' -StartTasks.') }
 if ($ExpectedPublisherRole -and $tasks.base44.argument -and $tasks.base44.argument -notmatch "-PublisherRole\s+$ExpectedPublisherRole") {
     $recommendations.Add("Base44 scheduled task is not configured for expected publisher role $ExpectedPublisherRole.")
 }
 
 $syncOk = $false
-if ($null -ne $syncStatusJson -and $null -ne $syncStatusJson.summary) {
+if ($null -ne $syncStatusJson -and (Get-Member -InputObject $syncStatusJson -Name summary -MemberType NoteProperty -ErrorAction SilentlyContinue)) {
     $syncOk = $syncStatusJson.summary.ok -eq $true
 }
 $report = [pscustomobject]@{
-    ok = ($syncOk -and $node.installed -and $npm.installed -and $git.installed -and $deno.installed -and $ghAuth.ok -and $base44Whoami.ok -and $tasks.base44.installed -and $tasks.cloudflare.installed)
+    ok = ($syncOk -and $node.installed -and $npm.installed -and $git.installed -and $deno.installed -and $ghAuth.ok -and $base44Whoami.ok -and (Test-TaskResultHealthy $tasks.base44) -and (Test-TaskResultHealthy $tasks.cloudflare))
     checked_at = (Get-Date).ToUniversalTime().ToString('o')
     machine = $env:COMPUTERNAME
     expected_publisher_role = $ExpectedPublisherRole

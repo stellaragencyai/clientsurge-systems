@@ -170,6 +170,8 @@ test("mirror scheduler supports bootstrap plus primary and failover publisher ro
 
   assert.match(doctor, /ClientSurge Machine Doctor/);
   assert.match(doctor, /machine-doctor-latest\.json/);
+  assert.match(doctor, /acceptableOverlapResults/);
+  assert.match(doctor, /Test-TaskResultHealthy/);
   assert.match(doctor, /base44 @\('whoami'\)/);
   assert.match(doctor, /gh @\('auth', 'status'\)/);
   assert.match(doctor, /npx @\('wrangler', 'whoami'\)/);
@@ -193,6 +195,8 @@ test("sync status audit covers GitHub mirror Base44 tasks and Cloudflare readine
   assert.match(status, /last-published-all\.json/);
   assert.match(status, /Base44 multi-app publish state does not match origin\/main/);
   assert.match(status, /Staging donor live signal does not contain donor app ID/);
+  assert.match(status, /isTaskOverlapResult/);
+  assert.match(status, /overlapping\/running tick/);
   assert.match(status, /check-app-access\.mjs/);
   assert.match(status, /last-published-main\.txt/);
   assert.match(status, /npx", \["wrangler", "whoami"\]/);

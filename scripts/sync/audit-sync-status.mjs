@@ -181,8 +181,9 @@ function getBase44PublishState(repoPath, mirrorPath, originMainSha, skipBase44) 
 
 function getScheduledTask(taskName) {
   const command = [
+    `$task = Get-ScheduledTask -TaskName '${taskName}' -ErrorAction Stop;`,
     `$info = Get-ScheduledTaskInfo -TaskName '${taskName}' -ErrorAction Stop;`,
-    "$info | Select-Object LastRunTime,NextRunTime,LastTaskResult | ConvertTo-Json -Compress",
+    "[pscustomobject]@{State=$task.State.ToString();LastRunTime=$info.LastRunTime;NextRunTime=$info.NextRunTime;LastTaskResult=$info.LastTaskResult} | ConvertTo-Json -Compress",
   ].join(" ");
   const result = run("pwsh", ["-NoProfile", "-Command", command]);
   if (!result.ok || !result.stdout) {
@@ -204,6 +205,11 @@ function getScheduledTask(taskName) {
       raw: result.stdout,
     };
   }
+}
+
+function isTaskOverlapResult(task) {
+  const result = Number(task?.LastTaskResult);
+  return result === 267009 || result === 2147946720;
 }
 
 function getCloudflareState(repoPath, liveSecurity) {
@@ -312,8 +318,25 @@ function evaluate(report) {
   if (report.base44.staging_donor_app && report.base44.staging_donor_app.ok === false) failures.push("Base44 staging donor app access check failed.");
   if (report.base44.app?.live_signal?.hasDonorAppId) failures.push("Production live signal contains donor app ID.");
   if (!report.base44.staging_donor_app?.live_signal?.hasDonorAppId) failures.push("Staging donor live signal does not contain donor app ID.");
-  if (!report.tasks.base44.installed || Number(report.tasks.base44.LastTaskResult) !== 0) failures.push("Base44 sync scheduled task is missing or failing.");
-  if (!report.tasks.cloudflare.installed || Number(report.tasks.cloudflare.LastTaskResult) !== 0) failures.push("Cloudflare security scheduled task is missing or failing.");
+  if (!report.tasks.base44.installed) {
+    failures.push("Base44 sync scheduled task is missing.");
+  } else if (Number(report.tasks.base44.LastTaskResult) !== 0) {
+    if (isTaskOverlapResult(report.tasks.base44) && report.base44.matches_origin_main) {
+      warnings.push("Base44 sync scheduled task last result indicates an overlapping/running tick, but publish state matches origin/main.");
+    } else {
+      failures.push("Base44 sync scheduled task is failing.");
+    }
+  }
+
+  if (!report.tasks.cloudflare.installed) {
+    failures.push("Cloudflare security scheduled task is missing.");
+  } else if (Number(report.tasks.cloudflare.LastTaskResult) !== 0) {
+    if (isTaskOverlapResult(report.tasks.cloudflare)) {
+      warnings.push("Cloudflare security scheduled task last result indicates an overlapping/running tick.");
+    } else {
+      failures.push("Cloudflare security scheduled task is failing.");
+    }
+  }
 
   const cloudflareStatus = report.cloudflare.monitor?.status || "";
   if (cloudflareStatus === "auth_required" || !report.cloudflare.authenticated) {
@@ -349,8 +372,8 @@ function format(report) {
     `Base44 app: ${report.base44.app?.app_name || "unknown"} auth=${report.base44.app?.auth_email || "unknown"} ok=${report.base44.app?.ok ?? "unknown"}`,
     `Base44 live app IDs: production=${Boolean(report.base44.app?.live_signal?.hasProductionAppId)} donor=${Boolean(report.base44.app?.live_signal?.hasDonorAppId)}`,
     `Base44 staging donor: ${report.base44.staging_donor_app?.app_name || "unknown"} ok=${report.base44.staging_donor_app?.ok ?? "unknown"} asset=${report.base44.staging_donor_app?.live_signal?.asset || "unknown"}`,
-    `Task Base44: installed=${report.tasks.base44.installed} last=${report.tasks.base44.LastTaskResult ?? "unknown"} next=${report.tasks.base44.NextRunTime ?? "unknown"}`,
-    `Task Cloudflare: installed=${report.tasks.cloudflare.installed} last=${report.tasks.cloudflare.LastTaskResult ?? "unknown"} next=${report.tasks.cloudflare.NextRunTime ?? "unknown"}`,
+    `Task Base44: installed=${report.tasks.base44.installed} state=${report.tasks.base44.State || "unknown"} last=${report.tasks.base44.LastTaskResult ?? "unknown"} next=${report.tasks.base44.NextRunTime ?? "unknown"}`,
+    `Task Cloudflare: installed=${report.tasks.cloudflare.installed} state=${report.tasks.cloudflare.State || "unknown"} last=${report.tasks.cloudflare.LastTaskResult ?? "unknown"} next=${report.tasks.cloudflare.NextRunTime ?? "unknown"}`,
     `Cloudflare: authenticated=${report.cloudflare.authenticated} monitor=${report.cloudflare.monitor?.status || "missing"}`,
   ];
 
