@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, LogIn, Menu, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
 import DemoBookingModal from "../forms/DemoBookingModal";
@@ -279,15 +279,26 @@ export default function Navbar() {
           </button>
         </div>
 
-        <button
-          className="xl:hidden w-10 h-10 rounded-full border bg-background/90 backdrop-blur flex items-center justify-center text-foreground shadow-sm"
-          onClick={() => setOpen(!open)}
-          style={{ borderColor: "rgba(200,150,92,0.2)" }}
-          aria-label={open ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={open}>
-          
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="xl:hidden flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => {
+              trackCTA("login", "mobile_header");
+              setShowLoginModal(true);
+            }}
+            className="inline-flex h-10 items-center gap-1.5 rounded-full border border-border bg-background/90 px-3 text-xs font-semibold text-foreground shadow-sm backdrop-blur transition-colors hover:border-primary/40 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary">
+            <LogIn className="h-4 w-4" />
+            Login
+          </button>
+          <button
+            className="w-10 h-10 rounded-full border bg-background/90 backdrop-blur flex items-center justify-center text-foreground shadow-sm"
+            onClick={() => setOpen(!open)}
+            style={{ borderColor: "rgba(200,150,92,0.2)" }}
+            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={open}>
+            
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {open &&
@@ -351,6 +362,17 @@ export default function Navbar() {
               <p className="text-xs text-muted-foreground capitalize">{mobileUserRole || "client"}</p>
             </div>
           )}
+
+          <button
+            onClick={() => {
+              trackCTA("login", "mobile_nav");
+              setOpen(false);
+              setShowLoginModal(true);
+            }}
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/40 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary">
+            <LogIn className="h-4 w-4" />
+            Client Login
+          </button>
 
           <button
             onClick={() => {
