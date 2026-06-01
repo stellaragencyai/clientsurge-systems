@@ -159,7 +159,7 @@ test("Cloudflare security release and monitor scripts keep auth and verification
   assert.match(monitor, /auth_required/);
   assert.match(monitor, /route_bypassed/);
   assert.match(monitor, /orange-to-orange/);
-  assert.match(monitor, /edge-probe:worker|edge-probe:security-layer/);
+  assert.match(monitor, /edge-probe:\(worker\|security-layer\)/);
   assert.match(monitor, /Test-RouteBypassFailure/);
   assert.match(monitor, /npm run cloudflare:security:release/);
   assert.match(monitor, /npm run cloudflare:security:diagnose-route -- --json/);

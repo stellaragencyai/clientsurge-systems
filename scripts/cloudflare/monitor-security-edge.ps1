@@ -54,7 +54,7 @@ function Test-RouteBypassFailure {
         $Text -match 'content-security-policy missing' -and
         $Text -match 'header:permissions-policy' -and
         $Text -match 'permissions-policy missing' -and
-        $Text -match 'edge-probe:worker'
+        $Text -match 'edge-probe:(worker|security-layer)'
     )
 }
 
