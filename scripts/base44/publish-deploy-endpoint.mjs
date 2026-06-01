@@ -1,5 +1,6 @@
 import { createRequire } from "node:module";
-import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -70,6 +71,69 @@ async function fetchLiveSignal(url) {
   };
 }
 
+function readCliAuth() {
+  const authPath = resolve(homedir(), ".base44/auth/auth.json");
+  if (!existsSync(authPath)) return null;
+  return {
+    authPath,
+    auth: JSON.parse(readFileSync(authPath, "utf8")),
+  };
+}
+
+async function refreshCliAuthIfNeeded() {
+  const authRecord = readCliAuth();
+  if (!authRecord?.auth?.accessToken) return null;
+
+  if (Date.now() < Number(authRecord.auth.expiresAt || 0) - 60_000) {
+    return authRecord.auth.accessToken;
+  }
+
+  if (!authRecord.auth.refreshToken) return authRecord.auth.accessToken;
+
+  const body = new URLSearchParams();
+  body.set("grant_type", "refresh_token");
+  body.set("refresh_token", authRecord.auth.refreshToken);
+  body.set("client_id", "base44_cli");
+
+  const response = await fetch("https://app.base44.com/oauth/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+  const payload = await response.json();
+  if (!response.ok) {
+    return authRecord.auth.accessToken;
+  }
+
+  const refreshed = {
+    ...authRecord.auth,
+    accessToken: payload.access_token,
+    refreshToken: payload.refresh_token || authRecord.auth.refreshToken,
+    expiresAt: Date.now() + Number(payload.expires_in || 0) * 1000,
+  };
+  writeFileSync(authRecord.authPath, `${JSON.stringify(refreshed, null, 2)}\n`, "utf8");
+  return refreshed.accessToken;
+}
+
+async function postDeployWithBearer(appId, accessToken) {
+  if (!accessToken) return null;
+  const response = await fetch(`https://app.base44.com/api/apps/${appId}/deploy`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "User-Agent": "ClientSurge Base44 publisher",
+    },
+  });
+  const text = await response.text();
+  let body = text;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    // Keep raw text when the API does not return JSON.
+  }
+  return { ok: response.ok, status: response.status, body };
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const appId = args.appId || readBase44AppId();
@@ -80,6 +144,21 @@ async function main() {
   }
 
   const beforeSignal = await fetchLiveSignal(args.verifyUrl);
+  const endpoint = `/api/apps/${appId}/deploy`;
+  const cliAccessToken = await refreshCliAuthIfNeeded();
+  if (args.dryRun) {
+    console.log(JSON.stringify({ ok: true, dryRun: true, dashboardUrl, endpoint, hasCliAuth: Boolean(cliAccessToken) }, null, 2));
+    return;
+  }
+
+  const cliDeployResult = await postDeployWithBearer(appId, cliAccessToken);
+  if (cliDeployResult?.ok) {
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 5000));
+    const afterSignal = await fetchLiveSignal(args.verifyUrl);
+    console.log(JSON.stringify({ ok: true, appId, beforeSignal, deployResult: cliDeployResult, afterSignal }, null, 2));
+    return;
+  }
+
   const context = await chromium.launchPersistentContext(args.profileDir, {
     headless: !args.showBrowser,
     viewport: { width: 1440, height: 960 },
@@ -91,22 +170,17 @@ async function main() {
 
     if (page.url().includes("/login")) {
       throw new Error(
-        `Base44 login is required. Re-run with --show-browser, sign in, then run the publish command again.`
+        `Base44 login is required. Re-run with --show-browser, sign in, or run 'base44 login' to refresh CLI bearer auth.`
       );
     }
 
-    const endpoint = `/api/apps/${appId}/deploy`;
-    if (args.dryRun) {
-      console.log(JSON.stringify({ ok: true, dryRun: true, dashboardUrl, endpoint }, null, 2));
-      return;
-    }
-
-    const deployResult = await page.evaluate(async (deployEndpoint) => {
+    const deployResult = await page.evaluate(async (deployEndpoint, bearerToken) => {
+      const headers = {};
+      if (bearerToken) headers.Authorization = `Bearer ${bearerToken}`;
       const response = await fetch(deployEndpoint, {
         method: "POST",
         credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: "{}",
+        headers,
       });
       const text = await response.text();
       let body = text;
@@ -116,7 +190,7 @@ async function main() {
         // Keep raw text when the API does not return JSON.
       }
       return { ok: response.ok, status: response.status, body };
-    }, endpoint);
+    }, endpoint, cliAccessToken);
 
     if (!deployResult.ok) {
       throw new Error(`Base44 deploy endpoint failed with HTTP ${deployResult.status}: ${JSON.stringify(deployResult.body)}`);

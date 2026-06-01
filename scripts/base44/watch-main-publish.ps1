@@ -64,8 +64,6 @@ function Invoke-ProductionPublish {
         Invoke-Step 'npm run test:node'
         Invoke-Step 'npm run test:deno'
         Invoke-Step 'node --test tests/base44PublishAutomation.test.js tests/adminLoginFlow.test.js'
-        Invoke-Step 'npm run smoke:public-routes'
-        Invoke-Step 'npm run verify:production-security'
     }
 
     if ($DryRun) {
@@ -82,6 +80,11 @@ function Invoke-ProductionPublish {
         }
         Write-Host "Deploy endpoint failed; falling back to UI clicker: $($_.Exception.Message)" -ForegroundColor Yellow
         Invoke-Step 'node scripts/base44/publish-ui-clicker.mjs --yes'
+    }
+
+    if (-not $SkipTests) {
+        Invoke-Step "npm run smoke:public-routes -- --base-url=$VerifyUrl"
+        Invoke-Step 'npm run verify:production-security'
     }
 
     Set-Content -Path $statePath -Value $Sha -Encoding UTF8
