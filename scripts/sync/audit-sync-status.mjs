@@ -368,7 +368,7 @@ function evaluate(report) {
   if (cloudflareStatus === "auth_required" || !report.cloudflare.authenticated) {
     warnings.push("Cloudflare edge release is waiting on Wrangler authentication.");
   } else if (cloudflareStatus === "route_bypassed") {
-    failures.push("Cloudflare Worker is authenticated/deployed, but live production traffic is missing edge security headers; inspect DNS/proxy/custom-domain routing for orange-to-orange bypass.");
+    warnings.push("External Cloudflare route bypass: Worker is authenticated/deployed, but live production traffic is missing edge security headers; inspect DNS/proxy/custom-domain routing for orange-to-orange bypass.");
   } else if (cloudflareStatus && !["verified", "released"].includes(cloudflareStatus)) {
     failures.push(`Cloudflare monitor status is ${cloudflareStatus}.`);
   }

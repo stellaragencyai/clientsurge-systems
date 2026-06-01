@@ -47,6 +47,30 @@ export async function readWranglerOAuthConfig(configPath = DEFAULT_WRANGLER_CONF
   };
 }
 
+function resolveCloudflareApiAuths(wrangler) {
+  const envToken = (process.env.CLOUDFLARE_API_TOKEN || process.env.CF_API_TOKEN || "").trim();
+  const auths = [];
+  if (envToken) {
+    auths.push({
+      token: envToken,
+      source: "env",
+      has_env_token: true,
+      has_oauth_token: Boolean(wrangler.oauth_token),
+    });
+  }
+
+  if (wrangler.oauth_token && wrangler.oauth_token !== envToken) {
+    auths.push({
+      token: wrangler.oauth_token,
+      source: "wrangler_oauth",
+      has_env_token: Boolean(envToken),
+      has_oauth_token: true,
+    });
+  }
+
+  return auths;
+}
+
 function safeError(error) {
   const message = String(error?.message || error || "");
   return {
@@ -96,6 +120,47 @@ async function probe(name, fn) {
       error: safeError(error),
     };
   }
+}
+
+async function probeCloudflare(name, path, auths, fetchImpl = globalThis.fetch) {
+  const attempts = [];
+  for (const auth of auths) {
+    try {
+      const result = await cloudflareGet({
+        token: auth.token,
+        path,
+        fetchImpl,
+      });
+      return {
+        name,
+        ok: true,
+        count: Array.isArray(result?.result) ? result.result.length : 0,
+        result,
+        token_source: auth.source,
+        attempted_sources: [...attempts.map((attempt) => attempt.source), auth.source],
+        error: null,
+      };
+    } catch (error) {
+      attempts.push({
+        source: auth.source,
+        error: safeError(error),
+      });
+    }
+  }
+
+  const last = attempts.at(-1)?.error || { message: "No Cloudflare token attempted", status: null, code: null };
+  return {
+    name,
+    ok: false,
+    count: 0,
+    result: null,
+    token_source: null,
+    attempted_sources: attempts.map((attempt) => attempt.source),
+    error: {
+      ...last,
+      attempts,
+    },
+  };
 }
 
 function summarizeRoutes(routes, { zoneName = DEFAULT_ZONE_NAME, workerScript = DEFAULT_WORKER_SCRIPT } = {}) {
@@ -238,7 +303,18 @@ function buildManagementPlaneAnalysis({
   };
 }
 
-function buildNextAction({ routeSummary, dnsProbe, customHostnamesProbe, rulesetsProbe, analysis }) {
+function buildNextAction({ routeSummary, routesProbe, dnsProbe, customHostnamesProbe, rulesetsProbe, analysis }) {
+  if (!routesProbe.ok) {
+    return {
+      status: "needs_cloudflare_worker_route_access",
+      message:
+        "Cloudflare zone lookup works, but no available token can inspect Worker routes. Grant Workers Routes read access or run Wrangler OAuth login before changing DNS.",
+      denied_probes: [routesProbe.name],
+      dashboard_path:
+        "Cloudflare Dashboard -> clientsurgesystems.com -> Workers Routes.",
+    };
+  }
+
   const routeMissing = routeSummary.some((route) => !route.present || !route.matches_worker);
   if (routeMissing) {
     return {
@@ -252,11 +328,16 @@ function buildNextAction({ routeSummary, dnsProbe, customHostnamesProbe, ruleset
     (item) => !item.ok && (item.error?.code === 10000 || item.error?.status === 403)
   );
   if (denied.length > 0) {
+    const deniedNames = denied.map((item) => item.name);
+    const readable = [dnsProbe, customHostnamesProbe, rulesetsProbe]
+      .filter((item) => item.ok)
+      .map((item) => item.name);
     return {
       status: "needs_cloudflare_dns_custom_hostname_ruleset_access",
       message:
-        "Worker routes are installed, but this token cannot inspect DNS records, custom hostnames, or rulesets. Grant Cloudflare DNS/custom-hostname/ruleset read access or inspect those dashboard pages next.",
-      denied_probes: denied.map((item) => item.name),
+        `Worker routes are installed, but available tokens cannot inspect ${deniedNames.join(", ")}. Readable management-plane probes: ${readable.length ? readable.join(", ") : "none"}.`,
+      denied_probes: deniedNames,
+      readable_probes: readable,
       dashboard_path:
         "Cloudflare Dashboard -> clientsurgesystems.com -> DNS -> Records, then Workers Routes, Custom Hostnames for SaaS, and Rules/Redirect Rules.",
     };
@@ -287,7 +368,10 @@ export async function diagnoseRouteBypass({
   fetchImpl = globalThis.fetch,
 } = {}) {
   const wrangler = await readWranglerOAuthConfig(configPath);
-  if (!wrangler.oauth_token) {
+  const apiAuths = resolveCloudflareApiAuths(wrangler);
+  const hasEnvToken = apiAuths.some((auth) => auth.has_env_token);
+  const hasOauthToken = apiAuths.some((auth) => auth.has_oauth_token);
+  if (apiAuths.length === 0) {
     return {
       ok: false,
       checked_at: new Date().toISOString(),
@@ -297,21 +381,23 @@ export async function diagnoseRouteBypass({
         config_path: wrangler.config_path,
         expiration_time: wrangler.expiration_time || null,
         scopes: wrangler.scopes,
-        has_oauth_token: false,
+        token_source: null,
+        available_token_sources: [],
+        has_env_token: hasEnvToken,
+        has_oauth_token: hasOauthToken,
       },
       next_action: {
         status: "cloudflare_login_required",
-        message: "Wrangler OAuth token is missing. Run npm run cloudflare:security:login.",
+        message: "Cloudflare API token is missing. Set CLOUDFLARE_API_TOKEN or run npm run cloudflare:security:login.",
       },
     };
   }
 
-  const zoneProbe = await probe("zone", () =>
-    cloudflareGet({
-      token: wrangler.oauth_token,
-      path: `/zones?name=${encodeURIComponent(zoneName)}`,
-      fetchImpl,
-    })
+  const zoneProbe = await probeCloudflare(
+    "zone",
+    `/zones?name=${encodeURIComponent(zoneName)}`,
+    apiAuths,
+    fetchImpl
   );
   const zone = zoneProbe.result?.result?.[0] || null;
 
@@ -325,7 +411,10 @@ export async function diagnoseRouteBypass({
         config_path: wrangler.config_path,
         expiration_time: wrangler.expiration_time || null,
         scopes: wrangler.scopes,
-        has_oauth_token: true,
+        token_source: zoneProbe.token_source || null,
+        available_token_sources: apiAuths.map((auth) => auth.source),
+        has_env_token: hasEnvToken,
+        has_oauth_token: hasOauthToken,
       },
       probes: { zone: zoneProbe },
       next_action: {
@@ -336,33 +425,29 @@ export async function diagnoseRouteBypass({
     };
   }
 
-  const routesProbe = await probe("worker-routes", () =>
-    cloudflareGet({
-      token: wrangler.oauth_token,
-      path: `/zones/${zone.id}/workers/routes`,
-      fetchImpl,
-    })
+  const routesProbe = await probeCloudflare(
+    "worker-routes",
+    `/zones/${zone.id}/workers/routes`,
+    apiAuths,
+    fetchImpl
   );
-  const dnsProbe = await probe("dns-records", () =>
-    cloudflareGet({
-      token: wrangler.oauth_token,
-      path: `/zones/${zone.id}/dns_records?per_page=100`,
-      fetchImpl,
-    })
+  const dnsProbe = await probeCloudflare(
+    "dns-records",
+    `/zones/${zone.id}/dns_records?per_page=100`,
+    apiAuths,
+    fetchImpl
   );
-  const customHostnamesProbe = await probe("custom-hostnames", () =>
-    cloudflareGet({
-      token: wrangler.oauth_token,
-      path: `/zones/${zone.id}/custom_hostnames?per_page=100`,
-      fetchImpl,
-    })
+  const customHostnamesProbe = await probeCloudflare(
+    "custom-hostnames",
+    `/zones/${zone.id}/custom_hostnames?per_page=100`,
+    apiAuths,
+    fetchImpl
   );
-  const rulesetsProbe = await probe("rulesets", () =>
-    cloudflareGet({
-      token: wrangler.oauth_token,
-      path: `/zones/${zone.id}/rulesets`,
-      fetchImpl,
-    })
+  const rulesetsProbe = await probeCloudflare(
+    "rulesets",
+    `/zones/${zone.id}/rulesets`,
+    apiAuths,
+    fetchImpl
   );
 
   const routes = routesProbe.result?.result || [];
@@ -375,6 +460,7 @@ export async function diagnoseRouteBypass({
   });
   const nextAction = buildNextAction({
     routeSummary,
+    routesProbe,
     dnsProbe,
     customHostnamesProbe,
     rulesetsProbe,
@@ -392,7 +478,10 @@ export async function diagnoseRouteBypass({
       config_path: wrangler.config_path,
       expiration_time: wrangler.expiration_time || null,
       scopes: wrangler.scopes,
-      has_oauth_token: true,
+      token_source: zoneProbe.token_source || apiAuths[0]?.source || null,
+      available_token_sources: apiAuths.map((auth) => auth.source),
+      has_env_token: hasEnvToken,
+      has_oauth_token: hasOauthToken,
     },
     routes: routeSummary,
     analysis,
@@ -401,30 +490,40 @@ export async function diagnoseRouteBypass({
         name: zoneProbe.name,
         ok: zoneProbe.ok,
         count: zoneProbe.count,
+        token_source: zoneProbe.token_source || null,
+        attempted_sources: zoneProbe.attempted_sources || [],
         error: zoneProbe.error,
       },
       worker_routes: {
         name: routesProbe.name,
         ok: routesProbe.ok,
         count: routesProbe.count,
+        token_source: routesProbe.token_source || null,
+        attempted_sources: routesProbe.attempted_sources || [],
         error: routesProbe.error,
       },
       dns_records: {
         name: dnsProbe.name,
         ok: dnsProbe.ok,
         count: dnsProbe.count,
+        token_source: dnsProbe.token_source || null,
+        attempted_sources: dnsProbe.attempted_sources || [],
         error: dnsProbe.error,
       },
       custom_hostnames: {
         name: customHostnamesProbe.name,
         ok: customHostnamesProbe.ok,
         count: customHostnamesProbe.count,
+        token_source: customHostnamesProbe.token_source || null,
+        attempted_sources: customHostnamesProbe.attempted_sources || [],
         error: customHostnamesProbe.error,
       },
       rulesets: {
         name: rulesetsProbe.name,
         ok: rulesetsProbe.ok,
         count: rulesetsProbe.count,
+        token_source: rulesetsProbe.token_source || null,
+        attempted_sources: rulesetsProbe.attempted_sources || [],
         error: rulesetsProbe.error,
       },
     },

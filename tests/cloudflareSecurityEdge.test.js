@@ -165,7 +165,8 @@ test("Cloudflare route-bypass diagnostic identifies missing DNS/custom-hostname 
   assert.equal(report.probes.custom_hostnames.ok, false);
   assert.equal(report.probes.rulesets.ok, false);
   assert.equal(report.next_action.status, "needs_cloudflare_dns_custom_hostname_ruleset_access");
-  assert.match(report.next_action.message, /DNS\/custom-hostname\/ruleset read access/);
+  assert.match(report.next_action.message, /cannot inspect dns-records, custom-hostnames, rulesets/);
+  assert.deepEqual(report.next_action.denied_probes, ["dns-records", "custom-hostnames", "rulesets"]);
   assert.ok(calls.some((url) => String(url).includes("/workers/routes")));
 
   const formatted = formatRouteBypassDiagnosis(report);
@@ -173,6 +174,56 @@ test("Cloudflare route-bypass diagnostic identifies missing DNS/custom-hostname 
   assert.match(formatted, /clientsurgesystems\.com\/\*: clientsurge-security-edge \(ok\)/);
   assert.match(formatted, /dns_records: denied/);
   assert.doesNotMatch(formatted, /test-token/);
+});
+
+test("Cloudflare route-bypass diagnostic falls back across env and Wrangler token sources per endpoint", async () => {
+  const previous = process.env.CLOUDFLARE_API_TOKEN;
+  process.env.CLOUDFLARE_API_TOKEN = "env-token";
+  try {
+    const report = await diagnoseRouteBypass({
+      configPath: new URL("./fixtures/wrangler-oauth.toml", import.meta.url),
+      fetchImpl: async (url, options = {}) => {
+        const auth = options.headers?.authorization || "";
+        const path = new URL(url).pathname;
+        if (path === "/client/v4/zones") {
+          return Response.json({ success: true, result: [{ id: "zone-123", name: "clientsurgesystems.com" }] });
+        }
+        if (path === "/client/v4/zones/zone-123/workers/routes" && auth.includes("env-token")) {
+          return Response.json(
+            { success: false, errors: [{ code: 10000, message: "Authentication error" }] },
+            { status: 403 }
+          );
+        }
+        if (path === "/client/v4/zones/zone-123/workers/routes") {
+          return Response.json({
+            success: true,
+            result: [
+              { id: "route-1", pattern: "clientsurgesystems.com/*", script: "clientsurge-security-edge" },
+              { id: "route-2", pattern: "www.clientsurgesystems.com/*", script: "clientsurge-security-edge" },
+            ],
+          });
+        }
+        if (path === "/client/v4/zones/zone-123/rulesets" && auth.includes("env-token")) {
+          return Response.json({ success: true, result: [] });
+        }
+        return Response.json(
+          { success: false, errors: [{ code: 10000, message: "Authentication error" }] },
+          { status: 403 }
+        );
+      },
+    });
+
+    assert.equal(report.probes.zone.token_source, "env");
+    assert.equal(report.probes.worker_routes.token_source, "wrangler_oauth");
+    assert.deepEqual(report.probes.worker_routes.attempted_sources, ["env", "wrangler_oauth"]);
+    assert.equal(report.probes.rulesets.token_source, "env");
+    assert.deepEqual(report.next_action.denied_probes, ["dns-records", "custom-hostnames"]);
+    assert.deepEqual(report.next_action.readable_probes, ["rulesets"]);
+    assert.doesNotMatch(JSON.stringify(report), /env-token|test-token/);
+  } finally {
+    if (previous === undefined) delete process.env.CLOUDFLARE_API_TOKEN;
+    else process.env.CLOUDFLARE_API_TOKEN = previous;
+  }
 });
 
 test("Cloudflare route-bypass diagnostic surfaces concrete DNS custom-hostname and ruleset candidates when readable", async () => {
