@@ -274,8 +274,10 @@ test("sync status audit covers GitHub mirror Base44 tasks and Cloudflare readine
   assert.match(status, /overlapping\/running tick/);
   assert.match(status, /check-app-access\.mjs/);
   assert.match(status, /last-published-main\.txt/);
-  assert.match(status, /npx", \["wrangler", "whoami"\]/);
+  assert.match(status, /runPwshCommand/);
+  assert.match(status, /npx wrangler whoami/);
   assert.match(status, /Cloudflare edge release is waiting on Wrangler authentication/);
+  assert.match(status, /live production traffic is missing edge security headers/);
   assert.match(status, /hasDonorAppId/);
   assert.match(packageJson, /"sync:status": "node scripts\/sync\/audit-sync-status\.mjs"/);
 });

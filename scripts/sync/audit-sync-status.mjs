@@ -54,11 +54,16 @@ function run(command, args, { cwd = process.cwd(), allowFailure = true } = {}) {
     status: result.status,
     stdout: (result.stdout || "").trim(),
     stderr: (result.stderr || "").trim(),
+    error: result.error?.message || "",
   };
   if (!record.ok && !allowFailure) {
-    throw new Error(`${command} ${args.join(" ")} failed: ${record.stderr || record.stdout}`);
+    throw new Error(`${command} ${args.join(" ")} failed: ${record.stderr || record.stdout || record.error}`);
   }
   return record;
+}
+
+function runPwshCommand(command, { cwd = process.cwd() } = {}) {
+  return run("pwsh", ["-NoProfile", "-Command", command], { cwd });
 }
 
 function git(cwd, args) {
@@ -218,7 +223,7 @@ function getCloudflareState(repoPath, liveSecurity) {
   const machine = hostname();
   const statusPath = join(repoPath, "logs", "cloudflare-security", machine, "latest-security-edge-status.json");
   const monitor = readJsonIfExists(statusPath);
-  const whoami = run("npx", ["wrangler", "whoami"], { cwd: repoPath });
+  const whoami = runPwshCommand("npx wrangler whoami", { cwd: repoPath });
   const authenticated = whoami.ok && !/not authenticated/i.test(`${whoami.stdout}\n${whoami.stderr}`);
   const state = {
     authenticated,
@@ -228,7 +233,7 @@ function getCloudflareState(repoPath, liveSecurity) {
   };
 
   if (liveSecurity) {
-    const verify = run("npm", ["run", "verify:production-security"], { cwd: repoPath });
+    const verify = runPwshCommand("npm run verify:production-security", { cwd: repoPath });
     state.live_security = {
       ok: verify.ok,
       output: verify.stdout || verify.stderr,
@@ -356,6 +361,8 @@ function evaluate(report) {
   const cloudflareStatus = report.cloudflare.monitor?.status || "";
   if (cloudflareStatus === "auth_required" || !report.cloudflare.authenticated) {
     warnings.push("Cloudflare edge release is waiting on Wrangler authentication.");
+  } else if (cloudflareStatus === "route_bypassed") {
+    failures.push("Cloudflare Worker is authenticated/deployed, but live production traffic is missing edge security headers.");
   } else if (cloudflareStatus && !["verified", "released"].includes(cloudflareStatus)) {
     failures.push(`Cloudflare monitor status is ${cloudflareStatus}.`);
   }

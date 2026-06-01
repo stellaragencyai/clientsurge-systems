@@ -73,6 +73,8 @@ test("Cloudflare security release and monitor scripts keep auth and verification
   assert.match(monitor, /npm run verify:production-security/);
   assert.match(monitor, /npx wrangler whoami/);
   assert.match(monitor, /auth_required/);
+  assert.match(monitor, /route_bypassed/);
+  assert.match(monitor, /Test-RouteBypassFailure/);
   assert.match(monitor, /npm run cloudflare:security:release/);
   assert.match(monitor, /latest-security-edge-status\.json/);
 
