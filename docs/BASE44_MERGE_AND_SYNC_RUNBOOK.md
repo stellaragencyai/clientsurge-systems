@@ -118,11 +118,11 @@ Dry-run the Worker package:
 npm run cloudflare:security:dry-run
 ```
 
-Deploy after `wrangler login` has access to the `clientsurgesystems.com` zone:
+Deploy after Wrangler has access to the `clientsurgesystems.com` zone:
 
 ```powershell
-npm run cloudflare:security:deploy
-npm run verify:production-security
+npm run cloudflare:security:login
+npm run cloudflare:security:release
 ```
 
 The Worker proxies Base44, injects CSP/Permissions-Policy/COOP, keeps Base44 editor `frame-ancestors` allowed, marks sensitive app routes `noindex` and `no-store`, serves `/.well-known/security.txt`, and redirects `www` to the canonical host.
