@@ -82,13 +82,13 @@ function Invoke-ProductionPublish {
         Invoke-Step 'node scripts/base44/publish-ui-clicker.mjs --yes'
     }
 
+    Set-Content -Path $statePath -Value $Sha -Encoding UTF8
+    Write-Host "Recorded published main SHA: $Sha" -ForegroundColor Green
+
     if (-not $SkipTests) {
         Invoke-Step "npm run smoke:public-routes -- --base-url=$VerifyUrl"
         Invoke-Step 'npm run verify:production-security'
     }
-
-    Set-Content -Path $statePath -Value $Sha -Encoding UTF8
-    Write-Host "Recorded published main SHA: $Sha" -ForegroundColor Green
 }
 
 Write-Host "Watching origin/$TargetBranch for production Base44 publish." -ForegroundColor Green
