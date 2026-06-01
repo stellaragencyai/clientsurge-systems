@@ -10,6 +10,7 @@ param(
     [switch]$DryRun,
     [switch]$FallbackToUiClick,
     [switch]$SkipGitHubChecks,
+    [switch]$SkipStagingMirrors,
     [int]$GitHubCheckTimeoutSeconds = 1800,
     [ValidateSet('Primary', 'Failover', 'MirrorOnly')]
     [string]$PublisherRole = 'Primary',
@@ -141,6 +142,10 @@ function Invoke-ProductionPublish {
 
     Set-Content -Path $statePath -Value $Sha -Encoding UTF8
     Write-Host "Recorded published main SHA: $Sha" -ForegroundColor Green
+
+    if (-not $SkipStagingMirrors) {
+        Invoke-Step 'node scripts/base44/publish-all-apps.mjs --staging-only'
+    }
 
     if (-not $SkipTests) {
         Invoke-Step "npm run smoke:public-routes -- --base-url=$VerifyUrl"

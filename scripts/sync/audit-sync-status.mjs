@@ -9,6 +9,8 @@ const DEFAULT_REPO_PATH = "C:\\Users\\nolan\\Code\\ClientSurge\\clientsurge-syst
 const DEFAULT_MIRROR_PATH = "C:\\Users\\nolan\\Code\\ClientSurge\\clientsurge-systems-main-mirror";
 const PRODUCTION_APP_ID = "69dc4a79656fdba136d413d3";
 const PRODUCTION_URL = "https://clientsurgesystems.com";
+const STAGING_DONOR_APP_ID = "69f959e2bc665e019e19840c";
+const STAGING_DONOR_URL = "https://client-surge-systems-copy-9e19840c.base44.app";
 
 function parseArgs(argv) {
   const args = {
@@ -103,15 +105,21 @@ function readJsonIfExists(path) {
 
 function getBase44PublishState(repoPath, mirrorPath, originMainSha, skipBase44) {
   const lastPublishedPath = join(mirrorPath, "logs", "base44-publish", "last-published-main.txt");
+  const lastPublishedAllPath = join(mirrorPath, "logs", "base44-publish", "last-published-all.json");
   const lastPublishedSha = readTextIfExists(lastPublishedPath);
+  const multiApp = readJsonIfExists(lastPublishedAllPath);
   const state = {
     last_published_sha: lastPublishedSha,
     matches_origin_main: Boolean(originMainSha && lastPublishedSha === originMainSha),
+    multi_app: multiApp,
+    multi_app_matches_origin_main: Boolean(originMainSha && multiApp?.sourceSha === originMainSha),
     app: null,
+    staging_donor_app: null,
   };
 
   if (skipBase44) {
     state.app = { skipped: true };
+    state.staging_donor_app = { skipped: true };
     return state;
   }
 
@@ -140,6 +148,32 @@ function getBase44PublishState(repoPath, mirrorPath, originMainSha, skipBase44) 
       parse_error: true,
       raw: check.stdout,
     };
+  }
+
+  const stagingCheck = run(process.execPath, [
+    "scripts/base44/check-app-access.mjs",
+    "--app-id",
+    STAGING_DONOR_APP_ID,
+    "--verify-url",
+    STAGING_DONOR_URL,
+    "--json",
+  ], { cwd: repoPath });
+
+  if (!stagingCheck.ok) {
+    state.staging_donor_app = {
+      ok: false,
+      error: stagingCheck.stderr || stagingCheck.stdout,
+    };
+  } else {
+    try {
+      state.staging_donor_app = JSON.parse(stagingCheck.stdout);
+    } catch {
+      state.staging_donor_app = {
+        ok: false,
+        parse_error: true,
+        raw: stagingCheck.stdout,
+      };
+    }
   }
 
   return state;
@@ -273,8 +307,11 @@ function evaluate(report) {
   if (!report.git.mirror_matches_origin_main) failures.push("Clean mirror is not at origin/main.");
   if (!report.github.release_gate.ok) failures.push("GitHub release gate has not passed for origin/main.");
   if (!report.base44.matches_origin_main) failures.push("Base44 last published SHA does not match origin/main.");
+  if (!report.base44.multi_app_matches_origin_main) failures.push("Base44 multi-app publish state does not match origin/main.");
   if (report.base44.app && report.base44.app.ok === false) failures.push("Base44 production app access check failed.");
+  if (report.base44.staging_donor_app && report.base44.staging_donor_app.ok === false) failures.push("Base44 staging donor app access check failed.");
   if (report.base44.app?.live_signal?.hasDonorAppId) failures.push("Production live signal contains donor app ID.");
+  if (!report.base44.staging_donor_app?.live_signal?.hasDonorAppId) failures.push("Staging donor live signal does not contain donor app ID.");
   if (!report.tasks.base44.installed || Number(report.tasks.base44.LastTaskResult) !== 0) failures.push("Base44 sync scheduled task is missing or failing.");
   if (!report.tasks.cloudflare.installed || Number(report.tasks.cloudflare.LastTaskResult) !== 0) failures.push("Cloudflare security scheduled task is missing or failing.");
 
@@ -308,8 +345,10 @@ function format(report) {
     `Active: ${report.git.branch} ${report.git.active_sha} clean=${report.git.active_clean}`,
     `Mirror: ${report.git.mirror_branch || "missing"} ${report.git.mirror_sha || "missing"} clean=${report.git.mirror_clean}`,
     `Base44 published: ${report.base44.last_published_sha || "unknown"} matches_main=${report.base44.matches_origin_main}`,
+    `Base44 multi-app: ${report.base44.multi_app?.sourceSha || "unknown"} matches_main=${report.base44.multi_app_matches_origin_main}`,
     `Base44 app: ${report.base44.app?.app_name || "unknown"} auth=${report.base44.app?.auth_email || "unknown"} ok=${report.base44.app?.ok ?? "unknown"}`,
     `Base44 live app IDs: production=${Boolean(report.base44.app?.live_signal?.hasProductionAppId)} donor=${Boolean(report.base44.app?.live_signal?.hasDonorAppId)}`,
+    `Base44 staging donor: ${report.base44.staging_donor_app?.app_name || "unknown"} ok=${report.base44.staging_donor_app?.ok ?? "unknown"} asset=${report.base44.staging_donor_app?.live_signal?.asset || "unknown"}`,
     `Task Base44: installed=${report.tasks.base44.installed} last=${report.tasks.base44.LastTaskResult ?? "unknown"} next=${report.tasks.base44.NextRunTime ?? "unknown"}`,
     `Task Cloudflare: installed=${report.tasks.cloudflare.installed} last=${report.tasks.cloudflare.LastTaskResult ?? "unknown"} next=${report.tasks.cloudflare.NextRunTime ?? "unknown"}`,
     `Cloudflare: authenticated=${report.cloudflare.authenticated} monitor=${report.cloudflare.monitor?.status || "missing"}`,

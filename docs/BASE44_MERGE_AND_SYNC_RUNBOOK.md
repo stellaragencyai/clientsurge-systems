@@ -107,6 +107,8 @@ node scripts/base44/publish-deploy-endpoint.mjs `
 
 Only one machine should publish immediately. Desktop runs `PublisherRole Primary`; laptop runs `PublisherRole Failover`, waits three minutes, checks the Base44 app `updated_date`, and only publishes if the primary did not already move production.
 
+After production publishes, the default watcher also refreshes the donor/staging Base44 app from the same source. It writes `logs/base44-publish/last-published-all.json`, and `npm run sync:status` fails if that multi-app state does not match GitHub `main`.
+
 For emergency manual publishing only, the watcher accepts `-SkipGitHubChecks`. Keep the scheduled desktop and laptop publishers on the default GitHub-gated path.
 
 Check the production app/auth connection at any time:

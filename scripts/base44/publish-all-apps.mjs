@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const DEFAULT_APPS = [
   {
@@ -21,16 +23,18 @@ function parseArgs(argv) {
   const args = {
     dryRun: false,
     includeMirror: false,
+    stagingOnly: false,
     continueOnOptionalFailure: true,
   };
 
   for (const arg of argv) {
     if (arg === "--dry-run") args.dryRun = true;
     else if (arg === "--include-stellar-mirror") args.includeMirror = true;
+    else if (arg === "--staging-only") args.stagingOnly = true;
     else if (arg === "--fail-optional") args.continueOnOptionalFailure = false;
     else if (arg === "--help" || arg === "-h") {
       console.log(`Usage:
-  node scripts/base44/publish-all-apps.mjs [--dry-run] [--include-stellar-mirror] [--fail-optional]
+  node scripts/base44/publish-all-apps.mjs [--dry-run] [--staging-only] [--include-stellar-mirror] [--fail-optional]
 
 Publishes production first, then staging/mirror apps from the same GitHub main source.`);
       process.exit(0);
@@ -64,7 +68,7 @@ function summarizeOutput(output) {
       appId: parsed.appId || parsed.app_id || null,
       beforeAsset: parsed.beforeSignal?.asset || parsed.live_signal?.asset || null,
       afterAsset: parsed.afterSignal?.asset || null,
-      updatedDate: parsed.updated_date || parsed.deployResult?.body?.updated_date || null,
+      updatedDate: parsed.updated_date || parsed.deploy?.updatedDate || parsed.deployResult?.body?.updated_date || null,
       authEmail: parsed.auth_email || null,
     };
   } catch {
@@ -72,9 +76,28 @@ function summarizeOutput(output) {
   }
 }
 
+function readSourceSha() {
+  const result = spawnSync("git", ["rev-parse", "HEAD"], {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  return result.status === 0 ? result.stdout.trim() : "";
+}
+
+function writePublishState(payload) {
+  const logDir = resolve(process.cwd(), "logs/base44-publish");
+  mkdirSync(logDir, { recursive: true });
+  writeFileSync(
+    resolve(logDir, "last-published-all.json"),
+    `${JSON.stringify(payload, null, 2)}\n`,
+    "utf8"
+  );
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
-  const apps = [...DEFAULT_APPS];
+  const apps = DEFAULT_APPS.filter((app) => !args.stagingOnly || app.role !== "production");
   if (args.includeMirror) {
     apps.push({
       role: "stellar-mirror",
@@ -116,7 +139,16 @@ function main() {
   }
 
   const failedRequired = results.filter((result) => result.required && !result.ok);
-  console.log(JSON.stringify({ ok: failedRequired.length === 0, dryRun: args.dryRun, results }, null, 2));
+  const payload = {
+    ok: failedRequired.length === 0,
+    dryRun: args.dryRun,
+    stagingOnly: args.stagingOnly,
+    sourceSha: readSourceSha(),
+    publishedAt: new Date().toISOString(),
+    results,
+  };
+  if (!args.dryRun) writePublishState(payload);
+  console.log(JSON.stringify(payload, null, 2));
   process.exit(failedRequired.length === 0 ? 0 : 1);
 }
 

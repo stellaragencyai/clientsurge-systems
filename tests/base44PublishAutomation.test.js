@@ -66,6 +66,9 @@ test("Base44 app access and multi-app publish helpers keep production required",
   assert.match(publishAll, /appId: "6a15f1424f4856ba4e9ed90b"/);
   assert.match(publishAll, /publish-deploy-endpoint\.mjs/);
   assert.match(publishAll, /"--summary"/);
+  assert.match(publishAll, /--staging-only/);
+  assert.match(publishAll, /last-published-all\.json/);
+  assert.match(publishAll, /sourceSha/);
   assert.match(packageJson, /"base44:check-app": "node scripts\/base44\/check-app-access\.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https:\/\/clientsurgesystems\.com"/);
   assert.match(packageJson, /"base44:publish-all": "node scripts\/base44\/publish-all-apps\.mjs"/);
 });
@@ -102,7 +105,9 @@ test("main publish watcher preserves build test and production-app guardrails", 
   assert.match(watcher, /\[ValidateSet\('Primary', 'Failover', 'MirrorOnly'\)\]/);
   assert.match(watcher, /FailoverDelayMinutes/);
   assert.match(watcher, /SkipGitHubChecks/);
+  assert.match(watcher, /SkipStagingMirrors/);
   assert.match(watcher, /wait-for-main-ci\.ps1/);
+  assert.match(watcher, /publish-all-apps\.mjs --staging-only/);
   assert.match(watcher, /check-app-access\.mjs/);
   assert.match(watcher, /Run this watcher from a clean \$TargetBranch mirror/);
   assert.match(watcher, /git merge --ff-only origin\/\$TargetBranch/);
@@ -166,6 +171,9 @@ test("sync status audit covers GitHub mirror Base44 tasks and Cloudflare readine
   assert.match(status, /getGitHubReleaseGate/);
   assert.match(status, /clientsurge-release-gate\.yml/);
   assert.match(status, /GitHub release gate has not passed for origin\/main/);
+  assert.match(status, /last-published-all\.json/);
+  assert.match(status, /Base44 multi-app publish state does not match origin\/main/);
+  assert.match(status, /Staging donor live signal does not contain donor app ID/);
   assert.match(status, /check-app-access\.mjs/);
   assert.match(status, /last-published-main\.txt/);
   assert.match(status, /npx", \["wrangler", "whoami"\]/);
