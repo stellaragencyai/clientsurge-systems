@@ -53,8 +53,8 @@
   "workspace": {
     "packageJson": {
       "dependencies": [
-        "npm:@base44/sdk@~0.8.30",
-        "npm:@base44/vite-plugin@^1.0.20",
+        "npm:@base44/sdk@~0.8.31",
+        "npm:@base44/vite-plugin@^1.0.21",
         "npm:@eslint/js@^9.19.0",
         "npm:@hello-pangea/dnd@17",
         "npm:@hookform/resolvers@^4.1.2",
