@@ -156,19 +156,30 @@ export default function Navbar() {
           onClick={handleLogoClick}
           className="shrink-0 bg-none border-none cursor-pointer transition-transform duration-300 hover:-translate-y-0.5"
           style={{ minHeight: "unset", minWidth: "unset", background: "none", padding: 0, overflow: "visible" }}>
-          <img
-            src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
-            alt="ClientSurge Systems"
-            width="240"
-            height="72"
-            decoding="async"
+          <span
             style={{
-              height: "clamp(52px, 6vw, 72px)",
-              width: "auto",
-              objectFit: "contain",
               display: "block",
+              width: "clamp(150px, 18vw, 220px)",
+              height: "clamp(52px, 6vw, 72px)",
+              overflow: "hidden",
             }}
-          />
+          >
+            <img
+              src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
+              alt="ClientSurge Systems"
+              width="240"
+              height="72"
+              decoding="async"
+              style={{
+                height: "clamp(96px, 11vw, 126px)",
+                width: "auto",
+                maxWidth: "none",
+                objectFit: "contain",
+                display: "block",
+                transform: "translate(-18px, -24px)",
+              }}
+            />
+          </span>
         </button>
 
         <div className="hidden xl:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">

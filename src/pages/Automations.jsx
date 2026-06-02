@@ -321,13 +321,22 @@ export default function Automations() {
         style={{ background: "#ffffff", borderBottom: "1px solid rgba(10,22,40,0.08)" }}
       >
         <Link to="/" className="flex items-center gap-2">
-          <img
-            src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
-            alt="ClientSurge Systems"
-            width="192"
-            height="48"
-            style={{ height: "48px", width: "auto", objectFit: "contain", display: "block" }}
-          />
+          <span style={{ display: "block", width: "180px", height: "54px", overflow: "hidden" }}>
+            <img
+              src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
+              alt="ClientSurge Systems"
+              width="192"
+              height="48"
+              style={{
+                height: "96px",
+                width: "auto",
+                maxWidth: "none",
+                objectFit: "contain",
+                display: "block",
+                transform: "translate(-14px, -21px)",
+              }}
+            />
+          </span>
         </Link>
         <Link
           to="/book"
