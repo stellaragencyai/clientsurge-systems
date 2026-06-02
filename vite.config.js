@@ -5,6 +5,9 @@ import path from "path";
 // #8: split recharts + framer-motion into separate chunks
 export default defineConfig({
   plugins: [react()],
+  server: {
+    allowedHosts: [".modal.host"],
+  },
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
   },
