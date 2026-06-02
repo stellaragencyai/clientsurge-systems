@@ -18,11 +18,18 @@ function safeSetCookieConsent(value) {
   }
 }
 
+function isBase44EditorPreview() {
+  const hostname = window.location.hostname;
+  return hostname.startsWith('preview-sandbox--') || hostname.endsWith('.modal.host');
+}
+
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
   const [offsetForMobileCallBar, setOffsetForMobileCallBar] = useState(false);
 
   useEffect(() => {
+    if (isBase44EditorPreview()) return;
+
     const consent = safeGetCookieConsent();
     if (!consent) setVisible(true);
   }, []);
