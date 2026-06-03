@@ -22,12 +22,15 @@ test("production app registers the local service worker", () => {
   assert.match(mainSource, /import\.meta\.env\.PROD/);
   assert.match(mainSource, /'serviceWorker' in navigator/);
   assert.match(mainSource, /navigator\.serviceWorker\.register\('\/sw\.js'\)/);
+  assert.match(mainSource, /registration\.update\(\)/);
 });
 
-test("service worker caches only same-origin core shell assets", () => {
-  assert.match(serviceWorker, /const CACHE_NAME = "clientsurge-shell-v1"/);
-  assert.match(serviceWorker, /const CORE_ASSETS = \["\/", "\/manifest\.json", "\/pwa-icon\.svg"\]/);
+test("service worker caches only same-origin static PWA assets", () => {
+  assert.match(serviceWorker, /const CACHE_NAME = "clientsurge-shell-v2"/);
+  assert.match(serviceWorker, /const CORE_ASSETS = \["\/manifest\.json", "\/pwa-icon\.svg"\]/);
   assert.match(serviceWorker, /url\.origin !== self\.location\.origin/);
   assert.match(serviceWorker, /event\.request\.method !== "GET"/);
+  assert.match(serviceWorker, /event\.request\.mode === "navigate"/);
+  assert.match(serviceWorker, /includes\("text\/html"\)/);
   assert.match(serviceWorker, /caches\.delete\(key\)/);
 });
