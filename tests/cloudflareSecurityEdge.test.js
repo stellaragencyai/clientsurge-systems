@@ -9,6 +9,7 @@ import worker, {
   isSensitivePath,
   originRequestFor,
   SENSITIVE_HEADERS,
+  SERVICE_WORKER_JS,
   SECURITY_TXT,
 } from "../cloudflare/clientsurge-security-edge-worker.mjs";
 import {
@@ -81,6 +82,19 @@ test("Cloudflare security edge worker serves a Worker-only health probe", async 
   assert.equal(response.headers.get(EDGE_HEALTH_HEADER), "active");
   assert.equal(body.ok, true);
   assert.equal(body.edge, "clientsurge-security-edge");
+});
+
+test("Cloudflare security edge worker serves the fresh service worker at the edge", async () => {
+  const response = await worker.fetch(new Request("https://clientsurgesystems.com/sw.js"));
+  const body = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") || "", /text\/javascript/);
+  assert.match(response.headers.get("cache-control") || "", /no-store/);
+  assert.equal(response.headers.get("service-worker-allowed"), "/");
+  assert.equal(body, SERVICE_WORKER_JS);
+  assert.match(body, /clientsurge-shell-v2/);
+  assert.doesNotMatch(body, /clientsurge-shell-v1/);
 });
 
 test("Cloudflare security edge worker proxies application traffic to the Base44 origin host", () => {

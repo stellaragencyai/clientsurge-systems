@@ -12,6 +12,41 @@ Policy: https://clientsurgesystems.com/privacy-policy
 Expires: 2027-06-01T00:00:00Z
 `;
 
+export const SERVICE_WORKER_JS = `const CACHE_NAME = "clientsurge-shell-v2";
+const CORE_ASSETS = ["/manifest.json", "/pwa-icon.svg"];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS)).then(() => self.skipWaiting()),
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim()),
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  if (event.request.mode === "navigate" || event.request.headers.get("accept")?.includes("text/html")) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then((cached) => cached || fetch(event.request)),
+  );
+});
+`;
+
 export const GLOBAL_SECURITY_HEADERS = {
   "Content-Security-Policy": [
     "default-src 'self' https: data: blob:",
@@ -88,6 +123,15 @@ function edgeHealthResponse() {
   }), { status: 200, headers });
 }
 
+function serviceWorkerResponse() {
+  const headers = applySecurityHeaders(new Headers({
+    "Content-Type": "text/javascript; charset=utf-8",
+    "Cache-Control": "no-store, max-age=0",
+    "Service-Worker-Allowed": "/",
+  }), "/sw.js");
+  return new Response(SERVICE_WORKER_JS, { status: 200, headers });
+}
+
 export function originRequestFor(request, url = new URL(request.url)) {
   const originUrl = new URL(url.toString());
   originUrl.protocol = "https:";
@@ -109,6 +153,10 @@ export default {
 
     if (url.pathname === EDGE_HEALTH_PATH) {
       return edgeHealthResponse();
+    }
+
+    if (url.pathname === "/sw.js") {
+      return serviceWorkerResponse();
     }
 
     const originResponse = await fetch(originRequestFor(request, url));
