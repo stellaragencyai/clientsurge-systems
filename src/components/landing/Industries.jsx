@@ -347,7 +347,7 @@ export default function Industries() {
         </p>
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10" style={{ overflowX: "hidden" }}>
+      <div className="w-full max-w-[92rem] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10" style={{ overflowX: "hidden" }}>
         {industries.map((industry, index) => {
           const Icon = industry.icon;
           const highlighted = hoveredIndustryId === industry.id;
@@ -365,7 +365,7 @@ export default function Industries() {
             type="button"
             aria-label={industry.name}
             aria-pressed={isSelected}
-            className="group relative block overflow-hidden h-[14rem] sm:h-[18rem] md:h-[27.6rem] text-left"
+            className="group relative block overflow-hidden h-[15.5rem] sm:h-[19.5rem] md:h-[29rem] lg:h-[30.5rem] text-left"
             onClick={() => handleIndustrySelect(industry.id)}
             onMouseEnter={() => setHoveredIndustryId(industry.id)}
             onMouseLeave={() => setHoveredIndustryId("")}
@@ -444,8 +444,8 @@ export default function Industries() {
                     fontSize: "18px",
                     fontWeight: "700",
                     lineHeight: 1.3,
-                    color: "#fff",
-                    textShadow: "0 1px 10px rgba(0,0,0,0.4)",
+                    color: accent.color,
+                    textShadow: "0 1px 12px rgba(0,0,0,0.72), 0 0 18px rgba(0,0,0,0.34)",
                     margin: 0
                   }}>
                   
