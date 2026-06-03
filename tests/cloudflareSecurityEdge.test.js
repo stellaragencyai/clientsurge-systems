@@ -6,11 +6,16 @@ import worker, {
   applySecurityHeaders,
   EDGE_HEALTH_HEADER,
   EDGE_HEALTH_PATH,
+  HOMEPAGE_MOTION_HEADER,
+  HOMEPAGE_MOTION_INJECTION,
+  HOMEPAGE_MOTION_STYLE_ID,
+  injectHomepageMotion,
   isSensitivePath,
   originRequestFor,
   SENSITIVE_HEADERS,
   SERVICE_WORKER_JS,
   SECURITY_TXT,
+  shouldInjectHomepageMotion,
 } from "../cloudflare/clientsurge-security-edge-worker.mjs";
 import {
   evaluateEdgeHealthProbe,
@@ -104,6 +109,53 @@ test("Cloudflare security edge worker proxies application traffic to the Base44 
   assert.equal(originUrl.hostname, "grinning-apex-flow-growth.base44.app");
   assert.equal(originUrl.pathname, "/store");
   assert.equal(originUrl.search, "?plan=starter");
+});
+
+test("Cloudflare security edge worker injects the five homepage cinematic motion hooks", async () => {
+  const previousFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response("<!doctype html><html><head><title>ClientSurge</title></head><body><main id=\"root\"></main></body></html>", {
+    status: 200,
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
+
+  try {
+    const response = await worker.fetch(new Request("https://clientsurgesystems.com/"));
+    const body = await response.text();
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get(HOMEPAGE_MOTION_HEADER), "edge-v1");
+    assert.match(response.headers.get("cache-control") || "", /no-store/);
+    assert.match(body, new RegExp(HOMEPAGE_MOTION_STYLE_ID));
+    assert.match(body, /ambient-sweep/);
+    assert.match(body, /headline-sheen/);
+    assert.match(body, /checklist-cascade/);
+    assert.match(body, /cta-energy/);
+    assert.match(body, /dashboard-float-scan/);
+    assert.match(body, /MutationObserver/);
+    assert.match(body, /prefers-reduced-motion/);
+    assert.match(body, /max-width: 640px/);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
+});
+
+test("Cloudflare homepage motion injection is scoped and idempotent", () => {
+  const homeResponse = new Response("<html></html>", {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
+  const assetResponse = new Response("body{}", {
+    headers: { "Content-Type": "text/css" },
+  });
+
+  assert.equal(shouldInjectHomepageMotion(new Request("https://clientsurgesystems.com/"), new URL("https://clientsurgesystems.com/"), homeResponse), true);
+  assert.equal(shouldInjectHomepageMotion(new Request("https://clientsurgesystems.com/book"), new URL("https://clientsurgesystems.com/book"), homeResponse), false);
+  assert.equal(shouldInjectHomepageMotion(new Request("https://clientsurgesystems.com/", { method: "POST" }), new URL("https://clientsurgesystems.com/"), homeResponse), false);
+  assert.equal(shouldInjectHomepageMotion(new Request("https://clientsurgesystems.com/"), new URL("https://clientsurgesystems.com/"), assetResponse), false);
+
+  const injected = injectHomepageMotion("<html><head></head><body></body></html>");
+  assert.equal(injectHomepageMotion(injected), injected);
+  assert.equal((injected.match(new RegExp(HOMEPAGE_MOTION_STYLE_ID, "g")) || []).length, 1);
+  assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_MOTION_STYLE_ID), true);
 });
 
 test("production security verifier checks the Cloudflare security layer probe", () => {
