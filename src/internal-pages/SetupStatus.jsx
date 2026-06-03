@@ -3,17 +3,42 @@
  * Page: /setup/status/[order_id]
  * Shows live install progress stepper.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 
 const STAGES = [
-  { key: "Paid", label: "Payment confirmed" },
-  { key: "Configuring", label: "Setup in progress" },
-  { key: "Installing", label: "AI systems being installed" },
-  { key: "Testing", label: "Testing & verification" },
-  { key: "Live", label: "Your system is live!" },
+  { key: "paid", label: "Payment confirmed", matches: ["paid", "pending"] },
+  { key: "credentials", label: "Credentials received", matches: ["configuring", "intake_received", "credentials_complete", "onboarding"] },
+  { key: "systems", label: "Systems configuring", matches: ["activation_ready", "installing", "testing"] },
+  { key: "website", label: "Website building", matches: ["website spec generated", "website copy generated", "awaiting approval", "website building"] },
+  { key: "live", label: "All live", matches: ["live", "went_live"] },
 ];
+
+function normalizeStage(value) {
+  return typeof value === "string" ? value.trim().toLowerCase() : "";
+}
+
+function findStageIndex(stageValue) {
+  const normalized = normalizeStage(stageValue);
+  if (!normalized) return 0;
+  const directMatch = STAGES.findIndex((stage) => stage.matches.includes(normalized));
+  if (directMatch >= 0) return directMatch;
+  if (normalized.includes("error") || normalized.includes("fail")) return 2;
+  return 0;
+}
+
+function formatTimestamp(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString([], {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
 
 export default function SetupStatus() {
   const params = useParams();
@@ -21,6 +46,7 @@ export default function SetupStatus() {
   const [order, setOrder] = useState(null);
   const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showSupportOptions, setShowSupportOptions] = useState(false);
 
   const fetchStatus = async () => {
     try {
@@ -48,7 +74,9 @@ export default function SetupStatus() {
     return () => clearInterval(interval);
   }, [orderId]);
 
-  const currentStageIndex = STAGES.findIndex((stage) => stage.key === order?.workflow_stage);
+  const currentStageIndex = useMemo(() => findStageIndex(order?.workflow_stage || progress?.workflow_stage), [order?.workflow_stage, progress?.workflow_stage]);
+  const hasActivationError = (progress?.errored || 0) > 0 || /error|fail|stalled/i.test(order?.workflow_stage || progress?.workflow_stage || "");
+  const statusUpdatedAt = formatTimestamp(order?.updated_date || progress?.updated_date);
 
   if (loading) {
     return (
@@ -78,7 +106,83 @@ export default function SetupStatus() {
           <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, margin: 0 }}>
             We&apos;ll email you the moment it&apos;s live.
           </p>
+          {statusUpdatedAt && (
+            <p style={{ color: "rgba(255,255,255,0.32)", fontSize: 12, margin: "10px 0 0" }}>
+              Last updated {statusUpdatedAt}
+            </p>
+          )}
         </div>
+
+        {hasActivationError && (
+          <div
+            style={{
+              marginBottom: 24,
+              background: "rgba(239,68,68,0.08)",
+              border: "1px solid rgba(248,113,113,0.25)",
+              borderRadius: 16,
+              padding: 18,
+            }}
+          >
+            <p style={{ color: "#FECACA", fontSize: 13, fontWeight: 700, margin: "0 0 6px" }}>
+              We hit a setup issue and our team should take a look.
+            </p>
+            <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, margin: 0 }}>
+              Your order is still safe. Reach out and we&apos;ll help fast.
+            </p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
+              <button
+                onClick={() => setShowSupportOptions((value) => !value)}
+                style={{
+                  borderRadius: 999,
+                  border: "none",
+                  background: "linear-gradient(135deg,#0088CC,#003B8F)",
+                  color: "#fff",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  padding: "10px 14px",
+                  cursor: "pointer",
+                }}
+              >
+                Contact Support
+              </button>
+              <a
+                href="mailto:support@clientsurgesystems.com?subject=Setup%20status%20help"
+                style={{
+                  borderRadius: 999,
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  color: "#fff",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  padding: "10px 14px",
+                  textDecoration: "none",
+                }}
+              >
+                Email support
+              </a>
+            </div>
+            {showSupportOptions && (
+              <div
+                style={{
+                  marginTop: 14,
+                  borderTop: "1px solid rgba(255,255,255,0.08)",
+                  paddingTop: 14,
+                  display: "grid",
+                  gap: 10,
+                }}
+              >
+                <a href="/client-portal?tab=support" style={{ color: "#7DD3FC", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
+                  Open portal support chat
+                </a>
+                <a href="tel:+16025874608" style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, textDecoration: "none" }}>
+                  Call (602) 587-4608
+                </a>
+                <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, margin: 0 }}>
+                  If you already have portal access, the support tab is the fastest way to keep the thread attached to your project.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
           {STAGES.map((stage, index) => {
@@ -180,7 +284,7 @@ export default function SetupStatus() {
         )}
 
         <p style={{ textAlign: "center", color: "rgba(255,255,255,0.25)", fontSize: 11, marginTop: 24 }}>
-          Updates every 30 seconds · Questions? Email nolan@clientsurgesystems.com
+          Updates every 30 seconds · Questions? Email support@clientsurgesystems.com
         </p>
       </div>
     </div>

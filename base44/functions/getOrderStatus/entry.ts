@@ -21,6 +21,8 @@ function buildSafeOrderSummary(order: any) {
     billing_status: cleanString(order.billing_status) || "active",
     subscription_status: cleanString(order.subscription_status) || "inactive",
     payment_status: cleanString(order.payment_status) || "pending",
+    updated_date: cleanString(order.updated_date),
+    created_date: cleanString(order.created_date),
   };
 }
 
