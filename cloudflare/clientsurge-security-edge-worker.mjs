@@ -468,11 +468,22 @@ export const TRUST_SECURITY_SCRIPT = `<script>
     return true;
   };
   if (insert()) return;
+  let attempts = 0;
   const observer = new MutationObserver(() => {
     if (insert()) observer.disconnect();
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
-  window.setTimeout(() => observer.disconnect(), 10000);
+  const interval = window.setInterval(() => {
+    attempts += 1;
+    if (insert() || attempts > 120) {
+      window.clearInterval(interval);
+      observer.disconnect();
+    }
+  }, 500);
+  window.setTimeout(() => {
+    window.clearInterval(interval);
+    observer.disconnect();
+  }, 65000);
 })();
 </script>`;
 
