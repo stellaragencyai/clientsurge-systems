@@ -4,6 +4,7 @@ const ALTERNATE_HOST = "www.clientsurgesystems.com";
 const BASE44_ORIGIN_HOST = "grinning-apex-flow-growth.base44.app";
 export const EDGE_HEALTH_PATH = "/.well-known/clientsurge-edge-health.json";
 export const EDGE_HEALTH_HEADER = "x-clientsurge-security-edge";
+export const TRUST_SECURITY_SCRIPT_PATH = "/.well-known/clientsurge-trust-security.js";
 
 export const SECURITY_TXT = `Contact: mailto:system@clientsurgesystems.com
 Preferred-Languages: en
@@ -487,7 +488,13 @@ export const TRUST_SECURITY_SCRIPT = `<script>
 })();
 </script>`;
 
-export const TRUST_SECURITY_INJECTION = `${TRUST_SECURITY_STYLE}${TRUST_SECURITY_SCRIPT}`;
+export const TRUST_SECURITY_CLIENT_JS = TRUST_SECURITY_SCRIPT
+  .replace(/^<script>\n?/, "")
+  .replace(/\n?<\/script>$/, "");
+
+export const TRUST_SECURITY_SCRIPT_TAG = `<script src="${TRUST_SECURITY_SCRIPT_PATH}" defer></script>`;
+
+export const TRUST_SECURITY_INJECTION = `${TRUST_SECURITY_STYLE}${TRUST_SECURITY_SCRIPT_TAG}`;
 
 export const GLOBAL_SECURITY_HEADERS = {
   "Content-Security-Policy": [
@@ -562,8 +569,8 @@ export function injectHomepageMotion(html) {
       : `${TRUST_SECURITY_STYLE}${nextHtml}`;
 
     nextHtml = nextHtml.includes("</body>")
-      ? nextHtml.replace("</body>", `${TRUST_SECURITY_SCRIPT}</body>`)
-      : `${nextHtml}${TRUST_SECURITY_SCRIPT}`;
+      ? nextHtml.replace("</body>", `${TRUST_SECURITY_SCRIPT_TAG}</body>`)
+      : `${nextHtml}${TRUST_SECURITY_SCRIPT_TAG}`;
   }
 
   return nextHtml;
@@ -606,6 +613,14 @@ function serviceWorkerResponse() {
   return new Response(SERVICE_WORKER_JS, { status: 200, headers });
 }
 
+function trustSecurityScriptResponse() {
+  const headers = applySecurityHeaders(new Headers({
+    "Content-Type": "text/javascript; charset=utf-8",
+    "Cache-Control": "no-store, max-age=0",
+  }), TRUST_SECURITY_SCRIPT_PATH);
+  return new Response(TRUST_SECURITY_CLIENT_JS, { status: 200, headers });
+}
+
 export function originRequestFor(request, url = new URL(request.url)) {
   const originUrl = new URL(url.toString());
   originUrl.protocol = "https:";
@@ -631,6 +646,10 @@ export default {
 
     if (url.pathname === "/sw.js") {
       return serviceWorkerResponse();
+    }
+
+    if (url.pathname === TRUST_SECURITY_SCRIPT_PATH) {
+      return trustSecurityScriptResponse();
     }
 
     const originResponse = await fetch(originRequestFor(request, url));

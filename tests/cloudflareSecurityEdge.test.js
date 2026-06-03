@@ -17,7 +17,9 @@ import worker, {
   SECURITY_TXT,
   shouldInjectHomepageMotion,
   TRUST_SECURITY_INJECTION,
+  TRUST_SECURITY_CLIENT_JS,
   TRUST_SECURITY_SECTION_ID,
+  TRUST_SECURITY_SCRIPT_PATH,
   TRUST_SECURITY_STYLE_ID,
 } from "../cloudflare/clientsurge-security-edge-worker.mjs";
 import {
@@ -105,6 +107,18 @@ test("Cloudflare security edge worker serves the fresh service worker at the edg
   assert.doesNotMatch(body, /clientsurge-shell-v1/);
 });
 
+test("Cloudflare security edge worker serves the trust section inserter script", async () => {
+  const response = await worker.fetch(new Request(`https://clientsurgesystems.com${TRUST_SECURITY_SCRIPT_PATH}`));
+  const body = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") || "", /text\/javascript/);
+  assert.match(response.headers.get("cache-control") || "", /no-store/);
+  assert.match(body, new RegExp(TRUST_SECURITY_SECTION_ID));
+  assert.match(body, /Stripe Secure Payment/);
+  assert.match(body, /GDPR Compliant/);
+});
+
 test("Cloudflare security edge worker proxies application traffic to the Base44 origin host", () => {
   const originRequest = originRequestFor(new Request("https://clientsurgesystems.com/store?plan=starter"));
   const originUrl = new URL(originRequest.url);
@@ -165,16 +179,17 @@ test("Cloudflare homepage injection adds the trust and security section before t
   const injected = injectHomepageMotion("<html><head></head><body><main id=\"root\"></main><footer>Footer</footer></body></html>");
 
   assert.match(injected, new RegExp(TRUST_SECURITY_STYLE_ID));
-  assert.match(injected, new RegExp(TRUST_SECURITY_SECTION_ID));
-  assert.match(injected, /Your Trust & Security/);
-  assert.match(injected, /Are Our Priority/);
-  assert.match(injected, /SSL Secure/);
-  assert.match(injected, /Stripe Secure Payment/);
-  assert.match(injected, /30-Day Money-Back Guarantee/);
-  assert.match(injected, /Verified & Trusted/);
-  assert.match(injected, /GDPR Compliant/);
-  assert.match(injected, /cs-stripe-word/);
-  assert.match(injected, /cs-gdpr-word/);
+  assert.match(injected, new RegExp(TRUST_SECURITY_SCRIPT_PATH));
+  assert.match(TRUST_SECURITY_CLIENT_JS, new RegExp(TRUST_SECURITY_SECTION_ID));
+  assert.match(TRUST_SECURITY_CLIENT_JS, /Your Trust & Security/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /Are Our Priority/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /SSL Secure/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /Stripe Secure Payment/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /30-Day Money-Back Guarantee/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /Verified & Trusted/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /GDPR Compliant/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /cs-stripe-word/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /cs-gdpr-word/);
   assert.equal(injectHomepageMotion(injected), injected);
   assert.equal(TRUST_SECURITY_INJECTION.includes(TRUST_SECURITY_STYLE_ID), true);
 });
