@@ -1,32 +1,47 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
+import { readdirSync, readFileSync } from "node:fs";
+import { join, relative } from "node:path";
 
-const rg = (...args) =>
-  execFileSync("rg", args, { encoding: "utf8" })
-    .split(/\r?\n/)
-    .filter(Boolean);
+const toPosixPath = (file) => file.replace(/\\/g, "/");
+
+const walkFiles = (dir) =>
+  readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const fullPath = join(dir, entry.name);
+    if (entry.isDirectory()) return walkFiles(fullPath);
+    if (entry.isFile()) return [fullPath];
+    return [];
+  });
+
+const filesMatching = (pattern, dir) => {
+  const regex = new RegExp(pattern);
+  return walkFiles(dir)
+    .filter((file) => regex.test(readFileSync(file, "utf8")))
+    .map((file) => toPosixPath(relative(process.cwd(), file)));
+};
+
+const lineMatches = (pattern, dir) => {
+  const regex = new RegExp(pattern);
+  return walkFiles(dir).flatMap((file) => {
+    const relativeFile = toPosixPath(relative(process.cwd(), file));
+    return readFileSync(file, "utf8")
+      .split(/\r?\n/)
+      .flatMap((line, index) =>
+        regex.test(line) ? [`${relativeFile}:${index + 1}:${line}`] : [],
+      );
+  });
+};
 
 test("backend functions use secure JSON responses instead of raw Response.json", () => {
-  let matches = [];
-  try {
-    matches = rg("-n", "Response\\.json", "base44/functions");
-  } catch {
-    matches = [];
-  }
-
+  const matches = lineMatches("Response\\.json", "base44/functions");
   assert.deepEqual(matches, []);
 });
 
 test("non-json backend Response constructors declare X-Frame-Options", () => {
-  const files = rg("-l", "new Response", "base44/functions");
+  const files = filesMatching("new Response", "base44/functions");
   const helperFiles = new Set([
-    "base44\\functions\\_shared\\response.ts",
     "base44/functions/_shared/response.ts",
-    "base44\\functions\\_shared\\secureJson.js",
     "base44/functions/_shared/secureJson.js",
-    "base44\\functions\\shared\\response.ts",
     "base44/functions/shared/response.ts",
   ]);
 
