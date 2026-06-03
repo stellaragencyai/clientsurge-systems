@@ -1,3 +1,5 @@
+import { TRUST_SECURITY_WEBP_BASE64 } from "./trust-security-assets.mjs";
+
 const CANONICAL_ORIGIN = "https://clientsurgesystems.com";
 const CANONICAL_HOST = "clientsurgesystems.com";
 const ALTERNATE_HOST = "www.clientsurgesystems.com";
@@ -602,6 +604,26 @@ function trustSecurityScriptResponse() {
   return new Response(TRUST_SECURITY_CLIENT_JS, { status: 200, headers });
 }
 
+function base64ToBytes(base64) {
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes;
+}
+
+export function trustSecurityAssetResponse(pathname) {
+  const base64 = TRUST_SECURITY_WEBP_BASE64[pathname];
+  if (!base64) return null;
+
+  const headers = applySecurityHeaders(new Headers({
+    "Content-Type": "image/webp",
+    "Cache-Control": "public, max-age=31536000, immutable",
+  }), pathname);
+  return new Response(base64ToBytes(base64), { status: 200, headers });
+}
+
 export function originRequestFor(request, url = new URL(request.url)) {
   const originUrl = new URL(url.toString());
   originUrl.protocol = "https:";
@@ -631,6 +653,11 @@ export default {
 
     if (url.pathname === TRUST_SECURITY_SCRIPT_PATH) {
       return trustSecurityScriptResponse();
+    }
+
+    const trustSecurityAsset = trustSecurityAssetResponse(url.pathname);
+    if (trustSecurityAsset) {
+      return trustSecurityAsset;
     }
 
     const originResponse = await fetch(originRequestFor(request, url));

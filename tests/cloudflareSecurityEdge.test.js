@@ -22,6 +22,7 @@ import worker, {
   TRUST_SECURITY_SCRIPT_PATH,
   TRUST_SECURITY_STYLE,
   TRUST_SECURITY_STYLE_ID,
+  trustSecurityAssetResponse,
 } from "../cloudflare/clientsurge-security-edge-worker.mjs";
 import {
   evaluateEdgeHealthProbe,
@@ -118,6 +119,16 @@ test("Cloudflare security edge worker serves the trust section inserter script",
   assert.match(body, new RegExp(TRUST_SECURITY_SECTION_ID));
   assert.match(body, /Stripe Secure Payment/);
   assert.match(body, /GDPR Compliant/);
+});
+
+test("Cloudflare security edge worker serves trust badge WebP assets", async () => {
+  const response = await worker.fetch(new Request("https://clientsurgesystems.com/trust-security/satisfaction-guarantee.webp"));
+
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") || "", /image\/webp/);
+  assert.match(response.headers.get("cache-control") || "", /immutable/);
+  assert.equal((await response.arrayBuffer()).byteLength > 1000, true);
+  assert.equal(trustSecurityAssetResponse("/trust-security/not-real.webp"), null);
 });
 
 test("Cloudflare security edge worker proxies application traffic to the Base44 origin host", () => {
