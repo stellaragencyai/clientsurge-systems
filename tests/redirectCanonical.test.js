@@ -34,9 +34,9 @@ test("legacy redirect routes have explicit canonical destinations", () => {
   assert.match(staticIndex, /canonical\.setAttribute\("href", canonicalUrl\)/);
 });
 
-test("in-app section redirects publish the homepage canonical before navigation", () => {
+test("in-app section redirects publish the homepage canonical and preserve hash navigation", () => {
   assert.match(appSource, /function SectionRedirect\(\{ hash \}\)/);
   assert.match(appSource, /setPageMetadata\(\{/);
   assert.match(appSource, /canonicalPath: "\/"/);
-  assert.match(appSource, /navigate\("\/", \{ replace: true \}\)/);
+  assert.match(appSource, /navigate\(`\/\$\{hash\}`, \{ replace: true \}\)/);
 });

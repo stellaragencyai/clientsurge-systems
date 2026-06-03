@@ -5,8 +5,9 @@ import { readFileSync } from "node:fs";
 const navbar = readFileSync(new URL("../src/components/landing/Navbar.jsx", import.meta.url), "utf8");
 
 test("navbar logo stays inside a stable first-viewport nav height", () => {
-  assert.match(navbar, /height:\s*"clamp\(64px, 7vw, 82px\)"/);
-  assert.match(navbar, /height:\s*"clamp\(52px, 6vw, 72px\)"/);
+  assert.match(navbar, /height:\s*"var\(--cs-nav-height\)"/);
+  assert.match(navbar, /height:\s*"clamp\(44px, 5\.2vw, 64px\)"/);
+  assert.match(navbar, /height:\s*"clamp\(80px, 9\.5vw, 112px\)"/);
   assert.doesNotMatch(navbar, /height:\s*"clamp\(100px, 11vw, 140px\)"/);
 });
 

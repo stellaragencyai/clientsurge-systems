@@ -4,10 +4,10 @@ import { test } from "node:test";
 
 const homeSource = readFileSync("src/pages/Home.jsx", "utf8");
 
-test("homepage below-fold groups wait for viewport approach before mounting lazy chunks", () => {
+test("homepage below-fold groups mount with stable document height", () => {
   assert.match(homeSource, /function LazyHomepageSection/);
-  assert.match(homeSource, /new IntersectionObserver/);
-  assert.match(homeSource, /rootMargin: "200px"/);
+  assert.doesNotMatch(homeSource, /new IntersectionObserver/);
+  assert.doesNotMatch(homeSource, /rootMargin:/);
   assert.match(homeSource, /<LazyHomepageSection fallback=\{<SectionSkeleton \/>/);
   assert.match(homeSource, /<LazyHomepageSection fallback=\{<LargeSectionSkeleton \/>/);
 });

@@ -14,6 +14,7 @@ test("homepage proof section gives concrete launch proof without fake case studi
   assert.match(proofSection, /Example SMS conversation/);
   assert.match(proofSection, /Before and after workflow/);
   assert.match(proofSection, /Dashboard visibility/);
-  assert.match(proofSection, /Paid order -> install workspace -> tested services -> live status/);
+  assert.match(proofSection, /"Paid order", "Install workspace", "Tested services", "Live status"/);
+  assert.match(proofSection, /<ArrowRight/);
   assert.doesNotMatch(proofSection, /case stud/i);
 });
