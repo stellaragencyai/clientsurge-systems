@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { CheckCircle2, XCircle } from "lucide-react";
 import { DemoBookingProvider, useDemoBooking } from "./DemoBookingContext";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
@@ -95,10 +96,36 @@ const INDUSTRY_BLOG_LINKS = {
   },
 };
 
+const INDUSTRY_THEME = {
+  default: {
+    accent: "#0088CC",
+    accentDark: "#003B8F",
+    sectionTint: "#f7fbff",
+  },
+  hvac: {
+    accent: "#0088CC",
+    accentDark: "#003B8F",
+    sectionTint: "#f7fbff",
+    triggerLabel: "Run missed-call rescue",
+    triggerEvent: "Missed emergency AC call detected",
+    automationName: "HVAC Missed-Call Recovery",
+  },
+};
+
+function buildSmsMessages(smsDemo) {
+  return [
+    smsDemo?.initialMessage && { from: "lead", text: smsDemo.initialMessage, delay: 300 },
+    smsDemo?.automatedResponse && { from: "system", text: smsDemo.automatedResponse, delay: 900 },
+    smsDemo?.leadReply && { from: "lead", text: smsDemo.leadReply, delay: 1100 },
+    smsDemo?.confirmationMessage && { from: "system", text: smsDemo.confirmationMessage, delay: 900 },
+  ].filter(Boolean);
+}
+
 function IndustryTemplateInner({ industrySlug }) {
   const industry = getIndustryBySlug(industrySlug);
   const seo = INDUSTRY_SEO[industrySlug];
   const blogLink = INDUSTRY_BLOG_LINKS[industrySlug];
+  const theme = INDUSTRY_THEME[industrySlug] || INDUSTRY_THEME.default;
   const demoBooking = useDemoBooking();
   const notFound = !industry;
 
@@ -134,7 +161,7 @@ function IndustryTemplateInner({ industrySlug }) {
   }
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div className="industry-page" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", "--industry-accent": theme.accent, "--industry-accent-dark": theme.accentDark }}>
       <Navbar />
 
       <main style={{ flex: 1 }}>
@@ -152,10 +179,10 @@ function IndustryTemplateInner({ industrySlug }) {
         <IndustryPainBar stats={industry.painStats} />
 
         {/* Problem/Solution Section (industry-tailored) */}
-        <section className="py-16 md:py-24 px-4 md:px-6" style={{ background: "#ffffff" }}>
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-12">
-              <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">
+        <section className="px-4 py-14 md:px-6 md:py-20" style={{ background: "#ffffff" }}>
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-10">
+              <p className="text-xs font-semibold text-primary tracking-[0.18em] uppercase mb-4">
                 The Problem & The Solution
               </p>
               <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
@@ -163,26 +190,24 @@ function IndustryTemplateInner({ industrySlug }) {
               </h2>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4">
               {industry.problems.map((item, i) => (
-                <div key={i} className="grid md:grid-cols-2 gap-5 items-stretch">
+                <div key={i} className="grid md:grid-cols-2 gap-4 md:gap-5 items-stretch">
                   {/* Problem */}
                   <div
-                    className="rounded-2xl px-5 py-4 border relative overflow-hidden flex items-start gap-3"
+                    className="rounded-lg px-5 py-5 border relative overflow-hidden flex items-start gap-3"
                     style={{
-                      background: "rgba(255,255,255,0.55)",
-                      backdropFilter: "blur(18px)",
-                      WebkitBackdropFilter: "blur(18px)",
-                      border: "1px solid rgba(220,38,38,0.2)",
-                      boxShadow: "0 4px 20px rgba(220,38,38,0.06), inset 0 1px 0 rgba(255,255,255,0.85)",
+                      background: "linear-gradient(180deg, #ffffff 0%, #fff7f7 100%)",
+                      border: "1px solid rgba(185,28,28,0.18)",
+                      boxShadow: "0 8px 24px rgba(185,28,28,0.05)",
                     }}
                   >
-                    <div className="w-8 h-8 rounded-xl bg-red-50 border border-red-200/70 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span style={{ fontSize: "12px" }}>✕</span>
+                    <div className="w-9 h-9 rounded-lg bg-red-50 border border-red-200/80 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <XCircle style={{ width: "17px", height: "17px", color: "#b91c1c" }} />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground leading-snug">{item.problem}</p>
-                      <div className="mt-2 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200/60 uppercase tracking-[0.08em]">
+                      <p className="text-sm md:text-base font-semibold text-foreground leading-snug">{item.problem}</p>
+                      <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded bg-red-50 border border-red-200/70 uppercase tracking-[0.08em]" style={{ color: "#991b1b" }}>
                         <span className="w-1 h-1 rounded-full bg-red-500 flex-shrink-0" />
                         {item.stat}
                       </div>
@@ -191,21 +216,19 @@ function IndustryTemplateInner({ industrySlug }) {
 
                   {/* Solution */}
                   <div
-                    className="rounded-2xl px-5 py-4 border relative overflow-hidden flex items-start gap-3"
+                    className="rounded-lg px-5 py-5 border relative overflow-hidden flex items-start gap-3"
                     style={{
-                      background: "rgba(255,255,255,0.55)",
-                      backdropFilter: "blur(18px)",
-                      WebkitBackdropFilter: "blur(18px)",
-                      border: "1px solid rgba(154,92,46,0.2)",
-                      boxShadow: "0 4px 20px rgba(154,92,46,0.07), inset 0 1px 0 rgba(255,255,255,0.9)",
+                      background: "linear-gradient(180deg, #ffffff 0%, #f2faff 100%)",
+                      border: "1px solid rgba(0,136,204,0.2)",
+                      boxShadow: "0 8px 24px rgba(0,59,143,0.06)",
                     }}
                   >
-                    <div className="w-8 h-8 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span style={{ fontSize: "12px" }}>✓</span>
+                    <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/25 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle2 style={{ width: "17px", height: "17px", color: theme.accent }} />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-foreground leading-snug">{item.solution}</p>
-                      <div className="mt-2 inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/25 uppercase tracking-[0.08em]">
+                      <p className="text-sm md:text-base font-semibold text-foreground leading-snug">{item.solution}</p>
+                      <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded bg-primary/10 text-primary border border-primary/25 uppercase tracking-[0.08em]">
                         {item.result}
                       </div>
                     </div>
@@ -219,8 +242,8 @@ function IndustryTemplateInner({ industrySlug }) {
         <IndustryAutomationUseCases industry={industry} />
 
         {blogLink && (
-          <section className="bg-[#0A0F1E] px-4 py-14 md:px-6">
-            <div className="mx-auto max-w-5xl rounded-2xl border border-white/10 bg-white/[0.04] p-6 md:p-8">
+          <section className="bg-[#07111f] px-4 py-12 md:px-6">
+            <div className="mx-auto max-w-5xl rounded-lg border border-white/10 bg-white/[0.05] p-6 md:p-8">
               <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">
                 Related launch guide
               </p>
@@ -251,11 +274,17 @@ function IndustryTemplateInner({ industrySlug }) {
           automatedResponse={industry.smsDemo.automatedResponse}
           leadReply={industry.smsDemo.leadReply}
           confirmationMessage={industry.smsDemo.confirmationMessage}
+          messages={buildSmsMessages(industry.smsDemo)}
+          triggerLabel={theme.triggerLabel || "Simulate"}
+          triggerEvent={theme.triggerEvent || "New lead detected"}
+          automationName={theme.automationName || `${industry.shortName} Automation`}
+          accentColor={theme.accent}
         />
 
         {/* Results/Metrics */}
         <IndustryResults
           metrics={industry.metrics}
+          testimonial={industry.testimonial}
           onBookDemo={() => demoBooking?.openDemoBooking?.()}
         />
 

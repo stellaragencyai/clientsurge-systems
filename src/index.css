@@ -586,6 +586,16 @@ section + section {
   margin-top: clamp(0px, 2vw, 24px);
 }
 
+.industry-page section + section {
+  margin-top: 0;
+}
+
+@media (max-width: 768px) {
+  #root > .industry-page {
+    padding-bottom: 0 !important;
+  }
+}
+
 /* Responsive section padding — consistent across all screen sizes */
 @media (max-width: 640px) {
   section {

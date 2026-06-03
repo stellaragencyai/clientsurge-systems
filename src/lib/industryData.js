@@ -395,7 +395,7 @@ export const INDUSTRIES = {
     metrics: [
       { value: "85%", label: "of calls responded to in under 2 minutes" },
       { value: "5-7 more", label: "service calls per week" },
-      { value: "5-7 business", label: "days to full setup and go-live" },
+      { value: "5-7 days", label: "to full setup and go-live" },
     ],
 
     testimonial: {

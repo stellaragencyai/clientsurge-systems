@@ -12,12 +12,25 @@ import { MessageSquare, Zap } from "lucide-react";
  */
 export default function IndustrySMSDemo({
   messages = [],
+  initialMessage,
+  automatedResponse,
+  leadReply,
+  confirmationMessage,
   triggerLabel = "Simulate",
   triggerEvent = "New lead detected",
   automationName = "AI Automation",
-  accentColor = "#9a5c2e",
+  accentColor = "#0088CC",
   businessName = "Your Business"
 }) {
+  const normalizedMessages = messages.length
+    ? messages
+    : [
+        initialMessage && { from: "lead", text: initialMessage, delay: 300 },
+        automatedResponse && { from: "system", text: automatedResponse, delay: 900 },
+        leadReply && { from: "lead", text: leadReply, delay: 1100 },
+        confirmationMessage && { from: "system", text: confirmationMessage, delay: 900 },
+      ].filter(Boolean);
+  const systemBubbleColor = accentColor.toLowerCase() === "#0088cc" ? "#005f99" : accentColor;
   const [visible, setVisible] = useState([]);
   const [running, setRunning] = useState(false);
   const [done, setDone] = useState(false);
@@ -37,11 +50,15 @@ export default function IndustrySMSDemo({
   const run = () => {
     if (running) {reset();return;}
     reset();
+    if (!normalizedMessages.length) {
+      setDone(true);
+      return;
+    }
     setRunning(true);
 
     let cumulativeDelay = 400;
 
-    messages.forEach((msg, i) => {
+    normalizedMessages.forEach((msg, i) => {
       cumulativeDelay += msg.delay || 1200;
 
       // Show typing indicator before system messages
@@ -72,10 +89,10 @@ export default function IndustrySMSDemo({
   useEffect(() => () => timeouts.current.forEach(clearTimeout), []);
 
   return (
-    <section id="demo-flow" className="py-16 md:py-20 px-4 md:px-6" style={{ background: "#ffffff" }}>
+    <section id="demo-flow" className="px-4 py-14 md:px-6 md:py-20" style={{ background: "linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)" }}>
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary mb-3">
+        <div className="text-center mb-10">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">
             Live Demo Flow
           </p>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
@@ -86,22 +103,22 @@ export default function IndustrySMSDemo({
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-start">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-8 items-stretch">
           {/* Left: trigger card */}
           <div
-            className="rounded-3xl p-6"
+            className="rounded-lg p-6"
             style={{
-              background: "rgba(255,255,255,0.9)",
-              border: "1.5px solid rgba(212,184,142,0.35)",
-              boxShadow: "0 8px 28px rgba(111,67,31,0.09)"
+              background: "#ffffff",
+              border: "1px solid rgba(0,136,204,0.18)",
+              boxShadow: "0 14px 38px rgba(0,59,143,0.08)"
             }}>
             
             <div className="flex items-center gap-3 mb-5">
               <div
-                className="w-10 h-10 rounded-2xl flex items-center justify-center"
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
                 style={{ background: `${accentColor}15`, border: `1px solid ${accentColor}30` }}>
                 
-                <Zap style={{ width: "18px", height: "18px", color: "#000" }} className="bg-[hsl(var(--background))] lucide lucide-zap" />
+                <Zap style={{ width: "18px", height: "18px", color: accentColor }} />
               </div>
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Automation Trigger</p>
@@ -125,8 +142,8 @@ export default function IndustrySMSDemo({
                 borderRadius: "9999px",
                 padding: "2px",
                 background: done ?
-                "linear-gradient(135deg,#22c55e,#16a34a)" :
-                `linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)`,
+                "linear-gradient(135deg,#16a34a,#22c55e)" :
+                "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
                 border: "none",
                 cursor: "pointer",
                 boxShadow: "0 4px 18px rgba(120,70,20,0.28)"
@@ -141,8 +158,8 @@ export default function IndustrySMSDemo({
                   height: "44px",
                   borderRadius: "9999px",
                   background: done ?
-                  "linear-gradient(135deg,#16a34a,#15803d)" :
-                  "linear-gradient(135deg,#0069C0 0%,#003B8F 40%,#002a6e 100%)",
+                  "linear-gradient(135deg,#15803d,#16a34a)" :
+                  "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
                   color: "#fff",
                   fontWeight: "700",
                   fontSize: "14px"
@@ -161,13 +178,13 @@ export default function IndustrySMSDemo({
 
           {/* Right: phone mockup */}
           <div
-            className="rounded-3xl overflow-hidden"
+            className="rounded-lg overflow-hidden"
             style={{
               background: "#1c1c1e",
               border: "8px solid #2c2c2e",
-              boxShadow: "0 24px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1)",
-              minHeight: "360px",
-              maxHeight: "520px",
+              boxShadow: "0 24px 60px rgba(0,59,143,0.18), inset 0 1px 0 rgba(255,255,255,0.1)",
+              minHeight: "420px",
+              maxHeight: "560px",
               display: "flex",
               flexDirection: "column"
             }}>
@@ -182,7 +199,7 @@ export default function IndustrySMSDemo({
               </div>
               <div>
                 <p className="text-xs font-bold text-white">{businessName}</p>
-                <p className="text-[10px] text-white/40">AI System · Text Message</p>
+                <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.68)" }}>AI System · Text Message</p>
               </div>
               <div className="ml-auto flex gap-1">
                 <span className="w-2 h-2 rounded-full" style={{ background: "#ff5f57" }} />
@@ -196,13 +213,32 @@ export default function IndustrySMSDemo({
               className="flex-1 overflow-y-auto px-4 py-4 space-y-3"
               style={{ background: "#1c1c1e" }}>
               
-              {visible.length === 0 && !running &&
-              <div className="flex items-center justify-center h-full">
-                  <p className="text-xs text-white/25 text-center">
-                    Press the button to see the automation run live →
+              {visible.length === 0 && !running && (
+              <div className="space-y-3">
+                  {normalizedMessages.slice(0, 2).map((msg, i) => (
+                    <div
+                      key={`preview-${i}`}
+                      className={`flex ${msg.from === "system" ? "justify-start" : "justify-end"}`}
+                    >
+                      <div
+                        className="rounded-2xl px-3 py-2.5 max-w-[82%]"
+                        style={{
+                          background: msg.from === "system" ? systemBubbleColor : "#3a3a3c",
+                          color: "#fff",
+                          fontSize: "12px",
+                          lineHeight: 1.55,
+                          borderRadius: msg.from === "system" ? "18px 18px 18px 4px" : "18px 18px 4px 18px",
+                        }}
+                      >
+                        <p style={{ whiteSpace: "pre-wrap" }}>{msg.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <p className="pt-4 text-center text-xs" style={{ color: "rgba(255,255,255,0.72)" }}>
+                    Press simulate to watch the full sequence run live.
                   </p>
                 </div>
-              }
+              )}
 
               {visible.map((msg, i) =>
               <div
@@ -215,12 +251,12 @@ export default function IndustrySMSDemo({
                   <div
                   className="rounded-2xl px-3 py-2.5 max-w-[82%]"
                   style={{
-                    background: msg.from === "system" ? accentColor : "#3a3a3c",
+                    background: msg.from === "system" ? systemBubbleColor : "#3a3a3c",
                     color: "#fff",
                     fontSize: "12px",
                     lineHeight: 1.55,
                     boxShadow: msg.from === "system" ?
-                    `0 4px 14px ${accentColor}55` :
+                    `0 4px 14px ${systemBubbleColor}55` :
                     "0 2px 8px rgba(0,0,0,0.25)",
                     borderRadius: msg.from === "system" ?
                     "18px 18px 18px 4px" :
@@ -247,7 +283,7 @@ export default function IndustrySMSDemo({
               <div className="flex justify-start">
                   <div
                   className="rounded-2xl px-4 py-3 flex items-center gap-1"
-                  style={{ background: accentColor, borderRadius: "18px 18px 18px 4px" }}>
+                  style={{ background: systemBubbleColor, borderRadius: "18px 18px 18px 4px" }}>
                   
                     {[0, 1, 2].map((d) =>
                   <span

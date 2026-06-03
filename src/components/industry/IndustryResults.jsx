@@ -2,10 +2,10 @@ import { ArrowRight } from "lucide-react";
 
 export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
   return (
-    <section id="results" className="py-16 md:py-20 px-4 md:px-6" style={{ background: "#ffffff", overflowX: "hidden" }}>
+    <section id="results" className="px-4 py-14 md:px-6 md:py-20" style={{ background: "#ffffff", overflowX: "hidden" }}>
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary mb-3">Launch Targets</p>
+        <div className="text-center mb-10">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">Launch Targets</p>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
             What This System Is Designed To Improve
           </h2>
@@ -15,14 +15,14 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
           {metrics.map((m, i) => (
             <div
               key={i}
-              className="rounded-2xl px-6 py-6 text-center"
+              className="rounded-lg px-6 py-7 text-center"
               style={{
                 background: "#ffffff",
-                border: "1.5px solid rgba(0,0,0,0.08)",
-                boxShadow: "0 4px 18px rgba(0,0,0,0.06)",
+                border: "1px solid rgba(0,136,204,0.15)",
+                boxShadow: "0 12px 34px rgba(0,59,143,0.08)",
               }}
             >
-              <p className="text-4xl font-black text-primary mb-2">{m.value}</p>
+              <p className="text-4xl md:text-5xl font-black text-primary mb-2">{m.value}</p>
               <p className="text-sm font-semibold text-foreground/80 leading-snug">{m.label}</p>
             </div>
           ))}
@@ -30,10 +30,10 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
 
         {testimonial && (
           <div
-            className="rounded-3xl px-8 py-8 mb-10 relative overflow-hidden"
+            className="rounded-lg px-6 py-7 md:px-8 md:py-8 mb-10 relative overflow-hidden"
             style={{
-              background: "linear-gradient(135deg, #7a4825 0%, #9a5c2e 46%, #c8965c 100%)",
-              boxShadow: "0 12px 40px rgba(122,72,37,0.25)",
+              background: "linear-gradient(135deg, #003B8F 0%, #006BB0 46%, #00AEEF 100%)",
+              boxShadow: "0 18px 48px rgba(0,59,143,0.22)",
             }}
           >
             <div
@@ -42,7 +42,7 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
             >
               "
             </div>
-            <p className="text-white text-lg md:text-xl font-medium leading-relaxed mb-5 relative z-10">
+            <p className="text-white text-base md:text-xl font-medium leading-relaxed mb-5 relative z-10">
               "{testimonial.quote}"
             </p>
             <div className="flex items-center gap-3 relative z-10">
@@ -65,7 +65,7 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
             type="button"
             onClick={onBookDemo}
             style={{
-              borderRadius: "9999px",
+              borderRadius: "8px",
               padding: "2px",
               background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
               boxShadow: "0 8px 28px rgba(0,174,239,0.4)",
@@ -81,7 +81,7 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
                 gap: "8px",
                 height: "52px",
                 padding: "0 36px",
-                borderRadius: "9999px",
+                borderRadius: "7px",
                 background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
                 color: "#ffffff",
                 fontWeight: "700",

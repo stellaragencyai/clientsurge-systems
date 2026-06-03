@@ -5,10 +5,10 @@ export default function IndustryFAQ({ faqs }) {
   const [open, setOpen] = useState(null);
 
   return (
-    <section className="py-20 px-6" style={{ overflowX: "hidden", background: "#ffffff" }}>
+    <section className="px-4 py-14 md:px-6 md:py-20" style={{ overflowX: "hidden", background: "linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)" }}>
       <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary mb-3">FAQ</p>
+        <div className="text-center mb-10">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">FAQ</p>
           <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
             Questions We Always Get
           </h2>
@@ -20,13 +20,13 @@ export default function IndustryFAQ({ faqs }) {
               key={i}
               className="rounded-2xl overflow-hidden"
               style={{
-                background: "rgba(255,255,255,0.9)",
+                background: "#ffffff",
                 border: open === i
-                  ? "1.5px solid rgba(154,92,46,0.35)"
-                  : "1.5px solid rgba(154,92,46,0.14)",
+                  ? "1px solid rgba(0,136,204,0.36)"
+                  : "1px solid rgba(0,136,204,0.14)",
                 boxShadow: open === i
-                  ? "0 6px 22px rgba(111,67,31,0.1)"
-                  : "0 2px 8px rgba(111,67,31,0.05)",
+                  ? "0 10px 28px rgba(0,59,143,0.1)"
+                  : "0 4px 14px rgba(0,59,143,0.04)",
                 transition: "all 0.2s ease",
               }}
             >
@@ -41,7 +41,7 @@ export default function IndustryFAQ({ faqs }) {
                   style={{
                     width: "18px",
                     height: "18px",
-                    color: "#9a5c2e",
+                    color: "#0088CC",
                     transform: open === i ? "rotate(180deg)" : "rotate(0deg)",
                   }}
                 />

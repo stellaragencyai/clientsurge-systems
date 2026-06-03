@@ -9,10 +9,10 @@ export default function IndustryAutomationUseCases({ industry }) {
   }
 
   return (
-    <section className="px-4 py-16 md:px-6 md:py-24" style={{ background: "#f8fbff" }}>
+    <section className="px-4 py-14 md:px-6 md:py-20" style={{ background: "linear-gradient(180deg, #f7fbff 0%, #eef7ff 100%)" }}>
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 text-center">
-          <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#005f99" }}>
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "#005f99" }}>
             Industry-specific workflows
           </p>
           <h2 className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
@@ -23,12 +23,15 @@ export default function IndustryAutomationUseCases({ industry }) {
           </p>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           {SIX_AUTOMATIONS.map((automation, index) => (
             <div
               key={automation.slug}
-              className="flex gap-4 rounded-lg border bg-white p-5"
-              style={{ borderColor: "rgba(0,174,239,0.14)" }}
+              className="flex gap-4 rounded-lg border bg-white p-5 md:p-6"
+              style={{
+                borderColor: "rgba(0,136,204,0.16)",
+                boxShadow: "0 10px 28px rgba(0,59,143,0.06)",
+              }}
             >
               <div
                 className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
