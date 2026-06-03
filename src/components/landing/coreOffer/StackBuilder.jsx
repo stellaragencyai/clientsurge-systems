@@ -215,7 +215,7 @@ export default function StackBuilder({ isOpen, onClose, systems = {} }) {
                                 <div className="flex justify-between pt-2 border-t">
                                   <span className="text-gray-600">Timeline:</span>
                                   <span className="font-semibold">
-                                    {system.timeline || "5-7 days"}
+                                    {system.timeline || "Confirmed after onboarding"}
                                   </span>
                                 </div>
                                 {system.features && (

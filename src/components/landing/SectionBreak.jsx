@@ -3,7 +3,7 @@ export default function SectionBreak() {
     <div className="bg-[#973535] py-24 opacity-100 rounded-none relative md:py-40 hidden"
 
     style={{
-      background: "linear-gradient(to bottom, transparent 0%, rgba(154,92,46,0.02) 20%, rgba(154,92,46,0.05) 50%, rgba(154,92,46,0.02) 80%, transparent 100%)"
+      background: "linear-gradient(to bottom, transparent 0%, rgba(0,136,204,0.02) 20%, rgba(0,136,204,0.05) 50%, rgba(0,136,204,0.02) 80%, transparent 100%)"
     }}>
       
       {/* Top soft fade-in from previous section */}
@@ -20,8 +20,8 @@ export default function SectionBreak() {
         <div
           className="absolute w-2/3 max-w-[360px] h-px"
           style={{
-            background: "linear-gradient(90deg, transparent 0%, rgba(154,92,46,0.18) 20%, rgba(154,92,46,0.28) 50%, rgba(154,92,46,0.18) 80%, transparent 100%)",
-            boxShadow: "0 0 32px rgba(200,150,92,0.18), 0 0 8px rgba(154,92,46,0.15)"
+            background: "linear-gradient(90deg, transparent 0%, rgba(0,136,204,0.18) 20%, rgba(0,174,239,0.28) 50%, rgba(0,136,204,0.18) 80%, transparent 100%)",
+            boxShadow: "0 0 32px rgba(0,174,239,0.18), 0 0 8px rgba(0,136,204,0.15)"
           }} />
         
 
@@ -29,8 +29,8 @@ export default function SectionBreak() {
         <div
           className="relative w-2 h-2 rounded-full z-10"
           style={{
-            background: "radial-gradient(circle, #9a5c2e 0%, rgba(154,92,46,0.5) 70%)",
-            boxShadow: "0 0 16px rgba(154,92,46,0.6), 0 0 32px rgba(200,150,92,0.3)",
+            background: "radial-gradient(circle, #00AEEF 0%, rgba(0,136,204,0.5) 70%)",
+            boxShadow: "0 0 16px rgba(0,174,239,0.6), 0 0 32px rgba(0,136,204,0.3)",
             animation: "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite"
           }} />
         

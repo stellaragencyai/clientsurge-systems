@@ -24,15 +24,15 @@ export default function FAQ() {
   });
 
   return (
-    <section id="faq" className="px-6 pt-10 pb-24 md:pb-32 relative overflow-hidden bg-gradient-to-b from-card to-background">
+    <section id="faq" className="px-4 pt-8 pb-20 md:px-6 md:pt-10 md:pb-32 relative overflow-hidden bg-gradient-to-b from-card to-background">
 
       <div className="max-w-3xl mx-auto relative z-10">
-        <div className="text-center mb-14">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Questions</p>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
+        <div className="text-center mb-8 md:mb-14">
+          <p className="text-[11px] md:text-xs font-semibold text-primary tracking-widest uppercase mb-3 md:mb-4">Questions</p>
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
            Frequently Asked Questions
           </h2>
-          <p className="mt-4 text-muted-foreground text-base">
+          <p className="mt-3 md:mt-4 text-muted-foreground text-sm md:text-base">
             Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">See your specific gaps</a> or <a href="/#pricing" className="text-primary font-semibold hover:underline">get your custom plan</a>
           </p>
           <div className="mt-8 border-t border-border/40" />
@@ -57,12 +57,12 @@ export default function FAQ() {
         </div>
 
         {/* Category filters */}
-        <div className="mb-6 flex flex-wrap gap-2">
+        <div className="mb-6 flex flex-wrap justify-center gap-2">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setCategory(cat)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-all ${
+              className={`px-3 py-1.5 rounded-full text-[11px] md:text-xs font-semibold uppercase tracking-wide transition-all ${
                 category === cat
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-foreground hover:bg-muted/80"

@@ -33,7 +33,6 @@ const navColumns = [
       { label: "HVAC & Home Services", href: "/hvac" },
       { label: "Roofing & Restoration", href: "/roofing" },
       { label: "Contractors & Trades", href: "/contractors" },
-      { label: "Tanning Salons", href: "/tanning" },
     ],
   },
   {
@@ -55,13 +54,7 @@ export default function Footer() {
     e.preventDefault();
     if (href.startsWith("/#")) {
       const anchor = href.slice(1);
-      if (location.pathname !== "/") {
-        navigate(`/${anchor}`);
-        return;
-      }
-      const el = document.querySelector(anchor);
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-      window.history.replaceState({}, "", `/${anchor}`);
+      navigate(`/${anchor}`);
     } else {
       window.scrollTo({ top: 0, behavior: "auto" });
       navigate(href);

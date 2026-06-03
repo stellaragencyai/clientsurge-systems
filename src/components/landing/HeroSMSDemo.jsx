@@ -188,7 +188,7 @@ export default function HeroSMSDemo() {
 
       {/* Caption + Replay */}
       <div style={{ textAlign: "center", marginTop: "14px" }}>
-        <p style={{ fontSize: "11px", color: "rgba(27,20,13,0.42)", letterSpacing: "0.04em", marginBottom: "6px" }}>
+        <p style={{ fontSize: "11px", color: "rgba(10,22,40,0.48)", letterSpacing: "0.04em", marginBottom: "6px" }}>
           Lead to booked appointment — fully automated
         </p>
         {done && (
@@ -196,8 +196,8 @@ export default function HeroSMSDemo() {
             onClick={runSequence}
             style={{
               display: "inline-flex", alignItems: "center", gap: "5px",
-              fontSize: "11px", fontWeight: "700", color: "#9a5c2e",
-              background: "rgba(154,92,46,0.08)", border: "1px solid rgba(154,92,46,0.25)",
+              fontSize: "11px", fontWeight: "700", color: "#0088CC",
+              background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,136,204,0.25)",
               borderRadius: "20px", padding: "5px 14px", cursor: "pointer",
             }}
           >

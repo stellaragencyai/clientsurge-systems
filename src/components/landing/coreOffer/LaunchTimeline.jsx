@@ -36,8 +36,8 @@ function TimelineSummaryBar({ activeStep, onStepClick }) {
       >
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs font-semibold text-foreground">Your estimated setup timeline</p>
-          <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(0,0,0,0.07)", color: "#1b140d" }}>
-            ~3–5 hours total
+          <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{ background: "rgba(0,136,204,0.09)", color: "#005f99" }}>
+            Plan confirmed after onboarding
           </span>
         </div>
 
@@ -181,13 +181,13 @@ export default function LaunchTimeline() {
     <div className="mt-16 md:mt-20">
       {/* Section Header — static, no animation */}
       <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3">
-        Get Live In 3–5 Hours
+        Launch Plan Confirmed After Onboarding
       </p>
       <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
         Our Process — Start To Launch
       </h3>
       <p className="text-center text-sm text-muted-foreground mb-10">
-        From first contact to fully live in 5 clear steps — most setups complete in 3–5 hours.
+        Every setup follows the same review, build, test, and launch path. Your exact timeline is confirmed after onboarding.
       </p>
 
       {/* Desktop horizontal tracker */}
@@ -268,18 +268,10 @@ export default function LaunchTimeline() {
         </div>
       </div>
 
-      {/* Detailed vertical timeline */}
-      <div className="relative">
-        <div
-          className="absolute left-6 md:left-1/2 top-0 w-0.5 hidden md:block pointer-events-none"
-          style={{ bottom: "-120px", background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 50%, rgba(0,174,239,0.6) 100%)", transform: "translateX(-50%)" }}
-        />
-
-        <div className="space-y-10 md:space-y-20 relative z-10">
-          {launchTimelineSteps.map((step, idx) => (
-            <StepRow key={step.id} step={step} idx={idx} />
-          ))}
-        </div>
+      <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-primary/15 bg-white px-5 py-4 text-center shadow-sm">
+        <p className="text-sm font-semibold text-foreground">
+          We keep this phase focused: confirm inputs, build the selected systems, test the handoffs, then launch with a clear go-live checklist.
+        </p>
       </div>
 
 

@@ -1,6 +1,20 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  Bot,
+  CalendarCheck,
+  CheckCircle2,
+  Mail,
+  MessageSquare,
+  PhoneCall,
+  RefreshCw,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Wallet,
+  Zap,
+} from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import {
   getSelectedIndustryRecommendation,
@@ -32,6 +46,21 @@ function SimpleCheck() {
   );
 }
 
+const SERVICE_ICONS = {
+  instant_lead_response: Zap,
+  missed_call_text_back: PhoneCall,
+  nurture_sequence_14d: RefreshCw,
+  ai_booking_agent: CalendarCheck,
+  lead_reactivation: RefreshCw,
+  review_request: Star,
+  email_campaign: Mail,
+  appointment_reminders: CalendarCheck,
+  customer_winback: RefreshCw,
+  website_chat: MessageSquare,
+  reputation_monitoring: ShieldCheck,
+  ai_qualification: Bot,
+};
+
 const STRIPE_LINKS = {
   starter_system: "/store",
   growth_system: "/store",
@@ -43,7 +72,7 @@ function formatMoney(amount) {
 }
 
 const ALA_CARTE = CANONICAL_SERVICE_PRODUCTS.map((product) => ({
-  emoji: product.icon || "",
+  Icon: SERVICE_ICONS[product.service_key] || Sparkles,
   name: product.name,
   desc: product.description,
   price: `${formatMoney(product.setup_fee)} setup · ${formatMoney(product.monthly_fee)}/mo`,
@@ -65,6 +94,7 @@ const plans = PACKAGE_OFFERS.map((offer) => ({
 export default function Pricing() {
   const demoBooking = useDemoBooking();
   const [selectedIndustry, setSelectedIndustry] = useState(null);
+  const [showAddOns, setShowAddOns] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -93,7 +123,7 @@ export default function Pricing() {
   return (
     <section
       id="pricing"
-      className="nebula-pricing pt-16 md:pt-28 pb-32 md:pb-40 px-6 overflow-visible"
+      className="nebula-pricing pt-14 md:pt-28 pb-24 md:pb-40 px-6 overflow-visible"
     >
       <div className="max-w-7xl mx-auto">
         <div className="max-w-3xl mx-auto text-center mb-16">
@@ -121,12 +151,12 @@ export default function Pricing() {
 
         <div className="flex flex-wrap justify-center gap-3 mb-8">
           {[
-            { icon: "Secure", text: "Secure Checkout via Stripe" },
-            { icon: "Clear", text: "No Hidden Fees" },
-            { icon: "Flexible", text: "Month-to-Month Only" },
-          ].map((badge) => (
+            { Icon: ShieldCheck, text: "Stripe checkout" },
+            { Icon: CheckCircle2, text: "No hidden fees" },
+            { Icon: Wallet, text: "Month-to-month" },
+          ].map(({ Icon, text }) => (
             <span
-              key={badge.text}
+              key={text}
               className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full border"
               style={{
                 background: "rgba(0,174,239,0.07)",
@@ -134,7 +164,7 @@ export default function Pricing() {
                 color: "rgba(0,80,160,0.85)",
               }}
             >
-              {badge.icon} {badge.text}
+              <Icon className="h-3.5 w-3.5" aria-hidden="true" /> {text}
             </span>
           ))}
         </div>
@@ -194,7 +224,15 @@ export default function Pricing() {
 
         <MoneyBackGuarantee />
 
-        <div className="mt-16">
+        <div className="mt-12 md:mt-16">
+          <button
+            type="button"
+            className="mx-auto mb-6 flex max-w-sm items-center justify-center rounded-full border border-primary/20 bg-white px-5 py-3 text-sm font-bold text-primary shadow-sm md:hidden"
+            onClick={() => setShowAddOns((value) => !value)}
+            aria-expanded={showAddOns}
+          >
+            {showAddOns ? "Hide A La Carte Add-Ons" : "Show A La Carte Add-Ons"}
+          </button>
           <div className="text-center mb-8">
             <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-2">
               A La Carte Add-Ons
@@ -204,8 +242,8 @@ export default function Pricing() {
               the same live checkout catalog used by the store.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {ALA_CARTE.map((item) => (
+          <div className={`${showAddOns ? "grid" : "hidden"} grid-cols-1 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6`}>
+            {ALA_CARTE.map(({ Icon, ...item }) => (
               <div
                 key={item.name}
                 className="flex flex-col rounded-2xl p-6"
@@ -215,7 +253,9 @@ export default function Pricing() {
                   backdropFilter: "blur(12px)",
                 }}
               >
-                <div className="text-3xl mb-3">{item.emoji}</div>
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-primary/15 bg-primary/8 text-primary">
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                </div>
                 <h4 className="font-semibold text-foreground text-sm mb-1">
                   {item.name}
                 </h4>
@@ -265,7 +305,7 @@ export default function Pricing() {
           width: 120px;
           height: 120px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(200,150,92,0.15) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(0,174,239,0.14) 0%, transparent 70%);
           pointer-events: none;
           z-index: 0;
         }
@@ -284,6 +324,9 @@ export default function Pricing() {
           white-space: nowrap;
         }
         @media (max-width: 640px) {
+          .nebula-pricing > div > .max-w-3xl {
+            margin-bottom: 2rem !important;
+          }
           .pricing-badge-float {
             position: relative;
             top: 0;
@@ -292,6 +335,9 @@ export default function Pricing() {
             display: flex;
             justify-content: center;
             margin-bottom: 8px;
+          }
+          .pricing-card .feature-list-extra {
+            display: none;
           }
         }
         .shiny-cta-btn {
@@ -418,7 +464,7 @@ function PricingCard({ plan, selectedIndustry }) {
         </div>
       ) : null}
 
-      <div className="p-6 opacity-100 flex flex-col flex-1 md:p-8 lg:p-10 relative z-10">
+      <div className="p-5 opacity-100 flex flex-col flex-1 md:p-8 lg:p-10 relative z-10">
         <div className="mb-7">
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">
             {plan.name}
@@ -467,11 +513,11 @@ function PricingCard({ plan, selectedIndustry }) {
           {plan.desc}
         </p>
 
-        <ul className="space-y-3.5 flex-1 mb-9">
+        <ul className="space-y-2.5 md:space-y-3.5 flex-1 mb-7 md:mb-9">
           {plan.features.map((feature, index) => (
             <li
               key={feature}
-              className="flex items-start gap-3"
+              className={`flex items-start gap-3 ${index > 3 ? "feature-list-extra" : ""}`}
               style={{
                 animation: `slideIn 0.5s ease-out ${index * 0.05}s both`,
               }}

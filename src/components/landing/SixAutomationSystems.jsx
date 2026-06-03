@@ -15,10 +15,10 @@ const ICONS = {
 
 export default function SixAutomationSystems() {
   return (
-    <section id="six-automations" className="px-4 py-16 md:px-6 md:py-24" style={{ background: "#ffffff" }}>
+    <section id="six-automations" className="px-4 py-12 md:px-6 md:py-20" style={{ background: "#ffffff" }}>
       <div className="mx-auto max-w-7xl">
         <motion.div
-          className="mb-10 max-w-3xl"
+          className="mb-8 md:mb-10 max-w-3xl"
           variants={revealContainer}
           initial="hidden"
           whileInView="visible"
@@ -37,7 +37,7 @@ export default function SixAutomationSystems() {
         </motion.div>
 
         <motion.div
-          className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+          className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
           variants={revealContainer}
           initial="hidden"
           whileInView="visible"
@@ -50,37 +50,33 @@ export default function SixAutomationSystems() {
               <motion.div
                 key={automation.slug}
                 variants={revealItem}
-                whileHover={{ y: -8, scale: 1.015 }}
+                whileHover={{ y: -5, scale: 1.01 }}
                 transition={{ duration: 0.25, ease: premiumEase }}
                 className="relative"
               >
                 <motion.span
                   aria-hidden="true"
-                  animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-                  transition={{ duration: 4.8, repeat: Infinity, ease: "linear", delay: index * 0.18 }}
                   style={{
                     position: "absolute",
                     inset: "-1px",
-                    borderRadius: "10px",
-                    background:
-                      "linear-gradient(115deg, rgba(0,174,239,0.08), rgba(0,174,239,0.38), rgba(0,59,143,0.08), rgba(0,174,239,0.08))",
-                    backgroundSize: "240% 240%",
+                    borderRadius: "8px",
+                    background: "rgba(0,136,204,0.14)",
                   }}
                 />
                 <Link
                   to={automation.routePath}
-                  className="cinematic-corner-card group relative block rounded-lg bg-white p-5 no-underline transition-shadow duration-200 hover:shadow-xl"
-                  style={{ border: "1px solid rgba(255,255,255,0.9)" }}
+                  className="cinematic-corner-card group relative block rounded-lg bg-white p-4 md:p-5 no-underline transition-shadow duration-200 hover:shadow-lg"
+                  style={{ border: "1px solid rgba(0,136,204,0.12)" }}
                 >
-                  <div className="mb-5 flex items-start justify-between gap-4">
+                  <div className="mb-4 flex items-start justify-between gap-4">
                     <MotionIconBadge className="h-11 w-11 rounded-lg">
                       <Icon className="h-5 w-5" style={{ color: "#0088CC" }} />
                     </MotionIconBadge>
                     <span className="text-xs font-bold text-muted-foreground">{String(index + 1).padStart(2, "0")}</span>
                   </div>
 
-                  <h3 className="mb-3 text-xl font-bold leading-tight text-foreground">{automation.title}</h3>
-                  <p className="mb-5 text-sm leading-6 text-muted-foreground">{automation.summary}</p>
+                  <h3 className="mb-2 text-base md:text-xl font-bold leading-tight text-foreground">{automation.title}</h3>
+                  <p className="mb-4 hidden text-sm leading-6 text-muted-foreground sm:block">{automation.summary}</p>
 
                   <div className="inline-flex items-center gap-2 text-sm font-bold" style={{ color: "#0088CC" }}>
                     See how it works

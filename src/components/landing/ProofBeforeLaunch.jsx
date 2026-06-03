@@ -1,4 +1,4 @@
-import { BarChart3, CheckCircle2, MessageSquareText, Workflow } from "lucide-react";
+import { ArrowRight, BarChart3, CheckCircle2, MessageSquareText, Workflow } from "lucide-react";
 
 const proofItems = [
   {
@@ -6,21 +6,21 @@ const proofItems = [
     label: "Example SMS conversation",
     title: "Missed call becomes an active lead",
     body: "A missed caller gets an immediate text-back, replies with the service they need, and lands in the follow-up queue instead of disappearing.",
-    proof: "Sorry we missed your call. What can we help you with today?",
+    proof: ["Missed call", "Instant text-back", "Lead replies"],
   },
   {
     icon: Workflow,
     label: "Before and after workflow",
     title: "Manual chasing becomes a clear sequence",
     body: "Forms, calls, ad leads, follow-up, booking, reviews, and reactivation move through one mapped system instead of separate inboxes.",
-    proof: "Lead captured -> AI follow-up -> booking handoff -> review request",
+    proof: ["Lead captured", "AI follow-up", "Booking handoff", "Review request"],
   },
   {
     icon: BarChart3,
     label: "Dashboard visibility",
     title: "Operators can see what is installed",
     body: "The admin workspace tracks package services, setup blockers, runtime tests, communication events, and go-live readiness.",
-    proof: "Paid order -> install workspace -> tested services -> live status",
+    proof: ["Paid order", "Install workspace", "Tested services", "Live status"],
   },
 ];
 
@@ -37,8 +37,8 @@ export default function ProofBeforeLaunch() {
               Show visitors what they are buying before they book.
             </h2>
             <p className="mt-5 text-base leading-7 text-muted-foreground">
-              The site now explains the offer, then backs it up with concrete previews of the automation flow:
-              messages, workflow handoffs, dashboard visibility, and the installation path after checkout.
+              See the actual customer journey before you book: how inquiries get answered, how follow-up stays organized,
+              and how installed services move from checkout to tested live status.
             </p>
             <div className="mt-7 space-y-3">
               {["Sample automation flows", "Example SMS language", "Before and after lead journey", "Admin install visibility"].map((item) => (
@@ -61,8 +61,13 @@ export default function ProofBeforeLaunch() {
                 </div>
                 <h3 className="text-lg font-bold text-foreground">{title}</h3>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{body}</p>
-                <div className="mt-4 rounded-md border border-sky-100 bg-sky-50 px-3 py-2 text-xs font-semibold text-slate-700">
-                  {proof}
+                <div className="mt-4 flex flex-wrap items-center gap-2 rounded-md border border-sky-100 bg-sky-50 px-3 py-2 text-xs font-semibold text-slate-700">
+                  {proof.map((step, index) => (
+                    <span key={step} className="inline-flex items-center gap-2">
+                      <span className="rounded-full bg-white px-2 py-1 text-[11px] text-slate-700 shadow-sm">{step}</span>
+                      {index < proof.length - 1 ? <ArrowRight className="h-3.5 w-3.5 text-sky-700" aria-hidden="true" /> : null}
+                    </span>
+                  ))}
                 </div>
               </article>
             ))}

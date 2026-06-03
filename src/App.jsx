@@ -211,7 +211,7 @@ function AppInner() {
   return null;
 }
 
-// SectionRedirect — just navigate to home, no auto-scroll
+// SectionRedirect — preserve the intended home anchor for lazy-mounted sections.
 function SectionRedirect({ hash }) {
   const navigate = useNavigate();
 
@@ -221,7 +221,7 @@ function SectionRedirect({ hash }) {
       description: "Done-for-you automation that helps appointment-based businesses respond faster, follow up consistently, and book more appointments.",
       canonicalPath: "/",
     });
-    navigate("/", { replace: true });
+    navigate(`/${hash}`, { replace: true });
     return cleanupMetadata;
   }, [hash, navigate]);
 

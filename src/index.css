@@ -170,9 +170,34 @@ img { max-width: 100%; height: auto; }
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
+  --cs-nav-height: 76px;
+  --cs-anchor-offset: calc(var(--cs-nav-height) + 24px);
+  --cs-floating-bottom: max(20px, calc(20px + var(--sab)));
 }
 .safe-top    { padding-top: max(12px, var(--sat)); }
 .safe-bottom { padding-bottom: max(12px, var(--sab)); }
+
+[id] {
+  scroll-margin-top: var(--cs-anchor-offset);
+}
+
+main,
+.landing-main,
+.public-page-shell {
+  scroll-padding-top: var(--cs-anchor-offset);
+}
+
+.cs-floating-control {
+  bottom: var(--cs-floating-bottom);
+}
+
+@media (max-width: 767px) {
+  :root {
+    --cs-nav-height: 68px;
+    --cs-anchor-offset: calc(var(--cs-nav-height) + 18px);
+    --cs-floating-bottom: max(92px, calc(92px + var(--sab)));
+  }
+}
 
 /* 4. iOS Safari: kill tap flash, enable fast tapping */
 a, button, [role="button"], label, input, select, textarea {
@@ -629,12 +654,18 @@ img[style*="object-fit"] {
   height: 100%;
 }
 
-/* 3. content-visibility for off-screen sections (Chrome/Edge perf boost) */
-@supports (content-visibility: auto) {
-  section:not(:first-of-type):not(:nth-of-type(2)) {
-    content-visibility: auto;
-    contain-intrinsic-size: 0 600px;
-  }
+.cs-section-skeleton {
+  min-height: clamp(180px, 22vw, 320px);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(226,238,248,0.72), rgba(255,255,255,0.9), rgba(226,238,248,0.72));
+  background-size: 220% 100%;
+  animation: csSkeletonSheen 1.4s ease-in-out infinite;
+}
+
+@keyframes csSkeletonSheen {
+  from { background-position: 120% 0; }
+  to { background-position: -120% 0; }
 }
 
 /* 4. Scrollbar styling — consistent cross-browser thin scrollbar */

@@ -30,10 +30,10 @@ export default function StardustOverlay({ seed = 42, opacity = 0.55 }) {
       speed: rand() * 0.0003 + 0.0001,
       phase: rand() * Math.PI * 2,
       color: rand() > 0.65
-        ? `rgba(245, 217, 168,`   // warm gold
+        ? `rgba(0, 174, 239,`
         : rand() > 0.4
-          ? `rgba(255, 240, 200,`  // pale cream
-          : `rgba(200, 150, 92,`,  // amber
+          ? `rgba(255, 255, 255,`
+          : `rgba(0, 59, 143,`,
     }));
 
     let w = 0, h = 0;

@@ -25,15 +25,15 @@ function DetailBlock({ label, value }) {
         className="px-4 py-3"
         style={{
           background: "#ffffff",
-          borderBottom: "1px solid rgba(212,184,142,0.25)",
+          borderBottom: "1px solid rgba(0,174,239,0.16)",
         }}
       >
-        <p className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "#9a5c2e" }}>
+        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary">
           {label}
         </p>
       </div>
       <div className="px-4 py-4" style={{ background: "#ffffff" }}>
-        <p className="text-sm leading-6" style={{ color: "rgba(27,20,13,0.7)" }}>{value}</p>
+        <p className="text-sm leading-6 text-foreground/70">{value}</p>
       </div>
     </div>
   );
@@ -59,9 +59,9 @@ export default function SystemDetailPanel({ systemId, onBookDemo, onPrevious, on
             className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 relative overflow-hidden"
             style={{
               background:
-                "linear-gradient(180deg, rgba(255,249,241,0.96) 0%, rgba(246,232,214,0.9) 100%)",
-              border: "1px solid rgba(205,164,114,0.5)",
-              boxShadow: `0 8px 20px rgba(154,92,46,0.2), ${flowIconGlow}`,
+                "linear-gradient(180deg, rgba(240,249,255,0.98) 0%, rgba(224,242,254,0.92) 100%)",
+              border: "1px solid rgba(0,174,239,0.25)",
+              boxShadow: `0 8px 20px rgba(0,59,143,0.12), ${flowIconGlow}`,
             }}
           >
             <div
@@ -88,7 +88,7 @@ export default function SystemDetailPanel({ systemId, onBookDemo, onPrevious, on
         </div>
       </div>
 
-      <div className="mt-6 pt-6 border-t border-[rgba(154,92,46,0.12)]">
+      <div className="mt-6 pt-6 border-t border-primary/12">
         <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-primary mb-4">
           What This Includes
         </p>
@@ -103,7 +103,7 @@ export default function SystemDetailPanel({ systemId, onBookDemo, onPrevious, on
                 boxShadow: `${flowInnerFrame}, inset 0 1px 0 rgba(255,255,255,0.04)`,
               }}
             >
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" style={{ color: "#ffd49a" }} />
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-white" />
               <span className="text-sm font-medium" style={{ color: flowTextLight }}>{item}</span>
             </div>
           ))}
@@ -114,14 +114,14 @@ export default function SystemDetailPanel({ systemId, onBookDemo, onPrevious, on
         <button
           type="button"
           onClick={onPrevious}
-          className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-foreground border border-[rgba(154,92,46,0.16)] bg-white/70 hover:bg-white transition-colors"
+          className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-foreground border border-primary/15 bg-white/70 hover:bg-white transition-colors"
         >
           Previous System
         </button>
         <button
           type="button"
           onClick={onNext}
-          className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-foreground border border-[rgba(154,92,46,0.16)] bg-white/70 hover:bg-white transition-colors"
+          className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-foreground border border-primary/15 bg-white/70 hover:bg-white transition-colors"
         >
           Next System
         </button>
@@ -139,8 +139,8 @@ export default function SystemDetailPanel({ systemId, onBookDemo, onPrevious, on
             borderRadius: "9999px",
             padding: "2px",
             background:
-              "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-            boxShadow: "0 4px 18px rgba(120,70,20,0.3)",
+              "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+            boxShadow: "0 4px 18px rgba(0,174,239,0.35)",
             border: "none",
             cursor: "pointer",
           }}
@@ -154,8 +154,8 @@ export default function SystemDetailPanel({ systemId, onBookDemo, onPrevious, on
               height: "44px",
               padding: "0 24px",
               borderRadius: "9999px",
-              background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-              color: "#f5e6d0",
+              background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
+              color: "#ffffff",
               fontWeight: "700",
               fontSize: "0.95rem",
             }}

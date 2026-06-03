@@ -80,10 +80,10 @@ const industries = [
   icon: Sparkles,
   name: "Med Spas & Aesthetic Clinics",
   accent: {
-    color: "#f472b6",
-    soft: "rgba(244,114,182,0.18)",
-    glow: "rgba(244,114,182,0.36)",
-    iconBg: "rgba(244,114,182,0.2)"
+    color: "#38bdf8",
+    soft: "rgba(56,189,248,0.18)",
+    glow: "rgba(56,189,248,0.28)",
+    iconBg: "rgba(56,189,248,0.18)"
   },
   image:
   "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/741357982_Gemini_Generated_Image_hdkpn1hdkpn1hdkp.png"
@@ -93,10 +93,10 @@ const industries = [
   icon: Heart,
   name: "Dental & Orthodontics",
   accent: {
-    color: "#38bdf8",
-    soft: "rgba(56,189,248,0.18)",
-    glow: "rgba(56,189,248,0.34)",
-    iconBg: "rgba(56,189,248,0.18)"
+    color: "#0ea5e9",
+    soft: "rgba(14,165,233,0.18)",
+    glow: "rgba(14,165,233,0.28)",
+    iconBg: "rgba(14,165,233,0.18)"
   },
   image:
   "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95"
@@ -106,10 +106,10 @@ const industries = [
   icon: Building2,
   name: "Chiropractic & Physical Therapy",
   accent: {
-    color: "#a78bfa",
-    soft: "rgba(167,139,250,0.18)",
-    glow: "rgba(167,139,250,0.34)",
-    iconBg: "rgba(167,139,250,0.18)"
+    color: "#2563eb",
+    soft: "rgba(37,99,235,0.16)",
+    glow: "rgba(37,99,235,0.24)",
+    iconBg: "rgba(37,99,235,0.16)"
   },
   image:
   "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=1200&q=95"
@@ -119,10 +119,10 @@ const industries = [
   icon: Wrench,
   name: "HVAC, Plumbing & Home Services",
   accent: {
-    color: "#22c55e",
-    soft: "rgba(34,197,94,0.18)",
-    glow: "rgba(34,197,94,0.34)",
-    iconBg: "rgba(34,197,94,0.18)"
+    color: "#0284c7",
+    soft: "rgba(2,132,199,0.18)",
+    glow: "rgba(2,132,199,0.28)",
+    iconBg: "rgba(2,132,199,0.18)"
   },
   image:
   "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=95"
@@ -132,10 +132,10 @@ const industries = [
   icon: Home,
   name: "Roofing & Restoration",
   accent: {
-    color: "#f97316",
-    soft: "rgba(249,115,22,0.18)",
-    glow: "rgba(249,115,22,0.34)",
-    iconBg: "rgba(249,115,22,0.18)"
+    color: "#075985",
+    soft: "rgba(7,89,133,0.18)",
+    glow: "rgba(7,89,133,0.28)",
+    iconBg: "rgba(7,89,133,0.18)"
   },
   image:
   "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/3fcc65c06_Screenshot2026-04-21185605.png"
@@ -145,10 +145,10 @@ const industries = [
   icon: MapPin,
   name: "Contractors & Trades",
   accent: {
-    color: "#facc15",
-    soft: "rgba(250,204,21,0.18)",
-    glow: "rgba(250,204,21,0.34)",
-    iconBg: "rgba(250,204,21,0.18)"
+    color: "#1d4ed8",
+    soft: "rgba(29,78,216,0.16)",
+    glow: "rgba(29,78,216,0.24)",
+    iconBg: "rgba(29,78,216,0.16)"
   },
   image:
   "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=95"
@@ -172,8 +172,8 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
     <div
       className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[28px] mx-auto"
       style={{
-        background: "linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(250,245,239,0.94) 100%)",
-        border: "1.5px solid rgba(154,92,46,0.22)",
+        background: "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(240,249,255,0.96) 100%)",
+        border: "1.5px solid rgba(0,136,204,0.18)",
         boxShadow: "0 50px 130px rgba(0,0,0,0.45)"
       }}
       onClick={(e) => e.stopPropagation()}>
@@ -212,7 +212,7 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
           {/* Recommended package */}
           <div
           className="rounded-2xl px-5 py-5"
-          style={{ background: "rgba(255,255,255,0.78)", border: "1px solid rgba(154,92,46,0.14)" }}>
+          style={{ background: "rgba(255,255,255,0.82)", border: "1px solid rgba(0,136,204,0.14)" }}>
           
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-2">Recommended Package</p>
             <h4 className="text-xl font-semibold text-foreground">{recommendation.recommendedPackage?.name}</h4>
@@ -259,7 +259,7 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
         </div>
 
         {/* Footer CTAs */}
-        <div className="px-7 py-5 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end" style={{ borderTop: "1px solid rgba(154,92,46,0.12)", background: "rgba(255,255,255,0.6)" }}>
+        <div className="px-7 py-5 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end" style={{ borderTop: "1px solid rgba(0,136,204,0.12)", background: "rgba(255,255,255,0.68)" }}>
           <a href="/store" className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
             See The AI Store <ArrowRight className="w-4 h-4" />
           </a>
@@ -392,7 +392,8 @@ export default function Industries() {
                 decoding="async"
                 width="600"
                 height="442"
-                className="absolute inset-0 h-full w-full object-cover" />
+                className="absolute inset-0 h-full w-full object-cover"
+                style={{ filter: "saturate(0.86) contrast(1.04) brightness(0.82)" }} />
               
               {/* Unique per-industry SVG texture pattern */}
               {industryPatterns[industry.id]}
@@ -402,8 +403,8 @@ export default function Industries() {
                 className="absolute inset-0"
                 style={{
                   background: highlighted ?
-                  `linear-gradient(to bottom, rgba(10,10,14,0.2) 0%, ${accent.soft} 42%, rgba(10,10,14,0.78) 100%)` :
-                  `linear-gradient(to bottom, rgba(10,10,14,0.12) 0%, rgba(10,10,14,0.18) 38%, rgba(10,10,14,0.72) 100%)`
+                  `linear-gradient(to bottom, rgba(0,35,82,0.18) 0%, ${accent.soft} 42%, rgba(0,22,54,0.82) 100%)` :
+                  `linear-gradient(to bottom, rgba(0,35,82,0.18) 0%, rgba(0,80,160,0.24) 38%, rgba(0,22,54,0.78) 100%)`
                 }} />
               
 
@@ -488,7 +489,7 @@ export default function Industries() {
             onClick={() => setModalOpen(false)}
             style={{
               position: "fixed", inset: 0, zIndex: 199,
-              background: "rgba(4,2,1,0.35)",
+              background: "rgba(0,22,54,0.38)",
               backdropFilter: "blur(8px) saturate(0.8)",
               WebkitBackdropFilter: "blur(8px) saturate(0.8)"
             }} />

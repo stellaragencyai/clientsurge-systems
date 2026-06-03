@@ -104,11 +104,11 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       {/* Scroll-driven spine line */}
-      <div style={{ position: "absolute", left: "-28px", top: 0, bottom: 0, width: "2px", background: "rgba(154,92,46,0.08)", borderRadius: "2px" }} className="hidden md:block">
+      <div style={{ position: "absolute", left: "-28px", top: 0, bottom: 0, width: "2px", background: "rgba(0,136,204,0.08)", borderRadius: "2px" }} className="hidden md:block">
         <div style={{
           position: "absolute", top: 0, left: 0, width: "100%",
           height: `${spineProgress * 100}%`,
-          background: "linear-gradient(180deg, #9a5c2e 0%, #c8965c 60%, rgba(200,150,92,0.4) 100%)",
+          background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 60%, rgba(0,174,239,0.4) 100%)",
           borderRadius: "2px",
           transition: "height 0.1s linear",
         }} />
@@ -116,8 +116,8 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
           position: "absolute", bottom: `${(1 - spineProgress) * 100}%`,
           left: "50%", transform: "translateX(-50%)",
           width: "8px", height: "8px", borderRadius: "50%",
-          background: "#c8965c",
-          boxShadow: "0 0 10px rgba(200,150,92,0.8)",
+          background: "#00AEEF",
+          boxShadow: "0 0 10px rgba(0,174,239,0.8)",
           transition: "bottom 0.1s linear",
         }} />
       </div>
@@ -247,9 +247,9 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
                   display: "inline-flex", alignItems: "center", gap: "6px",
                   borderRadius: "9999px", padding: "8px 18px",
                   fontSize: "12px", fontWeight: "700",
-                  background: isFeatured ? "rgba(255,255,255,0.1)" : "rgba(154,92,46,0.08)",
-                  border: isFeatured ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(154,92,46,0.2)",
-                  color: isFeatured ? "rgba(255,255,255,0.8)" : "#9a5c2e",
+                  background: isFeatured ? "rgba(255,255,255,0.1)" : "rgba(0,136,204,0.08)",
+                  border: isFeatured ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(0,136,204,0.2)",
+                  color: isFeatured ? "rgba(255,255,255,0.8)" : "#0088CC",
                   cursor: "pointer", transition: "all 0.2s",
                 }}
               >

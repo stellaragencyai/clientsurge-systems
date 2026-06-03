@@ -124,15 +124,7 @@ export default function Navbar() {
     setOpen(false);
     setIndustriesOpen(false);
 
-    if (location.pathname === "/") {
-      // Already on home — scroll directly
-      const id = href.startsWith("#") ? href.slice(1) : href;
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    } else {
-      // Navigate to home only — no auto-scroll
-      navigate("/");
-    }
+    navigate(`/${href}`);
   };
 
   const handleLogoClick = (e) => {
@@ -144,14 +136,18 @@ export default function Navbar() {
   return (
     <nav
       aria-label="Main navigation"
-      className="fixed top-0 left-0 right-0 z-50"
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
         paddingTop: "env(safe-area-inset-top)",
-        background: "transparent",
+        background: scrolled || open ? "rgba(255,255,255,0.94)" : "rgba(255,255,255,0.82)",
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
+        borderBottom: scrolled || open ? "1px solid rgba(0,136,204,0.14)" : "1px solid rgba(0,136,204,0.08)",
+        boxShadow: scrolled ? "0 14px 40px rgba(0,45,90,0.08)" : "0 1px 0 rgba(0,136,204,0.04)",
         overflow: "visible",
       }}>
       
-      <div className="w-full flex items-center justify-between px-4 md:px-6" style={{ height: "clamp(64px, 7vw, 82px)", paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
+      <div className="w-full flex items-center justify-between px-4 md:px-6" style={{ height: "var(--cs-nav-height)", paddingLeft: "max(1.25rem, env(safe-area-inset-left))", paddingRight: "max(1.25rem, env(safe-area-inset-right))" }}>
         <button
           onClick={handleLogoClick}
           className="shrink-0 bg-none border-none cursor-pointer transition-transform duration-300 hover:-translate-y-0.5"
@@ -159,8 +155,8 @@ export default function Navbar() {
           <span
             style={{
               display: "block",
-              width: "clamp(150px, 18vw, 220px)",
-              height: "clamp(52px, 6vw, 72px)",
+              width: "clamp(132px, 17vw, 204px)",
+              height: "clamp(44px, 5.2vw, 64px)",
               overflow: "hidden",
             }}
           >
@@ -171,12 +167,12 @@ export default function Navbar() {
               height="72"
               decoding="async"
               style={{
-                height: "clamp(96px, 11vw, 126px)",
+                height: "clamp(80px, 9.5vw, 112px)",
                 width: "auto",
                 maxWidth: "none",
                 objectFit: "contain",
                 display: "block",
-                transform: "translate(-18px, -24px)",
+                transform: "translate(-15px, -20px)",
               }}
             />
           </span>
@@ -210,7 +206,7 @@ export default function Navbar() {
                 left: 0,
                 height: "2px",
                 width: "100%",
-                background: "linear-gradient(90deg, #c8965c, #f5d9a8, #c8965c)",
+                background: "linear-gradient(90deg, #00AEEF, #009DFF, #003B8F)",
                 borderRadius: "1px",
                 transform: "scaleX(0)",
                 transformOrigin: "left",
@@ -293,7 +289,7 @@ export default function Navbar() {
         <button
           className="xl:hidden w-10 h-10 rounded-full border bg-background/90 backdrop-blur flex items-center justify-center text-foreground shadow-sm"
           onClick={() => setOpen(!open)}
-          style={{ borderColor: "rgba(200,150,92,0.2)" }}
+          style={{ borderColor: "rgba(0,136,204,0.22)" }}
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={open}>
           

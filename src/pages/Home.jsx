@@ -1,4 +1,5 @@
-import { useEffect, lazy, Suspense, useRef, useState } from "react";
+import { useEffect, lazy, Suspense } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import HomepageConversionContent from "../components/landing/HomepageConversionContent";
@@ -47,50 +48,38 @@ function useHomepageWhiteCanvas() {
   }, []);
 }
 
-function LazyHomepageSection({ children, fallback, minHeight = 360 }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    if (isVisible) {
-      return undefined;
-    }
-
-    if (typeof IntersectionObserver === "undefined") {
-      setIsVisible(true);
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "200px" }
-    );
-
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
-
-    return () => observer.disconnect();
-  }, [isVisible]);
-
-  return (
-    <div ref={ref} style={{ minHeight: isVisible ? undefined : minHeight }}>
-      {isVisible ? (
-        <Suspense fallback={fallback}>{children}</Suspense>
-      ) : (
-        fallback
-      )}
-    </div>
-  );
+function LazyHomepageSection({ children, fallback }) {
+  return <Suspense fallback={fallback}>{children}</Suspense>;
 }
 
 export default function Home() {
   useHomepageWhiteCanvas();
+  const location = useLocation();
+  useEffect(() => {
+    if (!location.hash) {
+      return undefined;
+    }
+
+    const id = decodeURIComponent(location.hash.slice(1));
+    let attempts = 0;
+    let timeoutId;
+
+    const scrollToHashTarget = () => {
+      const target = document.getElementById(id);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      if (attempts < 24) {
+        attempts += 1;
+        timeoutId = window.setTimeout(scrollToHashTarget, 125);
+      }
+    };
+
+    timeoutId = window.setTimeout(scrollToHashTarget, 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [location.hash]);
 
   useEffect(() => {
     let cleanupMetadata = () => {};
@@ -135,7 +124,7 @@ export default function Home() {
         <Navbar />
         <Hero />
         <HomepageConversionContent />
-        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={900}>
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
           <SixAutomationSystems />
           <SectionBreak />
           <ProofBeforeLaunch />
@@ -143,17 +132,17 @@ export default function Home() {
           <Industries />
           <SectionBreak />
         </LazyHomepageSection>
-        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={420}>
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
           <TrustBar />
           <SectionBreak />
         </LazyHomepageSection>
-        <LazyHomepageSection fallback={<LargeSectionSkeleton />} minHeight={900}>
+        <LazyHomepageSection fallback={<LargeSectionSkeleton />}>
           <CoreOffer />
           <SectionBreak />
           <Pricing />
           <SectionBreak />
         </LazyHomepageSection>
-        <LazyHomepageSection fallback={<SectionSkeleton />} minHeight={900}>
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
           <FAQ />
           <SectionBreak />
           <FounderSection />

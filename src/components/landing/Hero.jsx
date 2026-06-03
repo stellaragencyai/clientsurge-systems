@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle2, Clock, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDemoBooking } from "./DemoBookingContext";
 import CascadingChecklistItem from "@/components/visual-effects/CascadingChecklistItem";
@@ -15,6 +15,12 @@ const checklist = [
   "Appointment booking",
   "Review requests",
   "Customer reactivation",
+];
+
+const trustItems = [
+  { icon: ShieldCheck, label: "No long-term contracts" },
+  { icon: Clock, label: "Timeline confirmed after onboarding" },
+  { icon: CheckCircle2, label: "Done-for-you launch support" },
 ];
 
 function HeroDashboardStaticPreview({ onActivate }) {
@@ -44,7 +50,7 @@ function HeroDashboardStaticPreview({ onActivate }) {
           overflow: "hidden",
           borderRadius: "20px",
           background: "linear-gradient(150deg, #0d1f3c 0%, #0a2a5e 24%, #071535 58%, #061028 100%)",
-          minHeight: "520px",
+          minHeight: "440px",
           color: "#ffffff",
           fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
           position: "relative"
@@ -254,12 +260,12 @@ export default function Hero() {
           zIndex: 2,
           maxWidth: "1400px",
           margin: "0 auto",
-          padding: "clamp(7rem, 12vw, 10rem) clamp(1.5rem, 5vw, 4rem) clamp(3rem, 6vw, 5rem)",
+          padding: "clamp(6rem, 9vw, 8rem) clamp(1.5rem, 5vw, 4rem) clamp(2.5rem, 5vw, 4rem)",
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
           gap: "clamp(32px, 5vw, 64px)",
           alignItems: "center",
-          minHeight: "100svh"
+          minHeight: "92svh"
         }}>
         
         <div className="landing-hero__copy" style={{ gridColumn: "1", marginBottom: "0px", textAlign: "left", maxWidth: "100%", position: "relative", zIndex: 10 }}>
@@ -269,22 +275,22 @@ export default function Hero() {
             className="landing-hero__headline"
             style={{
               fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-              fontSize: "clamp(2rem, 5.2vw, 3.8rem)",
+              fontSize: "clamp(2.2rem, 4.5vw, 3.35rem)",
               fontWeight: "700",
-              lineHeight: 1.1,
+              lineHeight: 1.03,
               letterSpacing: "0",
-              color: "#1b140d",
+              color: "hsl(var(--foreground))",
               marginBottom: "16px"
             }}>
             
-            AI Automation Systems That Help Local Businesses Capture Leads, Follow Up Faster, Book More Appointments, and{" "}
+            AI Automation Systems for Faster Local Bookings{" "}
             <span
               style={{
-                color: "#0063A3",
+                color: "#006BB0",
                 display: "inline"
               }}>
               
-              Recover Lost Revenue
+              and Recovered Revenue
             </span>
           </h1>
 
@@ -295,13 +301,13 @@ export default function Hero() {
             className="landing-hero__body"
             style={{
               fontSize: "clamp(0.95rem, 2.2vw, 1.05rem)",
-              color: "rgba(27,20,13,0.74)",
-              lineHeight: 1.65,
-              maxWidth: "560px",
+              color: "rgba(10,22,40,0.76)",
+              lineHeight: 1.55,
+              maxWidth: "540px",
               margin: "0 0 18px"
             }}>
             
-            ClientSurge Systems installs six done-for-you automations for service businesses: lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation. The website, CRM handoff, and AI workflow are packaged as one remote launch system.
+            ClientSurge installs the website, CRM handoff, and six AI workflows that capture leads, recover missed calls, follow up, book appointments, request reviews, and reactivate old opportunities.
           </p>
 
           <div
@@ -322,7 +328,7 @@ export default function Hero() {
               alignItems: "center",
               justifyContent: "flex-start",
               WebkitTapHighlightColor: "transparent",
-              marginTop: "32px"
+              marginTop: "24px"
             }}>
             
             <button
@@ -378,22 +384,21 @@ export default function Hero() {
             </Link>
           </div>
 
-          <p
-            style={{
-              marginTop: "18px",
-              fontSize: "12px",
-              color: "rgba(27,20,13,0.68)",
-              letterSpacing: "0.04em"
-            }}>
-            No contracts - launch timeline confirmed after onboarding
-          </p>
+          <div className="landing-hero__trustRow" aria-label="Trust details">
+            {trustItems.map(({ icon: Icon, label }) => (
+              <span key={label}>
+                <Icon aria-hidden="true" />
+                {label}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div
           className="landing-hero__visualWrap"
           style={{
             position: "relative",
-            minHeight: "520px",
+            minHeight: "450px",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -406,12 +411,12 @@ export default function Hero() {
             style={{
               position: "absolute",
               width: "90%",
-              height: "72%",
+              height: "62%",
               borderRadius: "36px",
               background:
               "radial-gradient(circle at center, rgba(0,174,239,0.18) 0%, rgba(0,157,255,0.08) 38%, transparent 72%)",
               filter: "blur(36px)",
-              transform: "translateY(6%)"
+              transform: "translateY(-2%)"
             }} />
           
 
@@ -478,7 +483,7 @@ export default function Hero() {
             grid-template-columns: 1fr !important;
             gap: 32px !important;
             min-height: auto !important;
-            padding-top: clamp(5rem, 12vw, 7rem) !important;
+            padding-top: clamp(5.25rem, 11vw, 6.75rem) !important;
           }
           .landing-hero__visualWrap {
             display: flex !important;
@@ -504,9 +509,9 @@ export default function Hero() {
             display: none !important;
           }
           .landing-hero__headline {
-            font-size: clamp(2rem, 8.5vw, 3.4rem) !important;
-            line-height: 1.05 !important;
-            letter-spacing: -0.025em !important;
+            font-size: clamp(2rem, 7.5vw, 2.75rem) !important;
+            line-height: 1.02 !important;
+            letter-spacing: 0 !important;
             max-width: 680px !important;
             margin-left: auto !important;
             margin-right: auto !important;
@@ -514,8 +519,8 @@ export default function Hero() {
             text-wrap: balance !important;
           }
           .landing-hero__body {
-            font-size: 1rem !important;
-            line-height: 1.7 !important;
+            font-size: 0.98rem !important;
+            line-height: 1.55 !important;
           }
           .landing-hero__checklist {
             gap: 8px !important;
@@ -524,6 +529,7 @@ export default function Hero() {
             flex-direction: column !important;
             align-items: stretch !important;
             gap: 10px !important;
+            margin-top: 20px !important;
           }
           .landing-hero__actions > * {
             width: 100% !important;
@@ -537,6 +543,14 @@ export default function Hero() {
           .hero-check-item span {
             font-size: 13px !important;
           }
+          .landing-hero__trustRow {
+            justify-content: center !important;
+            gap: 8px !important;
+          }
+          .landing-hero__trustRow span {
+            width: 100% !important;
+            justify-content: center !important;
+          }
         }
 
         /* iPhone SE (375px) and smaller */
@@ -546,7 +560,7 @@ export default function Hero() {
             padding-right: 1rem !important;
           }
           .landing-hero__headline {
-            font-size: clamp(1.85rem, 9vw, 2.4rem) !important;
+            font-size: clamp(1.8rem, 8vw, 2.25rem) !important;
             max-width: 22rem !important;
           }
           .landing-hero__body {
@@ -557,9 +571,34 @@ export default function Hero() {
         /* iPhone SE specific (320px) */
         @media (max-width: 360px) {
           .landing-hero__headline {
-            font-size: 1.75rem !important;
-            letter-spacing: -0.02em !important;
+            font-size: 1.65rem !important;
+            letter-spacing: 0 !important;
           }
+        }
+        .landing-hero__trustRow {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 18px;
+        }
+        .landing-hero__trustRow span {
+          display: inline-flex;
+          min-height: 34px;
+          align-items: center;
+          gap: 7px;
+          border-radius: 999px;
+          border: 1px solid rgba(0,136,204,0.16);
+          background: rgba(0,174,239,0.06);
+          padding: 7px 11px;
+          color: rgba(10,22,40,0.74);
+          font-size: 11px;
+          font-weight: 700;
+        }
+        .landing-hero__trustRow svg {
+          width: 14px;
+          height: 14px;
+          color: #0088CC;
+          flex-shrink: 0;
         }
       `}</style>
     </section>);

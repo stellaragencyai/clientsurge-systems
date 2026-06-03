@@ -290,13 +290,13 @@ export default function CoreOffer() {
   return (
     <section
       id="services"
-      className="pt-16 md:pt-28 pb-24 md:pb-32 px-4 md:px-6 bg-gradient-to-b from-card via-background via-70% to-slate-50/30 relative overflow-hidden"
+      className="pt-12 md:pt-20 pb-16 md:pb-24 px-4 md:px-6 bg-gradient-to-b from-card via-background via-70% to-slate-50/30 relative overflow-hidden"
       style={{ overflowX: "hidden" }}>
       
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse 80% 100% at 50% 0%, rgba(154,92,46,0.08) 0%, transparent 70%)" }} />
+        style={{ background: "radial-gradient(ellipse 80% 100% at 50% 0%, rgba(0,136,204,0.08) 0%, transparent 70%)" }} />
       
 
       <div className="max-w-6xl mx-auto relative z-10 pt-10">
@@ -319,14 +319,14 @@ export default function CoreOffer() {
         </motion.div>
 
         {/* 2-col layout: vertical timeline + iPhone SMS demo */}
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-16 items-start">
+        <div className="flex flex-col lg:flex-row gap-10 lg:gap-12 items-start">
           <div className="flex-1 min-w-0">
             <VerticalTimeline
               selectedSystemId={selectedSystemId}
               onSystemSelect={setSelectedSystemId}
               onBookDemo={() => setShowBookingModal(true)} />
           </div>
-          <div className="lg:sticky lg:top-28 flex-shrink-0 flex flex-col items-center self-start w-full lg:w-auto">
+          <div className="core-offer-phone lg:sticky lg:top-24 flex-shrink-0 flex flex-col items-center self-start w-full lg:w-auto">
             <Suspense fallback={<div style={{ width: 300, height: 560 }} />}>
               <HeroSMSDemo />
             </Suspense>
@@ -343,6 +343,20 @@ export default function CoreOffer() {
         systems={systemsById} />
       
       {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
+      <style>{`
+        .core-offer-phone {
+          z-index: 2;
+          max-width: 320px;
+          margin-left: auto;
+          margin-right: auto;
+          transform-origin: top center;
+        }
+        @media (min-width: 1024px) {
+          .core-offer-phone {
+            transform: scale(0.92);
+          }
+        }
+      `}</style>
     </section>);
 
 }

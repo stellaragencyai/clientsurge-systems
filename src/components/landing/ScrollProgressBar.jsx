@@ -21,7 +21,7 @@ export default function ScrollProgressBar() {
     <motion.div
       className="fixed top-0 left-0 h-1 z-[49]"
       style={{
-        background: "linear-gradient(90deg, #9a5c2e 0%, #c8965c 50%, #7a4825 100%)",
+        background: "linear-gradient(90deg, #00AEEF 0%, #009DFF 50%, #003B8F 100%)",
         width: springProgress,
         scaleX: 1,
         transformOrigin: "left",

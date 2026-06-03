@@ -84,7 +84,7 @@ export default function IndustryModal({ industry, onClose }) {
 
           {/* Trust signal */}
           <p className="text-center text-xs text-muted-foreground mt-4">
-            Live in 5–7 days • No long-term contracts • Money-back guarantee
+            Launch timeline confirmed after onboarding • No long-term contracts • Money-back guarantee
           </p>
         </div>
       </div>

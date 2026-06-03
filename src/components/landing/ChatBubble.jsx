@@ -108,19 +108,19 @@ export default function ChatBubble() {
       {/* Chat window */}
       {open && (
         <div
-          className="fixed bottom-32 right-5 sm:right-8 z-[9990] w-[calc(100vw-2.5rem)] sm:w-96 flex flex-col rounded-3xl overflow-hidden shadow-2xl"
+          className="cs-chat-window fixed right-5 sm:right-8 z-[9990] w-[calc(100vw-2.5rem)] sm:w-96 flex flex-col rounded-3xl overflow-hidden shadow-2xl"
           style={{
             maxHeight: "min(580px, calc(100dvh - 120px))",
             border: "2px solid transparent",
             background:
-              "linear-gradient(white, white) padding-box, linear-gradient(135deg,#a0714f,#c8965c,#f5d9a8,#c8965c,#7a4f2e) border-box",
-            boxShadow: "0 20px 60px rgba(100,60,20,0.25), 0 4px 16px rgba(100,60,20,0.15)",
+              "linear-gradient(white, white) padding-box, linear-gradient(135deg,#00AEEF,#009DFF,#003B8F) border-box",
+            boxShadow: "0 20px 60px rgba(0,80,160,0.22), 0 4px 16px rgba(0,80,160,0.12)",
           }}
         >
           {/* Header */}
           <div
             className="flex items-center justify-between px-5 py-4 flex-shrink-0"
-            style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 60%,#c8965c 100%)" }}
+            style={{ background: "linear-gradient(135deg,#003B8F 0%,#006BB0 55%,#00AEEF 100%)" }}
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center">
@@ -130,7 +130,7 @@ export default function ChatBubble() {
                 <p className="text-white font-semibold text-sm leading-tight">ClientSurge AI</p>
                 <div className="flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                  <p className="text-amber-200/80 text-[11px]">Online · Typically replies instantly</p>
+                  <p className="text-sky-100/85 text-[11px]">Online · Typically replies instantly</p>
                 </div>
               </div>
             </div>
@@ -143,7 +143,7 @@ export default function ChatBubble() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ background: "hsl(40,30%,98%)" }}>
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ background: "#f6fbff" }}>
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 {msg.role === "assistant" && (
@@ -159,8 +159,8 @@ export default function ChatBubble() {
                   }`}
                   style={
                     msg.role === "user"
-                      ? { background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }
-                      : { background: "white", border: "1px solid rgba(154,92,46,0.15)", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }
+                      ? { background: "linear-gradient(135deg,#006BB0,#003B8F)" }
+                      : { background: "white", border: "1px solid rgba(0,136,204,0.15)", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }
                   }
                 >
                   {msg.content}
@@ -168,7 +168,7 @@ export default function ChatBubble() {
                     <button
                       onClick={() => setShowBookingModal(true)}
                       className="mt-2 block w-full text-center text-xs font-bold py-1.5 rounded-xl text-white"
-                      style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+                      style={{ background: "linear-gradient(135deg,#006BB0,#003B8F)" }}
                     >
                       Open Booking Form →
                     </button>
@@ -184,7 +184,7 @@ export default function ChatBubble() {
                 </div>
                 <div
                   className="rounded-2xl rounded-bl-sm px-4 py-3"
-                  style={{ background: "white", border: "1px solid rgba(154,92,46,0.15)" }}
+                  style={{ background: "white", border: "1px solid rgba(0,136,204,0.15)" }}
                 >
                   <div className="flex gap-1 items-center">
                     <span className="w-1.5 h-1.5 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -199,7 +199,7 @@ export default function ChatBubble() {
 
           {/* Quick questions (only at start) */}
           {messages.length === 1 && (
-            <div className="px-4 pb-3 flex flex-wrap gap-2" style={{ background: "hsl(40,30%,98%)" }}>
+            <div className="px-4 pb-3 flex flex-wrap gap-2" style={{ background: "#f6fbff" }}>
               {QUICK_QUESTIONS.map((q) => (
                 <button
                   key={q}
@@ -207,12 +207,12 @@ export default function ChatBubble() {
                   disabled={loading || cooldown}
                   className="text-xs font-semibold px-3 py-1.5 rounded-full border transition-all disabled:opacity-50"
                   style={{
-                    borderColor: "rgba(154,92,46,0.3)",
-                    color: "#7a4825",
-                    background: "rgba(154,92,46,0.06)",
+                    borderColor: "rgba(0,136,204,0.24)",
+                    color: "#005f99",
+                    background: "rgba(0,174,239,0.06)",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(154,92,46,0.12)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(154,92,46,0.06)")}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,174,239,0.12)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(0,174,239,0.06)")}
                 >
                   {q}
                 </button>
@@ -223,7 +223,7 @@ export default function ChatBubble() {
           {/* Input */}
           <div
             className="flex items-center gap-2 px-4 py-3 border-t flex-shrink-0"
-            style={{ borderColor: "rgba(154,92,46,0.15)", background: "white" }}
+            style={{ borderColor: "rgba(0,136,204,0.15)", background: "white" }}
           >
             <input
               ref={inputRef}
@@ -238,7 +238,7 @@ export default function ChatBubble() {
               onClick={() => sendMessage()}
               disabled={!input.trim() || loading || cooldown}
               className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-40"
-              style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+              style={{ background: "linear-gradient(135deg,#006BB0,#003B8F)" }}
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 text-white animate-spin" />
@@ -251,13 +251,13 @@ export default function ChatBubble() {
           {/* Book demo CTA footer */}
           <div
             className="px-4 py-2.5 flex items-center justify-between"
-            style={{ background: "rgba(154,92,46,0.05)", borderTop: "1px solid rgba(154,92,46,0.1)" }}
+            style={{ background: "rgba(0,174,239,0.06)", borderTop: "1px solid rgba(0,136,204,0.12)" }}
           >
             <p className="text-[11px] text-muted-foreground">Free 15-min demo · No commitment</p>
             <button
               onClick={() => setShowBookingModal(true)}
               className="text-[11px] font-bold px-3 py-1 rounded-full text-white"
-              style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+              style={{ background: "linear-gradient(135deg,#006BB0,#003B8F)" }}
             >
               Make the Leap →
             </button>
@@ -269,7 +269,7 @@ export default function ChatBubble() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label="Open chat"
-        className="fixed bottom-5 right-5 sm:right-8 z-[9991] h-14 px-4 rounded-full flex items-center gap-2.5 shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
+        className="cs-chat-button fixed right-5 sm:right-8 z-[9991] h-14 px-4 rounded-full flex items-center gap-2.5 shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
         style={{
           background: open
             ? "linear-gradient(135deg,#006BB0,#003B8F)"
@@ -300,6 +300,27 @@ export default function ChatBubble() {
           0%   { box-shadow: 0 0 0 0 rgba(0,174,239,0.55), 0 8px 24px rgba(0,100,200,0.35); }
           50%  { box-shadow: 0 0 0 12px rgba(0,174,239,0), 0 8px 24px rgba(0,100,200,0.35); }
           100% { box-shadow: 0 0 0 0 rgba(0,174,239,0), 0 8px 24px rgba(0,100,200,0.35); }
+        }
+        .cs-chat-button {
+          bottom: max(20px, calc(20px + env(safe-area-inset-bottom, 0px)));
+        }
+        .cs-chat-window {
+          bottom: max(92px, calc(92px + env(safe-area-inset-bottom, 0px)));
+        }
+        @media (max-width: 767px) {
+          .cs-chat-button {
+            bottom: max(92px, calc(92px + env(safe-area-inset-bottom, 0px)));
+            right: 14px;
+            height: 50px;
+            padding-left: 14px;
+            padding-right: 14px;
+          }
+          .cs-chat-window {
+            right: 12px;
+            bottom: max(150px, calc(150px + env(safe-area-inset-bottom, 0px)));
+            width: calc(100vw - 24px);
+            max-height: min(520px, calc(100dvh - 180px)) !important;
+          }
         }
       `}</style>
 

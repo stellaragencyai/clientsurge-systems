@@ -75,7 +75,7 @@ export default function HomepageConversionContent() {
   return (
     <section
       aria-labelledby="ai-automation-overview"
-      className="px-4 md:px-6 py-16 md:py-24"
+      className="px-4 py-12 md:px-6 md:py-20"
       style={{ background: "#ffffff" }}
     >
       <div className="max-w-6xl mx-auto">
@@ -102,7 +102,7 @@ export default function HomepageConversionContent() {
         </motion.div>
 
         <motion.div
-          className="mt-10 flex flex-wrap gap-2"
+          className="mt-8 flex flex-wrap gap-2"
           aria-label="Industries served"
           variants={revealContainer}
           initial="hidden"
@@ -123,7 +123,7 @@ export default function HomepageConversionContent() {
         </motion.div>
 
         <motion.div
-          className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+          className="mt-10 grid gap-3 md:gap-4 md:grid-cols-2 lg:grid-cols-3"
           variants={revealContainer}
           initial="hidden"
           whileInView="visible"
@@ -133,12 +133,10 @@ export default function HomepageConversionContent() {
             <CinematicCard
               as={motion.article}
               key={title}
-              className="rounded-2xl border border-border bg-card p-5 shadow-sm"
+              className="rounded-lg border border-border bg-card p-4 md:p-5 shadow-sm"
               variants={revealItem}
-              animate={{ y: [0, index % 2 === 0 ? -5 : -8, 0] }}
               whileHover={{ y: -7, scale: 1.015 }}
               transition={{
-                y: { duration: 5.2 + index * 0.24, repeat: Infinity, ease: "easeInOut" },
                 scale: { duration: 0.25 },
               }}
             >
@@ -166,7 +164,7 @@ export default function HomepageConversionContent() {
           ))}
         </motion.div>
 
-        <div className="mt-16 grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+        <div className="mt-12 md:mt-16 grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <motion.div
             initial={{ opacity: 0, x: -28 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -225,7 +223,7 @@ export default function HomepageConversionContent() {
             {steps.map((step, index) => (
               <motion.article
                 key={step.title}
-                className="cinematic-data-pulse flex gap-4 rounded-2xl border border-border bg-white p-5 shadow-sm"
+                className="cinematic-data-pulse flex gap-4 rounded-lg border border-border bg-white p-4 md:p-5 shadow-sm"
                 variants={revealItem}
               >
                 <span

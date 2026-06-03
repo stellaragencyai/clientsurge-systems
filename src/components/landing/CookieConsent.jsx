@@ -68,7 +68,7 @@ export default function CookieConsent() {
 
   return (
     <div
-      className="fixed inset-x-3 z-50 mx-auto max-w-sm md:inset-x-auto md:left-5 md:mx-0"
+      className="fixed left-3 right-auto z-50 max-w-[300px] md:left-5"
       style={{
         bottom: offsetForMobileCallBar
           ? "max(96px, calc(96px + env(safe-area-inset-bottom, 0px)))"
@@ -79,7 +79,7 @@ export default function CookieConsent() {
       aria-label="Cookie preferences"
     >
       <div 
-        className="rounded-2xl shadow-lg border backdrop-blur-md p-4 space-y-3"
+        className="rounded-xl shadow-lg border backdrop-blur-md p-3 space-y-2"
         style={{
           background: 'rgba(255,255,255,0.95)',
           borderColor: 'rgba(0,0,0,0.1)',
@@ -88,7 +88,7 @@ export default function CookieConsent() {
       >
         {/* Header with close */}
         <div className="flex items-start justify-between gap-3">
-          <h3 className="font-semibold text-sm text-foreground">Cookie Preferences</h3>
+          <h3 className="font-semibold text-xs text-foreground">Cookie Preferences</h3>
           <button
             onClick={handleDismiss}
             className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
@@ -99,7 +99,7 @@ export default function CookieConsent() {
         </div>
 
         {/* Message */}
-        <p className="text-xs text-muted-foreground leading-relaxed">
+        <p className="text-[11px] text-muted-foreground leading-relaxed">
           We use cookies to enhance your experience and analyze site traffic. By continuing to use this site, you agree to our{' '}
           <a 
             href="/privacy-policy"
@@ -110,16 +110,16 @@ export default function CookieConsent() {
           .
         </p>
         {/* Actions */}
-        <div className="flex gap-3 pt-1">
+        <div className="flex gap-2 pt-1">
           <button
             onClick={handleDecline}
-            className="flex-1 px-4 py-2 text-xs font-medium text-muted-foreground hover:text-foreground border border-border rounded-lg transition-colors"
+            className="flex-1 px-3 py-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground border border-border rounded-lg transition-colors"
           >
             Decline
           </button>
           <button
             onClick={handleAccept}
-            className="flex-1 px-4 py-2 text-xs font-medium text-white rounded-lg transition-all"
+            className="flex-1 px-3 py-1.5 text-[11px] font-medium text-white rounded-lg transition-all"
             style={{
               background: 'linear-gradient(135deg,#0088cc 0%,#00aaff 100%)',
               boxShadow: '0 4px 12px rgba(0,170,255,0.25)'
