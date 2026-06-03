@@ -16,6 +16,9 @@ import worker, {
   SERVICE_WORKER_JS,
   SECURITY_TXT,
   shouldInjectHomepageMotion,
+  TRUST_SECURITY_INJECTION,
+  TRUST_SECURITY_SECTION_ID,
+  TRUST_SECURITY_STYLE_ID,
 } from "../cloudflare/clientsurge-security-edge-worker.mjs";
 import {
   evaluateEdgeHealthProbe,
@@ -156,6 +159,24 @@ test("Cloudflare homepage motion injection is scoped and idempotent", () => {
   assert.equal(injectHomepageMotion(injected), injected);
   assert.equal((injected.match(new RegExp(HOMEPAGE_MOTION_STYLE_ID, "g")) || []).length, 1);
   assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_MOTION_STYLE_ID), true);
+});
+
+test("Cloudflare homepage injection adds the trust and security section before the footer", () => {
+  const injected = injectHomepageMotion("<html><head></head><body><main id=\"root\"></main><footer>Footer</footer></body></html>");
+
+  assert.match(injected, new RegExp(TRUST_SECURITY_STYLE_ID));
+  assert.match(injected, new RegExp(TRUST_SECURITY_SECTION_ID));
+  assert.match(injected, /Your Trust & Security/);
+  assert.match(injected, /Are Our Priority/);
+  assert.match(injected, /SSL Secure/);
+  assert.match(injected, /Stripe Secure Payment/);
+  assert.match(injected, /30-Day Money-Back Guarantee/);
+  assert.match(injected, /Verified & Trusted/);
+  assert.match(injected, /GDPR Compliant/);
+  assert.match(injected, /cs-stripe-word/);
+  assert.match(injected, /cs-gdpr-word/);
+  assert.equal(injectHomepageMotion(injected), injected);
+  assert.equal(TRUST_SECURITY_INJECTION.includes(TRUST_SECURITY_STYLE_ID), true);
 });
 
 test("production security verifier checks the Cloudflare security layer probe", () => {
