@@ -468,15 +468,16 @@ export const TRUST_SECURITY_SCRIPT = `<script>
     footer.parentNode.insertBefore(buildSection(), footer);
     return true;
   };
-  if (insert()) return;
   let attempts = 0;
+  insert();
   const observer = new MutationObserver(() => {
-    if (insert()) observer.disconnect();
+    insert();
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
   const interval = window.setInterval(() => {
     attempts += 1;
-    if (insert() || attempts > 120) {
+    insert();
+    if (attempts > 120) {
       window.clearInterval(interval);
       observer.disconnect();
     }
