@@ -20,6 +20,7 @@ const FounderSection = lazy(() => import("../components/landing/FounderSection")
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
+const SecurityPriority = lazy(() => import("../components/landing/SecurityPriority"));
 
 import {
   getFAQSchema,
@@ -150,6 +151,9 @@ export default function Home() {
           <Testimonials />
           <SectionBreak />
           <FinalCTA />
+        </LazyHomepageSection>
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <SecurityPriority />
         </LazyHomepageSection>
         <Footer />
         <ChatBubble />
