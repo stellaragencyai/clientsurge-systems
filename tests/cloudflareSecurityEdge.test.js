@@ -20,6 +20,7 @@ import worker, {
   TRUST_SECURITY_CLIENT_JS,
   TRUST_SECURITY_SECTION_ID,
   TRUST_SECURITY_SCRIPT_PATH,
+  TRUST_SECURITY_STYLE,
   TRUST_SECURITY_STYLE_ID,
 } from "../cloudflare/clientsurge-security-edge-worker.mjs";
 import {
@@ -188,8 +189,13 @@ test("Cloudflare homepage injection adds the trust and security section before t
   assert.match(TRUST_SECURITY_CLIENT_JS, /30-Day Money-Back Guarantee/);
   assert.match(TRUST_SECURITY_CLIENT_JS, /Verified & Trusted/);
   assert.match(TRUST_SECURITY_CLIENT_JS, /GDPR Compliant/);
-  assert.match(TRUST_SECURITY_CLIENT_JS, /cs-stripe-word/);
-  assert.match(TRUST_SECURITY_CLIENT_JS, /cs-gdpr-word/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /\/trust-security\/satisfaction-guarantee\.webp/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /\/trust-security\/secure-ssl-encryption\.webp/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /\/trust-security\/stripe-secure-payment\.webp/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /\/trust-security\/verified-seal\.webp/);
+  assert.match(TRUST_SECURITY_CLIENT_JS, /\/trust-security\/gdpr-compliant\.webp/);
+  assert.match(TRUST_SECURITY_STYLE, /background: transparent/);
+  assert.match(TRUST_SECURITY_STYLE, /box-shadow: none/);
   assert.equal(injectHomepageMotion(injected), injected);
   assert.equal(TRUST_SECURITY_INJECTION.includes(TRUST_SECURITY_STYLE_ID), true);
 });
