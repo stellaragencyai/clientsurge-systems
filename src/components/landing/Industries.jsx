@@ -86,7 +86,7 @@ const industries = [
     iconBg: "rgba(56,189,248,0.18)"
   },
   image:
-  "https://images.unsplash.com/photo-1643684391140-c5056cfd3436"
+  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/741357982_Gemini_Generated_Image_hdkpn1hdkpn1hdkp.png"
 },
 {
   id: "dental",
@@ -99,7 +99,7 @@ const industries = [
     iconBg: "rgba(14,165,233,0.18)"
   },
   image:
-  "https://images.unsplash.com/photo-1777331903190-341a3dd0441b"
+  "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95"
 },
 {
   id: "chiro-pt",
@@ -112,7 +112,7 @@ const industries = [
     iconBg: "rgba(37,99,235,0.16)"
   },
   image:
-  "https://images.unsplash.com/photo-1768507423533-b87b62769758"
+  "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=1200&q=95"
 },
 {
   id: "hvac",
@@ -125,7 +125,7 @@ const industries = [
     iconBg: "rgba(2,132,199,0.18)"
   },
   image:
-  "https://images.unsplash.com/photo-1718203862467-c33159fdc504"
+  "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=95"
 },
 {
   id: "roofing",
@@ -138,7 +138,7 @@ const industries = [
     iconBg: "rgba(7,89,133,0.18)"
   },
   image:
-  "https://images.unsplash.com/photo-1635424709961-f3a150459ad4"
+  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/3fcc65c06_Screenshot2026-04-21185605.png"
 },
 {
   id: "contractors",
@@ -151,7 +151,7 @@ const industries = [
     iconBg: "rgba(29,78,216,0.16)"
   },
   image:
-  "https://images.unsplash.com/photo-1504307651254-35680f356dfd"
+  "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=95"
 }];
 
 
@@ -354,9 +354,9 @@ export default function Industries() {
           const isSelected = selectedIndustryId === industry.id;
           const accent = industry.accent;
           const imageProps = buildResponsiveImageProps(industry.image, {
-            widths: [640, 960, 1200, 1600, 2000],
+            widths: [480, 720, 960, 1200],
             sizes: "(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw",
-            quality: 90,
+            quality: 80,
           });
 
           return (
