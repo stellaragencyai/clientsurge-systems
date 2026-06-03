@@ -492,7 +492,7 @@ export const TRUST_SECURITY_CLIENT_JS = TRUST_SECURITY_SCRIPT
   .replace(/^<script>\n?/, "")
   .replace(/\n?<\/script>$/, "");
 
-export const TRUST_SECURITY_SCRIPT_TAG = `<script src="${TRUST_SECURITY_SCRIPT_PATH}" defer></script>`;
+export const TRUST_SECURITY_SCRIPT_TAG = `<script src="${TRUST_SECURITY_SCRIPT_PATH}"></script>`;
 
 export const TRUST_SECURITY_INJECTION = `${TRUST_SECURITY_STYLE}${TRUST_SECURITY_SCRIPT_TAG}`;
 
