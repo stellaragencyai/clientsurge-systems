@@ -52,6 +52,7 @@ self.addEventListener("fetch", (event) => {
 
 export const HOMEPAGE_MOTION_HEADER = "x-clientsurge-homepage-motion";
 export const HOMEPAGE_MOTION_STYLE_ID = "clientsurge-edge-cinematic-motion";
+export const HOMEPAGE_ORDER_STYLE_ID = "clientsurge-edge-homepage-order";
 export const TRUST_SECURITY_STYLE_ID = "clientsurge-edge-trust-security";
 export const TRUST_SECURITY_SECTION_ID = "clientsurge-trust-security";
 
@@ -206,6 +207,18 @@ export const HOMEPAGE_MOTION_STYLE = `<style id="${HOMEPAGE_MOTION_STYLE_ID}">
 }
 </style>`;
 
+export const HOMEPAGE_ORDER_STYLE = `<style id="${HOMEPAGE_ORDER_STYLE_ID}">
+.landing-hero {
+  min-height: 76svh !important;
+  padding-bottom: clamp(2.25rem, 4vw, 3.5rem) !important;
+}
+.landing-hero__actions,
+.hero-checklist,
+.landing-hero__trustRow {
+  display: none !important;
+}
+</style>`;
+
 export const HOMEPAGE_MOTION_SCRIPT = `<script>
 (() => {
   const hooks = [
@@ -236,7 +249,77 @@ export const HOMEPAGE_MOTION_SCRIPT = `<script>
 })();
 </script>`;
 
-export const HOMEPAGE_MOTION_INJECTION = `${HOMEPAGE_MOTION_STYLE}${HOMEPAGE_MOTION_SCRIPT}`;
+export const HOMEPAGE_ORDER_SCRIPT = `<script>
+(() => {
+  const mark = (status) => {
+    document.documentElement.setAttribute("data-clientsurge-homepage-order", status);
+  };
+
+  const removeHeroExtras = (hero) => {
+    for (const selector of [".landing-hero__actions", ".hero-checklist", ".landing-hero__trustRow"]) {
+      hero.querySelectorAll(selector).forEach((node) => node.remove());
+    }
+  };
+
+  const moveTrustBeforeFooter = () => {
+    const footer = document.querySelector("footer");
+    const trust = document.querySelector(".security-priority, #${TRUST_SECURITY_SECTION_ID}");
+    if (footer && trust && footer.parentNode && trust.nextElementSibling !== footer) {
+      footer.parentNode.insertBefore(trust, footer);
+    }
+  };
+
+  const applyOrder = () => {
+    const hero = document.querySelector(".landing-hero");
+    const industries = document.querySelector("#industries");
+    if (!hero || !industries || !hero.parentNode || hero.parentNode !== industries.parentNode) {
+      moveTrustBeforeFooter();
+      mark("waiting");
+      return false;
+    }
+
+    removeHeroExtras(hero);
+
+    let removed = 0;
+    let node = hero.nextElementSibling;
+    while (node && node !== industries) {
+      const next = node.nextElementSibling;
+      node.remove();
+      removed += 1;
+      node = next;
+    }
+
+    moveTrustBeforeFooter();
+    mark("applied:" + removed);
+    return hero.nextElementSibling === industries;
+  };
+
+  if (applyOrder()) return;
+
+  let attempts = 0;
+  const observer = new MutationObserver(() => {
+    attempts += 1;
+    if (applyOrder() || attempts > 160) observer.disconnect();
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+
+  const interval = window.setInterval(() => {
+    attempts += 1;
+    if (applyOrder() || attempts > 160) {
+      window.clearInterval(interval);
+      observer.disconnect();
+    }
+  }, 250);
+
+  window.setTimeout(() => {
+    window.clearInterval(interval);
+    observer.disconnect();
+    applyOrder();
+  }, 45000);
+})();
+</script>`;
+
+export const HOMEPAGE_MOTION_INJECTION = `${HOMEPAGE_MOTION_STYLE}${HOMEPAGE_ORDER_STYLE}${HOMEPAGE_MOTION_SCRIPT}${HOMEPAGE_ORDER_SCRIPT}`;
 
 export const TRUST_SECURITY_STYLE = `<style id="${TRUST_SECURITY_STYLE_ID}">
 #${TRUST_SECURITY_SECTION_ID} {
@@ -483,6 +566,16 @@ export function injectHomepageMotion(html) {
     nextHtml = nextHtml.includes("</body>")
       ? nextHtml.replace("</body>", `${HOMEPAGE_MOTION_SCRIPT}</body>`)
       : `${nextHtml}${HOMEPAGE_MOTION_SCRIPT}`;
+  }
+
+  if (!nextHtml.includes(HOMEPAGE_ORDER_STYLE_ID)) {
+    nextHtml = nextHtml.includes("</head>")
+      ? nextHtml.replace("</head>", `${HOMEPAGE_ORDER_STYLE}</head>`)
+      : `${HOMEPAGE_ORDER_STYLE}${nextHtml}`;
+
+    nextHtml = nextHtml.includes("</body>")
+      ? nextHtml.replace("</body>", `${HOMEPAGE_ORDER_SCRIPT}</body>`)
+      : `${nextHtml}${HOMEPAGE_ORDER_SCRIPT}`;
   }
 
   if (!nextHtml.includes(TRUST_SECURITY_STYLE_ID)) {

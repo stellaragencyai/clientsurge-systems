@@ -9,6 +9,9 @@ import worker, {
   HOMEPAGE_MOTION_HEADER,
   HOMEPAGE_MOTION_INJECTION,
   HOMEPAGE_MOTION_STYLE_ID,
+  HOMEPAGE_ORDER_SCRIPT,
+  HOMEPAGE_ORDER_STYLE,
+  HOMEPAGE_ORDER_STYLE_ID,
   injectHomepageMotion,
   isSensitivePath,
   originRequestFor,
@@ -155,9 +158,11 @@ test("Cloudflare security edge worker injects the simplified homepage cinematic 
     assert.equal(response.headers.get(HOMEPAGE_MOTION_HEADER), "edge-v1");
     assert.match(response.headers.get("cache-control") || "", /no-store/);
     assert.match(body, new RegExp(HOMEPAGE_MOTION_STYLE_ID));
+    assert.match(body, new RegExp(HOMEPAGE_ORDER_STYLE_ID));
     assert.match(body, /ambient-sweep/);
     assert.match(body, /headline-sheen/);
     assert.match(body, /dashboard-float-scan/);
+    assert.match(body, /data-clientsurge-homepage-order/);
     assert.doesNotMatch(body, /checklist-cascade/);
     assert.doesNotMatch(body, /cta-energy/);
     assert.match(body, /MutationObserver/);
@@ -184,7 +189,9 @@ test("Cloudflare homepage motion injection is scoped and idempotent", () => {
   const injected = injectHomepageMotion("<html><head></head><body></body></html>");
   assert.equal(injectHomepageMotion(injected), injected);
   assert.equal((injected.match(new RegExp(HOMEPAGE_MOTION_STYLE_ID, "g")) || []).length, 1);
+  assert.equal((injected.match(new RegExp(HOMEPAGE_ORDER_STYLE_ID, "g")) || []).length, 1);
   assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_MOTION_STYLE_ID), true);
+  assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_ORDER_STYLE_ID), true);
 });
 
 test("Cloudflare homepage injection adds the trust and security section before the footer", () => {
@@ -210,6 +217,19 @@ test("Cloudflare homepage injection adds the trust and security section before t
   assert.match(TRUST_SECURITY_STYLE, /box-shadow: none/);
   assert.equal(injectHomepageMotion(injected), injected);
   assert.equal(TRUST_SECURITY_INJECTION.includes(TRUST_SECURITY_STYLE_ID), true);
+});
+
+test("Cloudflare homepage order patch removes only sections between hero and industries", () => {
+  assert.match(HOMEPAGE_ORDER_STYLE, /\.landing-hero__actions/);
+  assert.match(HOMEPAGE_ORDER_STYLE, /\.hero-checklist/);
+  assert.match(HOMEPAGE_ORDER_STYLE, /\.landing-hero__trustRow/);
+  assert.match(HOMEPAGE_ORDER_STYLE, /min-height: 76svh/);
+  assert.match(HOMEPAGE_ORDER_SCRIPT, /document\.querySelector\("\.landing-hero"\)/);
+  assert.match(HOMEPAGE_ORDER_SCRIPT, /document\.querySelector\("#industries"\)/);
+  assert.match(HOMEPAGE_ORDER_SCRIPT, /while \(node && node !== industries\)/);
+  assert.match(HOMEPAGE_ORDER_SCRIPT, /node\.remove\(\)/);
+  assert.match(HOMEPAGE_ORDER_SCRIPT, /\.security-priority, #clientsurge-trust-security/);
+  assert.match(HOMEPAGE_ORDER_SCRIPT, /insertBefore\(trust, footer\)/);
 });
 
 test("production security verifier checks the Cloudflare security layer probe", () => {
