@@ -51,12 +51,32 @@ self.addEventListener("fetch", (event) => {
 `;
 
 export const HOMEPAGE_MOTION_HEADER = "x-clientsurge-homepage-motion";
+export const STATIC_FALLBACK_PAINT_GUARD_HEADER = "x-clientsurge-static-fallback-guard";
+export const STATIC_FALLBACK_PAINT_GUARD_STYLE_ID = "clientsurge-static-fallback-paint-guard";
+export const STATIC_FALLBACK_PAINT_GUARD_SCRIPT_ID = "clientsurge-static-fallback-guard-script";
 export const HOMEPAGE_MOTION_STYLE_ID = "clientsurge-edge-cinematic-motion";
 export const HOMEPAGE_ORDER_STYLE_ID = "clientsurge-edge-homepage-order";
 export const HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID = "clientsurge-edge-phone-alignment";
 export const HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID = "clientsurge-edge-industry-dropdown";
 export const TRUST_SECURITY_STYLE_ID = "clientsurge-edge-trust-security";
 export const TRUST_SECURITY_SECTION_ID = "clientsurge-trust-security";
+
+export const STATIC_FALLBACK_PAINT_GUARD_STYLE = `<style id="${STATIC_FALLBACK_PAINT_GUARD_STYLE_ID}">
+html.js:not(.app-fallback-visible) #root > .static-fallback {
+  display: none !important;
+}
+</style>`;
+
+export const STATIC_FALLBACK_PAINT_GUARD_SCRIPT = `<script id="${STATIC_FALLBACK_PAINT_GUARD_SCRIPT_ID}">
+(() => {
+  document.documentElement.classList.add("js");
+  window.setTimeout(() => {
+    if (document.querySelector("#root > .static-fallback")) {
+      document.documentElement.classList.add("app-fallback-visible");
+    }
+  }, 6000);
+})();
+</script>`;
 
 export const HOMEPAGE_MOTION_STYLE = `<style id="${HOMEPAGE_MOTION_STYLE_ID}">
 @keyframes csEdgeAmbientSweep {
@@ -739,6 +759,29 @@ export function shouldInjectHomepageMotion(request, url, response) {
   return (response.headers.get("content-type") || "").includes("text/html");
 }
 
+export function shouldInjectStaticFallbackPaintGuard(request, response) {
+  if (request.method !== "GET") return false;
+  return (response.headers.get("content-type") || "").includes("text/html");
+}
+
+export function injectStaticFallbackPaintGuard(html) {
+  let nextHtml = html;
+
+  if (!nextHtml.includes(STATIC_FALLBACK_PAINT_GUARD_STYLE_ID)) {
+    nextHtml = nextHtml.includes("</head>")
+      ? nextHtml.replace("</head>", `${STATIC_FALLBACK_PAINT_GUARD_STYLE}</head>`)
+      : `${STATIC_FALLBACK_PAINT_GUARD_STYLE}${nextHtml}`;
+  }
+
+  if (!nextHtml.includes(STATIC_FALLBACK_PAINT_GUARD_SCRIPT_ID)) {
+    nextHtml = nextHtml.includes("</head>")
+      ? nextHtml.replace("</head>", `${STATIC_FALLBACK_PAINT_GUARD_SCRIPT}</head>`)
+      : `${STATIC_FALLBACK_PAINT_GUARD_SCRIPT}${nextHtml}`;
+  }
+
+  return nextHtml;
+}
+
 export function injectHomepageMotion(html) {
   let nextHtml = html;
 
@@ -899,11 +942,17 @@ export default {
     const originResponse = await fetch(originRequestFor(request, url));
     const headers = applySecurityHeaders(new Headers(originResponse.headers), url.pathname);
 
-    if (shouldInjectHomepageMotion(request, url, originResponse)) {
-      headers.set(HOMEPAGE_MOTION_HEADER, "edge-v1");
+    if (shouldInjectStaticFallbackPaintGuard(request, originResponse)) {
+      let html = injectStaticFallbackPaintGuard(await originResponse.text());
+      headers.set(STATIC_FALLBACK_PAINT_GUARD_HEADER, "edge-v1");
       headers.set("Cache-Control", "no-store, max-age=0");
 
-      return new Response(injectHomepageMotion(await originResponse.text()), {
+      if (shouldInjectHomepageMotion(request, url, originResponse)) {
+        headers.set(HOMEPAGE_MOTION_HEADER, "edge-v1");
+        html = injectHomepageMotion(html);
+      }
+
+      return new Response(html, {
         status: originResponse.status,
         statusText: originResponse.statusText,
         headers,

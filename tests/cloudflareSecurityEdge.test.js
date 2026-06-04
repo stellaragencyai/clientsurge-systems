@@ -25,6 +25,11 @@ import worker, {
   SERVICE_WORKER_JS,
   SECURITY_TXT,
   shouldInjectHomepageMotion,
+  shouldInjectStaticFallbackPaintGuard,
+  STATIC_FALLBACK_PAINT_GUARD_HEADER,
+  STATIC_FALLBACK_PAINT_GUARD_SCRIPT_ID,
+  STATIC_FALLBACK_PAINT_GUARD_STYLE_ID,
+  injectStaticFallbackPaintGuard,
   TRUST_SECURITY_INJECTION,
   TRUST_SECURITY_CLIENT_JS,
   TRUST_SECURITY_SECTION_ID,
@@ -162,7 +167,10 @@ test("Cloudflare security edge worker injects the simplified homepage cinematic 
 
     assert.equal(response.status, 200);
     assert.equal(response.headers.get(HOMEPAGE_MOTION_HEADER), "edge-v1");
+    assert.equal(response.headers.get(STATIC_FALLBACK_PAINT_GUARD_HEADER), "edge-v1");
     assert.match(response.headers.get("cache-control") || "", /no-store/);
+    assert.match(body, new RegExp(STATIC_FALLBACK_PAINT_GUARD_STYLE_ID));
+    assert.match(body, new RegExp(STATIC_FALLBACK_PAINT_GUARD_SCRIPT_ID));
     assert.match(body, new RegExp(HOMEPAGE_MOTION_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_ORDER_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID));
@@ -181,6 +189,26 @@ test("Cloudflare security edge worker injects the simplified homepage cinematic 
   } finally {
     globalThis.fetch = previousFetch;
   }
+});
+
+test("Cloudflare static fallback paint guard is scoped to HTML and idempotent", () => {
+  const htmlResponse = new Response("<html></html>", {
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
+  const assetResponse = new Response("body{}", {
+    headers: { "Content-Type": "text/css" },
+  });
+
+  assert.equal(shouldInjectStaticFallbackPaintGuard(new Request("https://clientsurgesystems.com/book"), htmlResponse), true);
+  assert.equal(shouldInjectStaticFallbackPaintGuard(new Request("https://clientsurgesystems.com/book", { method: "POST" }), htmlResponse), false);
+  assert.equal(shouldInjectStaticFallbackPaintGuard(new Request("https://clientsurgesystems.com/assets/index.css"), assetResponse), false);
+
+  const injected = injectStaticFallbackPaintGuard("<html><head></head><body><div id=\"root\"><main class=\"static-fallback\"></main></div></body></html>");
+  assert.match(injected, new RegExp(STATIC_FALLBACK_PAINT_GUARD_STYLE_ID));
+  assert.match(injected, new RegExp(STATIC_FALLBACK_PAINT_GUARD_SCRIPT_ID));
+  assert.match(injected, /html\.js:not\(\.app-fallback-visible\) #root > \.static-fallback/);
+  assert.match(injected, /classList\.add\("app-fallback-visible"\)/);
+  assert.equal(injectStaticFallbackPaintGuard(injected), injected);
 });
 
 test("Cloudflare homepage motion injection is scoped and idempotent", () => {
