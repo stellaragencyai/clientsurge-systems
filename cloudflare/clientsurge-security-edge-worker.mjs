@@ -58,6 +58,7 @@ export const HOMEPAGE_MOTION_STYLE_ID = "clientsurge-edge-cinematic-motion";
 export const HOMEPAGE_ORDER_STYLE_ID = "clientsurge-edge-homepage-order";
 export const HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID = "clientsurge-edge-phone-alignment";
 export const HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID = "clientsurge-edge-industry-dropdown";
+export const HOMEPAGE_INDUSTRY_GALLERY_STYLE_ID = "clientsurge-edge-industry-gallery";
 export const TRUST_SECURITY_STYLE_ID = "clientsurge-edge-trust-security";
 export const TRUST_SECURITY_SECTION_ID = "clientsurge-trust-security";
 
@@ -523,7 +524,152 @@ export const HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT = `<script>
 })();
 </script>`;
 
-export const HOMEPAGE_MOTION_INJECTION = `${HOMEPAGE_MOTION_STYLE}${HOMEPAGE_ORDER_STYLE}${HOMEPAGE_PHONE_ALIGNMENT_STYLE}${HOMEPAGE_INDUSTRY_DROPDOWN_STYLE}${HOMEPAGE_MOTION_SCRIPT}${HOMEPAGE_ORDER_SCRIPT}${HOMEPAGE_PHONE_ALIGNMENT_SCRIPT}${HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT}`;
+export const HOMEPAGE_INDUSTRY_GALLERY_STYLE = `<style id="${HOMEPAGE_INDUSTRY_GALLERY_STYLE_ID}">
+#industries > div[class*="grid-cols-1"][class*="z-10"] {
+  width: 100% !important;
+  max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+#industries button[aria-label] {
+  min-height: 50svh !important;
+  height: auto !important;
+}
+#industries button[aria-label] img {
+  filter: saturate(1) contrast(1.03) brightness(0.98) !important;
+}
+#industries button[aria-label] > div.absolute.inset-0:not(.border-2) {
+  background: linear-gradient(to bottom, rgba(3, 7, 18, 0.01) 0%, rgba(3, 7, 18, 0.06) 50%, rgba(3, 7, 18, 0.54) 100%) !important;
+}
+#industries button[aria-label] > div.absolute.inset-0.border-2 {
+  box-shadow: none !important;
+}
+#industries button[aria-label] > div.absolute.bottom-0 p:first-of-type {
+  color: #ffffff !important;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.76) !important;
+}
+@media (max-width: 767px) {
+  #industries > div[class*="grid-cols-1"][class*="z-10"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  #industries button[aria-label] {
+    min-height: 100svh !important;
+  }
+}
+@media (min-width: 768px) {
+  #industries > div[class*="grid-cols-1"][class*="z-10"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+@media (min-width: 1024px) {
+  #industries > div[class*="grid-cols-1"][class*="z-10"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+</style>`;
+
+export const HOMEPAGE_INDUSTRY_GALLERY_SCRIPT = `<script>
+(() => {
+  const labels = [
+    "Med Spas & Aesthetic Clinics",
+    "Dental & Orthodontics",
+    "Chiropractic & Physical Therapy",
+    "HVAC, Plumbing & Home Services",
+    "Roofing & Restoration",
+    "Contractors & Trades"
+  ];
+
+  const mark = (status) => {
+    document.documentElement.setAttribute("data-clientsurge-industry-gallery", status);
+  };
+
+  const setImportant = (node, property, value) => {
+    if (node?.style?.setProperty) node.style.setProperty(property, value, "important");
+  };
+
+  const applyGalleryFix = () => {
+    const section = document.querySelector("#industries");
+    if (!section) {
+      mark("waiting");
+      return false;
+    }
+
+    const buttons = Array.from(section.querySelectorAll("button[aria-label]")).filter((button) =>
+      labels.includes(button.getAttribute("aria-label") || "")
+    );
+
+    if (buttons.length < 6) {
+      mark("waiting:" + buttons.length);
+      return false;
+    }
+
+    const grid = buttons[0].parentElement;
+    if (grid) {
+      grid.setAttribute("data-clientsurge-edge-industry-gallery", "true");
+      setImportant(grid, "width", "100%");
+      setImportant(grid, "max-width", "none");
+      setImportant(grid, "margin-left", "0");
+      setImportant(grid, "margin-right", "0");
+    }
+
+    for (const button of buttons) {
+      button.setAttribute("data-clientsurge-industry-tile", "true");
+      setImportant(button, "height", "auto");
+      setImportant(button, "min-height", window.matchMedia("(max-width: 767px)").matches ? "100svh" : "50svh");
+
+      const image = button.querySelector("img");
+      setImportant(image, "filter", "saturate(1) contrast(1.03) brightness(0.98)");
+
+      const overlay = Array.from(button.children).find((child) =>
+        child.tagName === "DIV" &&
+        child.classList.contains("absolute") &&
+        child.classList.contains("inset-0") &&
+        !child.classList.contains("border-2")
+      );
+      setImportant(overlay, "background", "linear-gradient(to bottom, rgba(3, 7, 18, 0.01) 0%, rgba(3, 7, 18, 0.06) 50%, rgba(3, 7, 18, 0.54) 100%)");
+
+      const frame = Array.from(button.children).find((child) =>
+        child.tagName === "DIV" && child.classList.contains("border-2")
+      );
+      setImportant(frame, "box-shadow", "none");
+
+      const title = Array.from(button.querySelectorAll("p")).find((node) =>
+        labels.includes(node.textContent.trim())
+      );
+      setImportant(title, "color", "#ffffff");
+      setImportant(title, "text-shadow", "0 1px 12px rgba(0, 0, 0, 0.76)");
+    }
+
+    mark("applied:" + buttons.length);
+    return true;
+  };
+
+  if (applyGalleryFix()) return;
+
+  let attempts = 0;
+  const observer = new MutationObserver(() => {
+    attempts += 1;
+    if (applyGalleryFix() || attempts > 180) observer.disconnect();
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+
+  const interval = window.setInterval(() => {
+    attempts += 1;
+    if (applyGalleryFix() || attempts > 180) {
+      window.clearInterval(interval);
+      observer.disconnect();
+    }
+  }, 250);
+
+  window.setTimeout(() => {
+    window.clearInterval(interval);
+    observer.disconnect();
+    applyGalleryFix();
+  }, 45000);
+})();
+</script>`;
+
+export const HOMEPAGE_MOTION_INJECTION = `${HOMEPAGE_MOTION_STYLE}${HOMEPAGE_ORDER_STYLE}${HOMEPAGE_PHONE_ALIGNMENT_STYLE}${HOMEPAGE_INDUSTRY_DROPDOWN_STYLE}${HOMEPAGE_INDUSTRY_GALLERY_STYLE}${HOMEPAGE_MOTION_SCRIPT}${HOMEPAGE_ORDER_SCRIPT}${HOMEPAGE_PHONE_ALIGNMENT_SCRIPT}${HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT}${HOMEPAGE_INDUSTRY_GALLERY_SCRIPT}`;
 
 export const TRUST_SECURITY_STYLE = `<style id="${TRUST_SECURITY_STYLE_ID}">
 #${TRUST_SECURITY_SECTION_ID} {
@@ -823,6 +969,16 @@ export function injectHomepageMotion(html) {
     nextHtml = nextHtml.includes("</body>")
       ? nextHtml.replace("</body>", `${HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT}</body>`)
       : `${nextHtml}${HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT}`;
+  }
+
+  if (!nextHtml.includes(HOMEPAGE_INDUSTRY_GALLERY_STYLE_ID)) {
+    nextHtml = nextHtml.includes("</head>")
+      ? nextHtml.replace("</head>", `${HOMEPAGE_INDUSTRY_GALLERY_STYLE}</head>`)
+      : `${HOMEPAGE_INDUSTRY_GALLERY_STYLE}${nextHtml}`;
+
+    nextHtml = nextHtml.includes("</body>")
+      ? nextHtml.replace("</body>", `${HOMEPAGE_INDUSTRY_GALLERY_SCRIPT}</body>`)
+      : `${nextHtml}${HOMEPAGE_INDUSTRY_GALLERY_SCRIPT}`;
   }
 
   if (!nextHtml.includes(TRUST_SECURITY_STYLE_ID)) {

@@ -12,6 +12,9 @@ import worker, {
   HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT,
   HOMEPAGE_INDUSTRY_DROPDOWN_STYLE,
   HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID,
+  HOMEPAGE_INDUSTRY_GALLERY_SCRIPT,
+  HOMEPAGE_INDUSTRY_GALLERY_STYLE,
+  HOMEPAGE_INDUSTRY_GALLERY_STYLE_ID,
   HOMEPAGE_ORDER_SCRIPT,
   HOMEPAGE_ORDER_STYLE,
   HOMEPAGE_ORDER_STYLE_ID,
@@ -175,12 +178,14 @@ test("Cloudflare security edge worker injects the simplified homepage cinematic 
     assert.match(body, new RegExp(HOMEPAGE_ORDER_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID));
+    assert.match(body, new RegExp(HOMEPAGE_INDUSTRY_GALLERY_STYLE_ID));
     assert.match(body, /ambient-sweep/);
     assert.match(body, /headline-sheen/);
     assert.match(body, /dashboard-float-scan/);
     assert.match(body, /data-clientsurge-homepage-order/);
     assert.match(body, /data-clientsurge-phone-alignment/);
     assert.match(body, /data-clientsurge-industry-dropdown/);
+    assert.match(body, /data-clientsurge-industry-gallery/);
     assert.doesNotMatch(body, /checklist-cascade/);
     assert.doesNotMatch(body, /cta-energy/);
     assert.match(body, /MutationObserver/);
@@ -230,10 +235,12 @@ test("Cloudflare homepage motion injection is scoped and idempotent", () => {
   assert.equal((injected.match(new RegExp(HOMEPAGE_ORDER_STYLE_ID, "g")) || []).length, 1);
   assert.equal((injected.match(new RegExp(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID, "g")) || []).length, 1);
   assert.equal((injected.match(new RegExp(HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID, "g")) || []).length, 1);
+  assert.equal((injected.match(new RegExp(`<style id="${HOMEPAGE_INDUSTRY_GALLERY_STYLE_ID}"`, "g")) || []).length, 1);
   assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_MOTION_STYLE_ID), true);
   assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_ORDER_STYLE_ID), true);
   assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID), true);
   assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID), true);
+  assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_INDUSTRY_GALLERY_STYLE_ID), true);
 });
 
 test("Cloudflare homepage injection adds the trust and security section before the footer", () => {
@@ -294,6 +301,20 @@ test("Cloudflare homepage industry dropdown patch prevents the stale Base44 menu
   assert.match(HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT, /Dental & Orthodontics/);
   assert.match(HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT, /data-clientsurge-industry-dropdown/);
   assert.match(HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT, /MutationObserver/);
+});
+
+test("Cloudflare homepage industry gallery patch removes stale blue overlays and fills the viewport", () => {
+  assert.match(HOMEPAGE_INDUSTRY_GALLERY_STYLE, /clientsurge-edge-industry-gallery/);
+  assert.match(HOMEPAGE_INDUSTRY_GALLERY_STYLE, /max-width: none/);
+  assert.match(HOMEPAGE_INDUSTRY_GALLERY_STYLE, /min-height: 50svh/);
+  assert.match(HOMEPAGE_INDUSTRY_GALLERY_STYLE, /min-height: 100svh/);
+  assert.match(HOMEPAGE_INDUSTRY_GALLERY_STYLE, /color: #ffffff/);
+  assert.match(HOMEPAGE_INDUSTRY_GALLERY_STYLE, /box-shadow: none/);
+  assert.match(HOMEPAGE_INDUSTRY_GALLERY_STYLE, /rgba\(3, 7, 18/);
+  assert.match(HOMEPAGE_INDUSTRY_GALLERY_SCRIPT, /Med Spas & Aesthetic Clinics/);
+  assert.match(HOMEPAGE_INDUSTRY_GALLERY_SCRIPT, /data-clientsurge-industry-gallery/);
+  assert.match(HOMEPAGE_INDUSTRY_GALLERY_SCRIPT, /data-clientsurge-industry-tile/);
+  assert.match(HOMEPAGE_INDUSTRY_GALLERY_SCRIPT, /MutationObserver/);
 });
 
 test("production security verifier checks the Cloudflare security layer probe", () => {
