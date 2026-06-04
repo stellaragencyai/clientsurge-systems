@@ -52,10 +52,10 @@ export default function SystemFlowDiagram() {
   }, [inView]);
 
   return (
-    <section id="system-overview" className="py-20 md:py-28 px-4 md:px-6" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(252,248,243,0.8) 100%)" }}>
+    <section id="system-overview" className="py-20 md:py-28 px-4 md:px-6" style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(241,248,255,0.86) 100%)" }}>
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-14">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-3" style={{ color: "#9a5c2e" }}>The Full Pipeline</p>
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-3 text-primary">The Full Pipeline</p>
           <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground tracking-tight mb-4">
             How the ClientSurge System Works
           </h2>
@@ -81,7 +81,7 @@ export default function SystemFlowDiagram() {
                     <svg width="100%" height="4" style={{ display: "block" }}>
                       <line
                         x1="0" y1="2" x2="100%" y2="2"
-                        stroke={isLit ? "#c8965c" : "rgba(0,0,0,0.1)"}
+                        stroke={isLit ? "#00AEEF" : "rgba(0,0,0,0.1)"}
                         strokeWidth="2"
                         strokeDasharray="5 4"
                         style={{
@@ -93,7 +93,7 @@ export default function SystemFlowDiagram() {
                       {isLit && (
                         <polygon
                           points="100%,2 calc(100% - 6),0 calc(100% - 6),4"
-                          fill="#c8965c"
+                          fill="#00AEEF"
                           style={{ transition: `opacity 0.3s ease ${i * 0.18 + 0.2}s`, opacity: isLit ? 1 : 0 }}
                         />
                       )}
@@ -102,8 +102,8 @@ export default function SystemFlowDiagram() {
                       <div
                         className="absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full"
                         style={{
-                          background: "radial-gradient(circle, #f5d9a8 0%, #c8965c 55%, rgba(200,150,92,0.15) 100%)",
-                          boxShadow: "0 0 14px rgba(200,150,92,0.55)",
+                          background: "radial-gradient(circle, #B9ECFF 0%, #00AEEF 55%, rgba(0,174,239,0.15) 100%)",
+                          boxShadow: "0 0 14px rgba(0,174,239,0.55)",
                           left: activeConnector === i ? "calc(100% - 10px)" : "0%",
                           opacity: activeConnector === i ? 1 : 0.35,
                           transition: "left 850ms ease, opacity 250ms ease",
@@ -128,12 +128,12 @@ export default function SystemFlowDiagram() {
                     className="w-11 h-11 rounded-full flex items-center justify-center mb-2 transition-all duration-300"
                     style={{
                       background: isActive
-                        ? "linear-gradient(135deg,#6b3f1f,#c8965c)"
-                        : "linear-gradient(135deg,#9a5c2e,#c8965c)",
+                        ? "linear-gradient(135deg,#003B8F,#00AEEF)"
+                        : "linear-gradient(135deg,#0088CC,#00AEEF)",
                       boxShadow: isActive
-                        ? "0 0 0 4px rgba(200,150,92,0.3), 0 0 20px rgba(200,150,92,0.5)"
+                        ? "0 0 0 4px rgba(0,174,239,0.28), 0 0 20px rgba(0,174,239,0.48)"
                         : isLit
-                        ? "0 0 10px rgba(200,150,92,0.3)"
+                        ? "0 0 10px rgba(0,174,239,0.3)"
                         : "none",
                       transform: isActive ? "scale(1.15)" : "scale(1)",
                     }}
@@ -142,7 +142,7 @@ export default function SystemFlowDiagram() {
                   </div>
 
                   {/* Step badge */}
-                  <span className="text-[9px] font-black uppercase tracking-widest mb-0.5" style={{ color: "#9a5c2e" }}>
+                  <span className="text-[9px] font-black uppercase tracking-widest mb-0.5 text-primary">
                     {node.step}
                   </span>
 
@@ -155,13 +155,13 @@ export default function SystemFlowDiagram() {
                     <div
                       className="absolute top-full mt-3 z-20 rounded-xl px-4 py-3 text-center shadow-xl whitespace-nowrap"
                       style={{
-                        background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)",
-                        border: "1px solid rgba(200,150,92,0.4)",
+                        background: "linear-gradient(135deg,#003B8F,#0088CC)",
+                        border: "1px solid rgba(0,174,239,0.4)",
                         animation: "tooltipIn 0.2s ease-out forwards",
                       }}
                     >
-                      <p className="text-xs font-bold text-amber-100">{node.label}</p>
-                      <p className="text-[10px] text-amber-200/70 mt-0.5">{node.sub}</p>
+                      <p className="text-xs font-bold text-white">{node.label}</p>
+                      <p className="text-[10px] text-white/70 mt-0.5">{node.sub}</p>
                     </div>
                   )}
                 </button>
@@ -176,15 +176,15 @@ export default function SystemFlowDiagram() {
             className="h-full rounded-full transition-all ease-out"
             style={{
               width: inView ? "100%" : "0%",
-              background: "linear-gradient(90deg, #7a4825, #c8965c, #f5d9a8, #c8965c)",
-              boxShadow: "0 0 10px rgba(200,150,92,0.5)",
+              background: "linear-gradient(90deg, #003B8F, #0088CC, #00AEEF, #66D9FF)",
+              boxShadow: "0 0 10px rgba(0,174,239,0.5)",
               transitionDuration: "2500ms",
             }}
           />
         </div>
         <div className="flex justify-between mt-1.5 px-0.5">
           <span className="text-[10px] text-muted-foreground font-semibold">Lead Arrives</span>
-          <span className="text-[10px] font-bold" style={{ color: "#9a5c2e" }}>System Fully Live ✓</span>
+          <span className="text-[10px] font-bold text-primary">System Fully Live ✓</span>
         </div>
       </div>
 
@@ -208,7 +208,7 @@ export default function SystemFlowDiagram() {
                 <div
                   className="absolute left-[18px] top-10 w-0.5 h-8 z-0 transition-all duration-500"
                   style={{
-                    background: isLit ? "linear-gradient(to bottom, #c8965c, rgba(200,150,92,0.2))" : "rgba(0,0,0,0.08)",
+                    background: isLit ? "linear-gradient(to bottom, #00AEEF, rgba(0,174,239,0.2))" : "rgba(0,0,0,0.08)",
                     transitionDelay: `${i * 0.15}s`,
                   }}
                 />
@@ -217,8 +217,8 @@ export default function SystemFlowDiagram() {
               <div
                 className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center z-10"
                 style={{
-                  background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
-                  boxShadow: isLit ? "0 0 10px rgba(200,150,92,0.4)" : "none",
+                  background: "linear-gradient(135deg,#0088CC,#00AEEF)",
+                  boxShadow: isLit ? "0 0 10px rgba(0,174,239,0.4)" : "none",
                   transition: `box-shadow 0.4s ease ${i * 0.15}s`,
                 }}
               >
@@ -226,7 +226,7 @@ export default function SystemFlowDiagram() {
               </div>
               {/* Text */}
               <div className="pb-8 pt-1">
-                <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: "#9a5c2e" }}>Step {node.step}</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-primary">Step {node.step}</span>
                 <p className="text-sm font-bold text-foreground leading-snug">{node.label}</p>
                 <p className="text-xs text-muted-foreground">{node.sub}</p>
               </div>

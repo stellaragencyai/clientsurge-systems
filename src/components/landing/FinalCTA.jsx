@@ -71,24 +71,24 @@ export default function FinalCTA() {
                 trackCTA("book_your_free_demo", "final_cta");
                 setShowBookingModal(true);
               }}
-              className="focus:outline-none focus:ring-2 focus:ring-primary rounded-full"
+              className="focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
               style={{
-                borderRadius: "9999px",
+                borderRadius: "8px",
                 padding: "2px",
                 background:
                 "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
-                boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
+                boxShadow: "0 12px 28px rgba(0,88,160,0.24)",
                 border: "none",
                 cursor: "pointer",
                 textDecoration: "none"
               }}
               onMouseEnter={(event) => {
                 event.currentTarget.style.boxShadow =
-                "0 8px 40px rgba(0,174,239,0.6), 0 4px 18px rgba(0,174,239,0.4)";
+                "0 16px 40px rgba(0,174,239,0.36), 0 6px 18px rgba(0,59,143,0.18)";
               }}
               onMouseLeave={(event) => {
                 event.currentTarget.style.boxShadow =
-                "0 4px 18px rgba(0,174,239,0.4)";
+                "0 12px 28px rgba(0,88,160,0.24)";
               }}>
               
               <span
@@ -98,7 +98,7 @@ export default function FinalCTA() {
                   gap: "8px",
                   height: "56px",
                   padding: "0 40px",
-                  borderRadius: "9999px",
+                  borderRadius: "6px",
                   background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
                   color: "#ffffff",
                   fontWeight: "700",
@@ -113,7 +113,7 @@ export default function FinalCTA() {
             <a
               href="/book"
               onClick={() => trackCTA("lead_leakage_audit", "final_cta")}
-              className="inline-flex items-center justify-center h-14 px-6 rounded-full border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200">
+              className="inline-flex items-center justify-center h-14 px-6 rounded-lg border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200">
               
               Get a Free Lead Leakage Audit
             </a>

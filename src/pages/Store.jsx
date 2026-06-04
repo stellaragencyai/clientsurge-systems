@@ -109,7 +109,7 @@ function StoreInner() {
   }, []);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [showComparison, setShowComparison] = useState(false);
-  const [pathMode, setPathMode] = useState("guided");
+  const [pathMode, setPathMode] = useState("explore");
   const { items, setCartOpen, totalSetup, totalMonthly } = useCart();
 
   useEffect(() => {
@@ -181,7 +181,7 @@ function StoreInner() {
       return leftRecommended ? -1 : 1;
     });
 
-    // In guided mode: show recommended services if industry selected, else show all purchasable
+    // In guided mode, only narrow the catalog when a real recommendation exists.
     if (pathMode === "guided") {
       if (selectedIndustry) {
         const recommendedNames = new Set(
@@ -189,10 +189,6 @@ function StoreInner() {
         );
         results = results.filter((p) => recommendedNames.has(p.name)).slice(0, 6);
       }
-      if (!selectedIndustry) {
-        results = results.filter((product) => !product.coming_soon);
-      }
-      // No industry selected in guided mode — show all live self-serve products
     }
 
     return results;
@@ -312,6 +308,9 @@ function StoreInner() {
             border: 1px solid rgba(0,174,239,0.25);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
+            width: calc(100% - 48px);
+            font: inherit;
+            text-align: left;
           }
           .store-page .store-sticky-cart__meta {
             display: flex;
@@ -383,6 +382,7 @@ function StoreInner() {
               margin: 0 16px 18px;
               align-items: stretch;
               flex-direction: column;
+              width: calc(100% - 32px);
             }
             .store-page .store-sticky-cart__meta {
               width: 100%;
@@ -527,7 +527,12 @@ function StoreInner() {
           </div>
 
           {items.length > 0 ?
-          <div onClick={() => setCartOpen(true)} className="store-sticky-cart">
+          <button
+            type="button"
+            onClick={() => setCartOpen(true)}
+            className="store-sticky-cart"
+            aria-label={`Open cart with ${items.length} service${items.length === 1 ? "" : "s"} selected`}
+          >
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <span
                   style={{
@@ -598,7 +603,7 @@ function StoreInner() {
                   View Cart
                 </span>
               </div>
-            </div> :
+            </button> :
           null}
 
           <div

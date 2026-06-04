@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { CalendarCheck } from "lucide-react";
 
 const proofItems = [
-  { scenario: "HVAC & Home Services", location: "Phoenix, AZ", action: "demo lead captured", ago: "2 min ago" },
-  { scenario: "Med Spas & Aesthetic Clinics", location: "Scottsdale, AZ", action: "checkout path previewed", ago: "11 min ago" },
-  { scenario: "Roofing & Restoration", location: "Mesa, AZ", action: "missed-call workflow triggered", ago: "18 min ago" },
-  { scenario: "Chiropractic & Physical Therapy", location: "Tempe, AZ", action: "booking sequence previewed", ago: "34 min ago" },
-  { scenario: "Contractors & Trades", location: "Glendale, AZ", action: "lead follow-up simulated", ago: "47 min ago" },
-  { scenario: "Dental & Orthodontics", location: "Chandler, AZ", action: "nurture workflow previewed", ago: "1 hr ago" },
+  { scenario: "HVAC & Home Services", location: "Phoenix, AZ", action: "audit workflow preview", ago: "2 min ago" },
+  { scenario: "Med Spas & Aesthetic Clinics", location: "Scottsdale, AZ", action: "checkout path preview", ago: "11 min ago" },
+  { scenario: "Roofing & Restoration", location: "Mesa, AZ", action: "missed-call workflow preview", ago: "18 min ago" },
+  { scenario: "Chiropractic & Physical Therapy", location: "Tempe, AZ", action: "booking sequence preview", ago: "34 min ago" },
+  { scenario: "Contractors & Trades", location: "Glendale, AZ", action: "lead follow-up preview", ago: "47 min ago" },
+  { scenario: "Dental & Orthodontics", location: "Chandler, AZ", action: "nurture workflow preview", ago: "1 hr ago" },
 ];
 
 export default function SocialProofToasts() {
@@ -50,13 +50,13 @@ export default function SocialProofToasts() {
         </div>
         <div className="min-w-0">
           <p className="text-xs font-semibold text-foreground truncate">
-            Example: {current.scenario}
+            Preview: {current.scenario}
           </p>
           <p className="text-xs text-muted-foreground">{current.action} - {current.location}</p>
         </div>
         <div className="flex flex-col items-end flex-shrink-0">
           <p className="text-[10px] text-muted-foreground/60">{current.ago}</p>
-          <p className="text-[9px] text-muted-foreground/40 italic">example</p>
+          <p className="text-[9px] text-muted-foreground/70 italic">preview</p>
         </div>
       </div>
     </div>

@@ -271,9 +271,10 @@ export default function LaunchTimeline() {
         <div
           className="absolute left-6 md:left-1/2 top-0 w-0.5 hidden md:block pointer-events-none"
           style={{
-            bottom: "-120px",
-            background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 50%, rgba(0,174,239,0.6) 100%)",
+            bottom: "-8px",
+            background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 58%, rgba(0,174,239,0.72) 100%)",
             transform: "translateX(-50%)",
+            boxShadow: "0 0 18px rgba(0,174,239,0.22)",
           }}
         />
 
@@ -283,13 +284,6 @@ export default function LaunchTimeline() {
           ))}
         </div>
       </div>
-
-      <div className="mx-auto mt-8 max-w-3xl rounded-2xl border border-primary/15 bg-white px-5 py-4 text-center shadow-sm">
-        <p className="text-sm font-semibold text-foreground">
-          We keep this phase focused: confirm inputs, build the selected systems, test the handoffs, then launch with a clear go-live checklist.
-        </p>
-      </div>
-
 
     </div>
   );

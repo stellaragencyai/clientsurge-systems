@@ -19,7 +19,7 @@ export default function TextLink({
     gap: "6px",
     fontSize: "13px",
     fontWeight: "700",
-    color: "rgba(154,92,46,0.7)",
+    color: "rgba(0,106,163,0.78)",
     textDecoration: "none",
     border: "none",
     background: "none",
@@ -36,10 +36,10 @@ export default function TextLink({
     <Component
       style={baseStyles}
       onMouseEnter={(e) => {
-        e.currentTarget.style.color = "rgba(154,92,46,0.95)";
+        e.currentTarget.style.color = "rgba(0,136,204,0.98)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.color = "rgba(154,92,46,0.7)";
+        e.currentTarget.style.color = "rgba(0,106,163,0.78)";
       }}
       {...elementProps}
       {...props}

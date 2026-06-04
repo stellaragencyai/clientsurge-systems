@@ -15,8 +15,8 @@ test("homepage renders the founder credibility section before testimonials", () 
 });
 
 test("founder section uses an honest local fallback instead of third-party placeholder media", () => {
-  assert.match(founderSection, /Founder photo pending/);
-  assert.match(founderSection, /Launch-safe placeholder until the approved founder image is added/);
-  assert.match(founderSection, /setPhotoUnavailable\(true\)/);
+  assert.match(founderSection, /Founder-led implementation/);
+  assert.match(founderSection, /Phoenix-based automation strategy, setup, testing, and launch support/);
+  assert.doesNotMatch(founderSection, /Founder photo pending|placeholder/);
   assert.doesNotMatch(founderSection, /placehold\.co|placeholder\.com|via\.placeholder/);
 });

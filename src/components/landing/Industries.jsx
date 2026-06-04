@@ -180,7 +180,7 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
       
         {/* Header */}
         <div
-        className="px-7 pt-7 pb-5 flex items-start justify-between gap-4 sticky top-0 rounded-t-[28px] z-10"
+        className="px-7 pt-7 pb-5 flex items-start justify-between gap-4 sticky top-0 rounded-t-lg z-10"
         style={{
           background: "linear-gradient(135deg, rgba(0,174,239,0.06) 0%, rgba(240,249,255,0.97) 100%)",
           borderBottom: "1px solid rgba(0,174,239,0.12)"
@@ -201,7 +201,7 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-black/8 transition-colors">
+          className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-black/8 transition-colors">
           
             <X className="w-4 h-4" />
           </button>
@@ -211,18 +211,18 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
         <div className="px-7 py-6 space-y-6">
           {/* Recommended package */}
           <div
-          className="rounded-2xl px-5 py-5"
+          className="rounded-lg px-5 py-5"
           style={{ background: "rgba(255,255,255,0.82)", border: "1px solid rgba(0,136,204,0.14)" }}>
           
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-2">Recommended Package</p>
             <h4 className="text-xl font-semibold text-foreground">{recommendation.recommendedPackage?.name}</h4>
             <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{recommendation.recommendedPackage?.fit}</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.18)", color: "#0088CC" }}>
+              <span className="inline-flex items-center rounded-lg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.18)", color: "#0088CC" }}>
                 {recommendation.recommendedServices.length} services recommended
               </span>
               {recommendation.addOnsByReview.length ?
-            <span className="inline-flex items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(0,174,239,0.06)", border: "1px solid rgba(0,174,239,0.15)", color: "rgba(0,80,160,0.7)" }}>
+            <span className="inline-flex items-center rounded-lg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(0,174,239,0.06)", border: "1px solid rgba(0,174,239,0.15)", color: "rgba(0,80,160,0.7)" }}>
                   {recommendation.addOnsByReview.length} add-ons by review
                 </span> :
             null}
@@ -234,7 +234,7 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-3">Why This Stack Fits</p>
             <div className="space-y-2">
               {recommendation.pressurePoints.map((point) =>
-            <div key={point} className="rounded-2xl px-4 py-3" style={{ background: "rgba(0,174,239,0.04)", border: "1px solid rgba(0,174,239,0.12)" }}>
+            <div key={point} className="rounded-lg px-4 py-3" style={{ background: "rgba(0,174,239,0.04)", border: "1px solid rgba(0,174,239,0.12)" }}>
                   <p className="text-sm leading-6 text-foreground/78">{point}</p>
                 </div>
             )}
@@ -246,10 +246,10 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-3">Recommended Services</p>
             <div className="grid sm:grid-cols-2 gap-3">
               {recommendation.recommendedServices.map((service) =>
-            <div key={service.product_id} className="rounded-2xl px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,249,255,0.74) 100%)", border: "1px solid rgba(0,174,239,0.12)" }}>
+            <div key={service.product_id} className="rounded-lg px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,249,255,0.74) 100%)", border: "1px solid rgba(0,174,239,0.12)" }}>
                   <p className="text-sm font-semibold text-foreground">{service.name}</p>
                   <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{service.whyThisMatters}</p>
-                  <span className="mt-2 inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em]" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.14)", color: "#0088CC" }}>
+                  <span className="mt-2 inline-flex items-center rounded-lg px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em]" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.14)", color: "#0088CC" }}>
                     {service.availability_label}
                   </span>
                 </div>
@@ -260,11 +260,11 @@ function IndustryModal({ recommendation, onClose, onBookDemo }) {
 
         {/* Footer CTAs */}
         <div className="px-7 py-5 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end" style={{ borderTop: "1px solid rgba(0,136,204,0.12)", background: "rgba(255,255,255,0.68)" }}>
-          <a href="/store" className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
+          <a href="/store" className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
             See The AI Store <ArrowRight className="w-4 h-4" />
           </a>
-          <button type="button" onClick={onBookDemo} style={{ borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)", border: "none", cursor: "pointer" }}>
-            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "42px", padding: "0 24px", borderRadius: "9999px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.875rem" }}>
+          <button type="button" onClick={onBookDemo} style={{ borderRadius: "8px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", boxShadow: "0 12px 28px rgba(0,88,160,0.24)", border: "none", cursor: "pointer" }}>
+            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "42px", padding: "0 24px", borderRadius: "6px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.875rem" }}>
               Make the Leap <ArrowRight className="w-4 h-4" />
             </span>
           </button>
@@ -431,7 +431,7 @@ export default function Industries() {
 
               <div className="absolute bottom-0 inset-x-0 px-5 pb-5 pt-12">
                 <div
-                  className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl border backdrop-blur-sm transition-transform duration-300"
+                  className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-lg border backdrop-blur-sm transition-transform duration-300"
                   style={{
                     background: highlighted || isSelected ? accent.iconBg : "rgba(255,255,255,0.12)",
                     borderColor: highlighted || isSelected ? accent.soft : "rgba(255,255,255,0.14)",

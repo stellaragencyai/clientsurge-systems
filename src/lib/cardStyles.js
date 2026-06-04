@@ -5,20 +5,20 @@
 export const CARD = {
   // Primary surfaces
   SURFACE: {
-    background: "linear-gradient(180deg, rgba(252,247,241,0.99) 0%, rgba(246,238,228,0.97) 100%)",
-    border: "1.5px solid rgba(212, 184, 142, 0.42)",
-    boxShadow: "0 16px 34px rgba(111,67,31,0.08), 0 2px 12px rgba(111,67,31,0.05)",
+    background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(241,248,255,0.96) 100%)",
+    border: "1.5px solid rgba(0, 174, 239, 0.18)",
+    boxShadow: "0 16px 34px rgba(0,59,143,0.08), 0 2px 12px rgba(0,174,239,0.05)",
   },
   SURFACE_STRONG: {
-    background: "linear-gradient(180deg, rgba(255,250,245,1) 0%, rgba(248,240,230,0.99) 100%)",
-    border: "1.5px solid rgba(222, 194, 152, 0.72)",
-    boxShadow: "0 22px 48px rgba(122,72,37,0.16), 0 8px 22px rgba(154,92,46,0.1)",
+    background: "linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(232,246,255,0.98) 100%)",
+    border: "1.5px solid rgba(0, 174, 239, 0.32)",
+    boxShadow: "0 22px 48px rgba(0,59,143,0.14), 0 8px 22px rgba(0,174,239,0.1)",
   },
 
   // Header sections
   HEADER_BROWN: {
-    background: "linear-gradient(135deg, #7a4825 0%, #b1723b 42%, #8a542b 100%)",
-    borderBottom: "1px solid rgba(0,0,0,0.15)",
+    background: "linear-gradient(135deg, #003B8F 0%, #0088CC 48%, #00AEEF 100%)",
+    borderBottom: "1px solid rgba(255,255,255,0.16)",
   },
   HEADER_GLASS: {
     background: "linear-gradient(180deg, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.08) 42%, rgba(255,255,255,0) 100%)",
@@ -27,38 +27,38 @@ export const CARD = {
 
   // Stat/metric cards
   STAT_CARD: {
-    background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250,248,244,0.96) 100%)",
-    border: "1.5px solid rgba(212,184,142,0.38)",
-    boxShadow: "0 8px 28px rgba(111,67,31,0.07), 0 2px 8px rgba(111,67,31,0.04)",
+    background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(244,250,255,0.96) 100%)",
+    border: "1.5px solid rgba(0,174,239,0.18)",
+    boxShadow: "0 8px 28px rgba(0,59,143,0.07), 0 2px 8px rgba(0,174,239,0.04)",
   },
 
   // Badge/chip styles
   CHIP_BROWN: {
-    background: "rgba(154,92,46,0.08)",
-    border: "1px solid rgba(154,92,46,0.18)",
-    color: "#7a4825",
+    background: "rgba(0,174,239,0.08)",
+    border: "1px solid rgba(0,174,239,0.18)",
+    color: "#006AA3",
   },
   CHIP_OUTLINE: {
-    background: "rgba(255,255,255,0.82)",
-    border: "1.5px solid rgba(154,92,46,0.22)",
-    boxShadow: "0 10px 24px rgba(44,31,16,0.06)",
+    background: "rgba(255,255,255,0.86)",
+    border: "1.5px solid rgba(0,174,239,0.2)",
+    boxShadow: "0 10px 24px rgba(0,59,143,0.06)",
   },
 
   // Rounded corner
-  BORDER_RADIUS: "20px",
-  BORDER_RADIUS_SM: "18px",
-  BORDER_RADIUS_LG: "24px",
+  BORDER_RADIUS: "8px",
+  BORDER_RADIUS_SM: "8px",
+  BORDER_RADIUS_LG: "12px",
 
   // Dark mode variants
   DARK: {
     SURFACE: {
-      background: "linear-gradient(180deg, rgba(28,20,10,0.99) 0%, rgba(20,14,8,0.97) 100%)",
-      border: "1.5px solid rgba(200,150,92,0.22)",
+      background: "linear-gradient(180deg, rgba(7,20,38,0.99) 0%, rgba(5,13,27,0.97) 100%)",
+      border: "1.5px solid rgba(0,174,239,0.22)",
       boxShadow: "0 16px 34px rgba(0,0,0,0.4), 0 2px 12px rgba(0,0,0,0.2)",
     },
     STAT_CARD: {
-      background: "linear-gradient(180deg, rgba(30,22,12,0.98) 0%, rgba(25,18,10,0.96) 100%)",
-      border: "1.5px solid rgba(200,150,92,0.18)",
+      background: "linear-gradient(180deg, rgba(8,24,45,0.98) 0%, rgba(6,18,34,0.96) 100%)",
+      border: "1.5px solid rgba(0,174,239,0.18)",
       boxShadow: "0 8px 28px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.15)",
     },
   },

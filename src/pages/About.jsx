@@ -26,7 +26,7 @@ export default function About() {
       {/* Hero */}
       <section
         className="py-20 px-6 text-center"
-        style={{ background: "linear-gradient(to bottom, hsl(40,8%,88%), hsl(0,0%,100%))" }}
+        style={{ background: "linear-gradient(180deg, rgba(0,174,239,0.08) 0%, rgba(248,251,255,0.96) 52%, hsl(var(--background)) 100%)" }}
       >
         <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Our Story</p>
         <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
@@ -57,10 +57,10 @@ export default function About() {
             </div>
             <div className="flex flex-col gap-4">
               {[
-                { icon: Zap, title: "Instant Lead Response", desc: "AI responds to new leads within 90 seconds, 24/7." },
+                { icon: Zap, title: "Instant Lead Response", desc: "AI responds to new leads quickly, 24/7." },
                 { icon: Target, title: "Smart Follow-Up", desc: "Multi-step SMS and email sequences that run on autopilot." },
                 { icon: Users, title: "Done For You", desc: "We configure, test, and launch everything — you just approve." },
-                { icon: CheckCircle2, title: "Real Results", desc: "Clients see more booked appointments within the first 2 weeks." },
+                { icon: CheckCircle2, title: "Measured Launches", desc: "Every workflow is tested against clear response and booking goals." },
               ].map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="flex items-start gap-4 p-4 rounded-xl border border-border bg-card">
                   <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
@@ -104,7 +104,7 @@ export default function About() {
             <div className="mt-6 flex flex-wrap gap-3">
               <Link
                 to="/contact"
-                className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-white px-5 py-2.5 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
+                className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-background px-5 py-2.5 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
               >
                 Get in Touch
               </Link>

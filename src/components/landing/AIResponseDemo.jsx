@@ -25,7 +25,7 @@ function TypingDots() {
   return (
     <div className="flex items-center gap-1 px-4 py-3">
       {[0, 1, 2].map(i => (
-        <span key={i} className="w-2 h-2 rounded-full bg-amber-700/40" style={{ animation: `typingBounce 1s ease infinite ${i * 0.2}s` }} />
+        <span key={i} className="w-2 h-2 rounded-full bg-primary/40" style={{ animation: `typingBounce 1s ease infinite ${i * 0.2}s` }} />
       ))}
     </div>
   );
@@ -41,7 +41,7 @@ function IntentScorePanel({ score }) {
   if (!score) return null;
   const urgency = URGENCY_CONFIG[score.urgency] || URGENCY_CONFIG.Medium;
   return (
-    <div className="mt-5 rounded-2xl border p-5 space-y-4" style={{ background: "rgba(154,92,46,0.03)", border: "1px solid rgba(154,92,46,0.18)" }}>
+    <div className="mt-5 rounded-lg border p-5 space-y-4 bg-primary/5 border-primary/20">
       <div className="flex items-center gap-2 mb-1">
         <Target className="w-4 h-4 text-primary" />
         <span className="text-xs font-bold uppercase tracking-widest text-primary">Lead Intelligence</span>
@@ -235,7 +235,7 @@ Return a JSON object with:
           </p>
         </div>
 
-        <div className="rounded-3xl overflow-hidden" style={{ border: "1px solid rgba(154,92,46,0.2)", boxShadow: "0 20px 60px rgba(0,0,0,0.09)" }}>
+        <div className="rounded-lg overflow-hidden" style={{ border: "1px solid rgba(0,174,239,0.2)", boxShadow: "0 20px 60px rgba(0,59,143,0.09)" }}>
           {/* Config panel */}
           <div className="bg-white px-8 py-7 border-b border-border/50">
             <div className="grid md:grid-cols-2 gap-5">
@@ -277,8 +277,8 @@ Return a JSON object with:
                   </div>
                 </div>
                 <div className="flex items-start gap-3 opacity-30">
-                  <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)" }}>
-                    <Zap className="w-4 h-4 text-amber-100" />
+                  <div className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg,#003B8F,#00AEEF)" }}>
+                    <Zap className="w-4 h-4 text-white" />
                   </div>
                   <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 border border-border/50 shadow-sm">
                     <p className="text-sm text-foreground/40 italic">AI response will appear here...</p>
@@ -300,10 +300,10 @@ Return a JSON object with:
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)" }}>
-                    <Zap className="w-4 h-4 text-amber-100" />
+                  <div className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg,#003B8F,#00AEEF)" }}>
+                    <Zap className="w-4 h-4 text-white" />
                   </div>
-                  <div className="bg-white rounded-2xl rounded-tl-sm border border-amber-200 shadow-sm">
+                  <div className="bg-white rounded-2xl rounded-tl-sm border border-primary/20 shadow-sm">
                     <TypingDots />
                   </div>
                 </div>
@@ -313,8 +313,8 @@ Return a JSON object with:
             {/* Full conversation thread */}
             {(phase === "done") && messages.map((msg, idx) => (
               <div key={idx} className={`flex items-start gap-3 ${msg.role === "lead" ? "" : ""}`}>
-                <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${msg.role === "lead" ? "bg-slate-200" : ""}`} style={msg.role === "ai" ? { background: "linear-gradient(135deg,#9a5c2e,#7a4825)" } : {}}>
-                  {msg.role === "lead" ? <User className="w-4 h-4 text-slate-500" /> : <Bot className="w-4 h-4 text-amber-100" />}
+                <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${msg.role === "lead" ? "bg-slate-200" : ""}`} style={msg.role === "ai" ? { background: "linear-gradient(135deg,#003B8F,#00AEEF)" } : {}}>
+                  {msg.role === "lead" ? <User className="w-4 h-4 text-slate-500" /> : <Bot className="w-4 h-4 text-white" />}
                 </div>
                 {msg.role === "lead" ? (
                   <div className="bg-white rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm shadow-sm border border-border/50">
@@ -322,9 +322,9 @@ Return a JSON object with:
                     <p className="text-[10px] text-foreground/30 mt-1">Lead</p>
                   </div>
                 ) : (
-                  <div className="rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm shadow-sm" style={{ background: "linear-gradient(135deg, rgba(154,92,46,0.08), rgba(154,92,46,0.04))", border: "1px solid rgba(154,92,46,0.25)" }}>
+                  <div className="rounded-2xl rounded-tl-sm px-4 py-3 max-w-sm shadow-sm" style={{ background: "linear-gradient(135deg, rgba(0,174,239,0.08), rgba(0,174,239,0.04))", border: "1px solid rgba(0,174,239,0.25)" }}>
                     <p className="text-sm text-foreground/85 leading-relaxed">{msg.text}</p>
-                    <p className="text-[10px] mt-1.5 font-semibold" style={{ color: "rgba(154,92,46,0.6)" }}>ClientSurge AI responded in under 60 seconds</p>
+                    <p className="text-[10px] mt-1.5 font-semibold text-primary/70">ClientSurge AI responded in under 60 seconds</p>
                   </div>
                 )}
               </div>
@@ -333,10 +333,10 @@ Return a JSON object with:
             {/* Follow-up typing indicator */}
             {followUpPhase === "typing" && (
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg,#9a5c2e,#7a4825)" }}>
-                  <Zap className="w-4 h-4 text-amber-100" />
+                <div className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center" style={{ background: "linear-gradient(135deg,#003B8F,#00AEEF)" }}>
+                  <Zap className="w-4 h-4 text-white" />
                 </div>
-                <div className="bg-white rounded-2xl rounded-tl-sm border border-amber-200 shadow-sm">
+                <div className="bg-white rounded-2xl rounded-tl-sm border border-primary/20 shadow-sm">
                   <TypingDots />
                 </div>
               </div>
@@ -372,9 +372,9 @@ Return a JSON object with:
                   onClick={handleFollowUp}
                   disabled={isTyping || !followUpInput.trim()}
                   className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 disabled:opacity-40 transition-opacity"
-                  style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", border: "none", cursor: isTyping || !followUpInput.trim() ? "not-allowed" : "pointer" }}
+                  style={{ background: "linear-gradient(135deg,#003B8F 0%,#0088CC 52%,#00AEEF 100%)", border: "none", cursor: isTyping || !followUpInput.trim() ? "not-allowed" : "pointer" }}
                 >
-                  <Send className="w-4 h-4 text-amber-100" />
+                  <Send className="w-4 h-4 text-white" />
                 </button>
               </div>
               <p className="text-[10px] text-foreground/30 mt-2 pl-10">Press Enter or click send. The AI will respond just like in a real conversation.</p>
@@ -393,9 +393,9 @@ Return a JSON object with:
             <button
               onClick={handleGenerate}
               disabled={isTyping}
-              style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "8px", height: "46px", padding: "0 28px", borderRadius: "9999px", background: isTyping ? "#ccc" : "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.875rem", border: "none", cursor: isTyping ? "not-allowed" : "pointer", boxShadow: "0 4px 14px rgba(120,70,20,0.35)", transition: "box-shadow 0.3s" }}
-              onMouseEnter={e => { if (!isTyping) e.currentTarget.style.boxShadow = "0 6px 24px rgba(120,70,20,0.5)"; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 14px rgba(120,70,20,0.35)"; }}
+              style={{ flexShrink: 0, display: "inline-flex", alignItems: "center", gap: "8px", height: "46px", padding: "0 28px", borderRadius: "8px", background: isTyping ? "#ccc" : "linear-gradient(135deg,#003B8F 0%,#0088CC 52%,#00AEEF 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.875rem", border: "none", cursor: isTyping ? "not-allowed" : "pointer", boxShadow: "0 12px 28px rgba(0,88,160,0.22)", transition: "box-shadow 0.3s" }}
+              onMouseEnter={e => { if (!isTyping) e.currentTarget.style.boxShadow = "0 16px 36px rgba(0,174,239,0.32)"; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 12px 28px rgba(0,88,160,0.22)"; }}
             >
               <Sparkles className="w-4 h-4" />
               {phase === "typing" ? "Generating..." : phase === "done" ? "Start Over" : "Generate AI Response"}
@@ -403,8 +403,7 @@ Return a JSON object with:
             {phase === "done" && (
               <button
                 onClick={() => setShowDemoModal(true)}
-                className="text-sm font-semibold flex items-center gap-1.5 hover:underline focus:outline-none"
-                style={{ color: "#9a5c2e" }}
+                className="text-sm font-semibold flex items-center gap-1.5 text-primary hover:underline focus:outline-none"
               >
                 Make the Leap
                 <ArrowRight className="w-3.5 h-3.5" />

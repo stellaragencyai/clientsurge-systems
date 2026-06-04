@@ -143,6 +143,7 @@ function VideoPlaceholder({ service, onClose }) {
       >
         <button
           onClick={onClose}
+          aria-label="Close automation preview"
           className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
         >
           <X className="w-4 h-4" />
@@ -189,9 +190,9 @@ function ServiceCard({ service }) {
   return (
     <>
       <div
-        className="flex flex-col rounded-2xl overflow-hidden transition-all duration-300"
+        className="flex flex-col rounded-lg overflow-hidden transition-all duration-300"
         style={{
-          background: "white",
+          background: "hsl(var(--card))",
           border: hovered ? `1.5px solid ${BRAND.color}44` : "1.5px solid rgba(0,0,0,0.07)",
           boxShadow: hovered
             ? `0 24px 64px rgba(0,136,204,0.14), 0 4px 20px rgba(0,0,0,0.08)`
@@ -247,19 +248,19 @@ function ServiceCard({ service }) {
 
         {/* Content */}
         <div className="p-6 flex flex-col flex-1">
-          <h3 className="text-lg font-bold text-slate-900 mb-1" style={{ fontFamily: "Montserrat, sans-serif" }}>
+          <h2 className="text-lg font-bold text-foreground mb-1" style={{ fontFamily: "Montserrat, sans-serif" }}>
             {service.title}
-          </h3>
-          <p className="text-xs font-semibold mb-3" style={{ color: BRAND.color }}>
+          </h2>
+          <p className="text-xs font-semibold mb-3 text-primary">
             {service.tagline}
           </p>
-          <p className="text-sm text-slate-600 leading-relaxed mb-5">
+          <p className="text-sm text-muted-foreground leading-relaxed mb-5">
             {service.description}
           </p>
 
           {/* Stats */}
-          <div className="rounded-xl p-4 mb-5" style={{ background: "#f0f8ff", border: "1px solid rgba(0,136,204,0.12)" }}>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Industry Benchmarks</p>
+          <div className="rounded-lg p-4 mb-5 border border-primary/15 bg-primary/5">
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">System Signals</p>
             <div className="space-y-3">
               {service.stats.map((stat) => (
                 <div key={stat.label} className="flex items-start gap-3">
@@ -267,8 +268,8 @@ function ServiceCard({ service }) {
                     {stat.value}
                   </span>
                   <div>
-                    <p className="text-xs text-slate-700 font-medium leading-tight">{stat.label}</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Source: {stat.source}</p>
+                    <p className="text-xs text-foreground font-medium leading-tight">{stat.label}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Source: {stat.source}</p>
                   </div>
                 </div>
               ))}
@@ -277,12 +278,12 @@ function ServiceCard({ service }) {
 
           {/* What you get */}
           <div className="mb-6 flex-1">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">What's included</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">What's included</p>
             <ul className="space-y-2">
               {service.whatYouGet.map((item) => (
                 <li key={item} className="flex items-start gap-2">
                   <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: BRAND.color }} />
-                  <span className="text-xs text-slate-600 leading-snug">{item}</span>
+                  <span className="text-xs text-muted-foreground leading-snug">{item}</span>
                 </li>
               ))}
             </ul>
@@ -319,27 +320,26 @@ export default function Automations() {
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen" style={{ background: "#f8fafc" }}>
+      <div className="min-h-screen bg-background">
       <Navbar />
 
       {/* Hero */}
       <main className="pt-[var(--cs-nav-height)]">
       <div className="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center">
         <div
-          className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest"
-          style={{ background: "rgba(0,136,204,0.08)", border: "1px solid rgba(0,136,204,0.2)", color: BRAND.color }}
+          className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest border border-primary/20 bg-primary/10 text-primary"
         >
           AI Lead Conversion Systems
         </div>
         <h1
-          className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-5"
+          className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-5"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
           AI Automation Systems for
           <br />
           <span style={{ color: BRAND.color }}>Local Service Businesses</span>
         </h1>
-        <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed mb-8">
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-8">
           ClientSurge installs automation systems that capture, follow up with, qualify, book, and reactivate leads so fewer local service opportunities fall through the cracks.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
@@ -373,14 +373,14 @@ export default function Automations() {
           className="mt-16 rounded-3xl p-10 md:p-14 text-center"
           style={{ background: "linear-gradient(135deg,#eaf8ff 0%,#dff5ff 60%,#f8fbff 100%)", border: "1px solid rgba(0,136,204,0.14)" }}
         >
-          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "rgba(0,80,160,0.62)" }}>Ready to Begin?</p>
+          <p className="text-xs font-bold uppercase tracking-widest mb-3 text-primary">Ready to Begin?</p>
           <h2
-            className="text-3xl md:text-4xl font-bold text-slate-900 mb-4"
+            className="text-3xl md:text-4xl font-bold text-foreground mb-4"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
             Activate Your Systems in 24–48 Hours
           </h2>
-          <p className="text-slate-600 text-base max-w-xl mx-auto mb-8 leading-relaxed">
+          <p className="text-muted-foreground text-base max-w-xl mx-auto mb-8 leading-relaxed">
             Book a free automation audit and our team will map the right voice, lead response, follow-up, and booking systems for your business.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -393,12 +393,12 @@ export default function Automations() {
             </Link>
             <Link
               to="/book"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-slate-700 border-2 border-slate-200 hover:border-blue-300 transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-foreground border-2 border-border hover:border-primary/40 transition-colors"
             >
               Book a Live Demo
             </Link>
           </div>
-          <p className="mt-5 text-xs text-slate-500">No credit card required · Typical setup time: 24–48 hours</p>
+          <p className="mt-5 text-xs text-muted-foreground">No credit card required · Typical setup time: 24–48 hours</p>
         </div>
       </div>
       </main>

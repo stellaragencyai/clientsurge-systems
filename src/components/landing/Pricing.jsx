@@ -2,18 +2,9 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  Bot,
-  CalendarCheck,
   CheckCircle2,
-  Mail,
-  MessageSquare,
-  PhoneCall,
-  RefreshCw,
   ShieldCheck,
-  Sparkles,
-  Star,
   Wallet,
-  Zap,
 } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import {
@@ -21,7 +12,6 @@ import {
   INDUSTRY_SELECTION_STORAGE_KEY,
 } from "@/lib/industryRecommendations";
 import {
-  CANONICAL_SERVICE_PRODUCTS,
   PACKAGE_OFFERS,
 } from "@/lib/salesCatalog";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
@@ -46,46 +36,19 @@ function SimpleCheck() {
   );
 }
 
-const SERVICE_ICONS = {
-  instant_lead_response: Zap,
-  missed_call_text_back: PhoneCall,
-  nurture_sequence_14d: RefreshCw,
-  ai_booking_agent: CalendarCheck,
-  lead_reactivation: RefreshCw,
-  review_request: Star,
-  email_campaign: Mail,
-  appointment_reminders: CalendarCheck,
-  customer_winback: RefreshCw,
-  website_chat: MessageSquare,
-  reputation_monitoring: ShieldCheck,
-  ai_qualification: Bot,
-};
-
 const STRIPE_LINKS = {
   starter_system: "/store",
   growth_system: "/store",
   elite_system: "/store",
 };
 
-function formatMoney(amount) {
-  return `$${Number(amount || 0).toLocaleString()}`;
-}
-
-const ALA_CARTE = CANONICAL_SERVICE_PRODUCTS.map((product) => ({
-  Icon: SERVICE_ICONS[product.service_key] || Sparkles,
-  name: product.name,
-  desc: product.description,
-  price: `${formatMoney(product.setup_fee)} setup - ${formatMoney(product.monthly_fee)}/mo`,
-  link: "/store",
-}));
-
 const plans = PACKAGE_OFFERS.map((offer) => ({
   name: offer.name,
   packageKey: offer.package_key,
   fit: offer.fit,
   desc: offer.description,
-  setup: formatMoney(offer.setup_total),
-  monthly: formatMoney(offer.monthly_total),
+  setup: `$${Number(offer.setup_total || 0).toLocaleString()}`,
+  monthly: `$${Number(offer.monthly_total || 0).toLocaleString()}`,
   features: offer.included_services.map((service) => service.name),
   badge: offer.badge || null,
   highlight: Boolean(offer.highlight),
@@ -94,7 +57,6 @@ const plans = PACKAGE_OFFERS.map((offer) => ({
 export default function Pricing() {
   const demoBooking = useDemoBooking();
   const [selectedIndustry, setSelectedIndustry] = useState(null);
-  const [showAddOns, setShowAddOns] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -136,7 +98,7 @@ export default function Pricing() {
         </div>
 
         {selectedIndustry ? (
-          <div className="max-w-4xl mx-auto mb-10 rounded-3xl border border-primary/15 bg-primary/5 px-6 py-5 text-center">
+          <div className="max-w-4xl mx-auto mb-10 rounded-lg border border-primary/15 bg-primary/5 px-6 py-5 text-center">
             <p className="text-xs font-semibold text-[#005f99] tracking-[0.22em] uppercase mb-2">
               Recommended For {selectedIndustry.shortName}
             </p>
@@ -157,7 +119,7 @@ export default function Pricing() {
           ].map(({ Icon, text }) => (
             <span
               key={text}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full border"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg border"
               style={{
                 background: "rgba(0,174,239,0.07)",
                 borderColor: "rgba(0,174,239,0.2)",
@@ -192,9 +154,9 @@ export default function Pricing() {
           ].map((badge) => (
             <div
               key={badge.text}
-              className="flex flex-col items-center justify-center gap-2 py-6 rounded-2xl font-semibold"
+              className="flex flex-col items-center justify-center gap-2 py-6 rounded-lg font-semibold"
               style={{
-                background: "#ffffff",
+                background: "hsl(var(--card))",
                 border: "1px solid rgba(0,174,239,0.18)",
                 color: "rgba(0,0,0,0.75)",
               }}
@@ -223,58 +185,6 @@ export default function Pricing() {
         </div>
 
         <MoneyBackGuarantee />
-
-        <div className="mt-12 md:mt-16">
-          <button
-            type="button"
-            className="mx-auto mb-6 flex max-w-sm items-center justify-center rounded-full border border-primary/20 bg-white px-5 py-3 text-sm font-bold text-primary shadow-sm md:hidden"
-            onClick={() => setShowAddOns((value) => !value)}
-            aria-expanded={showAddOns}
-          >
-            {showAddOns ? "Hide A La Carte Add-Ons" : "Show A La Carte Add-Ons"}
-          </button>
-          <div className="text-center mb-8">
-            <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-2">
-              A La Carte Add-Ons
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Need one specific tool? Every self-serve service below comes from
-              the same live checkout catalog used by the store.
-            </p>
-          </div>
-          <div className={`${showAddOns ? "grid" : "hidden"} grid-cols-1 sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6`}>
-            {ALA_CARTE.map(({ Icon, ...item }) => (
-              <div
-                key={item.name}
-                className="flex flex-col rounded-2xl p-6"
-                style={{
-                  background: "rgba(255,255,255,0.7)",
-                  border: "1px solid rgba(0,0,0,0.12)",
-                  backdropFilter: "blur(12px)",
-                }}
-              >
-                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-primary/15 bg-primary/8 text-primary">
-                  <Icon className="h-5 w-5" aria-hidden="true" />
-                </div>
-                <h4 className="font-semibold text-foreground text-sm mb-1">
-                  {item.name}
-                </h4>
-                <p className="text-xs text-muted-foreground flex-1 mb-3 leading-relaxed">
-                  {item.desc}
-                </p>
-                <p className="text-xs font-bold text-foreground mb-4">
-                  {item.price}
-                </p>
-                <a
-                  href={item.link}
-                  className="inline-flex items-center justify-center gap-1.5 h-9 rounded-full border border-primary/30 bg-primary/5 text-xs font-semibold text-black hover:bg-primary/10 transition-colors hover:shadow-[0_0_12px_rgba(0,174,239,0.3)]"
-                >
-                  Add This <ArrowRight className="w-3 h-3" />
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       <style>{`
@@ -295,7 +205,7 @@ export default function Pricing() {
           background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.84) 100%);
         }
         .pricing-card.highlight-hover {
-          background: linear-gradient(135deg, rgba(255,248,235,0.98) 0%, rgba(245,217,168,0.4) 100%);
+          background: linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(221,245,255,0.54) 100%);
         }
         .pricing-card::before {
           content: "";
@@ -342,7 +252,7 @@ export default function Pricing() {
         }
         .shiny-cta-btn {
           display: inline-block;
-          border-radius: 9999px;
+          border-radius: 8px;
           padding: 2px;
           background: linear-gradient(135deg, #00AEEF 0%, #009DFF 45%, #003B8F 100%);
           box-shadow: 0 4px 18px rgba(0, 174, 239, 0.4), 0 1px 4px rgba(0, 0, 0, 0.1);
@@ -359,7 +269,7 @@ export default function Pricing() {
           width: 100%;
           height: 100%;
           background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-          border-radius: 9999px;
+          border-radius: 8px;
           pointer-events: none;
         }
         .shiny-cta-btn:hover {
@@ -368,7 +278,7 @@ export default function Pricing() {
         }
         .shiny-cta-inner {
           background: linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%);
-          border-radius: 9999px;
+          border-radius: 6px;
           color: #ffffff;
           font-weight: 700;
           letter-spacing: 0.01em;
@@ -398,7 +308,7 @@ function PricingCard({ plan, selectedIndustry }) {
 
   return (
     <motion.div
-      className={`pricing-card relative flex flex-col rounded-2xl transition-all duration-300 ${
+      className={`pricing-card relative flex flex-col rounded-lg transition-all duration-300 ${
         plan.highlight ? "highlight-glow" : ""
       } ${isHovered && plan.highlight ? "highlight-hover" : ""}`}
       style={{
@@ -437,7 +347,7 @@ function PricingCard({ plan, selectedIndustry }) {
     >
       {plan.highlight ? (
         <div
-          className="absolute inset-0 rounded-2xl pointer-events-none"
+          className="absolute inset-0 rounded-lg pointer-events-none"
           style={{
             boxShadow: isHovered
               ? "0 0 0 1px rgba(0,174,239,0.45), 0 0 48px rgba(0,174,239,0.18)"
@@ -451,7 +361,7 @@ function PricingCard({ plan, selectedIndustry }) {
       {plan.badge || isRecommended ? (
         <div className="pricing-badge-float" style={{ zIndex: 30 }}>
           <span
-            className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl"
+            className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-lg tracking-wide shadow-xl"
             style={{
               background:
                 "linear-gradient(135deg, #00AEEF 0%, #009DFF 50%, #003B8F 100%)",
@@ -534,11 +444,11 @@ function PricingCard({ plan, selectedIndustry }) {
             className={
               plan.highlight
                 ? "w-full shiny-cta-btn focus:ring-2 focus:ring-primary focus:outline-none"
-                : "w-full inline-flex items-center justify-center gap-2 h-12 rounded-full border border-primary/25 bg-white/80 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
+                : "w-full inline-flex items-center justify-center gap-2 h-12 rounded-lg border border-primary/25 bg-white/80 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
             }
           >
             {plan.highlight ? (
-              <span className="shiny-cta-inner w-full flex items-center justify-center gap-2 h-12 rounded-full font-semibold text-sm">
+              <span className="shiny-cta-inner w-full flex items-center justify-center gap-2 h-12 rounded-lg font-semibold text-sm">
                 Get Started - {plan.setup} Today
                 <ArrowRight className="w-4 h-4" />
               </span>

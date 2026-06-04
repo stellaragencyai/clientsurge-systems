@@ -13,12 +13,12 @@ import DemoBookingModal from "../forms/DemoBookingModal";
 const EVENT_POOL = [
   { icon: Zap, color: "#16a34a", bg: "rgba(22,163,74,0.1)", city: "Scottsdale, AZ", event: "New lead captured from Google Ads", detail: "Responded in 12 seconds" },
   { icon: PhoneCall, color: "#dc2626", bg: "rgba(220,38,38,0.08)", city: "Phoenix, AZ", event: "Missed call received", detail: "Text-back sent in 8 seconds" },
-  { icon: CalendarCheck, color: "#9a5c2e", bg: "rgba(154,92,46,0.1)", city: "Austin, TX", event: "Consultation booked", detail: "Lead qualified via SMS in 4 min" },
+  { icon: CalendarCheck, color: "#0088CC", bg: "rgba(0,174,239,0.1)", city: "Austin, TX", event: "Consultation booked", detail: "Lead qualified via SMS in 4 min" },
   { icon: MessageSquare, color: "#7c3aed", bg: "rgba(124,58,237,0.08)", city: "Miami, FL", event: "Follow-up sequence triggered", detail: "Day 3 of 14-day nurture" },
   { icon: RefreshCw, color: "#0891b2", bg: "rgba(8,145,178,0.08)", city: "Denver, CO", event: "Dormant lead reactivated", detail: "Re-engagement sent after 21 days" },
-  { icon: Mail, color: "#9a5c2e", bg: "rgba(154,92,46,0.08)", city: "Nashville, TN", event: "Booking confirmation sent", detail: "Email + SMS confirmed" },
+  { icon: Mail, color: "#0088CC", bg: "rgba(0,174,239,0.08)", city: "Nashville, TN", event: "Booking confirmation sent", detail: "Email + SMS confirmed" },
   { icon: Zap, color: "#16a34a", bg: "rgba(22,163,74,0.1)", city: "Dallas, TX", event: "Lead captured from Facebook form", detail: "Responded in 9 seconds" },
-  { icon: CalendarCheck, color: "#9a5c2e", bg: "rgba(154,92,46,0.1)", city: "Scottsdale, AZ", event: "Appointment confirmed", detail: "No-show reminder scheduled" },
+  { icon: CalendarCheck, color: "#0088CC", bg: "rgba(0,174,239,0.1)", city: "Scottsdale, AZ", event: "Appointment confirmed", detail: "No-show reminder scheduled" },
   { icon: PhoneCall, color: "#dc2626", bg: "rgba(220,38,38,0.08)", city: "Phoenix, AZ", event: "After-hours inquiry received", detail: "Instant response sent at 11:43 PM" },
   { icon: MessageSquare, color: "#7c3aed", bg: "rgba(124,58,237,0.08)", city: "Peoria, AZ", event: "Quote request follow-up", detail: "2nd touchpoint in sequence" },
 ];
@@ -32,8 +32,8 @@ function FeedItem({ item, isNew }) {
     <div
       className="flex items-start gap-4 px-5 py-4 rounded-xl transition-all duration-500"
       style={{
-        background: isNew ? "rgba(154,92,46,0.06)" : "transparent",
-        border: isNew ? "1px solid rgba(154,92,46,0.2)" : "1px solid transparent",
+        background: isNew ? "rgba(0,174,239,0.06)" : "transparent",
+        border: isNew ? "1px solid rgba(0,174,239,0.2)" : "1px solid transparent",
         opacity: 1,
       }}
     >
@@ -96,7 +96,7 @@ export default function LiveAutomationFeed() {
 
         <div className="grid lg:grid-cols-[1fr_320px] gap-6">
           {/* Feed */}
-          <div className="rounded-3xl overflow-hidden" style={{ background: "#fff", border: "1px solid rgba(154,92,46,0.15)", boxShadow: "0 16px 48px rgba(0,0,0,0.07)" }}>
+          <div className="rounded-lg overflow-hidden" style={{ background: "hsl(var(--card))", border: "1px solid rgba(0,174,239,0.15)", boxShadow: "0 16px 48px rgba(0,59,143,0.07)" }}>
             {/* Top bar */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-border/50">
               <div className="flex items-center gap-2">
@@ -117,10 +117,10 @@ export default function LiveAutomationFeed() {
           <div className="flex flex-col gap-4">
             {[
               { label: "Leads Captured", value: counter.leads, color: "#16a34a" },
-              { label: "Bookings Generated", value: counter.bookings, color: "#9a5c2e" },
+              { label: "Bookings Generated", value: counter.bookings, color: "#0088CC" },
               { label: "Leads Recovered", value: counter.recovered, color: "#7c3aed" },
             ].map(({ label, value, color }) => (
-              <div key={label} className="flex-1 rounded-2xl p-5 bg-white flex flex-col justify-between" style={{ border: "1px solid rgba(154,92,46,0.12)", boxShadow: "0 4px 16px rgba(0,0,0,0.05)" }}>
+              <div key={label} className="flex-1 rounded-lg p-5 bg-card flex flex-col justify-between" style={{ border: "1px solid rgba(0,174,239,0.12)", boxShadow: "0 4px 16px rgba(0,59,143,0.05)" }}>
                 <p className="text-xs font-bold uppercase tracking-widest text-foreground/45 mb-2">{label}</p>
                 <p className="font-display text-3xl font-bold transition-all duration-500" style={{ color }}>{value.toLocaleString()}</p>
                 <p className="text-[10px] text-foreground/35 mt-1">Simulated demo data</p>
@@ -129,9 +129,9 @@ export default function LiveAutomationFeed() {
 
             <button
               onClick={() => setShowDemoModal(true)}
-              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "52px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.9rem", border: "none", cursor: "pointer", boxShadow: "0 4px 18px rgba(120,70,20,0.35)" }}
-              onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 8px 32px rgba(120,70,20,0.5)"; }}
-              onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)"; }}
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "52px", borderRadius: "8px", background: "linear-gradient(135deg,#003B8F 0%,#0088CC 52%,#00AEEF 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.9rem", border: "none", cursor: "pointer", boxShadow: "0 12px 28px rgba(0,88,160,0.22)" }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 16px 36px rgba(0,174,239,0.32)"; }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 12px 28px rgba(0,88,160,0.22)"; }}
             >
               Get This For My Business
               <ArrowRight className="w-4 h-4" />

@@ -472,9 +472,9 @@ function App() {
             <AppInner />
             <AutoCTAAnalytics />
             <RouteIndexingGuard />
-            <main id="main-content" tabIndex={-1}>
+            <div id="main-content" tabIndex={-1}>
               <AuthenticatedApp />
-            </main>
+            </div>
             <PublicCookieConsent />
           </Router>
           <Toaster />

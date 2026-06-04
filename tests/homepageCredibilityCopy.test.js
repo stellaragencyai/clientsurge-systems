@@ -73,7 +73,8 @@ test("homepage launch copy uses proof-oriented language instead", () => {
 });
 
 test("public credibility surfaces avoid generic third-party placeholder media", () => {
-  assert.match(copy, /Founder photo pending/);
+  assert.match(copy, /Founder-led implementation/);
+  assert.doesNotMatch(copy, /Founder photo pending|Launch-safe placeholder/);
   assert.match(copy, /INDUSTRY_HERO_FALLBACKS/);
   assert.doesNotMatch(copy, /placehold\.co|placeholder\.com|via\.placeholder/);
 });

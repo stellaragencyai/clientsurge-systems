@@ -136,7 +136,7 @@ export default function Contact() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <section className="py-20 px-6 text-center" style={{ background: "linear-gradient(to bottom, hsl(var(--muted)), hsl(var(--background)))" }}>
+      <section className="px-6 pb-12 pt-[calc(var(--cs-nav-height)+28px)] text-center md:pb-14 md:pt-[calc(var(--cs-nav-height)+42px)]" style={{ background: "linear-gradient(to bottom, hsl(var(--muted)), hsl(var(--background)))" }}>
         <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Get In Touch</p>
         <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
           Contact ClientSurge Systems
@@ -146,8 +146,8 @@ export default function Contact() {
         </p>
       </section>
 
-      <section className="py-16 px-6">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+      <section className="px-6 pb-16 pt-8 md:pt-10">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-[0.95fr_1.05fr] gap-10 lg:gap-14 items-start">
           <div className="flex flex-col gap-8">
             <div>
               <h2 className="font-display text-2xl font-semibold text-foreground mb-6">Contact Information</h2>
@@ -186,7 +186,7 @@ export default function Contact() {
               </div>
             </div>
 
-            <div className="p-6 rounded-2xl border border-primary/20 bg-primary/5">
+            <div className="p-5 rounded-lg border border-primary/20 bg-primary/5 md:p-6">
               <p className="text-sm font-semibold text-foreground mb-2">Prefer a live walkthrough?</p>
               <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
                 Skip the form and book a free automation audit. We&apos;ll review your current lead flow and show the fastest practical automation wins.
@@ -203,7 +203,7 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="bg-card rounded-2xl border border-border p-8 shadow-sm">
+          <div className="bg-card rounded-lg border border-border p-6 shadow-sm md:p-8">
             {success ? (
               <motion.div
                 className="flex flex-col items-center text-center py-8"

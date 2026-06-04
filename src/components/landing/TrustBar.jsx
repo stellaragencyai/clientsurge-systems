@@ -85,14 +85,14 @@ function StatCard({ item, index, inView }) {
   
   return (
     <motion.article
-      className="relative rounded-2xl border border-border text-left shadow-sm"
+      className="relative rounded-lg border border-border text-left shadow-sm"
       aria-label={`${statText} — ${item.label}`}
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.55, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        background: "#ffffff",
+        background: "hsl(var(--card))",
         minHeight: "clamp(140px, 20vw, 190px)",
         padding: "clamp(14px, 3vw, 20px)",
         display: "flex",
@@ -101,7 +101,7 @@ function StatCard({ item, index, inView }) {
         boxShadow: isHighlighted ? "0 0 20px rgba(0,174,239,0.2), 0 6px 22px rgba(0,0,0,0.06)" : "0 6px 22px rgba(0,0,0,0.06)",
       }}
     >
-      <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3" style={isHighlighted ? { boxShadow: "0 0 12px rgba(0,174,239,0.3)" } : {}}>
+      <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3" style={isHighlighted ? { boxShadow: "0 0 12px rgba(0,174,239,0.3)" } : {}}>
         <Icon className="w-[17px] h-[17px] text-primary" />
       </div>
       <div>

@@ -113,7 +113,7 @@ export default function HeroSection({
 
           {/* Description (optional small text) */}
           {description && (
-            <p className="text-sm max-w-xl mx-auto mb-8 font-medium" style={{color: backgroundType === "image" ? "rgba(161,120,35,0.9)" : "inherit"}}>
+            <p className="text-sm max-w-xl mx-auto mb-8 font-medium" style={{color: backgroundType === "image" ? "rgba(255,255,255,0.78)" : "inherit"}}>
               {description}
             </p>
           )}
@@ -125,10 +125,10 @@ export default function HeroSection({
                 onClick={primaryCTA.onClick}
                 style={{
                   display: "inline-block",
-                  borderRadius: "9999px",
+                  borderRadius: "8px",
                   padding: "2px",
-                  background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
-                  boxShadow: "0 4px 24px rgba(120,70,20,0.4)",
+                  background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+                  boxShadow: "0 12px 28px rgba(0,88,160,0.24)",
                   border: "none",
                   cursor: "pointer",
                 }}
@@ -140,9 +140,9 @@ export default function HeroSection({
                     gap: "8px",
                     height: "52px",
                     padding: "0 32px",
-                    borderRadius: "9999px",
-                    background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                    color: "#f5e6d0",
+                    borderRadius: "6px",
+                    background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
+                    color: "#ffffff",
                     fontWeight: "700",
                     fontSize: "1rem",
                     textShadow: "0 1px 2px rgba(0,0,0,0.3)",
@@ -155,7 +155,7 @@ export default function HeroSection({
             )}
 
             {secondaryCTA && (
-              <Button size="lg" variant="outline" onClick={secondaryCTA.onClick} className="rounded-full px-8 h-[52px] text-base font-semibold gap-2">
+              <Button size="lg" variant="outline" onClick={secondaryCTA.onClick} className="rounded-lg px-8 h-[52px] text-base font-semibold gap-2">
                 {secondaryCTA.label}
                 {secondaryCTA.icon && <secondaryCTA.icon className="w-4 h-4" />}
               </Button>

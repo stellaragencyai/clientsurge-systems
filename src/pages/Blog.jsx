@@ -554,14 +554,22 @@ function BlogIndex() {
 
   return (
     <BlogShell>
-      <div className="mx-auto max-w-3xl">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Launch guides</p>
-        <h1 className="mb-4 text-4xl font-black leading-tight text-foreground md:text-5xl">
-          AI lead response guides for local service businesses
-        </h1>
-        <p className="mb-8 max-w-2xl text-base leading-7 text-muted-foreground">
-          Practical ClientSurge playbooks on missed-call recovery, AI lead follow-up, booking automation, and niche-specific response systems.
-        </p>
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-8 grid gap-6 lg:grid-cols-[1fr_19rem] lg:items-end">
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Launch guides</p>
+            <h1 className="mb-4 max-w-3xl text-4xl font-black leading-tight text-foreground md:text-5xl">
+              AI lead response guides for local service businesses
+            </h1>
+            <p className="max-w-2xl text-base leading-7 text-muted-foreground">
+              Practical ClientSurge playbooks on missed-call recovery, AI lead follow-up, booking automation, and niche-specific response systems.
+            </p>
+          </div>
+          <div className="rounded-lg border border-primary/15 bg-primary/5 p-4 text-sm text-muted-foreground">
+            <p className="mb-1 text-xs font-bold uppercase tracking-[0.18em] text-primary">Field notes</p>
+            <p className="leading-6">Each guide maps one lead leak to a practical automation path, then points to the matching package or audit route.</p>
+          </div>
+        </div>
         <div className="mb-6 flex gap-2 overflow-x-auto pb-2" aria-label="Filter blog guides by topic">
           {topicFilters.map((filter) => {
             const selected = filter.label === activeTopic;
@@ -570,10 +578,10 @@ function BlogIndex() {
                 key={filter.label}
                 type="button"
                 onClick={() => setActiveTopic(filter.label)}
-                className={`shrink-0 rounded-full border px-4 py-2 text-sm font-bold transition ${
+                className={`shrink-0 rounded-lg border px-4 py-2 text-sm font-bold transition ${
                   selected
                     ? "border-primary bg-primary text-white shadow-sm"
-                    : "border-primary/15 bg-white text-muted-foreground hover:border-primary/40 hover:text-primary"
+                    : "border-primary/15 bg-card text-muted-foreground hover:border-primary/40 hover:text-primary"
                 }`}
                 aria-pressed={selected}
               >
@@ -582,12 +590,12 @@ function BlogIndex() {
             );
           })}
         </div>
-        <div className="grid gap-4">
+        <div className="grid gap-4 md:grid-cols-2">
           {filteredPosts.map((post) => (
             <Link
               key={post.slug}
               to={`/blog/${post.slug}`}
-              className="block rounded-lg border border-primary/12 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md"
+              className="group block rounded-lg border border-primary/12 bg-card p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md md:p-6"
             >
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">{post.tag}</span>
@@ -596,7 +604,7 @@ function BlogIndex() {
               </div>
               <h2 className="mb-2 text-xl font-extrabold leading-snug text-foreground">{post.title}</h2>
               <p className="mb-4 text-sm leading-6 text-muted-foreground">{post.description}</p>
-              <span className="text-sm font-semibold text-primary">Read guide</span>
+              <span className="text-sm font-semibold text-primary transition group-hover:translate-x-0.5">Read guide</span>
             </Link>
           ))}
         </div>
@@ -638,11 +646,11 @@ function BlogArticle({ post }) {
         <h1 className="mb-5 text-4xl font-black leading-tight text-foreground md:text-5xl">{post.title}</h1>
         <p className="mb-8 text-lg leading-8 text-muted-foreground">{post.description}</p>
 
-        <div className="mb-10 rounded-lg border border-primary/12 bg-white p-5 shadow-sm">
+        <div className="mb-10 rounded-lg border border-primary/12 bg-card p-5 shadow-sm">
           <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Useful next steps</p>
           <div className="flex flex-wrap gap-3">
             {post.links.map((link) => (
-              <Link key={link.href} to={link.href} className="rounded-full border border-primary/20 bg-white px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5">
+              <Link key={link.href} to={link.href} className="rounded-lg border border-primary/20 bg-background px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5">
                 {link.label}
               </Link>
             ))}
@@ -662,7 +670,7 @@ function BlogArticle({ post }) {
           <h2 className="mb-5 text-2xl font-extrabold text-foreground">FAQ</h2>
           <div className="space-y-3">
             {post.faqs.map(([question, answer]) => (
-              <div key={question} className="rounded-lg border border-primary/12 bg-white p-5 shadow-sm">
+              <div key={question} className="rounded-lg border border-primary/12 bg-card p-5 shadow-sm">
                 <h3 className="mb-2 text-base font-bold text-foreground">{question}</h3>
                 <p className="text-sm leading-6 text-muted-foreground">{answer}</p>
               </div>
@@ -675,7 +683,7 @@ function BlogArticle({ post }) {
           <p className="mb-5 text-sm leading-6 text-muted-foreground">
             ClientSurge audits where leads go cold, then maps the automation stack that fits your package, team, and launch readiness.
           </p>
-          <Link to={post.cta.href} className="inline-flex rounded-full bg-primary px-5 py-3 text-sm font-black text-white shadow-sm hover:opacity-90">
+          <Link to={post.cta.href} className="inline-flex rounded-lg bg-primary px-5 py-3 text-sm font-black text-white shadow-sm hover:opacity-90">
             {post.cta.label}
           </Link>
         </div>

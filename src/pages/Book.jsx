@@ -27,9 +27,9 @@ export default function Book() {
     <DemoBookingProvider>
       <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
         <Navbar />
-        <main className="px-6 pb-16 pt-[calc(var(--cs-nav-height)+56px)]">
+        <main className="px-6 pb-16 pt-[calc(var(--cs-nav-height)+36px)] md:pt-[calc(var(--cs-nav-height)+48px)]">
       <div className="mx-auto w-full max-w-4xl">
-        <div className="text-center mb-12">
+        <div className="text-center mb-9 md:mb-11">
           <h1 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-4">
             Book Your Free ClientSurge Automation Audit
           </h1>
@@ -46,7 +46,7 @@ export default function Book() {
           </a>
         </div>
 
-        <div className="mt-10 rounded-2xl border border-border bg-card/80 p-6 md:p-8">
+        <div className="mt-8 rounded-lg border border-border bg-card/80 p-5 md:p-8">
           <div className="max-w-2xl mx-auto text-center mb-8">
             <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What Happens After You Book</p>
             <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
@@ -66,7 +66,7 @@ export default function Book() {
               "Booking friction review",
               "Practical automation recommendations",
             ].map((item) => (
-              <div key={item} className="rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground">
+              <div key={item} className="rounded-lg border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground">
                 {item}
               </div>
             ))}
@@ -92,7 +92,7 @@ export default function Book() {
             ].map((step) => {
               const Icon = step.icon;
               return (
-                <div key={step.title} className="rounded-2xl border border-border bg-background p-5 text-left shadow-sm">
+                <div key={step.title} className="rounded-lg border border-border bg-background p-5 text-left shadow-sm">
                   <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
                     <Icon className="w-5 h-5 text-primary" />
                   </div>
@@ -103,15 +103,15 @@ export default function Book() {
             })}
           </div>
 
-          <div id="scheduler" className="mt-8 rounded-2xl border border-primary/15 bg-primary/5 p-6 text-center shadow-sm">
+          <div id="scheduler" className="mt-8 rounded-lg border border-primary/15 bg-primary/5 p-6 text-center shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">
-              Fast scheduling
+              Audit request path
             </p>
             <h3 className="text-xl font-semibold text-foreground mb-3">
-              Tell us what you want reviewed and we will send the next available audit times.
+              Send the context once, then we will reply with the next clean audit openings.
             </h3>
             <p className="mx-auto max-w-2xl text-sm text-muted-foreground leading-relaxed">
-              The direct scheduler is temporarily unavailable in this preview, so the contact form is the clean path for audit requests.
+              The current booking path starts with a short contact note so we can route your request to the right automation review instead of dropping you into a generic calendar.
             </p>
           </div>
 
@@ -122,14 +122,14 @@ export default function Book() {
                 trackCTA('schedule_your_audit', 'book_page');
                 window.location.href = '/contact';
               }}
-              className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
+              className="inline-flex items-center justify-center rounded-lg border border-primary/20 bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity"
             >
               Schedule Your Audit
             </button>
             <Link
               to="/contact"
               onClick={() => trackCTA('contact_us_instead', 'book_page')}
-              className="inline-flex items-center justify-center rounded-full border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+              className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
             >
               Contact us instead
             </Link>

@@ -10,7 +10,7 @@ const testimonials = [
     before: "Online consult requests wait for manual follow-up",
     after: "New inquiries get an immediate response and booking path",
     result: "Target outcome: faster consult capture",
-    quote: "Example workflow: lead captured, SMS sent, booking handoff started.",
+    quote: "Workflow preview: lead captured, SMS sent, booking handoff started.",
     initials: "MS",
     color: "#00AEEF",
   },
@@ -21,7 +21,7 @@ const testimonials = [
     before: "Missed calls end without a callback or text thread",
     after: "Missed callers receive a prompt text-back and routing step",
     result: "Target outcome: fewer dropped calls",
-    quote: "Example workflow: missed call logged, reply captured, next step assigned.",
+    quote: "Workflow preview: missed call logged, reply captured, next step assigned.",
     initials: "HV",
     color: "#003B8F",
   },
@@ -32,7 +32,7 @@ const testimonials = [
     before: "Manual follow-up depends on front desk availability",
     after: "Follow-up sequence keeps qualified patients moving",
     result: "Target outcome: cleaner follow-up queue",
-    quote: "Example workflow: inquiry qualified, nurture started, booking prompt sent.",
+    quote: "Workflow preview: inquiry qualified, nurture started, booking prompt sent.",
     initials: "DE",
     color: "#009DFF",
   },
@@ -47,7 +47,7 @@ export default function Testimonials() {
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Launch Scenarios</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
-            Example Outcomes This System Is Built To Create
+            Launch Outcomes This System Is Built To Create
           </h2>
           <p className="mt-5 text-sm leading-6 text-muted-foreground">
             Illustrative examples based on the installed workflows. Verified customer case studies can replace these after launch proof.
@@ -107,7 +107,7 @@ export default function Testimonials() {
               </div>
 
               <div className="text-sm text-foreground/75 leading-relaxed flex-1 mb-6">
-                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-primary/80">Illustrative workflow</p>
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-primary/80">Workflow preview</p>
                 "{testimonial.quote}"
               </div>
 

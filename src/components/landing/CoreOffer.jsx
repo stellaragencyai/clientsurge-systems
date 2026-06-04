@@ -175,7 +175,7 @@ function MobileSystemGroupList({ selectedSystemId, onSelect, showAll, onToggle, 
       <button
         type="button"
         onClick={onToggle}
-        className="w-full inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-white/80">
+        className="w-full inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-white/80">
         
         {showAll ? "Show condensed view" : "See full 6-system flow"}
         <ArrowRight className="w-4 h-4" />
@@ -186,17 +186,28 @@ function MobileSystemGroupList({ selectedSystemId, onSelect, showAll, onToggle, 
 
 function CoreOfferCTA({ onBookDemo }) {
   return (
-    <div className="bg-[#f0f9ff] mt-24 mx-auto pt-8 text-center md:pt-10 md:mt-28 border-t border-border max-w-3xl flex flex-col items-center">
+    <div
+      className="relative mt-10 mb-20 mx-auto flex max-w-4xl flex-col items-center overflow-hidden rounded-lg border border-primary/15 px-6 py-8 text-center shadow-sm md:mt-12 md:mb-24 md:px-10 md:py-10"
+      style={{
+        background: "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(232,246,255,0.78) 100%)",
+        boxShadow: "0 22px 56px rgba(0,88,160,0.1)",
+      }}
+    >
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-1"
+        style={{ background: "linear-gradient(90deg, #003B8F, #00AEEF, #66D9FF)" }}
+      />
       <p className="font-display text-2xl md:text-3xl font-semibold text-foreground leading-tight">
         Ready to see which systems fit your business?
       </p>
-      <p className="text-sm md:text-base text-muted-foreground mt-3 leading-relaxed max-w-2xl mx-auto">
+      <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
         We will show you the right setup based on your lead flow, booking process, and goals.
       </p>
-      <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+      <div className="mt-7 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
         <a
           href={coreOfferSectionConfig.primaryCta.href}
-          className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
+          className="inline-flex h-12 w-full min-w-[220px] items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-primary/20 bg-white/80 px-6 text-sm font-semibold text-primary shadow-sm transition-colors hover:bg-primary/8 sm:w-auto">
           
           {coreOfferSectionConfig.primaryCta.label}
           <ArrowRight className="w-4 h-4" />
@@ -205,13 +216,14 @@ function CoreOfferCTA({ onBookDemo }) {
           type="button"
           onClick={onBookDemo}
           style={{
-            borderRadius: "9999px",
+            borderRadius: "8px",
             padding: "2px",
             background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
-            boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
-
+            boxShadow: "0 12px 28px rgba(0,88,160,0.24)",
             border: "none",
-            cursor: "pointer"
+            cursor: "pointer",
+            width: "100%",
+            maxWidth: "240px"
           }}>
           
           <span
@@ -221,12 +233,14 @@ function CoreOfferCTA({ onBookDemo }) {
               justifyContent: "center",
               gap: "8px",
               height: "44px",
-              padding: "0 24px",
-              borderRadius: "9999px",
+              minWidth: "220px",
+              padding: "0 28px",
+              borderRadius: "6px",
               background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
               color: "#ffffff",
               fontWeight: "700",
-              fontSize: "0.95rem"
+              fontSize: "0.95rem",
+              whiteSpace: "nowrap"
             }}>
             
             {coreOfferSectionConfig.secondaryCta.label}
@@ -236,6 +250,26 @@ function CoreOfferCTA({ onBookDemo }) {
       </div>
     </div>);
 
+}
+
+function ProcessToCtaConnector() {
+  return (
+    <div className="hidden md:flex flex-col items-center" aria-hidden="true">
+      <div
+        className="h-40 w-0.5"
+        style={{
+          background: "linear-gradient(180deg, rgba(0,136,204,0.36) 0%, rgba(0,174,239,0.86) 68%, #0088CC 100%)",
+          boxShadow: "0 0 18px rgba(0,174,239,0.2)",
+        }}
+      />
+      <div
+        className="-mt-1 h-5 w-5 rotate-45 border-b-2 border-r-2 border-primary"
+        style={{
+          filter: "drop-shadow(0 5px 10px rgba(0,136,204,0.28))",
+        }}
+      />
+    </div>
+  );
 }
 
 export default function CoreOffer() {
@@ -290,7 +324,7 @@ export default function CoreOffer() {
   return (
     <section
       id="services"
-      className="pt-12 md:pt-20 pb-16 md:pb-24 px-4 md:px-6 bg-gradient-to-b from-card via-background via-70% to-slate-50/30 relative overflow-hidden"
+      className="pt-12 md:pt-20 pb-24 md:pb-36 px-4 md:px-6 bg-gradient-to-b from-card via-background via-70% to-slate-50/30 relative overflow-hidden"
       style={{ overflowX: "hidden" }}>
       
       <div
@@ -308,7 +342,7 @@ export default function CoreOffer() {
           transition={{ delay: 0.3 }}>
           
           <button
-            onClick={() => setStackBuilderOpen(true)} className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary/10 border border-primary/25 text-primary font-semibold text-sm hover:bg-primary/15 transition hidden">
+            onClick={() => setStackBuilderOpen(true)} className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary/10 border border-primary/25 text-primary font-semibold text-sm hover:bg-primary/15 transition hidden">
 
             
             <ShoppingCart className="w-4 h-4" />
@@ -335,6 +369,7 @@ export default function CoreOffer() {
         </div>
         
         <LaunchTimeline />
+        <ProcessToCtaConnector />
         <CoreOfferCTA onBookDemo={() => setShowBookingModal(true)} />
       </div>
 
