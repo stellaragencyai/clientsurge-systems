@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
@@ -92,6 +93,9 @@ export default function Navbar() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
+  const [industriesMenuPosition, setIndustriesMenuPosition] = useState({ left: 0, top: 0, width: 560 });
+  const industriesCloseTimerRef = useRef(null);
+  const industriesTriggerRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
@@ -111,6 +115,67 @@ export default function Navbar() {
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
+
+  useEffect(() => {
+    if (!industriesOpen) {
+      return undefined;
+    }
+
+    const updateIndustriesMenuPosition = () => {
+      const trigger = industriesTriggerRef.current;
+      if (!trigger) {
+        return;
+      }
+
+      const rect = trigger.getBoundingClientRect();
+      const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+      const menuWidth = Math.min(560, Math.max(320, viewportWidth - 32));
+      const preferredLeft = rect.left + rect.width / 2 - menuWidth / 2;
+      const left = Math.min(Math.max(preferredLeft, 16), Math.max(16, viewportWidth - menuWidth - 16));
+
+      setIndustriesMenuPosition({
+        left,
+        top: rect.bottom + 10,
+        width: menuWidth,
+      });
+    };
+
+    updateIndustriesMenuPosition();
+    window.addEventListener("resize", updateIndustriesMenuPosition);
+    window.addEventListener("scroll", updateIndustriesMenuPosition, { passive: true });
+
+    return () => {
+      window.removeEventListener("resize", updateIndustriesMenuPosition);
+      window.removeEventListener("scroll", updateIndustriesMenuPosition);
+    };
+  }, [industriesOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (industriesCloseTimerRef.current) {
+        window.clearTimeout(industriesCloseTimerRef.current);
+      }
+    };
+  }, []);
+
+  const clearIndustriesCloseTimer = () => {
+    if (industriesCloseTimerRef.current) {
+      window.clearTimeout(industriesCloseTimerRef.current);
+      industriesCloseTimerRef.current = null;
+    }
+  };
+
+  const openIndustriesMenu = () => {
+    clearIndustriesCloseTimer();
+    setIndustriesOpen(true);
+  };
+
+  const closeIndustriesMenuSoon = () => {
+    clearIndustriesCloseTimer();
+    industriesCloseTimerRef.current = window.setTimeout(() => {
+      setIndustriesOpen(false);
+    }, 120);
+  };
 
 
 
@@ -220,44 +285,61 @@ export default function Navbar() {
 
           <div
             className="relative"
-            onMouseEnter={() => setIndustriesOpen(true)}
-            onMouseLeave={() => setIndustriesOpen(false)}
+            onMouseEnter={openIndustriesMenu}
+            onMouseLeave={closeIndustriesMenuSoon}
             onKeyDown={(e) => {if (e.key === "Escape") setIndustriesOpen(false);}}>
             
             <button
-              onClick={() => setIndustriesOpen((prev) => !prev)}
+              ref={industriesTriggerRef}
+              type="button"
+              onClick={openIndustriesMenu}
+              aria-expanded={industriesOpen}
+              aria-haspopup="menu"
               className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap">
               
               Industries
               <ChevronDown className={`w-4 h-4 transition-transform ${industriesOpen ? "rotate-180" : ""}`} />
             </button>
 
-            {industriesOpen && (
-            <div className="absolute top-full left-1/2 -translate-x-1/2 pt-2" style={{ zIndex: 200 }}>
+            {industriesOpen && typeof document !== "undefined" && createPortal((
+            <div
+              className="fixed"
+              onMouseEnter={openIndustriesMenu}
+              onMouseLeave={closeIndustriesMenuSoon}
+              style={{
+                left: `${industriesMenuPosition.left}px`,
+                top: `${industriesMenuPosition.top}px`,
+                width: `${industriesMenuPosition.width}px`,
+                zIndex: 200,
+              }}>
                 <div
-                className="rounded-2xl border border-border p-4 shadow-xl"
+                className="rounded-lg border border-border p-3 shadow-xl"
+                role="menu"
+                aria-label="Industries"
                 style={{
                   background: "rgba(255,255,255,0.98)",
                   backdropFilter: "blur(20px)",
                   WebkitBackdropFilter: "blur(20px)",
-                  width: "460px"
+                  boxShadow: "0 18px 48px rgba(0,45,90,0.16)"
                 }}>
-                  <div className="grid grid-cols-2 gap-1">
+                  <div className="grid grid-cols-2 gap-2">
                     {industryLinks.map((item) =>
                   <button
                     key={item.label}
+                    type="button"
+                    role="menuitem"
                     onClick={() => {
                       trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
                       navigate(item.href);
                       setIndustriesOpen(false);
                     }}
-                    className="w-full text-left block rounded-xl px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/8 hover:text-primary transition-colors border-none bg-transparent cursor-pointer">
+                    className="w-full text-left flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/8 hover:text-primary transition-colors border-none bg-transparent cursor-pointer whitespace-nowrap">
                         {item.label}
                       </button>
                   )}
                   </div>
                 </div>
-              </div>)
+              </div>), document.body)
             }
           </div>
         </div>
