@@ -1,21 +1,16 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  ArrowRight,
   Building2,
   Heart,
   Home,
   MapPin,
   Sparkles,
-  Wrench,
-  X } from
+  Wrench } from
 "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useDemoBooking } from "./DemoBookingContext";
-import {
-  INDUSTRY_RECOMMENDATIONS_BY_ID,
-  INDUSTRY_SELECTION_STORAGE_KEY } from
+import { motion } from "framer-motion";
+import { INDUSTRY_SELECTION_STORAGE_KEY } from
 "@/lib/industryRecommendations";
-import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 
 // Unique SVG pattern per industry — lightweight, inline, no external deps
@@ -77,6 +72,7 @@ const industryPatterns = {
 const industries = [
 {
   id: "med-spa",
+  routePath: "/med-spa",
   icon: Sparkles,
   name: "Med Spas & Aesthetic Clinics",
   accent: {
@@ -90,6 +86,7 @@ const industries = [
 },
 {
   id: "dental",
+  routePath: "/dental",
   icon: Heart,
   name: "Dental & Orthodontics",
   accent: {
@@ -103,6 +100,7 @@ const industries = [
 },
 {
   id: "chiro-pt",
+  routePath: "/chiropractic",
   icon: Building2,
   name: "Chiropractic & Physical Therapy",
   accent: {
@@ -116,6 +114,7 @@ const industries = [
 },
 {
   id: "hvac",
+  routePath: "/hvac",
   icon: Wrench,
   name: "HVAC, Plumbing & Home Services",
   accent: {
@@ -129,6 +128,7 @@ const industries = [
 },
 {
   id: "roofing",
+  routePath: "/roofing",
   icon: Home,
   name: "Roofing & Restoration",
   accent: {
@@ -142,6 +142,7 @@ const industries = [
 },
 {
   id: "contractors",
+  routePath: "/contractors",
   icon: MapPin,
   name: "Contractors & Trades",
   accent: {
@@ -155,136 +156,17 @@ const industries = [
 }];
 
 
-function IndustryModal({ recommendation, onClose, onBookDemo }) {
-  useEffect(() => {
-    const onKey = (e) => {if (e.key === "Escape") onClose();};
-    document.addEventListener("keydown", onKey);
-    const releaseScrollLock = acquireBodyScrollLock("industry-recommendation-modal");
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      releaseScrollLock();
-    };
-  }, [onClose]);
-
-  if (!recommendation) return null;
-
-  return (
-    <div
-      className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-[28px] mx-auto"
-      style={{
-        background: "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(240,249,255,0.96) 100%)",
-        border: "1.5px solid rgba(0,136,204,0.18)",
-        boxShadow: "0 50px 130px rgba(0,0,0,0.45)"
-      }}
-      onClick={(e) => e.stopPropagation()}>
-      
-        {/* Header */}
-        <div
-        className="px-7 pt-7 pb-5 flex items-start justify-between gap-4 sticky top-0 rounded-t-lg z-10"
-        style={{
-          background: "linear-gradient(135deg, rgba(0,174,239,0.06) 0%, rgba(240,249,255,0.97) 100%)",
-          borderBottom: "1px solid rgba(0,174,239,0.12)"
-        }}>
-        
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary mb-2">
-              Recommended For {recommendation.shortName}
-            </p>
-            <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground leading-tight">
-              Your Best-Fit AI Service Stack
-            </h3>
-            <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-lg">
-              {recommendation.summary}
-            </p>
-          </div>
-          <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close"
-          className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-foreground/50 hover:text-foreground hover:bg-black/8 transition-colors">
-          
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="px-7 py-6 space-y-6">
-          {/* Recommended package */}
-          <div
-          className="rounded-lg px-5 py-5"
-          style={{ background: "rgba(255,255,255,0.82)", border: "1px solid rgba(0,136,204,0.14)" }}>
-          
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-2">Recommended Package</p>
-            <h4 className="text-xl font-semibold text-foreground">{recommendation.recommendedPackage?.name}</h4>
-            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{recommendation.recommendedPackage?.fit}</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <span className="inline-flex items-center rounded-lg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.18)", color: "#0088CC" }}>
-                {recommendation.recommendedServices.length} services recommended
-              </span>
-              {recommendation.addOnsByReview.length ?
-            <span className="inline-flex items-center rounded-lg px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ background: "rgba(0,174,239,0.06)", border: "1px solid rgba(0,174,239,0.15)", color: "rgba(0,80,160,0.7)" }}>
-                  {recommendation.addOnsByReview.length} add-ons by review
-                </span> :
-            null}
-            </div>
-          </div>
-
-          {/* Why it fits */}
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-3">Why This Stack Fits</p>
-            <div className="space-y-2">
-              {recommendation.pressurePoints.map((point) =>
-            <div key={point} className="rounded-lg px-4 py-3" style={{ background: "rgba(0,174,239,0.04)", border: "1px solid rgba(0,174,239,0.12)" }}>
-                  <p className="text-sm leading-6 text-foreground/78">{point}</p>
-                </div>
-            )}
-            </div>
-          </div>
-
-          {/* Available services */}
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mb-3">Recommended Services</p>
-            <div className="grid sm:grid-cols-2 gap-3">
-              {recommendation.recommendedServices.map((service) =>
-            <div key={service.product_id} className="rounded-lg px-4 py-4" style={{ background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(240,249,255,0.74) 100%)", border: "1px solid rgba(0,174,239,0.12)" }}>
-                  <p className="text-sm font-semibold text-foreground">{service.name}</p>
-                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{service.whyThisMatters}</p>
-                  <span className="mt-2 inline-flex items-center rounded-lg px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em]" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.14)", color: "#0088CC" }}>
-                    {service.availability_label}
-                  </span>
-                </div>
-            )}
-            </div>
-          </div>
-        </div>
-
-        {/* Footer CTAs */}
-        <div className="px-7 py-5 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-end" style={{ borderTop: "1px solid rgba(0,136,204,0.12)", background: "rgba(255,255,255,0.68)" }}>
-          <a href="/store" className="inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold text-primary border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors">
-            See The AI Store <ArrowRight className="w-4 h-4" />
-          </a>
-          <button type="button" onClick={onBookDemo} style={{ borderRadius: "8px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", boxShadow: "0 12px 28px rgba(0,88,160,0.24)", border: "none", cursor: "pointer" }}>
-            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", height: "42px", padding: "0 24px", borderRadius: "6px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.875rem" }}>
-              Make the Leap <ArrowRight className="w-4 h-4" />
-            </span>
-          </button>
-        </div>
-    </div>);
-
-}
-
 export default function Industries() {
   const sectionRef = useRef(null);
-  const demoBooking = useDemoBooking();
+  const navigate = useNavigate();
   const [sectionVisible, setSectionVisible] = useState(false);
   const [selectedIndustryId, setSelectedIndustryId] = useState(null);
   const [hoveredIndustryId, setHoveredIndustryId] = useState("");
-  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
     const savedIndustryId = window.sessionStorage.getItem(INDUSTRY_SELECTION_STORAGE_KEY);
-    if (savedIndustryId && INDUSTRY_RECOMMENDATIONS_BY_ID[savedIndustryId]) {
+    if (savedIndustryId && industries.some((industry) => industry.id === savedIndustryId)) {
       setSelectedIndustryId(savedIndustryId);
     }
     return undefined;
@@ -319,13 +201,9 @@ export default function Industries() {
     return () => observer.disconnect();
   }, []);
 
-  const selectedRecommendation = selectedIndustryId ?
-  INDUSTRY_RECOMMENDATIONS_BY_ID[selectedIndustryId] :
-  null;
-
-  const handleIndustrySelect = (industryId) => {
-    setSelectedIndustryId(industryId);
-    setModalOpen(true);
+  const handleIndustrySelect = (industry) => {
+    setSelectedIndustryId(industry.id);
+    navigate(industry.routePath);
   };
 
   return (
@@ -368,7 +246,7 @@ export default function Industries() {
             aria-label={industry.name}
             aria-pressed={isSelected}
             className="group relative block overflow-hidden min-h-[100svh] md:min-h-[50svh] text-left"
-            onClick={() => handleIndustrySelect(industry.id)}
+            onClick={() => handleIndustrySelect(industry)}
             onMouseEnter={() => setHoveredIndustryId(industry.id)}
             onMouseLeave={() => setHoveredIndustryId("")}
             onFocus={() => setHoveredIndustryId(industry.id)}
@@ -463,7 +341,7 @@ export default function Industries() {
                     transition: "opacity 0.3s ease",
                   }}>
                   
-                  Click to see the recommended AI service stack for this niche.
+                  Open the industry landing page for this niche.
                 </p>
               </div>
 
@@ -479,51 +357,6 @@ export default function Industries() {
         })}
       </div>
 
-      <AnimatePresence>
-        {modalOpen && selectedRecommendation &&
-        <>
-            <motion.div
-            key="industry-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
-            onClick={() => setModalOpen(false)}
-            style={{
-              position: "fixed", inset: 0, zIndex: 199,
-              background: "rgba(0,22,54,0.38)",
-              backdropFilter: "blur(8px) saturate(0.8)",
-              WebkitBackdropFilter: "blur(8px) saturate(0.8)"
-            }} />
-          
-            <motion.div
-            key="industry-modal-wrap"
-            initial={{ opacity: 0, y: 140, scale: 0.72, rotateX: 10 }}
-            animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
-            exit={{ opacity: 0, y: 60, scale: 0.88, rotateX: 4 }}
-            transition={{
-              type: "spring", stiffness: 260, damping: 26, mass: 0.9,
-              opacity: { duration: 0.3, ease: "easeOut" }
-            }}
-            style={{
-              position: "fixed", inset: 0, zIndex: 200,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              padding: "16px 16px 32px",
-              perspective: "1200px",
-              pointerEvents: "none"
-            }}>
-            
-              <div style={{ pointerEvents: "auto", width: "100%" }}>
-                <IndustryModal
-                recommendation={selectedRecommendation}
-                onClose={() => setModalOpen(false)}
-                onBookDemo={() => {setModalOpen(false);demoBooking?.openDemoBooking?.({ prefillIndustry: selectedRecommendation?.name || "" });}} />
-              
-              </div>
-            </motion.div>
-          </>
-        }
-      </AnimatePresence>
     </section>);
 
 }
