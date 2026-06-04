@@ -2,7 +2,6 @@ import { useEffect, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
-import HomepageConversionContent from "../components/landing/HomepageConversionContent";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
@@ -11,8 +10,6 @@ import { FAQ_ITEMS } from "../components/landing/FAQData";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
-const SixAutomationSystems = lazy(() => import("../components/landing/SixAutomationSystems"));
-const ProofBeforeLaunch = lazy(() => import("../components/landing/ProofBeforeLaunch"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const FAQ = lazy(() => import("../components/landing/FAQ"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
@@ -124,12 +121,7 @@ export default function Home() {
       <div className="min-h-screen">
         <Navbar />
         <Hero />
-        <HomepageConversionContent />
         <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <SixAutomationSystems />
-          <SectionBreak />
-          <ProofBeforeLaunch />
-          <SectionBreak />
           <Industries />
           <SectionBreak />
         </LazyHomepageSection>
