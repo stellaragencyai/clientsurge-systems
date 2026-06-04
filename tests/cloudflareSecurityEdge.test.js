@@ -9,6 +9,9 @@ import worker, {
   HOMEPAGE_MOTION_HEADER,
   HOMEPAGE_MOTION_INJECTION,
   HOMEPAGE_MOTION_STYLE_ID,
+  HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT,
+  HOMEPAGE_INDUSTRY_DROPDOWN_STYLE,
+  HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID,
   HOMEPAGE_ORDER_SCRIPT,
   HOMEPAGE_ORDER_STYLE,
   HOMEPAGE_ORDER_STYLE_ID,
@@ -163,11 +166,13 @@ test("Cloudflare security edge worker injects the simplified homepage cinematic 
     assert.match(body, new RegExp(HOMEPAGE_MOTION_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_ORDER_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID));
+    assert.match(body, new RegExp(HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID));
     assert.match(body, /ambient-sweep/);
     assert.match(body, /headline-sheen/);
     assert.match(body, /dashboard-float-scan/);
     assert.match(body, /data-clientsurge-homepage-order/);
     assert.match(body, /data-clientsurge-phone-alignment/);
+    assert.match(body, /data-clientsurge-industry-dropdown/);
     assert.doesNotMatch(body, /checklist-cascade/);
     assert.doesNotMatch(body, /cta-energy/);
     assert.match(body, /MutationObserver/);
@@ -196,9 +201,11 @@ test("Cloudflare homepage motion injection is scoped and idempotent", () => {
   assert.equal((injected.match(new RegExp(HOMEPAGE_MOTION_STYLE_ID, "g")) || []).length, 1);
   assert.equal((injected.match(new RegExp(HOMEPAGE_ORDER_STYLE_ID, "g")) || []).length, 1);
   assert.equal((injected.match(new RegExp(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID, "g")) || []).length, 1);
+  assert.equal((injected.match(new RegExp(HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID, "g")) || []).length, 1);
   assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_MOTION_STYLE_ID), true);
   assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_ORDER_STYLE_ID), true);
   assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID), true);
+  assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID), true);
 });
 
 test("Cloudflare homepage injection adds the trust and security section before the footer", () => {
@@ -248,6 +255,17 @@ test("Cloudflare homepage phone alignment patch centers the SMS demo row", () =>
   assert.match(HOMEPAGE_PHONE_ALIGNMENT_SCRIPT, /insertBefore\(phone, row\.firstElementChild\)/);
   assert.match(HOMEPAGE_PHONE_ALIGNMENT_SCRIPT, /data-clientsurge-phone-alignment/);
   assert.match(HOMEPAGE_PHONE_ALIGNMENT_SCRIPT, /Math\.abs\(delta\) <= 12/);
+});
+
+test("Cloudflare homepage industry dropdown patch prevents the stale Base44 menu squeeze", () => {
+  assert.match(HOMEPAGE_INDUSTRY_DROPDOWN_STYLE, /data-clientsurge-edge-industries-menu/);
+  assert.match(HOMEPAGE_INDUSTRY_DROPDOWN_STYLE, /width: min\(560px, calc\(100vw - 32px\)\)/);
+  assert.match(HOMEPAGE_INDUSTRY_DROPDOWN_STYLE, /grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(HOMEPAGE_INDUSTRY_DROPDOWN_STYLE, /white-space: nowrap/);
+  assert.match(HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT, /Med Spas & Aesthetic Clinics/);
+  assert.match(HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT, /Dental & Orthodontics/);
+  assert.match(HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT, /data-clientsurge-industry-dropdown/);
+  assert.match(HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT, /MutationObserver/);
 });
 
 test("production security verifier checks the Cloudflare security layer probe", () => {

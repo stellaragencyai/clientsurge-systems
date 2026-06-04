@@ -54,6 +54,7 @@ export const HOMEPAGE_MOTION_HEADER = "x-clientsurge-homepage-motion";
 export const HOMEPAGE_MOTION_STYLE_ID = "clientsurge-edge-cinematic-motion";
 export const HOMEPAGE_ORDER_STYLE_ID = "clientsurge-edge-homepage-order";
 export const HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID = "clientsurge-edge-phone-alignment";
+export const HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID = "clientsurge-edge-industry-dropdown";
 export const TRUST_SECURITY_STYLE_ID = "clientsurge-edge-trust-security";
 export const TRUST_SECURITY_SECTION_ID = "clientsurge-trust-security";
 
@@ -398,7 +399,111 @@ export const HOMEPAGE_PHONE_ALIGNMENT_SCRIPT = `<script>
 })();
 </script>`;
 
-export const HOMEPAGE_MOTION_INJECTION = `${HOMEPAGE_MOTION_STYLE}${HOMEPAGE_ORDER_STYLE}${HOMEPAGE_PHONE_ALIGNMENT_STYLE}${HOMEPAGE_MOTION_SCRIPT}${HOMEPAGE_ORDER_SCRIPT}${HOMEPAGE_PHONE_ALIGNMENT_SCRIPT}`;
+export const HOMEPAGE_INDUSTRY_DROPDOWN_STYLE = `<style id="${HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID}">
+@media (min-width: 1280px) {
+  nav [data-clientsurge-edge-industries-menu] {
+    width: min(560px, calc(100vw - 32px)) !important;
+    max-width: min(560px, calc(100vw - 32px)) !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    z-index: 200 !important;
+  }
+  nav [data-clientsurge-edge-industries-menu] > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 8px !important;
+  }
+  nav [data-clientsurge-edge-industries-menu] .grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  nav [data-clientsurge-edge-industries-menu] button {
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+  }
+}
+</style>`;
+
+export const HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT = `<script>
+(() => {
+  const labels = [
+    "Med Spas & Aesthetic Clinics",
+    "Dental & Orthodontics",
+    "Chiropractic & Physical Therapy",
+    "HVAC, Plumbing & Home Services",
+    "Roofing & Restoration",
+    "Contractors & Trades"
+  ];
+
+  const mark = (status) => {
+    document.documentElement.setAttribute("data-clientsurge-industry-dropdown", status);
+  };
+
+  const findMenu = () => {
+    const buttons = Array.from(document.querySelectorAll("nav button"));
+    const firstIndustryButton = buttons.find((button) => labels.includes(button.textContent.trim()));
+    if (!firstIndustryButton) return null;
+    return firstIndustryButton.closest("[style*='z-index: 200'], .absolute");
+  };
+
+  const applyDropdownFix = () => {
+    const menu = findMenu();
+    if (!menu) {
+      mark("waiting");
+      return false;
+    }
+
+    menu.setAttribute("data-clientsurge-edge-industries-menu", "true");
+    const card = menu.firstElementChild;
+    if (card) {
+      card.style.width = "100%";
+      card.style.maxWidth = "100%";
+    }
+
+    const itemProblems = Array.from(menu.querySelectorAll("button")).filter((button) => {
+      const text = button.textContent.trim();
+      if (!labels.includes(text)) return false;
+      return button.scrollWidth > button.clientWidth + 1 || button.scrollHeight > button.clientHeight + 2;
+    });
+
+    mark(itemProblems.length ? "applied:needs-layout" : "applied");
+    return itemProblems.length === 0;
+  };
+
+  if (applyDropdownFix()) return;
+
+  let attempts = 0;
+  const observer = new MutationObserver(() => {
+    attempts += 1;
+    if (applyDropdownFix() || attempts > 180) observer.disconnect();
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+
+  const interval = window.setInterval(() => {
+    attempts += 1;
+    if (applyDropdownFix() || attempts > 180) {
+      window.clearInterval(interval);
+      observer.disconnect();
+    }
+  }, 250);
+
+  window.setTimeout(() => {
+    window.clearInterval(interval);
+    observer.disconnect();
+    applyDropdownFix();
+  }, 45000);
+})();
+</script>`;
+
+export const HOMEPAGE_MOTION_INJECTION = `${HOMEPAGE_MOTION_STYLE}${HOMEPAGE_ORDER_STYLE}${HOMEPAGE_PHONE_ALIGNMENT_STYLE}${HOMEPAGE_INDUSTRY_DROPDOWN_STYLE}${HOMEPAGE_MOTION_SCRIPT}${HOMEPAGE_ORDER_SCRIPT}${HOMEPAGE_PHONE_ALIGNMENT_SCRIPT}${HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT}`;
 
 export const TRUST_SECURITY_STYLE = `<style id="${TRUST_SECURITY_STYLE_ID}">
 #${TRUST_SECURITY_SECTION_ID} {
@@ -665,6 +770,16 @@ export function injectHomepageMotion(html) {
     nextHtml = nextHtml.includes("</body>")
       ? nextHtml.replace("</body>", `${HOMEPAGE_PHONE_ALIGNMENT_SCRIPT}</body>`)
       : `${nextHtml}${HOMEPAGE_PHONE_ALIGNMENT_SCRIPT}`;
+  }
+
+  if (!nextHtml.includes(HOMEPAGE_INDUSTRY_DROPDOWN_STYLE_ID)) {
+    nextHtml = nextHtml.includes("</head>")
+      ? nextHtml.replace("</head>", `${HOMEPAGE_INDUSTRY_DROPDOWN_STYLE}</head>`)
+      : `${HOMEPAGE_INDUSTRY_DROPDOWN_STYLE}${nextHtml}`;
+
+    nextHtml = nextHtml.includes("</body>")
+      ? nextHtml.replace("</body>", `${HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT}</body>`)
+      : `${nextHtml}${HOMEPAGE_INDUSTRY_DROPDOWN_SCRIPT}`;
   }
 
   if (!nextHtml.includes(TRUST_SECURITY_STYLE_ID)) {
