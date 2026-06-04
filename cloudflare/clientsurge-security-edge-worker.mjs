@@ -69,16 +69,6 @@ export const HOMEPAGE_MOTION_STYLE = `<style id="${HOMEPAGE_MOTION_STYLE_ID}">
   0%, 100% { transform: translateX(-18%) scaleX(0.72); opacity: 0.16; }
   48% { transform: translateX(18%) scaleX(1); opacity: 0.44; }
 }
-@keyframes csEdgeChecklistCascade {
-  from { opacity: 0; transform: translate3d(-18px, 16px, 0); filter: blur(8px); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); filter: blur(0); }
-}
-@keyframes csEdgeCtaEnergy {
-  0% { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
-  35% { opacity: 0.65; }
-  75% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
-  100% { transform: translateX(140%) skewX(-18deg); opacity: 0; }
-}
 @keyframes csEdgeDashboardFloat {
   0%, 100% { transform: translate3d(0, 0, 0) rotateX(0deg); }
   48% { transform: translate3d(0, -10px, 0) rotateX(1.5deg); }
@@ -129,31 +119,6 @@ export const HOMEPAGE_MOTION_STYLE = `<style id="${HOMEPAGE_MOTION_STYLE_ID}">
   background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.72), rgba(255, 255, 255, 0.72), transparent);
   animation: csEdgeHeadlineBeam 5.4s cubic-bezier(.22,.8,.24,1) infinite;
 }
-.hero-check-item {
-  opacity: 0;
-  animation: csEdgeChecklistCascade 760ms cubic-bezier(.22,.8,.24,1) forwards;
-}
-.hero-check-item:nth-child(1) { animation-delay: 120ms; }
-.hero-check-item:nth-child(2) { animation-delay: 250ms; }
-.hero-check-item:nth-child(3) { animation-delay: 380ms; }
-.landing-hero__actions a:first-child,
-.landing-hero__actions button:first-child {
-  position: relative;
-  overflow: hidden;
-  transform: translateZ(0);
-}
-.landing-hero__actions a:first-child::before,
-.landing-hero__actions button:first-child::before {
-  content: "";
-  position: absolute;
-  top: -30%;
-  bottom: -30%;
-  left: 0;
-  width: 42%;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
-  animation: csEdgeCtaEnergy 3.8s cubic-bezier(.22,.8,.24,1) infinite;
-}
 .hero-dashboard-static-preview {
   position: relative;
   overflow: hidden;
@@ -172,9 +137,6 @@ export const HOMEPAGE_MOTION_STYLE = `<style id="${HOMEPAGE_MOTION_STYLE_ID}">
   .landing-hero::before,
   .landing-hero__headline,
   .landing-hero__headline::after,
-  .hero-check-item,
-  .landing-hero__actions a:first-child::before,
-  .landing-hero__actions button:first-child::before,
   .hero-dashboard-static-preview,
   .hero-dashboard-static-preview::before {
     animation: none !important;
@@ -233,28 +195,6 @@ export const HOMEPAGE_MOTION_STYLE = `<style id="${HOMEPAGE_MOTION_STYLE_ID}">
     margin-left: auto !important;
     margin-right: auto !important;
   }
-  .landing-hero__checklist,
-  .hero-checklist {
-    display: grid !important;
-    grid-template-columns: minmax(0, 1fr) !important;
-    max-width: 100% !important;
-    width: 100%;
-  }
-  .hero-check-item {
-    min-width: 0;
-    width: 100%;
-  }
-  .landing-hero__actions {
-    display: flex !important;
-    flex-direction: column;
-    align-items: stretch !important;
-    width: 100%;
-  }
-  .landing-hero__actions a,
-  .landing-hero__actions button {
-    width: 100%;
-    justify-content: center;
-  }
   .landing-hero__visualWrap {
     grid-column: auto !important;
     width: 100% !important;
@@ -271,8 +211,6 @@ export const HOMEPAGE_MOTION_SCRIPT = `<script>
   const hooks = [
     ["ambient-sweep", ".landing-hero"],
     ["headline-sheen", ".landing-hero__headline"],
-    ["checklist-cascade", ".landing-hero__checklist, .hero-checklist"],
-    ["cta-energy", ".landing-hero__actions"],
     ["dashboard-float-scan", ".hero-dashboard-static-preview"]
   ];
   const applyHooks = () => {
@@ -445,6 +383,7 @@ export const TRUST_SECURITY_SCRIPT = `<script>
   };
   const insert = () => {
     if (document.getElementById(sectionId)) return true;
+    if (document.querySelector(".security-priority")) return true;
     const footer = document.querySelector("footer");
     if (!footer || !footer.parentNode) return false;
     footer.parentNode.insertBefore(buildSection(), footer);

@@ -21,3 +21,8 @@ test("homepage keeps the first viewport direct and defers framer-heavy sections"
   assert.match(homeSource, /<LazyHomepageSection[\s\S]*<CoreOffer \/>/);
   assert.match(homeSource, /<LazyHomepageSection[\s\S]*<FAQ \/>/);
 });
+
+test("homepage keeps trust and security as the final content section before the footer", () => {
+  assert.match(homeSource, /import SecurityPriority from "\.\.\/components\/landing\/SecurityPriority"/);
+  assert.match(homeSource, /<SecurityPriority \/>\s*<Footer \/>/);
+});

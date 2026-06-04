@@ -140,7 +140,7 @@ test("Cloudflare security edge worker proxies application traffic to the Base44 
   assert.equal(originUrl.search, "?plan=starter");
 });
 
-test("Cloudflare security edge worker injects the five homepage cinematic motion hooks", async () => {
+test("Cloudflare security edge worker injects the simplified homepage cinematic motion hooks", async () => {
   const previousFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response("<!doctype html><html><head><title>ClientSurge</title></head><body><main id=\"root\"></main></body></html>", {
     status: 200,
@@ -157,9 +157,9 @@ test("Cloudflare security edge worker injects the five homepage cinematic motion
     assert.match(body, new RegExp(HOMEPAGE_MOTION_STYLE_ID));
     assert.match(body, /ambient-sweep/);
     assert.match(body, /headline-sheen/);
-    assert.match(body, /checklist-cascade/);
-    assert.match(body, /cta-energy/);
     assert.match(body, /dashboard-float-scan/);
+    assert.doesNotMatch(body, /checklist-cascade/);
+    assert.doesNotMatch(body, /cta-energy/);
     assert.match(body, /MutationObserver/);
     assert.match(body, /prefers-reduced-motion/);
     assert.match(body, /max-width: 640px/);
@@ -193,6 +193,7 @@ test("Cloudflare homepage injection adds the trust and security section before t
   assert.match(injected, new RegExp(TRUST_SECURITY_STYLE_ID));
   assert.match(injected, new RegExp(TRUST_SECURITY_SCRIPT_PATH));
   assert.match(TRUST_SECURITY_CLIENT_JS, new RegExp(TRUST_SECURITY_SECTION_ID));
+  assert.match(TRUST_SECURITY_CLIENT_JS, /\.security-priority/);
   assert.match(TRUST_SECURITY_CLIENT_JS, /Your Trust & Security/);
   assert.match(TRUST_SECURITY_CLIENT_JS, /Are Our Priority/);
   assert.match(TRUST_SECURITY_CLIENT_JS, /SSL Secure/);

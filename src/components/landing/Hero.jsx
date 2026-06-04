@@ -1,29 +1,9 @@
 import { lazy, Suspense, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, CheckCircle2, Clock, ShieldCheck } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useDemoBooking } from "./DemoBookingContext";
-import CascadingChecklistItem from "@/components/visual-effects/CascadingChecklistItem";
-import { premiumEase, revealContainer } from "@/components/landing/PremiumHomepageMotion";
-import { BUTTON_TEXT } from "@/lib/constants";
+import { premiumEase } from "@/components/landing/PremiumHomepageMotion";
 
 
 const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
-
-const checklist = [
-  "Lead capture",
-  "Missed-call text-back",
-  "AI follow-up",
-  "Appointment booking",
-  "Review requests",
-  "Customer reactivation",
-];
-
-const trustItems = [
-  { icon: ShieldCheck, label: "No long-term contracts" },
-  { icon: Clock, label: "Timeline confirmed after onboarding" },
-  { icon: CheckCircle2, label: "Done-for-you launch support" },
-];
 
 const heroCopyReveal = {
   hidden: { opacity: 0, y: 28 },
@@ -46,16 +26,6 @@ const heroRevealItem = {
     y: 0,
     transition: { duration: 0.58, ease: premiumEase },
   },
-};
-
-const trustChipReveal = {
-  hidden: { opacity: 0, y: 12, scale: 0.97 },
-  visible: (index) => ({
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.45, delay: 0.42 + index * 0.07, ease: premiumEase },
-  }),
 };
 
 function HeroDashboardStaticPreview({ onActivate }) {
@@ -258,7 +228,6 @@ function DeferredHeroDashboard() {
 
 
 export default function Hero() {
-  const demoBooking = useDemoBooking();
   const reduceMotion = useReducedMotion();
 
   return (
@@ -268,7 +237,7 @@ export default function Hero() {
         position: "relative",
         overflow: "visible",
         background: "#ffffff",
-        paddingBottom: "clamp(5rem, 8vw, 7rem)"
+        paddingBottom: "clamp(2.25rem, 4vw, 3.5rem)"
       }}>
 
       <div
@@ -336,7 +305,7 @@ export default function Hero() {
           gridTemplateColumns: "1fr 1fr",
           gap: "clamp(32px, 5vw, 64px)",
           alignItems: "center",
-          minHeight: "92svh"
+          minHeight: "76svh"
         }}>
         
         <motion.div
@@ -395,101 +364,6 @@ export default function Hero() {
             
             ClientSurge installs the website, CRM handoff, and six AI workflows that capture leads, recover missed calls, follow up, book appointments, request reviews, and reactivate old opportunities.
           </motion.p>
-
-          <motion.div
-            className="landing-hero__checklist hero-checklist"
-            data-cinematic-animation="checklist-cascade"
-            variants={revealContainer}
-            style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "8px", maxWidth: "640px", margin: "0 0 32px" }}>
-            
-            {checklist.map((item, i) =>
-            <CascadingChecklistItem key={item} item={item} index={i} />
-            )}
-          </motion.div>
-
-          <motion.div
-            className="landing-hero__actions"
-            variants={heroRevealItem}
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "12px",
-              alignItems: "center",
-              justifyContent: "flex-start",
-              WebkitTapHighlightColor: "transparent",
-              marginTop: "24px"
-            }}>
-            
-            <motion.button
-              type="button"
-              data-cinematic-animation="cta-energy"
-              onClick={demoBooking?.openDemoBooking}
-              whileHover={reduceMotion ? undefined : { scale: 1.045, y: -2 }}
-              whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-              style={{
-                position: "relative",
-                overflow: "hidden",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
-                minHeight: "58px",
-                padding: "0 32px",
-                borderRadius: "9999px",
-                border: "none",
-                background:
-                "linear-gradient(135deg, #0088CC 0%, #006BB0 46%, #00AEEF 100%)",
-                color: "#ffffff",
-                fontSize: "1rem",
-                fontWeight: "700",
-                boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
-                cursor: "pointer",
-                transition: "all 0.3s ease"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,174,239,0.6)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,174,239,0.4)";
-              }}>
-              <motion.span
-                aria-hidden="true"
-                className="landing-hero__ctaShine"
-                animate={reduceMotion ? undefined : { x: ["-130%", "145%"] }}
-                transition={{ duration: 2.25, repeat: Infinity, repeatDelay: 1.9, ease: "easeInOut" }}
-              />
-              
-              {BUTTON_TEXT.BOOK_DEMO}
-              <ArrowRight style={{ width: "18px", height: "18px" }} />
-            </motion.button>
-            <Link
-              to="/automations"
-              className="inline-flex items-center justify-center"
-              style={{
-                minHeight: "58px",
-                padding: "0 28px",
-                borderRadius: "9999px",
-                border: "1.5px solid rgba(0,136,204,0.28)",
-                background: "rgba(255,255,255,0.86)",
-                color: "#0050A0",
-                fontSize: "0.95rem",
-                fontWeight: "700",
-                textDecoration: "none",
-                boxShadow: "0 4px 16px rgba(0,80,160,0.08)"
-              }}
-            >
-              View AI Automations
-            </Link>
-          </motion.div>
-
-          <motion.div className="landing-hero__trustRow" aria-label="Trust details" variants={heroRevealItem}>
-            {trustItems.map(({ icon: Icon, label }, index) => (
-              <motion.span key={label} custom={index} variants={trustChipReveal}>
-                <Icon aria-hidden="true" />
-                {label}
-              </motion.span>
-            ))}
-          </motion.div>
         </motion.div>
 
         <motion.div
@@ -598,12 +472,6 @@ export default function Hero() {
             text-align: center !important;
             grid-column: 1 !important;
           }
-          .landing-hero__checklist {
-            margin: 0 auto 32px !important;
-          }
-          .landing-hero__actions {
-            justify-content: center !important;
-          }
         }
 
         /* Hide tablet mock on small screens */
@@ -624,35 +492,6 @@ export default function Hero() {
           .landing-hero__body {
             font-size: 0.98rem !important;
             line-height: 1.55 !important;
-          }
-          .landing-hero__checklist {
-            gap: 8px !important;
-          }
-          .landing-hero__actions {
-            flex-direction: column !important;
-            align-items: stretch !important;
-            gap: 10px !important;
-            margin-top: 20px !important;
-          }
-          .landing-hero__actions > * {
-            width: 100% !important;
-            justify-content: center !important;
-          }
-          .hero-check-item {
-            width: 100% !important;
-            max-width: 100% !important;
-            padding: 9px 14px 9px 10px !important;
-          }
-          .hero-check-item span {
-            font-size: 13px !important;
-          }
-          .landing-hero__trustRow {
-            justify-content: center !important;
-            gap: 8px !important;
-          }
-          .landing-hero__trustRow span {
-            width: 100% !important;
-            justify-content: center !important;
           }
         }
 
@@ -677,31 +516,6 @@ export default function Hero() {
             font-size: 1.65rem !important;
             letter-spacing: 0 !important;
           }
-        }
-        .landing-hero__trustRow {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-top: 18px;
-        }
-        .landing-hero__trustRow span {
-          display: inline-flex;
-          min-height: 34px;
-          align-items: center;
-          gap: 7px;
-          border-radius: 999px;
-          border: 1px solid rgba(0,136,204,0.16);
-          background: rgba(0,174,239,0.06);
-          padding: 7px 11px;
-          color: rgba(10,22,40,0.74);
-          font-size: 11px;
-          font-weight: 700;
-        }
-        .landing-hero__trustRow svg {
-          width: 14px;
-          height: 14px;
-          color: #0088CC;
-          flex-shrink: 0;
         }
         .landing-hero__cinematicGrid {
           position: absolute;
@@ -733,14 +547,6 @@ export default function Hero() {
           transform-origin: left;
           animation: heroHeadlineBeam 3.4s ease-in-out infinite;
         }
-        .landing-hero__ctaShine {
-          position: absolute;
-          inset: -35% 0;
-          width: 42%;
-          transform: skewX(-18deg);
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.46), transparent);
-          pointer-events: none;
-        }
         .hero-dashboard-static-preview__scan {
           position: absolute;
           inset: 14px;
@@ -768,7 +574,6 @@ export default function Hero() {
           .landing-hero__headlineBeam {
             animation: none !important;
           }
-          .landing-hero__ctaShine,
           .hero-dashboard-static-preview__scan {
             display: none !important;
           }

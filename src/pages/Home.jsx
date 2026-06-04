@@ -5,6 +5,7 @@ import Hero from "../components/landing/Hero.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
+import SecurityPriority from "../components/landing/SecurityPriority";
 import { LargeSectionSkeleton, SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
 
@@ -17,7 +18,6 @@ const FounderSection = lazy(() => import("../components/landing/FounderSection")
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
-const SecurityPriority = lazy(() => import("../components/landing/SecurityPriority"));
 
 import {
   getFAQSchema,
@@ -144,9 +144,7 @@ export default function Home() {
           <SectionBreak />
           <FinalCTA />
         </LazyHomepageSection>
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <SecurityPriority />
-        </LazyHomepageSection>
+        <SecurityPriority />
         <Footer />
         <ChatBubble />
       </div>
